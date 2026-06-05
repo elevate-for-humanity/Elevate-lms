@@ -23,6 +23,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import {
   getRemotionBundleUrl,
   releaseRemotionBundle,
+  retainRemotionBundle,
   shouldReleaseRemotionBundleAfterJob,
 } from './remotion-bundle-cache';
 import {
@@ -168,16 +169,31 @@ function estimateDuration(script: string): number {
 
 // ── Main render function ──────────────────────────────────────────────────────
 
+export interface RenderLessonVideoOptions {
+  /** Batch already called retainRemotionBundle — skip per-lesson retain/release. */
+  sharedBundleSession?: boolean;
+}
+
 /**
  * Render a lesson MP4 using the free pipeline:
  *   edge-tts → Pexels/Pollinations → Remotion
  *
  * Renders to a temp dir, uploads MP4 (+ MP3) to Supabase course-videos, then deletes temp files.
  */
-export async function renderLessonVideo(input: RemotionLessonInput): Promise<RemotionRenderResult> {
+export async function renderLessonVideo(
+  input: RemotionLessonInput,
+  options?: RenderLessonVideoOptions,
+): Promise<RemotionRenderResult> {
   const { lessonId, domainKey = 'default', instructorId } = input;
   const instructor = getInstructor(instructorId);
   const paths = lessonRenderTempPaths(lessonId);
+
+  const releaseAfterJob = shouldReleaseRemotionBundleAfterJob();
+  const ownsBundle = releaseAfterJob && !options?.sharedBundleSession;
+
+  if (ownsBundle) {
+    await retainRemotionBundle();
+  }
 
   try {
     await mkdir(paths.dir, { recursive: true });
@@ -276,10 +292,6 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, lessonId, 'mp4');
     await rm(paths.dir, { recursive: true, force: true }).catch(() => {});
 
-    if (shouldReleaseRemotionBundleAfterJob()) {
-      await releaseRemotionBundle();
-    }
-
     return {
       success: true,
       videoUrl,
@@ -294,15 +306,15 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     await unlink(paths.videoPath).catch(() => {});
     await rm(paths.dir, { recursive: true, force: true }).catch(() => {});
 
-    if (shouldReleaseRemotionBundleAfterJob()) {
-      await releaseRemotionBundle();
-    }
-
     return {
       success: false,
       error: msg,
       method: 'remotion-free',
     };
+  } finally {
+    if (ownsBundle) {
+      await releaseRemotionBundle();
+    }
   }
 }
 
@@ -323,24 +335,35 @@ export async function renderLessonVideoBatch(
   onProgress?: (done: number, total: number, current: RemotionLessonInput) => void,
 ): Promise<BatchRenderResult[]> {
   const results: BatchRenderResult[] = [];
+  const releaseAfterJob = shouldReleaseRemotionBundleAfterJob();
 
-  for (let i = 0; i < lessons.length; i++) {
-    const lesson = lessons[i];
-    onProgress?.(i, lessons.length, lesson);
-
-    const result = await renderLessonVideo(lesson);
-    results.push({ lessonId: lesson.lessonId, title: lesson.title, result });
-
-    // Brief pause between renders to let GC run
-    if (i < lessons.length - 1) {
-      await new Promise((r) => setTimeout(r, 500));
-    }
+  if (releaseAfterJob) {
+    await retainRemotionBundle();
   }
 
-  onProgress?.(lessons.length, lessons.length, lessons[lessons.length - 1]);
+  try {
+    for (let i = 0; i < lessons.length; i++) {
+      const lesson = lessons[i];
+      onProgress?.(i, lessons.length, lesson);
 
-  if (shouldReleaseRemotionBundleAfterJob()) {
-    await releaseRemotionBundle();
+      const result = await renderLessonVideo(lesson, {
+        sharedBundleSession: releaseAfterJob,
+      });
+      results.push({ lessonId: lesson.lessonId, title: lesson.title, result });
+
+      // Brief pause between renders to let GC run
+      if (i < lessons.length - 1) {
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+
+    if (lessons.length > 0) {
+      onProgress?.(lessons.length, lessons.length, lessons[lessons.length - 1]!);
+    }
+  } finally {
+    if (releaseAfterJob) {
+      await releaseRemotionBundle();
+    }
   }
 
   return results;

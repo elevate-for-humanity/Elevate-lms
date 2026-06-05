@@ -150,6 +150,10 @@ nextjs-site-backup-*.tar.gz
 
 # PNPM store
 .pnpm-store/
+
+# Docker build artifact — scripts/export-admin-pdf-deps.mjs (do not commit)
+export/
+
 .env.local
 .env.local.backup
 public/build.json

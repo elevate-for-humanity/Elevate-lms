@@ -94,6 +94,7 @@ export default tseslint.config(
       'supabase/functions/**',
       'workers/**',
       '.pnpm-store/**',
+      'export/**',
       'playwright-report/**',
       'scripts/**',
       'public/**/*.js',

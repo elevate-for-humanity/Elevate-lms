@@ -2,13 +2,14 @@
 /**
  * Apply build ephemeral storage (fixes ERR_PNPM_ENOSPC when unset / 0 MB).
  *
- *   NORTHFLANK_EPHEMERAL_STORAGE_MB=65536 pnpm tsx scripts/northflank/patch-ephemeral-storage.ts --execute
+ *   NORTHFLANK_EPHEMERAL_STORAGE_MB=32768 pnpm tsx scripts/northflank/patch-ephemeral-storage.ts elevate-admin --execute
+ *   pnpm tsx scripts/northflank/patch-ephemeral-storage.ts --all --execute
  */
 
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
+import { resolveTargetServiceIds } from './service-targets';
 
 const STORAGE_MB = Number(process.env.NORTHFLANK_EPHEMERAL_STORAGE_MB || 65536);
-const SERVICES = ['elevate-lms', 'elevate-admin'];
 
 const storagePatch = {
   buildSettings: {
@@ -51,7 +52,10 @@ async function main() {
   const pid = resolveProjectId();
   if (!pid) process.exit(1);
 
-  for (const sid of SERVICES) {
+  const services = resolveTargetServiceIds();
+  console.log(`Targets: ${services.join(', ')}`);
+
+  for (const sid of services) {
     const attempts: Array<[string, string, 'patch' | 'build-options']> = [
       ['PATCH combined', projectApiPath(pid, `/services/combined/${sid}`), 'patch'],
       ['PATCH team', projectApiPath(pid, `/services/${sid}`), 'patch'],

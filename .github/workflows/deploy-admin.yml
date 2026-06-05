@@ -41,7 +41,7 @@ jobs:
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
       NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
-      NORTHFLANK_LMS_SERVICE_ID: ${{ secrets.NORTHFLANK_LMS_SERVICE_ID || 'elevate-lms' }}
+      NORTHFLANK_TARGET_SERVICE: admin
       DEPLOY_BRANCH: main
       NORTHFLANK_EPHEMERAL_STORAGE_MB: "32768"
 
@@ -63,14 +63,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Configure Northflank services
-        run: pnpm tsx scripts/northflank/configure-services.ts --execute
+      - name: Configure Northflank admin service only
+        run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
 
-      - name: Patch Northflank build ephemeral storage
-        run: pnpm tsx scripts/northflank/patch-ephemeral-storage.ts --execute
+      - name: Patch admin build ephemeral storage
+        run: pnpm tsx scripts/northflank/patch-ephemeral-storage.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
 
-      - name: Verify health probes on /api/ping
-        run: pnpm tsx scripts/northflank/verify-health-checks.ts
+      - name: Verify admin health probes on /api/ping
+        run: pnpm tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
       - name: Point admin service at main
         run: pnpm tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_ADMIN_SERVICE_ID" "$DEPLOY_BRANCH"

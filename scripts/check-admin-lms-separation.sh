@@ -40,6 +40,18 @@ grep -q 'Dockerfile.northflank-lms' "$LMS_WF" || fail "deploy-lms must reference
 if grep -q 'Dockerfile.northflank-admin' "$LMS_WF"; then
   fail "deploy-lms should not reference admin Dockerfile"
 fi
+if grep -q 'configure-services.ts --execute' "$ADMIN_WF" && ! grep -q 'NORTHFLANK_ADMIN_SERVICE_ID" --execute' "$ADMIN_WF"; then
+  fail "deploy-admin must scope configure-services to admin only"
+fi
+if grep -q 'configure-services.ts --execute' "$LMS_WF" && ! grep -q 'NORTHFLANK_LMS_SERVICE_ID" --execute' "$LMS_WF"; then
+  fail "deploy-lms must scope configure-services to LMS only"
+fi
+if grep -q 'verify-health-checks.ts"$' "$ADMIN_WF" || grep -q 'verify-health-checks.ts$' "$ADMIN_WF"; then
+  fail "deploy-admin must pass service id to verify-health-checks"
+fi
+if grep -q 'verify-health-checks.ts"$' "$LMS_WF" || grep -q 'verify-health-checks.ts$' "$LMS_WF"; then
+  fail "deploy-lms must pass service id to verify-health-checks"
+fi
 pass "Northflank deploy workflow split looks correct"
 
 # 3) Keep one canonical admin dashboard entry.

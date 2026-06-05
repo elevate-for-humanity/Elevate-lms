@@ -1,16 +1,14 @@
 #!/usr/bin/env tsx
 /**
- * Configure Northflank combined services for the Elevate production split.
+ * Configure Northflank services (separate elevate-lms and elevate-admin).
  *
- * Applies:
- *   - Dockerfile paths for LMS and Admin
- *   - BuildKit registry cache
- *   - runtime defaults
- *   - HTTP startup + readiness probes on /api/ping:8080 (both LMS and Admin)
+ * Applies per service:
+ *   - Dockerfile path, BuildKit cache, runtime env, health probes on /api/ping:8080
  *
  * Usage:
- *   pnpm tsx scripts/northflank/configure-services.ts --dry-run
- *   pnpm tsx scripts/northflank/configure-services.ts --execute
+ *   pnpm tsx scripts/northflank/configure-services.ts elevate-lms --dry-run
+ *   pnpm tsx scripts/northflank/configure-services.ts elevate-admin --execute
+ *   pnpm tsx scripts/northflank/configure-services.ts --all --execute
  */
 
 import {
@@ -21,8 +19,9 @@ import {
   resolveLmsServiceId,
   resolveProjectId,
 } from './lib';
+import { resolveTargetServiceIds } from './service-targets';
 
-const SERVICES = [
+export const NORTHFLANK_SERVICE_CONFIGS = [
   {
     id: process.env.NORTHFLANK_LMS_SERVICE_ID || resolveLmsServiceId() || 'elevate-lms',
     dockerfile: '/Dockerfile.northflank-lms',
@@ -132,7 +131,15 @@ async function main() {
 
   const requestedEphemeralMb = resolveEphemeralStorageMb();
 
-  for (const service of SERVICES) {
+  const targetIds = new Set(resolveTargetServiceIds());
+  const services = NORTHFLANK_SERVICE_CONFIGS.filter((s) => targetIds.has(s.id));
+  if (services.length === 0) {
+    console.error(`No services matched targets: ${[...targetIds].join(', ')}`);
+    process.exit(1);
+  }
+  console.log(`Targets: ${services.map((s) => s.id).join(', ')}`);
+
+  for (const service of services) {
     console.log(
       `${dryRun ? '[dry-run]' : '[patch]'} ${service.id} -> ${service.dockerfile}, build ${billing.buildPlan}, runtime ${billing.deploymentPlan}, ephemeral ${requestedEphemeralMb}MB (with allowance fallback), health /api/ping`,
     );

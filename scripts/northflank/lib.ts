@@ -88,7 +88,10 @@ export function projectApiPath(projectId: string, suffix: string): string {
   return `/projects/${projectId}${suffix}`;
 }
 
-/** POST create combined CI/CD service. */
+/**
+ * Northflank "combined" = build+deploy in one service resource (not one service for LMS+admin).
+ * Elevate uses two combined services: elevate-lms and elevate-admin.
+ */
 export function combinedServiceCreatePath(projectId: string): string {
   return projectApiPath(projectId, '/services/combined');
 }

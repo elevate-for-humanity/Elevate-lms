@@ -41,11 +41,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Configure Northflank
-        run: pnpm tsx scripts/northflank/configure-services.ts --execute
+      - name: Configure Northflank (LMS + admin)
+        run: pnpm tsx scripts/northflank/configure-services.ts --all --execute
 
       - name: Verify health probes on /api/ping
-        run: pnpm tsx scripts/northflank/verify-health-checks.ts
+        run: pnpm tsx scripts/northflank/verify-health-checks.ts --all
 
       - name: Set branches to main
         run: |

@@ -1,28 +1,23 @@
 #!/usr/bin/env tsx
 /**
- * Ensure Northflank combined services use BuildKit layer cache (10GB).
+ * Ensure Northflank services use BuildKit layer cache (10GB).
  *
- *   pnpm tsx scripts/northflank/ensure-build-cache.ts --dry-run
- *   pnpm tsx scripts/northflank/ensure-build-cache.ts --execute
+ *   pnpm tsx scripts/northflank/ensure-build-cache.ts elevate-lms --execute
+ *   pnpm tsx scripts/northflank/ensure-build-cache.ts --all --execute
  */
 
 import { combinedServicePatchPath, nfFetch, resolveProjectId } from './lib';
-
-const SERVICES = [
-  {
-    id: process.env.NORTHFLANK_LMS_SERVICE_ID || 'elevate-lms',
-    dockerfile: '/Dockerfile.northflank-lms',
-  },
-  {
-    id: process.env.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin',
-    dockerfile: '/Dockerfile.northflank-admin',
-  },
-];
+import { NORTHFLANK_SERVICE_CONFIGS } from './configure-services';
+import { resolveTargetServiceIds } from './service-targets';
 
 const BUILDKIT = {
   useCache: true,
   cacheStorageSize: 10240,
 };
+
+const SERVICE_DOCKERFILES = Object.fromEntries(
+  NORTHFLANK_SERVICE_CONFIGS.map((s) => [s.id, s.dockerfile]),
+);
 
 async function main() {
   const dryRun = !process.argv.includes('--execute');
@@ -32,7 +27,15 @@ async function main() {
     process.exit(1);
   }
 
-  for (const { id, dockerfile } of SERVICES) {
+  const targets = resolveTargetServiceIds();
+  console.log(`Targets: ${targets.join(', ')}`);
+
+  for (const id of targets) {
+    const dockerfile = SERVICE_DOCKERFILES[id];
+    if (!dockerfile) {
+      console.error(`Unknown service id (no Dockerfile mapping): ${id}`);
+      process.exit(1);
+    }
     const patch = {
       buildSettings: {
         dockerfile: {
@@ -55,7 +58,7 @@ async function main() {
   if (dryRun) {
     console.log('\nRe-run with --execute to apply.');
   } else {
-    console.log('\nBuildKit cache enabled on both services.');
+    console.log('\nBuildKit cache enabled on target service(s).');
   }
 }
 

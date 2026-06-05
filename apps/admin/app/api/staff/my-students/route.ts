@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getTenantContext, TenantContextError } from '@/lib/tenant';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { isStaffPortalApiAuth, requireStaffPortalApi } from '@/lib/api/staff-portal-guard';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -14,21 +15,12 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    // STEP 4D: Get tenant context - enforces tenant isolation
+    const auth = await requireStaffPortalApi();
+    if (!isStaffPortalApiAuth(auth)) return auth;
+
+    // Tenant context — enforces tenant isolation for student list
     const tenantContext = await getTenantContext();
-
     const supabase = await createClient();
-
-    // Get staff profile
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', tenantContext.userId)
-      .maybeSingle();
-
-    if (!profile || profile.role !== 'staff') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
 
     // Get students in this tenant (RLS enforces tenant_id filtering)
     const { data: students, error } = await supabase

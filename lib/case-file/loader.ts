@@ -5,12 +5,14 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
+import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 import { ParticipantCaseFile, CaseFileSummary, generateCaseNumber } from './types';
 
 /**
  * Load a complete participant case file
  */
 export async function loadCaseFile(participantId: string): Promise<ParticipantCaseFile | null> {
+  await requireStaffPortalAccess();
   const supabase = await createClient();
 
   // Load profile
@@ -18,6 +20,7 @@ export async function loadCaseFile(participantId: string): Promise<ParticipantCa
     .from('profiles')
     .select('*')
     .eq('id', participantId)
+    .eq('role', 'student')
     .maybeSingle();
 
   if (profileError || !profile) {
@@ -219,6 +222,7 @@ export async function loadCaseFileSummaries(
     offset?: number;
   } = {},
 ): Promise<CaseFileSummary[]> {
+  await requireStaffPortalAccess();
   const supabase = await createClient();
   const { limit = 50, offset = 0 } = options;
 
@@ -235,6 +239,7 @@ export async function loadCaseFileSummaries(
       updated_at
     `,
     )
+    .eq('role', 'student')
     .order('updated_at', { ascending: false })
     .range(offset, offset + limit - 1);
 

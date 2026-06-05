@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 import {
   Download,
   FileSpreadsheet,
@@ -23,15 +23,8 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function ExportAttendancePage() {
+  await requireStaffPortalAccess();
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/admin/staff-portal/attendance/export');
-  }
 
   // Fetch cohorts for filter
   const { data: cohorts } = await supabase.from('cohorts').select('id, name').order('name');

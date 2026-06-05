@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -27,11 +28,8 @@ export const metadata: Metadata = {
 };
 
 export default async function StaffPortalLanding() {
+  const { user } = await requireStaffPortalAccess();
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   // Fetch completion state if logged in
   let payrollDone = false;

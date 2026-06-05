@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 import { BookOpen, Search, Plus } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -13,11 +13,8 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function StaffCoursesPage() {
+  await requireStaffPortalAccess();
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/staff-portal/courses');
 
   // Fetch courses from training_programs table
   const { data: courses } = await supabase

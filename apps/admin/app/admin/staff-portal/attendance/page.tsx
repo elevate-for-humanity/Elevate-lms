@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function StaffPortalAttendancePage() {
+  await requireStaffPortalAccess();
   const supabase = await createClient();
 
   // Fetch attendance records from database

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 import { loadCaseFileSummaries } from '@/lib/case-file/loader';
 import { Search, Filter, ChevronRight, User } from 'lucide-react';
 
@@ -31,6 +32,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default async function CaseFilesListPage() {
+  await requireStaffPortalAccess();
   const cases = await loadCaseFileSummaries({ limit: 50 });
 
   const formatDate = (date: string) => {

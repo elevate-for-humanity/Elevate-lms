@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
+import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import AttendanceRecordForm from './AttendanceRecordForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -14,24 +14,8 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function RecordAttendancePage() {
+  const { user, profile } = await requireStaffPortalAccess();
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/admin/staff-portal/attendance/record');
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role, full_name')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (!profile || !['staff', 'instructor', 'admin', 'super_admin'].includes(profile.role)) {
-    redirect('/');
-  }
 
   // Fetch active students with their enrollments
   const { data: rawAttendEnrollments } = await supabase

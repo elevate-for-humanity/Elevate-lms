@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 import { CheckCircle, Circle, Star, BookOpen, Award, ChevronRight, TrendingUp } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -70,12 +70,8 @@ const SKILL_CATEGORIES = [
 ];
 
 export default async function StaffSkillsPage() {
+  const { user } = await requireStaffPortalAccess();
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/staff-portal/skills');
 
   // Fetch completed skills for this user
   const { data: userSkills } = await supabase

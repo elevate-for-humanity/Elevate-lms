@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { isStaffPortalApiAuth, requireStaffPortalApi } from '@/lib/api/staff-portal-guard';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -14,26 +15,11 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
+    const auth = await requireStaffPortalApi();
+    if (!isStaffPortalApiAuth(auth)) return auth;
+
     const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Get user role
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (!profile) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
-    }
+    const profile = { role: auth.role };
 
     // Get checklists for user's role
     const { data: checklists, error: checklistsError } = await supabase
@@ -85,15 +71,10 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
+    const auth = await requireStaffPortalApi();
+    if (!isStaffPortalApiAuth(auth)) return auth;
+
     const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const body = await parseBody<Record<string, any>>(request);
     const { checklist_id, notes } = body;
@@ -118,7 +99,7 @@ async function _POST(request: Request) {
       .from('qa_checklist_completions')
       .insert({
         checklist_id,
-        user_id: user.id,
+        user_id: auth.userId,
         notes: notes || null,
         completed_at: new Date().toISOString(),
       })

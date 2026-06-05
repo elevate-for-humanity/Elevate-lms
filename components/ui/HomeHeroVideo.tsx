@@ -21,6 +21,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
         videoSrcMobile={banner.videoSrcMobile}
         eagerVideoLoad
         compactBelowHero
+        analyticsName={banner.analyticsName}
         voiceoverSrc={banner.voiceoverSrc}
         microLabel={banner.microLabel}
         belowHeroHeadline={banner.belowHeroHeadline}

@@ -176,30 +176,6 @@ export default async function StaffPortalLanding() {
           ))}
         </div>
 
-        {/* Not logged in CTA */}
-        {!user && (
-          <div className="bg-white rounded-xl border p-8 text-center">
-            <h2 className="text-xl font-bold text-slate-900 mb-2">Sign In to Access Staff Tools</h2>
-            <p className="text-slate-500 mb-6">
-              Your dashboard, payroll, handbook, and student management tools are available after
-              signing in.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link
-                href="/login?redirect=/admin/staff-portal"
-                className="px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-xl hover:bg-brand-blue-700"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/onboarding/staff"
-                className="px-6 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200"
-              >
-                New Staff Onboarding
-              </Link>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

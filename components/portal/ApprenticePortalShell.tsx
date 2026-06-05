@@ -25,6 +25,7 @@ import {
   apprenticeshipLmsCoursePath,
   apprenticeshipOrientationPath,
 } from '@/lib/portal/program-portal-paths';
+import { ApprenticeClockInStatus } from '@/components/portal/ApprenticeClockInStatus';
 
 export interface ApprenticePortalConfig {
   programSlug: string;
@@ -492,6 +493,11 @@ export function ApprenticePortalShell({
               </div>
             )}
           </div>
+        </div>
+
+        {/* Live shift status */}
+        <div className="mb-5">
+          <ApprenticeClockInStatus />
         </div>
 
         {/* Quick actions + onboarding */}

@@ -1065,7 +1065,7 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
 
   return {
     counts: {
-      pendingApplications: pendingApps,
+      pendingApplications: totalPendingCount,
       activeEnrollments:     activeEnrollCount,
       revenueThisMonthCents: revenueThisMonthCents,
       certificatesIssued:    certsCount,
@@ -1084,6 +1084,7 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
     recentActivity: recentActivityItems,
     recentStudents,
     recentApplications,
+    pendingApplications: pendingApps,
     blockedPrograms,
     inactiveLearners,
     pendingSubmissions,

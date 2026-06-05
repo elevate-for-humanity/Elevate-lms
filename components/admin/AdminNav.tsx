@@ -41,7 +41,6 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const unread = notifs.filter((n) => n.unread).length;
@@ -302,39 +301,34 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               </Link>
             ))}
           </div>
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">All Sections</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">All Pages</p>
 
           {NAV.map((section) => {
             const active = isSectionActive(pathname, section);
-            const expanded = mobileExpanded === section.label;
             return (
               <div
                 key={section.label}
-                className="border-b border-slate-200 pb-1 mb-1 last:border-0"
+                className="border-b border-slate-200 pb-2 mb-2 last:border-0"
               >
-                <button
-                  onClick={() => setMobileExpanded(expanded ? null : section.label)}
-                  className={`w-full flex items-center justify-between px-3 py-3 rounded-xl text-sm font-bold transition-colors ${active ? 'text-brand-red-700 bg-brand-red-50' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'}`}
+                <Link
+                  href={section.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`block px-3 py-2 rounded-xl text-sm font-bold transition-colors ${active ? 'text-brand-red-700 bg-brand-red-50' : 'text-slate-800 hover:bg-slate-100'}`}
                 >
                   {section.label}
-                  <ChevronDown
-                    className={`w-4 h-4 text-slate-400 transition-transform ${expanded ? 'rotate-180' : ''}`}
-                  />
-                </button>
-                {expanded && (
-                  <div className="ml-3 mt-1 mb-2 space-y-0.5">
-                    {section.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setMobileOpen(false)}
-                        className={`block px-3 py-2 rounded-xl text-sm transition-colors ${isActive(pathname, item.href) ? 'bg-brand-red-50 text-brand-red-700 font-semibold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                </Link>
+                <div className="ml-2 mt-1 space-y-0.5">
+                  {section.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={`block px-3 py-2 rounded-xl text-sm transition-colors ${isActive(pathname, item.href) ? 'bg-brand-red-50 text-brand-red-700 font-semibold' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
             );
           })}

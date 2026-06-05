@@ -40,20 +40,12 @@ export default function UnauthorizedPage() {
             Signed in as <span className="text-slate-300">{email}</span>
           </p>
         )}
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={handleSignOut}
-            className="w-full px-4 py-2 bg-red-900 hover:bg-red-800 text-red-200 text-sm font-medium rounded-lg transition-colors"
-          >
-            Sign Out &amp; Try Different Account
-          </button>
-          <a
-            href="/login"
-            className="inline-block px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-lg transition-colors"
-          >
-            Back to Login
-          </a>
-        </div>
+        <button
+          onClick={handleSignOut}
+          className="w-full px-4 py-2 bg-red-900 hover:bg-red-800 text-red-200 text-sm font-medium rounded-lg transition-colors"
+        >
+          Sign out and use a different account
+        </button>
       </div>
     </div>
   );

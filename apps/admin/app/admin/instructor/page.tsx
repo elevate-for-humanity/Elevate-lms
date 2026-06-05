@@ -158,12 +158,10 @@ export default function InstructorPortalLanding() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href={`${process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl}/login?redirect=/instructor/dashboard`}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/login?redirect=/admin/instructor/dashboard"
               className="px-8 py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition"
             >
-              Sign In
+              Instructor sign in
             </Link>
             <Link
               href={`${process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl}/apply?role=instructor`}

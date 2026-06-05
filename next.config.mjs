@@ -980,6 +980,8 @@ const nextConfig = {
       // Canonical forgot-pw (request form): /reset-password
       // Canonical set-new-password: /auth/reset-password
       { source: '/auth/signin', destination: '/login', permanent: true },
+      { source: '/sign-in', destination: '/login', permanent: true },
+      { source: '/signin', destination: '/login', permanent: true },
       { source: '/auth/signup', destination: '/signup', permanent: true },
       { source: '/register', destination: '/signup', permanent: true },
       { source: '/auth/forgot-password', destination: '/reset-password', permanent: true },

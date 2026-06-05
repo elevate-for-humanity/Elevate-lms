@@ -35,6 +35,7 @@ export function getDegradedAdminDashboardData(): AdminDashboardData {
     recentActivity: [],
     recentStudents: [],
     recentApplications: [],
+    pendingApplications: [],
     blockedPrograms: [],
     inactiveLearners: [],
     pendingSubmissions: [],

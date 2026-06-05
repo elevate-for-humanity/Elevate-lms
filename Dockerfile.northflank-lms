@@ -32,16 +32,19 @@ COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 
-# See Dockerfile.northflank-admin - avoid separate `pnpm fetch` (ERR_PNPM_ENOSPC on ~2GB builders).
-COPY . .
-
+# See Dockerfile.northflank-admin — install before COPY . . + BuildKit pnpm store cache.
 ENV HUSKY=0
 ENV CI=true
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-RUN pnpm config set store-dir /app/.pnpm-store \
+RUN --mount=type=cache,id=pnpm-northflank-lms,target=/pnpm/store \
+    pnpm config set store-dir /pnpm/store \
     && pnpm install --frozen-lockfile \
     && pnpm store prune
+
+COPY . .
+
+RUN rm -rf /app/.pnpm-store
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

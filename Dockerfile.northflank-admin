@@ -32,19 +32,22 @@ COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 
-# Store on /app so pnpm can hardlink into node_modules (same filesystem as /app).
+# Install from manifests only (no source yet) so peak disk is not repo + store + node_modules.
+# pnpm store lives on a BuildKit cache mount (not committed to the image layer).
 # Do NOT use --package-import-method=copy - it duplicates every package and causes ENOSPC.
-# Do NOT run `pnpm fetch` before COPY . - on Northflank (~2GB build volume) it fills the
-# disk with the full lockfile store and fails ERR_PNPM_ENOSPC before install/next build.
-COPY . .
-
+# Do NOT run `pnpm fetch` - it fills disk before install on tight Northflank builders.
 ENV HUSKY=0
 ENV CI=true
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-RUN pnpm config set store-dir /app/.pnpm-store \
+RUN --mount=type=cache,id=pnpm-northflank-admin,target=/pnpm/store \
+    pnpm config set store-dir /pnpm/store \
     && pnpm install --frozen-lockfile \
     && pnpm store prune
+
+COPY . .
+
+RUN rm -rf /app/.pnpm-store
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

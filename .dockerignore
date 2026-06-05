@@ -40,6 +40,9 @@ temp
 # Local / archived content
 documents
 _archived
+export
+cloudflare-workers
+fly-containers
 
 # Not needed to compile Next.js images
 supabase

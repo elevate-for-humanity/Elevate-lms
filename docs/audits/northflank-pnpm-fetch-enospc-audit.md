@@ -41,15 +41,17 @@ WARN GET https://registry.npmjs.org/... error (ERR_PNPM_ENOSPC). Will retry ...
 - `elevate-lms`: same pattern; occasional **build timeout** after long retries on ENOSPC
 - Service JSON shows `deployment.storage.ephemeralStorage.storageSize: 2048` (MB) — runtime disk; build volume remains tight unless `buildSettings.storage` is applied in Northflank project quota
 
-## Fix (code — merged via PR)
+## Fix (code)
 
 **Dockerfile.northflank-admin** and **Dockerfile.northflank-lms**:
 
-1. Remove the separate **`pnpm fetch`** layer.
-2. **`COPY . .`** then single **`pnpm install --frozen-lockfile`**.
-3. **`pnpm store prune`** after install to trim store before `next build`.
+1. Remove the separate **`pnpm fetch`** layer (never use on Northflank).
+2. **`pnpm install --frozen-lockfile`** from workspace manifests **before** `COPY . .` so install peak is not repo + store + `node_modules`.
+3. **BuildKit cache mount** for the pnpm store (`/pnpm/store`) so the store is not written into the image layer.
+4. **`pnpm store prune`** after install; **`rm -rf /app/.pnpm-store`** after `COPY . .` if anything landed on `/app`.
+5. **`.dockerignore`**: exclude `export/`, `cloudflare-workers/`, `fly-containers/` from build context.
 
-This lowers peak disk versus fetch + offline install on a small volume.
+This lowers peak disk versus fetch + offline install or `/app/.pnpm-store` in-layer on a small volume.
 
 ## Fix (platform)
 

@@ -190,16 +190,6 @@
       "permanent": true
     },
     {
-      "source": "/programs/tax-preparation",
-      "destination": "/programs/business-administration",
-      "permanent": true
-    },
-    {
-      "source": "/programs/tax-preparation/:path*",
-      "destination": "/programs/business-administration",
-      "permanent": true
-    },
-    {
       "source": "/programs/office-admin",
       "destination": "/programs/office-administration",
       "permanent": true

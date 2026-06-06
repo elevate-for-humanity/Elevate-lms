@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import {
   buildProgramsCatalogMetadata,
   getPublicProgramsCatalogPage,
@@ -30,7 +31,6 @@ type SearchParams = {
   q?: string;
   category?: string;
   wioa?: string;
-  provider?: string;
   page?: string;
 };
 
@@ -43,7 +43,6 @@ export default async function ProgramCatalogPage({
   const q = params.q ?? '';
   const category = params.category ?? '';
   const wioaOnly = params.wioa === 'true';
-  const providerSlug = params.provider ?? '';
   const page = Math.max(1, parseInt(params.page ?? '1', 10));
   const perPage = 18;
 
@@ -87,7 +86,6 @@ export default async function ProgramCatalogPage({
     if (q) sp.set('q', q);
     if (category) sp.set('category', category);
     if (wioaOnly) sp.set('wioa', 'true');
-    if (providerSlug) sp.set('provider', providerSlug);
     if (p > 1) sp.set('page', String(p));
     const qs = sp.toString();
     return `/programs/catalog${qs ? `?${qs}` : ''}`;
@@ -120,7 +118,6 @@ export default async function ProgramCatalogPage({
             {count ?? 0} program{(count ?? 0) !== 1 ? 's' : ''} from approved providers
             {wioaOnly ? ' · WIOA eligible' : ''}
             {category ? ` · ${category}` : ''}
-            {providerSlug ? ` · ${providerSlug}` : ''}
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
@@ -145,7 +142,7 @@ export default async function ProgramCatalogPage({
           <aside className="lg:w-56 flex-shrink-0">
             <CatalogFilters
               categories={CATEGORIES}
-              current={{ q, category, wioa: wioaOnly, provider: providerSlug }}
+              current={{ q, category, wioa: wioaOnly }}
             />
           </aside>
 

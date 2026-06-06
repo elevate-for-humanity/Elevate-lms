@@ -23,7 +23,7 @@ function fixLine(line) {
   // JSX attribute: href=`...` → href={`...`}
   next = next.replace(
     /\b(href|title|alt|placeholder|from|subject|to)=`([^`]+)`/g,
-    '$1={$`$2`}',
+    '$1={`$2`}',
   );
   return next;
 }

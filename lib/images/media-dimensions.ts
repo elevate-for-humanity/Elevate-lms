@@ -78,7 +78,8 @@ export const MEDIA_SLOTS = {
   categoryLanding: {
     desktop: { width: 1600, height: 900 },
     mobile: { width: 1080, height: 1350 },
-    aspect: '16/9',
+    aspectDesktop: '16/9',
+    aspectMobile: '4/5',
     maxKb: MEDIA_BUDGET_KB.programCourse,
     format: MEDIA_FORMAT,
     nextImageSizes: '100vw',

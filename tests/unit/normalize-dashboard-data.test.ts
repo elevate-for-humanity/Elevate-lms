@@ -61,6 +61,40 @@ describe('normalizeAdminDashboardData', () => {
     expect(normalized.priorities[0].severity).toBe('low');
   });
 
+  it('skips null KPI entries without throwing', () => {
+    const normalized = normalizeAdminDashboardData({
+      kpis: [
+        null,
+        { label: 'Applications', value: 3, delta: 0, deltaLabel: '', href: '/admin/applications' },
+        undefined,
+      ] as unknown as import('@/components/admin/dashboard/types').KPICard[],
+    });
+
+    expect(normalized.kpis).toHaveLength(1);
+    expect(normalized.kpis[0].label).toBe('Applications');
+  });
+
+  it('skips null priority entries without throwing', () => {
+    const normalized = normalizeAdminDashboardData({
+      priorities: [
+        null,
+        {
+          id: 'p2',
+          type: 'application',
+          label: 'Queue',
+          href: '/admin/applications',
+          score: 10,
+          severity: 'high',
+          context: '',
+        },
+        undefined,
+      ] as unknown as import('@/lib/admin/priority-score').PriorityItem[],
+    });
+
+    expect(normalized.priorities).toHaveLength(1);
+    expect(normalized.priorities[0].severity).toBe('high');
+  });
+
   it('normalizes operational counters when partial payload omits fields', () => {
     const normalized = normalizeAdminDashboardData({
       operational: {

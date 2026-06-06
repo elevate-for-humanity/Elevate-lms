@@ -526,7 +526,7 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
           </div>
           <div className="space-y-4">
             <EnrollmentFunnel data={data} />
-            <RecentActivity items={data.recentActivity} />
+            <RecentActivity items={data.recentActivity ?? []} />
             {(data.recentApplications?.length ?? 0) > 0 && (
               <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
                 <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
@@ -542,7 +542,7 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
               </div>
             )}
             <RecentPaymentsPanel payments={data.recentPayments} />
-            <RecentStudentsPanel students={data.recentStudents} />
+            <RecentStudentsPanel students={data.recentStudents ?? []} />
           </div>
         </div>
 

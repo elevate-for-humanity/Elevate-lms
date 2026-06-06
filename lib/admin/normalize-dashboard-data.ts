@@ -11,6 +11,10 @@ function asArray<T>(value: T[] | null | undefined): T[] {
   return Array.isArray(value) ? value : [];
 }
 
+function asObjectArray<T extends object>(value: T[] | null | undefined): T[] {
+  return asArray(value).filter((item): item is T => item != null && typeof item === 'object');
+}
+
 function asCount(value: unknown, fallback = 0): number {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (Array.isArray(value)) return value.length;
@@ -25,7 +29,7 @@ const PRIORITY_SEVERITIES = new Set<PriorityItem['severity']>([
 ]);
 
 function normalizeKpis(kpis: KPICard[] | null | undefined): KPICard[] {
-  return asArray(kpis).map((kpi) => ({
+  return asObjectArray(kpis).map((kpi) => ({
     label: typeof kpi.label === 'string' ? kpi.label : 'Metric',
     value: asCount(kpi.value),
     delta: asCount(kpi.delta),
@@ -37,7 +41,7 @@ function normalizeKpis(kpis: KPICard[] | null | undefined): KPICard[] {
 }
 
 function normalizePriorities(items: PriorityItem[] | null | undefined): PriorityItem[] {
-  return asArray(items).map((item) => ({
+  return asObjectArray(items).map((item) => ({
     id: String(item.id ?? 'priority'),
     type: item.type ?? 'system',
     label: typeof item.label === 'string' ? item.label : 'Operational item',

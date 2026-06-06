@@ -226,6 +226,8 @@
     "audit:migrations": "node scripts/audit-migration-discipline.mjs",
     "production:gate": "bash scripts/production-readiness-gate.sh",
     "production:smoke": "bash scripts/post-deploy-smoke.sh",
+    "audit:public-media-nav": "node scripts/audit-public-site-media-nav.mjs",
+    "verify:package-registry": "node scripts/verify-package-registry.mjs",
     "audit:schema": "tsx scripts/audit-schema-drift.ts",
     "audit:schema:strict": "tsx scripts/audit-schema-drift.ts --fail-on-drift",
     "check:redirects": "node scripts/check-redirect-conflicts.mjs",

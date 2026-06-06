@@ -681,9 +681,7 @@ const nextConfig = {
 
       // Misc redirects
       { source: '/dashboards/:path*', destination: '/lms/:path*', permanent: true },
-      // /portals base route has its own page — only redirect sub-paths
-      { source: '/portals/:slug/:path*', destination: '/lms/:slug/:path*', permanent: true },
-      { source: '/portals/:slug', destination: '/lms/:slug', permanent: true },
+      // /portals is the public portal hub — do not wildcard to /lms (broke desktop/mobile parity)
 
       // These brands have their own pages — only redirect sub-paths, not the root
       // /serene-comfort-care/page.tsx exists and redirects to /partners itself

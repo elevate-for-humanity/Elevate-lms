@@ -166,6 +166,12 @@ const PUBLIC_MARKETING_PREFIXES = [
   '/apprenticeship-sponsor',
 ];
 
+/** Exact public routes (portal hub, role-specific login pages). */
+const PUBLIC_EXACT_ROUTES = new Set([
+  '/portals',
+  '/login/apprentice',
+]);
+
 // Routes requiring authentication (any role).
 const AUTH_REQUIRED_ROUTES = [
   '/lms/dashboard',
@@ -184,7 +190,6 @@ const AUTH_REQUIRED_ROUTES = [
   '/instructor/',
   '/apprentice',
   '/portal/',
-  '/portals',
   '/dashboards',
   '/case-manager/',
   '/case-manager',
@@ -662,6 +667,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api') ||
     pathname.includes('.') ||
     pathname === '/login' ||
+    pathname.startsWith('/login/') ||
+    PUBLIC_EXACT_ROUTES.has(pathname) ||
     pathname === '/admin-login' ||
     pathname === '/signup' ||
     pathname === '/unauthorized' ||

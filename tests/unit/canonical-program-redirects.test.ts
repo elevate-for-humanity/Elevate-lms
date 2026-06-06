@@ -23,6 +23,11 @@ describe('canonical program redirects', () => {
     expect(bad.map((r) => r.source)).toEqual([]);
   });
 
+  it('does not redirect /programs/business-administration away from its canonical URL', () => {
+    const bad = redirects.find((r) => r.source === '/programs/business-administration');
+    expect(bad).toBeUndefined();
+  });
+
   it('legacy slugs redirect to real program or funding pages', () => {
     const map = new Map(programRedirects.map((r) => [r.source, r.destination]));
     expect(map.get('/programs/cpr-aed')).toBe('/programs/cpr-first-aid');

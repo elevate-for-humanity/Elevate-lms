@@ -564,11 +564,6 @@
       "permanent": true
     },
     {
-      "source": "/programs/business-administration",
-      "destination": "/programs/business",
-      "permanent": true
-    },
-    {
       "source": "/programs/early-childhood-education",
       "destination": "/contact?program=early-childhood-education",
       "permanent": true

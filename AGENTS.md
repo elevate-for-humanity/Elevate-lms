@@ -749,6 +749,7 @@ All student-facing marketing and program pages must follow the locked design sys
 Full specification: `docs/page-design-standard.md`
 Hero video rules: `docs/hero-video-standard.md`
 Design tokens: `lib/page-design-tokens.ts`
+Image dimensions (SSOT): `lib/images/media-dimensions.ts` — heroes 2560×1440, program cards 1200×900 (4:3), course covers 1600×900
 
 ### Required for every new student-facing page
 

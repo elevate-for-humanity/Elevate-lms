@@ -12,6 +12,7 @@ import { ArrowRight } from 'lucide-react';
 import { ALL_PROGRAMS } from '@/data/programs/catalog';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
+import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
 import { card, grid, layout } from '@/lib/page-design-tokens';
 
 // Featured programs shown on homepage - ordered by demand/visibility
@@ -59,8 +60,8 @@ function PathwayCard({ prog }: { prog: ProgramSchema }) {
           src={prog.heroImage}
           alt={prog.heroImageAlt || prog.title}
           fill
-          className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className={card.programImageFill}
+          sizes={IMAGE_SIZES.programCard}
           loading="lazy"
           placeholder="empty"
         />

@@ -161,7 +161,7 @@ Do not bury this in fine print. It belongs in a dedicated section, not a footnot
 
 All program cards use `components/programs/ProgramCard.tsx`. Structure is locked:
 
-1. Top image — `aspect-[16/9]`, flush (no padding around image)
+1. Top image — `aspect-[4/3]` (1200×900 WebP), flush (no padding around image). See `lib/images/media-dimensions.ts`.
 2. Program name — `text-base font-bold text-slate-900`
 3. Short description — `text-slate-600 text-sm leading-relaxed`
 4. Metadata chips — duration, format, level

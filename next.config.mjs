@@ -603,7 +603,7 @@ const nextConfig = {
       // /funding/dol — real page, no redirect
       // /funding/federal-programs → /funding
       // /funding/jri — real page, no redirect
-      // /funding/state-programs → /funding
+      // /funding/state-programs → /funding (canonical-routes.json)
       // /funding/wrg → /funding
       // /jri — real 401-line page, no redirect
       // /partners/jri → /partners

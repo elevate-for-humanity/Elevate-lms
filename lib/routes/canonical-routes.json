@@ -618,6 +618,11 @@
       "source": "/programs/workforce-ready-grant",
       "destination": "/tuition",
       "permanent": true
+    },
+    {
+      "source": "/funding/state-programs",
+      "destination": "/funding",
+      "permanent": true
     }
   ],
   "externalOrAppHostedAllowlist": [

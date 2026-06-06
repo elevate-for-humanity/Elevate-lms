@@ -667,7 +667,7 @@ export default function MyDashboard({
                 },
                 {
                   label: 'Instructor Portal',
-                  href: 'https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/instructor',
+                  href: `https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/instructor`,
                   roles: ['instructor', 'admin', 'super_admin'],
                 },
                 {

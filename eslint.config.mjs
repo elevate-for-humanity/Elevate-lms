@@ -69,7 +69,7 @@ export default tseslint.config(
         {
           selector: 'Literal[value=/\\$\\{PLATFORM_DEFAULTS/]',
           message:
-            'PLATFORM_DEFAULTS must use template literals (`${PLATFORM_DEFAULTS.x}`), not quoted strings.',
+            'PLATFORM_DEFAULTS must use template literals (backtick interpolation), not quoted strings.',
         },
       ],
       // All other react-hooks v7 rules off — new rules with pre-existing violations
@@ -117,6 +117,7 @@ export default tseslint.config(
       'check-migrations-status.mjs',
       'test-env.js',
       'next-env.d.ts',
+      'apps/admin/next-env.d.ts',
       'lib/dynamic-imports.ts',
       'lib/ocr/**',
     ],

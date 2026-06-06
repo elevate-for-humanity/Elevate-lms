@@ -49,7 +49,7 @@ require('next');
 
 const { startServer } = require('next/dist/server/lib/start-server');
 
-console.log(
+console.info(
   `[admin] starting standalone server host=${host} port=${port} cwd=${process.cwd()}`,
 );
 

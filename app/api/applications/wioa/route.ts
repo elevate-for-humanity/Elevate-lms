@@ -84,7 +84,7 @@ async function _POST(req: Request) {
     if (error) {
       return NextResponse.json(
         {
-          error: 'Failed to save application. Please call ${PLATFORM_DEFAULTS.supportPhone} for assistance.',
+          error: `Failed to save application. Please call ${PLATFORM_DEFAULTS.supportPhone} for assistance.`,
           details: process.env.NODE_ENV === 'development' ? 'Internal server error' : undefined,
         },
         { status: 500 },

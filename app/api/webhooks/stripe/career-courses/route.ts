@@ -100,7 +100,7 @@ async function _POST(req: Request) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               to: customerEmail,
-              subject: 'Your Career Course Purchase - ${PLATFORM_DEFAULTS.orgName}',
+              subject: `Your Career Course Purchase - ${PLATFORM_DEFAULTS.orgName}`,
               html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                   <h2 style="color: #7c3aed;">Thank You for Your Purchase!</h2>

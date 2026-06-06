@@ -177,10 +177,10 @@ You are the ${PLATFORM_DEFAULTS.orgName} AI Assistant - a warm, helpful guide fo
 
       if (userMessage.includes('program') || userMessage.includes('training')) {
         fallbackReply +=
-          '**Our Programs:**\n• Healthcare (CNA, Phlebotomy)\n• Skilled Trades (HVAC, CDL)\n• Professional (Barbering)\n\nVisit ${PLATFORM_DEFAULTS.siteUrl}/programs or call ${PLATFORM_DEFAULTS.supportPhone}';
+          `**Our Programs:**\n• Healthcare (CNA, Phlebotomy)\n• Skilled Trades (HVAC, CDL)\n• Professional (Barbering)\n\nVisit ${PLATFORM_DEFAULTS.siteUrl}/programs or call ${PLATFORM_DEFAULTS.supportPhone}`;
       } else if (userMessage.includes('apply') || userMessage.includes('start')) {
         fallbackReply +=
-          "**To Apply:**\n1. Go to ${PLATFORM_DEFAULTS.siteUrl}/apply\n2. Complete the form\n3. We'll contact you!\n\nOr call ${PLATFORM_DEFAULTS.supportPhone}";
+          `**To Apply:**\n1. Go to ${PLATFORM_DEFAULTS.siteUrl}/apply\n2. Complete the form\n3. We'll contact you!\n\nOr call ${PLATFORM_DEFAULTS.supportPhone}`;
       } else {
         fallbackReply +=
           "Please call us at **" + PLATFORM_DEFAULTS.supportPhone + "** or visit **elevateforhumanity.org** and we'll help you right away!";
@@ -219,7 +219,7 @@ You are the ${PLATFORM_DEFAULTS.orgName} AI Assistant - a warm, helpful guide fo
     logger.error('Chat API error:', error);
     return NextResponse.json({
       reply:
-        "I'm having technical difficulties. Please call us at " + PLATFORM_DEFAULTS.supportPhone + " or visit ${PLATFORM_DEFAULTS.siteUrl}/apply to get started!",
+        "I'm having technical difficulties. Please call us at " + PLATFORM_DEFAULTS.supportPhone + ` or visit ${PLATFORM_DEFAULTS.siteUrl}/apply to get started!`,
     });
   }
 }

@@ -268,9 +268,11 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   funding: {
     fssa_eligible: true,
     snap_et_eligible: true,
-    wioa_eligible: false,   // DOL apprenticeship — not on Indiana ETPL
-    etpl_approved: false,
+    wioa_eligible: true,
+    etpl_approved: true,
     wrg_eligible: false,
+    fundingNotes:
+      'DOL Registered Apprenticeship (RAPIDS). WIOA Title I eligible for dislocated workers and adults. IMPACT/SNAP E&T for eligible participants.',
   },
   enrollmentType: 'internal',
   partnerCourses: [

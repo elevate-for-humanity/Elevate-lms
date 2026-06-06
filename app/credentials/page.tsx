@@ -14,6 +14,7 @@ import {
 import HeroVideo from '@/components/marketing/HeroVideo';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
+import { PUBLIC_CREDENTIALS_DISPLAY } from '@/lib/site-credentials';
 
 export const dynamic = 'force-static';
 
@@ -301,7 +302,7 @@ export default function CredentialsPage() {
           <div className="flex items-center gap-3">
             <BadgeCheck className="w-8 h-8 text-brand-red-400 flex-shrink-0" />
             <div>
-              <p className="text-slate-900 font-bold text-lg leading-none">20+</p>
+              <p className="text-slate-900 font-bold text-lg leading-none">{PUBLIC_CREDENTIALS_DISPLAY}</p>
               <p className="text-black text-xs mt-0.5">Credentials offered</p>
             </div>
           </div>

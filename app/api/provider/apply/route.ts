@@ -224,7 +224,7 @@ export async function POST(request: NextRequest) {
       subject: `Application received — ${orgName} | ${PLATFORM_DEFAULTS.orgName}`,
       html: applicantHtml,
       text: `Hi ${contactName},\n\nThank you for applying to partner with ${PLATFORM_DEFAULTS.orgName}. We've received your application for ${orgName} and will review it within 3–5 business days.\n\nReference ID: ${applicationId}\n\nQuestions? Email partnerships@${PLATFORM_DEFAULTS.canonicalDomain}\n\n— The ${PLATFORM_DEFAULTS.orgName} Team`,
-      replyTo: 'partnerships@${PLATFORM_DEFAULTS.canonicalDomain}',
+      replyTo: `partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
     });
 
     if (!emailResult.ok) {

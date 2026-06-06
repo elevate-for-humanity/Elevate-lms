@@ -221,7 +221,7 @@ async function _POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            'Service temporarily unavailable. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.',
+            `Service temporarily unavailable. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.`,
         },
         { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
@@ -280,7 +280,7 @@ async function _POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            'An application for this program was already submitted with this email in the last 24 hours. Please call ${PLATFORM_DEFAULTS.supportPhone} if you need to make changes.',
+            `An application for this program was already submitted with this email in the last 24 hours. Please call ${PLATFORM_DEFAULTS.supportPhone} if you need to make changes.`,
         },
         { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
@@ -639,7 +639,7 @@ async function _POST(req: Request) {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="padding: 24px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 2px solid #e5e7eb;">
-              <h1 style="margin: 0; font-size: 24px;">${needsICC ? 'Next Step Required' : 'Welcome to ${PLATFORM_DEFAULTS.orgName}!'}</h1>
+              <h1 style="margin: 0; font-size: 24px;">${needsICC ? 'Next Step Required' : `Welcome to ${PLATFORM_DEFAULTS.orgName}!`}</h1>
             </div>
             <div style="padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
               <p style="font-size: 16px;">Hi ${body.firstName},</p>

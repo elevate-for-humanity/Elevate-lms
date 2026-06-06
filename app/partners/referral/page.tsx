@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
   ArrowRight,
@@ -62,7 +63,14 @@ const PROGRAMS = [
   { name: 'Barber Apprenticeship', duration: '18 months', funding: 'DOL Registered', price: 'Varies' },
 ];
 
-export default function ReferralPartnerPage() {
+export default async function ReferralPartnerPage() {
+  const verified = await loadVerifiedPublicStats();
+  const statsStrip = [
+    { value: verified.programsDisplay, label: 'Programs available' },
+    { value: '$0', label: 'Cost for funded students' },
+    { value: '4 wks', label: 'Shortest program' },
+    { value: '100%', label: 'Job placement support' },
+  ];
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
@@ -109,12 +117,7 @@ export default function ReferralPartnerPage() {
       {/* Stats strip */}
       <section className="bg-brand-blue-700 py-8 px-6">
         <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-          {[
-            { value: '15+', label: 'Programs available' },
-            { value: '$0', label: 'Cost for funded students' },
-            { value: '4 wks', label: 'Shortest program' },
-            { value: '100%', label: 'Job placement support' },
-          ].map((s) => (
+          {statsStrip.map((s) => (
             <div key={s.label}>
               <p className="text-2xl font-extrabold text-white">{s.value}</p>
               <p className="text-brand-blue-200 text-sm">{s.label}</p>

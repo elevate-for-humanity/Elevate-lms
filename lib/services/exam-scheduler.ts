@@ -153,7 +153,7 @@ export async function resolveSchedulingRoute(
       providerType: 'elevate',
       mode: 'manual',
       schedulingUrl: null,
-      contactEmail: 'info@${PLATFORM_DEFAULTS.canonicalDomain}',
+      contactEmail: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
       instruction: `Contact Elevate staff to schedule your ${data.name} exam.`,
     };
   }

@@ -14,6 +14,7 @@ export function getCanonicalStripeWebhookSecrets(): string[] {
     process.env.STRIPE_WEBHOOK_SECRET_LICENSES,
     process.env.STRIPE_WEBHOOK_SECRET_STORE,
     process.env.STRIPE_WEBHOOK_SECRET_COSMETOLOGY,
+    process.env.STRIPE_TESTING_WEBHOOK_SECRET,
   ];
   const seen = new Set<string>();
   return candidates.filter((s): s is string => {

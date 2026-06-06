@@ -1,34 +1,38 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
-
-const ROOT = process.cwd();
-const config = JSON.parse(
-  readFileSync(join(ROOT, 'lib/routes/canonical-routes.json'), 'utf8'),
-) as {
-  legacyAliases: Array<{ source: string; destination: string }>;
-};
-
-const protectedSlugs = new Set(STATIC_PROGRAM_MAP.keys());
-const programsDir = join(ROOT, 'app/programs');
-for (const entry of readdirSync(programsDir, { withFileTypes: true })) {
-  if (!entry.isDirectory() || entry.name.startsWith('[')) continue;
-  if (existsSync(join(programsDir, entry.name, 'page.tsx'))) {
-    protectedSlugs.add(entry.name);
-  }
-}
 
 describe('canonical program redirects', () => {
-  it('does not send live program slugs to the catalog root', () => {
-    const bad: string[] = [];
-    for (const alias of config.legacyAliases) {
-      if (alias.destination !== '/programs') continue;
-      const match = alias.source.match(/^\/programs\/([^/]+)$/);
-      if (!match) continue;
-      const slug = match[1];
-      if (protectedSlugs.has(slug)) bad.push(alias.source);
-    }
-    expect(bad).toEqual([]);
+  const raw = readFileSync(join(process.cwd(), 'lib/routes/canonical-routes.json'), 'utf8');
+  const parsed = JSON.parse(raw) as {
+    legacyAliases: { source: string; destination: string }[];
+  };
+  const redirects = parsed.legacyAliases;
+
+  const programRedirects = redirects.filter(
+    (r) => r.source.startsWith('/programs/') && r.destination !== '/programs',
+  );
+
+  it('no program slug redirects dump to /programs catalog', () => {
+    const bad = redirects.filter(
+      (r) =>
+        r.source.startsWith('/programs/') &&
+        r.destination === '/programs' &&
+        r.source !== '/programs',
+    );
+    expect(bad.map((r) => r.source)).toEqual([]);
+  });
+
+  it('does not redirect /programs/business-administration away from its canonical URL', () => {
+    const bad = redirects.find((r) => r.source === '/programs/business-administration');
+    expect(bad).toBeUndefined();
+  });
+
+  it('legacy slugs redirect to real program or funding pages', () => {
+    const map = new Map(programRedirects.map((r) => [r.source, r.destination]));
+    expect(map.get('/programs/cpr-aed')).toBe('/programs/cpr-first-aid');
+    expect(map.get('/programs/reentry-specialist')).toBeUndefined();
+    expect(map.get('/programs/wioa')).toBe('/wioa-funded-training-indiana');
+    expect(map.get('/programs/workforce-readiness')).toBe('/programs/reentry-specialist');
   });
 });

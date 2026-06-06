@@ -424,7 +424,7 @@ export async function sendWelcomeEmail(params: WelcomeEmailParams) {
 
   return sendEmail({
     to,
-    subject: 'Welcome to ${PLATFORM_DEFAULTS.orgName} - License Activated',
+    subject: `Welcome to ${PLATFORM_DEFAULTS.orgName} - License Activated`,
     html: `
       <h1>Welcome to ${PLATFORM_DEFAULTS.orgName}!</h1>
       <p>Your ${licenseType} license has been successfully activated.</p>

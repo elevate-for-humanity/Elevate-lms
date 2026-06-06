@@ -282,8 +282,8 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
   // Org name in header
   const hx = logoImg ? ML + (logoImg.width / logoImg.height) * 52 + 12 : ML;
   txt(PLATFORM_DEFAULTS.orgLegalName, hx, H - 30, bold, 11, C.headerText);
-  txt('8888 Keystone Crossing, Suite 1300  ·  Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}', hx, H - 44, regular, 8, rgb(0.75, 0.85, 1));
-  txt('elevate4humanityedu@gmail.com  ·  ${PLATFORM_DEFAULTS.canonicalDomain}', hx, H - 56, regular, 8, rgb(0.75, 0.85, 1));
+  txt(`8888 Keystone Crossing, Suite 1300  ·  Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}`, hx, H - 44, regular, 8, rgb(0.75, 0.85, 1));
+  txt(`elevate4humanityedu@gmail.com  ·  ${PLATFORM_DEFAULTS.canonicalDomain}`, hx, H - 56, regular, 8, rgb(0.75, 0.85, 1));
 
   y = H - 90;
 
@@ -373,7 +373,7 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
       pg.drawImage(logoImg, { x: ML, y: H - 30, width: lw, height: lh });
     }
     const hx2 = logoImg ? ML + (logoImg.width / logoImg.height) * 24 + 8 : ML;
-    pg.drawText('${PLATFORM_DEFAULTS.orgName}  ·  FSSA SNAP E&T TPP Application', { x: hx2, y: H - 20, size: 8, font: bold, color: C.headerText });
+    pg.drawText(`${PLATFORM_DEFAULTS.orgName}  ·  FSSA SNAP E&T TPP Application`, { x: hx2, y: H - 20, size: 8, font: bold, color: C.headerText });
     pg.drawText(`Page ${pageNum}`, { x: W - MR - 30, y: H - 20, size: 8, font: regular, color: rgb(0.75, 0.85, 1) });
   };
 
@@ -713,7 +713,7 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
     subHeader(`${label}  [${comp.offered ? 'OFFERED' : 'NOT OFFERED'}]`);
 
     if (!comp.offered) {
-      txt('This component is not offered by ${PLATFORM_DEFAULTS.orgName} at this time.', ML + 6, y, italic, 8.5, C.gray);
+      txt(`This component is not offered by ${PLATFORM_DEFAULTS.orgName} at this time.`, ML + 6, y, italic, 8.5, C.gray);
       y -= 16;
       continue;
     }
@@ -870,7 +870,7 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
     if (pg === coverPage) return;
     addRunningHeader(pg, i); // page number = index (cover is 0, content starts at 1)
     pg.drawLine({ start: { x: ML, y: MB + 14 }, end: { x: W - MR, y: MB + 14 }, thickness: 0.5, color: C.rule });
-    pg.drawText('${PLATFORM_DEFAULTS.orgLegalName}  ·  8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}', {
+    pg.drawText(`${PLATFORM_DEFAULTS.orgLegalName}  ·  8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}`, {
       x: ML, y: MB + 4, size: 6.5, font: regular, color: C.lightGray,
     });
     pg.drawText(`Page ${i} of ${allPages.length - 1}`, {

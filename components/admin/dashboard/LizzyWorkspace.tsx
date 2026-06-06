@@ -39,7 +39,9 @@ type ToolPanel =
   | 'video'
   | 'secrets';
 
-const AIChat = dynamic(() => import('@/components/dev-studio/AIChat'), { ssr: false });
+const UnifiedEllieChat = dynamic(() => import('@/components/dev-studio/UnifiedEllieChat'), {
+  ssr: false,
+});
 const DeployPanel = dynamic(() => import('@/components/dev-studio/DeployPanel'), { ssr: false });
 const DevContainerPanel = dynamic(() => import('@/components/dev-studio/DevContainerPanel'), { ssr: false });
 const ServicesPanel = dynamic(() => import('@/components/dev-studio/ServicesPanel'), { ssr: false });
@@ -112,9 +114,9 @@ export function LizzyWorkspace({
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#1e1e1e] text-[#cccccc]">
       <div className="shrink-0 border-b border-[#3c3c3c] bg-[#1a2e1a] px-3 py-2 text-[10px] leading-snug text-[#9ca3af]">
-        <strong className="text-[#4ec9b0]">Lizzy</strong>
+        <strong className="text-[#4ec9b0]">Ellie</strong>
         {' '}
-        — talk to the platform AI, deploy to Northflank, upload files, and run operations. Credentials load from runtime env and the encrypted secrets store.
+        — unified ops, deploy, and code assistant. Deploy to Northflank, upload files, and run operations from one workspace.
       </div>
 
       {/* Northflank deploy — always visible */}
@@ -151,7 +153,7 @@ export function LizzyWorkspace({
       </div>
 
       <div className="min-h-0 flex-1 overflow-hidden">
-        {panel === 'command' && <AIChat ellieMode />}
+        {panel === 'command' && <UnifiedEllieChat embedded />}
         {panel === 'upload' && <LizzyUploadPanel />}
         {panel === 'files' && <LizzyFilesPanel />}
         {panel === 'ops' && (

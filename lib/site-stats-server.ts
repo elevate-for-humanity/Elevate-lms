@@ -1,6 +1,6 @@
 /**
- * Server-only public stats — DB-backed when available; conservative SITE_STATS otherwise.
- * Use on SSR pages so raw HTML never shows fabricated marketing numbers.
+ * Server-only public stats — catalog-backed counts only (same SSOT as /programs).
+ * Do not override with raw `programs` table row counts (includes drafts/archived).
  */
 
 import { SITE_STATS, formatProgramsDisplay } from '@/lib/site-stats';
@@ -25,7 +25,7 @@ export async function loadVerifiedProgramCount(): Promise<number> {
 }
 
 /**
- * Stats safe to render in server HTML. Does not invent "500+" or "85%" when DB is empty.
+ * Stats safe to render in server HTML. Program count matches /programs catalog.
  */
 export async function loadVerifiedPublicStats(): Promise<VerifiedPublicStats> {
   let programCount = SITE_STATS.programsOffered;

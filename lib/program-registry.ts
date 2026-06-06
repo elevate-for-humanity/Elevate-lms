@@ -599,6 +599,22 @@ const SLUG_ALIASES: Record<string, string> = {
   'health-safety': 'emergency-health-safety',
   'emergency-health': 'emergency-health-safety',
   cosmetology: 'cosmetology-apprenticeship',
+  // Legacy marketing / partner micro-course slugs → canonical program pages
+  'beauty-educator': 'beauty-career-educator',
+  'bloodborne-pathogens': 'cpr-first-aid',
+  'business-financial': 'bookkeeping',
+  careersafe: 'emergency-health-safety',
+  'cpr-aed': 'cpr-first-aid',
+  'food-handler': 'culinary-apprenticeship',
+  'servsafe-food-handler': 'culinary-apprenticeship',
+  hsi: 'cpr-first-aid',
+  'medical-billing': 'office-administration',
+  nrf: 'technology',
+  'osha-30': 'emergency-health-safety',
+  'osha-safety': 'emergency-health-safety',
+  'tax-entrepreneurship': 'entrepreneurship',
+  'workforce-readiness': 'reentry-specialist',
+  'it-certifications': 'technology',
 };
 
 /**

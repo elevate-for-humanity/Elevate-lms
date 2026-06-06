@@ -124,7 +124,7 @@ const TAB_LINKS: Record<string, { label: string; href: string }[]> = {
     { label: 'Workforce Board', href: '/workforce-board/dashboard' },
     { label: 'Employer Portal', href: '/employer/dashboard' },
     { label: 'WorkOne Appointment', href: 'https://www.indianacareerconnect.com' },
-    { label: 'FSSA Benefits', href: '/funding/state-programs' },
+    { label: 'FSSA / SNAP E&T', href: '/snap-et-partner' },
   ],
   business: [
     { label: 'Program Holder Portal', href: '/program-holder/dashboard' },
@@ -502,7 +502,7 @@ function WorkforcePanel({ data }: { data: any }) {
             WorkOne / WIOA Appointment <ChevronRight className="w-3 h-3" />
           </a>
           <Link
-            href="/funding/state-programs"
+            href="/snap-et-partner"
             className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-800 font-medium hover:bg-blue-100 flex items-center justify-between"
           >
             FSSA / SNAP &amp; TANF Benefits <ChevronRight className="w-3 h-3" />
@@ -667,7 +667,7 @@ export default function MyDashboard({
                 },
                 {
                   label: 'Instructor Portal',
-                  href: 'https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/instructor',
+                  href: `https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/instructor`,
                   roles: ['instructor', 'admin', 'super_admin'],
                 },
                 {

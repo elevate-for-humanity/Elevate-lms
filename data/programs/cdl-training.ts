@@ -15,20 +15,20 @@ export const CDL_TRAINING: ProgramSchema = {
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
-  durationWeeks: 6,
+  durationWeeks: 5,
   hoursPerWeekMin: 30,
   hoursPerWeekMax: 40,
   hoursBreakdown: {
-    onlineInstruction: 40,
-    handsOnLab: 120,
-    examPrep: 20,
-    careerPlacement: 10,
+    onlineInstruction: 30,
+    handsOnLab: 110,
+    examPrep: 15,
+    careerPlacement: 5,
   },
   schedule: 'Mon–Fri, 30–40 hours per week (accelerated format)',
   cohortSize: '8–12 participants per cohort',
   fundingStatement:
-    'WIOA funding available for eligible Indiana residents. Covers tuition, DOT physical, drug screen, and CDL exam fees when approved. Eligibility not guaranteed. Self-pay: $5,000.',
-  selfPayCost: '$5,000',
+    'WIOA funding available for eligible Indiana residents. Covers tuition, DOT physical, drug screen, and CDL exam fees when approved. Eligibility not guaranteed. Self-pay: $4,500.',
+  selfPayCost: '$4,500',
   badge: 'Now Enrolling — Funding Available',
   badgeColor: 'green',
 
@@ -69,7 +69,7 @@ export const CDL_TRAINING: ProgramSchema = {
       statement: 'Drive safely in traffic, highway, and intersection conditions',
       assessedAt: 'Week 5',
     },
-    { statement: 'Pass the Indiana CDL Class A skills test', assessedAt: 'Week 6' },
+    { statement: 'Pass the Indiana CDL Class A skills test', assessedAt: 'Week 5' },
   ],
 
   careerPathway: [
@@ -122,13 +122,9 @@ export const CDL_TRAINING: ProgramSchema = {
     },
     {
       week: 'Week 5',
-      title: 'On-Road Driving',
-      competencyMilestone: 'Drive safely in traffic and highway conditions',
-    },
-    {
-      week: 'Week 6',
-      title: 'CDL Exam & Career Placement',
-      competencyMilestone: 'Pass Indiana CDL Class A skills test',
+      title: 'On-Road Driving, CDL Exam & Placement',
+      competencyMilestone:
+        'Drive safely in traffic and highway conditions; pass Indiana CDL Class A skills test',
     },
   ],
 
@@ -240,7 +236,7 @@ export const CDL_TRAINING: ProgramSchema = {
     {
       phase: 4,
       title: 'CDL Exam & Job Placement',
-      weeks: 'Week 6',
+      weeks: 'Week 5',
       focus: 'Indiana CDL Class A skills test and employer placement.',
       labCompetencies: [
         'Pass Indiana CDL Class A skills test',
@@ -252,7 +248,7 @@ export const CDL_TRAINING: ProgramSchema = {
 
   credentialPipeline: [
     {
-      training: 'CDL Class A training (6 weeks)',
+      training: 'CDL Class A training (5 weeks)',
       certification: 'CDL Class A License',
       certBody: 'Indiana BMV',
       jobRole: 'Commercial Truck Driver',

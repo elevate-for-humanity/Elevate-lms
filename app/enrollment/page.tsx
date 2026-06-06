@@ -131,7 +131,7 @@ const FUNDING = [
     desc: "Indiana's state grant covers training costs for high-demand certifications. Available to Indiana residents pursuing approved programs.",
     icon: FileText,
     cta: 'Check WRG Eligibility',
-    href: '/funding/state-programs',
+    href: '/funding/wrg',
     badge: 'Indiana State',
   },
   {

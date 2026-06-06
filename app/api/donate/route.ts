@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
             price_data: {
               currency: 'usd',
               product_data: {
-                name: 'Donation — Sit Selfish Inc / ${PLATFORM_DEFAULTS.orgName}',
+                name: `Donation — Sit Selfish Inc / ${PLATFORM_DEFAULTS.orgName}`,
                 description:
                   'Your gift funds workforce training, credentials, and career placement for underserved communities.',
                 images: [`${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`],

@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/public';
-import { loadProgramCatalog } from '@/lib/programs/load-program-catalog';
-import { buildSiteMetadata } from '@/lib/seo/build-site-metadata';
+import {
+  buildProgramsCatalogMetadata,
+  getPublicProgramsCatalogPage,
+  type PublicCatalogProgram,
+} from '@/lib/programs/public-programs-page';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
@@ -13,14 +15,7 @@ import { PayNowButton } from '@/components/programs/PayNowButton';
 export const revalidate = 0;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const db = createPublicClient();
-  const { total } = await loadProgramCatalog(db, { perPage: 1, page: 1 });
-  const countLabel = total > 0 ? `${total}` : '30+';
-  return buildSiteMetadata({
-    title: 'Program Catalog',
-    description: `Browse ${countLabel} workforce training programs. Filter by funding eligibility, credential type, and delivery mode.`,
-    path: '/programs/catalog',
-  });
+  return buildProgramsCatalogMetadata();
 }
 
 const CATEGORIES = [
@@ -52,12 +47,10 @@ export default async function ProgramCatalogPage({
   const page = Math.max(1, parseInt(params.page ?? '1', 10));
   const perPage = 18;
 
-  const db = createPublicClient();
-  const catalog = await loadProgramCatalog(db, {
+  const catalog = await getPublicProgramsCatalogPage({
     q: q || undefined,
     category: category || undefined,
     wioaOnly,
-    providerSlug: providerSlug || undefined,
     page,
     perPage,
   });
@@ -211,25 +204,7 @@ export default async function ProgramCatalogPage({
   );
 }
 
-type ProgramRow = {
-  program_id: string;
-  provider_name: string;
-  provider_slug: string;
-  title: string;
-  slug: string | null;
-  category: string | null;
-  wioa_eligible: boolean;
-  funding_tags: string[];
-  credential_name: string | null;
-  duration_weeks: number | null;
-  next_start_date: string | null;
-  seats_available: number | null;
-  delivery_mode: string | null;
-  city: string | null;
-  state: string;
-  completion_rate: number | null;
-  placement_rate: number | null;
-};
+type ProgramRow = PublicCatalogProgram;
 
 type StripeData = {
   stripe_price_id: string | null;

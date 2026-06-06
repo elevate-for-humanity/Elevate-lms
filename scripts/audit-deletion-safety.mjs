@@ -27,7 +27,9 @@ if (!fs.existsSync(abs)) {
 }
 
 const rel = path.relative(ROOT, abs).replace(/\\/g, '/');
-const basename = path.basename(rel, path.extname(rel));
+const basename = rel.endsWith('/page.tsx')
+  ? path.basename(path.dirname(rel))
+  : path.basename(rel, path.extname(rel));
 const issues = [];
 
 // 1. Inbound imports (ripgrep)

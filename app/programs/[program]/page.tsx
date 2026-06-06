@@ -26,7 +26,10 @@ export async function generateMetadata({
   if (!meta) return {};
 
   const ogImage = getProgramOgImageUrl(program, SITE_URL);
-  const img = meta.image?.startsWith('http') ? meta.image : `${SITE_URL}${meta.image ?? ogImage}`;
+  const img =
+    meta.image?.startsWith('http') ? meta.image
+    : meta.image ? `${SITE_URL}${meta.image}`
+    : ogImage;
 
   return {
     title: meta.title,

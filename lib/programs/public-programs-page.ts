@@ -115,3 +115,126 @@ export async function buildProgramsListingMetadata(): Promise<Metadata> {
     path: '/programs',
   });
 }
+
+/** Catalog card shape — same listing as /programs, filterable + paginated. */
+export type PublicCatalogProgram = {
+  program_id: string;
+  provider_name: string;
+  provider_slug: string;
+  title: string;
+  slug: string;
+  category: string | null;
+  wioa_eligible: boolean;
+  funding_tags: string[];
+  credential_name: string | null;
+  duration_weeks: number | null;
+  delivery_mode: string | null;
+  city: string | null;
+  state: string;
+  next_start_date: string | null;
+  seats_available: number | null;
+  completion_rate: number | null;
+  placement_rate: number | null;
+};
+
+export type PublicCatalogPageParams = {
+  q?: string;
+  category?: string;
+  wioaOnly?: boolean;
+  page?: number;
+  perPage?: number;
+};
+
+export type PublicCatalogPageResult = {
+  programs: PublicCatalogProgram[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+};
+
+function parseDurationWeeks(duration: string | null): number | null {
+  if (!duration) return null;
+  const match = duration.match(/(\d+)\s*week/i);
+  return match ? parseInt(match[1], 10) : null;
+}
+
+function rowToCatalogProgram(row: ProgramsPageRow): PublicCatalogProgram {
+  return {
+    program_id: row.slug,
+    provider_name: PLATFORM_DEFAULTS.orgName,
+    provider_slug: 'elevate',
+    title: row.title,
+    slug: row.slug,
+    category: row.category,
+    wioa_eligible: row.funding_eligible,
+    funding_tags: row.funding_eligible ? ['wioa'] : [],
+    credential_name: row.credential,
+    duration_weeks: parseDurationWeeks(row.duration),
+    delivery_mode: null,
+    city: null,
+    state: 'IN',
+    next_start_date: null,
+    seats_available: null,
+    completion_rate: null,
+    placement_rate: null,
+  };
+}
+
+/**
+ * Paginated catalog for /programs/catalog — same SSOT as /programs (no raw DB divergence).
+ */
+export async function getPublicProgramsCatalogPage(
+  params: PublicCatalogPageParams = {},
+): Promise<PublicCatalogPageResult> {
+  const page = Math.max(1, params.page ?? 1);
+  const perPage = Math.min(50, Math.max(1, params.perPage ?? 18));
+  const q = params.q?.trim().toLowerCase() ?? '';
+  const category = params.category?.trim().toLowerCase() ?? '';
+
+  const { programs: rows } = await getPublicProgramsPageData();
+
+  let filtered = rows;
+  if (params.wioaOnly) {
+    filtered = filtered.filter((p) => p.funding_eligible);
+  }
+  if (category) {
+    filtered = filtered.filter(
+      (p) =>
+        p.category.toLowerCase() === category ||
+        p.category.toLowerCase().includes(category),
+    );
+  }
+  if (q) {
+    filtered = filtered.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.slug.toLowerCase().includes(q) ||
+        (p.credential?.toLowerCase().includes(q) ?? false) ||
+        (p.description?.toLowerCase().includes(q) ?? false),
+    );
+  }
+
+  const total = filtered.length;
+  const offset = (page - 1) * perPage;
+  const pageRows = filtered.slice(offset, offset + perPage);
+
+  return {
+    programs: pageRows.map(rowToCatalogProgram),
+    total,
+    page,
+    perPage,
+    totalPages: Math.ceil(total / perPage) || 0,
+  };
+}
+
+export async function buildProgramsCatalogMetadata(): Promise<Metadata> {
+  const { total } = await getPublicProgramsCatalogPage({ perPage: 1, page: 1 });
+  const count = resolvePublicProgramCount(total);
+  const countLabel = count > 0 ? `${count}` : SITE_STATS.programsOfferedDisplay.replace('+', '');
+  return buildSiteMetadata({
+    title: 'Program Catalog',
+    description: `Browse ${countLabel} workforce training programs. Filter by funding eligibility, credential type, and delivery mode.`,
+    path: '/programs/catalog',
+  });
+}

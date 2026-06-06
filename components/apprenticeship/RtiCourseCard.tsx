@@ -42,13 +42,21 @@ export function RtiCourseCard({ config, rti }: Props) {
             </div>
             <p className="text-xs text-slate-500 mt-1">{Math.round(rti.progressPercent)}% through RTI</p>
           </div>
-          <Link
-            href={`/lms/courses/${rti.courseId}`}
-            className={`inline-flex items-center justify-center gap-2 ${config.accentBg} text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:opacity-90 transition shrink-0`}
-          >
-            <Play className="w-4 h-4" />
-            {rti.completedLessonCount > 0 ? 'Continue training' : 'Start RTI lessons'}
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+            <Link
+              href={rti.continueHref}
+              className={`inline-flex items-center justify-center gap-2 ${config.accentBg} text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:opacity-90 transition`}
+            >
+              <Play className="w-4 h-4" />
+              {rti.completedLessonCount > 0 ? 'Continue training' : 'Start RTI lessons'}
+            </Link>
+            <Link
+              href={rti.workbookHref}
+              className="inline-flex items-center justify-center gap-2 border border-slate-200 text-slate-800 text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-slate-50 transition"
+            >
+              Open workbook
+            </Link>
+          </div>
         </div>
       </div>
     </div>

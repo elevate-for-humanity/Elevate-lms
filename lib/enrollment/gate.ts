@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { BARBER_LMS_COURSE_PATH } from '@/lib/barber/branding';
+import { apprenticeshipLmsCoursePath } from '@/lib/portal/program-portal-paths';
 
 export type EnrollmentState =
   | 'applied'
@@ -50,11 +50,12 @@ export function getNextRequiredAction(enrollment: {
     };
   }
 
-  // 3. Start first course
+  // 3. Open RTI course on Elevate LMS
+  const lmsPath = apprenticeshipLmsCoursePath(programSlug);
   return {
-    label: 'Begin Course 1',
-    href: '/apprentice/courses/1',
-    description: 'Start your first course module',
+    label: lmsPath ? 'Open RTI course' : 'Open training',
+    href: lmsPath ?? '/lms/courses',
+    description: 'Continue your related technical instruction on Elevate LMS',
   };
 }
 

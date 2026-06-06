@@ -21,6 +21,8 @@ import {
   Droplets,
 } from 'lucide-react';
 import { PRESTIGE_ELEVATION_BARBER_WORKBOOK_LABEL } from '@/lib/barber/branding';
+import { RtiCourseCard } from '@/components/apprenticeship/RtiCourseCard';
+import type { RtiTrainingSummary } from '@/lib/apprenticeship/load-apprenticeship-dashboard';
 import {
   BARBER_STUDENT_APP_HOME,
   BARBER_STUDENT_APP_SHORT_LABEL,
@@ -165,6 +167,7 @@ interface Props {
   transferHoursVerified?: number | null;
   hoursRemainingDisplay?: number;
   apprentice?: unknown;
+  rti?: RtiTrainingSummary | null;
 }
 
 export function ApprenticePortalShell({
@@ -178,6 +181,7 @@ export function ApprenticePortalShell({
   transferHoursClaimed = 0,
   transferHoursVerified = null,
   hoursRemainingDisplay,
+  rti = null,
 }: Props) {
   const ProgramIcon = config.icon;
 
@@ -223,12 +227,15 @@ export function ApprenticePortalShell({
 
   const orientationHref = apprenticeshipOrientationPath(config.programSlug);
   const documentsHref = apprenticeshipDocumentsPath(config.programSlug);
-  const lmsCourseHref = apprenticeshipLmsCoursePath(config.programSlug);
+  const lmsCourseHref =
+    rti?.courseHref ?? apprenticeshipLmsCoursePath(config.programSlug);
+  const continueCourseHref = rti?.continueHref ?? lmsCourseHref;
   const rtiCourseLabel =
     apprenticeshipRtiLabel(config.programSlug) ?? 'Online Course';
   const rtiCourseLabelShort =
     apprenticeshipRtiLabel(config.programSlug, true) ?? 'Online Course';
-  const workbookHref = apprenticeshipWorkbookHref(config.programSlug);
+  const workbookHref =
+    rti?.workbookHref ?? apprenticeshipWorkbookHref(config.programSlug);
   const isBarberApprentice = config.programSlug === 'barber-apprenticeship';
 
   const onboardingItems = [
@@ -251,8 +258,8 @@ export function ApprenticePortalShell({
 
   const navTabs = [
     { id: 'dashboard', label: 'Dashboard', href: config.portalPath },
-    ...(lmsCourseHref
-      ? [{ id: 'course', label: rtiCourseLabelShort, href: lmsCourseHref }]
+    ...(continueCourseHref
+      ? [{ id: 'course', label: rtiCourseLabelShort, href: continueCourseHref }]
       : []),
     { id: 'hours', label: 'Hours', href: '/apprentice/hours' },
     { id: 'timeclock', label: 'Timeclock', href: '/apprentice/timeclock' },
@@ -321,6 +328,8 @@ export function ApprenticePortalShell({
           </div>
         </div>
       </nav>
+
+      <RtiCourseCard config={config} rti={rti} />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Payment alert — no subscription at all */}
@@ -530,9 +539,9 @@ export function ApprenticePortalShell({
                   <p className="text-xs text-white/80">Start or end your shift</p>
                 </div>
               </Link>
-              {lmsCourseHref && (
+              {continueCourseHref && (
                 <Link
-                  href={lmsCourseHref}
+                  href={continueCourseHref}
                   className={`flex items-center gap-3 p-3 rounded-lg border-2 border-slate-200 hover:border-slate-300 bg-white transition`}
                 >
                   <BookOpen className={`w-5 h-5 ${config.accentText}`} />
@@ -637,9 +646,9 @@ export function ApprenticePortalShell({
             <p className="font-semibold text-sm text-slate-900">Skills Checklist</p>
             <p className="text-xs text-slate-500 mt-0.5">Track competency mastery</p>
           </Link>
-          {lmsCourseHref ? (
+          {continueCourseHref ? (
             <Link
-              href={lmsCourseHref}
+              href={continueCourseHref}
               className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm hover:border-slate-300 transition"
             >
               <BookOpen className={`w-5 h-5 ${config.accentText} mb-2`} />

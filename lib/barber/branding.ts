@@ -3,7 +3,7 @@
  * Do not use third-party curriculum vendor names in learner UI.
  */
 
-import { BARBER_COURSE_ID } from '@/lib/barber/pricing';
+import { BARBER_COURSE_ID } from '@/lib/barber/constants';
 
 export const PRESTIGE_ELEVATION_BARBER_CURRICULUM =
   'Prestige Elevation Barber Curriculum';
@@ -14,9 +14,27 @@ export const PRESTIGE_ELEVATION_BARBER_CURRICULUM_SHORT = 'Prestige Elevation Co
 /** Printable / offline companion materials */
 export const PRESTIGE_ELEVATION_BARBER_WORKBOOK_LABEL = 'Prestige Elevation Workbook';
 
-/** Canonical LMS path for Prestige Elevation RTI course */
-export const prestigeElevationBarberCoursePath = `/lms/courses/${BARBER_COURSE_ID}`;
+export const BARBER_CURRICULUM_COVER =
+  '/images/prestige-elevation/barber-curriculum-workbook-cover.svg';
 
-/** Primary workbook entry — opens Prestige Elevation RTI reading materials in LMS */
-export const PRESTIGE_ELEVATION_BARBER_WORKBOOK_HREF =
-  `${prestigeElevationBarberCoursePath}?activity=reading`;
+export const BARBER_ORIENTATION_VIDEO =
+  '/videos/barber-lessons/barber-apprenticeship-orientation.mp4';
+
+/** Canonical LMS path for Prestige Elevation RTI course */
+export const BARBER_LMS_COURSE_PATH = `/lms/courses/${BARBER_COURSE_ID}` as const;
+
+/** @deprecated Use BARBER_LMS_COURSE_PATH */
+export const prestigeElevationBarberCoursePath = BARBER_LMS_COURSE_PATH;
+
+/**
+ * Static workbook fallback — course landing with reading tab hint.
+ * Prefer server-resolved `workbookHref` from resolveCourseEntryLinks() on dashboards.
+ */
+export const PRESTIGE_ELEVATION_BARBER_WORKBOOK_HREF = BARBER_LMS_COURSE_PATH;
+
+export const PRESTIGE_BARBER_BRAND = {
+  instituteName: 'Prestige Barber & Beauty Institute',
+  curriculumName: 'Prestige Elevation™ Barbering RTI',
+  tagline: 'Elevate Your Future',
+  motto: 'Learn. Practice. Master. Elevate.',
+} as const;

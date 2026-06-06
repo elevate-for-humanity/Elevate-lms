@@ -119,7 +119,7 @@ export async function loadBarberDashboardData(): Promise<BarberDashboardData> {
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .eq('course_id', BARBER_COURSE_ID)
-      .eq('status', 'completed');
+      .eq('completed', true);
     rtiLessonsCompleted = count ?? 0;
   }
   const rtiLessonsTotal = lessonIds.length > 0 ? lessonIds.length : 50;

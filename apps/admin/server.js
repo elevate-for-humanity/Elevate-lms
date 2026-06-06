@@ -4,6 +4,10 @@
  */
 'use strict';
 
+// Before Next boots — swallow benign client aborts (ECONNRESET / aborted).
+const { registerConnectionGuards } = require('../../lib/server/register-connection-guards.cjs');
+registerConnectionGuards();
+
 const fs = require('fs');
 const path = require('path');
 

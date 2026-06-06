@@ -1,6 +1,6 @@
 /**
  * Copy pdf-parse → pdfjs-dist → @napi-rs/canvas into /export/pdf-node_modules
- * for admin Docker runtime (same pattern as sharp/ws).
+ * for LMS + admin Northflank Docker runtimes (same pattern as sharp/ws).
  */
 import { cpSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';

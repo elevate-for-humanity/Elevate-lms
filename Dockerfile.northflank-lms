@@ -77,7 +77,8 @@ RUN test -n "$NEXT_PUBLIC_SUPABASE_URL" \
     && test -f /export/sharp-node_modules/sharp/package.json \
     && test -d /export/sharp-node_modules/@img/sharp-linux-x64 \
     && EXPORT_ROOT=/export node scripts/export-admin-pdf-deps.mjs \
-    && test -f /export/pdf-node_modules/@napi-rs/canvas/package.json
+    && test -f /export/pdf-node_modules/@napi-rs/canvas/package.json \
+    && test -f /export/pdf-node_modules/pdf-parse/package.json
 
 RUN node scripts/prune-lms-builder-disk.mjs
 

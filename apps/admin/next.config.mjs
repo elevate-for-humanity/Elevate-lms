@@ -30,6 +30,9 @@ const adminConfig = {
     parallelServerBuildTraces: false,
   },
 
+  // edge-tts ships index.ts as its entry (uncompiled TS) — same as root LMS config.
+  transpilePackages: ['edge-tts'],
+
   // Resolve @/* to repo root so shared lib/, components/, types/ work
   webpack(config) {
     config.resolve.alias['@'] = ROOT;
@@ -120,6 +123,7 @@ const adminConfig = {
     '@opentelemetry/resources',
     '@opentelemetry/semantic-conventions',
     'sharp',
+    // edge-tts: transpilePackages only (conflicts if also listed here)
     // ws — custom server.js only
     'ws',
     // Document OCR / extract admin APIs

@@ -42,12 +42,16 @@ mkdirSync(exportRoot, { recursive: true });
 // Must match node_modules/@napi-rs/{canvas,canvas-linux-x64-gnu} layout
 copyPkg('@napi-rs/canvas', '@napi-rs/canvas');
 
-// pdf-parse does not export package.json subpath; resolve entry then dirname
-const pdfParseEntry = require.resolve('pdf-parse', { paths: [root] });
-copyDir(dirname(pdfParseEntry), 'pdf-parse');
+const pnpmDir = join(root, 'node_modules', '.pnpm');
+
+// pdf-parse v2 resolve() points at dist/.../index.cjs (no package.json export) — use pnpm store
+const pdfParseStore = readdirSync(pnpmDir).find((e) => e.startsWith('pdf-parse@'));
+if (!pdfParseStore) {
+  throw new Error('pdf-parse not found under node_modules/.pnpm');
+}
+copyDir(join(pnpmDir, pdfParseStore, 'node_modules', 'pdf-parse'), 'pdf-parse');
 
 // pdfjs-dist lives in pnpm store (not always hoisted to workspace root)
-const pnpmDir = join(root, 'node_modules', '.pnpm');
 const pdfjsStore = readdirSync(pnpmDir).find((e) => e.startsWith('pdfjs-dist@'));
 if (!pdfjsStore) {
   throw new Error('pdfjs-dist not found under node_modules/.pnpm');
@@ -70,6 +74,12 @@ if (canvasNative) {
 const canvasPkg = join(exportRoot, '@napi-rs', 'canvas', 'package.json');
 if (!existsSync(canvasPkg)) {
   console.error('[export-pdf] @napi-rs/canvas export failed');
+  process.exit(1);
+}
+
+const pdfParsePkg = join(exportRoot, 'pdf-parse', 'package.json');
+if (!existsSync(pdfParsePkg)) {
+  console.error('[export-pdf] pdf-parse export failed (missing package.json)');
   process.exit(1);
 }
 

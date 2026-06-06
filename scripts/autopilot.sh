@@ -10,7 +10,7 @@ echo "== Autopilot (Builder Mode) =="
 # - dashboard-consolidation-verification.md
 # - autopilot-run-log.md
 # Modifications to existing docs are allowed; only brand-new files are checked.
-ALLOWED_DOCS_REGEX='^(docs/(dashboard-inventory\.md|dashboard-canonical-architecture\.md|dashboard-crossed-analysis\.md|dashboard-schema-verification\.md|dashboard-orphans-disposition\.md|dashboard-consolidation-verification\.md|autopilot-run-log\.md|dashboard-consolidation-baseline\.md|SECURITY\.md|platform-e2e-audit-2026-05\.md|production-activation-2026-05\.md|LOCAL_DEVELOPMENT\.md))$'
+ALLOWED_DOCS_REGEX='^(docs/(dashboard-inventory\.md|dashboard-canonical-architecture\.md|dashboard-crossed-analysis\.md|dashboard-schema-verification\.md|dashboard-orphans-disposition\.md|dashboard-consolidation-verification\.md|autopilot-run-log\.md|dashboard-consolidation-baseline\.md|SECURITY\.md|platform-e2e-audit-2026-05\.md|production-activation-2026-05\.md|platform-owner-tenant-model\.md|LOCAL_DEVELOPMENT\.md))$'
 
 NEW_DOCS=$(git diff --name-only --diff-filter=ACR origin/main...HEAD 2>/dev/null | grep '^docs/.*\.md$' || true)
 

@@ -45,7 +45,6 @@ export const APPLY_AUDIT_SURFACES: ApplySurface[] = [
     expectForm: 'StudentApplicationForm',
     api: 'server:submitStudentApplication',
   },
-  { section: 'Students', name: 'FSSA waitlist', href: '/apply/fssa/waitlist', expectForm: 'form', api: '/api/waitlist' },
   { section: 'Students', name: 'Enroll hub', href: '/enrollment' },
   { section: 'Students', name: 'Track', href: '/apply/track', api: '/api/applications/track' },
   { section: 'Employers', name: 'Employer application', href: '/apply/employer', expectForm: 'EmployerApplicationForm' },

@@ -363,7 +363,7 @@ export default async function LearnerOnboardingPage({
       }
 
       // Notify admin of new completed onboarding
-      const adminEmail = process.env.ADMIN_EMAIL || 'admin@${PLATFORM_DEFAULTS.canonicalDomain}';
+      const adminEmail = process.env.ADMIN_EMAIL || `admin@${PLATFORM_DEFAULTS.canonicalDomain}`;
       const { sendEmail } = await import('@/lib/email/resend');
       await sendEmail({
         to: adminEmail,

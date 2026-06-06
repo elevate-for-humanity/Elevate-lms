@@ -16,6 +16,7 @@
 import Image from 'next/image';
 import { useId, useState } from 'react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
 import { hero as heroTokens } from '@/lib/page-design-tokens';
 import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
 
@@ -26,8 +27,10 @@ export interface HeroPictureCta {
 }
 
 export interface HeroPictureProps {
-  /** Path to the hero image (relative to /public) */
+  /** Desktop hero image (2560×1440 WebP) — relative to /public */
   src: string;
+  /** Mobile hero image (1080×1350 WebP) — uses src when omitted */
+  srcMobile?: string;
   /** Alt text — describe the scene, not the brand */
   alt: string;
   /** 2–4 word micro-label rendered in bottom-left corner of image */
@@ -61,6 +64,7 @@ export interface HeroPictureProps {
 
 export default function HeroPicture({
   src,
+  srcMobile,
   alt,
   microLabel,
   showBrandBug = false,
@@ -78,23 +82,35 @@ export default function HeroPicture({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
 
-  const imageSrc = resolveSiteImagePath(src);
+  const imageSrcDesktop = resolveSiteImagePath(src);
+  const imageSrcMobile = resolveSiteImagePath(srcMobile ?? src);
+  const wrapClass = heightStyle ?? heroTokens.homepageWrap;
 
   return (
     <div className={`w-full ${className}`}>
       {/* IMAGE FRAME */}
       <section
-        className={`relative w-full overflow-hidden ${heightStyle ?? heroTokens.imageWrap}`}
+        className={`relative w-full overflow-hidden ${wrapClass}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero image'}
       >
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
+        {/* Mobile 4:5 — program-desktop.webp / hero-mobile.webp pair */}
         <Image
-          src={imageSrc}
+          src={imageSrcMobile}
           alt={alt}
           fill
-          sizes={heroTokens.imageSizes}
+          sizes={IMAGE_SIZES.hero}
           quality={75}
-          className="object-cover object-center sm:object-[center_35%]"
+          className={`object-cover object-center sm:hidden ${heroTokens.imageFill}`}
+          priority={priority}
+          placeholder="empty"
+        />
+        <Image
+          src={imageSrcDesktop}
+          alt={alt}
+          fill
+          sizes={IMAGE_SIZES.hero}
+          quality={75}
+          className={`hidden sm:block object-cover object-center ${heroTokens.imageFill}`}
           priority={priority}
           placeholder="empty"
         />

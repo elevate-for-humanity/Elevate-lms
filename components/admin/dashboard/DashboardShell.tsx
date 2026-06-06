@@ -25,6 +25,7 @@ import {
   ProgramIntegrityPanelLazy,
   PublishWebsitePanelLazy,
   SitePreviewPanelWrapperLazy,
+  LizzyContainerWrapperLazy,
 } from "./DashboardDeferredPanels";
 
 
@@ -580,6 +581,13 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
         {/* ── Job board + site status + system health ──────────────────── */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <JobBoardPanelLazy />
+          <LizzyContainerWrapperLazy
+            sites={data.sitePreviewTargets ?? []}
+            isSuperAdmin={data.isSuperAdmin}
+            pendingApplications={data.recentApplications}
+            pendingApplicationsCount={data.counts.pendingApplications}
+            pendingProgramHolders={data.counts.pendingProgramHolders}
+          />
           <SitePreviewPanelWrapperLazy sites={data.sitePreviewTargets ?? []} />
           <SystemHealthPanel health={data.systemHealth} />
         </div>

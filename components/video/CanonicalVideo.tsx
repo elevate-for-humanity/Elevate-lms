@@ -85,7 +85,11 @@ export default function CanonicalVideo({
   // timeupdate fires on every frame tick — use as a reliable fallback for
   // browsers/situations where onPlaying fires before React attaches the handler
   // (e.g. autoPlayOnMount on a fast connection where canplay fires synchronously).
-  const handleTimeUpdate = useCallback(() => { isPlayingRef.current = true; setPlaying(true); }, []);
+  const handleTimeUpdate = useCallback(() => {
+    if (isPlayingRef.current) return;
+    isPlayingRef.current = true;
+    setPlaying(true);
+  }, []);
   const handleEnded = useCallback(() => setEnded(true), []);
   const handleError = useCallback(() => setFailed(true), []);
   // Recover from stall/waiting — browser buffered enough to resume, call play()
@@ -127,9 +131,9 @@ export default function CanonicalVideo({
   // Fires on mount and whenever src changes (e.g. desktop→mobile swap after hydration).
   // Only one play path runs — autoPlayOnMount OR observer, never both.
   useEffect(() => {
-    if (!autoPlayOnMount || reducedMotion || failed) return;
+    if (!autoPlayOnMount || reducedMotion || failed) return undefined;
     const video = ref.current;
-    if (!video) return;
+    if (!video) return undefined;
     // Only reset the fade state when the src actually changes to a new URL.
     // Skipping the reset when src is unchanged prevents the poster blink that
     // occurs when HeroVideo re-renders after setMounted(true) with the same src.
@@ -165,11 +169,12 @@ export default function CanonicalVideo({
     // internally before rendering the first frame.
     if (video.readyState >= 1) {
       startPlay(video);
-    } else {
-      const onReady = () => startPlay(video);
-      video.addEventListener('loadedmetadata', onReady, { once: true });
-      return () => video.removeEventListener('loadedmetadata', onReady);
+      return undefined;
     }
+
+    const onReady = () => startPlay(video);
+    video.addEventListener('loadedmetadata', onReady, { once: true });
+    return () => video.removeEventListener('loadedmetadata', onReady);
   }, [autoPlayOnMount, reducedMotion, failed, src]);
 
   // Visibility-gated playback — starts when video enters view.
@@ -177,9 +182,9 @@ export default function CanonicalVideo({
   // If playThrough=false, pauses when scrolled out of view.
   // Skipped entirely when autoPlayOnMount=true.
   useEffect(() => {
-    if (autoPlayOnMount || reducedMotion || failed) return;
+    if (autoPlayOnMount || reducedMotion || failed) return undefined;
     const video = ref.current;
-    if (!video) return;
+    if (!video) return undefined;
 
     let started = false;
 

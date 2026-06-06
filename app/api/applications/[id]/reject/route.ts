@@ -69,7 +69,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
     // Send rejection email
     await sendEmail({
       to: application.email,
-      subject: 'Application Update - ${PLATFORM_DEFAULTS.orgName}',
+      subject: `Application Update - ${PLATFORM_DEFAULTS.orgName}`,
       html: `
         <h2>Hello ${application.first_name},</h2>
         <p>Thank you for your interest in ${PLATFORM_DEFAULTS.orgName}.</p>

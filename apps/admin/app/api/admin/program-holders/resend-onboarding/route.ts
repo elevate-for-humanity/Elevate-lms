@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
     from: { email: PLATFORM_DEFAULTS.emailFromAddress, name: PLATFORM_DEFAULTS.orgName },
     reply_to: { email: 'elevate4humanityedu@gmail.com', name: 'Elizabeth Greene' },
     personalizations: [{ to: [{ email: authEmail, name: holder.contact_name }] }],
-    subject: 'Your Onboarding Link — ${PLATFORM_DEFAULTS.orgName}',
+    subject: `Your Onboarding Link — ${PLATFORM_DEFAULTS.orgName}`,
     content: [
       {
         type: 'text/html',

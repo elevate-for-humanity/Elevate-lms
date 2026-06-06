@@ -102,7 +102,7 @@ async function _POST(req: Request) {
       // Confirmation email to the requester
       await sendEmail({
         to: data.email,
-        subject: 'Meeting Request Received — ${PLATFORM_DEFAULTS.orgName}',
+        subject: `Meeting Request Received — ${PLATFORM_DEFAULTS.orgName}`,
         html: `
           <h2>Your Meeting Request Has Been Received</h2>
           <p>Hi ${data.name.split(' ')[0]},</p>

@@ -48,7 +48,7 @@ const footerLinks = {
     { name: 'Check My Eligibility', href: '/check-eligibility' },
     { name: 'WIOA / WorkOne', href: '/funding/wioa' },
     { name: 'Workforce Ready Grant', href: '/funding/wrg' },
-    { name: 'FSSA IMPACT', href: '/funding/state-programs' },
+    { name: 'SNAP E&T Partner', href: '/snap-et-partner' },
     { name: 'Federal Programs', href: '/funding/federal-programs' },
     { name: 'Consumer Education', href: '/consumer-education' },
     { name: 'Tuition & Fees', href: '/tuition-fees' },

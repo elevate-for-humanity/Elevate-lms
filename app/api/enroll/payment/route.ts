@@ -90,6 +90,12 @@ async function _POST(req: Request) {
       totalPrice: amount,
     };
 
+    const { data: programRow } = await supabase
+      .from('programs')
+      .select('id, slug, title')
+      .eq('slug', program)
+      .maybeSingle();
+
     const amountDollars = amount;
     const paymentMethodTypes = getStripeMethodsForAmount(amountDollars);
 
@@ -116,14 +122,17 @@ async function _POST(req: Request) {
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
+        kind: 'program_enrollment',
         payment_type: 'enrollment',
         funding_source: 'self_pay',
-        program_slug: program,
+        program_id: programRow?.id ?? '',
+        program_slug: programRow?.slug ?? program,
         program_name: programInfo.name,
-        enrollment_payment_type: paymentType,
+        student_id: user?.id ?? '',
+        user_id: user?.id ?? '',
+        enrollment_payment_type: paymentType ?? 'full',
         amount_paid: amount.toString(),
         total_program_cost: programInfo.totalPrice.toString(),
-        user_id: user?.id || '',
       },
       automatic_tax: {
         enabled: true,

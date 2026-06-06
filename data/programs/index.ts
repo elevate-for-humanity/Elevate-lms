@@ -47,6 +47,7 @@ import { HOSPITALITY } from './hospitality';
 import { TECHNOLOGY } from './technology';
 import { QMA } from './qma';
 import { BEAUTY_CAREER_EDUCATOR } from './beauty-career-educator';
+import { COMMUNITY_HEALTH_WORKER } from './community-health-worker';
 
 const STATIC_PROGRAMS: ProgramSchema[] = [
   // Programs with dedicated page.tsx - registered here for [slug] fallback and sitemap
@@ -82,6 +83,7 @@ const STATIC_PROGRAMS: ProgramSchema[] = [
   FORKLIFT,
   GRAPHIC_DESIGN,
   HOME_HEALTH_AIDE,
+  COMMUNITY_HEALTH_WORKER,
   IT_HELP_DESK,
   NETWORK_ADMIN,
   NETWORK_SUPPORT,

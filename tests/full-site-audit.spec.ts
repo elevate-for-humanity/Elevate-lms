@@ -43,7 +43,7 @@ const programPages = [
   '/programs/cdl-transportation',
   '/programs/barber-apprenticeship',
   '/programs/cna',
-  '/programs/tax-preparation',
+  '/programs/bookkeeping',
 ];
 
 // Service pages

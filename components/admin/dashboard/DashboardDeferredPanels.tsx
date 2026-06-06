@@ -32,3 +32,8 @@ export const SitePreviewPanelWrapperLazy = dynamic(
   () => import('./SitePreviewPanelWrapper'),
   { loading: () => panelSkeleton, ssr: false },
 );
+
+export const LizzyContainerWrapperLazy = dynamic(() => import('./LizzyContainerWrapper'), {
+  loading: () => panelSkeleton,
+  ssr: false,
+});

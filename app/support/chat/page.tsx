@@ -40,10 +40,10 @@ async function getAIResponse(history: Message[], userMessage: string): Promise<s
       data.message ||
       data.reply ||
       data.choices?.[0]?.message?.content ||
-      'Thank you for your message. For immediate assistance, call ${PLATFORM_DEFAULTS.supportPhone} Mon–Fri 9am–5pm ET or submit a support ticket at /support.'
+      `Thank you for your message. For immediate assistance, call ${PLATFORM_DEFAULTS.supportPhone} Mon–Fri 9am–5pm ET or submit a support ticket at /support.`
     );
   } catch {
-    return 'Thank you for your message. For immediate assistance, please call ${PLATFORM_DEFAULTS.supportPhone} (Mon–Fri 9am–5pm ET) or submit a support ticket at /support.';
+    return `Thank you for your message. For immediate assistance, please call ${PLATFORM_DEFAULTS.supportPhone} (Mon–Fri 9am–5pm ET) or submit a support ticket at /support.`;
   }
 }
 

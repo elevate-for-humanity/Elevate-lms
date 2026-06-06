@@ -105,7 +105,6 @@ export const PORTAL_CONFIGS: Record<string, PortalConfig> = {
     availablePrograms: [
       { title: 'Office Administration', slug: 'office-administration', credential: 'MOS Certification' },
       { title: 'Bookkeeping', slug: 'bookkeeping', credential: 'QuickBooks / NACPB' },
-      { title: 'Tax Preparation', slug: 'tax-preparation', credential: 'IRS AFSP / PTIN' },
       { title: 'Project Management', slug: 'project-management', credential: 'CAPM Pathway' },
     ],
   },

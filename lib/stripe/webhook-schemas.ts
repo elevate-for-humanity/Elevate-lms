@@ -51,6 +51,17 @@ export const TestingSessionMeta = z.object({
 });
 export type TestingSessionMeta = z.infer<typeof TestingSessionMeta>;
 
+/**
+ * Metadata set by /api/testing/enforcement/checkout on checkout.session.completed.
+ */
+export const TestingEnforcementMeta = z.object({
+  payment_type: z.literal('testing_enforcement'),
+  enforcement_id: metaStr,
+  enforcement_type: metaStrOpt,
+  email: metaStrOpt,
+});
+export type TestingEnforcementMeta = z.infer<typeof TestingEnforcementMeta>;
+
 // ── Barber apprenticeship ─────────────────────────────────────────────────────
 
 /**

@@ -26,7 +26,6 @@
       "graphicDesign": "/programs/graphic-design",
       "cadDrafting": "/programs/cad-drafting",
       "bookkeeping": "/programs/bookkeeping",
-      "taxPreparation": "/programs/tax-preparation",
       "officeAdministration": "/programs/office-administration",
       "businessAdministration": "/programs/business-administration",
       "entrepreneurship": "/programs/entrepreneurship",
@@ -177,26 +176,6 @@
     {
       "source": "/programs/bookkeeping-quickbooks",
       "destination": "/programs/bookkeeping",
-      "permanent": true
-    },
-    {
-      "source": "/programs/tax-prep",
-      "destination": "/programs/business-administration",
-      "permanent": true
-    },
-    {
-      "source": "/programs/tax-prep-financial-services",
-      "destination": "/programs/business-administration",
-      "permanent": true
-    },
-    {
-      "source": "/programs/tax-preparation",
-      "destination": "/programs/business-administration",
-      "permanent": true
-    },
-    {
-      "source": "/programs/tax-preparation/:path*",
-      "destination": "/programs/business-administration",
       "permanent": true
     },
     {
@@ -466,93 +445,88 @@
     },
     {
       "source": "/programs/beauty-educator",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/beauty-career-educator",
+      "permanent": true
     },
     {
       "source": "/programs/bloodborne-pathogens",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/cpr-first-aid",
+      "permanent": true
     },
     {
       "source": "/programs/business-financial",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/bookkeeping",
+      "permanent": true
     },
     {
       "source": "/programs/business-management",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/business-administration",
+      "permanent": true
     },
     {
       "source": "/programs/careersafe",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/emergency-health-safety",
+      "permanent": true
     },
     {
       "source": "/programs/cpr-aed",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/cpr-first-aid",
+      "permanent": true
     },
     {
       "source": "/programs/emergency-health",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/emergency-health-safety",
+      "permanent": true
     },
     {
       "source": "/programs/food-handler",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/culinary-apprenticeship",
+      "permanent": true
     },
     {
       "source": "/programs/hsi",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/cpr-first-aid",
+      "permanent": true
     },
     {
       "source": "/programs/medical-billing",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/office-administration",
+      "permanent": true
     },
     {
       "source": "/programs/nrf",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/technology",
+      "permanent": true
     },
     {
       "source": "/programs/osha-30",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/emergency-health-safety",
+      "permanent": true
     },
     {
       "source": "/programs/osha-safety",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/reentry-specialist",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/emergency-health-safety",
+      "permanent": true
     },
     {
       "source": "/programs/tax-entrepreneurship",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/entrepreneurship",
+      "permanent": true
     },
     {
       "source": "/programs/wioa",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/wioa-funded-training-indiana",
+      "permanent": true
     },
     {
       "source": "/programs/workforce-readiness",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/reentry-specialist",
+      "permanent": true
     },
     {
       "source": "/programs/wrg",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/tuition",
+      "permanent": true
     },
     {
       "source": "/programs/certified-nursing-assistant",
@@ -590,139 +564,39 @@
       "permanent": true
     },
     {
-      "source": "/programs/bookkeeping",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/business",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/business-administration",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/cad-drafting",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/construction-trades-certification",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/cpr-first-aid",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/cybersecurity-analyst",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/diesel-mechanic",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
       "source": "/programs/early-childhood-education",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/emergency-health-safety",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/entrepreneurship",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/forklift",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/graphic-design",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/home-health-aide",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/contact?program=early-childhood-education",
+      "permanent": true
     },
     {
       "source": "/programs/it-certifications",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/it-help-desk",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/technology",
+      "permanent": true
     },
     {
       "source": "/programs/nail-technician",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/network-administration",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/office-administration",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/phlebotomy",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/project-management",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/sanitation-infection-control",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/programs/nail-technician-apprenticeship",
+      "permanent": true
     },
     {
       "source": "/programs/snap-et",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/software-development",
-      "destination": "/programs",
-      "permanent": false
-    },
-    {
-      "source": "/programs/web-development",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/snap/snap-et",
+      "permanent": true
     },
     {
       "source": "/programs/wioa-funding",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/wioa-funded-training-indiana",
+      "permanent": true
     },
     {
       "source": "/programs/workforce-ready-grant",
-      "destination": "/programs",
-      "permanent": false
+      "destination": "/tuition",
+      "permanent": true
+    },
+    {
+      "source": "/funding/state-programs",
+      "destination": "/funding",
+      "permanent": true
     }
   ],
   "externalOrAppHostedAllowlist": [

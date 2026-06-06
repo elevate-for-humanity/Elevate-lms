@@ -191,7 +191,7 @@ export function getPolicyContent(policyType: string): PageContent {
     terms: {
       title: 'Terms of Service',
       description:
-        'Terms and conditions governing your use of ${PLATFORM_DEFAULTS.orgName} services, programs, and digital platforms.',
+        `Terms and conditions governing your use of ${PLATFORM_DEFAULTS.orgName} services, programs, and digital platforms.`,
       imageSrc: '/images/pages/business-sector.webp',
       imageAlt: 'Legal agreement and terms documentation',
       breadcrumbs: [

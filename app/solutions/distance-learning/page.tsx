@@ -62,10 +62,10 @@ const PROGRAMS = [
     href: '/programs/medical-assistant',
   },
   {
-    name: 'Tax Preparation',
-    credential: 'IRS PTIN',
+    name: 'Bookkeeping & QuickBooks',
+    credential: 'QuickBooks Certified',
     format: 'Self-paced',
-    href: '/programs/tax-preparation',
+    href: '/programs/bookkeeping',
   },
   {
     name: 'Cybersecurity Fundamentals',

@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/public';
-import { loadProgramCatalog } from '@/lib/programs/load-program-catalog';
-import { buildSiteMetadata } from '@/lib/seo/build-site-metadata';
+import { redirect } from 'next/navigation';
+import {
+  buildProgramsCatalogMetadata,
+  getPublicProgramsCatalogPage,
+  type PublicCatalogProgram,
+} from '@/lib/programs/public-programs-page';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
@@ -13,14 +16,7 @@ import { PayNowButton } from '@/components/programs/PayNowButton';
 export const revalidate = 0;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const db = createPublicClient();
-  const { total } = await loadProgramCatalog(db, { perPage: 1, page: 1 });
-  const countLabel = total > 0 ? `${total}` : '30+';
-  return buildSiteMetadata({
-    title: 'Program Catalog',
-    description: `Browse ${countLabel} workforce training programs. Filter by funding eligibility, credential type, and delivery mode.`,
-    path: '/programs/catalog',
-  });
+  return buildProgramsCatalogMetadata();
 }
 
 const CATEGORIES = [
@@ -35,8 +31,9 @@ type SearchParams = {
   q?: string;
   category?: string;
   wioa?: string;
-  provider?: string;
   page?: string;
+  /** @deprecated Provider filter removed — stripped on redirect */
+  provider?: string;
 };
 
 export default async function ProgramCatalogPage({
@@ -45,19 +42,28 @@ export default async function ProgramCatalogPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
+
+  // Legacy ?provider= links (multi-provider catalog) — filter no longer exists
+  if (params.provider) {
+    const sp = new URLSearchParams();
+    if (params.q) sp.set('q', params.q);
+    if (params.category) sp.set('category', params.category);
+    if (params.wioa === 'true') sp.set('wioa', 'true');
+    if (params.page && params.page !== '1') sp.set('page', params.page);
+    const qs = sp.toString();
+    redirect(`/programs/catalog${qs ? `?${qs}` : ''}`);
+  }
+
   const q = params.q ?? '';
   const category = params.category ?? '';
   const wioaOnly = params.wioa === 'true';
-  const providerSlug = params.provider ?? '';
   const page = Math.max(1, parseInt(params.page ?? '1', 10));
   const perPage = 18;
 
-  const db = createPublicClient();
-  const catalog = await loadProgramCatalog(db, {
+  const catalog = await getPublicProgramsCatalogPage({
     q: q || undefined,
     category: category || undefined,
     wioaOnly,
-    providerSlug: providerSlug || undefined,
     page,
     perPage,
   });
@@ -94,7 +100,6 @@ export default async function ProgramCatalogPage({
     if (q) sp.set('q', q);
     if (category) sp.set('category', category);
     if (wioaOnly) sp.set('wioa', 'true');
-    if (providerSlug) sp.set('provider', providerSlug);
     if (p > 1) sp.set('page', String(p));
     const qs = sp.toString();
     return `/programs/catalog${qs ? `?${qs}` : ''}`;
@@ -127,7 +132,6 @@ export default async function ProgramCatalogPage({
             {count ?? 0} program{(count ?? 0) !== 1 ? 's' : ''} from approved providers
             {wioaOnly ? ' · WIOA eligible' : ''}
             {category ? ` · ${category}` : ''}
-            {providerSlug ? ` · ${providerSlug}` : ''}
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
@@ -152,7 +156,7 @@ export default async function ProgramCatalogPage({
           <aside className="lg:w-56 flex-shrink-0">
             <CatalogFilters
               categories={CATEGORIES}
-              current={{ q, category, wioa: wioaOnly, provider: providerSlug }}
+              current={{ q, category, wioa: wioaOnly }}
             />
           </aside>
 
@@ -211,25 +215,7 @@ export default async function ProgramCatalogPage({
   );
 }
 
-type ProgramRow = {
-  program_id: string;
-  provider_name: string;
-  provider_slug: string;
-  title: string;
-  slug: string | null;
-  category: string | null;
-  wioa_eligible: boolean;
-  funding_tags: string[];
-  credential_name: string | null;
-  duration_weeks: number | null;
-  next_start_date: string | null;
-  seats_available: number | null;
-  delivery_mode: string | null;
-  city: string | null;
-  state: string;
-  completion_rate: number | null;
-  placement_rate: number | null;
-};
+type ProgramRow = PublicCatalogProgram;
 
 type StripeData = {
   stripe_price_id: string | null;

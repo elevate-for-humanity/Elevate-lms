@@ -6,28 +6,35 @@ const ROOT = process.cwd();
 const PROGRAMS_DIR = join(ROOT, 'app/programs');
 
 describe('program marketing pages', () => {
-  it('ProgramDetailPage uses interpolated org name for delivery disclosure', () => {
-    const src = readFileSync(join(ROOT, 'components/programs/ProgramDetailPage.tsx'), 'utf8');
-    expect(src).not.toContain("'Delivered directly by ${PLATFORM_DEFAULTS.orgName}.'");
-    expect(src).toContain('`Delivered directly by ${PLATFORM_DEFAULTS.orgName}.`');
+  it('ProgramDetailPage resolves delivery via formatDeliveryDisclosure helper', () => {
+    const detail = readFileSync(join(ROOT, 'components/programs/ProgramDetailPage.tsx'), 'utf8');
+    const schema = readFileSync(join(ROOT, 'lib/programs/program-schema.ts'), 'utf8');
+    expect(detail).toContain('formatDeliveryDisclosure');
+    expect(detail).not.toContain("'Delivered directly by ${PLATFORM_DEFAULTS.orgName}.'");
+    expect(schema).toContain('formatDeliveryDisclosure');
+    expect(schema).toMatch(/`Delivered directly by \$\{org\}\.`/);
   });
 
-  it('dedicated program pages use ProgramMarketingPage (server-side hero banner)', () => {
-    const dirs = readdirSync(PROGRAMS_DIR, { withFileTypes: true })
-      .filter((d) => d.isDirectory() && !d.name.startsWith('['))
-      .map((d) => d.name);
-
-    const offenders: string[] = [];
-    for (const slug of dirs) {
-      const pagePath = join(PROGRAMS_DIR, slug, 'page.tsx');
-      if (!existsSync(pagePath)) continue;
-      const content = readFileSync(pagePath, 'utf8');
-      if (content.includes('redirect(') && content.split('\n').length < 15) continue;
-      if (content.includes('ProgramDetailPage') && !content.includes('ProgramMarketingPage')) {
-        offenders.push(slug);
-      }
-    }
-    expect(offenders).toEqual([]);
+  it('thin ProgramMarketingPage wrappers are removed — use [program] dynamic route', () => {
+    const thinWrappers = [
+      'cna',
+      'cdl-training',
+      'hvac-technician',
+      'welding',
+      'plumbing',
+      'electrical',
+      'medical-assistant',
+      'cpr-first-aid',
+      'qma',
+      'peer-recovery-specialist',
+      'cosmetology-apprenticeship',
+      'esthetician-apprenticeship',
+      'nail-technician-apprenticeship',
+    ];
+    const stillPresent = thinWrappers.filter((slug) =>
+      existsSync(join(PROGRAMS_DIR, slug, 'page.tsx')),
+    );
+    expect(stillPresent).toEqual([]);
   });
 
   it('hero banner secondary CTAs do not use dead /inquiry paths', () => {

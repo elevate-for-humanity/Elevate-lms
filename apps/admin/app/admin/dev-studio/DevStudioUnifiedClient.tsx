@@ -52,7 +52,13 @@ interface CourseBuilderProps {
 type Workspace = 'studio' | 'deploy' | 'files' | 'environments' | 'health' | 'secrets';
 type StudioMode = 'ask' | 'run' | 'courses';
 
-const AIChat = dynamic(() => import('@/components/dev-studio/AIChat'), { ssr: false });
+const UnifiedEllieChat = dynamic(() => import('@/components/dev-studio/UnifiedEllieChat'), {
+  ssr: false,
+});
+const DevStudioEditorWorkspace = dynamic(
+  () => import('@/components/dev-studio/DevStudioEditorWorkspace'),
+  { ssr: false },
+);
 const DeployPanel = dynamic(() => import('@/components/dev-studio/DeployPanel'), { ssr: false });
 const DevContainerPanel = dynamic(() => import('@/components/dev-studio/DevContainerPanel'), { ssr: false });
 const ServicesPanel = dynamic(() => import('@/components/dev-studio/ServicesPanel'), { ssr: false });
@@ -221,7 +227,7 @@ export default function DevStudioUnifiedClient({ isSuperAdmin = false }: { isSup
               />
             )}
             {workspace === 'deploy' && <DeployPanel workflowButtons={config?.workflowButtons} />}
-            {workspace === 'files' && <FilesPanel />}
+            {workspace === 'files' && <DevStudioEditorWorkspace />}
             {workspace === 'environments' && <EnvironmentPanel />}
             {workspace === 'health' && <HealthPanel health={health} onRefresh={() => window.location.reload()} />}
             {workspace === 'secrets' && (isSuperAdmin ? <SecretsPanel /> : <HealthPanel health={health} onRefresh={() => window.location.reload()} />)}
@@ -337,7 +343,7 @@ function StudioPanel({
         ))}
       </div>
       <div className="min-h-0 flex-1 overflow-hidden">
-        {mode === 'ask' && <AIChat ellieMode={true} />}
+        {mode === 'ask' && <UnifiedEllieChat embedded />}
         {mode === 'run' && <RunPanel />}
         {mode === 'courses' && (
           programsLoading ? (

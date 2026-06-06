@@ -8,6 +8,7 @@ import {
   formatPublicProgramsDisplay,
   getPublicProgramsPageData,
 } from '@/lib/programs/public-programs-page';
+import { PUBLIC_PROGRAM_DURATION_RANGE } from '@/lib/programs/marketing-duration';
 import { getProgramCardImage } from '@/lib/images/programImages';
 import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
 import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
@@ -122,7 +123,7 @@ export default async function ProgramsPage() {
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-2">{PLATFORM_DEFAULTS.orgName}</p>
           <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight">Career Training Programs</h1>
           <p className="mt-3 text-slate-200 text-sm sm:text-base max-w-xl">
-            {formatPublicProgramsDisplay(programs.length)} credential-bearing programs · 4-12 weeks · WIOA &amp; WRG funding available
+            {formatPublicProgramsDisplay(programs.length)} credential-bearing programs · {PUBLIC_PROGRAM_DURATION_RANGE} · WIOA &amp; WRG funding available
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link href="/orientation/schedule" className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-red-700 transition-colors">

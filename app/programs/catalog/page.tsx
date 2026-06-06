@@ -32,6 +32,8 @@ type SearchParams = {
   category?: string;
   wioa?: string;
   page?: string;
+  /** @deprecated Provider filter removed — stripped on redirect */
+  provider?: string;
 };
 
 export default async function ProgramCatalogPage({
@@ -40,6 +42,18 @@ export default async function ProgramCatalogPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
+
+  // Legacy ?provider= links (multi-provider catalog) — filter no longer exists
+  if (params.provider) {
+    const sp = new URLSearchParams();
+    if (params.q) sp.set('q', params.q);
+    if (params.category) sp.set('category', params.category);
+    if (params.wioa === 'true') sp.set('wioa', 'true');
+    if (params.page && params.page !== '1') sp.set('page', params.page);
+    const qs = sp.toString();
+    redirect(`/programs/catalog${qs ? `?${qs}` : ''}`);
+  }
+
   const q = params.q ?? '';
   const category = params.category ?? '';
   const wioaOnly = params.wioa === 'true';

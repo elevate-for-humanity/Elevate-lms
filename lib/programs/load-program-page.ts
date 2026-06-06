@@ -13,6 +13,7 @@ import {
   type DbProgramRow,
 } from '@/lib/programs/build-program-schema';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
+import { isArchivedProgramSlug } from '@/lib/programs/archived-program-slugs';
 
 export type LoadedProgramPage = {
   program: ProgramSchema;
@@ -57,6 +58,10 @@ async function overlayDbFields(
  */
 export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgramPage | null> {
   const slug = resolveSlug(rawSlug) ?? rawSlug.toLowerCase().trim();
+
+  if (isArchivedProgramSlug(slug)) {
+    return null;
+  }
 
   const staticProgram = getStaticProgram(slug);
   if (staticProgram) {

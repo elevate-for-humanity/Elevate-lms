@@ -5,6 +5,7 @@ import { EducationHeader } from '@/components/education/EducationHeader.client';
 import { ArrowRight, MapPin, Clock, Phone, Mail, BookOpen, Users, Award, CheckCircle } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { getMarketingProgramSectors } from '@/lib/programs/catalog-sectors';
+import { formatPublicProgramsDisplay } from '@/lib/programs/public-programs-page';
 import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
 import Logo from '@/components/ui/Logo';
 
@@ -59,7 +60,7 @@ export default async function EducationLandingPage() {
           microLabel="Career Training"
           analyticsName="education"
           belowHeroHeadline="Career Training That Changes Lives"
-          belowHeroSubheadline={`${totalProgramCount} credential-bearing programs. No-cost training for eligible participants through WIOA and state workforce funding.`}
+          belowHeroSubheadline={`${formatPublicProgramsDisplay(totalProgramCount)} credential-bearing programs. No-cost training for eligible participants through WIOA and state workforce funding.`}
           ctas={[
             { label: 'Browse All Programs', href: '/programs', variant: 'primary' },
             { label: 'Apply', href: '/apply', variant: 'secondary' },

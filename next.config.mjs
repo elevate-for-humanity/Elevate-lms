@@ -778,7 +778,6 @@ const nextConfig = {
       { source: '/programs/it-support', destination: '/programs/it-help-desk', permanent: true },
       { source: '/programs/it-support-specialist', destination: '/programs/it-help-desk', permanent: true },
       { source: '/programs/bookkeeping-fundamentals', destination: '/programs/bookkeeping', permanent: true },
-      { source: '/programs/tax-prep', destination: '/programs/tax-preparation', permanent: true },
       { source: '/programs/cpr-cert', destination: '/programs/cpr-first-aid', permanent: true },
       { source: '/programs/health-safety', destination: '/programs/cpr-first-aid', permanent: true },
       { source: '/programs/phlebotomy-technician', destination: '/programs/phlebotomy', permanent: true },

@@ -309,7 +309,7 @@ export const TAX_OFFICE_GUIDES: Record<string, PageGuide> = {
         type: 'tip',
         message:
           "Thinking about a career in tax preparation? It's great side income - preparers earn $50-150 per return during tax season. Our training gets you certified in 8 weeks.",
-        action: { label: 'See Tax Training', href: '/programs/tax-preparation' },
+        action: { label: 'See Bookkeeping Training', href: '/programs/bookkeeping' },
       },
     ],
     quickTips: [
@@ -348,7 +348,7 @@ export const TAX_OFFICE_GUIDES: Record<string, PageGuide> = {
         type: 'tip',
         message:
           "Many of our graduates do 100+ returns per season. At $75 average per return, that's $7,500+ in extra income. Some go full-time and open their own tax offices.",
-        action: { label: 'Enroll Now', href: '/programs/tax-preparation/enroll' },
+        action: { label: 'Enroll Now', href: '/apply?program=bookkeeping' },
       },
       {
         id: 'upsell',

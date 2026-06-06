@@ -57,7 +57,7 @@ const SECTOR_PRESENTATION: Record<
     href: '/programs/business-administration',
     image: '/images/business/office-admin.webp',
     description:
-      'Bookkeeping, Office Administration, Tax Preparation, and Entrepreneurship programs.',
+      'Bookkeeping, Office Administration, and Entrepreneurship programs.',
   },
   apprenticeship: {
     title: 'Apprenticeships',

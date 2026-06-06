@@ -85,7 +85,11 @@ export default function CanonicalVideo({
   // timeupdate fires on every frame tick — use as a reliable fallback for
   // browsers/situations where onPlaying fires before React attaches the handler
   // (e.g. autoPlayOnMount on a fast connection where canplay fires synchronously).
-  const handleTimeUpdate = useCallback(() => { isPlayingRef.current = true; setPlaying(true); }, []);
+  const handleTimeUpdate = useCallback(() => {
+    if (isPlayingRef.current) return;
+    isPlayingRef.current = true;
+    setPlaying(true);
+  }, []);
   const handleEnded = useCallback(() => setEnded(true), []);
   const handleError = useCallback(() => setFailed(true), []);
   // Recover from stall/waiting — browser buffered enough to resume, call play()

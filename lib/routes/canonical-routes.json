@@ -26,7 +26,6 @@
       "graphicDesign": "/programs/graphic-design",
       "cadDrafting": "/programs/cad-drafting",
       "bookkeeping": "/programs/bookkeeping",
-      "taxPreparation": "/programs/tax-preparation",
       "officeAdministration": "/programs/office-administration",
       "businessAdministration": "/programs/business-administration",
       "entrepreneurship": "/programs/entrepreneurship",
@@ -177,16 +176,6 @@
     {
       "source": "/programs/bookkeeping-quickbooks",
       "destination": "/programs/bookkeeping",
-      "permanent": true
-    },
-    {
-      "source": "/programs/tax-prep",
-      "destination": "/programs/business-administration",
-      "permanent": true
-    },
-    {
-      "source": "/programs/tax-prep-financial-services",
-      "destination": "/programs/business-administration",
       "permanent": true
     },
     {

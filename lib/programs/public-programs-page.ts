@@ -12,6 +12,7 @@ import {
   loadPublishedProgramsListing,
   type ProgramsListingItem,
 } from '@/lib/programs/load-program-catalog';
+import { ARCHIVED_PROGRAM_SLUGS } from '@/lib/programs/archived-program-slugs';
 
 /** Slugs hidden from the public /programs grid (legacy duplicates, drafts). */
 export const PROGRAMS_PAGE_SUPPRESSED_SLUGS = new Set([
@@ -30,6 +31,7 @@ export const PROGRAMS_PAGE_SUPPRESSED_SLUGS = new Set([
   'health-safety',
   'forklift-operator',
   'tax-prep',
+  ...ARCHIVED_PROGRAM_SLUGS,
   'it-support',
   'it-support-specialist',
   'cybersecurity',

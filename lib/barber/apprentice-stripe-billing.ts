@@ -24,6 +24,15 @@ export const BARBER_APPRENTICE_STRIPE_CUSTOMERS = {
     downPaymentCents: 60_000,
     paymentTermWeeks: 29,
   },
+  cus_UG4BIa05facQez: {
+    name: 'Mercedes Wellington',
+    email: 'msanqin@gmail.com',
+    enrollmentId: '0320f78d-40df-4fb4-b5b9-3bed858e975b',
+    weeklyRateCents: 15103,
+    startDate: '2026-05-18',
+    downPaymentCents: 60_000,
+    paymentTermWeeks: 29,
+  },
 } as const;
 
 export type ApprenticeBillingAction = 'ensure_subscription' | 'pay_open_invoices';
@@ -39,7 +48,7 @@ export interface ApprenticeBillingResult {
 }
 
 export interface RunApprenticeBillingOptions {
-  /** Defaults to Jordan + Natalia only. */
+  /** Defaults to Jordan, Natalia, and Mercedes. */
   customerIds?: string[];
   actions?: ApprenticeBillingAction[];
 }
@@ -49,7 +58,7 @@ function resolveCustomerIds(customerIds?: string[]): string[] {
   const requested =
     customerIds?.length ?
       customerIds
-    : ['cus_UGFxoJKjtlNoy8', 'cus_UTVa6pmsYlWBsp'];
+    : ['cus_UGFxoJKjtlNoy8', 'cus_UTVa6pmsYlWBsp', 'cus_UG4BIa05facQez'];
   const invalid = requested.filter((id) => !allowed.includes(id));
   if (invalid.length) {
     throw new Error(`Unknown customer id(s): ${invalid.join(', ')}`);

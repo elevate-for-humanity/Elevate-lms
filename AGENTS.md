@@ -937,4 +937,4 @@ Elevate is **not** a customer workspace — it is the **platform owner tenant** 
 - **Barber apprenticeship** events may also use `/api/barber/webhook` with `STRIPE_WEBHOOK_SECRET_BARBER` — keep both endpoints’ secrets in Northflank if both are registered.
 - Handler tries all configured `STRIPE_WEBHOOK_SECRET*` env vars (`lib/stripe/construct-webhook-event.ts`) so a mismatched secondary endpoint secret does not cause repeated 400s.
 - After fixing webhook secrets, redeploy LMS and **Enable** the endpoint in Stripe Dashboard. `GET /api/webhooks/stripe` returns `{ ok: true }` for smoke checks.
-- **Jordan / Natalia weekly billing (manual):** `POST /api/admin/stripe-apprentice-payments` (admin auth) or `pnpm tsx scripts/run-apprentice-stripe-billing.ts` with live `STRIPE_SECRET_KEY`. Defaults to customers `cus_UGFxoJKjtlNoy8` and `cus_UTVa6pmsYlWBsp`.
+- **Barber apprentice weekly billing (manual):** `POST /api/admin/stripe-apprentice-payments` (admin auth) or `pnpm tsx scripts/run-apprentice-stripe-billing.ts` with live `STRIPE_SECRET_KEY`. Defaults to Jordan (`cus_UGFxoJKjtlNoy8`), Natalia (`cus_UTVa6pmsYlWBsp`), and Mercedes (`cus_UG4BIa05facQez`, $151.03/wk).

@@ -296,32 +296,32 @@ export const TAX_OFFICE_GUIDES: Record<string, PageGuide> = {
         id: 'welcome',
         type: 'welcome',
         message:
-          "Welcome to the Elevate Tax Office! I'm David. Whether you need your taxes done or want to become a tax preparer yourself, I'll guide you through.",
+          "Welcome! I'm David. If you're exploring bookkeeping or finance credentials, I can point you to our active business programs.",
       },
       {
         id: 'explain',
         type: 'explain',
         message:
-          'We offer two things: Tax preparation services (we do your taxes), and Tax Preparer Training (become a certified tax professional yourself).',
+          'Our finance pathway covers bookkeeping, QuickBooks certification, and office administration — stackable credentials for accounting support roles.',
       },
       {
         id: 'tip',
         type: 'tip',
         message:
-          "Thinking about a career in tax preparation? It's great side income - preparers earn $50-150 per return during tax season. Our training gets you certified in 8 weeks.",
-        action: { label: 'See Bookkeeping Training', href: '/programs/bookkeeping' },
+          'Bookkeeping is a strong entry point: QuickBooks certification, WIOA funding for eligible participants, and a clear path into office and accounting roles.',
+        action: { label: 'See Bookkeeping Program', href: '/programs/bookkeeping' },
       },
     ],
     quickTips: [
-      'Tax prep services available year-round',
-      'Become a certified preparer in 8 weeks',
-      'Earn $50-150 per return',
+      'Bookkeeping & QuickBooks certification',
+      'Finance pathway includes multiple tiers',
+      'WIOA funding for eligible participants',
     ],
   },
 
   'tax-preparation-training': {
     pageId: 'tax-preparation-training',
-    pageName: 'Tax Preparer Training',
+    pageName: 'Finance & Bookkeeping Training',
     avatarName: 'David',
     avatarImage: '/images/pages/store-guide-1.webp',
     messages: [
@@ -329,40 +329,40 @@ export const TAX_OFFICE_GUIDES: Record<string, PageGuide> = {
         id: 'welcome',
         type: 'welcome',
         message:
-          'Want to become a tax preparer? This is one of the best side hustles out there. 8 weeks of training, then you can earn $50-150 per return during tax season.',
+          'Exploring a career in bookkeeping or office finance? Our active programs prepare you for QuickBooks certification and accounting support roles.',
       },
       {
         id: 'explain',
         type: 'explain',
         message:
-          "You'll learn federal and state tax law, how to use professional tax software, and how to handle different return types - W-2s, 1099s, self-employment, deductions.",
+          "You'll learn bookkeeping fundamentals, payroll basics, and QuickBooks — the skills employers expect for entry-level accounting and office roles.",
       },
       {
         id: 'how-to',
         type: 'how-to',
         message:
-          "The training is 8 weeks, mostly online with some in-person sessions. You'll practice on real scenarios. After passing the exam, you get your PTIN and can start preparing returns.",
+          'Programs run 6–16 weeks depending on track. Training blends online coursework with instructor support and certification exam prep.',
       },
       {
         id: 'tip',
         type: 'tip',
         message:
-          "Many of our graduates do 100+ returns per season. At $75 average per return, that's $7,500+ in extra income. Some go full-time and open their own tax offices.",
-        action: { label: 'Enroll Now', href: '/apply?program=bookkeeping' },
+          'Start with Bookkeeping for the fastest path to a credential, or explore the full Finance & Accounting pathway for stacked certifications.',
+        action: { label: 'View Finance Pathway', href: '/programs/finance-bookkeeping-accounting' },
       },
       {
         id: 'upsell',
         type: 'upsell',
         message:
-          'Want to open your own tax office? We have a Tax Business Toolkit that includes everything - software, marketing materials, client management system.',
-        action: { label: 'See Tax Business Toolkit', href: '/store/digital/tax-business-toolkit' },
+          'Ready to apply? Bookkeeping cohorts enroll through our standard application — an advisor will review funding options with you.',
+        action: { label: 'Apply for Bookkeeping', href: '/apply?program=bookkeeping' },
       },
     ],
     quickTips: [
-      '8 weeks to certification',
-      'Earn $50-150 per return',
-      'Work from home or office',
-      'Great seasonal income',
+      'QuickBooks certification prep',
+      'Stackable finance credentials',
+      'WIOA funding for eligible participants',
+      'Career placement support',
     ],
   },
 };

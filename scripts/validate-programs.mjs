@@ -230,7 +230,6 @@ const SECTOR_GROUPS = {
   business: ['bookkeeping','office-administration','entrepreneurship','project-management',
     'business-administration','hospitality','finance-bookkeeping-accounting'],
   transport: ['cdl-training'],
-  tax: ['bookkeeping'],
 };
 const slugToSector = {};
 for (const [sector, slugs] of Object.entries(SECTOR_GROUPS)) {

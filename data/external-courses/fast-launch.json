@@ -591,6 +591,32 @@
     "payer_rule": "always_student"
   },
   {
+    "partner_name": "IRS",
+    "title": "IRS VITA/TCE Link & Learn Certification",
+    "description": "Official IRS certification for volunteer tax preparers. Required for all VITA/TCE site volunteers. Covers tax law, ethics, and intake procedures.",
+    "external_url": "https://www.irs.gov/individuals/irs-link-and-learn-taxes",
+    "credential_type": "Federal Certification",
+    "credential_name": "IRS VITA Certification",
+    "duration_display": "Self-paced, ~20 hours",
+    "is_required": true,
+    "manual_completion_enabled": true,
+    "opens_in_new_tab": true,
+    "sort_order": 80,
+    "program_slugs": [
+      "tax-preparation"
+    ],
+    "elevate_fee_cents": 19900,
+    "fee_label": "Elevate Program Support Fee",
+    "support_included": [
+      "VITA certification coaching",
+      "Tax law review sessions",
+      "Practice return support",
+      "Certificate upload review",
+      "Site placement support"
+    ],
+    "payer_rule": "always_student"
+  },
+  {
     "partner_name": "Intuit Academy",
     "title": "Intuit Academy: Tax Preparation",
     "description": "Learn tax preparation fundamentals from Intuit. Covers individual returns, deductions, credits, and tax software.",
@@ -754,9 +780,7 @@
     "manual_completion_enabled": true,
     "opens_in_new_tab": true,
     "sort_order": 120,
-    "program_slugs": [
-      "barber-apprenticeship"
-    ],
+    "program_slugs": [],
     "elevate_fee_cents": 14900,
     "fee_label": "Elevate Program Support Fee",
     "support_included": [

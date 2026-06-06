@@ -445,6 +445,8 @@ export default function InteractiveVideoPlayer({
             ref={videoRef}
             src={videoUrl}
             className="w-full aspect-video"
+            controls
+            preload="metadata"
             playsInline
             controls
             onTimeUpdate={handleTimeUpdate}

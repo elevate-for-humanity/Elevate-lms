@@ -14,6 +14,7 @@
  *   pnpm tsx scripts/generate-barber-lesson-videos.ts --slug barber-lesson-1
  *   pnpm tsx scripts/generate-barber-lesson-videos.ts --slug barber-lesson-1 --dry-run
  *   pnpm tsx scripts/generate-barber-lesson-videos.ts --force
+ *   pnpm tsx scripts/generate-barber-lesson-videos.ts --missing
  */
 
 import { config } from 'dotenv';
@@ -23,16 +24,17 @@ config({ path: path.resolve(process.cwd(), '.env.local') });
 import fs from 'fs';
 import os from 'os';
 import { execSync } from 'child_process';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-const OPENAI_KEY = process.env.OPENAI_API_KEY!;
+const SESSION_KEY_FILE = '/tmp/.openai-session-key';
 const COURSE_ID = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
 const OUT_DIR = path.join(process.cwd(), 'public/videos/barber-lessons');
-const BROLL = path.join(process.cwd(), 'public/videos');
+const FALLBACK_BROLL = path.join(OUT_DIR, 'barber-lesson-1.mp4');
 const SIDECAR_DIR = path.join(process.cwd(), 'scripts/course-builder/seeds/content');
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const FORCE = process.argv.includes('--force');
+const MISSING_ONLY = process.argv.includes('--missing');
 const SLUG_FILTER = (() => {
   const i = process.argv.indexOf('--slug');
   return i !== -1 ? process.argv[i + 1] : null;
@@ -43,10 +45,40 @@ const MODULE_FILTER = (() => {
 })();
 const CHAPTER_MODE = process.argv.includes('--chapter'); // concat all lessons into one file
 
-const sb = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+let sb: SupabaseClient;
+let openaiKey = '';
+
+function initSupabase(): void {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!url?.startsWith('http') || !key) {
+    throw new Error(
+      'Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local (valid HTTP URL).',
+    );
+  }
+  sb = createClient(url, key);
+}
+
+function resolveOpenAiKey(): string {
+  if (fs.existsSync(SESSION_KEY_FILE)) {
+    const fromFile = fs.readFileSync(SESSION_KEY_FILE, 'utf8').trim();
+    if (fromFile.startsWith('sk-')) {
+      process.env.OPENAI_API_KEY = fromFile;
+      return fromFile;
+    }
+  }
+  const fromEnv = process.env.OPENAI_API_KEY?.trim();
+  if (fromEnv?.startsWith('sk-')) return fromEnv;
+  throw new Error(
+    'OPENAI_API_KEY required (export in shell or write sk- key to /tmp/.openai-session-key).',
+  );
+}
+
+function resolveClipPath(candidate: string): string {
+  if (fs.existsSync(candidate)) return candidate;
+  if (fs.existsSync(FALLBACK_BROLL)) return FALLBACK_BROLL;
+  throw new Error(`B-roll missing: ${candidate} (and no ${FALLBACK_BROLL})`);
+}
 
 // ─── Clip library — precise scene-matched b-roll ──────────────────────────────
 const B = path.join(process.cwd(), 'public/videos/broll');
@@ -118,7 +150,8 @@ function matchText(t: string): string | null {
 function pickClip(heading: string, body: string, _lessonSlug: string): string {
   const h = heading.toLowerCase();
   const b = body.toLowerCase();
-  return matchText(h) ?? matchText(b) ?? clip('barbershop-intro');
+  const candidate = matchText(h) ?? matchText(b) ?? clip('barbershop-intro');
+  return resolveClipPath(candidate);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -227,7 +260,7 @@ function splitIntoScenes(
 async function generateTTS(text: string, outPath: string): Promise<void> {
   const res = await fetch('https://api.openai.com/v1/audio/speech', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${OPENAI_KEY}` },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${openaiKey}` },
     body: JSON.stringify({
       model: 'gpt-4o-mini-tts',
       input: text,
@@ -288,6 +321,8 @@ function concatScenes(scenePaths: string[], outPath: string, tmpDir: string): vo
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
+  initSupabase();
+  openaiKey = resolveOpenAiKey();
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
   const { data: lessons, error } = await sb
@@ -305,6 +340,17 @@ async function main() {
   if (SLUG_FILTER) targets = targets.filter((l) => l.slug === SLUG_FILTER);
   if (MODULE_FILTER)
     targets = targets.filter((l) => Math.floor((l as any).order_index / 1000) === MODULE_FILTER);
+  if (MISSING_ONLY && !SLUG_FILTER) {
+    targets = targets.filter((l) => {
+      const outPath = path.join(OUT_DIR, `${(l as { slug: string }).slug}.mp4`);
+      if (!fs.existsSync(outPath)) return true;
+      try {
+        return getFileDur(outPath) <= 60;
+      } catch {
+        return true;
+      }
+    });
+  }
   if (targets.length === 0) {
     console.error('No lessons found');
     process.exit(1);

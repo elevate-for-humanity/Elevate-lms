@@ -411,7 +411,19 @@ export async function runAITask(input: AITaskInput): Promise<AITaskResult> {
 
     return taskResult;
   } catch (err) {
-    logger.error('[ai-orchestrator] Task failed', undefined, { task, err });
+    if (task === 'prospective_student_chat' && isAiDegradedError(err)) {
+      logger.warn('[ai-orchestrator] Public chat degraded; caller should use fallback', {
+        task,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      return { content: '', provider: 'degraded', task };
+    }
+
+    if (isAiDegradedError(err)) {
+      logger.warn('[ai-orchestrator] Task degraded', { task, err });
+    } else {
+      logger.error('[ai-orchestrator] Task failed', undefined, { task, err });
+    }
     throw err;
   }
 }

@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 
-const BLUEPRINT_FILE = path.resolve(ROOT, 'lib/curriculum/blueprints/barber-apprenticeship.ts');
+const BLUEPRINT_DIR = path.resolve(ROOT, 'lib/curriculum/blueprints/barber');
 const GENERATOR_FILE = path.resolve(ROOT, 'scripts/generate-barber-course.ts');
 const GENERATED_FILE = path.resolve(ROOT, 'scripts/generated/barber-course.generated.ts');
 
@@ -107,8 +107,17 @@ function printSection(title: string, items: string[]): void {
   for (const item of items) console.log(item);
 }
 
+
+function readModularBlueprintText(): string {
+  const files = fs
+    .readdirSync(BLUEPRINT_DIR)
+    .filter((f) => f.endsWith('.ts'))
+    .map((f) => path.join(BLUEPRINT_DIR, f));
+  return files.map((f) => readFileSafe(f)).join('\n');
+}
+
 function main(): void {
-  const blueprint = readFileSafe(BLUEPRINT_FILE);
+  const blueprint = readModularBlueprintText();
   const generator = readFileSafe(GENERATOR_FILE);
   const generated = fs.existsSync(GENERATED_FILE) ? readFileSafe(GENERATED_FILE) : '';
 

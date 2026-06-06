@@ -85,6 +85,43 @@ function stripHtml(html: string): string {
     .trim();
 }
 
+function fallbackSlides(title: string, moduleTitle: string, nextTitle?: string): Slide[] {
+  const body =
+    `This lesson covers ${title} for Indiana barber apprentices. Focus on state board expectations, shop safety, and professional technique.`;
+  return [
+    {
+      segment: 'intro',
+      title: 'Introduction',
+      bullets: ['Lesson goals', 'State board relevance', 'Shop application'],
+      narration: `Welcome to ${moduleTitle}. In this lesson, ${title}, you will build skills required for the Indiana State Board and your host shop.`,
+    },
+    {
+      segment: 'concept',
+      title: 'Core concepts',
+      bullets: ['Key definitions', 'Rules and standards', 'Common exam topics'],
+      narration: `${body} Study each point carefully and connect it to what you see at the chair every day.`,
+    },
+    {
+      segment: 'visual',
+      title: 'Technique',
+      bullets: ['Setup', 'Execution', 'Finish and check'],
+      narration: `Picture the correct setup, hand position, and client communication for ${title}. Your master barber will sign off practical skills separately.`,
+    },
+    {
+      segment: 'application',
+      title: 'In the shop',
+      bullets: ['Client safety', 'Mistakes to avoid', 'Professional habits'],
+      narration: `Apply ${title} with consistent sanitation and consultation habits. The board tests both knowledge and judgment.`,
+    },
+    {
+      segment: 'wrapup',
+      title: 'Summary',
+      bullets: ['Review main ideas', 'Complete practice quiz', 'Ask your mentor'],
+      narration: `You have completed ${title}. ${nextTitle ? `Next up: ${nextTitle}.` : 'Complete the checkpoint quiz below.'} Great work.`,
+    },
+  ];
+}
+
 async function planLesson(
   title: string,
   content: string,

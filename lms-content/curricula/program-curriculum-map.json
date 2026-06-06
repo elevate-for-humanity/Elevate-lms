@@ -259,12 +259,6 @@
           "hours": 8
         },
         {
-          "name": "Milady RISE Safety",
-          "provider": "Milady/Cengage",
-          "delivery": "External (code: efhcti-rise295)",
-          "hours": 10
-        },
-        {
           "name": "OSHA 10-Hour General Industry",
           "provider": "CareerSafe",
           "delivery": "careersafeonline.com",
@@ -283,10 +277,10 @@
           "hours": 2
         },
         {
-          "name": "Barber Theory & Practice",
-          "provider": "Milady",
-          "delivery": "External",
-          "hours": 1500
+          "name": "Prestige Elevation™ Barbering RTI",
+          "provider": "Elevate for Humanity",
+          "delivery": "Elevate LMS (barber-apprenticeship-v1)",
+          "hours": 500
         }
       ]
     },

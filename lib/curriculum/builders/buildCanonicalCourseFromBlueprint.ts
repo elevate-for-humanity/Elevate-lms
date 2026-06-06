@@ -489,7 +489,11 @@ async function upsertModule(
   if (existing?.id) {
     await db
       .from('course_modules')
-      .update({ title: mod.title, updated_at: new Date().toISOString() })
+      .update({
+        title: mod.title,
+        slug: mod.slug,
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', existing.id);
     return existing.id;
   }
@@ -498,13 +502,23 @@ async function upsertModule(
     .from('course_modules')
     .insert({
       course_id: courseId,
+      slug: mod.slug,
       title: mod.title,
       order_index: mod.orderIndex,
     })
     .select('id')
     .maybeSingle();
 
-  if (error || !newMod) return null;
+  if (error || !newMod) {
+    if (error) {
+      logger.error(`[seeder] Module upsert failed [${mod.slug}]:`, {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+      });
+    }
+    return null;
+  }
   return newMod.id;
 }
 
@@ -527,12 +541,24 @@ async function upsertLesson(
   // this function is called, so these are safe to spread directly.
   const contentPayload: Record<string, unknown> = {};
   if (lessonRef.content) contentPayload.content = lessonRef.content;
-  if (lessonRef.objective) contentPayload.scenario_prompt = lessonRef.objective;
+  if (lessonRef.objective) {
+    contentPayload.scenario_prompt = lessonRef.objective;
+    contentPayload.learning_objectives = [lessonRef.objective];
+  }
   if (lessonRef.quizQuestions) contentPayload.quiz_questions = lessonRef.quizQuestions;
   if (lessonRef.passingScore != null) contentPayload.passing_score = lessonRef.passingScore;
   if (lessonRef.durationMinutes != null)
     contentPayload.duration_minutes = lessonRef.durationMinutes;
   if (lessonRef.partnerExamCode) contentPayload.partner_exam_code = lessonRef.partnerExamCode;
+  if (lessonRef.videoFile) {
+    contentPayload.video_url = lessonRef.videoFile;
+    contentPayload.video_config = {
+      ...(videoConfig ?? {}),
+      videoFile: lessonRef.videoFile,
+    };
+  } else if (videoConfig) {
+    contentPayload.video_config = videoConfig;
+  }
   const instructorNotes = mergeInstructorNotes(lessonRef, industryStandards ?? null);
   if (instructorNotes) contentPayload.instructor_notes = instructorNotes;
 
@@ -553,7 +579,6 @@ async function upsertLesson(
         order_index: orderIndex,
         activities,
         ...contentPayload,
-        ...(videoConfig ? { video_config: videoConfig } : {}),
         updated_at: new Date().toISOString(),
       })
       .eq('id', existing.id);
@@ -574,7 +599,6 @@ async function upsertLesson(
     status: 'published',
     activities,
     ...contentPayload,
-    ...(videoConfig ? { video_config: videoConfig } : {}),
   });
 
   if (error)

@@ -24,22 +24,6 @@ function buildAssistantFallback(message: string): string {
   const normalized = message.toLowerCase();
   const supportLine = `You can also call ${PLATFORM_DEFAULTS.supportPhone} or use the [Contact Page](/contact).`;
 
-  if (/\b(take me to|go to|open|show me|navigate)\b/.test(normalized)) {
-    if (/\b(barber|barbering|barbershop)\b/.test(normalized)) {
-      return `Our DOL Registered Barber Apprenticeship is earn-while-you-learn training toward an Indiana barber license. Details: [Barber Apprenticeship](/programs/barber-apprenticeship). Ready to apply? [Apply for Barber Apprenticeship](/apply?program=barber-apprenticeship). ${supportLine}`;
-    }
-    if (/\b(cna|nursing assistant|nurse aide)\b/.test(normalized)) {
-      return `Start here: [CNA Program](/programs/cna) or [Apply for CNA](/apply?program=cna). ${supportLine}`;
-    }
-    if (/\b(hvac)\b/.test(normalized)) {
-      return `Start here: [HVAC Program](/programs/hvac-technician) or [Apply](/apply?program=hvac-technician). ${supportLine}`;
-    }
-  }
-
-  if (/\b(barber|barbering|barbershop|barber apprenticeship)\b/.test(normalized)) {
-    return `The Barber Apprenticeship is a DOL-registered earn-while-you-learn program (about 2,000 hours) toward an Indiana barber license. Most eligible learners qualify for workforce funding. Explore: [Barber Apprenticeship](/programs/barber-apprenticeship). Apply: [Apply Now](/apply?program=barber-apprenticeship). ${supportLine}`;
-  }
-
   if (/\b(cna|nursing assistant|nurse aide)\b/.test(normalized)) {
     return `The CNA program is 4 weeks and prepares students for the Indiana CNA written and skills exam. Self-pay is currently listed at $1,850, regular price $2,500, and FSSA IMPACT funding may cover eligible SNAP/TANF participants. BNPL/self-pay options are available. Start here: [Apply for CNA](/apply?program=cna). ${supportLine}`;
   }
@@ -142,7 +126,13 @@ export async function POST(req: NextRequest) {
       assistantMessage =
         aiResult.content || buildAssistantFallback(message);
     } catch (aiError) {
-      logger.error('AI Assistant model unavailable; using guided fallback:', aiError);
+      if (isAiDegradedError(aiError)) {
+        logger.warn('AI Assistant degraded; using guided fallback', {
+          error: aiError instanceof Error ? aiError.message : String(aiError),
+        });
+      } else {
+        logger.error('AI Assistant model unavailable; using guided fallback:', aiError);
+      }
       assistantMessage = buildAssistantFallback(message);
     }
 

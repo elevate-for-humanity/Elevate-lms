@@ -50,7 +50,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
   },
 
   expectedModuleCount: 8,
-  expectedLessonCount: 58,
+  expectedLessonCount: 50,
 
   certificationPathway: {
     certificationBodyId: 'cb000000-0000-0000-0000-000000000006',

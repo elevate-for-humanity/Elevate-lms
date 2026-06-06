@@ -1,6 +1,7 @@
 // PUBLIC ROUTE: public metrics endpoint
 
 import { NextResponse } from 'next/server';
+import { isSupabaseConfigured } from '@/lib/supabase/server';
 import { createPublicClient } from '@/lib/supabase/public';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -14,10 +15,44 @@ export const dynamic = 'force-dynamic';
  * Returns real backend activity metrics that can be verified
  * No authentication required - public data only
  */
+function degradedMetricsResponse() {
+  const now = new Date().toISOString();
+  return NextResponse.json(
+    {
+      timestamp: now,
+      verified: false,
+      degraded: true,
+      metrics: {
+        totalUsers: 0,
+        activeStudents: 0,
+        totalEnrollments: 0,
+        completedCourses: 0,
+        totalApplications: 0,
+        recentLogins24h: 0,
+        activeCourses: 0,
+        totalCertificates: 0,
+        completionRate: 0,
+      },
+      recentActivity: [],
+      dataSource: 'fallback',
+      lastUpdated: now,
+    },
+    {
+      headers: {
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120',
+      },
+    },
+  );
+}
+
 async function _GET(request: Request) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+
+    if (!isSupabaseConfigured()) {
+      return degradedMetricsResponse();
+    }
 
     const supabase = createPublicClient();
 

@@ -25,7 +25,7 @@ import { config } from 'dotenv';
 import path from 'path';
 
 // Load .env.local
-config({ path: path.resolve(process.cwd(), '.env.local') });
+config({ path: path.resolve(process.cwd(), '.env.local'), override: false });
 
 import { createClient } from '@supabase/supabase-js';
 import {

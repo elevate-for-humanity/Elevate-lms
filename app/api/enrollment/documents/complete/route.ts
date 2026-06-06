@@ -28,7 +28,7 @@ async function _POST(req: Request) {
     // Verify ownership and current state
     const { data: enrollment, error: fetchError } = await supabase
       .from('program_enrollments')
-      .select('id, user_id, enrollment_state, program_id, email, full_name')
+      .select('id, user_id, enrollment_state, program_id, program_slug, email, full_name')
       .eq('id', enrollment_id)
       .maybeSingle();
 

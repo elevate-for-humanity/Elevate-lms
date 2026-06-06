@@ -117,7 +117,11 @@ export default async function CoursePage({ params }: { params: Params }) {
         .maybeSingle()
     : { data: null };
 
-  const heroImage = program?.hero_image_url || program?.image_url || '/images/pages/hvac-unit.webp';
+  const isBarberCourse =
+    lessonCourseId === BARBER_COURSE_ID || courseId === BARBER_COURSE_ID || course.slug === 'barber-apprenticeship-v1';
+  const heroImage = isBarberCourse
+    ? BARBER_CURRICULUM_COVER
+    : program?.hero_image_url || program?.image_url || '/images/pages/hvac-unit.webp';
   const credentialName = program?.credential_name || program?.credential || null;
 
   // Check if user is admin/staff — they bypass enrollment requirements entirely.

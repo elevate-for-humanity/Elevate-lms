@@ -58,38 +58,8 @@ const DigitalBinder = dynamic(() => import('@/components/DigitalBinder'), { ssr:
 import { transformLessonContent, isAiJsonBlob } from '@/lib/lms/transformLessonContent';
 // HVAC_COURSE_ID removed — isHvacCourse now derived from course slug (see fetchLesson)
 
-/**
- * Resolve a barber lesson video URL.
- * Priority:
- *   1. lesson.video_url (set by seeder/migration)
- *   2. video_config.videoFile (blueprint fallback)
- *   3. known MP3 fallback for missing legacy MP4 paths
- *   4. null
- */
-function barberVideoUrl(
-  slug: string | null | undefined,
-  videoConfig?: Record<string, string> | null,
-  videoUrl?: string | null,
-): string | null {
-  if (!slug) return null;
-
-  const withAudioFallback = (url: string | null | undefined): string | null => {
-    if (!url) return null;
-
-    const audioFallbackMap: Record<string, string> = {
-      '/videos/barber-client-experience.mp4': '/videos/barber-client-experience.mp3',
-      '/videos/barber-shop-culture.mp4': '/videos/barber-shop-culture.mp3',
-    };
-
-    return audioFallbackMap[url] ?? url;
-  };
-
-  // video_url set directly on the lesson row (all seeded lessons)
-  if (videoUrl) return withAudioFallback(videoUrl);
-  // Fall back to blueprint-assigned videoFile stored in video_config JSONB
-  if (videoConfig?.videoFile) return withAudioFallback(videoConfig.videoFile);
-  return null;
-}
+import { resolveBarberLessonVideoUrl } from '@/lib/barber/resolve-lesson-video-url';
+import { mergeCourseLessonFields } from '@/lib/lms/enrich-lesson-row';
 import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
 import { getActivitiesForLesson, getDefaultActivity } from '@/lib/lms/activity-map';
 import type { ActivityId } from '@/lib/lms/activity-map';
@@ -311,6 +281,13 @@ export default function LessonPage() {
           order_index: clLesson.order_index,
         };
       }
+    } else {
+      const { data: clHydrate } = await supabase
+        .from('course_lessons')
+        .select('slug, video_url')
+        .eq('id', lessonId)
+        .maybeSingle();
+      lessonData = mergeCourseLessonFields(lessonData, clHydrate);
     }
 
     let { data: lessonsData } = await supabase

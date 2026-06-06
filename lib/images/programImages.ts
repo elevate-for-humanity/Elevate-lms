@@ -95,7 +95,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Pharmacy technician preparing medications',
   },
   'sanitation-infection-control': {
-    card: `${P}/sanitation.jpg`,
+    card: `${P}/sanitation.webp`,
     hero: `${P}/cna-clinical.jpg`,
     alt: 'Healthcare worker following infection control procedures',
   },

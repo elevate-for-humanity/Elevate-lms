@@ -58,8 +58,12 @@ function AlertSection({ icon, title, count, viewAllHref, children }: AlertSectio
 }
 
 export function OperationalAlerts({ data }: { data: AdminDashboardData }) {
-  const { stalledApplications, noOutcomeEnrollments, missingFundingEnrollments, complianceAlerts } = data;
-  const openComplianceAlerts: any[] = Array.isArray(complianceAlerts) ? complianceAlerts : [];
+  const stalledApplications = Array.isArray(data.stalledApplications) ? data.stalledApplications : [];
+  const noOutcomeEnrollments = Array.isArray(data.noOutcomeEnrollments) ? data.noOutcomeEnrollments : [];
+  const missingFundingEnrollments = Array.isArray(data.missingFundingEnrollments)
+    ? data.missingFundingEnrollments
+    : [];
+  const openComplianceAlerts: any[] = Array.isArray(data.complianceAlerts) ? data.complianceAlerts : [];
 
   const totalAlerts =
     stalledApplications.length + noOutcomeEnrollments.length + missingFundingEnrollments.length + openComplianceAlerts.length;

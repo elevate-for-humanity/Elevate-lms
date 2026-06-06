@@ -8,7 +8,6 @@ import { logger } from '@/lib/logger';
 import DashboardLoading from './loading';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60; // cache dashboard data for 60s — reduces DB load
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard | Elevate For Humanity',

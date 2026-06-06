@@ -2,7 +2,6 @@
 // Operational command center layout — all data is real and DB-driven.
 
 import Link from "next/link";
-import Image from "next/image";
 import { AdminGreeting } from "@/components/admin/AdminGreeting";
 import {
   ArrowRight, AlertTriangle,
@@ -257,7 +256,7 @@ function TodaysPriorities({ data }: { data: AdminDashboardData }) {
       ) : (
         <div className="divide-y divide-slate-100">
           {items.map((item) => {
-            const s = SEVERITY_STYLES[item.severity];
+            const s = SEVERITY_STYLES[item.severity] ?? SEVERITY_STYLES.low;
             return (
               <Link key={item.id} href={item.href}
                 className={`flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 hover:brightness-95 group transition-all ${s.bg}`}>
@@ -322,13 +321,23 @@ function LearnersNeedingAttention({ learners }: { learners: InactiveLearner[] })
 }
 
 function ReviewQueues({ data }: { data: AdminDashboardData }) {
+  const counts = data.counts ?? {
+    pendingApplications: 0,
+    activeEnrollments: 0,
+    revenueThisMonthCents: 0,
+    certificatesIssued: 0,
+    pendingProgramHolders: 0,
+    pendingDocuments: 0,
+  };
+  const pendingWioaDocs = data.pendingWioaDocs ?? 0;
+  const pendingSubmissionsCount = data.pendingSubmissions?.length ?? 0;
   const queues = [
-    { label: "Applications awaiting review", count: data.counts.pendingApplications, context: data.counts.pendingApplications > 0 ? "Intake queue needs admin action" : "Queue is clear", href: "/admin/applications?status=submitted,pending,in_review,pending_admin_review", urgent: data.counts.pendingApplications > 0 },
-    { label: "WIOA documents awaiting review", count: data.pendingWioaDocs, context: data.pendingWioaDocs > 0 ? "Funding eligibility may be blocked" : "Queue is clear", href: "/admin/wioa/documents", urgent: data.pendingWioaDocs > 0 },
-    { label: "Lab submissions awaiting sign-off", count: data.pendingSubmissions?.length ?? 0, context: (data.pendingSubmissions?.length ?? 0) > 0 ? "Instructor action required" : "Queue is clear", href: "/admin/submissions", urgent: (data.pendingSubmissions?.length ?? 0) > 0 },
-    { label: "Program holders awaiting approval", count: data.counts.pendingProgramHolders, context: data.counts.pendingProgramHolders > 0 ? "Partner applications need review" : "Queue is clear", href: "/admin/program-holders", urgent: data.counts.pendingProgramHolders > 0 },
-    { label: "Program holder documents pending", count: data.counts.pendingDocuments, context: data.counts.pendingDocuments > 0 ? "Documents submitted, awaiting review" : "Queue is clear", href: "/admin/program-holder-documents", urgent: data.counts.pendingDocuments > 0 },
-    { label: "Certificates to issue", count: data.counts.certificatesIssued, context: "Completed learners awaiting credential", href: "/admin/certificates", urgent: false },
+    { label: "Applications awaiting review", count: counts.pendingApplications, context: counts.pendingApplications > 0 ? "Intake queue needs admin action" : "Queue is clear", href: "/admin/applications?status=submitted,pending,in_review,pending_admin_review", urgent: counts.pendingApplications > 0 },
+    { label: "WIOA documents awaiting review", count: pendingWioaDocs, context: pendingWioaDocs > 0 ? "Funding eligibility may be blocked" : "Queue is clear", href: "/admin/wioa/documents", urgent: pendingWioaDocs > 0 },
+    { label: "Lab submissions awaiting sign-off", count: pendingSubmissionsCount, context: pendingSubmissionsCount > 0 ? "Instructor action required" : "Queue is clear", href: "/admin/submissions", urgent: pendingSubmissionsCount > 0 },
+    { label: "Program holders awaiting approval", count: counts.pendingProgramHolders, context: counts.pendingProgramHolders > 0 ? "Partner applications need review" : "Queue is clear", href: "/admin/program-holders", urgent: counts.pendingProgramHolders > 0 },
+    { label: "Program holder documents pending", count: counts.pendingDocuments, context: counts.pendingDocuments > 0 ? "Documents submitted, awaiting review" : "Queue is clear", href: "/admin/program-holder-documents", urgent: counts.pendingDocuments > 0 },
+    { label: "Certificates to issue", count: counts.certificatesIssued, context: "Completed learners awaiting credential", href: "/admin/certificates", urgent: false },
   ];
   return (
     <div className="rounded-xl border border-slate-200 bg-white mb-6">
@@ -456,17 +465,10 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
 
   return (
     <div className="pb-16">
-      <div className="relative w-full h-32 sm:h-40 overflow-hidden rounded-2xl mb-6">
-        <Image
-          src="/images/pages/admin-dashboard-hero.webp"
-          alt=""
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 1200px"
-          loading="lazy"
-        />
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent" />
-      </div>
+      <div
+        className="relative w-full h-32 sm:h-40 overflow-hidden rounded-2xl mb-6 bg-slate-100 border border-slate-200"
+        aria-hidden="true"
+      />
 
       <div className="pt-2">
 
@@ -518,9 +520,9 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
         {/* Right (1/3): activity feed + recent applications               */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mt-6">
           <div className="lg:col-span-2 min-w-0 space-y-4">
-            <LearnersNeedingAttention learners={data.inactiveLearners} />
+            <LearnersNeedingAttention learners={data.inactiveLearners ?? []} />
             <ReviewQueues data={data} />
-            <CrmFollowUpQueue leads={data.staleLeads} />
+            <CrmFollowUpQueue leads={data.staleLeads ?? []} />
           </div>
           <div className="space-y-4">
             <EnrollmentFunnel data={data} />
@@ -585,11 +587,11 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
             sites={data.sitePreviewTargets ?? []}
             isSuperAdmin={data.isSuperAdmin === true}
             pendingApplications={data.recentApplications}
-            pendingApplicationsCount={data.counts.pendingApplications}
-            pendingProgramHolders={data.counts.pendingProgramHolders}
+            pendingApplicationsCount={data.counts?.pendingApplications ?? 0}
+            pendingProgramHolders={data.counts?.pendingProgramHolders ?? 0}
           />
           <SitePreviewPanelWrapperLazy sites={data.sitePreviewTargets ?? []} />
-          <SystemHealthPanel health={data.systemHealth} />
+          <SystemHealthPanel health={data.systemHealth ?? { stripeWebhookOk: false, stripeIssuingOk: false, buildEnvOk: false, staleJobs: 0, degraded: true, missingDocuments: 0, missingCertifications: 0, unresolvedFlags: 0, alerts: [] }} />
         </div>
 
       </div>

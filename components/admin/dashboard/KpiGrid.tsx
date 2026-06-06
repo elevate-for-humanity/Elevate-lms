@@ -52,9 +52,11 @@ function useCountUp(target: number) {
 
 function KpiCard({ card }: { card: KPICard }) {
   const pos = card.delta >= 0;
-  const IconComponent = ICON_MAP[iconKeyFor(card.label)];
-  const isRevenue = card.label.toLowerCase().includes('revenue');
-  const animated = useCountUp(card.value);
+  const label = typeof card.label === 'string' ? card.label : 'Metric';
+  const deltaLabel = typeof card.deltaLabel === 'string' ? card.deltaLabel : '';
+  const IconComponent = ICON_MAP[iconKeyFor(label)] ?? Award;
+  const isRevenue = label.toLowerCase().includes('revenue');
+  const animated = useCountUp(typeof card.value === 'number' ? card.value : 0);
 
   return (
     <Link
@@ -80,7 +82,7 @@ function KpiCard({ card }: { card: KPICard }) {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 truncate mb-1">
-              {card.label}
+              {label}
             </p>
             <p className="text-3xl font-bold tracking-tight text-slate-900 tabular-nums">
               {isRevenue ? fmtCents(animated) : fmt(animated)}
@@ -99,7 +101,7 @@ function KpiCard({ card }: { card: KPICard }) {
         </div>
 
         <div className="mt-4 flex items-center gap-2 flex-wrap">
-          {card.delta !== 0 && card.deltaLabel.includes('%') && (
+          {card.delta !== 0 && deltaLabel.includes('%') && (
             <span
               className={[
                 'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold',
@@ -116,7 +118,7 @@ function KpiCard({ card }: { card: KPICard }) {
               {Math.abs(card.delta)}%
             </span>
           )}
-          <span className="text-xs text-slate-500">{card.deltaLabel}</span>
+          {deltaLabel ? <span className="text-xs text-slate-500">{deltaLabel}</span> : null}
         </div>
       </div>
 

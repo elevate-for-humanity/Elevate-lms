@@ -22,9 +22,10 @@ function pct(num: number, denom: number) {
 }
 
 export function EnrollmentFunnel({ data }: Props) {
-  const applied   = data.kpis.find(k => k.label === 'Pending Applications')?.value ?? 0;
-  const active    = data.kpis.find(k => k.label === 'Active Enrollments')?.value ?? 0;
-  const certs     = data.kpis.find(k => k.label === 'Certificates Issued')?.value ?? 0;
+  const kpis = Array.isArray(data.kpis) ? data.kpis : [];
+  const applied   = kpis.find(k => k.label === 'Pending Applications')?.value ?? 0;
+  const active    = kpis.find(k => k.label === 'Active Enrollments')?.value ?? 0;
+  const certs     = kpis.find(k => k.label === 'Certificates Issued')?.value ?? 0;
   // Total ever enrolled = active + completed (certs) + withdrawn (not tracked separately yet)
   const enrolled  = active + certs;
 

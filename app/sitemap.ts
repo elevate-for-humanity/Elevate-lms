@@ -98,7 +98,6 @@ const STATIC_ROUTES = [
   '/funding/job-ready-indy',
   '/funding/jri',
   '/funding/grant-programs',
-  '/funding/state-programs',
   '/funding/federal-programs',
   '/funding/dol',
   '/how-it-works',

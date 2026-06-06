@@ -120,7 +120,7 @@ export default async function LmsProgramsPage() {
               WorkOne / WIOA — Schedule Appointment →
             </a>
             <Link
-              href="/funding/state-programs"
+              href="/snap-et-partner"
               className="inline-flex items-center gap-1.5 bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-blue-800 transition"
             >
               FSSA / SNAP &amp; TANF Benefits →

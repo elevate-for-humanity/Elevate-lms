@@ -168,14 +168,14 @@ export default async function StaffDashboard() {
             <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
             <div className="space-y-2">
               <Link
-                href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/students"
+                href={`https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/students`}
                 className="block p-3 border rounded-lg hover:bg-slate-50 transition"
               >
                 <div className="font-semibold">View All Students</div>
                 <div className="text-sm text-black">Manage student accounts and enrollments</div>
               </Link>
               <Link
-                href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/programs"
+                href={`https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/programs`}
                 className="block p-3 border rounded-lg hover:bg-slate-50 transition"
               >
                 <div className="font-semibold">View Programs</div>

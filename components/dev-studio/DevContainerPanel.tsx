@@ -479,6 +479,12 @@ export default function DevContainerPanel() {
         </div>
       </div>
 
+      <p className="px-4 py-2 text-[11px] text-slate-500 border-b border-slate-100 bg-slate-50/80 flex-shrink-0">
+        Control plane: devcontainer (GitHub) + Northflank env push. Secret precedence:{' '}
+        <span className="font-mono text-slate-600">platform_secrets → app_secrets → process.env</span>.
+        AI governance: <span className="font-mono text-slate-600">lib/devstudio/ai-studio-charter.ts</span>.
+      </p>
+
       {/* Status bar */}
       {status && (
         <div

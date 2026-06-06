@@ -87,7 +87,7 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
       name: PLATFORM_DEFAULTS.orgName,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://${PLATFORM_DEFAULTS.canonicalDomain}/logo.jpg',
+        url: `https://${PLATFORM_DEFAULTS.canonicalDomain}/logo.jpg`,
       },
     },
   };

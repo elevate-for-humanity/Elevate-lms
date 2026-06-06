@@ -64,6 +64,14 @@ export default tseslint.config(
       // application code. console.warn and console.error are allowed as fallbacks
       // in edge cases where the logger itself cannot be imported (e.g. config files).
       'no-console': ['error', { allow: ['warn', 'error', 'debug', 'info'] }],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Literal[value=/\\$\\{PLATFORM_DEFAULTS/]',
+          message:
+            'PLATFORM_DEFAULTS must use template literals (backtick interpolation), not quoted strings.',
+        },
+      ],
       // All other react-hooks v7 rules off — new rules with pre-existing violations
       'react-hooks/set-state-in-effect': 'off',
       'react-hooks/immutability': 'off',
@@ -109,6 +117,7 @@ export default tseslint.config(
       'check-migrations-status.mjs',
       'test-env.js',
       'next-env.d.ts',
+      'apps/admin/next-env.d.ts',
       'lib/dynamic-imports.ts',
       'lib/ocr/**',
     ],

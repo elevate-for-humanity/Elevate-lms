@@ -34,7 +34,7 @@ class PendingPartnerAPI extends BasePartnerAPI {
     return {
       externalId: generatedId,
       username: student.email,
-      loginUrl: 'https://partner.${PLATFORM_DEFAULTS.canonicalDomain}/login',
+      loginUrl: `https://partner.${PLATFORM_DEFAULTS.canonicalDomain}/login`,
       passwordPlaintext: undefined,
     };
   }
@@ -48,7 +48,7 @@ class PendingPartnerAPI extends BasePartnerAPI {
       externalEnrollmentId: `${this.partner}_${accountExternalId}_${courseExternalCode}`,
       courseId: courseExternalCode,
       courseName: `Course ${courseExternalCode}`,
-      accessUrl: 'https://partner.${PLATFORM_DEFAULTS.canonicalDomain}/course/launch',
+      accessUrl: `https://partner.${PLATFORM_DEFAULTS.canonicalDomain}/course/launch`,
     };
   }
 

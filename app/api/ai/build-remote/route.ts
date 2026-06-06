@@ -32,7 +32,7 @@ function generateSetupSteps(platform: string): string[] {
     'Paste it before the closing </body> tag on your site',
     'Add a container element where you want the LMS to appear: <div id="elevate-lms"></div>',
     'Save and publish your changes',
-    'Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate your integration',
+    `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate your integration`,
   ];
 
   const platformSteps: Record<string, string[]> = {
@@ -41,7 +41,7 @@ function generateSetupSteps(platform: string): string[] {
       'Paste the script before </body>',
       'Add the shortcode [elevate_lms] where you want the widget',
       'Install the Elevate LMS WordPress plugin (contact us for access)',
-      'Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate',
+      `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate`,
     ],
     wix: [
       'In Wix Editor, click Add → Embed → Custom Code',

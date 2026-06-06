@@ -52,7 +52,7 @@ import { getSystemRegistryContext, requiresConfirmation } from '@/lib/platform/s
 import { requireTypedConfirmation, getConfirmationPhrase } from '@/lib/security/require-confirmation';
 import { emitAiAction, emitMigrationEvent } from '@/lib/platform/events';
 import { describeCheckedAppDirs, discoverNextAppDirs } from '@/lib/devstudio/next-app-dirs';
-import { getDevIntPromptContext } from '@/lib/devstudio/devint-container';
+import { getAiCharterContext } from '@/lib/devstudio/platform-control-plane';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
@@ -3547,7 +3547,7 @@ When using ask_question to request missing parameters, write a single concise pl
 - Funding: DOL grants, JRI, WIOA ITA, employer partnerships
 
 ## DevInt Operating Container
-${getDevIntPromptContext()}
+${getAiCharterContext()}
 
 ## Platform Architecture
 ${systemSummary}

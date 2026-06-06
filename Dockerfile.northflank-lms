@@ -75,7 +75,9 @@ RUN test -n "$NEXT_PUBLIC_SUPABASE_URL" \
       cp -a "$pkg" "/export/sharp-node_modules/@img/${name}"; \
     done \
     && test -f /export/sharp-node_modules/sharp/package.json \
-    && test -d /export/sharp-node_modules/@img/sharp-linux-x64
+    && test -d /export/sharp-node_modules/@img/sharp-linux-x64 \
+    && EXPORT_ROOT=/export node scripts/export-admin-pdf-deps.mjs \
+    && test -f /export/pdf-node_modules/@napi-rs/canvas/package.json
 
 RUN node scripts/prune-lms-builder-disk.mjs
 
@@ -101,10 +103,17 @@ COPY --from=builder /app/.next/standalone ./
 RUN mkdir -p node_modules
 COPY --from=builder /export/sharp-node_modules/sharp ./node_modules/sharp
 COPY --from=builder /export/sharp-node_modules/@img ./node_modules/@img
+COPY --from=builder /export/pdf-node_modules/@napi-rs ./node_modules/@napi-rs
+COPY --from=builder /export/pdf-node_modules/pdfjs-dist ./node_modules/pdfjs-dist
+COPY --from=builder /export/pdf-node_modules/pdf-parse ./node_modules/pdf-parse
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/.next/server ./.next/server
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/remotion-src ./remotion-src
+COPY --from=builder /app/lib/server/register-connection-guards.cjs ./lib/server/register-connection-guards.cjs
+
+# Fail image build if PDF stack is missing (OCR + pdf-parse routes need canvas at runtime).
+RUN node -e "require('@napi-rs/canvas'); require('pdf-parse'); console.log('[lms] pdf runtime ok')"
 
 RUN addgroup --gid 1001 nodejs && \
     adduser --uid 1001 --ingroup nodejs --disabled-password --gecos "" nextjs && \

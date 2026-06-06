@@ -42,6 +42,7 @@ import { DeliveryBadge, FundingSection } from './ProgramTruthBadges';
 import { ICC_URL, ICC_INSTRUCTION, hero as heroTokens } from '@/lib/page-design-tokens';
 import { DEFAULT_HERO_VIDEO, resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { formatDeliveryDisclosure } from '@/lib/programs/program-schema';
 import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
 
 interface Props {
@@ -75,6 +76,7 @@ export default function ProgramDetailPage({
   const hoursRange = getTotalHoursRange(p);
   const primaryCTA = getPrimaryCTA(p);
   const enrollmentTracks = getEnrollmentTracks(p);
+  const deliveryDisclosure = formatDeliveryDisclosure(p.deliveredBy);
   const selfPayNumeric = Number((p.selfPayCost || '').replace(/[^0-9.]/g, '')) || 0;
   // Use depositAmount from program data if set, otherwise fall back to $600 minimum.
   const bnplDepositStart = p.depositAmount
@@ -239,14 +241,8 @@ export default function ProgramDetailPage({
                 </div>
 
                 {/* Delivery disclosure */}
-                {p.deliveredBy && (
-                  <p className="mt-4 text-xs text-slate-500">
-                    {p.deliveredBy === 'Elevate'
-                      ? `Delivered directly by ${PLATFORM_DEFAULTS.orgName}.`
-                      : p.deliveredBy === 'Partner'
-                        ? 'Delivered by an approved training partner.'
-                        : `Delivered by ${PLATFORM_DEFAULTS.orgName} or an approved training partner.`}
-                  </p>
+                {deliveryDisclosure && (
+                  <p className="mt-4 text-xs text-slate-500">{deliveryDisclosure}</p>
                 )}
               </div>
 

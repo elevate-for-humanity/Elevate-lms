@@ -45,7 +45,7 @@ export async function sendAdminAlert(alert: EmailAlert) {
 // Predefined alert templates
 export const AlertTemplates = {
   newApplication: (data: { name: string; email: string; program: string; id: string }) => ({
-    to: 'admissions@${PLATFORM_DEFAULTS.canonicalDomain}',
+    to: `admissions@${PLATFORM_DEFAULTS.canonicalDomain}`,
     subject: `New Application: ${data.name} - ${data.program}`,
     html: `
       <h2>New Application Received</h2>
@@ -60,7 +60,7 @@ export const AlertTemplates = {
   }),
 
   newContactMessage: (data: { name: string; email: string; message: string; id: string }) => ({
-    to: 'info@${PLATFORM_DEFAULTS.canonicalDomain}',
+    to: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
     subject: `New Contact Message: ${data.name}`,
     html: `
       <h2>New Contact Message</h2>
@@ -80,7 +80,7 @@ export const AlertTemplates = {
     fundingSource: string;
     id: string;
   }) => ({
-    to: 'registrar@${PLATFORM_DEFAULTS.canonicalDomain}',
+    to: `registrar@${PLATFORM_DEFAULTS.canonicalDomain}`,
     subject: `New Enrollment: ${data.studentName} - ${data.program}`,
     html: `
       <h2>New Enrollment Created</h2>
@@ -99,7 +99,7 @@ export const AlertTemplates = {
     certificateNumber: string;
     id: string;
   }) => ({
-    to: 'registrar@${PLATFORM_DEFAULTS.canonicalDomain}',
+    to: `registrar@${PLATFORM_DEFAULTS.canonicalDomain}`,
     subject: `Certificate Issued: ${data.certificateNumber}`,
     html: `
       <h2>Certificate Issued</h2>
@@ -113,7 +113,7 @@ export const AlertTemplates = {
   }),
 
   contentFlagged: (data: { postId: string; reason: string; flaggedBy: string }) => ({
-    to: 'community@${PLATFORM_DEFAULTS.canonicalDomain}',
+    to: `community@${PLATFORM_DEFAULTS.canonicalDomain}`,
     subject: `Content Flagged for Moderation`,
     html: `
       <h2>Content Flagged</h2>

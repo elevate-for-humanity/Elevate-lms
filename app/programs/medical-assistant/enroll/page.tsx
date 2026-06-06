@@ -66,7 +66,7 @@ export default function MedicalAssistantEnrollPage() {
       } else {
         window.location.href = `/enroll/payment?application_id=${data.enrollmentId}&program=medical-assistant&amount=${PROGRAM.price}&type=full-payment`;
       }
-    } catch (err: any) { setError(err?.message || 'Something went wrong. Call ${PLATFORM_DEFAULTS.supportPhone}.'); setIsSubmitting(false); }
+    } catch (err: any) { setError(err?.message || `Something went wrong. Call ${PLATFORM_DEFAULTS.supportPhone}.`); setIsSubmitting(false); }
   };
 
   return (

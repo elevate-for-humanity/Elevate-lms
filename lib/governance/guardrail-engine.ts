@@ -296,7 +296,7 @@ async function sendGuardrailNotifications(
   }
 
   if (policy.notifyAdmin) {
-    const adminEmail = process.env.ADMIN_ALERT_EMAIL || process.env.ADMIN_EMAIL || 'compliance@${PLATFORM_DEFAULTS.canonicalDomain}';
+    const adminEmail = process.env.ADMIN_ALERT_EMAIL || process.env.ADMIN_EMAIL || `compliance@${PLATFORM_DEFAULTS.canonicalDomain}`;
     notifications.push(
       sendEmail({
         to: adminEmail,

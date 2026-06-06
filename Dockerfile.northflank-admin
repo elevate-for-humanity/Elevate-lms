@@ -128,6 +128,7 @@ COPY --from=builder /app/public/hero-images ./apps/admin/public/hero-images
 COPY --from=builder /app/public/downloads ./apps/admin/public/downloads
 COPY --from=builder /app/remotion-src ./remotion-src
 COPY --from=builder /app/apps/admin/server.js ./apps/admin/server.js
+COPY --from=builder /app/lib/server/register-connection-guards.cjs ./lib/server/register-connection-guards.cjs
 RUN mkdir -p apps/admin/node_modules
 COPY --from=builder /export/ws ./apps/admin/node_modules/ws
 RUN test -f apps/admin/node_modules/ws/package.json

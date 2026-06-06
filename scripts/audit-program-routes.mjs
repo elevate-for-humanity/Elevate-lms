@@ -57,6 +57,57 @@ function discoverAppRoutes(dir, prefix = '') {
 
 const programAppRoutes = discoverAppRoutes(path.join(ROOT, 'app/programs'), '/programs');
 
+// Dynamic catch-all: app/programs/[program]/page.tsx serves any static/registry slug
+const hasDynamicProgramRoute = fs.existsSync(
+  path.join(ROOT, 'app/programs/[program]/page.tsx'),
+);
+
+/** Static ProgramSchema slugs from data/programs/index.ts */
+function loadStaticProgramSlugs() {
+  const slugs = new Set();
+  const indexPath = path.join(ROOT, 'data/programs/index.ts');
+  if (!fs.existsSync(indexPath)) return slugs;
+  const content = fs.readFileSync(indexPath, 'utf8');
+  const importRe = /from '\.\/([^']+)'/g;
+  const files = new Set();
+  let m;
+  while ((m = importRe.exec(content)) !== null) files.add(m[1]);
+  for (const file of files) {
+    const fp = path.join(ROOT, 'data/programs', `${file}.ts`);
+    if (!fs.existsSync(fp)) continue;
+    const src = fs.readFileSync(fp, 'utf8');
+    const slugM = src.match(/slug:\s*['"`]([a-z0-9-]+)['"`]/);
+    if (slugM) slugs.add(slugM[1]);
+  }
+  return slugs;
+}
+
+const staticProgramSlugs = loadStaticProgramSlugs();
+
+/** Registry slugs + SLUG_ALIASES targets from lib/program-registry.ts */
+function loadRegistrySlugs() {
+  const slugs = new Set();
+  const regPath = path.join(ROOT, 'lib/program-registry.ts');
+  if (!fs.existsSync(regPath)) return slugs;
+  const content = fs.readFileSync(regPath, 'utf8');
+  const slugRe = /slug:\s*['"`]([a-z0-9-]+)['"`]/g;
+  let m;
+  while ((m = slugRe.exec(content)) !== null) slugs.add(m[1]);
+  const aliasRe = /['"`]([a-z0-9-]+)['"`]:\s*['"`]([a-z0-9-]+)['"`]/g;
+  while ((m = aliasRe.exec(content)) !== null) {
+    slugs.add(m[1]);
+    slugs.add(m[2]);
+  }
+  return slugs;
+}
+
+const registrySlugs = loadRegistrySlugs();
+
+function isServedByDynamicRoute(slug) {
+  if (!hasDynamicProgramRoute) return false;
+  return staticProgramSlugs.has(slug) || registrySlugs.has(slug);
+}
+
 // ── Scan codebase for /programs/* hrefs ─────────────────────────────────────
 
 const SCAN_DIRS = ['app', 'components', 'content', 'lib'];
@@ -105,19 +156,23 @@ for (const dir of SCAN_DIRS) {
 const heroBannersPath = path.join(ROOT, 'public/data/hero-banners.json');
 const heroBanners = JSON.parse(fs.readFileSync(heroBannersPath, 'utf8'));
 
-// ── Check cf-programs for duplicate titles ───────────────────────────────────
+// ── Check static program registry for duplicate titles ───────────────────────
 
-let cfPrograms = [];
-try {
-  // Read the TS file and extract title strings (simple regex, not full parse)
-  const cfContent = fs.readFileSync(path.join(ROOT, 'content/cf-programs.ts'), 'utf8');
-  const titleRe = /title:\s*['"`]([^'"`]+)['"`]/g;
-  let m;
-  while ((m = titleRe.exec(cfContent)) !== null) cfPrograms.push(m[1]);
-} catch { /* ignore */ }
+const programTitles = [];
+for (const slug of staticProgramSlugs) {
+  const candidates = fs
+    .readdirSync(path.join(ROOT, 'data/programs'))
+    .filter((f) => f.endsWith('.ts') && f !== 'index.ts' && f !== 'catalog.ts');
+  for (const file of candidates) {
+    const src = fs.readFileSync(path.join(ROOT, 'data/programs', file), 'utf8');
+    if (!src.includes(`slug: '${slug}'`) && !src.includes(`slug: "${slug}"`)) continue;
+    const titleM = src.match(/title:\s*['"`]([^'"`]+)['"`]/);
+    if (titleM) programTitles.push(titleM[1]);
+  }
+}
 
 const titleCounts = {};
-for (const t of cfPrograms) {
+for (const t of programTitles) {
   const key = t.toLowerCase().trim();
   titleCounts[key] = (titleCounts[key] || 0) + 1;
 }
@@ -140,15 +195,18 @@ for (const [href, refs] of [...allLinks.entries()].sort()) {
   const slug = parts[0];
   const appRoute = `/programs/${slug}`;
   const hasPage = programAppRoutes.has(appRoute);
+  const hasDynamic = isServedByDynamicRoute(slug);
   const hasRedirect = redirectSources.has(appRoute);
   const hasBanner = !!heroBanners[slug];
 
-  if (!hasPage && !hasRedirect) {
+  if (!hasPage && !hasDynamic && !hasRedirect) {
     console.log(`❌ MISSING ROUTE: ${appRoute}`);
     console.log(`   Referenced in: ${refs.slice(0, 3).join(', ')}${refs.length > 3 ? ` (+${refs.length - 3} more)` : ''}`);
     if (!hasBanner) console.log(`   ⚠️  Also missing from hero-banners.json`);
     issues++;
     toAdd.push(appRoute);
+  } else if (!hasPage && hasDynamic) {
+    console.log(`✓  DYNAMIC OK:  ${appRoute} (served by [program] + static/registry)`);
   } else if (!hasPage && hasRedirect) {
     console.log(`↪  REDIRECT OK:  ${appRoute} (no page, but redirect exists)`);
   }
@@ -156,7 +214,7 @@ for (const [href, refs] of [...allLinks.entries()].sort()) {
 
 // Duplicate titles
 if (duplicateTitles.length > 0) {
-  console.log(`\n❌ DUPLICATE PROGRAM TITLES in cf-programs.ts:`);
+  console.log(`\n❌ DUPLICATE PROGRAM TITLES in data/programs:`);
   for (const t of duplicateTitles) {
     console.log(`   "${t}"`);
     issues++;
@@ -186,16 +244,9 @@ console.log(`  Duplicate titles:        ${duplicateTitles.length}`);
 console.log(`  Issues:                  ${issues}`);
 
 if (FIX_MODE && toAdd.length > 0) {
-  console.log(`\n[audit:program-routes] --fix: adding ${toAdd.length} redirects to /programs...`);
-  for (const route of toAdd) {
-    canonicalConfig.legacyAliases.push({
-      source: route,
-      destination: '/programs',
-      permanent: false,
-    });
-    console.log(`  Added: ${route} → /programs`);
-  }
-  fs.writeFileSync(canonicalRoutesPath, JSON.stringify(canonicalConfig, null, 2) + '\n');
+  console.error(
+    `\n[audit:program-routes] --fix disabled for catalog dumps. Add canonical redirects manually or create data/programs/*.ts for:\n${toAdd.map((r) => `  - ${r}`).join('\n')}\n`,
+  );
 }
 
 if (issues > 0) {

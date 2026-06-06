@@ -34,7 +34,7 @@ export async function notifySendgrid(subject: string, text: string) {
     },
     body: JSON.stringify({
       personalizations: [{ to: [{ email: ALERT_EMAIL_TO }] }],
-      from: { email: SENDGRID_FROM, name: '${PLATFORM_DEFAULTS.orgName} Alerts' },
+      from: { email: SENDGRID_FROM, name: `${PLATFORM_DEFAULTS.orgName} Alerts` },
       subject,
       content: [{ type: 'text/plain', value: text }],
     }),

@@ -60,7 +60,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: application.contact_email,
-          subject: 'Partner Application Update - ${PLATFORM_DEFAULTS.orgName}',
+          subject: `Partner Application Update - ${PLATFORM_DEFAULTS.orgName}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #1e3a8a;">Partner Application Update</h2>

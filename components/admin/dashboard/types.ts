@@ -222,4 +222,6 @@ export interface AdminDashboardData {
   /** Non-empty when one or more non-critical sections failed to load. */
   degradedSections: DegradedSection[];
   systemHealth: SystemHealth;
+  /** Derived from admin profile role — gates Lizzy secrets panel. */
+  isSuperAdmin?: boolean;
 }

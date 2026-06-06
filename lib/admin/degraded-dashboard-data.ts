@@ -64,6 +64,7 @@ export function getDegradedAdminDashboardData(): AdminDashboardData {
       },
     ],
     degradedSections: ['dashboard_data'],
+    isSuperAdmin: false,
     systemHealth: {
       stripeWebhookOk: false,
       stripeIssuingOk: false,

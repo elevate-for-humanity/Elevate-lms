@@ -46,7 +46,17 @@ function fmt(cents: number) {
 }
 
 export function StatsOverviewBar({ data }: Props) {
-  const { counts, totalStudents, revenueAllTimeCents, operational } = data;
+  const counts = data.counts ?? {
+    pendingApplications: 0,
+    activeEnrollments: 0,
+    revenueThisMonthCents: 0,
+    certificatesIssued: 0,
+    pendingProgramHolders: 0,
+    pendingDocuments: 0,
+  };
+  const totalStudents = data.totalStudents ?? 0;
+  const revenueAllTimeCents = data.revenueAllTimeCents ?? 0;
+  const operational = data.operational;
 
   return (
     <div className="mb-6">

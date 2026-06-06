@@ -1099,5 +1099,6 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
     sitePreviewTargets,
     degradedSections,
     systemHealth,
+    isSuperAdmin: adminProfile?.role === 'super_admin',
   };
 }

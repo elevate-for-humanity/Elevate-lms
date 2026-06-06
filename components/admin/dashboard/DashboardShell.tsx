@@ -501,7 +501,7 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
         <StatsOverviewBar data={data} />
 
         {/* ── KPI cards ────────────────────────────────────────────────── */}
-        {data.kpis.length > 0 && (
+        {(data.kpis?.length ?? 0) > 0 && (
           <div className="mb-6">
             <RealtimeKpiGrid kpis={data.kpis} />
           </div>
@@ -525,7 +525,7 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
           <div className="space-y-4">
             <EnrollmentFunnel data={data} />
             <RecentActivity items={data.recentActivity} />
-            {data.recentApplications.length > 0 && (
+            {(data.recentApplications?.length ?? 0) > 0 && (
               <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
                 <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -546,7 +546,7 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
 
         {/* ── Top programs + unpublished programs ──────────────────────── */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {data.topPrograms.length > 0 && (
+          {(data.topPrograms?.length ?? 0) > 0 && (
             <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
               <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -568,7 +568,7 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
               </div>
             </div>
           )}
-          {data.blockedPrograms.length > 0 && (
+          {(data.blockedPrograms?.length ?? 0) > 0 && (
             <BlockedProgramsList items={data.blockedPrograms} />
           )}
         </div>
@@ -583,7 +583,7 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
           <JobBoardPanelLazy />
           <LizzyContainerWrapperLazy
             sites={data.sitePreviewTargets ?? []}
-            isSuperAdmin={data.isSuperAdmin}
+            isSuperAdmin={data.isSuperAdmin === true}
             pendingApplications={data.recentApplications}
             pendingApplicationsCount={data.counts.pendingApplications}
             pendingProgramHolders={data.counts.pendingProgramHolders}

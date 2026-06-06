@@ -64,7 +64,7 @@ Phone: ${PLATFORM_DEFAULTS.supportPhone}
    * EMAIL 2: Advisor Outreach (Manual / Assisted)
    */
   advisorOutreach: {
-    from: 'advisor@${PLATFORM_DEFAULTS.canonicalDomain}',
+    from: `advisor@${PLATFORM_DEFAULTS.canonicalDomain}`,
     subject: "Let's talk about your next steps",
     getHtml: (data: { firstName: string; advisorName: string; calendlyLink?: string }) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

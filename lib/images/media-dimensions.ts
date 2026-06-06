@@ -57,9 +57,10 @@ export const MEDIA_SLOTS = {
     nextImageSizes: '100vw',
   },
   programPageHero: {
-    desktop: { width: 1920, height: 800 },
+    desktop: { width: 2560, height: 1440 },
     mobile: { width: 1080, height: 1350 },
-    aspectDesktop: '12/5', // 2.4:1
+    source: { width: 2560, height: 1440 },
+    aspectDesktop: '16/9',
     aspectMobile: '4/5',
     maxKb: MEDIA_BUDGET_KB.hero,
     format: MEDIA_FORMAT,

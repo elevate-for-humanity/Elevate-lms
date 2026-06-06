@@ -62,9 +62,9 @@ export const hero = {
   /** Homepage hero — 16:9 desktop, 4:5 mobile (source 2560×1440 WebP) */
   homepageWrap:
     'relative w-full aspect-[4/5] sm:aspect-[16/9] max-h-[min(85vw,560px)] sm:max-h-[min(56.25vw,560px)] overflow-hidden bg-slate-100',
-  /** Program detail hero — 2.4:1 desktop, 4:5 mobile */
+  /** Program detail hero — 16:9 desktop, 4:5 mobile (pair desktop/mobile WebP assets) */
   programPageWrap:
-    'relative w-full aspect-[4/5] lg:aspect-[12/5] overflow-hidden bg-slate-100',
+    'relative w-full aspect-[4/5] sm:aspect-[16/9] max-h-[min(85vw,560px)] sm:max-h-[min(56.25vw,560px)] overflow-hidden bg-slate-100',
   /** Dashboard strip — 3.2:1 desktop, 1:1 mobile */
   dashboardWrap:
     'relative w-full aspect-square lg:aspect-[16/5] overflow-hidden bg-slate-100',

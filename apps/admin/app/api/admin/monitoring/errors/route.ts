@@ -52,6 +52,18 @@ export async function GET(request: Request) {
     process.env.SENTRY_ADMIN_DSN ||
     '';
 
+  const rows = auditFailures ?? [];
+
+  // MonitoringClient (/admin/monitoring) expects `errors` with API-error row shape
+  const errors = rows.map((row) => ({
+    id: row.id,
+    timestamp: row.created_at,
+    endpoint: row.endpoint ?? 'audit_pipeline',
+    error: row.error_message ?? 'Audit write failed',
+    statusCode: 500,
+    ip: '—',
+  }));
+
   return NextResponse.json({
     sentry: {
       configured: Boolean(sentryDsn),
@@ -64,7 +76,8 @@ export async function GET(request: Request) {
     intake: {
       idempotencyTtlSeconds: Number(process.env.APPLICATION_INTAKE_IDEMPOTENCY_TTL_SECONDS || '86400'),
     },
-    auditFailures: auditFailures ?? [],
+    auditFailures: rows,
+    errors,
     auditFailuresDegraded: Boolean(auditError),
     generatedAt: new Date().toISOString(),
   });

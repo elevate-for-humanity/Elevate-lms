@@ -155,7 +155,10 @@ export default function BusinessProgramsPage() {
                       </h3>
                       <div className="mt-2 flex flex-wrap gap-3 text-sm text-slate-600">
                         <span>{p.duration}</span>
-                        <span className="text-brand-green-600 font-semibold">{p.salary}/yr avg</span>
+                        <span className="text-brand-green-600 font-semibold">
+                          {p.salary}
+                          {/^\$/.test(p.salary) ? '/yr avg' : ''}
+                        </span>
                       </div>
                       <div className="mt-3 text-brand-red-600 font-semibold text-sm group-hover:underline">
                         Learn More →

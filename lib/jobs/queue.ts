@@ -19,7 +19,8 @@ export type JobType =
   | 'license_reactivate'
   | 'email_send'
   | 'tenant_setup'
-  | 'webhook_process';
+  | 'webhook_process'
+  | 'workspace_provision';
 
 export type JobStatus = 'queued' | 'processing' | 'completed' | 'failed' | 'dead';
 

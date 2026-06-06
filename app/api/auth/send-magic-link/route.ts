@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       personalizations: [{ to: [{ email: email.trim() }] }],
       from: { email: PLATFORM_DEFAULTS.emailFromAddress, name: PLATFORM_DEFAULTS.orgName },
       reply_to: { email: 'elevate4humanityedu@gmail.com' },
-      subject: 'Your sign-in link — ${PLATFORM_DEFAULTS.orgName}',
+      subject: `Your sign-in link — ${PLATFORM_DEFAULTS.orgName}`,
       content: [
         {
           type: 'text/html',

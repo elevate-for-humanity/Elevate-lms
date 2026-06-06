@@ -279,16 +279,16 @@ export async function generateCDLStudentMOUPdf(data: CDLStudentMOUData): Promise
   page.drawText('$500 per enrolled student — due at class start', {
     x: M + 10, y: y - 16, size: 11, font: bold, color: rgb(0.55, 0.27, 0.07),
   });
-  page.drawText('${PLATFORM_DEFAULTS.orgName} covers the remaining program balance on behalf of the student.', {
+  page.drawText(`${PLATFORM_DEFAULTS.orgName} covers the remaining program balance on behalf of the student.`, {
     x: M + 10, y: y - 30, size: BODY, font: regular, color: rgb(0.2, 0.2, 0.2),
   });
   y -= boxH + 16;
 
   body(
     'Referral partners entering into this MOU agree to submit a $500 referral contribution per student at the ' +
-    'time of class start. ${PLATFORM_DEFAULTS.orgName} will fund the remaining balance of the program cost (up to the ' +
-    'full program price less $500) on behalf of the referred student. The referral partner is not responsible ' +
-    'for any additional tuition beyond the $500 per-student contribution.'
+      `time of class start. ${PLATFORM_DEFAULTS.orgName} will fund the remaining balance of the program cost (up to the ` +
+      'full program price less $500) on behalf of the referred student. The referral partner is not responsible ' +
+      'for any additional tuition beyond the $500 per-student contribution.',
   );
   gap(4);
 

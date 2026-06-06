@@ -204,7 +204,6 @@ export const siteMapSections: SiteMapSection[] = [
       { label: "How It Works", href: "/funding/how-it-works" },
       { label: "Job Ready Indy", href: "/funding/job-ready-indy" },
       { label: "Jri", href: "/funding/jri" },
-      { label: "State Programs", href: "/funding/state-programs" },
       { label: "Wioa", href: "/funding/wioa" },
       { label: "Wrg", href: "/funding/wrg" }
     ],

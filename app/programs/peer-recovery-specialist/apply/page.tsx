@@ -118,7 +118,7 @@ export default function PeerRecoveryApplyPage() {
         `/programs/peer-recovery-specialist/apply/success${data.id ? `?id=${data.id}` : ''}`,
       );
     } catch {
-      setError('Unexpected error. Please call ${PLATFORM_DEFAULTS.supportPhone}.');
+      setError(`Unexpected error. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);
     } finally {
       setLoading(false);
     }

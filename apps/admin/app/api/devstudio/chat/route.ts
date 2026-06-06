@@ -23,7 +23,7 @@ import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-cl
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type Groq from 'groq-sdk';
 import { getRAGContext } from '@/lib/platform/rag';
-import { getDevIntPromptContext } from '@/lib/devstudio/devint-container';
+import { getAiCharterContext } from '@/lib/devstudio/platform-control-plane';
 import {
   ROUTE_DEPENDENCIES,
   lookupRoute,
@@ -1212,7 +1212,7 @@ async function _POST(req: NextRequest) {
     const toolCalls: ToolCallRecord[] = [...automaticEvidence];
 
     const systemPrompt = buildAdminAiSystemPrompt({
-      ragContext: `## DevInt Operating Container\n${getDevIntPromptContext()}\n\n${ragContext || ''}`,
+      ragContext: `## AI Studio Charter\n${getAiCharterContext()}\n\n${ragContext || ''}`,
       fileContext,
       documentsContext,
       lastUserMessage,

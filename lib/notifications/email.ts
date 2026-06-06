@@ -181,7 +181,7 @@ export class EmailService {
 
   private getWelcomeTemplate(userName: string): EmailTemplate {
     return {
-      subject: 'Welcome to ${PLATFORM_DEFAULTS.orgName}',
+      subject: `Welcome to ${PLATFORM_DEFAULTS.orgName}`,
       html: this.wrap(`
         <p style="margin: 0 0 16px;">Hello ${userName},</p>
         <p style="margin: 0 0 16px;">Your account is active. Here's what you have access to:</p>
@@ -192,7 +192,7 @@ export class EmailService {
           <li style="margin: 6px 0;">Dedicated advisor throughout your program</li>
         </ul>
         <p style="margin: 0 0 24px;">Log in to your student portal to get started.</p>
-        <div style="margin: 0 0 16px;">${this.btn('${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard', 'Go to Student Portal')}</div>
+        <div style="margin: 0 0 16px;">${this.btn(`${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard`, 'Go to Student Portal')}</div>
         <p style="margin: 0; color: #6b7280; font-size: 14px;">Questions? Reply to this email or call ${PLATFORM_DEFAULTS.supportPhone}.</p>
       `),
       text: `Hello ${userName},\n\nYour ${PLATFORM_DEFAULTS.orgName} account is active. Log in to get started.\n\n${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard\n\n— ${PLATFORM_DEFAULTS.orgName}`,
@@ -212,7 +212,7 @@ export class EmailService {
           <li style="margin: 6px 0;">Begin your coursework</li>
         </ol>
         <p style="margin: 0 0 24px;">Your advisor will be in touch with any additional details.</p>
-        <div style="margin: 0 0 16px;">${this.btn('${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard', 'Start Learning')}</div>
+        <div style="margin: 0 0 16px;">${this.btn(`${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard`, 'Start Learning')}</div>
       `),
       text: `Hello ${userName},\n\nYou are enrolled in ${courseName}.\n\nNext steps:\n1. Log in to the student portal\n2. Complete the orientation module\n3. Begin your coursework\n\n— ${PLATFORM_DEFAULTS.orgName}`,
     };
@@ -229,7 +229,7 @@ export class EmailService {
         <p style="margin: 0 0 16px;">Hello ${userName},</p>
         <p style="margin: 0 0 16px;"><strong>${assignmentName}</strong> is due on <strong>${dueDate}</strong>.</p>
         <p style="margin: 0 0 24px;">Make sure you've reviewed the requirements and submitted your work before the deadline.</p>
-        <div style="margin: 0 0 16px;">${this.btn('${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard', 'View Assignment')}</div>
+        <div style="margin: 0 0 16px;">${this.btn(`${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard`, 'View Assignment')}</div>
         <p style="margin: 0; color: #6b7280; font-size: 14px;">Need help? Contact your instructor or advisor.</p>
       `),
       text: `Hello ${userName},\n\n${assignmentName} is due on ${dueDate}. Submit before the deadline.\n\n— ${PLATFORM_DEFAULTS.orgName}`,
@@ -261,7 +261,7 @@ export class EmailService {
         <p style="margin: 0 0 16px;">Hello ${userName},</p>
         <p style="margin: 0 0 16px;">You've earned the <strong>${achievementName}</strong> achievement.</p>
         <p style="margin: 0 0 24px;">View your achievements in the student portal.</p>
-        <div style="margin: 0 0 16px;">${this.btn('${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard', 'View Achievements')}</div>
+        <div style="margin: 0 0 16px;">${this.btn(`${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard`, 'View Achievements')}</div>
       `),
       text: `Hello ${userName},\n\nYou've earned the ${achievementName} achievement.\n\n— ${PLATFORM_DEFAULTS.orgName}`,
     };
@@ -281,7 +281,7 @@ export class EmailService {
           <tr><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-weight: 600;">Document</td><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${documentType}</td></tr>
           <tr><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; font-weight: 600;">Program</td><td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${programName}</td></tr>
         </table>
-        <div style="margin: 0 0 16px;">${this.btn('${PLATFORM_DEFAULTS.siteUrl}/admin/documents/review', 'Review Document')}</div>
+        <div style="margin: 0 0 16px;">${this.btn(`${PLATFORM_DEFAULTS.siteUrl}/admin/documents/review`, 'Review Document')}</div>
       `),
       text: `Document review required.\n\nStudent: ${studentName}\nDocument: ${documentType}\nProgram: ${programName}\n\n${PLATFORM_DEFAULTS.siteUrl}/admin/documents/review\n\n— ${PLATFORM_DEFAULTS.orgName}`,
     };

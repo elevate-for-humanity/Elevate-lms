@@ -32,14 +32,14 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
       validity: '2 years',
     },
     {
-      name: 'CPR/AED/First Aid Certification',
+      name: 'CPR',
       issuer: 'American Heart Association',
       description:
-        'BLS-level CPR, AED operation, and first aid for healthcare and public safety settings.',
+        'Industry-recognized BLS CPR and AED certification for healthcare and public safety settings.',
       validity: '2 years',
     },
     {
-      name: 'OSHA 10-Hour Safety Certification',
+      name: 'OSHA 10 - CareerSafe',
       issuer: 'CareerSafe',
       description:
         'OSHA-authorized workplace safety training for healthcare and public safety environments.',
@@ -175,8 +175,9 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
 
   complianceAlignment: [
     {
-      standard: 'ETPL Program ID #10004621',
-      description: 'Approved on Indiana ETPL for WIOA Individual Training Account funding.',
+      standard: 'Indiana ETPL Program #10004621',
+      description:
+        'Provider: 2Exclusive LLC-S · Elevate for Humanity Training Center · Indianapolis, Marion County. WIOA Individual Training Account eligible.',
     },
     {
       standard: 'NREMT EMR Standards',
@@ -278,7 +279,8 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
   ],
   equipmentIncluded: 'CPR mannequin access, AED trainer, and all course materials provided.',
   modality: 'Hybrid — online theory modules plus in-person hands-on skills training.',
-  facilityInfo: 'Elevate training center, Indianapolis. Monthly cohort start dates.',
+  facilityInfo:
+    'Elevate for Humanity Training Center, Indianapolis, Indiana (Marion County). Monthly cohort start dates.',
   employerPartners: [
     'Hospitals and healthcare systems',
     'Schools and childcare centers',
@@ -323,12 +325,14 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
     'Earn EMR, CPR/AED, First Aid, and OSHA 10 certifications in 4 weeks. WIOA-funded Emergency Health & Safety Technician program in Indianapolis.',
 
 
-  fundingOptions: ['self_pay', 'employer_paid'],
+  fundingOptions: ['wioa', 'wrg', 'self_pay', 'employer_paid'],
   funding: {
-    wioa_eligible: false,
+    wioa_eligible: true,
     fssa_eligible: false,
-    wrg_eligible: false,
+    wrg_eligible: true,
+    etpl_approved: true,
     jobReadyIndyEligible: false,
-    fundingNotes: 'Short certification. Eligibility for standalone WIOA/FSSA funding determined by the applicable workforce agency.',
+    fundingNotes:
+      'ETPL Program #10004621. WIOA and Workforce Ready Grant eligible through WorkOne Marion County. Self-pay: $4,950.',
   },
 };

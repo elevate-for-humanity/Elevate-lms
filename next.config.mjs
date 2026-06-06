@@ -603,7 +603,7 @@ const nextConfig = {
       // /funding/dol — real page, no redirect
       // /funding/federal-programs → /funding
       // /funding/jri — real page, no redirect
-      // /funding/state-programs → /funding
+      // /funding/state-programs → /funding (canonical-routes.json)
       // /funding/wrg → /funding
       // /jri — real 401-line page, no redirect
       // /partners/jri → /partners
@@ -681,9 +681,7 @@ const nextConfig = {
 
       // Misc redirects
       { source: '/dashboards/:path*', destination: '/lms/:path*', permanent: true },
-      // /portals base route has its own page — only redirect sub-paths
-      { source: '/portals/:slug/:path*', destination: '/lms/:slug/:path*', permanent: true },
-      { source: '/portals/:slug', destination: '/lms/:slug', permanent: true },
+      // /portals is the public portal hub — do not wildcard to /lms (broke desktop/mobile parity)
 
       // These brands have their own pages — only redirect sub-paths, not the root
       // /serene-comfort-care/page.tsx exists and redirects to /partners itself
@@ -780,7 +778,6 @@ const nextConfig = {
       { source: '/programs/it-support', destination: '/programs/it-help-desk', permanent: true },
       { source: '/programs/it-support-specialist', destination: '/programs/it-help-desk', permanent: true },
       { source: '/programs/bookkeeping-fundamentals', destination: '/programs/bookkeeping', permanent: true },
-      { source: '/programs/tax-prep', destination: '/programs/tax-preparation', permanent: true },
       { source: '/programs/cpr-cert', destination: '/programs/cpr-first-aid', permanent: true },
       { source: '/programs/health-safety', destination: '/programs/cpr-first-aid', permanent: true },
       { source: '/programs/phlebotomy-technician', destination: '/programs/phlebotomy', permanent: true },

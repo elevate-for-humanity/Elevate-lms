@@ -136,7 +136,7 @@ export async function handleTestingCheckoutSession(
     const email = enforcementMeta.email;
     if (!enforcementId) return;
 
-    await db
+    const { error: updateErr } = await db
       .from('testing_enforcement')
       .update({
         fee_paid: true,
@@ -145,6 +145,15 @@ export async function handleTestingCheckoutSession(
         unlocked_at: new Date().toISOString(),
       })
       .eq('id', enforcementId);
+
+    if (updateErr) {
+      logger.error(
+        '[testing/checkout] Enforcement update failed',
+        new Error(updateErr.message),
+        { enforcementId },
+      );
+      return;
+    }
 
     if (email) {
       await sendEmail({

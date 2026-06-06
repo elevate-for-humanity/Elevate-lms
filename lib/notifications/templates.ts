@@ -372,7 +372,7 @@ Please reach out to the apprentice to coordinate their first day. Questions? Rep
 
     case 'employer_application_received':
       return {
-        subject: 'Application Received — ${PLATFORM_DEFAULTS.orgName} Employer Partnership',
+        subject: `Application Received — ${PLATFORM_DEFAULTS.orgName} Employer Partnership`,
         html: baseTemplate(`
           <h2 style="color: ${BRAND_COLOR};">Application Received</h2>
           <p>Dear ${data.contact_name},</p>
@@ -439,7 +439,7 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
 
     case 'employer_activated':
       return {
-        subject: 'Welcome to ${PLATFORM_DEFAULTS.orgName} — Your Employer Portal Is Live',
+        subject: `Welcome to ${PLATFORM_DEFAULTS.orgName} — Your Employer Portal Is Live`,
         html: baseTemplate(`
           <h2 style="color: #16a34a;">Welcome to ${PLATFORM_DEFAULTS.orgName}</h2>
           <p>Dear ${data.contact_name},</p>
@@ -456,7 +456,7 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
             </ul>
           </div>
 
-          ${button('Go to Your Dashboard →', '${PLATFORM_DEFAULTS.siteUrl}/employer/dashboard')}
+          ${button('Go to Your Dashboard →', `${PLATFORM_DEFAULTS.siteUrl}/employer/dashboard`)}
 
           <h3>Employer Partner Benefits</h3>
           <ul>
@@ -538,7 +538,7 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
         };
       } else {
         return {
-          subject: 'Application Update — ${PLATFORM_DEFAULTS.orgName}',
+          subject: `Application Update — ${PLATFORM_DEFAULTS.orgName}`,
           html: baseTemplate(`
             <h2 style="color: #dc2626;">Application Not Approved</h2>
             <p>Dear ${data.contact_name},</p>
@@ -583,7 +583,7 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
             <p style="margin: 0; font-size: 14px;"><strong>Insurance requirement:</strong> Your COI must be on file and approved before apprentices can be placed at your shop. Ask your insurance agent for an ACORD 25 certificate naming &quot;Elevate for Humanity&quot; as Certificate Holder.</p>
           </div>
 
-          ${button('Sign In to Partner Portal \u2192', data.login_link || '${PLATFORM_DEFAULTS.siteUrl}/login')}
+          ${button('Sign In to Partner Portal \u2192', data.login_link || `${PLATFORM_DEFAULTS.siteUrl}/login`)}
 
           <p><strong>What happens next:</strong></p>
           <ul style="padding-left: 20px; line-height: 1.8;">
@@ -594,7 +594,7 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
 
           <p style="font-size: 14px; color: #666;">If you have questions about onboarding, insurance requirements, or the program, reply to this email or call ${SUPPORT_PHONE}.</p>
         `),
-        text: `Partner Onboarding \u2014 You're Approved\n\nHi ${data.owner_name || 'there'},\n\nYour partner application has been approved. Your shop is now an authorized training site in the ${PLATFORM_DEFAULTS.orgName} Barber Apprenticeship Program.\n\nONBOARDING CHECKLIST\n1. Sign in to your Partner Portal: ${data.login_link || '${PLATFORM_DEFAULTS.siteUrl}/login'}\n2. Upload your Certificate of Insurance (COI) \u2014 Commercial General Liability ($1M/$2M) with PLATFORM_DEFAULTS.orgName as Certificate Holder\n3. Sign the Memorandum of Understanding (MOU)\n4. Confirm your supervising barber\n5. Set your apprentice capacity\n\nINSURANCE REQUIREMENT: Your COI must be on file and approved before apprentices can be placed. Ask your insurance agent for an ACORD 25 certificate naming PLATFORM_DEFAULTS.orgName as Certificate Holder.\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\n\n${PLATFORM_DEFAULTS.orgName} | Indianapolis, IN`,
+        text: `Partner Onboarding \u2014 You're Approved\n\nHi ${data.owner_name || 'there'},\n\nYour partner application has been approved. Your shop is now an authorized training site in the ${PLATFORM_DEFAULTS.orgName} Barber Apprenticeship Program.\n\nONBOARDING CHECKLIST\n1. Sign in to your Partner Portal: ${data.login_link || `${PLATFORM_DEFAULTS.siteUrl}/login`}\n2. Upload your Certificate of Insurance (COI) \u2014 Commercial General Liability ($1M/$2M) with ${PLATFORM_DEFAULTS.orgName} as Certificate Holder\n3. Sign the Memorandum of Understanding (MOU)\n4. Confirm your supervising barber\n5. Set your apprentice capacity\n\nINSURANCE REQUIREMENT: Your COI must be on file and approved before apprentices can be placed. Ask your insurance agent for an ACORD 25 certificate naming ${PLATFORM_DEFAULTS.orgName} as Certificate Holder.\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\n\n${PLATFORM_DEFAULTS.orgName} | Indianapolis, IN`,
       };
 
     case 'provider_approved':
@@ -605,7 +605,7 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
           <p>Hi ${data.contact_name || 'there'},</p>
           <p><strong>${data.org_name || 'Your organization'}</strong> has been approved as a provider on the Elevate Workforce Hub.</p>
           <p>Use the link below to sign in and complete your provider profile. Your account is ready — no password required for first login.</p>
-          ${button('Access Your Provider Portal →', data.login_link || '${PLATFORM_DEFAULTS.siteUrl}/provider/dashboard')}
+          ${button('Access Your Provider Portal →', data.login_link || `${PLATFORM_DEFAULTS.siteUrl}/provider/dashboard`)}
           <p><strong>Your next steps:</strong></p>
           <ol style="padding-left: 20px; line-height: 2;">
             <li>Complete your organization profile and upload your logo</li>
@@ -614,7 +614,7 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
           </ol>
           <p style="font-size: 14px; color: #666;">Questions? Reply to this email or call ${SUPPORT_PHONE}.</p>
         `),
-        text: `Your provider application has been approved\n\nHi ${data.contact_name || 'there'},\n\n${data.org_name || 'Your organization'} has been approved as a provider on the Elevate Workforce Hub.\n\nSign in to your provider portal: ${data.login_link || '${PLATFORM_DEFAULTS.siteUrl}/provider/dashboard'}\n\nNext steps:\n1. Complete your organization profile\n2. Upload compliance documents (MOU, insurance, W-9)\n3. Submit your first program for review\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\n${PLATFORM_DEFAULTS.orgName} | Indianapolis, IN`,
+        text: `Your provider application has been approved\n\nHi ${data.contact_name || 'there'},\n\n${data.org_name || 'Your organization'} has been approved as a provider on the Elevate Workforce Hub.\n\nSign in to your provider portal: ${data.login_link || `${PLATFORM_DEFAULTS.siteUrl}/provider/dashboard`}\n\nNext steps:\n1. Complete your organization profile\n2. Upload compliance documents (MOU, insurance, W-9)\n3. Submit your first program for review\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\n${PLATFORM_DEFAULTS.orgName} | Indianapolis, IN`,
       };
 
     case 'compliance_expiring': {
@@ -630,10 +630,10 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
             Expires: <strong>${data.expires_at || 'soon'}</strong></p>
           </div>
           <p>Upload a renewed document in your provider portal to avoid a compliance hold on your programs.</p>
-          ${button('Upload Renewal →', data.portal_link || '${PLATFORM_DEFAULTS.siteUrl}/provider/compliance')}
+          ${button('Upload Renewal →', data.portal_link || `${PLATFORM_DEFAULTS.siteUrl}/provider/compliance`)}
           <p style="font-size: 14px; color: #666;">Questions? Reply to this email or call ${SUPPORT_PHONE}.</p>
         `),
-        text: `Compliance document expiring in ${daysLeft} days\n\nHi ${data.contact_name || 'there'},\n\n${data.artifact_label || 'A compliance document'} for ${data.org_name || 'your organization'} expires on ${data.expires_at || 'soon'}.\n\nUpload a renewal at: ${data.portal_link || '${PLATFORM_DEFAULTS.siteUrl}/provider/compliance'}\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\n${PLATFORM_DEFAULTS.orgName} | Indianapolis, IN`,
+        text: `Compliance document expiring in ${daysLeft} days\n\nHi ${data.contact_name || 'there'},\n\n${data.artifact_label || 'A compliance document'} for ${data.org_name || 'your organization'} expires on ${data.expires_at || 'soon'}.\n\nUpload a renewal at: ${data.portal_link || `${PLATFORM_DEFAULTS.siteUrl}/provider/compliance`}\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\n${PLATFORM_DEFAULTS.orgName} | Indianapolis, IN`,
       };
     }
 
@@ -645,10 +645,10 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
           <p>Hi ${data.contact_name || 'there'},</p>
           <p><strong>${data.program_title || 'Your program'}</strong> has been reviewed and approved. It is now published in the Elevate program catalog.</p>
           ${data.review_notes ? `<p><strong>Reviewer notes:</strong> ${data.review_notes}</p>` : ''}
-          ${button('View Your Programs →', data.portal_link || '${PLATFORM_DEFAULTS.siteUrl}/provider/programs')}
+          ${button('View Your Programs →', data.portal_link || `${PLATFORM_DEFAULTS.siteUrl}/provider/programs`)}
           <p style="font-size: 14px; color: #666;">Questions? Reply to this email or call ${SUPPORT_PHONE}.</p>
         `),
-        text: `Program approved: ${data.program_title || 'Your program'}\n\nHi ${data.contact_name || 'there'},\n\n${data.program_title || 'Your program'} has been approved and is now published in the catalog.\n\n${data.review_notes ? `Reviewer notes: ${data.review_notes}\n\n` : ''}View your programs: ${data.portal_link || '${PLATFORM_DEFAULTS.siteUrl}/provider/programs'}\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\n${PLATFORM_DEFAULTS.orgName} | Indianapolis, IN`,
+        text: `Program approved: ${data.program_title || 'Your program'}\n\nHi ${data.contact_name || 'there'},\n\n${data.program_title || 'Your program'} has been approved and is now published in the catalog.\n\n${data.review_notes ? `Reviewer notes: ${data.review_notes}\n\n` : ''}View your programs: ${data.portal_link || `${PLATFORM_DEFAULTS.siteUrl}/provider/programs`}\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\n${PLATFORM_DEFAULTS.orgName} | Indianapolis, IN`,
       };
 
     case 'program_rejected':
@@ -667,15 +667,15 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
               : ''
           }
           <p>Update your program submission and resubmit for review.</p>
-          ${button('Edit Program →', data.portal_link || '${PLATFORM_DEFAULTS.siteUrl}/provider/programs')}
+          ${button('Edit Program →', data.portal_link || `${PLATFORM_DEFAULTS.siteUrl}/provider/programs`)}
           <p style="font-size: 14px; color: #666;">Questions? Reply to this email or call ${SUPPORT_PHONE}.</p>
         `),
-        text: `Program needs revision: ${data.program_title || 'Your program'}\n\nHi ${data.contact_name || 'there'},\n\n${data.program_title || 'Your program'} requires changes before it can be published.\n\n${data.review_notes ? `Reviewer feedback: ${data.review_notes}\n\n` : ''}Edit your program: ${data.portal_link || '${PLATFORM_DEFAULTS.siteUrl}/provider/programs'}\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\n${PLATFORM_DEFAULTS.orgName} | Indianapolis, IN`,
+        text: `Program needs revision: ${data.program_title || 'Your program'}\n\nHi ${data.contact_name || 'there'},\n\n${data.program_title || 'Your program'} requires changes before it can be published.\n\n${data.review_notes ? `Reviewer feedback: ${data.review_notes}\n\n` : ''}Edit your program: ${data.portal_link || `${PLATFORM_DEFAULTS.siteUrl}/provider/programs`}\n\nQuestions? Reply to this email or call ${SUPPORT_PHONE}\n${PLATFORM_DEFAULTS.orgName} | Indianapolis, IN`,
       };
 
     default:
       return {
-        subject: 'Notification from ${PLATFORM_DEFAULTS.orgName}',
+        subject: `Notification from ${PLATFORM_DEFAULTS.orgName}`,
         html: baseTemplate(`
           <p>You have a new notification. Please log in to view details.</p>
         `),

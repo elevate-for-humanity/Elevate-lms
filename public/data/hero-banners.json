@@ -301,10 +301,10 @@
     "voiceoverSrc": "/audio/heroes/skilled-trades.mp3",
     "microLabel": "EPA 608 Universal",
     "credentialLabel": "EPA 608 Universal",
-    "durationLabel": "20 weeks",
+    "durationLabel": "6 weeks",
     "salaryRangeLabel": "$38,000 to $55,000",
-    "belowHeroHeadline": "HVAC Technician — EPA 608 Universal in 20 weeks.",
-    "belowHeroSubheadline": "Hands-on training with real HVAC systems. Earn EPA 608 Universal, OSHA 30, CPR, and Rise Up. Proctored on-site. Total cost $5,000 — most students pay $0 through the Workforce Ready Grant.",
+    "belowHeroHeadline": "HVAC Technician — EPA 608 Universal in 6 weeks.",
+    "belowHeroSubheadline": "Hands-on training with real HVAC systems. Earn EPA 608 Universal, OSHA 10, CPR, and Rise Up. Proctored on-site. Total cost $5,000 — most students pay $0 through the Workforce Ready Grant.",
     "primaryCta": {
       "label": "Enroll Now",
       "href": "/programs/hvac-technician/apply",
@@ -318,10 +318,10 @@
     "trustIndicators": [
       "EPA 608 proctored on-site",
       "Workforce Ready Grant eligible — $0 for most",
-      "OSHA 30 + CPR + Rise Up",
+      "OSHA 10 + CPR + Rise Up",
       "Job placement assistance"
     ],
-    "transcript": "Train for EPA 608 Universal certification in 20 weeks at Elevate for Humanity, working on real HVAC systems with hands-on instruction. Graduates also earn OSHA 30, CPR, and Rise Up credentials. HVAC technicians in Indiana commonly earn $38,000 to $55,000. Total program cost is $5,000 — most students pay $0 through the Workforce Ready Grant.",
+    "transcript": "Train for EPA 608 Universal certification in 6 weeks at Elevate for Humanity, working on real HVAC systems with hands-on instruction. Graduates also earn OSHA 10, CPR, and Rise Up credentials. HVAC technicians in Indiana commonly earn $38,000 to $55,000. Total program cost is $5,000 — most students pay $0 through the Workforce Ready Grant.",
     "analyticsName": "hvac-technician",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
   },

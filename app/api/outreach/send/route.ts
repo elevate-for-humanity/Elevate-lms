@@ -170,7 +170,7 @@ async function sendViaSendGrid(to: string[], subject: string, html: string, text
         },
         body: JSON.stringify({
           personalizations: [{ to: [{ email }] }],
-          from: { email: SENDGRID_FROM, name: 'Elizabeth Greene — ${PLATFORM_DEFAULTS.orgName}' },
+          from: { email: SENDGRID_FROM, name: `Elizabeth Greene — ${PLATFORM_DEFAULTS.orgName}` },
           reply_to: { email: 'elevate4humanityedu@gmail.com', name: 'Elizabeth Greene' },
           subject,
           content: [

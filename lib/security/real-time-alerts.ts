@@ -140,7 +140,7 @@ async function sendEmailAlert(alert: SecurityAlert, emails?: string[]): Promise<
       },
       body: JSON.stringify({
         personalizations: emails.map((email) => ({ to: [{ email }] })),
-        from: { email: 'security@${PLATFORM_DEFAULTS.canonicalDomain}', name: 'EFH Security' },
+        from: { email: `security@${PLATFORM_DEFAULTS.canonicalDomain}`, name: 'EFH Security' },
         subject,
         content: [
           {

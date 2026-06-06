@@ -234,7 +234,7 @@ async function _POST(req: Request) {
           const { sendEmail } = await import('@/lib/email/sendgrid');
           await sendEmail({
             to: emailLower,
-            subject: 'Set Your Password — ${PLATFORM_DEFAULTS.orgName}',
+            subject: `Set Your Password — ${PLATFORM_DEFAULTS.orgName}`,
             html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2>Welcome to ${PLATFORM_DEFAULTS.orgName}!</h2><p>Your account has been created. Click below to set your password:</p><p style="text-align:center;margin:24px 0"><a href="${linkData.properties.action_link}" style="background:#dc2626;color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:bold">Set Password</a></p><p style="color:#64748b;font-size:13px">This link expires in 24 hours.</p></div>`,
           });
           logger.info('Password setup email sent', { email: emailLower });
@@ -251,7 +251,7 @@ async function _POST(req: Request) {
 
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
-        customer_email: 'accounting@${PLATFORM_DEFAULTS.canonicalDomain}', // Elevate pays, not student
+        customer_email: `accounting@${PLATFORM_DEFAULTS.canonicalDomain}`, // Elevate pays, not student
         line_items: [
           {
             price_data: {

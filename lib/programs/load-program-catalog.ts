@@ -19,23 +19,55 @@ const STATIC_SECTOR_SECTION: Record<string, string> = {
   business: 'business',
 };
 
+function resolveStaticFundingEligible(program: (typeof ALL_PROGRAMS)[number]): boolean {
+  return Boolean(
+    program.funding?.wioa_eligible ||
+      program.funding?.wrg_eligible ||
+      program.funding?.fssa_eligible ||
+      program.fundingOptions?.some(
+        (option) => option === 'wioa' || option === 'wrg' || option === 'impact',
+      ),
+  );
+}
+
 /** SSR/Google-safe listing when public Supabase returns no published rows (RLS/env). */
 function listingFromStaticCatalog(suppressed: Set<string>): ProgramsListingItem[] {
-  return ALL_PROGRAMS.filter((p) => p.slug && !suppressed.has(p.slug)).map((p) => {
-    const sectionKey =
-      STATIC_SECTOR_SECTION[p.sector] ?? normalizeProgramSectionKey(p.category);
-    const weeks = p.durationWeeks;
-    return {
-      slug: p.slug,
-      title: p.title,
-      description: p.subtitle?.trim() || null,
-      category: p.category,
-      sectionKey,
-      duration: weeks > 0 ? `${weeks} weeks` : null,
-      credential: p.credentials?.[0]?.name ?? null,
-      funding_eligible: !p.isSelfPay,
-    };
-  });
+  return ALL_PROGRAMS.filter(
+    (p) =>
+      p.slug &&
+      !suppressed.has(p.slug) &&
+      p.public_visible !== false &&
+      p.active !== false,
+  )
+    .map((p) => {
+      const sectionKey =
+        STATIC_SECTOR_SECTION[p.sector] ?? normalizeProgramSectionKey(p.category);
+      const weeks = p.durationWeeks;
+      return {
+        slug: p.slug,
+        title: p.title,
+        description: p.subtitle?.trim() || null,
+        category: p.category,
+        sectionKey,
+        duration: weeks != null && weeks > 0 ? `${weeks} weeks` : null,
+        credential: p.credentials?.[0]?.name ?? null,
+        funding_eligible: resolveStaticFundingEligible(p),
+      };
+    })
+    .sort((a, b) => a.title.localeCompare(b.title));
+}
+
+/** Backfill canonical static programs missing from live `programs` rows. */
+export function mergeDbListingWithStaticCatalog(
+  dbPrograms: ProgramsListingItem[],
+  suppressed: Set<string>,
+): ProgramsListingItem[] {
+  const dbSlugs = new Set(dbPrograms.map((p) => p.slug));
+  const staticOnly = listingFromStaticCatalog(suppressed).filter((p) => !dbSlugs.has(p.slug));
+  if (staticOnly.length === 0) {
+    return dbPrograms;
+  }
+  return [...dbPrograms, ...staticOnly].sort((a, b) => a.title.localeCompare(b.title));
 }
 
 
@@ -306,7 +338,11 @@ export async function loadPublishedProgramsListing(
     .map(mapProgramsRowToListing);
 
   if (dbPrograms.length > 0) {
-    return { programs: dbPrograms, error: error?.message, source: 'database' };
+    return {
+      programs: mergeDbListingWithStaticCatalog(dbPrograms, suppressed),
+      error: error?.message,
+      source: 'database',
+    };
   }
 
   if (!options?.suppressFallbackWarning) {

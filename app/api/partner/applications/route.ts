@@ -130,7 +130,7 @@ async function _POST(request: NextRequest) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: email,
-          subject: 'Partner Shop Application Received - ${PLATFORM_DEFAULTS.orgName}',
+          subject: `Partner Shop Application Received - ${PLATFORM_DEFAULTS.orgName}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #1e3a8a;">Partner Shop Application Received</h2>

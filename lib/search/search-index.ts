@@ -122,15 +122,15 @@ export const SEARCH_INDEX: SearchItem[] = [
     badge: 'WIOA Eligible',
   },
   {
-    id: 'tax-preparation',
-    title: 'Tax Preparer Training',
-    description: '8-week tax preparation certification. Earn $50-150 per return during tax season.',
-    href: '/programs/tax-preparation',
+    id: 'bookkeeping',
+    title: 'Bookkeeping & QuickBooks',
+    description: 'Bookkeeping certification with QuickBooks — workforce-funded for eligible Indiana residents.',
+    href: '/programs/bookkeeping',
     category: 'program',
     audiences: ['students', 'everyone'],
-    keywords: ['tax', 'taxes', 'irs', 'preparer', 'preparation', 'accounting', 'finance', 'ptin'],
+    keywords: ['bookkeeping', 'quickbooks', 'accounting', 'finance', 'business'],
     image: '/images/pages/training-classroom.webp',
-    price: '$499',
+    price: 'WIOA Funded',
   },
 
   // ============================================

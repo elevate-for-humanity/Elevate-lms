@@ -486,7 +486,6 @@ export const footerNavigation = {
     links: [
       { label: 'DOL Funding', href: '/funding/dol' },
       { label: 'Federal Programs', href: '/funding/federal-programs' },
-      { label: 'State Programs', href: '/funding/state-programs' },
       { label: 'JRI Funding', href: '/funding/jri' },
       { label: 'WRG Funding', href: '/funding/wrg' },
       { label: 'Scholarships', href: '/scholarships' },

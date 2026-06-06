@@ -84,7 +84,7 @@ export async function sendEnrollmentApprovalNotification(
 ) {
   return sendEmail({
     to: email,
-    subject: 'Enrollment Approved - ${PLATFORM_DEFAULTS.orgName}',
+    subject: `Enrollment Approved - ${PLATFORM_DEFAULTS.orgName}`,
     html: `
       <h1>Enrollment Approved!</h1>
       <p>Hi ${name},</p>

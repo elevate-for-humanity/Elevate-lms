@@ -601,7 +601,7 @@ export async function verifyUploadAndIssueCertificate(
     db.from('credential_registry').select('name').eq('id', req.credential_id).maybeSingle(),
   ]);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://${PLATFORM_DEFAULTS.canonicalDomain}';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${PLATFORM_DEFAULTS.canonicalDomain}`;
   const downloadUrl = `${siteUrl}/learner/certifications/${cert.id}/download`;
 
   if (profileRes.data && programRes.data && credRes.data) {

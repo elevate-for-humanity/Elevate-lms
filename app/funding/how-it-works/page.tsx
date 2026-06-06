@@ -54,7 +54,7 @@ const FUNDING_SOURCES = [
   {
     name: 'State Grant Programs',
     desc: 'Indiana state workforce development grants including Next Level Jobs Workforce Ready Grant and employer training grants.',
-    href: '/funding/state-programs',
+    href: '/funding',
   },
   {
     name: 'Job Ready Indy',

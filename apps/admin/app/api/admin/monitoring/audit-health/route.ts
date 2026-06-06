@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { apiRequireAdmin } from '@/lib/admin/guards';
+import { safeInternalError } from '@/lib/api/safe-error';
+import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -12,30 +16,19 @@ export const dynamic = 'force-dynamic';
 // Use with cron/uptime monitoring to alert on audit system degradation.
 
 async function _GET(request: Request) {
+  try {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-  const supabase = await createClient();
+
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
   const admin = await requireAdminClient();
-  const db = admin || supabase;
+  const supabase = admin ?? (await createClient());
+  const db = admin ?? supabase;
 
   if (!db) {
     return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
-  }
-
-  // Auth check — admin only
-  if (supabase) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const { data: profile } = await db
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
   }
 
   const now = new Date();
@@ -89,17 +82,32 @@ async function _GET(request: Request) {
     });
   }
 
+  const eventsLast24h = eventsLastDay ?? 0;
+  const failuresLast24h = failuresLastDay ?? 0;
+
   return NextResponse.json({
     status,
     timestamp: now.toISOString(),
+    // MonitoringSetupClient fields
+    recentCount: eventsLast24h,
+    failureCount: failuresLast24h,
+    message: hasGap
+      ? 'No audit events in the last hour during business hours'
+      : failuresLast24h > 10
+        ? `${failuresLast24h} audit write failures in the last 24h`
+        : 'Audit pipeline operational',
     metrics: {
       events_last_hour: eventsLastHour ?? 0,
-      events_last_24h: eventsLastDay ?? 0,
-      failures_last_24h: failuresLastDay ?? 0,
+      events_last_24h: eventsLast24h,
+      failures_last_24h: failuresLast24h,
       gap_detected: hasGap,
     },
     recent_critical_events: recentCritical ?? [],
   });
+  } catch (err) {
+    logger.error('[monitoring/audit-health] failed', err);
+    return safeInternalError(err, 'Audit health check failed');
+  }
 }
 
 export const GET = withApiAudit('/api/admin/monitoring/audit-health', _GET);

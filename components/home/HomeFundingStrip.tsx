@@ -9,8 +9,8 @@ import { ArrowRight } from 'lucide-react';
 const FUNDING_PATHS = [
   { label: 'WIOA', desc: 'Federal tuition', href: '/funding/wioa' },
   { label: 'Workforce Ready Grant', desc: 'Indiana state', href: '/funding/wrg' },
-  { label: 'SNAP E&T', desc: 'Training support', href: '/funding/state-programs' },
-  { label: 'FSSA IMPACT', desc: 'Family services', href: '/funding/state-programs' },
+  { label: 'SNAP E&T', desc: 'Training support', href: '/snap-et-partner' },
+  { label: 'State funding hub', desc: 'WRG, JRI, WIOA', href: '/funding' },
   { label: 'Earn While You Learn', desc: 'Apprenticeship', href: '/programs/apprenticeships' },
 ];
 

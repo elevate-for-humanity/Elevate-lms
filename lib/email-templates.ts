@@ -317,7 +317,7 @@ export const emailTemplates = {
 
   partnerOutreach: {
     name: 'Partner Outreach',
-    subject: 'Partnership Opportunity with ${PLATFORM_DEFAULTS.orgName}',
+    subject: `Partnership Opportunity with ${PLATFORM_DEFAULTS.orgName}`,
     html: `
 <!DOCTYPE html>
 <html>

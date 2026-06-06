@@ -22,12 +22,28 @@ UPDATE public.marketing_contacts
 SET updated_at = COALESCE(created_at, now())
 WHERE updated_at IS NULL;
 
--- Repair prior draft that used ADD COLUMN ... DEFAULT now() (all existing rows stamped at migration time)
-UPDATE public.marketing_contacts
-SET updated_at = created_at
-WHERE created_at IS NOT NULL
-  AND updated_at IS NOT NULL
-  AND updated_at > created_at + interval '1 day';
+-- Repair prior draft that used ADD COLUMN ... DEFAULT now() (all existing rows stamped at migration time).
+-- Runs at most once: re-applying this migration must not reset legitimate CRM updates.
+DO $repair$
+DECLARE
+  repair_key constant text := 'migration_marketing_contacts_updated_at_repair_20260708';
+  already_done boolean;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1 FROM public.platform_settings WHERE key = repair_key
+  ) INTO already_done;
+
+  IF NOT already_done THEN
+    UPDATE public.marketing_contacts
+    SET updated_at = created_at
+    WHERE created_at IS NOT NULL
+      AND updated_at IS NOT NULL
+      AND updated_at > created_at + interval '1 day';
+
+    INSERT INTO public.platform_settings (key, value, updated_at)
+    VALUES (repair_key, 'done', now());
+  END IF;
+END $repair$;
 
 ALTER TABLE public.marketing_contacts
   ALTER COLUMN updated_at SET DEFAULT now();

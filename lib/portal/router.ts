@@ -196,7 +196,7 @@ export async function cachePortalTypeForEnrollment(
 
     if (!program) return
 
-    const portalKey = derivePortalKey(program.program_type, program.category, program.slug)
+    const portalKey = derivePortalKey(program.program_type, program.category)
     if (!portalKey) return
 
     await supabase

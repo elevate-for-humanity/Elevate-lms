@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
   const totalOwed = rows.length * 2500;
 
   await sendEmail({
-    to: 'info@${PLATFORM_DEFAULTS.canonicalDomain}',
+    to: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
     subject: `⚠️ ${rows.length} Partner Payout${rows.length > 1 ? 's' : ''} Due Within 2 Days — $${totalOwed.toLocaleString()} Owed`,
     html: `
 <div style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;padding:20px;">

@@ -105,7 +105,7 @@ export function HomeHowItWorks() {
                   src={step.img}
                   alt={step.imgAlt}
                   fill
-                  className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                  className={card.programImageFill}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   loading={i < 2 ? 'eager' : 'lazy'}
                   placeholder="empty"

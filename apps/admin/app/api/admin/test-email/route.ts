@@ -49,7 +49,7 @@ async function _POST(req: NextRequest) {
     html: [
       '<div style="font-family:sans-serif;max-width:600px;margin:0 auto">',
       '<h2 style="color:#059669">Email System Test</h2>',
-      '<p>If you received this, SendGrid is configured correctly for ${PLATFORM_DEFAULTS.orgName}.</p>',
+      `<p>If you received this, SendGrid is configured correctly for ${PLATFORM_DEFAULTS.orgName}.</p>`,
       '<hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0"/>',
       `<p style="color:#6b7280;font-size:14px">Sent to: ${to}<br/>`,
       `Sent at: ${new Date().toLocaleString('en-US', { timeZone: 'America/Indiana/Indianapolis' })} ET</p>`,

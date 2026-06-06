@@ -393,7 +393,7 @@ async function sendPaymentFailedEmail(studentId: string, programId: string): Pro
   if (!student?.email) return;
 
   await resend.emails.send({
-    from: 'Elevate LMS <billing@${PLATFORM_DEFAULTS.canonicalDomain}>',
+    from: `Elevate LMS <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
     to: student.email,
     subject: 'Payment Failed - Action Required',
     html: `

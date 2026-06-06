@@ -100,12 +100,12 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
     pg.drawRectangle({ x: 0, y: H - 30, width: W, height: 30, color: NAVY });
     if (logo) { const lh = 22, lw = (logo.width / logo.height) * lh; pg.drawImage(logo, { x: ML, y: H - 28, width: lw, height: lh }); }
     const hx = logo ? ML + (logo.width / logo.height) * 22 + 8 : ML;
-    pg.drawText('${PLATFORM_DEFAULTS.orgName}  ·  FSSA SNAP E&T Program Overview & Capability Statement', { x: hx, y: H - 19, size: 7.5, font: bold, color: HTXT });
+    pg.drawText(`${PLATFORM_DEFAULTS.orgName}  ·  FSSA SNAP E&T Program Overview & Capability Statement`, { x: hx, y: H - 19, size: 7.5, font: bold, color: HTXT });
     pg.drawText(`Page ${pn} of ${tot}`, { x: W - MR - 50, y: H - 19, size: 7.5, font: reg, color: rgb(0.75, 0.85, 1) });
   };
   const runFtr = (pg: PDFPage) => {
     pg.drawLine({ start: { x: ML, y: MB + 14 }, end: { x: W - MR, y: MB + 14 }, thickness: 0.4, color: RULE });
-    pg.drawText('${PLATFORM_DEFAULTS.orgLegalName}  ·  8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}', { x: ML, y: MB + 4, size: 6.5, font: reg, color: LGRAY });
+    pg.drawText(`${PLATFORM_DEFAULTS.orgLegalName}  ·  8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}`, { x: ML, y: MB + 4, size: 6.5, font: reg, color: LGRAY });
   };
 
   // ══════════════════════════════════════════════════════════════════
@@ -116,7 +116,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
   const hx0 = logo ? ML + (logo.width / logo.height) * 62 + 14 : ML;
   t(PLATFORM_DEFAULTS.orgLegalName, hx0, H - 30, bold, 11, HTXT);
   t('8888 Keystone Crossing, Suite 1300  ·  Indianapolis, IN 46240', hx0, H - 44, reg, 8, rgb(0.75, 0.85, 1));
-  t('${PLATFORM_DEFAULTS.supportPhone}  ·  elevate4humanityedu@gmail.com  ·  ${PLATFORM_DEFAULTS.canonicalDomain}', hx0, H - 57, reg, 8, rgb(0.75, 0.85, 1));
+  t(`${PLATFORM_DEFAULTS.supportPhone}  ·  elevate4humanityedu@gmail.com  ·  ${PLATFORM_DEFAULTS.canonicalDomain}`, hx0, H - 57, reg, 8, rgb(0.75, 0.85, 1));
   t('EIN: 85-3832840  ·  UEI: VX2GK5S8SZH8  ·  CAGE: 0Q856  ·  RAPIDS: 2025-IN-132301', hx0, H - 70, reg, 7.5, rgb(0.65, 0.78, 1));
   y = H - 104; y -= 20;
   t('STATE OF INDIANA', ML, y, bold, 9, GRAY); y -= 13;
@@ -130,7 +130,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
   t('Authorized Representative: Elizabeth Greene, Founder & Chief Executive Officer', ML, y, reg, 9, DGRAY); y -= 26;
   box(ML, y - 76, CW, 84, rgb(0.97, 0.97, 1), NAVY, 0.75);
   t('EXECUTIVE SUMMARY', ML + 10, y - 4, bold, 9, NAVY);
-  ['${PLATFORM_DEFAULTS.orgLegalName} (2Exclusive LLC-S, DBA) is a For-Profit workforce',
+  [`${PLATFORM_DEFAULTS.orgLegalName} (2Exclusive LLC-S, DBA) is a For-Profit workforce`,
    'development organization headquartered in Indianapolis, Indiana. We deliver 35+ industry-recognized',
    'credential programs to SNAP recipients, ABAWD participants, Returning Citizens, and workforce-ready',
    'individuals across Marion County and surrounding communities. Our model combines hands-on credential',
@@ -184,7 +184,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
   y -= 4;
 
   subHdr('Facility Locations — 4 Active Training Sites');
-  para('${PLATFORM_DEFAULTS.orgName} operates four dedicated training facilities across Indianapolis, each serving a specific program track. All locations are accessible by IndyGo public transit.');
+  para(`${PLATFORM_DEFAULTS.orgName} operates four dedicated training facilities across Indianapolis, each serving a specific program track. All locations are accessible by IndyGo public transit.`);
   y -= 2;
 
   const facilities4 = [
@@ -260,7 +260,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
   y -= 8;
 
   subHdr('Certiport Authorized Testing Center (CATC)');
-  para('${PLATFORM_DEFAULTS.orgName} operates a Certiport Authorized Testing Center at 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. The testing center is equipped with dedicated testing workstations, a certified proctor (Alberta Davis, Testing Center Coordinator), and secure exam delivery infrastructure. The following credential exams are administered on-site:');
+  para(`${PLATFORM_DEFAULTS.orgName} operates a Certiport Authorized Testing Center at 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. The testing center is equipped with dedicated testing workstations, a certified proctor (Alberta Davis, Testing Center Coordinator), and secure exam delivery infrastructure. The following credential exams are administered on-site:`);
   const testingCreds = [
     'Microsoft Office Specialist (MOS) — Word, Excel, PowerPoint, Outlook, Access',
     'Microsoft Technology Associate (MTA)',
@@ -283,7 +283,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
   secHdr('2', 'Mission, Vision & Target Population');
 
   subHdr('Mission Statement');
-  para('${PLATFORM_DEFAULTS.orgLegalName} delivers industry-recognized credential programs to SNAP recipients, ABAWD participants, Returning Citizens, and workforce-ready individuals across Marion County and surrounding Indiana communities. Our model combines hands-on credential training, wraparound supportive services, and direct employer connections to achieve sustainable, living-wage employment outcomes. We believe that access to a credential — not a four-year degree — is the fastest, most direct path to economic self-sufficiency for the populations we serve.');
+  para(`${PLATFORM_DEFAULTS.orgLegalName} delivers industry-recognized credential programs to SNAP recipients, ABAWD participants, Returning Citizens, and workforce-ready individuals across Marion County and surrounding Indiana communities. Our model combines hands-on credential training, wraparound supportive services, and direct employer connections to achieve sustainable, living-wage employment outcomes. We believe that access to a credential — not a four-year degree — is the fastest, most direct path to economic self-sufficiency for the populations we serve.`);
 
   subHdr('Vision');
   para('A workforce ecosystem in which every individual — regardless of economic background, justice involvement, or prior education — has access to the credentials, support, and employer connections needed to achieve economic self-sufficiency. Elevate envisions a Marion County where SNAP receipt is a temporary bridge, not a permanent condition, because every participant has a clear, supported pathway to a living-wage career.');
@@ -395,7 +395,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
     '6331 N Keystone Ave, Indianapolis, IN 46220 — Barbering, cosmetology, nail technician, esthetician programs. Near IndyGo Route 39 (Keystone). Operated by Naomi Jordan / Rebuilds Mind and Body Studio LLC.',
     '7116 N College Ave, Indianapolis, IN — Manufacturing and construction trades training: forklift, building services, diesel mechanic. Near IndyGo Route 28 (College).',
   ].forEach(l => bul(l));
-  para('All locations are accessible by IndyGo public transit. Transportation assistance (bus passes and mileage reimbursement) is provided to all participants who require it to attend training. Online and hybrid program components are available statewide via Elevate\'s proprietary LMS platform at ${PLATFORM_DEFAULTS.canonicalDomain}.');
+  para(`All locations are accessible by IndyGo public transit. Transportation assistance (bus passes and mileage reimbursement) is provided to all participants who require it to attend training. Online and hybrid program components are available statewide via Elevate's proprietary LMS platform at ${PLATFORM_DEFAULTS.canonicalDomain}.`);
   y -= 8;
 
   // ══════════════════════════════════════════════════════════════════
@@ -634,10 +634,10 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
   const svcs = [
     { name: 'Transportation Assistance', mandatory: true, max: '$150/participant/month',
       policy: 'IndyGo bus passes, mileage reimbursement at current IRS standard rate, and rideshare coordination (Lyft/Uber) provided to all participants requiring transportation to attend training, job search, or employment. Required for all mandatory E&T participants.',
-      providers: '${PLATFORM_DEFAULTS.orgName} (direct); IndyGo (bus passes); Lyft/Uber (rideshare coordination)' },
+      providers: `${PLATFORM_DEFAULTS.orgName} (direct); IndyGo (bus passes); Lyft/Uber (rideshare coordination)` },
     { name: 'Work Clothing / Uniforms', mandatory: false, max: '$200/participant (one-time)',
       policy: 'Scrubs, safety gear, steel-toed boots, hard hats, high-visibility vests, and professional attire required for program completion. Items must be required by the program or employer and not available through other means.',
-      providers: '${PLATFORM_DEFAULTS.orgName} (direct purchase or reimbursement)' },
+      providers: `${PLATFORM_DEFAULTS.orgName} (direct purchase or reimbursement)` },
     { name: 'Credential Testing Fees', mandatory: false, max: '$250/participant (one-time)',
       policy: 'Exam registration, proctoring, and certification fees covered for all required credential exams: Indiana ISDH CNA, EPA Section 608, CompTIA A+, CDL skills test, Indiana DMHA CPRS, NACPB Bookkeeping, QuickBooks ProAdvisor, NHA exams, PTCB CPhT, and all Certiport exams.',
       providers: 'Elevate for Humanity (direct payment to testing agencies); Alberta Davis (on-site proctor)' },
@@ -793,7 +793,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
       benefits: '$10,200',
       total: '$78,200',
       fte: '1.0',
-      bio: 'Multi-licensed beauty professional holding Indiana Nail Technician License, Nail Instructor License, and Esthetician License. Oversees the nail program at Textures Institute of Cosmetology. Manages enrollment operations for ${PLATFORM_DEFAULTS.orgName}.',
+      bio: `Multi-licensed beauty professional holding Indiana Nail Technician License, Nail Instructor License, and Esthetician License. Oversees the nail program at Textures Institute of Cosmetology. Manages enrollment operations for ${PLATFORM_DEFAULTS.orgName}.`,
       responsibilities: 'Manages all student enrollment processes, admissions intake, and enrollment documentation. Oversees all beauty industry programs: Cosmetology Apprenticeship, Nail Technician Apprenticeship, Esthetician, Barber Apprenticeship, and Beauty Career Educator. Coordinates with Textures Institute of Cosmetology and all beauty program holder partners. Manages Milady curriculum delivery and licensing exam preparation.',
     },
     {

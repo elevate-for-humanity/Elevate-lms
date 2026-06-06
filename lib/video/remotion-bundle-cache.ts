@@ -1,21 +1,19 @@
 /**
  * Remotion webpack bundle cache — lazy, on-demand only.
- * Release after renders to avoid holding hundreds of MB on idle admin pods.
+ * Reference-counted release so concurrent renders do not delete a shared bundle.
  */
 
 import path from 'node:path';
-import os from 'node:os';
-import { readdir, rm } from 'node:fs/promises';
+import { rm } from 'node:fs/promises';
 import { bundle } from '@remotion/bundler';
 import { logger } from '@/lib/logger';
 
 let _bundleUrl: string | null = null;
+let _bundleRefCount = 0;
 
 const DEFAULT_ENTRY = path.join(process.cwd(), 'remotion-src', 'index.ts');
 
-export async function getRemotionBundleUrl(
-  entryPoint: string = DEFAULT_ENTRY,
-): Promise<string> {
+async function ensureRemotionBundle(entryPoint: string = DEFAULT_ENTRY): Promise<string> {
   if (_bundleUrl) return _bundleUrl;
 
   logger.info('[RemotionBundle] Bundling composition (first use this process)...');
@@ -33,28 +31,64 @@ export async function getRemotionBundleUrl(
   return _bundleUrl;
 }
 
-/** Drop in-memory bundle reference and best-effort webpack temp dirs under os.tmpdir(). */
+/**
+ * Hold the shared bundle for one render job. Call once per concurrent render (or once per batch).
+ */
+export async function retainRemotionBundle(
+  entryPoint: string = DEFAULT_ENTRY,
+): Promise<string> {
+  _bundleRefCount++;
+  return ensureRemotionBundle(entryPoint);
+}
+
+/** @deprecated Prefer retainRemotionBundle — does not increment ref count. */
+export async function getRemotionBundleUrl(
+  entryPoint: string = DEFAULT_ENTRY,
+): Promise<string> {
+  return ensureRemotionBundle(entryPoint);
+}
+
+/**
+ * Release one hold on the bundle. Deletes only this process's bundle directory when the last hold ends.
+ */
 export async function releaseRemotionBundle(): Promise<void> {
+  if (_bundleRefCount > 0) {
+    _bundleRefCount--;
+  }
+
+  if (_bundleRefCount > 0) {
+    return;
+  }
+
+  const bundlePath = _bundleUrl;
   _bundleUrl = null;
-  const tmp = os.tmpdir();
-  const entries = await readdir(tmp).catch(() => [] as string[]);
-  let removed = 0;
-  for (const name of entries) {
-    if (
-      name.startsWith('remotion-webpack-bundle-') ||
-      name.startsWith('esbuild-') ||
-      name.startsWith('remotion-')
-    ) {
-      await rm(path.join(tmp, name), { recursive: true, force: true }).catch(() => {});
-      removed++;
-    }
+
+  if (!bundlePath) {
+    return;
   }
-  if (removed > 0) {
-    logger.info('[RemotionBundle] Released bundle cache', { removedDirs: removed });
-  }
+
+  await rm(bundlePath, { recursive: true, force: true }).catch((err) => {
+    logger.warn('[RemotionBundle] Failed to remove bundle directory', {
+      bundlePath,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  });
+
+  logger.info('[RemotionBundle] Released bundle cache', { bundlePath });
 }
 
 /** Default: release after each render/batch unless explicitly disabled. */
 export function shouldReleaseRemotionBundleAfterJob(): boolean {
   return process.env.REMOTION_RELEASE_BUNDLE_AFTER_RENDER !== 'false';
+}
+
+/** @internal Test-only reset */
+export function _resetRemotionBundleCacheForTests(): void {
+  _bundleUrl = null;
+  _bundleRefCount = 0;
+}
+
+/** @internal Test-only introspection */
+export function _getRemotionBundleRefCountForTests(): number {
+  return _bundleRefCount;
 }

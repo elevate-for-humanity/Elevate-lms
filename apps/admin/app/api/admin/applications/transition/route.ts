@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
         await sendEmail({
           to: [application.email],
           from: `${PLATFORM_DEFAULTS.orgName} <info@${PLATFORM_DEFAULTS.canonicalDomain}>`,
-          subject: 'Update on Your Application — ${PLATFORM_DEFAULTS.orgName}',
+          subject: `Update on Your Application — ${PLATFORM_DEFAULTS.orgName}`,
           html: `<p>Hi ${firstName},</p>
 <p>Thank you for your interest in <strong>${programName}</strong> at Elevate for Humanity.</p>
 <p>After careful review, we are unable to move forward with your application at this time${reason ? ': ' + reason : '.'}</p>
@@ -211,7 +211,7 @@ export async function POST(req: NextRequest) {
           await sendEmail({
             to: [application.email],
             from: `${PLATFORM_DEFAULTS.orgName} <info@${PLATFORM_DEFAULTS.canonicalDomain}>`,
-            subject: 'Your Application Has Been Approved — ${PLATFORM_DEFAULTS.orgName}',
+            subject: `Your Application Has Been Approved — ${PLATFORM_DEFAULTS.orgName}`,
             html: `<p>Hi ${firstName},</p>
 <p>Congratulations! Your application for <strong>${application.program_slug || application.program_interest || 'the program'}</strong> has been <strong>approved</strong>.</p>
 <p>Please log in to your portal to complete enrollment:</p>

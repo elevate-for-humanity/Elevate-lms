@@ -36,7 +36,7 @@ export default function Header() {
           </span>
         </Link>
 
-        <div className="hidden lg:flex justify-center min-w-0 overflow-hidden">
+        <div className="hidden lg:flex justify-center min-w-0 overflow-x-auto overflow-y-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 

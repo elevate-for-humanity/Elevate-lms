@@ -2,7 +2,21 @@
 // Renders a horizontal stats bar with key all-time and period metrics.
 import Link from 'next/link';
 import { Users, BookOpen, DollarSign, BadgeCheck, FileText, TrendingUp } from 'lucide-react';
-import type { AdminDashboardData } from './types';
+import type { AdminDashboardData, OperationalCounts } from './types';
+
+const EMPTY_OPERATIONAL: OperationalCounts = {
+  needsReview: 0,
+  needsReviewDetail: 'Dashboard data is temporarily unavailable',
+  atRisk: 0,
+  complianceAlerts: 0,
+  complianceAlertsSeverity: null,
+  newToday: 0,
+  newTodayDetail: 'Dashboard data is temporarily unavailable',
+  newAppsToday: 0,
+  newLeadsToday: 0,
+  newEnrollmentsToday: 0,
+  revenueThisMonthCents: 0,
+};
 
 interface Props {
   data: AdminDashboardData;
@@ -56,7 +70,7 @@ export function StatsOverviewBar({ data }: Props) {
   };
   const totalStudents = data.totalStudents ?? 0;
   const revenueAllTimeCents = data.revenueAllTimeCents ?? 0;
-  const operational = data.operational;
+  const operational = data.operational ?? EMPTY_OPERATIONAL;
 
   return (
     <div className="mb-6">

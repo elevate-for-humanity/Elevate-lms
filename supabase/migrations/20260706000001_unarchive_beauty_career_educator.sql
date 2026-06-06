@@ -23,7 +23,6 @@ INSERT INTO public.programs (
   is_active,
   published,
   status,
-  wioa_eligible,
   created_at,
   updated_at
 )
@@ -39,7 +38,6 @@ SELECT
   true,
   true,
   'published',
-  true,
   NOW(),
   NOW()
 WHERE NOT EXISTS (

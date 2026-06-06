@@ -101,7 +101,7 @@ export default function BeautyDocumentsPage() {
       }
       router.push(`/programs/${cfg.slug}/payment-setup`);
     } catch {
-      setSubmitError('Unable to submit. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.');
+      setSubmitError(`Unable to submit. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
       setSubmitting(false);
     }
   };

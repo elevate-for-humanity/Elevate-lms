@@ -41,7 +41,7 @@ export async function geocodeAddress(
 
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'ElevateForHumanity-LMS/1.0 (contact@${PLATFORM_DEFAULTS.canonicalDomain})',
+        'User-Agent': `ElevateForHumanity-LMS/1.0 (contact@${PLATFORM_DEFAULTS.canonicalDomain})`,
       },
     });
 

@@ -11,6 +11,8 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { ALL_PROGRAMS } from '@/data/programs/catalog';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
+import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
+import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
 import { card, grid, layout } from '@/lib/page-design-tokens';
 
 // Featured programs shown on homepage - ordered by demand/visibility
@@ -58,8 +60,8 @@ function PathwayCard({ prog }: { prog: ProgramSchema }) {
           src={prog.heroImage}
           alt={prog.heroImageAlt || prog.title}
           fill
-          className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className={card.programImageFill}
+          sizes={IMAGE_SIZES.programCard}
           loading="lazy"
           placeholder="empty"
         />
@@ -132,7 +134,8 @@ function PathwayCard({ prog }: { prog: ProgramSchema }) {
   );
 }
 
-export function HomeCareerPathways() {
+export async function HomeCareerPathways() {
+  const verified = await loadVerifiedPublicStats();
   const featured = FEATURED_SLUGS.map((slug) =>
     ALL_PROGRAMS.find((p) => p.slug === slug),
   ).filter((p): p is ProgramSchema => Boolean(p));
@@ -164,7 +167,7 @@ export function HomeCareerPathways() {
               href="/programs"
               className="inline-flex items-center gap-1.5 text-brand-red-600 hover:text-brand-red-700 text-sm font-bold transition-colors shrink-0"
             >
-              View all {ALL_PROGRAMS.length}+ programs <ArrowRight className="w-4 h-4" />
+              View all {verified.programsDisplay} programs <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>

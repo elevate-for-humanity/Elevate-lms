@@ -148,7 +148,7 @@ function getEmailTemplate(
         <p>Your license has been activated.</p>
         <p>Plan: ${data.plan || 'Professional'}</p>
         <p>Tenant: ${data.tenantName || 'Your Organization'}</p>
-        <p><a href="${data.loginUrl || '${PLATFORM_DEFAULTS.siteUrl}/login'}">Login to your dashboard</a></p>
+        <p><a href="${data.loginUrl || `${PLATFORM_DEFAULTS.siteUrl}/login`}">Login to your dashboard</a></p>
       `,
     },
     license_suspended: {
@@ -157,7 +157,7 @@ function getEmailTemplate(
         <h1>License Suspended</h1>
         <p>Your license has been suspended due to: ${data.reason || 'payment issue'}</p>
         <p>Please update your billing information to restore access.</p>
-        <p><a href="${data.billingUrl || '${PLATFORM_DEFAULTS.siteUrl}/billing'}">Update Billing</a></p>
+        <p><a href="${data.billingUrl || `${PLATFORM_DEFAULTS.siteUrl}/billing`}">Update Billing</a></p>
       `,
     },
     license_expiring: {
@@ -166,7 +166,7 @@ function getEmailTemplate(
         <h1>License Expiring</h1>
         <p>Your license will expire on ${data.expiryDate || 'soon'}.</p>
         <p>Renew now to avoid interruption.</p>
-        <p><a href="${data.renewUrl || '${PLATFORM_DEFAULTS.siteUrl}/renew'}">Renew License</a></p>
+        <p><a href="${data.renewUrl || `${PLATFORM_DEFAULTS.siteUrl}/renew`}">Renew License</a></p>
       `,
     },
     payment_failed: {
@@ -175,7 +175,7 @@ function getEmailTemplate(
         <h1>Payment Failed</h1>
         <p>We were unable to process your payment.</p>
         <p>Please update your payment method to continue service.</p>
-        <p><a href="${data.billingUrl || '${PLATFORM_DEFAULTS.siteUrl}/billing'}">Update Payment</a></p>
+        <p><a href="${data.billingUrl || `${PLATFORM_DEFAULTS.siteUrl}/billing`}">Update Payment</a></p>
       `,
     },
     welcome: {
@@ -183,7 +183,7 @@ function getEmailTemplate(
       html: `
         <h1>Welcome!</h1>
         <p>Thank you for joining Elevate LMS.</p>
-        <p><a href="${data.loginUrl || '${PLATFORM_DEFAULTS.siteUrl}/login'}">Get Started</a></p>
+        <p><a href="${data.loginUrl || `${PLATFORM_DEFAULTS.siteUrl}/login`}">Get Started</a></p>
       `,
     },
     password_reset: {

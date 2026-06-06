@@ -4,6 +4,10 @@
  */
 'use strict';
 
+// Before Next boots — swallow benign client aborts (ECONNRESET / aborted).
+const { registerConnectionGuards } = require('../../lib/server/register-connection-guards.cjs');
+registerConnectionGuards();
+
 const fs = require('fs');
 const path = require('path');
 
@@ -49,7 +53,7 @@ require('next');
 
 const { startServer } = require('next/dist/server/lib/start-server');
 
-console.log(
+console.info(
   `[admin] starting standalone server host=${host} port=${port} cwd=${process.cwd()}`,
 );
 

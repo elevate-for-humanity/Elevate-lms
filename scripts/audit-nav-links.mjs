@@ -62,17 +62,28 @@ function parseNextRedirects() {
 }
 
 function loadStaticProgramSlugs() {
-  const indexPath = path.join(ROOT, 'data/programs/index.ts');
-  const src = fs.readFileSync(indexPath, 'utf8');
   const slugs = new Set();
-  const re = /slug:\s*['"]([^'"]+)['"]/g;
+  const indexPath = path.join(ROOT, 'data/programs/index.ts');
+  if (!fs.existsSync(indexPath)) return slugs;
+  const content = fs.readFileSync(indexPath, 'utf8');
+  const importRe = /from '\.\/([^']+)'/g;
+  const files = new Set();
   let m;
-  while ((m = re.exec(src))) slugs.add(m[1]);
+  while ((m = importRe.exec(content)) !== null) files.add(m[1]);
+  for (const file of files) {
+    const fp = path.join(ROOT, 'data/programs', `${file}.ts`);
+    if (!fs.existsSync(fp)) continue;
+    const src = fs.readFileSync(fp, 'utf8');
+    const slugM = src.match(/slug:\s*['"`]([a-z0-9-]+)['"`]/);
+    if (slugM) slugs.add(slugM[1]);
+  }
   return slugs;
 }
 
 function loadCfProgramSlugs() {
-  const src = fs.readFileSync(path.join(ROOT, 'content/cf-programs.ts'), 'utf8');
+  const cfPath = path.join(ROOT, 'content/cf-programs.ts');
+  if (!fs.existsSync(cfPath)) return new Set();
+  const src = fs.readFileSync(cfPath, 'utf8');
   const slugs = new Set();
   const re = /slug:\s*['"]([^'"]+)['"]/g;
   let m;
@@ -108,12 +119,18 @@ function resolveHref(href, ctx) {
 
   if (ctx.exactPages.has(p)) return { ok: true, resolved: p, via: 'page' };
 
-  // Dynamic program slug
+  // Dynamic program slug (app/programs/[program]/page.tsx + static registry)
   const prog = p.match(/^\/programs\/([^/]+)$/);
   if (prog && !prog[1].includes('[')) {
     const slug = prog[1];
-    if (ctx.programSlugs.has(slug) || ctx.cfSlugs.has(slug)) {
-      return { ok: true, resolved: `/programs/:program`, via: `program slug "${slug}"` };
+    const hasDynamicProgramRoute = fs.existsSync(
+      path.join(ROOT, 'app/programs/[program]/page.tsx'),
+    );
+    if (
+      hasDynamicProgramRoute &&
+      (ctx.programSlugs.has(slug) || ctx.cfSlugs.has(slug))
+    ) {
+      return { ok: true, resolved: '/programs/:program', via: `program slug "${slug}"` };
     }
   }
 

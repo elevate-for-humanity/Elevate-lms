@@ -99,7 +99,7 @@ async function _POST(req: NextRequest) {
         return NextResponse.json({ error: `Invalid URL: ${url}` }, { status: 400 });
       }
     }
-    const photoUrl = '${PLATFORM_DEFAULTS.siteUrl}/images/team/elizabeth-greene-headshot.jpg';
+    const photoUrl = `${PLATFORM_DEFAULTS.siteUrl}/images/team/elizabeth-greene-headshot.jpg`;
 
     // Single file mode
     if (audioUrl) {

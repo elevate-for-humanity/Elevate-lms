@@ -126,7 +126,7 @@ export class SocialMediaAutomation {
   private generateContent(timeSlot: number): string {
     const contentTemplates = {
       morning: [
-        '🌅 Good morning! Start your career transformation today with ${PLATFORM_DEFAULTS.orgName}. Free training programs available through federal and state funding. #WorkforceDevelopment #CareerTraining',
+        `🌅 Good morning! Start your career transformation today with ${PLATFORM_DEFAULTS.orgName}. Free training programs available through federal and state funding. #WorkforceDevelopment #CareerTraining`,
         '☕ Morning motivation: Your future starts with the right training. Explore our ETPL-approved programs and government-funded opportunities. Apply today! #Education #CareerGrowth',
         '🎓 New day, new opportunities! Join thousands who have transformed their careers through our programs. SAM.gov registered contractor. #GovernmentContracts #Training',
       ],

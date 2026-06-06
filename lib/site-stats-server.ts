@@ -1,10 +1,9 @@
 /**
- * Server-only public stats — DB-backed when available; conservative SITE_STATS otherwise.
- * Use on SSR pages so raw HTML never shows fabricated marketing numbers.
+ * Server-only public stats — catalog-backed counts only (same SSOT as /programs).
+ * Do not override with raw `programs` table row counts (includes drafts/archived).
  */
 
-import { createPublicClient } from '@/lib/supabase/public';
-import { SITE_STATS, statLabel } from '@/lib/site-stats';
+import { SITE_STATS, formatProgramsDisplay } from '@/lib/site-stats';
 import {
   getPublicProgramsPageData,
   resolvePublicProgramCount,
@@ -26,40 +25,32 @@ export async function loadVerifiedProgramCount(): Promise<number> {
 }
 
 /**
- * Stats safe to render in server HTML. Does not invent "500+" or "85%" when DB is empty.
+ * Stats safe to render in server HTML. Program count matches /programs catalog.
  */
 export async function loadVerifiedPublicStats(): Promise<VerifiedPublicStats> {
   let programCount = SITE_STATS.programsOffered;
+  let catalogVerified = false;
   try {
-    programCount = await loadVerifiedProgramCount();
+    const verified = await loadVerifiedProgramCount();
+    if (verified > 0) {
+      programCount = verified;
+      catalogVerified = true;
+    }
   } catch {
     programCount = SITE_STATS.programsOffered;
   }
 
-  let publishedFromDb: number | null = null;
-  try {
-    const db = createPublicClient();
-    const { count, error } = await db
-      .from('programs')
-      .select('id', { count: 'exact', head: true })
-      .eq('published', true)
-      .eq('is_active', true)
-      .neq('status', 'archived');
-    if (!error && count != null && count > 0) publishedFromDb = count;
-  } catch {
-    publishedFromDb = null;
-  }
-
-  const programsOffered =
-    publishedFromDb ?? (programCount > 0 ? programCount : SITE_STATS.programsOffered);
+  const programsOffered = programCount > 0 ? programCount : SITE_STATS.programsOffered;
 
   return {
     programsOffered,
-    programsDisplay: `${programsOffered}+`,
+    programsDisplay: formatProgramsDisplay(programsOffered),
     studentsDisplay: SITE_STATS.studentsDisplay,
-    placementDisplay: statLabel.placement,
-    placementRate: SITE_STATS.jobPlacementRate,
-    dataAvailable: publishedFromDb != null,
+    placementDisplay: SITE_STATS.careerServicesSupportRate != null
+      ? `${SITE_STATS.careerServicesSupportRate}%`
+      : 'Data upon request',
+    placementRate: SITE_STATS.careerServicesSupportRate,
+    dataAvailable: catalogVerified,
   };
 }
 

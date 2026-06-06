@@ -191,7 +191,7 @@ export default function CheckEligibilityPage() {
       setStep(3);
     } catch (err: unknown) {
       setError(
-        err instanceof Error ? err.message : 'Something went wrong. Please call ${PLATFORM_DEFAULTS.supportPhone}.',
+        err instanceof Error ? err.message : `Something went wrong. Please call ${PLATFORM_DEFAULTS.supportPhone}.`,
       );
     } finally {
       setSubmitting(false);
@@ -272,7 +272,7 @@ export default function CheckEligibilityPage() {
       primaryLabel: 'View Programs',
       primaryHref: '/programs',
       secondaryLabel: 'Call Us Now',
-      secondaryHref: 'tel:${PLATFORM_DEFAULTS.supportPhone}',
+      secondaryHref: `tel:${PLATFORM_DEFAULTS.supportPhone}`,
     },
   };
 

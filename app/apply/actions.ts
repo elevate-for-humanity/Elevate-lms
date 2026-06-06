@@ -780,7 +780,7 @@ async function insertApplication(payload: {
   return {
     success: false,
     error:
-      'We could not save your application right now. Please try again in a moment or call ${PLATFORM_DEFAULTS.supportPhone} so we can assist immediately.',
+      `We could not save your application right now. Please try again in a moment or call ${PLATFORM_DEFAULTS.supportPhone} so we can assist immediately.`,
   };
 }
 

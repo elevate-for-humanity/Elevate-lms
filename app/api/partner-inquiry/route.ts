@@ -70,7 +70,7 @@ async function _POST(request: NextRequest) {
       // Auto-reply to submitter
       await sendEmail({
         to: data.email,
-        subject: 'We received your partner inquiry | ${PLATFORM_DEFAULTS.orgName}',
+        subject: `We received your partner inquiry | ${PLATFORM_DEFAULTS.orgName}`,
         html:
           `<p>Thank you for your inquiry.</p>` +
           `<p>We review requests through our structured process to protect participants and platform integrity. ` +

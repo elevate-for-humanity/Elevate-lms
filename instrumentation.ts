@@ -1,5 +1,8 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
+    const { registerConnectionGuards } = await import('./lib/server/register-connection-guards.cjs');
+    registerConnectionGuards();
+
     // Load runtime secrets from Supabase into process.env.
     // Platform env vars are injected by Northflank at container start.
     const { applyNormalizedSupabaseUrlToEnv } = await import('./lib/supabase/normalize-url');

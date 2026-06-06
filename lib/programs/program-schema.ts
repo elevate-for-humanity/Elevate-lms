@@ -18,6 +18,9 @@
  *   J. Institutional footer + disclaimers
  */
 
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { sanitizePlatformValue } from '@/lib/config/sanitize-platform-value';
+
 // ─── Credential ──────────────────────────────────────────────────────
 export interface ProgramCredential {
   /** Credential name as it appears on the certificate/card */
@@ -580,6 +583,17 @@ export function getPrimaryCTA(p: ProgramSchema): PrimaryCTA | null {
 // ═══════════════════════════════════════════════════════════════════════
 //  HELPERS
 // ═══════════════════════════════════════════════════════════════════════
+
+/** Resolved delivery disclosure — never emit raw template placeholders. */
+export function formatDeliveryDisclosure(
+  deliveredBy?: ProgramSchema['deliveredBy'],
+): string | null {
+  if (!deliveredBy) return null;
+  const org = sanitizePlatformValue(PLATFORM_DEFAULTS.orgName, 'Elevate for Humanity');
+  if (deliveredBy === 'Elevate') return `Delivered directly by ${org}.`;
+  if (deliveredBy === 'Partner') return 'Delivered by an approved training partner.';
+  return `Delivered by ${org} or an approved training partner.`;
+}
 
 /**
  * Derive enrollment tracks for a program.

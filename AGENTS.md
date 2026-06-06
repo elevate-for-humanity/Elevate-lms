@@ -749,6 +749,7 @@ All student-facing marketing and program pages must follow the locked design sys
 Full specification: `docs/page-design-standard.md`
 Hero video rules: `docs/hero-video-standard.md`
 Design tokens: `lib/page-design-tokens.ts`
+Image dimensions (SSOT): `lib/images/media-dimensions.ts` — heroes 2560×1440, program cards 1200×900 (4:3), course covers 1600×900
 
 ### Required for every new student-facing page
 
@@ -805,15 +806,10 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
 - **Node.js 20.19.2** required (pinned in `.node-version`). Use `nvm use 20.19.2`.
 - **pnpm 10.28.2** is the package manager — `corepack enable` activates it.
 - **No local database** — the app connects to hosted Supabase. A `.env.local` with placeholder keys is enough to start the dev server; DB-dependent features fail gracefully at runtime.
-- Minimum `.env.local` for dev server startup:
-  ```
-  NEXT_PUBLIC_SUPABASE_URL=https://cuxzzpsyufcewtmicszk.supabase.co
-  NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder
-  SUPABASE_SERVICE_ROLE_KEY=placeholder
-  NEXTAUTH_SECRET=dev-secret
-  NEXT_TELEMETRY_DISABLED=1
-  SKIP_ENV_VALIDATION=true
-  ```
+- **`.env.local`** holds real Supabase/auth secrets for this VM (gitignored). Symlink for admin: `ln -sf ../../.env.local apps/admin/.env.local`.
+- Sync runtime keys to hosted `app_secrets` after updating `.env.local`: `set -a && . ./.env.local && set +a && node scripts/push-dotenv-runtime-vars.mjs`
+- Apply migrations: `set -a && . ./.env.local && set +a && node scripts/db/runMigrations.js`
+- Minimum keys if bootstrapping a fresh VM: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXTAUTH_SECRET`, `SESSION_SECRET`, `CRON_SECRET`, `NEXT_PUBLIC_SITE_URL`, `SKIP_ENV_VALIDATION=true`
 
 ### Running services
 

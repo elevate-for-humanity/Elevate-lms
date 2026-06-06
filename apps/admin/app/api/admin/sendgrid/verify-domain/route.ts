@@ -41,14 +41,14 @@ export async function POST(request: NextRequest) {
     if (!match) {
       return NextResponse.json({
         ok: false,
-        message: 'Domain ${PLATFORM_DEFAULTS.canonicalDomain} not found in SendGrid. Add it under Settings → Sender Authentication.',
+        message: `Domain ${PLATFORM_DEFAULTS.canonicalDomain} not found in SendGrid. Add it under Settings → Sender Authentication.`,
       });
     }
 
     if (match.valid) {
       return NextResponse.json({
         ok: true,
-        message: 'Domain ${PLATFORM_DEFAULTS.canonicalDomain} is fully verified in SendGrid.',
+        message: `Domain ${PLATFORM_DEFAULTS.canonicalDomain} is fully verified in SendGrid.`,
         domain: match,
       });
     }

@@ -134,7 +134,7 @@ export async function PATCH(req: NextRequest) {
               subject: msg.subject,
             },
           ],
-          from: { email: 'info@${PLATFORM_DEFAULTS.canonicalDomain}', name: PLATFORM_DEFAULTS.orgName },
+          from: { email: `info@${PLATFORM_DEFAULTS.canonicalDomain}`, name: PLATFORM_DEFAULTS.orgName },
           content: [
             {
               type: 'text/html',

@@ -137,7 +137,7 @@ export function assertNoAutoSubmit(
 export const INTAKE_COMPLIANCE_DISCLOSURE = {
   heading: 'How We Handle Your Information',
   body: [
-    'Submitting this form sends your information to ${PLATFORM_DEFAULTS.orgName} for internal review only.',
+    `Submitting this form sends your information to ${PLATFORM_DEFAULTS.orgName} for internal review only.`,
     'Your documents and eligibility information are NOT automatically forwarded to any government agency, state system, or external benefits authority.',
     'Any submission to a government program (WIOA, SNAP E&T, WRG, FSSA, etc.) requires your explicit consent and is processed manually by Elevate staff.',
     'Your information is stored securely and accessible only to authorized Elevate personnel.',

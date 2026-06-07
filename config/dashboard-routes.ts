@@ -1,40 +1,18 @@
-import { UserRole } from '@/types/user';
+/**
+ * @deprecated Import getRoleDestination from '@/lib/auth/role-destinations' instead.
+ * Thin wrapper kept for UserMenu and legacy imports.
+ */
+import { getRoleDestination, ROLE_DESTINATIONS } from '@/lib/auth/role-destinations';
+import type { UserRole } from '@/types/user';
 
-export const DASHBOARD_ROUTES: Record<UserRole, string> = {
-  // Admin tier
-  super_admin: '/admin/dashboard',
-  admin: '/admin/dashboard',
-  org_admin: '/admin/dashboard',
-
-  // Staff / operations
-  staff: 'https://admin.elevateforhumanity.org/admin/staff-portal/dashboard',
-  instructor: 'https://admin.elevateforhumanity.org/admin/instructor/dashboard',
-
-  // Program holders / delegates
-  program_holder: '/program-holder/dashboard',
-  delegate: '/my-dashboard',
-
-  // Partners / sponsors
-  partner: '/partner/dashboard',
-  sponsor: '/employer/dashboard',
-
-  // Workforce oversight
-  workforce_board: '/workforce-board/dashboard',
-
-  // Employer
-  employer: '/employer/dashboard',
-
-  // Mentor
-  mentor: '/mentor/dashboard',
-
-  // Creator
-  creator: '/creator/products',
-
-  // Student
-  student: '/learner/dashboard',
-};
+/** @deprecated Use ROLE_DESTINATIONS from role-destinations.ts */
+export const DASHBOARD_ROUTES = ROLE_DESTINATIONS as Record<UserRole, string>;
 
 export function getDashboardUrl(role?: UserRole): string {
   if (!role) return '/unauthorized?reason=unknown_role';
-  return DASHBOARD_ROUTES[role] || '/unauthorized?reason=unknown_role';
+  const destination = getRoleDestination(role);
+  if (destination === '/learner/dashboard' && !(role in ROLE_DESTINATIONS)) {
+    return '/unauthorized?reason=unknown_role';
+  }
+  return destination;
 }

@@ -844,6 +844,7 @@ The hook attempts unmuted play and falls back silently. No mute button shown.
 ### Gotchas
 
 - **Middleware auth prefixes:** `AUTH_REQUIRED_ROUTES` uses segment-aware matching (`pathMatchesAuthPrefix` in `proxy.ts`). Never use bare `/apprentice` with `pathname.startsWith` — it incorrectly gates public `/apprenticeships`. Public marketing prefixes are listed in `PUBLIC_MARKETING_PREFIXES` (`/apprenticeships`, `/programs/`, `/partners/`, etc.).
+- **Before recommending manual SQL migrations**, run `node scripts/verify-pending-migrations.mjs`. If all five checks pass, migrations are already live — do not ask the user to re-run them.
 - The `predev` script runs `scripts/setup-env-auto.sh` which will fail if `.env.local` doesn't exist. Create it first or set `SKIP_ENV_VALIDATION=true`.
 - Dev server logs `Failed to load from app_secrets` and `Failed to load from platform_secrets` with placeholder Supabase keys — this is expected and does not block the server.
 - Northflank Dockerfiles require real `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` at build time. Runtime must also inject real keys via the `elevate-production-env` secret group. Admin `/api/health` returns 500 with `supabaseAnonKeyLooksPlaceholder` when the anon key is still a placeholder. URL must be `https://<ref>.supabase.co`, not `db.<ref>.supabase.co`.

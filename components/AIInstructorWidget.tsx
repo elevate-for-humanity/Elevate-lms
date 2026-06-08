@@ -21,12 +21,6 @@ export function AIInstructorWidget({
   const [speaking, setSpeaking] = useState(false);
   const [muted, setMuted] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchMessage();
-    }
-  }, [isOpen, fetchMessage]);
-
   const fetchMessage = useCallback(async () => {
     try {
       const response = await fetch('/api/ai-instructor/message', {
@@ -43,12 +37,17 @@ export function AIInstructorWidget({
       }
     } catch (error) {
       /* Error handled silently */
-      // Error: $1
       setMessage(
         "Hi! I'm here to help you succeed in your training. Feel free to ask me anything!",
       );
     }
   }, [context, programId, lessonId, muted]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchMessage();
+    }
+  }, [isOpen, fetchMessage]);
 
   const playAudio = (url: string) => {
     setSpeaking(true);

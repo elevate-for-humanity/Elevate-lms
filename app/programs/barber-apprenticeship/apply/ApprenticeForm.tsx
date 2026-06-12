@@ -258,7 +258,7 @@ export default function ApprenticeForm({
           const isBotError = apiError.toLowerCase().includes('bot') || apiError.toLowerCase().includes('verification');
           setError(
             isBotError
-              ? `Security check failed. Please scroll up, complete the verification widget, and try again. Need help? Call {PLATFORM_DEFAULTS.supportPhone}.`
+              ? `Security check failed. Please scroll up, complete the verification widget, and try again. Need help? Call ${PLATFORM_DEFAULTS.supportPhone}.`
               : apiError || `Failed to save your application. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
           );
           setErrorSeverity('critical');

@@ -54,7 +54,7 @@ function lineNumber(content, index) {
 
 function runCmd(name, cmd, severity = 'CRITICAL', env = {}) {
   log(`\n> ${name}`);
-  const result = spawnSync('bash', ['-lc', `cd "${ROOT}" && ${cmd}`], {
+  const result = spawnSync('bash', ['-c', `cd "${ROOT}" && ${cmd}`], {
     encoding: 'utf8',
     maxBuffer: 20 * 1024 * 1024,
     env: { ...process.env, ...env },
@@ -66,12 +66,13 @@ function runCmd(name, cmd, severity = 'CRITICAL', env = {}) {
   return { ok, output };
 }
 
-function runCmdWithTimeout(name, cmd, timeoutMs, severity = 'CRITICAL') {
+function runCmdWithTimeout(name, cmd, timeoutMs, severity = 'CRITICAL', env = {}) {
   log(`\n> ${name}`);
-  const result = spawnSync('bash', ['-lc', `cd "${ROOT}" && ${cmd}`], {
+  const result = spawnSync('bash', ['-c', `cd "${ROOT}" && ${cmd}`], {
     encoding: 'utf8',
     maxBuffer: 20 * 1024 * 1024,
     timeout: timeoutMs,
+    env: { ...process.env, ...env },
   });
   if (result.signal === 'SIGTERM' || result.error?.code === 'ETIMEDOUT') {
     addCheck(name, 'pass', `skipped - timed out after ${timeoutMs / 1000}s (treated as pass)`);

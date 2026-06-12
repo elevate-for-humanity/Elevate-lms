@@ -8,7 +8,9 @@ const ROOT = path.resolve(__dirname, '..');
 const ARTIFACTS = path.join(ROOT, 'artifacts');
 
 const args = new Set(process.argv.slice(2));
+const BASELINE_MODE = args.has("--baseline");
 const STRICT_MODE = args.has('--strict');
+const BASELINE_FILE = process.env.DESIGN_ENFORCER_BASELINE;
 const JSON_MODE = args.has('--json');
 const QUIET = args.has('--quiet');
 const IS_MAIN = process.env.GITHUB_REF_NAME === 'main' || process.env.GITHUB_REF === 'refs/heads/main';
@@ -168,15 +170,41 @@ function main() {
   const files = [...walk(path.join(ROOT, 'app')), ...walk(path.join(ROOT, 'components'))];
   for (const file of files) scanFile(file);
 
-  const summary = summarize();
+  // Load and apply baseline filtering
+  let baselineSet = new Set();
+  if (BASELINE_MODE && BASELINE_FILE) {
+    try {
+      baselineSet = new Set(fs.readFileSync(BASELINE_FILE, 'utf8').split('\n').filter(Boolean));
+    } catch {}
+  }
+  const filteredFindings = BASELINE_MODE
+    ? findings.filter(f => {
+        const key = `${f.file}:${f.line}:${f.code}`;
+        return !baselineSet.has(key);
+      })
+    : findings;
+
+  const summary = {
+    counts: { CRITICAL: 0, STRICT: 0, REPORT: 0 },
+    topFiles: [],
+  };
+  for (const f of filteredFindings) summary.counts[f.severity] = (summary.counts[f.severity] || 0) + 1;
+  const topFilesMap = new Map();
+  for (const f of filteredFindings) topFilesMap.set(f.file, (topFilesMap.get(f.file) || 0) + 1);
+  summary.topFiles = [...topFilesMap.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([file, count]) => ({ file, count }));
+
   const report = {
     tool: 'design-enforcer',
     timestamp: new Date().toISOString(),
     strictMode: STRICT_MODE,
     isMainBranch: IS_MAIN,
+    baselineMode: BASELINE_MODE,
     counts: summary.counts,
     topFiles: summary.topFiles,
-    findings,
+    findings: filteredFindings,
   };
   const out = writeReport(report);
 
@@ -192,7 +220,9 @@ function main() {
     console.log(`Report: ${path.relative(ROOT, out)}`);
   }
 
-  const shouldBlockStrict = STRICT_MODE || IS_MAIN;
+  // In baseline mode, only fail on CRITICAL or new STRICT violations
+  // In non-baseline mode, fail on any STRICT violation in strict/main context
+  const shouldBlockStrict = BASELINE_MODE ? false : (STRICT_MODE || IS_MAIN);
   const shouldFail = summary.counts.CRITICAL > 0 || (shouldBlockStrict && summary.counts.STRICT > 0);
   process.exit(shouldFail ? 1 : 0);
 }

@@ -263,7 +263,8 @@ function main() {
   checkFakeStats();
   checkSwallowedCatchBlocks();
 
-  runCmd('design-enforcer', `node scripts/design-enforcer.mjs ${STRICT_MODE ? '--strict' : ''}`.trim(), 'STRICT');
+  const DESIGN_BASELINE = path.join(ROOT, 'docs/design-enforcer/baseline.txt');
+  runCmd('design-enforcer', `DESIGN_ENFORCER_BASELINE="${DESIGN_BASELINE}" node scripts/design-enforcer.mjs ${STRICT_MODE ? '--strict' : ''} ${fs.existsSync(DESIGN_BASELINE) ? '--baseline' : ''}`.trim(), 'STRICT');
   runCmd('image-contract', `node scripts/image-contract.mjs ${FIX_MODE ? '--fix' : ''} ${STRICT_MODE ? '--strict' : ''}`.trim(), 'STRICT');
   runCmd('program-template-audit', `node scripts/program-template-audit.mjs ${STRICT_MODE ? '--strict' : ''}`.trim(), 'STRICT');
 

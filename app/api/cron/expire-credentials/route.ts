@@ -52,7 +52,9 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
         html: `<p>Hi ${profile.full_name ?? 'there'},</p><p>Your <strong>${cred.credential_type ?? 'credential'}</strong> expires in <strong>${daysLeft} days</strong>. Please contact your program coordinator to begin the renewal process.</p><p>— Elevate for Humanity</p>`,
       }).catch((e: unknown) => logger.warn('[cron/expire-credentials] Warn email failed', { cred_id: cred.id, error: String(e) }));
     }
-    await db.from('credentials').update({ expiry_warned_at: now.toISOString() }).eq('id', cred.id).catch(() => {});
+    await Promise.resolve(
+      db.from('credentials').update({ expiry_warned_at: now.toISOString() }).eq('id', cred.id)
+    ).catch(() => {});
     warned++;
   }
 

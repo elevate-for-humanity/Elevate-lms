@@ -45,12 +45,14 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const failed = results.filter(r => r.status === 'error');
 
   if (failed.length > 0) {
-    await db.from('admin_alerts').insert({
-      alert_type: 'webhook_health_failure',
-      severity: 'critical',
-      message: `${failed.length} internal endpoint${failed.length !== 1 ? 's' : ''} failing health check: ${failed.map(f => f.name).join(', ')}`,
-      metadata: { results },
-    }).catch(() => {});
+    await Promise.resolve(
+      db.from('admin_alerts').insert({
+        alert_type: 'webhook_health_failure',
+        severity: 'critical',
+        message: `${failed.length} internal endpoint${failed.length !== 1 ? 's' : ''} failing health check: ${failed.map(f => f.name).join(', ')}`,
+        metadata: { results },
+      })
+    ).catch(() => {});
 
     await emitEvent('system.webhook_health_failure', 'system', {
       severity: 'error',

@@ -275,30 +275,31 @@ export async function POST(request: NextRequest) {
     const db = await requireAdminClient();
     if (db) {
       const p = event.payload;
-      await db
-        .from('calendly_bookings')
-        .upsert(
-          {
-            event_type: event.event,
-            invitee_name: p.invitee.name,
-            invitee_email: p.invitee.email,
-            invitee_timezone: p.invitee.timezone ?? null,
-            event_name: p.scheduled_event.name,
-            start_time: p.scheduled_event.start_time,
-            end_time: p.scheduled_event.end_time,
-            location:
-              p.scheduled_event.location?.location ?? p.scheduled_event.location?.type ?? null,
-            utm_source: p.tracking?.utm_source ?? null,
-            utm_medium: p.tracking?.utm_medium ?? null,
-            utm_campaign: p.tracking?.utm_campaign ?? null,
-            questions: p.questions_and_answers ?? null,
-            status: event.event === 'invitee.canceled' ? 'canceled' : 'scheduled',
-            raw_payload: p,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'invitee_email,start_time', ignoreDuplicates: false },
-        )
-        .catch((err) => {
+      await Promise.resolve(
+        db
+          .from('calendly_bookings')
+          .upsert(
+            {
+              event_type: event.event,
+              invitee_name: p.invitee.name,
+              invitee_email: p.invitee.email,
+              invitee_timezone: p.invitee.timezone ?? null,
+              event_name: p.scheduled_event.name,
+              start_time: p.scheduled_event.start_time,
+              end_time: p.scheduled_event.end_time,
+              location:
+                p.scheduled_event.location?.location ?? p.scheduled_event.location?.type ?? null,
+              utm_source: p.tracking?.utm_source ?? null,
+              utm_medium: p.tracking?.utm_medium ?? null,
+              utm_campaign: p.tracking?.utm_campaign ?? null,
+              questions: p.questions_and_answers ?? null,
+              status: event.event === 'invitee.canceled' ? 'canceled' : 'scheduled',
+              raw_payload: p,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: 'invitee_email,start_time', ignoreDuplicates: false },
+          )
+      ).catch((err) => {
           logger.error('[Calendly Webhook] DB upsert failed', err);
         });
     }
@@ -312,17 +313,17 @@ export async function POST(request: NextRequest) {
           sendReminder(event.payload.invitee, event.payload.scheduled_event.start_time),
         ]);
         logger.info(
-          '[Calendly Webhook] Booking confirmation sent to:',
-          event.payload.invitee.email,
+          '[Calendly Webhook] Booking confirmation sent',
+          { email: event.payload.invitee.email },
         );
         break;
 
       case 'invitee.canceled':
-        logger.info('[Calendly Webhook] Booking canceled:', event.payload.invitee.email);
+        logger.info('[Calendly Webhook] Booking canceled', { email: event.payload.invitee.email });
         break;
 
       default:
-        logger.info('[Calendly Webhook] Unhandled event type:', event.event);
+        logger.info('[Calendly Webhook] Unhandled event type', { event: event.event });
     }
 
     return NextResponse.json({ success: true });

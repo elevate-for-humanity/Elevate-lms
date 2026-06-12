@@ -123,22 +123,24 @@ export const GET = withRuntime({ cron: true }, async () => {
     });
 
     // Raise admin alert
-    await db.from('admin_alerts').insert({
-      alert_type: 'low_hours_pace',
-      severity: deficitPct > 0.25 ? 'critical' : 'warning',
-      resolved: false,
-      details: {
-        apprentice_id: enroll.user_id,
-        program_slug: enroll.program_slug,
-        ojl_logged: Math.round(actualOjl),
-        ojl_required: req.ojl,
-        expected_at_this_point: Math.round(expectedOjl),
-        deficit: Math.round(deficit),
-        weeks_remaining: Math.round(weeksRemaining),
-        weekly_hours_needed: weeklyNeeded,
-      },
-      created_at: new Date().toISOString(),
-    }).catch((err: any) => logger.warn('[low-hours-pace] alert insert failed', { err }));
+    await Promise.resolve(
+      db.from('admin_alerts').insert({
+        alert_type: 'low_hours_pace',
+        severity: deficitPct > 0.25 ? 'critical' : 'warning',
+        resolved: false,
+        details: {
+          apprentice_id: enroll.user_id,
+          program_slug: enroll.program_slug,
+          ojl_logged: Math.round(actualOjl),
+          ojl_required: req.ojl,
+          expected_at_this_point: Math.round(expectedOjl),
+          deficit: Math.round(deficit),
+          weeks_remaining: Math.round(weeksRemaining),
+          weekly_hours_needed: weeklyNeeded,
+        },
+        created_at: new Date().toISOString(),
+      })
+    ).catch((err: any) => logger.warn('[low-hours-pace] alert insert failed', { err }));
 
     // Email student
     if (profile?.email) {

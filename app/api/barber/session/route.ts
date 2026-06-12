@@ -121,10 +121,9 @@ export async function PATCH(request: NextRequest) {
       .eq('id', session_id);
 
     if (video_seconds) {
-      await db
-        .rpc('increment_session_video', { p_session_id: session_id, p_seconds: video_seconds })
-        .then(() => {})
-        .catch(() => {}); // non-critical
+      await Promise.resolve(
+        db.rpc('increment_session_video', { p_session_id: session_id, p_seconds: video_seconds })
+      ).then(() => {}).catch(() => {}); // non-critical
     }
 
     return NextResponse.json({ ok: true, idle_gap: additionalIdle });

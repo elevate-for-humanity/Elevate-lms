@@ -193,25 +193,26 @@ export const POST = withRuntime({ cron: true }, async () => {
       });
 
       // 2. In-app notification
-      await db
-        .from('notifications')
-        .insert({
-          user_id: enrollment.student_id,
-          type: 'compliance',
-          title: 'Hours pace warning',
-          message: `You are ${Math.round(deficit)} hours behind your required OJL pace. You need to log ${requiredPacePerWeek.toFixed(1)} hours per week to complete on time.`,
-          action_label: 'View hours',
-          action_url: '/apprentice/hours',
-          link: '/apprentice/hours',
-          read: false,
-          metadata: {
-            enrollment_id: enrollment.id,
-            deficit_hours: Math.round(deficit),
-            required_pace_per_week: requiredPacePerWeek.toFixed(1),
-          },
-          idempotency_key: `pace-warning-${enrollment.id}-${new Date().toISOString().slice(0, 10)}`,
-        })
-        .catch(() => {});
+      await Promise.resolve(
+        db
+          .from('notifications')
+          .insert({
+            user_id: enrollment.student_id,
+            type: 'compliance',
+            title: 'Hours pace warning',
+            message: `You are ${Math.round(deficit)} hours behind your required OJL pace. You need to log ${requiredPacePerWeek.toFixed(1)} hours per week to complete on time.`,
+            action_label: 'View hours',
+            action_url: '/apprentice/hours',
+            link: '/apprentice/hours',
+            read: false,
+            metadata: {
+              enrollment_id: enrollment.id,
+              deficit_hours: Math.round(deficit),
+              required_pace_per_week: requiredPacePerWeek.toFixed(1),
+            },
+            idempotency_key: `pace-warning-${enrollment.id}-${new Date().toISOString().slice(0, 10)}`,
+          })
+      ).catch(() => {});
 
       // 3. Email apprentice
       if (apprenticeEmail) {

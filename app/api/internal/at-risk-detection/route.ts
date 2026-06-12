@@ -135,34 +135,38 @@ export const POST = withRuntime({ cron: true }, async () => {
     const message = `${name} is at risk: ${daysInactive} days inactive, ${overdue} overdue items, ${progress}% progress`;
 
     // Write admin alert
-    await db.from('admin_alerts').insert({
-      alert_type: 'at_risk_student',
-      severity: overdue > 3 ? 'high' : 'warning',
-      apprentice_id: row.user_id,
-      message,
-      escalation_level: 1,
-      details: {
-        days_since_activity: daysInactive,
-        overdue_count: overdue,
-        progress_percentage: progress,
-        last_activity_date: row.last_activity_date,
-        program_id: row.program_id,
-      },
-      metadata: { user_id: row.user_id, program_id: row.program_id },
-    }).catch(() => {});
+    await Promise.resolve(
+      db.from('admin_alerts').insert({
+        alert_type: 'at_risk_student',
+        severity: overdue > 3 ? 'high' : 'warning',
+        apprentice_id: row.user_id,
+        message,
+        escalation_level: 1,
+        details: {
+          days_since_activity: daysInactive,
+          overdue_count: overdue,
+          progress_percentage: progress,
+          last_activity_date: row.last_activity_date,
+          program_id: row.program_id,
+        },
+        metadata: { user_id: row.user_id, program_id: row.program_id },
+      })
+    ).catch(() => {});
 
     // In-app notification to student
-    await db.from('notifications').insert({
-      user_id: row.user_id,
-      type: 'at_risk',
-      title: 'Action required: You may be falling behind',
-      message: `You have ${overdue} overdue item${overdue !== 1 ? 's' : ''} and haven't logged activity in ${daysInactive} day${daysInactive !== 1 ? 's' : ''}. Please contact your instructor.`,
-      action_label: 'View progress',
-      action_url: '/lms/courses',
-      link: '/lms/courses',
-      read: false,
-      idempotency_key: `at-risk-${row.user_id}-${new Date().toISOString().split('T')[0]}`,
-    }).catch(() => {});
+    await Promise.resolve(
+      db.from('notifications').insert({
+        user_id: row.user_id,
+        type: 'at_risk',
+        title: 'Action required: You may be falling behind',
+        message: `You have ${overdue} overdue item${overdue !== 1 ? 's' : ''} and haven't logged activity in ${daysInactive} day${daysInactive !== 1 ? 's' : ''}. Please contact your instructor.`,
+        action_label: 'View progress',
+        action_url: '/lms/courses',
+        link: '/lms/courses',
+        read: false,
+        idempotency_key: `at-risk-${row.user_id}-${new Date().toISOString().split('T')[0]}`,
+      })
+    ).catch(() => {});
 
     // Email student
     if (email) {

@@ -37,12 +37,14 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   }
 
   // Write admin alert
-  await db.from('admin_alerts').insert({
-    alert_type: 'daily_attendance',
-    severity: absences.length > 5 ? 'warning' : 'info',
-    message: `${absences.length} student${absences.length !== 1 ? 's' : ''} absent today (${today})`,
-    metadata: { date: today, count: absences.length, student_ids: absences.map(a => a.student_id) },
-  }).catch(() => {});
+  await Promise.resolve(
+    db.from('admin_alerts').insert({
+      alert_type: 'daily_attendance',
+      severity: absences.length > 5 ? 'warning' : 'info',
+      message: `${absences.length} student${absences.length !== 1 ? 's' : ''} absent today (${today})`,
+      metadata: { date: today, count: absences.length, student_ids: absences.map(a => a.student_id) },
+    })
+  ).catch(() => {});
 
   await sendEmail({
     to: ADMIN_EMAIL,

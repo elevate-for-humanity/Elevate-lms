@@ -149,8 +149,15 @@ class Logger {
     this.log('warn', message, context);
   }
 
-  error(message: string, error?: Error, context?: Record<string, any>) {
-    this.log('error', message, context, error);
+  error(message: string, context?: Record<string, any> | Error, extra?: Record<string, any>) {
+    // Handle both signatures:
+    // - error(message, context) where context is Record
+    // - error(message, error, extra) where error is Error
+    if (context instanceof Error) {
+      this.log('error', message, extra, context);
+    } else {
+      this.log('error', message, context);
+    }
   }
 }
 
@@ -162,6 +169,11 @@ export const log = {
   debug: (message: string, context?: Record<string, any>) => logger.debug(message, context),
   info: (message: string, context?: Record<string, any>) => logger.info(message, context),
   warn: (message: string, context?: Record<string, any>) => logger.warn(message, context),
-  error: (message: string, error?: Error, context?: Record<string, any>) =>
-    logger.error(message, error, context),
+  error: (message: string, context?: Record<string, any> | Error, extra?: Record<string, any>) => {
+    if (context instanceof Error) {
+      logger.error(message, context, extra);
+    } else {
+      logger.error(message, context);
+    }
+  },
 };

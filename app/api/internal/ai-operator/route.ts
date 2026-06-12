@@ -107,34 +107,37 @@ Respond with ONLY valid JSON, no markdown.`;
     const autoResolvable = parsed.auto_resolvable === true;
 
     // Write admin alert with AI recommendation
-    await db.from('admin_alerts').insert({
-      alert_type: 'ai_operator_triage',
-      severity: priority === 'critical' ? 'critical' : priority === 'high' ? 'high' : 'warning',
-      message: summary,
-      details: {
-        recommended_action: recommendation,
-        event_count: events.length,
-        event_ids: events.map((e) => e.id),
-        auto_resolvable: autoResolvable,
-        triaged_at: new Date().toISOString(),
-      },
-      metadata: {
-        source: 'ai_operator',
-        priority,
-        event_types: [...new Set(events.map((e) => e.event_type))],
-      },
-    }).catch((err: unknown) => {
+    await Promise.resolve(
+      db.from('admin_alerts').insert({
+        alert_type: 'ai_operator_triage',
+        severity: priority === 'critical' ? 'critical' : priority === 'high' ? 'high' : 'warning',
+        message: summary,
+        details: {
+          recommended_action: recommendation,
+          event_count: events.length,
+          event_ids: events.map((e) => e.id),
+          auto_resolvable: autoResolvable,
+          triaged_at: new Date().toISOString(),
+        },
+        metadata: {
+          source: 'ai_operator',
+          priority,
+          event_types: [...new Set(events.map((e) => e.event_type))],
+        },
+      })
+    ).catch((err: unknown) => {
       logger.warn('[ai-operator] Failed to write admin_alert', err);
     });
 
     // Mark events resolved if AI says they're auto-resolvable
     if (autoResolvable) {
       const ids = events.map((e) => e.id);
-      await db
-        .from('platform_events')
-        .update({ resolved: true })
-        .in('id', ids)
-        .catch(() => {});
+      await Promise.resolve(
+        db
+          .from('platform_events')
+          .update({ resolved: true })
+          .in('id', ids)
+      ).catch(() => {});
       autoResolved = ids.length;
     }
 
@@ -154,7 +157,7 @@ Respond with ONLY valid JSON, no markdown.`;
       message: `AI operator triaged ${events.length} event${events.length !== 1 ? 's' : ''}: ${summary.slice(0, 100)}`,
     }).catch(() => {});
   } catch (err) {
-    logger.error('[ai-operator] AI triage failed', err instanceof Error ? err.message : String(err));
+    logger.error('[ai-operator] AI triage failed', { error: err instanceof Error ? err.message : String(err) });
     return NextResponse.json({ error: 'AI triage failed' }, { status: 500 });
   }
 

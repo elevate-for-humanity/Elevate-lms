@@ -184,28 +184,30 @@ export const POST = withRuntime({ cron: true }, async () => {
       currentStatus; // don't downgrade at_risk/critical
 
     if (existingRisk?.id) {
-      await db
-        .from('student_risk_status')
-        .update({
-          status: newStatus,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', existingRisk.id)
-        .catch(() => {});
+      await Promise.resolve(
+        db
+          .from('student_risk_status')
+          .update({
+            status: newStatus,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingRisk.id)
+      ).catch(() => {});
     } else {
-      await db
-        .from('student_risk_status')
-        .insert({
-          user_id: userId,
-          status: 'watch',
-          days_since_activity: 0,
-          overdue_count: Math.round(deficit),
-          progress_percentage: enrollment.progress_percent ?? 0,
-          last_activity_date: enrollment.last_activity_at
-            ? new Date(enrollment.last_activity_at).toISOString().split('T')[0]
-            : null,
-        })
-        .catch(() => {});
+      await Promise.resolve(
+        db
+          .from('student_risk_status')
+          .insert({
+            user_id: userId,
+            status: 'watch',
+            days_since_activity: 0,
+            overdue_count: Math.round(deficit),
+            progress_percentage: enrollment.progress_percent ?? 0,
+            last_activity_date: enrollment.last_activity_at
+              ? new Date(enrollment.last_activity_at).toISOString().split('T')[0]
+              : null,
+          })
+      ).catch(() => {});
     }
 
     // Platform event

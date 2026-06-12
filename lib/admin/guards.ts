@@ -141,6 +141,8 @@ export type GuardedUser = {
   id: string;
   email: string | null;
   role: UserRole | null;
+  user?: { id: string; email?: string | null };
+  profile?: Record<string, unknown>;
   error?: NextResponse;
 };
 

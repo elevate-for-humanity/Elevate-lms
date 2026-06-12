@@ -167,21 +167,22 @@ export const POST = withRuntime({ cron: true }, async () => {
 
       // 4. In-app notification to apprentice
       if (userId) {
-        await db
-          .from('notifications')
-          .insert({
-            user_id: userId,
-            type: 'timeclock',
-            title: 'Shift auto-closed',
-            message: `Your shift on ${shift.work_date} at ${siteName} was automatically closed after ${MAX_AUTO_CLOSE_HOURS} hours. Hours are pending supervisor approval. Please contact your supervisor.`,
-            action_label: 'View timeclock',
-            action_url: '/apprentice/timeclock',
-            link: '/apprentice/timeclock',
-            read: false,
-            metadata: { progress_entry_id: shift.id, auto_closed: true },
-            idempotency_key: `missed-clockout-${shift.id}`,
-          })
-          .catch(() => {});
+        await Promise.resolve(
+          db
+            .from('notifications')
+            .insert({
+              user_id: userId,
+              type: 'timeclock',
+              title: 'Shift auto-closed',
+              message: `Your shift on ${shift.work_date} at ${siteName} was automatically closed after ${MAX_AUTO_CLOSE_HOURS} hours. Hours are pending supervisor approval. Please contact your supervisor.`,
+              action_label: 'View timeclock',
+              action_url: '/apprentice/timeclock',
+              link: '/apprentice/timeclock',
+              read: false,
+              metadata: { progress_entry_id: shift.id, auto_closed: true },
+              idempotency_key: `missed-clockout-${shift.id}`,
+            })
+        ).catch(() => {});
       }
 
       // 5. Email apprentice

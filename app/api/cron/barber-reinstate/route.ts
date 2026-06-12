@@ -52,12 +52,13 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     }
 
     // Restore program enrollment
-    await db
-      .from('program_enrollments')
-      .update({ status: 'active', updated_at: new Date().toISOString() })
-      .eq('user_id', sub.student_id)
-      .eq('status', 'suspended')
-      .catch((e: unknown) => logger.warn('[cron/barber-reinstate] Enrollment restore failed', { error: String(e) }));
+    await Promise.resolve(
+      db
+        .from('program_enrollments')
+        .update({ status: 'active', updated_at: new Date().toISOString() })
+        .eq('user_id', sub.student_id)
+        .eq('status', 'suspended')
+    ).catch((e: unknown) => logger.warn('[cron/barber-reinstate] Enrollment restore failed', { error: String(e) }));
 
     if (profile?.email) {
       await sendEmail({

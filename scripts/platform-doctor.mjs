@@ -52,11 +52,12 @@ function lineNumber(content, index) {
   return content.slice(0, index).split('\n').length;
 }
 
-function runCmd(name, cmd, severity = 'CRITICAL') {
+function runCmd(name, cmd, severity = 'CRITICAL', env = {}) {
   log(`\n> ${name}`);
   const result = spawnSync('bash', ['-lc', `cd "${ROOT}" && ${cmd}`], {
     encoding: 'utf8',
     maxBuffer: 20 * 1024 * 1024,
+    env: { ...process.env, ...env },
   });
   const ok = result.status === 0;
   const output = `${result.stdout || ''}${result.stderr || ''}`.trim();
@@ -264,7 +265,8 @@ function main() {
   checkSwallowedCatchBlocks();
 
   const DESIGN_BASELINE = path.join(ROOT, 'docs/design-enforcer/baseline.txt');
-  runCmd('design-enforcer', `DESIGN_ENFORCER_BASELINE="${DESIGN_BASELINE}" node scripts/design-enforcer.mjs ${STRICT_MODE ? '--strict' : ''} ${fs.existsSync(DESIGN_BASELINE) ? '--baseline' : ''}`.trim(), 'STRICT');
+  const designEnv = fs.existsSync(DESIGN_BASELINE) ? { DESIGN_ENFORCER_BASELINE: DESIGN_BASELINE } : {};
+  runCmd('design-enforcer', `node scripts/design-enforcer.mjs ${STRICT_MODE ? '--strict' : ''} ${fs.existsSync(DESIGN_BASELINE) ? '--baseline' : ''}`.trim(), 'STRICT', designEnv);
   runCmd('image-contract', `node scripts/image-contract.mjs ${FIX_MODE ? '--fix' : ''} ${STRICT_MODE ? '--strict' : ''}`.trim(), 'STRICT');
   runCmd('program-template-audit', `node scripts/program-template-audit.mjs ${STRICT_MODE ? '--strict' : ''}`.trim(), 'STRICT');
 

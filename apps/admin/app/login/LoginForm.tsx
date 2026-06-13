@@ -92,7 +92,7 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
             />
           </div>
           <h1 className="text-xl font-bold text-white">Elevate Admin</h1>
-          <p className="text-slate-400 text-sm mt-1">Super Admin Portal</p>
+          <p className="text-slate-400 text-sm mt-1">Admin Portal</p>
         </div>
 
         {mode === 'login' ? (

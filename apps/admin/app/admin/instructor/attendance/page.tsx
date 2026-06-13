@@ -14,7 +14,6 @@ export const metadata: Metadata = {
 export default async function InstructorAttendancePage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (!profile || !['instructor', 'admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 

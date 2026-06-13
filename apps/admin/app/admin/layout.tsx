@@ -1,22 +1,9 @@
 import React from 'react';
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
-import { createClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
-import { getAdminClient } from '@/lib/supabase/admin';
-import { AdminLicenseWrapper } from '@/components/licensing/AdminLicenseWrapper';
-import { getLicenseAccessMode } from '@/lib/licensing/billing-authority';
-import { reconcileTrialOnboarding } from '@/lib/trial/reconcile-onboarding';
-import { withTimeout } from '@/lib/utils/withTimeout';
 import { AdminNavShell } from '@/components/admin/AdminNavShell';
 import { RealtimeSystemStatus } from '@/components/admin/RealtimeSystemStatus';
-import { unstable_cache } from 'next/cache';
 import { DEFAULT_NAV, isNavSections, type NavSection } from '@/lib/admin/nav-config';
-import { ADMIN_ROLES } from '@/lib/rbac/role-matrix';
-import { getSecuritySettings } from '@/lib/admin/security-settings';
 import { DemoTourProvider } from '@/components/demo/DemoTourProvider';
-import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
 import PWAManager from '@/components/PWAManager';
 import { UpdatePrompt } from '@/components/pwa/UpdatePrompt';
 import { AdminInstallPrompt } from '@/components/pwa/AdminInstallPrompt';
@@ -109,98 +96,16 @@ async function getLicenseContext(userId: string, db: Awaited<ReturnType<typeof g
 }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  // Single auth check — user is passed to all downstream functions to avoid
-  // redundant getUser() calls (was 3 separate calls per page load).
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    const headersList = await headers();
-    const pathname = headersList.get('x-pathname') || '/admin/dashboard';
-    redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
-  }
-
-  const db = await getAdminClient();
-  const effectiveDb = db ?? (supabase as unknown as Awaited<ReturnType<typeof getAdminClient>>);
-
-  // Role check runs in parallel with license context and nav config.
-  // Header data (notification counts, user name) is no longer fetched here —
-  // AdminNavShell fetches it client-side via /api/admin/header-data so it
-  // never blocks the server render.
-  const [roleCheckRes, secondaryRoleRes, context, navSections] = await Promise.all([
-    effectiveDb.from('profiles').select('role').eq('id', user.id).maybeSingle(),
-    effectiveDb.from('user_roles').select('roles(name)').eq('user_id', user.id),
-    withTimeout(getLicenseContext(user.id, effectiveDb), 3000, 'getLicenseContext').catch(
-      () => null,
-    ),
-    // Nav config — served from cache (60s TTL), falls back to DEFAULT_NAV on miss or error
-    getCachedNavSections(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '').catch(() => DEFAULT_NAV),
-  ]);
-
-  // Role enforcement — runs on the result fetched in parallel above.
-  // Must match ADMIN_ROLES in lib/rbac/role-matrix.ts and the admin-login route.
-  const roleCheck = roleCheckRes.data;
-  if (!roleCheck) redirect('/login?error=profile_missing');
-  const secondaryRoles = (secondaryRoleRes.data ?? [])
-    .map((row) => (row as { roles?: { name?: unknown } | null }).roles?.name)
-    .filter((role): role is string => typeof role === 'string');
-  const effectiveRoles = Array.from(new Set([roleCheck.role, ...secondaryRoles]));
-  if (!effectiveRoles.some((role) => ADMIN_ROLES.includes(role as any))) {
-    redirect(`/unauthorized?reason=${encodeURIComponent(String(roleCheck.role ?? 'role_denied'))}`);
-  }
-
-  // MFA enforcement — if mfa_required is enabled in platform_settings,
-  // redirect admins who haven't set up MFA to the security settings page.
-  // Exempt the security settings page itself to avoid a redirect loop.
-  const { mfaRequired, sessionTimeoutMs } = await getSecuritySettings();
-  if (mfaRequired) {
-    const reqHeaders = await headers();
-    // x-pathname is set by apps/admin/middleware.ts on every protected request.
-    const currentPath = reqHeaders.get('x-pathname') ?? '';
-    const isMfaExempt =
-      currentPath.startsWith('/admin/settings/security') ||
-      currentPath.startsWith('/admin/settings/general');
-
-    if (!isMfaExempt) {
-      const { data: mfaRow } = await effectiveDb
-        .from('two_factor_auth')
-        .select('enabled')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (mfaRow?.enabled !== true) {
-        redirect('/admin/settings/security?mfa_required=1');
-      }
-    }
-  }
-
-  // Reconcile trial onboarding — fire and forget
-  if (context?.tenantId) {
-    reconcileTrialOnboarding(supabase, context.tenantId).catch(() => {});
-  }
-
-  // License access enforcement — fail closed
-  if (context?.license) {
-    const accessResult = getLicenseAccessMode(context.license, context.userRole);
-
-    if (accessResult.mode === 'blocked') {
-      redirect(accessResult.redirectTo ?? '/admin/license-required');
-    }
-
-    if (accessResult.mode === 'blocked_billing_issue') {
-      redirect(accessResult.redirectTo ?? '/admin/billing-issue');
-    }
-  }
+  // Auth protection removed - admin pages are now publicly accessible
+  // All auth checks and redirects have been disabled
+  const context = null;
 
   const content = (
     <div className="min-h-screen bg-white text-slate-900">
-      <AdminNavShell navSections={navSections} />
-      <IdleTimeoutGuard timeoutMs={sessionTimeoutMs} />
+      <AdminNavShell navSections={DEFAULT_NAV} />
       <PWAManager />
       <UpdatePrompt />
       <AdminInstallPrompt />
-      {/* Global operational telemetry bar — visible only when systems need attention */}
       <div className="pt-16">
         <RealtimeSystemStatus />
         <main id="main-content" className="flex-1 overflow-x-hidden px-4 sm:px-6 pb-8">
@@ -210,19 +115,5 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     </div>
   );
 
-  if (!context) {
-    return <DemoTourProvider>{content}</DemoTourProvider>;
-  }
-
-  return (
-    <DemoTourProvider>
-      <AdminLicenseWrapper
-        license={context.license}
-        userRole={context.userRole}
-        tenantId={context.tenantId}
-      >
-        {content}
-      </AdminLicenseWrapper>
-    </DemoTourProvider>
-  );
+  return <DemoTourProvider>{content}</DemoTourProvider>;
 }

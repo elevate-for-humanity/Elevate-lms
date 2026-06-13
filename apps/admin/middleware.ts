@@ -80,12 +80,15 @@ export async function middleware(req: NextRequest) {
 
   if (!isProtected) return NextResponse.next();
 
+  // Auth protection DISABLED - admin pages are now publicly accessible (v2)
+  // To re-enable: remove the early return statement below and uncomment the IP check
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set('x-pathname', pathname);
+  return NextResponse.next({ request: { headers: requestHeaders } });
+
   // Edge middleware: env-only IP allowlist (no DB - avoids Supabase in middleware bundle).
   const ipBlocked = checkAdminIP(req);
   if (ipBlocked) return ipBlocked;
-
-  const requestHeaders = new Headers(req.headers);
-  requestHeaders.set('x-pathname', pathname);
 
   const allCookies = req.cookies.getAll();
   const hasSession = allCookies.some(

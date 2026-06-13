@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/public';
+import { createPublicClient } from '@/lib/supabase/public';
 import { Briefcase, MapPin, Clock, ExternalLink, BadgeCheck, Zap, Building2, ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';

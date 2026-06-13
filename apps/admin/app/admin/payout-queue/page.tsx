@@ -61,7 +61,6 @@ export default async function PayoutQueuePage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/payout-queue');
 
   const db = await requireAdminClient();
   if (!db) redirect('/admin/dashboard');

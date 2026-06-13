@@ -20,7 +20,6 @@ export default async function SignPage({
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
   const db = await requireAdminClient();
   const { data: profile } = await db.from('profiles').select('role, full_name, email').eq('id', user.id).maybeSingle();

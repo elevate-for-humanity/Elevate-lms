@@ -16,7 +16,6 @@ export default async function GradebookPage({ params }: { params: { courseId: st
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
   const { data: course } = await supabase
     .from('lms_courses')

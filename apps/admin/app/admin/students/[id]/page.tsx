@@ -85,7 +85,6 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
   const db = await requireAdminClient();
   const { data: adminProfile } = await db

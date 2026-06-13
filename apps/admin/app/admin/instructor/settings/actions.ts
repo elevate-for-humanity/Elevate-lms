@@ -9,7 +9,6 @@ export async function updateInstructorProfile(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
   const full_name = (formData.get('full_name') as string)?.trim() || null;
   const title = (formData.get('title') as string)?.trim() || null;

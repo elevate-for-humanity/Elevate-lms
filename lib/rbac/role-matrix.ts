@@ -6,7 +6,7 @@
  * rather than hardcoding role arrays inline.
  *
  * Roles (from lib/admin/guards.ts UserRole):
- *   super_admin    — full platform access, can impersonate, manage all settings
+ *   admin          — full platform access, can manage all settings
  *   admin          — platform admin, cannot impersonate or access dev tools
  *   staff          — case managers, enrollment staff, limited admin access
  *   org_admin      — organization-level admin (employer orgs, partner orgs)
@@ -22,7 +22,7 @@
  */
 
 export type UserRole =
-  | 'super_admin'
+  | 'admin'
   | 'admin'
   | 'staff'
   | 'org_admin'
@@ -40,29 +40,29 @@ export type UserRole =
 // Named sets used by guards. Import these instead of writing inline arrays.
 
 /** Can access /admin/* routes */
-export const ADMIN_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'org_admin', 'platform_operator'];
+export const ADMIN_ROLES: UserRole[] = ['admin', 'admin', 'staff', 'org_admin', 'platform_operator'];
 
 /** Can access admin API routes (apiRequireAdmin) */
-export const API_ADMIN_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'org_admin', 'platform_operator'];
+export const API_ADMIN_ROLES: UserRole[] = ['admin', 'admin', 'staff', 'org_admin', 'platform_operator'];
 
 /** Can perform instructor actions (sign-offs, lesson management) */
-export const INSTRUCTOR_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'instructor'];
+export const INSTRUCTOR_ROLES: UserRole[] = ['admin', 'admin', 'staff', 'instructor'];
 
 /** Can access employer portal */
-export const EMPLOYER_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'employer', 'org_admin'];
+export const EMPLOYER_ROLES: UserRole[] = ['admin', 'admin', 'staff', 'employer', 'org_admin'];
 
 /** Can access staff portal */
-export const STAFF_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'case_manager'];
+export const STAFF_ROLES: UserRole[] = ['admin', 'admin', 'staff', 'case_manager'];
 
 /** Can access workforce board / WIOA case management */
-export const WORKFORCE_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'case_manager'];
+export const WORKFORCE_ROLES: UserRole[] = ['admin', 'admin', 'staff', 'case_manager'];
 
 /** Can access program holder portal */
-export const PROGRAM_HOLDER_ROLES: UserRole[] = ['super_admin', 'admin', 'program_holder'];
+export const PROGRAM_HOLDER_ROLES: UserRole[] = ['admin', 'admin', 'program_holder'];
 
 /** Any authenticated user (all roles) */
 export const ALL_AUTHENTICATED_ROLES: UserRole[] = [
-  'super_admin', 'admin', 'staff', 'org_admin', 'platform_operator', 'instructor',
+  'admin', 'admin', 'staff', 'org_admin', 'platform_operator', 'instructor',
   'case_manager', 'employer', 'program_holder', 'provider_admin',
   'partner', 'delegate', 'student',
 ];
@@ -73,42 +73,42 @@ export const ALL_AUTHENTICATED_ROLES: UserRole[] = [
 
 export const PERMISSIONS = {
   // Identity & access
-  impersonate_users:          ['super_admin'] as UserRole[],
-  manage_roles:               ['super_admin'] as UserRole[],
-  access_dev_tools:           ['super_admin', 'platform_operator'] as UserRole[],
-  view_audit_logs:            ['super_admin', 'admin'] as UserRole[],
+  impersonate_users:          ['admin'] as UserRole[],
+  manage_roles:               ['admin'] as UserRole[],
+  access_dev_tools:           ['admin', 'platform_operator'] as UserRole[],
+  view_audit_logs:            ['admin', 'admin'] as UserRole[],
 
   // Platform administration
-  manage_programs:            ['super_admin', 'admin'] as UserRole[],
-  manage_courses:             ['super_admin', 'admin', 'staff'] as UserRole[],
-  manage_enrollments:         ['super_admin', 'admin', 'staff'] as UserRole[],
-  manage_users:               ['super_admin', 'admin'] as UserRole[],
-  manage_payments:            ['super_admin', 'admin'] as UserRole[],
-  manage_grants:              ['super_admin', 'admin', 'staff', 'case_manager'] as UserRole[],
-  manage_platform_settings:   ['super_admin'] as UserRole[],
-  trigger_deployments:        ['super_admin', 'platform_operator'] as UserRole[],
-  access_devstudio:           ['super_admin', 'platform_operator'] as UserRole[],
-  provision_workspaces:       ['super_admin', 'admin', 'staff'] as UserRole[],
-  manage_customer_workspaces: ['super_admin', 'admin', 'staff'] as UserRole[],
-  run_bulk_operations:        ['super_admin', 'admin'] as UserRole[],
+  manage_programs:            ['admin', 'admin'] as UserRole[],
+  manage_courses:             ['admin', 'admin', 'staff'] as UserRole[],
+  manage_enrollments:         ['admin', 'admin', 'staff'] as UserRole[],
+  manage_users:               ['admin', 'admin'] as UserRole[],
+  manage_payments:            ['admin', 'admin'] as UserRole[],
+  manage_grants:              ['admin', 'admin', 'staff', 'case_manager'] as UserRole[],
+  manage_platform_settings:   ['admin'] as UserRole[],
+  trigger_deployments:        ['admin', 'platform_operator'] as UserRole[],
+  access_devstudio:           ['admin', 'platform_operator'] as UserRole[],
+  provision_workspaces:       ['admin', 'admin', 'staff'] as UserRole[],
+  manage_customer_workspaces: ['admin', 'admin', 'staff'] as UserRole[],
+  run_bulk_operations:        ['admin', 'admin'] as UserRole[],
 
   // Instructor actions
-  sign_off_lab_submissions:   ['super_admin', 'admin', 'staff', 'instructor'] as UserRole[],
-  view_student_progress:      ['super_admin', 'admin', 'staff', 'instructor'] as UserRole[],
-  manage_lesson_content:      ['super_admin', 'admin', 'instructor'] as UserRole[],
+  sign_off_lab_submissions:   ['admin', 'admin', 'staff', 'instructor'] as UserRole[],
+  view_student_progress:      ['admin', 'admin', 'staff', 'instructor'] as UserRole[],
+  manage_lesson_content:      ['admin', 'admin', 'instructor'] as UserRole[],
 
   // Employer portal
-  view_apprentice_hours:      ['super_admin', 'admin', 'staff', 'employer', 'org_admin'] as UserRole[],
-  approve_apprentice_hours:   ['super_admin', 'admin', 'staff', 'employer'] as UserRole[],
-  post_jobs:                  ['super_admin', 'admin', 'employer', 'org_admin'] as UserRole[],
+  view_apprentice_hours:      ['admin', 'admin', 'staff', 'employer', 'org_admin'] as UserRole[],
+  approve_apprentice_hours:   ['admin', 'admin', 'staff', 'employer'] as UserRole[],
+  post_jobs:                  ['admin', 'admin', 'employer', 'org_admin'] as UserRole[],
 
   // Workforce / WIOA
-  manage_wioa_cases:          ['super_admin', 'admin', 'staff', 'case_manager'] as UserRole[],
-  authorize_funding:          ['super_admin', 'admin', 'staff', 'case_manager'] as UserRole[],
+  manage_wioa_cases:          ['admin', 'admin', 'staff', 'case_manager'] as UserRole[],
+  authorize_funding:          ['admin', 'admin', 'staff', 'case_manager'] as UserRole[],
 
   // Program holder
-  manage_partner_shop:        ['super_admin', 'admin', 'program_holder'] as UserRole[],
-  view_apprentice_compliance: ['super_admin', 'admin', 'staff', 'program_holder'] as UserRole[],
+  manage_partner_shop:        ['admin', 'admin', 'program_holder'] as UserRole[],
+  view_apprentice_compliance: ['admin', 'admin', 'staff', 'program_holder'] as UserRole[],
 
   // Student / learner
   access_lms:                 ALL_AUTHENTICATED_ROLES,

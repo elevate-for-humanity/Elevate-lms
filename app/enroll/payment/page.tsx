@@ -8,25 +8,35 @@ import { CreditCard, Calendar, Loader2 } from 'lucide-react';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 import UnifiedPaymentFlow from '@/components/payments/UnifiedPaymentFlow';
 
-// Pricing derived from canonical source
-const PRICING = {
-  full: {
-    amount: BARBER_PRICING.fullPrice,
-    label: 'Full Payment',
-    description: 'Pay in full today',
-    savings: 'Best value',
+// Program pricing configuration
+const PROGRAM_PRICING = {
+  'barber-apprenticeship': {
+    fullPrice: BARBER_PRICING.fullPrice,
+    deposit: BARBER_PRICING.setupFee,
+    name: 'Barber Apprenticeship Program',
+    weeklyPayment: BARBER_PRICING.weeklyPayment,
+    weeks: BARBER_PRICING.weeks,
   },
-  deposit: {
-    amount: BARBER_PRICING.setupFee,
-    label: 'Deposit',
-    description: `$${BARBER_PRICING.setupFee.toLocaleString()} now, balance paid weekly during training`,
-    savings: 'Reserve your spot',
+  'esthetician-apprenticeship': {
+    fullPrice: 550000, // $5,500
+    deposit: 60000,   // $600 BNPL start
+    name: 'Esthetician Apprenticeship Program',
+    weeklyPayment: 20500, // ~$205/week for 24 weeks
+    weeks: 24,
   },
-  installment: {
-    amount: BARBER_PRICING.fullPrice,
-    label: 'Payment Plan',
-    description: 'Split into weekly payments',
-    savings: 'Flexible payments',
+  'cosmetology-apprenticeship': {
+    fullPrice: 550000, // $5,500
+    deposit: 60000,   // $600 BNPL start
+    name: 'Cosmetology Apprenticeship Program',
+    weeklyPayment: 20500, // ~$205/week
+    weeks: 24,
+  },
+  'nail-technician-apprenticeship': {
+    fullPrice: 350000, // $3,500
+    deposit: 35000,   // $350 BNPL start
+    name: 'Nail Technician Apprenticeship Program',
+    weeklyPayment: 13000, // ~$130/week
+    weeks: 24,
   },
 };
 
@@ -37,12 +47,39 @@ function EnrollPaymentContent() {
   const router = useRouter();
   const applicationId = searchParams.get('application_id');
   const canceled = searchParams.get('canceled');
+  const programSlug = searchParams.get('program') || 'barber-apprenticeship';
+
+  // Get pricing for the program (default to barber if not found)
+  const pricing = PROGRAM_PRICING[programSlug as keyof typeof PROGRAM_PRICING] || PROGRAM_PRICING['barber-apprenticeship'];
 
   const [selectedOption, setSelectedOption] = useState<PaymentOption>('deposit');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(true);
   const [applicationValid, setApplicationValid] = useState(false);
+  const [applicationData, setApplicationData] = useState<{program_slug?: string} | null>(null);
+
+  // Pricing derived from canonical source
+  const PRICING = {
+    full: {
+      amount: pricing.fullPrice,
+      label: 'Full Payment',
+      description: 'Pay in full today',
+      savings: 'Best value',
+    },
+    deposit: {
+      amount: pricing.deposit,
+      label: 'BNPL Deposit',
+      description: `$${(pricing.deposit / 100).toLocaleString()} now, balance paid weekly during training`,
+      savings: 'Reserve your spot',
+    },
+    installment: {
+      amount: pricing.fullPrice,
+      label: 'Payment Plan',
+      description: `Split into ${pricing.weeks} weekly payments`,
+      savings: 'Flexible payments',
+    },
+  };
 
   // Verify application exists before showing payment options
   useEffect(() => {
@@ -56,9 +93,19 @@ function EnrollPaymentContent() {
       try {
         const res = await fetch(`/api/applications/${applicationId}/verify`);
         if (res.ok) {
+          const data = await res.json();
+          setApplicationData(data);
           setApplicationValid(true);
         } else {
-          setError('We could not verify this application for payment. Please confirm your details or submit a new application.');
+          // If no verification endpoint, try to fetch application directly
+          const appRes = await fetch(`/api/applications/${applicationId}`);
+          if (appRes.ok) {
+            const appData = await appRes.json();
+            setApplicationData(appData);
+            setApplicationValid(true);
+          } else {
+            setError('We could not verify this application for payment. Please confirm your details or submit a new application.');
+          }
         }
       } catch {
         // If verification endpoint doesn't exist, allow proceeding
@@ -120,11 +167,11 @@ function EnrollPaymentContent() {
         <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
           <h1 className="text-2xl font-bold text-slate-900 mb-3">Enroll</h1>
           <p className="text-slate-600 mb-6">
-            To enroll in the Barber Apprenticeship Program, start by submitting an application.
+            To enroll in the {pricing.name}, start by submitting an application.
             Payment happens after your application is reviewed.
           </p>
           <Link
-            href="/programs/barber-apprenticeship/apply"
+            href={`/programs/${programSlug}/apply`}
             className="inline-flex items-center justify-center w-full px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition"
           >
             Start Application
@@ -144,7 +191,7 @@ function EnrollPaymentContent() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Enroll</h1>
           <p className="text-slate-600">
-            Barber Apprenticeship Program — choose a payment option to secure your spot.
+            {pricing.name} — choose a payment option to secure your spot.
           </p>
         </div>
 
@@ -350,10 +397,10 @@ function EnrollPaymentContent() {
         {/* Unified Payment Flow */}
         <div className="mt-8">
           <UnifiedPaymentFlow
-            programId={programId || 'barber-apprenticeship'}
-            programName="Barber Apprenticeship"
-            programSlug="barber-apprenticeship"
-            price={BARBER_PRICING.fullPrice}
+            programId={programSlug}
+            programName={pricing.name}
+            programSlug={programSlug}
+            price={pricing.fullPrice}
           />
         </div>
 

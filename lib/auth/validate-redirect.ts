@@ -21,6 +21,21 @@ export function buildReturnPath(pathname: string, search = '', hash = ''): strin
   return `${path}${search}${hash}`;
 }
 
+/**
+ * Build a clean return path by stripping any existing `redirect` or `next`
+ * query params from the original URL. This prevents double-encoding when the
+ * login page re-encodes the redirect parameter.
+ */
+export function buildCleanReturnPath(pathname: string, search = ''): string {
+  const path = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  // Strip existing redirect/next params to avoid double-encoding
+  const params = new URLSearchParams(search);
+  params.delete('redirect');
+  params.delete('next');
+  const cleanSearch = params.toString() ? `?${params.toString()}` : '';
+  return `${path}${cleanSearch}`;
+}
+
 /** Read canonical ?redirect= with legacy ?next= fallback. */
 export function readRedirectParam(
   searchParams: Pick<URLSearchParams, 'get'>,

@@ -8,7 +8,6 @@ export async function createCampaignAction(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
   const name = (formData.get('name') as string)?.trim();
   const campaign_type = (formData.get('campaign_type') as string) || 'email';

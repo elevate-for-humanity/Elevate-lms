@@ -80,7 +80,6 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/program-holders');
 
   const { data: adminProfile } = await supabase
     .from('profiles')

@@ -50,7 +50,7 @@ export default async function UsersReportPage() {
   };
 
   const roleLabels: Record<string, string> = {
-    super_admin: 'Super Admin',
+    super_admin: 'Admin',
     admin: 'Admin',
     instructor: 'Instructor',
     student: 'Student',

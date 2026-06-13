@@ -22,7 +22,6 @@ export default async function DocumentMapPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
   const db = await requireAdminClient();
 

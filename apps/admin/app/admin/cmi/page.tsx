@@ -41,7 +41,6 @@ export default async function CMIDashboardPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/cmi');
 
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
 

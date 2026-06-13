@@ -8,6 +8,7 @@ import SkillsGapAnalysis from '@/components/SkillsGapAnalysis';
 import VirtualCareerFair from '@/components/VirtualCareerFair';
 import { StudentSuccessCoaching } from '@/components/StudentSuccessCoaching';
 import WorkOneLocator from '@/components/WorkOneLocator';
+import LiveJobPostings from '@/components/careers/LiveJobPostings';
 
 export const dynamic = 'force-static';
 

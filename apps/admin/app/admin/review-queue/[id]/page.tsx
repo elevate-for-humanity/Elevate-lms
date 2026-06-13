@@ -32,7 +32,6 @@ export default async function ReviewDetailPage({ params }: { params: Promise<{ i
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
   // Check admin role
   const { data: profile } = await supabase

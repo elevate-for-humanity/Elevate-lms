@@ -77,7 +77,7 @@ export async function createClient(): Promise<SupabaseClient<any>> {
   try {
     const cookieStore = await cookies();
 
-    return createServerClient(supabaseUrl, supabaseAnonKey, {
+    const client = createServerClient(supabaseUrl, supabaseAnonKey, {
       global: { fetch: timedFetch },
       cookies: {
         getAll() {
@@ -101,6 +101,47 @@ export async function createClient(): Promise<SupabaseClient<any>> {
         },
       },
     });
+
+    // Intercept refresh token errors to prevent infinite retry loops.
+    // When a refresh token has already been used (e.g., from parallel requests or
+    // a race condition), Supabase throws "Invalid Refresh Token: Already Used".
+    // We catch this, sign out the user, and return a clean client state.
+    const originalGetUser = client.auth.getUser.bind(client.auth);
+    client.auth.getUser = async () => {
+      try {
+        return await originalGetUser();
+      } catch (error: any) {
+        if (
+          error?.message?.includes('refresh_token_already_used') ||
+          error?.message?.includes('Invalid Refresh Token') ||
+          error?.code === 'refresh_token_already_used'
+        ) {
+          // Clear the stale session and return null user
+          await client.auth.signOut().catch(() => {});
+          return { data: { user: null }, error: null };
+        }
+        throw error;
+      }
+    };
+
+    const originalGetSession = client.auth.getSession.bind(client.auth);
+    client.auth.getSession = async () => {
+      try {
+        return await originalGetSession();
+      } catch (error: any) {
+        if (
+          error?.message?.includes('refresh_token_already_used') ||
+          error?.message?.includes('Invalid Refresh Token') ||
+          error?.code === 'refresh_token_already_used'
+        ) {
+          await client.auth.signOut().catch(() => {});
+          return { data: { session: null }, error: null };
+        }
+        throw error;
+      }
+    };
+
+    return client;
   } catch (error) {
     // cookies() throws during static prerender — this is expected and handled.
     // Only log in development; at build time this fires for every static page

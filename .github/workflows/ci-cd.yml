@@ -118,7 +118,10 @@ jobs:
         continue-on-error: true
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          # Ensure consistent @playwright/test version across all packages
+          pnpm add -D @playwright/test@1.57.0 --no-frozen-lockfile
 
       - name: Browser E2E (CI-safe)
         shell: bash

@@ -19,7 +19,6 @@ export default async function InstructorAddStudentPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/instructor/students/new');
 
   const { data: courses } = await supabase
     .from('lms_courses')

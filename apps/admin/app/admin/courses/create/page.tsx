@@ -18,7 +18,6 @@ export default async function CreateCoursePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/admin/courses/create');
 
   const { data: profile } = await supabase
     .from('profiles')

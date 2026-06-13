@@ -278,7 +278,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                     onClick={closeMenu}
                     className="block w-full text-center py-3 border border-slate-300 text-slate-800 rounded-lg font-semibold hover:bg-slate-50"
                   >
-                    Portals
+                    Admin Dashboard
                   </Link>
                   <Link
                     href="/login"

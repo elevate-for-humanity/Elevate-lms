@@ -14,7 +14,6 @@ export async function issueCertificate(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
   const { data: profile } = await db
     .from('profiles')
@@ -86,7 +85,6 @@ export async function revokeCertificate(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
   const certId = formData.get('certId') as string;
   const reason = formData.get('reason') as string;

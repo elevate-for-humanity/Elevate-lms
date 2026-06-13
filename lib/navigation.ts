@@ -346,7 +346,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/portals',
     subItems: [
       { name: '— Sign in —', href: '/portals', isHeader: true },
-      { name: 'Portal hub', href: '/portals' },
+      { name: 'All Portals', href: '/portals' },
       { name: 'Student / learner', href: '/login?redirect=/learner/dashboard' },
       { name: 'Apprentice', href: '/login/apprentice' },
       { name: 'Employer', href: '/login?redirect=/employer/dashboard' },
@@ -354,8 +354,8 @@ export const NAV_ITEMS: NavItem[] = [
         name: 'Instructor',
         href: '/login?redirect=https%3A%2F%2Fadmin.elevateforhumanity.org%2Fadmin%2Finstructor%2Fdashboard',
       },
-      { name: 'Partner', href: '/login?redirect=/partner/dashboard' },
-      { name: 'Program holder', href: '/login?redirect=/program-holder/dashboard' },
+      { name: 'Partner / Program Holder', href: '/login?redirect=/program-holder/dashboard' },
+      { name: 'Admin Dashboard', href: 'https://admin.elevateforhumanity.org/admin/dashboard' },
       { name: 'Case manager', href: '/login?redirect=/case-manager/dashboard' },
       { name: 'Mentor', href: '/login?redirect=/mentor/dashboard' },
       {

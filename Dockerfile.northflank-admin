@@ -131,6 +131,14 @@ COPY --from=builder /app/public/data ./apps/admin/public/data
 COPY --from=builder /app/public/images ./apps/admin/public/images
 COPY --from=builder /app/public/hero-images ./apps/admin/public/hero-images
 COPY --from=builder /app/public/downloads ./apps/admin/public/downloads
+# Copy root-level public assets (favicon, logos, manifest, etc.)
+COPY --from=builder /app/apps/admin/public/*.png ./apps/admin/public/
+COPY --from=builder /app/apps/admin/public/*.ico ./apps/admin/public/
+COPY --from=builder /app/apps/admin/public/*.svg ./apps/admin/public/
+COPY --from=builder /app/apps/admin/public/*.webp ./apps/admin/public/
+COPY --from=builder /app/apps/admin/public/*.css ./apps/admin/public/
+COPY --from=builder /app/apps/admin/public/*.json ./apps/admin/public/
+COPY --from=builder /app/apps/admin/public/manifest.webmanifest ./apps/admin/public/
 COPY --from=builder /app/remotion-src ./remotion-src
 # DevContainer config for Dev Studio local-fallback when GitHub API is unavailable
 COPY --from=builder /app/.devcontainer/devcontainer.json ./.devcontainer/devcontainer.json

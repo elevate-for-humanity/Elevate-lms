@@ -92,7 +92,7 @@ export default function HostShopApplyPage() {
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/beauty-apprenticeships"
+              href="/programs/cosmetology-apprenticeship"
               className="text-sm font-bold text-brand-blue-600 hover:underline"
             >
               Beauty apprenticeship overview

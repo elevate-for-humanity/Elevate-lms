@@ -22,7 +22,6 @@ export default async function InstructorDocumentsPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/instructor/documents');
 
   const db = await requireAdminClient();
   const { data: profile } = await db

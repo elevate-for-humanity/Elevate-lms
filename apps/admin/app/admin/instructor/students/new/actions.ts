@@ -8,7 +8,6 @@ export async function enrollStudentAction(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
 
   const email = (formData.get('email') as string)?.trim();
   const full_name = (formData.get('full_name') as string)?.trim();

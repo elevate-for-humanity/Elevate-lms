@@ -18,6 +18,7 @@
 
 // Backend API Server - Separate from Frontend
 const express = require('express');
+const helmet = require('helmet');
 const cors = require('cors');
 const { ENV, SERVICES } = require('./shared/config');
 const db = require('./shared/database');
@@ -27,6 +28,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Security and CORS
+app.use(helmet());
 app.use(
   cors({
     origin: [

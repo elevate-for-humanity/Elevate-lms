@@ -1,7 +1,9 @@
 const express = require('express');
+const helmet = require('helmet');
 const { generateLicense, validateLicense } = require('./license-generator');
 const app = express();
 
+app.use(helmet());
 app.use(express.json());
 app.use(express.static('.'));
 

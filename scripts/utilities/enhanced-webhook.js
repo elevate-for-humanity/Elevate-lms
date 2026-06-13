@@ -9,8 +9,10 @@ const nodemailer = require('nodemailer');
 const fs = require('fs').promises;
 const path = require('path');
 const crypto = require('crypto');
+const helmet = require('helmet');
 
 const app = express();
+app.use(helmet());
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

@@ -1,9 +1,11 @@
 const express = require('express');
+const helmet = require('helmet');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { generateLicense } = require('./license-generator');
 const generateLicensePDF = require('./generate-certificate');
 const app = express();
 
+app.use(helmet());
 app.use(express.json());
 app.use(express.static('.'));
 

@@ -103,15 +103,15 @@ jobs:
       - name: Create PR staging -> main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REASON: ${{ github.event.inputs.reason }}
+          COUNT: ${{ steps.diff.outputs.count }}
+          COMMITS: ${{ steps.diff.outputs.commits }}
+          ACTOR: ${{ github.actor }}
         run: |
-          REASON="${{ github.event.inputs.reason }}"
-          COUNT="${{ steps.diff.outputs.count }}"
-          COMMITS="${{ steps.diff.outputs.commits }}"
-
           cat > /tmp/promotion-pr.md <<EOF
           ## Staging -> Production Promotion
 
-          **Triggered by:** @${{ github.actor }}
+          **Triggered by:** @${ACTOR}
           **Reason:** ${REASON}
           **Commits ahead of main:** ${COUNT}
 
@@ -156,6 +156,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Merge staging into main
+        env:
+          ACTOR: ${{ github.actor }}
+          REASON: ${{ github.event.inputs.reason }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -165,7 +168,7 @@ jobs:
             -m "chore: promote staging -> production ($(date -u +%Y-%m-%d))
 
           Auto-merged by promote-to-production workflow.
-          Triggered by: ${{ github.actor }}
-          Reason: ${{ github.event.inputs.reason }}"
+          Triggered by: ${ACTOR}
+          Reason: ${REASON}"
           git push origin main
           echo "Merged staging -> main. Production deploy will start automatically."

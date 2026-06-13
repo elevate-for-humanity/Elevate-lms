@@ -5,6 +5,7 @@
 */
 
 const express = require('express');
+const helmet = require('helmet');
 const axios = require('axios');
 const open = require('open');
 const fs = require('fs');
@@ -12,6 +13,8 @@ const path = require('path');
 
 const app = express();
 const PORT = 3000;
+
+app.use(helmet());
 
 // Store tokens temporarily
 const tokens = {};

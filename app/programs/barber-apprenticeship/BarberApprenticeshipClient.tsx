@@ -372,14 +372,6 @@ export default function BarberApprenticeshipClient({ program: p, heroBanner: b, 
             <p>Equipment: {p.equipmentIncluded}</p>
             <p>Tuition: $4,980 if self-pay. Funding and payment plans available — determined after application review.</p>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Link href="/preview/barber-studio" className="px-3 py-1.5 bg-slate-100 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-200 transition">
-              Preview Studio
-            </Link>
-            <Link href="/preview/barber-videos" className="px-3 py-1.5 bg-slate-100 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-200 transition">
-              Preview Videos
-            </Link>
-          </div>
         </div>
       </section>
     </div>

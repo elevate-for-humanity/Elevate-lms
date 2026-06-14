@@ -1,11 +1,10 @@
 import { Metadata } from 'next';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
-import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
-import BarberApprenticeshipProcess from '@/components/programs/beauty/BarberApprenticeshipProcess';
-import BarberApprenticeshipExtras from '@/components/programs/beauty/BarberApprenticeshipExtras';
 import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
 import { validateProgram } from '@/lib/programs/program-schema';
 import heroBanners from '@/content/heroBanners';
+import { createClient } from '@/lib/supabase/server';
+import BarberApprenticeshipClient from './BarberApprenticeshipClient';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -28,6 +27,20 @@ export const metadata: Metadata = {
 export default async function BarberApprenticeshipPage() {
   const heroBanner = heroBanners['barber-apprenticeship'] ?? null;
 
+  // Live enrollment count from DB
+  let enrollmentCount = 0;
+  try {
+    const supabase = await createClient();
+    const { count } = await supabase
+      .from('program_enrollments')
+      .select('*', { count: 'exact', head: true })
+      .eq('program_slug', 'barber-apprenticeship')
+      .eq('status', 'active');
+    enrollmentCount = count ?? 0;
+  } catch {
+    // non-fatal — fall back to 0
+  }
+
   return (
     <>
       <ProgramStructuredData
@@ -43,13 +56,7 @@ export default async function BarberApprenticeshipPage() {
           outcomes: p.outcomes.map((o) => o.statement),
         }}
       />
-      <ProgramDetailPage
-        program={p}
-        banner={heroBanner}
-        processSlot={<BarberApprenticeshipProcess />}
-      >
-        <BarberApprenticeshipExtras />
-      </ProgramDetailPage>
+      <BarberApprenticeshipClient program={p} heroBanner={heroBanner} enrollmentCount={enrollmentCount} />
     </>
   );
 }

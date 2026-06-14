@@ -15,7 +15,7 @@ export const NAIL_TECH: ProgramSchema = {
   durationWeeks: 52,
   hoursPerWeekMin: 15,
   hoursPerWeekMax: 20,
-  hoursBreakdown: { onlineInstruction: 500, handsOnLab: 1400, examPrep: 50, careerPlacement: 50 },
+  hoursBreakdown: { onlineInstruction: 500, handsOnLab: 400, examPrep: 50, careerPlacement: 50 },
   schedule: 'Flexible — 15–20 hrs/week (OJT at host salon + RTI online)',
   cohortSize: '1–3 apprentices per salon',
   fundingStatement:

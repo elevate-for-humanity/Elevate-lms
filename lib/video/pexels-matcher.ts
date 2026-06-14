@@ -145,7 +145,7 @@ function scoreCandidates(
 
     // 3. Duration fit
     const dur = video.duration;
-    let durationScore = 0;
+    let durationScore: number;
     if (dur >= IDEAL_MIN_DURATION && dur <= IDEAL_MAX_DURATION) {
       durationScore = 1.0;
     } else if (dur < IDEAL_MIN_DURATION) {

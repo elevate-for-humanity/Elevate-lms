@@ -368,7 +368,7 @@ async function _POST(request: NextRequest) {
             // No application_id — send legacy welcome email
             try {
             const { sendEmail } = await import('@/lib/email/sendgrid');
-            let paymentSummary = '';
+            let paymentSummary: string;
             if (fullyPaid) {
               if (bnplProvider) {
                 paymentSummary = `• Paid via ${bnplProvider.charAt(0).toUpperCase() + bnplProvider.slice(1)}: $${BARBER_PRICING.fullPrice.toLocaleString()}<br>

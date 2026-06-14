@@ -110,9 +110,9 @@ export default function EPA608PTChart({ onComplete }: { onComplete?: () => void 
     }
 
     const delta = lineType === 'suction' ? t - satTemp : satTemp - t;
-    let label = '';
-    let color = '';
-    let explanation = '';
+    let label: string;
+    let color: string;
+    let explanation: string;
 
     if (lineType === 'suction') {
       label = `Superheat: ${delta}°F`;

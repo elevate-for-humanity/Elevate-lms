@@ -32,7 +32,7 @@ const PHONE = PLATFORM_DEFAULTS.supportPhone;
 function wrapText(text: string, maxWidth: number, font: PDFFont, fontSize: number): string[] {
   const words = text.split(' ');
   const lines: string[] = [];
-  let current = '';
+  let current: string;
   for (const word of words) {
     const test = current ? `${current} ${word}` : word;
     if (font.widthOfTextAtSize(test, fontSize) <= maxWidth) {

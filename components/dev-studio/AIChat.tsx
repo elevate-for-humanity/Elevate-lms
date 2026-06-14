@@ -87,7 +87,7 @@ interface CourseDraft {
 }
 
 function CourseCard({ result }: { result: string }) {
-  let data: CourseDraft = {};
+  let data: CourseDraft;
   try { data = JSON.parse(result); } catch { return null; }
   if (!data.title && !data.course_id) return null;
 
@@ -142,7 +142,7 @@ interface VideoJob { lesson_id?: string; title?: string; status?: string; video_
 interface VideoGenResult { jobs?: VideoJob[]; total?: number; queued?: number; completed?: number; failed?: number }
 
 function VideoProgressCard({ result }: { result: string }) {
-  let data: VideoGenResult = {};
+  let data: VideoGenResult;
   try { data = JSON.parse(result); } catch { return null; }
   if (!data.jobs && !data.total) return null;
 
@@ -194,7 +194,7 @@ interface DocAnalysisResult {
 }
 
 function DocumentAnalysisCard({ result }: { result: string }) {
-  let data: DocAnalysisResult = {};
+  let data: DocAnalysisResult;
   try { data = JSON.parse(result); } catch { return null; }
   const fields = data.fields ?? Object.entries(data.extracted_data?.fields ?? {}).map(([field, value]) => ({ field, value }));
   if (!fields.length && !data.anomalies?.length) return null;
@@ -555,7 +555,8 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
 
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
-      let buffer = '';
+      let buffer: string;
+      buffer = '';
 
       if (reader) {
         while (true) {

@@ -132,7 +132,8 @@ export function AIPanel() {
       // Stream response — handles text deltas and tool_call events
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
-      let fullContent = '';
+      let fullContent: string;
+      fullContent = '';
 
       if (reader) {
         while (true) {

@@ -30,9 +30,9 @@ export async function scanApproveStrict(args: {
   /** Worker relationship type. Drives conditional WC gate. */
   workerRelationship?: 'w2_employees' | '1099_contractors_only' | 'owner_only' | 'not_sure';
 }): Promise<StrictInsuranceDecision> {
-  let extractedText = '';
   let method: StrictInsuranceDecision['method'] = 'PDF_TEXT';
   let ocrConfidence: number | undefined;
+  let extractedText: string;
 
   // 1) Try native PDF text extraction (pdf-parse → pdfjs-dist; needs @napi-rs/canvas in admin runtime)
   try {

@@ -63,7 +63,8 @@ export function generateBreadcrumbs(
   const segments = pathname.split('/').filter(Boolean);
   const items: BreadcrumbItem[] = [];
 
-  let currentPath = '';
+  let currentPath: string;
+  currentPath = '';
 
   for (let i = 0; i < segments.length; i++) {
     const segment = segments[i];

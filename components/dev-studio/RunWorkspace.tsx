@@ -58,7 +58,8 @@ export default function RunWorkspace({ studioRuntime }: { studioRuntime?: Studio
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let buffer = '';
+      let buffer: string;
+      buffer = '';
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;

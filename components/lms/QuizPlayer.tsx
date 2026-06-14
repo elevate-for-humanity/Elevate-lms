@@ -69,7 +69,7 @@ function normalizeQuestion(raw: unknown, index: number): Question | null {
   // correct_answer may be a letter ("A"–"D") or a numeric string ("0"–"3").
   if (typeof q.question_text === 'string' && Array.isArray(q.options)) {
     const opts = q.options.filter((o): o is string => typeof o === 'string');
-    let correctIndex: number | null = null;
+    let correctIndex: number | null;
 
     if (typeof q.correct_answer === 'string') {
       const upper = q.correct_answer.trim().toUpperCase();

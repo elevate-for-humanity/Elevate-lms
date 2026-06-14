@@ -56,11 +56,12 @@ export function chunkText(text: string, maxChars = CHUNK_SIZE): string[] {
   const chunks: string[] = [];
   let current = '';
   for (const para of paragraphs) {
-    if (current.length + para.length + 2 > maxChars && current.length > 0) {
+    const proposed = current ? current + '\n\n' + para : para;
+    if (current.length > 0 && proposed.length > maxChars) {
       chunks.push(current.trim());
       current = para;
     } else {
-      current += (current ? '\n\n' : '') + para;
+      current = proposed;
     }
   }
   if (current.trim()) chunks.push(current.trim());

@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, Loader2, ShoppingCart } from 'lucide-react';
+import { Check, Loader2, ShoppingCart, Building2, CreditCard } from 'lucide-react';
 import {
   BASE_PLANS,
   type BasePlanId,
   type BillingInterval,
 } from '@/lib/store/platform-pricing';
+import { BNPL_CHECKOUT_LABEL } from '@/lib/bnpl-config';
 
 interface Props {
   selectedAddonSlugs?: string[];
@@ -99,6 +100,7 @@ export function PlatformBasePlansSection({
             const popular = plan.popular;
             const price = interval === 'annual' ? plan.priceAnnual : plan.priceMonthly;
             const priceLabel = interval === 'annual' ? '/yr' : '/mo';
+            const monthlyEquivalent = interval === 'annual' ? Math.round(price / 12) : price;
             return (
               <div
                 key={plan.id}
@@ -116,13 +118,18 @@ export function PlatformBasePlansSection({
                 <h3 className={`text-2xl font-bold ${popular ? 'text-white' : 'text-slate-900'}`}>
                   {plan.name}
                 </h3>
-                <div className="mt-4 mb-6">
+                <div className="mt-4 mb-2">
                   <span className="text-4xl font-bold">${price}</span>
                   <span className={popular ? 'text-brand-blue-100' : 'text-slate-600'}>
                     {priceLabel}
                   </span>
                 </div>
-                <ul className="space-y-3 mb-8 flex-1">
+                {interval === 'annual' && (
+                  <p className={`text-sm mb-4 ${popular ? 'text-brand-blue-100' : 'text-slate-500'}`}>
+                    ${monthlyEquivalent}/mo equivalent
+                  </p>
+                )}
+                <ul className="space-y-3 mb-6 flex-1">
                   {plan.featureBullets.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm">
                       <Check
@@ -149,6 +156,12 @@ export function PlatformBasePlansSection({
                   )}
                   Subscribe
                 </button>
+                <div className={`mt-3 p-3 rounded-lg ${popular ? 'bg-white/10' : 'bg-slate-100'}`}>
+                  <div className={`flex items-center gap-2 text-xs ${popular ? 'text-white' : 'text-slate-600'}`}>
+                    <CreditCard className="w-4 h-4" />
+                    <span>{BNPL_CHECKOUT_LABEL}</span>
+                  </div>
+                </div>
                 <Link
                   href="/store/trial"
                   className={`block w-full text-center py-2.5 mt-2 rounded-lg text-sm font-semibold border ${
@@ -162,6 +175,31 @@ export function PlatformBasePlansSection({
               </div>
             );
           })}
+        </div>
+
+        {/* Enterprise Plan */}
+        <div className="mt-12 p-8 bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-brand-red-600 rounded-xl flex items-center justify-center">
+                <Building2 className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Enterprise</h3>
+                <p className="text-slate-400">For large organizations with custom needs</p>
+              </div>
+            </div>
+            <div className="text-center md:text-right">
+              <p className="text-2xl font-bold text-white">Custom pricing</p>
+              <p className="text-slate-400 text-sm">Volume discounts, dedicated support, custom integrations</p>
+            </div>
+            <Link
+              href="/store/contact?type=enterprise"
+              className="px-8 py-4 bg-brand-red-600 text-white rounded-lg font-bold hover:bg-brand-red-700 transition whitespace-nowrap"
+            >
+              Contact Sales
+            </Link>
+          </div>
         </div>
 
         {selectedAddonSlugs.length > 0 && (

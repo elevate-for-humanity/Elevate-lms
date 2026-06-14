@@ -3,7 +3,7 @@
  *
  * POLICY (immutable):
  *   Tuition is fixed at $4,980. Transfer hours NEVER affect price.
- *   Only custom_setup_fee is user-selectable, and it is server-clamped here.
+ *   Deposits are UNLIMITED — no minimum required. User can put any amount down ($0 to full tuition).
  *   No other file may define or derive barber tuition amounts.
  *
  * Program/course IDs — single source of truth.
@@ -29,33 +29,21 @@ export const TUITION_CENTS = 498000; // $4,980
 /** Full program tuition in dollars. */
 export const TUITION_DOLLARS = 4980;
 
-/**
- * Minimum down payment in cents.
- * Override via BARBER_MIN_SETUP_FEE_DOLLARS env var (e.g. "750" for $750).
- * Must be between $100 and full tuition. Falls back to $600 if not set or invalid.
- */
-export const MIN_SETUP_FEE_CENTS = (() => {
-  const override = process.env.BARBER_MIN_SETUP_FEE_DOLLARS;
-  if (override) {
-    const parsed = Math.round(parseFloat(override) * 100);
-    if (!isNaN(parsed) && parsed >= 10000 && parsed <= 498000) return parsed;
-  }
-  return 60000; // $600 default
-})();
+/** Universal deposit — NO minimum required. User can put $0 to full tuition. */
+export const MIN_SETUP_FEE_CENTS = 0; // $0 - no minimum
 
 /** Payment term — fixed at 29 weekly invoices. */
 export const PAYMENT_TERM_WEEKS = 29;
 
-/** 
+/**
  * Total training hours required per DOL Standards.
  * 2,000 hours total (OJT + RTI) per DOL Registered Apprenticeship.
  */
 export const TOTAL_HOURS_REQUIRED = 2000;
 
 /**
- * Clamp a user-provided setup fee to the allowed range.
- * This is the ONLY place where a user-influenced value touches pricing.
- * Input is in dollars. Returns cents.
+ * Clamp a user-provided setup fee to the allowed range (0 to tuition).
+ * Universal deposit — any amount from $0 up to full tuition is allowed.
  */
 export function clampSetupFeeCents(inputDollars: number): number {
   const cents = Math.round(inputDollars * 100);

@@ -21,7 +21,7 @@ export async function forwardEnrollmentCheckout(
     target === 'guest' ? CANONICAL_GUEST_CHECKOUT : CANONICAL_PROGRAM_CHECKOUT;
   logger.warn(`[${deprecatedPath}] Deprecated checkout — forwarding to ${canonicalPath}`);
 
-  let body: Record<string, unknown> = {};
+  let body: Record<string, unknown>;
   try {
     body = (await request.json()) as Record<string, unknown>;
   } catch {

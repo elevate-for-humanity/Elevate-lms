@@ -269,6 +269,7 @@ export async function validateRequestBody<T>(request: Request, schema: z.ZodSche
     if (error instanceof z.ZodError) {
       throw new Error(
         `Validation failed: ${error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`,
+        { cause: error },
       );
     }
     throw error;

@@ -354,11 +354,11 @@ export async function processLesson(
   // Loop clips until we cover the full audio duration
   const clipDuration = 30; // each clip is trimmed to 30 s
   const loopsNeeded = Math.ceil(duration / (clipPaths.length * clipDuration)) + 1;
-  let concatContent = '';
+  const concatContent: string[] = [];
   for (let i = 0; i < loopsNeeded; i++) {
-    for (const p of clipPaths) concatContent += `file '${p}'\n`;
+    for (const p of clipPaths) concatContent.push(`file '${p}'`);
   }
-  fs.writeFileSync(concatPath, concatContent);
+  fs.writeFileSync(concatPath, concatContent.join('\n') + '\n');
 
   const brollAssembled = path.join(tmpDir, `${slug}-broll.mp4`);
   execSync(

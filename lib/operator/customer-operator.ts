@@ -44,7 +44,7 @@ export async function runCustomerOperator(params: {
     .select('id')
     .maybeSingle();
 
-  let reply = '';
+  let reply: string;
   try {
     const result = await aiChat({
       model: 'gpt-4.1-mini',

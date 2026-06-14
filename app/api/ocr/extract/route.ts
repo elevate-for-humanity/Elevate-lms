@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
       await getOCRFunctions();
 
     let result: any;
-    let rawText = '';
+    let rawText: string;
 
     // Handle based on document type
     if (file.type === 'application/pdf') {

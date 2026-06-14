@@ -166,7 +166,7 @@ export async function completeProgramEnrollment(
     .maybeSingle();
 
   // 5. Generate certificate PDF and upload to storage
-  let pdfUrl: string | null = null;
+  let pdfUrl: string | null;
   try {
     const { generateCertificatePDF, generateCertificateNumber } =
       await import('@/lib/certificates/generator');

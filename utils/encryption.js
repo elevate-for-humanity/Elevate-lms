@@ -44,7 +44,7 @@ function encrypt(text) {
     // Return format: iv:authTag:encrypted
     return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
   } catch (error) {
-    throw new Error('Failed to encrypt data');
+    throw new Error('Failed to encrypt data', { cause: error });
   }
 }
 
@@ -74,7 +74,7 @@ function decrypt(encryptedData) {
 
     return decrypted;
   } catch (error) {
-    throw new Error('Failed to decrypt data');
+    throw new Error('Failed to decrypt data', { cause: error });
   }
 }
 

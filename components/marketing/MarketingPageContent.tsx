@@ -76,7 +76,7 @@ function TextSection({ section }: { section: MarketingSection }) {
 
 function FeaturesSection({ section }: { section: MarketingSection }) {
   // Parse body as JSON array of features if possible
-  let features: string[] = [];
+  let features: string[];
   try {
     features = JSON.parse(section.body);
   } catch {
@@ -120,7 +120,7 @@ function CTASection({ section }: { section: MarketingSection }) {
 
 function StatsSection({ section }: { section: MarketingSection }) {
   // Parse body as JSON array of stats
-  let stats: { value: string; label: string }[] = [];
+  let stats: { value: string; label: string }[];
   try {
     stats = JSON.parse(section.body);
   } catch {
@@ -146,7 +146,7 @@ function StatsSection({ section }: { section: MarketingSection }) {
 
 function FAQSection({ section }: { section: MarketingSection }) {
   // Parse body as JSON array of FAQs
-  let faqs: { question: string; answer: string }[] = [];
+  let faqs: { question: string; answer: string }[];
   try {
     faqs = JSON.parse(section.body);
   } catch {

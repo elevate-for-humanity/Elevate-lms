@@ -6,7 +6,7 @@
     "voiceoverSrc": "/audio/heroes/home.mp3",
     "microLabel": "Indianapolis, Indiana",
     "belowHeroHeadline": "Workforce Infrastructure. Apprenticeships. Funding. Placement.",
-    "belowHeroSubheadline": "Elevate connects people to funded training, DOL-registered apprenticeships, industry credentials, and employment — often at no cost through WIOA or state funding.",
+    "belowHeroSubheadline": "Elevate connects people to funded training, DOL-registered apprenticeships, industry credentials, and employment \u2014 often at no cost through WIOA or state funding.",
     "primaryCta": {
       "label": "Explore Career Pathways",
       "href": "/programs"
@@ -17,7 +17,7 @@
       "variant": "secondary"
     },
     "trustIndicators": [],
-    "transcript": "Elevate for Humanity is an AI-powered workforce operating system — not just a training provider. We handle credentialing, compliance tracking, employer placement, apprenticeship coordination, and funding documentation so agencies and participants can focus on outcomes.",
+    "transcript": "Elevate for Humanity is an AI-powered workforce operating system \u2014 not just a training provider. We handle credentialing, compliance tracking, employer placement, apprenticeship coordination, and funding documentation so agencies and participants can focus on outcomes.",
     "analyticsName": "home"
   },
   "about": {
@@ -125,13 +125,13 @@
     "voiceoverSrc": "/audio/heroes/store.mp3",
     "microLabel": "White-Label Platform",
     "belowHeroHeadline": "License the LMS that runs workforce programs end to end.",
-    "belowHeroSubheadline": "One platform handles enrollment, eligibility, attendance, credentials, employer matching, compliance reporting, and grant tracking — all automated. Your brand, your domain, your instance.",
+    "belowHeroSubheadline": "One platform handles enrollment, eligibility, attendance, credentials, employer matching, compliance reporting, and grant tracking \u2014 all automated. Your brand, your domain, your instance.",
     "primaryCta": {
       "label": "Start 14-Day Free Trial",
       "href": "/store/trial"
     },
     "secondaryCta": {
-      "label": "Try Full Demo — No Signup",
+      "label": "Try Full Demo \u2014 No Signup",
       "href": "/demo/admin",
       "variant": "secondary"
     },
@@ -141,7 +141,7 @@
       "White-label branding included",
       "Launch in two weeks"
     ],
-    "transcript": "If your organization manages workforce training, you already know the problem. Enrollment is tracked in spreadsheets. Eligibility paperwork gets emailed back and forth. WIOA reports are assembled by hand every quarter. Credentials are issued late — if at all. Employers call asking for candidate lists you don't have ready.\n\nThe Elevate Workforce Operating System was built to replace all of that.\n\nWhen a student applies, the platform checks eligibility automatically, collects documents, and routes the application through your approval workflow — no paper, no re-keying. When they enroll, attendance is tracked in real time. When they complete a program, their credential is issued automatically and posted to a public verification page employers can check with a single link.\n\nYour WIOA compliance reports generate themselves from enrollment data. PIRL reporting, ITA tracking, quarterly performance metrics — all automated. Your workforce board gets the data they need without your staff spending a week assembling it.\n\nThe employer portal gives your hiring partners a live view of pre-screened candidates with verified credentials. They can track apprenticeship hours, manage OJT reimbursement requests, and sign MOUs electronically. WOTC documentation is generated automatically.\n\nYou get your own branded instance — your logo, your domain, your colors. Students and employers see your organization. The platform is invisible.\n\nWe handle the hosting, security, backups, and updates. Your staff focuses on people, not data entry.\n\nTwo licensing options: Managed Platform starting at fifteen hundred dollars per month, or Enterprise Source-Use for organizations that need to deploy on their own infrastructure.\n\nBoth start with a 14-day free trial. No credit card required. Full platform access from day one.\n\nTry the live demo — no signup, no time limit. Every screen is clickable. Search students, run reports, review applications, browse candidates. See exactly what your staff and students will use every day.",
+    "transcript": "If your organization manages workforce training, you already know the problem. Enrollment is tracked in spreadsheets. Eligibility paperwork gets emailed back and forth. WIOA reports are assembled by hand every quarter. Credentials are issued late \u2014 if at all. Employers call asking for candidate lists you don't have ready.\n\nThe Elevate Workforce Operating System was built to replace all of that.\n\nWhen a student applies, the platform checks eligibility automatically, collects documents, and routes the application through your approval workflow \u2014 no paper, no re-keying. When they enroll, attendance is tracked in real time. When they complete a program, their credential is issued automatically and posted to a public verification page employers can check with a single link.\n\nYour WIOA compliance reports generate themselves from enrollment data. PIRL reporting, ITA tracking, quarterly performance metrics \u2014 all automated. Your workforce board gets the data they need without your staff spending a week assembling it.\n\nThe employer portal gives your hiring partners a live view of pre-screened candidates with verified credentials. They can track apprenticeship hours, manage OJT reimbursement requests, and sign MOUs electronically. WOTC documentation is generated automatically.\n\nYou get your own branded instance \u2014 your logo, your domain, your colors. Students and employers see your organization. The platform is invisible.\n\nWe handle the hosting, security, backups, and updates. Your staff focuses on people, not data entry.\n\nTwo licensing options: Managed Platform starting at fifteen hundred dollars per month, or Enterprise Source-Use for organizations that need to deploy on their own infrastructure.\n\nBoth start with a 14-day free trial. No credit card required. Full platform access from day one.\n\nTry the live demo \u2014 no signup, no time limit. Every screen is clickable. Search students, run reports, review applications, browse candidates. See exactly what your staff and students will use every day.",
     "analyticsName": "store",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/store-marketplace.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -149,8 +149,8 @@
   "programs": {
     "pageKey": "programs",
     "microLabel": "Career Training",
-    "belowHeroHeadline": "Start a Career — Not Just a Class",
-    "belowHeroSubheadline": "Get trained, certified, and connected to real job opportunities in weeks — not years. Most programs are available at no cost to eligible Indiana residents through WIOA and state funding.",
+    "belowHeroHeadline": "Start a Career \u2014 Not Just a Class",
+    "belowHeroSubheadline": "Get trained, certified, and connected to real job opportunities in weeks \u2014 not years. Most programs are available at no cost to eligible Indiana residents through WIOA and state funding.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/apply/student"
@@ -166,7 +166,7 @@
       "ETPL approved training provider",
       "Job placement assistance included"
     ],
-    "transcript": "At Elevate for Humanity, we train adults for real jobs — in weeks, not years.\n\nEvery program we offer ends with a nationally recognized credential and a direct introduction to hiring employers. Not a participation certificate. A credential that verifies your skills and opens doors.\n\nHere is what we offer.\n\nIn healthcare, we train Certified Nursing Assistants, Medical Assistants, Pharmacy Technicians, and Phlebotomy Technicians. CNA training runs six weeks. Medical Assistant runs twelve. Every program includes hands-on clinical practice and a proctored certification exam on-site at Elevate.\n\nIn skilled trades, we offer HVAC Technician training leading to EPA Section 608 certification, CDL Class A training for commercial driving careers, Electrical Technician, Welding Technology, Plumbing, and Construction Trades. Most trades programs run eight to twelve weeks. Starting wages range from twenty to thirty-five dollars per hour.\n\nIn technology, we offer IT Help Desk Technician leading to CompTIA A Plus, Cybersecurity Analyst leading to CompTIA Security Plus, Network Support, Web Development, and Software Development. Tech programs run six to twelve weeks.\n\nIn business, we offer Bookkeeping and QuickBooks, Office Administration, Tax Preparation, and Entrepreneurship. These programs run five to eight weeks and are designed for people who want to work in professional environments or start their own business.\n\nWe also offer registered apprenticeships in barbering, cosmetology, nail technology, and culinary arts — earn-while-you-learn programs where you work in a licensed shop and get paid from day one.\n\nMost programs are available at no cost to eligible Indiana residents. Funding comes through WIOA Title One, the Indiana Workforce Ready Grant, Job Ready Indy, and other state and federal workforce programs. If you qualify, tuition, books, tools, and your certification exam fee are all covered.\n\nThe process is straightforward. Register at Indiana Career Connect. Meet with a WorkOne case manager. They determine your funding eligibility — usually within a week. Once funding is confirmed, you join a scheduled cohort. We provide all tools, materials, and safety gear. You focus on training.\n\nAfter you complete your program, our career services team builds your resume, preps you for interviews, and makes direct introductions to hiring employers. Many of our students have job offers before their last day of class.\n\nApply online in minutes. No cost to apply. No obligation. Just the first step toward a career that pays.",
+    "transcript": "At Elevate for Humanity, we train adults for real jobs \u2014 in weeks, not years.\n\nEvery program we offer ends with a nationally recognized credential and a direct introduction to hiring employers. Not a participation certificate. A credential that verifies your skills and opens doors.\n\nHere is what we offer.\n\nIn healthcare, we train Certified Nursing Assistants, Medical Assistants, Pharmacy Technicians, and Phlebotomy Technicians. CNA training runs six weeks. Medical Assistant runs twelve. Every program includes hands-on clinical practice and a proctored certification exam on-site at Elevate.\n\nIn skilled trades, we offer HVAC Technician training leading to EPA Section 608 certification, CDL Class A training for commercial driving careers, Electrical Technician, Welding Technology, Plumbing, and Construction Trades. Most trades programs run eight to twelve weeks. Starting wages range from twenty to thirty-five dollars per hour.\n\nIn technology, we offer IT Help Desk Technician leading to CompTIA A Plus, Cybersecurity Analyst leading to CompTIA Security Plus, Network Support, Web Development, and Software Development. Tech programs run six to twelve weeks.\n\nIn business, we offer Bookkeeping and QuickBooks, Office Administration, Tax Preparation, and Entrepreneurship. These programs run five to eight weeks and are designed for people who want to work in professional environments or start their own business.\n\nWe also offer registered apprenticeships in barbering, cosmetology, nail technology, and culinary arts \u2014 earn-while-you-learn programs where you work in a licensed shop and get paid from day one.\n\nMost programs are available at no cost to eligible Indiana residents. Funding comes through WIOA Title One, the Indiana Workforce Ready Grant, Job Ready Indy, and other state and federal workforce programs. If you qualify, tuition, books, tools, and your certification exam fee are all covered.\n\nThe process is straightforward. Register at Indiana Career Connect. Meet with a WorkOne case manager. They determine your funding eligibility \u2014 usually within a week. Once funding is confirmed, you join a scheduled cohort. We provide all tools, materials, and safety gear. You focus on training.\n\nAfter you complete your program, our career services team builds your resume, preps you for interviews, and makes direct introductions to hiring employers. Many of our students have job offers before their last day of class.\n\nApply online in minutes. No cost to apply. No obligation. Just the first step toward a career that pays.",
     "analyticsName": "programs",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -291,7 +291,7 @@
       "Hands-on training",
       "Apprenticeship pathways available"
     ],
-    "transcript": "In the trades, confidence comes from repetition, safety, and real equipment. Elevate trains for the field — with hands-on practice, credentials, and a clear route to employment.",
+    "transcript": "In the trades, confidence comes from repetition, safety, and real equipment. Elevate trains for the field \u2014 with hands-on practice, credentials, and a clear route to employment.",
     "analyticsName": "skilled-trades",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
   },
@@ -303,8 +303,8 @@
     "credentialLabel": "EPA 608 Universal",
     "durationLabel": "6 weeks",
     "salaryRangeLabel": "$38,000 to $55,000",
-    "belowHeroHeadline": "HVAC Technician — EPA 608 Universal in 6 weeks.",
-    "belowHeroSubheadline": "Hands-on training with real HVAC systems. Earn EPA 608 Universal, OSHA 10, CPR, and Rise Up. Proctored on-site. Total cost $5,000 — most students pay $0 through the Workforce Ready Grant.",
+    "belowHeroHeadline": "HVAC Technician \u2014 EPA 608 Universal in 6 weeks.",
+    "belowHeroSubheadline": "Hands-on training with real HVAC systems. Earn EPA 608 Universal, OSHA 10, CPR, and Rise Up. Proctored on-site. Total cost $5,000 \u2014 most students pay $0 through the Workforce Ready Grant.",
     "primaryCta": {
       "label": "Enroll Now",
       "href": "/programs/hvac-technician/apply",
@@ -317,11 +317,11 @@
     },
     "trustIndicators": [
       "EPA 608 proctored on-site",
-      "Workforce Ready Grant eligible — $0 for most",
+      "Workforce Ready Grant eligible \u2014 $0 for most",
       "OSHA 10 + CPR + Rise Up",
       "Job placement assistance"
     ],
-    "transcript": "Train for EPA 608 Universal certification in 6 weeks at Elevate for Humanity, working on real HVAC systems with hands-on instruction. Graduates also earn OSHA 10, CPR, and Rise Up credentials. HVAC technicians in Indiana commonly earn $38,000 to $55,000. Total program cost is $5,000 — most students pay $0 through the Workforce Ready Grant.",
+    "transcript": "Train for EPA 608 Universal certification in 6 weeks at Elevate for Humanity, working on real HVAC systems with hands-on instruction. Graduates also earn OSHA 10, CPR, and Rise Up credentials. HVAC technicians in Indiana commonly earn $38,000 to $55,000. Total program cost is $5,000 \u2014 most students pay $0 through the Workforce Ready Grant.",
     "analyticsName": "hvac-technician",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
   },
@@ -332,7 +332,7 @@
     "credentialLabel": "CDL Class A",
     "durationLabel": "3 to 6 weeks",
     "salaryRangeLabel": "$50,000 to $65,000",
-    "belowHeroHeadline": "CDL Training Program — Class A & Class B",
+    "belowHeroHeadline": "CDL Training Program \u2014 Class A & Class B",
     "belowHeroSubheadline": "Get licensed. Get hired. Get on the road fast with job placement support. WIOA funding available for eligible Indiana residents.",
     "primaryCta": {
       "label": "Enroll Now",
@@ -348,7 +348,7 @@
       "WIOA covers exam + DOT physical",
       "CDL Class A + DOT Medical Card",
       "Werner, Schneider, FedEx hiring",
-      "Starting pay $50K–$65K"
+      "Starting pay $50K\u2013$65K"
     ],
     "transcript": "Train for CDL Class A licensure in 3 to 6 weeks at Elevate for Humanity in Indianapolis, with behind-the-wheel instruction, pre-trip inspection, and on-site skills testing. CDL drivers commonly earn $50,000 to $65,000. WIOA covers tuition, DOT physical, drug screen, and exam fees for eligible Indiana residents.",
     "analyticsName": "cdl-training",
@@ -361,7 +361,7 @@
     "credentialLabel": "NCCER Core Curriculum",
     "durationLabel": "12 weeks",
     "salaryRangeLabel": "$35,000 to $45,000",
-    "belowHeroHeadline": "Electrical Technician — OSHA 30 + NCCER in 12 weeks.",
+    "belowHeroHeadline": "Electrical Technician \u2014 OSHA 30 + NCCER in 12 weeks.",
     "belowHeroSubheadline": "Residential and commercial wiring, NEC code, load calculations, and conduit bending. Graduate with OSHA 30 Construction and NCCER Core Curriculum. WIOA and Next Level Jobs funding available.",
     "primaryCta": {
       "label": "Enroll Now",
@@ -390,7 +390,7 @@
     "credentialLabel": "AWS D1.1",
     "durationLabel": "10 weeks",
     "salaryRangeLabel": "$38,000 to $62,000",
-    "belowHeroHeadline": "Welding Technology — AWS D1.1 certification in 10 weeks.",
+    "belowHeroHeadline": "Welding Technology \u2014 AWS D1.1 certification in 10 weeks.",
     "belowHeroSubheadline": "MIG, TIG, and stick welding on structural steel. AWS D1.1 tested by a Certified Welding Inspector. OSHA 10 included. WIOA and Next Level Jobs funding available.",
     "primaryCta": {
       "label": "Enroll Now",
@@ -404,9 +404,9 @@
     },
     "trustIndicators": [
       "WIOA + Next Level Jobs eligible",
-      "AWS D1.1 — CWI proctored",
+      "AWS D1.1 \u2014 CWI proctored",
       "OSHA 10 Construction",
-      "Welder pay $38K–$62K"
+      "Welder pay $38K\u2013$62K"
     ],
     "transcript": "Train for AWS D1.1 certification in 10 weeks, building MIG, TIG, and stick welding skills on structural steel. Testing is conducted by a Certified Welding Inspector at an AWS Authorized Test Facility. Welders commonly earn $38,000 to $62,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.",
     "analyticsName": "welding",
@@ -420,7 +420,7 @@
     "credentialLabel": "NCCER Core Curriculum",
     "durationLabel": "10 weeks",
     "salaryRangeLabel": "$36,000 to $52,000",
-    "belowHeroHeadline": "Plumbing Technician — OSHA 10 + NCCER in 10 weeks.",
+    "belowHeroHeadline": "Plumbing Technician \u2014 OSHA 10 + NCCER in 10 weeks.",
     "belowHeroSubheadline": "Residential and commercial plumbing systems, pipe fitting, and code compliance. Graduate with OSHA 10 Construction and NCCER Core Curriculum. WIOA and Next Level Jobs funding available.",
     "primaryCta": {
       "label": "Enroll Now",
@@ -450,7 +450,7 @@
     "credentialLabel": "ASE exam preparation",
     "durationLabel": "12 weeks",
     "salaryRangeLabel": "$42,000 to $58,000",
-    "belowHeroHeadline": "Diesel Mechanic — OSHA 10 + ASE prep in 12 weeks.",
+    "belowHeroHeadline": "Diesel Mechanic \u2014 OSHA 10 + ASE prep in 12 weeks.",
     "belowHeroSubheadline": "Diagnose and repair diesel engines, transmissions, and hydraulic systems. OSHA 10 and ASE exam preparation included. WIOA and Next Level Jobs funding available.",
     "primaryCta": {
       "label": "Enroll Now",
@@ -466,7 +466,7 @@
       "WIOA + Next Level Jobs eligible",
       "OSHA 10 Construction",
       "ASE exam preparation",
-      "Diesel tech pay $42K–$58K"
+      "Diesel tech pay $42K\u2013$58K"
     ],
     "transcript": "Train for ASE exam preparation and OSHA 10 Construction credentials in 12 weeks, building skills in diesel engine diagnosis, transmission repair, and hydraulic systems. Diesel technicians commonly earn $42,000 to $58,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.",
     "analyticsName": "diesel-mechanic",
@@ -480,7 +480,7 @@
     "credentialLabel": "OSHA 30 Construction",
     "durationLabel": "8 weeks",
     "salaryRangeLabel": "$32,000 to $48,000",
-    "belowHeroHeadline": "Construction Trades Certification — OSHA 30 + EPA 608 + Forklift in 8 weeks.",
+    "belowHeroHeadline": "Construction Trades Certification \u2014 OSHA 30 + EPA 608 + Forklift in 8 weeks.",
     "belowHeroSubheadline": "Multi-trade foundation for construction careers. Earn OSHA 30 Construction, EPA 608, and Forklift Operator Certification. WIOA and Next Level Jobs funding available.",
     "primaryCta": {
       "label": "Apply Now",
@@ -497,7 +497,7 @@
       "EPA 608 + Forklift cert",
       "Self-pay $3,800"
     ],
-    "transcript": "Earn OSHA 30 Construction, EPA 608, and Forklift Operator Certification in 8 weeks — a multi-credential foundation for construction, HVAC, and logistics work. Entry-level construction workers commonly earn $32,000 to $48,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.",
+    "transcript": "Earn OSHA 30 Construction, EPA 608, and Forklift Operator Certification in 8 weeks \u2014 a multi-credential foundation for construction, HVAC, and logistics work. Entry-level construction workers commonly earn $32,000 to $48,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.",
     "analyticsName": "construction-trades-certification",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hvac-hero-final.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hvac-hero-final.mp4",
@@ -509,7 +509,7 @@
     "credentialLabel": "OSHA 29 CFR 1910.178",
     "durationLabel": "1 week",
     "salaryExempt": true,
-    "salaryNote": "Short standalone cert; wage outcome depends entirely on employer and role — not attributable to this cert alone.",
+    "salaryNote": "Short standalone cert; wage outcome depends entirely on employer and role \u2014 not attributable to this cert alone.",
     "belowHeroHeadline": "Forklift Operator Certification in 1 week.",
     "belowHeroSubheadline": "OSHA 29 CFR 1910.178 compliant. Hands-on training on sit-down, stand-up, and reach truck forklifts. Certification valid 3 years. WIOA funding available.",
     "primaryCta": {
@@ -541,7 +541,7 @@
     "credentialLabel": "Indiana CNA certification",
     "durationLabel": "6 weeks",
     "salaryRangeLabel": "$30,000 to $40,000",
-    "belowHeroHeadline": "Certified Nursing Assistant — Indiana state exam on-site.",
+    "belowHeroHeadline": "Certified Nursing Assistant \u2014 Indiana state exam on-site.",
     "belowHeroSubheadline": "Indiana state CNA certification exam proctored on-site. Clinical rotations at licensed healthcare facilities. WIOA and Workforce Ready Grant funding available. Join the waitlist for the next cohort.",
     "primaryCta": {
       "label": "Join Waitlist",
@@ -570,7 +570,7 @@
     "credentialLabel": "NHA CCMA",
     "durationLabel": "12 weeks",
     "salaryRangeLabel": "$35,000 to $45,000",
-    "belowHeroHeadline": "Medical Assistant — NHA CCMA certification in 12 weeks.",
+    "belowHeroHeadline": "Medical Assistant \u2014 NHA CCMA certification in 12 weeks.",
     "belowHeroSubheadline": "Clinical procedures, patient intake, EHR documentation, and phlebotomy. Prepare for the NHA CCMA and CPT exams. Free with WIOA or Next Level Jobs funding.",
     "primaryCta": {
       "label": "Apply Now",
@@ -585,7 +585,7 @@
       "Free with WIOA funding",
       "NHA CCMA + CPT exams",
       "Clinical rotations included",
-      "MA pay $35K–$45K"
+      "MA pay $35K\u2013$45K"
     ],
     "transcript": "Train for NHA CCMA and CPT certification in 12 weeks, building skills in clinical procedures, patient intake, EHR documentation, and phlebotomy. Medical assistants commonly earn $35,000 to $45,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "medical-assistant",
@@ -600,7 +600,7 @@
     "credentialLabel": "PTCB CPhT",
     "durationLabel": "10 weeks",
     "salaryRangeLabel": "$34,000 to $46,000",
-    "belowHeroHeadline": "Pharmacy Technician — PTCB CPhT exam prep in 10 weeks.",
+    "belowHeroHeadline": "Pharmacy Technician \u2014 PTCB CPhT exam prep in 10 weeks.",
     "belowHeroSubheadline": "Medication dispensing, pharmacy law, sterile compounding, and inventory management. Prepare for the PTCB CPhT exam. Free with WIOA funding.",
     "primaryCta": {
       "label": "Enroll Now",
@@ -616,7 +616,7 @@
       "Free with WIOA funding",
       "PTCB CPhT exam prep",
       "Next Level Jobs accepted",
-      "Pharm tech pay $34K–$46K"
+      "Pharm tech pay $34K\u2013$46K"
     ],
     "transcript": "Train for PTCB CPhT certification in 10 weeks, building skills in medication dispensing, pharmacy law, sterile compounding, and inventory management. Pharmacy technicians commonly earn $34,000 to $46,000. Free with WIOA funding for eligible Indiana residents. Self-pay is $4,200 with payment plans available.",
     "analyticsName": "pharmacy-technician",
@@ -631,7 +631,7 @@
     "credentialLabel": "NHA CPT",
     "durationLabel": "4 weeks",
     "salaryRangeLabel": "$30,000 to $40,000",
-    "belowHeroHeadline": "Phlebotomy Technician — NHA CPT certification in 4 weeks.",
+    "belowHeroHeadline": "Phlebotomy Technician \u2014 NHA CPT certification in 4 weeks.",
     "belowHeroSubheadline": "120 hours of classroom and clinical training. Prepare for the NHA CPT exam. Enter healthcare in 4 weeks. Self-pay $1,500 with payment plans.",
     "primaryCta": {
       "label": "Apply Now",
@@ -661,7 +661,7 @@
     "credentialLabel": "Indiana HHA certification",
     "durationLabel": "4 weeks",
     "salaryRangeLabel": "$26,000 to $36,000",
-    "belowHeroHeadline": "Home Health Aide — Indiana HHA certification in 4 weeks.",
+    "belowHeroHeadline": "Home Health Aide \u2014 Indiana HHA certification in 4 weeks.",
     "belowHeroSubheadline": "Indiana state HHA certification and CCHW credential for in-home and community care careers. Free with WIOA or Workforce Ready Grant.",
     "primaryCta": {
       "label": "Apply Now",
@@ -689,7 +689,7 @@
     "credentialLabel": "NREMT Emergency Medical Responder",
     "durationLabel": "4 weeks",
     "salaryRangeLabel": "$32,000 to $45,000",
-    "belowHeroHeadline": "Emergency Health & Safety — NREMT EMR + OSHA 10 in 4 weeks.",
+    "belowHeroHeadline": "Emergency Health & Safety \u2014 NREMT EMR + OSHA 10 in 4 weeks.",
     "belowHeroSubheadline": "NREMT Emergency Medical Responder, CPR/AED, First Aid, and OSHA 10 certifications. Free with WIOA or Workforce Ready Grant.",
     "primaryCta": {
       "label": "Apply Now",
@@ -720,8 +720,8 @@
     "credentialLabel": "HSI-certified CPR, AED, and First Aid",
     "durationLabel": "1 day",
     "salaryExempt": true,
-    "salaryNote": "Bundled prerequisite cert included free with all Elevate programs; $130 standalone. No direct salary outcome — strengthens employability across roles.",
-    "belowHeroHeadline": "CPR & First Aid — HSI certified, train from home.",
+    "salaryNote": "Bundled prerequisite cert included free with all Elevate programs; $130 standalone. No direct salary outcome \u2014 strengthens employability across roles.",
+    "belowHeroHeadline": "CPR & First Aid \u2014 HSI certified, train from home.",
     "belowHeroSubheadline": "Live instructor. Mannequin shipped to your door. HSI-certified CPR, AED, and First Aid for healthcare, education, and licensed professions. $130. Included free with all Elevate programs.",
     "primaryCta": {
       "label": "Enroll Now",
@@ -738,7 +738,7 @@
       "Live instructor online",
       "Free with Elevate programs"
     ],
-    "transcript": "Earn HSI-certified CPR, AED, and First Aid certification in 1 day from home — a mannequin ships to your door and a live instructor guides the skills session. Accepted for healthcare, education, childcare, and licensed professions. $130 self-pay. Included free with any Elevate training program.",
+    "transcript": "Earn HSI-certified CPR, AED, and First Aid certification in 1 day from home \u2014 a mannequin ships to your door and a live instructor guides the skills session. Accepted for healthcare, education, childcare, and licensed professions. $130 self-pay. Included free with any Elevate training program.",
     "analyticsName": "cpr-first-aid",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
     "_pexelsVideoId": 3981738
@@ -751,8 +751,8 @@
     "credentialLabel": "ServSafe Food Handler",
     "durationLabel": "2 weeks",
     "salaryExempt": true,
-    "salaryNote": "Bundled prerequisite cert included free with Elevate programs; $400 standalone. Required credential for entry into healthcare/food service — not a standalone career program.",
-    "belowHeroHeadline": "Sanitation & Infection Control — ServSafe + Bloodborne Pathogens in 2 weeks.",
+    "salaryNote": "Bundled prerequisite cert included free with Elevate programs; $400 standalone. Required credential for entry into healthcare/food service \u2014 not a standalone career program.",
+    "belowHeroHeadline": "Sanitation & Infection Control \u2014 ServSafe + Bloodborne Pathogens in 2 weeks.",
     "belowHeroSubheadline": "ServSafe Food Handler and OSHA-compliant Bloodborne Pathogens certifications. Required for healthcare, food service, and personal services. Included free with Elevate programs.",
     "primaryCta": {
       "label": "Apply Now",
@@ -783,7 +783,7 @@
     "durationLabel": "2,000 hours",
     "salaryRangeLabel": "$28,000 to $52,000",
     "belowHeroHeadline": "Earn your Indiana Barber License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. 2,000 hours — 1,500 OJT in a licensed barbershop + 500 RTI. Earn wages from day one. Graduate with your Indiana Barber License.",
+    "belowHeroSubheadline": "DOL Registered Apprenticeship. 2,000 hours \u2014 1,500 OJT in a licensed barbershop + 500 RTI. Earn wages from day one. Graduate with your Indiana Barber License.",
     "primaryCta": {
       "label": "Enroll Now",
       "href": "/programs/barber-apprenticeship/apply",
@@ -800,7 +800,7 @@
       "Indiana Barber License",
       "Barbershop Business Certificate"
     ],
-    "transcript": "Earn your Indiana Barber License through a DOL Registered Apprenticeship — 2,000 hours of training, 1,500 of which are paid on-the-job at a licensed barbershop. Barbers commonly earn $28,000 to $52,000 depending on clientele and setting. Wages begin on day one.",
+    "transcript": "Earn your Indiana Barber License through a DOL Registered Apprenticeship \u2014 2,000 hours of training, 1,500 of which are paid on-the-job at a licensed barbershop. Barbers commonly earn $28,000 to $52,000 depending on clientele and setting. Wages begin on day one.",
     "analyticsName": "barber-apprenticeship",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4"
   },
@@ -831,8 +831,8 @@
     ],
     "transcript": "Earn Indiana Cosmetology License through a DOL Registered Apprenticeship of 2,000 hours of supervised training in a licensed salon. Cosmetologists commonly earn $26,000 to $48,000 depending on clientele and setting. Wages begin on day one. The Indiana Cosmetology License is required to work in any Indiana salon.",
     "analyticsName": "cosmetology-apprenticeship",
-    "videoSrcDesktop": "https://videos.pexels.com/video-files/7686503/7686503-hd_1280_720_24fps.mp4",
-    "videoSrcMobile": "https://videos.pexels.com/video-files/7686503/7686503-hd_1280_720_24fps.mp4",
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cosmetology-hero.mp4",
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cosmetology-hero.mp4",
     "_pexelsVideoId": 7686503
   },
   "nail-technician-apprenticeship": {
@@ -857,12 +857,12 @@
       "DOL Registered Apprenticeship",
       "Earn wages from day one",
       "Indiana Nail Technician License",
-      "600 hours — fastest path"
+      "600 hours \u2014 fastest path"
     ],
-    "transcript": "Earn Indiana Nail Technician License through a DOL Registered Apprenticeship of 600 hours — the fastest path to an Indiana nail license. Training covers manicure, pedicure, acrylics, and gel nails in a licensed salon. Nail technicians commonly earn $24,000 to $42,000. Wages begin on day one.",
+    "transcript": "Earn Indiana Nail Technician License through a DOL Registered Apprenticeship of 600 hours \u2014 the fastest path to an Indiana nail license. Training covers manicure, pedicure, acrylics, and gel nails in a licensed salon. Nail technicians commonly earn $24,000 to $42,000. Wages begin on day one.",
     "analyticsName": "nail-technician-apprenticeship",
-    "videoSrcDesktop": "https://videos.pexels.com/video-files/8023058/8023058-hd_1920_1080_25fps.mp4",
-    "videoSrcMobile": "https://videos.pexels.com/video-files/8023058/8023058-hd_1920_1080_25fps.mp4",
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/nail-tech-hero.mp4",
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/nail-tech-hero.mp4",
     "_pexelsVideoId": 8023058
   },
   "culinary-apprenticeship": {
@@ -871,7 +871,7 @@
     "credentialLabel": "ServSafe Manager",
     "durationLabel": "2,000 hours",
     "salaryRangeLabel": "$28,000 to $45,000",
-    "belowHeroHeadline": "Culinary Apprenticeship — earn while you train.",
+    "belowHeroHeadline": "Culinary Apprenticeship \u2014 earn while you train.",
     "belowHeroSubheadline": "DOL Registered Apprenticeship. Hands-on training in a professional kitchen. Earn ServSafe Manager certification and culinary credentials. Wages from day one.",
     "primaryCta": {
       "label": "Apply Now",
@@ -891,8 +891,8 @@
     "transcript": "Earn ServSafe Manager certification through a DOL Registered Culinary Apprenticeship of 2,000 hours in a professional kitchen, building skills in food preparation, kitchen operations, and food safety. Culinary professionals commonly earn $28,000 to $45,000. Wages begin on day one.",
     "analyticsName": "culinary-apprenticeship",
     "_pexelsVideoId": 8627105,
-    "videoSrcDesktop": "https://videos.pexels.com/video-files/8627105/8627105-hd_1280_720_25fps.mp4",
-    "videoSrcMobile": "https://videos.pexels.com/video-files/8627105/8627105-hd_1280_720_25fps.mp4"
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/culinary-hero.mp4",
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/culinary-hero.mp4"
   },
   "esthetician": {
     "pageKey": "esthetician",
@@ -901,7 +901,7 @@
     "credentialLabel": "Esthetician Certificate",
     "durationLabel": "5 weeks",
     "salaryRangeLabel": "$32,000 to $48,000",
-    "belowHeroHeadline": "Esthetician Certificate — skin care career in 5 weeks.",
+    "belowHeroHeadline": "Esthetician Certificate \u2014 skin care career in 5 weeks.",
     "belowHeroSubheadline": "Skin analysis, facial treatments, chemical peels, hair removal, and business startup. ETPL approved. Free with WIOA or Workforce Ready Grant.",
     "primaryCta": {
       "label": "Apply Now",
@@ -916,13 +916,13 @@
       "Free with WIOA + WRG",
       "ETPL approved",
       "Business startup module",
-      "Esthetician pay $32K–$48K"
+      "Esthetician pay $32K\u2013$48K"
     ],
     "transcript": "Earn an Esthetician Certificate in 5 weeks, building skills in skin analysis, facial treatments, chemical peels, hair removal, and business startup. Estheticians commonly earn $32,000 to $48,000. ETPL approved. Free with WIOA or Workforce Ready Grant for eligible Indiana residents.",
     "analyticsName": "esthetician",
     "_pexelsVideoId": 7423537,
-    "videoSrcDesktop": "https://videos.pexels.com/video-files/7423537/7423537-hd_1920_1080_30fps.mp4",
-    "videoSrcMobile": "https://videos.pexels.com/video-files/7423537/7423537-hd_1920_1080_30fps.mp4"
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/esthetician-hero.mp4",
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/esthetician-hero.mp4"
   },
   "beauty-career-educator": {
     "pageKey": "beauty-career-educator",
@@ -931,7 +931,7 @@
     "credentialLabel": "Certiport ESB",
     "durationLabel": "12 weeks",
     "salaryRangeLabel": "$28,000 to $45,000",
-    "belowHeroHeadline": "Beauty & Career Educator — salon skills + workforce credentials in 12 weeks.",
+    "belowHeroHeadline": "Beauty & Career Educator \u2014 salon skills + workforce credentials in 12 weeks.",
     "belowHeroSubheadline": "Salon services, peer teaching, Certiport ESB, and Rise Up certification. Hybrid schedule. Free with WIOA or Workforce Ready Grant.",
     "primaryCta": {
       "label": "Enroll Now",
@@ -952,14 +952,14 @@
     "transcript": "Earn Certiport ESB, Rise Up, and CPR credentials in 12 weeks alongside hands-on salon training and peer teaching skills. Beauty and career educator roles commonly earn $28,000 to $45,000. Hybrid schedule. Free with WIOA or Workforce Ready Grant for eligible Indiana residents.",
     "analyticsName": "beauty-career-educator",
     "_pexelsVideoId": 8927661,
-    "videoSrcDesktop": "https://videos.pexels.com/video-files/8927661/8927661-hd_1280_720_25fps.mp4",
-    "videoSrcMobile": "https://videos.pexels.com/video-files/8927661/8927661-hd_1280_720_25fps.mp4"
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4",
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4"
   },
   "apprenticeships": {
     "pageKey": "apprenticeships",
     "voiceoverSrc": "/audio/heroes/barber.mp3",
     "microLabel": "Earn While You Learn",
-    "belowHeroHeadline": "Apprenticeships — get paid to train.",
+    "belowHeroHeadline": "Apprenticeships \u2014 get paid to train.",
     "belowHeroSubheadline": "DOL-registered apprenticeships in Barber, Cosmetology, Nail Technician, and Culinary. Earn wages from day one while working toward your license.",
     "primaryCta": {
       "label": "Apply Now",
@@ -976,7 +976,7 @@
       "Indiana state licenses",
       "Job placement assistance"
     ],
-    "transcript": "DOL-registered apprenticeships in barbering, cosmetology, nail technology, and culinary arts. Earn while you learn — work in a licensed shop and get paid from day one. Apply at Elevate for Humanity.",
+    "transcript": "DOL-registered apprenticeships in barbering, cosmetology, nail technology, and culinary arts. Earn while you learn \u2014 work in a licensed shop and get paid from day one. Apply at Elevate for Humanity.",
     "analyticsName": "apprenticeships",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -988,7 +988,7 @@
     "credentialLabel": "CompTIA A+",
     "durationLabel": "8 weeks",
     "salaryRangeLabel": "$38,000 to $52,000",
-    "belowHeroHeadline": "IT Help Desk Technician — CompTIA A+ in 8 weeks.",
+    "belowHeroHeadline": "IT Help Desk Technician \u2014 CompTIA A+ in 8 weeks.",
     "belowHeroSubheadline": "Troubleshoot hardware, software, and networks. Prepare for CompTIA A+ Core 1 and Core 2. A 4-Star Indiana Top Job. Free with WIOA or Next Level Jobs funding.",
     "primaryCta": {
       "label": "Enroll Now",
@@ -1004,7 +1004,7 @@
       "Free with WIOA + Next Level Jobs",
       "CompTIA A+ Core 1 + Core 2",
       "4-Star Indiana Top Job",
-      "IT support pay $38K–$52K"
+      "IT support pay $38K\u2013$52K"
     ],
     "transcript": "Train for CompTIA A+ certification in 8 weeks, building skills in hardware troubleshooting, software support, and network fundamentals. IT help desk roles commonly earn $38,000 to $52,000. A 4-Star Indiana Top Job. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "it-help-desk",
@@ -1018,7 +1018,7 @@
     "credentialLabel": "CompTIA Security+",
     "durationLabel": "12 weeks",
     "salaryRangeLabel": "$55,000 to $85,000",
-    "belowHeroHeadline": "Cybersecurity Analyst — CompTIA Security+ in 12 weeks.",
+    "belowHeroHeadline": "Cybersecurity Analyst \u2014 CompTIA Security+ in 12 weeks.",
     "belowHeroSubheadline": "Network defense, threat analysis, and incident response. Prepare for CompTIA Security+ SY0-701. A 5-Star Indiana Top Job. Free with WIOA or Next Level Jobs funding.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1033,7 +1033,7 @@
       "Free with WIOA + Next Level Jobs",
       "CompTIA Security+ SY0-701",
       "5-Star Indiana Top Job",
-      "Cybersecurity pay $55K–$85K"
+      "Cybersecurity pay $55K\u2013$85K"
     ],
     "transcript": "Train for CompTIA Security+ certification in 12 weeks, building skills in network defense, threat analysis, and incident response. Cybersecurity analysts commonly earn $55,000 to $85,000. A 5-Star Indiana Top Job. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "cybersecurity-analyst",
@@ -1048,7 +1048,7 @@
     "credentialLabel": "CompTIA Network+",
     "durationLabel": "10 weeks",
     "salaryRangeLabel": "$45,000 to $65,000",
-    "belowHeroHeadline": "Network Administration — CompTIA Network+ in 10 weeks.",
+    "belowHeroHeadline": "Network Administration \u2014 CompTIA Network+ in 10 weeks.",
     "belowHeroSubheadline": "Network design, TCP/IP, routing, switching, and troubleshooting. Prepare for CompTIA Network+ N10-009. Free with WIOA or Next Level Jobs funding.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1063,7 +1063,7 @@
       "Free with WIOA + Next Level Jobs",
       "CompTIA Network+ N10-009",
       "Hands-on lab environment",
-      "Network admin pay $45K–$65K"
+      "Network admin pay $45K\u2013$65K"
     ],
     "transcript": "Train for CompTIA Network+ certification in 10 weeks, building skills in network design, TCP/IP, routing, switching, and troubleshooting. Network administrators commonly earn $45,000 to $65,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "network-administration",
@@ -1077,7 +1077,7 @@
     "credentialLabel": "Certiport IT Specialist Networking",
     "durationLabel": "6 weeks",
     "salaryRangeLabel": "$35,000 to $48,000",
-    "belowHeroHeadline": "Network Support Technician — IT Specialist Networking in 6 weeks.",
+    "belowHeroHeadline": "Network Support Technician \u2014 IT Specialist Networking in 6 weeks.",
     "belowHeroSubheadline": "Entry-level network support, cabling, and help desk skills. Prepare for the Certiport IT Specialist Networking exam. Free with WIOA or Next Level Jobs funding.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1092,7 +1092,7 @@
       "Free with WIOA + Next Level Jobs",
       "Certiport IT Specialist Networking",
       "Entry-level pathway",
-      "Network support pay $35K–$48K"
+      "Network support pay $35K\u2013$48K"
     ],
     "transcript": "Train for Certiport IT Specialist Networking certification in 6 weeks, building skills in network support, cabling, and help desk operations. Network support technicians commonly earn $35,000 to $48,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "network-support-technician",
@@ -1107,7 +1107,7 @@
     "credentialLabel": "Certiport IT Specialist Python",
     "durationLabel": "12 weeks",
     "salaryRangeLabel": "$48,000 to $72,000",
-    "belowHeroHeadline": "Software Development — IT Specialist Python in 12 weeks.",
+    "belowHeroHeadline": "Software Development \u2014 IT Specialist Python in 12 weeks.",
     "belowHeroSubheadline": "Python programming, databases, APIs, and software engineering fundamentals. Prepare for Certiport IT Specialist Python and HTML certifications. Free with WIOA or Next Level Jobs funding.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1122,7 +1122,7 @@
       "Free with WIOA + Next Level Jobs",
       "Certiport IT Specialist Python",
       "Python + HTML certifications",
-      "Dev pay $48K–$72K"
+      "Dev pay $48K\u2013$72K"
     ],
     "transcript": "Train for Certiport IT Specialist Python and HTML certifications in 12 weeks, building skills in Python programming, databases, APIs, and software engineering fundamentals. Entry-level developers commonly earn $48,000 to $72,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "software-development",
@@ -1137,7 +1137,7 @@
     "credentialLabel": "Meta Front-End Developer Professional Certificate",
     "durationLabel": "12 weeks",
     "salaryRangeLabel": "$45,000 to $70,000",
-    "belowHeroHeadline": "Web Development — Meta Front-End Developer + WordPress in 12 weeks.",
+    "belowHeroHeadline": "Web Development \u2014 Meta Front-End Developer + WordPress in 12 weeks.",
     "belowHeroSubheadline": "HTML, CSS, JavaScript, React, and WordPress. Prepare for Meta Front-End Developer Professional Certificate and WordPress Certified Developer. Free with WIOA or Next Level Jobs funding.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1152,7 +1152,7 @@
       "Free with WIOA + Next Level Jobs",
       "Meta Front-End Developer cert",
       "WordPress Certified Developer",
-      "Web dev pay $45K–$70K"
+      "Web dev pay $45K\u2013$70K"
     ],
     "transcript": "Train for Meta Front-End Developer Professional Certificate and WordPress Certified Developer credentials in 12 weeks, building skills in HTML, CSS, JavaScript, React, and WordPress. Web developers commonly earn $45,000 to $70,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "web-development",
@@ -1166,7 +1166,7 @@
     "credentialLabel": "Adobe Certified Professional",
     "durationLabel": "10 weeks",
     "salaryRangeLabel": "$38,000 to $58,000",
-    "belowHeroHeadline": "Graphic Design — Adobe Certified Professional in 10 weeks.",
+    "belowHeroHeadline": "Graphic Design \u2014 Adobe Certified Professional in 10 weeks.",
     "belowHeroSubheadline": "Adobe Photoshop, Illustrator, and InDesign. Prepare for Adobe Certified Professional in Visual Design. WIOA and Next Level Jobs funding available.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1181,7 +1181,7 @@
       "WIOA + Next Level Jobs eligible",
       "Adobe Certified Professional",
       "Photoshop + Illustrator + InDesign",
-      "Designer pay $38K–$58K"
+      "Designer pay $38K\u2013$58K"
     ],
     "transcript": "Train for Adobe Certified Professional in Visual Design in 10 weeks, building skills in Photoshop, Illustrator, and InDesign. Graphic designers commonly earn $38,000 to $58,000. WIOA and Next Level Jobs funding available for eligible Indiana residents. Apply now.",
     "analyticsName": "graphic-design",
@@ -1195,7 +1195,7 @@
     "credentialLabel": "Autodesk Certified User",
     "durationLabel": "10 weeks",
     "salaryRangeLabel": "$42,000 to $60,000",
-    "belowHeroHeadline": "CAD/Drafting Technician — Autodesk Certified User in 10 weeks.",
+    "belowHeroHeadline": "CAD/Drafting Technician \u2014 Autodesk Certified User in 10 weeks.",
     "belowHeroSubheadline": "AutoCAD and Revit for architectural and mechanical drafting. Prepare for Autodesk Certified User credentials. WIOA and Next Level Jobs funding available.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1210,7 +1210,7 @@
       "WIOA + Next Level Jobs eligible",
       "Autodesk Certified User",
       "AutoCAD + Revit",
-      "Drafter pay $42K–$60K"
+      "Drafter pay $42K\u2013$60K"
     ],
     "transcript": "Train for Autodesk Certified User credentials in 10 weeks, building skills in AutoCAD and Revit for architectural and mechanical drafting. Drafting technicians commonly earn $42,000 to $60,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.",
     "analyticsName": "cad-drafting",
@@ -1225,7 +1225,7 @@
     "credentialLabel": "IRS PTIN and AFSP",
     "durationLabel": "8 weeks",
     "salaryRangeLabel": "$35,000 to $55,000",
-    "belowHeroHeadline": "Tax Preparation — IRS PTIN and AFSP credential in 8 weeks.",
+    "belowHeroHeadline": "Tax Preparation \u2014 IRS PTIN and AFSP credential in 8 weeks.",
     "belowHeroSubheadline": "Individual and small business tax preparation with real tax software. Earn your IRS PTIN and AFSP credential. Enrolled Agent exam prep included. Free with WIOA or Next Level Jobs funding.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1240,7 +1240,7 @@
       "Free with WIOA + Next Level Jobs",
       "IRS PTIN + AFSP credential",
       "Enrolled Agent exam prep",
-      "Tax prep pay $35K–$55K"
+      "Tax prep pay $35K\u2013$55K"
     ],
     "transcript": "Train for IRS PTIN and AFSP credentials in 8 weeks, building skills in individual and small business tax preparation using real tax software. Tax preparers commonly earn $35,000 to $55,000. Enrolled Agent exam preparation included. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "tax-preparation",
@@ -1253,7 +1253,7 @@
     "credentialLabel": "QuickBooks Certified User",
     "durationLabel": "5 weeks",
     "salaryRangeLabel": "$38,000 to $52,000",
-    "belowHeroHeadline": "Bookkeeping & QuickBooks — QuickBooks Certified User in 5 weeks.",
+    "belowHeroHeadline": "Bookkeeping & QuickBooks \u2014 QuickBooks Certified User in 5 weeks.",
     "belowHeroSubheadline": "Small business accounting, accounts payable, receivable, and payroll. Prepare for the QuickBooks Certified User exam. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1268,7 +1268,7 @@
       "Free with WIOA + Next Level Jobs",
       "QuickBooks Certified User cert",
       "Accounts payable, receivable & payroll",
-      "Bookkeepers earn $38K–$52K"
+      "Bookkeepers earn $38K\u2013$52K"
     ],
     "transcript": "Train for QuickBooks Certified User certification in 5 weeks, building skills in small business accounting, accounts payable, accounts receivable, and payroll processing. Bookkeepers commonly earn $38,000 to $52,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "bookkeeping",
@@ -1282,7 +1282,7 @@
     "credentialLabel": "Microsoft Office Specialist",
     "durationLabel": "6 weeks",
     "salaryRangeLabel": "$32,000 to $48,000",
-    "belowHeroHeadline": "Office Administration — Microsoft Office Specialist in 6 weeks.",
+    "belowHeroHeadline": "Office Administration \u2014 Microsoft Office Specialist in 6 weeks.",
     "belowHeroSubheadline": "Word, Excel, PowerPoint, Outlook, and business communication. Prepare for Microsoft Office Specialist Word and Excel certifications. Free with WIOA or Next Level Jobs funding.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1297,7 +1297,7 @@
       "Free with WIOA + Next Level Jobs",
       "MOS Word certification",
       "MOS Excel certification",
-      "Admin pay $32K–$48K"
+      "Admin pay $32K\u2013$48K"
     ],
     "transcript": "Train for Microsoft Office Specialist Word and Excel certifications in 6 weeks, building skills in Word, Excel, PowerPoint, Outlook, and business communication. Office administrators commonly earn $32,000 to $48,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "office-administration",
@@ -1311,7 +1311,7 @@
     "credentialLabel": "Certiport ESB",
     "durationLabel": "6 weeks",
     "salaryRangeLabel": "$32,000 to $55,000",
-    "belowHeroHeadline": "Entrepreneurship & Small Business — Certiport ESB in 6 weeks.",
+    "belowHeroHeadline": "Entrepreneurship & Small Business \u2014 Certiport ESB in 6 weeks.",
     "belowHeroSubheadline": "Business planning, marketing, financial management, and Certiport ESB certification. Evening program. Build a real business plan. Free with WIOA or grant funding.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1340,7 +1340,7 @@
     "credentialLabel": "Microsoft Office Specialist",
     "durationLabel": "8 weeks",
     "salaryRangeLabel": "$38,000 to $55,000",
-    "belowHeroHeadline": "Business Administration — Microsoft Office Specialist + Certiport ESB in 8 weeks.",
+    "belowHeroHeadline": "Business Administration \u2014 Microsoft Office Specialist + Certiport ESB in 8 weeks.",
     "belowHeroSubheadline": "Microsoft Office, QuickBooks, and business fundamentals. Prepare for Microsoft Office Specialist and Certiport ESB certifications. WIOA and Next Level Jobs funding available.",
     "primaryCta": {
       "label": "Enroll Now",
@@ -1356,7 +1356,7 @@
       "Free with WIOA + Next Level Jobs",
       "Microsoft Office Specialist",
       "Certiport ESB cert",
-      "Business admin pay $38K–$55K"
+      "Business admin pay $38K\u2013$55K"
     ],
     "transcript": "Train for Microsoft Office Specialist and Certiport ESB certifications in 8 weeks, building skills in Microsoft Office, QuickBooks, and business fundamentals. Business administrators commonly earn $38,000 to $55,000. WIOA and Next Level Jobs funding available for eligible Indiana residents.",
     "analyticsName": "business-administration",
@@ -1369,7 +1369,7 @@
     "credentialLabel": "Certiport Project Management",
     "durationLabel": "6 weeks",
     "salaryRangeLabel": "$52,000 to $75,000",
-    "belowHeroHeadline": "Project Management — Certiport PM certification in 6 weeks.",
+    "belowHeroHeadline": "Project Management \u2014 Certiport PM certification in 6 weeks.",
     "belowHeroSubheadline": "Agile, Scrum, and traditional project management methodologies. Prepare for Certiport Project Management certification. Free with WIOA or Next Level Jobs funding.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1384,7 +1384,7 @@
       "Free with WIOA + Next Level Jobs",
       "Certiport Project Management cert",
       "Agile + Scrum methodology",
-      "PM pay $52K–$75K"
+      "PM pay $52K\u2013$75K"
     ],
     "transcript": "Train for Certiport Project Management certification in 6 weeks, building skills in Agile, Scrum, and traditional project management methodologies. Project managers commonly earn $52,000 to $75,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "project-management",
@@ -1398,7 +1398,7 @@
     "credentialLabel": "IRS PTIN",
     "durationLabel": "12 weeks",
     "salaryRangeLabel": "$42,000 to $62,000",
-    "belowHeroHeadline": "Finance, Bookkeeping & Accounting — tiered credential pathway in 12 weeks.",
+    "belowHeroHeadline": "Finance, Bookkeeping & Accounting \u2014 tiered credential pathway in 12 weeks.",
     "belowHeroSubheadline": "Tax preparation, bookkeeping, payroll, and accounting. Earn IRS PTIN, QuickBooks Certified User, and prepare for the Enrolled Agent exam. Funded for eligible participants.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1427,7 +1427,7 @@
     "credentialLabel": "Indiana CPRS",
     "durationLabel": "8 weeks",
     "salaryRangeLabel": "$32,000 to $45,000",
-    "belowHeroHeadline": "Peer Recovery Specialist — Indiana CPRS credential in 8 weeks.",
+    "belowHeroHeadline": "Peer Recovery Specialist \u2014 Indiana CPRS credential in 8 weeks.",
     "belowHeroSubheadline": "Substance use recovery support, motivational interviewing, and crisis response. Earn the Indiana CPRS credential. WIOA, FSSA IMPACT, and JRI funding available for eligible Indiana residents.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1442,7 +1442,7 @@
       "WIOA + FSSA IMPACT + JRI eligible",
       "Indiana CPRS credential",
       "Motivational interviewing",
-      "Recovery support pay $32K–$45K"
+      "Recovery support pay $32K\u2013$45K"
     ],
     "transcript": "Train for Indiana CPRS certification in 8 weeks, building skills in substance use recovery support, motivational interviewing, and crisis response. Peer recovery specialists commonly earn $32,000 to $45,000. WIOA, FSSA IMPACT, and JRI funding available for eligible Indiana residents.",
     "analyticsName": "peer-recovery-specialist",
@@ -1452,7 +1452,7 @@
   "technology": {
     "pageKey": "technology",
     "microLabel": "Indianapolis, Indiana",
-    "belowHeroHeadline": "Technology Career Training — CompTIA A+ in 12 weeks.",
+    "belowHeroHeadline": "Technology Career Training \u2014 CompTIA A+ in 12 weeks.",
     "belowHeroSubheadline": "Launch an IT career with industry-recognized certifications. WIOA and Workforce Ready Grant funding available.",
     "primaryCta": {
       "href": "/apply?program=technology",
@@ -1476,7 +1476,7 @@
     "pageKey": "business",
     "voiceoverSrc": "/audio/heroes/business.mp3",
     "microLabel": "Business & Finance Programs",
-    "belowHeroHeadline": "Launch a business career — certifications in 5–10 weeks.",
+    "belowHeroHeadline": "Launch a business career \u2014 certifications in 5\u201310 weeks.",
     "belowHeroSubheadline": "Tax preparation, bookkeeping, office administration, entrepreneurship, and project management. Certiport, IRS, and QuickBooks credentials. Free with WIOA or Next Level Jobs for eligible Indiana residents.",
     "primaryCta": {
       "label": "Apply Now",
@@ -1491,7 +1491,7 @@
       "Free with WIOA + Next Level Jobs",
       "Certiport MOS + ESB + QuickBooks",
       "IRS PTIN credential",
-      "Earn $35K–$55K"
+      "Earn $35K\u2013$55K"
     ],
     "transcript": "Launch a business career with Elevate for Humanity. Programs in tax preparation, bookkeeping, office administration, entrepreneurship, and project management. Earn Certiport, IRS, and QuickBooks credentials in 5 to 10 weeks. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "business",
@@ -1502,7 +1502,7 @@
     "pageKey": "mission",
     "microLabel": "Our Mission",
     "belowHeroHeadline": "Pathways out of poverty. Into prosperity.",
-    "belowHeroSubheadline": "Free career training for those who need it most — justice-involved, low-income, veterans, and anyone facing barriers to employment.",
+    "belowHeroSubheadline": "Free career training for those who need it most \u2014 justice-involved, low-income, veterans, and anyone facing barriers to employment.",
     "primaryCta": {
       "label": "Our Story",
       "href": "/about#who-we-are"
@@ -1526,7 +1526,7 @@
     "pageKey": "partners",
     "microLabel": "Partner With Us",
     "belowHeroHeadline": "Build the workforce your community needs.",
-    "belowHeroSubheadline": "Workforce agencies, employers, training providers, barbershops, and reentry organizations — we build pathways together.",
+    "belowHeroSubheadline": "Workforce agencies, employers, training providers, barbershops, and reentry organizations \u2014 we build pathways together.",
     "primaryCta": {
       "label": "Become a Partner",
       "href": "/partners/join"
@@ -1551,7 +1551,7 @@
     "voiceoverSrc": "/audio/heroes/lms.mp3",
     "microLabel": "Student Training Portal",
     "belowHeroHeadline": "Your career training starts here.",
-    "belowHeroSubheadline": "Browse programs, enroll, and earn industry credentials — all in one place.",
+    "belowHeroSubheadline": "Browse programs, enroll, and earn industry credentials \u2014 all in one place.",
     "primaryCta": {
       "label": "Browse Programs",
       "href": "/lms/programs"
@@ -1566,7 +1566,7 @@
       "Self-paced learning",
       "Instructor support"
     ],
-    "transcript": "The Elevate student portal gives you access to career training programs, lesson content, and credential pathways — all in one place.",
+    "transcript": "The Elevate student portal gives you access to career training programs, lesson content, and credential pathways \u2014 all in one place.",
     "analyticsName": "lms",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/lms-learning.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -1599,7 +1599,7 @@
     "pageKey": "jri",
     "microLabel": "Justice-Involved Reentry",
     "belowHeroHeadline": "A second chance backed by real training.",
-    "belowHeroSubheadline": "Career pathways for justice-involved individuals — credentials, employer connections, and funding support.",
+    "belowHeroSubheadline": "Career pathways for justice-involved individuals \u2014 credentials, employer connections, and funding support.",
     "primaryCta": {
       "label": "Get Started",
       "href": "/apply?program=jri"
@@ -1638,7 +1638,7 @@
       "Community-driven",
       "ETPL Certified"
     ],
-    "transcript": "Meet the team behind Elevate for Humanity — workforce professionals and educators committed to expanding access to career training.",
+    "transcript": "Meet the team behind Elevate for Humanity \u2014 workforce professionals and educators committed to expanding access to career training.",
     "analyticsName": "about-team",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -1671,7 +1671,7 @@
     "pageKey": "blog",
     "microLabel": "News & Insights",
     "belowHeroHeadline": "Workforce training news and career insights.",
-    "belowHeroSubheadline": "Updates from Elevate for Humanity — program news, student success stories, and workforce development resources.",
+    "belowHeroSubheadline": "Updates from Elevate for Humanity \u2014 program news, student success stories, and workforce development resources.",
     "primaryCta": {
       "label": "Browse Articles",
       "href": "/blog"
@@ -1689,7 +1689,7 @@
   "career-services": {
     "pageKey": "career-services",
     "microLabel": "Career Services",
-    "belowHeroHeadline": "From training to employment — we stay with you.",
+    "belowHeroHeadline": "From training to employment \u2014 we stay with you.",
     "belowHeroSubheadline": "Resume building, interview prep, job placement, and ongoing career support for every Elevate graduate.",
     "primaryCta": {
       "label": "Get Career Support",
@@ -1737,7 +1737,7 @@
   "cna-waitlist": {
     "pageKey": "cna-waitlist",
     "microLabel": "CNA Certification",
-    "belowHeroHeadline": "CNA Certification — Join the Waitlist.",
+    "belowHeroHeadline": "CNA Certification \u2014 Join the Waitlist.",
     "belowHeroSubheadline": "Indiana CNA certification training is opening soon. Join the waitlist to be first in line when enrollment opens.",
     "primaryCta": {
       "label": "Join the Waitlist",
@@ -1762,7 +1762,7 @@
     "pageKey": "contact",
     "microLabel": "Contact Us",
     "belowHeroHeadline": "We're here to help.",
-    "belowHeroSubheadline": "Questions about programs, funding, enrollment, or partnerships — reach out and we'll respond within one business day.",
+    "belowHeroSubheadline": "Questions about programs, funding, enrollment, or partnerships \u2014 reach out and we'll respond within one business day.",
     "primaryCta": {
       "label": "Send a Message",
       "href": "/contact#form"
@@ -1810,7 +1810,7 @@
     "pageKey": "events",
     "microLabel": "Events & Workshops",
     "belowHeroHeadline": "Connect, learn, and grow.",
-    "belowHeroSubheadline": "Orientation sessions, employer hiring events, graduation ceremonies, and community workshops — all free to attend.",
+    "belowHeroSubheadline": "Orientation sessions, employer hiring events, graduation ceremonies, and community workshops \u2014 all free to attend.",
     "primaryCta": {
       "label": "View Upcoming Events",
       "href": "/events#calendar"
@@ -1825,7 +1825,7 @@
       "Employer hiring events",
       "Graduation ceremonies"
     ],
-    "transcript": "Elevate for Humanity hosts orientation sessions, employer hiring events, graduation ceremonies, and community workshops — all free to attend.",
+    "transcript": "Elevate for Humanity hosts orientation sessions, employer hiring events, graduation ceremonies, and community workshops \u2014 all free to attend.",
     "analyticsName": "events",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -1834,7 +1834,7 @@
     "pageKey": "for-partners",
     "microLabel": "For Partners",
     "belowHeroHeadline": "Partner with Indiana's workforce training leader.",
-    "belowHeroSubheadline": "Workforce agencies, employers, and community organizations — join the Elevate network and connect your clients to real careers.",
+    "belowHeroSubheadline": "Workforce agencies, employers, and community organizations \u2014 join the Elevate network and connect your clients to real careers.",
     "primaryCta": {
       "label": "Become a Partner",
       "href": "/partners/join"
@@ -1858,7 +1858,7 @@
     "pageKey": "for-students",
     "microLabel": "For Students",
     "belowHeroHeadline": "Your career starts here.",
-    "belowHeroSubheadline": "Free and funded training programs in healthcare, trades, technology, and business. Most programs complete in 4–12 weeks.",
+    "belowHeroSubheadline": "Free and funded training programs in healthcare, trades, technology, and business. Most programs complete in 4\u201312 weeks.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/apply"
@@ -1940,7 +1940,7 @@
       "Student Stories",
       "Partnership News"
     ],
-    "transcript": "Stay current with the latest news from Elevate for Humanity — program announcements, partnerships, and student success stories.",
+    "transcript": "Stay current with the latest news from Elevate for Humanity \u2014 program announcements, partnerships, and student success stories.",
     "analyticsName": "news",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -1949,7 +1949,7 @@
     "pageKey": "pathways",
     "microLabel": "Career Pathways",
     "belowHeroHeadline": "Find your pathway to a career.",
-    "belowHeroSubheadline": "Healthcare, skilled trades, technology, beauty, and business — explore credential pathways designed for Indiana's job market.",
+    "belowHeroSubheadline": "Healthcare, skilled trades, technology, beauty, and business \u2014 explore credential pathways designed for Indiana's job market.",
     "primaryCta": {
       "label": "Explore Pathways",
       "href": "/pathways#sectors"
@@ -1964,7 +1964,7 @@
       "Employer-aligned credentials",
       "WIOA funded"
     ],
-    "transcript": "Explore career pathways at Elevate for Humanity in healthcare, skilled trades, technology, beauty, and business — all designed for Indiana's job market.",
+    "transcript": "Explore career pathways at Elevate for Humanity in healthcare, skilled trades, technology, beauty, and business \u2014 all designed for Indiana's job market.",
     "analyticsName": "pathways",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4"
@@ -2093,7 +2093,7 @@
     "pageKey": "impact",
     "microLabel": "Impact & Outcomes",
     "belowHeroHeadline": "Real results for learners, employers, and communities.",
-    "belowHeroSubheadline": "Elevate for Humanity tracks every outcome — credentials earned, jobs placed, wages increased. See the data.",
+    "belowHeroSubheadline": "Elevate for Humanity tracks every outcome \u2014 credentials earned, jobs placed, wages increased. See the data.",
     "primaryCta": {
       "label": "Our Programs",
       "href": "/programs"
@@ -2108,7 +2108,7 @@
       "DOL Registered",
       "RAPIDS Tracked"
     ],
-    "transcript": "Elevate for Humanity measures every outcome — credentials earned, jobs placed, and wages increased. Our programs are ETPL certified, DOL registered, and RAPIDS tracked.",
+    "transcript": "Elevate for Humanity measures every outcome \u2014 credentials earned, jobs placed, and wages increased. Our programs are ETPL certified, DOL registered, and RAPIDS tracked.",
     "analyticsName": "impact",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/graduation-success.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -2140,7 +2140,7 @@
   "services": {
     "pageKey": "services",
     "microLabel": "Our Services",
-    "belowHeroHeadline": "Training, credentials, and support — end to end.",
+    "belowHeroHeadline": "Training, credentials, and support \u2014 end to end.",
     "belowHeroSubheadline": "From enrollment to employment: career coaching, credential prep, employer connections, and funding navigation.",
     "primaryCta": {
       "label": "Check Eligibility",
@@ -2156,7 +2156,7 @@
       "Career coaching included",
       "Employer network"
     ],
-    "transcript": "Elevate provides end-to-end workforce services — training, credential preparation, career coaching, and employer connections — all coordinated in one system.",
+    "transcript": "Elevate provides end-to-end workforce services \u2014 training, credential preparation, career coaching, and employer connections \u2014 all coordinated in one system.",
     "analyticsName": "services",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4"
@@ -2166,7 +2166,7 @@
     "voiceoverSrc": "/audio/heroes/enrollment.mp3",
     "microLabel": "Enrollment",
     "belowHeroHeadline": "Ready to start? Let's get you enrolled.",
-    "belowHeroSubheadline": "Choose your program, confirm your funding, and begin training — often within days.",
+    "belowHeroSubheadline": "Choose your program, confirm your funding, and begin training \u2014 often within days.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/apply"
@@ -2181,7 +2181,7 @@
       "Funding pre-checked",
       "No upfront cost for eligible students"
     ],
-    "transcript": "Enrollment at Elevate is fast. Choose your program, confirm your funding eligibility, and start training — often within days of applying.",
+    "transcript": "Enrollment at Elevate is fast. Choose your program, confirm your funding eligibility, and start training \u2014 often within days of applying.",
     "analyticsName": "enrollment",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/getting-started-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -2232,7 +2232,7 @@
       "DOL Registered Apprenticeship Sponsor",
       "No placement fees"
     ],
-    "transcript": "Elevate graduates are credential-ready and pre-screened. Access WOTC tax credits, OJT wage reimbursement, and Registered Apprenticeship sponsorship — all through one partner.",
+    "transcript": "Elevate graduates are credential-ready and pre-screened. Access WOTC tax credits, OJT wage reimbursement, and Registered Apprenticeship sponsorship \u2014 all through one partner.",
     "analyticsName": "employer",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/employer-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -2240,7 +2240,7 @@
   "credentials": {
     "pageKey": "credentials",
     "microLabel": "Compliance Infrastructure",
-    "belowHeroHeadline": "Credentials and compliance — active, verifiable, and integrated.",
+    "belowHeroHeadline": "Credentials and compliance \u2014 active, verifiable, and integrated.",
     "belowHeroSubheadline": "DOL Registered Apprenticeship Sponsor. Indiana ETPL Certified. WIOA compliant. Every credential is operationally integrated, not decorative.",
     "primaryCta": {
       "label": "View Programs",
@@ -2257,7 +2257,7 @@
       "WIOA Title I Compliant",
       "Certiport Authorized Testing Center"
     ],
-    "transcript": "Every Elevate credential is active, verifiable, and operationally integrated. DOL Registered Apprenticeship Sponsor, Indiana ETPL Certified, and WIOA compliant — four compliance tiers, three credential layers.",
+    "transcript": "Every Elevate credential is active, verifiable, and operationally integrated. DOL Registered Apprenticeship Sponsor, Indiana ETPL Certified, and WIOA compliant \u2014 four compliance tiers, three credential layers.",
     "analyticsName": "credentials",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4"
@@ -2266,7 +2266,7 @@
     "pageKey": "student-support",
     "microLabel": "Student Support",
     "belowHeroHeadline": "Support from enrollment through employment.",
-    "belowHeroSubheadline": "Academic help, financial aid, career services, and counseling — everything you need to succeed.",
+    "belowHeroSubheadline": "Academic help, financial aid, career services, and counseling \u2014 everything you need to succeed.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/apply"
@@ -2282,7 +2282,7 @@
       "Financial aid navigation",
       "Counseling services"
     ],
-    "transcript": "Elevate provides academic support, financial aid navigation, career placement, and counseling services — all included for enrolled students at no additional cost.",
+    "transcript": "Elevate provides academic support, financial aid navigation, career placement, and counseling services \u2014 all included for enrolled students at no additional cost.",
     "analyticsName": "student-support",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/student-portal-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/student-portal-hero.mp4"
@@ -2390,7 +2390,7 @@
     "pageKey": "certifications",
     "microLabel": "Credentials & Certifications",
     "belowHeroHeadline": "Earn credentials employers recognize.",
-    "belowHeroSubheadline": "Industry certifications in healthcare, trades, technology, and business — backed by national credentialing bodies.",
+    "belowHeroSubheadline": "Industry certifications in healthcare, trades, technology, and business \u2014 backed by national credentialing bodies.",
     "primaryCta": {
       "label": "See Programs",
       "href": "/programs"
@@ -2406,7 +2406,7 @@
       "CompTIA ready",
       "IRS PTIN credential"
     ],
-    "transcript": "Elevate programs lead to industry-recognized credentials — NHA, EPA 608, CompTIA, IRS PTIN, and more. Credentials that employers hire for.",
+    "transcript": "Elevate programs lead to industry-recognized credentials \u2014 NHA, EPA 608, CompTIA, IRS PTIN, and more. Credentials that employers hire for.",
     "analyticsName": "certifications",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4"
@@ -2415,7 +2415,7 @@
     "pageKey": "apprenticeship-sponsor",
     "voiceoverSrc": "/audio/heroes/apprenticeship-sponsor.mp3",
     "microLabel": "DOL Apprenticeship Sponsor",
-    "belowHeroHeadline": "Registered Apprenticeship — the earn-while-you-learn path.",
+    "belowHeroHeadline": "Registered Apprenticeship \u2014 the earn-while-you-learn path.",
     "belowHeroSubheadline": "Elevate is a DOL Registered Apprenticeship Sponsor. Apprentices earn wages while completing structured on-the-job training and related instruction.",
     "primaryCta": {
       "label": "Apply as Apprentice",
@@ -2466,7 +2466,7 @@
     "pageKey": "locations",
     "microLabel": "Training Locations",
     "belowHeroHeadline": "Training in Indianapolis and beyond.",
-    "belowHeroSubheadline": "In-person, hybrid, and online training options across Indiana — with employer site training available.",
+    "belowHeroSubheadline": "In-person, hybrid, and online training options across Indiana \u2014 with employer site training available.",
     "primaryCta": {
       "label": "Find a Location",
       "href": "/locations#map"
@@ -2481,7 +2481,7 @@
       "Hybrid & online options",
       "Employer site training"
     ],
-    "transcript": "Elevate offers training in Indianapolis and across Indiana — in-person, hybrid, and fully online. Find the format that works for you.",
+    "transcript": "Elevate offers training in Indianapolis and across Indiana \u2014 in-person, hybrid, and fully online. Find the format that works for you.",
     "analyticsName": "locations",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -2516,7 +2516,7 @@
     "credentialLabel": "Indiana Esthetician License",
     "durationLabel": "1,500 hours",
     "salaryRangeLabel": "$32,000 to $52,000",
-    "belowHeroHeadline": "Esthetician Apprenticeship — earn while you train.",
+    "belowHeroHeadline": "Esthetician Apprenticeship \u2014 earn while you train.",
     "belowHeroSubheadline": "DOL Registered Apprenticeship. Hands-on training at a licensed salon. Graduate with your Indiana Esthetician License and a paying clientele.",
     "primaryCta": {
       "label": "Apply Now",
@@ -2536,8 +2536,8 @@
     "transcript": "Train for the Indiana Esthetician License through a DOL Registered Apprenticeship of 1,500 hours at a licensed salon. Apprentices earn wages while completing supervised skin care, sanitation, client service, and exam preparation. Licensed estheticians commonly earn $32,000 to $52,000.",
     "analyticsName": "esthetician-apprenticeship",
     "_pexelsVideoId": 7423537,
-    "videoSrcDesktop": "https://videos.pexels.com/video-files/7423537/7423537-hd_1920_1080_30fps.mp4",
-    "videoSrcMobile": "https://videos.pexels.com/video-files/7423537/7423537-hd_1920_1080_30fps.mp4"
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/esthetician-hero.mp4",
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/esthetician-hero.mp4"
   },
   "cybersecurity": {
     "pageKey": "cybersecurity",
@@ -2545,7 +2545,7 @@
     "credentialLabel": "CompTIA Security+",
     "durationLabel": "12 weeks",
     "salaryRangeLabel": "$55,000 to $85,000",
-    "belowHeroHeadline": "Cybersecurity Analyst — launch a tech career.",
+    "belowHeroHeadline": "Cybersecurity Analyst \u2014 launch a tech career.",
     "belowHeroSubheadline": "Earn CompTIA Security+ and CySA+ in 12 weeks. WIOA and Workforce Ready Grant funding available.",
     "primaryCta": {
       "label": "Enroll Now",
@@ -2571,7 +2571,7 @@
   "hospitality": {
     "pageKey": "hospitality",
     "microLabel": "Indianapolis, Indiana",
-    "belowHeroHeadline": "Hospitality & Customer Service — ServSafe certified in 8 weeks.",
+    "belowHeroHeadline": "Hospitality & Customer Service \u2014 ServSafe certified in 8 weeks.",
     "belowHeroSubheadline": "Build a career in hotels, restaurants, and event services. WIOA and Workforce Ready Grant funding available.",
     "primaryCta": {
       "href": "/apply?program=hospitality",
@@ -2598,7 +2598,7 @@
     "analyticsName": "direct-support-professional",
     "trustIndicators": [],
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "belowHeroHeadline": "Direct Support Professional — Indiana DSP credential in 6 weeks.",
+    "belowHeroHeadline": "Direct Support Professional \u2014 Indiana DSP credential in 6 weeks.",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
     "_pexelsVideoId": 8400789
   },
@@ -2606,7 +2606,7 @@
     "pageKey": "career-training-indiana",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
     "microLabel": "Indianapolis, Indiana",
-    "belowHeroHeadline": "Career Training in Indiana — Funded Programs for Adults.",
+    "belowHeroHeadline": "Career Training in Indiana \u2014 Funded Programs for Adults.",
     "belowHeroSubheadline": "Healthcare, skilled trades, technology, and business programs. Most available at no cost through WIOA and state funding for eligible Indiana residents.",
     "primaryCta": {
       "label": "Apply Now",
@@ -2623,7 +2623,7 @@
       "ETPL approved training provider",
       "Indianapolis, Indiana"
     ],
-    "transcript": "Elevate for Humanity offers workforce training programs in Indianapolis, Indiana — in healthcare, skilled trades, technology, and business. Most programs are available at no cost to eligible Indiana residents through WIOA, the Workforce Ready Grant, and Job Ready Indy.",
+    "transcript": "Elevate for Humanity offers workforce training programs in Indianapolis, Indiana \u2014 in healthcare, skilled trades, technology, and business. Most programs are available at no cost to eligible Indiana residents through WIOA, the Workforce Ready Grant, and Job Ready Indy.",
     "analyticsName": "career-training-indiana",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
   },
@@ -2635,7 +2635,7 @@
     "credentialLabel": "Indiana QMA Certificate",
     "durationLabel": "4 weeks",
     "salaryRangeLabel": "$30,000 to $42,000",
-    "belowHeroHeadline": "Qualified Medication Aide — Indiana state certification in 4 weeks.",
+    "belowHeroHeadline": "Qualified Medication Aide \u2014 Indiana state certification in 4 weeks.",
     "belowHeroSubheadline": "Administer medications under nurse supervision in residential care settings. ISDH-approved curriculum. WIOA and Workforce Ready Grant funding available for eligible Indiana residents.",
     "primaryCta": {
       "label": "Apply Now",
@@ -2650,7 +2650,7 @@
       "ISDH-approved curriculum",
       "WIOA + Workforce Ready Grant",
       "CPR/AED included",
-      "QMA pay $30K–$42K"
+      "QMA pay $30K\u2013$42K"
     ],
     "transcript": "Train for the Indiana QMA Certificate in 4 weeks, learning medication administration, documentation, and resident safety under nurse supervision. QMAs in Indiana commonly earn $30,000 to $42,000. WIOA and Workforce Ready Grant funding available for eligible Indiana residents. Self-pay is $1,200.",
     "analyticsName": "qma",
@@ -2663,7 +2663,7 @@
     "analyticsName": "drug-collector",
     "trustIndicators": [],
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "belowHeroHeadline": "Drug & Alcohol Collector — DOT-compliant certification in 2 weeks.",
+    "belowHeroHeadline": "Drug & Alcohol Collector \u2014 DOT-compliant certification in 2 weeks.",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
     "_pexelsVideoId": 7230300
   },
@@ -2671,7 +2671,7 @@
     "pageKey": "beauty",
     "microLabel": "DOL Registered Apprenticeships",
     "belowHeroHeadline": "Beauty Industry Apprenticeships",
-    "belowHeroSubheadline": "Cosmetology · Esthetics · Nails — earn while you learn with flat-fee pricing and DOL-registered programs.",
+    "belowHeroSubheadline": "Cosmetology \u00b7 Esthetics \u00b7 Nails \u2014 earn while you learn with flat-fee pricing and DOL-registered programs.",
     "primaryCta": {
       "label": "View Programs",
       "href": "#programs",
@@ -2690,8 +2690,8 @@
     ],
     "analyticsName": "beauty-programs",
     "transcript": "Elevate for Humanity offers DOL-registered beauty apprenticeships in cosmetology, esthetics, and nail technology. Earn while you learn.",
-    "videoSrcDesktop": "https://videos.pexels.com/video-files/8225738/8225738-hd_1920_1080_25fps.mp4",
-    "videoSrcMobile": "https://videos.pexels.com/video-files/8225738/8225738-hd_1920_1080_25fps.mp4",
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/beauty-overview.mp4",
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/beauty-overview.mp4",
     "_pexelsVideoId": 8225738
   },
   "administrative-assistant": {

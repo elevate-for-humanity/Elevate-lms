@@ -40,7 +40,7 @@ export function getAdminUrl(): string {
     }
     return `${parsed.protocol}//${parsed.host}`;
   } catch (e) {
-    throw new Error(`Invalid NEXT_PUBLIC_ADMIN_URL: ${e instanceof Error ? e.message : e}`);
+    throw new Error(`Invalid NEXT_PUBLIC_ADMIN_URL: ${e instanceof Error ? e.message : e}`, { cause: e });
   }
 }
 

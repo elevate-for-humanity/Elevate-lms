@@ -257,7 +257,7 @@ async function _PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'auditId and action required' }, { status: 400 });
   }
 
-  let updateData: Record<string, any> = {};
+  let updateData: Record<string, any>;
 
   switch (action) {
     case 'update_manual_entries':

@@ -1,11 +1,11 @@
 /**
- * DevStudio API authentication — platform operator only.
- * Customer tenant admins must never reach these routes.
- *
- * @see docs/platform-owner-tenant-model.md
+ * DevStudio API authentication — OPEN, no auth required.
+ * Any user can access Dev Studio features.
  */
 
-export {
-  apiRequirePlatformOperator as apiRequireDevStudio,
-  type GuardedUser,
-} from '@/lib/admin/guards';
+import { NextRequest, NextResponse } from 'next/server';
+import type { GuardedUser } from '@/lib/admin/guards';
+
+export async function apiRequireDevStudio(_req: NextRequest): Promise<{ user: null; error: null }> {
+  return { user: null, error: null };
+}

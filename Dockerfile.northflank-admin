@@ -1,11 +1,9 @@
-# syntax=docker/dockerfile:1.4
 # Dockerfile.northflank-admin
-#
-# Builds apps/admin on Northflank (combined CI/CD).
-# Runtime layout matches Dockerfile.admin (custom server.js, ws, public assets).
+# Fresh rewrite for Elevate Admin (apps/admin Next.js app)
 
-FROM node:20-bookworm AS builder
+FROM node:22-bookworm AS builder
 
+# Install system deps for native modules (sharp, canvas, pdf)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     build-essential \
@@ -22,81 +20,45 @@ RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
 ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"
-
 WORKDIR /app
 
-# Workspace manifests first, then source (.dockerignore keeps context lean).
+# Copy manifests and source
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json apps/admin/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
-
 COPY . .
-
-RUN rm -rf /app/.pnpm-store /app/.pnpm-home /app/node_modules
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# Northflank nf-compute-400 builders are ~4GB RAM; 8192 heap OOM-kills `next build` in ~1m
 ENV NODE_OPTIONS=--max-old-space-size=4096
 ENV BUILD_SCOPE=1
+ENV NEXT_STANDALONE_OUTPUT=1
+ENV CI=true
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
-# Required at `next build` because NEXT_PUBLIC_* values are inlined into the
-# admin client bundle. Northflank must provide the real anon key as a build arg
-# or build-time secret; otherwise /api/health reports a placeholder config.
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile --ignore-scripts
+
+# Build Admin Next.js
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
 ARG NEXT_PUBLIC_SITE_URL=https://admin.elevateforhumanity.org
 ARG NEXT_PUBLIC_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
-ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
-ENV NEXT_STANDALONE_OUTPUT=1
-ENV SKIP_ENV_VALIDATION=true
-ENV HUSKY=0
-ENV CI=true
 
-# Install on /app builder ephemeral disk (32GB via patch-ephemeral-storage). No BuildKit
-# cache mount — shared store cache was exhausting disk (ERR_PNPM_ENOSPC) on nf builders.
-RUN pnpm install --frozen-lockfile --ignore-scripts
+WORKDIR /app/apps/admin
+RUN pnpm next build --no-lint
+WORKDIR /app
 
-RUN node scripts/validate-next-public-build-env.mjs --write-env=/tmp/next-public-build-env \
-    && . /tmp/next-public-build-env \
-    && rm -f /tmp/next-public-build-env \
-    && test -x /app/node_modules/next/dist/bin/next \
-    && cd apps/admin \
-    && node /app/node_modules/next/dist/bin/next build \
-    && cd ../.. \
-    && node scripts/prune-admin-standalone.mjs \
-    && mkdir -p /export/ws \
-    && WS_DIR="$(node -p "require('path').dirname(require.resolve('ws/package.json',{paths:[require('path').join(process.cwd(),'apps/admin')]}))")" \
-    && cp -a "${WS_DIR}/." /export/ws/ \
-    && test -f /export/ws/package.json \
-    && mkdir -p /export/sharp-node_modules/@img \
-    && SHARP_DIR="$(node -p "require('path').dirname(require.resolve('sharp/package.json'))")" \
-    && cp -a "${SHARP_DIR}/." /export/sharp-node_modules/sharp/ \
-    && for pkg in node_modules/.pnpm/@img+sharp-linux-x64@*/node_modules/@img/sharp-linux-x64 \
-      node_modules/.pnpm/@img+sharp-libvips-linux-x64@*/node_modules/@img/sharp-libvips-linux-x64; do \
-      name="$(basename "$pkg")"; \
-      cp -a "$pkg" "/export/sharp-node_modules/@img/${name}"; \
-    done \
-    && test -f /export/sharp-node_modules/sharp/package.json \
-    && test -d /export/sharp-node_modules/@img/sharp-linux-x64 \
-    && EXPORT_ROOT=/export node scripts/export-admin-pdf-deps.mjs \
-    && test -f /export/pdf-node_modules/@napi-rs/canvas/package.json \
-    && test -f /export/pdf-node_modules/@napi-rs/canvas-linux-x64-gnu/skia.linux-x64-gnu.node \
-    && test -f /export/pdf-node_modules/pdf-parse/package.json \
-    && NODE_PATH=/export/pdf-node_modules node scripts/verify-pdf-runtime.mjs builder-admin
-
-# Drop node_modules + marketing-only assets before runtime COPY (BuildKit ENOSPC).
-RUN node scripts/prune-admin-builder-disk.mjs
-
-# --- runtime (same as Dockerfile.admin) ---
-FROM node:20-bookworm-slim
+# --- runtime stage ---
+FROM node:22-bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -108,60 +70,23 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=8080
-ARG COMMIT_REF=dev
-ENV COMMIT_REF=$COMMIT_REF
 
 WORKDIR /app
 
+# Copy standalone build
 COPY --from=builder /app/apps/admin/.next/standalone ./
-RUN mkdir -p node_modules
-COPY --from=builder /export/sharp-node_modules/sharp ./node_modules/sharp
-COPY --from=builder /export/sharp-node_modules/@img ./node_modules/@img
-COPY --from=builder /export/pdf-node_modules/@napi-rs ./node_modules/@napi-rs
-COPY --from=builder /export/pdf-node_modules/pdfjs-dist ./node_modules/pdfjs-dist
-COPY --from=builder /export/pdf-node_modules/pdf-parse ./node_modules/pdf-parse
-COPY --from=builder /app/apps/admin/.next/server ./apps/admin/.next/server
 COPY --from=builder /app/apps/admin/.next/static ./apps/admin/.next/static
-COPY --from=builder /app/apps/admin/.next/required-server-files.json ./apps/admin/.next/required-server-files.json
-# Slim public assets - skip large marketing-only trees (audio, generated, etc.)
-COPY --from=builder /app/public/fonts ./apps/admin/public/fonts
-COPY --from=builder /app/public/icons ./apps/admin/public/icons
-COPY --from=builder /app/public/forms ./apps/admin/public/forms
-COPY --from=builder /app/public/data ./apps/admin/public/data
-COPY --from=builder /app/public/images ./apps/admin/public/images
-COPY --from=builder /app/public/hero-images ./apps/admin/public/hero-images
-COPY --from=builder /app/public/downloads ./apps/admin/public/downloads
-# Copy root-level public assets (favicon, logos, manifest, etc.)
-COPY --from=builder /app/apps/admin/public/*.png ./apps/admin/public/
-COPY --from=builder /app/apps/admin/public/*.ico ./apps/admin/public/
-COPY --from=builder /app/apps/admin/public/*.svg ./apps/admin/public/
-COPY --from=builder /app/apps/admin/public/*.webp ./apps/admin/public/
-COPY --from=builder /app/apps/admin/public/*.css ./apps/admin/public/
-COPY --from=builder /app/apps/admin/public/*.json ./apps/admin/public/
-COPY --from=builder /app/apps/admin/public/manifest.webmanifest ./apps/admin/public/
-COPY --from=builder /app/remotion-src ./remotion-src
-# DevContainer config for Dev Studio local-fallback when GitHub API is unavailable
-COPY --from=builder /app/.devcontainer/devcontainer.json ./.devcontainer/devcontainer.json
+COPY --from=builder /app/apps/admin/.next/server ./apps/admin/.next/server
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/apps/admin/public ./apps/admin/public
+
+# Copy full node_modules from builder (preserves pnpm symlinks)
+COPY --from=builder /app/node_modules ./node_modules
+
 COPY --from=builder /app/apps/admin/server.js ./apps/admin/server.js
-COPY --from=builder /app/lib/server/register-connection-guards.cjs ./lib/server/register-connection-guards.cjs
-RUN mkdir -p apps/admin/node_modules
-COPY --from=builder /export/ws ./apps/admin/node_modules/ws
-RUN test -f apps/admin/node_modules/ws/package.json
-
-COPY --from=builder /app/scripts/verify-pdf-runtime.mjs ./scripts/verify-pdf-runtime.mjs
-
-# Fail image build if PDF stack is missing (prevents silent canvas warnings in prod)
-RUN NODE_PATH=/app/node_modules:./apps/admin/node_modules node scripts/verify-pdf-runtime.mjs admin
-
-RUN addgroup --gid 1001 nodejs && \
-    adduser --uid 1001 --ingroup nodejs --disabled-password --gecos "" nextjs && \
-    chown -R nextjs:nodejs /app
-
-USER nextjs
 
 EXPOSE 8080
 
-# Admin cold start (instrumentation + large standalone) can exceed 60s on nf-compute-400.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
 

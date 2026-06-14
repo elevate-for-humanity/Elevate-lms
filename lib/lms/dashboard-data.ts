@@ -41,12 +41,6 @@ export interface ProgramMetrics {
 export async function getAdminDashboardStats(orgId?: string): Promise<DashboardStats> {
   const supabase = await createClient();
 
-  let query = supabase.from('program_enrollments').select('*', { count: 'exact', head: true });
-
-  if (orgId) {
-    query = query.eq('organization_id', orgId);
-  }
-
   const [
     { count: totalStudents },
     { count: activeEnrollments },

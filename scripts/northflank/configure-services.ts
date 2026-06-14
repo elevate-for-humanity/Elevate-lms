@@ -54,12 +54,6 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
   },
 ];
 
-// Registry layer cache was exhausting nf-buildkit overlay disk (ENOSPC on COPY).
-const BUILDKIT = {
-  useCache: false,
-  cacheStorageSize: 0,
-};
-
 /** Northflank only accepts these MB values for build ephemeral storage. */
 const ALLOWED_EPHEMERAL_STORAGE_MB = [16384, 32768, 65536, 131072, 262144, 524288] as const;
 
@@ -190,7 +184,10 @@ async function main() {
               buildEngine: 'buildkit',
               dockerFilePath: service.dockerfile,
               dockerWorkDir: '/',
-              buildkit: BUILDKIT,
+              buildkit: {
+                useCache: false,
+                cacheStorageSize: 0,
+              },
             },
           },
           buildConfiguration: {

@@ -183,7 +183,7 @@ function validateAndFormatField(
     return { formatted: blank(), issues };
   }
 
-  let str: string | null = null;
+  let str: string | null;
 
   // Date handling
   if (spec.type === 'DT') {

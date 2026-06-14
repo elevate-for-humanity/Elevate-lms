@@ -109,7 +109,7 @@ export async function indexRepository(
     const ext = repoPath.split('.').pop()?.toLowerCase() ?? '';
     const language = EXT_LANG[ext] ?? ext;
 
-    let content = '';
+    let content: string;
     try {
       const st = await stat(abs);
       if (st.size > 256_000) {

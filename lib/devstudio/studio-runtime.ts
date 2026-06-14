@@ -95,7 +95,7 @@ export function buildStudioRuntimeCompletion(input: {
     steps.find((s) => s.id === 'runtime-running')?.done &&
     steps.find((s) => s.id === 'repo-ready')?.done;
 
-  let phase: StudioRuntimePhase = 'not_configured';
+  let phase: StudioRuntimePhase;
   if (!input.adminConfigured) phase = 'not_configured';
   else if (!input.probe.reachable) phase = 'offline';
   else if (!input.probe.ready) phase = 'booting';

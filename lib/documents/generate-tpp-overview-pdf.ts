@@ -11,7 +11,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 function wrap(text: string, maxW: number, font: PDFFont, sz: number): string[] {
   const words = text.split(' ');
   const lines: string[] = [];
-  let cur = '';
+  let cur: string;
   for (const w of words) {
     const test = cur ? `${cur} ${w}` : w;
     if (font.widthOfTextAtSize(test, sz) <= maxW) { cur = test; }

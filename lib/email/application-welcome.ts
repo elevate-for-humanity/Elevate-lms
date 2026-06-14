@@ -438,7 +438,7 @@ ${buildNextStepsHtml(p)}
 function buildText(firstName: string, p: ProgramInfo): string {
   const selfPay = isSelfPayOnly(p);
 
-  let fundingText = '';
+  let fundingText: string;
   if (selfPay) {
     fundingText = `PROGRAM COST
 The ${p.name} program is self-pay or employer-sponsored. Contact us at ${PLATFORM_DEFAULTS.supportPhone} to discuss payment options.`;
@@ -455,7 +455,7 @@ The ${p.name} program is self-pay or employer-sponsored. Contact us at ${PLATFOR
     }
   }
 
-  let stepsText = '';
+  let stepsText: string;
   if (selfPay) {
     stepsText = `NEXT STEPS
 1. Call us at ${PLATFORM_DEFAULTS.supportPhone} to discuss enrollment, schedule, and payment options.

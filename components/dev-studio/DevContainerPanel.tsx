@@ -43,10 +43,12 @@ interface ContainerEnvEntry {
 }
 
 function stripJsonCommentsAndTrailingCommas(input: string): string {
-  let out = '';
+  let out: string;
   let inString = false;
-  let quote = '';
+  let quote: string;
   let i = 0;
+  out = '';
+  quote = '';
 
   while (i < input.length) {
     const ch = input[i];

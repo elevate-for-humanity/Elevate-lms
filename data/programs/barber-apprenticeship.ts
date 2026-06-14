@@ -26,7 +26,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   hoursPerWeekMin: 15,
   hoursPerWeekMax: 20,
   hoursBreakdown: {
-    onlineInstruction: 300,
+    onlineInstruction: 400,
     handsOnLab: 500,
     examPrep: 50,
     careerPlacement: 50,

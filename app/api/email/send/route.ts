@@ -26,8 +26,8 @@ async function _POST(req: Request) {
   }
 
 
-  let emailTo = '';
-  let emailSubject = '';
+  let emailTo: string;
+  let emailSubject: string;
 
   try {
     const body = await req.json();

@@ -543,12 +543,10 @@ export async function awardCredential(
  */
 function generateVerificationCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 12; i++) {
-    if (i > 0 && i % 4 === 0) code += '-';
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
+  return Array.from({ length: 12 }, (_, i) => {
+    if (i > 0 && i % 4 === 0) return '-';
+    return chars.charAt(Math.floor(Math.random() * chars.length));
+  }).join('');
 }
 
 /**

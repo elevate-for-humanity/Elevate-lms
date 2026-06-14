@@ -36,7 +36,7 @@ export async function getMyPartnerContext() {
 
   // Shops the user belongs to — only active shops
   // Try with shop_staff.active filter first; fall back if column doesn't exist yet
-  let shops: any[] | null = null;
+  let shops: any[] | null;
   const { data: s1, error: e1 } = await supabase
     .from('shop_staff')
     .select('shop_id, role, active, shops:shops!inner(id, name, active)')

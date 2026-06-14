@@ -120,9 +120,9 @@ async function _POST(req: NextRequest) {
   yesterdayDate.setDate(todayDate.getDate() - 1);
   const yesterdayStr = yesterdayDate.toISOString().slice(0, 10);
 
-  let currentStreak = 0;
-  let longestStreak = 0;
-  let lastActiveDate: string | null = null;
+  let currentStreak: number;
+  let longestStreak: number;
+  let lastActiveDate: string | null;
 
   const reachedGoalToday = secondsToday >= dailyGoalSeconds;
 

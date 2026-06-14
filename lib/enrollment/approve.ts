@@ -135,7 +135,7 @@ export async function approveApplication(
   // Step 1: Find or create user
   let userId: string | null = null;
   let isNewUser = false;
-  let tempPassword: string | null = null;
+  let _tempPassword: string | null;
   let passwordSetupLink: string | null = null;
 
   // Check profiles first (fast, indexed)
@@ -157,10 +157,10 @@ export async function approveApplication(
     } else {
       // Create new auth user with a cryptographically random temp password.
       // Math.random() is predictable — use randomBytes instead.
-      tempPassword = `EFH-${randomBytes(8).toString('hex')}-Temp!`;
+      _tempPassword = `EFH-${randomBytes(8).toString('hex')}-Temp!`;
       const { data: newUser, error: createError } = await db.auth.admin.createUser({
         email,
-        password: tempPassword,
+        password: _tempPassword,
         email_confirm: true,
         user_metadata: {
           full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),

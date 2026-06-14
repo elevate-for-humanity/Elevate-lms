@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     let authorized = false;
-    let authPath = '';
+    let authPath: string;
     // verifiedShopId (stored in verified_shop_id) is only populated for shop supervisor approvals; partner approvals leave it null.
     let verifiedShopId: string | null = null;
     let supervisorRowId: string | null = null;

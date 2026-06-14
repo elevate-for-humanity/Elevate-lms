@@ -278,8 +278,8 @@ export function getMilestoneProgress(totalHours: number): {
   const current = achieved.length > 0 ? achieved[achieved.length - 1] : null;
   const next = getNextMilestone(totalHours);
 
-  let progressPercent = 0;
-  let hoursToNext = 0;
+  let progressPercent: number;
+  let hoursToNext: number;
 
   if (next) {
     const startHours = current?.hours || 0;

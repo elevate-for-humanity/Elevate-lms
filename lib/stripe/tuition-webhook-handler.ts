@@ -815,10 +815,6 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
   const supabase = await getSupabaseAdmin();
   if (subscription.metadata.payment_type !== 'tuition_installment') return;
 
-  const studentId = subscription.metadata.student_id;
-  const programId = subscription.metadata.program_id;
-
-  const supabase = await getSupabaseAdmin();
   const { data: sub } = await supabase
     .from('tuition_subscriptions')
     .select('installments_paid, total_installments, status')

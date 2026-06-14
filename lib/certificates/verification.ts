@@ -6,16 +6,9 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
  */
 export function generateVerificationCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed confusing chars (0, O, 1, I)
-  const segments = [];
-
-  for (let i = 0; i < 3; i++) {
-    let segment = '';
-    for (let j = 0; j < 4; j++) {
-      segment += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    segments.push(segment);
-  }
-
+  const segments = Array.from({ length: 3 }, () =>
+    Array.from({ length: 4 }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('')
+  );
   return segments.join('-'); // Format: XXXX-XXXX-XXXX
 }
 

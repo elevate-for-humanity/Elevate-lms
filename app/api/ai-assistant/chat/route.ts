@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
       logger.warn('AI Assistant database unavailable; continuing without history', { databaseError });
     }
 
-    let assistantMessage = '';
+    let assistantMessage: string;
 
     try {
       const { runAITask } = await import('@/lib/ai/orchestrator');

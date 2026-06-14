@@ -317,8 +317,8 @@ export async function loadPublishedProgramsListing(
 }> {
   const suppressed = options?.suppressSlugs ?? new Set<string>();
 
-  let data: ProgramsRow[] | null = null;
-  let error: { message: string } | null = null;
+  let data: ProgramsRow[] | null;
+  let error: { message: string } | null;
 
   try {
     const result = await basePublishedQuery(client).order('title', { ascending: true });

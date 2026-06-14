@@ -19,7 +19,8 @@ export function Breadcrumbs() {
 
   const breadcrumbs: BreadcrumbItem[] = [{ label: 'Home', href: '/' }];
 
-  let currentPath = '';
+  let currentPath: string;
+  currentPath = '';
   pathSegments.forEach((segment, index) => {
     currentPath += `/${segment}`;
     const label = segment

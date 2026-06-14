@@ -251,7 +251,7 @@ export function validateModuleSequence(mod: CourseModule): LessonValidationError
     );
 
   let hasContent = false;
-  let prevType = '';
+  let prevType: string | null = null;
 
   for (const lesson of lessons) {
     // Practical must follow content

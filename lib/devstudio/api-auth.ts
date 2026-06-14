@@ -1,11 +1,9 @@
 /**
- * DevStudio API authentication — platform operator only.
- * Customer tenant admins must never reach these routes.
- *
- * @see docs/platform-owner-tenant-model.md
+ * DevStudio API authentication — admin role required.
+ * No platform operator restriction — any admin can access Dev Studio.
  */
 
 export {
-  apiRequirePlatformOperator as apiRequireDevStudio,
+  apiRequireAdmin as apiRequireDevStudio,
   type GuardedUser,
 } from '@/lib/admin/guards';

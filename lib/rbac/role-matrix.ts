@@ -40,10 +40,10 @@ export type UserRole =
 // Named sets used by guards. Import these instead of writing inline arrays.
 
 /** Can access /admin/* routes */
-export const ADMIN_ROLES: UserRole[] = ['admin', 'admin', 'staff', 'org_admin', 'platform_operator'];
+export const ADMIN_ROLES: UserRole[] = ['admin', 'staff'];
 
 /** Can access admin API routes (apiRequireAdmin) */
-export const API_ADMIN_ROLES: UserRole[] = ['admin', 'admin', 'staff', 'org_admin', 'platform_operator'];
+export const API_ADMIN_ROLES: UserRole[] = ['admin', 'staff'];
 
 /** Can perform instructor actions (sign-offs, lesson management) */
 export const INSTRUCTOR_ROLES: UserRole[] = ['admin', 'admin', 'staff', 'instructor'];

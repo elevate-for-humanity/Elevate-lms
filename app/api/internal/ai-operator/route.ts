@@ -75,7 +75,7 @@ Respond with a JSON object:
 
 Respond with ONLY valid JSON, no markdown.`;
 
-  let triaged = 0;
+  let triaged;
   let autoResolved = 0;
 
   try {

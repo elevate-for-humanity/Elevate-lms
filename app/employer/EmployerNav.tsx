@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 const NAV_LINKS = [
@@ -20,29 +21,29 @@ export function EmployerNav() {
   return (
     <nav className="bg-white border-b border-slate-200 sticky top-0 z-40">
       <div className="max-w-screen-xl mx-auto px-4 flex items-center gap-6 h-14 overflow-x-auto">
-        <a
+        <Link
           href="/employer/dashboard"
           className="font-black text-brand-blue-700 whitespace-nowrap shrink-0"
         >
           Employer Portal
-        </a>
+        </Link>
         {NAV_LINKS.map((l) => (
-          <a
+          <Link
             key={l.href}
             href={l.href}
             className="text-sm text-slate-700 hover:text-brand-blue-700 whitespace-nowrap transition-colors"
           >
             {l.label}
-          </a>
+          </Link>
         ))}
         <div className="ml-auto flex items-center gap-3 shrink-0">
           <NotificationBell />
-          <a
+          <Link
             href="/api/auth/signout"
             className="text-sm text-slate-700 hover:text-slate-900 whitespace-nowrap"
           >
             Sign out
-          </a>
+          </Link>
         </div>
       </div>
     </nav>

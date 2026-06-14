@@ -67,6 +67,7 @@ export default function PartnerProgramClient({ slug, programName }: Props) {
   });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     fetchData();
   }, [slug]);
 

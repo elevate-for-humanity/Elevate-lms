@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import AcceptInviteClient from './_components/AcceptInviteClient';
 
@@ -77,9 +78,9 @@ export default async function AcceptInvitePage({ searchParams }: Props) {
               </svg>
             </div>
             <p className="text-sm text-slate-900">{fetchError}</p>
-            <a href="/" className="mt-4 inline-block text-sm text-brand-blue-600 hover:underline">
+            <Link href="/" className="mt-4 inline-block text-sm text-brand-blue-600 hover:underline">
               Return to home
-            </a>
+            </Link>
           </div>
         ) : inviteDetails ? (
           <AcceptInviteClient

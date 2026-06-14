@@ -1,3 +1,4 @@
+import Link from "next/link";
 'use client';
 
 import { useState } from 'react';
@@ -105,13 +106,13 @@ export default function EnrollmentForm({
         />
         <span className="text-sm text-slate-600">
           I agree to the{' '}
-          <a href="/legal" className="text-brand-blue-600 hover:underline">
+          <Link href="/legal" className="text-brand-blue-600 hover:underline">
             Terms of Service
-          </a>{' '}
+          </Link>{' '}
           and{' '}
-          <a href="/legal/privacy" className="text-brand-blue-600 hover:underline">
+          <Link href="/legal/privacy" className="text-brand-blue-600 hover:underline">
             Privacy Policy
-          </a>
+          </Link>
           . I understand that I will have access to this course upon enrollment.
         </span>
       </label>

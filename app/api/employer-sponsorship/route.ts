@@ -196,7 +196,7 @@ async function _PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'sponsorshipId and action required' }, { status: 400 });
   }
 
-  let updateData: Record<string, any> = {};
+  let updateData;
 
   switch (action) {
     case 'send_agreement':

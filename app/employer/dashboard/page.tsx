@@ -317,19 +317,19 @@ export default async function EmployerDashboardOrchestrated() {
             <h3 className="text-lg font-bold text-black mb-4">Quick Actions</h3>
             <div className="space-y-3">
               {profile.verified && (
-                <a
+                <Link
                   href="/employer/post-job"
                   className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
                 >
                   Post New Job
-                </a>
+                </Link>
               )}
-              <a
+              <Link
                 href="/employer/candidates"
                 className="block w-full text-center px-4 py-3 bg-slate-200 text-black rounded-lg font-semibold hover:bg-slate-300 transition"
               >
                 Browse Candidates
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -342,12 +342,12 @@ export default async function EmployerDashboardOrchestrated() {
               <p className="text-brand-blue-800 mb-4 text-sm">
                 Start an apprenticeship program and train workers specifically for your needs.
               </p>
-              <a
+              <Link
                 href="/employer/apprenticeships"
                 className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 View Apprenticeships
-              </a>
+              </Link>
             </div>
           )}
 

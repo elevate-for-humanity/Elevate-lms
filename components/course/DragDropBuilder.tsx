@@ -256,10 +256,10 @@ export default function DragDropBuilder({
   };
 
   const handleEditModule = (id: string) => {
-    const module = modules.find((m) => m.id === id);
-    if (module) {
-      setEditingModule(module);
-      setNewModule(module);
+    const foundModule = modules.find((m) => m.id === id);
+    if (foundModule) {
+      setEditingModule(foundModule);
+      setNewModule(foundModule);
       setShowAddModal(true);
     }
   };

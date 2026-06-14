@@ -24,17 +24,15 @@ export default async function OnboardingPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let profile = null;
   if (user) {
     const { data }: any = await supabase
       .from('profiles')
       .select('role, full_name')
       .eq('id', user.id)
       .maybeSingle();
-    profile = data;
-    if (profile?.role === 'student') redirect('/onboarding/learner');
-    else if (profile?.role === 'program_holder') redirect('/program-holder/onboarding');
-    else if (profile?.role === 'admin' || profile?.role === 'super_admin')
+    if (data?.role === 'student') redirect('/onboarding/learner');
+    else if (data?.role === 'program_holder') redirect('/program-holder/onboarding');
+    else if (data?.role === 'admin' || data?.role === 'super_admin')
       redirect('/admin/dashboard');
   }
 

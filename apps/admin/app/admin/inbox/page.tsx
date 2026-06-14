@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -110,12 +111,12 @@ export default async function AdminInboxPage() {
       <section className="mt-10">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-zinc-900">Partner Inquiries</h2>
-          <a
+          <Link
             className="text-sm font-semibold text-zinc-700 underline"
             href="/admin/partner-inquiries"
           >
             Open full list
-          </a>
+          </Link>
         </div>
 
         <div className="mt-4 space-y-4">
@@ -185,12 +186,12 @@ export default async function AdminInboxPage() {
       <section className="mt-12">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-zinc-900">License Requests</h2>
-          <a
+          <Link
             className="text-sm font-semibold text-zinc-700 underline"
             href="/admin/licenses"
           >
             Open full list
-          </a>
+          </Link>
         </div>
 
         <div className="mt-4 space-y-4">

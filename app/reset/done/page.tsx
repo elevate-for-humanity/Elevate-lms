@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 
@@ -26,12 +27,12 @@ export default async function ResetDonePage() {
         <p className="text-black mb-6">
           All cached data, sessions, and service workers have been cleared.
         </p>
-        <a
+        <Link
           href="/"
           className="inline-block bg-brand-blue-600 text-white px-6 py-3 rounded-lg hover:bg-brand-blue-700 transition"
         >
           Return to Home
-        </a>
+        </Link>
       </div>
     </div>
   );

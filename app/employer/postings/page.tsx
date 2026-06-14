@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import Link from 'next/link';
 
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
@@ -50,12 +51,12 @@ export default async function EmployerPostingsPage() {
               <p className="text-sm text-black">Schedule interviews and make offers</p>
             </div>
           </div>
-          <a
+          <Link
             href="/employer/post-job"
             className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
           >
             Post a Job
-          </a>
+          </Link>
           <p className="text-slate-500 text-sm mt-4">
             Or contact us at{' '}
             <a href={`tel:${PLATFORM_DEFAULTS.supportPhone}`} className="text-blue-600 hover:underline">

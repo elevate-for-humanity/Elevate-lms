@@ -55,9 +55,9 @@ export function StudentPortfolio() {
     portfolio: '',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan',
   });
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [_projects, setProjects] = useState<Project[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [_certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Load portfolio data from database

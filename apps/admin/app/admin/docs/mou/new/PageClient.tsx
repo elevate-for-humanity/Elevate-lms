@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -116,12 +117,12 @@ export default function NewMouPage() {
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {saving ? 'Saving…' : 'Create MOU'}
           </button>
-          <a
+          <Link
             href="/admin/docs/mou"
             className="px-5 py-2.5 text-sm text-slate-600 hover:text-slate-900 font-medium"
           >
             Cancel
-          </a>
+          </Link>
         </div>
       </form>
     </div>

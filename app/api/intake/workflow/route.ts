@@ -156,7 +156,7 @@ async function _PATCH(request: NextRequest) {
   }
 
   // Process step update
-  let updateData: Record<string, any> = {};
+  let updateData;
   let newStatus: IntakeStatus = intake.status;
 
   switch (step) {

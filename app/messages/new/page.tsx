@@ -20,6 +20,7 @@ export default function NewMessagePage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) router.push('/login?redirect=/messages/new');
       else setUserId(user.id);

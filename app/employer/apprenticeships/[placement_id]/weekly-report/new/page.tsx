@@ -146,12 +146,12 @@ export default async function NewWeeklyReportPage({
             </div>
 
             <div className="pt-4 flex gap-4">
-              <a
+              <Link
                 href="/employer/dashboard"
                 className="flex-1 px-6 py-3 border border-slate-300 text-black font-semibold rounded-lg hover:bg-white transition text-center"
               >
                 Cancel
-              </a>
+              </Link>
               <button
                 type="submit"
                 className="flex-1 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"

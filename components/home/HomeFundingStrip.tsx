@@ -22,7 +22,7 @@ export function HomeFundingStrip() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
-            <h2 id="funding-strip-heading" className="text-lg font-extrabold text-white">
+            <h2 id="funding-strip-heading" className="text-lg font-extrabold">
               Can training be paid for?
             </h2>
             <p className="text-brand-blue-100 text-sm mt-0.5">
@@ -49,9 +49,9 @@ export function HomeFundingStrip() {
             <Link
               key={path.label}
               href={path.href}
-              className="rounded-lg border border-white/20 hover:bg-white/15 px-3 py-2.5 transition-colors"
+              className="rounded-lg border border-white/20 bg-white/10 hover:bg-white/20 px-3 py-2.5 transition-colors"
             >
-              <p className="text-sm font-bold leading-tight text-white">{path.label}</p>
+              <p className="text-sm font-bold leading-tight">{path.label}</p>
               <p className="text-[11px] text-brand-blue-100 mt-0.5">{path.desc}</p>
             </Link>
           ))}

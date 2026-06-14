@@ -48,6 +48,8 @@ function PathwayCard({ prog, priority }: { prog: ProgramSchema; priority?: boole
     prog.slug === 'barber-apprenticeship' ||
     prog.slug === 'cdl-training' ||
     prog.slug === 'hvac-technician' ||
+    prog.slug === 'electrical' ||
+    prog.slug === 'welding' ||
     prog.slug === 'culinary-apprenticeship';
 
   return (

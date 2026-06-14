@@ -1,7 +1,11 @@
 import { Metadata } from 'next';
-import BeautyProgramPage from '@/components/beauty/BeautyProgramPage';
+import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
+import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
+import BarberApprenticeshipProcess from '@/components/programs/beauty/BarberApprenticeshipProcess';
+import BarberApprenticeshipExtras from '@/components/programs/beauty/BarberApprenticeshipExtras';
 import { COSMETOLOGY } from '@/data/programs/cosmetology-apprenticeship';
 import { validateProgram } from '@/lib/programs/program-schema';
+import heroBanners from '@/content/heroBanners';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,5 +25,30 @@ export const metadata: Metadata = {
 };
 
 export default async function CosmetologyApprenticeshipPage() {
-  return <BeautyProgramPage program={p} />;
+  const heroBanner = heroBanners['cosmetology-apprenticeship'] ?? null;
+
+  return (
+    <>
+      <ProgramStructuredData
+        program={{
+          id: p.slug,
+          name: p.title,
+          slug: p.slug,
+          description: p.subtitle,
+          duration_weeks: p.durationWeeks,
+          price: parseInt(p.selfPayCost.replace(/[^0-9]/g, ''), 10) || undefined,
+          image_url: p.heroImage,
+          category: p.category,
+          outcomes: p.outcomes.map((o) => o.statement),
+        }}
+      />
+      <ProgramDetailPage
+        program={p}
+        banner={heroBanner}
+        processSlot={<BarberApprenticeshipProcess />}
+      >
+        <BarberApprenticeshipExtras />
+      </ProgramDetailPage>
+    </>
+  );
 }

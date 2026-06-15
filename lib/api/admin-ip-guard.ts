@@ -60,3 +60,11 @@ export function checkAdminIP(request: NextRequest): NextResponse | null {
   }
   return null;
 }
+
+/**
+ * Async version — for API routes that may need DB lookups in the future.
+ * Currently just wraps the sync version.
+ */
+export async function checkAdminIPAsync(request: NextRequest): Promise<NextResponse | null> {
+  return checkAdminIP(request);
+}

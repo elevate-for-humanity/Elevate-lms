@@ -122,10 +122,11 @@ export const DEFAULT_NAV: NavSection[] = [
     label: 'Automation',
     href: '/admin/dev-studio',
     items: [
-      { label: 'Dev Studio', href: '/admin/dev-studio' },
-      { label: 'Workflows', href: '/admin/dev-studio/workflows' },
+      { label: 'Open Studio', href: '/admin/dev-studio' },
       { label: 'Course Builder', href: '/admin/dev-studio/courses' },
+      { label: 'Workflows', href: '/admin/dev-studio/workflows' },
       { label: 'Automation Log', href: '/admin/automation' },
+      { label: 'Media Studio', href: '/admin/media-studio' },
       { label: 'Agents', href: '/admin/dev-studio/agents' },
       { label: 'Builds', href: '/admin/dev-studio/builds' },
       { label: 'Deployments', href: '/admin/dev-studio/deployments' },

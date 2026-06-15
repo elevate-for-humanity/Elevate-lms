@@ -49,3 +49,16 @@ export function constructStripeEventWithAnySecret(
   }
   throw lastError ?? new Error('Webhook signature verification failed');
 }
+
+/**
+ * Alias for backward compatibility.
+ * @deprecated Use constructStripeEventWithAnySecret with explicit secrets.
+ */
+export function constructWebhookEvent(
+  stripe: Stripe,
+  body: string,
+  signature: string,
+): Stripe.Event {
+  const secrets = getCanonicalStripeWebhookSecrets();
+  return constructStripeEventWithAnySecret(stripe, body, signature, secrets);
+}

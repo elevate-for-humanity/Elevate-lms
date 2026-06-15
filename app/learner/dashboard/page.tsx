@@ -6,6 +6,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import { loadLearnerDashboard } from '@/lib/learner/dashboard-loader';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
 import OjtHoursLogger from '@/components/learner/OjtHoursLogger';
+import { DOLCompetencyTracker } from '@/components/dashboard/DOLCompetencyTracker';
 import {
   Clock,
   Play,
@@ -664,6 +665,15 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
               pendingWorkone={isPendingWorkone}
               fundingSource={(workoneApp as any)?.requested_funding_source ?? undefined}
             />
+
+            {/* DOL Competency Tracker — for apprenticeship students */}
+            {enrollment && (
+              <DOLCompetencyTracker
+                userId={user.id}
+                organizationId={null}
+                apprenticeshipProgram={enrollment.program_slug || 'barber'}
+              />
+            )}
 
             {/* Achievements */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200">

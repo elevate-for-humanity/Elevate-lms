@@ -98,43 +98,6 @@ export async function HomeOutcomes() {
   return (
     <section className="bg-slate-900 py-16 px-4" aria-labelledby="outcomes-heading">
       <div className="max-w-6xl mx-auto">
-        {/* Stats strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-14">
-          {[
-            {
-              stat: verified.placementDisplay,
-              label: 'Credential attainment rate',
-              note: 'Among completers',
-            },
-            {
-              stat: verified.studentsDisplay,
-              label: 'Learners served',
-              note: 'Verified count when available',
-            },
-            {
-              stat: '$0',
-              label: 'Cost for eligible students',
-              note: 'WIOA & state funding',
-            },
-            {
-              stat: verified.programsDisplay,
-              label: 'Programs available',
-              note: 'Across 6 sectors',
-            },
-          ].map((item) => (
-            <div
-              key={item.label}
-              className="text-center px-4 py-5 rounded-2xl bg-slate-800 border border-slate-700"
-            >
-              <p className="text-3xl sm:text-4xl font-extrabold text-white mb-1">{item.stat}</p>
-              <p className="text-slate-300 text-xs font-semibold leading-snug mb-1">
-                {item.label}
-              </p>
-              <p className="text-slate-400 text-[10px]">{item.note}</p>
-            </div>
-          ))}
-        </div>
-
         {/* Section header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>

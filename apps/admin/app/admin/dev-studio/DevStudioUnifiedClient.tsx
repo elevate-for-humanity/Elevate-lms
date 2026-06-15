@@ -370,10 +370,10 @@ export default function DevStudioUnifiedClient({
             {workspace === 'files' && (
               <div className="flex h-full flex-col overflow-hidden">
                 <div className="min-h-0 flex-1 overflow-hidden">
-                  <DevStudioEditorWorkspace
-                    onFileContextChange={(path, content) => {
-                      setOpenFilePath(path);
-                      setOpenFileContent(content);
+                  <WebContainerSandbox
+                    onOutput={(output) => setCommandOutput(prev => prev + '\n' + output)}
+                    onFileChange={(files) => {
+                      console.log('Files changed:', files);
                     }}
                   />
                 </div>

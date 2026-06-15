@@ -1,6 +1,8 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { unstable_cache } from 'next/cache';
+import { createServerClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 import { AdminNavShell } from '@/components/admin/AdminNavShell';
 import { RealtimeSystemStatus } from '@/components/admin/RealtimeSystemStatus';
 import { DEFAULT_NAV, isNavSections, type NavSection } from '@/lib/admin/nav-config';
@@ -31,6 +33,14 @@ const getCachedNavSections = unstable_cache(
 );
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  // Check authentication
+  const supabase = createServerClient();
+  const { data: { user }, error } = await supabase.auth.getUser();
+  
+  if (error || !user) {
+    redirect('/login');
+  }
+
   const navSections = await getCachedNavSections(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '').catch(() => DEFAULT_NAV);
 
   const content = (

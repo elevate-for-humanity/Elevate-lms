@@ -22,19 +22,6 @@ export async function GET(request: NextRequest) {
   try {
     const db = await requireAdminClient();
 
-    // Return workflows from ai_tasks table
-    const { data: workflows, error: workflowsError } = await db
-      .from('ai_tasks')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(50);
-
-    if (workflowsError) {
-      console.error('Error fetching workflows:', workflowsError);
-      // Return empty workflows if table doesn't exist yet
-      return jsonOk({ workflows: [], message: 'ai_tasks table not found' });
-    }
-
     if (view === 'repo-search') {
       const q = request.nextUrl.searchParams.get('q') ?? '';
       const results = await searchRepoIndex(db, q);
@@ -52,7 +39,7 @@ export async function GET(request: NextRequest) {
     }
 
     const snapshot = await buildCommandCenterSnapshot(db, { health });
-    return jsonOk({ workflows: workflows || [], snapshot });
+    return jsonOk({ snapshot });
   } catch (err) {
     return safeInternalError(err, 'Failed to load command center');
   }

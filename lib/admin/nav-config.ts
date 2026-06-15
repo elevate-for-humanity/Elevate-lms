@@ -119,24 +119,13 @@ export const DEFAULT_NAV: NavSection[] = [
     ],
   },
   {
-    label: 'LMS',
-    href: '/lms',
-    items: [
-      { label: 'LMS Portal', href: '/lms' },
-      { label: 'LMS Dashboard', href: '/learner/dashboard' },
-      { label: 'Courses', href: '/lms/courses' },
-      { label: 'My Progress', href: '/learner/progress' },
-    ],
-  },
-  {
     label: 'Automation',
     href: '/admin/dev-studio',
     items: [
-      { label: 'Open Studio', href: '/admin/dev-studio' },
-      { label: 'Course Builder', href: '/admin/dev-studio/courses' },
+      { label: 'Dev Studio', href: '/admin/dev-studio' },
       { label: 'Workflows', href: '/admin/dev-studio/workflows' },
+      { label: 'Course Builder', href: '/admin/dev-studio/courses' },
       { label: 'Automation Log', href: '/admin/automation' },
-      { label: 'Media Studio', href: '/admin/media-studio' },
       { label: 'Agents', href: '/admin/dev-studio/agents' },
       { label: 'Builds', href: '/admin/dev-studio/builds' },
       { label: 'Deployments', href: '/admin/dev-studio/deployments' },

@@ -27,15 +27,7 @@ import {
   Upload,
   Briefcase,
   Plug,
-  Brain,
 } from 'lucide-react';
-import { getSkillsLoader, type Skill } from '@/lib/dev-studio/skills-loader';
-
-// Import OpenHands-style components
-const WebContainerSandbox = dynamic(
-  () => import('@/components/dev-studio/WebContainerSandbox'),
-  { ssr: false }
-);
 
 interface WorkflowButton {
   key: string;
@@ -378,10 +370,10 @@ export default function DevStudioUnifiedClient({
             {workspace === 'files' && (
               <div className="flex h-full flex-col overflow-hidden">
                 <div className="min-h-0 flex-1 overflow-hidden">
-                  <WebContainerSandbox
-                    onOutput={(output) => setCommandOutput(prev => prev + '\n' + output)}
-                    onFileChange={(files) => {
-                      console.log('Files changed:', files);
+                  <DevStudioEditorWorkspace
+                    onFileContextChange={(path, content) => {
+                      setOpenFilePath(path);
+                      setOpenFileContent(content);
                     }}
                   />
                 </div>

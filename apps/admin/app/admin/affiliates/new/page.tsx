@@ -1,0 +1,150 @@
+export const revalidate = 3600;
+
+import { requireRole } from '@/lib/auth/require-role';
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ArrowLeft, Users, Mail, Phone, Globe, DollarSign, Save } from 'lucide-react';
+import { createAffiliate } from '../actions';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export const metadata: Metadata = {
+  title: 'New Affiliate | Admin',
+  description: 'Add a new affiliate partner.',
+};
+
+export default async function NewAffiliatePage() {
+  await requireRole(['admin', 'super_admin', 'staff']);
+
+  return (
+    <div className="min-h-screen bg-white p-6">
+      {/* Hero Image */}
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-4">
+          <Breadcrumbs
+            items={[
+              { label: 'Admin', href: '/admin/dashboard' },
+              { label: 'Affiliates', href: '/admin/affiliates' },
+              { label: 'New Affiliate' },
+            ]}
+          />
+        </div>
+
+        <Link
+          href="/admin/affiliates"
+          className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-4"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Affiliates
+        </Link>
+
+        <h1 className="text-2xl font-bold text-slate-900 mb-6">Add New Affiliate</h1>
+
+        <form
+          action={createAffiliate}
+          className="bg-white rounded-xl border border-slate-200 p-6 space-y-5"
+        >
+          <div>
+            <label className="block text-sm font-medium text-slate-900 mb-1">
+              <span className="flex items-center gap-1">
+                <Users className="w-3.5 h-3.5" /> Organization / Name *
+              </span>
+            </label>
+            <input
+              name="name"
+              required
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+              placeholder="Partner organization name"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-900 mb-1">
+                <span className="flex items-center gap-1">
+                  <Mail className="w-3.5 h-3.5" /> Email *
+                </span>
+              </label>
+              <input
+                name="email"
+                type="email"
+                required
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+                placeholder="contact@partner.org"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-900 mb-1">
+                <span className="flex items-center gap-1">
+                  <Phone className="w-3.5 h-3.5" /> Phone
+                </span>
+              </label>
+              <input
+                name="phone"
+                type="tel"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+                placeholder={PLATFORM_DEFAULTS.supportPhone}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-900 mb-1">
+                <span className="flex items-center gap-1">
+                  <Globe className="w-3.5 h-3.5" /> Website
+                </span>
+              </label>
+              <input
+                name="website"
+                type="url"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+                placeholder="https://partner.org"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-900 mb-1">
+                <span className="flex items-center gap-1">
+                  <DollarSign className="w-3.5 h-3.5" /> Commission Rate (%)
+                </span>
+              </label>
+              <input
+                name="commission"
+                type="number"
+                step="0.1"
+                min="0"
+                max="100"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+                placeholder="10"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-900 mb-1">Notes</label>
+            <textarea
+              name="notes"
+              rows={3}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+              placeholder="Additional details about this affiliate..."
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+            <Link
+              href="/admin/affiliates"
+              className="px-4 py-2 text-sm text-slate-700 hover:text-slate-900"
+            >
+              Cancel
+            </Link>
+            <button
+              type="submit"
+              className="flex items-center gap-2 px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700"
+            >
+              <Save className="w-4 h-4" /> Create Affiliate
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

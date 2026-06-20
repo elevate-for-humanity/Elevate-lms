@@ -1,0 +1,146 @@
+import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
+
+import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+
+const VALID_ROLES = ['student', 'staff', 'instructor', 'admin', 'super_admin'];
+
+/**
+ * POST /api/admin/users/role
+ *
+ * Update a user's role. Only super_admin can do this.
+ *
+ * Body: { email: string, role: string }
+ */
+async function _POST(request: NextRequest) {
+  try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
+    const supabase = await createClient();
+
+    // Check if current user is super_admin
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { data: currentProfile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!currentProfile || currentProfile.role !== 'super_admin') {
+      return NextResponse.json({ error: 'Only super admins can change roles' }, { status: 403 });
+    }
+
+    // Get request body
+    const body = await request.json();
+    const { email, role } = body;
+
+    if (!email || !role) {
+      return NextResponse.json({ error: 'Email and role are required' }, { status: 400 });
+    }
+
+    if (!VALID_ROLES.includes(role)) {
+      return NextResponse.json(
+        { error: `Invalid role. Must be one of: ${VALID_ROLES.join(', ')}` },
+        { status: 400 },
+      );
+    }
+
+    // Update the user's role
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ role, updated_at: new Date().toISOString() })
+      .eq('email', email)
+      .select('id, email, role')
+      .single();
+
+    if (error) {
+      logger.error('Role update error:', error);
+      return NextResponse.json({ error: 'Failed to update role' }, { status: 500 });
+    }
+
+    if (!data) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    await logAdminAudit({
+      action: AdminAction.ROLE_CHANGED,
+      actorId: user.id,
+      entityType: 'profiles',
+      entityId: data.id,
+      metadata: { new_role: role, target_email: email },
+      req: request,
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `User ${email} role updated to ${role}`,
+      user: data,
+    });
+  } catch (error) {
+    logger.error('Role API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+/**
+ * GET /api/admin/users/role
+ *
+ * List all users with admin/staff roles. Only super_admin can do this.
+ */
+async function _GET(request: NextRequest) {
+  try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
+    const supabase = await createClient();
+
+    // Check if current user is super_admin
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { data: currentProfile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!currentProfile || currentProfile.role !== 'super_admin') {
+      return NextResponse.json({ error: 'Only super admins can view roles' }, { status: 403 });
+    }
+
+    // Get all admin/staff users
+    const { data: admins, error } = await supabase
+      .from('profiles')
+      .select('id, email, full_name, role, created_at')
+      .in('role', ['admin', 'super_admin', 'staff', 'instructor'])
+      .order('role')
+      .order('email');
+
+    if (error) {
+      logger.error('Fetch admins error:', error);
+      return NextResponse.json({ error: 'Failed to fetch admins' }, { status: 500 });
+    }
+
+    return NextResponse.json({ admins: admins || [] });
+  } catch (error) {
+    logger.error('Role API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+export const GET = withApiAudit('/api/admin/users/role', _GET);
+export const POST = withApiAudit('/api/admin/users/role', _POST);

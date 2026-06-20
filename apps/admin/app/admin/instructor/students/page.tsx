@@ -1,0 +1,241 @@
+import Image from 'next/image';
+import { Metadata } from 'next';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { Users, Search, Mail, GraduationCap, Clock } from 'lucide-react';
+import { safeFormatDate } from '@/lib/format-utils';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+export const metadata: Metadata = {
+  title: 'My Students | Instructor Portal',
+  description: 'View and manage your enrolled students.',
+};
+
+export const dynamic = 'force-dynamic';
+
+export default async function InstructorStudentsPage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (!profile || !['instructor', 'admin', 'super_admin'].includes(profile.role)) {
+    redirect('/');
+  }
+
+  // Get students enrolled in instructor's courses
+  const { data: rawStudentEnrollments } = await supabase
+    .from('program_enrollments')
+    .select(
+      'id, status, progress_percent, enrolled_at, completed_at, user_id, programs ( name, title )',
+    )
+    .order('enrolled_at', { ascending: false })
+    .limit(100);
+
+  // Hydrate profiles separately (no FK from program_enrollments.user_id to profiles)
+  const instrUserIds = [
+    ...new Set((rawStudentEnrollments || []).map((e: any) => e.user_id).filter(Boolean)),
+  ];
+  const { data: instrProfiles } = instrUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', instrUserIds)
+    : { data: [] };
+  const instrProfileMap = Object.fromEntries((instrProfiles || []).map((p: any) => [p.id, p]));
+  const enrollments = (rawStudentEnrollments || []).map((e: any) => ({
+    ...e,
+    progress: e.progress_percent,
+    profiles: instrProfileMap[e.user_id] ?? null,
+  }));
+
+  const activeStudents = enrollments?.filter((e) => e.status === 'active') || [];
+  const completedStudents = enrollments?.filter((e) => e.status === 'completed') || [];
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
+        <Image
+          src="/images/pages/instructor-page-14.jpg"
+          alt="Instructor portal"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+        />
+      </section>
+      {/* Breadcrumbs */}
+      <div className="bg-white border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs
+            items={[{ label: 'Instructor', href: '/admin/instructor' }, { label: 'Students' }]}
+          />
+        </div>
+      </div>
+
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">My Students</h1>
+              <p className="text-slate-700">View and manage enrolled students</p>
+            </div>
+            <Link
+              href="/admin/instructor/dashboard"
+              className="px-4 py-2 text-slate-700 hover:text-slate-900"
+            >
+              ← Dashboard
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center gap-3">
+              <Users className="w-8 h-8 text-brand-blue-600" />
+              <div>
+                <div className="text-2xl font-bold">{enrollments?.length || 0}</div>
+                <div className="text-sm text-slate-700">Total Students</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center gap-3">
+              <Clock className="w-8 h-8 text-yellow-600" />
+              <div>
+                <div className="text-2xl font-bold">{activeStudents.length}</div>
+                <div className="text-sm text-slate-700">Active</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center gap-3">
+              <span className="text-slate-500 flex-shrink-0">•</span>
+              <div>
+                <div className="text-2xl font-bold">{completedStudents.length}</div>
+                <div className="text-sm text-slate-700">Completed</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700" />
+            <input
+              type="text"
+              placeholder="Search students..."
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
+            />
+          </div>
+        </div>
+
+        {/* Students List */}
+        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-white border-b">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">
+                  Student
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">
+                  Program
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">
+                  Progress
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">
+                  Enrolled
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {enrollments && enrollments.length > 0 ? (
+                enrollments.map((enrollment: any) => (
+                  <tr key={enrollment.id} className="hover:bg-white">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                          <Users className="w-4 h-4 text-brand-blue-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-slate-900">
+                            {enrollment.profiles?.full_name || 'Student'}
+                          </div>
+                          <div className="text-sm text-slate-700">{enrollment.profiles?.email}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-900">
+                      {enrollment.programs?.name || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-white rounded-full"
+                            style={{ width: `${enrollment.progress || 0}%` }}
+                          />
+                        </div>
+                        <span className="text-sm text-slate-700">{enrollment.progress || 0}%</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full ${
+                          enrollment.status === 'completed'
+                            ? 'bg-brand-green-100 text-brand-green-800'
+                            : enrollment.status === 'active'
+                              ? 'bg-brand-blue-100 text-brand-blue-800'
+                              : 'bg-white text-slate-900'
+                        }`}
+                      >
+                        {enrollment.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-700">
+                      {safeFormatDate(enrollment.enrolled_at)}
+                    </td>
+                    <td className="px-6 py-4">
+                      {enrollment.profiles?.email && (
+                        <a
+                          href={`mailto:${enrollment.profiles.email}`}
+                          className="text-brand-blue-600 hover:text-brand-blue-800"
+                        >
+                          <Mail className="w-5 h-5" />
+                        </a>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-slate-700">
+                    <GraduationCap className="w-12 h-12 mx-auto mb-4 text-slate-700" />
+                    <p>No students enrolled yet.</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}

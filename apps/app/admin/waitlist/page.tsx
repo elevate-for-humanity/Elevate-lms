@@ -1,0 +1,145 @@
+import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
+import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: 'Waitlist | Admin | Elevate For Humanity',
+  description: 'View and manage program waitlist entries',
+};
+
+const statusColors: Record<string, string> = {
+  waiting: 'bg-yellow-100 text-yellow-800',
+  contacted: 'bg-brand-blue-100 text-brand-blue-800',
+  enrolled: 'bg-brand-green-100 text-brand-green-800',
+  removed: 'bg-slate-100 text-slate-700',
+};
+
+export default async function AdminWaitlistPage() {
+  await requireRole(['admin', 'super_admin']);
+  const supabase = await createClient();
+
+  const { data: entries, error } = await supabase
+    .from('waitlist')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  // Count by status
+  const counts: Record<string, number> = {};
+  entries?.forEach((e: { status: string }) => {
+    counts[e.status] = (counts[e.status] || 0) + 1;
+  });
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Hero Image */}
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Waitlist' }]} />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Program Waitlist</h1>
+            <p className="text-slate-700 mt-1">{entries?.length || 0} total entries</p>
+          </div>
+          <Link
+            href="/admin/dashboard"
+            className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            Back to Dashboard
+          </Link>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h3 className="text-xs font-medium text-slate-700 uppercase">Waiting</h3>
+            <p className="text-2xl font-bold text-yellow-600">{counts['waiting'] || 0}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h3 className="text-xs font-medium text-slate-700 uppercase">Contacted</h3>
+            <p className="text-2xl font-bold text-brand-blue-600">{counts['contacted'] || 0}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h3 className="text-xs font-medium text-slate-700 uppercase">Enrolled</h3>
+            <p className="text-2xl font-bold text-brand-green-600">{counts['enrolled'] || 0}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h3 className="text-xs font-medium text-slate-700 uppercase">Removed</h3>
+            <p className="text-2xl font-bold text-slate-700">{counts['removed'] || 0}</p>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+          {error ? (
+            <div className="p-8 text-center text-brand-red-600">
+              Error loading waitlist. Ensure the waitlist table exists.
+            </div>
+          ) : entries && entries.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-50 border-b">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase">
+                      Name
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase">
+                      Contact
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase">
+                      Program
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase">
+                      Status
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {entries.map((entry: any) => (
+                    <tr key={entry.id} className="hover:bg-slate-50">
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="font-medium text-slate-900">
+                          {entry.first_name} {entry.last_name}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="text-sm text-slate-900">{entry.email}</div>
+                        {entry.phone && <div className="text-sm text-slate-700">{entry.phone}</div>}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span className="text-sm text-slate-900">
+                          {(entry.program_slug || '').replace(/-/g, ' ')}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${statusColors[entry.status] || 'bg-slate-100 text-slate-900'}`}
+                        >
+                          {entry.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-slate-700">
+                        {new Date(entry.created_at).toLocaleDateString('en-US')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="p-8 text-center text-slate-700">No waitlist entries yet.</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

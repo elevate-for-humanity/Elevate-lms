@@ -1,0 +1,105 @@
+import { Metadata } from 'next';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { GradebookClient } from './GradebookClient';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: 'Gradebook | Admin | Elevate LMS',
+  description: 'Grade student submissions and manage course grades.',
+};
+
+export default async function AdminGradebookPage({
+  params,
+}: {
+  params: Promise<{ courseId: string }>;
+}) {
+  const { courseId } = await params;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (!['admin', 'super_admin', 'instructor'].includes(profile?.role || '')) {
+    redirect('/unauthorized');
+  }
+
+  // Fetch course
+  const { data: course } = await supabase
+    .from('courses')
+    .select('id, title')
+    .eq('id', courseId)
+    .maybeSingle();
+
+  if (!course) redirect('/admin/courses');
+
+  // Fetch enrollments with student profiles
+  const { data: rawGradebookEnrollments } = await supabase
+    .from('program_enrollments')
+    .select('id, user_id, progress_percent, status')
+    .eq('course_id', courseId)
+    .order('created_at');
+
+  // Hydrate profiles separately (program_enrollments.user_id → auth.users, not profiles)
+  const gbUserIds = [
+    ...new Set((rawGradebookEnrollments || []).map((e: any) => e.user_id).filter(Boolean)),
+  ];
+  const { data: gbProfiles } = gbUserIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', gbUserIds)
+    : { data: [] };
+  const gbProfileMap = Object.fromEntries((gbProfiles || []).map((p: any) => [p.id, p]));
+  const enrollments = (rawGradebookEnrollments || []).map((e: any) => ({
+    ...e,
+    progress: e.progress_percent,
+    profiles: gbProfileMap[e.user_id] ?? null,
+  }));
+
+  // Fetch assignment submissions for this course
+  const { data: submissions } = await supabase
+    .from('assignment_submissions')
+    .select('*')
+    .eq('course_id', courseId)
+    .order('submitted_at', { ascending: false });
+
+  // Fetch quiz attempts for this course
+  const { data: quizAttempts } = await supabase
+    .from('quiz_attempts')
+    .select('*')
+    .eq('course_id', courseId)
+    .order('created_at', { ascending: false });
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Hero Image */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Link
+            href="/admin/courses"
+            className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 mb-4"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Courses
+          </Link>
+          <h1 className="text-2xl font-bold text-slate-900">Gradebook: {course.title}</h1>
+        </div>
+
+        <GradebookClient
+          courseId={courseId}
+          enrollments={(enrollments || []) as any[]}
+          submissions={submissions || []}
+          quizAttempts={quizAttempts || []}
+        />
+      </div>
+    </div>
+  );
+}

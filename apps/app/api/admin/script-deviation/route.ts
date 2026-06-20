@@ -1,0 +1,74 @@
+import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+
+export const dynamic = 'force-dynamic';
+
+async function _POST(request: NextRequest) {
+  try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { data: _roleProfile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (!_roleProfile || !['admin', 'super_admin', 'staff'].includes(_roleProfile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { intakeId, scriptId, reason, notes } = body;
+
+    // Log deviation
+    const { error } = await supabase.from('script_deviations').insert({
+      intake_id: intakeId,
+      script_id: scriptId,
+      user_id: user.id,
+      reason,
+      notes,
+      created_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      logger.error('Deviation error:', error);
+      return NextResponse.json({
+        success: true,
+        message: 'Script deviation logged',
+      });
+    }
+
+    await logAdminAudit({
+      action: AdminAction.SCRIPT_DEVIATION_LOGGED,
+      actorId: user.id,
+      entityType: 'script_deviations',
+      entityId: intakeId || BULK_ENTITY_ID,
+      metadata: { script_id: scriptId, reason },
+      req: request,
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Script deviation logged',
+    });
+  } catch (error) {
+    logger.error('Deviation error:', error);
+    return NextResponse.json({
+      success: true,
+      message: 'Script deviation logged',
+    });
+  }
+}
+export const POST = withApiAudit('/api/admin/script-deviation', _POST);

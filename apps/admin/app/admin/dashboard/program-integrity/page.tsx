@@ -64,7 +64,7 @@ export default function ProgramIntegrityPage() {
     }
   }
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const critical = programs.filter(p => p.integrity_score < 60);
   const warning = programs.filter(p => p.integrity_score >= 60 && p.integrity_score < 80);

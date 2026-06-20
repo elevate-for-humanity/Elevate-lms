@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { 
   DollarSign, 
   GraduationCap, 
@@ -219,19 +220,19 @@ export default function BeautyFundingOptions() {
             and spread the rest over weekly payments. BNPL options available at checkout.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <a
+            <Link
               href="/programs/barber-apprenticeship#payment-calculator"
               className="inline-flex items-center px-6 py-3 bg-white text-amber-600 font-bold rounded-lg hover:bg-gray-100 transition-all"
             >
               <FileText className="w-5 h-5 mr-2" />
               Calculate Payments
-            </a>
-            <a
+            </Link>
+            <Link
               href="/contact"
               className="inline-flex items-center px-6 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 transition-all"
             >
               Talk to an Advisor
-            </a>
+            </Link>
           </div>
         </div>
 

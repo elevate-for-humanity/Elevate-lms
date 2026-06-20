@@ -79,11 +79,11 @@ ${parsed.modules?.map((mod: any, i: number) => `${i + 1}. ${mod.title || mod}`).
 
     // Create folders + lessons if modules exist
     if (parsed.modules && Array.isArray(parsed.modules)) {
-      for (const module of parsed.modules) {
-        const moduleSlug = (module.title || 'module').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      for (const mod of parsed.modules) {
+        const moduleSlug = (mod.title || 'module').toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-        if (module.lessons && Array.isArray(module.lessons)) {
-          for (const lesson of module.lessons) {
+        if (mod.lessons && Array.isArray(mod.lessons)) {
+          for (const lesson of mod.lessons) {
             const lessonSlug = (lesson.title || lesson).toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
             const lessonContent =

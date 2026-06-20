@@ -34,7 +34,7 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
       }
     }
     checkSession();
-  }, []);
+  }, [next]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

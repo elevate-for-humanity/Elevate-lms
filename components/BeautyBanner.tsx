@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Pause, Play, Volume2, VolumeX } from 'lucide-react';
 
 interface BannerSlide {
@@ -175,7 +176,7 @@ export default function BeautyBanner() {
           
           {/* CTA Button */}
           <div className="flex flex-wrap gap-4">
-            <a
+            <Link
               href={slide.ctaLink}
               className="inline-flex items-center px-8 py-4 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-lg transition-all transform hover:scale-105 shadow-lg shadow-amber-500/30"
             >
@@ -183,13 +184,13 @@ export default function BeautyBanner() {
               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/programs/barber-apprenticeship"
               className="inline-flex items-center px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-black transition-all"
             >
               View All Programs
-            </a>
+            </Link>
           </div>
         </div>
       </div>

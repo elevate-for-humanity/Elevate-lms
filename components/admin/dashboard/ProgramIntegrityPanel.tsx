@@ -74,7 +74,7 @@ export function ProgramIntegrityPanel() {
     }
   }
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const programs = data?.programs ?? [];
   const critical = programs.filter((p) => p.integrity_score < 60);

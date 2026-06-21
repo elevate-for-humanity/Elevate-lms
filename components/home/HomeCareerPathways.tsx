@@ -117,6 +117,12 @@ function PathwayCard({ prog, priority }: { prog: ProgramSchema; priority?: boole
 
         {/* CTAs */}
         <div className="flex flex-col gap-2 mt-auto pt-2">
+          {prog.paymentPlan && (
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter flex justify-between items-center px-1">
+              <span>Payment Plan</span>
+              <span className="text-brand-red-600">Starting at ${prog.paymentPlan.weeklyPayment}/week</span>
+            </div>
+          )}
           <div className="flex gap-2">
             <Link
               href={prog.cta?.applyHref || `/apply?program=${prog.slug}`}

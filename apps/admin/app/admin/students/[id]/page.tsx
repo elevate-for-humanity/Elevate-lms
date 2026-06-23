@@ -360,7 +360,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                     key={e.id}
                     data={{
                       enrollment_id: e.id,
-                      student_name: profile?.full_name ?? '—',
+                      student_name: student?.full_name ?? '—',
                       program_name:
                         programNames[e.program_id] || e.program_slug || e.id.slice(0, 8),
                       partner_name: null,

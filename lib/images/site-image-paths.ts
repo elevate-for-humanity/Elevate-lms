@@ -35,6 +35,23 @@ const SITE_IMAGE_ALIASES: Record<string, string> = {
   '/images/pages/learner/dashboard-page-6.webp': '/images/pages/learner-page-1.webp',
   '/images/pages/learner/dashboard-page-7.webp': '/images/pages/learner-page-1.webp',
   '/media/elevate-watermark.png': '/images/certification-badge.png',
+  // Missing .jpg images → fallbacks
+  '/images/pages/platform-page-7.jpg': '/images/pages/platform-page-7.webp',
+  '/images/pages/platform-page-3.jpg': '/images/pages/platform-page-3.webp',
+  '/images/pages/marketplace.jpg': '/images/pages/marketplace-page-1.webp',
+  '/images/pages/testing-page-1.jpg': '/images/pages/testing-page-1.webp',
+  '/images/pages/barber-shop-interior.jpg': '/images/pages/barber-apprenticeship-hero.jpg',
+  '/images/pages/barber-fade-cut.jpg': '/images/pages/barber-fade-cut.webp',
+  '/images/pages/barber-shop-wide.jpg': '/images/pages/barber-apprenticeship-hero.jpg',
+  '/images/pages/barber-straight-razor.jpg': '/images/pages/barber-apprenticeship-hero.jpg',
+  '/images/pages/barber-tools-closeup.jpg': '/images/pages/barber-apprenticeship-hero.jpg',
+  '/images/pages/urban-build-crew-page-1.jpg': '/images/pages/urban-build-crew-page-1.webp',
+  '/images/pages/login-page-1.jpg': '/images/pages/login-page-1.webp',
+  '/images/pages/technology-sector.jpg': '/images/pages/prog-hero-main-2.webp',
+  '/images/heroes/hero-state-funding.jpg': '/images/heroes/hero-state-funding.webp',
+  '/images/programs/dental-assistant.jpg': '/images/programs/dental-assistant.webp',
+  '/images/gallery/image8.jpg': '/images/gallery/image1.webp',
+  '/images/pages/healthcare/cpr-certification-group.jpg': '/images/pages/prog-hero-main-2.webp',
 };
 
 /** JPG paths retired after WebP migration — map to existing .webp siblings. */

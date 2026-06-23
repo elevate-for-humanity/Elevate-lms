@@ -52,6 +52,16 @@ const SITE_IMAGE_ALIASES: Record<string, string> = {
   '/images/programs/dental-assistant.jpg': '/images/programs/dental-assistant.webp',
   '/images/gallery/image8.jpg': '/images/gallery/image1.webp',
   '/images/pages/healthcare/cpr-certification-group.jpg': '/images/pages/prog-hero-main-2.webp',
+  // More missing .jpg → existing .webp
+  '/images/pages/marketplace-page-1.jpg': '/images/pages/marketplace-page-1.webp',
+  '/images/pages/employer-handshake.jpg': '/images/pages/employer-handshake.webp',
+  '/images/pages/enrollment-agreement-page-1.jpg': '/images/pages/enrollment-agreement-page-1.webp',
+  '/images/pages/funding-impact-5.jpg': '/images/pages/funding-impact-3.webp',
+  '/images/pages/barber-client-consult.jpg': '/images/pages/barber-client-consult.webp',
+  '/images/gallery/image3.jpg': '/images/gallery/image1.webp',
+  '/images/hvac/hvac-commercial.jpg': '/images/pages/prog-hero-main-2.webp',
+  '/images/pages/programs-hvac-apply-hero.jpg': '/images/pages/prog-hero-main-2.webp',
+  '/images/heroes/hero-state-funding.jpg': '/images/heroes/hero-state-funding.webp',
 };
 
 /** JPG paths retired after WebP migration — map to existing .webp siblings. */

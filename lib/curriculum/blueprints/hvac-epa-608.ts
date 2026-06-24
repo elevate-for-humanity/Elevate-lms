@@ -1,4 +1,12 @@
 /**
+ * hvac-epa-608 Blueprint
+ * 
+ * © 2026 Elevate for Humanity
+ * All Rights Reserved
+ *
+ * Version: 1.0.0
+ */
+/**
  * lib/curriculum/blueprints/hvac-epa-608.ts
  *
  * Canonical blueprint for the HVAC / EPA Section 608 program.

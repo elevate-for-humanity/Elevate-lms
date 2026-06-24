@@ -31,6 +31,9 @@ export default async function OrgProfilePage() {
   } = await supabase.auth.getUser();
   const db = await requireAdminClient();
 
+  // Guard against null user
+  if (!user) redirect('/login');
+
   const { data: profile } = await db
     .from('profiles')
     .select('role')

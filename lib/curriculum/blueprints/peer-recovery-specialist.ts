@@ -1,3 +1,11 @@
+/**
+ * peer-recovery-specialist Blueprint
+ * 
+ * © 2026 Elevate for Humanity
+ * All Rights Reserved
+ *
+ * Version: 1.0.0
+ */
 import type { CredentialBlueprint } from './types';
 
 export const peerRecoverySpecialistBlueprint: CredentialBlueprint = {

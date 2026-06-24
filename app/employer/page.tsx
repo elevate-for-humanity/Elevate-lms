@@ -138,7 +138,7 @@ export default function EmployerPage() {
               >
                 <div className="relative h-40 flex-shrink-0">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                  <Image src={img} alt={alt} fill sizes="400px" className="object-cover"  />
+                  {img && <Image src={img} alt={alt} fill sizes="400px" className="object-cover"  />}
                 </div>
                 <div className="p-4 flex-1">
                   <h3 className="font-bold text-slate-900 text-sm leading-tight mb-1">{title}</h3>

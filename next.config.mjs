@@ -202,15 +202,21 @@ const nextConfig = {
       };
     }
 
-    // Limit parallelism to 1 on all builds — this is a 2,670-file app and
-    // webpack holds all in-flight module graphs in memory simultaneously.
-    // 2 workers doubles peak heap; 1 worker keeps it manageable.
-    config.parallelism = 1;
+    // Allow webpack to use its default parallelism.
+    // On 16GB+ builds, the default parallelism is safe and faster.
+    // Remove config.parallelism = 1 to let webpack scale naturally.
 
-    // Northflank's allowed ephemeral build storage is not large enough for
-    // Next's production webpack filesystem cache on this app. Disable only in
-    // container builds; local builds keep the cache for faster iteration.
+    // Webpack cache configuration for consistent builds
+    // - Enable filesystem cache when NEXT_BUILD_CACHE is set (Northflank persistent /cache/.next)
+    // - This ensures consistent Server Action IDs across builds
+    // - Only disable if DISABLE_WEBPACK_FILESYSTEM_CACHE='1'
     if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') {
+      config.cache = false;
+    } else if (process.env.NEXT_BUILD_CACHE) {
+      // Next.js auto-detects NEXT_BUILD_CACHE and enables filesystem cache
+      // No explicit config needed - ensures stable Server Action IDs
+    } else if (process.env.CI === 'true') {
+      // CI without persistent cache - disable to avoid stale cache
       config.cache = false;
     }
 
@@ -318,12 +324,12 @@ const nextConfig = {
       { source: '/admin/leads/new', destination: '/admin/crm/leads/new', permanent: true },
       { source: '/admin/syllabus-generator', destination: '/admin/studio', permanent: true },
       { source: '/admin/course-templates', destination: '/admin/studio', permanent: true },
-      { source: '/admin/courses/manage', destination: '/admin/courses', permanent: true },
+      { source: '/admin/courses/manage', destination: '/admin/studio', permanent: true },
       { source: '/admin/course-import', destination: '/admin/studio', permanent: true },
       { source: '/admin/quiz-builder', destination: '/admin/studio', permanent: true },
-      { source: '/admin/external-courses', destination: '/admin/courses', permanent: true },
-      { source: '/admin/enrollment', destination: '/admin/students', permanent: true },
-      { source: '/admin/users', destination: '/admin/staff', permanent: true },
+      { source: '/admin/external-courses', destination: '/admin/studio', permanent: true },
+      { source: '/admin/enrollment', destination: '/admin/enrollments', permanent: true },
+      { source: '/admin/users', destination: '/admin/staff-portal/users', permanent: true },
       { source: '/admin/contacts', destination: '/admin/crm/contacts', permanent: true },
       { source: '/admin/campaigns', destination: '/admin/crm/campaigns', permanent: true },
       { source: '/admin/email-marketing', destination: '/admin/crm/campaigns', permanent: true },
@@ -521,7 +527,7 @@ const nextConfig = {
       { source: '/admin/course-studio', destination: '/admin/studio', permanent: true },
       { source: '/admin/dight', destination: '/admin/dashboard', permanent: true },
       { source: '/admin/dight/:path*', destination: '/admin/dashboard/:path*', permanent: true },
-      { source: '/admin/users/invite', destination: '/admin/staff', permanent: true },
+      { source: '/admin/users/invite', destination: '/admin/staff-portal/users', permanent: true },
       {
         source: '/admin/wioa/documents/upload',
         destination: '/admin/wioa/documents',

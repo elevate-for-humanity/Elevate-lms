@@ -290,7 +290,7 @@ export default function LicensingGuidePage() {
             </div>
             <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-[4/3]" style={{ aspectRatio: '16/7' }}>
               <Image
-                src="/images/pages/platform-page-7.jpg"
+                src="/images/pages/platform-page-7.webp"
                 alt="Billing and subscription management"
                 fill
                 className="object-cover"

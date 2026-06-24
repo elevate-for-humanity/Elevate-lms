@@ -86,6 +86,11 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Guard against null user - redirect to login if not authenticated
+  if (!user) {
+    redirect('/login');
+  }
+
   const db = await requireAdminClient();
   const { data: adminProfile } = await db
     .from('profiles')
@@ -355,7 +360,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                     key={e.id}
                     data={{
                       enrollment_id: e.id,
-                      student_name: profile?.full_name ?? '—',
+                      student_name: student?.full_name ?? '—',
                       program_name:
                         programNames[e.program_id] || e.program_slug || e.id.slice(0, 8),
                       partner_name: null,

@@ -32,11 +32,18 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS=--max-old-space-size=4096
+# Fixed: Build memory aligned with container (8GB)
+ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV BUILD_SCOPE=1
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV CI=true
-ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
+# Fixed: Enable webpack cache (matching LMS)
+ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=
+# Fixed: Add persistent build cache
+ENV NEXT_BUILD_CACHE=/cache/.next
+
+# Create persistent cache directory
+RUN mkdir -p /cache/.next && chmod 755 /cache/.next
 
 # Install dependencies
 RUN pnpm install --no-frozen-lockfile
@@ -54,7 +61,8 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
 
 WORKDIR /app/apps/admin
-RUN pnpm next build --no-lint
+# Fixed: Use memory limit and cache in build
+RUN NODE_OPTIONS='--max-old-space-size=8192' NEXT_BUILD_CACHE=/cache/.next pnpm next build --no-lint
 WORKDIR /app
 
 # --- runtime stage ---
@@ -70,6 +78,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=8080
+# Fixed: Runtime memory limit
+ENV NODE_OPTIONS=--max-old-space-size=4096
 
 WORKDIR /app
 
@@ -90,4 +100,4 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
 
-CMD ["node", "--max-http-header-size=32768", "apps/admin/server.js"]
+CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "apps/admin/server.js"]

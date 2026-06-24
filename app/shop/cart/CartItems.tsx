@@ -32,47 +32,37 @@ export default function CartItems({ items }: CartItemProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-      <div className="divide-y divide-slate-200">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+      <div className="divide-y divide-gray-200">
         {items.map((item) => (
           <div key={item.cart_item_id} className="p-6">
             <div className="flex gap-4">
               <div className="w-20 h-20 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-                <ShoppingCart className="w-8 h-8 text-slate-400" />
+                <ShoppingCart className="w-8 h-8 text-slate-700" />
               </div>
               <div className="flex-1">
                 <div className="flex justify-between">
                   <div>
                     <h3 className="font-semibold text-slate-900">{item.name}</h3>
-                    <p className="text-sm text-slate-500 line-clamp-1">{item.description}</p>
+                    <p className="text-sm text-slate-700 line-clamp-1">{item.description}</p>
                   </div>
-                  <button
-                    onClick={() => removeItem(item.cart_item_id)}
-                    aria-label="Remove item"
-                    className="text-slate-400 hover:text-brand-red-600"
-                  >
+                  <button onClick={() => removeItem(item.cart_item_id)} aria-label="Remove item" className="text-slate-700 hover:text-brand-red-600">
                     <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
                 <div className="flex items-center justify-between mt-4">
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => updateQuantity(item.cart_item_id, item.quantity - 1)}
-                      className="w-8 h-8 flex items-center justify-center border border-slate-300 rounded hover:bg-white"
-                    >
+                    <button onClick={() => updateQuantity(item.cart_item_id, item.quantity - 1)}
+                      className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-white">
                       <Minus className="w-4 h-4" />
                     </button>
                     <span className="w-8 text-center font-medium">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.cart_item_id, item.quantity + 1)}
-                      className="w-8 h-8 flex items-center justify-center border border-slate-300 rounded hover:bg-white"
-                    >
+                    <button onClick={() => updateQuantity(item.cart_item_id, item.quantity + 1)}
+                      className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-white">
                       <Plus className="w-4 h-4" />
                     </button>
                   </div>
-                  <p className="font-semibold text-slate-900">
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </p>
+                  <p className="font-semibold text-slate-900">${(item.price * item.quantity).toFixed(2)}</p>
                 </div>
               </div>
             </div>

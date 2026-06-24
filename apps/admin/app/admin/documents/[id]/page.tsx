@@ -21,6 +21,9 @@ export default async function DocumentDetailPage({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const db = await requireAdminClient();
 
   const { data: profile } = await db

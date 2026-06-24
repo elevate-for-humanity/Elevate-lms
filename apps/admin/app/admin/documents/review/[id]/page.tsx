@@ -19,6 +19,9 @@ export default async function ReviewDocumentPage({ params }: { params: Promise<{
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: rawDocument } = await supabase
     .from('documents')
     .select('*')

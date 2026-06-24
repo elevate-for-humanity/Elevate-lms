@@ -48,6 +48,9 @@ async function verifyApprovalCaller(
     data: { user: caller },
   } = await supa.auth.getUser();
   if (!caller) {
+
+  // Guard against null user
+  if (!user) redirect('/login');
     redirect(`/admin/program-holders/${holderId}?error=${encodeURIComponent('Session expired')}`);
   }
 
@@ -81,6 +84,9 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: adminProfile } = await supabase
     .from('profiles')
     .select('role')

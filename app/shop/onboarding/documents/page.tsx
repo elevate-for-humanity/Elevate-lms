@@ -1,3 +1,4 @@
+
 import { Metadata } from 'next';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 
@@ -13,12 +14,11 @@ import { ShopDocumentUpload } from '@/components/shop/ShopDocumentUpload';
 
 export const dynamic = 'force-dynamic';
 
+
 export default async function ShopDocumentsPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/shop/onboarding/documents');
 
   const { data: staff } = await supabase
@@ -27,7 +27,9 @@ export default async function ShopDocumentsPage() {
     .eq('user_id', user.id);
 
   const shop = staff?.[0]?.shops;
-  if (!shop) redirect('/learner/dashboard');
+  if (!shop) redirect('/dashboard');
 
-  return <ShopDocumentUpload shopId={(shop as any).id} requirements={[]} />;
+  return (
+    <ShopDocumentUpload shopId={(shop as any).id} requirements={[]} />
+  );
 }

@@ -400,9 +400,6 @@ export const siteMapSections: SiteMapSection[] = [
     id: "special-programs",
     title: "Special Programs",
     items: [
-      { label: "Kingdom Konnect", href: "/kingdom-konnect" },
-      { label: "Serene Comfort Care", href: "/serene-comfort-care" },
-      { label: "Urban Build Crew", href: "/urban-build-crew" }
     ],
   },
   {

@@ -40,6 +40,9 @@ export default async function ProviderDetailPage({
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const db = await requireAdminClient();
   if (!db) return <div className="p-8 text-red-600">Database unavailable</div>;
 

@@ -5,8 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Star, Filter, Search, ShoppingCart } from 'lucide-react';
 import { trackSearch, trackProductView, trackAddToCart } from '@/components/analytics/PageTracker';
-import { addToCart } from '@/lib/store/cart';
-import { useStoreCart } from '@/hooks/useStoreCart';
 
 interface Product {
   id: string;
@@ -27,7 +25,6 @@ interface ShopClientProps {
 export function ShopClient({ products, categories }: ShopClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
-  const { cart } = useStoreCart();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,37 +41,24 @@ export function ShopClient({ products, categories }: ShopClientProps) {
     e.preventDefault();
     e.stopPropagation();
     trackAddToCart(product.id, product.name, product.category, product.price);
-    addToCart(
-      {
-        id: product.id,
-        name: product.name,
-        slug: product.slug || product.id,
-        category: 'physical-product',
-        price: product.price,
-        description: product.name,
-        image: product.image_url || '/images/pages/store-hero.webp',
-        inStock: true,
-        featured: false,
-        digital: false,
-      },
-      1,
-    );
+    // Add to cart logic here
   };
 
-  const filteredProducts =
-    activeCategory === 'All' ? products : products.filter((p) => p.category === activeCategory);
+  const filteredProducts = activeCategory === 'All' 
+    ? products 
+    : products.filter(p => p.category === activeCategory);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-4" data-tour="shop-categories">
-          <Filter className="w-5 h-5 text-slate-500" />
+          <Filter className="w-5 h-5 text-slate-700" />
           <div className="flex flex-wrap gap-2">
             {categories.map((cat) => (
-              <button
+              <button 
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-lg text-sm ${activeCategory === cat ? 'bg-brand-blue-600 text-white' : 'bg-white text-slate-700 hover:bg-white'}`}
+                className={`px-4 py-2 rounded-lg text-sm ${activeCategory === cat ? 'bg-brand-blue-600 text-white' : 'bg-white text-slate-900 hover:bg-white'}`}
               >
                 {cat}
               </button>
@@ -83,49 +67,39 @@ export function ShopClient({ products, categories }: ShopClientProps) {
         </div>
         <div className="flex items-center gap-4">
           <form onSubmit={handleSearch} className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search products..."
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-700" />
+            <input 
+              type="text" 
+              placeholder="Search products..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg w-full md:w-64"
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-64"
               aria-label="Search products"
             />
           </form>
-          <Link
-            href="/store/cart"
-            className="relative p-2 text-slate-600 hover:text-brand-blue-600"
-            aria-label={cart.itemCount > 0 ? `Shopping cart, ${cart.itemCount} items` : 'Shopping cart'}
-            data-tour="shop-cart"
-          >
+          <Link href="/shop/cart" className="relative p-2 text-slate-700 hover:text-brand-blue-600" aria-label="Shopping cart" data-tour="shop-cart">
             <ShoppingCart className="w-6 h-6" />
-            {cart.itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1 bg-brand-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                {cart.itemCount > 99 ? '99+' : cart.itemCount}
-              </span>
-            )}
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-brand-blue-600 text-white text-xs rounded-full flex items-center justify-center">0</span>
           </Link>
         </div>
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProducts.map((product, index) => (
-          <Link
-            key={product.id}
-            href={`/shop/product/${product.slug || product.id}`}
+          <Link 
+            key={product.id} 
+            href={`/shop/product/${product.slug || product.id}`} 
             className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
             onClick={() => handleProductClick(product)}
-            data-tour={index === 0 ? 'shop-product' : undefined}
+            data-tour={index === 0 ? "shop-product" : undefined}
           >
             <div className="relative aspect-square">
               <Image
-                src={product.image_url || '/images/pages/shop-hero.webp'}
+                src={product.image_url || '/images/pages/shop-hero.jpg'}
                 alt={product.name}
                 fill
                 className="object-cover"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
+               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
             </div>
             <div className="p-6">
               <span className="text-xs text-brand-blue-600 font-medium">{product.category}</span>
@@ -135,11 +109,11 @@ export function ShopClient({ products, categories }: ShopClientProps) {
                   <Star className="w-4 h-4 text-yellow-400 fill-current" />
                   <span className="text-sm font-medium text-slate-900">{product.rating}</span>
                 </div>
-                <span className="text-sm text-slate-500">({product.review_count} reviews)</span>
+                <span className="text-sm text-slate-700">({product.review_count} reviews)</span>
               </div>
               <div className="flex items-center justify-between mt-4">
                 <span className="text-xl font-bold text-slate-900">${product.price}</span>
-                <button
+                <button 
                   onClick={(e) => handleAddToCart(e, product)}
                   className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-blue-700"
                 >

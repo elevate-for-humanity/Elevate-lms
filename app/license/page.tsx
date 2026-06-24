@@ -1,34 +1,43 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-static'
 
 import { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/public';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  Building2,
-  Users,
+import { 
+  ArrowRight, 
+  
+  Building2, 
+  Users, 
   Briefcase,
   GraduationCap,
   Route,
   ClipboardCheck,
   Handshake,
   Calendar,
-  Zap,
+  Zap
 } from 'lucide-react';
-import { LICENSE_TIERS, INTEGRATIONS, ROUTES, DISCLAIMERS, getStartingPrice } from '@/lib/pricing';
+import { 
+  LICENSE_TIERS, 
+  INTEGRATIONS, 
+  ROUTES, 
+  DISCLAIMERS,
+  getStartingPrice 
+} from '@/lib/pricing';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
+export const revalidate = 600;
 
 export const metadata: Metadata = {
-  title: 'License the Elevate LMS + Workforce Hub',
-  description:
-    'White-label LMS + Workforce Platform Licensing. Built for training providers, workforce boards, and employer partners. Starting at $4,999.',
+  title: 'License the Elevate LMS + Workforce Hub | {PLATFORM_DEFAULTS.orgName}',
+  description: 'White-label LMS + Workforce Platform Licensing. Built for training providers, workforce boards, and employer partners. Starting at $4,999.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/license',
   },
 };
 
 export default async function LicensePage() {
+
   const startingPrice = getStartingPrice();
 
   // Queries wrapped in try/catch — tables/columns may not exist yet
@@ -40,11 +49,7 @@ export default async function LicensePage() {
     const supabase = createPublicClient();
     if (supabase) {
       const [tiersResult, testimonialsResult, partnersResult] = await Promise.allSettled([
-        supabase
-          .from('license_tiers')
-          .select('*')
-          .eq('is_active', true)
-          .order('price', { ascending: true }),
+        supabase.from('license_tiers').select('*').eq('is_active', true).order('price', { ascending: true }),
         supabase.from('testimonials').select('*').eq('is_featured', true).limit(3),
         supabase.from('partners').select('id, name').eq('is_active', true).limit(6),
       ]);
@@ -59,38 +64,12 @@ export default async function LicensePage() {
   const displayTiers = licenseTiers && licenseTiers.length > 0 ? licenseTiers : LICENSE_TIERS;
 
   const features = [
-    {
-      icon: Zap,
-      title: 'Self-Operating Automation',
-      description:
-        'Runs the entire learner lifecycle — from application to credential — without staff intervention',
-    },
-    {
-      icon: GraduationCap,
-      title: 'LMS Platform',
-      description:
-        'Full learning management with courses, assessments, and automated certifications',
-    },
-    {
-      icon: Users,
-      title: 'Automated Enrollment',
-      description: 'Auto-routing, status transitions, and progress tracking with zero manual entry',
-    },
-    {
-      icon: Briefcase,
-      title: 'Employer Portal',
-      description: 'Connect graduates with hiring employers through automated pipelines',
-    },
-    {
-      icon: ClipboardCheck,
-      title: 'Compliance Automation',
-      description: 'WIOA tracking, audit logs, and exportable reports — built-in, not bolted on',
-    },
-    {
-      icon: Handshake,
-      title: 'Partner Network',
-      description: 'Access to employer and training provider network with automated matching',
-    },
+    { icon: Zap, title: 'Self-Operating Automation', description: 'Runs the entire learner lifecycle — from application to credential — without staff intervention' },
+    { icon: GraduationCap, title: 'LMS Platform', description: 'Full learning management with courses, assessments, and automated certifications' },
+    { icon: Users, title: 'Automated Enrollment', description: 'Auto-routing, status transitions, and progress tracking with zero manual entry' },
+    { icon: Briefcase, title: 'Employer Portal', description: 'Connect graduates with hiring employers through automated pipelines' },
+    { icon: ClipboardCheck, title: 'Compliance Automation', description: 'WIOA tracking, audit logs, and exportable reports — built-in, not bolted on' },
+    { icon: Handshake, title: 'Partner Network', description: 'Access to employer and training provider network with automated matching' },
   ];
 
   const governanceFeatures = [
@@ -101,6 +80,8 @@ export default async function LicensePage() {
     'Tested disaster recovery processes',
     'Secure document handling with defined data retention standards',
   ];
+
+
 
   return (
     <div>
@@ -118,9 +99,7 @@ export default async function LicensePage() {
             License the Elevate LMS + Workforce Hub
           </h1>
           <p className="text-base sm:text-xl text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-3xl mx-auto">
-            Self-operating workforce infrastructure that runs the entire learner lifecycle — from
-            application to credential — without staff. Built for funded training, employer
-            pipelines, and apprenticeships.
+            Self-operating workforce infrastructure that runs the entire learner lifecycle — from application to credential — without staff. Built for funded training, employer pipelines, and apprenticeships.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6">
@@ -133,7 +112,7 @@ export default async function LicensePage() {
             </Link>
             <Link
               href={ROUTES.licensePricing}
-              className="inline-flex items-center justify-center gap-2 bg-white/10 text-slate-900 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-white/20 transition text-sm sm:text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-white/10 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-white/20 transition text-sm sm:text-lg"
             >
               View Pricing
               <ArrowRight className="w-5 h-5" />
@@ -150,28 +129,16 @@ export default async function LicensePage() {
       <section className="py-3 border-b border-slate-700">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link
-              href="/license/features"
-              className="px-4 py-1.5 bg-slate-700 text-slate-200 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors"
-            >
+            <Link href="/license/features" className="px-4 py-1.5 bg-slate-700 text-slate-200 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors">
               Full Feature List
             </Link>
-            <Link
-              href="/license/integrations"
-              className="px-4 py-1.5 bg-slate-700 text-slate-200 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors"
-            >
+            <Link href="/license/integrations" className="px-4 py-1.5 bg-slate-700 text-slate-200 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors">
               Integrations
             </Link>
-            <Link
-              href="/license/pricing"
-              className="px-4 py-1.5 bg-slate-700 text-slate-200 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors"
-            >
+            <Link href="/license/pricing" className="px-4 py-1.5 bg-slate-700 text-slate-200 rounded-full text-sm font-medium hover:bg-slate-600 transition-colors">
               Pricing
             </Link>
-            <Link
-              href="/license/onboarding"
-              className="px-4 py-1.5 bg-brand-orange-600 text-white rounded-full text-sm font-medium hover:bg-brand-orange-700 transition-colors"
-            >
+            <Link href="/license/onboarding" className="px-4 py-1.5 bg-brand-orange-600 text-white rounded-full text-sm font-medium hover:bg-brand-orange-700 transition-colors">
               Start Onboarding
             </Link>
           </div>
@@ -200,14 +167,9 @@ export default async function LicensePage() {
       {/* Automated Self-Service Operations Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4 text-slate-900">
-            Automated, Self-Service Operations
-          </h2>
+          <h2 className="text-3xl font-bold text-center mb-4 text-slate-900">Automated, Self-Service Operations</h2>
           <p className="text-lg text-slate-600 text-center mb-8 max-w-3xl mx-auto">
-            This platform operates as a self-service workforce system. Enrollment triggers automated
-            workflows for eligibility, course assignment, progress tracking, compliance logging,
-            credential issuance, and reporting. Staff intervention is required only for
-            exceptions—not daily operations.
+            This platform operates as a self-service workforce system. Enrollment triggers automated workflows for eligibility, course assignment, progress tracking, compliance logging, credential issuance, and reporting. Staff intervention is required only for exceptions—not daily operations.
           </p>
           <div className="max-w-2xl mx-auto">
             <ul className="space-y-4">
@@ -217,9 +179,7 @@ export default async function LicensePage() {
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
                 <span className="text-slate-500 flex-shrink-0">•</span>
-                <span className="text-slate-200 text-lg">
-                  Rules-based progress and hour tracking
-                </span>
+                <span className="text-slate-200 text-lg">Rules-based progress and hour tracking</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
                 <span className="text-slate-500 flex-shrink-0">•</span>
@@ -227,15 +187,11 @@ export default async function LicensePage() {
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
                 <span className="text-slate-500 flex-shrink-0">•</span>
-                <span className="text-slate-200 text-lg">
-                  Auto-generated compliance and outcome reports
-                </span>
+                <span className="text-slate-200 text-lg">Auto-generated compliance and outcome reports</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
                 <span className="text-slate-500 flex-shrink-0">•</span>
-                <span className="text-slate-200 text-lg">
-                  Credential issuance with public verification
-                </span>
+                <span className="text-slate-200 text-lg">Credential issuance with public verification</span>
               </li>
             </ul>
           </div>
@@ -251,8 +207,8 @@ export default async function LicensePage() {
           </p>
           <div className="grid md:grid-cols-3 gap-8">
             {displayTiers.map((tier: any, index: number) => (
-              <div
-                key={index}
+              <div 
+                key={index} 
                 className={`bg-white rounded-xl p-8 shadow-sm border-2 ${
                   tier.popular ? 'border-brand-orange-500' : 'border-transparent'
                 }`}
@@ -264,8 +220,7 @@ export default async function LicensePage() {
                 )}
                 <h3 className="text-2xl font-bold mt-4">{tier.name}</h3>
                 <div className="text-3xl font-bold text-brand-orange-600 my-4">
-                  ${tier.price?.toLocaleString()}
-                  <span className="text-lg text-slate-700">/year</span>
+                  ${tier.price?.toLocaleString()}<span className="text-lg text-slate-700">/year</span>
                 </div>
                 <p className="text-slate-700 mb-6">{tier.description}</p>
                 <ul className="space-y-3 mb-8">
@@ -279,9 +234,9 @@ export default async function LicensePage() {
                 <Link
                   href={ROUTES.schedule}
                   className={`block text-center py-3 rounded-lg font-semibold transition ${
-                    tier.popular
-                      ? 'bg-brand-orange-600 text-white hover:bg-brand-orange-700'
-                      : 'bg-white text-slate-900 hover:bg-slate-200'
+                    tier.popular 
+                      ? 'bg-brand-orange-600 text-white hover:bg-brand-orange-700' 
+                      : 'bg-white text-slate-900 hover:bg-gray-200'
                   }`}
                 >
                   Get Started
@@ -295,12 +250,9 @@ export default async function LicensePage() {
       {/* Platform Governance & Operational Readiness */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4">
-            Platform Governance & Operational Readiness
-          </h2>
+          <h2 className="text-3xl font-bold text-center mb-4">Platform Governance & Operational Readiness</h2>
           <p className="text-slate-700 text-center mb-12 max-w-3xl mx-auto">
-            Partner and agency access is role-based, auditable, and governed by published
-            operational policies to support compliance and oversight.
+            Partner and agency access is role-based, auditable, and governed by published operational policies to support compliance and oversight.
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {governanceFeatures.map((feature, index) => (
@@ -345,15 +297,10 @@ export default async function LicensePage() {
       {partners && partners.length > 0 && (
         <section className="py-12">
           <div className="max-w-7xl mx-auto px-4">
-            <h3 className="text-center text-slate-700 mb-8">
-              Trusted by organizations across Indiana
-            </h3>
+            <h3 className="text-center text-slate-700 mb-8">Trusted by organizations across Indiana</h3>
             <div className="flex flex-wrap justify-center items-center gap-8">
               {partners.map((partner: any) => (
-                <div
-                  key={partner.id}
-                  className="grayscale hover:grayscale-0 transition relative h-12 w-32 overflow-hidden"
-                >
+                <div key={partner.id} className="grayscale hover:grayscale-0 transition relative h-12 w-32 overflow-hidden">
                   <span className="text-slate-500 font-medium">{partner.name}</span>
                 </div>
               ))}

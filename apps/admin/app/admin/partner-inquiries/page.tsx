@@ -19,6 +19,9 @@ export default async function PartnerInquiriesAdminPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
@@ -64,6 +67,9 @@ export default async function PartnerInquiriesAdminPage() {
       data: { user: actor },
     } = await supabase2.auth.getUser();
     if (actor)
+
+  // Guard against null user
+  if (!user) redirect('/login');
       await logAdminAudit({
         action: AdminAction.PARTNER_INQUIRY_REVIEWED,
         actorId: actor.id,

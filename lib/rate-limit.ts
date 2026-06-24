@@ -42,16 +42,16 @@ const inMemoryRateLimiters = new Map<string, { count: number; resetAt: number }>
 export function checkInMemoryRateLimit(key: string, limit: number, windowMs: number): boolean {
   const now = Date.now();
   const entry = inMemoryRateLimiters.get(key);
-
+  
   if (!entry || now > entry.resetAt) {
     inMemoryRateLimiters.set(key, { count: 1, resetAt: now + windowMs });
     return true;
   }
-
+  
   if (entry.count >= limit) {
     return false;
   }
-
+  
   entry.count++;
   return true;
 }
@@ -63,12 +63,16 @@ function createRateLimiter(
 ): Ratelimit | null {
   const r = getRedis();
   if (!r) return null;
-  return new Ratelimit({
-    redis: r,
-    limiter: Ratelimit.slidingWindow(config.requests, config.window as any),
-    analytics: true,
-    prefix,
-  });
+  try {
+    return new Ratelimit({
+      redis: r,
+      limiter: Ratelimit.slidingWindow(config.requests, config.window as any),
+      analytics: false, // Disable analytics to prevent extra API calls
+      prefix,
+    });
+  } catch {
+    return null;
+  }
 }
 
 // Lazy getters for rate limiters

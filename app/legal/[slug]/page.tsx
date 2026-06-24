@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { legalDocs } from '@/content/cf-legal';
-import { findBySlug, staticParamsFromSlugs } from '@/lib/content-helpers';
+import { findBySlug, staticParamsFromSlugs } from '@/lib/cf-content-helpers';
 import { buildMetadata } from '@/lib/cf-seo';
 import { siteConfig } from '@/content/cf-site';
 
@@ -36,8 +36,7 @@ export default async function LegalDocPage({ params }: { params: Promise<{ slug:
           or call{' '}
           <a href={`tel:${siteConfig.phone}`} className="underline">
             {siteConfig.phone}
-          </a>
-          .
+          </a>.
         </p>
       </div>
     </section>

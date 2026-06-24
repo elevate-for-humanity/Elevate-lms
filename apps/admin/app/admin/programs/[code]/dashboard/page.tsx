@@ -22,6 +22,9 @@ export default async function ProgramDashboardPage({
     data: { user },
   } = await supabase.auth.getUser();
   const { data: profile } = await supabase
+
+  // Guard against null user
+  if (!user) redirect('/login');
     .from('profiles')
     .select('role')
     .eq('id', user.id)

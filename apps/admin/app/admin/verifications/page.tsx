@@ -24,6 +24,9 @@ export default async function VerificationsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const db = await requireAdminClient();
   const { data: profile } = await db
     .from('profiles')

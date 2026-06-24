@@ -16,6 +16,9 @@ export default async function LeadsReportPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
+
+  // Guard against null user
+  if (!user) redirect('/login');
   if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();

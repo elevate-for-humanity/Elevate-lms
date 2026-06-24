@@ -240,7 +240,7 @@ export default async function ProviderPage({ params }: Props) {
                 you test helps you prepare to the right standard.
               </p>
               <div className="space-y-4">
-                {((provider as any).ncrcJobProfiles as any[]).map((tier: any) => (
+                {((provider as any).ncrcJobProfiles as any[])?.map((tier: any) => (
                   <div
                     key={tier.level}
                     className={`rounded-xl border p-5 ${LEVEL_COLORS[tier.color] ?? LEVEL_COLORS.slate}`}
@@ -250,7 +250,7 @@ export default async function ProviderPage({ params }: Props) {
                       <span className="text-xs font-medium opacity-70">{tier.score}</span>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-2">
-                      {tier.jobs.map((job: any) => (
+                      {(tier.jobs ?? []).map((job: any) => (
                         <div key={job.title} className="flex items-start gap-2">
                           <span className="text-slate-300 flex-shrink-0 select-none mt-0.5">—</span>
                           <div>

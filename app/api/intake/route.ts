@@ -165,7 +165,7 @@ async function _POST(req: Request) {
       last_name: lastName,
       full_name: fullName,
       email: clean(body.email as string) ?? '',
-      phone: clean(body.phone as string) ?? '',
+      phone: clean(body.phone as string) ?? null,  // null allowed after migration
       city: clean(body.city as string) ?? '',
       zip: zipCode,
       program_interest: clean(programInterest) ?? 'not-specified',

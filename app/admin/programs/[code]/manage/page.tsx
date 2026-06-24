@@ -63,7 +63,7 @@ export default async function ManageProgramPage({ params }: { params: Promise<{ 
     program = bySlug;
   }
 
-  if (!program) {
+  if (!program || !program.id) {
     return (
       <div className="p-8">
         <h1 className="text-2xl font-bold text-slate-900">Program not found</h1>
@@ -75,7 +75,7 @@ export default async function ManageProgramPage({ params }: { params: Promise<{ 
     );
   }
 
-  const programCode = program.code || program.slug || code;
+  const programCode = program?.code || program?.slug || code;
 
   // Load attached internal courses
   const { data: internalLinks } = await supabase

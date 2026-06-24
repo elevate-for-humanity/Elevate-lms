@@ -58,6 +58,9 @@ export default async function AccreditationReportPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')

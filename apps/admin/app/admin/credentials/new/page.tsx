@@ -15,6 +15,9 @@ export default async function NewCredentialPage() {
     data: { user },
   } = await supabase.auth.getUser();
   const db = await requireAdminClient();
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')

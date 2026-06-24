@@ -18,6 +18,9 @@ async function requireAdmin(supabase: any) {
   const { data }: any = await supabase.auth.getUser();
   if (!data?.user) return false;
 
+  // Guard against null user
+  if (!user) redirect('/login');
+
   const { data: profile } = await supabase
     .from('user_profiles')
     .select('role')
@@ -67,6 +70,9 @@ export default async function AdminInboxPage() {
       data: { user: actor },
     } = await supabase2.auth.getUser();
     if (actor)
+
+  // Guard against null user
+  if (!user) redirect('/login');
       await logAdminAudit({
         action: AdminAction.PARTNER_INQUIRY_REVIEWED,
         actorId: actor.id,
@@ -91,6 +97,9 @@ export default async function AdminInboxPage() {
       data: { user: actor },
     } = await supabase2.auth.getUser();
     if (actor)
+
+  // Guard against null user
+  if (!user) redirect('/login');
       await logAdminAudit({
         action: AdminAction.LICENSE_REQUEST_REVIEWED,
         actorId: actor.id,

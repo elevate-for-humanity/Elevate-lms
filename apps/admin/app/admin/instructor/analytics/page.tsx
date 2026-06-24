@@ -19,6 +19,9 @@ export default async function InstructorAnalyticsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   // Get courses assigned to this instructor
   const { data: myCourses } = await supabase
     .from('lms_courses')

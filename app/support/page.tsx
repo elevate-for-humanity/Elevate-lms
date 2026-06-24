@@ -4,13 +4,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { LifeBuoy, MessageSquare, Phone, Mail, FileText, Clock } from 'lucide-react';
 import SupportForm from '@/components/support/SupportForm';
-import SupportTicketsList from '@/components/support/SupportTicketsList';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { LiveChatSupport } from '@/components/LiveChatSupport';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Support',
+  title: 'Support | Elevate For Humanity',
   description: 'Get help with your account, programs, or technical issues.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/support',
@@ -22,55 +21,22 @@ export const dynamic = 'force-dynamic';
 export default async function SupportPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  // Tickets are loaded client-side via /api/support/tickets in SupportTicketsList
+  const { data: tickets } = user ? await supabase
+    .from('support_tickets')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(5) : { data: null };
 
   const supportOptions = [
-    {
-      icon: MessageSquare,
-      title: 'Live Chat',
-      desc: 'Chat with our support team',
-      href: '/support/chat',
-      available: 'Mon-Fri 9am-5pm EST',
-    },
-    {
-      icon: Mail,
-      title: 'Email Support',
-      desc: 'Send us a message',
-      href: '/contact',
-      available: 'Response within 24 hours',
-    },
-    {
-      icon: Phone,
-      title: 'Submit a Ticket',
-      desc: 'Get a response within 24 hours',
-      href: '/support/ticket',
-      available: '24/7 Online',
-    },
-    {
-      icon: FileText,
-      title: 'Help Articles',
-      desc: 'Browse help articles & guides',
-      href: '/support/help',
-      available: 'Available 24/7',
-    },
-    {
-      icon: FileText,
-      title: 'Video Tutorials',
-      desc: 'Step-by-step platform walkthroughs',
-      href: '/help/tutorials',
-      available: 'Available 24/7',
-    },
-    {
-      icon: FileText,
-      title: 'Certification Help',
-      desc: 'Guides for earning credentials',
-      href: '/help/articles/certifications',
-      available: 'Available 24/7',
-    },
+    { icon: MessageSquare, title: 'Live Chat', desc: 'Chat with our support team', href: '/support/chat', available: 'Mon-Fri 9am-5pm EST' },
+    { icon: Mail, title: 'Email Support', desc: 'Send us a message', href: '/contact', available: 'Response within 24 hours' },
+    { icon: Phone, title: 'Submit a Ticket', desc: 'Get a response within 24 hours', href: '/support/ticket', available: '24/7 Online' },
+    { icon: FileText, title: 'Help Articles', desc: 'Browse help articles & guides', href: '/support/help', available: 'Available 24/7' },
+    { icon: FileText, title: 'Video Tutorials', desc: 'Step-by-step platform walkthroughs', href: '/help/tutorials', available: 'Available 24/7' },
+    { icon: FileText, title: 'Certification Help', desc: 'Guides for earning credentials', href: '/help/articles/certifications', available: 'Available 24/7' },
   ];
 
   return (
@@ -84,23 +50,15 @@ export default async function SupportPage() {
 
       {/* Hero Image */}
       <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
-          src="/images/pages/support-page-2.webp"
-          alt="Student support services"
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority 
-        />
+        <Image src="/images/pages/support-page-2.jpg" alt="Student support services" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       <div className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Student Support Center</h1>
           <p className="text-xl text-white max-w-2xl">
-            Need help with enrollment, training programs, or your student account? Our team is here
-            to support your career journey.
+            Need help with enrollment, training programs, or your student account? 
+            Our team is here to support your career journey.
           </p>
         </div>
       </div>
@@ -108,11 +66,7 @@ export default async function SupportPage() {
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {supportOptions.map((option) => (
-            <Link
-              key={option.title}
-              href={option.href}
-              className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition text-center"
-            >
+            <Link key={option.title} href={option.href} className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition text-center">
               <option.icon className="w-10 h-10 text-brand-blue-600 mx-auto mb-4" />
               <h3 className="font-semibold text-lg mb-2">{option.title}</h3>
               <p className="text-slate-700 text-sm mb-3">{option.desc}</p>
@@ -130,15 +84,35 @@ export default async function SupportPage() {
           <div>
             <h2 className="text-xl font-bold mb-6">Your Recent Tickets</h2>
             {user ? (
-              <SupportTicketsList />
+              tickets && tickets.length > 0 ? (
+                <div className="space-y-4">
+                  {tickets.map((ticket: any) => (
+                    <div key={ticket.id} className="bg-white rounded-lg shadow-sm border p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium">{ticket.subject}</span>
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          ticket.status === 'open' ? 'bg-brand-green-100 text-brand-green-700' :
+                          ticket.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-white text-slate-900'
+                        }`}>
+                          {ticket.status}
+                        </span>
+                      </div>
+                      <p className="text-slate-700 text-sm">{new Date(ticket.created_at).toLocaleDateString()}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white rounded-lg shadow-sm border p-8 text-center text-slate-700">
+                  <LifeBuoy className="w-12 h-12 mx-auto mb-4 text-slate-700" />
+                  <p>No support tickets yet</p>
+                </div>
+              )
             ) : (
               <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
                 <LifeBuoy className="w-12 h-12 mx-auto mb-4 text-slate-700" />
                 <p className="text-slate-700 mb-4">Sign in to view your support tickets</p>
-                <Link
-                  href="/login?redirect=/support"
-                  className="text-brand-blue-600 font-medium hover:underline"
-                >
+                <Link href="/login?redirect=/support" className="text-brand-blue-600 font-medium hover:underline">
                   Sign In
                 </Link>
               </div>
@@ -153,143 +127,72 @@ export default async function SupportPage() {
             <details className="bg-white rounded-xl shadow-sm border overflow-hidden group">
               <summary className="p-5 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
                 How do I reset my password?
-                <svg
-                  className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
+                <svg className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <div className="px-5 pb-5 text-slate-700">
-                Click &quot;Forgot Password&quot; on the login page. Enter your email and we&apos;ll
-                send you a reset link. Check your spam folder if you don&apos;t see it within 5
-                minutes.
+                Click &quot;Forgot Password&quot; on the login page. Enter your email and we&apos;ll send you a reset link. Check your spam folder if you don&apos;t see it within 5 minutes.
               </div>
             </details>
-
+            
             <details className="bg-white rounded-xl shadow-sm border overflow-hidden group">
               <summary className="p-5 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
                 How do I check my enrollment status?
-                <svg
-                  className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
+                <svg className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <div className="px-5 pb-5 text-slate-700">
-                Log into your student dashboard and check the &quot;My Programs&quot; section. Your
-                enrollment status will show as Pending, Approved, or Active. Contact us if you have
-                questions.
+                Log into your student dashboard and check the &quot;My Programs&quot; section. Your enrollment status will show as Pending, Approved, or Active. Contact us if you have questions.
               </div>
             </details>
-
+            
             <details className="bg-white rounded-xl shadow-sm border overflow-hidden group">
               <summary className="p-5 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
                 How do I access my course materials?
-                <svg
-                  className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
+                <svg className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <div className="px-5 pb-5 text-slate-700">
-                Once enrolled, log into your student dashboard. Click on your program to access
-                course materials, videos, and assignments. Some programs use external platforms like
-                Elevate LMS - check your email for access instructions.
+                Once enrolled, log into your student dashboard. Click on your program to access course materials, videos, and assignments. Some programs use external platforms like Elevate LMS - check your email for access instructions.
               </div>
             </details>
-
+            
             <details className="bg-white rounded-xl shadow-sm border overflow-hidden group">
               <summary className="p-5 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
                 How do I log my training hours?
-                <svg
-                  className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
+                <svg className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <div className="px-5 pb-5 text-slate-700">
-                For apprenticeship programs, use the &quot;Log Hours&quot; feature in your student
-                dashboard. Enter your date, hours worked, and activities. Your supervisor will
-                verify the hours.
+                For apprenticeship programs, use the &quot;Log Hours&quot; feature in your student dashboard. Enter your date, hours worked, and activities. Your supervisor will verify the hours.
               </div>
             </details>
-
+            
             <details className="bg-white rounded-xl shadow-sm border overflow-hidden group">
               <summary className="p-5 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
                 Who do I contact about funding/WIOA?
-                <svg
-                  className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
+                <svg className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <div className="px-5 pb-5 text-slate-700">
-                For WIOA funding questions, contact your WorkOne case manager directly. For general
-                funding questions, email us at our contact form or call {PLATFORM_DEFAULTS.supportPhone}.
+                For WIOA funding questions, contact your WorkOne case manager directly. For general funding questions, email us at our contact form or call {PLATFORM_DEFAULTS.supportPhone}.
               </div>
             </details>
-
+            
             <details className="bg-white rounded-xl shadow-sm border overflow-hidden group">
               <summary className="p-5 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
                 What if I need to miss class?
-                <svg
-                  className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
+                <svg className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <div className="px-5 pb-5 text-slate-700">
-                Contact your instructor as soon as possible. Most programs have attendance
-                requirements for funding. We can work with you on makeup options if you communicate
-                early.
+                Contact your instructor as soon as possible. Most programs have attendance requirements for funding. We can work with you on makeup options if you communicate early.
               </div>
             </details>
           </div>
@@ -298,27 +201,19 @@ export default async function SupportPage() {
         {/* Contact Info */}
         <div className="mt-16 bg-white rounded-2xl p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-4">Still Need Help?</h2>
-          <p className="text-slate-400 mb-6">
-            Our support team is available Monday-Friday, 9am-5pm EST
-          </p>
+          <p className="text-slate-400 mb-6">Our support team is available Monday-Friday, 9am-5pm EST</p>
           <div className="flex flex-wrap gap-6 justify-center">
             <div className="text-white">
               <p className="text-sm text-slate-500">Live Chat</p>
-              <a href="/support/chat" className="text-lg font-semibold hover:text-brand-blue-400">
-                Chat With Us
-              </a>
+              <a href="/support/chat" className="text-lg font-semibold hover:text-brand-blue-400">Chat With Us</a>
             </div>
             <div className="text-white">
               <p className="text-sm text-slate-500">Email</p>
-              <a href="/contact" className="text-lg font-semibold hover:text-brand-blue-400">
-                Contact Us
-              </a>
+              <a href="/contact" className="text-lg font-semibold hover:text-brand-blue-400">Contact Us</a>
             </div>
             <div className="text-white">
               <p className="text-sm text-slate-500">Submit a Ticket</p>
-              <a href="/support/ticket" className="text-lg font-semibold hover:text-brand-blue-400">
-                Open a Ticket
-              </a>
+              <a href="/support/ticket" className="text-lg font-semibold hover:text-brand-blue-400">Open a Ticket</a>
             </div>
           </div>
         </div>

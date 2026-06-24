@@ -11,6 +11,8 @@ const useStandaloneOutput =
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Disable source maps in production builds — saves ~500MB heap during build
+  productionSourceMap: false,
   // Disable Next's built-in lint step during build — ESLint runs separately
   // Server external packages - exclude heavy dependencies from the server bundle
   // These are loaded at runtime instead of being bundled, reducing Lambda size

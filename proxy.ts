@@ -116,6 +116,7 @@ const PUBLIC_MARKETING_PREFIXES = [
   '/apply',
   '/for-employers',
   '/apprenticeship-sponsor',
+  '/pwa',
 ];
 
 /** Exact public routes (portal hub, role-specific login pages). */

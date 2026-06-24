@@ -166,7 +166,7 @@ export default async function StudentPWAPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-44 sm:h-52 overflow-hidden">
-        <Image src="/images/pages/admin-accreditation-report-hero.jpg" alt="Students in classroom" fill className="object-cover" priority  sizes="100vw" />
+        <Image src="/images/pages/admin-accreditation-report-hero.webp" alt="Students in classroom" fill className="object-cover" priority  sizes="100vw" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Logo alt="Elevate" width={36} height={36} className="mb-2" />
           <h1 className="text-xl font-bold text-slate-900">Welcome back, {firstName}</h1>

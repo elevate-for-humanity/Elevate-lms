@@ -142,7 +142,7 @@ export default async function TrainingPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pathways/business-hero.jpg"
+                  src="/images/pathways/business-hero.webp"
                   alt="Training"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"

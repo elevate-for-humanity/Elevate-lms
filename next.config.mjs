@@ -204,9 +204,20 @@ const nextConfig = {
     // On 16GB+ builds, the default parallelism is safe and faster.
     // Remove config.parallelism = 1 to let webpack scale naturally.
 
-    // Only disable webpack cache in CI/container builds where persistent cache is unavailable.
-    // Local builds should use the cache for faster incremental builds.
-    if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1' || process.env.CI === 'true') {
+    // Enable webpack filesystem cache in CI when NEXT_BUILD_CACHE is set (Northflank persistent cache).
+    // This ensures consistent Server Action IDs across builds, preventing "Failed to find Server Action" errors.
+    // Only disable if DISABLE_WEBPACK_FILESYSTEM_CACHE is explicitly set.
+    if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') {
+      config.cache = false;
+    } else if (process.env.NEXT_BUILD_CACHE) {
+      // Northflank has persistent /cache/.next - use filesystem cache for consistent builds
+      // This ensures Server Action IDs remain stable across rebuilds of the same commit
+      config.cache = {
+        type: 'filesystem',
+        cacheDirectory: process.env.NEXT_BUILD_CACHE,
+      };
+    } else if (process.env.CI === 'true' && !process.env.NEXT_BUILD_CACHE) {
+      // CI without persistent cache - disable to avoid stale cache issues
       config.cache = false;
     }
 

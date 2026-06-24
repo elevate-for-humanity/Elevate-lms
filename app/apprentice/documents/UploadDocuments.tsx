@@ -1,18 +1,53 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { Upload, CheckCircle, AlertCircle } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Upload, CheckCircle, AlertCircle, FileText } from 'lucide-react';
+
+interface DocumentType {
+  id: string;
+  name: string;
+  document_type: string;
+}
 
 export default function UploadDocuments({ refreshKey }: { refreshKey?: number }) {
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [selectedDocType, setSelectedDocType] = useState<string>('');
+  const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
+  const [loadingTypes, setLoadingTypes] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch available document types
+  useEffect(() => {
+    async function fetchDocTypes() {
+      try {
+        const res = await fetch('/api/apprentice/documents?program=barber-apprenticeship');
+        if (res.ok) {
+          const data = await res.json();
+          setDocumentTypes(data.documentTypes || []);
+          if (data.documentTypes?.length > 0) {
+            setSelectedDocType(data.documentTypes[0].id);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch document types:', err);
+      } finally {
+        setLoadingTypes(false);
+      }
+    }
+    fetchDocTypes();
+  }, []);
 
   const handleUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     
+    if (!selectedDocType) {
+      setError('Please select a document type first');
+      return;
+    }
+
     const file = files[0];
     setError(null);
     setSuccess(null);
@@ -20,7 +55,8 @@ export default function UploadDocuments({ refreshKey }: { refreshKey?: number })
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('document_type', 'government-id');
+    formData.append('documentTypeId', selectedDocType);
+    formData.append('programSlug', 'barber-apprenticeship');
 
     try {
       const res = await fetch('/api/apprentice/documents', {
@@ -56,6 +92,33 @@ export default function UploadDocuments({ refreshKey }: { refreshKey?: number })
 
   return (
     <div className="space-y-4">
+      {/* Document Type Selector */}
+      <div>
+        <label htmlFor="doc-type" className="block text-sm font-medium text-slate-700 mb-2">
+          Document Type
+        </label>
+        {loadingTypes ? (
+          <div className="h-10 bg-slate-100 rounded-lg animate-pulse" />
+        ) : documentTypes.length > 0 ? (
+          <select
+            id="doc-type"
+            value={selectedDocType}
+            onChange={(e) => setSelectedDocType(e.target.value)}
+            className="w-full h-10 px-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+          >
+            <option value="">Select document type...</option>
+            {documentTypes.map((docType) => (
+              <option key={docType.id} value={docType.id}>
+                {docType.name || docType.document_type.replace(/_/g, ' ')}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <p className="text-sm text-slate-500">No document types available</p>
+        )}
+      </div>
+
+      {/* File Upload Area */}
       <div
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -65,12 +128,13 @@ export default function UploadDocuments({ refreshKey }: { refreshKey?: number })
           setDragActive(false);
           handleUpload(e.dataTransfer.files);
         }}
-        onClick={() => fileInputRef.current?.click()}
+        onClick={() => !uploading && fileInputRef.current?.click()}
         className={`
           border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
           ${dragActive 
             ? 'border-brand-blue-500 bg-brand-blue-50' 
             : 'border-slate-300 hover:border-brand-blue-400 hover:bg-slate-50'}
+          ${uploading ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       >
         <input
@@ -79,6 +143,7 @@ export default function UploadDocuments({ refreshKey }: { refreshKey?: number })
           accept=".pdf,.jpg,.jpeg,.png"
           onChange={(e) => handleUpload(e.target.files)}
           className="hidden"
+          disabled={uploading}
         />
         {uploading ? (
           <div className="flex flex-col items-center">

@@ -19,7 +19,7 @@ export default function ServSafePage() {
     <main className="min-h-screen">
       <section className="relative bg-brand-blue-900 text-white py-20">
         <div className="absolute inset-0 opacity-20">
-          <Image src="/images/pages/certifications-page-1.webp" alt="" fill className="object-cover" />
+          <Image src="/images/pages/certifications-page-1.webp" alt="ServSafe food handler certification" fill className="object-cover" sizes="100vw" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4">
           <Breadcrumbs items={[{ label: 'Testing', href: '/testing' }, { label: 'ServSafe' }]} />

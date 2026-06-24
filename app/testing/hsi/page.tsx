@@ -21,7 +21,7 @@ export default function HSIPage() {
     <main className="min-h-screen">
       <section className="relative bg-brand-blue-900 text-white py-20">
         <div className="absolute inset-0 opacity-20">
-          <Image src="/images/pages/programs-emergency-health-safety-hero.webp" alt="" fill className="object-cover" />
+          <Image src="/images/pages/programs-emergency-health-safety-hero.webp" alt="Health and Safety Institute testing" fill className="object-cover" sizes="100vw" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4">
           <Breadcrumbs items={[{ label: 'Testing', href: '/testing' }, { label: 'HSI Certifications' }]} />

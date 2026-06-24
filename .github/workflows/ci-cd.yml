@@ -145,6 +145,7 @@ jobs:
           # 6 GB heap - ubuntu-latest has 7 GB RAM; the LMS build peaks ~3 GB
           # without this flag the SWC compiler OOMs on large page counts.
           NODE_OPTIONS: '--max-old-space-size=6144'
+          GENERATE_SOURCEMAP: 'false'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

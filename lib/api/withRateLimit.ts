@@ -10,6 +10,8 @@ import {
   publicRateLimit,
   pageLoadRateLimit,
   createRateLimitHeaders,
+  RATE_LIMITS,
+  checkInMemoryRateLimit,
 } from '@/lib/rate-limit';
 
 type Tier = 'strict' | 'contact' | 'api' | 'auth' | 'payment' | 'public' | 'pageLoad';
@@ -87,6 +89,35 @@ export async function applyRateLimit(
     const msg = err instanceof Error ? err.message : String(err);
     const isQuotaExhausted = msg.includes('max requests limit exceeded');
     const isCredential = msg.includes('401') || msg.includes('403') || msg.includes('Unauthorized');
+
+    // Check for malformed response errors (indicates Redis/Upstash issue)
+    const isMalformedResponse = 
+      msg.includes('res.map is not a function') || 
+      msg.includes('res.filter is not a function') || 
+      msg.includes('Cannot read properties of');
+
+    // If Redis command is not available (e.g., plain Redis vs Upstash Redis), use in-memory fallback
+    const isCommandUnavailable = 
+      msg.includes('not available') || 
+      msg.includes('not a function') || 
+      isMalformedResponse;
+
+    if (isCommandUnavailable) {
+      // Use in-memory rate limiting as fallback - this is expected when using plain Redis without RATELIMIT command
+      if (failClosed) {
+        // For strict tier, use in-memory check
+        const windowMs = tier === 'strict' ? 5 * 60 * 1000 : 60 * 1000;
+        const limit = RATE_LIMITS[tier]?.requests || 60;
+        const allowed = checkInMemoryRateLimit(id, limit, windowMs);
+        if (!allowed) {
+          return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+        }
+        return null;
+      }
+      // For non-strict tiers, allow request but log once
+      logger.debug('[rate-limit] Using in-memory fallback', { tier, ip: id });
+      return null;
+    }
 
     if (failClosed) {
       // Only strict tier logs at error — it's actually blocking traffic.

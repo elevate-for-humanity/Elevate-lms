@@ -555,7 +555,7 @@ const nextConfig = {
       { source: '/training-institute', destination: '/programs', permanent: true },
       // /student/dashboard — real 606-line Supabase dashboard, no redirect
 
-      // Fix old hero image paths
+      // Fix old hero image paths → redirect to .webp versions
       {
         source: '/clear-pathways-hero.jpg',
         destination: '/clear-path-main-image.jpg',
@@ -564,6 +564,18 @@ const nextConfig = {
       {
         source: '/images/efh/hero/hero-main.jpg',
         destination: '/images/hero/hero-main-welcome.jpg',
+        permanent: true,
+      },
+      // Fix missing heroes-hq path → hero-images
+      {
+        source: '/images/heroes-hq/:file',
+        destination: '/hero-images/:file',
+        permanent: true,
+      },
+      // Fix .jpg hero images → .webp
+      {
+        source: '/hero-images/:file.jpg',
+        destination: '/hero-images/:file.webp',
         permanent: true,
       },
       // /client-portal → /learner/dashboard (SaaS portal page removed)

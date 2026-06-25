@@ -17,7 +17,7 @@ export default function InstructorPerformanceClient() {
     fetch('/api/instructor/course-performance')
       .then(r => r.json())
       .then(d => setCourses(d.courses ?? []))
-      .catch(() => {})
+      .catch((err) => console.error('[Performance] Failed to load courses:', err))
       .finally(() => setLoading(false));
   }, []);
 

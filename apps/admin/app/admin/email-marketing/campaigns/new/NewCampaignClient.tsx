@@ -42,7 +42,7 @@ export default function NewCampaignPage() {
       .then((data) => {
         if (data) setAudienceCounts(data);
       })
-      .catch(() => {});
+      .catch((err) => console.error('[EmailMarketing] Failed to load audience counts:', err));
   }, []);
 
   const handleTemplateSelect = (templateKey: EmailTemplateKey) => {

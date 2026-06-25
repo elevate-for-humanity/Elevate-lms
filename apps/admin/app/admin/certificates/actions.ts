@@ -62,8 +62,8 @@ export async function issueCertificate(formData: FormData) {
     redirect('/admin/certificates/issue?error=insert_failed');
   }
 
-  // Log to audit
-  await db
+  // Log to audit (non-blocking - don't fail cert issuance if audit fails)
+  db
     .from('audit_logs')
     .insert({
       user_id: user.id,
@@ -72,7 +72,8 @@ export async function issueCertificate(formData: FormData) {
       resource_id: cert?.id || null,
       details: { recipientName, email, certNumber, courseId: courseId || null },
     })
-    .then(() => {});
+    .then(() => {})
+    .catch((err) => console.error('[audit] certificate_issued failed:', err));
 
   redirect('/admin/certificates?success=issued&cert=' + certNumber);
 }
@@ -107,7 +108,8 @@ export async function revokeCertificate(formData: FormData) {
     .update({ status: 'revoked', description: desc })
     .eq('id', certId);
 
-  await db
+  // Log to audit (non-blocking)
+  db
     .from('audit_logs')
     .insert({
       user_id: user.id,
@@ -116,7 +118,8 @@ export async function revokeCertificate(formData: FormData) {
       resource_id: certId,
       details: { reason },
     })
-    .then(() => {});
+    .then(() => {})
+    .catch((err) => console.error('[audit] certificate_revoked failed:', err));
 
   redirect('/admin/certificates?success=revoked');
 }

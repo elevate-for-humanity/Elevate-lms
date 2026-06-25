@@ -66,7 +66,7 @@ function MOUBuilder() {
           }
         }
       })
-      .catch(() => {});
+      .catch((err) => console.error('[Documents] Failed to load MOU template:', err));
   }, []);
 
   const handleSave = async () => {
@@ -329,7 +329,7 @@ function ReportBuilder() {
           }
         }
       })
-      .catch(() => {});
+      .catch((err) => console.error('[Documents] Failed to load report template:', err));
   }, []);
 
   const handleSave = async () => {

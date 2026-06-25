@@ -27,7 +27,8 @@ export default function NewCampaignPage() {
   useEffect(() => {
     fetch('/api/admin/crm/follow-ups')
       .then((res) => res.json())
-      .then((data) => setTemplates(data.templates || []));
+      .then((data) => setTemplates(data.templates || []))
+      .catch((err) => console.error('[CRM] Failed to load templates:', err));
   }, []);
 
   const handleTemplateSelect = (template) => {

@@ -26,12 +26,14 @@ export default function InstructorCampaignsPage() {
     // Load templates
     fetch('/api/crm/templates')
       .then((res) => res.json())
-      .then((data) => setTemplates(data.templates || []));
+      .then((data) => setTemplates(data.templates || []))
+      .catch((err) => console.error('[Instructor] Failed to load templates:', err));
 
     // Load my course students
     fetch('/api/instructor/my-students')
       .then((res) => res.json())
-      .then((data) => setMyStudents(data.students || []));
+      .then((data) => setMyStudents(data.students || []))
+      .catch((err) => console.error('[Instructor] Failed to load students:', err));
   }, []);
 
   const handleTemplateSelect = (template) => {

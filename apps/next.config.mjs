@@ -36,8 +36,14 @@ const adminConfig = {
   transpilePackages: ['edge-tts'],
 
   // Resolve @/* to repo root so shared lib/, components/, types/ work
-  webpack(config) {
+  webpack(config, { isServer }) {
     config.resolve.alias['@'] = ROOT;
+    // For standalone server.js, resolve @/lib/* to actual files for bundling
+    // This ensures lib/logger.js and lib/memory-monitor.js are included in standalone output
+    if (isServer) {
+      config.resolve.alias['@/lib/logger'] = path.join(ROOT, 'lib/logger.js');
+      config.resolve.alias['@/lib/memory-monitor'] = path.join(ROOT, 'lib/memory-monitor.js');
+    }
     // Keep peak memory stable during admin builds on low-RAM runners.
     config.parallelism = 1;
     // Northflank's allowed ephemeral build storage is not large enough for

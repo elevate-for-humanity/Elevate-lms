@@ -1,3 +1,10 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Redirect',
+  robots: { index: false, follow: false },
+};
+
 import { redirect } from "next/navigation";
 
 type Props = { params: Promise<{ slug: string }> };

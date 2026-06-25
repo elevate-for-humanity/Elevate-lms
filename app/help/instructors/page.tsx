@@ -3,7 +3,8 @@ import { Metadata } from 'next';
 
 
 export const metadata: Metadata = {
-  title: 'Instructors',
+  title: 'Redirect',
+  robots: { index: false, follow: false },
   alternates: { canonical: 'https://www.elevateforhumanity.org/help/instructors' },
 };
 

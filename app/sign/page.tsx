@@ -2,7 +2,8 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
-  title: 'Sign Document | Elevate For Humanity',
+  title: 'Redirect',
+  robots: { index: false, follow: false },
   description: 'Sign documents electronically.',
 };
 

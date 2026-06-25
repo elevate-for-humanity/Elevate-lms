@@ -210,6 +210,6 @@ export async function runPostApprovalActions(input: PostApprovalInput): Promise<
       Funding: fundingLabel ?? 'N/A',
       'Enrollment ID': enrollmentId ?? 'N/A',
     },
-  ).catch((err) => logger.error('[post-approval] Teams notification failed', err));
+  ).catch((err) => logger.warn('[post-approval] Teams notification failed (non-fatal)', { err }));
 }
 

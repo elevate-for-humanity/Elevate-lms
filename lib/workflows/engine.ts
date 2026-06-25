@@ -257,7 +257,7 @@ async function execStepWithRetry(
       attempts,
       created_at: new Date().toISOString(),
     })
-  ).catch((err: unknown) => logger.error('[workflow/engine] dead-letter write failed', { run_id: ctx.runId, error: String(err) }));
+  ).catch((err: unknown) => logger.warn('[workflow/engine] dead-letter write failed (non-fatal)', { run_id: ctx.runId, error: String(err) }));
   logger.error('[workflow/engine] step exhausted retries → dead-letter', {
     run_id: ctx.runId, step_id: step.id, action_type: step.action_type, attempts,
   });

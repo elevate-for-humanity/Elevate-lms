@@ -708,7 +708,7 @@ async function sendPaymentConfirmationEmail(
       <p>- ${PLATFORM_DEFAULTS.orgName}</p>
     `,
     })
-    .catch((err) => logger.error('Failed to send payment confirmation:', err));
+    .catch((err) => logger.warn('Failed to send payment confirmation (non-fatal)', { err }));
 }
 
 /**
@@ -747,7 +747,7 @@ async function sendPaymentCompletionEmail(studentId: string, programId: string):
       <p>- ${PLATFORM_DEFAULTS.orgName}</p>
     `,
     })
-    .catch((err) => logger.error('Failed to send completion email:', err));
+    .catch((err) => logger.warn('Failed to send completion email (non-fatal)', { err }));
 }
 
 /**

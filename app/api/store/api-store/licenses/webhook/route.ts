@@ -8,7 +8,6 @@ import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { headers } from 'next/headers';
-import { Resend } from 'resend';
 import { generateLicenseWelcomeEmail } from '@/lib/email-templates/license-welcome';
 import { logger } from '@/lib/logger';
 import { isEventProcessed, markEventProcessed } from '@/lib/store/idempotency';
@@ -16,8 +15,10 @@ import { logProvisioningStep } from '@/lib/store/audit';
 import { provisionLicense } from '@/lib/store/provisioning';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
+// Lazy initialization to prevent build-time errors when env vars are missing
+const getResend = () => new (require('resend')).Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest) {
   try {
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
 
               const { subject, html, text } = generateLicenseWelcomeEmail(emailData);
 
-              await resend.emails.send({
+              await getResend().emails.send({
                 from: 'Elevate for Humanity <licenses@elevateforhumanity.org>',
                 to: purchase.contact_email,
                 subject,

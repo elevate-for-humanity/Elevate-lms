@@ -12,9 +12,9 @@ const client = new Client({
 
 async function main() {
   try {
-    console.log('🔌 Connecting to Supabase PostgreSQL...');
+    console.warn('🔌 Connecting to Supabase PostgreSQL...');
     await client.connect();
-    console.log('✅ Connected!\n');
+    console.warn('✅ Connected!\n');
 
     // Check for schema_migrations table
     console.log('📊 Checking schema_migrations table...');

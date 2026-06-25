@@ -318,7 +318,7 @@ export const TAX_OFFICE_GUIDES: Record<string, PageGuide> = {
       'WIOA funding for eligible participants',
     ],
   },
-
+  'finance-bookkeeping': {
     pageName: 'Finance & Bookkeeping Training',
     avatarName: 'David',
     avatarImage: '/images/pages/store-guide-1.webp',

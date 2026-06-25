@@ -4,24 +4,15 @@ import { type ElementType, useCallback, useEffect, useMemo, useRef, useState } f
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { 
-  Bot, 
-  Globe, 
-  Zap, 
-  Brain,
-  LayoutDashboard,
   Loader2,
-  MessageSquare,
-  PanelBottomOpen,
   RefreshCw,
   Rocket,
   Save,
   Send,
   Server,
-  Sparkles,
   Upload,
-  Briefcase,
-  Plug
 } from 'lucide-react';
+import { Bot, Globe, Zap, Brain, Sparkles, Plug, Briefcase } from '@/components/ui/BrandIcons';
 import { getSkillsLoader, type Skill } from '@/lib/studio/skills-loader';
 
 // Import OpenHands-style components

@@ -12,6 +12,7 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   trailingSlash: false,
+  transpilePackages: ['edge-tts'],
   
   images: {
     remotePatterns: [

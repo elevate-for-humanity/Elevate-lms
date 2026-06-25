@@ -16,6 +16,7 @@ async function main() {
   console.log(`Deployment: ${adminStatus?.status?.deployment?.status || adminStatus?.deploymentStatus?.status || 'unknown'}`);
   
   // Get admin builds
+  /*
   const adminBuilds = await nfFetch(projectApiPath(projectId, `/services/${adminServiceId}/builds?limit=3`)) as any;
   if (adminBuilds?.builds) {
     console.log('\nRecent builds:');
@@ -24,6 +25,7 @@ async function main() {
       if (b.message) console.log(`    Message: ${b.message.slice(0, 200)}`);
     }
   }
+  */
   
   // Get LMS service status
   console.log('\n=== LMS Service ===');
@@ -32,6 +34,7 @@ async function main() {
   console.log(`Deployment: ${lmsStatus?.status?.deployment?.status || lmsStatus?.deploymentStatus?.status || 'unknown'}`);
   
   // Get LMS builds
+  /*
   const lmsBuilds = await nfFetch(projectApiPath(projectId, `/services/${lmsServiceId}/builds?limit=3`)) as any;
   if (lmsBuilds?.builds) {
     console.log('\nRecent builds:');
@@ -40,6 +43,7 @@ async function main() {
       if (b.message) console.log(`    Message: ${b.message?.slice(0, 200)}`);
     }
   }
+  */
 }
 
 main().catch(console.error);

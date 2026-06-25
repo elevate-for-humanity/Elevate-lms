@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ShoppingCart, X, Plus, Minus, Loader2, CreditCard } from 'lucide-react';
 import { useCart } from '@/lib/store/use-cart';
-import { createCheckoutSession } from '@/lib/stripe/client';
+import { handleTestingCheckout } from '@/lib/store/actions';
 
 export default function TestingCart() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart();
@@ -14,8 +14,8 @@ export default function TestingCart() {
     setLoading(true);
     setError(null);
     try {
-      const { url } = await createCheckoutSession(items);
-      window.location.href = url;
+      const { url } = await handleTestingCheckout(items);
+      if (url) window.location.href = url;
     } catch (err) {
       setError('Checkout failed. Please try again.');
       setLoading(false);

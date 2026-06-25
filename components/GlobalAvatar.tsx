@@ -25,7 +25,7 @@ const avatarConfig: { pattern: RegExp; video: string; name: string }[] = [
     video: '/videos/avatars/financial-guide.mp4',
     name: 'Reports Guide',
   },
-  { pattern: /^\/learner/dashboard/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Student Guide' },
+  { pattern: /^\/learner\/dashboard/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Student Guide' },
   { pattern: /^\/student/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Student Guide' },
   { pattern: /^\/instructor/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Instructor Guide' },
   {

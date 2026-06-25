@@ -24,6 +24,7 @@ interface NavCard {
   color: string;
 }
 
+// Ensure all nav cards have required href
 const MAIN_NAV_CARDS: NavCard[] = [
   {
     title: 'Programs',

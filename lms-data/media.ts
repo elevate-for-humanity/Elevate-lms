@@ -69,7 +69,7 @@ export const homeHeroImages: HeroImage[] = [
   },
   {
     id: 'home-hero-3',
-    src: '/images/hero-new/hero-2.jpg',
+    src: '/images/students-new/student-2.webp',
     alt: 'Student working while studying on a laptop',
     headline: 'Online + In-Person Support, Wrapped Around You',
     subheadline:
@@ -114,7 +114,7 @@ export const homeSecondaryStripImages: ProgramHighlightImage[] = [
   },
   {
     id: 'strip-tax-it',
-    src: '/images/hero-new/hero-2.jpg',
+    src: '/images/students-new/student-1.webp',
     alt: 'Learners working on laptops',
     programId: 'tax-vita',
     label: 'Tax, VITA & IT Support',
@@ -147,7 +147,7 @@ export const successStoryImages: SuccessStoryImage[] = [
   },
   {
     id: 'success-3',
-    src: '/images/hero-new/hero-2.jpg',
+    src: '/images/students-new/student-3.webp',
     alt: 'Student working on computer',
     name: 'Sample Learner – Tax & IT',
     outcome: 'Seasonal tax experience & IT support role',

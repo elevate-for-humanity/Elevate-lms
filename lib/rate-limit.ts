@@ -61,16 +61,22 @@ function createRateLimiter(
   config: { requests: number; window: string },
   prefix: string,
 ): Ratelimit | null {
-  const r = getRedis();
-  if (!r) return null;
   try {
+    const r = getRedis();
+    if (!r) return null;
+    
+    // Use fixed window for simpler, more reliable rate limiting
     return new Ratelimit({
       redis: r,
-      limiter: Ratelimit.slidingWindow(config.requests, config.window as any),
-      analytics: false, // Disable analytics to prevent extra API calls
+      limiter: Ratelimit.fixedWindow(config.requests, config.window),
+      analytics: false,
       prefix,
     });
-  } catch {
+  } catch (err) {
+    // Log and return null - callers will use in-memory fallback
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[rate-limit] Failed to create limiter:', err);
+    }
     return null;
   }
 }

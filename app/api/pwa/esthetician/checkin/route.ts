@@ -5,7 +5,14 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
 
 export async function POST(request: NextRequest) {
-  try { const rl = await applyRateLimit(request, 'api'); if (rl) return rl; } catch (e) { console.warn('[rate-limit] applyRateLimit failed — continuing without limit', e); }
+  // Apply rate limiting - log errors but don't block requests if rate limit fails
+  try {
+    const rl = await applyRateLimit(request, 'api');
+    if (rl) return rl;
+  } catch (e) {
+    // Rate limit service failure should be visible in logs but not block the request
+    console.error(`[rate-limit] esthetician/checkin: rate limit check failed: ${e instanceof Error ? e.message : String(e)}`);
+  }
 
   const auth = await apiAuthGuard(request);
   if (auth.error) return auth.error;

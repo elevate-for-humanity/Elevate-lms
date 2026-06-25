@@ -81,6 +81,7 @@ export class LocalStorage {
       await fs.access(videoPath);
       return videoPath;
     } catch (error) {
+      console.error(`[video-storage] LocalStorage.getVideo: failed to access video (jobId=${jobId}): ${error instanceof Error ? error.message : String(error)}`);
       return null;
     }
   }
@@ -92,6 +93,7 @@ export class LocalStorage {
       const data = await fs.readFile(metadataPath, 'utf-8');
       return JSON.parse(data);
     } catch (error) {
+      console.error(`[video-storage] LocalStorage.getVideoMetadata: failed to read metadata (jobId=${jobId}): ${error instanceof Error ? error.message : String(error)}`);
       return null;
     }
   }
@@ -102,14 +104,24 @@ export class LocalStorage {
       const metadataPath = path.join(this.basePath, 'videos', `${jobId}.json`);
       const thumbnailPath = path.join(this.basePath, 'thumbnails', `${jobId}.jpg`);
 
-      await Promise.all([
-        fs.unlink(videoPath).catch(() => {}),
-        fs.unlink(metadataPath).catch(() => {}),
-        fs.unlink(thumbnailPath).catch(() => {}),
+      const results = await Promise.allSettled([
+        fs.unlink(videoPath),
+        fs.unlink(metadataPath),
+        fs.unlink(thumbnailPath),
       ]);
+
+      const failures = results.filter(r => r.status === 'rejected');
+      if (failures.length > 0) {
+        console.warn(`[video-storage] LocalStorage.deleteVideo: ${failures.length}/${results.length} deletions failed for jobId=${jobId}`);
+        failures.forEach((f, i) => {
+          const files = ['video', 'metadata', 'thumbnail'];
+          console.warn(`[video-storage] LocalStorage.deleteVideo: failed to delete ${files[i]}: ${f.reason instanceof Error ? f.reason.message : String(f.reason)}`);
+        });
+      }
 
       return true;
     } catch (error) {
+      console.error(`[video-storage] LocalStorage.deleteVideo: unexpected error (jobId=${jobId}): ${error instanceof Error ? error.message : String(error)}`);
       return false;
     }
   }
@@ -124,12 +136,16 @@ export class LocalStorage {
 
       for (const file of metadataFiles) {
         const metadataPath = path.join(videosDir, file);
-        const data = await fs.readFile(metadataPath, 'utf-8');
-        const metadata: VideoMetadata = JSON.parse(data);
+        try {
+          const data = await fs.readFile(metadataPath, 'utf-8');
+          const metadata: VideoMetadata = JSON.parse(data);
 
-        // Filter by userId if provided
-        if (!userId || metadata.userId === userId) {
-          videos.push(metadata);
+          // Filter by userId if provided
+          if (!userId || metadata.userId === userId) {
+            videos.push(metadata);
+          }
+        } catch (fileError) {
+          console.warn(`[video-storage] LocalStorage.listVideos: failed to read metadata file ${file}: ${fileError instanceof Error ? fileError.message : String(fileError)}`);
         }
       }
 
@@ -138,6 +154,7 @@ export class LocalStorage {
 
       return videos;
     } catch (error) {
+      console.error(`[video-storage] LocalStorage.listVideos: failed to list videos: ${error instanceof Error ? error.message : String(error)}`);
       return [];
     }
   }
@@ -381,6 +398,7 @@ export class CloudflareR2Storage {
 
       return url;
     } catch (error) {
+      console.error(`[video-storage] CloudStorage.uploadVideo: upload failed (jobId=${jobId}): ${error instanceof Error ? error.message : String(error)}`);
       throw error;
     }
   }
@@ -408,6 +426,7 @@ export class CloudflareR2Storage {
       });
       return url;
     } catch (error) {
+      console.error(`[video-storage] CloudStorage.getVideo: failed to get video (jobId=${jobId}): ${error instanceof Error ? error.message : String(error)}`);
       return null;
     }
   }
@@ -424,12 +443,14 @@ export class CloudflareR2Storage {
       );
 
       if (!response.Body) {
+        console.warn(`[video-storage] CloudStorage.getVideoMetadata: empty response body (jobId=${jobId})`);
         return null;
       }
 
       const bodyString = await response.Body.transformToString();
       return JSON.parse(bodyString);
     } catch (error) {
+      console.error(`[video-storage] CloudStorage.getVideoMetadata: failed to get metadata (jobId=${jobId}): ${error instanceof Error ? error.message : String(error)}`);
       return null;
     }
   }
@@ -440,36 +461,25 @@ export class CloudflareR2Storage {
       const metadataFileName = `videos/${jobId}.json`;
       const thumbnailFileName = `thumbnails/${jobId}.jpg`;
 
-      await Promise.all([
-        this.s3Client
-          .send(
-            new DeleteObjectCommand({
-              Bucket: this.bucket,
-              Key: fileName,
-            }),
-          )
-          .catch((e) => console.warn('[video-storage] Failed to delete video file:', fileName, e instanceof Error ? e.message : e)),
-        this.s3Client
-          .send(
-            new DeleteObjectCommand({
-              Bucket: this.bucket,
-              Key: metadataFileName,
-            }),
-          )
-          .catch((e) => console.warn('[video-storage] Failed to delete metadata file:', metadataFileName, e instanceof Error ? e.message : e)),
-        this.s3Client
-          .send(
-            new DeleteObjectCommand({
-              Bucket: this.bucket,
-              Key: thumbnailFileName,
-            }),
-          )
-          .catch((e) => console.warn('[video-storage] Failed to delete thumbnail:', thumbnailFileName, e instanceof Error ? e.message : e)),
+      const results = await Promise.allSettled([
+        this.s3Client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: fileName })),
+        this.s3Client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: metadataFileName })),
+        this.s3Client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: thumbnailFileName })),
       ]);
+
+      const failures = results.filter(r => r.status === 'rejected');
+      if (failures.length > 0) {
+        const files = ['video', 'metadata', 'thumbnail'];
+        failures.forEach((f, i) => {
+          if (f.status === 'rejected') {
+            console.error(`[video-storage] CloudStorage.deleteVideo: failed to delete ${files[i]} (jobId=${jobId}): ${f.reason instanceof Error ? f.reason.message : String(f.reason)}`);
+          }
+        });
+      }
 
       return true;
     } catch (error) {
-      console.error('[video-storage] deleteVideo failed for job', jobId, error instanceof Error ? error.message : error);
+      console.error(`[video-storage] CloudStorage.deleteVideo: unexpected error (jobId=${jobId}): ${error instanceof Error ? error.message : String(error)}`);
       return false;
     }
   }

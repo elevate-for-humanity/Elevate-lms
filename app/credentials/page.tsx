@@ -29,32 +29,32 @@ const completionCerts = [
   {
     name: 'Entrepreneurship',
     desc: 'Business plan development, entity formation, marketing, and financial management.',
-    img: '/images/pages/business-sector.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/business-sector.webp',
   },
   {
     name: 'Bookkeeping & QuickBooks',
     desc: 'Double-entry bookkeeping, financial statements, and QuickBooks Online proficiency.',
-    img: '/images/pages/bookkeeping-ledger.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/bookkeeping-ledger.webp',
   },
   {
     name: 'Business Administration',
     desc: 'Microsoft Office, business communication, project management, and professional development.',
-    img: '/images/pages/office-admin-desk.jpg',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/office-admin-desk.jpg',
   },
   {
     name: 'Tax Preparation',
     desc: 'Individual tax return preparation, IRS compliance, and tax software proficiency.',
-    img: '/images/business/office-admin.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp',
   },
   {
     name: 'Sanitation & Infection Control',
     desc: 'Disinfection procedures, bloodborne pathogen safety, and regulatory compliance.',
-    img: '/images/pages/sanitation.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/sanitation.webp',
   },
   {
     name: 'Micro Programs',
     desc: 'Short-term stackable credentials in safety, digital literacy, and professional development.',
-    img: '/images/pages/certifications.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/certifications.webp',
   },
 ];
 
@@ -64,105 +64,105 @@ const industryCerts = [
     issuer: 'U.S. Department of Labor',
     field: 'Construction & Trades',
     desc: 'Workplace safety certification. DOL-issued card upon completion.',
-    img: '/images/pages/electrical.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/electrical.webp',
   },
   {
     name: 'CPR / AED / First Aid',
     issuer: 'AHA / Health & Safety Institute',
     field: 'Healthcare & General',
     desc: 'Same-day certification. Valid 2 years. Required for healthcare, childcare, and many trades.',
-    img: '/images/pages/cna-nursing.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-nursing.webp',
   },
   {
     name: 'CNA (Certified Nursing Assistant)',
     issuer: 'Indiana State Dept. of Health',
     field: 'Healthcare',
     desc: 'State-certified credential for patient care. Requires state competency exam.',
-    img: '/images/pages/healthcare-sector.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-sector.webp',
   },
   {
     name: 'CDL Class A License',
     issuer: 'Indiana BMV',
     field: 'Transportation',
     desc: 'Commercial driver license. Requires pre-trip, skills, and road test administered by the state.',
-    img: '/images/pages/cdl-loading-dock.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-loading-dock.webp',
   },
   {
     name: 'EPA Section 608',
     issuer: 'ESCO Institute / Mainstream Engineering',
     field: 'HVAC',
     desc: 'Required by federal law to handle refrigerants. Proctored on-site at our authorized testing center. Does not expire.',
-    img: '/images/pages/hvac-technician.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
   },
   {
     name: 'QuickBooks Certified User',
     issuer: 'Certiport / Intuit',
     field: 'Business',
     desc: 'Vendor certification exam administered through Certiport testing centers.',
-    img: '/images/pages/bookkeeping.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/bookkeeping.webp',
   },
   {
     name: 'IT Specialist',
     issuer: 'Certiport',
     field: 'Technology',
     desc: 'Vendor certification in business applications, administered through Certiport.',
-    img: '/images/pages/it-help-desk.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/it-help-desk.webp',
   },
   {
     name: 'CompTIA A+',
     issuer: 'CompTIA / Certiport',
     field: 'Technology',
     desc: 'Industry-standard IT support certification. Elevate provides exam preparation training. Exam delivered through Certiport, an authorized CompTIA testing partner.',
-    img: '/images/pages/network-administration.jpg',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/network-administration.jpg',
   },
   {
     name: 'CompTIA Security+',
     issuer: 'CompTIA / Certiport',
     field: 'Cybersecurity',
     desc: 'Baseline cybersecurity certification. Elevate provides exam preparation training. Exam delivered through Certiport, an authorized CompTIA testing partner.',
-    img: '/images/pages/cybersecurity.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity.webp',
   },
   {
     name: 'ServSafe Food Handler',
     issuer: 'National Restaurant Association',
     field: 'Culinary / Food Service',
     desc: 'Food safety certification. Valid 5 years. NRA-administered exam.',
-    img: '/images/pages/culinary.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/culinary.webp',
   },
   {
     name: 'NCCER Core',
     issuer: 'NCCER',
     field: 'Construction',
     desc: 'Foundational construction skills credential. NCCER-administered assessment.',
-    img: '/images/pages/skilled-trades-sector.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/skilled-trades-sector.webp',
   },
   {
     name: 'Phlebotomy Technician (CPT)',
     issuer: 'NHA',
     field: 'Healthcare',
     desc: 'National certification for blood draw and specimen collection. Exam administered on-site at Elevate — NHA Authorized Testing Center.',
-    img: '/images/pages/phlebotomy.jpg',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/phlebotomy.jpg',
   },
   {
     name: 'Medical Assistant (CCMA)',
     issuer: 'NHA',
     field: 'Healthcare',
     desc: 'Clinical and administrative medical assisting. Exam administered on-site at Elevate — NHA Authorized Testing Center.',
-    img: '/images/pages/medical-assistant.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant.webp',
   },
   {
     name: 'Indiana CPRS',
     issuer: 'Indiana DMHA',
     field: 'Behavioral Health',
     desc: 'State credential for peer recovery specialists. Requires supervised practicum hours and state application.',
-    img: '/images/pages/peer-recovery.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/peer-recovery.webp',
   },
   {
     name: 'IRS PTIN',
     issuer: 'IRS',
     field: 'Tax Preparation',
     desc: 'Preparer Tax Identification Number. Required to prepare federal returns for compensation.',
-    img: '/images/pages/finance-accounting.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/finance-accounting.webp',
   },
 ];
 
@@ -172,7 +172,7 @@ const apprenticeshipCreds = [
     issuer: 'Indiana Professional Licensing Agency',
     field: 'Cosmetology',
     desc: 'State barber license earned through DOL Registered Apprenticeship. Requires 2,000 total hours (1,500 OJT + 500 RTI) under employer supervision, competency verification, and state board exam. RAPIDS: 2025-IN-132301.',
-    img: '/images/pages/barber-hero-main.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-hero-main.webp',
   },
 ];
 
@@ -188,7 +188,7 @@ export default function CredentialsPage() {
       {/* Hero */}
       <HeroVideo
         videoSrcDesktop="/videos/welding-trades.mp4"
-        posterImage="/images/pages/credentials-page-1.webp"
+        posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/credentials-page-1.webp"
         microLabel="System of Record"
         analyticsName="credentials"
       >

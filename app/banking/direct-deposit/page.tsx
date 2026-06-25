@@ -53,7 +53,7 @@ export default function DirectDepositPage() {
       <section className="relative h-48 md:h-64 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/banking-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/banking-page-1.webp"
           alt="Direct Deposit"
           fill
           className="object-cover"

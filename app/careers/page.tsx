@@ -20,14 +20,14 @@ export const metadata: Metadata = {
       'Join our mission to provide career training at no cost to eligible participants and workforce development.',
     url: 'https://www.elevateforhumanity.org/careers',
     siteName: PLATFORM_DEFAULTS.orgName,
-    images: [{ url: '/og-default.webp', width: 1200, height: 630, alt: 'Careers at Elevate' }],
+    images: [{ url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp', width: 1200, height: 630, alt: 'Careers at Elevate' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: `Careers at ${PLATFORM_DEFAULTS.orgName}`,
     description: 'Join our mission to provide career training at no cost to eligible participants.',
-    images: ['/og-default.webp'],
+    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp'],
   },
 };
 
@@ -60,33 +60,33 @@ export default async function CareersPage() {
 
   const benefits = [
     {
-      image: '/images/pages/career-services-page-2.jpg',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
       title: 'Competitive Salary',
       description:
         'Fair compensation with performance bonuses and annual raises based on performance',
     },
     {
-      image: '/images/pages/career-services-page-3.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-3.webp',
       title: 'Health Benefits',
       description: 'Comprehensive health, dental, and vision coverage for you and your family',
     },
     {
-      image: '/images/pages/career-services-page-4.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-4.webp',
       title: 'Paid Time Off',
       description: 'Generous PTO and holiday schedule with work-life balance',
     },
     {
-      image: '/images/pages/career-services-page-5.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-5.webp',
       title: 'Professional Development',
       description: 'Continuous learning and growth opportunities with training stipends',
     },
     {
-      image: '/images/pages/career-services-page-6.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-6.webp',
       title: 'Remote Work',
       description: 'Flexible work arrangements with hybrid and fully remote options',
     },
     {
-      image: '/images/pages/comp-highlights-team.jpg',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-highlights-team.jpg',
       title: 'Mission-Driven',
       description: "Make a real impact on people's lives through workforce development",
     },
@@ -108,7 +108,7 @@ export default async function CareersPage() {
         accentText="Workforce Development"
         subheadline="Help Us Provide Free Career Training to Thousands"
         description="At Elevate For Humanity, we believe everyone deserves access to quality career training and the opportunity to build a better future. Join our mission-driven team and make a real impact on people's lives through workforce development."
-        imageSrc="/images/pages/apply-employer-hero.webp"
+        imageSrc="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-employer-hero.webp"
         imageAlt="Join Our Team"
         primaryCTA={{ text: 'View Open Positions', href: '#positions' }}
         secondaryCTA={{ text: 'Learn About Our Culture', href: '#culture' }}

@@ -30,7 +30,7 @@ export default async function FollowUpsPage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/workforce-board-page-2.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-board-page-2.webp"
           alt="Workforce board"
           fill
           sizes="100vw"

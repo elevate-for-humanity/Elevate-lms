@@ -43,7 +43,7 @@ export const programTrainingContent: LocalizedContent = {
     hero: {
       title: 'Program Overview',
       purpose: 'This page explains who this program is for, what you will learn, and how to apply.',
-      image: '/images/pages/training-classroom.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
       imageAlt: 'Students in training program',
     },
     sections: {
@@ -79,7 +79,7 @@ export const programTrainingContent: LocalizedContent = {
     hero: {
       title: 'Resumen del programa',
       purpose: 'Esta página explica para quién es el programa, qué aprenderás y cómo aplicar.',
-      image: '/images/pages/healthcare-classroom.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
       imageAlt: 'Estudiantes en programa de capacitación',
     },
     sections: {
@@ -109,7 +109,7 @@ export const applicationEnrollmentContent: LocalizedContent = {
     hero: {
       title: 'Program Application',
       purpose: 'Use this page to apply and submit the information required for review.',
-      image: '/images/pages/apply-employer-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-employer-hero.webp',
       imageAlt: 'Application form',
     },
     sections: {
@@ -137,7 +137,7 @@ export const applicationEnrollmentContent: LocalizedContent = {
     hero: {
       title: 'Solicitud del programa',
       purpose: 'Usa esta página para aplicar y enviar la información requerida.',
-      image: '/images/pages/apply-employer-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-employer-hero.webp',
       imageAlt: 'Formulario de solicitud',
     },
     sections: {
@@ -163,7 +163,7 @@ export const dashboardPortalContent: LocalizedContent = {
     hero: {
       title: 'My Dashboard',
       purpose: 'This page shows your current status and next required steps.',
-      image: '/images/pages/hvac-technician.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
       imageAlt: 'Student dashboard',
     },
     sections: {
@@ -199,7 +199,7 @@ export const dashboardPortalContent: LocalizedContent = {
     hero: {
       title: 'Mi panel',
       purpose: 'Este panel muestra tu estado actual y los siguientes pasos.',
-      image: '/images/pages/cdl-truck-highway.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-truck-highway.webp',
       imageAlt: 'Panel del estudiante',
     },
     sections: {
@@ -232,7 +232,7 @@ export const directoryListingContent: LocalizedContent = {
     hero: {
       title: 'Available Programs',
       purpose: 'Browse and filter programs that are currently open for enrollment.',
-      image: '/images/pages/comp-universal-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-universal-hero.webp',
       imageAlt: 'Program directory',
     },
     sections: {
@@ -257,7 +257,7 @@ export const directoryListingContent: LocalizedContent = {
     hero: {
       title: 'Programas disponibles',
       purpose: 'Explora programas abiertos y filtra según tus necesidades.',
-      image: '/images/pages/comp-universal-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-universal-hero.webp',
       imageAlt: 'Directorio de programas',
     },
     sections: {
@@ -285,7 +285,7 @@ export const policyComplianceContent: LocalizedContent = {
     hero: {
       title: 'Policy Information',
       purpose: 'This page explains policies that apply to your use of this platform.',
-      image: '/images/pages/for-employers-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/for-employers-page-1.webp',
       imageAlt: 'Policy documentation',
     },
     sections: {
@@ -311,7 +311,7 @@ export const policyComplianceContent: LocalizedContent = {
     hero: {
       title: 'Información de políticas',
       purpose: 'Esta página explica las políticas que aplican al uso de la plataforma.',
-      image: '/images/pages/business-sector.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/business-sector.webp',
       imageAlt: 'Documentación de políticas',
     },
     sections: {},
@@ -380,7 +380,7 @@ export const authAccountContent: LocalizedContent = {
     hero: {
       title: 'Account Access',
       purpose: 'Use this page to log in, create an account, or manage your profile.',
-      image: '/images/pages/healthcare-grad.jpg',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-grad.jpg',
       imageAlt: 'Account login',
     },
     sections: {
@@ -408,7 +408,7 @@ export const authAccountContent: LocalizedContent = {
     hero: {
       title: 'Acceso a cuenta',
       purpose: 'Usa esta página para iniciar sesión, crear una cuenta o administrar tu perfil.',
-      image: '/images/pages/career-counseling.jpg',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg',
       imageAlt: 'Inicio de sesión',
     },
     sections: {},
@@ -429,7 +429,7 @@ export const reportingAdminContent: LocalizedContent = {
     hero: {
       title: 'Administrative Dashboard',
       purpose: 'This page provides tools for reporting, management, and operations.',
-      image: '/images/pages/technology-sector.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/technology-sector.webp',
       imageAlt: 'Administrative dashboard',
     },
     sections: {
@@ -457,7 +457,7 @@ export const reportingAdminContent: LocalizedContent = {
     hero: {
       title: 'Panel administrativo',
       purpose: 'Esta página proporciona herramientas para informes, gestión y operaciones.',
-      image: '/images/pages/cybersecurity-screen.jpg',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity-screen.jpg',
       imageAlt: 'Panel administrativo',
     },
     sections: {},
@@ -478,7 +478,7 @@ export const marketingInformationalContent: LocalizedContent = {
     hero: {
       title: 'About This Platform',
       purpose: 'Learn about our mission, programs, and how to get involved.',
-      image: '/images/pages/admin-dashboard-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
       imageAlt: 'Platform overview',
     },
     sections: {
@@ -506,7 +506,7 @@ export const marketingInformationalContent: LocalizedContent = {
     hero: {
       title: 'Acerca de esta plataforma',
       purpose: 'Conoce nuestra misión, programas y cómo participar.',
-      image: '/images/pages/admin-dashboard-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
       imageAlt: 'Resumen de la plataforma',
     },
     sections: {},
@@ -527,7 +527,7 @@ export const systemUtilityContent: LocalizedContent = {
     hero: {
       title: 'Page Not Found',
       purpose: "The page you're looking for doesn't exist or has been moved.",
-      image: '/images/pages/training-cohort.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-cohort.webp',
       imageAlt: 'Page not found',
     },
     sections: {
@@ -551,7 +551,7 @@ export const systemUtilityContent: LocalizedContent = {
     hero: {
       title: 'Página no encontrada',
       purpose: 'La página que buscas no existe o ha sido movida.',
-      image: '/images/pages/workforce-training.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp',
       imageAlt: 'Página no encontrada',
     },
     sections: {},

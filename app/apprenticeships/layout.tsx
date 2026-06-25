@@ -15,14 +15,14 @@ export const metadata: Metadata = {
       'DOL-registered apprenticeships in barbering, cosmetology, culinary arts, and skilled trades. Hands-on training with job placement.',
     url: 'https://www.elevateforhumanity.org/apprenticeships',
     siteName: PLATFORM_DEFAULTS.orgName,
-    images: [{ url: '/og-default.webp', width: 1200, height: 630, alt: 'Apprenticeship Programs' }],
+    images: [{ url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp', width: 1200, height: 630, alt: 'Apprenticeship Programs' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Apprenticeship Programs - Earn While You Learn',
     description: 'Paid apprenticeships with hands-on training and job placement.',
-    images: ['/og-default.webp'],
+    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp'],
   },
 };
 

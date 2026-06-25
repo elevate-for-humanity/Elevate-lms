@@ -111,8 +111,8 @@ async function _GET(request: NextRequest) {
         const payload = JSON.stringify({
           title: 'Log Your Hours',
           body: "Don't forget to log your training hours for this week!",
-          icon: '/icon-192.png',
-          badge: '/icon-192.png',
+          icon: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
+          badge: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
           url: '/pwa/barber/log-hours',
           tag: 'weekly-reminder',
           actions: [

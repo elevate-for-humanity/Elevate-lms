@@ -14,49 +14,49 @@
   ],
   "icons": [
     {
-      "src": "/icons/admin-72.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/admin-96.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/admin-128.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-128.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/admin-144.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-144.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/admin-192.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/admin-512.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/admin-192-maskable.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-192-maskable.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icons/admin-512-maskable.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -69,7 +69,7 @@
       "url": "/admin/students",
       "icons": [
         {
-          "src": "/icons/admin-96.png",
+          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-96.png",
           "sizes": "96x96"
         }
       ]
@@ -80,7 +80,7 @@
       "url": "/admin/applications",
       "icons": [
         {
-          "src": "/icons/admin-96.png",
+          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-96.png",
           "sizes": "96x96"
         }
       ]
@@ -91,7 +91,7 @@
       "url": "/admin/reports",
       "icons": [
         {
-          "src": "/icons/admin-96.png",
+          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-96.png",
           "sizes": "96x96"
         }
       ]
@@ -100,14 +100,14 @@
   "id": "org.elevateforhumanity.admin",
   "screenshots": [
     {
-      "src": "/screenshots/home-narrow.jpg",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/screenshots/home-narrow.jpg",
       "sizes": "1080x1920",
       "type": "image/jpeg",
       "form_factor": "narrow",
       "label": "Home screen"
     },
     {
-      "src": "/screenshots/home-wide.jpg",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/screenshots/home-wide.jpg",
       "sizes": "1920x1080",
       "type": "image/jpeg",
       "form_factor": "wide",

@@ -8,42 +8,42 @@ export default function Programs() {
       description:
         'Train for careers as a Certified Nursing Assistant (CNA), Medical Assistant, or Home Health Aide. Programs include clinical training, certification preparation, and job placement support.',
       href: '/programs/healthcare',
-      image: '/hero-images/healthcare-category.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/healthcare-category.webp',
     },
     {
       title: 'Skilled Trades',
       description:
         'Learn HVAC installation and repair, electrical systems, plumbing, or construction trades. Hands-on training leads to industry certifications and apprenticeship opportunities.',
       href: '/programs/skilled-trades',
-      image: '/hero-images/skilled-trades-category.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/skilled-trades-category.webp',
     },
     {
       title: 'Barber Apprenticeship',
       description:
         'Complete state-approved training in barbering, cosmetology, or esthetics. Programs meet licensing requirements and include practical experience in working salons.',
       href: '/programs/barber-apprenticeship',
-      image: '/hero-images/barber-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/barber-hero.webp',
     },
     {
       title: 'Technology',
       description:
         'Build skills in IT support, cybersecurity, or web development. Training covers industry-standard tools and prepares you for recognized certifications like Certiport IT Specialist.',
       href: '/programs/technology',
-      image: '/hero-images/technology-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/technology-hero.webp',
     },
     {
       title: 'Business',
       description:
         'Study accounting, business management, or entrepreneurship. Programs focus on practical skills employers need, from bookkeeping to business planning.',
       href: '/programs/business-administration',
-      image: '/hero-images/business-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/business-hero.webp',
     },
     {
       title: 'CDL & Transportation',
       description:
         "Earn your Commercial Driver's License (CDL) through approved training. Includes classroom instruction, behind-the-wheel training, and job placement assistance.",
       href: '/programs/cdl-training',
-      image: '/hero-images/cdl-transportation-category.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/cdl-transportation-category.webp',
     },
   ];
 

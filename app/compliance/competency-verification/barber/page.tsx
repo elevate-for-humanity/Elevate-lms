@@ -146,7 +146,7 @@ export default function BarberCompetencyRubricPage() {
       <section className="relative h-[240px] sm:h-[300px] print:hidden overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/admin-compliance-agreements-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-compliance-agreements-hero.webp"
           alt="Barber apprentice training in a barbershop"
           fill
           sizes="100vw"

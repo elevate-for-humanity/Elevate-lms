@@ -54,7 +54,7 @@ function PathwayCard({ prog, priority }: { prog: ProgramSchema; priority?: boole
     prog.slug === 'culinary-apprenticeship';
 
   // Safe Image Source - Prevents build crashes on null sources
-  const imageSrc = prog.heroImage || '/logo.png';
+  const imageSrc = prog.heroImage || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/logo.png';
   
   // Compute payment plan for this program
   const paymentPlan = getProgramPaymentPlan(prog.slug);

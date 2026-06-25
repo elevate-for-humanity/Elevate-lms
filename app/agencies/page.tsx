@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 const complianceFeatures = [
   {
-    image: '/images/pages/government-1.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-1.webp',
     alt: 'DOL Registered apprenticeship compliance',
     title: 'DOL Registered',
     description: 'Registered apprenticeship sponsor with the Department of Labor',
@@ -25,7 +25,7 @@ const complianceFeatures = [
     cta: 'View Apprenticeships',
   },
   {
-    image: '/images/pages/government-2.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-2.webp',
     alt: 'ETPL approved training provider listing',
     title: 'ETPL Approved',
     description: "Listed on Indiana's Eligible Training Provider List",
@@ -33,7 +33,7 @@ const complianceFeatures = [
     cta: 'How Funding Works',
   },
   {
-    image: '/images/pages/government-3.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-3.webp',
     alt: 'WIOA compliance documentation and reporting',
     title: 'WIOA Compliant',
     description: 'Full compliance with Workforce Innovation and Opportunity Act',
@@ -41,7 +41,7 @@ const complianceFeatures = [
     cta: 'WIOA Details',
   },
   {
-    image: '/images/pages/government-4.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-4.webp',
     alt: 'Real-time outcome tracking and placement reporting',
     title: 'Outcome Tracking',
     description: 'Real-time reporting on placement, retention, and wages',
@@ -81,7 +81,7 @@ export default function AgenciesPage() {
 
       <HeroVideo
         videoSrcDesktop="/videos/training-providers-hero.mp4"
-        posterImage="/images/pages/agencies-page-1.webp"
+        posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/agencies-page-1.webp"
         microLabel="For Workforce Agencies"
         analyticsName="agencies"
       >

@@ -29,7 +29,7 @@ export default function GrantsPage() {
       <section className="relative h-[clamp(190px,32vw,360px)] flex items-center overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/grants-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/grants-page-1.webp"
           alt="Students celebrating graduation"
           fill
           className="object-cover"

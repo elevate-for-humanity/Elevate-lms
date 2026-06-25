@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
       {
-        url: '/images/pages/admin-dashboard-hero.webp',
+        url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
         width: 1200,
         height: 630,
         alt: `${PLATFORM_DEFAULTS.orgName} workforce training`,
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training & Apprenticeships`,
     description:
       'Funded training, DOL-registered apprenticeships, and job placement — often at no cost.',
-    images: ['/images/pages/admin-dashboard-hero.webp'],
+    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp'],
   },
 };
 

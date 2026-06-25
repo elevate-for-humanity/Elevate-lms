@@ -166,7 +166,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                 </div>
                 <div className="relative hidden lg:block aspect-[4/3]">
                   <Image
-                    src={bundle.image_url || '/images/pages/career-services-page-3.webp'}
+                    src={bundle.image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-3.webp'}
                     alt={bundle.title}
                     fill
                     className="object-cover"
@@ -191,7 +191,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                 <div key={course.id} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 flex flex-col">
                   <div className="relative h-48 overflow-hidden">
                     <Image
-                      src={course.image_url || '/images/pages/apply-employer-hero.webp'}
+                      src={course.image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-employer-hero.webp'}
                       alt={course.title}
                       fill
                       className="object-cover"

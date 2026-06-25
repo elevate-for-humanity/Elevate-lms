@@ -126,7 +126,7 @@ export default function LessonVideoEditor({
             type="text"
             value={video.posterImage ?? ''}
             onChange={(e) => set({ posterImage: e.target.value })}
-            placeholder="/images/video-poster.jpg"
+            placeholder="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/video-poster.jpg"
             className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           />
         </div>

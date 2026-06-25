@@ -23,7 +23,7 @@ const dotTests = [
       'Clearinghouse query (if needed)',
       'Same-day scheduling available',
     ],
-    image: '/images/heroes/training-provider-1.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/training-provider-1.webp',
   },
   {
     name: 'DOT Random Testing',
@@ -37,7 +37,7 @@ const dotTests = [
       'MRO review included',
       'Clearinghouse reporting',
     ],
-    image: '/images/heroes/training-provider-3.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/training-provider-3.webp',
   },
   {
     name: 'DOT Post-Accident',
@@ -51,7 +51,7 @@ const dotTests = [
       'Full documentation',
       'MRO review included',
     ],
-    image: '/images/pages/about-career-training.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp',
   },
   {
     name: 'DOT Reasonable Suspicion',
@@ -65,7 +65,7 @@ const dotTests = [
       'MRO review included',
       'Confidential handling',
     ],
-    image: '/images/pages/about-supportive-services.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-supportive-services.webp',
   },
   {
     name: 'Return to Duty (RTD)',
@@ -80,7 +80,7 @@ const dotTests = [
       'Follow-up testing schedule setup',
       'Full compliance documentation',
     ],
-    image: '/images/pages/about-employer-partners.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-employer-partners.webp',
   },
   {
     name: 'Follow-Up Testing',

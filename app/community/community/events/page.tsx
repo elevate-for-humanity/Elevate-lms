@@ -30,7 +30,7 @@ export default async function CommunityEventsPage() {
       {/* Hero */}
       <div className="relative h-64 sm:h-80 w-full overflow-hidden">
         <Image
-          src="/images/pages/community-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/community-page-1.webp"
           alt="Elevate community events and workshops"
           fill className="object-cover" priority
          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />

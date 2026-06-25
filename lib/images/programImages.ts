@@ -124,8 +124,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Nail technician apprentice performing a manicure',
   },
   'esthetician-apprenticeship': {
-    card: '/images/beauty/esthetician.webp',
-    hero: '/images/beauty/esthetician.webp',
+    card: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/esthetician.webp',
+    hero: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/esthetician.webp',
     alt: 'Esthetician apprentice performing a professional facial treatment',
   },
 
@@ -173,8 +173,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
 
   // ── Business / Finance ───────────────────────────────────────────────────
   'tax-preparation': {
-    card: '/images/business/office-admin.webp',
-    hero: '/images/business/professional-2.jpg',
+    card: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp',
+    hero: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/professional-2.jpg',
     alt: 'Tax preparer working with a client on financial documents',
   },
   bookkeeping: {
@@ -210,8 +210,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
 
   // ── Culinary ─────────────────────────────────────────────────────────────
   'culinary-apprenticeship': {
-    card: '/images/pages/culinary.webp',
-    hero: '/images/pages/culinary.webp',
+    card: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/culinary.webp',
+    hero: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/culinary.webp',
     alt: 'Culinary apprentice preparing food in a professional kitchen',
   },
 

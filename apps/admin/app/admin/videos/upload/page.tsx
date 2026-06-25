@@ -22,7 +22,7 @@ export default async function UploadVideosPage() {
     <div className="min-h-screen bg-white">
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
         <Image
-          src="/images/pages/admin-videos-upload-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-videos-upload-hero.webp"
           alt="Upload videos"
           fill
           sizes="100vw"

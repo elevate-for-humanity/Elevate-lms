@@ -26,7 +26,7 @@ export default function ApprovalsPage() {
       <section className="relative h-48 md:h-64 w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/approvals-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/approvals-page-1.webp"
           alt={`${PLATFORM_DEFAULTS.orgName} institutional approvals and governance`}
           fill
           className="object-cover"

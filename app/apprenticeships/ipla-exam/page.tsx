@@ -67,7 +67,7 @@ export default function IPLAExamSignup() {
       <section className="relative h-[40vh] min-h-[280px] max-h-[400px]">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/apprenticeships-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeships-page-1.webp"
           alt="Barber apprentice preparing for licensing exam"
           fill
           sizes="100vw"

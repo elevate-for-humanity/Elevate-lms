@@ -101,7 +101,7 @@ function TeamMemberForm({ member, onSave, onCancel, saving }: {
         <Field label="Title *"><Input value={form.title} onChange={set('title')} placeholder="Program Director" /></Field>
         <Field label="Role"><Input value={form.org_role ?? ''} onChange={set('org_role')} placeholder="leadership" /></Field>
         <Field label="Email"><Input value={form.email ?? ''} onChange={set('email')} type="email" placeholder="jane@elevateforhumanity.org" /></Field>
-        <Field label="Headshot URL"><Input value={form.headshot_url ?? ''} onChange={set('headshot_url')} placeholder="/images/heroes/hero-homepage.webp" /></Field>
+        <Field label="Headshot URL"><Input value={form.headshot_url ?? ''} onChange={set('headshot_url')} placeholder="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp" /></Field>
         <Field label="LinkedIn URL"><Input value={form.linkedin_url ?? ''} onChange={set('linkedin_url')} placeholder="https://linkedin.com/in/..." /></Field>
         <Field label="Display Order"><Input value={String(form.display_order ?? 0)} onChange={v => set('display_order')(Number(v))} type="number" /></Field>
       </div>
@@ -173,7 +173,7 @@ function PartnerForm({ partner, onSave, onCancel, saving }: {
         <Field label="State"><Input value={form.state ?? 'IN'} onChange={set('state')} placeholder="IN" /></Field>
         <Field label="Contact Name"><Input value={form.contact_name ?? ''} onChange={set('contact_name')} placeholder="John Doe" /></Field>
         <Field label="Contact Email"><Input value={form.contact_email ?? ''} onChange={set('contact_email')} type="email" placeholder="john@acme.com" /></Field>
-        <Field label="Logo URL"><Input value={form.logo_url ?? ''} onChange={set('logo_url')} placeholder="/images/heroes/workforce-partner-1.webp" /></Field>
+        <Field label="Logo URL"><Input value={form.logo_url ?? ''} onChange={set('logo_url')} placeholder="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/workforce-partner-1.webp" /></Field>
         <Field label="Website"><Input value={form.website_url ?? ''} onChange={set('website_url')} placeholder="https://acme.com" /></Field>
         <Field label="Display Order"><Input value={String(form.display_order ?? 0)} onChange={v => set('display_order')(Number(v))} type="number" /></Field>
       </div>

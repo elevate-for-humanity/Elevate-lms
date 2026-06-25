@@ -9,7 +9,7 @@ export const HOSPITALITY: ProgramSchema = {
   sector: 'business',
   category: 'Hospitality & Tourism',
   programType: 'workforce',
-  heroImage: '/images/pages/culinary.webp',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/culinary.webp',
   heroImageAlt: 'Hospitality professional at a hotel front desk',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

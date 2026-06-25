@@ -25,7 +25,7 @@ export default function DemoPartnersPage() {
   return (
     <DemoPageShell title="Partners" description="Employer partners, workforce boards, and training providers in your network." portal="admin">
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] mb-6">
-        <Image src="/images/pages/demo-page-8.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/demo-page-8.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="bg-white rounded-xl border overflow-hidden">
         <table className="w-full text-sm">

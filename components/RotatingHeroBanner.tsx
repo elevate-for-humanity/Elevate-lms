@@ -5,12 +5,12 @@ import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const slides = [
-  { image: '/images/pages/training-classroom.webp' },
-  { image: '/images/pages/cna-nursing-real.webp' },
-  { image: '/images/pages/cdl-truck-highway.webp' },
-  { image: '/images/pages/welding-sparks.webp' },
-  { image: '/images/pages/hvac-technician.webp' },
-  { image: '/images/pages/electrical-wiring.jpg' },
+  { image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp' },
+  { image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-nursing-real.webp' },
+  { image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-truck-highway.webp' },
+  { image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/welding-sparks.webp' },
+  { image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp' },
+  { image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/electrical-wiring.jpg' },
 ];
 
 export default function RotatingHeroBanner() {

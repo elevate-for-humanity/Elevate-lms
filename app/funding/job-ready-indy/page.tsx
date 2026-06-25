@@ -19,7 +19,7 @@ export default function JobReadyIndyPage() {
     <div className="min-h-screen bg-white">
       <PageVideoHero
         videoSrc="/videos/training-providers-hero.mp4"
-        posterSrc="/images/pages/funding-page-4.jpg"
+        posterSrc="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-page-4.jpg"
         posterAlt="Funding Job Ready Indy — {PLATFORM_DEFAULTS.orgName}"
         size="marketing"
       />
@@ -35,7 +35,7 @@ export default function JobReadyIndyPage() {
       <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/jri-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/jri-hero.webp"
           alt="Job Ready Indy workforce training"
           fill
           className="object-cover"
@@ -80,7 +80,7 @@ export default function JobReadyIndyPage() {
             </div>
             <div className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/pages/learner-page-1.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/learner-page-1.webp"
                 alt="Job Ready Indy career training"
                 fill
                 className="object-cover"

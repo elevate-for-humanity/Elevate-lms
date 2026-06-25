@@ -9,7 +9,7 @@ export const ESTHETICIAN: ProgramSchema = {
   sector: 'personal-services',
   category: 'Beauty & Personal Services',
   programType: 'certification',
-  heroImage: '/images/pages/cosmetology-hero.webp',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-hero.webp',
   heroImageAlt: 'Esthetician performing professional facial treatment',
   videoSrc: '/videos/esthetician-spa.mp4',
   deliveryMode: 'hybrid',

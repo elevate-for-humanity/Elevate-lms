@@ -10,7 +10,7 @@ export function SiteLogo({ className }: SiteLogoProps) {
   return (
     <Link href="/" aria-label="Link" className={className ?? ''}>
       <Image
-        src="/logo-small.png"
+        src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/logo-small.png"
         alt={`${PLATFORM_DEFAULTS.orgName} – Building Success Stories`}
         width={96}
         height={96}

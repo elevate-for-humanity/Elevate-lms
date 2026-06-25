@@ -83,7 +83,7 @@ export default async function FerpaHelpPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        <Image src="/images/pages/ferpa-page-4.webp" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/ferpa-page-4.webp" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

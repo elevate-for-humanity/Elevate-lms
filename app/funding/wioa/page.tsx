@@ -46,7 +46,7 @@ export default async function WioaPage() {
       <section className="relative h-[400px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/funding-page-5.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-page-5.webp"
           alt="WIOA Success Story"
           fill
           className="object-cover"

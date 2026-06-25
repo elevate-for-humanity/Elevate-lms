@@ -85,8 +85,8 @@ export default async function CompanyProfilePage() {
   const companyData = {
     name: employer.business_name || 'Company Name',
     dba: employer.dba_name,
-    logo: employer.logo_url || '/images/avatar-default.svg',
-    cover: employer.cover_image_url || '/images/pages/about-employer-partners.webp',
+    logo: employer.logo_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/avatar-default.svg',
+    cover: employer.cover_image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-employer-partners.webp',
     industry: employer.industry || 'Not specified',
     size: employer.employee_count ? `${employer.employee_count} employees` : 'Not specified',
     founded: employer.year_established || 'Not specified',

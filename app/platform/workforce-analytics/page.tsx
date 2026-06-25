@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
       {
-        url: '/hero-images/technology-hero.webp',
+        url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/technology-hero.webp',
         width: 1200,
         height: 630,
         alt: 'Workforce Analytics',
@@ -129,7 +129,7 @@ export default function WorkforceAnalyticsPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/hero-images/technology-hero.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/technology-hero.webp"
             alt="Workforce Analytics"
             fill
             className="object-cover"
@@ -223,7 +223,7 @@ export default function WorkforceAnalyticsPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[350px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/pages/platform-page-6.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-6.webp"
                 alt="Analytics dashboard"
                 fill
                 sizes="100vw"

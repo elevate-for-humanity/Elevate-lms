@@ -108,7 +108,7 @@ export default async function NonprofitPage() {
           {/* Logo */}
           <div className="mb-8">
             <Image
-              src="/logo.png"
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/logo.png"
               alt="Selfish Inc"
               width={200}
               height={80}
@@ -140,7 +140,7 @@ export default async function NonprofitPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-[400px] rounded-lg overflow-hidden border-4 border-gray-200">
               <Image
-                src="/images/heroes/hero-homepage.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp"
                 alt="Mind, Body and spirit words engraved on zen stones"
                 fill
                 className="object-cover"
@@ -150,7 +150,7 @@ export default async function NonprofitPage() {
             </div>
             <div className="relative h-[400px] rounded-lg overflow-hidden border-4 border-gray-200">
               <Image
-                src="/images/heroes/hero-homepage.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp"
                 alt="Rocks of strength and resilience"
                 fill
                 className="object-cover"

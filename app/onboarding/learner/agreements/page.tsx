@@ -42,22 +42,22 @@ const AGREEMENT = {
 
 const AGREEMENT_POINTS = [
   {
-    image: '/images/pages/career-services-page-2.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
     title: 'Program Terms',
     body: '6–8 week training, 240 hours of instruction, hands-on labs at employer sites.',
   },
   {
-    image: '/images/pages/adult-learner.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/adult-learner.webp',
     title: 'Attendance Policy',
     body: 'Minimum 80% attendance required. Three unexcused absences triggers an intervention.',
   },
   {
-    image: '/images/pages/career-services-page-2.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
     title: 'Student Conduct',
     body: 'Professional behavior in class, online, and at employer sites at all times.',
   },
   {
-    image: '/images/pages/about-funding-nav.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-funding-nav.webp',
     title: 'FERPA Consent',
     body: 'Authorizes sharing your enrollment and progress with your funding source.',
   },
@@ -110,7 +110,7 @@ export default function AgreementsPage() {
       >
         <CanonicalVideo
           src="/videos/elevate-overview-with-narration.mp4"
-          poster="/images/pages/enrollment-agreement-page-1.webp"
+          poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/enrollment-agreement-page-1.webp"
           className="absolute inset-0 w-full h-full object-cover"
         />
       </div>
@@ -234,7 +234,7 @@ export default function AgreementsPage() {
             <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
               <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
                 <Image
-                  src="/images/pages/career-services-page-2.jpg"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg"
                   alt="Enrollment Agreement"
                   fill
                   className="object-cover"

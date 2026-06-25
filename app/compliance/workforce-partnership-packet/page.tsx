@@ -132,7 +132,7 @@ export default function WorkforcePartnershipPacketPage() {
       <div className="print:hidden">
         <HeroVideo
           videoSrcDesktop="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero.mp4"
-          posterImage="/images/pages/admin-automation-qa-hero.webp"
+          posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-automation-qa-hero.webp"
           microLabel="Partnership"
           belowHeroHeadline="Workforce Partnership Packet"
           belowHeroSubheadline="Share-ready partner packet covering delivery model, credential chain, reporting practices, and implementation timeline."

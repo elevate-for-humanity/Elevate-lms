@@ -44,7 +44,7 @@ export default async function PartnerCoursesPage() {
       {/* Hero — image only, text below */}
       <section className="relative w-full">
         <div className="relative h-48 md:h-64 overflow-hidden">
-          <Image src="/images/pages/about-partner-cta.webp" alt="Short-term courses" fill className="object-cover" priority sizes="100vw" />
+          <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partner-cta.webp" alt="Short-term courses" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-white border-t py-10 text-center px-4">
           <h1 className="text-4xl md:text-5xl font-bold text-black mb-3">Short-Term Courses</h1>

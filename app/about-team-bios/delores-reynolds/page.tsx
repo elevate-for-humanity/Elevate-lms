@@ -27,7 +27,7 @@ export default function Page() {
             <div className="lg:col-span-2">
               <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/delores-reynolds.jpg"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/delores-reynolds.jpg"
                   alt="Delores Reynolds"
                   fill
                   className="object-cover"

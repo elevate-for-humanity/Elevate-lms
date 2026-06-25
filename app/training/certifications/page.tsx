@@ -17,56 +17,56 @@ const certPrograms = [
     name: 'CNA — Certified Nursing Assistant',
     duration: '4-6 weeks',
     cost: 'Free with WIOA/WRG',
-    image: '/images/pages/cna-nursing.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-nursing.webp',
     href: '/programs/healthcare',
   },
   {
     name: 'CDL — Commercial Driver License',
     duration: '4-8 weeks',
     cost: 'Free with WRG',
-    image: '/images/pages/cdl-training.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-training.webp',
     href: '/programs/cdl-training',
   },
   {
     name: 'HVAC Technician + EPA 608',
     duration: '8-12 weeks',
     cost: 'Free with WIOA',
-    image: '/images/pages/hvac-technician.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
     href: '/programs/skilled-trades',
   },
   {
     name: 'Barber Apprenticeship',
     duration: '18-24 months',
     cost: 'Paid apprenticeship',
-    image: '/images/pages/barber-training.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-training.webp',
     href: '/programs/barber-apprenticeship',
   },
   {
     name: 'Phlebotomy Technician',
     duration: '6-8 weeks',
     cost: 'Self-pay · BNPL available',
-    image: '/images/pages/certifications-page-1.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/certifications-page-1.webp',
     href: '/programs/healthcare',
   },
   {
     name: 'CPR/AED/First Aid (HSI)',
     duration: '1 day',
     cost: '$65-$85',
-    image: '/images/pages/training-page-2.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-page-2.webp',
     href: '/programs/cpr-first-aid',
   },
   {
     name: 'OSHA 10 / OSHA 30',
     duration: '2-4 days',
     cost: 'Included with trades programs',
-    image: '/images/pages/trades-classroom.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/trades-classroom.webp',
     href: '/programs/skilled-trades',
   },
   {
     name: 'Welding Certification',
     duration: '8-12 weeks',
     cost: 'Free with WIOA',
-    image: '/images/pages/welding.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/welding.webp',
     href: '/programs/skilled-trades',
   },
 ];
@@ -86,7 +86,7 @@ export default function CertificationsPage() {
       <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/training-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-page-1.webp"
           alt="Certification training"
           fill
           className="object-cover"

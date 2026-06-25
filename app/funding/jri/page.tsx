@@ -44,7 +44,7 @@ export default function JriPage() {
         <div className="absolute inset-0">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image sizes="100vw"
-            src="/images/pages/jri-hero.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/jri-hero.webp"
             alt="Second chance career training"
             fill
             className="object-cover"
@@ -178,7 +178,7 @@ export default function JriPage() {
             {[
               {
                 title: 'Barber Apprenticeship',
-                image: '/images/programs/barber-hero.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/barber-hero.webp',
                 duration: '18 months',
                 outcome: 'Indiana Barber License',
                 salary: '$35,000 - $60,000+/year',
@@ -186,7 +186,7 @@ export default function JriPage() {
               },
               {
                 title: 'CNA / Healthcare',
-                image: '/images/programs/cna-hero.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
                 duration: '4-8 weeks',
                 outcome: 'State CNA Certification',
                 salary: '$30,000 - $40,000/year',
@@ -194,7 +194,7 @@ export default function JriPage() {
               },
               {
                 title: 'CDL Truck Driving',
-                image: '/images/programs/cdl-hero.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cdl-hero.webp',
                 duration: '3-4 weeks',
                 outcome: 'Commercial Driver License',
                 salary: '$45,000 - $70,000+/year',
@@ -202,7 +202,7 @@ export default function JriPage() {
               },
               {
                 title: 'Building Maintenance',
-                image: '/images/programs/building-maintenance-hero.svg',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/building-maintenance-hero.svg',
                 duration: '8-12 weeks',
                 outcome: 'Multiple Certifications',
                 salary: '$32,000 - $50,000/year',
@@ -210,7 +210,7 @@ export default function JriPage() {
               },
               {
                 title: 'Forklift & Warehouse',
-                image: '/images/hero/hero-skilled-trades.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero/hero-skilled-trades.webp',
                 duration: '1-2 weeks',
                 outcome: 'OSHA Forklift Certification',
                 salary: '$30,000 - $45,000/year',
@@ -218,7 +218,7 @@ export default function JriPage() {
               },
               {
                 title: 'Construction Trades',
-                image: '/images/pages/construction-trades.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/construction-trades.webp',
                 duration: '8-16 weeks',
                 outcome: 'OSHA 10 + Trade Certs',
                 salary: '$35,000 - $55,000/year',

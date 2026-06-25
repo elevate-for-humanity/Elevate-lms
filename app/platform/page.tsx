@@ -19,37 +19,37 @@ export const metadata: Metadata = {
 
 const capabilities = [
   {
-    image: '/images/pages/platform-page-2.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-2.webp',
     alt: 'Multi-tenant provider management dashboard',
     label: 'Multi-Tenant Architecture',
     desc: 'Each provider, employer, and agency operates in an isolated data environment. Role-based access enforced at the row level — no cross-tenant data exposure.',
   },
   {
-    image: '/images/pages/platform-page-3.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-3.webp',
     alt: 'WIOA and workforce funding compliance tools',
     label: 'Funding Compliance',
     desc: 'WIOA Title I, Workforce Ready Grant, Job Ready Indy, and DOL Registered Apprenticeship standards built into the data model. Compliance documentation maintained per program.',
   },
   {
-    image: '/images/pages/platform-page-4.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-4.webp',
     alt: 'Credential pathway and verification management',
     label: 'Credential Authority Separation',
     desc: 'Platform stores credential records and verification links. Certifications issued exclusively by their respective national or state authorities — EPA, PTCB, CompTIA, NCCER, Indiana SDOH.',
   },
   {
-    image: '/images/pages/platform-page-5.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-5.webp',
     alt: 'Audit-ready reporting and analytics dashboard',
     label: 'Audit-Ready Reporting',
     desc: 'Attendance, FERPA, DOL/DWD, and PIRL-aligned reports. Every admin action logged. Immutable audit trail on all operations involving learner data or funding records.',
   },
   {
-    image: '/images/pages/platform-page-6.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-6.webp',
     alt: 'Employer pipeline and graduate placement tracking',
     label: 'Employer Pipeline',
     desc: 'Verified graduate pipeline with credential records, placement tracking, and WOTC documentation. Employers post hiring needs and access pre-screened candidates directly.',
   },
   {
-    image: '/images/pages/platform-page-7.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-7.jpg',
     alt: 'Apprenticeship hours and OJT management',
     label: 'Apprenticeship & OJT',
     desc: 'DOL Registered Apprenticeship sponsor infrastructure. Hours logging, RTI tracking, wage progression, and employer agreement management in one system.',
@@ -58,7 +58,7 @@ const capabilities = [
 
 const audiences = [
   {
-    image: '/images/pages/platform-page-8.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-8.webp',
     alt: 'Training provider onboarding and program management',
     title: 'Training Providers',
     desc: 'Deliver workforce programs under the Elevate hub with built-in compliance infrastructure, credential pathway management, and employer connections. MOU-based onboarding.',
@@ -66,7 +66,7 @@ const audiences = [
     cta: 'Provider requirements',
   },
   {
-    image: '/images/pages/platform-page-9.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-9.webp',
     alt: 'Workforce board and agency reporting tools',
     title: 'Workforce Boards & Agencies',
     desc: 'WIOA-aligned dashboards, multi-provider outcome reporting, and state agency integration. Built for organizations that answer to funders and auditors.',
@@ -74,7 +74,7 @@ const audiences = [
     cta: 'Agency overview',
   },
   {
-    image: '/images/pages/platform-page-10.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-10.webp',
     alt: 'Employer hiring portal and apprenticeship management',
     title: 'Employers',
     desc: 'Access a verified pipeline of credentialed graduates. Manage apprenticeship agreements, track OJT hours, and document WOTC eligibility — all in one place.',
@@ -82,7 +82,7 @@ const audiences = [
     cta: 'Employer portal',
   },
   {
-    image: '/images/pages/platform-page-11.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-11.webp',
     alt: 'Platform licensing for workforce organizations',
     title: 'License the Platform',
     desc: 'Organizations running their own workforce programs can license the full infrastructure stack — enrollment, compliance, credentialing, reporting, and employer pipeline.',
@@ -325,7 +325,7 @@ export default function PlatformPage() {
               style={{ aspectRatio: '4/3' }}
             >
               <Image
-                src="/images/pages/platform-page-12.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-12.webp"
                 alt="Compliance and audit infrastructure"
                 fill
                 className="object-cover"

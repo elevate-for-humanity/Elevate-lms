@@ -43,7 +43,7 @@ export const cdlTrainingBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'James Holloway',
     instructorTitle: 'CDL Certified Instructor & Fleet Safety Expert',
-    instructorImagePath: '/images/heroes/hero-homepage.webp',
+    instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     topBarColor: '#f59e0b',
     accentColor: '#6b7280',
     backgroundColor: '#1e293b',

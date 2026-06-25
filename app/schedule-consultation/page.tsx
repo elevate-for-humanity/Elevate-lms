@@ -158,7 +158,7 @@ export default function ScheduleConsultationPage() {
       <div className="relative h-[160px] sm:h-[200px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/schedule-consultation-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/schedule-consultation-page-1.webp"
           alt="Schedule enrollment consultation"
           fill
           sizes="100vw"

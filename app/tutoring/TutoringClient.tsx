@@ -14,32 +14,32 @@ const subjects = [
   {
     title: 'Healthcare & CNA',
     description: 'Anatomy review, medical terminology, patient care procedures, clinical skills practice, and state exam preparation for CNA certification.',
-    image: '/images/pages/cna-clinical.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-clinical.jpg',
   },
   {
     title: 'Skilled Trades',
     description: 'Electrical theory, NEC code review, welding technique coaching, HVAC system troubleshooting, plumbing calculations, and blueprint reading.',
-    image: '/images/pages/hvac-technician.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
   },
   {
     title: 'Technology & IT',
     description: 'CompTIA A+ and Network+ exam prep, cybersecurity concepts, help desk scenarios, coding fundamentals, and web development projects.',
-    image: '/images/pages/cybersecurity.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity.webp',
   },
   {
     title: 'Business & Finance',
     description: 'QuickBooks operations, bookkeeping fundamentals, business plan development, and Microsoft Office proficiency.',
-    image: '/images/pages/bookkeeping.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/bookkeeping.webp',
   },
   {
     title: 'General Academic Support',
     description: 'Math fundamentals, reading comprehension, study skills, test-taking strategies, and GED preparation.',
-    image: '/images/pages/adult-learner.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/adult-learner.webp',
   },
   {
     title: 'Certification Exam Prep',
     description: 'Focused review sessions for OSHA, AWS, QuickBooks, CompTIA, AFSP, or state licensing boards. Practice tests and targeted review.',
-    image: '/images/pages/certifications.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/certifications.webp',
   },
 ];
 
@@ -86,7 +86,7 @@ export default function TutoringClient({ tutors }: { tutors: { id: string; full_
       </div>
 
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden">
-        <Image src="/images/pages/tutoring-page-1.webp" alt="Students receiving tutoring" fill sizes="100vw" className="object-cover" priority />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/tutoring-page-1.webp" alt="Students receiving tutoring" fill sizes="100vw" className="object-cover" priority />
       </section>
 
       <section className="py-16">
@@ -127,10 +127,10 @@ export default function TutoringClient({ tutors }: { tutors: { id: string; full_
           <h2 className="text-3xl font-bold text-center mb-12">How Tutoring Works</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { step: '1', title: 'Log In to LMS', desc: 'Access the tutoring portal through your student dashboard.', image: '/images/pages/lms-page-1.webp' },
-              { step: '2', title: 'Choose Your Subject', desc: 'Select from healthcare, trades, technology, business, or exam prep.', image: '/images/pages/courses-page-1.webp' },
-              { step: '3', title: 'Book a Session', desc: 'Pick an available tutor and time slot. Choose 30 or 60 minutes.', image: '/images/pages/calendar-page-1.webp' },
-              { step: '4', title: 'Meet & Learn', desc: 'Join via Zoom or at the training center.', image: '/images/pages/career-counseling.jpg' },
+              { step: '1', title: 'Log In to LMS', desc: 'Access the tutoring portal through your student dashboard.', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/lms-page-1.webp' },
+              { step: '2', title: 'Choose Your Subject', desc: 'Select from healthcare, trades, technology, business, or exam prep.', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/courses-page-1.webp' },
+              { step: '3', title: 'Book a Session', desc: 'Pick an available tutor and time slot. Choose 30 or 60 minutes.', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/calendar-page-1.webp' },
+              { step: '4', title: 'Meet & Learn', desc: 'Join via Zoom or at the training center.', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg' },
             ].map((item, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="bg-white rounded-2xl overflow-hidden shadow-sm">
                 <div className="relative h-40 overflow-hidden">

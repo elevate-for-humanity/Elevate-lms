@@ -8,7 +8,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
   sector: 'healthcare',
   category: 'Home & Community Health',
   programType: 'workforce',
-  heroImage: '/images/pages/healthcare-classroom.webp',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
   heroImageAlt: 'Home health aide assisting elderly client',
   videoSrc: '/videos/cna-hero.mp4',
   deliveryMode: 'hybrid',

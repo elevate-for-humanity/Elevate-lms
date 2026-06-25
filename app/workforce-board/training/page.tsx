@@ -46,7 +46,7 @@ export default async function TrainingPage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/workforce-board-page-7.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-board-page-7.webp"
           alt="Workforce board"
           fill
           sizes="100vw"

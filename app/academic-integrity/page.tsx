@@ -29,7 +29,7 @@ export default function AcademicIntegrityPage() {
       <section className="relative h-48 md:h-64 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/academic-integrity-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/academic-integrity-hero.webp"
           alt="Academic Integrity"
           fill
           className="object-cover"

@@ -677,7 +677,7 @@ export default function ${pageTitle.replace(/[^a-zA-Z0-9]/g, '') || 'Template'}P
     <main className="min-h-screen bg-white">
       <section className="relative h-[45vh] min-h-[280px] max-h-[560px] overflow-hidden">
         <img
-          src="/images/heroes/hero-homepage.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp"
           alt="${pageTitle} hero"
           className="h-full w-full object-cover"
         />

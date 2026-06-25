@@ -27,7 +27,7 @@ const defaultProps: ElevateLessonProps = {
   backgroundImageSrc: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
   instructorName: 'Marcus Johnson',
   instructorTitle: 'Workforce Development Specialist',
-  instructorImageSrc: '/images/instructors/marcus-johnson.jpg',
+  instructorImageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg',
   topBarColor: '#f97316',
   accentColor: '#3b82f6',
   backgroundColor: '#0f172a',

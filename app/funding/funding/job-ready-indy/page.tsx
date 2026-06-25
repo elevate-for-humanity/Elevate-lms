@@ -19,7 +19,7 @@ export default function JobReadyIndyPage() {
 
       <PageVideoHero
         videoSrc="/videos/training-providers-hero.mp4"
-        posterSrc="/images/pages/funding-page-4.jpg"
+        posterSrc="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-page-4.jpg"
         posterAlt="Funding Job Ready Indy — {PLATFORM_DEFAULTS.orgName}"
         size="marketing"
       />
@@ -31,7 +31,7 @@ export default function JobReadyIndyPage() {
 
       {/* Hero */}
       <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
-        <Image src="/images/pages/jri-hero.webp" alt="Job Ready Indy workforce training" fill className="object-cover" priority sizes="100vw" />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/jri-hero.webp" alt="Job Ready Indy workforce training" fill className="object-cover" priority sizes="100vw" />
       </section>
       <div className="bg-white border-b border-slate-200 py-8 px-4">
         <div className="max-w-6xl mx-auto">
@@ -57,7 +57,7 @@ export default function JobReadyIndyPage() {
               </Link>
             </div>
             <div className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/pages/student-portal-page-5.webp" alt="Job Ready Indy career training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/student-portal-page-5.webp" alt="Job Ready Indy career training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
           </div>
         </div>

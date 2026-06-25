@@ -31,7 +31,7 @@ export default async function CartPage({
     <div className="min-h-screen bg-white">
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image
-          src="/images/pages/store-cart-hero.jpg"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-cart-hero.jpg"
           alt="Elevate store"
           fill
           sizes="100vw"

@@ -99,7 +99,7 @@ export default function NewWorkflowPage({ programs = [] }: { programs?: Program[
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/admin-email-automation-new-d1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-email-automation-new-d1.webp"
           alt="Email marketing automation"
           fill
           className="object-cover"
@@ -478,7 +478,7 @@ export default function NewWorkflowPage({ programs = [] }: { programs?: Program[
                 </div>
                 <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/pages/admin-email-automation-new-d2.webp"
+                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-email-automation-new-d2.webp"
                     alt="Students learning"
                     fill
                     className="object-cover"

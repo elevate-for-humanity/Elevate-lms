@@ -417,21 +417,21 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
     const cat = normalizeSection(section);
     switch (cat) {
       case 'programs':
-        return '/images/pages/training-classroom.webp';
+        return 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp';
       case 'funding':
-        return '/images/pages/how-it-works-hero.webp';
+        return 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/how-it-works-hero.webp';
       case 'students':
-        return '/images/pages/healthcare-classroom.webp';
+        return 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp';
       case 'lms':
-        return '/images/pages/training-cohort.webp';
+        return 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-cohort.webp';
       case 'employers':
-        return '/images/pages/for-employers-page-1.webp';
+        return 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/for-employers-page-1.webp';
       case 'community':
-        return '/images/pages/workforce-training.webp';
+        return 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp';
       case 'admin-staff':
-        return '/images/pages/about-hero.webp';
+        return 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp';
       default:
-        return '/images/pages/features-hero.webp';
+        return 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/features-hero.webp';
     }
   };
 

@@ -97,7 +97,7 @@ export default async function AdminHomePage() {
       {/* Hero Section */}
       <section className="relative h-72 sm:h-80 w-full overflow-hidden">
         <Image
-          src="/images/pages/admin-dashboard-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp"
           alt="Admin Portal"
           fill
           className="object-cover object-center"

@@ -31,7 +31,7 @@ export default async function HireGraduatesPage() {
         <Breadcrumbs items={[{ label: 'Hire Graduates' }]} />
       </div>
       <HeroVideo
-        posterImage="/images/pages/hire-graduates-page-1.webp"
+        posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hire-graduates-page-1.webp"
         videoSrcDesktop={heroBanners['hire-graduates'].videoSrcDesktop}
         voiceoverSrc={heroBanners['hire-graduates'].voiceoverSrc}
         microLabel={heroBanners['hire-graduates'].microLabel}
@@ -73,7 +73,7 @@ export default async function HireGraduatesPage() {
             <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
               <Image
-                src="/images/pages/employers-page-1.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employers-page-1.webp"
                 alt="Certified graduates ready for employment"
                 fill
                 className="object-cover"
@@ -86,19 +86,19 @@ export default async function HireGraduatesPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                image: '/images/pages/hire-graduates-page-1.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hire-graduates-page-1.webp',
                 alt: 'Students in workforce training programs',
                 title: 'Learn',
                 desc: 'Short-term, industry-aligned training programs with hands-on instruction.',
               },
               {
-                image: '/images/pages/credentials-page-1.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/credentials-page-1.webp',
                 alt: 'Industry certifications earned by graduates',
                 title: 'Certify',
                 desc: 'Graduates earn nationally recognized credentials before day one on the job.',
               },
               {
-                image: '/images/pages/about-employer-partners.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-employer-partners.webp',
                 alt: 'Graduates placed with employer partners',
                 title: 'Work',
                 desc: 'We connect certified graduates directly with employers hiring in their field.',

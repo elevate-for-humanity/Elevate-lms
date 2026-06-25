@@ -122,7 +122,7 @@ export default function HeroPicture({
           <div className="absolute top-4 left-4 z-10">
             {/* IMAGE-CONTRACT: allow raw img because legacy markup */}
             <img
-              src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
               alt={PLATFORM_DEFAULTS.orgName}
               className="h-7 w-auto opacity-90"
             />

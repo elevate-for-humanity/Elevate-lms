@@ -149,7 +149,7 @@ export default async function CourseDetailPage({
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <Image
-                  src={course.image_url || '/images/pages/career-services-page-4.webp'}
+                  src={course.image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-4.webp'}
                   alt={course.title}
                   width={600}
                   height={400}

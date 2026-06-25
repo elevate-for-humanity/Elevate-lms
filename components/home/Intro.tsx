@@ -10,7 +10,7 @@ export default function Intro() {
           <div className="flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="relative h-64">
               <Image
-                src="/free-career-training.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/free-career-training.webp"
                 alt="Free Workforce Training"
                 fill
                 className="object-cover"
@@ -34,7 +34,7 @@ export default function Intro() {
           <div className="flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="relative h-64">
               <Image
-                src="/industry-credentials-new.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/industry-credentials-new.webp"
                 alt="Industry Credentials"
                 fill
                 className="object-cover"

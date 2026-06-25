@@ -160,7 +160,7 @@ export default function HealthcareFundamentalsCoursePage() {
 
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20">
               <Image
-                src="/images/pages/lms-page-5.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/lms-page-5.webp"
                 alt="Healthcare Fundamentals Course"
                 fill
                 className="object-cover"

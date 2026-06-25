@@ -43,7 +43,7 @@ export default async function DOLFundingPage() {
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/apprenticeship-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeship-hero.webp"
           alt="DOL Registered Apprenticeship"
           fill
           className="object-cover"
@@ -79,7 +79,7 @@ export default async function DOLFundingPage() {
             </div>
             <div className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/pages/ojt-and-funding.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/ojt-and-funding.webp"
                 alt="Hands-on apprenticeship training"
                 fill
                 className="object-cover"

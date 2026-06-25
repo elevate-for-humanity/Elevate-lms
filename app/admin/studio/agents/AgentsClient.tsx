@@ -49,7 +49,7 @@ export default function AgentsClient() {
       {/* Hero Section */}
       <div className="relative h-[280px] w-full overflow-hidden">
         <Image
-          src="/images/pages/admin-ai-studio-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-ai-studio-hero.webp"
           alt="AI Agents"
           fill
           className="object-cover"

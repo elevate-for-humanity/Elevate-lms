@@ -125,7 +125,7 @@ export default function CredentialPartnersPage() {
       <section className="relative h-[240px] sm:h-[300px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/credential-partners-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/credential-partners-hero.webp"
           alt="Credential partners and training providers"
           fill
           sizes="100vw"

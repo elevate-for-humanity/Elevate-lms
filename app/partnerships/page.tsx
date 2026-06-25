@@ -17,7 +17,7 @@ export default function PartnershipsPage() {
       config={{
         breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Partnerships' }],
         hero: {
-          image: '/images/pages/about-employer-partners.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-employer-partners.webp',
           tag: 'Partnerships',
           tagColor: 'text-brand-blue-600',
           title: 'Build Something That Lasts',
@@ -29,7 +29,7 @@ export default function PartnershipsPage() {
             `${PLATFORM_DEFAULTS.orgName} partners with employers who hire our graduates, workforce agencies who refer participants, community organizations who serve overlapping populations, and technology providers who integrate with our platform.`,
             'Every partnership is structured around a shared outcome: more Indiana residents with industry credentials and living-wage jobs.',
           ],
-          image: '/images/pages/about-career-training.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp',
         },
         features: {
           heading: 'Partnership Opportunities',

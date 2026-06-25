@@ -22,7 +22,7 @@ export default async function AdminsPage() {
 {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/heroes/training-provider-3.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/training-provider-3.webp"
           alt="Admins"
           fill
           className="object-cover"
@@ -119,7 +119,7 @@ export default async function AdminsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/about-career-training.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp"
                   alt="Admins"
                   fill
                   className="object-cover"

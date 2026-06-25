@@ -16,7 +16,7 @@ const LOCATIONS = [
     state: 'Indiana',
     href: '/career-training-indiana',
     cities: ['Indianapolis', 'Fort Wayne', 'Evansville', 'South Bend'],
-    image: '/images/pages/about-career-training.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp',
     desc: 'Main campus and training sites. WIOA-eligible programs, apprenticeships, and job placement across Central Indiana.',
   },
 ];
@@ -41,7 +41,7 @@ export default async function EducationLandingPage() {
       <section className="pt-[60px]">
         <HeroVideo
           videoSrcDesktop="/videos/lms-learning.mp4"
-          posterImage="/images/pages/higher-ed-hero.webp"
+          posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/higher-ed-hero.webp"
           voiceoverSrc="/audio/heroes/programs.mp3"
           microLabel="Career Training"
           analyticsName="education"

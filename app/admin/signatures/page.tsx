@@ -56,7 +56,7 @@ export default async function SignaturesPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/admin-signatures-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-signatures-hero.webp"
           alt="Signatures Management"
           fill
           className="object-cover"

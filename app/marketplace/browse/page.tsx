@@ -50,7 +50,7 @@ export default async function MarketplaceBrowsePage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/images/pages/marketplace-page-1.webp" alt="Marketplace" fill className="object-cover" priority sizes="100vw" />
+          <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/marketplace-page-1.webp" alt="Marketplace" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -86,7 +86,7 @@ export default async function MarketplaceBrowsePage() {
               <div key={item.id} className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition">
                 <div className="relative h-40 overflow-hidden">
                   <Image alt="Product listing" 
-                    src={item.image_url || '/images/pages/features-hero.webp'} 
+                    src={item.image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/features-hero.webp'} 
                     alt={item.title} 
                     fill 
                     className="object-cover" 
@@ -122,7 +122,7 @@ export default async function MarketplaceBrowsePage() {
         ) : (
           <div className="bg-white rounded-xl border overflow-hidden">
             <div className="relative h-48 overflow-hidden">
-              <Image src="/images/pages/marketplace.webp" alt="Browse marketplace" fill sizes="100vw" className="object-cover" />
+              <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/marketplace.webp" alt="Browse marketplace" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-8 text-center">
               <h2 className="text-xl font-semibold text-slate-900 mb-2">No Items Available</h2>

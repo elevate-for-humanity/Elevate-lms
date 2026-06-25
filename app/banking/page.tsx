@@ -23,7 +23,7 @@ export default function BankingPage() {
 
       <section className="relative h-64 md:h-80 overflow-hidden">
         <Image
-          src="/images/pages/banking-page-2.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/banking-page-2.webp"
           alt="Banking services for Elevate for Humanity learners and partners"
           fill
           className="object-cover"
@@ -70,7 +70,7 @@ export default function BankingPage() {
             <div className="bg-white border-2 border-brand-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                 <Image
-                  src="/images/pages/banking-page-2.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/banking-page-2.webp"
                   alt="Program payment access support"
                   fill
                   className="object-cover"
@@ -111,7 +111,7 @@ export default function BankingPage() {
             <div className="bg-white border-2 border-brand-green-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                 <Image
-                  src="/images/pages/pathways-page-7.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pathways-page-7.webp"
                   alt="Direct deposit support"
                   fill
                   className="object-cover"
@@ -152,7 +152,7 @@ export default function BankingPage() {
             <div className="bg-white border-2 border-brand-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                 <Image
-                  src="/images/pages/pathways-page-6.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pathways-page-6.webp"
                   alt="Prepaid debit card support"
                   fill
                   className="object-cover"
@@ -241,7 +241,7 @@ export default function BankingPage() {
               style={{ aspectRatio: '4/3' }}
             >
               <Image
-                src="/images/pages/pathways-page-7.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pathways-page-7.webp"
                 alt="Banking partner support for program payments"
                 fill
                 className="object-cover"

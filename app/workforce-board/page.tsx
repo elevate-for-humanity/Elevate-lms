@@ -21,37 +21,37 @@ export default function WorkforceBoardPage() {
 
   const features = [
     {
-      image: '/images/pages/workforce-board-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-board-page-1.webp',
       title: 'Performance Dashboards',
       description: 'Real-time metrics on enrollment, completion, and employment outcomes',
       href: '/workforce-board/reports',
     },
     {
-      image: '/images/pages/features-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/features-hero.webp',
       title: 'Compliance Reporting',
       description: 'Automated WIOA, DOL, and state compliance reports with audit trails',
       href: '/workforce-board/reports',
     },
     {
-      image: '/images/pages/workforce-board-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-board-page-1.webp',
       title: 'Participant Tracking',
       description: 'Monitor participant progress, services, and outcomes across all programs',
       href: '/workforce-board/participants',
     },
     {
-      image: '/hero-images/business-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/business-hero.webp',
       title: 'Budget Oversight',
       description: 'Track spending, allocations, and financial performance by program',
       href: '/workforce-board/reports',
     },
     {
-      image: '/images/pages/workforce-board-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-board-page-1.webp',
       title: 'Goal Monitoring',
       description: 'Track progress toward performance goals and benchmarks',
       href: '/workforce-board/reports/performance',
     },
     {
-      image: '/images/pages/barber-gallery-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-gallery-1.webp',
       title: 'Audit Readiness',
       description: 'Maintain audit-ready documentation and compliance records',
       href: '/workforce-board/reports',
@@ -60,31 +60,31 @@ export default function WorkforceBoardPage() {
 
   const quickLinks = [
     {
-      image: '/hero-images/healthcare-category.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/healthcare-category.webp',
       title: 'Participants',
       description: 'View and manage all program participants',
       href: '/workforce-board/participants',
     },
     {
-      image: '/hero-images/skilled-trades-category.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/skilled-trades-category.webp',
       title: 'Training Programs',
       description: 'Monitor training program performance',
       href: '/workforce-board/training',
     },
     {
-      image: '/hero-images/technology-category.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/technology-category.webp',
       title: 'Employment Outcomes',
       description: 'Track job placements and retention',
       href: '/workforce-board/employment',
     },
     {
-      image: '/images/pages/workforce-board-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-board-page-1.webp',
       title: 'Supportive Services',
       description: 'Review supportive services provided',
       href: '/workforce-board/supportive-services',
     },
     {
-      image: '/images/pages/workforce-board-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-board-page-1.webp',
       title: 'Follow-Ups',
       description: 'Track post-exit follow-up contacts and outcomes',
       href: '/workforce-board/follow-ups',
@@ -106,7 +106,7 @@ export default function WorkforceBoardPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
           <LazyVideo
             src="/videos/training-providers-hero.mp4"
-            poster="/images/pages/how-it-works-hero.webp"
+            poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/how-it-works-hero.webp"
             className="absolute inset-0 w-full h-full object-cover"
           />
         </div>

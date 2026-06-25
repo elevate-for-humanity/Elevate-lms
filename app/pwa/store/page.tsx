@@ -24,7 +24,7 @@ export default async function StorePWAPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-48 sm:h-56 overflow-hidden">
-        <Image src="/images/pages/demo-page-5.webp" alt="Elevate Store" fill className="object-cover" priority  sizes="100vw" />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/demo-page-5.webp" alt="Elevate Store" fill className="object-cover" priority  sizes="100vw" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Logo alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-white">Elevate Store</h1>

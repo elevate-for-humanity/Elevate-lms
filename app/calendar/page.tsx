@@ -72,7 +72,7 @@ export default async function CalendarPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/images/pages/calendar-hero.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/calendar-hero.webp"
             alt="Calendar and Schedule"
             fill
             className="object-cover"
@@ -95,7 +95,7 @@ export default async function CalendarPage() {
           <div className="bg-white rounded-xl overflow-hidden shadow-lg mb-8">
             <div className="relative h-32 overflow-hidden">
               <Image
-                src="/images/pages/lms-page-2.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/lms-page-2.webp"
                 alt="Sign in to view your schedule"
                 fill
                 sizes="100vw"
@@ -135,7 +135,7 @@ export default async function CalendarPage() {
                           <div className="flex items-stretch">
                             <div className="relative w-24 flex-shrink-0 aspect-[4/3]">
                               <Image
-                                src="/images/pages/calendar-page-1.webp"
+                                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/calendar-page-1.webp"
                                 alt={enrollment.course?.title || 'Course'}
                                 fill
                                 sizes="100vw"
@@ -166,7 +166,7 @@ export default async function CalendarPage() {
                       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
                         <div className="relative h-32 overflow-hidden">
                           <Image
-                            src="/images/pages/programs-catalog-hero.webp"
+                            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-catalog-hero.webp"
                             alt="Browse programs"
                             fill
                             sizes="100vw"
@@ -258,7 +258,7 @@ export default async function CalendarPage() {
               >
                 <div className="relative h-24 overflow-hidden">
                   <Image
-                    src="/images/pages/events-page-1.webp"
+                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/events-page-1.webp"
                     alt="Events"
                     fill
                     sizes="100vw"

@@ -166,7 +166,7 @@ export default async function ImpactPage() {
       <section className="relative bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white overflow-hidden">
         <div className="absolute inset-0">
           <Image sizes="100vw"
-            src="/images/hero/hero-hands-on-training.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero/hero-hands-on-training.webp"
             alt="Hands-on workforce training"
             fill
             className="object-cover opacity-20"

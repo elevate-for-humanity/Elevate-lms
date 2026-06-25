@@ -16,7 +16,7 @@ export default function InterviewPrepPage() {
       config={{
         breadcrumbs: [{ label: 'Career Services', href: '/career-services' }, { label: 'Interview Prep' }],
         hero: {
-          image: '/images/pages/career-services-page-2.jpg',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
           tag: 'Interview Preparation',
           tagColor: 'text-brand-blue-600',
           title: 'Walk In Confident',
@@ -28,7 +28,7 @@ export default function InterviewPrepPage() {
             'Generic interview advice does not work for skilled trades, healthcare, or technical roles. Our coaching is specific to your field — the questions employers actually ask, the certifications they verify, and the red flags they watch for.',
             'Available to all enrolled students and graduates at no cost.',
           ],
-          image: '/images/pages/career-services-page-1.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp',
         },
         features: {
           heading: 'What We Cover',

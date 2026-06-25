@@ -36,7 +36,7 @@ export default async function ExportsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/admin-compliance-exports-detail.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-compliance-exports-detail.webp"
           alt="Exports"
           fill
           className="object-cover"

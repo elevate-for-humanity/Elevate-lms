@@ -21,7 +21,7 @@ export function indianapolisHubMetadata(config: IndianapolisProgramHubConfig): M
       siteName: PLATFORM_DEFAULTS.orgName,
       images: [
         {
-          url: '/og-default.webp',
+          url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp',
           width: 1200,
           height: 630,
           alt: config.breadcrumbLabel,
@@ -33,7 +33,7 @@ export function indianapolisHubMetadata(config: IndianapolisProgramHubConfig): M
       card: 'summary_large_image',
       title: config.metadata.ogTitle ?? config.metadata.title,
       description: config.metadata.twitterDescription ?? config.metadata.description,
-      images: ['/og-default.webp'],
+      images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp'],
     },
   };
 }

@@ -37,7 +37,7 @@ export default async function EmployerProgramsPage() {
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Programs" }]} />
 <div className="relative h-64 bg-white overflow-hidden">
         <Image
-          src="/images/pages/employer-portal-page-3.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-portal-page-3.webp"
           alt="Employer programs"
           fill
           className="object-cover"
@@ -67,7 +67,7 @@ export default async function EmployerProgramsPage() {
               <div className="md:flex">
                 <div className="md:w-1/3 relative h-64 md:h-auto overflow-hidden">
                   <Image
-                    src={program.image_url ?? '/images/pages/programs-cna-hero.webp'}
+                    src={program.image_url ?? 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-cna-hero.webp'}
                     alt={program.title}
                     fill
                     className="object-cover"

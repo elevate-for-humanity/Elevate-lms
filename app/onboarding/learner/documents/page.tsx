@@ -169,7 +169,7 @@ export default function DocumentsPage() {
       >
         <CanonicalVideo
           src="/videos/elevate-overview-with-narration.mp4"
-          poster="/images/pages/docs-page-1.webp"
+          poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/docs-page-1.webp"
           className="absolute inset-0 w-full h-full object-cover"
         />
       </div>

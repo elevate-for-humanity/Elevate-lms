@@ -25,7 +25,7 @@ const BARBER_VIDEO_CONFIG: BlueprintVideoConfig = {
   template: 'elevate-slide',
   instructorName: 'Brandon Williams',
   instructorTitle: 'Master Barber · 12 yrs',
-  instructorImagePath: '/images/team/instructors/instructor-barber.jpg',
+  instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/instructors/instructor-barber.jpg',
   topBarColor: '#ea580c',
   accentColor: '#0f172a',
   backgroundColor: '#ffffff',

@@ -28,7 +28,7 @@ export default function DemoCompliancePage() {
   return (
     <DemoPageShell title="Compliance" description="Compliance status across WIOA, FERPA, and program requirements." portal="admin">
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] mb-6">
-        <Image src="/images/pages/demo-page-3.webp" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/demo-page-3.webp" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="bg-white rounded-xl border overflow-hidden">
         <table className="w-full text-sm">

@@ -96,7 +96,7 @@ export default async function EligibilityPage() {
       <section className="relative bg-slate-900 text-white overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="/images/pages/hp-wioa-real.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hp-wioa-real.webp"
             alt="Funded career training"
             fill
             className="object-cover opacity-30"

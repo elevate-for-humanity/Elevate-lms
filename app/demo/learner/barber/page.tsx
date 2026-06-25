@@ -300,7 +300,7 @@ export default function BarberApprenticeshipDemoPage() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="group cursor-pointer">
                     <div className="relative aspect-video bg-slate-200 rounded-lg overflow-hidden mb-2">
-                      <Image src="/hero-images/barber-beauty-category.webp" alt="Lesson" fill className="object-cover" />
+                      <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/barber-beauty-category.webp" alt="Lesson" fill className="object-cover" />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                         <Play className="w-12 h-12 text-white" />
                       </div>
@@ -311,7 +311,7 @@ export default function BarberApprenticeshipDemoPage() {
                   </div>
                   <div className="group cursor-pointer">
                     <div className="relative aspect-video bg-slate-200 rounded-lg overflow-hidden mb-2">
-                      <Image src="/images/beauty/hero-program-barber.webp" alt="Lesson" fill className="object-cover" />
+                      <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/hero-program-barber.webp" alt="Lesson" fill className="object-cover" />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                         <Play className="w-12 h-12 text-white" />
                       </div>

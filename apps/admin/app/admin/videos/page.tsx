@@ -41,7 +41,7 @@ export default async function VideosPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/admin-videos-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-videos-hero.webp"
           alt="Videos Management"
           fill
           className="object-cover"

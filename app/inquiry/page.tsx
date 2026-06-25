@@ -79,7 +79,7 @@ function InquiryForm() {
         accentText="In 10 Minutes"
         subheadline="Quick application. Fast response. Real results."
         description="Last year, 753 students were accepted and 89% got jobs after graduation. Average time from application to first paycheck: 67 days."
-        imageSrc="/hero-images/apply-hero.webp"
+        imageSrc="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/apply-hero.webp"
         imageAlt="Apply Now"
         primaryCTA={{ text: 'Start Application', href: '#application' }}
         secondaryCTA={{ text: 'Questions? Visit FAQ', href: '/faq' }}

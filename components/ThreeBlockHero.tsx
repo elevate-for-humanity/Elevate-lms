@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 
 const heroBlocks = [
   {
-    image: '/images/pages/barber-fade.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-fade.webp',
     title: 'Beauty & Wellness Programs',
     description: 'Barber, Cosmetology, and Esthetics training with state licensure',
     cta: 'Explore Beauty Programs',
@@ -13,7 +13,7 @@ const heroBlocks = [
     color: ' ',
   },
   {
-    image: '/images/pages/cna-patient-care.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-patient-care.jpg',
     title: 'Healthcare Training',
     description: 'CNA, Medical Assistant, and Phlebotomy certifications in weeks',
     cta: 'View Healthcare Programs',
@@ -22,7 +22,7 @@ const heroBlocks = [
     color: ' ',
   },
   {
-    image: '/images/pages/employer-handshake.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-handshake.webp',
     title: 'Direct Job Placement',
     description: 'Our staffing team connects you with employers before graduation',
     cta: 'Learn About Job Support',

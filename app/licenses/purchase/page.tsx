@@ -21,7 +21,7 @@ export default function PurchaseLicensePage() {
       description: 'Certified Nursing Assistant Program License',
       price: 1500,
       duration: '6 weeks',
-      image: '/images/pages/program-holder-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/program-holder-page-1.webp',
     },
     {
       id: 'barber',
@@ -29,7 +29,7 @@ export default function PurchaseLicensePage() {
       description: 'Professional Barber Apprenticeship License',
       price: 2000,
       duration: '12 months',
-      image: '/images/pages/program-holder-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/program-holder-page-1.webp',
     },
     {
       id: 'hvac',
@@ -37,7 +37,7 @@ export default function PurchaseLicensePage() {
       description: 'HVAC Technician Certification License',
       price: 2500,
       duration: '8 weeks',
-      image: '/images/pages/program-holder-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/program-holder-page-1.webp',
     },
   ];
 

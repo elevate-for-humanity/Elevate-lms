@@ -129,7 +129,7 @@ export default async function PortalsPage() {
       <Breadcrumbs items={[{ label: 'Portals' }]} />
 
       <HeroPicture
-        src="/images/pages/workforce-training.webp"
+        src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp"
         alt="Workforce training at Elevate for Humanity"
         microLabel="Your dashboard"
         heightStyle={heroTokens.imageWrap}

@@ -96,7 +96,7 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center mb-4">
             <Image
-              src="/favicon.png"
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/favicon.png"
               alt="Elevate for Humanity"
               width={48}
               height={48}

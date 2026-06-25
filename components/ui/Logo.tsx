@@ -17,7 +17,7 @@ export default function Logo({
 }: LogoProps) {
   return (
     <Image
-      src="/logo.jpg"
+      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/logo.jpg"
       alt={alt}
       quality={85}
       priority={priority}

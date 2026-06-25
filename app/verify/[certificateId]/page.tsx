@@ -152,7 +152,7 @@ export default async function VerifyCertificatePage({
       <section className="relative h-48 md:h-64 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/verify-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/verify-page-1.webp"
           alt="Certificate verification"
           fill
           className="object-cover"

@@ -14,7 +14,7 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
   category: 'Healthcare',
   programType: 'workforce',
 
-  heroImage: '/images/pages/pharmacy-tech.webp',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pharmacy-tech.webp',
   heroImageAlt: 'Pharmacy technician student in a clinical lab setting',
   videoSrc: '/videos/healthcare-cna.mp4',
 

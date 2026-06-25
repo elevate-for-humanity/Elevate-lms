@@ -14,25 +14,25 @@
   ],
   "icons": [
     {
-      "src": "/icons/partner-192.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/partner-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/partner-512.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/partner-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/partner-192-maskable.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/partner-192-maskable.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icons/partner-512-maskable.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/partner-512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -51,14 +51,14 @@
   "id": "org.elevateforhumanity.partner",
   "screenshots": [
     {
-      "src": "/screenshots/home-narrow.jpg",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/screenshots/home-narrow.jpg",
       "sizes": "1080x1920",
       "type": "image/jpeg",
       "form_factor": "narrow",
       "label": "Home screen"
     },
     {
-      "src": "/screenshots/home-wide.jpg",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/screenshots/home-wide.jpg",
       "sizes": "1920x1080",
       "type": "image/jpeg",
       "form_factor": "wide",

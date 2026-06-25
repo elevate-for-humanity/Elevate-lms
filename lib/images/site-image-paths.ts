@@ -5,7 +5,7 @@
 import { existsSync } from 'fs';
 import { join } from 'path';
 
-const DEFAULT_FALLBACK = '/images/heroes/hero-homepage.webp';
+const DEFAULT_FALLBACK = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp';
 
 export function resolveSiteImagePath(src: string | null | undefined): string {
   if (!src || !src.trim()) return DEFAULT_FALLBACK;

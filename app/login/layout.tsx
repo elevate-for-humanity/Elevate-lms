@@ -12,13 +12,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: `Sign In | ${PLATFORM_DEFAULTS.orgName}`,
     description: `Sign in to access your training programs, career services, and workforce development tools.`,
-    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: `${PLATFORM_DEFAULTS.orgName} — Sign In` }],
+    images: [{ url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-image.jpg', width: 1200, height: 630, alt: `${PLATFORM_DEFAULTS.orgName} — Sign In` }],
   },
   twitter: {
     card: 'summary_large_image',
     title: `Sign In | ${PLATFORM_DEFAULTS.orgName}`,
     description: `Sign in to access your training programs, career services, and workforce development tools.`,
-    images: ['/images/og-image.jpg'],
+    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-image.jpg'],
   },
   robots: {
     index: false,

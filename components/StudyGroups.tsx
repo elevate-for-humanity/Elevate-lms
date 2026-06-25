@@ -55,7 +55,7 @@ export function StudyGroups() {
             maxMembers: g.max_members,
             privacy: g.privacy,
             nextMeeting: g.next_meeting,
-            avatar: g.avatar_url || '/images/heroes/hero-homepage.webp',
+            avatar: g.avatar_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
           })),
         );
       }

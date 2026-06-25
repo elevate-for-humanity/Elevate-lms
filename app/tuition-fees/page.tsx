@@ -190,7 +190,7 @@ export default async function TuitionFeesPage() {
       <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/tuition-fees-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/tuition-fees-page-1.webp"
           alt="Tuition and fee information"
           fill
           sizes="100vw"

@@ -22,7 +22,7 @@ const addOns = [
     icon: Users,
     price: '$1,997',
     video: '/videos/store/store-community-hub.mp4',
-    poster: '/images/pages/store-hero.webp',
+    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-hero.webp',
     features: [
       'Discussion Forums with Categories',
       'Member Groups & Cohorts',
@@ -48,7 +48,7 @@ const moreAddOns = [
     href: '/store/add-ons/analytics-pro',
     price: '$1,497',
     video: '/videos/store/store-analytics-pro.mp4',
-    poster: '/images/pages/wioa-meeting.webp',
+    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
   },
   {
     id: 'compliance-automation',
@@ -57,7 +57,7 @@ const moreAddOns = [
     href: '/store/add-ons/compliance-automation',
     price: '$1,297',
     video: '/videos/store/store-compliance-automation.mp4',
-    poster: '/images/pages/admin-compliance-hero.webp',
+    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-compliance-hero.webp',
   },
   {
     id: 'agency-template-autofill',
@@ -66,7 +66,7 @@ const moreAddOns = [
     href: '/store/add-ons/agency-template-autofill',
     price: '$997',
     video: '/videos/store/store-compliance-automation.mp4',
-    poster: '/images/pages/admin-compliance-hero.webp',
+    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-compliance-hero.webp',
   },
   {
     id: 'compliance-signature-automation',
@@ -75,7 +75,7 @@ const moreAddOns = [
     href: '/store/add-ons/compliance-signature-automation',
     price: '$997',
     video: '/videos/store/store-compliance-automation.mp4',
-    poster: '/images/pages/admin-compliance-hero.webp',
+    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-compliance-hero.webp',
   },
   {
     id: 'proposal-writing-assistant',
@@ -84,7 +84,7 @@ const moreAddOns = [
     href: '/store/add-ons/proposal-writing-assistant',
     price: '$1,497',
     video: '/videos/store/store-analytics-pro.mp4',
-    poster: '/images/pages/wioa-meeting.webp',
+    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
   },
   {
     id: 'workforce-grant-operations-hub',
@@ -93,7 +93,7 @@ const moreAddOns = [
     href: '/store/add-ons/workforce-grant-operations-hub',
     price: '$1,997',
     video: '/videos/store/store-analytics-pro.mp4',
-    poster: '/images/pages/wioa-meeting.webp',
+    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
   },
 ];
 
@@ -122,7 +122,7 @@ export default function AddOnsPage() {
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image src="/images/pages/store-addons-hero.jpg" alt="Platform Add-Ons" fill className="object-cover" priority sizes="100vw"  />
+          <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-addons-hero.jpg" alt="Platform Add-Ons" fill className="object-cover" priority sizes="100vw"  />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

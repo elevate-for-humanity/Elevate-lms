@@ -32,7 +32,7 @@ export default function ParticipantsPage() {
       <section className="relative h-48 md:h-64 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/workforce-board-page-2.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-board-page-2.webp"
           alt="Participants"
           fill
           priority
@@ -71,7 +71,7 @@ export default function ParticipantsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/workforce-board-page-3.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-board-page-3.webp"
                   alt="Participants"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"

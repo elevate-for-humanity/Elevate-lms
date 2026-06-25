@@ -28,7 +28,7 @@ const urineTests = [
       'Clearinghouse reporting (if applicable)',
     ],
     turnaround: '24-48 hours',
-    image: '/images/programs/cna-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
   },
   {
     name: '5-Panel Drug Test',
@@ -43,7 +43,7 @@ const urineTests = [
       'Email notification when ready',
     ],
     turnaround: '24-48 hours',
-    image: '/images/programs/cna-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
   },
   {
     name: '10-Panel Drug Test',
@@ -58,7 +58,7 @@ const urineTests = [
       'Detailed results report',
     ],
     turnaround: '24-48 hours',
-    image: '/images/programs/cna-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
   },
   {
     name: '5-Panel + Expanded Opiates',
@@ -89,7 +89,7 @@ const urineTests = [
       'Same fast turnaround',
     ],
     turnaround: '24-48 hours',
-    image: '/images/pages/construction-trades.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/construction-trades.webp',
   },
   {
     name: '5-Panel + Alcohol',
@@ -104,7 +104,7 @@ const urineTests = [
       'Combined results report',
     ],
     turnaround: '24-48 hours',
-    image: '/images/pages/about-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp',
   },
 ];
 

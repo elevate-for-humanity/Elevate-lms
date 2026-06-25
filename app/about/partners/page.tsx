@@ -50,7 +50,7 @@ export default async function PartnersPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/images/pages/about-partners-hero.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partners-hero.webp"
             alt="Partners background"
             fill
             className="object-cover"

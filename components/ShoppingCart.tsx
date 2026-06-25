@@ -52,7 +52,7 @@ export function ShoppingCart() {
           id: item.product_id,
           title: item.products?.name || 'Product',
           price: item.products?.price || 0,
-          image: item.products?.image_url || '/images/heroes/student-catalog.webp',
+          image: item.products?.image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/student-catalog.webp',
           quantity: item.quantity,
         }));
         setCartItems(items);

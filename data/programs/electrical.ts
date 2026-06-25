@@ -9,7 +9,7 @@ export const ELECTRICAL: ProgramSchema = {
   category: 'Electrical',
   programType: 'workforce',
 
-  heroImage: '/images/pages/electrical-wiring.jpg',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/electrical-wiring.jpg',
   heroImageAlt: 'Electrical student working on wiring in a training lab',
   videoSrc: '/videos/electrician-trades.mp4',
 

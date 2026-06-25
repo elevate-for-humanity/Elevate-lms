@@ -66,7 +66,7 @@ export default function CompetencyTestPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/images/pages/orientation-page-1.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/orientation-page-1.webp"
             alt="Competency assessment"
             fill
             className="object-cover"
@@ -126,7 +126,7 @@ export default function CompetencyTestPage() {
             </div>
             <div className="relative h-72 rounded-2xl overflow-hidden">
               <Image
-                src="/images/pages/orientation-page-2.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/orientation-page-2.webp"
                 alt="Student completing assessment"
                 fill
                 className="object-cover"

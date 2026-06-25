@@ -10,53 +10,53 @@
   "scope": "/pwa/barber",
   "icons": [
     {
-      "src": "/icon-72.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-72.png",
       "sizes": "72x72",
       "type": "image/png"
     },
     {
-      "src": "/icon-96.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-96.png",
       "sizes": "96x96",
       "type": "image/png"
     },
     {
-      "src": "/icon-128.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-128.png",
       "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "/icon-144.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-144.png",
       "sizes": "144x144",
       "type": "image/png"
     },
     {
-      "src": "/icon-152.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-152.png",
       "sizes": "152x152",
       "type": "image/png"
     },
     {
-      "src": "/icon-192.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icon-192-maskable.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192-maskable.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icon-384.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-384.png",
       "sizes": "384x384",
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/icon-512-maskable.png",
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -85,7 +85,7 @@
       "url": "/pwa/barber/log-hours",
       "icons": [
         {
-          "src": "/icon-96.png",
+          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-96.png",
           "sizes": "96x96"
         }
       ]
@@ -97,7 +97,7 @@
       "url": "/pwa/barber/progress",
       "icons": [
         {
-          "src": "/icon-96.png",
+          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-96.png",
           "sizes": "96x96"
         }
       ]
@@ -109,7 +109,7 @@
       "url": "/pwa/barber/training",
       "icons": [
         {
-          "src": "/icon-96.png",
+          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-96.png",
           "sizes": "96x96"
         }
       ]

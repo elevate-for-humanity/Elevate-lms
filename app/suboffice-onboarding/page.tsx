@@ -34,7 +34,7 @@ export default function SubofficeOnboardingPage() {
       <section className="relative h-48 md:h-64 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/suboffice-onboarding-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/suboffice-onboarding-page-1.webp"
           alt="Suboffice Onboarding"
           fill
           className="object-cover"

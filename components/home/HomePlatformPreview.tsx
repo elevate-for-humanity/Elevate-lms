@@ -14,19 +14,19 @@ const PLATFORM_CAPABILITIES = [
   {
     label: 'Learner Portal',
     desc: 'Progress tracking, assignments, attendance, and messaging — all in one place.',
-    img: '/images/pages/platform-page-1.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-1.webp',
     href: '/lms',
   },
   {
     label: 'Employer Dashboard',
     desc: 'Live cohort visibility, OJT hours, apprenticeship status, and compliance docs.',
-    img: '/images/pages/employer-portal-page-1.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-portal-page-1.webp',
     href: '/for-employers',
   },
   {
     label: 'Workforce Analytics',
     desc: 'Outcome tracking, WIOA performance metrics, and agency reporting — automated.',
-    img: '/images/pages/admin-analytics-hero.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-analytics-hero.webp',
     href: '/for-agencies',
   },
 ];

@@ -93,7 +93,7 @@ export default async function StaffPortalLanding() {
       <section className="relative h-[220px] sm:h-[260px]">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/staff-portal-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/staff-portal-page-1.webp"
           alt="Staff Portal"
           fill
           sizes="100vw"

@@ -47,7 +47,7 @@ export default async function StateProgramsPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/heroes/student-catalog.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/student-catalog.webp"
           alt="State Programs"
           fill
           className="object-cover"
@@ -148,7 +148,7 @@ export default async function StateProgramsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/heroes/student-catalog.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/student-catalog.webp"
                   alt="State Programs"
                   fill
                   className="object-cover"

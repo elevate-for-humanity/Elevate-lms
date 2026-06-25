@@ -136,8 +136,8 @@ ${stockImages
   .map(
     (img) => `  {
     id: '${img.id}',
-    url: '/images/heroes/hero-homepage.webp',
-    thumbnail: '/images/heroes/hero-homepage.webp',
+    url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     category: '${img.category}',
     tags: ${JSON.stringify(img.tags)},
     source: '${img.source}',

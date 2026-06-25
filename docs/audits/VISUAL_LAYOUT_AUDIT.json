@@ -993,7 +993,7 @@
         {
           "file": "app/programs/cosmetology-apprenticeship/host-shops/page.tsx",
           "line": 122,
-          "match": "<Image sizes=\"100vw\"\n                src=\"/images/pages/barber-styling-hair.webp",
+          "match": "<Image sizes=\"100vw\"\n                src=\"https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-styling-hair.webp",
           "id": "fill-no-sizes",
           "re": {},
           "severity": "low",

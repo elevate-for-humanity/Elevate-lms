@@ -48,7 +48,7 @@ export default async function WorkforceAnalyticsPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/pages/about-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp"
           alt="Workforce Analytics"
           fill
           className="object-cover"
@@ -145,7 +145,7 @@ export default async function WorkforceAnalyticsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/electrical.jpg"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/electrical.jpg"
                   alt="Workforce Analytics"
                   fill
                   className="object-cover"

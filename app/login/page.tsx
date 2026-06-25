@@ -337,7 +337,7 @@ function LoginForm() {
       <section className="relative h-[200px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/login-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/login-page-1.webp"
           alt={`${PLATFORM_DEFAULTS.orgName} login`}
           fill
           className="object-cover"

@@ -6,7 +6,7 @@ export function HomeTopHero() {
     <section className="relative w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
       <Image
-        src="/images/pages/prog-hero-main-2.webp"
+        src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/prog-hero-main-2.webp"
         alt={`${PLATFORM_DEFAULTS.orgName} - Empowering Futures Through Innovation & Opportunity`}
         width={1920}
         height={800}

@@ -30,7 +30,7 @@ export default async function EmployerApplicationPage() {
       <div className="relative h-[200px] sm:h-[260px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/apply-employer-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-employer-hero.webp"
           alt="Employer partnership"
           fill
           sizes="100vw"

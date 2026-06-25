@@ -52,7 +52,7 @@ const credentials: VerifiableCredential[] = [
     verificationInstructions:
       'Search for PLATFORM_DEFAULTS.orgName in the DOL Apprenticeship Partner Finder',
     icon: Shield,
-    image: '/images/pages/credential-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/credential-partners-hero.webp',
     category: 'federal',
   },
   {
@@ -65,7 +65,7 @@ const credentials: VerifiableCredential[] = [
     verificationInstructions:
       'Search INTraining for Location ID 10004621 or PLATFORM_DEFAULTS.orgName',
     icon: Building2,
-    image: '/images/pages/credential-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/credential-partners-hero.webp',
     category: 'state',
   },
   {
@@ -77,7 +77,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: 'https://www.in.gov/doe/students/private-schools/',
     verificationInstructions: 'Contact Indiana DOE to verify registration status',
     icon: Award,
-    image: '/images/pages/credential-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/credential-partners-hero.webp',
     category: 'state',
   },
   {
@@ -89,7 +89,7 @@ const credentials: VerifiableCredential[] = [
     verificationUrl: 'https://intraining.dwd.in.gov/',
     verificationInstructions: 'WIOA eligibility verified through ETPL listing on INTraining',
     icon: FileCheck,
-    image: '/images/pages/credential-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/credential-partners-hero.webp',
     category: 'funding',
   },
   {
@@ -102,7 +102,7 @@ const credentials: VerifiableCredential[] = [
       'https://www.in.gov/che/state-financial-aid/state-financial-aid-by-program/workforce-ready-grant/',
     verificationInstructions: 'WRG eligibility tied to ETPL-approved programs',
     icon: BadgeCheck,
-    image: '/images/pages/credential-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/credential-partners-hero.webp',
     category: 'funding',
   },
   {
@@ -115,7 +115,7 @@ const credentials: VerifiableCredential[] = [
     verificationInstructions:
       'Contact Indiana DOC or local WorkOne office to verify Job Ready Indy partnership',
     icon: Shield,
-    image: '/images/pages/credential-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/credential-partners-hero.webp',
     category: 'funding',
   },
 ];
@@ -217,7 +217,7 @@ export default function VerifyCredentialsPage() {
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px] overflow-hidden">
         <Image
-          src="/images/pages/verify-credentials-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/verify-credentials-page-1.webp"
           alt={`${PLATFORM_DEFAULTS.orgName} credential verification`}
           fill
           sizes="100vw"

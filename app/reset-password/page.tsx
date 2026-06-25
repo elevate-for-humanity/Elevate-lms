@@ -65,7 +65,7 @@ export default function ResetPasswordPage() {
         <div className="text-center mb-8">
           <Link href="/">
             <Image
-              src="/images/pages/reset-password-page-1.webp"
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/reset-password-page-1.webp"
               alt={PLATFORM_DEFAULTS.orgName}
               width={180}
               height={60}

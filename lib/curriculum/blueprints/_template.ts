@@ -30,7 +30,7 @@ const PROGRAM_VIDEO_CONFIG: BlueprintVideoConfig = {
   template: 'elevate-slide',
   instructorName: 'Marcus Johnson', // Change per program
   instructorTitle: 'Lead Instructor', // Change per program
-  instructorImagePath: '/images/instructors/marcus-johnson.jpg',
+  instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg',
 
   topBarColor: '#f97316', // Elevate orange — change for different programs
   accentColor: '#3b82f6', // Blue accent

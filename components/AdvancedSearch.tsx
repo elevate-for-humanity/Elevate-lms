@@ -100,7 +100,7 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
         price: p.price || 0,
         rating: 0,
         students: countMap[p.id] || 0,
-        image: p.image_url || '/images/programs/cna-hero.webp',
+        image: p.image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
       }));
 
       setResults(searchResults);

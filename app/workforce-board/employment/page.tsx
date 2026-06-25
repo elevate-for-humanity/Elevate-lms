@@ -63,7 +63,7 @@ export default function EmploymentPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/images/pages/workforce-board-page-1.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-board-page-1.webp"
             alt="Employment services"
             fill
             className="object-cover"

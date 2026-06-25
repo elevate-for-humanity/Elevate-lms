@@ -50,7 +50,7 @@ export default async function EnrollmentSuccessPage({
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/courses-page-6.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/courses-page-6.webp"
           alt="Success"
           fill
           className="object-cover"

@@ -12,7 +12,7 @@ type Props = {
 export function CourseCard({ course }: Props) {
   const coverSrc =
     (manifest as Record<string, string>)[course.coverImageKey] ??
-    '/images/pages/training-classroom.webp';
+    'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp';
 
   return (
     <Link

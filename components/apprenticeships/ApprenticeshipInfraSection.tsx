@@ -111,7 +111,7 @@ export function ApprenticeshipInfraSection({
           >
             <div className={card.image16x9Desktop}>
               <Image
-                src="/images/pages/about-employer-partners.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-employer-partners.webp"
                 alt="Employer partner working with Elevate team"
                 fill
                 className="object-cover object-center"
@@ -147,7 +147,7 @@ export function ApprenticeshipInfraSection({
         <div className={`${card.base} border-slate-200`}>
           <div className={hero.imageWrap}>
             <Image
-              src="/images/pages/apprenticeships-page-1.webp"
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeships-page-1.webp"
               alt="Apprentice working on-site with employer supervisor"
               fill
               className="object-cover object-center"

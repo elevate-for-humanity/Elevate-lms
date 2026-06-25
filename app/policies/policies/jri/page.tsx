@@ -31,7 +31,7 @@ export default async function JRIPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image src="/hero-images/jri-hero.webp" alt="Justice Reinvestment Initiative" fill className="object-cover" priority sizes="100vw" />
+          <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/jri-hero.webp" alt="Justice Reinvestment Initiative" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

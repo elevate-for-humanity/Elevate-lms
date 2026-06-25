@@ -14,14 +14,14 @@ export const metadata: Metadata = {
       'WIOA, Job Ready Indy, and state funding programs. Many programs can be FREE if you qualify.',
     url: 'https://www.elevateforhumanity.org/funding',
     siteName: PLATFORM_DEFAULTS.orgName,
-    images: [{ url: '/og-default.webp', width: 1200, height: 630, alt: 'Career Training Funding' }],
+    images: [{ url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp', width: 1200, height: 630, alt: 'Career Training Funding' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Funding Options for Career Training',
     description: 'WIOA, Job Ready Indy, and state funding programs. Many programs can be FREE if you qualify.',
-    images: ['/og-default.webp'],
+    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp'],
   },
 };
 

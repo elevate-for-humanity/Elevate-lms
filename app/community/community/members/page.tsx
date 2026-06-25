@@ -54,7 +54,7 @@ export default async function MembersPage() {
 
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image src="/images/pages/community-page-4.webp" alt="Community Members" fill className="object-cover" priority sizes="100vw" />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/community-page-4.webp" alt="Community Members" fill className="object-cover" priority sizes="100vw" />
       </section>
 
       {/* Categories */}

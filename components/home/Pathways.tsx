@@ -14,7 +14,7 @@ export default function Pathways() {
           >
             <div className="relative h-48">
               <Image
-                src="/images/pages/comp-home-pathways-train.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-pathways-train.webp"
                 alt="Students learning"
                 fill
                 className="object-cover group-hover:scale-105 transition"
@@ -34,7 +34,7 @@ export default function Pathways() {
           >
             <div className="relative h-48">
               <Image
-                src="/images/pages/comp-home-pathways-support.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-pathways-support.webp"
                 alt="Career pathways"
                 fill
                 className="object-cover group-hover:scale-105 transition"

@@ -61,7 +61,7 @@ export default async function ForEmployersPage() {
       <section className="relative h-[200px] sm:h-[260px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/for-employers-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/for-employers-page-1.webp"
           alt={`Employer partner meeting with ${PLATFORM_DEFAULTS.orgName} team`}
           fill
           className="object-cover"

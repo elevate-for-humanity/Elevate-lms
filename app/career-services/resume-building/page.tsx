@@ -16,7 +16,7 @@ export default function ResumeBuildingPage() {
       config={{
         breadcrumbs: [{ label: 'Career Services', href: '/career-services' }, { label: 'Resume Building' }],
         hero: {
-          image: '/images/pages/career-services-page-4.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-4.webp',
           tag: 'Resume Building',
           tagColor: 'text-brand-blue-600',
           title: 'A Resume That Gets Callbacks',
@@ -28,7 +28,7 @@ export default function ResumeBuildingPage() {
             'Most resume templates are designed for office jobs. Skilled trades, healthcare, and technical roles require a different format — one that leads with credentials, certifications, and hands-on experience.',
             'Our career staff builds and reviews resumes specifically for the employers who hire Elevate graduates. Free for all enrolled students and graduates.',
           ],
-          image: '/images/pages/career-services-page-3.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-3.webp',
         },
         features: {
           heading: 'What We Provide',

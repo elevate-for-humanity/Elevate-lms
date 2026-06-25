@@ -49,7 +49,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Add your contact information so we can support you throughout the program.',
     href: '/profile/edit',
     icon: User,
-    image: '/images/pages/career-services-page-2.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
     imageAlt: `Student completing profile at ${PLATFORM_DEFAULTS.orgName}`,
     required: true,
   },
@@ -60,7 +60,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
       'Confirm your identity with a government-issued ID and selfie verification.',
     href: '/onboarding/learner/verify-identity',
     icon: ShieldCheck,
-    image: '/images/pages/career-services-page-2.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
     imageAlt: 'Identity verification process',
     required: true,
   },
@@ -71,7 +71,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
       'Submit your government-issued ID, proof of Indiana residency, and proof of income (if applying for WIOA funding).',
     href: '/onboarding/learner/documents',
     icon: FileText,
-    image: '/images/pages/career-services-page-2.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
     imageAlt: 'Document submission process',
     required: true,
   },
@@ -82,7 +82,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
       'Review and confirm how your training will be funded — WIOA, Workforce Ready Grant, employer sponsorship, or self-pay.',
     href: '/onboarding/learner/funding',
     icon: CreditCard,
-    image: '/images/pages/career-services-page-2.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
     imageAlt: 'Funding and financial aid options',
     required: true,
   },
@@ -93,7 +93,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
       'Choose your cohort start date and class schedule. Day and evening options available.',
     href: '/onboarding/learner/schedule',
     icon: Calendar,
-    image: '/images/pages/career-services-page-2.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
     imageAlt: 'Training classroom schedule selection',
     required: true,
   },
@@ -104,7 +104,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
       'Review and sign your enrollment agreement covering program terms, attendance policy, and your rights as a student.',
     href: '/onboarding/learner/agreements',
     icon: ClipboardCheck,
-    image: '/images/pages/career-services-page-2.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
     imageAlt: 'Signing enrollment agreement',
     required: true,
   },
@@ -115,7 +115,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
       'Read and acknowledge the student handbook covering attendance, dress code, conduct, and grievance procedures.',
     href: '/onboarding/learner/handbook',
     icon: BookOpen,
-    image: '/images/pages/career-services-page-2.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
     imageAlt: 'Student handbook',
     required: true,
   },
@@ -126,7 +126,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
       'Review program policies and complete your orientation to get ready for your first day.',
     href: '/onboarding/learner/orientation',
     icon: BookOpen,
-    image: '/images/pages/career-services-page-2.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
     imageAlt: 'Students in orientation session',
     required: true,
   },
@@ -426,7 +426,7 @@ export default async function LearnerOnboardingPage({
       >
         <CanonicalVideo
           src="/videos/getting-started-hero.mp4"
-          poster="/images/pages/onboarding-page-2.webp"
+          poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/onboarding-page-2.webp"
           className="absolute inset-0 w-full h-full object-cover"
         />
       </div>
@@ -533,7 +533,7 @@ export default async function LearnerOnboardingPage({
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden flex-shrink-0">
                     <Image sizes="100vw"
-                      src="/images/pages/onboarding-page-1.webp"
+                      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/onboarding-page-1.webp"
                       alt="Enrollment approved"
                       width={80}
                       height={80}
@@ -695,7 +695,7 @@ export default async function LearnerOnboardingPage({
                 <div className="relative overflow-hidden rounded-2xl bg-white aspect-[4/3]">
                   <div className="absolute inset-0">
                     <Image
-                      src="/images/pages/onboarding.webp"
+                      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/onboarding.webp"
                       alt={`Contact ${PLATFORM_DEFAULTS.orgName} support`}
                       fill
                       className="object-cover opacity-20"

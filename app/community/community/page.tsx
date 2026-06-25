@@ -95,7 +95,7 @@ export default async function CommunityPage() {
       {/* Clean Hero - Image Only */}
       <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image
-          src="/images/pages/community-page-5.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/community-page-5.webp"
           alt="Community members collaborating"
           fill
           className="object-cover"
@@ -231,9 +231,9 @@ export default async function CommunityPage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { title: "Career Development Workshop", frequency: "Weekly", image: "/images/pages/comp-home-pathways-support.webp" },
-              { title: "Monthly Networking Mixer", frequency: "Monthly", image: "/images/pages/comp-home-pathways-support.webp" },
-              { title: "Live Q&A with Experts", frequency: "Bi-Weekly", image: "/images/pages/comp-home-pathways-support.webp" }
+              { title: "Career Development Workshop", frequency: "Weekly", image: "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-pathways-support.webp" },
+              { title: "Monthly Networking Mixer", frequency: "Monthly", image: "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-pathways-support.webp" },
+              { title: "Live Q&A with Experts", frequency: "Bi-Weekly", image: "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-pathways-support.webp" }
             ].map((event, index) => (
               <div key={index} className="bg-white rounded-xl overflow-hidden">
                 <div className="relative h-40 overflow-hidden">
@@ -280,7 +280,7 @@ export default async function CommunityPage() {
             </div>
             <div className="relative h-64 md:h-auto rounded-xl overflow-hidden">
               <Image
-                src="/images/pages/community-page-10.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/community-page-10.webp"
                 alt="Community members"
                 fill
                 className="object-cover"

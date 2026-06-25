@@ -25,13 +25,13 @@ export const metadata: Metadata = {
 };
 
 const PROVIDER_IMAGES: Record<string, string> = {
-  esco: '/images/pages/hvac-unit.webp',
-  nrf: '/images/pages/certifications-page-1.webp',
-  certiport: '/images/pages/testing-page-1.webp',
-  nha: '/images/pages/medical-assistant.webp',
-  workkeys: '/images/pages/career-services-page-1.webp',
-  careersafe: '/images/pages/programs-emergency-health-safety-hero.webp',
-  midland: '/images/pages/competency-test-hero.webp',
+  esco: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-unit.webp',
+  nrf: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/certifications-page-1.webp',
+  certiport: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/testing-page-1.webp',
+  nha: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant.webp',
+  workkeys: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp',
+  careersafe: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-emergency-health-safety-hero.webp',
+  midland: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/competency-test-hero.webp',
 };
 
 const CAPABILITY_LABELS: Record<string, string> = {
@@ -63,7 +63,7 @@ export default function TestingPage() {
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/career-services-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp"
           alt="Workforce credential testing"
           fill
           sizes="100vw"
@@ -145,7 +145,7 @@ export default function TestingPage() {
                   >
                     <Image
                       src={
-                        PROVIDER_IMAGES[provider.key] || '/images/pages/career-services-page-1.webp'
+                        PROVIDER_IMAGES[provider.key] || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp'
                       }
                       alt={provider.name}
                       fill
@@ -392,25 +392,25 @@ export default function TestingPage() {
               {
                 step: '1',
                 title: 'Book Your Seat',
-                img: '/images/pages/academic-calendar-hero.webp',
+                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/academic-calendar-hero.webp',
                 desc: `Select your exam and preferred date. Pay the exam fee at booking to reserve your seat. ${TESTING_CENTER.policy.noWalkIns}`,
               },
               {
                 step: '2',
                 title: 'Arrive Prepared',
-                img: '/images/pages/apply-page-1.jpg',
+                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-page-1.jpg',
                 desc: `Arrive at least ${TESTING_CENTER.policy.arriveMinutesBefore} minutes early. ${TESTING_CENTER.policy.idRequired} No ID, no exam — no exceptions.`,
               },
               {
                 step: '3',
                 title: 'Take the Exam',
-                img: '/images/pages/testing-page-1.webp',
+                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/testing-page-1.webp',
                 desc: 'All exams are proctored. No phones or outside materials unless explicitly permitted by the provider.',
               },
               {
                 step: '4',
                 title: 'Receive Your Credential',
-                img: '/images/pages/certificates-page-1.webp',
+                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/certificates-page-1.webp',
                 desc: 'Results and credentials are issued directly by the certifying body. Elevate records your outcome for your training record.',
               },
             ].map((s) => (

@@ -163,7 +163,7 @@ export default function EnrollmentOrientationPage() {
             <video
               ref={videoRef}
               className="w-full h-full object-cover"
-              poster="/images/pages/orientation-page-1.webp"
+              poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/orientation-page-1.webp"
               onTimeUpdate={handleTimeUpdate}
               onEnded={handleEnded}
               onPlay={() => setPlaying(true)}

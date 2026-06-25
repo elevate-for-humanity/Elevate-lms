@@ -27,7 +27,7 @@ const GUIDES = [
     originalPrice: '$497',
     badge: 'Best Seller',
     badgeColor: 'bg-brand-blue-600',
-    image: '/images/pages/admin-compliance-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-compliance-hero.webp',
     imageAlt: 'Compliance audit dashboard showing documentation readiness',
     features: [
       '150+ page practical guide',
@@ -53,7 +53,7 @@ const GUIDES = [
     originalPrice: null,
     badge: 'Included with License',
     badgeColor: 'bg-brand-green-600',
-    image: '/images/pages/admin-analytics-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-analytics-hero.webp',
     imageAlt: 'Platform analytics dashboard showing license usage and feature access',
     features: [
       'License tier comparison',
@@ -90,7 +90,7 @@ export default function GuidesPage() {
       <section className="relative h-56 md:h-72 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/store-guides-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-guides-hero.webp"
           alt="Workforce development guides and resources"
           fill
           className="object-cover"

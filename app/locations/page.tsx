@@ -71,7 +71,7 @@ export default async function LocationsPage() {
       </div>
 
       <HeroVideo
-        posterImage="/images/pages/locations-page-1.webp"
+        posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/locations-page-1.webp"
         videoSrcDesktop={heroBanners['locations'].videoSrcDesktop}
         voiceoverSrc={heroBanners['locations'].voiceoverSrc}
         microLabel={heroBanners['locations'].microLabel}

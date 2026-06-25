@@ -95,7 +95,7 @@ export function ShopClient({ products, categories }: ShopClientProps) {
           >
             <div className="relative aspect-square">
               <Image
-                src={product.image_url || '/images/pages/shop-hero.webp'}
+                src={product.image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/shop-hero.webp'}
                 alt={product.name}
                 fill
                 className="object-cover"

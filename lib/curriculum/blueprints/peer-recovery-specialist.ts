@@ -40,7 +40,7 @@ export const peerRecoverySpecialistBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'Marcus Johnson',
     instructorTitle: 'Workforce Development Specialist',
-    instructorImagePath: '/images/instructors/marcus-johnson.jpg',
+    instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg',
     topBarColor: '#f97316',
     accentColor: '#3b82f6',
     backgroundColor: '#0f172a',

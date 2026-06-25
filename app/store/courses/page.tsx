@@ -39,7 +39,7 @@ export default function StoreCoursesPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image src="/images/pages/store-courses-hero.jpg" alt="Certification courses" fill sizes="100vw" className="object-cover" priority quality={85} />
+          <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-courses-hero.jpg" alt="Certification courses" fill sizes="100vw" className="object-cover" priority quality={85} />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -60,7 +60,7 @@ export default function StoreCoursesPage() {
               >
                 <div className="relative h-48 overflow-hidden">
                   <Image
-                    src={course.image || '/images/pages/course-create-hero.webp'}
+                    src={course.image || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp'}
                     alt={course.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"

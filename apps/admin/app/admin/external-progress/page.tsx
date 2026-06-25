@@ -40,7 +40,7 @@ export default async function ExternalProgressPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/admin-external-progress-detail.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-external-progress-detail.webp"
           alt="External Progress"
           fill
           className="object-cover"

@@ -17,7 +17,7 @@ export default function ConsumerEducationPage() {
       config={{
         breadcrumbs: [{ label: 'Community Services', href: '/community-services' }, { label: 'Consumer Education' }],
         hero: {
-          image: '/images/pages/community-page-3.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/community-page-3.webp',
           tag: 'Consumer Education',
           tagColor: 'text-brand-blue-600',
           title: 'Know Your Rights. Manage Your Money.',
@@ -29,7 +29,7 @@ export default function ConsumerEducationPage() {
             `${PLATFORM_DEFAULTS.orgName} provides free consumer education resources to help Indiana residents make informed financial decisions, access benefits they qualify for, and protect themselves from predatory practices.`,
             'Our VITA-certified volunteers prepare free federal and state tax returns for households earning under $67,000. We also offer workshops on budgeting, credit building, and navigating public benefits.',
           ],
-          image: '/images/pages/community-page-4.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/community-page-4.webp',
         },
         features: {
           heading: 'What We Offer',

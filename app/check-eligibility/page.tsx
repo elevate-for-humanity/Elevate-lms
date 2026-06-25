@@ -288,7 +288,7 @@ export default function CheckEligibilityPage() {
       >
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/funding-page-2.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-page-2.webp"
           alt="Check your eligibility for funded career training"
           fill
           className="object-cover object-center"

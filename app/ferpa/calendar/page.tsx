@@ -118,7 +118,7 @@ export default async function FerpaCalendarPage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/ferpa-page-1.jpg"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/ferpa-page-1.jpg"
           alt="FERPA compliance"
           fill
           sizes="100vw"

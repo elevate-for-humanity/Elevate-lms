@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'SAM.gov Assistant - Federal Contractor Registration Made Simple',
     description: 'Complete your SAM.gov registration in hours, not days. Step-by-step wizard, compliance monitoring, and automatic renewal reminders.',
-    images: ['/images/pages/comp-universal-hero.webp'],
+    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-universal-hero.webp'],
   },
 };
 
@@ -41,9 +41,9 @@ const productData = {
   rating: 4.9,
   reviewCount: 127,
   images: [
-    { src: '/images/pages/store-compliance-hero.jpg', alt: 'SAM.gov Assistant — compliance dashboard overview', type: 'image' as const },
-    { src: '/images/pages/store-digital-detail1.jpg', alt: 'SAM.gov Assistant — registration step-by-step wizard', type: 'image' as const },
-    { src: '/images/pages/store-addons-compliance-hero.webp', alt: 'SAM.gov Assistant — compliance monitoring', type: 'image' as const },
+    { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-compliance-hero.jpg', alt: 'SAM.gov Assistant — compliance dashboard overview', type: 'image' as const },
+    { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-digital-detail1.jpg', alt: 'SAM.gov Assistant — registration step-by-step wizard', type: 'image' as const },
+    { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-addons-compliance-hero.webp', alt: 'SAM.gov Assistant — compliance monitoring', type: 'image' as const },
   ],
   features: [
     {

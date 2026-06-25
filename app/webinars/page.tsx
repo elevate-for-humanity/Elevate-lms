@@ -49,7 +49,7 @@ export default async function WebinarsPage() {
       <section className="relative w-full">
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
           <Image
-            src="/hero-images/how-it-works-hero.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/how-it-works-hero.webp"
             alt="Webinars"
             fill
             className="object-cover"

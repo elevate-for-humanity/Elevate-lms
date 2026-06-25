@@ -26,7 +26,7 @@ export default function EmploymentSupportPage() {
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/employment-support-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employment-support-page-1.webp"
           alt={`Employment support services at ${PLATFORM_DEFAULTS.orgName}`}
           fill
           sizes="100vw"
@@ -66,32 +66,32 @@ export default function EmploymentSupportPage() {
               {
                 title: 'One-on-One Career Coaching',
                 desc: 'Work directly with a career advisor to set goals, identify strengths, and build a personalized employment plan.',
-                image: '/images/pages/career-services-page-1.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp',
               },
               {
                 title: 'Resume & Application Assistance',
                 desc: 'Get help building a professional resume, completing job applications, and creating cover letters tailored to your target industry.',
-                image: '/images/pages/career-services-page-2.jpg',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
               },
               {
                 title: 'Interview Preparation',
                 desc: 'Practice with mock interviews, receive feedback, and learn how to present yourself confidently to employers.',
-                image: '/images/pages/career-services-page-3.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-3.webp',
               },
               {
                 title: 'Employer Connections',
                 desc: 'We connect you directly with employer partners who are actively hiring in your field through our partner network.',
-                image: '/images/pages/about-employer-partners.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-employer-partners.webp',
               },
               {
                 title: 'Barrier-to-Employment Support',
                 desc: 'Transportation coordination, referral support, and assistance addressing challenges that impact your ability to work.',
-                image: '/images/pages/about-supportive-services.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-supportive-services.webp',
               },
               {
                 title: 'Post-Placement Retention',
                 desc: 'Follow-up support after you start working to help you stay employed, resolve workplace issues, and advance in your career.',
-                image: '/images/pages/job-placement.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/job-placement.webp',
               },
             ].map((item) => (
               <div
@@ -182,7 +182,7 @@ export default function EmploymentSupportPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="relative rounded-2xl overflow-hidden h-[300px] md:h-auto min-h-[300px]">
               <Image
-                src="/images/pages/admin-campaigns-hero.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-campaigns-hero.webp"
                 alt="Participants in a training session"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -229,7 +229,7 @@ export default function EmploymentSupportPage() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="relative h-[200px] rounded-xl overflow-hidden mb-4">
                 <Image
-                  src="/images/pages/hvac-technician.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp"
                   alt="Hands-on industry training"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
@@ -253,7 +253,7 @@ export default function EmploymentSupportPage() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
               <div className="relative h-[200px] rounded-xl overflow-hidden mb-4">
                 <Image
-                  src="/images/pages/career-services-page-4.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-4.webp"
                   alt="One-on-one career coaching session"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"

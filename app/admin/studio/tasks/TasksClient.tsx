@@ -65,7 +65,7 @@ export default function TasksClient() {
       {/* Hero Section */}
       <div className="relative h-[280px] w-full overflow-hidden">
         <Image
-          src="/images/pages/admin-ai-console-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-ai-console-hero.webp"
           alt="AI Tasks"
           fill
           className="object-cover"

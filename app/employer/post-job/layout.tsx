@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: 'Post a Job - Hire Skilled Workers',
     description:
       'Post job openings and connect with qualified candidates trained in healthcare and skilled trades.',
-    images: ['/images/pages/for-employers-page-1.webp'],
+    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/for-employers-page-1.webp'],
     type: 'website',
   },
 };

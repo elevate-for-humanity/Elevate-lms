@@ -7,7 +7,7 @@ export const NETWORK_ADMIN: ProgramSchema = {
   sector: 'technology',
   category: 'Networking',
   programType: 'workforce',
-  heroImage: '/images/pages/network-administration.jpg',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/network-administration.jpg',
   heroImageAlt: 'Network administration student configuring network equipment',
   videoSrc: '/videos/it-technology.mp4',
   deliveryMode: 'hybrid',

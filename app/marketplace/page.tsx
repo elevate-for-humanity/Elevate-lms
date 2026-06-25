@@ -72,7 +72,7 @@ export default async function MarketplacePage() {
       </div>
 <div className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/marketplace-page-2.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/marketplace-page-2.webp"
           alt="Marketplace"
           fill
           className="object-cover"
@@ -106,7 +106,7 @@ export default async function MarketplacePage() {
             >
               <div className="relative h-48 overflow-hidden">
                 <Image
-                  src={course.image_url || '/images/pages/comp-home-pathways-support.webp'}
+                  src={course.image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-pathways-support.webp'}
                   alt={course.title}
                   fill
                   className="object-cover"

@@ -10,7 +10,7 @@ export const OFFICE_ADMINISTRATION: ProgramSchema = {
   category: 'Business Administration',
   programType: 'workforce',
 
-  heroImage: '/images/pages/office-admin-desk.jpg',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/office-admin-desk.jpg',
   heroImageAlt: 'Office administration and business training program',
   videoSrc: '/videos/business-finance.mp4',
 

@@ -78,7 +78,7 @@ export default async function StoreSuccessPage({
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        <Image src="/images/pages/store-success-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-success-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-3xl mx-auto px-4 py-16">
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">

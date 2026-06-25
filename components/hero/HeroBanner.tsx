@@ -30,8 +30,8 @@ export default function HeroBanner({
   trustIndicators = [],
   type = 'image',
   videoSrc = '/videos/homepage-hero-montage.mp4',
-  posterSrc = '/images/pages/admin-dashboard-hero.webp',
-  heroImageSrc = '/images/pages/workforce-training.webp',
+  posterSrc = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+  heroImageSrc = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp',
   heroImageAlt = PLATFORM_DEFAULTS.orgName,
   caption,
 }: HeroBannerProps) {

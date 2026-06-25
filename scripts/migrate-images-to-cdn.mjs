@@ -9,7 +9,8 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { readdir, stat, readFile, writeFileSync, rmSync, existsSync } from 'fs/promises';
+import { readdir, stat, readFile } from 'fs/promises';
+import { writeFileSync, rmSync, existsSync } from 'fs';
 import { join, relative, extname, dirname } from 'path';
 
 const DRY_RUN = process.argv.includes('--dry-run');

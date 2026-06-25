@@ -15,37 +15,37 @@ export default function WritingCenterPage() {
       title: 'Course Essays & Written Assignments',
       description:
         'Get feedback on structure, clarity, grammar, and argument strength for any course assignment. Tutors review your draft and provide specific, actionable suggestions — not just corrections.',
-      image: '/images/pages/writing-center-page-1.jpg',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/writing-center-page-1.jpg',
     },
     {
       title: 'Resume & Cover Letter Writing',
       description:
         'Build a professional resume tailored to your target industry. Learn how to highlight certifications, skills, and training. Cover letter templates and customization for specific job postings.',
-      image: '/images/pages/writing-center-page-1.jpg',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/writing-center-page-1.jpg',
     },
     {
       title: 'Professional Communication',
       description:
         'Email etiquette, business letter formatting, workplace communication norms, and professional tone. Essential for office administration students and anyone entering a professional environment.',
-      image: '/images/pages/writing-center-page-1.jpg',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/writing-center-page-1.jpg',
     },
     {
       title: 'Scholarship & Application Essays',
       description:
         'Craft compelling personal statements for scholarship applications, program admissions, and funding requests. Tutors help you tell your story effectively and meet word count requirements.',
-      image: '/images/pages/writing-center-page-1.jpg',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/writing-center-page-1.jpg',
     },
     {
       title: 'Citation & Research Formatting',
       description:
         'APA and MLA formatting, in-text citations, reference pages, and avoiding plagiarism. Required for students completing research-based assignments or capstone projects.',
-      image: '/images/pages/writing-center-page-1.jpg',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/writing-center-page-1.jpg',
     },
     {
       title: 'GED Writing Preparation',
       description:
         'Extended response practice for the GED Reasoning Through Language Arts test. Learn the scoring rubric, practice timed essays, and build confidence in written argumentation.',
-      image: '/images/pages/writing-center-page-1.jpg',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/writing-center-page-1.jpg',
     },
   ];
 
@@ -100,7 +100,7 @@ export default function WritingCenterPage() {
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/writing-center-page-1.jpg"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/writing-center-page-1.jpg"
           alt="Student receiving writing assistance at the Elevate Writing Center"
           fill
           sizes="100vw"
@@ -133,7 +133,7 @@ export default function WritingCenterPage() {
             >
               <div className="relative h-56 overflow-hidden">
                 <Image
-                  src="/images/pages/writing-center.jpg"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/writing-center.jpg"
                   alt="Student submitting a draft for written review"
                   fill
                   className="object-cover"
@@ -161,7 +161,7 @@ export default function WritingCenterPage() {
             >
               <div className="relative h-56 overflow-hidden">
                 <Image
-                  src="/images/pages/career-services-page-10.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-10.webp"
                   alt="Live tutoring session via Zoom"
                   fill
                   className="object-cover"

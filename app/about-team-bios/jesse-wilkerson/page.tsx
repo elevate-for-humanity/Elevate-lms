@@ -27,7 +27,7 @@ export default function Page() {
             <div className="lg:col-span-2">
               <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/team/jesse-wilkerson.jpg"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/jesse-wilkerson.jpg"
                   alt="Jesse J. Wilkerson"
                   fill
                   className="object-cover"

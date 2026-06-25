@@ -27,7 +27,7 @@ export default function DemoWioaPage() {
   return (
     <DemoPageShell title="WIOA" description="WIOA eligibility, Individual Training Accounts, and participant tracking." portal="admin">
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] mb-6">
-        <Image src="/images/pages/demo-page-10.webp" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/demo-page-10.webp" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="grid sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl border p-4">

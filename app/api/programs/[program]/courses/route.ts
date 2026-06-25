@@ -69,7 +69,7 @@ async function _GET(request: Request, { params }: { params: Params }) {
       enrolled: course.enrolled_count || 0,
       certification: course.certification || false,
       funding: course.funding_source,
-      image: course.cover_image_url || '/images/pages/course-create-hero.webp',
+      image: course.cover_image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     }));
 
     return NextResponse.json({

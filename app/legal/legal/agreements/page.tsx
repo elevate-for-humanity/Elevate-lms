@@ -42,63 +42,63 @@ const AGREEMENT_DEFINITIONS: Record<string, Omit<Agreement, 'type' | 'version'> 
     title: 'Enrollment Agreement',
     description: 'Terms and conditions of your enrollment in the training program, including program requirements, attendance policies, and completion standards.',
     documentUrl: '/legal/enrollment-agreement',
-    img: '/images/pages/enrollment-agreement.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/enrollment-agreement.webp',
     icon: ClipboardList,
   },
   handbook: {
     title: 'Student Handbook Acknowledgment',
     description: 'Acknowledgment of student handbook policies and procedures, including code of conduct, grievance procedures, and student rights.',
     documentUrl: '/legal/student-handbook',
-    img: '/images/pages/onboarding-page-1.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/onboarding-page-1.webp',
     icon: BookOpen,
   },
   data_sharing: {
     title: 'Data Sharing Consent',
     description: 'Authorization for sharing data with workforce agencies and employers as required for WIOA, Job Ready Indy, and other funded program reporting.',
     documentUrl: '/legal/data-sharing',
-    img: '/images/pages/admin-governance-legal-hero.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-governance-legal-hero.webp',
     icon: Shield,
   },
   program_holder_mou: {
     title: 'Program Holder MOU',
     description: 'Memorandum of Understanding for program delivery partnership, outlining responsibilities, reporting requirements, and compliance obligations.',
     documentUrl: '/legal/program-holder-mou',
-    img: '/images/pages/programs-admin-signmou-hero.jpg',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-admin-signmou-hero.jpg',
     icon: Handshake,
   },
   employer_agreement: {
     title: 'Employer Partnership Agreement',
     description: 'Terms for employer participation in workforce programs, including OJT supervision requirements and apprenticeship obligations.',
     documentUrl: '/legal/employer-agreement',
-    img: '/images/pages/admin-employers-onboarding-hero.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-employers-onboarding-hero.webp',
     icon: Briefcase,
   },
   staff_agreement: {
     title: 'Staff Agreement',
     description: 'Terms of employment and confidentiality obligations for {PLATFORM_DEFAULTS.orgName} staff and contractors.',
     documentUrl: '/legal/staff-agreement',
-    img: '/images/pages/admin-signatures-hero.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-signatures-hero.webp',
     icon: UserCheck,
   },
   mou: {
     title: 'Partner MOU',
     description: 'Memorandum of Understanding for partnership, defining scope, responsibilities, and compliance requirements.',
     documentUrl: '/legal/partner-mou',
-    img: '/images/pages/programs-admin-signmou-hero.jpg',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-admin-signmou-hero.jpg',
     icon: Users,
   },
   ferpa: {
     title: 'FERPA Consent',
     description: 'Authorization for release of educational records to authorized parties as permitted under the Family Educational Rights and Privacy Act.',
     documentUrl: '/legal/ferpa-consent',
-    img: '/images/pages/admin-governance-legal-hero.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-governance-legal-hero.webp',
     icon: Lock,
   },
   participation: {
     title: 'Participation Agreement',
     description: 'Program participation requirements and expectations, including attendance, conduct, and completion milestones.',
     documentUrl: '/legal/participation-agreement',
-    img: '/images/pages/enrollment-agreement-page-1.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/enrollment-agreement-page-1.webp',
     icon: ClipboardList,
   },
 };
@@ -171,7 +171,7 @@ function LegalAgreementsContent() {
             title: req.type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
             description: 'Please review and sign this agreement.',
             documentUrl: `/legal/${req.type}`,
-            img: '/images/pages/enrollment-agreement.webp',
+            img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/enrollment-agreement.webp',
             icon: FileText,
           }),
         }));
@@ -294,7 +294,7 @@ function LegalAgreementsContent() {
       {/* Hero */}
       <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image
-          src="/images/pages/enrollment-agreement.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/enrollment-agreement.webp"
           alt="Legal agreements"
           fill
           sizes="100vw"
@@ -376,7 +376,7 @@ function LegalAgreementsContent() {
           {/* Agreement image header */}
           <div className="relative h-48 sm:h-56 overflow-hidden">
             <Image
-              src={currentDef?.img || '/images/pages/enrollment-agreement.webp'}
+              src={currentDef?.img || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/enrollment-agreement.webp'}
               alt={currentAgreement.title}
               fill
               sizes="(max-width: 768px) 100vw, 672px"
@@ -547,9 +547,9 @@ function LegalAgreementsContent() {
         {/* Trust badges */}
         <div className="mt-6 grid grid-cols-3 gap-4">
           {[
-            { img: '/images/pages/admin-governance-legal-hero.webp', label: 'FERPA Compliant' },
-            { img: '/images/pages/admin-signatures-hero.webp', label: 'Secure E-Signature' },
-            { img: '/images/pages/onboarding-page-2.webp', label: 'DOL Registered' },
+            { img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-governance-legal-hero.webp', label: 'FERPA Compliant' },
+            { img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-signatures-hero.webp', label: 'Secure E-Signature' },
+            { img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/onboarding-page-2.webp', label: 'DOL Registered' },
           ].map((badge) => (
             <div key={badge.label} className="relative rounded-xl overflow-hidden border border-slate-200 aspect-[4/3]">
               <div className="relative h-20">

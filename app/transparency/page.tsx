@@ -73,7 +73,7 @@ export default async function TransparencyPage() {
       <section className="relative h-64 sm:h-80 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/transparency-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/transparency-page-1.webp"
           alt={`${PLATFORM_DEFAULTS.orgName} transparency`}
           fill
           className="object-cover"

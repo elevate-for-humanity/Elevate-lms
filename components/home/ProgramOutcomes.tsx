@@ -8,7 +8,7 @@ import { ArrowRight, TrendingUp, Clock, DollarSign } from 'lucide-react';
 const PROGRAMS = [
   {
     title: 'CNA Certification',
-    image: '/images/pages/cna-clinical.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-clinical.jpg',
     duration: '6 weeks',
     salary: '$35K–$42K',
     placement: '92%',
@@ -17,7 +17,7 @@ const PROGRAMS = [
   },
   {
     title: 'CDL Class A',
-    image: '/images/pages/hvac-technician.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
     duration: '8 weeks',
     salary: '$55K–$72K',
     placement: '88%',
@@ -26,7 +26,7 @@ const PROGRAMS = [
   },
   {
     title: 'HVAC Technician',
-    image: '/images/pages/cdl-truck-highway.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-truck-highway.webp',
     duration: '6 weeks',
     salary: '$45K–$65K',
     placement: '—',
@@ -35,7 +35,7 @@ const PROGRAMS = [
   },
   {
     title: 'Medical Assistant',
-    image: '/images/pages/it-helpdesk-desk.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/it-helpdesk-desk.webp',
     duration: '10 weeks',
     salary: '$32K–$40K',
     placement: '87%',
@@ -44,7 +44,7 @@ const PROGRAMS = [
   },
   {
     title: 'Welding',
-    image: '/images/pages/barber-hero-main.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-hero-main.webp',
     duration: '14 weeks',
     salary: '$40K–$58K',
     placement: '83%',
@@ -53,7 +53,7 @@ const PROGRAMS = [
   },
   {
     title: 'IT Help Desk',
-    image: '/images/pages/welding-sparks.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/welding-sparks.webp',
     duration: '8 weeks',
     salary: '$38K–$60K',
     placement: '80%',

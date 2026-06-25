@@ -17,49 +17,49 @@ const services = [
     title: 'Community Services (VITA)',
     description: 'Free tax preparation and financial literacy for qualifying Indiana residents',
     href: '/community-services',
-    image: '/images/pages/career-services.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services.jpg',
   },
   {
     title: 'Career Services',
     description: 'Resume building, interview prep, job search support',
     href: '/career-services',
-    image: '/images/pages/homepage-why-elevate.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/homepage-why-elevate.webp',
   },
   {
     title: 'Career Center',
     description: 'Job boards, employer connections, placement assistance',
     href: '/career-services',
-    image: '/images/pages/comp-home-pathways-support.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-pathways-support.webp',
   },
   {
     title: 'Career Fairs',
     description: 'Meet employers hiring our graduates',
     href: '/career-fair',
-    image: '/images/pages/homepage-why-elevate.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/homepage-why-elevate.webp',
   },
   {
     title: 'Academic Advising',
     description: 'One-on-one guidance to help you succeed',
     href: '/contact',
-    image: '/images/pages/healthcare-grad.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-grad.jpg',
   },
   {
     title: 'Mentorship Program',
     description: 'Connect with industry professionals',
     href: '/student-support',
-    image: '/images/pages/store-recommendations.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp',
   },
   {
     title: 'Support Services',
     description: 'Transportation, childcare, barrier removal',
     href: '/support',
-    image: '/images/pages/career-services.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services.jpg',
   },
   {
     title: 'Help Center',
     description: 'FAQs, guides, and support resources',
     href: '/help',
-    image: '/images/pages/career-services.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services.jpg',
   },
 ];
 
@@ -79,7 +79,7 @@ export default function ServicesPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/images/pages/services-page-1.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/services-page-1.webp"
             alt="Support Services"
             fill
             className="object-cover"

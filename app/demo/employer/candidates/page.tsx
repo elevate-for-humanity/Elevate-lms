@@ -18,7 +18,7 @@ export default function DemoCandidatesPage() {
   return (
     <DemoPageShell title="Candidates" description="Pre-screened candidates from training programs ready for hire." portal="employer">
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] mb-6">
-        <Image src="/images/pages/demo-page-12.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/demo-page-12.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="space-y-4">
         {(DEMO_CANDIDATES as any[]).map((c, i) => (

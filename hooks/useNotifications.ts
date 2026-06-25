@@ -62,7 +62,7 @@ export function useNotifications({
       if (showBrowserNotifications && Notification.permission === 'granted') {
         new Notification(notification.title, {
           body: notification.message,
-          icon: '/icon-192.png',
+          icon: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
           tag: notification.id,
         });
       }

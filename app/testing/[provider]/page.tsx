@@ -29,13 +29,13 @@ const LEVEL_COLORS: Record<string, string> = {
 
 // Hero images per provider key
 const PROVIDER_HERO: Record<string, string> = {
-  esco: '/images/pages/hvac-technician.webp',
-  certiport: '/images/pages/programs-it-hero.webp',
-  nha: '/images/pages/medical-assistant.webp',
-  nrf: '/images/pages/apply-employer-hero.webp',
-  workkeys: '/images/pages/career-services-page-4.webp',
-  careersafe: '/images/pages/apprenticeships-hero.webp',
-  midland: '/images/pages/hvac-technician.webp',
+  esco: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
+  certiport: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-it-hero.webp',
+  nha: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant.webp',
+  nrf: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-employer-hero.webp',
+  workkeys: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-4.webp',
+  careersafe: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeships-hero.webp',
+  midland: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
 };
 
 const PROVIDER_ACCENT: Record<string, string> = {
@@ -103,7 +103,7 @@ export default async function ProviderPage({ params }: Props) {
     if (dbOverride.website_url) (provider as any).verifyUrl = dbOverride.website_url;
   }
 
-  const heroImg = PROVIDER_HERO[key] ?? '/images/pages/career-services-hero.webp';
+  const heroImg = PROVIDER_HERO[key] ?? 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-hero.webp';
   const accent = PROVIDER_ACCENT[key] ?? 'from-brand-blue-900';
   const capInfo = CAPABILITY_LABEL[provider.capability];
   const CapIcon = capInfo?.icon ?? MapPin;

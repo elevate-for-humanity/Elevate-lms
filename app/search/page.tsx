@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     url: 'https://www.elevateforhumanity.org/search',
     images: [
       {
-        url: '/images/pages/healthcare-grad.jpg',
+        url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-grad.jpg',
         width: 1200,
         height: 630,
         alt: `${PLATFORM_DEFAULTS.orgName} — Workforce Training Programs`,
@@ -32,42 +32,42 @@ const programs = [
   {
     name: 'Healthcare',
     href: '/programs/healthcare',
-    image: '/images/pages/programs-cna-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-cna-hero.webp',
     certs: ['CNA', 'Medical Assistant', 'Phlebotomy*'],
     funding: 'WIOA & WRG eligible · *Phlebotomy self-pay',
   },
   {
     name: 'Skilled Trades',
     href: '/programs/skilled-trades',
-    image: '/images/pages/programs-hvac-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hvac-hero.webp',
     certs: ['HVAC', 'Electrical', 'Welding', 'Plumbing'],
     funding: 'WIOA & Job Ready Indy eligible',
   },
   {
     name: 'CDL Training',
     href: '/programs/cdl-training',
-    image: '/images/pages/programs-cdl-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-cdl-hero.webp',
     certs: ['Class A CDL', 'Class B CDL'],
     funding: 'WRG eligible',
   },
   {
     name: 'Barber Apprenticeship',
     href: '/programs/barber-apprenticeship',
-    image: '/images/pages/programs-barber-hero-new.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-barber-hero-new.webp',
     certs: ['Barber License'],
     funding: 'Earn while you learn — paid apprenticeship',
   },
   {
     name: 'Technology',
     href: '/programs/technology',
-    image: '/images/pages/programs-it-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-it-hero.webp',
     certs: ['IT Support', 'Cybersecurity'],
     funding: 'WIOA eligible',
   },
   {
     name: 'CPR & First Aid',
     href: '/programs/cpr-first-aid',
-    image: '/images/pages/programs-cpr-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-cpr-hero.webp',
     certs: ['HSI CPR/AED', 'First Aid'],
     funding: 'Same-day certification',
   },
@@ -103,7 +103,7 @@ export default function SearchPage() {
       <section className="relative h-[320px] sm:h-[400px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/programs-hero-vibrant.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hero-vibrant.webp"
           alt="Workforce training programs"
           fill
           className="object-cover"
@@ -191,7 +191,7 @@ export default function SearchPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-[260px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/pages/about-funding-nav.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-funding-nav.webp"
                 alt="Workforce funding and financial aid"
                 fill
                 className="object-cover"
@@ -281,7 +281,7 @@ export default function SearchPage() {
             </div>
             <div className="relative h-[260px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl order-1 md:order-2">
               <Image
-                src="/images/pages/admin-apprenticeships-hero.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-apprenticeships-hero.webp"
                 alt="Employer partnerships"
                 fill
                 className="object-cover"

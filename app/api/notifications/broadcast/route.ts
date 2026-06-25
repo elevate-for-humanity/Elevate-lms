@@ -74,8 +74,8 @@ async function _POST(req: Request) {
             const payload = JSON.stringify({
               title,
               body,
-              icon: icon || '/icon-192x192.png',
-              badge: '/icon-192x192.png',
+              icon: icon || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192x192.png',
+              badge: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192x192.png',
               url: url || '/',
               timestamp: Date.now(),
             });

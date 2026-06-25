@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 const SCHEDULE_OPTIONS = [
   {
     id: 'day',
-    image: '/images/pages/schedule-consultation-page-1.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/schedule-consultation-page-1.webp',
     imageAlt: 'Students in daytime HVAC training class',
     label: 'Day Classes',
     hours: 'Monday – Friday, 8:00 AM – 2:30 PM',
@@ -28,7 +28,7 @@ const SCHEDULE_OPTIONS = [
   },
   {
     id: 'evening',
-    image: '/images/pages/admin-apprenticeships-classroom.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-apprenticeships-classroom.webp',
     imageAlt: 'Evening HVAC training class',
     label: 'Evening Classes',
     hours: 'Monday – Thursday, 5:30 PM – 9:00 PM',
@@ -39,7 +39,7 @@ const SCHEDULE_OPTIONS = [
   },
   {
     id: 'self-paced',
-    image: '/images/pages/admin-analytics-learning-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-analytics-learning-hero.webp',
     imageAlt: 'Student learning online at their own pace',
     label: 'Self-Paced Online',
     hours: 'Anytime — complete lessons on your own schedule',
@@ -126,7 +126,7 @@ export default async function SelectSchedulePage() {
       >
         <CanonicalVideo
           src="/videos/getting-started-hero.mp4"
-          poster="/images/pages/calendar-page-1.webp"
+          poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/calendar-page-1.webp"
           className="absolute inset-0 w-full h-full object-cover"
         />
       </div>

@@ -16,7 +16,7 @@ export default function CareerCounselingPage() {
       config={{
         breadcrumbs: [{ label: 'Career Services', href: '/career-services' }, { label: 'Career Counseling' }],
         hero: {
-          image: '/images/pages/career-services-page-1.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp',
           tag: 'Career Counseling',
           tagColor: 'text-brand-blue-600',
           title: 'Plan Your Career Path',
@@ -28,7 +28,7 @@ export default function CareerCounselingPage() {
             'Career counseling at Elevate is not generic advice. Sessions are focused on your specific program, your local job market, and the employers who hire our graduates. We help you understand what credentials to pursue, what wages to expect, and how to position yourself for the jobs you want.',
             'Available to all enrolled students and graduates at no additional cost.',
           ],
-          image: '/images/pages/career-services-page-2.jpg',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
         },
         features: {
           heading: 'What We Cover',

@@ -33,25 +33,25 @@ export default async function HubWelcomePage() {
     {
       title: 'Classroom',
       description: 'Access your courses, track progress, and continue your learning journey.',
-      image: '/images/pages/comp-universal-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-universal-hero.webp',
       href: '/hub/classroom',
     },
     {
       title: 'Leaderboard',
       description: 'See how you rank among peers and earn recognition for your achievements.',
-      image: '/images/pages/comp-home-pathways-support.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-pathways-support.webp',
       href: '/hub/leaderboard',
     },
     {
       title: 'Members',
       description: 'Connect with fellow learners, mentors, and industry professionals.',
-      image: '/images/pages/comp-universal-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-universal-hero.webp',
       href: '/hub/members',
     },
     {
       title: 'Calendar',
       description: 'View upcoming events, workshops, and live sessions.',
-      image: '/images/pages/comp-home-pathways-support.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-pathways-support.webp',
       href: '/hub/calendar',
     },
   ];
@@ -61,17 +61,17 @@ export default async function HubWelcomePage() {
     {
       title: 'Real-Time Progress Tracking',
       description: 'See exactly where you are in your program. No guessing - the system shows your status, completion percentage, and what comes next.',
-      image: '/images/pages/comp-universal-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-universal-hero.webp',
     },
     {
       title: 'Automated Guidance',
       description: 'The platform tells you what to do next. Receive smart nudges, reminders, and step-by-step guidance to stay on track.',
-      image: '/images/pages/career-services-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp',
     },
     {
       title: 'Compliance Documentation',
       description: 'All your hours, credentials, and progress are documented automatically. Ready for audits, certifications, and employer verification.',
-      image: '/images/pages/career-services-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp',
     },
   ];
 
@@ -81,19 +81,19 @@ export default async function HubWelcomePage() {
       name: 'Healthcare Graduate',
       program: 'CNA Certification',
       quote: 'The Hub made it easy to track my clinical hours and know exactly what I needed to complete.',
-      image: '/images/pages/comp-universal-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-universal-hero.webp',
     },
     {
       name: 'Trades Apprentice',
       program: 'HVAC Technician',
       quote: 'I could see my progress every day. The system kept me accountable and on schedule.',
-      image: '/images/pages/comp-universal-hero.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-universal-hero.webp',
     },
     {
       name: 'Tech Graduate',
       program: 'IT Support',
       quote: 'Having everything in one place - courses, certifications, job prep - made all the difference.',
-      image: '/images/pages/career-services-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp',
     },
   ];
 
@@ -102,7 +102,7 @@ export default async function HubWelcomePage() {
       {/* Hero Section */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image src="/images/pages/admin-accreditation-report-hero.webp" alt="Students collaborating and learning together" fill className="object-cover" priority sizes="100vw" />
+          <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-accreditation-report-hero.webp" alt="Students collaborating and learning together" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -259,7 +259,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/pages/admin-applications-hero.webp"
+                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-applications-hero.webp"
                     alt="Apply for a program"
                     fill
                     className="object-cover"
@@ -275,7 +275,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/pages/lms-page-11.webp"
+                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/lms-page-11.webp"
                     alt="Get enrolled"
                     fill
                     className="object-cover"
@@ -291,7 +291,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/pages/about-hero.webp"
+                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp"
                     alt="Complete and succeed"
                     fill
                     className="object-cover"

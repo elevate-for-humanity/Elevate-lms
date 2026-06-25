@@ -6,7 +6,7 @@ export const siteConfig = {
   url: 'https://www.elevateforhumanity.org',
   description:
     'Career training, workforce pathways, and community-centered education programs for re-entry, workforce development, and economic mobility.',
-  ogImage: '/images/og-default.jpg',
+  ogImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-default.jpg',
   handoff: {
     apply: '/apply',
     login: '/login',

@@ -23,7 +23,7 @@ export default function DemoApprenticeshipsPage() {
   return (
     <DemoPageShell title="Apprenticeships" description="Track apprentice hours, wage progression, and mentor assignments." portal="employer">
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] mb-6">
-        <Image src="/images/pages/demo-page-11.webp" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/demo-page-11.webp" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="space-y-4">
         {DEMO_DATA.map((a, i) => {

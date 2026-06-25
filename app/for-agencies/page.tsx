@@ -100,7 +100,7 @@ export default async function ForAgenciesPage() {
       <section className="relative h-[280px] sm:h-[360px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/government-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-1.webp"
           alt="Workforce agency partnership"
           fill
           sizes="100vw"

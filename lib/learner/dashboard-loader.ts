@@ -288,12 +288,12 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
       const slug = e.program_slug?.toLowerCase() ?? '';
       // Map program slugs to hero images
       const heroImageMap: Record<string, string> = {
-        'barber-apprenticeship': '/images/pages/barber-apprenticeship-hero.jpg',
-        'cosmetology-apprenticeship': '/images/pages/cosmetology-apprenticeship-hero.webp',
-        'nail-technician-apprenticeship': '/images/pages/nail-tech-hero.webp',
-        'esthetician-apprenticeship': '/images/pages/nail-tech-hero.webp',
+        'barber-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship-hero.jpg',
+        'cosmetology-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-apprenticeship-hero.webp',
+        'nail-technician-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-tech-hero.webp',
+        'esthetician-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-tech-hero.webp',
       };
-      const hero_image = heroImageMap[slug] || '/images/pages/barber-apprenticeship-hero.jpg';
+      const hero_image = heroImageMap[slug] || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship-hero.jpg';
       courses = {
         id: ap.id,
         title: ap.name ?? 'Apprenticeship Program',

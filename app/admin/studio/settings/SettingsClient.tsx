@@ -122,7 +122,7 @@ export default function SettingsClient() {
     <div className="min-h-screen bg-white">
       <div className="relative h-[280px] w-full overflow-hidden">
         <Image
-          src="/images/pages/admin-activity-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-activity-hero.webp"
           alt="System Settings"
           fill
           className="object-cover"

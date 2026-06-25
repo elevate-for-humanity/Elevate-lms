@@ -40,7 +40,7 @@ export default function WorkflowsClient() {
     <div className="min-h-screen bg-white">
       <div className="relative h-[280px] w-full overflow-hidden">
         <Image
-          src="/images/pages/admin-grants-workflow-detail.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-grants-workflow-detail.webp"
           alt="Workflows"
           fill
           className="object-cover"

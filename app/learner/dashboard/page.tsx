@@ -492,7 +492,7 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
                       ? enrollment.courses[0]
                       : enrollment.courses;
                     // Use hero_image for apprenticeship programs, fallback to course image or default
-                    const courseImage = course?.hero_image || course?.image || (enrollment._isApprenticeship ? '/images/pages/barber-apprenticeship-hero.jpg' : null);
+                    const courseImage = course?.hero_image || course?.image || (enrollment._isApprenticeship ? 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship-hero.jpg' : null);
                     return (
                       <div key={enrollment.id} className="p-6">
                         <div className="flex gap-4">

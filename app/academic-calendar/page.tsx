@@ -67,7 +67,7 @@ export default function AcademicCalendarPage() {
       <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/academic-calendar-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/academic-calendar-hero.webp"
           alt="Academic calendar and important dates"
           fill
           sizes="100vw"

@@ -101,7 +101,7 @@ export default async function FerpaRecordsPage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/ferpa-page-6.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/ferpa-page-6.webp"
           alt="FERPA compliance"
           fill
           sizes="100vw"

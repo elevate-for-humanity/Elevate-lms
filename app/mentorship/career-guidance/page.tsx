@@ -43,7 +43,7 @@ export default async function CareerGuidancePage() {
       </div>
 
       <section className="relative h-[350px] flex items-center justify-center text-white overflow-hidden">
-        <Image src="/images/hero/hero-career-services.webp" alt="Career Guidance" fill className="object-cover" priority sizes="100vw" />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero/hero-career-services.webp" alt="Career Guidance" fill className="object-cover" priority sizes="100vw" />
         
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <Compass className="w-16 h-16 mx-auto mb-4 text-white/80" />

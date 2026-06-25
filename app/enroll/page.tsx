@@ -40,7 +40,7 @@ export default async function EnrollPage() {
       <div className="relative h-[40vh] min-h-[300px]">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image sizes="100vw"
-          src="/images/pages/programs-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hero.webp"
           alt="Enroll in Training"
           fill
           className="object-cover"

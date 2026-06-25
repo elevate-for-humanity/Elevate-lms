@@ -408,7 +408,7 @@ export default function CoursesCatalogPage() {
       {/* Hero */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/admin-apprenticeships-classroom.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-apprenticeships-classroom.webp"
           alt="Partner Course Catalog"
           fill
           className="object-cover"

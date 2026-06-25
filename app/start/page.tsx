@@ -59,7 +59,7 @@ export default function StartPage() {
       <section className="relative overflow-hidden bg-brand-blue-700 text-white">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/how-it-works-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/how-it-works-hero.webp"
           alt="Career training students"
           fill
           sizes="100vw"

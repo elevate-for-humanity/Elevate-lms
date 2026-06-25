@@ -23,25 +23,25 @@ const tracks = [
     title: 'Barbering',
     href: '/programs/barber-apprenticeship',
     desc: 'DOL-registered apprenticeship. Earn while you complete your hours toward licensure.',
-    img: '/images/pages/barber-apprenticeship-hero.jpg',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship-hero.jpg',
   },
   {
     title: 'Cosmetology',
     href: '/programs/cosmetology-apprenticeship',
     desc: 'Complete your cosmetology hours through a structured earn-while-you-learn program.',
-    img: '/images/pages/cosmetology-apprenticeship-hero.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-apprenticeship-hero.webp',
   },
   {
     title: 'Culinary Arts',
     href: '/programs/culinary-apprenticeship',
     desc: 'Hands-on culinary training with employer partners in the food service industry.',
-    img: '/images/pages/culinary-apprenticeship-hero.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/culinary-apprenticeship-hero.webp',
   },
   {
     title: 'Skilled Trades',
     href: '/programs/skilled-trades',
     desc: 'Apprenticeship pathways in electrical, plumbing, and construction trades.',
-    img: '/images/pages/skilled-trades-hero.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/skilled-trades-hero.webp',
   },
 ];
 

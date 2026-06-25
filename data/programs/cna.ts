@@ -9,7 +9,7 @@ export const CNA: ProgramSchema = {
   category: 'Healthcare',
   programType: 'workforce',
 
-  heroImage: '/images/pages/cna-patient-care.jpg',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-patient-care.jpg',
   heroImageAlt: 'CNA student assisting a patient at a licensed healthcare facility in Indianapolis',
   videoSrc: '/videos/cna-hero.mp4',
 

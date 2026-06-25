@@ -38,7 +38,7 @@ export default function StoreDigitalPage() {
 {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
-          <LazyVideo src="/videos/store-marketplace.mp4" poster="/images/pages/programs-hero.webp"
+          <LazyVideo src="/videos/store-marketplace.mp4" poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hero.webp"
             className="absolute inset-0 w-full h-full object-cover" />
         </div>
         <div className="bg-slate-900 py-10">
@@ -76,7 +76,7 @@ export default function StoreDigitalPage() {
             <div className="bg-white rounded-2xl overflow-hidden">
               <StoreProductVideo
                 src="/videos/store/store-ai-studio.mp4"
-                poster="/images/pages/store-digital-hero.webp"
+                poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-digital-hero.webp"
                 alt="AI Studio demo"
                 label="AI Studio Demo"
               />
@@ -88,7 +88,7 @@ export default function StoreDigitalPage() {
             <div className="bg-white rounded-2xl overflow-hidden">
               <StoreProductVideo
                 src="/videos/store/store-sam-gov.mp4"
-                poster="/images/pages/store-digital-detail1.jpg"
+                poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-digital-detail1.jpg"
                 alt="SAM.gov Assistant demo"
                 label="SAM.gov Walkthrough"
               />
@@ -100,7 +100,7 @@ export default function StoreDigitalPage() {
             <div className="bg-white rounded-2xl overflow-hidden">
               <StoreProductVideo
                 src="/videos/store/store-digital-resources.mp4"
-                poster="/images/pages/store-digital-detail2.webp"
+                poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-digital-detail2.webp"
                 alt="Digital resources demo"
                 label="Digital Resources Overview"
               />
@@ -137,7 +137,7 @@ export default function StoreDigitalPage() {
                 <div className="relative h-48 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
                   <Image
-                    src={product.image || '/images/pages/comp-universal-hero.webp'}
+                    src={product.image || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-universal-hero.webp'}
                     alt={product.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -222,7 +222,7 @@ export default function StoreDigitalPage() {
               >
                 <div className="relative h-40 overflow-hidden">
                   <Image
-                    src={product.image || '/images/pages/comp-universal-hero.webp'}
+                    src={product.image || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-universal-hero.webp'}
                     alt={product.name}
                     fill
                     quality={85} className="object-cover"

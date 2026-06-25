@@ -5,7 +5,7 @@ export default function Assurance() {
     <section className="bg-slate-50 py-12 md:py-24 relative overflow-hidden">
       <div className="absolute inset-0 opacity-5">
         <Image
-          src="/clear-path-main-image.jpg"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/clear-path-main-image.jpg"
           alt="Clear Pathways Background"
           fill
           className="object-cover"
@@ -17,7 +17,7 @@ export default function Assurance() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="relative w-full aspect-video md:aspect-[4/3] rounded-lg overflow-hidden shadow-xl bg-slate-100">
             <Image
-              src="/clear-path-main-image.jpg"
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/clear-path-main-image.jpg"
               alt="Clear Career Pathways"
               fill
               className="object-contain"

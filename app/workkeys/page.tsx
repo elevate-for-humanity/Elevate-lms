@@ -16,22 +16,22 @@ const LEVELS = [
   {
     level: 'Bronze',
     desc: 'Demonstrates foundational workplace skills. Recognized by many Indiana employers and workforce programs.',
-    img: '/images/pages/courses-page-7.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/courses-page-7.webp',
   },
   {
     level: 'Silver',
     desc: 'Mid-level career readiness. Required for many skilled trades and technical roles.',
-    img: '/images/pages/courses-page-8.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/courses-page-8.webp',
   },
   {
     level: 'Gold',
     desc: 'Advanced workplace skills. Preferred for supervisory, technical, and professional positions.',
-    img: '/images/pages/courses-page-9.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/courses-page-9.webp',
   },
   {
     level: 'Platinum',
     desc: 'Highest level. Demonstrates exceptional applied math, reading, and locating information skills.',
-    img: '/images/pages/courses-page-10.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/courses-page-10.webp',
   },
 ];
 
@@ -39,17 +39,17 @@ const SUBJECTS = [
   {
     name: 'Applied Math',
     desc: 'Workplace math problems — measurements, calculations, and data interpretation.',
-    img: '/images/pages/courses-page-11.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/courses-page-11.webp',
   },
   {
     name: 'Workplace Documents',
     desc: 'Reading and interpreting workplace materials — forms, charts, graphs, and instructions.',
-    img: '/images/pages/courses-page-12.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/courses-page-12.webp',
   },
   {
     name: 'Graphic Literacy',
     desc: 'Reading and interpreting workplace graphics — charts, graphs, diagrams, and tables.',
-    img: '/images/pages/courses-page-13.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/courses-page-13.webp',
   },
 ];
 
@@ -60,7 +60,7 @@ export default function WorkKeysPage() {
       <section className="relative h-[300px] sm:h-[420px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/about-team-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-team-hero.webp"
           alt="ACT WorkKeys career readiness assessment"
           fill
           sizes="100vw"
@@ -106,7 +106,7 @@ export default function WorkKeysPage() {
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div className="relative h-64 rounded-2xl overflow-hidden">
               <Image
-                src="/images/pages/career-services-page-11.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-11.webp"
                 alt="WorkKeys assessment testing"
                 fill
                 sizes="600px"
@@ -234,7 +234,7 @@ export default function WorkKeysPage() {
             </div>
             <div className="relative h-64 rounded-2xl overflow-hidden">
               <Image
-                src="/images/pages/career-services-page-12.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-12.webp"
                 alt="WorkKeys testing at Elevate"
                 fill
                 sizes="600px"

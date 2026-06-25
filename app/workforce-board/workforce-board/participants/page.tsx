@@ -42,7 +42,7 @@ export default async function ParticipantsPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/og-default.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp"
           alt="Participants"
           fill
           priority

@@ -45,7 +45,7 @@ export function AiNarratorSection() {
               controls
               playsInline
               preload="metadata"
-              poster="/images/og-default.jpg"
+              poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-default.jpg"
             />
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center gap-2 px-4 text-center text-xs text-slate-300">

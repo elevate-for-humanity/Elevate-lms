@@ -87,7 +87,7 @@ export default async function ApplyPage({
       <section className="relative w-full">
         <div className={`${heroTokens.imageWrap} w-full overflow-hidden`}>
           <Image
-            src="/images/pages/apply-hero.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-hero.webp"
             alt="Students exploring career training programs at Elevate for Humanity"
             fill
             className="object-cover object-center"

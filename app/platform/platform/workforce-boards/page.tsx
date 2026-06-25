@@ -115,7 +115,7 @@ export default function WorkforceBoardsPage() {
               <div className="relative hidden lg:block">
                 <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/heroes/workforce-partner-1.webp"
+                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/workforce-partner-1.webp"
                     alt="Workforce Board Portal"
                     fill
                     className="object-cover"
@@ -249,7 +249,7 @@ export default function WorkforceBoardsPage() {
               </div>
               <div className="relative h-[400px] rounded-2xl overflow-hidden">
                 <Image
-                  src="/images/heroes/lms-analytics.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/lms-analytics.webp"
                   alt="System Integration"
                   fill
                   className="object-cover"

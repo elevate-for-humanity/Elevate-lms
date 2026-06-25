@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Our Mission',
     description:
       'Credential-bearing workforce training and community support for underserved populations.',
-    images: [{ url: '/images/pages/mission-hero.webp', width: 1200, height: 630 }],
+    images: [{ url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/mission-hero.webp', width: 1200, height: 630 }],
   },
 };
 
@@ -69,7 +69,7 @@ export default function MissionPage() {
         <div className="absolute inset-0">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/images/pages/mission-hero.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/mission-hero.webp"
             alt={`${PLATFORM_DEFAULTS.orgName} mission`}
             fill
             className="object-cover opacity-40"
@@ -115,7 +115,7 @@ export default function MissionPage() {
           </div>
           <div className="relative rounded-2xl overflow-hidden h-80">
             <Image
-              src="/images/pages/mission-page-1.webp"
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/mission-page-1.webp"
               alt={`${PLATFORM_DEFAULTS.orgName} training`}
               fill
               className="object-cover"
@@ -150,7 +150,7 @@ export default function MissionPage() {
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div className="relative rounded-2xl overflow-hidden h-72 order-2 md:order-1">
             <Image
-              src="/images/pages/about-career-training.webp"
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp"
               alt="Learners in training"
               fill
               className="object-cover"

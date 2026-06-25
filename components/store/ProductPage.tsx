@@ -207,7 +207,7 @@ export function ProductPage({ product }: ProductPageProps) {
                 </div>
               ) : (
                 <Image
-                  src={product.images[selectedImage]?.src || '/images/pages/training-classroom.webp'}
+                  src={product.images[selectedImage]?.src || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp'}
                   alt={product.images[selectedImage]?.alt || product.name}
                   fill
                   className="object-cover"
@@ -375,7 +375,7 @@ export function ProductPage({ product }: ProductPageProps) {
                       category: 'template',
                       price: plan.price,
                       description: plan.description,
-                      image: product.images[0]?.src || '/images/pages/store-hero.webp',
+                      image: product.images[0]?.src || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-hero.webp',
                       inStock: true,
                       featured: Boolean(plan.popular),
                       digital: true,

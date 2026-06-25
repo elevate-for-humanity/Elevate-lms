@@ -55,7 +55,7 @@ export default async function MentorshipPage() {
         accentText="Mentors"
         subheadline="Get Guidance From Experienced Professionals"
         description="Our mentorship program connects students and graduates with experienced professionals in their field. Mentors provide one-on-one guidance, share industry insights, help you set career goals, and navigate your professional journey. Whether you're just starting out or looking to advance, our mentors are here to support your success."
-        imageSrc="/images/business/team-2.jpg"
+        imageSrc="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/team-2.jpg"
         imageAlt="Mentorship Program"
         primaryCTA={{ text: "Join the Program", href: "/apply" }}
         secondaryCTA={{ text: "Learn More", href: "#benefits" }}
@@ -284,7 +284,7 @@ export default async function MentorshipPage() {
             <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
               <div className="relative h-40">
                 <Image
-                  src="/images/pages/hvac-hero.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-hero.webp"
                   alt="Skilled Trades Mentors"
                   fill
                   className="object-cover"
@@ -299,7 +299,7 @@ export default async function MentorshipPage() {
             <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
               <div className="relative h-40">
                 <Image
-                  src="/images/programs/cna-hero.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp"
                   alt="Technology Mentors"
                   fill
                   className="object-cover"
@@ -314,7 +314,7 @@ export default async function MentorshipPage() {
             <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
               <div className="relative h-40">
                 <Image
-                  src="/images/heroes/training-provider-1.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/training-provider-1.webp"
                   alt="Business Mentors"
                   fill
                   className="object-cover"
@@ -471,7 +471,7 @@ export default async function MentorshipPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/construction-trades.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/construction-trades.webp"
                   alt="Mentorship"
                   fill
                   className="object-cover"

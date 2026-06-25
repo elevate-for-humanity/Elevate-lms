@@ -8,10 +8,10 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateconnects.org' },
   icons: {
     icon: [
-      { url: '/favicon.png', type: 'image/png', sizes: '192x192' },
+      { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/favicon.png', type: 'image/png', sizes: '192x192' },
     ],
-    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
-    shortcut: '/favicon.png',
+    apple: [{ url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    shortcut: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/favicon.png',
   },
 };
 

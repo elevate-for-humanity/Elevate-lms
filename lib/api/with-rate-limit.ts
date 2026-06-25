@@ -76,14 +76,26 @@ export function withRateLimit<T = any>(
 
       return response;
     } catch (error) {
-      logger.error('Rate limit error:', error);
+      const msg = error instanceof Error ? error.message : String(error);
+      
+      // Check for malformed Upstash responses (plan limits, bad config, etc.)
+      const isMalformedResponse = 
+        msg.includes('res.map is not a function') ||
+        msg.includes('res.filter is not a function') ||
+        msg.includes('Cannot read properties of') ||
+        msg.includes('Unexpected token') ||
+        msg.includes('JSON.parse') ||
+        msg.includes('SyntaxError') ||
+        msg.includes('is not a function') ||
+        msg.includes('max requests limit exceeded');
 
-      // On error, allow request but log
-      if (skipOnMissing) {
+      if (isMalformedResponse || skipOnMissing) {
+        // Upstash issue or skip requested - fail open, allow request
         return handler(request, context);
-      } else {
-        return NextResponse.json({ error: 'Rate limiting error' }, { status: 500 });
       }
+      
+      logger.error('Rate limit error:', error);
+      return NextResponse.json({ error: 'Rate limiting error' }, { status: 500 });
     }
   };
 }

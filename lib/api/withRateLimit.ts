@@ -87,17 +87,31 @@ export async function applyRateLimit(
     // Redis error (timeout, connection refused, bad credentials, plan limit exceeded, etc.).
     // Strict tier fails closed; other tiers fail open.
     const msg = err instanceof Error ? err.message : String(err);
+
+    // Check for various Redis/Upstash error patterns
     const isQuotaExhausted = msg.includes('max requests limit exceeded');
     const isCredential = msg.includes('401') || msg.includes('403') || msg.includes('Unauthorized');
-    const isMalformedResponse = msg.includes('res.map is not a function') || msg.includes('res.filter is not a function') || msg.includes('Cannot read properties of');
+    
+    // Malformed response = Upstash returned non-JSON or unexpected structure
+    // This often happens when Upstash returns HTML error pages instead of JSON
+    const isMalformedResponse = 
+      msg.includes('res.map is not a function') ||
+      msg.includes('res.filter is not a function') ||
+      msg.includes('Cannot read properties of') ||
+      msg.includes('Unexpected token') ||
+      msg.includes('JSON.parse') ||
+      msg.includes('SyntaxError') ||
+      msg.includes('is not a function');
 
-    // If Redis command is not available (e.g., plain Redis vs Upstash Redis), use in-memory fallback
-    const isCommandUnavailable = msg.includes('not available') || msg.includes('not a function') || isMalformedResponse;
+    // If Redis command is not available or response is malformed, use in-memory fallback
+    const isCommandUnavailable = 
+      msg.includes('not available') || 
+      msg.includes('not a function') || 
+      isMalformedResponse;
 
     if (isCommandUnavailable) {
-      // Use in-memory rate limiting as fallback - this is expected when using plain Redis without RATELIMIT command
+      // Use in-memory rate limiting as fallback
       if (failClosed) {
-        // For strict tier, use in-memory check
         const windowMs = tier === 'strict' ? 5 * 60 * 1000 : 60 * 1000;
         const limit = RATE_LIMITS[tier]?.requests || 60;
         const allowed = checkInMemoryRateLimit(id, limit, windowMs);
@@ -106,28 +120,27 @@ export async function applyRateLimit(
         }
         return null;
       }
-      // For non-strict tiers, allow request but log once
-      logger.debug('[rate-limit] Using in-memory fallback', { tier, ip: id });
+      // Silent fallback - don't spam logs for expected Upstash quirks
       return null;
     }
 
     if (failClosed) {
-      // Only strict tier logs at error — it's actually blocking traffic.
       logger.error(`[rate-limit] Redis error — failing closed`, undefined, { tier, error: msg });
       return NextResponse.json({ error: 'Rate limiting temporarily unavailable' }, { status: 503 });
     }
 
     if (isQuotaExhausted) {
-      // Monthly quota exhausted — log once at warn, not error, to avoid Sentry spam.
-      // Failing open: traffic continues normally until quota resets.
       logger.warn('[rate-limit] Upstash monthly quota exhausted — failing open until reset', { tier });
     } else if (isCredential) {
-      logger.error('[rate-limit] Redis credentials invalid — failing open', undefined, {
+      // 401/403 = invalid credentials - log once at warn, not error
+      // Credentials should be fixed in config, not spam logs
+      logger.warn('[rate-limit] Redis credentials invalid — failing open', {
         tier,
-        error: msg,
+        error: msg.substring(0, 100),
         action: 'Check UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Northflank secrets.',
       });
     } else {
+      // Log once at warn, not error, to avoid Sentry spam for transient issues
       logger.warn('[rate-limit] Redis unavailable — failing open', { tier, error: msg });
     }
 

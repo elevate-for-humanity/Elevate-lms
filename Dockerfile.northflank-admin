@@ -32,8 +32,8 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# Fixed: Build memory aligned with container (8GB)
-ENV NODE_OPTIONS=--max-old-space-size=8192
+# P0-3: 12GB heap for admin builds
+ENV NODE_OPTIONS=--max-old-space-size=12288
 ENV BUILD_SCOPE=1
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV CI=true
@@ -61,8 +61,8 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
 
 WORKDIR /app/apps/admin
-# Fixed: Use memory limit and cache in build
-RUN NODE_OPTIONS='--max-old-space-size=8192' NEXT_BUILD_CACHE=/cache/.next pnpm next build --no-lint
+# P0-3: 12GB memory for admin builds
+RUN NODE_OPTIONS='--max-old-space-size=12288' NEXT_BUILD_CACHE=/cache/.next pnpm next build --no-lint
 WORKDIR /app
 
 # --- runtime stage ---

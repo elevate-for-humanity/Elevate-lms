@@ -4,8 +4,8 @@
 FROM node:22-bookworm AS builder
 
 # Cache invalidation marker
-# P0-2: Increased memory 8GB->16GB, enabled persistent build cache
-RUN echo "nf-cache-invalidate-20260623-p0-2-memory-cache"
+# P0-3: Increased memory to 12GB for 1,600+ page static generation
+RUN echo "nf-cache-invalidate-20260625-p0-3-memory-fix"
 
 # Install system deps for native modules (sharp, canvas, pdf)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -36,8 +36,8 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# Fixed: Align with Northflank container limit (8GB)
-ENV NODE_OPTIONS=--max-old-space-size=8192
+# P0-3: 12GB heap for build with 1,600+ pages
+ENV NODE_OPTIONS=--max-old-space-size=12288
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=1
 ENV CI=true
@@ -62,8 +62,8 @@ ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-# Use explicit build with 8GB memory and persistent cache
-RUN NODE_OPTIONS='--max-old-space-size=8192' NEXT_BUILD_CACHE=/cache/.next pnpm next build
+# P0-3: 12GB memory for large app builds
+RUN NODE_OPTIONS='--max-old-space-size=12288' NEXT_BUILD_CACHE=/cache/.next pnpm next build
 
 # --- runtime stage ---
 FROM node:22-bookworm-slim

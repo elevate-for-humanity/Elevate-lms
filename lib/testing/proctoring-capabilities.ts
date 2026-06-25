@@ -809,7 +809,12 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
     ],
   },
   midland: {
-    // ... preserved midland config
+    key: 'midland',
+    name: 'Midland Testing',
+    capability: 'IN_PERSON_OR_PROVIDER_REMOTE',
+    description: 'Midland certification testing services',
+    exams: MIDLAND_FEES.map((f) => ({ name: f.label, amountCents: f.amount * 100 })),
+    status: 'available_through_partner',
   },
   ase: {
     key: 'ase',

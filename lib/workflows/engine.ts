@@ -189,10 +189,12 @@ async function execAiAction(config: Record<string, unknown>, ctx: RunContext) {
   const resolvedPrompt = String(interpolate(prompt, ctx.triggerPayload));
   logger.info('[workflow/ai_action] calling aiChat', { run_id: ctx.runId, prompt_length: resolvedPrompt.length });
   try {
-    const response = await aiChat([
-      { role: 'system', content: 'You are an operational AI assistant for Elevate for Humanity. Respond concisely and factually.' },
-      { role: 'user', content: resolvedPrompt },
-    ]);
+    const response = await aiChat({
+      messages: [
+        { role: 'system', content: 'You are an operational AI assistant for Elevate for Humanity. Respond concisely and factually.' },
+        { role: 'user', content: resolvedPrompt },
+      ],
+    });
     const persistTable = config.persist_table as string | undefined;
     const persistMatch = config.persist_match as Record<string, unknown> | string | undefined;
     const persistField = config.persist_field as string | undefined;

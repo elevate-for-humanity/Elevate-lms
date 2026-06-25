@@ -13,11 +13,20 @@ const PORT = process.env.VIDEO_API_PORT || 3001;
 // Middleware - exclude streaming/SSE responses from compression
 app.use(compression({
   filter: (req, res) => {
-    // Don't compress streaming responses or SSE
-    if (res.getHeader('Content-Type')?.toString().includes('text/event-stream')) {
+    try {
+      // Don't compress streaming responses or SSE
+      if (res.getHeader('Content-Type')?.toString().includes('text/event-stream')) {
+        return false;
+      }
+      // Check if res has the expected methods for compression
+      if (typeof res.map !== 'function' || typeof res.filter !== 'function') {
+        return false;
+      }
+      return compression.filter(req, res);
+    } catch {
+      // If anything goes wrong, don't compress
       return false;
     }
-    return compression.filter(req, res);
   }
 }));
 app.use(express.json({ limit: '50mb' }));

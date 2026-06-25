@@ -19,7 +19,7 @@ export default function SellerRegisterPage() {
 
     try {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = safeGetUser(await supabase.auth.getUser());
 
       const { error: insertError } = await supabase.from('seller_applications').insert({
         user_id: user?.id || null,

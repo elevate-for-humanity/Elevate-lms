@@ -17,7 +17,7 @@ export default async function ReviewDocumentPage({ params }: { params: Promise<{
   await requireRole(['admin']);
   const { id } = await params;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) {
     redirect('/login');

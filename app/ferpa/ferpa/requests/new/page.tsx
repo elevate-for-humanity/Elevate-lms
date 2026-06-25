@@ -80,7 +80,7 @@ export default function NewFerpaRequestPage() {
     try {
       const supabase = createClient();
       
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = safeGetUser(await supabase.auth.getUser());
       if (!user) {
         router.push('/login?redirect=/ferpa/requests/new');
         return;

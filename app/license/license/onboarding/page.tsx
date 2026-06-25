@@ -16,7 +16,7 @@ export default async function LicenseeOnboardingPage() {
   const supabase = await createClient();
   
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/license/onboarding');
 
   // Check if user has a license

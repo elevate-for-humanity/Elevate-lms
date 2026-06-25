@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = safeGetUser(await supabase.auth.getUser());
 
     // Get purchase from Stripe checkout session
     // Integrate with Stripe SDK for full details

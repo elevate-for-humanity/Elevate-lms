@@ -122,7 +122,7 @@ async function _POST(req: Request) {
     if (!isAdmin && !isWebhook) {
       // Check for authenticated admin user
       const supabase = await createClient();
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
       
       if (authError || !user) {
         logger.warn('Unauthorized license generation attempt', { ip: clientIp });

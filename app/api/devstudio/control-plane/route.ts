@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     const { logger } = await import('@/lib/logger');
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = safeGetUser(await supabase.auth.getUser());
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     const { logger } = await import('@/lib/logger');
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = safeGetUser(await supabase.auth.getUser());
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

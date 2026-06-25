@@ -29,7 +29,7 @@ export default async function BeautyEnrollmentSuccessPage({ params }: Props) {
   if (!cfg) return notFound();
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect(`/login?redirect=/programs/${cfg.slug}/enrollment-success`);
 
   // Find enrollment — try by user_id first, then by email for pre-auth enrollments

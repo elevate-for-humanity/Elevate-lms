@@ -30,7 +30,7 @@ export default function BeautyDocumentsPage() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then((authRes) => { const user = authRes.data?.user; if (!user) return; {
       if (!user) return;
       supabase
         .from('program_enrollments')

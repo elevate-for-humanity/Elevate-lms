@@ -46,7 +46,7 @@ const PAY_METHOD_LABELS: Record<string, string> = {
 export default async function EmployeePayrollPage() {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/employee/payroll');
 
   // Fetch pay stubs for this employee

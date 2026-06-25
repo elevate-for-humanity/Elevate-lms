@@ -26,7 +26,7 @@ export default async function BarberPWALayout({
 }) {
   // Auth check — unauthenticated users go to login
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) {
     redirect(`/login?redirect=${encodeURIComponent('/pwa/barber')}`);
   }

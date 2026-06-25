@@ -54,7 +54,7 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
     if (authError || !user) return safeError('Authentication required', 401);
 
     const formData = await request.formData();
@@ -135,7 +135,7 @@ async function _DELETE(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
     if (authError || !user) return safeError('Authentication required', 401);
 
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();

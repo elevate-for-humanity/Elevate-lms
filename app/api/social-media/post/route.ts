@@ -18,7 +18,7 @@ async function _POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
   if (authError || !user) return safeError('Unauthorized', 401);
 
   const body = await parseBody<Record<string, unknown>>(request);
@@ -192,7 +192,7 @@ async function _GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
   if (authError || !user) return safeError('Unauthorized', 401);
 
   const { searchParams } = new URL(request.url);

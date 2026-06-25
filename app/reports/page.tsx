@@ -17,7 +17,7 @@ export default async function ReportsPage() {
   const supabase = await createClient();
 
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/reports');
 
   const { data: reports } = await supabase

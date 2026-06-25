@@ -16,7 +16,7 @@ async function startTrial() {
   'use server';
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/apps/website-builder/start-trial');
 
   const result = await startAppTrial(user.id, 'website-builder');
@@ -32,7 +32,7 @@ export default async function StartTrialPage({
 }) {
   const { error: errorParam } = await searchParams;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/apps/website-builder/start-trial');
 
   const { data: existing } = await supabase

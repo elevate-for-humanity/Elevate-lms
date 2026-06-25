@@ -21,7 +21,7 @@ const ALLOWED_ROLES = ['workforce_board', 'case_manager', 'admin', 'staff', 'org
 
 export default async function WorkforceLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) redirect('/login?redirect=/workforce/dashboard');
 

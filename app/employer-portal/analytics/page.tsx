@@ -25,7 +25,7 @@ export default async function AnalyticsPage() {
     redirect('/login?redirect=/employer-portal/analytics');
   }
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) {
     redirect('/login?redirect=/employer-portal/analytics');

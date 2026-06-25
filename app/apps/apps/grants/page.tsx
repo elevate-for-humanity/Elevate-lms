@@ -15,7 +15,7 @@ export default async function GrantsPage() {
   const supabase = await createClient();
   
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) {
     redirect('/login?redirect=/apps/grants&message=login-required');
   }

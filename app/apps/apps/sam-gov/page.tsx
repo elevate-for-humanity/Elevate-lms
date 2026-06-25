@@ -19,7 +19,7 @@ export default async function SamGovPage() {
   // Must have database connection
 
   // Must be logged in
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) {
     redirect('/login?redirect=/apps/sam-gov&message=login-required');
   }

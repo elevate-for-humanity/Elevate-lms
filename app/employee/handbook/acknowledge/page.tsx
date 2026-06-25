@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export default async function AcknowledgeHandbookPage() {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/employee/handbook/acknowledge');
 
   // Upsert acknowledgment

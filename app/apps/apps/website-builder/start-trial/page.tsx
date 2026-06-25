@@ -19,7 +19,7 @@ async function startTrial() {
   const db = (await getAdminClient()) || supabase;
   if (!supabase) redirect('/error?message=service-unavailable');
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/apps/website-builder/start-trial');
 
   const { data: existing } = await db
@@ -55,7 +55,7 @@ export default async function StartTrialPage() {
   const db = (await getAdminClient()) || supabase;
   if (!supabase) redirect('/error?message=service-unavailable');
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/apps/website-builder/start-trial');
 
   const { data: existing } = await db

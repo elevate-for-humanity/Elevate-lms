@@ -19,7 +19,7 @@ export default async function HubWelcomePage() {
     
     // If user is logged in, redirect to the main hub
     if (supabase) {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = safeGetUser(await supabase.auth.getUser());
       if (user) {
         redirect('/hub');
       }

@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export default async function AdminGroupLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
 
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const authRes = await supabase.auth.getUser(); const { data: { user }, error } = authRes;
 
   if (error || !user) {
     const headersList = await headers();

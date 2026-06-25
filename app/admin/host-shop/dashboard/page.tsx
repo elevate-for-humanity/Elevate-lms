@@ -124,7 +124,7 @@ async function getHostShopData(userId: string) {
 
 export default async function HostShopDashboardPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) {
     redirect('/login');

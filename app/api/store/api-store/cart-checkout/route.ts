@@ -31,7 +31,7 @@ async function _POST(req: Request) {
     }
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = safeGetUser(await supabase.auth.getUser());
 
     if (!user) {
       return NextResponse.redirect(`${baseUrl}/login?redirect=/store/cart`);

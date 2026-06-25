@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic';
 export default async function SupportPage() {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   const { data: tickets } = user ? await supabase
     .from('support_tickets')

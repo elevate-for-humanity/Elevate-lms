@@ -27,7 +27,7 @@ export default async function StoreSuccessPage({
   const { order_id } = await searchParams;
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) {
     redirect('/login?redirect=/store');

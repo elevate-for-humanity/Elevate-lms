@@ -52,7 +52,7 @@ export default function NotificationsPage() {
     );
 
     async function fetchNotifications() {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = safeGetUser(await supabase.auth.getUser());
       if (!user) { setLoading(false); return; }
 
       const { data } = await supabase

@@ -18,7 +18,7 @@ async function _POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = safeGetUser(await supabase.auth.getUser());
     
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

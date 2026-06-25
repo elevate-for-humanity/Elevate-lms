@@ -128,7 +128,7 @@ const HANDBOOK_SECTIONS = [
 export default async function EmployeeHandbookPage() {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/employee/handbook');
 
   // Check if user has already acknowledged

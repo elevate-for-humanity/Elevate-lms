@@ -18,7 +18,7 @@ async function confirmFunding(formData: FormData) {
   'use server';
   const { createClient: createServerClient } = await import('@/lib/supabase/server');
   const supabase = await createServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login');
 
   const fundingSource = formData.get('funding_source') as string;
@@ -43,7 +43,7 @@ export default async function ConfirmFundingPage({
 }) {
   const { error: errorParam } = await searchParams;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login');
 
   const fundingOptions = [

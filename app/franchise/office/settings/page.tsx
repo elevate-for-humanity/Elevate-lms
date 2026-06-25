@@ -57,7 +57,7 @@ export default function OfficeSettingsPage() {
   async function loadData() {
     try {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = safeGetUser(await supabase.auth.getUser());
       
       if (!user) {
         window.location.href = '/login';

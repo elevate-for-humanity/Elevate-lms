@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function CareerDiscussionsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   // Fetch career-related discussions
   const { data: discussions } = await supabase

@@ -30,7 +30,7 @@ async function _GET(request: Request) {
     const limit = Math.min(parseInt(searchParams.get('limit') ?? '50', 10), 200);
 
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

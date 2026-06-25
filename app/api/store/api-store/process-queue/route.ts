@@ -30,7 +30,7 @@ async function _POST(req: Request) {
       // Check if it's an admin request
       const { createClient } = await import('@/lib/supabase/server');
       const supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = safeGetUser(await supabase.auth.getUser());
       
       if (!user) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });

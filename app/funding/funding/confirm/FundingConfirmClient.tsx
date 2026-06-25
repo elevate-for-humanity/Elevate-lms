@@ -58,7 +58,7 @@ export default function FundingConfirmClient({ currentFundingSource, alreadyConf
     setSaving(true);
     setError('');
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = safeGetUser(await supabase.auth.getUser());
     if (!user) { router.push('/login?redirect=/funding/confirm'); return; }
 
     const { error: updateError } = await supabase

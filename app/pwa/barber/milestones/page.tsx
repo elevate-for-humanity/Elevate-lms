@@ -41,7 +41,7 @@ export default function MilestonesPage() {
 
     async function load() {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = safeGetUser(await supabase.auth.getUser());
         if (!user) { setLoading(false); return; }
 
         const [msRes, hoursRes] = await Promise.all([

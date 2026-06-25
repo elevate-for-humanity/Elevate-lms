@@ -19,7 +19,7 @@ export default async function EmployerSettingsPage() {
   
   if (!supabase) redirect('/login');
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/employer-portal/settings');
 
   // Fetch user profile

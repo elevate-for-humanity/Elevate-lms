@@ -28,7 +28,7 @@ export default async function EmployerPortalLayout({
 }) {
   const supabase = await createClient();
   if (!supabase) redirect('/login');
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/employer-portal');
 
   return (

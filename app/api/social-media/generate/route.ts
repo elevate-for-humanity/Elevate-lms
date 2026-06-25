@@ -31,7 +31,7 @@ async function _POST(req: Request) {
 
     const { createClient } = await import('@/lib/supabase/server');
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = safeGetUser(await supabase.auth.getUser());
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const { data: prof } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
     if (!prof || !['admin', 'staff'].includes(prof.role)) {

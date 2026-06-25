@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function StudyGroupsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   // Fetch study group discussions
   const { data: discussions } = await supabase

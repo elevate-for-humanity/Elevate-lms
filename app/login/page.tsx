@@ -79,7 +79,7 @@ function LoginForm() {
     // Check if already logged in and redirect away
     async function checkSession() {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = safeGetUser(await supabase.auth.getUser());
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')

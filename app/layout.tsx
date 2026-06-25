@@ -15,6 +15,7 @@ import { CopyrightProtection } from '@/components/CopyrightProtection';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { GoogleAds } from '@/components/analytics/google-ads';
 import RootWidgets from '@/components/layout/RootWidgets';
+import BuildVersionSync from '@/components/BuildVersionSync';
 import { generateChromeSuppressionScript } from '@/lib/layout/app-routes';
 
 import PWAManager from '@/components/PWAManager';
@@ -237,6 +238,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <SkipToContent />
         <GoogleAnalytics />
+        <BuildVersionSync />
         <GoogleAds />
         <PWAManager />
         <InstallPromptBanner />

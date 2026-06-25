@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
 export default async function ShopDocumentsPage() {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/shop/onboarding/documents');
 
   const { data: staff } = await supabase

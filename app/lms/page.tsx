@@ -25,7 +25,7 @@ const STEPS = [
 
 export default async function LmsRootPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (user) redirect('/learner/dashboard');
 
   const { requireAdminClient } = await import('@/lib/supabase/admin');

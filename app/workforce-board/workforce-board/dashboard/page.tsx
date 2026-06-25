@@ -42,7 +42,7 @@ export default async function WorkforceBoardDashboard() {
 
 
   // Require authentication
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) {
     redirect('/login?redirect=/workforce-board/dashboard');
   }

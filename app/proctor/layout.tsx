@@ -20,7 +20,7 @@ const ALLOWED_ROLES = ['admin', 'staff', 'instructor'];
 export default async function ProctorLayout({ children }: { children: React.ReactNode }) {
   await requireUser();
   const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')

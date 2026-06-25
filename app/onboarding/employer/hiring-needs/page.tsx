@@ -52,7 +52,7 @@ export default function HiringNeedsPage() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     );
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then((authRes) => { const user = authRes.data?.user; if (!user) return; {
       if (!user) router.replace('/login?redirect=/onboarding/employer/hiring-needs');
     });
   }, [router]);

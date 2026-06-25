@@ -138,7 +138,7 @@ function SignedOutView() {
 
 export default async function StudentPWAPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) return <SignedOutView />;
 

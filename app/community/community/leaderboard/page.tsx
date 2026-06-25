@@ -16,7 +16,7 @@ export default async function LeaderboardPage() {
   const supabase = await createClient();
   
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   // Fetch top learners from real data
   const { data: topLearners } = await supabase

@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = safeGetUser(await supabase.auth.getUser());
     if (!user) return safeError('Unauthorized', 401);
 
     // ── 1. Approved + pending hours ──────────────────────────────────────────

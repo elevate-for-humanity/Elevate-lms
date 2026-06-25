@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     if (!message) return NextResponse.json({ error: 'Message is required' }, { status: 400 });
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = safeGetUser(await supabase.auth.getUser());
 
     let convId = conversationId;
     if (!convId) {

@@ -16,7 +16,7 @@ async function startTrial() {
   'use server';
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/apps/sam-gov/start-trial');
 
   const result = await startAppTrial(user.id, 'sam-gov');
@@ -27,7 +27,7 @@ async function startTrial() {
 
 export default async function StartTrialPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/apps/sam-gov/start-trial');
 
   const { data: existing } = await supabase

@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await request.json();
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 // GET — fetch call log for a student
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const studentId = request.nextUrl.searchParams.get('student_id');

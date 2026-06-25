@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function CommunityHubPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   // Get community groups
   const { data: groups } = await supabase

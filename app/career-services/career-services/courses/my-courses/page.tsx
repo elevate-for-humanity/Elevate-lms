@@ -23,7 +23,7 @@ export default async function MyCoursesPage() {
     redirect('/login?redirect=/career-services/courses/my-courses');
   }
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) {
     redirect('/login?redirect=/career-services/courses/my-courses');

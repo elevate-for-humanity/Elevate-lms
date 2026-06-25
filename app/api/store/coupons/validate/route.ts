@@ -17,7 +17,7 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = safeGetUser(await supabase.auth.getUser());
     const userId = user?.id;
 
     const result = await validateCoupon(code, userId, purchaseAmountCents);

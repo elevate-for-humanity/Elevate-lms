@@ -47,7 +47,7 @@ export default function NewPreparerPage() {
   const loadData = useCallback(async () => {
     try {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = safeGetUser(await supabase.auth.getUser());
       
       if (!user) {
         router.push('/login?redirect=' + encodeURIComponent(window.location.pathname));

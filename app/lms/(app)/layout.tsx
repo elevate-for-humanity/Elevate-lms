@@ -29,7 +29,7 @@ export default async function LmsAppLayout({ children }: { children: ReactNode }
     redirect(loginRedirect);
   }
 
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const authRes = await supabase.auth.getUser(); const { data: { user }, error } = authRes;
 
   if (error || !user) {
     redirect(loginRedirect);

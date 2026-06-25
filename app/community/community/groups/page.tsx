@@ -41,7 +41,7 @@ export default async function GroupsPage() {
   }
 
   // Get current user and their group memberships
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   let userGroups: string[] = [];
 
   if (user) {

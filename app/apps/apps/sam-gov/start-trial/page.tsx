@@ -21,7 +21,7 @@ async function startTrial(formData: FormData) {
     redirect('/error?message=service-unavailable');
   }
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) {
     redirect('/login?redirect=/apps/sam-gov/start-trial');
   }
@@ -70,7 +70,7 @@ export default async function StartTrialPage() {
     redirect('/error?message=service-unavailable');
   }
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   
   if (!user) {
     redirect('/login?redirect=/apps/sam-gov/start-trial');

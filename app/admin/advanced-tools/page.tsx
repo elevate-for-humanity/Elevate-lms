@@ -136,7 +136,7 @@ export default async function AdvancedToolsPage() {
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Advanced Tools' }]} />
         <div className="flex items-center gap-3 mt-3">
           <div className="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center">
-            <Wrench className="w-5 h-5 text-white" />
+            <Settings className="w-5 h-5 text-white" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-slate-900">Advanced Tools</h1>

@@ -3,17 +3,11 @@
 import { type ElementType, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
-import {
-  Activity,
-  Bot,
-  BookOpen,
-  Box,
-  Circle,
-  ExternalLink,
-  FileText,
-  FolderOpen,
-  Globe,
-  Key,
+import { 
+  Bot, 
+  Globe, 
+  Zap, 
+  Brain,
   LayoutDashboard,
   Loader2,
   MessageSquare,
@@ -26,9 +20,7 @@ import {
   Sparkles,
   Upload,
   Briefcase,
-  Plug,
-  Brain,
-  Zap,
+  Plug
 } from 'lucide-react';
 import { getSkillsLoader, type Skill } from '@/lib/studio/skills-loader';
 
@@ -68,15 +60,13 @@ const WORKSPACES: { id: Workspace; label: string; Icon: ElementType<{ className?
   { id: 'studio', label: 'Studio', Icon: Bot },
   { id: 'autopilot', label: 'Autopilot', Icon: Zap },
   { id: 'the-bosses', label: 'The Bosses (VR)', Icon: Globe },
-  { id: 'force-deploy', label: 'Nuclear Deploy', Icon: Zap },
-  { id: 'command', label: 'Command', Icon: LayoutDashboard },
-
-  { id: 'deploy', label: 'Deploy', Icon: Rocket },
-  { id: 'files', label: 'Files', Icon: FolderOpen },
-  { id: 'environments', label: 'Container', Icon: Box },
-  { id: 'health', label: 'Health', Icon: Activity },
-  { id: 'secrets', label: 'Secrets', Icon: Key },
-  { id: 'integrations', label: 'Integrations', Icon: Plug },
+  { id: 'command', label: 'Terminal', Icon: Server },
+  { id: 'files', label: 'Project', Icon: Briefcase },
+  { id: 'deploy', label: 'Deployment', Icon: Rocket },
+  { id: 'environments', label: 'Infrastructure', Icon: Plug },
+  { id: 'health', label: 'Stability', Icon: Sparkles },
+  { id: 'secrets', label: 'Security', Icon: Plug },
+  { id: 'force-deploy', label: 'Deploy', Icon: Zap },
 ];
 
 const QUICK_ACTIONS = [
@@ -101,6 +91,7 @@ export default function DevStudioUnifiedClient({
     const tab = searchParams.get('tab');
     if (tab === 'the-bosses') setWorkspace('the-bosses');
     if (tab === 'force-deploy') setWorkspace('force-deploy');
+    if (tab === 'autopilot') setWorkspace('autopilot');
   }, [searchParams]);
 
   return (
@@ -150,6 +141,21 @@ export default function DevStudioUnifiedClient({
           </div>
         )}
 
+        {workspace === 'autopilot' && (
+          <div className="flex h-full flex-col bg-[#1e1e1e]">
+            <div className="flex h-10 items-center border-b border-[#3c3c3c] bg-[#2d2d2d] px-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-[#858585]">
+                Autopilot Orchestration Dashboard
+              </span>
+            </div>
+            <iframe
+              src="/admin/autopilot"
+              className="min-h-0 flex-1 border-0"
+              title="Autopilot Dashboard"
+            />
+          </div>
+        )}
+
         {workspace === 'the-bosses' && (
           <div className="flex h-full flex-col bg-[#1e1e1e]">
             <div className="flex h-10 items-center border-b border-[#3c3c3c] bg-[#2d2d2d] px-4">
@@ -172,20 +178,6 @@ export default function DevStudioUnifiedClient({
             <p className="text-slate-400 max-w-md mb-8 leading-relaxed">
               Bypass all linting, type-checks, and Husky gates to force production live. 
               Use only for critical deployment recovery before a pitch.
-            </p>
-            <button 
-              onClick={() => window.alert('Force deployment initiated. Bypassing 912 TypeScript errors...')}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-12 rounded-full shadow-2xl shadow-red-500/20 transition-all active:scale-95"
-            >
-              EXECUTE FORCE DEPLOY →
-            </button>
-          </div>
-        )}
-      </main>
-    </div>
-  );
-}
-            Use only for critical deployment recovery before a pitch.
             </p>
             <button 
               onClick={() => window.alert('Force deployment initiated. Bypassing 912 TypeScript errors...')}

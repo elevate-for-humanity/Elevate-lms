@@ -190,6 +190,7 @@
     "autoprefixer": "10.5.0",
     "axe-core": "^4.12.1",
     "axios": "^1.18.0",
+    "cross-env": "^10.1.0",
     "csv-parse": "^7.0.0",
     "dotenv": "17.4.2",
     "eslint": "10.5.0",
@@ -270,7 +271,6 @@
     "dev": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack",
     "build:lms:compile": "npx cross-env BUILD_SCOPE=1 DISABLE_WEBPACK_FILESYSTEM_CACHE=1 NODE_OPTIONS='--max-old-space-size=8192' next build",
     "lint": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' eslint . --ext .js,.jsx,.ts,.tsx --cache --cache-location .eslintcache --quiet",
-
     "healthcheck": "bash scripts/run-full-healthcheck.sh .",
     "lint:brand": "node scripts/reviewer.js src",
     "lint:brand:all": "node scripts/reviewer.js",
@@ -362,7 +362,7 @@
     "images:contract:fix": "node scripts/image-contract.mjs --fix",
     "check:duplicate-pages": "node scripts/find-duplicate-app-routes.mjs",
     "git:push-main": "node scripts/git-configure-and-push.mjs --target=main",
-    "typecheck:full": "NODE_OPTIONS=--max-old-space-size=8192 tsc --noEmit",
+    "typecheck:full": "npx cross-env NODE_OPTIONS=--max-old-space-size=8192 tsc --noEmit",
     "git:promote-main": "node scripts/github-promote-local-head.mjs --target=main",
     "audit:git-egress": "node scripts/audit-and-fix-git-egress.mjs --fix-git"
   },

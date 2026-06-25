@@ -14,14 +14,20 @@ export function extractJSON(text: string): unknown {
       }
     }
     
-    // Look for JSON object or array in text
-    const jsonMatch = text.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
-    if (jsonMatch) {
+    // Look for JSON object or array in text - need balanced braces
+    // Check for complete JSON structure
+    const completeMatch = text.match(/\{[^{}]*\}/) || text.match(/\[[^\[\]]*\]/);
+    if (completeMatch) {
       try {
-        return JSON.parse(jsonMatch[1]);
+        return JSON.parse(completeMatch[0]);
       } catch {
         throw new Error('Incomplete JSON structure');
       }
+    }
+    
+    // Check if there are any braces suggesting incomplete JSON
+    if (text.includes('{') || text.includes('[')) {
+      throw new Error('Incomplete JSON structure');
     }
     
     throw new Error('No JSON structure found');

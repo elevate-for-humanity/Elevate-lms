@@ -1,34 +1,12 @@
-export * from './navigation-config';
+// Re-export from lib/navigation.ts for backward compatibility
+export * from '../navigation';
 
-export const NAV_ITEMS: Array<{id: string; label: string; href?: string; subItems?: unknown[]; isHeader?: boolean}> = [
-  { id: 'apply', label: 'Apply', href: '/apply', subItems: [] },
-];
+import { NAV_ITEMS, findDuplicateNavHrefs as _findDuplicateNavHrefs, NavItem, NavSubItem, groupNavSubItemsByHeader, getNavCategoryLabel } from '../navigation';
 
-interface NavItemType { id: string; label: string; href?: string; subItems?: NavItemType[]; isHeader?: boolean }
+// Re-export with original names for test compatibility
+export { NAV_ITEMS, groupNavSubItemsByHeader, getNavCategoryLabel };
 
-export function findDuplicateNavHrefs(items?: NavItemType[]): NavItemType[] {
-  const itemsToCheck = items ?? NAV_ITEMS;
-  if (!itemsToCheck || itemsToCheck.length === 0) return [];
-  const seen = new Map<string, NavItemType>();
-  const duplicates: NavItemType[] = [];
-  
-  function processItem(item: NavItemType) {
-    if (item.href) {
-      if (seen.has(item.href)) {
-        duplicates.push(item);
-      } else {
-        seen.set(item.href, item);
-      }
-    }
-    if (item.subItems) {
-      for (const sub of item.subItems) {
-        processItem(sub);
-      }
-    }
-  }
-  
-  for (const item of itemsToCheck) {
-    processItem(item);
-  }
-  return duplicates;
+// Alias for backward compatibility with tests expecting different signature
+export function findDuplicateNavHrefs(items?: NavItem[]): { href: string; owners: string }[] {
+  return _findDuplicateNavHrefs(items);
 }

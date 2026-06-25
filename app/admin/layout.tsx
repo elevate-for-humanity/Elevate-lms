@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
  */
 export default async function AdminGroupLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
-  const db = await getAdminClient();
+  const db = await requireAdminClient();
 
   // Get return path for login redirect
   const headersList = await headers();
@@ -46,12 +46,12 @@ export default async function AdminGroupLayout({ children }: { children: ReactNo
     .from('profiles')
     .select('role')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   const adminRoles = ['admin', 'super_admin'];
   const isEmergencyAdmin = user.email === 'elizabethpowell6262@gmail.com';
   
-  if (!isEmergencyAdmin && (!profile?.role || !adminRoles.includes(profile.role))) {
+  if (!isEmergencyAdmin && (!profile || !profile.role || !adminRoles.includes(profile.role))) {
     redirect('/unauthorized');
   }
 

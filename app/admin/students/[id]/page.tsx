@@ -329,9 +329,9 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
           {/* Voucher & Payout Tracking — one panel per enrollment that has voucher activity */}
           {await Promise.all(
             enrollments
-              .filter((e) => e.voucher_paid_date || e.voucher_issued_date || e.student_start_date)
+              .filter((e) => e && (e.voucher_paid_date || e.voucher_issued_date || e.student_start_date))
               .map(async (e) => {
-                const { data: auditRows } = await supabase
+                const { data: auditRows } = await db
                   .from('enrollment_voucher_audit')
                   .select(
                     'id, enrollment_id, changed_by, field_changed, old_value, new_value, changed_at, notes',
@@ -343,9 +343,9 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                     key={e.id}
                     data={{
                       enrollment_id: e.id,
-                      student_name: profile?.full_name ?? '—',
+                      student_name: student?.full_name ?? '—',
                       program_name:
-                        programNames[e.program_id] || e.program_slug || e.id.slice(0, 8),
+                        programNames[e.program_id] || e.program_slug || (e.id ? e.id.slice(0, 8) : '—'),
                       partner_name: null,
                       student_start_date: e.student_start_date,
                       voucher_issued_date: e.voucher_issued_date,

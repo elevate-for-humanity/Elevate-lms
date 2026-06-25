@@ -244,6 +244,8 @@ const nextConfig = {
   },
   // Removed staticPageGenerationTimeout - use route segment config instead
   // See: https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
+  // Include lib/, components/, types/ in standalone output
+  outputFileTracingRoot: path.join(process.cwd()),
   outputFileTracingExcludes: {
     '/api/devstudio/files': ['**/*'],
     '/api/devstudio/shell': ['**/*'],

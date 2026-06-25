@@ -382,3 +382,6 @@ export const siteMapSections: SiteMapSection[] = [
       { label: "Success", href: "/programs/hvac-technician/apply/success" },
       { label: "Success", href: "/programs/peer-recovery-specialist/apply/success" },
       { label: "Success", href: "/programs/qma/apply/success" },
+    ],
+  },
+];

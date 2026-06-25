@@ -3,5 +3,5 @@ export async function notifyCritical(message: string): Promise<void> {
 }
 
 export async function notifySlack(message: string): Promise<void> {
-  console.log('[notifySlack]', message);
+  console.warn('[notifySlack]', message);
 }

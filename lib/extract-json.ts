@@ -16,7 +16,7 @@ export function extractJSON(text: string): unknown {
     
     // Look for JSON object or array in text - need balanced braces
     // Check for complete JSON structure
-    const completeMatch = text.match(/\{[^{}]*\}/) || text.match(/\[[^\[\]]*\]/);
+    const completeMatch = text.match(/\{[^{}]*\}/) || text.match(/\[[^\]]*\]/);
     if (completeMatch) {
       try {
         return JSON.parse(completeMatch[0]);

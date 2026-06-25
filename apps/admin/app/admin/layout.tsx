@@ -2,8 +2,9 @@
  * Admin group layout - applies authentication to all /admin/* pages.
  * Requires valid session for all admin routes.
  */
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import BuildVersionSync from '@/components/BuildVersionSync';
 
 export default async function AdminGroupLayout({
   children,
@@ -11,9 +12,7 @@ export default async function AdminGroupLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   // Redirect to login if no valid session
   if (!user) {
@@ -33,5 +32,10 @@ export default async function AdminGroupLayout({
     redirect('/unauthorized');
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <BuildVersionSync />
+      {children}
+    </>
+  );
 }

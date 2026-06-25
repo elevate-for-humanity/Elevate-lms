@@ -70,7 +70,7 @@ const PROGRAM_IMAGES: Record<string, string> = {
   'graphic-design':'/images/pages/tech-classroom.webp',
   'cad-drafting':'/images/pages/tech-classroom.webp',
   'web-development':'/images/pages/programs-tech-webdev-hero.webp',
-  'tax-preparation':'/images/business/office-admin.webp',
+  
   bookkeeping:'/images/business/office-admin.webp',
   'finance-bookkeeping-accounting':'/images/business/office-admin.webp',
   'business-startup':'/images/programs/efh-business-startup-marketing-hero.jpg',

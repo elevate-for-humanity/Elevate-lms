@@ -319,8 +319,6 @@ export const TAX_OFFICE_GUIDES: Record<string, PageGuide> = {
     ],
   },
 
-  'tax-preparation-training': {
-    pageId: 'tax-preparation-training',
     pageName: 'Finance & Bookkeeping Training',
     avatarName: 'David',
     avatarImage: '/images/pages/store-guide-1.webp',

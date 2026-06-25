@@ -102,7 +102,7 @@ export default async function MyCoursesPage() {
                 >
                   <div className="relative h-40 overflow-hidden">
                     <Image
-                      src={purchase.course?.image_url || '/images/pages/career-services-page-5.jpg'}
+                      src={purchase.course?.image_url || '/images/pages/career-services-page-5.webp'}
                       alt={purchase.course?.title}
                       fill
                       className="object-cover"
@@ -145,7 +145,7 @@ export default async function MyCoursesPage() {
                 >
                   <div className="relative h-40 overflow-hidden">
                     <Image
-                      src={course.image_url || '/images/pages/apply-employer-hero.jpg'}
+                      src={course.image_url || '/images/pages/apply-employer-hero.webp'}
                       alt={course.title}
                       fill
                       className="object-cover"

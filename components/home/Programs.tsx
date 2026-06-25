@@ -8,14 +8,14 @@ export default function Programs() {
       description:
         'Train for careers as a Certified Nursing Assistant (CNA), Medical Assistant, or Home Health Aide. Programs include clinical training, certification preparation, and job placement support.',
       href: '/programs/healthcare',
-      image: '/hero-images/healthcare-category.jpg',
+      image: '/hero-images/healthcare-category.webp',
     },
     {
       title: 'Skilled Trades',
       description:
         'Learn HVAC installation and repair, electrical systems, plumbing, or construction trades. Hands-on training leads to industry certifications and apprenticeship opportunities.',
       href: '/programs/skilled-trades',
-      image: '/hero-images/skilled-trades-category.jpg',
+      image: '/hero-images/skilled-trades-category.webp',
     },
     {
       title: 'Barber Apprenticeship',
@@ -29,21 +29,21 @@ export default function Programs() {
       description:
         'Build skills in IT support, cybersecurity, or web development. Training covers industry-standard tools and prepares you for recognized certifications like Certiport IT Specialist.',
       href: '/programs/technology',
-      image: '/hero-images/technology-hero.jpg',
+      image: '/hero-images/technology-hero.webp',
     },
     {
       title: 'Business',
       description:
         'Study accounting, business management, or entrepreneurship. Programs focus on practical skills employers need, from bookkeeping to business planning.',
       href: '/programs/business-administration',
-      image: '/hero-images/business-hero.jpg',
+      image: '/hero-images/business-hero.webp',
     },
     {
       title: 'CDL & Transportation',
       description:
         "Earn your Commercial Driver's License (CDL) through approved training. Includes classroom instruction, behind-the-wheel training, and job placement assistance.",
       href: '/programs/cdl-training',
-      image: '/hero-images/cdl-transportation-category.jpg',
+      image: '/hero-images/cdl-transportation-category.webp',
     },
   ];
 

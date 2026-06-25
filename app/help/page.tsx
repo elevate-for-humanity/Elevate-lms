@@ -39,7 +39,7 @@ export default async function HelpPage() {
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
-            src="/images/artlist/hero-training-1.jpg"
+            src="/images/artlist/hero-training-1.webp"
             alt="Student receiving personalized help and support"
             fill
             className="object-cover"
@@ -201,7 +201,7 @@ export default async function HelpPage() {
             {/* Left: Image */}
             <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="/images/artlist/hero-training-2.jpg"
+                src="/images/artlist/hero-training-2.webp"
                 alt="Student using help resources on laptop"
                 fill
                 className="object-cover"

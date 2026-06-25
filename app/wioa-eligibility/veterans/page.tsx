@@ -87,7 +87,7 @@ export default async function VeteransPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/hero-images/about-hero.jpg"
+            src="/hero-images/about-hero.webp"
             alt="Veterans Priority Services"
             fill
             className="object-cover"

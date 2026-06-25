@@ -28,7 +28,7 @@ export default async function FederalCompliancePage() {
 {/* Hero */}
       <section className="relative min-h-[400px] flex items-center overflow-hidden">
         <Image
-          src="/images/heroes/training-provider-2.jpg"
+          src="/images/heroes/training-provider-2.webp"
           alt="Federal Compliance"
           fill
           className="object-cover"

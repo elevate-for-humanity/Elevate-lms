@@ -60,7 +60,7 @@ export default function StoreCoursesPage() {
               >
                 <div className="relative h-48 overflow-hidden">
                   <Image
-                    src={course.image || '/images/pages/course-create-hero.jpg'}
+                    src={course.image || '/images/pages/course-create-hero.webp'}
                     alt={course.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"

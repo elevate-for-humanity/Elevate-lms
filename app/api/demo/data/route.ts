@@ -109,10 +109,10 @@ export const demoData = {
     ],
     students: [
       { id: 's1', name: 'Darius Williams', email: 'd.williams@email.com', program: 'Barber Apprenticeship', progress: 42, status: 'active', avatar: '/images/testimonials/student-marcus.jpg' },
-      { id: 's2', name: 'Sarah Mitchell', email: 's.mitchell@email.com', program: 'CNA Training', progress: 95, status: 'active', avatar: '/images/testimonials/student-sarah.jpg' },
+      { id: 's2', name: 'Sarah Mitchell', email: 's.mitchell@email.com', program: 'CNA Training', progress: 95, status: 'active', avatar: '/images/heroes/student-catalog.webp' },
       { id: 's3', name: 'Marcus Johnson', email: 'm.johnson@email.com', program: 'HVAC Training', progress: 28, status: 'active', avatar: '/images/testimonials/student-david.jpg' },
-      { id: 's4', name: 'Lisa Rodriguez', email: 'l.rodriguez@email.com', program: 'Medical Assistant', progress: 67, status: 'active', avatar: '/images/testimonials/testimonial-medical-assistant.png' },
-      { id: 's5', name: 'James Thompson', email: 'j.thompson@email.com', program: 'CDL Training', progress: 85, status: 'active', avatar: '/images/testimonials/student-graduate-testimonial.jpg' },
+      { id: 's4', name: 'Lisa Rodriguez', email: 'l.rodriguez@email.com', program: 'Medical Assistant', progress: 67, status: 'active', avatar: '/images/heroes/student-catalog.webp' },
+      { id: 's5', name: 'James Thompson', email: 'j.thompson@email.com', program: 'CDL Training', progress: 85, status: 'active', avatar: '/images/heroes/student-catalog.webp' },
     ],
   },
   employer: {
@@ -125,9 +125,9 @@ export const demoData = {
     },
     stats: { openRoles: 5, activeCandidates: 12, hiredThisYear: 8, apprentices: 3 },
     candidates: [
-      { id: 'c1', name: 'Sarah Mitchell', program: 'CNA Training', progress: 95, status: 'Interview Scheduled', match: 95, avatar: '/images/testimonials/student-sarah.jpg' },
+      { id: 'c1', name: 'Sarah Mitchell', program: 'CNA Training', progress: 95, status: 'Interview Scheduled', match: 95, avatar: '/images/heroes/student-catalog.webp' },
       { id: 'c2', name: 'James Thompson', program: 'CNA Training', progress: 88, status: 'Application Review', match: 88, avatar: '/images/testimonials/student-david.jpg' },
-      { id: 'c3', name: 'Lisa Rodriguez', program: 'Medical Assistant', progress: 67, status: 'Screening', match: 82, avatar: '/images/testimonials/testimonial-medical-assistant.png' },
+      { id: 'c3', name: 'Lisa Rodriguez', program: 'Medical Assistant', progress: 67, status: 'Screening', match: 82, avatar: '/images/heroes/student-catalog.webp' },
       { id: 'c4', name: 'Michael Chen', program: 'Phlebotomy', progress: 100, status: 'Offer Extended', match: 91, avatar: '/images/testimonials/student-marcus.jpg' },
     ],
     openRoles: [
@@ -138,7 +138,7 @@ export const demoData = {
     ],
     apprentices: [
       { id: 'ap1', name: 'David Park', role: 'CNA Apprentice', hours: 847, level: 'Intermediate', wage: '$16.50/hr', avatar: '/images/testimonials/student-david.jpg' },
-      { id: 'ap2', name: 'Jennifer Lee', role: 'MA Apprentice', hours: 456, level: 'Entry', wage: '$15.00/hr', avatar: '/images/testimonials/student-sarah.jpg' },
+      { id: 'ap2', name: 'Jennifer Lee', role: 'MA Apprentice', hours: 456, level: 'Entry', wage: '$15.00/hr', avatar: '/images/heroes/student-catalog.webp' },
       { id: 'ap3', name: 'Robert Wilson', role: 'CNA Apprentice', hours: 1203, level: 'Advanced', wage: '$18.00/hr', avatar: '/images/testimonials/student-marcus.jpg' },
     ],
   },

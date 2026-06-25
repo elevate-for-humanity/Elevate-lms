@@ -30,7 +30,7 @@ export default function FundingPage() {
       icon: CheckCircle,
       color: 'green',
       category: 'Eligibility',
-      image: '/images/heroes/hero-state-funding.jpg',
+      image: '/images/heroes/hero-federal-funding.webp',
     },
 
     {
@@ -42,7 +42,7 @@ export default function FundingPage() {
       icon: DollarSign,
       color: 'emerald',
       category: 'Funding',
-      image: '/images/funding/funding-dol-program-v2.jpg',
+      image: '/images/heroes/hero-federal-funding.webp',
     },
     {
       title: 'JRI Funding',
@@ -53,7 +53,7 @@ export default function FundingPage() {
       icon: Shield,
       color: 'purple',
       category: 'Funding',
-      image: '/images/apprenticeships-card.jpg',
+      image: '/images/heroes/student-catalog.webp',
     },
     {
       title: 'SNAP E&T',
@@ -64,7 +64,7 @@ export default function FundingPage() {
       icon: Users,
       color: 'orange',
       category: 'Funding',
-      image: '/images/heroes/hero-state-funding.jpg',
+      image: '/images/heroes/hero-federal-funding.webp',
     },
     {
       title: 'FSSA Partnership',
@@ -75,7 +75,7 @@ export default function FundingPage() {
       icon: Handshake,
       color: 'pink',
       category: 'Partnerships',
-      image: '/images/apprenticeships-card.jpg',
+      image: '/images/heroes/student-catalog.webp',
     },
     {
       title: 'OJT & Funding',
@@ -86,7 +86,7 @@ export default function FundingPage() {
       icon: Briefcase,
       color: 'indigo',
       category: 'Programs',
-      image: '/images/apprenticeships-card.jpg',
+      image: '/images/heroes/student-catalog.webp',
     },
     {
       title: 'Funding Impact',
@@ -97,7 +97,7 @@ export default function FundingPage() {
       icon: TrendingUp,
       color: 'cyan',
       category: 'Impact',
-      image: '/images/funding/funding-dol-program-v2.jpg',
+      image: '/images/heroes/hero-federal-funding.webp',
     },
     {
       title: 'Workforce Partners',
@@ -108,7 +108,7 @@ export default function FundingPage() {
       icon: Users,
       color: 'violet',
       category: 'Partnerships',
-      image: '/images/apprenticeships-card.jpg',
+      image: '/images/heroes/student-catalog.webp',
     },
     {
       title: 'WorkOne Partner Packet',
@@ -119,7 +119,7 @@ export default function FundingPage() {
       icon: FileText,
       color: 'rose',
       category: 'Resources',
-      image: '/images/heroes/hero-state-funding.jpg',
+      image: '/images/heroes/hero-federal-funding.webp',
     },
     {
       title: 'Partner Agencies',
@@ -130,7 +130,7 @@ export default function FundingPage() {
       icon: Building2,
       color: 'amber',
       category: 'Partnerships',
-      image: '/images/apprenticeships-card.jpg',
+      image: '/images/heroes/student-catalog.webp',
     },
     {
       title: 'Government Programs',
@@ -141,7 +141,7 @@ export default function FundingPage() {
       icon: Shield,
       color: 'lime',
       category: 'Programs',
-      image: '/images/funding/funding-dol-program-v2.jpg',
+      image: '/images/heroes/hero-federal-funding.webp',
     },
     {
       title: 'Federal Compliance',
@@ -152,7 +152,7 @@ export default function FundingPage() {
       icon: CheckCircle,
       color: 'teal',
       category: 'Compliance',
-      image: '/images/heroes/hero-state-funding.jpg',
+      image: '/images/heroes/hero-federal-funding.webp',
     },
     {
       title: 'Equal Opportunity',
@@ -163,7 +163,7 @@ export default function FundingPage() {
       icon: Users,
       color: 'sky',
       category: 'Compliance',
-      image: '/images/apprenticeships-card.jpg',
+      image: '/images/heroes/student-catalog.webp',
     },
   ];
 
@@ -172,7 +172,7 @@ export default function FundingPage() {
       {/* Hero with Image */}
       <section className="relative min-h-[600px] flex items-center overflow-hidden">
         <Image
-          src="/images/heroes/hero-state-funding.jpg"
+          src="/images/heroes/hero-federal-funding.webp"
           alt="Free career training funding"
           fill
           className="object-cover"

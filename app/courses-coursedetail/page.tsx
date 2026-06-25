@@ -47,7 +47,7 @@ export default async function CoursedetailPage() {
 {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/admin-apprenticeships-classroom.jpg"
+          src="/images/pages/admin-apprenticeships-classroom.webp"
           alt="Coursedetail"
           fill
           className="object-cover"
@@ -87,7 +87,7 @@ export default async function CoursedetailPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/programs/cdl-hero.jpg"
+                  src="/images/programs/cdl-hero.webp"
                   alt="Course detail"
                   fill
                   className="object-cover"

@@ -18,13 +18,13 @@ export type ProgramCategory =
  * Category default hero images
  */
 export const CATEGORY_HEROES: Record<ProgramCategory, string> = {
-  healthcare: '/hero-images/healthcare-hero.jpg',
-  'skilled-trades': '/hero-images/skilled-trades-hero.jpg',
-  technology: '/hero-images/technology-hero.jpg',
-  business: '/hero-images/business-hero.jpg',
+  healthcare: '/images/programs/cna-hero.webp',
+  'skilled-trades': '/images/heroes/training-provider-1.webp',
+  technology: '/hero-images/technology-hero.webp',
+  business: '/hero-images/business-hero.webp',
   beauty: '/hero-images/barber-beauty-cat-new.jpg',
   transportation: '/hero-images/cdl-cat-new.jpg',
-  general: '/hero-images/programs-hero.jpg',
+  general: '/images/heroes/hero-homepage.webp',
 };
 
 /**
@@ -40,19 +40,19 @@ export const PROGRAM_HEROES: Record<string, string> = {
   beauty: '/hero-images/barber-beauty-cat-new.jpg',
 
   // Healthcare
-  'cna-certification': '/hero-images/healthcare-hero.jpg',
-  cna: '/hero-images/healthcare-hero.jpg',
-  phlebotomy: '/hero-images/healthcare-hero.jpg',
-  'medical-assistant': '/hero-images/healthcare-hero.jpg',
-  'direct-support-professional': '/hero-images/healthcare-hero.jpg',
-  'drug-collector': '/hero-images/healthcare-hero.jpg',
-  'cpr-first-aid-hsi': '/hero-images/healthcare-hero.jpg',
-  healthcare: '/hero-images/healthcare-hero.jpg',
+  'cna-certification': '/images/programs/cna-hero.webp',
+  cna: '/images/programs/cna-hero.webp',
+  phlebotomy: '/images/programs/cna-hero.webp',
+  'medical-assistant': '/images/programs/cna-hero.webp',
+  'direct-support-professional': '/images/programs/cna-hero.webp',
+  'drug-collector': '/images/programs/cna-hero.webp',
+  'cpr-first-aid-hsi': '/images/programs/cna-hero.webp',
+  healthcare: '/images/programs/cna-hero.webp',
 
   // Skilled Trades
   'hvac-technician': '/images/pages/hvac-technician.webp',
   hvac: '/images/pages/hvac-unit.webp',
-  'skilled-trades': '/hero-images/skilled-trades-hero.jpg',
+  'skilled-trades': '/images/heroes/training-provider-1.webp',
 
   // Transportation
   'cdl-training': '/images/pages/cdl-training.webp',
@@ -60,21 +60,21 @@ export const PROGRAM_HEROES: Record<string, string> = {
   'cdl-transportation': '/hero-images/cdl-cat-new.jpg',
 
   // Technology
-  cybersecurity: '/hero-images/technology-hero.jpg',
-  'it-support': '/hero-images/technology-hero.jpg',
-  technology: '/hero-images/technology-hero.jpg',
+  cybersecurity: '/hero-images/technology-hero.webp',
+  'it-support': '/hero-images/technology-hero.webp',
+  technology: '/hero-images/technology-hero.webp',
 
   // Business
-  'tax-preparation': '/hero-images/business-hero.jpg',
-  'tax-entrepreneurship': '/hero-images/business-hero.jpg',
-  business: '/hero-images/business-hero.jpg',
-  'business-financial': '/hero-images/business-hero.jpg',
+  
+  'tax-entrepreneurship': '/hero-images/business-hero.webp',
+  business: '/hero-images/business-hero.webp',
+  'business-financial': '/hero-images/business-hero.webp',
 
   // Special Programs
-  jri: '/hero-images/programs-hero.jpg',
-  'federal-funded': '/hero-images/programs-hero.jpg',
-  apprenticeships: '/hero-images/apprenticeships-hero.jpg',
-  'micro-programs': '/hero-images/programs-hero.jpg',
+  jri: '/images/heroes/hero-homepage.webp',
+  'federal-funded': '/images/heroes/hero-homepage.webp',
+  apprenticeships: '/hero-images/apprenticeships-hero.webp',
+  'micro-programs': '/images/heroes/hero-homepage.webp',
 };
 
 /**
@@ -115,7 +115,7 @@ export const PROGRAM_CATEGORIES: Record<string, ProgramCategory> = {
   technology: 'technology',
 
   // Business
-  'tax-preparation': 'business',
+  
   'tax-entrepreneurship': 'business',
   business: 'business',
   'business-financial': 'business',

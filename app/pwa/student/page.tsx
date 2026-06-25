@@ -113,7 +113,7 @@ function SignedOutView() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <div className="relative h-56 sm:h-64 overflow-hidden">
-        <Image src="/images/pages/lms-page-12.jpg" alt="Students in classroom" fill className="object-cover" priority  sizes="100vw" />
+        <Image src="/images/pages/lms-page-12.webp" alt="Students in classroom" fill className="object-cover" priority  sizes="100vw" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <Logo alt="Elevate" width={40} height={40} className="mb-3" />
           <h1 className="text-2xl font-bold text-slate-900">Student Portal</h1>

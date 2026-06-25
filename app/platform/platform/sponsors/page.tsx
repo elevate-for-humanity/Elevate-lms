@@ -60,7 +60,7 @@ export default async function SponsorLicensingPage() {
         accentText="Infrastructure"
         subheadline="Operate Compliant, Funded Programs Without Building From Scratch"
         description="The platform serves as the system of record for programs. Program activation is driven by required signatures. Tasks, milestones, and reporting are initialized automatically. All actions are logged for audit and reimbursement purposes."
-        imageSrc="/images/pages/apply-employer-hero.jpg"
+        imageSrc="/images/pages/apply-employer-hero.webp"
         imageAlt="Apprenticeship Licensing Partnership"
         primaryCTA={{ text: "View Pricing Tiers", href: "#pricing" }}
         secondaryCTA={{ text: "Contact Sales", href: "#contact" }}

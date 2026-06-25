@@ -214,7 +214,6 @@ const taxPartnerIds = ['irs-vita-training', 'rise-tax-customer-service'];
 
 const taxProgram: Program = {
   id: 'prog-tax-vita',
-  slug: 'tax-preparation-vita',
   title: 'Tax Preparation & IRS VITA Pathway',
   subtitle: 'Serve the community and build tax preparation skills for seasonal or year-round work.',
   description:

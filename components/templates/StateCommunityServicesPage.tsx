@@ -65,7 +65,7 @@ export default function StateCommunityServicesPage({ state }: StateCommunityServ
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/hero-images/services-hero.jpg"
+            src="/hero-images/services-hero.webp"
             alt={`Community Services in ${state.name}`}
             fill
             className="object-cover"

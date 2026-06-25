@@ -27,7 +27,7 @@ export default function Page() {
             <div className="lg:col-span-2">
               <div className="rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/team/elizabeth-greene.jpg"
+                  src="/images/team/elizabeth-greene.webp"
                   alt="Elizabeth Greene, Founder and CEO of {PLATFORM_DEFAULTS.orgName}"
                   width={600}
                   height={750}

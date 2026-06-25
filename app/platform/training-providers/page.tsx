@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
       {
-        url: '/hero-images/programs-hero.jpg',
+        url: '/images/heroes/hero-homepage.webp',
         width: 1200,
         height: 630,
         alt: 'Training Provider Solutions',

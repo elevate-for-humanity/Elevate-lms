@@ -70,8 +70,8 @@ export const PROGRAM_OG_IMAGES: Record<string, string> = {
   'project-management':             '/images/programs/efh-business-startup-marketing-hero.jpg',
   'entrepreneurship':               '/images/programs/efh-business-startup-marketing-hero.jpg',
   'graphic-design':                 '/images/programs/efh-business-startup-marketing-hero.jpg',
-  'tax-preparation':                '/images/pages/tax-main-hero.webp',
-  'tax-prep-financial-services':    '/images/pages/tax-main-hero.webp',
+  
+  'tax-prep-financial-services':    '/images/business/office-admin.webp',
 
   // ── Hospitality / Other ───────────────────────────────────────────────────
   'hospitality':                    '/images/pages/programs-hvac-hero.webp',

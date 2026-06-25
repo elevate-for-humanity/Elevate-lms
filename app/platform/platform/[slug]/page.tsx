@@ -62,7 +62,7 @@ export default async function ProductDetailPage({ params }: Props) {
 {/* Hero Section */}
       <section className="relative h-[300px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/programs/cpr-group-training-hd.jpg"
+          src="/images/programs/cna-hero.webp"
           alt={product.name}
           fill
           className="object-cover"

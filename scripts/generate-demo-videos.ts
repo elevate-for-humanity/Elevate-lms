@@ -32,13 +32,13 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 const AUDIO_DIR = path.join(process.cwd(), 'public', 'videos', 'demo', 'audio');
 const VIDEO_DIR = path.join(process.cwd(), 'public', 'videos', 'demo');
-const PHOTO_URL = `${SITE_URL}/images/team/elizabeth-greene-headshot.jpg`;
+const PHOTO_URL = `${SITE_URL}/images/team/elizabeth-greene-headshot.webp`;
 const PHOTO_LOCAL = path.join(
   process.cwd(),
   'public',
   'images',
   'team',
-  'elizabeth-greene-headshot.jpg',
+  'elizabeth-greene-headshot.webp',
 );
 
 const DRY_RUN = process.argv.includes('--dry-run');

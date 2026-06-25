@@ -35,7 +35,7 @@ export const weldingBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'Marcus Webb',
     instructorTitle: 'Certified Welding Inspector (CWI) & Instructor',
-    instructorImagePath: '/images/instructors/marcus-webb.jpg',
+    instructorImagePath: '/images/heroes/hero-homepage.webp',
     topBarColor: '#f97316',
     accentColor: '#78716c',
     backgroundColor: '#1e293b',

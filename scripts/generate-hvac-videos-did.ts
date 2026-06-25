@@ -37,15 +37,15 @@ const SUPABASE_SERVICE_KEY =
 
 const AUDIO_DIR = path.join(process.cwd(), 'public', 'hvac', 'audio');
 const VIDEO_DIR = path.join(process.cwd(), 'public', 'hvac', 'videos');
-// elizabeth-greene-headshot.jpg: 800x1080 portrait — passes D-ID face detection
+// elizabeth-greene-headshot.webp: 800x1080 portrait — passes D-ID face detection
 const PHOTO_LOCAL = path.join(
   process.cwd(),
   'public',
   'images',
   'team',
-  'elizabeth-greene-headshot.jpg',
+  'elizabeth-greene-headshot.webp',
 );
-const PHOTO_URL = `${SITE_URL}/images/team/elizabeth-greene-headshot.jpg`;
+const PHOTO_URL = `${SITE_URL}/images/team/elizabeth-greene-headshot.webp`;
 const CONCURRENCY = 3; // D-ID free tier allows ~3 concurrent
 
 if (!DID_KEY) {

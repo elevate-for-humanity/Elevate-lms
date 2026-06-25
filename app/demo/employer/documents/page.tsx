@@ -26,7 +26,7 @@ export default function DemoDocumentsPage() {
   return (
     <DemoPageShell title="Documents" description="Contracts, MOUs, and compliance documents." portal="employer">
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] mb-6">
-        <Image src="/images/pages/demo-page-13.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/demo-page-13.webp" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="space-y-3">
         {DEMO_DOCS.map((d, i) => (

@@ -30,7 +30,7 @@ async function _GET(request: Request, { params }: { params: Params }) {
       cna: 'Healthcare',
       'hvac-technician': 'Skilled Trades',
       'barber-apprenticeship': 'Skilled Trades',
-      'tax-preparation': 'Business',
+      
       'tax-entrepreneurship': 'Business',
       'direct-support-professional': 'Healthcare',
       'drug-collector': 'Healthcare',

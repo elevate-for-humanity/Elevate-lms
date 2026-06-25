@@ -53,7 +53,7 @@ const services = [
     description:
       'One-on-one tutoring, study groups, and academic advising. Get help with coursework, exam prep, and staying on track in your program.',
     link: '/student-support/academic',
-    image: '/images/pages/learner/dashboard-page-1.webp',
+    image: '/images/pages/learner-page-1.webp',
   },
   {
     title: 'Financial Aid',
@@ -74,7 +74,7 @@ const services = [
     description:
       'Personal counseling, mental health resources, and crisis support. Confidential services available to all enrolled students at no cost.',
     link: '/student-support/counseling',
-    image: '/images/pages/learner/dashboard-page-2.webp',
+    image: '/images/pages/learner-page-1.webp',
   },
   {
     title: 'Accessibility Services',
@@ -88,7 +88,7 @@ const services = [
     description:
       'Class scheduling, program advising, and calendar management. Flexible scheduling for working adults and parents.',
     link: '/student-support/scheduling',
-    image: '/images/pages/learner/dashboard-page-3.webp',
+    image: '/images/pages/learner-page-1.webp',
   },
 ];
 

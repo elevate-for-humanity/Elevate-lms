@@ -59,7 +59,7 @@ export const itHelpDeskBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'Marcus Washington',
     instructorTitle: 'CompTIA Certified IT Instructor',
-    instructorImagePath: '/images/instructors/marcus-washington.jpg',
+    instructorImagePath: '/images/heroes/hero-homepage.webp',
     topBarColor: '#6366f1',
     accentColor: '#3b82f6',
     backgroundColor: '#0f172a',

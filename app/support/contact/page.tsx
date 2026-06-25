@@ -40,7 +40,7 @@ export default function SupportContactPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image src="/images/pages/support-page-1.jpg" alt="Contact support" fill className="object-cover" priority sizes="100vw" />
+          <Image src="/images/pages/support-page-1.webp" alt="Contact support" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-white py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

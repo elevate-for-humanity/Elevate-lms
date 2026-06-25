@@ -112,7 +112,7 @@ export default function DOLFundingPage() {
               <div className="relative hidden lg:block">
                 <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/heroes/dol-programs.jpg"
+                    src="/images/heroes/hero-federal-funding.webp"
                     alt="DOL Programs"
                     fill
                     className="object-cover"
@@ -171,7 +171,7 @@ export default function DOLFundingPage() {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/business/training-workshop.jpg"
+                  src="/images/heroes/training-provider-1.webp"
                   alt="Training Workshop"
                   fill
                   className="object-cover"

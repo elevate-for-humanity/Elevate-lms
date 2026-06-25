@@ -117,7 +117,7 @@ export default function TrainingProvidersPage() {
               <div className="relative hidden lg:block">
                 <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/heroes/training-provider.jpg"
+                    src="/images/heroes/training-provider-1.webp"
                     alt="Training Provider Portal"
                     fill
                     className="object-cover"
@@ -250,7 +250,7 @@ export default function TrainingProvidersPage() {
               </div>
               <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/business/training-classroom.jpg"
+                  src="/images/heroes/training-provider-1.webp"
                   alt="Training Classroom"
                   fill
                   className="object-cover"

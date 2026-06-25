@@ -60,7 +60,7 @@ export default async function DrugTestingTrainingPage() {
       {/* Hero */}
       <section className="relative h-[40vh] min-h-[300px]">
         <Image alt="Drug testing training" 
-          src="/images/pages/drug-testing-page-4.jpg" 
+          src="/images/pages/drug-testing-page-4.webp" 
           alt="Drug Testing Training" 
           fill 
           className="object-cover" 

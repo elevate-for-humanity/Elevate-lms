@@ -24,7 +24,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const HVAC_COURSE_ID = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0';
 const AUDIO_DIR = path.join(process.cwd(), 'public/hvac/audio');
-const PHOTO_LOCAL = path.join(process.cwd(), 'public/images/team/elizabeth-greene-headshot.jpg');
+const PHOTO_LOCAL = path.join(process.cwd(), 'public/images/team/elizabeth-greene-headshot.webp');
 const PHOTO_STORAGE = 'hvac-instructor.jpg'; // uploaded to Supabase avatars bucket
 const DID_API = 'https://api.d-id.com';
 const CONCURRENCY = 3;

@@ -269,7 +269,7 @@ export default async function MentorshipPage() {
             <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
               <div className="relative h-40">
                 <Image
-                  src="/images/healthcare/program-cna-training.jpg"
+                  src="/images/healthcare/program-cna-training.webp"
                   alt="Healthcare Mentors"
                   fill
                   className="object-cover"
@@ -284,7 +284,7 @@ export default async function MentorshipPage() {
             <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
               <div className="relative h-40">
                 <Image
-                  src="/images/pages/hvac-hero.jpg"
+                  src="/images/pages/hvac-hero.webp"
                   alt="Skilled Trades Mentors"
                   fill
                   className="object-cover"
@@ -299,7 +299,7 @@ export default async function MentorshipPage() {
             <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
               <div className="relative h-40">
                 <Image
-                  src="/images/technology/hero-programs-technology.jpg"
+                  src="/images/programs/cna-hero.webp"
                   alt="Technology Mentors"
                   fill
                   className="object-cover"
@@ -314,7 +314,7 @@ export default async function MentorshipPage() {
             <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
               <div className="relative h-40">
                 <Image
-                  src="/images/business/tax-prep-certification.jpg"
+                  src="/images/heroes/training-provider-1.webp"
                   alt="Business Mentors"
                   fill
                   className="object-cover"
@@ -471,7 +471,7 @@ export default async function MentorshipPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/construction-trades.jpg"
+                  src="/images/pages/construction-trades.webp"
                   alt="Mentorship"
                   fill
                   className="object-cover"

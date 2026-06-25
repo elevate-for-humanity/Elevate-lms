@@ -49,7 +49,7 @@ export default function BarberApprenticeshipDemoPage() {
   const student = {
     name: 'Marcus Johnson',
     email: 'marcus.j@email.com',
-    avatar: '/images/avatars/student-1.jpg',
+    avatar: '/images/avatars/student-1.webp',
     enrollmentDate: 'September 15, 2025',
     expectedCompletion: 'December 15, 2026',
     hoursCompleted: 847,
@@ -300,7 +300,7 @@ export default function BarberApprenticeshipDemoPage() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="group cursor-pointer">
                     <div className="relative aspect-video bg-slate-200 rounded-lg overflow-hidden mb-2">
-                      <Image src="/hero-images/barber-beauty-category.jpg" alt="Lesson" fill className="object-cover" />
+                      <Image src="/hero-images/barber-beauty-category.webp" alt="Lesson" fill className="object-cover" />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                         <Play className="w-12 h-12 text-white" />
                       </div>
@@ -311,7 +311,7 @@ export default function BarberApprenticeshipDemoPage() {
                   </div>
                   <div className="group cursor-pointer">
                     <div className="relative aspect-video bg-slate-200 rounded-lg overflow-hidden mb-2">
-                      <Image src="/images/beauty/hero-program-barber.jpg" alt="Lesson" fill className="object-cover" />
+                      <Image src="/images/beauty/hero-program-barber.webp" alt="Lesson" fill className="object-cover" />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                         <Play className="w-12 h-12 text-white" />
                       </div>

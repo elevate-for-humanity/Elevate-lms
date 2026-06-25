@@ -58,7 +58,7 @@ export const HERO_IMAGES = {
     cdl: '/images/pages/cdl-truck-highway.webp',
     welding: '/images/pages/welding-sparks.webp',
     electrical: '/images/pages/electrical.webp',
-    plumbing: '/images/pages/plumbing.jpg',
+    plumbing: '/images/pages/about-hero.webp',
     diesel: '/images/pages/hvac-tools.webp',
   },
 

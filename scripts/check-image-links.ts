@@ -32,7 +32,7 @@ interface BrokenLink {
   imagePath: string;
 }
 
-// Match strings like '/images/pages/foo.jpg' or "/images/icons/bar.svg"
+// Match strings like '/images/pages/about-hero.webp' or "/images/icons/bar.svg"
 const IMAGE_REF_PATTERN = /['"`](\/(images\/[^'"`\s?#]+))['"` ]/g;
 
 function scanFile(filePath: string): BrokenLink[] {

@@ -18,7 +18,7 @@ const SLUG_IMAGES: Record<string, string> = {
   'cybersecurity-analyst': '/images/pages/cybersecurity.webp',
   'medical-assistant': '/images/pages/medical-assistant.webp',
   phlebotomy: '/images/pages/phlebotomy.jpg',
-  plumbing: '/images/pages/plumbing.jpg',
+  plumbing: '/images/pages/about-hero.webp',
   healthcare: '/images/pages/healthcare-sector.webp',
   technology: '/images/pages/technology-sector.webp',
 };

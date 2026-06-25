@@ -80,7 +80,7 @@ const slides: Slide[] = [
     },
   },
   {
-    image: '/images/hero/hero-tech-careers.webp',
+    image: '/images/heroes/training-provider-1.webp',
     title: 'Technology Career Pathways',
     text: 'IT training and technology skills for the digital economy.',
     cta: {

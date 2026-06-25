@@ -13,7 +13,7 @@ interface PageHeroProps {
 export default function PageHero({
   title,
   subtitle,
-  backgroundImage = '/images/programs-hero-new.jpg',
+  backgroundImage = '/images/programs-hero-new.webp',
   backgroundVideo,
   height = 'medium',
 }: PageHeroProps) {

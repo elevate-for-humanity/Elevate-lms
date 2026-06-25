@@ -23,7 +23,7 @@ const dotTests = [
       'Clearinghouse query (if needed)',
       'Same-day scheduling available',
     ],
-    image: '/images/heroes/training-provider-1.jpg',
+    image: '/images/heroes/training-provider-1.webp',
   },
   {
     name: 'DOT Random Testing',
@@ -37,7 +37,7 @@ const dotTests = [
       'MRO review included',
       'Clearinghouse reporting',
     ],
-    image: '/images/heroes/training-provider-3.jpg',
+    image: '/images/heroes/training-provider-3.webp',
   },
   {
     name: 'DOT Post-Accident',
@@ -51,7 +51,7 @@ const dotTests = [
       'Full documentation',
       'MRO review included',
     ],
-    image: '/images/pages/about-career-training.jpg',
+    image: '/images/pages/about-career-training.webp',
   },
   {
     name: 'DOT Reasonable Suspicion',
@@ -65,7 +65,7 @@ const dotTests = [
       'MRO review included',
       'Confidential handling',
     ],
-    image: '/images/pages/about-supportive-services.jpg',
+    image: '/images/pages/about-supportive-services.webp',
   },
   {
     name: 'Return to Duty (RTD)',
@@ -80,7 +80,7 @@ const dotTests = [
       'Follow-up testing schedule setup',
       'Full compliance documentation',
     ],
-    image: '/images/pages/about-employer-partners.jpg',
+    image: '/images/pages/about-employer-partners.webp',
   },
   {
     name: 'Follow-Up Testing',
@@ -94,7 +94,7 @@ const dotTests = [
       'MRO review included',
       'Clearinghouse reporting',
     ],
-    image: '/images/learners/coaching-session.jpg',
+    image: '/images/learners/coaching-session.webp',
   },
 ];
 
@@ -117,7 +117,7 @@ export default function DotTestingPage() {
       <section className="relative min-h-[400px] flex items-center">
         <div className="absolute inset-0">
           <Image
-            src="/images/learners/barrier-support.jpg"
+            src="/images/learners/barrier-support.webp"
             alt="DOT Drug Testing for Commercial Drivers"
             fill
             className="object-cover"
@@ -325,7 +325,7 @@ export default function DotTestingPage() {
             </div>
             <div className="relative h-[350px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/learners/reentry-coaching.jpg"
+                src="/images/learners/reentry-coaching.webp"
                 alt="DOT Random Testing Consortium"
                 fill
                 className="object-cover"

@@ -72,7 +72,7 @@ export default async function MarketplacePage() {
       </div>
 <div className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/marketplace-page-2.jpg"
+          src="/images/pages/marketplace-page-2.webp"
           alt="Marketplace"
           fill
           className="object-cover"
@@ -106,7 +106,7 @@ export default async function MarketplacePage() {
             >
               <div className="relative h-48 overflow-hidden">
                 <Image
-                  src={course.image_url || '/images/pages/comp-home-pathways-support.jpg'}
+                  src={course.image_url || '/images/pages/comp-home-pathways-support.webp'}
                   alt={course.title}
                   fill
                   className="object-cover"

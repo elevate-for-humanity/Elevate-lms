@@ -47,7 +47,7 @@ export default async function FederalProgramsPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/pages/plumbing.jpg"
+          src="/images/pages/about-hero.webp"
           alt="Federal Programs"
           fill
           className="object-cover"

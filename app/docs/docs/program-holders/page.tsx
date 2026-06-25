@@ -119,7 +119,7 @@ export default async function ProgramHoldersPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/about-employer-partners.jpg"
+                  src="/images/pages/about-employer-partners.webp"
                   alt="Program Holders"
                   fill
                   className="object-cover"

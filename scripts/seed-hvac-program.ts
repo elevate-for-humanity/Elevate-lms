@@ -670,7 +670,7 @@ async function seed() {
     {
       program_id: PROGRAM_ID,
       media_type: 'hero_image',
-      url: '/images/pages/programs-hvac-course-hero.jpg',
+      url: '/images/pages/programs-hvac-course-hero.webp',
       alt_text: 'HVAC technician working on an air conditioning unit',
       sort_order: 1,
     },

@@ -39,7 +39,7 @@ export default function WorkforceBoardPage() {
       href: '/workforce-board/participants',
     },
     {
-      image: '/hero-images/business-hero.jpg',
+      image: '/hero-images/business-hero.webp',
       title: 'Budget Oversight',
       description: 'Track spending, allocations, and financial performance by program',
       href: '/workforce-board/reports',
@@ -60,19 +60,19 @@ export default function WorkforceBoardPage() {
 
   const quickLinks = [
     {
-      image: '/hero-images/healthcare-category.jpg',
+      image: '/hero-images/healthcare-category.webp',
       title: 'Participants',
       description: 'View and manage all program participants',
       href: '/workforce-board/participants',
     },
     {
-      image: '/hero-images/skilled-trades-category.jpg',
+      image: '/hero-images/skilled-trades-category.webp',
       title: 'Training Programs',
       description: 'Monitor training program performance',
       href: '/workforce-board/training',
     },
     {
-      image: '/hero-images/technology-category.jpg',
+      image: '/hero-images/technology-category.webp',
       title: 'Employment Outcomes',
       description: 'Track job placements and retention',
       href: '/workforce-board/employment',

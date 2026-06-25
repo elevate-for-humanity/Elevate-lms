@@ -250,7 +250,7 @@ export default function WorkforceBoardsPage() {
             </div>
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/pages/platform-page-7.webp"
+                src="/images/pages/platform-page-7.jpg"
                 alt="Workforce board dashboard"
                 fill
                 sizes="100vw"

@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
       {
-        url: '/hero-images/technology-hero.jpg',
+        url: '/hero-images/technology-hero.webp',
         width: 1200,
         height: 630,
         alt: 'Workforce Analytics',

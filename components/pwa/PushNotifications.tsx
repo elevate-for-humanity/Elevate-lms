@@ -267,12 +267,12 @@ export interface AppNotification {
 // Helper to create notification payloads
 export function createNotificationPayload(notification: AppNotification) {
   const icons: Record<NotificationType, string> = {
-    hours_approved: '/icons/check-circle.png',
-    hours_rejected: '/icons/x-circle.png',
-    milestone_reached: '/icons/award.png',
-    weekly_reminder: '/icons/clock.png',
-    new_apprentice: '/icons/user-plus.png',
-    compliance_warning: '/icons/alert-triangle.png',
+    hours_approved: '/images/heroes/hero-homepage.webp',
+    hours_rejected: '/images/heroes/hero-homepage.webp',
+    milestone_reached: '/images/heroes/hero-homepage.webp',
+    weekly_reminder: '/images/heroes/hero-homepage.webp',
+    new_apprentice: '/images/heroes/hero-homepage.webp',
+    compliance_warning: '/images/heroes/hero-homepage.webp',
   };
 
   return {

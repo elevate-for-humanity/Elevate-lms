@@ -106,7 +106,7 @@ export default async function FerpaRecordsPage() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        <Image src="/images/pages/ferpa-page-6.jpg" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/ferpa-page-6.webp" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
       </section>
       {/* Header */}
       <div className="bg-white border-b border-gray-200">

@@ -52,7 +52,7 @@ export default async function PlatformAppsPage() {
       {/* Hero Section */}
       <section className="relative h-[300px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/pages/success-stories-hero.jpg"
+          src="/images/pages/success-stories-hero.webp"
           alt="Platform Apps"
           fill
           className="object-cover"

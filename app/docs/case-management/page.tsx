@@ -119,7 +119,7 @@ export default async function CaseManagementPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/business/team-1.webp"
+                  src="/images/business/team-2.jpg"
                   alt="Case Management"
                   fill
                   className="object-cover"

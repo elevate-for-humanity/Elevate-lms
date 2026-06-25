@@ -20,47 +20,47 @@ const OUTPUT_DIR = path.join(process.cwd(), 'public');
 // Missing images to generate
 const MISSING_IMAGES = [
   {
-    path: '/images/cdl-hero.jpg',
+    path: '/images/cdl-hero.webp',
     prompt:
       'Professional photo of a commercial truck driver in front of a large semi-truck, wearing safety vest, confident pose, sunny day at trucking facility, high quality corporate photography',
   },
   {
-    path: '/images/getting-started-hero.jpg',
+    path: '/images/getting-started-hero.webp',
     prompt:
       'Diverse group of adult students at orientation, receiving welcome packets, modern training facility lobby, excited expressions, professional corporate photography, bright lighting',
   },
   {
-    path: '/images/healthcare/medical-terminology.jpg',
+    path: '/images/programs/cna-hero.webp',
     prompt:
       'Healthcare student studying medical textbook with anatomical diagrams, modern classroom setting, focused learning, medical terminology charts on wall, professional educational photography',
   },
   {
-    path: '/images/healthcare/phlebotomy-hero.jpg',
+    path: '/images/programs/cna-hero.webp',
     prompt:
       'Professional phlebotomist drawing blood from patient arm, clinical setting, proper technique demonstration, healthcare training environment, clean medical photography',
   },
   {
-    path: '/images/hvac-hero.jpg',
+    path: '/images/hvac-hero.webp',
     prompt:
       'HVAC technician working on air conditioning unit on rooftop, wearing safety gear and tool belt, professional trade worker, sunny day, corporate industrial photography',
   },
   {
-    path: '/images/technology/cybersecurity-hero.jpg',
+    path: '/images/programs/cna-hero.webp',
     prompt:
       'Cybersecurity professional at computer workstation with multiple monitors showing security dashboards, modern tech office, focused concentration, blue lighting accents, corporate tech photography',
   },
   {
-    path: '/images/trades/electrical-hero.jpg',
+    path: '/images/programs/cna-hero.webp',
     prompt:
       'Electrician working on electrical panel, wearing safety glasses and gloves, professional trade worker, industrial setting, proper safety equipment, corporate photography',
   },
   {
-    path: '/images/trades/welding-hero.jpg',
+    path: '/images/programs/cna-hero.webp',
     prompt:
       'Welder in full protective gear with welding mask, sparks flying from welding torch, industrial workshop setting, dramatic lighting, professional trade photography',
   },
   {
-    path: '/images/training-providers-hero.jpg',
+    path: '/images/training-providers-hero.webp',
     prompt:
       'Professional instructors and trainers in modern classroom, diverse group of educators, training facility with equipment visible, collaborative atmosphere, corporate educational photography',
   },

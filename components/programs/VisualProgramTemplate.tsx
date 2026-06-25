@@ -81,7 +81,7 @@ const PROGRAM_HERO_MEDIA: Record<
   'tax-prep': {
     video: '/videos/tax-career-paths.mp4',
     audio: '/audio/heroes/tax.mp3',
-    poster: '/images/pages/tax-hero.webp',
+    poster: '/images/business/office-admin.webp',
     microLabel: 'Tax Preparation',
     script: `Tax preparation is a year-round career. The Elevate Tax Preparation program runs 8 weeks and prepares you for the IRS Annual Filing Season Program. Starting wages from $18 to $35 per hour. Funding available through WIOA. Apply today.`,
   },

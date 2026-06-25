@@ -37,31 +37,31 @@ export const mediaConfig: MediaConfigItem[] = [
   // Homepage Images - High-impact hero sections
   {
     slot: 'home_hero_primary',
-    imageSrc: '/images/facilities-new/facility-1.jpg',
+    imageSrc: '/images/facilities-new/facility-1.webp',
     alt: 'Elevate for Humanity training facility at Keystone Crossing, Indianapolis',
     category: 'homepage',
   },
   {
     slot: 'home_hero_secondary',
-    imageSrc: '/media/hero-slide-healthcare.jpg',
+    imageSrc: '/images/programs/cna-hero.webp',
     alt: 'Healthcare professional supporting a learner in clinical setting',
     category: 'homepage',
   },
   {
     slot: 'home_strip_stats',
-    imageSrc: '/media/homepage-hero.jpg',
+    imageSrc: '/images/heroes/hero-homepage.webp',
     alt: 'Collage representing Elevate outcomes and community impact',
     category: 'homepage',
   },
   {
     slot: 'home_student_story',
-    imageSrc: '/media/programs/healthcare-professional-1-hd.jpg',
+    imageSrc: '/images/programs/cna-hero.webp',
     alt: 'Graduate in professional healthcare attire after successful program completion',
     category: 'homepage',
   },
   {
     slot: 'home_employer_collage',
-    imageSrc: '/media/employers/employer-partnership-handshake.png',
+    imageSrc: '/images/heroes/training-provider-1.webp',
     alt: 'Employer and Elevate staff shaking hands, symbolizing partnership',
     category: 'homepage',
   },
@@ -69,13 +69,13 @@ export const mediaConfig: MediaConfigItem[] = [
   // Healthcare Programs
   {
     slot: 'program_cna_hero',
-    imageSrc: '/images/programs/efh-cna-hero.jpg',
+    imageSrc: '/images/programs/cna-hero.webp',
     alt: 'CNA student providing compassionate care to elderly patient',
     category: 'healthcare',
   },
   {
     slot: 'program_medical_hero',
-    imageSrc: '/media/programs/medical-hd.jpg',
+    imageSrc: '/images/programs/cna-hero.webp',
     alt: 'Medical assistant in clinical setting with patient',
     category: 'healthcare',
   },
@@ -83,7 +83,7 @@ export const mediaConfig: MediaConfigItem[] = [
   // Beauty & Personal Care
   {
     slot: 'program_barber_hero',
-    imageSrc: '/media/programs/beauty-hd.jpg',
+    imageSrc: '/images/programs/barber-hero.webp',
     alt: 'Barber apprentice cutting hair in modern barbershop',
     category: 'beauty',
   },
@@ -91,25 +91,25 @@ export const mediaConfig: MediaConfigItem[] = [
   // Skilled Trades
   {
     slot: 'program_hvac_hero',
-    imageSrc: '/images/programs/efh-hvac-hero.jpg',
+    imageSrc: '/images/programs/cna-hero.webp',
     alt: 'HVAC technician working on rooftop air conditioning unit',
     category: 'trades',
   },
   {
     slot: 'program_welding_hero',
-    imageSrc: '/media/programs/welding-hd.jpg',
+    imageSrc: '/images/programs/cna-hero.webp',
     alt: 'Welder in protective gear working with metal fabrication',
     category: 'trades',
   },
   {
     slot: 'program_plumbing_hero',
-    imageSrc: '/media/programs/plumbing.jpg',
+    imageSrc: '/images/programs/cna-hero.webp',
     alt: 'Plumber working on pipe installation',
     category: 'trades',
   },
   {
     slot: 'program_building_hero',
-    imageSrc: '/media/programs/webp/building.webp',
+    imageSrc: '/images/programs/building-maintenance-hero.svg',
     alt: 'Building maintenance technician at work',
     category: 'trades',
   },
@@ -117,7 +117,7 @@ export const mediaConfig: MediaConfigItem[] = [
   // Transportation
   {
     slot: 'program_cdl_hero',
-    imageSrc: '/media/programs/cdl-hd.jpg',
+    imageSrc: '/images/programs/cdl-hero.webp',
     alt: 'CDL student standing proudly in front of commercial truck',
     category: 'transportation',
   },
@@ -125,13 +125,13 @@ export const mediaConfig: MediaConfigItem[] = [
   // Business & Tax
   {
     slot: 'program_tax_hero',
-    imageSrc: '/media/programs/tax-prep-hd.jpg',
+    imageSrc: '/images/programs/cna-hero.webp',
     alt: 'Tax preparer helping family with tax return preparation',
     category: 'business',
   },
   {
     slot: 'program_it_hero',
-    imageSrc: '/media/programs/it-hd.jpg',
+    imageSrc: '/images/programs/cna-hero.webp',
     alt: 'IT professional working at computer workstation',
     category: 'business',
   },
@@ -139,7 +139,7 @@ export const mediaConfig: MediaConfigItem[] = [
   // Culinary
   {
     slot: 'program_culinary_hero',
-    imageSrc: '/media/programs/culinary-hd.jpg',
+    imageSrc: '/images/programs/cna-hero.webp',
     alt: 'Chef preparing food in professional kitchen',
     category: 'culinary',
   },
@@ -147,13 +147,13 @@ export const mediaConfig: MediaConfigItem[] = [
   // Training Modules
   {
     slot: 'training_cpr',
-    imageSrc: '/media/programs/cpr-training-hd.jpg',
+    imageSrc: '/images/programs/cna-hero.webp',
     alt: 'Students practicing CPR techniques in training session',
     category: 'training',
   },
   {
     slot: 'training_counseling',
-    imageSrc: '/media/programs/counseling-training-hd.jpg',
+    imageSrc: '/images/programs/cna-hero.webp',
     alt: 'Counseling training session with instructor and students',
     category: 'training',
   },

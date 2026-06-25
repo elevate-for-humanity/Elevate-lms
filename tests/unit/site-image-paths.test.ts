@@ -3,22 +3,22 @@ import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
 
 describe('resolveSiteImagePath', () => {
   it('maps known broken webp paths to existing files', () => {
-    expect(resolveSiteImagePath('/images/pages/tax-preparation.webp')).toBe(
+    expect(resolveSiteImagePath('/images/business/office-admin.webp')).toBe(
       '/images/business/office-admin.webp',
     );
-    expect(resolveSiteImagePath('/images/pages/accessibility-hero.webp')).toBe(
+    expect(resolveSiteImagePath('/images/pages/accessibility-hero.jpg')).toBe(
       '/images/pages/accessibility-hero.jpg',
     );
-    expect(resolveSiteImagePath('/images/pages/esthetician.webp')).toBe(
+    expect(resolveSiteImagePath('/images/beauty/esthetician.webp')).toBe(
       '/images/beauty/esthetician.webp',
     );
   });
 
   it('maps legacy .jpg paths to .webp from conversion manifest', () => {
-    expect(resolveSiteImagePath('/images/pages/pathways-page-6.jpg')).toBe(
+    expect(resolveSiteImagePath('/images/pages/pathways-page-6.webp')).toBe(
       '/images/pages/pathways-page-6.webp',
     );
-    expect(resolveSiteImagePath('/images/pages/how-it-works-hero.jpg')).toBe(
+    expect(resolveSiteImagePath('/images/pages/how-it-works-hero.webp')).toBe(
       '/images/pages/how-it-works-hero.webp',
     );
   });

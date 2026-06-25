@@ -17,7 +17,7 @@ export const videos: VideoData[] = [
     description:
       'Discover 100% free, funded workforce training programs in Indianapolis. WIOA-funded programs in healthcare, skilled trades, technology, and business. No tuition, no debt, real careers.',
     videoUrl: '/videos/hero-home.mp4',
-    thumbnailUrl: '/images/heroes/hero-homepage.jpg',
+    thumbnailUrl: '/images/heroes/hero-homepage.webp',
     duration: 'PT1M30S',
     uploadDate: '2025-01-01',
     category: 'Overview',
@@ -28,7 +28,7 @@ export const videos: VideoData[] = [
     description:
       'CNA training in Indianapolis. State-approved program, 6 weeks, job placement assistance. FSSA IMPACT funded for eligible participants. Self-pay: $1,800.',
     videoUrl: '/videos/cna-hero.mp4',
-    thumbnailUrl: '/images/healthcare/video-thumbnail-cna-training.jpg',
+    thumbnailUrl: '/images/healthcare/video-thumbnail-cna-training.webp',
     duration: 'PT45S',
     uploadDate: '2025-01-01',
     category: 'Healthcare',
@@ -51,7 +51,7 @@ export const videos: VideoData[] = [
     description:
       'Free CDL training in Indianapolis. Class A, B, and C commercial driving licenses. WIOA-funded, job placement with local carriers.',
     videoUrl: '/videos/cdl-hero.mp4',
-    thumbnailUrl: '/images/cdl-hero.jpg',
+    thumbnailUrl: '/images/cdl-hero.webp',
     duration: 'PT50S',
     uploadDate: '2025-01-01',
     category: 'Transportation',
@@ -62,7 +62,7 @@ export const videos: VideoData[] = [
     description:
       'Free HVAC training in Indianapolis. Learn heating, ventilation, air conditioning, and refrigeration. EPA certification included.',
     videoUrl: '/videos/hvac-hero-final.mp4',
-    thumbnailUrl: '/images/hvac-hero.jpg',
+    thumbnailUrl: '/images/hvac-hero.webp',
     duration: 'PT40S',
     uploadDate: '2025-01-01',
     category: 'Skilled Trades',
@@ -73,7 +73,7 @@ export const videos: VideoData[] = [
     description:
       'Overview of all free career training programs at Elevate for Humanity. Healthcare, skilled trades, technology, business, and more.',
     videoUrl: '/videos/programs-overview-video-with-narration.mp4',
-    thumbnailUrl: '/images/programs-catalog-hero.jpg',
+    thumbnailUrl: '/images/programs-catalog-hero.webp',
     duration: 'PT30S',
     uploadDate: '2025-01-01',
     category: 'Overview',
@@ -84,7 +84,7 @@ export const videos: VideoData[] = [
     description:
       'Learn about our network of training providers and partners. Quality education from certified instructors and industry experts.',
     videoUrl: '/videos/training-providers-video-with-narration.mp4',
-    thumbnailUrl: '/images/training-providers-hero.jpg',
+    thumbnailUrl: '/images/training-providers-hero.webp',
     duration: 'PT1M10S',
     uploadDate: '2025-01-01',
     category: 'About',
@@ -95,7 +95,7 @@ export const videos: VideoData[] = [
     description:
       'Step-by-step guide to applying for free career training programs. Learn about eligibility, application process, and what to expect.',
     videoUrl: '/videos/getting-started-hero.mp4',
-    thumbnailUrl: '/images/getting-started-hero.jpg',
+    thumbnailUrl: '/images/getting-started-hero.webp',
     duration: 'PT35S',
     uploadDate: '2025-01-01',
     category: 'How To',

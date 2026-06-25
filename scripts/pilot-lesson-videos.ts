@@ -31,7 +31,7 @@ const COURSE_ID = '2cffc43f-b90f-4c6d-a5d1-1fd2a5e14285';
 const COURSE_NAME = 'Bookkeeping & QuickBooks Certified User';
 const INSTRUCTOR_PHOTO = path.join(
   process.cwd(),
-  'public/images/team/elizabeth-greene-headshot.jpg',
+  'public/images/team/elizabeth-greene-headshot.webp',
 );
 const VOICE = 'nova';
 

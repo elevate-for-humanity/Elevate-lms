@@ -1,4 +1,4 @@
-import { FEATURED_BEAUTY_HOST_PARTNERS, PARTNER_BRAND_ALIASES } from '@/lib/beauty-apprenticeship/host-partners';
+import { FEATURED_BEAUTY_HOST_PARTNERS, PARTNER_BRAND_ALIASES } from '@/lib/apprenticeship-programs/host-partners';
 
 export default function FeaturedHostPartners() {
   return (

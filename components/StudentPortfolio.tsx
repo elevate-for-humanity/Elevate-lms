@@ -110,7 +110,7 @@ export function StudentPortfolio() {
               title: p.title,
               description: p.description,
               category: p.category || 'web',
-              imageUrl: p.image_url || '/media/projects/default.jpg',
+              imageUrl: p.image_url || '/images/heroes/student-catalog.webp',
               technologies: p.technologies || [],
               completedDate: p.completed_date,
               githubUrl: p.github_url,

@@ -23,7 +23,7 @@ const plans: Record<string, {
     priceDisplay: '$750',
     interval: 'month',
     description: 'For solo operators, small nonprofits, and pilot programs.',
-    image: '/images/pages/program-holder-page-1.jpg',
+    image: '/images/pages/program-holder-page-1.webp',
   },
   institutional: {
     id: 'institutional',
@@ -32,7 +32,7 @@ const plans: Record<string, {
     priceDisplay: '$2,500',
     interval: 'month',
     description: 'For schools, training providers, and nonprofits running multiple programs.',
-    image: '/images/pages/program-holder-page-1.jpg',
+    image: '/images/pages/program-holder-page-1.webp',
   },
   enterprise: {
     id: 'enterprise',
@@ -41,7 +41,7 @@ const plans: Record<string, {
     priceDisplay: '$8,500',
     interval: 'month',
     description: 'For workforce boards, government agencies, and regional operators.',
-    image: '/images/pages/comp-home-highlight-health.jpg',
+    image: '/images/pages/comp-home-highlight-health.webp',
   },
 };
 

@@ -108,7 +108,7 @@ export default function EmployerPortalPage() {
               <div className="relative hidden lg:block">
                 <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/heroes/employer-dashboard.jpg"
+                    src="/images/heroes/lms-analytics.webp"
                     alt="Employer Portal Dashboard"
                     fill
                     className="object-cover"
@@ -187,7 +187,7 @@ export default function EmployerPortalPage() {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/business/team-meeting.jpg"
+                  src="/images/business/team-2.jpg"
                   alt="Employer Benefits"
                   fill
                   className="object-cover"

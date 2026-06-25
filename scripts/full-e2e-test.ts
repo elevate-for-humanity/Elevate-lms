@@ -79,7 +79,7 @@ async function main() {
     'cybersecurity-analyst','it-support','data-analytics','project-management',
     'cosmetology-apprenticeship','barbershop-apprenticeship','nail-technician-apprenticeship',
     'esthetician-apprenticeship','cdl-class-a','cdl-class-b','forklift-operator',
-    'osha-10','osha-30','bookkeeping','tax-preparation','real-estate',
+    'osha-10','osha-30','bookkeeping','real-estate',
     'social-media-marketing','graphic-design','web-development','business-management',
     'workforce-readiness',
   ];

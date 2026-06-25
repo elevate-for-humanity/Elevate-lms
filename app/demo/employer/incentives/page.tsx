@@ -18,7 +18,7 @@ export default function DemoIncentivesPage() {
   return (
     <DemoPageShell title="Incentives" description="OJT reimbursements, WOTC tax credits, and hiring incentives." portal="employer">
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] mb-6">
-        <Image src="/images/pages/demo-page-14.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/demo-page-14.webp" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="grid sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl border p-4">

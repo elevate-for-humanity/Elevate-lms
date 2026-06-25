@@ -8,7 +8,7 @@ export function CareerHero() {
     <section className="relative h-[60svh] min-h-[380px] max-h-[640px] overflow-hidden bg-slate-900">
       <CanonicalVideo
         src={VIDEO_HEROES.careerServices}
-        poster="/images/pages/career-services-hero.jpg"
+        poster="/images/pages/career-services-hero.webp"
         className="absolute inset-0 w-full h-full object-cover"
       />
     </section>

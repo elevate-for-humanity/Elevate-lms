@@ -5,7 +5,7 @@ import { MapPin, Navigation, Phone } from 'lucide-react';
 import {
   BARBER_WORKFORCE_NETWORK_PINS,
   type NetworkMapPin,
-} from '@/lib/beauty-apprenticeship/workforce-network-locations';
+} from '@/lib/apprenticeship-programs/workforce-network-locations';
 
 const KIND_LABEL: Record<NetworkMapPin['kind'], string> = {
   workone: 'WorkOne',

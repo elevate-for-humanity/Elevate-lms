@@ -41,7 +41,7 @@ export default async function FollowUpsPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/og-default.jpg"
+          src="/og-default.webp"
           alt="Follow Ups"
           fill
           priority
@@ -142,7 +142,7 @@ export default async function FollowUpsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pathways/business-hero.jpg"
+                  src="/images/pathways/business-hero.webp"
                   alt="Follow Ups"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"

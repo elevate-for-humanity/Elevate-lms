@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     url: 'https://www.elevateforhumanity.org/platform/partner-portal',
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
-      { url: '/hero-images/pathways-hero.jpg', width: 1200, height: 630, alt: 'Partner Portal' },
+      { url: '/hero-images/pathways-hero.webp', width: 1200, height: 630, alt: 'Partner Portal' },
     ],
     type: 'website',
   },

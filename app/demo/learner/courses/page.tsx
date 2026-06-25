@@ -18,7 +18,7 @@ export default function DemoCoursesPage() {
   return (
     <DemoPageShell title="Courses" description="Your enrolled courses and module progress." portal="learner">
       <section className="relative h-[60vh] min-h-[400px] max-h-[720px] mb-6">
-        <Image src="/images/pages/demo-page-16.jpg" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/pages/demo-page-16.webp" alt="Platform demo" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="space-y-4">
         {(DEMO_LEARNER_COURSES as any[]).map((c, i) => (

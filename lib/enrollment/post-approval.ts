@@ -51,7 +51,7 @@ const PROGRAM_TITLES: Record<string, string> = {
   'project-management': 'Project Management',
   'office-administration': 'Office Administration',
   'bookkeeping': 'Bookkeeping & QuickBooks',
-  'tax-preparation': 'Tax Preparation',
+  
   'entrepreneurship': 'Entrepreneurship & Small Business',
 };
 

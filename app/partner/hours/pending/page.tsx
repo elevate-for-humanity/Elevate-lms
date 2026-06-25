@@ -169,7 +169,7 @@ export default function PartnerHoursPendingPage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/partner-page-6.webp"
+          src="/images/pages/partner-page-6.jpg"
           alt="Pending hours"
           fill
           sizes="100vw"

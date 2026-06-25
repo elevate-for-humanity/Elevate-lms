@@ -48,7 +48,7 @@ export default async function HowItWorksPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/pathways/hvac.jpg"
+          src="/images/programs/cna-hero.webp"
           alt="How Funding Works"
           fill
           className="object-cover"
@@ -149,7 +149,7 @@ export default async function HowItWorksPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/heroes/hero-state-funding.jpg"
+                  src="/images/heroes/hero-federal-funding.webp"
                   alt="How It Works"
                   fill
                   className="object-cover"

@@ -27,10 +27,13 @@ const limiters: Record<Tier, { get: () => any }> = {
 };
 
 // IPs that should never consume Upstash quota.
-// Platform health checks originate from localhost/container-internal networks.
-const INTERNAL_IP_PREFIXES = ['127.', '::1', '10.', '172.16.', '172.17.', '172.18.', '172.19.', '172.20.', '172.21.', '172.22.', '172.23.', '172.24.', '172.25.', '172.26.', '172.27.', '172.28.', '172.29.', '172.30.', '172.31.'];
+// Only skip loopback (127.x, ::1) - actual client IPs from cloud providers
+// (10.x, 172.16-31.x) should still be rate limited as they are public-facing.
+const INTERNAL_IP_PREFIXES = ['127.', '::1'];
 
 function isInternalIP(ip: string): boolean {
+  // Defensive: skip if IP is undefined/null/empty
+  if (!ip) return true;
   return INTERNAL_IP_PREFIXES.some((prefix) => ip.startsWith(prefix));
 }
 
@@ -68,8 +71,20 @@ export async function applyRateLimit(
   // and would otherwise burn ~1,440 Upstash requests/day per task per route.
   if (isInternalIP(id)) return null;
 
+  // Defensive: ensure limiter.limit is actually a function before calling
+  if (typeof limiter.limit !== 'function') {
+    logger.warn('[rate-limit] limiter.limit is not a function — failing open', { tier, limiterType: typeof limiter });
+    return null;
+  }
+
   try {
     const result = await limiter.limit(id);
+
+    // Defensive: ensure result has expected shape
+    if (!result || typeof result.success !== 'boolean') {
+      logger.warn('[rate-limit] Invalid rate limit result shape — failing open', { tier, resultType: typeof result });
+      return null;
+    }
 
     if (!result.success) {
       return NextResponse.json(

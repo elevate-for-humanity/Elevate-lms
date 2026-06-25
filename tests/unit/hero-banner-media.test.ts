@@ -3,16 +3,16 @@ import { resolveHeroPosterSrc, DEFAULT_HERO_FALLBACK } from '@/lib/images/hero-b
 
 describe('resolveHeroPosterSrc', () => {
   it('uses banner poster with tax alias fallback chain', () => {
-    const src = resolveHeroPosterSrc('tax-preparation', {
+    const src = resolveHeroPosterSrc( {
       banner: {
-        pageKey: 'tax-preparation',
-        posterImage: '/images/pages/admin-tax-training-hero.webp',
+        pageKey: 
+        posterImage: '/images/heroes/training-provider-1.webp',
         belowHeroHeadline: 'x',
         belowHeroSubheadline: 'y',
         primaryCta: { label: 'Apply', href: '/apply' },
         analyticsName: 'tax',
       },
-      heroImage: '/images/pages/tax-preparation.jpg',
+      heroImage: '/images/business/professional-2.jpg',
     });
     expect(src).toBe('/images/business/office-admin.webp');
   });

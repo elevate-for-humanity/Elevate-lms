@@ -174,7 +174,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   // ── Business / Finance ───────────────────────────────────────────────────
   'tax-preparation': {
     card: '/images/business/office-admin.webp',
-    hero: '/images/business/professional-2.webp',
+    hero: '/images/business/professional-2.jpg',
     alt: 'Tax preparer working with a client on financial documents',
   },
   bookkeeping: {

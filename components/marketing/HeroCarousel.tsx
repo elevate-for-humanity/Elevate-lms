@@ -28,7 +28,7 @@ const slides: Slide[] = [
     title: 'Free career paths for real people.',
     highlight: 'Healthcare, trades, CDL, barbering.',
     body: 'Most learners qualify for $0 tuition through workforce grants and justice-aligned funding. We help with paperwork, approvals, and the hard parts.',
-    image: '/media/programs/efh-cna-hero.jpg',
+    image: '/media/programs/efh-cna-hero.webp',
     primaryCtaLabel: 'Check my eligibility',
     primaryCtaHref: '/apply',
     secondaryCtaLabel: 'See all programs',

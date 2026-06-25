@@ -54,7 +54,7 @@ Today, Marcus has been promoted to Lead Technician earning $58,000 annually.
 "I went from unemployed and hopeless to having a real career with a future. Elevate for Humanity changed my life."
 
 Ready to start your own success story? Apply now at /apply or call ${PLATFORM_DEFAULTS.supportPhone}.`,
-    featured_image_url: '/images/blog/hvac-success.jpg',
+    featured_image_url: '/images/heroes/student-catalog.webp',
     tags: ['HVAC', 'success story', 'career change', 'WIOA'],
     published: true,
     author_name: 'Elevate for Humanity',
@@ -110,7 +110,7 @@ You may qualify if you meet ANY of these criteria:
 **Timeline: 2-4 weeks from application to training start**
 
 Check your eligibility at /wioa-eligibility or call ${PLATFORM_DEFAULTS.supportPhone}.`,
-    featured_image_url: '/images/blog/wioa-guide.jpg',
+    featured_image_url: '/images/heroes/hero-federal-funding.webp',
     tags: ['WIOA', 'funding', 'financial aid', 'free training'],
     published: true,
     author_name: 'Elevate for Humanity',
@@ -164,7 +164,7 @@ The truth? Some of the best-paying careers require months of training—not year
 | Phlebotomist | 8-10 weeks | $35,000 |
 
 All five are available at Elevate for Humanity with WIOA funding. Apply at /apply.`,
-    featured_image_url: '/images/blog/careers.jpg',
+    featured_image_url: '/images/heroes/student-catalog.webp',
     tags: ['careers', 'salary', 'training'],
     published: true,
     author_name: 'Elevate for Humanity',
@@ -219,7 +219,7 @@ All five are available at Elevate for Humanity with WIOA funding. Apply at /appl
 **Choose MA if:** You prefer daytime hours, like variety, want higher starting pay.
 
 Both programs available at Elevate for Humanity with WIOA funding.`,
-    featured_image_url: '/images/blog/healthcare-comparison.jpg',
+    featured_image_url: '/images/heroes/student-catalog.webp',
     tags: ['CNA', 'medical assistant', 'healthcare'],
     published: true,
     author_name: 'Elevate for Humanity',
@@ -258,7 +258,7 @@ Visit us at 8888 Keystone Crossing, Suite 1300, Indianapolis
 ${PLATFORM_DEFAULTS.supportPhone}
 
 Don't let paperwork stand between you and your new career.`,
-    featured_image_url: '/images/blog/partnership.jpg',
+    featured_image_url: '/images/heroes/student-catalog.webp',
     tags: ['partnership', 'Indiana Career Connect', 'WorkOne'],
     published: true,
     author_name: 'Elevate for Humanity',

@@ -9,8 +9,18 @@ import {
 const useStandaloneOutput =
   process.env.GITHUB_ACTIONS !== 'true' || process.env.NEXT_STANDALONE_OUTPUT === '1';
 
+// Generate a unique build version for this deployment
+// Used by useBuildVersion hook to detect stale pages after deployment
+const buildVersion = process.env.NEXT_PUBLIC_BUILD_VERSION || 
+                     process.env.DEPLOYMENT_ID || 
+                     Date.now().toString(36);
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Expose build version to client for Server Action mismatch detection
+  env: {
+    NEXT_PUBLIC_BUILD_VERSION: buildVersion,
+  },
   // Disable source maps in production builds — saves ~500MB heap during build
   productionSourceMap: false,
   // Disable Next's built-in lint step during build — ESLint runs separately

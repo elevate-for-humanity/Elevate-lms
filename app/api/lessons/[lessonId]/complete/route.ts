@@ -130,7 +130,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
       if (e.code === 'CHECKPOINT_NOT_PASSED') {
         return NextResponse.json(
           {
-            error: e.message,
+            error: 'Internal server error',
             code: 'CHECKPOINT_NOT_PASSED',
             checkpointLessonId: e.checkpointLessonId,
             requiredScore: e.requiredScore,

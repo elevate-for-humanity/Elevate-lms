@@ -102,7 +102,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
       } else {
         return NextResponse.json(
           {
-            error: approveResult?.message || 'Approval failed',
+            error: 'Approval failed',
             code: approveResult?.code,
           },
           { status: 400 },

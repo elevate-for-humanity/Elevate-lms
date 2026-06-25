@@ -76,7 +76,7 @@ async function _POST(request: NextRequest) {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data.message || 'Failed to generate video' },
+        { error: 'Request failed' },
         { status: response.status },
       );
     }

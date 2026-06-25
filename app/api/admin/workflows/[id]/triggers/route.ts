@@ -21,7 +21,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
   logAdminAudit({ action: AdminAction.WORKFLOW_TRIGGER_ADDED, actorId: auth.id, entityType: 'workflow_triggers', entityId: data.id, metadata: { workflow_id: id, trigger_type, cron_expr }, req: request }).catch(() => {});
 

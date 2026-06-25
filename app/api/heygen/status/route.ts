@@ -33,7 +33,7 @@ async function _GET(request: NextRequest) {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data.message || 'Failed to get video status' },
+        { error: 'Request failed' },
         { status: response.status },
       );
     }

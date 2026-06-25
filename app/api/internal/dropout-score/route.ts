@@ -135,7 +135,7 @@ Respond with ONLY valid JSON, no markdown, no explanation. Example: {"score":72,
     } catch (err) {
       logger.warn('[dropout-score] AI scoring failed for student', {
         user_id: row.user_id,
-        error: err instanceof Error ? err.message : String(err),
+        error: 'Internal server error',
       });
       failed++;
     }

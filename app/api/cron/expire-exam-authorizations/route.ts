@@ -24,7 +24,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/expire-exam-authorizations] DB error', error);
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 
   if (!expiring?.length) return NextResponse.json({ ok: true, expired: 0 });
@@ -37,7 +37,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (updateErr) {
     logger.error('[cron/expire-exam-authorizations] Update failed', updateErr);
-    return NextResponse.json({ ok: false, error: updateErr.message }, { status: 500 });
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 
   // Notify affected students

@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
                 paymentIntentId: paymentIntent.id,
                 step: 'email_sent',
                 status: 'failed',
-                error: emailError instanceof Error ? emailError.message : String(emailError),
+                error: 'Failed to send license email',
               });
               logger.error('Failed to send license welcome email', emailError as Error);
             }
@@ -230,7 +230,7 @@ export async function POST(request: NextRequest) {
   } catch (err: unknown) {
     logger.error('Webhook handler failed', err instanceof Error ? err : new Error(String(err)));
     return NextResponse.json(
-      { error: (err instanceof Error ? err.message : String(err)) || 'Webhook handler failed' },
+      { error: 'Webhook handler failed' },
       { status: 500 }
     );
   }

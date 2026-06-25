@@ -50,6 +50,18 @@ export default async function CandidatesPage() {
     completed_at: e.completed_at,
   }));
 
+  // Get certified candidates count
+  const { count: certifiedCount } = userIds.length
+    ? await supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .in('id', userIds)
+        .eq('is_certified', true)
+    : { count: 0 };
+
+  // Get program graduates count (already have from enrollments)
+  const graduatesCount = candidates.length;
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -108,7 +120,7 @@ export default async function CandidatesPage() {
             <div className="flex items-center gap-3">
               <Award aria-label="award" className="w-8 h-8 text-brand-green-600" />
               <div>
-                <div className="text-2xl font-bold">0</div>
+                <div className="text-2xl font-bold">{certifiedCount || 0}</div>
                 <div className="text-sm text-slate-700">Certified</div>
               </div>
             </div>
@@ -117,7 +129,7 @@ export default async function CandidatesPage() {
             <div className="flex items-center gap-3">
               <GraduationCap aria-label="graduationcap" className="w-8 h-8 text-brand-blue-600" />
               <div>
-                <div className="text-2xl font-bold">0</div>
+                <div className="text-2xl font-bold">{graduatesCount || 0}</div>
                 <div className="text-sm text-slate-700">Program Graduates</div>
               </div>
             </div>

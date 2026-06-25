@@ -318,6 +318,7 @@ const nextConfig = {
       { source: '/schools/mesmerized-by-beauty', destination: '/programs', permanent: true },
 
       // Admin path redirects
+      // NOTE: Removed redirects for pages that now exist (course-import, external-courses, curriculum, video-generator)
 
       { source: '/admin/applicants', destination: '/admin/applications', permanent: true },
       { source: '/admin/leads', destination: '/admin/crm/leads', permanent: true },
@@ -325,9 +326,9 @@ const nextConfig = {
       { source: '/admin/syllabus-generator', destination: '/admin/studio', permanent: true },
       { source: '/admin/course-templates', destination: '/admin/studio', permanent: true },
       { source: '/admin/courses/manage', destination: '/admin/studio', permanent: true },
-      { source: '/admin/course-import', destination: '/admin/studio', permanent: true },
+      // /admin/course-import EXISTS - no redirect needed
       { source: '/admin/quiz-builder', destination: '/admin/studio', permanent: true },
-      { source: '/admin/external-courses', destination: '/admin/studio', permanent: true },
+      // /admin/external-courses EXISTS - no redirect needed
       { source: '/admin/enrollment', destination: '/admin/enrollments', permanent: true },
       { source: '/admin/users', destination: '/admin/staff-portal/users', permanent: true },
       { source: '/admin/contacts', destination: '/admin/crm/contacts', permanent: true },
@@ -421,11 +422,11 @@ const nextConfig = {
       // LMS
       { source: '/lms/catalog', destination: '/lms/courses', permanent: true },
 
-      { source: '/admin/curriculum',        destination: '/admin/studio', permanent: true },
-      { source: '/admin/media-studio',      destination: '/admin/studio', permanent: true },
-      { source: '/admin/video-generator',   destination: '/admin/studio', permanent: true },
-      { source: '/admin/courses/pipeline',  destination: '/admin/studio', permanent: true },
-      { source: '/admin/courses/generate',  destination: '/admin/studio', permanent: true },
+      // These pages EXIST - removed redirects so they work directly
+      // /admin/curriculum, /admin/video-generator, /admin/courses/pipeline, /admin/courses/generate
+      // /admin/media-studio does NOT exist - keep redirect to studio
+      { source: '/admin/media-studio', destination: '/admin/studio', permanent: true },
+      // /admin/courses/pipeline and /admin/courses/generate are handled by /admin/studio sub-routes
 
       // /lms/programs — real browse page (app/lms/(app)/programs/page.tsx); do not redirect
 
@@ -524,7 +525,7 @@ const nextConfig = {
         permanent: true,
       },
       { source: '/admin/blog/new', destination: '/admin/blog', permanent: true },
-      { source: '/admin/course-studio', destination: '/admin/studio', permanent: true },
+      // /admin/course-studio removed - /admin/studio handles this
       { source: '/admin/dight', destination: '/admin/dashboard', permanent: true },
       { source: '/admin/dight/:path*', destination: '/admin/dashboard/:path*', permanent: true },
       { source: '/admin/users/invite', destination: '/admin/staff-portal/users', permanent: true },

@@ -119,7 +119,7 @@ export default async function DocsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/heroes/training-provider-1.jpg"
+                  src="/images/heroes/training-provider-1.webp"
                   alt="Docs"
                   fill
                   className="object-cover"

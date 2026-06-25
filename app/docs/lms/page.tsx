@@ -119,7 +119,7 @@ export default async function LmsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/business/team-3.jpg"
+                  src="/images/business/team-3.webp"
                   alt="Lms"
                   fill
                   className="object-cover"

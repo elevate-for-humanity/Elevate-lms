@@ -1,0 +1,1 @@
+export const groq = { chat: async () => '' };

@@ -1,0 +1,1 @@
+export const programImages = { getImage: (id: string) => null };

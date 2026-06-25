@@ -1,0 +1,1 @@
+export const courseUtils = { parse: (c: string) => c };

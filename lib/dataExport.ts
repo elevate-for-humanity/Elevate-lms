@@ -1,0 +1,1 @@
+export const dataExport = { export: async () => null };

@@ -1,0 +1,1 @@
+export const securityUtils = { sanitize: (s: string) => s };

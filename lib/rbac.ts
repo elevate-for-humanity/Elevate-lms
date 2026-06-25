@@ -1,0 +1,1 @@
+export const rbac = { can: () => true, check: () => true };

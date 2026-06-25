@@ -1,0 +1,1 @@
+export const extractJson = (text: string) => ({});

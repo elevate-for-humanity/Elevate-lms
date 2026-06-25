@@ -1,0 +1,1 @@
+export const gemini = { chat: async () => '' };

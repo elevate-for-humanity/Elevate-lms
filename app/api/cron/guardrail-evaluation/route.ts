@@ -23,8 +23,8 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    logger.error('[cron/guardrail-evaluation] DB error', { error: error.message });
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+    logger.error('[cron/guardrail-evaluation] DB error', { error: 'Internal server error' });
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 
   const rows = violations ?? [];

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function DocsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   // Fetch documentation data

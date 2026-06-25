@@ -20,7 +20,7 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function EmployerApprenticeshipsPage() {
-  const { user } = await requireRole(['employer', 'admin', 'super_admin', 'staff']);
+  const { user } = await requireRole(['employer', 'admin', 'staff']);
   const supabase = await createClient();
 
   // Fetch all apprenticeship programs for this employer

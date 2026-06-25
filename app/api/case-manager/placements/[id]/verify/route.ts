@@ -10,7 +10,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-const ALLOWED_ROLES = ['case_manager', 'admin', 'super_admin', 'staff'];
+const ALLOWED_ROLES = ['case_manager', 'admin', 'staff'];
 
 export const dynamic = 'force-dynamic';
 
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     if (!placement) return safeError('Placement not found', 404);
 
-    const isAdmin = ['admin', 'super_admin', 'staff'].includes(profile?.role ?? '');
+    const isAdmin = ['admin', 'staff'].includes(profile?.role ?? '');
     if (!isAdmin && placement.case_manager_id !== user.id) {
       return safeError('Forbidden', 403);
     }

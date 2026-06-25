@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const allowed = ['admin', 'super_admin', 'staff', 'workforce_board', 'employer'];
+  const allowed = ['admin', 'staff', 'workforce_board', 'employer'];
   if (!profile || !allowed.includes(profile.role)) return safeError('Forbidden', 403);
 
   const { searchParams } = new URL(request.url);

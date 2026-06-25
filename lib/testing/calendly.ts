@@ -76,6 +76,14 @@ export async function getEventTypes(): Promise<CalendlyEventType[]> {
   return data.collection ?? [];
 }
 
+/**
+ * Finds the testing event type (slug: "60min") or returns first active event type.
+ */
+export async function getTestingEventType(): Promise<CalendlyEventType | null> {
+  const eventTypes = await getEventTypes();
+  return eventTypes.find((e) => e.slug === '60min') ?? eventTypes[0] ?? null;
+}
+
 // ─── Scheduling links ─────────────────────────────────────────────────────────
 
 export interface SchedulingLinkOptions {

@@ -93,13 +93,16 @@ export default async function BarberShopApplicationsPage() {
 
   const { data: { user } } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/');
 
   const { data: applications, error } = await supabase
     .from('barbershop_partner_applications')

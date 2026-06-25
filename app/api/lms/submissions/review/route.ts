@@ -8,7 +8,7 @@ import { checkCompetencyGate } from '@/lib/lms/competency-gate';
 
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_ROLES = ['instructor', 'admin', 'super_admin', 'staff'];
+const ALLOWED_ROLES = ['instructor', 'admin', 'staff'];
 const VALID_STATUSES = ['under_review', 'approved', 'rejected', 'revision_requested'] as const;
 type ReviewStatus = (typeof VALID_STATUSES)[number];
 

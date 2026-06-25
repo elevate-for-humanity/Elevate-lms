@@ -12,16 +12,16 @@ interface Props {
   acceptedAgreements: string[];
 }
 
-export default function LicenseeOnboardingForm({
-  userId,
+export default function LicenseeOnboardingForm({ 
+  userId, 
   userEmail,
   userName,
   organizationId,
-  requiredAgreements,
-  acceptedAgreements,
+  requiredAgreements, 
+  acceptedAgreements 
 }: Props) {
   const router = useRouter();
-  const pendingAgreements = requiredAgreements.filter((a) => !acceptedAgreements.includes(a));
+  const pendingAgreements = requiredAgreements.filter(a => !acceptedAgreements.includes(a));
   const allAccepted = pendingAgreements.length === 0;
 
   if (allAccepted) {
@@ -34,7 +34,7 @@ export default function LicenseeOnboardingForm({
   }
 
   // Map agreement types to labels and URLs
-  const agreementConfig = requiredAgreements.map((type) => {
+  const agreementConfig = requiredAgreements.map(type => {
     const labels: Record<string, string> = {
       eula: 'End User License Agreement',
       tos: 'Terms of Service',
@@ -44,7 +44,7 @@ export default function LicenseeOnboardingForm({
     };
     const urls: Record<string, string> = {
       eula: '/legal/eula',
-      tos: '/legal',
+      tos: '/terms-of-service',
       aup: '/legal/acceptable-use',
       disclosures: '/legal/disclosures',
       license: '/legal/license-agreement',

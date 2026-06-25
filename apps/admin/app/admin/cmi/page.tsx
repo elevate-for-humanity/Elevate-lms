@@ -42,9 +42,12 @@ export default async function CMIDashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
 
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff'].includes(profile.role)) {
     redirect('/admin');
   }
 

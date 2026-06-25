@@ -160,7 +160,7 @@ function TrendBadge({ trend }: { trend: 'up' | 'down' | 'flat' }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function ForecastPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   // Pull 16 weeks of enrollment + completion data

@@ -17,7 +17,7 @@ const RISK_STYLES: Record<string, string> = {
 };
 
 export default async function AtRiskPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const adminDb = await requireAdminClient();
   if (!adminDb) {
     return (

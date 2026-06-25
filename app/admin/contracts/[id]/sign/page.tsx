@@ -28,7 +28,7 @@ export default async function SignPage({
 
   const db = await requireAdminClient();
   const { data: profile } = await db.from('profiles').select('role, full_name, email').eq('id', user.id).maybeSingle();
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   const { data: contract } = await db
     .from('contract_templates')

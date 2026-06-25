@@ -665,12 +665,12 @@ const TOOLS: unknown[] = [
     type: 'function',
     function: {
       name: 'update_user_role',
-      description: 'Update a user\'s role (student, staff, admin, super_admin, instructor)',
+      description: 'Update a user\'s role (student, staff, admin, admin, instructor)',
       parameters: {
         type: 'object',
         properties: {
           user_id: { type: 'string', description: 'User UUID' },
-          role: { type: 'string', enum: ['student', 'staff', 'admin', 'super_admin', 'instructor'] },
+          role: { type: 'string', enum: ['student', 'staff', 'admin', 'instructor'] },
         },
         required: ['user_id', 'role'],
       },
@@ -2255,11 +2255,11 @@ async function executeAction(
     }
 
     case 'update_user_role': {
-      // super_admin escalation is never permitted via the AI console.
+      // admin escalation is never permitted via the AI console.
       // It must be done directly in the Supabase dashboard or via a
       // dedicated admin UI with MFA confirmation.
-      if (String(args.role) === 'super_admin') {
-        write(`\x1b[31m✗  Escalation to super_admin is not permitted via the AI console.\x1b[0m`);
+      if (String(args.role) === 'admin') {
+        write(`\x1b[31m✗  Escalation to admin is not permitted via the AI console.\x1b[0m`);
         write(`   Use the Supabase dashboard or the Users admin page directly.`);
         break;
       }

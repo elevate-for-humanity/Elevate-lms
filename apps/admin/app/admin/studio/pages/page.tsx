@@ -13,6 +13,6 @@ export const metadata: Metadata = {
 };
 
 export default async function PageBuilderPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   return <PageBuilderClient />;
 }

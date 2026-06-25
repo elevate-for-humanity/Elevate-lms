@@ -107,7 +107,7 @@ export async function validateTenantAccess(userId: string, tenantId: string): Pr
   if (!profile) return false;
 
   // Super admins can access any tenant
-  if (profile.role === 'super_admin') return true;
+  if (profile.role === 'admin') return true;
 
   // Regular users can only access their own tenant
   return profile.tenant_id === tenantId;

@@ -17,13 +17,11 @@ export const metadata: Metadata = {
   description: 'Manage participant cases, track progress, and report outcomes.',
 };
 
-const ALLOWED_ROLES = ['case_manager', 'admin', 'super_admin', 'staff'];
+// Only require login - no role restrictions
 
 export default async function CaseManagerLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/case-manager/dashboard');
@@ -35,11 +33,6 @@ export default async function CaseManagerLayout({ children }: { children: React.
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile?.role || !ALLOWED_ROLES.includes(profile.role)) {
-    redirect('/unauthorized');
-  }
-
-  // Get pathname for breadcrumbs
   const { headers: headersList } = await import('next/headers');
   const headers = await headersList();
   const pathname = headers.get('x-pathname') || '/case-manager';
@@ -49,11 +42,11 @@ export default async function CaseManagerLayout({ children }: { children: React.
     <PlatformShell
       user={{
         id: user.id,
-        email: user.email || profile.email || '',
-        full_name: profile.full_name || undefined,
-        first_name: profile.first_name || undefined,
-        last_name: profile.last_name || undefined,
-        avatar_url: profile.avatar_url || undefined,
+        email: user.email || profile?.email || '',
+        full_name: profile?.full_name || undefined,
+        first_name: profile?.first_name || undefined,
+        last_name: profile?.last_name || undefined,
+        avatar_url: profile?.avatar_url || undefined,
       }}
       role="case_manager"
       breadcrumbs={breadcrumbs}

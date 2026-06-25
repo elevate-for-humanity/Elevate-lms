@@ -27,7 +27,7 @@ async function _GET(request: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    const allowedRoles = ['program_holder', 'admin', 'super_admin', 'staff'];
+    const allowedRoles = ['program_holder', 'admin', 'staff'];
     if (!profile || !allowedRoles.includes(profile.role ?? '')) {
       return NextResponse.json(
         { error: 'Forbidden - Program holder access only' },

@@ -209,7 +209,7 @@ export default async function WioaReportPage({
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
 
   const sp = await searchParams;
   const filters: Filters = {

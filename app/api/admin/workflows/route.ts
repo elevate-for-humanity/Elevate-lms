@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     .select('*')
     .order('updated_at', { ascending: false });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
   // Enrich with trigger + step counts
   const ids = (workflows ?? []).map((w: any) => w.id);
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
   logAdminAudit({ action: AdminAction.WORKFLOW_CREATED, actorId: auth.id, entityType: 'workflows', entityId: data.id, metadata: { name, category }, req: request }).catch(() => {});
 

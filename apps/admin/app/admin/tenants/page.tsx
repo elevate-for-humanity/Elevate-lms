@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function TenantsPage() {
-  await requireRole(['super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   const { data: tenants, count } = await supabase

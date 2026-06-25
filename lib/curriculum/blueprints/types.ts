@@ -154,6 +154,9 @@ export type BlueprintModule = {
   // ── Competency coverage requirements (enforced by auditor) ──
   competencies: BlueprintCompetency[];
 
+  // NHA-Style Interaction Specs
+  interactionSpecs?: InteractionSpecs;
+
   /**
    * Suggested lesson titles for the AI generator.
    * Not enforced — generator may deviate within bounds.
@@ -440,3 +443,40 @@ export type BlueprintAuditResult = {
   violations: BlueprintAuditViolation[];
   warnings: BlueprintAuditViolation[];
 };
+
+
+// ─── NHA-Style Interaction Specs ──────────────────────────────────────────────
+export interface InteractionSpecs {
+  includeKnowledgeChecks: boolean;
+  includeScenarios: boolean;
+  includeFlashcards: boolean;
+  includeClickToReveal: boolean;
+  includeDragDrop: boolean;
+  knowledgeCheckCount: number;
+  scenarioCount: number;
+  flashcardCount: number;
+}
+
+// ─── Enrollment-Based Features ────────────────────────────────────────────────
+export type EnrollmentType = "standard" | "apprentice" | "enterprise";
+
+export interface ApprenticeshipFeatures {
+  enabled: boolean;
+  rtiHoursRequired: number;
+  ojlHoursRequired: number;
+  competencyTracking: boolean;
+  employerEvaluations: boolean;
+  skillSignoffs: boolean;
+  rapidsReporting: boolean;
+}
+
+export interface CourseFeatures {
+  enrollmentTypes: EnrollmentType[];
+  apprenticeship?: ApprenticeshipFeatures;
+  certificationPrep: boolean;
+  practiceExams: boolean;
+  discussionBoards: boolean;
+  studyGroups: boolean;
+  careerPathways: boolean;
+  mobileOffline: boolean;
+}

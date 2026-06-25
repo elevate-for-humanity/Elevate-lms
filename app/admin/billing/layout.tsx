@@ -3,7 +3,7 @@ import { BillingSubnav, ADMIN_BILLING_NAV } from '@/components/billing/BillingSu
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default async function AdminBillingLayout({ children }: { children: React.ReactNode }) {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
 
   return (
     <div className="min-h-screen bg-slate-50">

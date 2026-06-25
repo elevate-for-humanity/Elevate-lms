@@ -168,7 +168,7 @@ export default function WorkOnePartnerPacketPage() {
                   fill
                   quality={85}
                   className="object-cover"
-                  sizes="100vw" placeholder="blur"
+                  sizes="100vw" 
                 />
               </div>
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
@@ -244,7 +244,7 @@ export default function WorkOnePartnerPacketPage() {
                   fill
                   sizes="100vw"
                   quality={85}
-                  className="object-cover" placeholder="blur"
+                  className="object-cover" 
                 />
               </div>
               <div className="p-6">
@@ -267,7 +267,7 @@ export default function WorkOnePartnerPacketPage() {
                   fill
                   sizes="100vw"
                   quality={85}
-                  className="object-cover" placeholder="blur"
+                  className="object-cover" 
                 />
               </div>
               <div className="p-6">
@@ -290,7 +290,7 @@ export default function WorkOnePartnerPacketPage() {
                   fill
                   sizes="100vw"
                   quality={85}
-                  className="object-cover" placeholder="blur"
+                  className="object-cover" 
                 />
               </div>
               <div className="p-6">
@@ -313,7 +313,7 @@ export default function WorkOnePartnerPacketPage() {
                   fill
                   sizes="100vw"
                   quality={85}
-                  className="object-cover" placeholder="blur"
+                  className="object-cover" 
                 />
               </div>
               <div className="p-6">
@@ -406,7 +406,7 @@ export default function WorkOnePartnerPacketPage() {
                     fill
                     sizes="100vw"
                     quality={85}
-                    className="object-cover" placeholder="blur"
+                    className="object-cover" 
                   />
                 </div>
                 <div className="p-6">

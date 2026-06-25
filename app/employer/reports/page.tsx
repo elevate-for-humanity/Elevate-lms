@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function EmployerReportsPage() {
-  const { user, profile } = await requireRole(['employer', 'admin', 'super_admin', 'staff']);
+  const { user, profile } = await requireRole(['employer', 'admin', 'staff']);
   const db = await requireAdminClient();
 
   const employerId = (profile as any)?.employer_id;

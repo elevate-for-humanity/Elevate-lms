@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export default async function FerpaConsentFormsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const { data: forms, count } = await db

@@ -158,7 +158,7 @@ export default function StudentSupportPage() {
                     alt={service.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="blur"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" 
                   />
                   <div className="absolute bottom-3 left-4">
                     <h3 className="text-lg font-bold text-slate-900">{service.title}</h3>
@@ -235,7 +235,7 @@ export default function StudentSupportPage() {
           alt="Students succeeding in workforce training"
           fill
           className="object-cover"
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">

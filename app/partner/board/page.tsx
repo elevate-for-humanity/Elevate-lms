@@ -12,7 +12,7 @@ export default async function PartnerBoardPage() {
   if (!user) redirect('/login?redirect=/partner/board');
 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!profile || !['partner', 'admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
+  if (!profile || !['partner', 'admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   const board = await getHostShopBoard(user.id);
 

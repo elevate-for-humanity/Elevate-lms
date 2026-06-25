@@ -30,7 +30,7 @@ export default async function ApplicationsPage({
 }: {
   searchParams: Promise<{ status?: string; search?: string; page?: string; program?: string }>;
 }) {
-  await requireRole(['admin', 'super_admin', 'staff', 'org_admin', 'instructor']);
+  await requireRole(['admin', 'staff', 'org_admin', 'instructor']);
   const params = await searchParams;
 
   const sessionClient = await createClient();

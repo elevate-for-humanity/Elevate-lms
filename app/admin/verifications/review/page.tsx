@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminVerificationReviewPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   const { data: rawVerifications, error: verificationsError } = await supabase

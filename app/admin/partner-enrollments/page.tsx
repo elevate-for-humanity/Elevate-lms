@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PartnerEnrollmentsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   const { data: profile } = await supabase
@@ -21,7 +21,7 @@ export default async function PartnerEnrollmentsPage() {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
+  if (profile?.role !== 'admin' && profile?.role !== 'admin') redirect('/unauthorized');
 
   const { data: enrollments, count } = await supabase
     .from('partner_course_enrollments')

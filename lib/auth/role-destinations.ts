@@ -21,7 +21,7 @@ export type UserRole =
   | 'student'
   | 'instructor'
   | 'admin'
-  | 'super_admin'
+  | 'admin'
   | 'org_admin'
   | 'staff'
   | 'program_holder'
@@ -37,7 +37,7 @@ export type UserRole =
   | 'provider_admin'
   | 'grant_client'
   | 'partner_admin'
-  | 'platform_operator';
+  | 'admin';
 
 /**
  * Maps every role to its canonical post-auth landing page.
@@ -50,10 +50,10 @@ export type UserRole =
 export const ROLE_DESTINATIONS: Record<string, string> = {
   // ── Platform admins ───────────────────────────────────────────────
   // Admin roles always land on the admin app, never the LMS
-  super_admin: '/admin/dashboard',
+  admin: '/admin/dashboard',
   admin: '/admin/dashboard',
   org_admin: '/admin/dashboard',
-  platform_operator: '/admin/dev-studio',
+  admin: '/admin/dev-studio',
 
   // ── Internal Elevate staff ────────────────────────────────────────
   staff: '/admin/staff-portal/dashboard',

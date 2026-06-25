@@ -33,7 +33,7 @@ const _GET = withAuth(
       return NextResponse.json({ error }, { status });
     }
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 
 // POST /api/admin/sso - Create SSO connection
@@ -114,7 +114,7 @@ const _POST = withAuth(
       return NextResponse.json({ error }, { status });
     }
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 export const GET = withApiAudit('/api/admin/sso', _GET);
 export const POST = withApiAudit('/api/admin/sso', _POST);

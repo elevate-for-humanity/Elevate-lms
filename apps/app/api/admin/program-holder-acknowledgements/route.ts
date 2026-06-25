@@ -32,6 +32,6 @@ const _GET = withAuth(
       return NextResponse.json({ error: 'Unexpected error' }, { status: 500 });
     }
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 export const GET = withApiAudit('/api/admin/program-holder-acknowledgements', _GET);

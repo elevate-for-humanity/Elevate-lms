@@ -64,7 +64,7 @@ async function notifyPaymentSucceeded(
   const { data: adminUsers } = await supabase
     .from('profiles')
     .select('id')
-    .in('role', ['admin', 'super_admin', 'staff'])
+    .in('role', ['admin', 'staff'])
     .limit(200);
 
   if (adminUsers?.length) {
@@ -1192,7 +1192,7 @@ async function _PUT(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    if (!profile || !['admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 

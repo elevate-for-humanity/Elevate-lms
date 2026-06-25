@@ -40,7 +40,7 @@ function statusBadge(status: string) {
 }
 
 export default async function StudentHoursPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   // Load all hour entries

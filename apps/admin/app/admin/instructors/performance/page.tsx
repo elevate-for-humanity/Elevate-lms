@@ -10,7 +10,7 @@ export const revalidate = 60;
 export const metadata: Metadata = { title: 'Instructor Performance | Admin | Elevate For Humanity' };
 
 export default async function InstructorPerformancePage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   // Load instructors with their profiles and assignment counts

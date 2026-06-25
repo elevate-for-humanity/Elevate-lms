@@ -1,3 +1,4 @@
+
 import { Metadata } from 'next';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 
@@ -15,6 +16,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
+
 
 export default async function ShopOnboardingPage() {
   const supabase = await createClient();
@@ -36,7 +38,7 @@ export default async function ShopOnboardingPage() {
   const shop = staff?.[0]?.shops;
 
   if (!shop) {
-    redirect('/learner/dashboard');
+    redirect('/dashboard');
   }
 
   // Get onboarding status
@@ -44,7 +46,7 @@ export default async function ShopOnboardingPage() {
     .from('shop_onboarding')
     .select('*')
     .eq('shop_id', shop.id)
-    .single();
+    .maybeSingle();
 
   // Get required documents status
   const { data: docsStatus } = await supabase
@@ -70,8 +72,12 @@ export default async function ShopOnboardingPage() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
-          <h1 className="text-3xl font-bold text-black">Shop Partner Onboarding</h1>
-          <p className="mt-2 text-black">Complete all steps to begin hosting apprentices</p>
+          <h1 className="text-3xl font-bold text-black">
+            Shop Partner Onboarding
+          </h1>
+          <p className="mt-2 text-black">
+            Complete all steps to begin hosting apprentices
+          </p>
         </div>
       </div>
 
@@ -80,7 +86,9 @@ export default async function ShopOnboardingPage() {
         {/* Progress Overview */}
         <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-black">Onboarding Progress</h2>
+            <h2 className="text-xl font-bold text-black">
+              Onboarding Progress
+            </h2>
             <div className="text-right">
               <div className="text-3xl font-bold text-brand-blue-600">
                 {approvedDocs.length}/{requiredDocs.length}
@@ -94,7 +102,9 @@ export default async function ShopOnboardingPage() {
               className="bg-white h-3 rounded-full transition-all"
               style={{
                 width: `${
-                  requiredDocs.length > 0 ? (approvedDocs.length / requiredDocs.length) * 100 : 0
+                  requiredDocs.length > 0
+                    ? (approvedDocs.length / requiredDocs.length) * 100
+                    : 0
                 }%`,
               }}
             />
@@ -105,12 +115,17 @@ export default async function ShopOnboardingPage() {
         <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6">
           <div className="flex items-center gap-3 mb-6">
             <FileText className="w-6 h-6 text-brand-blue-600" />
-            <h2 className="text-xl font-bold text-black">Required Documents</h2>
+            <h2 className="text-xl font-bold text-black">
+              Required Documents
+            </h2>
           </div>
 
           <div className="space-y-4">
             {requiredDocs.map((doc) => (
-              <div key={doc.document_type} className="border border-slate-200 rounded-lg p-4">
+              <div
+                key={doc.document_type}
+                className="border border-slate-200 rounded-lg p-4"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1">
                     {doc.approved ? (
@@ -120,16 +135,21 @@ export default async function ShopOnboardingPage() {
                     )}
                     <div className="flex-1">
                       <div
-                        className={`font-semibold ${doc.approved ? 'text-black' : 'text-black'}`}
+                        className={`font-semibold ${
+                          doc.approved ? 'text-black' : 'text-black'
+                        }`}
                       >
                         {doc.display_name}
                       </div>
                       {doc.description && (
-                        <div className="text-sm text-black mt-1">{doc.description}</div>
+                        <div className="text-sm text-black mt-1">
+                          {doc.description}
+                        </div>
                       )}
                       {doc.approved && doc.approved_at && (
                         <div className="text-xs text-brand-green-600 mt-2">
-                          • Approved on {new Date(doc.approved_at).toLocaleDateString()}
+                          • Approved on{' '}
+                          {new Date(doc.approved_at).toLocaleDateString()}
                         </div>
                       )}
                       {!doc.approved && doc.uploaded_at && (
@@ -138,7 +158,9 @@ export default async function ShopOnboardingPage() {
                         </div>
                       )}
                       {!doc.approved && !doc.uploaded_at && (
-                        <div className="text-xs text-slate-500 mt-2">Not yet uploaded</div>
+                        <div className="text-xs text-slate-500 mt-2">
+                          Not yet uploaded
+                        </div>
                       )}
                     </div>
                   </div>
@@ -171,7 +193,9 @@ export default async function ShopOnboardingPage() {
 
         {/* Onboarding Checklist */}
         <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6">
-          <h2 className="text-xl font-bold text-black mb-4">Onboarding Checklist</h2>
+          <h2 className="text-xl font-bold text-black mb-4">
+            Onboarding Checklist
+          </h2>
 
           <div className="space-y-3">
             <div className="flex items-center gap-3">
@@ -180,7 +204,13 @@ export default async function ShopOnboardingPage() {
               ) : (
                 <Clock className="w-5 h-5 text-slate-400" />
               )}
-              <span className={onboarding?.handbook_ack ? 'text-black font-medium' : 'text-black'}>
+              <span
+                className={
+                  onboarding?.handbook_ack
+                    ? 'text-black font-medium'
+                    : 'text-black'
+                }
+              >
                 Acknowledge sponsor handbook + expectations
               </span>
             </div>
@@ -192,7 +222,11 @@ export default async function ShopOnboardingPage() {
                 <Clock className="w-5 h-5 text-slate-400" />
               )}
               <span
-                className={onboarding?.reporting_trained ? 'text-black font-medium' : 'text-black'}
+                className={
+                  onboarding?.reporting_trained
+                    ? 'text-black font-medium'
+                    : 'text-black'
+                }
               >
                 Complete reporting training
               </span>
@@ -223,7 +257,9 @@ export default async function ShopOnboardingPage() {
               )}
               <span
                 className={
-                  onboarding?.rapids_reporting_ready ? 'text-black font-medium' : 'text-black'
+                  onboarding?.rapids_reporting_ready
+                    ? 'text-black font-medium'
+                    : 'text-black'
                 }
               >
                 RAPIDS reporting readiness
@@ -234,20 +270,22 @@ export default async function ShopOnboardingPage() {
 
         {/* Sponsor of Record */}
         <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-6">
-          <h3 className="text-lg font-bold text-brand-blue-900 mb-3">Sponsor of Record</h3>
+          <h3 className="text-lg font-bold text-brand-blue-900 mb-3">
+            Sponsor of Record
+          </h3>
           <p className="text-sm text-brand-blue-900 mb-2">
-            {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute is a DBA of 2Exclusive LLC-S, the
-            USDOL Registered Apprenticeship Sponsor of Record.
+            {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute is a DBA of 2Exclusive LLC-S, the USDOL Registered Apprenticeship Sponsor of Record.
           </p>
           <p className="text-sm text-brand-blue-800">
-            Partner training sites provide supervised practical training and validate training
-            hours. Partners do not set wages, provide payroll services, or guarantee employment.
+            Partner training sites provide supervised practical training and validate training hours. Partners do not set wages, provide payroll services, or guarantee employment.
           </p>
         </div>
 
         {/* Partner Training Responsibilities */}
         <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-6">
-          <h3 className="text-lg font-bold text-black mb-3">Partner Training Responsibilities</h3>
+          <h3 className="text-lg font-bold text-black mb-3">
+            Partner Training Responsibilities
+          </h3>
           <ul className="space-y-2 text-sm text-black">
             <li className="flex items-start gap-2">
               <span className="text-brand-blue-600 mt-0.5">•</span>
@@ -278,7 +316,9 @@ export default async function ShopOnboardingPage() {
 
         {/* What Partners Do NOT Provide */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
-          <h3 className="text-lg font-bold text-amber-900 mb-3">What Partners Do NOT Provide</h3>
+          <h3 className="text-lg font-bold text-amber-900 mb-3">
+            What Partners Do NOT Provide
+          </h3>
           <ul className="space-y-2 text-sm text-amber-900">
             <li className="flex items-start gap-2">
               <span className="text-amber-600 mt-0.5">•</span>
@@ -294,25 +334,25 @@ export default async function ShopOnboardingPage() {
             </li>
           </ul>
           <p className="text-xs text-amber-700 mt-3">
-            Employment classification and compensation are external matters governed by employer
-            policies and labor law, not Elevate.
+            Employment classification and compensation are external matters governed by employer policies and labor law, not Elevate.
           </p>
         </div>
 
         {/* Hour Tracking Clarification */}
         <div className="bg-white border border-slate-200 rounded-xl p-6">
-          <h3 className="text-lg font-bold text-black mb-3">Hour Tracking Clarification</h3>
+          <h3 className="text-lg font-bold text-black mb-3">
+            Hour Tracking Clarification
+          </h3>
           <p className="text-sm text-black">
-            Elevate tracks <strong>training hours only</strong> for program completion and
-            compliance reporting. Any employment relationship, compensation, or overtime rules are
-            governed by the employer and applicable labor law, not Elevate.
+            Elevate tracks <strong>training hours only</strong> for program completion and compliance reporting. 
+            Any employment relationship, compensation, or overtime rules are governed by the employer and applicable labor law, not Elevate.
           </p>
         </div>
 
         {/* Back to Dashboard */}
         <div className="text-center">
           <Link
-            href="/learner/dashboard"
+            href="/dashboard"
             className="text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
           >
             ← Back to Dashboard

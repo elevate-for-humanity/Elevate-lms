@@ -40,7 +40,7 @@ export const metadata: Metadata = {
  */
 export default async function StaffDashboard() {
   // Require staff or admin role
-  const { user, profile } = await requireRole(['staff', 'admin', 'super_admin']);
+  const { user, profile } = await requireRole(['staff', 'admin']);
 
   const supabase = await createClient();
 
@@ -385,8 +385,8 @@ export default async function StaffDashboard() {
           </div>
         </div>
 
-        {/* HR, Hiring & Payroll — admin/super_admin only */}
-        {['admin', 'super_admin'].includes(profile?.role ?? '') && (
+        {/* HR, Hiring & Payroll — admin/admin only */}
+        {['admin'].includes(profile?.role ?? '') && (
           <div className="mt-8">
             <h3 className="text-lg font-semibold text-black mb-4">HR, Hiring &amp; Payroll</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

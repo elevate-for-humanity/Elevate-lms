@@ -1,11 +1,10 @@
-export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DocumentPage, DocumentSection } from '@/components/documents';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Program Licensing Agreement',
+  title: 'Program Licensing Agreement | {PLATFORM_DEFAULTS.orgName}',
   robots: { index: false, follow: false },
 };
 
@@ -13,20 +12,24 @@ export default function ProgramLicenseAgreementPage() {
   return (
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
-        <Breadcrumbs
-          items={[{ label: 'Legal', href: '/legal' }, { label: 'Program Licensing Agreement' }]}
-        />
+        <Breadcrumbs items={[
+          { label: 'Legal', href: '/legal' },
+          { label: 'Program Licensing Agreement' },
+        ]} />
       </div>
       <DocumentPage
         documentType="Program Licensing Agreement"
         title="Inter-Entity Program Licensing Agreement"
-        subtitle={`${PLATFORM_DEFAULTS.orgName} (Nonprofit) and 2Exclusive LLC-S (Operating Company)`}
+        subtitle="{PLATFORM_DEFAULTS.orgName} (Nonprofit) and 2Exclusive LLC-S (Operating Company)"
         date="2025-01-01"
         version="1.0"
         confidential
       >
+
         <DocumentSection heading="Parties" number={1}>
-          <p>This Program Licensing Agreement ("Agreement") is entered into between:</p>
+          <p>
+            This Program Licensing Agreement ("Agreement") is entered into between:
+          </p>
           <ul>
             <li>
               <strong>{PLATFORM_DEFAULTS.orgName}</strong> ("Program Authority"), a nonprofit organization
@@ -34,32 +37,29 @@ export default function ProgramLicenseAgreementPage() {
               compliance, and program standards; and
             </li>
             <li>
-              <strong>
-                2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
-              </strong>{' '}
-              ("Operating Company"), a for-profit limited liability company operating under Indiana
-              law, responsible for enrollment operations, tuition collection, technology
-              infrastructure, marketing, and training network expansion.
+              <strong>2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName} Career &amp; Training Institute</strong>{' '}
+              ("Operating Company"), a for-profit limited liability company operating under Indiana law,
+              responsible for enrollment operations, tuition collection, technology infrastructure,
+              marketing, and training network expansion.
             </li>
           </ul>
           <p className="mt-3">
             Together, the parties operate a coordinated hybrid training model in which the Program
-            Authority defines and owns the program, and the Operating Company delivers and scales
-            it.
+            Authority defines and owns the program, and the Operating Company delivers and scales it.
           </p>
         </DocumentSection>
 
         <DocumentSection heading="Purpose" number={2}>
           <p>
             The Program Authority authorizes the Operating Company to deliver workforce training
-            programs under the Program Authority's standards, brand, and credential framework. This
-            Agreement defines the scope of that authorization, the responsibilities of each entity,
-            and the financial arrangement between them.
+            programs under the Program Authority's standards, brand, and credential framework.
+            This Agreement defines the scope of that authorization, the responsibilities of each
+            entity, and the financial arrangement between them.
           </p>
           <p className="mt-3">
-            This Agreement does not merge the two entities, create shared ownership, or transfer any
-            intellectual property from the Program Authority to the Operating Company. The Program
-            Authority retains all ownership rights defined in Section 4.
+            This Agreement does not merge the two entities, create shared ownership, or transfer
+            any intellectual property from the Program Authority to the Operating Company. The
+            Program Authority retains all ownership rights defined in Section 4.
           </p>
         </DocumentSection>
 
@@ -67,19 +67,10 @@ export default function ProgramLicenseAgreementPage() {
           <p>The Program Authority is solely responsible for:</p>
           <ul>
             <li>Curriculum design, instructional standards, and all program content</li>
-            <li>
-              Credential alignment and relationships with credentialing bodies (EPA, CompTIA,
-              Indiana SDOH, ICAADA, and others)
-            </li>
-            <li>
-              ETPL registration and compliance with Indiana Department of Workforce Development
-              requirements
-            </li>
+            <li>Credential alignment and relationships with credentialing bodies (EPA, CompTIA, Indiana SDOH, ICAADA, and others)</li>
+            <li>ETPL registration and compliance with Indiana Department of Workforce Development requirements</li>
             <li>Student outcome reporting to state and federal workforce agencies</li>
-            <li>
-              Compliance with WIOA nondiscrimination requirements and federal workforce program
-              regulations
-            </li>
+            <li>Compliance with WIOA nondiscrimination requirements and federal workforce program regulations</li>
             <li>Program quality standards and instructor qualification requirements</li>
             <li>Approval of any modifications to curriculum or credential structure</li>
             <li>Professional liability insurance covering curriculum and instruction</li>
@@ -87,7 +78,9 @@ export default function ProgramLicenseAgreementPage() {
         </DocumentSection>
 
         <DocumentSection heading="Program Authority Ownership" number={4}>
-          <p>The Program Authority retains sole and exclusive ownership of:</p>
+          <p>
+            The Program Authority retains sole and exclusive ownership of:
+          </p>
           <ul>
             <li>All curriculum materials, instructional content, assessments, and media</li>
             <li>Program model, training methodology, and operational framework</li>
@@ -97,10 +90,10 @@ export default function ProgramLicenseAgreementPage() {
             <li>Student outcome data and program performance records</li>
           </ul>
           <p className="mt-3">
-            The Operating Company receives a limited, non-exclusive, non-transferable license to use
-            these assets solely for the purpose of delivering authorized training programs under
-            this Agreement. This license terminates automatically upon expiration or termination of
-            this Agreement.
+            The Operating Company receives a limited, non-exclusive, non-transferable license to
+            use these assets solely for the purpose of delivering authorized training programs
+            under this Agreement. This license terminates automatically upon expiration or
+            termination of this Agreement.
           </p>
         </DocumentSection>
 
@@ -113,35 +106,30 @@ export default function ProgramLicenseAgreementPage() {
             <li>Marketing, recruitment, and student outreach</li>
             <li>Contracts with Training Network host facilities and coordination partners</li>
             <li>Instructor hiring, payroll, and operational HR</li>
-            <li>
-              Training network expansion — identifying, approving, and onboarding new delivery sites
-            </li>
-            <li>
-              Operational compliance with state business registration requirements in each state of
-              operation
-            </li>
+            <li>Training network expansion — identifying, approving, and onboarding new delivery sites</li>
+            <li>Operational compliance with state business registration requirements in each state of operation</li>
             <li>General commercial liability insurance for program operations</li>
           </ul>
           <p className="mt-3">
             The Operating Company may not modify curriculum, alter credential requirements, or
-            represent programs to workforce agencies without written authorization from the Program
-            Authority.
+            represent programs to workforce agencies without written authorization from the
+            Program Authority.
           </p>
         </DocumentSection>
 
         <DocumentSection heading="Revenue Flow and Program Support Fee" number={6}>
           <p>
-            All tuition payments are collected by the Operating Company. Operational costs are paid
-            from gross tuition at the Operating Company level. Net program revenue is calculated as
-            gross tuition minus operational costs as defined in the Training Network Partner
-            Agreement.
+            All tuition payments are collected by the Operating Company. Operational costs are
+            paid from gross tuition at the Operating Company level. Net program revenue is
+            calculated as gross tuition minus operational costs as defined in the Training
+            Network Partner Agreement.
           </p>
           <p className="mt-3">
             The Operating Company pays the Program Authority a <strong>Program Support Fee</strong>{' '}
-            equal to <strong>ten percent (10%) of gross tuition collected</strong> per cohort. This
-            fee sustains the Program Authority's curriculum development, compliance, and credential
-            maintenance functions. The Program Support Fee is paid within 30 days of cohort
-            completion.
+            equal to <strong>ten percent (10%) of gross tuition collected</strong> per cohort.
+            This fee sustains the Program Authority's curriculum development, compliance, and
+            credential maintenance functions. The Program Support Fee is paid within 30 days
+            of cohort completion.
           </p>
           <p className="mt-3">
             The Program Support Fee is not contingent on net revenue and is paid before host
@@ -153,22 +141,21 @@ export default function ProgramLicenseAgreementPage() {
         <DocumentSection heading="Multi-State Expansion" number={7}>
           <p>
             The Operating Company may expand the training network into additional states by
-            registering as a foreign entity in each state of operation. Expansion does not require
-            approval from existing Training Network host sites.
+            registering as a foreign entity in each state of operation. Expansion does not
+            require approval from existing Training Network host sites.
           </p>
-          <p className="mt-3">Before operating in a new state, the Operating Company must:</p>
+          <p className="mt-3">
+            Before operating in a new state, the Operating Company must:
+          </p>
           <ul>
             <li>Complete required foreign entity registration in that state</li>
             <li>Notify the Program Authority of the expansion in writing</li>
-            <li>
-              Confirm that the program curriculum and credential structure are appropriate for that
-              state's workforce requirements
-            </li>
+            <li>Confirm that the program curriculum and credential structure are appropriate for that state's workforce requirements</li>
             <li>Ensure any state-specific workforce program compliance requirements are met</li>
           </ul>
           <p className="mt-3">
-            The Program Authority retains the right to withhold authorization for expansion into a
-            specific state if compliance requirements cannot be met or if the expansion would
+            The Program Authority retains the right to withhold authorization for expansion into
+            a specific state if compliance requirements cannot be met or if the expansion would
             jeopardize ETPL status or credential relationships.
           </p>
         </DocumentSection>
@@ -200,27 +187,28 @@ export default function ProgramLicenseAgreementPage() {
         </DocumentSection>
 
         <DocumentSection heading="Governance and Decision Authority" number={9}>
-          <p>The Program Authority retains decision rights over:</p>
+          <p>
+            The Program Authority retains decision rights over:
+          </p>
           <ul>
             <li>Curriculum content and instructional standards</li>
             <li>Credential alignment and exam authorization</li>
             <li>Program integrity and quality standards</li>
             <li>ETPL compliance and workforce agency reporting</li>
           </ul>
-          <p className="mt-3">The Operating Company retains decision rights over:</p>
+          <p className="mt-3">
+            The Operating Company retains decision rights over:
+          </p>
           <ul>
-            <li>
-              Enrollment operations and tuition pricing (within parameters set by the Program
-              Authority)
-            </li>
+            <li>Enrollment operations and tuition pricing (within parameters set by the Program Authority)</li>
             <li>Marketing and recruitment strategy</li>
             <li>Technology infrastructure and LMS operations</li>
             <li>Host facility selection and Training Network expansion</li>
             <li>Instructor hiring and operational staffing</li>
           </ul>
           <p className="mt-3">
-            Tuition pricing changes that affect ETPL-reported program costs require notification to
-            the Program Authority at least 30 days before implementation.
+            Tuition pricing changes that affect ETPL-reported program costs require notification
+            to the Program Authority at least 30 days before implementation.
           </p>
         </DocumentSection>
 
@@ -242,18 +230,19 @@ export default function ProgramLicenseAgreementPage() {
           <p className="mt-3">
             Upon termination, the Operating Company's license to use Program Authority assets
             terminates immediately. Active cohorts continue under this Agreement until completion.
-            The Operating Company must return or destroy all proprietary curriculum materials within
-            30 days of termination.
+            The Operating Company must return or destroy all proprietary curriculum materials
+            within 30 days of termination.
           </p>
         </DocumentSection>
 
         <DocumentSection heading="Governing Law" number={11}>
           <p>
-            This Agreement is governed by the laws of the State of Indiana. Disputes shall first be
-            submitted to good-faith mediation. If unresolved within 30 days, the parties consent to
-            jurisdiction in Marion County, Indiana.
+            This Agreement is governed by the laws of the State of Indiana. Disputes shall first
+            be submitted to good-faith mediation. If unresolved within 30 days, the parties
+            consent to jurisdiction in Marion County, Indiana.
           </p>
         </DocumentSection>
+
       </DocumentPage>
     </>
   );

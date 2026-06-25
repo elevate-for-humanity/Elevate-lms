@@ -11,7 +11,7 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const auth = await requireApiRole(['workforce_board', 'admin', 'super_admin', 'org_admin']);
+    const auth = await requireApiRole(['workforce_board', 'admin', 'org_admin']);
     if (auth instanceof NextResponse) return auth;
 
     const { db } = auth;

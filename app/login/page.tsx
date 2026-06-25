@@ -18,7 +18,7 @@ import { hydrateBrowserSupabaseConfig } from '@/lib/supabase/public-config';
 import { mapAuthError } from '@/lib/auth/map-auth-error';
 
 
-const ADMIN_LOGIN_ROLES = new Set(['super_admin', 'admin', 'staff', 'org_admin', 'platform_operator']);
+const ADMIN_LOGIN_ROLES = new Set(['admin', 'staff', 'org_admin', 'admin']);
 const ADMIN_ORIGIN = (process.env.NEXT_PUBLIC_ADMIN_URL || '').replace(/\/$/, '');
 
 function normalizePostLoginRedirect(target: string, role: string | null | undefined): string | null {
@@ -343,7 +343,7 @@ function LoginForm() {
           className="object-cover"
           priority
           quality={90}
-          sizes="100vw" placeholder="blur"
+          sizes="100vw"
         />
       </section>
 

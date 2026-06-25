@@ -27,7 +27,7 @@ export default async function FERPATrainingPage() {
       .from('profiles')
       .select('id, full_name, email, role')
       .not('id', 'in', `(SELECT user_id FROM ferpa_training_records WHERE status = 'completed')`)
-      .in('role', ['staff', 'instructor', 'admin', 'super_admin'])
+      .in('role', ['staff', 'instructor', 'admin'])
       .order('full_name'),
   ]);
 

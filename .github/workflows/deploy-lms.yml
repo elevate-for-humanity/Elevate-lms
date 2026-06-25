@@ -92,11 +92,14 @@ jobs:
         id: trigger_lms_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_LMS_SERVICE_ID"
 
+      - name: Wait for LMS build to complete
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --build-id "${{ steps.trigger_lms_build.outputs.build_id }}" --timeout-ms 3600000
+
       - name: Roll out latest LMS image
         run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_LMS_SERVICE_ID"
 
       - name: Wait for LMS deployment
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --build-id "${{ steps.trigger_lms_build.outputs.build_id }}" --timeout-ms 3600000
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --timeout-ms 600000
 
       - name: Verify deployed SHA matches main
         env:

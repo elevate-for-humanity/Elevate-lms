@@ -4,7 +4,12 @@
  * Handles payment confirmations for $15 application fees.
  * On checkout.session.completed:
  *   - Marks the application as paid and eligible for review
- *   - Sends confirmation email to applicant
+ *   - Records payment in application_payments table
+ *
+ * Fee Policy:
+ * - Programs: $15 fee required
+ * - Host Shops: $15 fee required
+ * - Apprenticeships: $0 NO FEE (no checkout created)
  *
  * Stripe Dashboard:
  * https://dashboard.stripe.com/webhooks/we_1TiEECH4a2yrVOt5ontaDew38
@@ -16,14 +21,16 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { constructWebhookEvent } from '@/lib/stripe/construct-webhook-event';
 import { getStripe } from '@/lib/stripe/client';
+import { 
+  APPLICATION_FEE_PRICE_ID, 
+  APPLICATION_FEE_AMOUNT_CENTS,
+  isHostShopApplication 
+} from '@/lib/config/application-fee-config';
 import type Stripe from 'stripe';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-
-export const APPLICATION_FEE_PRICE_ID = 'price_1TiEDyH4a2yrVOt5pYBCQc2D';
-export const APPLICATION_FEE_AMOUNT_CENTS = 1500; // $15
 
 async function _POST(request: NextRequest) {
   const payload = await request.text();
@@ -61,12 +68,14 @@ async function _POST(request: NextRequest) {
         const applicationId = metadata.application_id;
         const programSlug = metadata.program_slug;
         const userId = metadata.user_id || session.customer_details?.email;
+        const isHostShop = metadata.is_host_shop === 'true';
 
         logger.info('Application fee payment completed', {
           sessionId: session.id,
           applicationId,
           programSlug,
           amount: session.amount_total,
+          isHostShop,
         });
 
         // Record the payment in application_payments table
@@ -82,35 +91,44 @@ async function _POST(request: NextRequest) {
             paid_at: new Date().toISOString(),
             customer_email: session.customer_details?.email,
             customer_name: session.customer_details?.name,
+            payment_type: isHostShop ? 'host_shop_fee' : 'program_fee',
           });
 
           if (insertError) {
             logger.error('Failed to record application payment', insertError);
           } else {
-            logger.info('Application payment recorded successfully', { applicationId, programSlug });
+            logger.info('Application payment recorded successfully', { applicationId, programSlug, isHostShop });
           }
         }
 
         // Update application status to paid if application_id provided
         if (applicationId && adminDb) {
+          const updateData: Record<string, unknown> = {
+            application_fee_paid: true,
+            application_fee_paid_at: new Date().toISOString(),
+            application_fee_session_id: session.id,
+          };
+
+          // Set status based on type
+          if (isHostShop) {
+            updateData.status = 'host_shop_fee_paid';
+          } else {
+            updateData.status = 'fee_paid';
+          }
+
           const { error: updateError } = await adminDb
             .from('applications')
-            .update({
-              application_fee_paid: true,
-              application_fee_paid_at: new Date().toISOString(),
-              application_fee_session_id: session.id,
-              status: 'fee_paid',
-            })
+            .update(updateData)
             .eq('id', applicationId);
 
           if (updateError) {
             logger.error('Failed to update application status', updateError);
           } else {
-            logger.info('Application status updated to fee_paid', { applicationId });
+            logger.info('Application status updated', { applicationId, status: updateData.status });
           }
         }
 
-        logger.info('Application fee processed successfully', { applicationId, programSlug });
+        logger.info('Application fee processed successfully', { applicationId, programSlug, isHostShop });
         break;
       }
 

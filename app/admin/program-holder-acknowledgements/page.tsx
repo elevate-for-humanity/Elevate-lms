@@ -40,7 +40,7 @@ function fmtDate(iso: string) {
 }
 
 export default async function ProgramHolderAcknowledgementsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const [acksRes, handbookRes, holdersRes] = await Promise.all([

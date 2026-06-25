@@ -105,7 +105,7 @@ export default async function ForAgenciesPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
         <div className="absolute inset-0 bg-slate-900/60" />
         <div className="absolute inset-0 flex items-end">

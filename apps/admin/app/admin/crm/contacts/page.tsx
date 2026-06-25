@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export default async function ContactsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const supabase = await createClient();
 
   // Fetch real contacts from CRM

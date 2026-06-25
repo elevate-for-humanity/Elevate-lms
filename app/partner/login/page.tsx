@@ -146,12 +146,12 @@ function PartnerLoginPageInner() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/partner-page-8.webp"
+          src="/images/pages/partner-page-9.webp"
           alt="Partner login"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
       <div className="max-w-md w-full">

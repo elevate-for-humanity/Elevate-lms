@@ -10,7 +10,7 @@ export const revalidate = 0;
 export const metadata: Metadata = { title: 'General Settings | Admin' };
 
 export default async function GeneralSettingsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   const { data: rows } = await db

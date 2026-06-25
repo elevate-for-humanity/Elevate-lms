@@ -44,7 +44,7 @@ export default async function EnrollPage() {
           alt="Enroll in Training"
           fill
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </div>
 

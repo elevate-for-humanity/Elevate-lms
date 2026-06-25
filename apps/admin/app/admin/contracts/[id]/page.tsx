@@ -21,6 +21,9 @@ export default async function ContractDetailPage({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const db = await requireAdminClient();
 
   const { data: profile } = await db
@@ -29,7 +32,7 @@ export default async function ContractDetailPage({
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff'].includes(profile.role)) {
     redirect('/unauthorized');
   }
 

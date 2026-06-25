@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function NewModulePage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   // Fetch programs for selection

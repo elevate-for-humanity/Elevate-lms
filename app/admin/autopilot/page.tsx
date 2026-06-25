@@ -24,7 +24,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export default async function AutomationLogPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const supabase = await createClient();
 
   // Check admin role

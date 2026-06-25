@@ -23,7 +23,7 @@ export default async function CountersignMouPage({ params, searchParams }: Props
   const { id } = await params;
   const { error: pageError, success: pageSuccess } = await searchParams;
 
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   // Fetch the program holder

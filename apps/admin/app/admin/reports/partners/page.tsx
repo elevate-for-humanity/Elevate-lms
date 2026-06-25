@@ -18,7 +18,10 @@ export default async function PartnerReportsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
+
+  // Guard against null user
+  if (!user) redirect('/login');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   // Fetch real stats from DB
   const [

@@ -128,7 +128,7 @@ describe('normalizeAdminDashboardData', () => {
 
   it('coerces non-string profile full_name for greeting render', () => {
     const normalized = normalizeAdminDashboardData({
-      profile: { full_name: 123 as unknown as string, role: 'super_admin' },
+      profile: { full_name: 123 as unknown as string, role: 'admin' },
     });
 
     expect(normalized.profile?.full_name).toBeNull();

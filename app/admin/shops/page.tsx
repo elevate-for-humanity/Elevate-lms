@@ -17,7 +17,7 @@ import Link from 'next/link';
 import { Building2, Clock, XCircle, FileText, Users, CheckCircle } from 'lucide-react';
 
 export default async function AdminShopsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   // Check if user is admin

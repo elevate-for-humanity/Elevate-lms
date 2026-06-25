@@ -114,12 +114,12 @@ export default function PartnerPortalPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/hero-images/pathways-hero.jpg"
+            src="/hero-images/pathways-hero.webp"
             alt="Partner Portal"
             fill
             className="object-cover"
             priority
-            sizes="100vw" placeholder="blur"
+            sizes="100vw" 
           />
         </div>
         <div className="bg-white py-10">
@@ -200,7 +200,7 @@ export default function PartnerPortalPage() {
                 alt="Partner collaboration"
                 fill
                 sizes="100vw"
-                className="object-cover" placeholder="blur"
+                className="object-cover" 
               />
             </div>
             <div>

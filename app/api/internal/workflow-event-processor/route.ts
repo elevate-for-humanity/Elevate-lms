@@ -116,7 +116,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
     if (markErr) {
       logger.warn('[workflow-event-processor] Failed to mark event processed', {
         event_id: event.id,
-        error: markErr.message,
+        error: 'Internal server error',
       });
     } else {
       processed++;

@@ -4,7 +4,7 @@
  * Returns all documents uploaded by the student on this enrollment,
  * with signed URLs (60 min) and OCR text from metadata.
  *
- * Requires admin, super_admin, or staff role.
+ * Requires admin, admin, or staff role.
  */
 
 import { NextRequest, NextResponse } from 'next/server';

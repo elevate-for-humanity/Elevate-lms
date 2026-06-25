@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CustomerServicePage() {
-  const { user, profile } = await requireRole(['staff', 'admin', 'super_admin', 'advisor']);
+  const { user, profile } = await requireRole(['staff', 'admin', 'advisor']);
   const supabase = await createClient();
 
   const { data: protocols } = await supabase

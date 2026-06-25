@@ -11,6 +11,6 @@ export const metadata: Metadata = {
 };
 
 export default async function NavSettingsPage() {
-  await requireRole(['super_admin']);
+  await requireRole(['admin']);
   return <NavEditorClient />;
 }

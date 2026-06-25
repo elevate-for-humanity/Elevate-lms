@@ -23,7 +23,7 @@ export async function createProgram(formData: FormData) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+  if (profile?.role !== 'admin' && profile?.role !== 'admin') {
     redirect('/unauthorized');
   }
 
@@ -80,7 +80,7 @@ export async function updateProgram(id: string, formData: FormData) {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
+  if (profile?.role !== 'admin' && profile?.role !== 'admin') redirect('/unauthorized');
 
   const { data: existing } = await db.from('programs').select('id').eq('id', id).maybeSingle();
   if (!existing) throw new Error('Program not found');
@@ -143,7 +143,7 @@ export async function deleteProgram(id: string) {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') throw new Error('Unauthorized');
+  if (profile?.role !== 'admin' && profile?.role !== 'admin') throw new Error('Unauthorized');
 
   const { data: existing } = await db.from('programs').select('id').eq('id', id).maybeSingle();
   if (!existing) throw new Error('Program not found');

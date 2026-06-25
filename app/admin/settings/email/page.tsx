@@ -40,7 +40,7 @@ const FIELDS: SettingsField[] = [
 ];
 
 export default async function EmailSettingsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   const { data: rows } = await db

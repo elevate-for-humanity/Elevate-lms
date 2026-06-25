@@ -29,7 +29,7 @@ async function _GET(request: Request) {
 
     const role = profile?.role || 'user';
     const isAdmin = API_ADMIN_ROLES.includes(role as any);
-    const isPlatformOperator = role === 'platform_operator' || role === 'super_admin';
+    const isPlatformOperator = role === 'admin' || role === 'admin';
 
     return NextResponse.json({
       isAdmin,

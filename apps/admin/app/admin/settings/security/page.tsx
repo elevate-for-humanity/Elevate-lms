@@ -35,8 +35,8 @@ const FIELDS: SettingsField[] = [
 ];
 
 export default async function SecuritySettingsPage() {
-  const auth = await requireRole(['admin', 'super_admin']);
-  const isSuperAdmin = auth.effectiveRoles.includes('super_admin');
+  const auth = await requireRole(['admin']);
+  const isSuperAdmin = auth.effectiveRoles.includes('admin');
   const db = await requireAdminClient();
 
   const { data: rows } = await db

@@ -28,7 +28,7 @@ const CAT_LABELS: Record<string, string> = {
 };
 
 export default async function AccreditationPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   const [standardsRes, evidenceRes] = await Promise.all([

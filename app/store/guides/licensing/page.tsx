@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
 import { Metadata } from 'next';
@@ -193,7 +193,7 @@ export default function LicensingGuidePage() {
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
         <div className="absolute inset-0 bg-slate-900/55" />
         <div className="absolute inset-0 flex items-end">
@@ -229,7 +229,7 @@ export default function LicensingGuidePage() {
                 alt="License tier comparison — managed vs source-use"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 896px" placeholder="blur"
+                sizes="(max-width: 768px) 100vw, 896px" 
               />
             </div>
             <div className="grid md:grid-cols-2 gap-5">
@@ -275,7 +275,7 @@ export default function LicensingGuidePage() {
                   alt={step.imageAlt}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 896px" placeholder="blur"
+                  sizes="(max-width: 768px) 100vw, 896px" 
                 />
               </div>
               {step.content}
@@ -290,11 +290,11 @@ export default function LicensingGuidePage() {
             </div>
             <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-[4/3]" style={{ aspectRatio: '16/7' }}>
               <Image
-                src="/images/pages/platform-page-7.jpg"
+                src="/images/pages/platform-page-7.webp"
                 alt="Billing and subscription management"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 896px" placeholder="blur"
+                sizes="(max-width: 768px) 100vw, 896px" 
               />
             </div>
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">

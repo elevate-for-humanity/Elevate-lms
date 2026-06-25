@@ -2,7 +2,7 @@
  * /api/admin/platform-secrets
  *
  * CRUD for platform_secrets table. Values are stored encrypted in DB.
- * Only super_admin / admin can read or write.
+ * Only admin / admin can read or write.
  * GET  — list all keys (values masked, show last 4 chars only)
  * POST — upsert a key/value
  * DELETE — remove a key
@@ -24,7 +24,7 @@ async function requireSuperAdmin() {
   if (!user) return { error: 'Unauthorized', status: 401 as const };
   const { data: profile } = await supabase
     .from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !['admin'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 as const };
   }
   return { user, profile };

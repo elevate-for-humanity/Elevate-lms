@@ -28,7 +28,7 @@ const WIOA_TYPE_STYLES: Record<string, string> = {
 };
 
 export default async function FundingPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const soon = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];

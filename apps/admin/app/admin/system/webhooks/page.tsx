@@ -21,6 +21,9 @@ export default async function WebhookHealthPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const adminDb = await requireAdminClient();
   if (adminDb) {
     const { data: profile } = await adminDb
@@ -28,7 +31,7 @@ export default async function WebhookHealthPage() {
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    if (!profile || !['admin'].includes(profile.role)) {
       redirect('/admin');
     }
   }

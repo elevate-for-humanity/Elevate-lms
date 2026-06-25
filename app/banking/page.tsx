@@ -29,7 +29,7 @@ export default function BankingPage() {
           className="object-cover"
           priority
           sizes="100vw"
-          placeholder="blur"
+          
         />
       </section>
 
@@ -75,7 +75,7 @@ export default function BankingPage() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  placeholder="blur"
+                  
                 />
               </div>
               <div className="p-7">
@@ -116,7 +116,7 @@ export default function BankingPage() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  placeholder="blur"
+                  
                 />
               </div>
               <div className="p-7">
@@ -157,7 +157,7 @@ export default function BankingPage() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  placeholder="blur"
+                  
                 />
               </div>
               <div className="p-7">
@@ -246,7 +246,7 @@ export default function BankingPage() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
-                placeholder="blur"
+                
               />
             </div>
             <div>

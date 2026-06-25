@@ -30,7 +30,7 @@ export default function FounderPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
         <div className="absolute inset-0 flex items-center px-6">
           <div className="max-w-6xl mx-auto w-full">
@@ -58,7 +58,7 @@ export default function FounderPage() {
                 fill
                 className="object-cover object-top"
                 priority
-                sizes="(max-width: 1024px) 100vw, 50vw" placeholder="blur"
+                sizes="(max-width: 1024px) 100vw, 50vw" 
               />
             </div>
 

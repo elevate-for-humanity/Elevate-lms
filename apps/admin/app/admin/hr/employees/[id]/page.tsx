@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function EmployeeDetailPage({ params }: Props) {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const { id } = await params;
   const supabase = await createClient();
 

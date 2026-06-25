@@ -31,7 +31,7 @@ async function _GET(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!['admin', 'super_admin'].includes(profile?.role)) {
+  if (!['admin'].includes(profile?.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -76,7 +76,7 @@ async function _POST(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!['admin', 'super_admin'].includes(profile?.role)) {
+  if (!['admin'].includes(profile?.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

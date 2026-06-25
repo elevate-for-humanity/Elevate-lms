@@ -21,7 +21,7 @@ const _POST = withAuth(
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 
-    if (!user?.role || !['admin', 'super_admin', 'staff'].includes(user.role)) {
+    if (!user?.role || !['admin', 'staff'].includes(user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -93,6 +93,6 @@ const _POST = withAuth(
       return NextResponse.json({ error: 'Failed to perform bulk operation' }, { status: 500 });
     }
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 export const POST = withApiAudit('/api/admin/bulk', _POST);

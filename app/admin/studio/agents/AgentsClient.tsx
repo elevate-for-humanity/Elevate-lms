@@ -111,7 +111,7 @@ export default function AgentsClient() {
                   <div>
                     <p className="font-bold text-slate-900">{agent.name}</p>
                     <p className="text-xs text-slate-500 capitalize">
-                      {agent.role.replace(/_/g, ' ')}
+                      {agent.role?.replace(/_/g, ' ') ?? agent.slug ?? 'Agent'}
                     </p>
                   </div>
                 </div>

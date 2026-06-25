@@ -6,7 +6,7 @@
  *
  * Query params: same as /api/reports/participants (no pagination — returns all matching rows)
  *
- * Access: admin | super_admin | staff
+ * Access: admin | admin | staff
  */
 
 import { NextRequest, NextResponse } from 'next/server';

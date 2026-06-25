@@ -292,7 +292,7 @@ export default async function ProgressPage() {
                                 fill
                                 className="object-cover rounded-xl"
                                 sizes="64px"
-                                placeholder="blur"
+                                
                               />
                             ) : (
                               <BookOpen className="w-8 h-8 text-slate-400" />

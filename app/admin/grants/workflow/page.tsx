@@ -39,13 +39,19 @@ export default async function GrantWorkflowPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect('/login?redirect=/admin/grants/workflow');
+  }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .maybeSingle();
 
-  await requireAdmin();
+  if (!profile || !['admin'].includes(profile.role)) {
+    redirect('/admin');
+  }
 
   const { grants, entities, applications } = await getWorkflowData();
 

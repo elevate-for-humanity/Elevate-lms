@@ -57,6 +57,6 @@ const _GET = withAuth(
 
     return Response.json(mapped);
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 export const GET = withApiAudit('/api/admin/program-holders', _GET);

@@ -193,7 +193,7 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
   const warnings: string[] = [];
 
   // ── 1. IDENTITY ────────────────────────────────────────────────────
-  const { user, profile } = await requireRole(['student', 'admin', 'super_admin']);
+  const { user, profile } = await requireRole(['student', 'admin']);
   const supabase = await createClient();
 
   // ── 2. ENROLLMENTS (required) ──────────────────────────────────────

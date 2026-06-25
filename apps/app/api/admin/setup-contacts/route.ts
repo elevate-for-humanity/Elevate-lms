@@ -274,6 +274,6 @@ const _POST = withAuth(
       );
     }
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 export const POST = withApiAudit('/api/admin/setup-contacts', _POST);

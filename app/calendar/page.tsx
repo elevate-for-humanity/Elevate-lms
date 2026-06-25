@@ -77,7 +77,7 @@ export default async function CalendarPage() {
             fill
             className="object-cover"
             priority
-            sizes="100vw" placeholder="blur"
+            sizes="100vw" 
           />
         </div>
         <div className="bg-white py-10">
@@ -99,7 +99,7 @@ export default async function CalendarPage() {
                 alt="Sign in to view your schedule"
                 fill
                 sizes="100vw"
-                className="object-cover" placeholder="blur"
+                className="object-cover" 
               />
             </div>
             <div className="p-6 text-center">
@@ -139,7 +139,7 @@ export default async function CalendarPage() {
                                 alt={enrollment.course?.title || 'Course'}
                                 fill
                                 sizes="100vw"
-                                className="object-cover" placeholder="blur"
+                                className="object-cover" 
                               />
                             </div>
                             <div className="flex-1 p-4">
@@ -170,7 +170,7 @@ export default async function CalendarPage() {
                             alt="Browse programs"
                             fill
                             sizes="100vw"
-                            className="object-cover" placeholder="blur"
+                            className="object-cover" 
                           />
                         </div>
                         <div className="p-6 text-center text-slate-700">
@@ -262,7 +262,7 @@ export default async function CalendarPage() {
                     alt="Events"
                     fill
                     sizes="100vw"
-                    className="object-cover" placeholder="blur"
+                    className="object-cover" 
                   />
                 </div>
                 <div className="p-4 text-center">

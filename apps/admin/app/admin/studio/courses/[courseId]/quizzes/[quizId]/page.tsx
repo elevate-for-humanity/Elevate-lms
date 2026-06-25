@@ -28,7 +28,7 @@ export default async function QuizPage({
 }: {
   params: Promise<{ courseId: string; quizId: string }>;
 }) {
-  await requireRole(['admin', 'super_admin', 'instructor']);
+  await requireRole(['admin', 'instructor']);
   const { courseId, quizId } = await params;
   const supabase = await createClient();
 

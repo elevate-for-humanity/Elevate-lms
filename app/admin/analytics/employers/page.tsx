@@ -8,7 +8,7 @@ export const revalidate = 60;
 export const metadata: Metadata = { title: 'Employer Analytics | Elevate For Humanity' };
 
 export default async function EmployerAnalyticsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   const { count: totalEmployers } = await db

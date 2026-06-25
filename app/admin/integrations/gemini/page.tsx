@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function GeminiIntegrationPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
 
   const hasKey = !!process.env.GEMINI_API_KEY;
   const hasOpenAI = !!process.env.OPENAI_API_KEY;

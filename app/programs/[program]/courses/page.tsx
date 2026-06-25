@@ -44,7 +44,7 @@ export default async function ProgramCoursesPage({ params }: { params: { program
     'student',
     'learner',
     'admin',
-    'super_admin',
+    'admin',
     'staff',
     'instructor',
     'program_holder',

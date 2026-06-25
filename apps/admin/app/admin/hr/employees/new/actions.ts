@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 
 export async function createEmployeeAction(formData: FormData) {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   const first_name = (formData.get('first_name') as string)?.trim();

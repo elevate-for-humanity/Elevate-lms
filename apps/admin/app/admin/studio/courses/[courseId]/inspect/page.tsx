@@ -42,7 +42,7 @@ export default async function InspectCoursePage({
 }: {
   params: Promise<{ courseId: string }>;
 }) {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const { courseId } = await params;
   const detail = await getCourseDetail(courseId);
 

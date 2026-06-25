@@ -1,7 +1,7 @@
 // Update a user's role. Called by UserManagementTable.
 // Accepts { userId, role } — delegates to the same logic as /api/admin/users/role
 // but keyed on userId instead of email for direct table-row operations.
-// Requires admin or super_admin.
+// Requires admin or admin.
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -16,7 +16,7 @@ const VALID_ROLES = [
   'staff',
   'instructor',
   'admin',
-  'super_admin',
+  'admin',
   'program_holder',
   'employer',
   'partner',
@@ -40,7 +40,7 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!actor || !['admin', 'super_admin'].includes(actor.role)) {
+    if (!actor || !['admin'].includes(actor.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -57,10 +57,10 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Only super_admin can promote to admin/super_admin
-    if (['admin', 'super_admin'].includes(role) && actor.role !== 'super_admin') {
+    // Only admin can promote to admin/admin
+    if (['admin'].includes(role) && actor.role !== 'admin') {
       return NextResponse.json(
-        { error: 'Only super_admin can grant admin roles' },
+        { error: 'Only admin can grant admin roles' },
         { status: 403 },
       );
     }

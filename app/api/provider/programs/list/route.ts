@@ -7,7 +7,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const LIST_ROLES = new Set(['provider_admin', 'admin', 'super_admin', 'staff']);
+const LIST_ROLES = new Set(['provider_admin', 'admin', 'staff']);
 
 export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');

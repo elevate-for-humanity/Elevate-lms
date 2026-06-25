@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
 import LogoImage from '@/components/site/LogoImage';
 import Copyright from '@/components/ui/Copyright';
+import { Facebook, Instagram, Linkedin, Youtube } from '@/components/ui/BrandIcons';
 import { Globe, MessageCircle, Share2, Video } from 'lucide-react';
 import { SOCIAL_LINKS } from '@/config/social-links';
 import FooterAccordion from '@/components/site/FooterAccordion.client';
@@ -172,6 +173,7 @@ export default function ServerFooter() {
           sections={[
             { title: 'Funding', links: footerLinks.funding },
             { title: 'Employers & Partners', links: footerLinks.partners },
+            { title: 'Partnerships', links: [{ name: 'Partner With Us', href: '/partnerships' }] },
             { title: 'About', links: footerLinks.about },
             { title: 'Platform', links: footerLinks.platform },
             { title: 'Legal & Disclosures', links: footerLinks.legalDisclosures },
@@ -193,7 +195,7 @@ export default function ServerFooter() {
               Apply for Training
             </Link>
             <Link
-              href="/partners"
+              href="/partnerships"
               className="border border-slate-600 text-white hover:text-white hover:border-slate-400 font-semibold text-sm px-6 py-2.5 rounded-lg transition-colors"
             >
               Partner With Us

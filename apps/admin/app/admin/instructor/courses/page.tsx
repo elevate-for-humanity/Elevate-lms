@@ -23,6 +23,9 @@ export default async function InstructorCoursesPage() {
     try {
       const { data: authData, error: authError } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
       if (authError) {
         error = 'Authentication error';
       } else {

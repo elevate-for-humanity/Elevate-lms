@@ -331,7 +331,9 @@ export default function ProgramManagerClient({
 
   // ── Internal course attach ──────────────────────────────────────────────────
 
-  const attachedCourseIds = new Set(internalLinks.map((l) => l.course.id));
+  // Filter out any orphaned links where course FK is null (defensive)
+  const validInternalLinks = internalLinks.filter((l) => l.course != null);
+  const attachedCourseIds = new Set(validInternalLinks.map((l) => l.course.id));
   const unattachedCourses = availableCourses.filter((c) => !attachedCourseIds.has(c.id));
 
   const handleAttachInternal = useCallback(async () => {

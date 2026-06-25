@@ -41,7 +41,7 @@ async function getCurrentStats(): Promise<Record<string, string>> {
 }
 
 export default async function SiteStatsPage() {
-  await requireRole(['super_admin']);
+  await requireRole(['admin']);
   const current = await getCurrentStats();
   return <SiteStatsClient current={current} statKeys={[...STAT_KEYS]} />;
 }

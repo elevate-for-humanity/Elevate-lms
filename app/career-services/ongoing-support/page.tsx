@@ -109,7 +109,7 @@ export default async function OngoingSupportPage() {
             fill
             className="object-cover"
             priority
-            sizes="100vw" placeholder="blur"
+            sizes="100vw" 
           />
         </div>
         <div className="bg-white py-10">

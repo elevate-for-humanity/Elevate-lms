@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function CandidatesPage() {
-  const { user } = await requireRole(['employer', 'admin', 'super_admin']);
+  const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
 
   // Get completed/graduated candidates only — not all students
@@ -52,8 +52,22 @@ export default async function CandidatesPage() {
     certified: true, // If progress is 100%, they are certified
   }));
 
+<<<<<<< HEAD
   const certifiedCount = candidates.filter(c => c.certified).length;
   const graduateCount = candidates.length;
+=======
+  // Get certified candidates count
+  const { count: certifiedCount } = userIds.length
+    ? await supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .in('id', userIds)
+        .eq('is_certified', true)
+    : { count: 0 };
+
+  // Get program graduates count (already have from enrollments)
+  const graduatesCount = candidates.length;
+>>>>>>> origin/main
 
   return (
     <div className="min-h-screen bg-white">
@@ -113,7 +127,11 @@ export default async function CandidatesPage() {
             <div className="flex items-center gap-3">
               <Award aria-label="award" className="w-8 h-8 text-brand-green-600" />
               <div>
+<<<<<<< HEAD
                 <div className="text-2xl font-bold">{certifiedCount}</div>
+=======
+                <div className="text-2xl font-bold">{certifiedCount || 0}</div>
+>>>>>>> origin/main
                 <div className="text-sm text-slate-700">Certified</div>
               </div>
             </div>
@@ -122,7 +140,11 @@ export default async function CandidatesPage() {
             <div className="flex items-center gap-3">
               <GraduationCap aria-label="graduationcap" className="w-8 h-8 text-brand-blue-600" />
               <div>
+<<<<<<< HEAD
                 <div className="text-2xl font-bold">{graduateCount}</div>
+=======
+                <div className="text-2xl font-bold">{graduatesCount || 0}</div>
+>>>>>>> origin/main
                 <div className="text-sm text-slate-700">Program Graduates</div>
               </div>
             </div>

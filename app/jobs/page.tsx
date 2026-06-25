@@ -236,7 +236,7 @@ export default async function JobBoardPage() {
               width={140}
               height={32}
               sizes="140px"
-              placeholder="blur"
+              
               className="h-8 w-auto"
               unoptimized
             />

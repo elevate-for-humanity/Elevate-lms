@@ -7,12 +7,12 @@ import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-const VALID_ROLES = ['student', 'staff', 'instructor', 'admin', 'super_admin'];
+const VALID_ROLES = ['student', 'staff', 'instructor', 'admin'];
 
 /**
  * POST /api/admin/users/role
  *
- * Update a user's role. Only super_admin can do this.
+ * Update a user's role. Only admin can do this.
  *
  * Body: { email: string, role: string }
  */
@@ -23,7 +23,7 @@ async function _POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Check if current user is super_admin
+    // Check if current user is admin
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -37,7 +37,7 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!currentProfile || currentProfile.role !== 'super_admin') {
+    if (!currentProfile || currentProfile.role !== 'admin') {
       return NextResponse.json({ error: 'Only super admins can change roles' }, { status: 403 });
     }
 
@@ -96,7 +96,7 @@ async function _POST(request: NextRequest) {
 /**
  * GET /api/admin/users/role
  *
- * List all users with admin/staff roles. Only super_admin can do this.
+ * List all users with admin/staff roles. Only admin can do this.
  */
 async function _GET(request: NextRequest) {
   try {
@@ -105,7 +105,7 @@ async function _GET(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Check if current user is super_admin
+    // Check if current user is admin
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -119,7 +119,7 @@ async function _GET(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!currentProfile || currentProfile.role !== 'super_admin') {
+    if (!currentProfile || currentProfile.role !== 'admin') {
       return NextResponse.json({ error: 'Only super admins can view roles' }, { status: 403 });
     }
 
@@ -127,7 +127,7 @@ async function _GET(request: NextRequest) {
     const { data: admins, error } = await supabase
       .from('profiles')
       .select('id, email, full_name, role, created_at')
-      .in('role', ['admin', 'super_admin', 'staff', 'instructor'])
+      .in('role', ['admin', 'staff', 'instructor'])
       .order('role')
       .order('email');
 

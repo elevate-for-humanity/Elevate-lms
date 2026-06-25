@@ -34,7 +34,7 @@ async function createSignatureRequest(formData: FormData) {
 }
 
 export default async function NewSignaturePage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   return (
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-xl mx-auto">

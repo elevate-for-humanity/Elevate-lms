@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PostJobPage() {
-  await requireRole(['employer', 'admin', 'super_admin']);
+  await requireRole(['employer', 'admin']);
 
   return (
     <div className="min-h-screen bg-slate-50">

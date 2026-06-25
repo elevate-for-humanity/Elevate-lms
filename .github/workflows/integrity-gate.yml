@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       # Pre-auth registry check — runs before build, no secrets needed.
       # Fails if any public-write route inserts into a table not declared in

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Share2, Globe, Mail, Check, Link as LinkIcon } from 'lucide-react';
+import { Share2, Mail, Check, Link as LinkIcon } from 'lucide-react';
+import { Facebook, Linkedin } from '@/components/ui/BrandIcons';
 
 interface SocialShareProps {
   url: string;
@@ -35,7 +36,6 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       /* Error handled silently */
-      // Error: $1
     }
   }
 
@@ -49,7 +49,6 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
         });
       } catch (error) {
         /* Error handled silently */
-        // Error: $1
       }
     } else {
       setShowMenu(!showMenu);
@@ -85,11 +84,12 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
                 className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition"
               >
                 <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                  <Globe className="w-4 h-4 text-white" />
+                  <Facebook className="w-4 h-4 text-[#1877F2]" />
                 </div>
                 <span className="text-sm font-medium text-black">Facebook</span>
               </a>
 
+              {/* LinkedIn */}
               <a
                 href={shareLinks.linkedin}
                 target="_blank"
@@ -97,7 +97,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
                 className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition"
               >
                 <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                  <Share2 className="w-4 h-4 text-white" />
+                  <Linkedin className="w-4 h-4 text-[#0A66C2]" />
                 </div>
                 <span className="text-sm font-medium text-black">LinkedIn</span>
               </a>
@@ -108,7 +108,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
                 className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition"
               >
                 <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                  <Mail className="w-4 h-4 text-white" />
+                  <Mail className="w-4 h-4 text-slate-600" />
                 </div>
                 <span className="text-sm font-medium text-black">Email</span>
               </a>
@@ -120,9 +120,9 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
               >
                 <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                   {copied ? (
-                    <Check className="w-4 h-4 text-white" />
+                    <Check className="w-4 h-4 text-green-600" />
                   ) : (
-                    <LinkIcon className="w-4 h-4 text-white" />
+                    <LinkIcon className="w-4 h-4 text-slate-600" />
                   )}
                 </div>
                 <span className="text-sm font-medium text-black">

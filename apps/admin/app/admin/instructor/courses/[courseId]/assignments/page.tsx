@@ -22,6 +22,9 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: course } = await supabase
     .from('lms_courses')
     .select('id, title')

@@ -1,11 +1,10 @@
-export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DocumentPage, DocumentSection, DocumentSignatureBlock } from '@/components/documents';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Data Sharing Consent',
+  title: 'Data Sharing Consent | {PLATFORM_DEFAULTS.orgName}',
   robots: { index: false, follow: false },
 };
 
@@ -13,23 +12,18 @@ export default function DataSharingPage() {
   return (
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
-        <Breadcrumbs
-          items={[{ label: 'Legal', href: '/legal' }, { label: 'Data Sharing Consent' }]}
-        />
+        <Breadcrumbs items={[{ label: 'Legal', href: '/legal' }, { label: 'Data Sharing Consent' }]} />
       </div>
       <DocumentPage
         documentType="Data Sharing Consent"
         title="Data Sharing Consent Form"
-        subtitle={`${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`}
+        subtitle="{PLATFORM_DEFAULTS.orgName} Career & Technical Institute"
         date="2025-01-01"
         version="1.0"
       >
         <DocumentSection heading="Purpose" number={1}>
           <p>
-            This consent authorizes {PLATFORM_DEFAULTS.orgName} to share your personal and educational data
-            with designated agencies and partners as required for program funding, compliance
-            reporting, and workforce development services under WIOA, Job Ready Indy, the Workforce
-            Ready Grant, and DOL Registered Apprenticeship programs.
+            This consent authorizes {PLATFORM_DEFAULTS.orgName} to share your personal and educational data with designated agencies and partners as required for program funding, compliance reporting, and workforce development services under WIOA, Job Ready Indy, the Workforce Ready Grant, and DOL Registered Apprenticeship programs.
           </p>
         </DocumentSection>
 
@@ -48,33 +42,13 @@ export default function DataSharingPage() {
 
         <DocumentSection heading="Authorized Recipients" number={3}>
           <ul>
-            <li>
-              <strong>Indiana Department of Workforce Development (DWD)</strong> — WIOA Title I
-              compliance and outcome reporting
-            </li>
-            <li>
-              <strong>WorkOne / Local Workforce Development Boards</strong> — Case management and
-              co-enrollment services
-            </li>
-            <li>
-              <strong>Indiana Department of Correction / Job Ready Indy Program</strong> — Justice
-              Reinvestment Initiative reporting
-            </li>
-            <li>
-              <strong>U.S. Department of Labor</strong> — Registered Apprenticeship RAPIDS reporting
-            </li>
-            <li>
-              <strong>Employer Partners</strong> — Limited to attendance and progress for
-              apprenticeship and OJT placements
-            </li>
-            <li>
-              <strong>Funding Agencies</strong> — Organizations providing tuition assistance,
-              grants, or scholarships
-            </li>
-            <li>
-              <strong>Accreditation and Compliance Bodies</strong> — As required for program
-              approval and audit
-            </li>
+            <li><strong>Indiana Department of Workforce Development (DWD)</strong> — WIOA Title I compliance and outcome reporting</li>
+            <li><strong>WorkOne / Local Workforce Development Boards</strong> — Case management and co-enrollment services</li>
+            <li><strong>Indiana Department of Correction / Job Ready Indy Program</strong> — Justice Reinvestment Initiative reporting</li>
+            <li><strong>U.S. Department of Labor</strong> — Registered Apprenticeship RAPIDS reporting</li>
+            <li><strong>Employer Partners</strong> — Limited to attendance and progress for apprenticeship and OJT placements</li>
+            <li><strong>Funding Agencies</strong> — Organizations providing tuition assistance, grants, or scholarships</li>
+            <li><strong>Accreditation and Compliance Bodies</strong> — As required for program approval and audit</li>
           </ul>
         </DocumentSection>
 
@@ -90,27 +64,20 @@ export default function DataSharingPage() {
 
         <DocumentSection heading="Duration" number={5}>
           <p>
-            This consent is effective from the date of signing and remains in effect for the
-            duration of your enrollment and for three (3) years following program completion,
-            withdrawal, or exit, as required by federal reporting obligations.
+            This consent is effective from the date of signing and remains in effect for the duration of your enrollment and for three (3) years following program completion, withdrawal, or exit, as required by federal reporting obligations.
           </p>
         </DocumentSection>
 
         <DocumentSection heading="Right to Revoke" number={6}>
           <p>
-            You may revoke this consent at any time by submitting a written request to{' '}
-            <strong>info@elevateforhumanity.org</strong>. Revocation is not retroactive. Revoking
-            consent may affect your eligibility for funded programs that require data sharing for
-            compliance.
+            You may revoke this consent at any time by submitting a written request to <strong>info@elevateforhumanity.org</strong>. Revocation is not retroactive. Revoking consent may affect your eligibility for funded programs that require data sharing for compliance.
           </p>
         </DocumentSection>
 
         <DocumentSection heading="Contact" number={7}>
           <p>
-            {PLATFORM_DEFAULTS.orgName} — Program Director
-            <br />
-            8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
-            <br />
+            {PLATFORM_DEFAULTS.orgName} — Program Director<br />
+            8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240<br />
             Email: info@elevateforhumanity.org · Phone: {PLATFORM_DEFAULTS.supportPhone}
           </p>
         </DocumentSection>
@@ -119,7 +86,7 @@ export default function DataSharingPage() {
           agreementType="data_sharing"
           agreementVersion="1.0"
           buttonLabel="Sign Data Sharing Consent"
-          nextUrl="/onboarding/learner"
+          nextUrl="/student-portal/onboarding"
         />
       </DocumentPage>
     </>

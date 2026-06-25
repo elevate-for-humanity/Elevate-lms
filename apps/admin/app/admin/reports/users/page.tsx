@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function UsersReportPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const supabase = await createClient();
   
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -42,7 +42,7 @@ export default async function UsersReportPage() {
   });
 
   const roleColors: Record<string, { bg: string; text: string; icon: typeof Users }> = {
-    super_admin: { bg: 'bg-brand-red-100', text: 'text-brand-red-700', icon: Shield },
+    admin: { bg: 'bg-brand-red-100', text: 'text-brand-red-700', icon: Shield },
     admin: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700', icon: Shield },
     instructor: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700', icon: GraduationCap },
     student: { bg: 'bg-brand-green-100', text: 'text-brand-green-700', icon: Users },
@@ -50,7 +50,7 @@ export default async function UsersReportPage() {
   };
 
   const roleLabels: Record<string, string> = {
-    super_admin: 'Admin',
+    admin: 'Admin',
     admin: 'Admin',
     instructor: 'Instructor',
     student: 'Student',
@@ -103,7 +103,7 @@ export default async function UsersReportPage() {
               <span className="text-sm text-slate-700">Admins</span>
             </div>
             <p className="text-3xl font-bold text-slate-900">
-              {(usersByRole['admin'] || 0) + (usersByRole['super_admin'] || 0)}
+              {(usersByRole['admin'] || 0) + (usersByRole['admin'] || 0)}
             </p>
           </div>
           

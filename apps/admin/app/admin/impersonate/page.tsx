@@ -20,6 +20,9 @@ export default async function ImpersonatePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const db = await requireAdminClient();
   const { data: profile } = await supabase
     .from('profiles')
@@ -27,7 +30,7 @@ export default async function ImpersonatePage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  // Impersonation is restricted to super_admin — admin role can view audit log only.
+  // Impersonation is restricted to admin — admin role can view audit log only.
   if (!hasPermission(profile?.role as UserRole, 'impersonate_users')) {
     redirect('/unauthorized');
   }

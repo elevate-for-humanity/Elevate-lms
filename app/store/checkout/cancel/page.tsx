@@ -19,7 +19,7 @@ function CancelContent() {
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image src="/images/pages/store-checkout-cancel-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority placeholder="blur" />
+        <Image src="/images/pages/store-checkout-cancel-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority  />
       </section>
       <div className="max-w-lg w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 md:p-12">
         <div className="text-center">

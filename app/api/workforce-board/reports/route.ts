@@ -12,7 +12,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 
-const ALLOWED_ROLES = ['workforce_board', 'admin', 'super_admin', 'staff'];
+const ALLOWED_ROLES = ['workforce_board', 'admin', 'staff'];
 
 export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');

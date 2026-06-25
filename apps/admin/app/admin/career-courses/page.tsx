@@ -18,13 +18,16 @@ export default async function CareerCoursesPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Guard against null user
+  if (!user) redirect('/login');
+
   const db = await requireAdminClient();
   const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
+  if (!['admin', 'staff'].includes(profile?.role ?? '')) redirect('/unauthorized');
 
   const [{ data: courses, count: total }, { count: published }, { count: draft }] =
     await Promise.all([

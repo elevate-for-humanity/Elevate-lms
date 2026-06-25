@@ -4,7 +4,7 @@
 //   - Admin dashboard "Run automations" button
 //   - Cron (external scheduler hitting this endpoint with INTERNAL_API_KEY)
 //
-// Auth: admin/super_admin session OR valid INTERNAL_API_KEY header.
+// Auth: admin/admin session OR valid INTERNAL_API_KEY header.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';

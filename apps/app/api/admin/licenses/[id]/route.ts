@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
  * - PATCH: Update license (suspend, reactivate, update features/limits)
  * - DELETE: Revoke license
  *
- * All actions require super_admin role and are audited.
+ * All actions require admin role and are audited.
  */
 
 async function _PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -31,14 +31,14 @@ async function _PATCH(request: NextRequest, { params }: { params: Promise<{ id: 
     const tenantContext = await getTenantContext();
     const supabase = await createClient();
 
-    // Verify super_admin role
+    // Verify admin role
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', tenantContext.userId)
       .maybeSingle();
 
-    if (profile?.role !== 'super_admin') {
+    if (profile?.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -158,14 +158,14 @@ async function _DELETE(request: NextRequest, { params }: { params: Promise<{ id:
     const tenantContext = await getTenantContext();
     const supabase = await createClient();
 
-    // Verify super_admin role
+    // Verify admin role
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', tenantContext.userId)
       .maybeSingle();
 
-    if (profile?.role !== 'super_admin') {
+    if (profile?.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

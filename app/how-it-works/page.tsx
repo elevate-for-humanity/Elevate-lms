@@ -125,7 +125,7 @@ export default function HowItWorksPage() {
                     fill
                     sizes="100vw"
                     quality={90}
-                    className="object-cover" placeholder="blur"
+                    className="object-cover" 
                   />
                 </div>
                 <div className="p-5 flex-1">

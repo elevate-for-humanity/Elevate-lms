@@ -74,7 +74,7 @@ export default function MissionPage() {
             fill
             className="object-cover opacity-40"
             priority
-            sizes="100vw" placeholder="blur"
+            sizes="100vw" 
           />
         </div>
         <div className="relative max-w-5xl mx-auto px-4 py-20">
@@ -119,7 +119,7 @@ export default function MissionPage() {
               alt={`${PLATFORM_DEFAULTS.orgName} training`}
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw" placeholder="blur"
+              sizes="(max-width: 768px) 100vw, 50vw" 
             />
           </div>
         </div>
@@ -154,7 +154,7 @@ export default function MissionPage() {
               alt="Learners in training"
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw" placeholder="blur"
+              sizes="(max-width: 768px) 100vw, 50vw" 
             />
           </div>
           <div className="order-1 md:order-2">

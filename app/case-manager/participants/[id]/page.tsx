@@ -19,7 +19,7 @@ interface Props {
 
 export default async function ParticipantDetailPage({ params }: Props) {
   const { id } = await params;
-  const { user } = await requireRole(['case_manager', 'admin', 'super_admin', 'staff']);
+  const { user } = await requireRole(['case_manager', 'admin', 'staff']);
 
   const supabase = await createClient();
   const admin = await requireAdminClient();
@@ -40,7 +40,7 @@ export default async function ParticipantDetailPage({ params }: Props) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const isAdmin = ['admin', 'super_admin', 'staff'].includes(profileData?.role ?? '');
+  const isAdmin = ['admin', 'staff'].includes(profileData?.role ?? '');
 
   if (!assignment && !isAdmin) notFound();
 

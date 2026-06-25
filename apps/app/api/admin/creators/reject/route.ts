@@ -36,14 +36,14 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized', code: 'AUTH_REQUIRED' }, { status: 401 });
     }
 
-    // 2. Authorization - check for admin or super_admin
+    // 2. Authorization - check for admin or admin
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || (profile.role !== 'admin' && profile.role !== 'super_admin')) {
+    if (!profile || (profile.role !== 'admin' && profile.role !== 'admin')) {
       logger.warn('[Creator Rejection] Unauthorized attempt', {
         userId: user.id,
         role: profile?.role,

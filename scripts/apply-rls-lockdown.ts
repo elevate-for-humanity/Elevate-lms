@@ -96,7 +96,7 @@ async function main() {
       AND EXISTS (
         SELECT 1 FROM public.profiles p
         WHERE p.id = auth.uid()
-          AND p.role IN ('admin', 'super_admin', 'instructor', 'staff')
+          AND p.role IN ('admin', 'instructor', 'staff')
       )
     )
   `,
@@ -170,7 +170,7 @@ async function main() {
       AND EXISTS (
         SELECT 1 FROM public.profiles p
         WHERE p.id = auth.uid()
-          AND p.role IN ('admin', 'super_admin', 'instructor', 'staff')
+          AND p.role IN ('admin', 'instructor', 'staff')
       )
     )
   `,
@@ -235,7 +235,7 @@ async function main() {
       AND EXISTS (
         SELECT 1 FROM public.profiles p
         WHERE p.id = auth.uid()
-          AND p.role IN ('admin', 'super_admin', 'instructor', 'staff')
+          AND p.role IN ('admin', 'instructor', 'staff')
       )
     )
   `,

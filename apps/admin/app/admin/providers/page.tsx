@@ -19,6 +19,9 @@ export default async function AdminProvidersPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const db = await requireAdminClient();
   if (!db) return <div className="p-8 text-red-600">Database unavailable</div>;
 
@@ -28,7 +31,7 @@ export default async function AdminProvidersPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !['admin'].includes(profile.role)) {
     redirect('/unauthorized');
   }
 

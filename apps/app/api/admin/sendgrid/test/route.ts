@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
   try {
-    await requireRole(['admin', 'super_admin']);
+    await requireRole(['admin']);
   } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

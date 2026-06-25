@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ReviewVerificationPage({ params }: { params: { id: string } }) {
-  const { user, profile } = await requireRole(['admin', 'super_admin']);
+  const { user, profile } = await requireRole(['admin']);
   const supabase = await requireAdminClient();
 
   // Get program holder

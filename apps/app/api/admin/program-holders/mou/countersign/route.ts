@@ -134,6 +134,6 @@ const _POST = withAuth(
 
     return Response.json(updated);
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 export const POST = withApiAudit('/api/admin/program-holders/mou/countersign', _POST);

@@ -49,7 +49,7 @@ export default async function FerpaDocumentationPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  const allowedRoles = ['admin', 'super_admin', 'ferpa_officer', 'registrar', 'staff', 'student'];
+  const allowedRoles = ['admin', 'ferpa_officer', 'registrar', 'staff', 'student'];
   if (!profile || !allowedRoles.includes(profile.role)) redirect('/unauthorized');
 
   // Fetch documents based on role
@@ -106,7 +106,7 @@ export default async function FerpaDocumentationPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
       <div className="bg-white border-b border-slate-200">

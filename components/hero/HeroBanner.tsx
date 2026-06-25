@@ -50,7 +50,7 @@ export default function HeroBanner({
     <section className="relative w-full overflow-hidden rounded-3xl">
       <div
         ref={wrapperRef}
-        className="relative h-[50svh] sm:h-[55svh] md:h-[60svh] lg:h-[65svh] min-h-[320px] w-full"
+        className="relative h-[35svh] sm:h-[40svh] md:h-[45svh] lg:h-[50svh] min-h-[240px] max-h-[500px] w-full"
       >
         {type === 'video' ? (
           <CanonicalVideo

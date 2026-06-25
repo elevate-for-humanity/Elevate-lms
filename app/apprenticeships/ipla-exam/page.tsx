@@ -72,7 +72,7 @@ export default function IPLAExamSignup() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 to-brand-blue-900/20" />
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">

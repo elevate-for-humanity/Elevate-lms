@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function LeavePage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   const { data: rawLeaveRequests } = await supabase

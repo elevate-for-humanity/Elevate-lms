@@ -34,7 +34,7 @@ const FIELDS: SettingsField[] = [
 ];
 
 export default async function NotificationSettingsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   const { data: rows } = await db

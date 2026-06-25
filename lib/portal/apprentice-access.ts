@@ -8,7 +8,7 @@ export const APPRENTICE_FIELD_PORTAL_ROLES = [
   'partner',
   'program_holder',
   'admin',
-  'super_admin',
+  'admin',
   'staff',
   'instructor',
 ] as const;
@@ -16,7 +16,7 @@ export const APPRENTICE_FIELD_PORTAL_ROLES = [
 export const GENERAL_PORTAL_ROLES = [
   'student',
   'admin',
-  'super_admin',
+  'admin',
   'staff',
   'instructor',
 ] as const;

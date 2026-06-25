@@ -9,7 +9,7 @@ export const revalidate = 60;
 export const metadata: Metadata = { title: 'Data Import | Admin | Elevate For Humanity' };
 
 export default async function DataImportPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       <div>

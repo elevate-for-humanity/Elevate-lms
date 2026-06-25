@@ -41,13 +41,13 @@ export default async function PartnerDashboardPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  const allowedRoles = ['partner', 'admin', 'super_admin', 'staff'];
+  const allowedRoles = ['partner', 'admin', 'staff'];
   if (!profile || !allowedRoles.includes(profile.role)) {
     redirect('/unauthorized');
   }
 
   // Admins/staff have no partners row — send them to their own dashboard
-  if (['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (['admin', 'staff'].includes(profile.role)) {
     redirect('/admin/dashboard');
   }
 

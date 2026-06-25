@@ -108,7 +108,7 @@ export default function SearchPage() {
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
       </section>
       {/* Program Cards with Images */}
@@ -132,7 +132,7 @@ export default function SearchPage() {
                     alt={prog.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="blur"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
                   />
                 </div>
                 <div className="p-5">
@@ -195,7 +195,7 @@ export default function SearchPage() {
                 alt="Workforce funding and financial aid"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw" placeholder="blur"
+                sizes="(max-width: 768px) 100vw, 50vw" 
               />
             </div>
             <div>
@@ -285,7 +285,7 @@ export default function SearchPage() {
                 alt="Employer partnerships"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw" placeholder="blur"
+                sizes="(max-width: 768px) 100vw, 50vw" 
               />
             </div>
           </div>

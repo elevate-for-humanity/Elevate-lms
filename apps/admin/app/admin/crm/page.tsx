@@ -24,6 +24,9 @@ export default async function CRMHubPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   // Check admin access
   const { data: profile } = await supabase
     .from('profiles')
@@ -31,7 +34,7 @@ export default async function CRMHubPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !['admin'].includes(profile.role)) {
     redirect('/dashboard');
   }
 

@@ -1,8 +1,6 @@
 export type UserRole =
   | 'student'
   | 'admin'
-  | 'super_admin'
-  | 'platform_operator'
   | 'staff'
   | 'employer'
   | 'workforce_board'
@@ -13,7 +11,9 @@ export type UserRole =
   | 'program_holder'
   | 'delegate'
   | 'creator'
-  | 'instructor';
+  | 'instructor'
+  | 'case_manager'
+  | 'provider_admin';
 
 export interface User {
   id: string;

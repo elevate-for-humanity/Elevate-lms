@@ -6,8 +6,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = {
-  title: 'Legal Creator Agreement',
-  description: `Terms governing creators who sell digital products on the ${PLATFORM_DEFAULTS.orgName} marketplace, including eligibility, content standards, and revenue sharing.`,
+  title: 'Legal Creator Agreement | Elevate For Humanity',
+  description: 'Elevate For Humanity - Career training and workforce development',
 };
 
 export default async function CreatorAgreementPage() {
@@ -15,11 +15,11 @@ export default async function CreatorAgreementPage() {
   const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Legal', href: '/legal' }, { label: 'Creator Agreement' }]} />
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
+            <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: "Legal", href: "/legal" }, { label: "Creator Agreement" }]} />
       </div>
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8">
+<div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8">
         <h1 className="text-3xl font-bold mb-2">Creator Agreement</h1>
         <p className="text-black mb-8">Last Updated: December 13, 2024</p>
 
@@ -27,10 +27,11 @@ export default async function CreatorAgreementPage() {
           <section>
             <h2 className="text-2xl font-bold mb-3">1. Agreement to Terms</h2>
             <p>
-              By applying to become a creator on the {PLATFORM_DEFAULTS.orgName} marketplace ("Platform"),
-              you agree to be bound by this Creator Agreement. This agreement governs your
-              relationship with {PLATFORM_DEFAULTS.orgName} ("Platform Owner," "we," "us") as a seller of
-              digital products.
+              By applying to become a creator on the {PLATFORM_DEFAULTS.orgName}
+              marketplace ("Platform"), you agree to be bound by this Creator
+              Agreement. This agreement governs your relationship with Elevate
+              for Humanity ("Platform Owner," "we," "us") as a seller of digital
+              products.
             </p>
           </section>
 
@@ -50,11 +51,17 @@ export default async function CreatorAgreementPage() {
             <h2 className="text-2xl font-bold mb-3">3. Content Ownership</h2>
             <p>You represent and warrant that:</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>You own or have the necessary rights to all content you upload</li>
               <li>
-                Your content does not infringe on any third-party intellectual property rights
+                You own or have the necessary rights to all content you upload
               </li>
-              <li>You have obtained all necessary permissions, licenses, and releases</li>
+              <li>
+                Your content does not infringe on any third-party intellectual
+                property rights
+              </li>
+              <li>
+                You have obtained all necessary permissions, licenses, and
+                releases
+              </li>
               <li>Your content does not violate any laws or regulations</li>
             </ul>
           </section>
@@ -78,20 +85,24 @@ export default async function CreatorAgreementPage() {
             <p>Payouts are processed as follows:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>
-                <strong>Schedule:</strong> Monthly, on or around the 15th of each month
+                <strong>Schedule:</strong> Monthly, on or around the 15th of
+                each month
               </li>
               <li>
-                <strong>Minimum:</strong> $50 USD minimum balance required for payout
+                <strong>Minimum:</strong> $50 USD minimum balance required for
+                payout
               </li>
               <li>
-                <strong>Methods:</strong> ACH, PayPal, Zelle, or Stripe Connect (when available)
+                <strong>Methods:</strong> ACH, PayPal, Zelle, or Stripe Connect
+                (when available)
               </li>
               <li>
-                <strong>Timing:</strong> Payouts may take 3-7 business days to process
+                <strong>Timing:</strong> Payouts may take 3-7 business days to
+                process
               </li>
               <li>
-                <strong>Fees:</strong> You are responsible for any fees charged by your payout
-                method
+                <strong>Fees:</strong> You are responsible for any fees charged
+                by your payout method
               </li>
             </ul>
           </section>
@@ -112,8 +123,8 @@ export default async function CreatorAgreementPage() {
           <section>
             <h2 className="text-2xl font-bold mb-3">7. Approval Process</h2>
             <p>
-              All creator applications and products are subject to approval by Platform Owner. We
-              reserve the right to:
+              All creator applications and products are subject to approval by
+              Platform Owner. We reserve the right to:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Approve or reject any creator application</li>
@@ -130,14 +141,20 @@ export default async function CreatorAgreementPage() {
             <ul className="list-disc pl-6 space-y-2">
               <li>The full sale amount is refunded to the buyer</li>
               <li>Your creator earnings for that sale are deducted</li>
-              <li>If already paid out, the amount may be deducted from future earnings</li>
+              <li>
+                If already paid out, the amount may be deducted from future
+                earnings
+              </li>
               <li>Platform Owner handles all refund requests and decisions</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold mb-3">9. License Grant</h2>
-            <p>You grant Platform Owner a non-exclusive, worldwide, royalty-free license to:</p>
+            <p>
+              You grant Platform Owner a non-exclusive, worldwide, royalty-free
+              license to:
+            </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Display and market your products on the Platform</li>
               <li>Process payments and deliver products to buyers</li>
@@ -147,7 +164,9 @@ export default async function CreatorAgreementPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mb-3">10. Prohibited Activities</h2>
+            <h2 className="text-2xl font-bold mb-3">
+              10. Prohibited Activities
+            </h2>
             <p>You may not:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Upload content you don't own or have rights to</li>
@@ -161,7 +180,10 @@ export default async function CreatorAgreementPage() {
 
           <section>
             <h2 className="text-2xl font-bold mb-3">11. Termination</h2>
-            <p>Either party may terminate this agreement at any time. Upon termination:</p>
+            <p>
+              Either party may terminate this agreement at any time. Upon
+              termination:
+            </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Your products will be removed from the marketplace</li>
               <li>Pending earnings will be paid out (if above minimum)</li>
@@ -171,19 +193,22 @@ export default async function CreatorAgreementPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mb-3">12. Limitation of Liability</h2>
+            <h2 className="text-2xl font-bold mb-3">
+              12. Limitation of Liability
+            </h2>
             <p>
-              Platform Owner is not liable for any indirect, incidental, or consequential damages
-              arising from your use of the marketplace. Our total liability is limited to the amount
-              of creator earnings owed to you.
+              Platform Owner is not liable for any indirect, incidental, or
+              consequential damages arising from your use of the marketplace.
+              Our total liability is limited to the amount of creator earnings
+              owed to you.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold mb-3">13. Indemnification</h2>
             <p>
-              You agree to indemnify and hold harmless Platform Owner from any claims, damages, or
-              expenses arising from:
+              You agree to indemnify and hold harmless Platform Owner from any
+              claims, damages, or expenses arising from:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Your breach of this agreement</li>
@@ -194,20 +219,25 @@ export default async function CreatorAgreementPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mb-3">14. Changes to Agreement</h2>
+            <h2 className="text-2xl font-bold mb-3">
+              14. Changes to Agreement
+            </h2>
             <p>
-              We may modify this agreement at any time. Continued use of the marketplace after
-              changes constitutes acceptance of the modified terms. Material changes will be
-              communicated via email.
+              We may modify this agreement at any time. Continued use of the
+              marketplace after changes constitutes acceptance of the modified
+              terms. Material changes will be communicated via email.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mb-3">15. Tax Responsibilities</h2>
+            <h2 className="text-2xl font-bold mb-3">
+              15. Tax Responsibilities
+            </h2>
             <p>
-              You are responsible for all taxes related to your creator earnings. Platform Owner may
-              issue tax forms (e.g., 1099) as required by law. You must provide accurate tax
-              information when requested.
+              You are responsible for all taxes related to your creator
+              earnings. Platform Owner may issue tax forms (e.g., 1099) as
+              required by law. You must provide accurate tax information when
+              requested.
             </p>
           </section>
 
@@ -215,7 +245,10 @@ export default async function CreatorAgreementPage() {
             <h2 className="text-2xl font-bold mb-3">16. Contact</h2>
             <p>
               For questions about this Creator Agreement, contact us at{' '}
-              <a href="/contact" className="text-brand-blue-600 hover:underline">
+              <a
+                href="/contact"
+                className="text-brand-blue-600 hover:underline"
+              >
                 our contact form
               </a>
             </p>
@@ -224,8 +257,9 @@ export default async function CreatorAgreementPage() {
           <div className="mt-8 p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
             <p className="text-sm text-brand-blue-900">
               <strong>
-                By applying to become a creator, you acknowledge that you have read, understood, and
-                agree to be bound by this Creator Agreement.
+                By applying to become a creator, you acknowledge that you have
+                read, understood, and agree to be bound by this Creator
+                Agreement.
               </strong>
             </p>
           </div>

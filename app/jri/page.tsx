@@ -143,7 +143,7 @@ export default function JRIPage() {
           fill
           className="object-cover"
           priority
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="blur"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
         />
       </section>
       {/* Stats Section */}
@@ -187,7 +187,7 @@ export default function JRIPage() {
                     alt={benefit.alt}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="blur"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
                   />
                 </div>
                 <div className="p-5">

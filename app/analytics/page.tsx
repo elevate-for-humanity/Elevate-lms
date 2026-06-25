@@ -41,7 +41,7 @@ export default async function AnalyticsPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  const allowedRoles = ['admin', 'super_admin', 'staff'];
+  const allowedRoles = ['admin', 'staff'];
   if (!profile || !allowedRoles.includes(profile.role)) {
     redirect('/lms/dashboard');
   }

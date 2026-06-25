@@ -12,7 +12,7 @@ function fmtUsd(n: number) {
 }
 
 export default async function RevenueAnalyticsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   const now = new Date();

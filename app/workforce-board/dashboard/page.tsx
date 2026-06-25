@@ -43,7 +43,7 @@ export default async function WorkforceBoardDashboard() {
   const { user, profile } = await requireRole([
     'workforce_board',
     'admin',
-    'super_admin',
+    'admin',
     'org_admin',
   ]);
 

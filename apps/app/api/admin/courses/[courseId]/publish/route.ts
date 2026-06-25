@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
  * Returns 422 with the full defect list if blocked.
  * Returns 200 with the updated course on success.
  *
- * Requires admin/super_admin/staff role.
+ * Requires admin/admin/staff role.
  */
 export async function POST(request: NextRequest, { params }: { params: { courseId: string } }) {
   const rateLimited = await applyRateLimit(request, 'strict');

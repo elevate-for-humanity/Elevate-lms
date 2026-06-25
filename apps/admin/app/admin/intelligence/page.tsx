@@ -24,7 +24,7 @@ function ProbBar({ value, color }: { value: number | null; color: string }) {
 }
 
 export default async function IntelligencePage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const [

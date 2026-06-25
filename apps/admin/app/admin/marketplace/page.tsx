@@ -34,7 +34,7 @@ const sections = [
 ];
 
 export default async function AdminMarketplacePage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await createClient();
 
   const [{ count: productCount }, { count: creatorCount }, { count: pendingPayouts }] =

@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const isAdmin = ['admin', 'super_admin', 'staff'].includes(profile?.role ?? '');
+  const isAdmin = ['admin', 'staff'].includes(profile?.role ?? '');
 
   if (!isAdmin) {
     const { data: app } = await db

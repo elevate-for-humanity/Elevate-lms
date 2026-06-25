@@ -459,7 +459,7 @@ export async function listApplications(filters?: { status?: string; programId?: 
   } = await supabase.auth.getUser();
   if (!user) throw new Error('Unauthorized');
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!profile || !['admin', 'super_admin', 'staff', 'org_admin'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff', 'org_admin'].includes(profile.role)) {
     throw new Error('Forbidden');
   }
 

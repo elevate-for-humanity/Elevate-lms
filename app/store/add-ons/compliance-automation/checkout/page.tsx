@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 import AddOnCheckout from '@/components/store/AddOnCheckout';
 import type { Metadata } from 'next';

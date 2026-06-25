@@ -47,7 +47,7 @@ async function _GET(request: NextRequest) {
     if (!adminClient) {
       return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
     }
-    const isAdmin = profile?.role && ['admin', 'super_admin', 'staff'].includes(profile.role);
+    const isAdmin = profile?.role && ['admin', 'staff'].includes(profile.role);
 
     let query = adminClient
       .from('support_tickets')

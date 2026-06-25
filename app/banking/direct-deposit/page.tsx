@@ -58,7 +58,7 @@ export default function DirectDepositPage() {
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
       </section>
 

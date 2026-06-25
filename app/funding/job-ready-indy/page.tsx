@@ -40,7 +40,7 @@ export default function JobReadyIndyPage() {
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
       </section>
       <div className="bg-white border-b border-slate-200 py-8 px-4">
@@ -80,11 +80,11 @@ export default function JobReadyIndyPage() {
             </div>
             <div className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/pages/learner/dashboard-page-5.webp"
+                src="/images/pages/learner-page-1.webp"
                 alt="Job Ready Indy career training"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw" placeholder="blur"
+                sizes="(max-width: 768px) 100vw, 50vw" 
               />
             </div>
           </div>

@@ -16,7 +16,7 @@ export default async function WorkforceParticipantsPage({
 }: {
   searchParams: Promise<{ filter?: string; q?: string }>;
 }) {
-  await requireRole(['workforce_board', 'case_manager', 'admin', 'super_admin', 'staff', 'org_admin']);
+  await requireRole(['workforce_board', 'case_manager', 'admin', 'staff', 'org_admin']);
 
   const { filter, q } = await searchParams;
 

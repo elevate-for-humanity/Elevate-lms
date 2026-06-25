@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 /** Auth on server; all program/form data loads via /api/admin/compliance/wioa-etpl/[programId]. */
 export default async function WioaEtplProgramHubPage({ params }: Props) {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const { programId } = await params;
 
   return (

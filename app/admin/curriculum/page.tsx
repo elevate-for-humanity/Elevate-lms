@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CurriculumPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const supabase = await requireAdminClient();
 
   // Aggregate lesson counts per course_id from curriculum_lessons (live table)

@@ -129,7 +129,7 @@ export default function SiteStatsClient({
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
             Save Stats
           </button>
-          <p className="text-slate-600 text-xs">super_admin only</p>
+          <p className="text-slate-600 text-xs">admin only</p>
         </div>
       </div>
     </div>

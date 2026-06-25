@@ -195,7 +195,7 @@ export default async function TuitionFeesPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
 

@@ -5,7 +5,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ADMIN_ROLES = ['admin', 'super_admin', 'platform_operator', 'org_admin', 'staff'];
+const ADMIN_ROLES = ['admin', 'admin', 'org_admin', 'staff'];
 
 /**
  * Called immediately after signInWithPassword on the admin-login page.

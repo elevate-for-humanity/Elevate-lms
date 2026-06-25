@@ -1,4 +1,4 @@
-// AUTH: admin/super_admin/staff only
+// AUTH: admin/admin/staff only
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';

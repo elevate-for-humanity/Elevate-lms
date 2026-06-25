@@ -23,6 +23,9 @@ export default async function InstructorDocumentsPage({
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const db = await requireAdminClient();
   const { data: profile } = await db
     .from('profiles')
@@ -30,7 +33,7 @@ export default async function InstructorDocumentsPage({
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['instructor', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['instructor', 'admin', 'staff'].includes(profile.role)) {
     redirect('/onboarding/learner');
   }
 

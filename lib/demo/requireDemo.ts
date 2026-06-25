@@ -12,7 +12,7 @@ const ALLOWED_DEMO_ROLES: DemoRole[] = [
   'demo_staff',
   'demo_partner',
   'demo_learner',
-  'super_admin',
+  'admin',
 ];
 
 export interface DemoAuthResult {
@@ -111,7 +111,7 @@ export async function checkDemoContext(): Promise<DemoAuthResult | null> {
 export async function requireDemoAdmin(): Promise<DemoAuthResult> {
   const result = await requireDemo();
 
-  if (result.role !== 'demo_admin' && result.role !== 'super_admin') {
+  if (result.role !== 'demo_admin' && result.role !== 'admin') {
     redirect(`/demo?message=${encodeURIComponent('Admin access required for this operation')}`);
   }
 

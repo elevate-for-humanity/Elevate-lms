@@ -29,7 +29,7 @@ export default function SchoolLicensePage() {
           alt="School License Platform"
           fill
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
 
@@ -283,7 +283,7 @@ export default function SchoolLicensePage() {
             ].map((item, i) => (
               <div key={i} className="bg-slate-50 rounded-xl overflow-hidden">
                 <div className="relative h-40">
-                  <Image sizes="100vw" src={item.img} alt={item.title} fill className="object-cover" placeholder="blur" />
+                  <Image sizes="100vw" src={item.img} alt={item.title} fill className="object-cover"  />
                 </div>
                 <div className="p-6">
                   <h3 className="font-bold text-lg mb-2">{item.title}</h3>

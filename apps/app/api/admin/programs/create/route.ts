@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
  * This is the only route that should create new LMS programs.
  * Seed scripts and manual SQL inserts are not the production path.
  *
- * Auth: admin, super_admin, or staff only.
+ * Auth: admin, admin, or staff only.
  * Rate limit: strict (3 req / 5 min) — program creation is a heavyweight write.
  */
 

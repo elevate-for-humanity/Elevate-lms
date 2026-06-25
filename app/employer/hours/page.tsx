@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function EmployerHoursPage() {
-  const { user } = await requireRole(['employer', 'admin', 'super_admin', 'sponsor']);
+  const { user } = await requireRole(['employer', 'admin', 'sponsor']);
   const supabase = await createClient();
 
   // Get stats from hour_entries

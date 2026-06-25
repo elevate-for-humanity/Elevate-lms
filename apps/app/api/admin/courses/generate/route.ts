@@ -16,7 +16,7 @@ import { aiChat } from '@/lib/ai/ai-service';
 
 import { withRuntime } from '@/lib/api/withRuntime';
 
-const ADMIN_ROLES = new Set(['admin', 'super_admin', 'staff']);
+const ADMIN_ROLES = new Set(['admin', 'staff']);
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

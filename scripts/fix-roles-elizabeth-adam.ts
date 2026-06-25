@@ -9,7 +9,7 @@ const db = createClient(
 );
 
 // Elizabeth Greene elizabethpowell6262 → partner
-// Elizabeth L. Greene elizabthpowell6262  → super_admin (already correct, keep)
+// Elizabeth L. Greene elizabthpowell6262  → admin (already correct, keep)
 // Adam Kriech adamkriech1               → partner (confirm/set)
 
 const targets = [

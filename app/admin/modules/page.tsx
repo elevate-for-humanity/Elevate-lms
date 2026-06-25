@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ModulesPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   // Fetch program modules (LMS)

@@ -38,7 +38,7 @@ export default async function AdminNotificationsPage() {
   const { data: adminUsers } = await db
     .from('profiles')
     .select('id')
-    .in('role', ['admin', 'super_admin', 'staff'])
+    .in('role', ['admin', 'staff'])
     .limit(200);
   const adminIds = (adminUsers ?? []).map((u) => u.id);
 

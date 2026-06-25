@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 export default async function TenantDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireRole(['super_admin', 'admin']);
+  await requireRole(['admin']);
   const { id } = await params;
   const db = await requireAdminClient();
 

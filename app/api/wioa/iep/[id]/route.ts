@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 async function _GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-  const _authCheck = await requireApiRole(['workforce_board', 'staff', 'admin', 'super_admin']);
+  const _authCheck = await requireApiRole(['workforce_board', 'staff', 'admin']);
   if (_authCheck instanceof NextResponse) return _authCheck;
   const supabase = _authCheck.adminDb;
   try {
@@ -46,7 +46,7 @@ async function _GET(request: NextRequest, { params }: { params: Promise<{ id: st
 async function _PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-  const _authCheck = await requireApiRole(['workforce_board', 'staff', 'admin', 'super_admin']);
+  const _authCheck = await requireApiRole(['workforce_board', 'staff', 'admin']);
   if (_authCheck instanceof NextResponse) return _authCheck;
   const supabase = _authCheck.adminDb;
   try {

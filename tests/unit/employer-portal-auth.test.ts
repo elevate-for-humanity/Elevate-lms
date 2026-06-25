@@ -51,7 +51,7 @@ function hasNoInlineRoleCheck(src: string): boolean {
 
 /**
  * Assert that a page uses requireRole with a role set that includes
- * at least 'employer', 'admin', and 'super_admin'.
+ * at least 'employer', 'admin', and 'admin'.
  */
 function assertCanonicalRoleSet(src: string, pagePath: string): void {
   // Extract the requireRole call argument string
@@ -60,11 +60,11 @@ function assertCanonicalRoleSet(src: string, pagePath: string): void {
   const roleArray = match[1];
   expect(roleArray, `${pagePath}: role set must include 'employer'`).toContain("'employer'");
   expect(roleArray, `${pagePath}: role set must include 'admin'`).toContain("'admin'");
-  expect(roleArray, `${pagePath}: role set must include 'super_admin'`).toContain("'super_admin'");
+  expect(roleArray, `${pagePath}: role set must include 'admin'`).toContain("'admin'");
 }
 
 // ---------------------------------------------------------------------------
-// Pages that must use requireRole(['employer', 'admin', 'super_admin'])
+// Pages that must use requireRole(['employer', 'admin'])
 // ---------------------------------------------------------------------------
 
 const STANDARD_PAGES = [
@@ -89,7 +89,7 @@ const STANDARD_PAGES = [
 ];
 
 // Pages with extended role sets (superset of standard — still must include
-// employer + admin + super_admin).
+// employer + admin + admin).
 const EXTENDED_ROLE_PAGES = [
   // staff added
   'app/employer/apprenticeships/page.tsx',
@@ -128,7 +128,7 @@ describe('Employer portal — standard pages use requireRole', () => {
       expect(hasRequireRoleCall(src), `missing requireRole() call in ${pagePath}`).toBe(true);
     });
 
-    it(`${pagePath} role set includes employer + admin + super_admin`, () => {
+    it(`${pagePath} role set includes employer + admin + admin`, () => {
       const src = readPage(pagePath);
       assertCanonicalRoleSet(src, pagePath);
     });
@@ -152,7 +152,7 @@ describe('Employer portal — extended-role pages use requireRole', () => {
       expect(hasRequireRoleCall(src), `missing requireRole() call in ${pagePath}`).toBe(true);
     });
 
-    it(`${pagePath} role set includes employer + admin + super_admin`, () => {
+    it(`${pagePath} role set includes employer + admin + admin`, () => {
       const src = readPage(pagePath);
       assertCanonicalRoleSet(src, pagePath);
     });

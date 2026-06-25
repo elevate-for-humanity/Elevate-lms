@@ -293,7 +293,7 @@ export default function CheckEligibilityPage() {
           fill
           className="object-cover object-center"
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
         <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/85 via-brand-blue-800/60 to-transparent" />
         <div

@@ -33,7 +33,7 @@ export async function GET(req: Request) {
     .maybeSingle();
 
   const role = profile?.role as string | undefined;
-  const allowedRoles = ['admin', 'super_admin', 'employer', 'supervisor', 'staff'];
+  const allowedRoles = ['admin', 'employer', 'supervisor', 'staff'];
   if (!role || !allowedRoles.includes(role)) {
     return jsonError('Forbidden', 403);
   }
@@ -120,7 +120,7 @@ export async function POST(req: Request) {
     .maybeSingle();
 
   const role = profile?.role as string | undefined;
-  const allowedRoles = ['admin', 'super_admin', 'employer', 'supervisor', 'staff'];
+  const allowedRoles = ['admin', 'employer', 'supervisor', 'staff'];
   if (!role || !allowedRoles.includes(role)) {
     return jsonError('Forbidden', 403);
   }
@@ -215,7 +215,7 @@ export async function POST(req: Request) {
 }
 
 // PATCH — hardened approval endpoint using approval_status column
-const APPROVER_ROLES = new Set(['admin', 'super_admin', 'employer', 'supervisor', 'staff']);
+const APPROVER_ROLES = new Set(['admin', 'employer', 'supervisor', 'staff']);
 
 export async function PATCH(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');

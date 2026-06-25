@@ -73,7 +73,7 @@ export default function HostShopApplyPage() {
           className="object-cover object-center"
           priority
           sizes={heroTokens.imageSizes}
-          placeholder="blur"
+          
         />
       </section>
 

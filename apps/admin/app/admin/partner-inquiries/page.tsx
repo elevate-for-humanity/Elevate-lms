@@ -19,13 +19,16 @@ export default async function PartnerInquiriesAdminPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff'].includes(profile.role)) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-12">
         <h1 className="text-2xl font-bold">Access denied</h1>
@@ -64,6 +67,9 @@ export default async function PartnerInquiriesAdminPage() {
       data: { user: actor },
     } = await supabase2.auth.getUser();
     if (actor)
+
+  // Guard against null user
+  if (!user) redirect('/login');
       await logAdminAudit({
         action: AdminAction.PARTNER_INQUIRY_REVIEWED,
         actorId: actor.id,

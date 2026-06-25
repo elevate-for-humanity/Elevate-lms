@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function MentorDashboardPage() {
   // Require mentor role (admins can view for support)
-  const { user } = await requireRole(['mentor', 'admin', 'super_admin']);
+  const { user } = await requireRole(['mentor', 'admin']);
 
   const supabase = await createClient();
 

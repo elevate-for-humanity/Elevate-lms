@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { safeError } from '@/lib/api/safe-error';
 
-type Role = 'admin' | 'super_admin' | 'platform_operator' | 'org_admin' | 'staff' | 'instructor' | 'student';
+type Role = 'admin' | 'admin' | 'admin' | 'org_admin' | 'staff' | 'instructor' | 'student';
 
 interface WithAuthOptions {
-  /** Roles allowed to call this route. Defaults to ['admin', 'super_admin', 'platform_operator']. */
+  /** Roles allowed to call this route. Defaults to ['admin']. */
   roles?: Role[];
 }
 
@@ -20,10 +20,10 @@ type AuthedHandler = (
  * Usage:
  *   export const GET = withAuth(async (req, { user, role }) => {
  *     // business logic only — auth is already verified
- *   }, { roles: ['admin', 'super_admin', 'platform_operator'] });
+ *   }, { roles: ['admin'] });
  */
 export function withAuth(handler: AuthedHandler, options: WithAuthOptions = {}) {
-  const allowedRoles: Role[] = options.roles ?? ['admin', 'super_admin', 'platform_operator'];
+  const allowedRoles: Role[] = options.roles ?? ['admin'];
 
   return async function (req: NextRequest): Promise<NextResponse> {
     try {

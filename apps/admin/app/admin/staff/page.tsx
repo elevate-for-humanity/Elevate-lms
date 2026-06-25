@@ -12,10 +12,10 @@ export const metadata: Metadata = {
   title: 'Staff | Admin | Elevate For Humanity',
 };
 
-const STAFF_ROLES = ['admin', 'super_admin', 'staff', 'instructor', 'org_admin'];
+const STAFF_ROLES = ['admin', 'staff', 'instructor', 'org_admin'];
 
 export default async function AdminStaffPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
   if (!db) notFound();
 

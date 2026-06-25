@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/training' },
@@ -103,7 +103,7 @@ export default function TrainingPage() {
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
       </section>
 
@@ -166,7 +166,7 @@ export default function TrainingPage() {
                     alt={area.title}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500" placeholder="blur"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500" 
                   />
                 </div>
                 <div className="p-5">

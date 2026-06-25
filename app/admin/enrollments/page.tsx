@@ -19,7 +19,7 @@ export default async function AdminEnrollmentsPage({
 }: {
   searchParams: Promise<{ program?: string; status?: string }>;
 }) {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const params = await searchParams;
   const programFilter = params.program || '';
   const statusFilter = params.status || '';

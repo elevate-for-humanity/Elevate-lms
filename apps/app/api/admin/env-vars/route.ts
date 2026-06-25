@@ -4,7 +4,7 @@
  * Read and write platform configuration values stored in `platform_settings`.
  *
  * SECURITY MODEL (explicit):
- * - Super-admin only (apiRequireAdmin enforces admin|super_admin|staff|org_admin).
+ * - Super-admin only (apiRequireAdmin enforces admin|admin|staff|org_admin).
  * - Values are stored PLAINTEXT in platform_settings. No encryption at rest
  *   beyond what Supabase/Postgres provides at the infrastructure level.
  *   Do not store credentials here that are not already in your .env.

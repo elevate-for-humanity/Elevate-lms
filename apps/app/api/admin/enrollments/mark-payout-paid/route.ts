@@ -1,4 +1,4 @@
-// AUTH: admin/super_admin only — staff cannot mark payouts paid
+// AUTH: admin/admin only — staff cannot mark payouts paid
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
-  // Only admin/super_admin can mark paid — not staff
+  // Only admin/admin can mark paid — not staff
   const db = await requireAdminClient();
   if (!db) return safeError('Server error', 500);
 
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     .eq('id', auth.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !['admin'].includes(profile.role)) {
     return safeError('Only admins can mark payouts as paid', 403);
   }
 

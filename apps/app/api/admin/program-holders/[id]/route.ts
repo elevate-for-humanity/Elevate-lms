@@ -27,7 +27,7 @@ async function _GET(req: Request, { params }: { params: Promise<{ id: string }> 
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff'].includes(profile.role)) {
     return new Response('Forbidden', { status: 403 });
   }
 

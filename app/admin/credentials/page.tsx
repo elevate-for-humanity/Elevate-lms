@@ -25,7 +25,7 @@ const STACK_LABELS: Record<string, string> = {
 };
 
 export default async function CredentialRegistryPage() {
-  await requireRole(['admin', 'super_admin', 'org_admin', 'staff']);
+  await requireRole(['admin', 'org_admin', 'staff']);
   const db = await requireAdminClient();
 
   const { data: rawCredentials } = await db

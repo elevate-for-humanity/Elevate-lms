@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 
 import { Metadata } from 'next';
@@ -163,7 +163,7 @@ export default function CommunityHubPage() {
                     alt={feature.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="blur"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" 
                   />
                   <div className="absolute bottom-3 left-4">
                     <h3 className="text-lg font-bold text-white">{feature.title}</h3>

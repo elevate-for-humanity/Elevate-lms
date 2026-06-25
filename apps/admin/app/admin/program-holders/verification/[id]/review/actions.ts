@@ -6,7 +6,7 @@ import { writeAdminAuditEvent, AuditActions } from '@/lib/audit';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-const ADMIN_ROLES = ['admin', 'super_admin'];
+const ADMIN_ROLES = ['admin'];
 
 // Valid status transitions for program_holders
 const VALID_FROM_STATES = ['pending', 'submitted', 'under_review'];

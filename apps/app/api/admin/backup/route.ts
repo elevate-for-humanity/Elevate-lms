@@ -11,7 +11,7 @@ const _POST = withAuth(
   async (request: NextRequest, user) => {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
-    if (!user?.role || !['admin', 'super_admin', 'staff'].includes(user.role)) {
+    if (!user?.role || !['admin', 'staff'].includes(user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -37,12 +37,12 @@ const _POST = withAuth(
       return NextResponse.json({ error: 'Failed to create backup' }, { status: 500 });
     }
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 
 const _GET = withAuth(
   async (request: NextRequest, user) => {
-    if (!user?.role || !['admin', 'super_admin', 'staff'].includes(user.role)) {
+    if (!user?.role || !['admin', 'staff'].includes(user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -55,7 +55,7 @@ const _GET = withAuth(
       return NextResponse.json({ error: 'Failed to list backups' }, { status: 500 });
     }
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 export const GET = withApiAudit('/api/admin/backup', _GET);
 export const POST = withApiAudit('/api/admin/backup', _POST);

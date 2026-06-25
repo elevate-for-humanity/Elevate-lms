@@ -31,7 +31,7 @@ async function _POST(request: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'super_admin', 'staff', 'advisor'].includes(profile.role)) {
+    if (!profile || !['admin', 'staff', 'advisor'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

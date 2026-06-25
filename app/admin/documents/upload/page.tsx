@@ -12,6 +12,6 @@ export const metadata: Metadata = {
 };
 
 export default async function UploadDocumentsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   return <DocumentUploadClient />;
 }

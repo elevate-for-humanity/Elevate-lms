@@ -11,7 +11,7 @@
 // this is a read-only support view, not a full auth swap.
 //
 // Every start/end action is written to admin_audit_events (immutable).
-// super_admin and admin only. provider_admin and below cannot impersonate.
+// admin and admin only. provider_admin and below cannot impersonate.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -36,9 +36,9 @@ export async function POST(req: NextRequest) {
 
   const auth = await apiAuthGuard(req);
 
-  // Impersonation is super_admin only — admin and staff cannot impersonate users.
-  if (auth.role !== 'super_admin') {
-    return NextResponse.json({ error: 'Forbidden — super_admin required' }, { status: 403 });
+  // Impersonation is admin only — admin and staff cannot impersonate users.
+  if (auth.role !== 'admin') {
+    return NextResponse.json({ error: 'Forbidden — admin required' }, { status: 403 });
   }
 
   const body = await req.json().catch(() => null);
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
-  if (['admin', 'super_admin'].includes(target.role)) {
+  if (['admin'].includes(target.role)) {
     return NextResponse.json({ error: 'Cannot impersonate admin users' }, { status: 403 });
   }
 
@@ -117,8 +117,8 @@ export async function DELETE(req: NextRequest) {
 
   const auth = await apiAuthGuard(req);
 
-  if (auth.role !== 'super_admin') {
-    return NextResponse.json({ error: 'Forbidden — super_admin required' }, { status: 403 });
+  if (auth.role !== 'admin') {
+    return NextResponse.json({ error: 'Forbidden — admin required' }, { status: 403 });
   }
 
   const cookieStore = await cookies();

@@ -27,7 +27,7 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function WIOAEligibilityPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   // wioa_applications may not exist — fall back to applications with wioa funding

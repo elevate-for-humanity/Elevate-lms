@@ -25,7 +25,7 @@ export default async function PartnerEntitiesPage() {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/admin');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/admin');
 
   const { data: org } = await db
     .from('sos_organizations')

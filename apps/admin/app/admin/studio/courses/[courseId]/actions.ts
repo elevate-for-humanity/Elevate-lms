@@ -16,7 +16,7 @@ async function requireAdminClient() {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) throw new Error('Forbidden');
+  if (!profile || !['admin'].includes(profile.role)) throw new Error('Forbidden');
   return { db: await getAdminDb(), userId: user.id };
 }
 

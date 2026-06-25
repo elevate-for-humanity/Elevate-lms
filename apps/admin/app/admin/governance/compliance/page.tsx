@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CompliancePage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',

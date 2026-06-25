@@ -9,7 +9,7 @@ export const revalidate = 60;
 export const metadata: Metadata = { title: 'New Learning Path | Admin | Elevate For Humanity' };
 
 export default async function NewLearningPathPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
       <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-6">

@@ -21,6 +21,9 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   // Verify instructor role
   const { data: profile } = await supabase
     .from('profiles')
@@ -28,7 +31,7 @@ export default async function SpeedGraderPage({ params }: { params: Params }) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff', 'instructor'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff', 'instructor'].includes(profile.role)) {
     redirect('/learner/dashboard');
   }
 

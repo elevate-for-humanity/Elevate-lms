@@ -24,7 +24,7 @@ export default function LicensesPage() {
           alt="Platform Licensing"
           fill
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
 

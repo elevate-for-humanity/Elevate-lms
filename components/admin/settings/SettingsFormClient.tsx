@@ -26,7 +26,7 @@ export interface SettingsField {
 interface Props {
   fields: SettingsField[];
   initialValues: Record<string, string>;
-  /** If true, only super_admin can save. Renders a notice for regular admins. */
+  /** If true, only admin can save. Renders a notice for regular admins. */
   superAdminOnly?: boolean;
   isSuperAdmin?: boolean;
 }
@@ -80,7 +80,7 @@ export default function SettingsFormClient({
       {readonly && (
         <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
-          <span>These settings require <strong>super_admin</strong> access to edit.</span>
+          <span>These settings require <strong>admin</strong> access to edit.</span>
         </div>
       )}
 

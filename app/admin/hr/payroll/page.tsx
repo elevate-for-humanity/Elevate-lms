@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PayrollPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   const [
@@ -24,7 +24,7 @@ export default async function PayrollPage() {
     supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
-      .in('role', ['admin', 'super_admin', 'instructor', 'staff']),
+      .in('role', ['admin', 'instructor', 'staff']),
     supabase
       .from('payroll_runs')
       .select('id, pay_period_start, pay_period_end, pay_date, status, total_gross, total_net, total_taxes, employee_count, created_at')

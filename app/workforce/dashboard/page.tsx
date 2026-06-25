@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function WorkforceDashboardPage() {
   const { user, profile } = await requireRole([
-    'workforce_board', 'case_manager', 'admin', 'super_admin', 'staff', 'org_admin',
+    'workforce_board', 'case_manager', 'admin', 'staff', 'org_admin',
   ]);
 
   const supabase = await createClient();
@@ -26,7 +26,7 @@ export default async function WorkforceDashboardPage() {
   const db = admin || supabase;
 
   const isCaseManager = profile?.role === 'case_manager';
-  const isWorkforceBoard = profile?.role === 'workforce_board' || profile?.role === 'admin' || profile?.role === 'super_admin' || profile?.role === 'staff' || profile?.role === 'org_admin';
+  const isWorkforceBoard = profile?.role === 'workforce_board' || profile?.role === 'admin' || profile?.role === 'admin' || profile?.role === 'staff' || profile?.role === 'org_admin';
 
   // ── Case manager: load assigned caseload ──────────────────────────────────
   let learnerIds: string[] = [];

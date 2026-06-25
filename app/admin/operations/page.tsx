@@ -50,7 +50,7 @@ function healthFromCounts(failed: number, warnAt: number, failAt: number): 'ok' 
 }
 
 export default async function OperationsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();

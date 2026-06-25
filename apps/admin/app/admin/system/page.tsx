@@ -21,7 +21,7 @@ const SECTIONS = [
 ];
 
 export default async function SystemPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
 
   return (
     <div className="min-h-screen bg-slate-50">

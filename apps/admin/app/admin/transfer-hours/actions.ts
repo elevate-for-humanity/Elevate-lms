@@ -19,7 +19,7 @@ async function requireAdminActor() {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+  if (profile?.role !== 'admin' && profile?.role !== 'admin') {
     throw new Error('Forbidden');
   }
 

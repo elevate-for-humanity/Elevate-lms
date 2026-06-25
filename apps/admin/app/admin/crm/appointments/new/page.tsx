@@ -23,7 +23,7 @@ async function createAppointment(formData: FormData) {
 }
 
 export default async function NewAppointmentPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   return (
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-xl mx-auto">

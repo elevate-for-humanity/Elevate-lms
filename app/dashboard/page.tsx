@@ -25,7 +25,6 @@ export default async function DashboardPage() {
   // Role-based dashboard routing
   switch (role) {
     case 'admin':
-    case 'super_admin':
     case 'staff':
       redirect('/admin/dashboard');
       break;

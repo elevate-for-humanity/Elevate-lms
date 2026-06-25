@@ -104,7 +104,7 @@ export default async function BarberShopApplicationsPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/');
 
   const { data: applications, error } = await supabase
     .from('barbershop_partner_applications')

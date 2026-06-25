@@ -34,7 +34,7 @@ async function _GET(req: Request, { params }: { params: Promise<{ courseId: stri
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'super_admin', 'instructor'].includes(profile.role)) {
+    if (!profile || !['admin', 'instructor'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

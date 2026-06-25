@@ -88,7 +88,7 @@ const FEATURES = [
 ];
 
 export default async function AdminHomePage() {
-  const auth = await requireRole(['admin', 'super_admin', 'staff', 'platform_operator']);
+  const auth = await requireRole(['admin', 'staff', 'admin']);
   const { profile } = auth;
   const firstName = profile.first_name || profile.full_name?.split(' ')[0] || 'Admin';
 
@@ -102,7 +102,7 @@ export default async function AdminHomePage() {
           fill
           className="object-cover object-center"
           priority
-          placeholder="blur"
+          
         />
         <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/90 to-brand-blue-900/40" />
         <div className="relative z-10 flex h-full flex-col justify-center px-6 sm:px-12 max-w-6xl mx-auto">

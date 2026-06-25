@@ -10,7 +10,7 @@ export const maxDuration = 60;
 export const GET = withAuth(
   async (request: NextRequest, user) => {
     try {
-      // Role check enforced by withAuth({ roles: ['admin', 'super_admin'] }) below
+      // Role check enforced by withAuth({ roles: ['admin'] }) below
 
       const { searchParams } = new URL(request.url);
       const action = searchParams.get('action');
@@ -77,5 +77,5 @@ export const GET = withAuth(
       return NextResponse.json({ error: 'Failed to fetch audit logs' }, { status: 500 });
     }
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );

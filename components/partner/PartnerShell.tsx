@@ -17,7 +17,7 @@ interface PartnerShellProps {
 
 export default function PartnerShell({ ctx, children }: PartnerShellProps) {
   const shops = ctx?.shops ?? [];
-  const isAdmin = ['admin', 'super_admin', 'org_admin'].includes(ctx?.profileRole ?? '');
+  const isAdmin = ['admin', 'org_admin'].includes(ctx?.profileRole ?? '');
 
   return (
     <div className="min-h-screen bg-white">

@@ -30,7 +30,7 @@ export default async function CompliancePage() {
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image src="/images/pages/store-compliance-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority placeholder="blur" />
+        <Image src="/images/pages/store-compliance-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority  />
       </section>
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Compliance" }]} />
@@ -53,7 +53,7 @@ export default async function CompliancePage() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
               <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
-                <Image src="/images/pages/admin-wioa-hero.webp" alt="WIOA compliance reporting dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="blur" />
+                <Image src="/images/pages/admin-wioa-hero.webp" alt="WIOA compliance reporting dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw"  />
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-4">WIOA Compliance</h3>
@@ -90,7 +90,7 @@ export default async function CompliancePage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
               <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
-                <Image src="/images/pages/admin-compliance-hero.webp" alt="FERPA student data protection dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="blur" />
+                <Image src="/images/pages/admin-compliance-hero.webp" alt="FERPA student data protection dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw"  />
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-4">FERPA Protection</h3>
@@ -163,7 +163,7 @@ export default async function CompliancePage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
               <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
-                <Image src="/images/pages/admin-grants-hero.jpg" alt="Grant reporting and compliance documentation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="blur" />
+                <Image src="/images/pages/admin-grants-hero.jpg" alt="Grant reporting and compliance documentation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw"  />
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-4">Grant Reporting</h3>

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ChartsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   const [enrollments, completions, programs, applications] = await Promise.all([

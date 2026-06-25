@@ -3,8 +3,9 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { FileText, Download, Upload } from 'lucide-react';
+import { FileText, Download } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import UploadDocuments from './UploadDocuments';
 
 export const metadata: Metadata = {
   title: 'Documents | Apprentice Portal',
@@ -60,10 +61,12 @@ export default async function ApprenticeDocumentsPage() {
             <h1 className="text-2xl font-bold">Documents</h1>
             <p className="text-slate-700">Access your apprenticeship documents and forms</p>
           </div>
-          <button className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-blue-700 transition">
-            <Upload className="w-5 h-5" />
-            Upload Document
-          </button>
+        </div>
+        
+        {/* Upload Section */}
+        <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
+          <h2 className="text-lg font-semibold mb-4">Upload Documents</h2>
+          <UploadDocuments />
         </div>
 
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">

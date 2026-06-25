@@ -48,7 +48,7 @@ export default function JriPage() {
             alt="Second chance career training"
             fill
             className="object-cover"
-            priority placeholder="blur"
+            priority 
           />
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/90 to-indigo-900/70" />
         </div>
@@ -235,7 +235,7 @@ export default function JriPage() {
                     alt={program.title}
                     fill
                     unoptimized={program.image.endsWith('.svg')}
-                    className="object-cover group-hover:scale-105 transition-transform duration-300" placeholder="blur"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300" 
                   />
                   <div className="absolute top-4 right-4 bg-brand-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                     JRI FUNDED
@@ -309,7 +309,7 @@ export default function JriPage() {
                 alt="JRI participant in training"
                 width={600}
                 height={500}
-                className="rounded-2xl shadow-xl" placeholder="blur" sizes="(max-width: 768px) 100vw, 50vw"
+                className="rounded-2xl shadow-xl"  sizes="(max-width: 768px) 100vw, 50vw"
               />
               <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-6 shadow-lg max-w-xs">
                 <p className="text-slate-900 font-medium italic">

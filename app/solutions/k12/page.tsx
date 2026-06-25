@@ -129,7 +129,7 @@ export default function K12SolutionsPage() {
             alt="K-12 students in a career and technical education classroom"
             fill
             className="object-cover"
-            priority placeholder="blur"
+            priority 
           />
           <div className="absolute inset-0 bg-slate-900/50" />
           <div className="absolute inset-0 flex items-end">

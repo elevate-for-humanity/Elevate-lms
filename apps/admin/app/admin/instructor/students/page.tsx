@@ -21,13 +21,16 @@ export default async function InstructorStudentsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['instructor', 'admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !['instructor', 'admin'].includes(profile.role)) {
     redirect('/');
   }
 

@@ -49,7 +49,7 @@ const deploymentChecks = [
 ];
 
 export default async function OperationalControlsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',

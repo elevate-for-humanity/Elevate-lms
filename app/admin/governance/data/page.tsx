@@ -37,7 +37,7 @@ function PolicySection({
 }
 
 export default async function DataGovernancePage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
 
   return (
     <div className="min-h-screen bg-white">

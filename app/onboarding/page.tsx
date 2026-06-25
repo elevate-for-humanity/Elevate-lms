@@ -32,7 +32,7 @@ export default async function OnboardingPage() {
       .maybeSingle();
     if (data?.role === 'student') redirect('/onboarding/learner');
     else if (data?.role === 'program_holder') redirect('/program-holder/onboarding');
-    else if (data?.role === 'admin' || data?.role === 'super_admin')
+    else if (data?.role === 'admin' || data?.role === 'admin')
       redirect('/admin/dashboard');
   }
 

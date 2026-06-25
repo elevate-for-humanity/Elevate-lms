@@ -26,15 +26,15 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { href: '/workforce/dashboard',           label: 'Dashboard',           icon: LayoutDashboard, roles: ['workforce_board', 'case_manager', 'admin', 'super_admin', 'staff', 'org_admin'] },
-  { href: '/workforce/participants',        label: 'Participants',        icon: Users,           roles: ['workforce_board', 'case_manager', 'admin', 'super_admin', 'staff', 'org_admin'] },
-  { href: '/workforce/search',              label: 'Student Search',      icon: Search,          roles: ['case_manager', 'admin', 'super_admin', 'staff'] },
-  { href: '/workforce/placements',          label: 'Placements',          icon: Briefcase,       roles: ['workforce_board', 'case_manager', 'admin', 'super_admin', 'staff', 'org_admin'] },
-  { href: '/workforce/follow-ups',          label: 'Follow-Ups',          icon: CheckSquare,     roles: ['workforce_board', 'admin', 'super_admin', 'staff', 'org_admin'] },
-  { href: '/workforce/eligibility',         label: 'Eligibility',         icon: Shield,          roles: ['workforce_board', 'admin', 'super_admin', 'staff', 'org_admin'] },
-  { href: '/workforce/supportive-services', label: 'Supportive Services', icon: HeartHandshake,  roles: ['workforce_board', 'admin', 'super_admin', 'staff', 'org_admin'] },
-  { href: '/workforce/reports',             label: 'Reports',             icon: BarChart3,       roles: ['workforce_board', 'case_manager', 'admin', 'super_admin', 'staff', 'org_admin'] },
-  { href: '/workforce/wioa-export',         label: 'WIOA Export',         icon: FileText,        roles: ['case_manager', 'workforce_board', 'admin', 'super_admin', 'staff', 'org_admin'] },
+  { href: '/workforce/dashboard',           label: 'Dashboard',           icon: LayoutDashboard, roles: ['workforce_board', 'case_manager', 'admin', 'staff', 'org_admin'] },
+  { href: '/workforce/participants',        label: 'Participants',        icon: Users,           roles: ['workforce_board', 'case_manager', 'admin', 'staff', 'org_admin'] },
+  { href: '/workforce/search',              label: 'Student Search',      icon: Search,          roles: ['case_manager', 'admin', 'staff'] },
+  { href: '/workforce/placements',          label: 'Placements',          icon: Briefcase,       roles: ['workforce_board', 'case_manager', 'admin', 'staff', 'org_admin'] },
+  { href: '/workforce/follow-ups',          label: 'Follow-Ups',          icon: CheckSquare,     roles: ['workforce_board', 'admin', 'staff', 'org_admin'] },
+  { href: '/workforce/eligibility',         label: 'Eligibility',         icon: Shield,          roles: ['workforce_board', 'admin', 'staff', 'org_admin'] },
+  { href: '/workforce/supportive-services', label: 'Supportive Services', icon: HeartHandshake,  roles: ['workforce_board', 'admin', 'staff', 'org_admin'] },
+  { href: '/workforce/reports',             label: 'Reports',             icon: BarChart3,       roles: ['workforce_board', 'case_manager', 'admin', 'staff', 'org_admin'] },
+  { href: '/workforce/wioa-export',         label: 'WIOA Export',         icon: FileText,        roles: ['case_manager', 'workforce_board', 'admin', 'staff', 'org_admin'] },
 ];
 
 export default function WorkforceShell({

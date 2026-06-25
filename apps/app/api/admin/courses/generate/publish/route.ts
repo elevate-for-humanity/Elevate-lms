@@ -115,13 +115,13 @@ type CompiledModule = z.infer<typeof CompiledModuleSchema>;
  *
  * Rules:
  *   - wantsLive=false → always 'draft' (caller is staging, not publishing)
- *   - wantsLive=true + admin/super_admin/staff → 'published' (trusted roles)
+ *   - wantsLive=true + admin/admin/staff → 'published' (trusted roles)
  *   - wantsLive=true + any other role → 'pending_review' (requires human approval)
  *
  * This is the single place that enforces the review workflow. All status
  * assignments in the publish path must go through this function.
  */
-const TRUSTED_PUBLISH_ROLES = new Set(['admin', 'super_admin', 'staff']);
+const TRUSTED_PUBLISH_ROLES = new Set(['admin', 'staff']);
 
 function resolvePublishStatus(
   wantsLive: boolean,

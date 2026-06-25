@@ -5,7 +5,7 @@
  * A course with ANY blocking issue returns status: "FAIL".
  * Publish is blocked when health.status !== "PASS".
  *
- * Protected: admin or super_admin only.
+ * Protected: admin or admin only.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -56,7 +56,7 @@ export async function GET(_request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    if (!profile || !['admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

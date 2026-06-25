@@ -18,7 +18,7 @@ export async function createWOTCApplication(formData: FormData) {
     return { error: 'Not authenticated' };
   }
   const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!_p || !['admin', 'super_admin'].includes(_p.role)) return { error: 'Forbidden' };
+  if (!_p || !['admin'].includes(_p.role)) return { error: 'Forbidden' };
 
   // Get target groups as array
   const targetGroups = formData.getAll('targetGroups') as string[];
@@ -80,7 +80,7 @@ export async function updateWOTCApplication(id: string, formData: FormData) {
     return { error: 'Not authenticated' };
   }
   const { data: _p2 } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!_p2 || !['admin', 'super_admin'].includes(_p2.role)) return { error: 'Forbidden' };
+  if (!_p2 || !['admin'].includes(_p2.role)) return { error: 'Forbidden' };
 
   const { data: _existing } = await db
     .from('wotc_applications')
@@ -140,7 +140,7 @@ export async function submitWOTCApplication(id: string) {
   } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };
   const { data: _p3 } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!_p3 || !['admin', 'super_admin'].includes(_p3.role)) return { error: 'Forbidden' };
+  if (!_p3 || !['admin'].includes(_p3.role)) return { error: 'Forbidden' };
 
   const { data: _rec } = await db
     .from('wotc_applications')
@@ -176,7 +176,7 @@ export async function updateWOTCStatus(id: string, status: string, notes?: strin
   } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };
   const { data: _p4 } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!_p4 || !['admin', 'super_admin'].includes(_p4.role)) return { error: 'Forbidden' };
+  if (!_p4 || !['admin'].includes(_p4.role)) return { error: 'Forbidden' };
 
   const { data: _rec2 } = await db
     .from('wotc_applications')
@@ -218,7 +218,7 @@ export async function deleteWOTCApplication(id: string) {
   } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };
   const { data: _p5 } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!_p5 || !['admin', 'super_admin'].includes(_p5.role)) return { error: 'Forbidden' };
+  if (!_p5 || !['admin'].includes(_p5.role)) return { error: 'Forbidden' };
 
   const { data: _rec3 } = await db
     .from('wotc_applications')

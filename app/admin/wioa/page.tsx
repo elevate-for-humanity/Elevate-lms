@@ -28,7 +28,7 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function WioaPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const [participantsRes, approvedRes, pendingRes] = await Promise.all([

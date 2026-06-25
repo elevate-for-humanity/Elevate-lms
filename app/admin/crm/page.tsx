@@ -36,7 +36,7 @@ export default async function CRMHubPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !['admin'].includes(profile.role)) {
     redirect('/dashboard');
   }
 

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CoursePartnersPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const supabase = await createClient();
 
   const { data: partners, count } = await supabase

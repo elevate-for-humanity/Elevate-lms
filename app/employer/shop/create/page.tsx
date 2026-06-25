@@ -12,7 +12,7 @@ import { createShop } from './_actions/create-shop';
 export const dynamic = 'force-dynamic';
 
 export default async function CreateShopPage() {
-  const { user } = await requireRole(['employer', 'admin', 'super_admin']);
+  const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
 
   // Check if user already has shop access

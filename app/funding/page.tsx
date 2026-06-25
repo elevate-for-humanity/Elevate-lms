@@ -196,7 +196,7 @@ export default function FundingPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
 
@@ -278,7 +278,7 @@ export default function FundingPage() {
                     alt={opt.imageAlt}
                     fill
                     sizes="(max-width: 640px) 100vw, 50vw"
-                    className="object-cover" placeholder="blur"
+                    className="object-cover" 
                   />
                   <span
                     className={`absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full ${opt.tagColor}`}

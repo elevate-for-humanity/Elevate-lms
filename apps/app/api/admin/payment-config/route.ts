@@ -1,7 +1,7 @@
 /**
  * Admin-only diagnostic endpoint — checks BNPL provider configuration status.
  * Returns which env vars are present (not their values).
- * Requires admin/super_admin/staff authentication.
+ * Requires admin/admin/staff authentication.
  */
 
 import { NextResponse } from 'next/server';

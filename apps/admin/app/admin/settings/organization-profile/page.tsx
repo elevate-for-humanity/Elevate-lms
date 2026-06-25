@@ -11,7 +11,7 @@ export const revalidate = 60;
 export const metadata: Metadata = { title: 'Organization Profile | Admin' };
 
 export default async function OrgProfilePage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   const { data: org } = await db

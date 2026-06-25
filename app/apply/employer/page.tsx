@@ -35,7 +35,7 @@ export default async function EmployerApplicationPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
           <span className="text-sm font-bold text-slate-900">{PLATFORM_DEFAULTS.orgName}</span>

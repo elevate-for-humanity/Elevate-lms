@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SendGridSettingsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
 
   const apiKeyConfigured = !!(
     process.env.SENDGRID_API_KEY || process.env.SENDGRID_KEY

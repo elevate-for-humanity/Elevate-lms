@@ -14,7 +14,7 @@ export default async function NewGrantApplicationPage({
 }: {
   searchParams: Promise<{ opportunity_id?: string; title?: string }>;
 }) {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const { opportunity_id, title } = await searchParams;
   const db = await requireAdminClient();
 

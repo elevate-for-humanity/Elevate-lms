@@ -18,23 +18,13 @@ export const metadata: Metadata = {
   description: 'Manage your mentees, schedule sessions, and track mentoring progress.',
 };
 
-const ALLOWED_ROLES = ['mentor', 'admin', 'super_admin'];
+// Only require login - no role restrictions
 
 export default async function MentorLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect('/login?redirect=/mentor/dashboard');
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role, full_name, first_name, last_name, avatar_url, email')
-    .eq('id', user.id)
-    .single();
-
-  if (!profile?.role || !ALLOWED_ROLES.includes(profile.role)) {
-    redirect('/unauthorized');
-  }
 
   // Get pathname for breadcrumbs
   const { headers: headersList } = await import('next/headers');

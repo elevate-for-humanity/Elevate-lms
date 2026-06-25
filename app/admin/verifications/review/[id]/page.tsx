@@ -17,7 +17,7 @@ export default async function ReviewVerificationPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const { id } = await params;
   const supabase = await createClient();
 

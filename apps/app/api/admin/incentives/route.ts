@@ -30,7 +30,7 @@ async function _GET(req: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+    if (profile?.role !== 'admin' && profile?.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -98,7 +98,7 @@ async function _POST(req: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+    if (profile?.role !== 'admin' && profile?.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

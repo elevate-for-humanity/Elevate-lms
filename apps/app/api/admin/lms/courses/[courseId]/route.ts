@@ -38,7 +38,7 @@ export async function PATCH(
     const supabase = await createClient();
     const { user, profile } = await requireAdmin(supabase);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+    if (!profile || !['admin', 'staff'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -75,7 +75,7 @@ export async function DELETE(
     const supabase = await createClient();
     const { user, profile } = await requireAdmin(supabase);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    if (!profile || !['admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

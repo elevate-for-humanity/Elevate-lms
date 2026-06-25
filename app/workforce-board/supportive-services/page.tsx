@@ -38,7 +38,7 @@ export default function SupportiveServicesPage() {
           priority
           sizes="100vw"
           className="object-cover"
-          quality={85} placeholder="blur"
+          quality={85} 
         />
       </section>
 
@@ -77,7 +77,7 @@ export default function SupportiveServicesPage() {
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
-                  quality={85} placeholder="blur"
+                  quality={85} 
                 />
               </div>
             </div>

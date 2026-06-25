@@ -7,21 +7,21 @@ import {
 } from '@/lib/platform/permission-levels';
 
 describe('platform permission levels', () => {
-  it('maps super_admin on owner tenant to platform_owner', () => {
+  it('maps admin on owner tenant to platform_owner', () => {
     expect(
-      resolvePermissionLevel({ profileRole: 'super_admin', isPlatformOwnerTenant: true }),
+      resolvePermissionLevel({ profileRole: 'admin', isPlatformOwnerTenant: true }),
     ).toBe('platform_owner');
   });
 
-  it('maps super_admin to platform_owner regardless of tenant membership', () => {
+  it('maps admin to platform_owner regardless of tenant membership', () => {
     expect(
-      resolvePermissionLevel({ profileRole: 'super_admin', isPlatformOwnerTenant: false }),
+      resolvePermissionLevel({ profileRole: 'admin', isPlatformOwnerTenant: false }),
     ).toBe('platform_owner');
   });
 
-  it('maps platform_operator to platform_owner regardless of tenant membership', () => {
+  it('maps admin to platform_owner regardless of tenant membership', () => {
     expect(
-      resolvePermissionLevel({ profileRole: 'platform_operator', isPlatformOwnerTenant: false }),
+      resolvePermissionLevel({ profileRole: 'admin', isPlatformOwnerTenant: false }),
     ).toBe('platform_owner');
   });
 

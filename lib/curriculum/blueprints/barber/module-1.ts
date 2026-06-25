@@ -20,6 +20,17 @@ export const barberModule1: BlueprintModule = {
         { competencyKey: 'osha_compliance', isCritical: true, minimumTouchpoints: 1 },
         { competencyKey: 'bloodborne_pathogens', isCritical: true, minimumTouchpoints: 1 },
       ],
+      // NHA-Style Interaction Specs
+      interactionSpecs: {
+        includeKnowledgeChecks: true,
+        includeScenarios: true,
+        includeFlashcards: true,
+        includeClickToReveal: true,
+        includeDragDrop: false,
+        knowledgeCheckCount: 4,
+        scenarioCount: 2,
+        flashcardCount: 8,
+      },
       lessons: [
         {
           slug: 'barber-lesson-1',

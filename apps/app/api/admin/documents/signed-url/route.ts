@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Generate a short-lived signed URL for a document in a private bucket.
- * Admin-only — requires authenticated user with admin/super_admin role.
+ * Admin-only — requires authenticated user with admin/admin role.
  *
  * Accepts either:
  *   ?id=<document_id>  — delegates to getAdminDocumentUrl (preferred)

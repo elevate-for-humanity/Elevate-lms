@@ -81,7 +81,7 @@ const highlights = [
 ];
 
 export default async function GovernancePage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',

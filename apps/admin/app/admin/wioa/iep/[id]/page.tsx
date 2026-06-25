@@ -84,7 +84,7 @@ export default async function IepDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireRole(['admin', 'super_admin', 'staff', 'advisor']);
+  await requireRole(['admin', 'staff', 'advisor']);
   const { id } = await params;
   const db = await requireAdminClient();
 

@@ -38,7 +38,7 @@ export default function GlobalError({
 
     // Auto-reload on Server Action ID mismatch (deployment rollover)
     if (isServerActionMismatch(error)) {
-      console.log('Server action mismatch detected, reloading...');
+      console.info('Server action mismatch detected, reloading...');
       window.location.reload();
       return;
     }

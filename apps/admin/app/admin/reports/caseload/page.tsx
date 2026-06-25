@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CaseloadReportsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   // Total active caseload = active program enrollments
@@ -22,11 +22,11 @@ export default async function CaseloadReportsPage() {
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active');
 
-  // Staff members = profiles with role staff, admin, super_admin, instructor
+  // Staff members = profiles with role staff, admin, admin, instructor
   const { count: staffCount } = await db
     .from('profiles')
     .select('*', { count: 'exact', head: true })
-    .in('role', ['staff', 'admin', 'super_admin', 'instructor']);
+    .in('role', ['staff', 'admin', 'instructor']);
 
   const avgPerStaff = staffCount && staffCount > 0
     ? Math.round((totalCaseload || 0) / staffCount)
@@ -37,7 +37,7 @@ export default async function CaseloadReportsPage() {
   const { data: staffMembers } = await db
     .from('profiles')
     .select('id, full_name, email, role')
-    .in('role', ['staff', 'admin', 'super_admin', 'instructor'])
+    .in('role', ['staff', 'admin', 'instructor'])
     .order('full_name');
 
   // Count active enrollments per staff member via assigned_staff_id (if column exists)

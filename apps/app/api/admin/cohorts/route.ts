@@ -17,7 +17,7 @@ async function requireAdmin() {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !['admin'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
   }
   return { user, profile, supabase };

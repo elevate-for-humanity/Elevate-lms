@@ -27,8 +27,8 @@ type ProviderProgram = {
 const SUBMIT_ROLES = new Set([
   'provider_admin',
   'admin',
-  'super_admin',
-  'platform_operator',
+  'admin',
+  'admin',
   'staff',
   'org_admin',
 ]);

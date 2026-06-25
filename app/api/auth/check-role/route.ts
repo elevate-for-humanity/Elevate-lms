@@ -30,7 +30,7 @@ async function _GET(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const allowedRoles = [requiredRole, 'admin', 'super_admin'];
+  const allowedRoles = [requiredRole, 'admin'];
   const hasRole = profile && allowedRoles.includes(profile.role);
 
   return NextResponse.json({

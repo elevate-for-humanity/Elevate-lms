@@ -26,7 +26,7 @@ function Toggle({ label, hint, value, onChange }: { label: string; hint: string;
 }
 
 const TOGGLE_FIELDS = [
-  { key: 'mfa_required', label: 'Require MFA for Admins', hint: 'Force multi-factor authentication for all admin and super_admin accounts.' },
+  { key: 'mfa_required', label: 'Require MFA for Admins', hint: 'Force multi-factor authentication for all admin and admin accounts.' },
   { key: 'demo_mode', label: 'Demo Mode', hint: 'Masks real student data with anonymized values for demos and screenshots.' },
   { key: 'demo_allow_in_prod', label: 'Allow Demo Mode in Production', hint: 'Permit demo mode on the live production environment.' },
 ];

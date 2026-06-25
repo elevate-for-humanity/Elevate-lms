@@ -208,56 +208,96 @@ async function main() {
   }
 
   const timeoutMs = Number(argValue('--timeout-ms') || 900_000);
-  const buildId = argValue('--build-id');
+  const targetBuildId = argValue('--build-id');
   const start = Date.now();
   let last = '';
   let lastService: ServiceStatus | undefined;
+  let lastBuild: ServiceBuild | undefined;
+
+  console.log(`${serviceId}: Waiting for ${targetBuildId ? `build ${targetBuildId}` : 'service'}...`);
 
   while (Date.now() - start < timeoutMs) {
-    const service = await nfFetch<ServiceStatus>(projectApiPath(projectId, `/services/${serviceId}`));
-    lastService = service;
-    const build = service.status?.build?.status ?? service.buildStatus;
-    const deploy = service.status?.deployment?.status ?? service.deploymentStatus?.status;
-    const phase = resolveServicePhase(service);
-    const label =
-      build && deploy && build !== deploy ? `${build} (deploy: ${deploy})` : phase;
+    // If tracking a specific build, fetch its status
+    if (targetBuildId) {
+      const build = await nfFetch<ServiceBuild>(
+        projectApiPath(projectId, `/services/${serviceId}/build/${targetBuildId}`),
+      ).catch(() => undefined);
+      lastBuild = build;
 
-    if (label !== last) {
-      console.log(`${serviceId}: ${label}`);
-      last = label;
-    }
+      if (build) {
+        const buildStatus = build.status;
+        const buildSuccess = build.success;
 
-    const deployReady = deploy && DEPLOY_READY_STATUSES.has(deploy);
-    const buildDone = !build || BUILD_DONE_STATUSES.has(build);
+        if (buildStatus !== last) {
+          console.log(`${serviceId} build: ${buildStatus}`);
+          last = buildStatus ?? '';
+        }
 
-    // If build failed but deployment is RUNNING/COMPLETED, the old deployment is still live
-    // Don't fail - we can still serve traffic with the previous image
-    if (BUILD_FAILURE_STATUSES.has(build ?? '')) {
-      if (deployReady) {
-        console.log(`${serviceId}: build failed (${build}) but deployment is healthy (${deploy}) - using previous image`);
+        // Build completed successfully
+        if (BUILD_DONE_STATUSES.has(buildStatus ?? '')) {
+          if (buildSuccess === true) {
+            console.log(`${serviceId}: build ${targetBuildId} completed successfully ✅`);
+            return;
+          }
+          // Build done but failed
+          console.error(`${serviceId}: build ${targetBuildId} ${buildStatus} (failed)`);
+          await printBuildLogs(projectId, serviceId, targetBuildId);
+          process.exit(1);
+        }
+
+        // Build still in progress - wait
+        if (BUILD_FAILURE_STATUSES.has(buildStatus ?? '')) {
+          console.error(`${serviceId}: build failed with status ${buildStatus}`);
+          await printBuildLogs(projectId, serviceId, targetBuildId);
+          process.exit(1);
+        }
+      }
+    } else {
+      // Not tracking specific build - just wait for deployment
+      const service = await nfFetch<ServiceStatus>(projectApiPath(projectId, `/services/${serviceId}`));
+      lastService = service;
+
+      const buildStatus = service.status?.build?.status ?? service.buildStatus;
+      const deploy = service.status?.deployment?.status ?? service.deploymentStatus?.status;
+
+      if (buildStatus !== last) {
+        console.log(`${serviceId}: build=${buildStatus} deploy=${deploy}`);
+        last = buildStatus ?? '';
+      }
+
+      const deployReady = deploy && DEPLOY_READY_STATUSES.has(deploy);
+      const buildDone = !buildStatus || BUILD_DONE_STATUSES.has(buildStatus);
+
+      // If build failed but deployment is RUNNING/COMPLETED, the old deployment is still live
+      if (BUILD_FAILURE_STATUSES.has(buildStatus ?? '')) {
+        if (deployReady) {
+          console.log(`${serviceId}: build failed (${buildStatus}) but deployment healthy (${deploy})`);
+          return;
+        }
+        console.error(`${serviceId}: build failed (${buildStatus}) and deployment not ready`);
+        process.exit(1);
+      }
+
+      if (buildDone && deployReady) {
+        console.log(`${serviceId}: service ready ✅`);
         return;
       }
-      console.error(`${serviceId} build failed (${build}) and deployment not ready (${deploy})`);
-      await printFailureDiagnostics(projectId, serviceId, buildId, service);
-      process.exit(1);
-    }
 
-    if (buildDone && deployReady) {
-      return;
-    }
-
-    if (DEPLOY_FAILURE_STATUSES.has(deploy ?? '')) {
-      console.error(`${serviceId} deployment failed (${deploy})`);
-      await printFailureDiagnostics(projectId, serviceId, buildId, service);
-      process.exit(1);
+      if (DEPLOY_FAILURE_STATUSES.has(deploy ?? '')) {
+        console.error(`${serviceId}: deployment failed (${deploy})`);
+        process.exit(1);
+      }
     }
 
     await new Promise((resolve) => setTimeout(resolve, 15_000));
   }
 
-  console.error(`${serviceId} did not settle within ${timeoutMs}ms`);
+  console.error(`${serviceId}: timeout after ${timeoutMs}ms`);
+  if (lastBuild) {
+    console.error('Last build:', JSON.stringify(lastBuild, null, 2));
+  }
   if (lastService) {
-    await printFailureDiagnostics(projectId, serviceId, buildId, lastService);
+    console.error('Last service status:', JSON.stringify(lastService, null, 2));
   }
   process.exit(1);
 }

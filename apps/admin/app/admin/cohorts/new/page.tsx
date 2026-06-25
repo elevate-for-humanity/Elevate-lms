@@ -28,7 +28,7 @@ export default async function NewCohortPage() {
   const { data: instructors } = await db
     .from('profiles')
     .select('id, full_name, email')
-    .in('role', ['instructor', 'admin', 'super_admin'])
+    .in('role', ['instructor', 'admin'])
     .order('full_name');
 
   // Generate a default cohort code (e.g. C-2026-001)

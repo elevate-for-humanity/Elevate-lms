@@ -18,7 +18,7 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ id: strin
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
-  // Auth guard — requires admin, super_admin, or staff
+  // Auth guard — requires admin, admin, or staff
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
   const adminUserId = auth.id;

@@ -43,7 +43,7 @@ export default async function InstructorOnboardingPage() {
     .maybeSingle();
 
   // Redirect non-instructors before running any further queries
-  if (profile && !['instructor', 'admin', 'super_admin', 'staff'].includes(profile.role ?? '')) {
+  if (profile && !['instructor', 'admin', 'staff'].includes(profile.role ?? '')) {
     redirect('/onboarding/learner');
   }
 

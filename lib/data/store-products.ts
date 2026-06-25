@@ -344,3 +344,6 @@ export const ALL_PRODUCTS: StoreProduct[] = [
   ...COMMUNITY_ADDONS,
   ...GRANT_CONTRACT_ADDONS,
 ];
+// Aliases for backwards compatibility
+export const ALL_PRODUCTS = [...PLATFORM_APPS];
+export const STORE_PRODUCTS = [...WORKFORCE_PLATFORM_PLANS];

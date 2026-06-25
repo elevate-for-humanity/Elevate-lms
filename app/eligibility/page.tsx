@@ -102,7 +102,7 @@ export default async function EligibilityPage() {
             className="object-cover opacity-30"
             priority
             sizes="100vw"
-            placeholder="blur"
+            
           />
         </div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-24">

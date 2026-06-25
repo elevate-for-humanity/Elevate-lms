@@ -30,13 +30,13 @@ interface Props {
   searchParams: Promise<{ error?: string; success?: string }>;
 }
 
-type AdminRole = 'admin' | 'super_admin' | 'staff';
+type AdminRole = 'admin' | 'admin' | 'staff';
 
 function canApprove(role: AdminRole): boolean {
-  return role === 'admin' || role === 'super_admin';
+  return role === 'admin' || role === 'admin';
 }
 
-/** Re-verify caller is admin/super_admin. Returns caller ID + admin client, or redirects with error. */
+/** Re-verify caller is admin/admin. Returns caller ID + admin client, or redirects with error. */
 async function verifyApprovalCaller(
   holderId: string,
 ): Promise<{ callerId: string; adb: SupabaseClient }> {
@@ -59,7 +59,7 @@ async function verifyApprovalCaller(
 
   if (!callerProfile || !canApprove(callerProfile.role as AdminRole)) {
     redirect(
-      `/admin/program-holders/${holderId}?error=${encodeURIComponent('Approval requires admin or super_admin role')}`,
+      `/admin/program-holders/${holderId}?error=${encodeURIComponent('Approval requires admin or admin role')}`,
     );
   }
 
@@ -92,7 +92,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
     .eq('id', user.id)
     .maybeSingle();
 
-  const viewRoles: AdminRole[] = ['admin', 'super_admin', 'staff'];
+  const viewRoles: AdminRole[] = ['admin', 'staff'];
   if (!adminProfile || !viewRoles.includes(adminProfile.role as AdminRole)) {
     redirect('/unauthorized');
   }
@@ -432,7 +432,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
               {!hasApprovalAuthority && (
                 <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg">
                   <ShieldAlert className="w-4 h-4 flex-shrink-0" />
-                  <span>Review only — approval requires admin or super_admin role</span>
+                  <span>Review only — approval requires admin or admin role</span>
                 </div>
               )}
             </div>
@@ -646,7 +646,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
 
           {!hasApprovalAuthority && unassignedPrograms.length > 0 && (
             <p className="text-xs text-slate-700 mt-2">
-              Program provisioning requires admin or super_admin role.
+              Program provisioning requires admin or admin role.
             </p>
           )}
         </div>

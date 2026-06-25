@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PlatformConsolePage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
 
   const [health, db] = await Promise.all([getPlatformHealth(), requireAdminClient()]);
 

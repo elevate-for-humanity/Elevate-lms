@@ -23,7 +23,7 @@ import {
 
 // Maps every role to its portal landing page — mirrors lib/auth/role-destinations.ts
 const ROLE_PORTAL: Record<string, { label: string; href: string }> = {
-  super_admin:     { label: 'Admin Dashboard',        href: '/admin/dashboard' },
+  admin:     { label: 'Admin Dashboard',        href: '/admin/dashboard' },
   admin:           { label: 'Admin Dashboard',        href: '/admin/dashboard' },
   org_admin:       { label: 'Admin Dashboard',        href: '/admin/dashboard' },
   staff:           { label: 'Staff Portal',           href: '/admin/staff-portal/dashboard' },
@@ -202,7 +202,7 @@ export function ProfileDropdown({ className }: Props) {
       .slice(0, 2);
   };
 
-  const ADMIN_ROLES = ['admin', 'super_admin', 'platform_operator', 'org_admin'];
+  const ADMIN_ROLES = ['admin', 'admin', 'org_admin'];
   const isAdmin = ADMIN_ROLES.includes(profile?.role ?? '') ||
     profile?.roles?.some((r) => ADMIN_ROLES.includes(r));
 

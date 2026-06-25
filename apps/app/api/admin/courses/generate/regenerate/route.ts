@@ -15,7 +15,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { hydrateProcessEnv } from '@/lib/secrets';
 
-const ADMIN_ROLES = new Set(['admin', 'super_admin', 'staff']);
+const ADMIN_ROLES = new Set(['admin', 'staff']);
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

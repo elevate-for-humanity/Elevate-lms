@@ -15,7 +15,7 @@ interface HourEntry {
   created_at: string;
   user_name?: string;
   user_email?: string;
-  user_profiles?: { first_name?: string; last_name?: string; email?: string } | null;
+  profile?: { first_name?: string; last_name?: string; full_name?: string; email?: string } | null;
 }
 
 export function HoursApprovalQueue() {
@@ -40,11 +40,12 @@ export function HoursApprovalQueue() {
       setEntries(
         hours.map((h: any) => ({
           ...h,
-          user_name: h.user_profiles
-            ? `${h.user_profiles.first_name || ''} ${h.user_profiles.last_name || ''}`.trim() ||
+          user_name: h.profile
+            ? `${h.profile.first_name || ''} ${h.profile.last_name || ''}`.trim() ||
+              h.profile.full_name ||
               'Unknown'
             : 'Unknown',
-          user_email: h.user_profiles?.email || '',
+          user_email: h.profile?.email || '',
         })),
       );
     } catch {

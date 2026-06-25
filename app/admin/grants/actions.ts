@@ -18,7 +18,7 @@ export async function createGrantOpportunity(formData: FormData) {
     return { error: 'Not authenticated' };
   }
   const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!_p || !['admin', 'super_admin'].includes(_p.role)) return { error: 'Forbidden' };
+  if (!_p || !['admin'].includes(_p.role)) return { error: 'Forbidden' };
 
   const focusAreas =
     (formData.get('focusAreas') as string)
@@ -71,7 +71,7 @@ export async function updateGrantOpportunity(id: string, formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };
   const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!_p || !['admin', 'super_admin'].includes(_p.role)) return { error: 'Forbidden' };
+  if (!_p || !['admin'].includes(_p.role)) return { error: 'Forbidden' };
 
   const { data: existing } = await db
     .from('grant_opportunities')
@@ -131,7 +131,7 @@ export async function deleteGrantOpportunity(id: string) {
   } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };
   const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!_p || !['admin', 'super_admin'].includes(_p.role)) return { error: 'Forbidden' };
+  if (!_p || !['admin'].includes(_p.role)) return { error: 'Forbidden' };
 
   const { data: existing } = await db
     .from('grant_opportunities')
@@ -171,7 +171,7 @@ export async function createGrantApplication(formData: FormData) {
     return { error: 'Not authenticated' };
   }
   const { data: _p } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!_p || !['admin', 'super_admin'].includes(_p.role)) return { error: 'Forbidden' };
+  if (!_p || !['admin'].includes(_p.role)) return { error: 'Forbidden' };
 
   const applicationData = {
     grant_id: formData.get('grantId') as string,

@@ -19,7 +19,7 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function GrantsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const [grantsRes, activeRes, pendingRes] = await Promise.all([

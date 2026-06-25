@@ -48,7 +48,7 @@ export default async function FERPAPortal() {
     .maybeSingle();
 
   // Check if user has FERPA access
-  const allowedRoles = ['admin', 'super_admin', 'ferpa_officer', 'registrar', 'staff'];
+  const allowedRoles = ['admin', 'ferpa_officer', 'registrar', 'staff'];
   if (!profile || !allowedRoles.includes(profile.role)) {
     redirect('/unauthorized');
   }
@@ -80,7 +80,7 @@ export default async function FERPAPortal() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
       {/* Header */}

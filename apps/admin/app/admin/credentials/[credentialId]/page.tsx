@@ -35,12 +35,15 @@ export default async function EditCredentialPage({
   } = await supabase.auth.getUser();
   const db = await requireAdminClient();
 
+  // Guard against null user
+  if (!user) redirect('/login');
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'super_admin', 'org_admin', 'staff'].includes(profile.role))
+  if (!profile || !['admin', 'org_admin', 'staff'].includes(profile.role))
     redirect('/unauthorized');
 
   const { data: credential } = await supabase

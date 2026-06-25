@@ -13,7 +13,7 @@
  * Rules:
  *   1. User must be authenticated.
  *   2. If allowedRoles is non-empty, user.role must be in the list.
- *   3. If resourceTenantId is set, user.tenant_id must match — unless user is a super_admin.
+ *   3. If resourceTenantId is set, user.tenant_id must match — unless user is a admin.
  *      Super-admins are platform-level and cross-tenant by design.
  */
 
@@ -34,7 +34,7 @@ export interface EnforceAccessOptions {
   allowedRoles?: string[];
 }
 
-const SUPER_ADMIN_ROLES = new Set(['super_admin', 'platform_operator', 'admin']);
+const SUPER_ADMIN_ROLES = new Set(['admin']);
 
 export function enforceAccess({
   user,
@@ -51,7 +51,7 @@ export function enforceAccess({
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  // 3. Tenant boundary — super_admin bypasses (platform-level access)
+  // 3. Tenant boundary — admin bypasses (platform-level access)
   if (resourceTenantId && !SUPER_ADMIN_ROLES.has(user.role)) {
     if (user.tenant_id !== resourceTenantId) {
       return NextResponse.json({ error: 'Cross-tenant access denied' }, { status: 403 });

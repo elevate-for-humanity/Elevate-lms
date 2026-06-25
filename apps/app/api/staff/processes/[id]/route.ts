@@ -29,7 +29,7 @@ async function _GET(request: Request, { params }: { params: Promise<{ id: string
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'super_admin', 'staff', 'advisor'].includes(profile.role)) {
+    if (!profile || !['admin', 'staff', 'advisor'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

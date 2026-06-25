@@ -58,7 +58,7 @@ export default async function LmsProgramsPage() {
                 alt={PLATFORM_DEFAULTS.orgName}
                 width={120}
                 height={32}
-                className="h-8 w-auto" placeholder="blur"
+                className="h-8 w-auto" 
               />
             </Link>
             <div className="flex items-center gap-3">
@@ -176,7 +176,7 @@ export default async function LmsProgramsPage() {
                         alt={p.title}
                         fill
                         className="object-cover group-hover:scale-105 transition duration-500"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="blur"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
                       />
                       {p.funded && (
                         <span className="absolute top-3 left-3 bg-brand-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">

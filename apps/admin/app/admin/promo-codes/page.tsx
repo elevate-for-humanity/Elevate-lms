@@ -7,6 +7,6 @@ export const revalidate = 60;
 export const metadata: Metadata = { title: 'Promo Codes | Admin | Elevate For Humanity' };
 
 export default async function PromoCodesPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   return <PromoCodesClient />;
 }

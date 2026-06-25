@@ -41,11 +41,11 @@ async function _GET(request: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['program_holder', 'admin', 'super_admin'].includes(profile.role)) {
+    if (!profile || !['program_holder', 'admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const isAdmin = ['admin', 'super_admin'].includes(profile.role);
+    const isAdmin = ['admin'].includes(profile.role);
 
     // Resolve program_holder_id
     let programHolderId: string | null = profile.program_holder_id ?? null;

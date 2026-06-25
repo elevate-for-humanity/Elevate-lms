@@ -3,7 +3,7 @@
  *
  * Batch-updates order_index for modules within a course.
  * Body: { items: Array<{ id: string; order_index: number }> }
- * Protected: instructor, admin, super_admin, staff.
+ * Protected: instructor, admin, admin, staff.
  */
 
 import { NextRequest, NextResponse } from 'next/server';

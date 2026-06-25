@@ -4,6 +4,8 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import SettingsForm from './SettingsForm';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata = { robots: { index: false, follow: false } };
 import type { Metadata } from 'next';
 
 

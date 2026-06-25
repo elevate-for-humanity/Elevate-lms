@@ -35,7 +35,7 @@ export default function WIOAEligibilityPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -101,7 +101,7 @@ export default function WIOAEligibilityPage() {
                     alt={item.title}
                     fill
                     sizes="100vw"
-                    className="object-cover" placeholder="blur"
+                    className="object-cover" 
                   />
                   <div className="absolute top-3 left-3 w-9 h-9 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold shadow">
                     {item.step}
@@ -156,7 +156,7 @@ export default function WIOAEligibilityPage() {
                     alt={item.title}
                     fill
                     sizes="100vw"
-                    className="object-cover" placeholder="blur"
+                    className="object-cover" 
                   />
                 </div>
                 <div className="p-3 text-center">
@@ -253,7 +253,7 @@ export default function WIOAEligibilityPage() {
                     alt={item.title}
                     fill
                     sizes="100vw"
-                    className="object-cover" placeholder="blur"
+                    className="object-cover" 
                   />
                 </div>
                 <div className="p-4">

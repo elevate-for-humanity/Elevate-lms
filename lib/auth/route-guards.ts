@@ -7,24 +7,24 @@ import type { UserRole } from '@/lib/navigation/navigation-config';
 
 // Allowed roles for each portal
 const PORTAL_ROLE_MAP: Record<string, UserRole[]> = {
-  '/admin': ['admin', 'super_admin'],
-  '/lms': ['admin', 'super_admin', 'student', 'partner', 'program_holder', 'instructor', 'apprentice'],
-  '/apprentice': ['admin', 'super_admin', 'apprentice', 'instructor'],
-  '/instructor': ['admin', 'super_admin', 'instructor'],
-  '/employer': ['admin', 'super_admin', 'employer'],
-  '/partner': ['admin', 'super_admin', 'partner'],
-  '/staff-portal': ['admin', 'super_admin', 'staff'],
-  '/case-manager': ['admin', 'super_admin', 'case_manager'],
-  '/sponsor': ['admin', 'super_admin', 'sponsor'],
-  '/host-shop': ['admin', 'super_admin', 'host_shop'],
-  '/workforce': ['admin', 'super_admin', 'workforce'],
-  '/workforce-board': ['admin', 'super_admin', 'employer'],
-  '/provider': ['admin', 'super_admin', 'provider'],
-  '/program-holder': ['admin', 'super_admin', 'program_holder', 'partner'],
-  '/mentor': ['admin', 'super_admin', 'mentor'],
-  '/student-portal': ['admin', 'super_admin', 'student'],
-  '/student': ['admin', 'super_admin', 'student'],
-  '/learner': ['admin', 'super_admin', 'student'],
+  '/admin': ['admin'],
+  '/lms': ['admin', 'student', 'partner', 'program_holder', 'instructor', 'apprentice'],
+  '/apprentice': ['admin', 'apprentice', 'instructor'],
+  '/instructor': ['admin', 'instructor'],
+  '/employer': ['admin', 'employer'],
+  '/partner': ['admin', 'partner'],
+  '/staff-portal': ['admin', 'staff'],
+  '/case-manager': ['admin', 'case_manager'],
+  '/sponsor': ['admin', 'sponsor'],
+  '/host-shop': ['admin', 'host_shop'],
+  '/workforce': ['admin', 'workforce'],
+  '/workforce-board': ['admin', 'employer'],
+  '/provider': ['admin', 'provider'],
+  '/program-holder': ['admin', 'program_holder', 'partner'],
+  '/mentor': ['admin', 'mentor'],
+  '/student-portal': ['admin', 'student'],
+  '/student': ['admin', 'student'],
+  '/learner': ['admin', 'student'],
 };
 
 // Route to redirect to after login
@@ -52,7 +52,7 @@ const ROUTE_REDIRECTS: Record<string, string> = {
 // Unauthorized redirect per role
 const UNAUTHORIZED_REDIRECTS: Record<string, string> = {
   admin: '/admin/dashboard',
-  super_admin: '/admin/dashboard',
+  admin: '/admin/dashboard',
   student: '/lms/dashboard',
   apprentice: '/apprentice',
   instructor: '/instructor/dashboard',
@@ -131,7 +131,7 @@ export function canAccessPortal(role: string | null | undefined, pathname: strin
 export function normalizeRole(role: string): string {
   const roleMap: Record<string, string> = {
     admin: 'admin',
-    super_admin: 'super_admin',
+    admin: 'admin',
     student: 'student',
     apprentice: 'apprentice',
     instructor: 'instructor',

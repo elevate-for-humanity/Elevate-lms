@@ -20,6 +20,9 @@ export default async function InstructorAddStudentPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: courses } = await supabase
     .from('lms_courses')
     .select('id, course_name')

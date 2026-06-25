@@ -22,7 +22,7 @@ export default async function EnrollmentReportPage() {
   }
 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 

@@ -48,7 +48,7 @@ export default async function MobilePage() {
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
@@ -142,7 +142,7 @@ export default async function MobilePage() {
                   fill
                   className="object-cover"
                   quality={90}
-                  sizes="(max-width: 768px) 100vw, 50vw" placeholder="blur"
+                  sizes="(max-width: 768px) 100vw, 50vw" 
                 />
               </div>
             </div>

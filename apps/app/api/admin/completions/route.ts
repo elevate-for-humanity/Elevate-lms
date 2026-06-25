@@ -126,6 +126,6 @@ const _GET = withAuth(
 
     return NextResponse.json({ completions });
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 export const GET = withApiAudit('/api/admin/completions', _GET);

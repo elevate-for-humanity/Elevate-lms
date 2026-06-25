@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AuthoritativeDocsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const supabase = await createClient();
   const { data: dbRows } = await supabase.from('compliance_documents').select('*').limit(50);
   const documents = (dbRows as any[]) || [];

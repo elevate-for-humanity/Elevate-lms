@@ -1,7 +1,7 @@
 // Batch file upload for the Content Library admin UI.
 // Accepts multipart/form-data with one or more files under the 'files' field.
 // Stores each file in the `media` bucket and creates a content_items row.
-// Requires admin, super_admin, or staff role.
+// Requires admin, admin, or staff role.
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -27,7 +27,7 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+    if (!profile || !['admin', 'staff'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

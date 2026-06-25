@@ -4,7 +4,7 @@
  * Sets access_granted_at on a program_enrollment row and sends the student
  * an email notifying them their access is live.
  *
- * Requires admin, super_admin, or staff role.
+ * Requires admin, admin, or staff role.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
 
-  // Auth — admin/super_admin/staff only
+  // Auth — admin/admin/staff only
   const supabase = await createClient();
   const {
     data: { user },
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!adminProfile || !['admin', 'super_admin', 'staff'].includes(adminProfile.role)) {
+  if (!adminProfile || !['admin', 'staff'].includes(adminProfile.role)) {
     return safeError('Forbidden', 403);
   }
 

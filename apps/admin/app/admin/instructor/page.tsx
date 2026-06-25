@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 };
 
 export default async function InstructorPortalLanding() {
-  const { profile } = await requireRole(['instructor', 'admin', 'super_admin', 'staff']);
-  if (profile?.role === 'admin' || profile?.role === 'super_admin' || profile?.role === 'staff') {
+  const { profile } = await requireRole(['instructor', 'admin', 'staff']);
+  if (profile?.role === 'admin' || profile?.role === 'admin' || profile?.role === 'staff') {
     redirect('/admin/instructor/dashboard');
   }
 

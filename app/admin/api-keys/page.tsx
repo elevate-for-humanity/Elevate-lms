@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminApiKeysPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const supabase = await createClient();
 
   const { data: apiKeys } = await supabase

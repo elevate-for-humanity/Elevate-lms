@@ -85,7 +85,7 @@ function CatalogProgramCard({ p }: { p: CatalogProgram }) {
           alt={p.heroImageAlt}
           fill
           className="object-cover transition duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw" placeholder="blur"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw" 
         />
         {/* Top badges only — no overlay, no text */}
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">

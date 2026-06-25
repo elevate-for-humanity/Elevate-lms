@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 
 import Image from 'next/image';
@@ -113,7 +113,7 @@ export default function CapitalReadinessSlidesPage() {
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image src="/images/pages/store-guides-capital-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority placeholder="blur" />
+        <Image src="/images/pages/store-guides-capital-hero.jpg" alt="Elevate store" fill sizes="100vw" className="object-cover" priority  />
       </section>
       {/* Header */}
       <header className="border-b border-slate-200 py-4">

@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
  *
  * Body: { application_id: string, cohort?: string }
  *
- * Requires admin or super_admin role.
+ * Requires admin or admin role.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
 
-    if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+    if (!profile || !['admin', 'staff'].includes(profile.role)) {
       return safeError('Forbidden', 403);
     }
 

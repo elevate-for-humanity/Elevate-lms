@@ -22,7 +22,7 @@ import { aiChat } from '@/lib/ai/ai-service';
 
 import { hydrateProcessEnv } from '@/lib/secrets';
 
-const ADMIN_ROLES = new Set(['admin', 'super_admin']);
+const ADMIN_ROLES = new Set(['admin']);
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

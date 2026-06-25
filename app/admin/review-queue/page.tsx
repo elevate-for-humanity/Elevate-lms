@@ -58,7 +58,7 @@ export default async function ReviewQueuePage({
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff'].includes(profile.role)) {
     redirect('/unauthorized');
   }
 

@@ -48,7 +48,7 @@ export default async function MobileAppPage() {
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
       </section>
 

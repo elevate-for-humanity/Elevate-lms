@@ -47,7 +47,7 @@ async function notifyHourDecision(
   const { data: admins } = await adminDb
     .from('profiles')
     .select('id')
-    .in('role', ['admin', 'super_admin', 'staff'])
+    .in('role', ['admin', 'staff'])
     .limit(200);
 
   if (admins?.length) {

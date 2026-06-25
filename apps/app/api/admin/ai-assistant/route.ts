@@ -645,7 +645,7 @@ async function resolveIntent(message: string, db: SupabaseClient): Promise<Inten
     const { data } = await db
       .from('profiles')
       .select('full_name, email, role, created_at')
-      .in('role', ['admin', 'super_admin', 'staff', 'instructor'])
+      .in('role', ['admin', 'staff', 'instructor'])
       .order('role', { ascending: true })
       .limit(30);
     if (data?.length) {

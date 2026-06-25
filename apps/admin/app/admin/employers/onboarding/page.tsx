@@ -13,7 +13,7 @@ export const metadata = {
 };
 
 export default async function EmployerOnboardingReview() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const auth = await createClient();
 
   const supabase = await requireAdminClient();

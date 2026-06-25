@@ -40,7 +40,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const dynamic = 'force-dynamic';
 
 export default async function StudentDashboard() {
-  const { user, profile } = await requireRole(['student', 'admin', 'super_admin']);
+  const { user, profile } = await requireRole(['student', 'admin']);
   const supabase = await createClient();
 
   // ── Core data fetches ────────────────────────────────────────────────────

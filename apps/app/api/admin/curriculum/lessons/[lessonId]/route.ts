@@ -3,7 +3,7 @@
  *
  * Updates a curriculum_lessons row. Uses the service-role client so the write
  * is not blocked by the authenticated-only RLS policy on curriculum_lessons.
- * Auth is enforced here — admin/super_admin/staff only.
+ * Auth is enforced here — admin/admin/staff only.
  */
 
 import { NextRequest, NextResponse } from 'next/server';

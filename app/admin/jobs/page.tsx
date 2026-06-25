@@ -50,7 +50,7 @@ async function getJobsData() {
 }
 
 export default async function JobsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const { jobs: dbJobs, stats: dbStats } = await getJobsData();
 
   const stats = [

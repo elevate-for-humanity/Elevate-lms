@@ -170,8 +170,8 @@ export interface CourseSession {
 export async function loadCourseSession(courseId: string): Promise<CourseSession> {
   const warnings: string[] = [];
 
-  // Auth — admin, super_admin, or staff only
-  await requireRole(['admin', 'super_admin', 'staff']);
+  // Auth — admin, admin, or staff only
+  await requireRole(['admin', 'staff']);
 
   const db = await createClient();
   const adminDb = await requireAdminClient();

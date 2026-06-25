@@ -5,6 +5,8 @@ import { CheckCircle, Clock, AlertTriangle, Upload } from 'lucide-react';
 import ComplianceUpload from './ComplianceUpload';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata = { robots: { index: false, follow: false } };
 import type { Metadata } from 'next';
 
 

@@ -105,7 +105,7 @@ export default function WritingCenterPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
 
@@ -137,7 +137,7 @@ export default function WritingCenterPage() {
                   alt="Student submitting a draft for written review"
                   fill
                   className="object-cover"
-                  sizes="100vw" placeholder="blur"
+                  sizes="100vw" 
                 />
               </div>
               <div className="p-8">
@@ -165,7 +165,7 @@ export default function WritingCenterPage() {
                   alt="Live tutoring session via Zoom"
                   fill
                   className="object-cover"
-                  sizes="100vw" placeholder="blur"
+                  sizes="100vw" 
                 />
               </div>
               <div className="p-8">
@@ -207,7 +207,7 @@ export default function WritingCenterPage() {
                     alt={service.title}
                     fill
                     className="object-cover"
-                    sizes="100vw" placeholder="blur"
+                    sizes="100vw" 
                   />
                 </div>
                 <div className="p-6">

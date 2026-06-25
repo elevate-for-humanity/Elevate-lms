@@ -58,7 +58,7 @@ export default async function VolunteerPage() {
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
       </div>
 

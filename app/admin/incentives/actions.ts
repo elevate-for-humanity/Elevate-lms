@@ -21,7 +21,7 @@ export async function createIncentive(formData: FormData) {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!_profile || !['admin', 'super_admin'].includes(_profile.role)) throw new Error('Forbidden');
+  if (!_profile || !['admin'].includes(_profile.role)) throw new Error('Forbidden');
 
   const name = formData.get('name') as string;
   const type = formData.get('type') as string;

@@ -10,7 +10,7 @@ import { apiAuthGuard } from '@/lib/admin/guards';
 
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_ROLES = ['admin', 'super_admin', 'staff', 'workforce_board'] as const;
+const ALLOWED_ROLES = ['admin', 'staff', 'workforce_board'] as const;
 const ALLOWED_FORMATS = ['json', 'csv', 'full'] as const;
 
 function parseIsoDate(input: string | null, fallback: string): string {

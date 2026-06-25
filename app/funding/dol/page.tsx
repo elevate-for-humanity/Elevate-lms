@@ -48,7 +48,7 @@ export default async function DOLFundingPage() {
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
       </section>
       {/* What Is It */}
@@ -83,7 +83,7 @@ export default async function DOLFundingPage() {
                 alt="Hands-on apprenticeship training"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw" placeholder="blur"
+                sizes="(max-width: 768px) 100vw, 50vw" 
               />
             </div>
           </div>

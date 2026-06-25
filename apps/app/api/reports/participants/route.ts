@@ -16,7 +16,7 @@
  *   page        integer (default 1)
  *   per_page    integer (default 100, max 500)
  *
- * Access: admin | super_admin | staff
+ * Access: admin | admin | staff
  */
 
 import { NextRequest, NextResponse } from 'next/server';

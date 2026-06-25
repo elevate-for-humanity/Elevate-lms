@@ -54,7 +54,7 @@ async function _GET(request: NextRequest) {
       .maybeSingle();
 
     const isOwner = certificate.user_id === user.id;
-    const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+    const isAdmin = profile?.role === 'admin' || profile?.role === 'admin';
 
     if (!isOwner && !isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

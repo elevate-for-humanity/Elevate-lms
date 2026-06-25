@@ -45,7 +45,7 @@ async function _GET(request: NextRequest, { params }: { params: Params }) {
         .eq('id', user.id)
         .maybeSingle();
 
-      const isAdmin = profile?.role && ['admin', 'super_admin', 'staff'].includes(profile.role);
+      const isAdmin = profile?.role && ['admin', 'staff'].includes(profile.role);
       if (!isAdmin && ticket.user_id !== user.id) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
@@ -82,7 +82,7 @@ async function _PATCH(request: NextRequest, { params }: { params: Params }) {
       .eq('id', user.id)
       .maybeSingle();
 
-    const isStaff = profile?.role && ['admin', 'super_admin', 'staff'].includes(profile.role);
+    const isStaff = profile?.role && ['admin', 'staff'].includes(profile.role);
 
     const body = await request.json();
     const { status, message, priority, assigned_to } = body;

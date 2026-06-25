@@ -26,7 +26,7 @@ export async function approveApplication(id: string): Promise<void> {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff', 'org_admin'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff', 'org_admin'].includes(profile.role)) {
     throw new Error('Forbidden');
   }
 
@@ -61,7 +61,7 @@ export async function rejectApplication(id: string): Promise<void> {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff', 'org_admin'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff', 'org_admin'].includes(profile.role)) {
     throw new Error('Forbidden');
   }
 

@@ -24,14 +24,14 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
     const tenantContext = await getTenantContext();
     const supabase = await createClient();
 
-    // Verify super_admin role
+    // Verify admin role
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', tenantContext.userId)
       .maybeSingle();
 
-    if (profile?.role !== 'super_admin') {
+    if (profile?.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

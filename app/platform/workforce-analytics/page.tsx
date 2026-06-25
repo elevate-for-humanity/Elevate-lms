@@ -129,12 +129,12 @@ export default function WorkforceAnalyticsPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/hero-images/technology-hero.jpg"
+            src="/hero-images/technology-hero.webp"
             alt="Workforce Analytics"
             fill
             className="object-cover"
             priority
-            sizes="100vw" placeholder="blur"
+            sizes="100vw" 
           />
         </div>
         <div className="bg-white py-10">
@@ -227,7 +227,7 @@ export default function WorkforceAnalyticsPage() {
                 alt="Analytics dashboard"
                 fill
                 sizes="100vw"
-                className="object-cover" placeholder="blur"
+                className="object-cover" 
               />
             </div>
             <div>

@@ -5,7 +5,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withAuth } from '@/lib/api/withAuth';
 import { safeInternalError } from '@/lib/api/safe-error';
 
-const ADMIN_ROLES = ['admin', 'super_admin', 'staff'];
+const ADMIN_ROLES = ['admin', 'staff'];
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -128,5 +128,5 @@ export const GET = withAuth(
       return safeInternalError(err, 'Failed to fetch analytics');
     }
   },
-  { roles: ['admin', 'super_admin', 'staff'] },
+  { roles: ['admin', 'staff'] },
 );

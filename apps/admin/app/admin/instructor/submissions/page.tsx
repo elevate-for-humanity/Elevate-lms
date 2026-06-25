@@ -72,7 +72,7 @@ export default async function InstructorSubmissionsPage({
 }: {
   searchParams: Promise<{ status?: string; course?: string; competency?: string }>;
 }) {
-  const { user, profile } = await requireRole(['instructor', 'admin', 'super_admin']);
+  const { user, profile } = await requireRole(['instructor', 'admin']);
 
   const supabase = await createClient();
 
@@ -82,7 +82,7 @@ export default async function InstructorSubmissionsPage({
   const filterCompetency = params.competency === '1';
 
   // Fetch submissions assigned to this instructor (or all, for admin)
-  const isAdmin = profile.role === 'admin' || profile.role === 'super_admin';
+  const isAdmin = profile.role === 'admin' || profile.role === 'admin';
 
   let query = supabase
     .from('step_submissions')

@@ -24,7 +24,7 @@ export interface ApiAuthResult {
  * Returns the authenticated user + profile if authorized,
  * or a NextResponse (401/403) if not. Callers must check:
  *
- *   const auth = await requireApiRole(['employer', 'admin', 'super_admin']);
+ *   const auth = await requireApiRole(['employer', 'admin']);
  *   if (auth instanceof NextResponse) return auth;
  *   // auth.user, auth.profile, auth.db are now available
  *

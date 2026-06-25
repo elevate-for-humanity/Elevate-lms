@@ -63,5 +63,5 @@ export const GET = withAuth(
       return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
     }
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );

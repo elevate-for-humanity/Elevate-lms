@@ -62,7 +62,7 @@ function eventCategory(action: string, resourceType: string): string {
 }
 
 export default async function ActivityPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const [logsRes, countRes, enrollRes, appRes] = await Promise.all([

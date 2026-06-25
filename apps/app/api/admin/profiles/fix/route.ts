@@ -17,7 +17,7 @@ import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
 const VALID_ROLES = new Set([
-  'student', 'instructor', 'admin', 'super_admin', 'staff', 'platform_operator',
+  'student', 'instructor', 'admin', 'staff', 'admin',
   'program_holder', 'provider_admin', 'case_manager', 'employer', 'partner', 'delegate',
   'workforce_board', 'grant_client', 'sponsor', 'creator', 'org_admin',
 ]);
@@ -42,7 +42,7 @@ async function POST(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    if (!profile || !['admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

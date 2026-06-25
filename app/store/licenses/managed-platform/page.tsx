@@ -132,7 +132,7 @@ export default function ManagedPlatformPage() {
                   alt="Elevate managed platform dashboard"
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 80vw" placeholder="blur"
+                  sizes="(max-width: 768px) 100vw, 80vw" 
                 />
               </div>
             </div>

@@ -73,7 +73,7 @@ const DEFAULT_DASHBOARDS: Dashboard[] = [
       'workforce_board',
       'org_admin',
       'admin',
-      'super_admin',
+      'admin',
     ],
     order_index: 0,
   },
@@ -108,7 +108,7 @@ const DEFAULT_DASHBOARDS: Dashboard[] = [
     icon: 'BookOpen',
     description: 'Students, submissions, courses',
     color: 'text-indigo-600',
-    roles: ['instructor', 'admin', 'super_admin'],
+    roles: ['instructor', 'admin'],
     order_index: 3,
   },
   {
@@ -118,7 +118,7 @@ const DEFAULT_DASHBOARDS: Dashboard[] = [
     icon: 'Users',
     description: 'Mentees and sessions',
     color: 'text-brand-green-600',
-    roles: ['mentor', 'admin', 'super_admin'],
+    roles: ['mentor', 'admin'],
     order_index: 4,
   },
   {
@@ -128,7 +128,7 @@ const DEFAULT_DASHBOARDS: Dashboard[] = [
     icon: 'Palette',
     description: 'Build and publish courses',
     color: 'text-pink-600',
-    roles: ['creator', 'admin', 'super_admin'],
+    roles: ['creator', 'admin'],
     order_index: 5,
   },
 
@@ -140,7 +140,7 @@ const DEFAULT_DASHBOARDS: Dashboard[] = [
     icon: 'Briefcase',
     description: 'Jobs, candidates, apprentices',
     color: 'text-brand-orange-600',
-    roles: ['employer', 'admin', 'super_admin'],
+    roles: ['employer', 'admin'],
     order_index: 6,
   },
   {
@@ -158,7 +158,7 @@ const DEFAULT_DASHBOARDS: Dashboard[] = [
     icon: 'Building2',
     description: 'Programs, attendance, and compliance',
     color: 'text-purple-600',
-    roles: ['partner', 'provider_admin', 'program_holder', 'sponsor', 'admin', 'super_admin'],
+    roles: ['partner', 'provider_admin', 'program_holder', 'sponsor', 'admin'],
     order_index: 7,
   },
 
@@ -170,7 +170,7 @@ const DEFAULT_DASHBOARDS: Dashboard[] = [
     icon: 'Users',
     description: 'Caseload and WIOA placements',
     color: 'text-brand-green-600',
-    roles: ['case_manager', 'staff', 'admin', 'super_admin'],
+    roles: ['case_manager', 'staff', 'admin'],
     order_index: 10,
   },
   {
@@ -180,7 +180,7 @@ const DEFAULT_DASHBOARDS: Dashboard[] = [
     icon: 'LayoutDashboard',
     description: 'Regional workforce data',
     color: 'text-slate-600',
-    roles: ['workforce_board', 'admin', 'super_admin'],
+    roles: ['workforce_board', 'admin'],
     order_index: 11,
   },
 
@@ -192,7 +192,7 @@ const DEFAULT_DASHBOARDS: Dashboard[] = [
     icon: 'Users',
     description: 'Students, attendance, ops',
     color: 'text-brand-green-600',
-    roles: ['staff', 'admin', 'super_admin'],
+    roles: ['staff', 'admin'],
     order_index: 12,
   },
   {
@@ -202,7 +202,7 @@ const DEFAULT_DASHBOARDS: Dashboard[] = [
     icon: 'Shield',
     description: 'Full site management',
     color: 'text-brand-red-600',
-    roles: ['admin', 'super_admin'],
+    roles: ['admin'],
     order_index: 13,
   },
 
@@ -214,7 +214,7 @@ const DEFAULT_DASHBOARDS: Dashboard[] = [
     icon: 'Sparkles',
     description: 'AI video and media tools',
     color: 'text-purple-600',
-    roles: ['instructor', 'creator', 'admin', 'super_admin'],
+    roles: ['instructor', 'creator', 'admin'],
     order_index: 14,
   },
 ];
@@ -307,7 +307,7 @@ export function DashboardDropdown({ className }: Props) {
 
   // Filter dashboards based on user roles (show all if admin or no roles set)
   const filteredDashboards =
-    userRoles.includes('admin') || userRoles.includes('super_admin')
+    userRoles.includes('admin') || userRoles.includes('admin')
       ? dashboards
       : dashboards.filter(
           (d) => d.roles.some((role) => userRoles.includes(role)) || d.roles.includes('user'),

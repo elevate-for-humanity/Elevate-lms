@@ -42,7 +42,7 @@ async function _POST(request: NextRequest) {
 
     if (
       !staffProfile ||
-      !['admin', 'super_admin', 'instructor', 'staff'].includes(staffProfile.role)
+      !['admin', 'instructor', 'staff'].includes(staffProfile.role)
     ) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

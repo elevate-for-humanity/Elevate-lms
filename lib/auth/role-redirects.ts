@@ -61,11 +61,8 @@ export function resolvePostLoginDestination(
  */
 export const ADMIN_ROLES: ReadonlyArray<string> = [
   'admin',
-  'super_admin',
-  'platform_operator',
   'staff',
   'org_admin',
-  'platform_operator',
 ];
 
 export function isAdminRole(role: string | null | undefined): boolean {

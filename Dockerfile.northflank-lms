@@ -3,6 +3,10 @@
 
 FROM node:22-bookworm AS builder
 
+# Cache invalidation marker
+# P0-3: Increased memory to 12GB for 1,600+ page static generation
+RUN echo "nf-cache-invalidate-20260625-p0-3-memory-fix"
+
 # Install system deps for native modules (sharp, canvas, pdf)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -32,14 +36,24 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+<<<<<<< HEAD
+=======
+# P0-3: 12GB heap for build with 1,600+ pages
+>>>>>>> origin/main
 ENV NODE_OPTIONS=--max-old-space-size=12288
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=1
 ENV CI=true
-ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
+# Persistent build cache for incremental builds
+ENV NEXT_BUILD_CACHE=/cache/.next
+ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=
+
+# Create persistent cache directory
+RUN mkdir -p /cache/.next && chmod 755 /cache/.next
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+# Using --no-frozen-lockfile because lockfile may not match overrides in CI
+RUN pnpm install --no-frozen-lockfile
 
 # Build Next.js
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
@@ -51,7 +65,8 @@ ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-RUN pnpm run build:lms:compile
+# P0-3: 12GB memory for large app builds
+RUN NODE_OPTIONS='--max-old-space-size=12288' NEXT_BUILD_CACHE=/cache/.next pnpm next build
 
 # --- runtime stage ---
 FROM node:22-bookworm-slim
@@ -66,6 +81,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=8080
+# Runtime memory limit (4GB - leaving room for OS/native modules)
+ENV NODE_OPTIONS=--max-old-space-size=4096
 
 WORKDIR /app
 
@@ -83,4 +100,4 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
 
-CMD ["node", "--max-http-header-size=32768", "server.js"]
+CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "server.js"]

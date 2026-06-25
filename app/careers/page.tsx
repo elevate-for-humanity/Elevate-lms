@@ -171,7 +171,7 @@ export default async function CareersPage() {
                       alt={benefit.title}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover" placeholder="blur"
+                      className="object-cover" 
                     />
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-black">{benefit.title}</h3>

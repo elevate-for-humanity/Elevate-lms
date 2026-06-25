@@ -20,7 +20,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default async function AdminWaitlistPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   const { data: entries, error } = await supabase

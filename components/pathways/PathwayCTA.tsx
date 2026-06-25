@@ -5,7 +5,7 @@
  *   - Not logged in       → "Check Eligibility & Apply" → /start
  *   - student / learner   → "Go to My Dashboard" → /learner/dashboard
  *   - instructor          → "Go to Instructor Portal" → /instructor/dashboard
- *   - admin / super_admin / staff → "Go to Admin" → /admin/dashboard
+ *   - admin / admin / staff → "Go to Admin" → /admin/dashboard
  *   - employer            → "Go to Employer Portal" → /employer/dashboard
  *   - partner             → "Go to Partner Portal" → /partner/dashboard
  */
@@ -26,7 +26,7 @@ const ROLE_DESTINATIONS: Record<string, { label: string; href: string }> = {
   learner: { label: 'Go to My Dashboard', href: '/learner/dashboard' },
   instructor: { label: 'Go to Instructor Portal', href: '/admin/instructor/dashboard' },
   admin: { label: 'Go to Admin Dashboard', href: '/admin/dashboard' },
-  super_admin: { label: 'Go to Admin Dashboard', href: '/admin/dashboard' },
+  admin: { label: 'Go to Admin Dashboard', href: '/admin/dashboard' },
   staff: { label: 'Go to Admin Dashboard', href: '/admin/dashboard' },
   org_admin: { label: 'Go to Admin Dashboard', href: '/admin/dashboard' },
   employer: { label: 'Go to Employer Portal', href: '/employer/dashboard' },

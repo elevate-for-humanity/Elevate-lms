@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PlacementsPage() {
-  const { user } = await requireRole(['employer', 'admin', 'super_admin']);
+  const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
 
   const { data: rawPlacements, count } = await supabase

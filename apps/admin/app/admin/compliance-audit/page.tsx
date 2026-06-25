@@ -9,7 +9,7 @@ export const revalidate = 60;
 export const metadata: Metadata = { title: 'Compliance Audit | Admin | Elevate For Humanity' };
 
 export default async function ComplianceAuditPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   const cutoff30d = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();

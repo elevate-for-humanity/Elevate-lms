@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     .eq('id', userId)
     .maybeSingle();
 
-  if (!profile || !['program_holder', 'admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !['program_holder', 'admin'].includes(profile.role)) {
     return safeError('Forbidden', 403);
   }
 

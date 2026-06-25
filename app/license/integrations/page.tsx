@@ -1,24 +1,14 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import {
-  Zap,
-  Database,
-  Mail,
-  Award,
-  Calendar,
-  ArrowRight,
-  AlertCircle,
-  ArrowRightLeft,
-} from 'lucide-react';
+import { Zap, Database, Mail, Award, Calendar, ArrowRight, AlertCircle, ArrowRightLeft } from 'lucide-react';
 import { INTEGRATIONS, DISCLAIMERS, ROUTES } from '@/lib/pricing';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const revalidate = 3600;
 export const metadata: Metadata = {
   title: 'Integrations | Elevate LMS Licensing',
-  description:
-    'Salesforce CRM integration, Supabase authentication, email providers, and credentialing partners. Connect the Elevate LMS with your systems.',
+  description: 'Salesforce CRM integration, Supabase authentication, email providers, and credentialing partners. Connect the Elevate LMS with your systems.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/license/integrations',
   },
@@ -33,13 +23,14 @@ const iconMap: Record<string, typeof Zap> = {
 
 const statusColors: Record<string, { bg: string; text: string }> = {
   'Integration-ready': { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700' },
-  Included: { bg: 'bg-brand-green-100', text: 'text-brand-green-700' },
-  Configurable: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700' },
+  'Included': { bg: 'bg-brand-green-100', text: 'text-brand-green-700' },
+  'Configurable': { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700' },
 };
 
 export default async function IntegrationsPage() {
   const supabase = await createClient();
 
+  
   // Fetch integrations
   const { data: dbIntegrations } = await supabase
     .from('integrations')
@@ -51,9 +42,7 @@ export default async function IntegrationsPage() {
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs
-            items={[{ label: 'License', href: '/license' }, { label: 'Integrations' }]}
-          />
+          <Breadcrumbs items={[{ label: 'License', href: '/license' }, { label: 'Integrations' }]} />
         </div>
       </div>
 
@@ -76,29 +65,24 @@ export default async function IntegrationsPage() {
             {INTEGRATIONS.map((integration) => {
               const Icon = iconMap[integration.id] || Zap;
               const colors = statusColors[integration.status] || statusColors['Configurable'];
-
+              
               return (
-                <div
-                  key={integration.id}
-                  className="bg-white border border-slate-200 rounded-xl p-8"
-                >
+                <div key={integration.id} className="bg-white border border-slate-200 rounded-xl p-8">
                   <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                     <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center flex-shrink-0">
                       <Icon className="w-8 h-8 text-slate-600" />
                     </div>
-
+                    
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-3 mb-3">
                         <h2 className="text-2xl font-bold text-slate-900">{integration.name}</h2>
-                        <span
-                          className={`px-3 py-2 rounded-full text-sm font-medium ${colors.bg} ${colors.text}`}
-                        >
+                        <span className={`px-3 py-2 rounded-full text-sm font-medium ${colors.bg} ${colors.text}`}>
                           {integration.status}
                         </span>
                       </div>
-
+                      
                       <p className="text-lg text-slate-600 mb-4">{integration.description}</p>
-
+                      
                       <div className="flex items-start gap-2 text-sm text-slate-500 bg-white p-3 rounded-lg">
                         <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                         <span>{integration.note}</span>
@@ -117,16 +101,14 @@ export default async function IntegrationsPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Salesforce Integration</h2>
-            <p className="text-lg text-slate-600">
-              How the Elevate LMS connects with Salesforce CRM
-            </p>
+            <p className="text-lg text-slate-600">How the Elevate LMS connects with Salesforce CRM</p>
           </div>
 
           <div className="bg-white rounded-xl border border-slate-200 p-8">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="space-y-4">
                 <h3 className="font-semibold text-slate-900 mb-4">Data Flow</h3>
-
+                
                 <div className="flex items-center gap-4">
                   <div className="w-32 bg-brand-blue-100 text-brand-blue-700 px-4 py-2 rounded-lg text-center text-sm font-medium">
                     Elevate LMS
@@ -154,7 +136,9 @@ export default async function IntegrationsPage() {
 
               <div className="bg-white rounded-lg p-6">
                 <h3 className="font-semibold text-slate-900 mb-4">Implementation</h3>
-                <p className="text-slate-600 text-sm mb-4">{DISCLAIMERS.integration}</p>
+                <p className="text-slate-600 text-sm mb-4">
+                  {DISCLAIMERS.integration}
+                </p>
                 <ul className="space-y-2 text-sm text-slate-600">
                   <li className="flex items-start gap-2">
                     <span className="text-slate-400 flex-shrink-0">•</span>
@@ -180,8 +164,7 @@ export default async function IntegrationsPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Questions about integrations?</h2>
           <p className="text-slate-300 mb-8">
-            We'll discuss your integration needs during the demo and provide implementation
-            guidance.
+            We'll discuss your integration needs during the demo and provide implementation guidance.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -193,7 +176,7 @@ export default async function IntegrationsPage() {
             </Link>
             <Link
               href={ROUTES.licensePricing}
-              className="inline-flex items-center justify-center gap-2 bg-transparent text-slate-900 px-8 py-4 rounded-lg font-semibold border-2 border-white hover:bg-white/10 transition"
+              className="inline-flex items-center justify-center gap-2 bg-transparent text-white px-8 py-4 rounded-lg font-semibold border-2 border-white hover:bg-white/10 transition"
             >
               View Pricing <ArrowRight className="w-5 h-5" />
             </Link>

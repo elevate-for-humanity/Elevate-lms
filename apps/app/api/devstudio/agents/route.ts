@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const db = await requireAdminClient();
     const { data, error } = await db
       .from('ai_agents')
-      .select('id, slug, name, description, capabilities, status, model_hint, updated_at')
+      .select('id, slug, name, role, description, capabilities, status, model_hint, updated_at')
       .order('name', { ascending: true });
 
     if (error) {

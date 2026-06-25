@@ -23,7 +23,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export default async function ProgramCatalogPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const supabase = await createClient();
 
   const { data: allPrograms = [] } = await supabase

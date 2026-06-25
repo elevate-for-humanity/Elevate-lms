@@ -23,7 +23,7 @@ async function createCampaign(formData: FormData) {
 }
 
 export default async function NewCampaignPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   return (
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-2xl mx-auto">

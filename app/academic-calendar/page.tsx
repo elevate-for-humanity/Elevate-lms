@@ -72,7 +72,7 @@ export default function AcademicCalendarPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
 

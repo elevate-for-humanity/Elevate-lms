@@ -1,112 +1,42 @@
 /**
  * Admin Route Guards - container runtime context
  * Controls access to dev/test tools and sensitive admin features
- *
- * Required env vars (injected through runtime env or secret groups):
- * - Production: ENABLE_ADMIN_DEVTOOLS=false
- * - Deploy Previews: ENABLE_ADMIN_DEVTOOLS=true (optional)
  */
 
 import { notFound } from 'next/navigation';
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { unauthorized, forbidden, serverError } from '@/lib/api/responses';
 
-export type AdminRole = 'admin' | 'super_admin' | 'staff' | 'org_admin' | 'platform_operator';
+// Re-export UserRole from the canonical role matrix
+export type { UserRole } from '@/lib/rbac/role-matrix';
+import type { UserRole } from '@/lib/rbac/role-matrix';
 
-/**
- * Environment detection — container runtime (NODE_ENV driven)
- */
+// ── Environment detection ─────────────────────────────────────────────────────
 export const isProd = process.env.NODE_ENV === 'production';
-export const isPreview = false;
-export const isDev = !isProd;
-
-/**
- * Dev tools access control
- * Server-side gating is what matters - keep NEXT_PUBLIC version false
- */
 export const allowDevTools = process.env.ENABLE_ADMIN_DEVTOOLS === 'true';
 
-/**
- * Check if user has super_admin role
- */
-export function isSuperAdmin(role: string | null | undefined): boolean {
-  return role === 'super_admin';
+// ── Role checking ─────────────────────────────────────────────────────────────
+export function isAdminRole(role: string | null | undefined): boolean {
+  return role === 'admin';
 }
 
-export function isPlatformOperatorRole(role: string | null | undefined): boolean {
-  return role === 'super_admin' || role === 'platform_operator';
+export function isStaffRole(role: string | null | undefined): boolean {
+  return role === 'admin' || role === 'staff';
 }
 
-/**
- * Guard for dev/test routes - STRICT
- *
- * Rules:
- * 1. Production context → ALWAYS 404 (no exceptions)
- * 2. Non-production + ENABLE_ADMIN_DEVTOOLS=false → 404
- * 3. Non-production + ENABLE_ADMIN_DEVTOOLS=true → super_admin only
- *
- * Usage in layout.tsx:
- *   const { role } = await requireAdmin();
- *   requireDevToolsAccess(role);
- */
+// ── Dev tools access ──────────────────────────────────────────────────────────
 export function requireDevToolsAccess(role: string | null | undefined): void {
-  // Production = hard block for everyone, no exceptions
-  if (isProd) {
-    notFound();
-  }
-
-  // Non-production but dev tools disabled
-  if (!allowDevTools) {
-    notFound();
-  }
-
-  // Dev tools enabled but not super_admin
-  if (!isPlatformOperatorRole(role)) {
-    notFound();
-  }
+  if (isProd) notFound();
+  if (!allowDevTools) notFound();
+  if (!isAdminRole(role)) notFound();
 }
 
-/**
- * Guard for sensitive admin features (AI, automation, bulk operations)
- * Less restrictive than dev tools but still requires elevated access in prod
- */
-export function requireSensitiveFeatureAccess(role: string | null | undefined): void {
-  if (isProd && !isPlatformOperatorRole(role)) {
-    notFound();
-  }
-
-  if (!['admin', 'super_admin', 'platform_operator'].includes(role || '')) {
-    notFound();
-  }
-}
-
-/**
- * Get environment label for UI badge
- */
-export function getEnvironmentLabel(): { label: string; color: string } {
-  if (isProd) {
-    return { label: 'PRODUCTION', color: 'bg-red-100 text-red-800 border-red-200' };
-  }
-  if (isPreview) {
-    return { label: 'PREVIEW', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
-  }
-  return { label: 'DEVELOPMENT', color: 'bg-blue-100 text-blue-800 border-blue-200' };
-}
-
-/**
- * Check if dev tools should be visible in navigation
- */
 export function shouldShowDevToolsInNav(role: string | null | undefined): boolean {
-  // Never show in production
-  if (isProd) {
-    return false;
-  }
-
-  // Non-prod: require both flag and super_admin
-  return allowDevTools && isPlatformOperatorRole(role);
+  if (isProd) return false;
+  return allowDevTools && isAdminRole(role);
 }
 
-/**
- * List of dev/test route prefixes that should be guarded
- */
 export const DEV_TOOL_ROUTES = [
   '/admin/test-emails',
   '/admin/test-funding',
@@ -116,27 +46,13 @@ export const DEV_TOOL_ROUTES = [
   '/admin/autopilots',
 ] as const;
 
-/**
- * List of sensitive feature routes (require elevated access in prod)
- */
 export const SENSITIVE_ROUTES = [
   '/admin/course-generator',
   '/admin/program-generator',
   '/admin/syllabus-generator',
 ] as const;
 
-// =====================================================
-// API ROUTE GUARDS (canonical — import from here, not from lib/authGuards)
-// =====================================================
-
-import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { unauthorized, forbidden, serverError } from '@/lib/api/responses';
-import { API_ADMIN_ROLES, INSTRUCTOR_ROLES as _INSTRUCTOR_ROLES, type UserRole } from '@/lib/rbac/role-matrix';
-
-// Re-export UserRole from the canonical role matrix so all guards share one type.
-export type { UserRole } from '@/lib/rbac/role-matrix';
-
+// ── Guarded user type ─────────────────────────────────────────────────────────
 export type GuardedUser = {
   id: string;
   email: string | null;
@@ -146,22 +62,11 @@ export type GuardedUser = {
   error?: NextResponse;
 };
 
-/**
- * Verify the request carries a valid Supabase session.
- * Throws a 401 NextResponse if not authenticated.
- * Throws a 500 NextResponse if the profile lookup fails.
- *
- * Usage (inside handleRoute):
- *   const user = await apiAuthGuard(req);
- */
+// ── API guards ────────────────────────────────────────────────────────────────
 export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
   try {
     const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return { id: '', email: null, role: null, error: unauthorized() };
@@ -174,105 +79,38 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
       .maybeSingle();
 
     if (profileError) {
-      return {
-        id: user.id,
-        email: user.email ?? null,
-        role: null,
-        error: serverError('PROFILE_LOOKUP_FAILED'),
-      };
+      return { id: user.id, email: user.email ?? null, role: null, error: serverError('PROFILE_LOOKUP_FAILED') };
     }
 
-    return {
-      id: user.id,
-      email: user.email ?? null,
-      role: (profile?.role as UserRole) ?? null,
-    };
-  } catch (err) {
+    return { id: user.id, email: user.email ?? null, role: (profile?.role as UserRole) ?? null };
+  } catch {
     return { id: '', email: null, role: null, error: unauthorized() };
   }
 }
 
-// Role sets sourced from the canonical RBAC matrix (lib/rbac/role-matrix.ts).
-const ADMIN_ROLES = API_ADMIN_ROLES;
-const INSTRUCTOR_ROLES = _INSTRUCTOR_ROLES;
+const ADMIN_ROLES: UserRole[] = ['admin', 'staff'];
+const INSTRUCTOR_ROLES: UserRole[] = ['instructor', 'admin'];
 
-/**
- * Verify the request is from an admin, super_admin, or staff user.
- * Throws 401 if unauthenticated, 403 if authenticated but wrong role.
- *
- * Usage (inside handleRoute):
- *   const user = await apiRequireAdmin(req);
- */
 export async function apiRequireAdmin(_req?: Request): Promise<GuardedUser> {
   const user = await apiAuthGuard(_req);
   if (user.error) return user;
-
   if (!user.role || !ADMIN_ROLES.includes(user.role)) {
     return { ...user, error: forbidden() };
   }
-
   return user;
 }
 
-/**
- * Verify the request is from an instructor, admin, super_admin, or staff user.
- * Throws 401 if unauthenticated, 403 if authenticated but wrong role.
- */
 export async function apiRequireInstructor(_req?: Request): Promise<GuardedUser> {
   const user = await apiAuthGuard(_req);
   if (user.error) return user;
-
   if (!user.role || !INSTRUCTOR_ROLES.includes(user.role)) {
     return { ...user, error: forbidden() };
   }
-
   return user;
 }
 
-const PLATFORM_STAFF_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'platform_operator'];
-
-/**
- * Platform staff on the owner tenant — workspace provisioning, all-tenant admin.
- * Organization admins on customer tenants are rejected.
- */
-export async function apiRequirePlatformStaff(_req?: Request): Promise<GuardedUser> {
-  const user = await apiAuthGuard(_req);
-  if (user.error) return user;
-
-  if (!user.role || !PLATFORM_STAFF_ROLES.includes(user.role)) {
-    return { ...user, error: forbidden() };
-  }
-
-  const { getPlatformUserContext } = await import('@/lib/platform/platform-owner');
-  const ctx = await getPlatformUserContext(user.id);
-  if (!ctx || (ctx.permissionLevel !== 'platform_owner' && ctx.permissionLevel !== 'platform_admin')) {
-    return { ...user, error: forbidden('Platform staff access required') };
-  }
-
-  return user;
-}
-
-/**
- * Platform operator (owner) — DevStudio, deploy, Northflank, AI autopilot.
- * Requires super_admin or platform_operator on the platform owner tenant.
- */
-export async function apiRequirePlatformOperator(_req?: Request): Promise<GuardedUser> {
-  const user = await apiAuthGuard(_req);
-  if (user.error) return user;
-
-  if (!isPlatformOperatorRole(user.role)) {
-    return { ...user, error: forbidden() };
-  }
-
-  // super_admin/platform_operator are platform operators by definition for Dev Studio access.
-  // Do not block when tenant context lookup fails — service-role hydration can lag on cold start.
-  try {
-    const { getPlatformUserContext } = await import('@/lib/platform/platform-owner');
-    const ctx = await getPlatformUserContext(user.id);
-    if (ctx?.canAccessDevStudio) return user;
-  } catch {
-    // Fall through — authenticated super_admin still allowed.
-  }
-
-  return user;
+// ── Environment label ─────────────────────────────────────────────────────────
+export function getEnvironmentLabel(): { label: string; color: string } {
+  if (isProd) return { label: 'PRODUCTION', color: 'bg-red-100 text-red-800 border-red-200' };
+  return { label: 'DEVELOPMENT', color: 'bg-blue-100 text-blue-800 border-blue-200' };
 }

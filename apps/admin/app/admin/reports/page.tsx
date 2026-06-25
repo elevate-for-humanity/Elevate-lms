@@ -17,7 +17,7 @@ const REPORTS = [
 ];
 
 export default async function ReportsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const [

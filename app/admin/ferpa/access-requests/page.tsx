@@ -43,7 +43,7 @@ const statusLabel: Record<string, string> = {
 };
 
 export default async function FerpaAccessRequestsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const requests = await getAccessRequests();
 
   return (

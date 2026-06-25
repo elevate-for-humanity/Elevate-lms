@@ -49,7 +49,7 @@ const FEATURES = [
     icon: Bell,
     title: 'Notifications',
     desc: 'Get alerts for grades, attendance events, upcoming exams, and program announcements.',
-    image: '/images/pages/learner/dashboard-page-5.webp',
+    image: '/images/pages/learner-page-1.webp',
   },
   {
     icon: BarChart3,
@@ -113,7 +113,7 @@ export default async function ParentPortalPage() {
             fill
             className="object-cover object-center"
             priority
-            sizes="100vw" placeholder="blur"
+            sizes="100vw" 
           />
         </div>
         <div className="bg-white border-t py-10 text-center px-4">
@@ -200,7 +200,7 @@ export default async function ParentPortalPage() {
                       alt={f.title}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 640px) 100vw, 33vw" placeholder="blur"
+                      sizes="(max-width: 640px) 100vw, 33vw" 
                     />
                     <div className="absolute top-3 left-3 w-9 h-9 rounded-full bg-white/90 flex items-center justify-center shadow">
                       <Icon className="w-4 h-4 text-brand-blue-600" />
@@ -262,7 +262,7 @@ export default async function ParentPortalPage() {
                 alt="Supportive services for students and families"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw" placeholder="blur"
+                sizes="(max-width: 768px) 100vw, 50vw" 
               />
             </div>
           </div>

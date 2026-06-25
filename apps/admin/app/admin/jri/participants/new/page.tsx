@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function NewJRIParticipantPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   const [{ data: students }, { data: programs }] = await Promise.all([

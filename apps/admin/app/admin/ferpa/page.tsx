@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminFerpaPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
   const ytdStart = new Date(new Date().getFullYear(), 0, 1).toISOString();
 

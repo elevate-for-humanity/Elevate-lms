@@ -53,7 +53,7 @@ function EnrollmentBadge({ state, accessGranted }: { state: string | null; acces
 }
 
 export default async function StudentsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   // Load students with their most recent enrollment

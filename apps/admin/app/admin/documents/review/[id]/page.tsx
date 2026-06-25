@@ -14,11 +14,14 @@ export const metadata: Metadata = {
 };
 
 export default async function ReviewDocumentPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const { id } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: rawDocument } = await supabase
     .from('documents')
     .select('*')

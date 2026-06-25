@@ -36,7 +36,7 @@ async function requireAdminActor() {
     throw new Error('Unauthorized');
   }
 
-  if (!['admin', 'super_admin', 'staff', 'org_admin'].includes(profile.role)) {
+  if (!['admin', 'staff', 'org_admin'].includes(profile.role)) {
     throw new Error('Forbidden');
   }
 

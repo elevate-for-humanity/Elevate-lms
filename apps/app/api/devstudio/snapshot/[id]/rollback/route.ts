@@ -4,7 +4,7 @@
  * Execute rollback for a snapshot. Runs rollback_sql if present,
  * marks the snapshot as rolled_back, emits a rollback event.
  *
- * Requires deployer-tier confirmation — only super_admin can trigger.
+ * Requires deployer-tier confirmation — only admin can trigger.
  */
 
 import { NextRequest, NextResponse } from 'next/server';

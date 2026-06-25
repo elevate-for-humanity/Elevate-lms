@@ -50,7 +50,7 @@ export default async function ReferralsPage({
 }: {
   searchParams: Promise<{ status?: string; agency?: string }>;
 }) {
-  await requireRole(['admin', 'super_admin', 'staff', 'advisor']);
+  await requireRole(['admin', 'staff', 'advisor']);
   const params = await searchParams;
 
   const db = await requireAdminClient();

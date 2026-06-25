@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminGradebookIndexPage() {
-  await requireRole(['admin', 'super_admin', 'instructor']);
+  await requireRole(['admin', 'instructor']);
   const supabase = await requireAdminClient();
 
   const { data: courses } = await supabase

@@ -14,7 +14,7 @@ import { scanAllGaps, createDraftJobsFromGaps, type CourseGap } from '@/lib/ai/c
 
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_ROLES = new Set(['platform_owner', 'platform_admin', 'platform_operator', 'admin', 'super_admin', 'staff']);
+const ALLOWED_ROLES = new Set(['admin', 'staff']);
 
 export async function POST(req: NextRequest) {
   try {

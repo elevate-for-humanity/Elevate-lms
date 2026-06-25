@@ -107,7 +107,7 @@ export default function HomeHeroVideo() {
         fill
         priority
         sizes="100vw"
-        className="object-cover z-0" placeholder="blur"
+        className="object-cover z-0" 
       />
       <video
         ref={videoRef}

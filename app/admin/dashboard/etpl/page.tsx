@@ -26,7 +26,7 @@ export const metadata = {
 };
 
 export default async function EtplDashboard() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
 
   const etpl = await getEtplMetrics();
   const funding = await getFundingMetrics();

@@ -40,6 +40,6 @@ const _GET = withAuth(
       },
     });
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 export const GET = withApiAudit('/api/admin/storage/signature', _GET);

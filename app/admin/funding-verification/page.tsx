@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function FundingVerificationPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const supabase = await requireAdminClient();
 
   // v_funding_verification_queue is defined in migration 20260503000013.

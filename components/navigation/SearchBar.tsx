@@ -296,6 +296,9 @@ export function SearchBar({
                 const colorClass = TYPE_COLORS[result.type];
                 const isSelected = index === selectedIndex;
 
+                // Defensive: skip results without href
+                if (!result?.href) return null;
+
                 return (
                   <Link
                     key={`${result.type}-${result.id}`}

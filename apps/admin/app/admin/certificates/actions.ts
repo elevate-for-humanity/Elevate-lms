@@ -20,7 +20,7 @@ export async function issueCertificate(formData: FormData) {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
+  if (profile?.role !== 'admin' && profile?.role !== 'admin') redirect('/unauthorized');
 
   const recipientName = formData.get('recipientName') as string;
   const email = formData.get('email') as string;

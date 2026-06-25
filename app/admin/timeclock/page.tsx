@@ -42,7 +42,7 @@ export default async function TimeclockPage({
 }: {
   searchParams: Promise<{ tab?: string; date?: string }>;
 }) {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
   const sp = await searchParams;
   const tab = sp.tab || 'live';

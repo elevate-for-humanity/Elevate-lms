@@ -138,7 +138,7 @@ export default function PartnerApplyPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
       <div className="bg-slate-50 border-b">

@@ -23,7 +23,7 @@ function statusClass(status: string) {
 }
 
 export default async function PartnerApplicationsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   const { data: applications } = await supabase

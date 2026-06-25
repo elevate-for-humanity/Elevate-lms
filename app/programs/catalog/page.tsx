@@ -123,7 +123,7 @@ export default async function ProgramCatalogPage({
             priority
             sizes="100vw"
             className="object-cover object-center"
-            placeholder="blur"
+            
           />
         </div>
         <div className="max-w-4xl mx-auto px-4 py-8">

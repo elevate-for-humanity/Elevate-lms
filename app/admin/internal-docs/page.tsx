@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function InternalDocsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   // documents: id, document_type, file_name, status, created_at, expiration_date, user_id

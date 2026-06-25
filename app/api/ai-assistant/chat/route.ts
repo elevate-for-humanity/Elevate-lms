@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
 
         if (conversationError) {
           logger.warn('AI Assistant conversation create failed', {
-            error: conversationError.message,
+            error: 'Internal server error',
           });
         }
         convId = newConv?.id ?? null;
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
     } catch (aiError) {
       if (isAiDegradedError(aiError)) {
         logger.warn('AI Assistant degraded; using guided fallback', {
-          error: aiError instanceof Error ? aiError.message : String(aiError),
+          error: 'Internal server error',
         });
       } else {
         logger.error('AI Assistant model unavailable; using guided fallback:', aiError);

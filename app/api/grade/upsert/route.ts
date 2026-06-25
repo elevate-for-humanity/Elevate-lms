@@ -31,7 +31,7 @@ async function _POST(req: Request) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const gradingRoles = ['instructor', 'admin', 'super_admin', 'staff'];
+  const gradingRoles = ['instructor', 'admin', 'staff'];
   if (!profile?.role || !gradingRoles.includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }

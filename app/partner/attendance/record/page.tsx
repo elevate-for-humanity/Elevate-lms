@@ -32,7 +32,7 @@ export default async function RecordAttendancePage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  const allowedRoles = ['partner', 'admin', 'super_admin', 'staff'];
+  const allowedRoles = ['partner', 'admin', 'staff'];
   if (!profile || !allowedRoles.includes(profile.role)) redirect('/unauthorized');
 
   // Resolve partner_id via partner_users (partners table has no user_id column)
@@ -86,7 +86,7 @@ export default async function RecordAttendancePage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
       {/* Breadcrumbs */}

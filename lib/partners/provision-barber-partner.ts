@@ -125,7 +125,7 @@ export async function provisionPartnerFromBarberApplication(
       .update({ role: 'partner' })
       .eq('id', options.linkUserId)
       .neq('role', 'admin')
-      .neq('role', 'super_admin')
+      .neq('role', 'admin')
       .then(undefined, () => undefined);
   }
 

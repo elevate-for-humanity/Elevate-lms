@@ -48,7 +48,7 @@ export default function GrantProgramsPage() {
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center text-white h-full flex flex-col justify-center drop-shadow-lg">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-md">
@@ -164,7 +164,7 @@ export default function GrantProgramsPage() {
                     alt={`${program.title} program`}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" placeholder="blur"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
                   />
                 </div>
                 <div className="p-6">

@@ -44,7 +44,7 @@ export default async function CompleteFERPATrainingPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
       <FERPATrainingForm user={profile} existingTraining={existingTraining} />

@@ -3,7 +3,7 @@
 /**
  * SecretsPanel — Platform Secrets manager inside DevStudio.
  *
- * Lets super_admin / admin set API keys and credentials directly in the UI.
+ * Lets admin / admin set API keys and credentials directly in the UI.
  * Values are stored encrypted in platform_secrets table.
  * Never displays raw values — only shows masked previews and test status.
  */

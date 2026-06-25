@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function CaseManagerDashboardPage() {
-  const { user } = await requireRole(['case_manager', 'admin', 'super_admin', 'staff']);
+  const { user } = await requireRole(['case_manager', 'admin', 'staff']);
 
   const supabase = await createClient();
   const admin = await requireAdminClient();

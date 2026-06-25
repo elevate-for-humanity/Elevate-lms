@@ -100,7 +100,7 @@ export default async function ParentDashboardPage() {
           fill
           className="object-cover object-center"
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent" />
       </section>

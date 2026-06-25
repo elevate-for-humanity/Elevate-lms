@@ -53,7 +53,7 @@ const actionColor: Record<string, string> = {
 };
 
 export default async function FerpaAuditLogPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const entries = await getFerpaAuditLog();
 
   return (

@@ -9,7 +9,7 @@ import { handleRoute } from '@/lib/api/route';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Checks migration status. Requires admin/super_admin/staff session.
+// Checks migration status. Requires admin/admin/staff session.
 async function _POST(request: NextRequest) {
   return handleRoute(async () => {
     const rateLimited = await applyRateLimit(request, 'strict');

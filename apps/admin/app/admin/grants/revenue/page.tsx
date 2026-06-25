@@ -19,7 +19,7 @@ function formatCurrency(cents: number): string {
 }
 
 export default async function GrantRevenuePage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const supabase = await createClient();
 
   const { data: applications } = await supabase

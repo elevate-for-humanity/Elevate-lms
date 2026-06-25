@@ -21,7 +21,7 @@ export async function createJob(formData: FormData) {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!_profile || !['admin', 'super_admin'].includes(_profile.role)) throw new Error('Forbidden');
+  if (!_profile || !['admin'].includes(_profile.role)) throw new Error('Forbidden');
 
   const { error } = await db.from('jobs').insert({
     title: formData.get('title') as string,

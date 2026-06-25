@@ -61,7 +61,7 @@ const _GET = withAuth(
       timestamp: new Date().toISOString(),
     });
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 
 export const GET = withApiAudit('/api/admin/analytics/overview', _GET);

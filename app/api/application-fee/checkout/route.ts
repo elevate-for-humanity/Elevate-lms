@@ -2,6 +2,11 @@
  * Application Fee Checkout API
  *
  * Creates a Stripe checkout session for the $15 application fee.
+ * 
+ * Fee Policy:
+ * - Programs: $15 fee required
+ * - Host Shops: $15 fee required
+ * - Apprenticeships: $0 NO FEE
  *
  * POST /api/application-fee/checkout
  * Body: { programSlug: string, applicationId?: string, userId?: string }
@@ -10,13 +15,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
-import type Stripe from 'stripe';
+import { 
+  APPLICATION_FEE_PRICE_ID, 
+  APPLICATION_FEE_AMOUNT_CENTS,
+  requiresApplicationFee,
+  isHostShopApplication,
+  getApplicationFeeAmount
+} from '@/lib/config/application-fee-config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-const APPLICATION_FEE_PRICE_ID = 'price_1TiEDyH4a2yrVOt5pYBCQc2D';
-const APPLICATION_FEE_AMOUNT_CENTS = 1500;
 
 interface CheckoutBody {
   programSlug?: string;
@@ -25,6 +33,7 @@ interface CheckoutBody {
   userEmail?: string;
   successUrl?: string;
   cancelUrl?: string;
+  programType?: 'program' | 'host-shop' | 'apprenticeship';
 }
 
 export async function POST(request: NextRequest) {
@@ -41,6 +50,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'programSlug is required' }, { status: 400 });
   }
 
+  // Check if application fee is required
+  const feeRequired = requiresApplicationFee(programSlug);
+  const feeAmount = getApplicationFeeAmount(programSlug);
+  const isHostShop = isHostShopApplication(programSlug);
+
+  // Apprenticeships and similar programs with no fee
+  if (!feeRequired || feeAmount === 0) {
+    logger.info('Application fee waived', { programSlug, reason: 'apprenticeship_or_no_fee_program' });
+    return NextResponse.json({
+      sessionId: null,
+      url: null,
+      feeRequired: false,
+      feeAmount: 0,
+      message: 'No application fee required for this program type',
+    });
+  }
+
   const stripe = getStripe();
   if (!stripe) {
     logger.error('Application fee checkout: Stripe not configured');
@@ -48,6 +74,14 @@ export async function POST(request: NextRequest) {
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+
+  // Determine success/cancel URLs based on program type
+  const successPath = isHostShop 
+    ? '/partners/barber-host-shop/confirmation' 
+    : `/programs/${programSlug}/apply/fee-success`;
+  const cancelPath = isHostShop 
+    ? '/partners/barber-host-shop/apply?cancelled=true' 
+    : `/programs/${programSlug}/apply?cancelled=true`;
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -66,10 +100,12 @@ export async function POST(request: NextRequest) {
         application_id: applicationId || '',
         user_id: userId || '',
         fee_amount: String(APPLICATION_FEE_AMOUNT_CENTS),
+        is_host_shop: String(isHostShop),
+        fee_required: String(feeRequired),
       },
-      success_url: successUrl || `${siteUrl}/programs/${programSlug}/apply/fee-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl || `${siteUrl}/programs/${programSlug}/apply?cancelled=true`,
-      description: `Program Application Fee - ${programSlug}`,
+      success_url: successUrl || `${siteUrl}${successPath}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl || `${siteUrl}${cancelPath}`,
+      description: `${isHostShop ? 'Host Shop' : 'Program'} Application Fee - ${programSlug}`,
       automatic_tax: { enabled: false },
       billing_address_collection: 'required',
     });
@@ -79,11 +115,15 @@ export async function POST(request: NextRequest) {
       programSlug,
       applicationId,
       userId,
+      feeAmount,
+      isHostShop,
     });
 
     return NextResponse.json({
       sessionId: session.id,
       url: session.url,
+      feeRequired: true,
+      feeAmount,
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);

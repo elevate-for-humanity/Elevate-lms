@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-    if (['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) {
+    if (['admin', 'staff'].includes(profile?.role ?? '')) {
       return NextResponse.json({
         enrolled: true,
         status: 'active',

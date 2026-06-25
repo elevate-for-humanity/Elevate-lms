@@ -20,7 +20,7 @@ export default async function EmployerProposalPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const { id } = await params;
 
   const adminClient = await requireAdminClient();

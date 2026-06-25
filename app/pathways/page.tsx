@@ -212,7 +212,7 @@ export default function PathwaysPage() {
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="blur"
+          priority 
         />
       </section>
       {/* ── Who We Are / What This Is ── */}
@@ -281,7 +281,7 @@ export default function PathwaysPage() {
                       alt={s.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 384px"
-                      className="object-cover" placeholder="blur"
+                      className="object-cover" 
                     />
                     <div className="absolute top-4 left-4 w-10 h-10 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
                       {s.num}
@@ -344,7 +344,7 @@ export default function PathwaysPage() {
                       alt={`${p.name} training`}
                       fill
                       sizes="(max-width: 1024px) 100vw, 320px"
-                      className="object-cover" placeholder="blur"
+                      className="object-cover" 
                     />
                   </div>
                   <div className="p-6 flex-1">
@@ -483,7 +483,7 @@ export default function PathwaysPage() {
                   alt="Funding navigation"
                   fill
                   sizes="80px"
-                  className="object-cover" placeholder="blur"
+                  className="object-cover" 
                 />
               </div>
               <div>
@@ -502,7 +502,7 @@ export default function PathwaysPage() {
                   alt="Credentials"
                   fill
                   sizes="80px"
-                  className="object-cover" placeholder="blur"
+                  className="object-cover" 
                 />
               </div>
               <div>
@@ -523,7 +523,7 @@ export default function PathwaysPage() {
                   alt="Employer connections"
                   fill
                   sizes="80px"
-                  className="object-cover" placeholder="blur"
+                  className="object-cover" 
                 />
               </div>
               <div>
@@ -544,7 +544,7 @@ export default function PathwaysPage() {
                   alt="Ongoing support"
                   fill
                   sizes="80px"
-                  className="object-cover" placeholder="blur"
+                  className="object-cover" 
                 />
               </div>
               <div>

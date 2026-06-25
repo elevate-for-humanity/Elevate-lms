@@ -37,7 +37,7 @@ async function _GET(request: Request) {
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-    if (!_roleProfile || !['admin', 'super_admin', 'staff'].includes(_roleProfile.role)) {
+    if (!_roleProfile || !['admin', 'staff'].includes(_roleProfile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -81,7 +81,7 @@ async function _POST(request: NextRequest) {
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-    if (!_roleProfile || !['admin', 'super_admin', 'staff'].includes(_roleProfile.role)) {
+    if (!_roleProfile || !['admin', 'staff'].includes(_roleProfile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -174,7 +174,7 @@ async function _PATCH(request: NextRequest) {
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-    if (!_roleProfile || !['admin', 'super_admin', 'staff'].includes(_roleProfile.role)) {
+    if (!_roleProfile || !['admin', 'staff'].includes(_roleProfile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -243,7 +243,7 @@ async function _DELETE(request: NextRequest) {
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-    if (!_roleProfile || !['admin', 'super_admin', 'staff'].includes(_roleProfile.role)) {
+    if (!_roleProfile || !['admin', 'staff'].includes(_roleProfile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

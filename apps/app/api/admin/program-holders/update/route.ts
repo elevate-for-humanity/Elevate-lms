@@ -112,5 +112,5 @@ export const POST = withAuth(
     });
     return Response.json({ ok: true });
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );

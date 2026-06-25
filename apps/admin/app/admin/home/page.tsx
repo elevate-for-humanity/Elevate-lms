@@ -88,7 +88,7 @@ const FEATURES = [
 ];
 
 export default async function AdminHomePage() {
-  const auth = await requireRole(['admin', 'super_admin', 'staff', 'platform_operator']);
+  const auth = await requireRole(['admin', 'staff', 'admin']);
   const { profile } = auth;
   const firstName = profile.first_name || profile.full_name?.split(' ')[0] || 'Admin';
 

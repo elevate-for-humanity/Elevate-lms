@@ -19,9 +19,9 @@ async function requireAdmin(supabase: any) {
   if (!data?.user) return false;
 
   const { data: profile } = await supabase
-    .from('user_profiles')
+    .from('profiles')
     .select('role')
-    .eq('user_id', data.user.id)
+    .eq('id', data.user.id)
     .maybeSingle();
 
   return profile?.role === 'admin';

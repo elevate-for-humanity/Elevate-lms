@@ -11,8 +11,8 @@ export type UserRole =
   | 'student'
   | 'instructor'
   | 'admin'
-  | 'super_admin'
-  | 'platform_operator'
+  | 'admin'
+  | 'admin'
   | 'staff'
   | 'program_holder'
   | 'provider_admin'
@@ -146,7 +146,7 @@ export async function requireAuth() {
 export async function requireAdmin() {
   const { user, role } = await authGuard({
     requireAuth: true,
-    allowedRoles: ['admin', 'super_admin', 'staff'],
+    allowedRoles: ['admin', 'staff'],
   });
 
   return user;
@@ -228,8 +228,8 @@ export async function getUserRole(): Promise<UserRole | null> {
 
 const PERMISSIONS: Record<UserRole, string[]> = {
   admin: ['*'], // All permissions
-  super_admin: ['*'],
-  platform_operator: ['*'],
+  admin: ['*'],
+  admin: ['*'],
   staff: ['view_students', 'view_programs', 'view_analytics', 'manage_enrollments'],
   instructor: [
     'view_students',
@@ -510,7 +510,7 @@ export async function apiAuthGuard(options: AuthGuardOptions = {}): Promise<{
 export async function apiRequireAdmin() {
   const result = await apiAuthGuard({
     requireAuth: true,
-    allowedRoles: ['admin', 'super_admin', 'staff'],
+    allowedRoles: ['admin', 'staff'],
   });
 
   if (!result.authorized) {

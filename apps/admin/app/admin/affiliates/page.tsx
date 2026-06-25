@@ -70,7 +70,7 @@ async function getAffiliateData() {
 }
 
 export default async function AffiliatesPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const { applications: dbApplications, stats: dbStats } = await getAffiliateData();
 
   const stats = [

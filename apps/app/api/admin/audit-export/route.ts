@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
  * as a JSONL file. Creates an offsite survivability copy that
  * persists independently of the audit_logs table.
  *
- * Requires admin/super_admin role.
+ * Requires admin/admin role.
  */
 async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'strict');

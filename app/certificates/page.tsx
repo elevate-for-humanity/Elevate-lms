@@ -40,7 +40,7 @@ export default function CertificatesPage() {
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
       </section>
       {/* Verify Certificate */}

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MentorMessagesPage() {
-  const auth = await requireRole(['mentor', 'admin', 'super_admin', 'staff']);
+  const auth = await requireRole(['mentor', 'admin', 'staff']);
   const supabase = await createClient();
 
   const { data: messages } = await supabase

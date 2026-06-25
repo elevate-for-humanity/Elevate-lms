@@ -23,7 +23,7 @@ function Field({ label, value }: { label: string; value: string | null | undefin
 }
 
 export default async function AccreditationStandardPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const { id } = await params;
   const db = await requireAdminClient();
   if (!db) notFound();

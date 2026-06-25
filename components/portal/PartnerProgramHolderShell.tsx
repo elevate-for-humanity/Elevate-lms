@@ -18,8 +18,8 @@ interface NavItem {
   section: string;
 }
 
-const PH = ['program_holder', 'admin', 'super_admin', 'staff', 'org_admin'];
-const PA = ['partner', 'admin', 'super_admin', 'staff', 'org_admin'];
+const PH = ['program_holder', 'admin', 'staff', 'org_admin'];
+const PA = ['partner', 'admin', 'staff', 'org_admin'];
 
 const NAV: NavItem[] = [
   // ── Overview ───────────────────────────────────────────────────────────────

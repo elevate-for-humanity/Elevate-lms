@@ -1,4 +1,4 @@
-// AUTH: admin/super_admin/staff only
+// AUTH: admin/admin/staff only
 // Sets provider_notified_at + provider_notified_by on a program_enrollments row.
 // Must be called AFTER the enrollment is recorded here — the timestamp proves
 // Elevate owns the student record before the training provider is contacted.

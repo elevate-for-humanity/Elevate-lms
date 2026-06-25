@@ -13,9 +13,9 @@
  *   any          → archive      → archived   (admin only)
  *
  * Roles:
- *   submit:          org_admin, org_owner, program_manager, admin, super_admin
- *   approve/reject:  reviewer, org_admin, org_owner, admin, super_admin
- *   archive:         admin, super_admin only
+ *   submit:          org_admin, org_owner, program_manager, admin, admin
+ *   approve/reject:  reviewer, org_admin, org_owner, admin, admin
+ *   archive:         admin, admin only
  *   revert_to_draft: same as submit
  */
 

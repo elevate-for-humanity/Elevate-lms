@@ -22,12 +22,15 @@ export default async function ContentLibraryPage() {
     data: { user },
   } = await supabase.auth.getUser();
   const db = await requireAdminClient();
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/admin');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/admin');
 
   const { data: org } = await db
     .from('sos_organizations')

@@ -46,7 +46,7 @@ type Props = { searchParams: Promise<{ access?: string }> };
 
 export default async function LearnerDashboardPage({ searchParams }: Props) {
   // Require student role (admins can view for support)
-  const { user, profile } = await requireRole(['student', 'admin', 'super_admin']);
+  const { user, profile } = await requireRole(['student', 'admin']);
 
   const supabase = await createClient();
   const sp = await searchParams;

@@ -1,4 +1,12 @@
 /**
+ * cdl-training Blueprint
+ * 
+ * © 2026 Elevate for Humanity
+ * All Rights Reserved
+ *
+ * Version: 1.0.0
+ */
+/**
  * lib/curriculum/blueprints/cdl-training.ts
  *
  * CDL Class A Training — DOT/FMCSA aligned.

@@ -93,7 +93,7 @@ export default async function ApplyPage({
             className="object-cover object-center"
             priority
             sizes="100vw"
-            placeholder="blur"
+            
           />
         </div>
         <div className="bg-white border-b border-slate-200 py-10">

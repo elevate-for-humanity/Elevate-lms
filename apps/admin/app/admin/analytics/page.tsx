@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AnalyticsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const [

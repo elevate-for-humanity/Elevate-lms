@@ -1,6 +1,6 @@
 // Toggle a user's active/inactive status. Called by UserManagementTable.
 // Accepts { userId, status: 'active' | 'inactive' }.
-// Requires admin or super_admin.
+// Requires admin or admin.
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -27,7 +27,7 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!actor || !['admin', 'super_admin'].includes(actor.role)) {
+    if (!actor || !['admin'].includes(actor.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

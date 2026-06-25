@@ -121,7 +121,7 @@ function TrialPageContent() {
       <div className="min-h-screen bg-white">
         <section className="relative h-[160px] sm:h-[220px] overflow-hidden">
           {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image src="/images/pages/store-trial-hero.jpg" alt="Elevate platform" fill sizes="100vw" className="object-cover" priority placeholder="blur" />
+          <Image src="/images/pages/store-trial-hero.jpg" alt="Elevate platform" fill sizes="100vw" className="object-cover" priority  />
         </section>
 
         <div className="bg-white border-b">
@@ -234,7 +234,7 @@ function TrialPageContent() {
             {/* Left: value prop */}
             <div className="hidden lg:block">
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl border border-slate-200 mb-6">
-                <Image src="/images/pages/store-trial-detail.jpg" alt="Admin dashboard preview" fill sizes="50vw" className="object-cover" placeholder="blur" />
+                <Image src="/images/pages/store-trial-detail.jpg" alt="Admin dashboard preview" fill sizes="50vw" className="object-cover"  />
               </div>
               <p className="text-sm text-slate-500 text-center mb-6">Your branded training website + LMS — ready in under 60 seconds</p>
               <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 space-y-3">

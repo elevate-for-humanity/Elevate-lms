@@ -109,7 +109,7 @@ const _GET = withAuth(
       return NextResponse.json({ error: 'Failed to export enrollments' }, { status: 500 });
     }
   },
-  { roles: ['admin', 'super_admin'] },
+  { roles: ['admin'] },
 );
 
 function escapeCsvField(field: any): string {

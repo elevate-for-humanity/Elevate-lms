@@ -1,4 +1,12 @@
 /**
+ * cna Blueprint
+ * 
+ * © 2026 Elevate for Humanity
+ * All Rights Reserved
+ *
+ * Version: 1.0.0
+ */
+/**
  * lib/curriculum/blueprints/cna.ts
  *
  * Certified Nursing Assistant (CNA) — Indiana Board of Nursing aligned.

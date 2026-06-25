@@ -18,7 +18,7 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function AppointmentsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const [upcomingRes, pastRes, countRes] = await Promise.all([

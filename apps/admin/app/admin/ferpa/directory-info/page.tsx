@@ -63,7 +63,7 @@ async function getDirectorySettings() {
 }
 
 export default async function FerpaDirectoryInfoPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const settings = await getDirectorySettings();
 
   return (

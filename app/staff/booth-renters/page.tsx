@@ -61,7 +61,7 @@ const STATUS_STYLES: Record<
 };
 
 export default async function BoothRentersPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
 
   const _admin = await requireAdminClient();
   const supabase = await createClient();

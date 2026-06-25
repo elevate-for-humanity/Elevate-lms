@@ -12,7 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-const ALLOWED_ROLES = new Set(['platform_owner', 'platform_admin', 'platform_operator']);
+const ALLOWED_ROLES = new Set(['admin']);
 
 // GET /api/devstudio/control-plane/map
 export async function GET(req: NextRequest) {

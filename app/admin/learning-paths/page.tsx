@@ -9,7 +9,7 @@ export const revalidate = 60;
 export const metadata: Metadata = { title: 'Learning Paths | Admin' };
 
 export default async function LearningPathsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const { data: paths, error } = await db

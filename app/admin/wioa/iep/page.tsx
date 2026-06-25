@@ -34,7 +34,7 @@ export default async function IepListPage({
 }: {
   searchParams: Promise<{ status?: string; search?: string }>;
 }) {
-  await requireRole(['admin', 'super_admin', 'staff', 'advisor']);
+  await requireRole(['admin', 'staff', 'advisor']);
   const params = await searchParams;
   const db = await requireAdminClient();
 

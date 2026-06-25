@@ -16,7 +16,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-const ADMIN_ROLES = new Set(['admin', 'super_admin', 'staff']);
+const ADMIN_ROLES = new Set(['admin', 'staff']);
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

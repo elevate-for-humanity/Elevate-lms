@@ -23,7 +23,7 @@ export async function createModule(formData: FormData) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+  if (profile?.role !== 'admin' && profile?.role !== 'admin') {
     redirect('/unauthorized');
   }
 
@@ -74,7 +74,7 @@ export async function updateModule(id: string, formData: FormData) {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
+  if (profile?.role !== 'admin' && profile?.role !== 'admin') redirect('/unauthorized');
 
   const { data: existing } = await db.from('modules').select('id').eq('id', id).maybeSingle();
   if (!existing) throw new Error('Module not found');
@@ -131,7 +131,7 @@ export async function deleteModule(id: string) {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') throw new Error('Unauthorized');
+  if (profile?.role !== 'admin' && profile?.role !== 'admin') throw new Error('Unauthorized');
 
   const { data: existing } = await db.from('modules').select('id').eq('id', id).maybeSingle();
   if (!existing) throw new Error('Module not found');

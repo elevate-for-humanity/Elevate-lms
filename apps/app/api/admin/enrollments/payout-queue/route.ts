@@ -1,4 +1,4 @@
-// AUTH: admin/super_admin/staff only
+// AUTH: admin/admin/staff only
 // Returns enrollments where payout has been triggered, filtered by status.
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';

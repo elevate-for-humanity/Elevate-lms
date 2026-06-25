@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
  * Returns the authenticated user's timeclock context.
  *
  * Site access is role-based:
- * - admin/super_admin/staff: all active sites
+ * - admin/admin/staff: all active sites
  * - apprentice: only sites linked to their assigned shop/employer
  * - others: empty list
  */
@@ -43,7 +43,7 @@ async function _GET(request: NextRequest) {
       .maybeSingle();
 
     const role = profile?.role || 'student';
-    const isAdmin = ['admin', 'super_admin', 'staff'].includes(role);
+    const isAdmin = ['admin', 'staff'].includes(role);
 
     // Get apprentice record linked to this user via user_id or email match
     let apprentice = null;

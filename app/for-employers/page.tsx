@@ -66,7 +66,7 @@ export default async function ForEmployersPage() {
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="blur"
+          sizes="100vw" 
         />
       </section>
       <div className="bg-white border-b border-slate-200 py-8 px-4">

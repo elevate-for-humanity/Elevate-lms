@@ -6,9 +6,8 @@ import { Search, ArrowRight, HelpCircle } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Help Center',
-  description:
-    'Browse our knowledge base for answers to common questions about enrollment, programs, funding, and more.',
+  title: 'Help Center | Elevate For Humanity',
+  description: 'Browse our knowledge base for answers to common questions about enrollment, programs, funding, and more.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/support/help',
   },
@@ -27,21 +26,21 @@ const categories = [
 
 async function getArticles(category?: string, search?: string) {
   const supabase = await getDb();
-
+  
   let query = supabase
     .from('support_articles')
     .select('id, title, slug, excerpt, category, views')
     .eq('published', true)
     .order('views', { ascending: false });
-
+  
   if (category) {
     query = query.eq('category', category);
   }
-
+  
   if (search) {
     query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`);
   }
-
+  
   const { data: articles } = await query.limit(20);
   return articles || [];
 }
@@ -58,14 +57,16 @@ export default async function HelpCenterPage({
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Support', href: '/support' }, { label: 'Help' }]} />
+            <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: "Support", href: "/support" }, { label: "Help" }]} />
       </div>
-      {/* Hero */}
+{/* Hero */}
       <section className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h1 className="text-4xl font-bold mb-4">Help Center</h1>
-          <p className="text-xl text-white mb-8">Find answers to your questions</p>
+          <p className="text-xl text-white mb-8">
+            Find answers to your questions
+          </p>
           <form className="max-w-2xl mx-auto relative">
             <input
               type="text"
@@ -93,7 +94,7 @@ export default async function HelpCenterPage({
               className={`px-4 py-2 rounded-full font-medium transition ${
                 !activeCategory
                   ? 'bg-brand-blue-600 text-white'
-                  : 'bg-white text-slate-900 hover:bg-slate-200'
+                  : 'bg-white text-slate-900 hover:bg-gray-200'
               }`}
             >
               All Articles
@@ -105,7 +106,7 @@ export default async function HelpCenterPage({
                 className={`px-4 py-2 rounded-full font-medium transition ${
                   activeCategory === cat.slug
                     ? 'bg-brand-blue-600 text-white'
-                    : 'bg-white text-slate-900 hover:bg-slate-200'
+                    : 'bg-white text-slate-900 hover:bg-gray-200'
                 }`}
               >
                 {cat.name}
@@ -146,24 +147,23 @@ export default async function HelpCenterPage({
                 <Link
                   key={article.id}
                   href={`/support/help/${article.slug}`}
-                  className="block p-6 bg-white rounded-xl border border-slate-200 hover:shadow-lg hover:border-brand-blue-300 transition group"
+                  className="block p-6 bg-white rounded-xl border border-gray-200 hover:shadow-lg hover:border-brand-blue-300 transition group"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span
-                          className={`px-2 py-2 text-xs font-medium rounded ${
-                            categories.find((c) => c.slug === article.category)?.color ||
-                            'bg-white text-slate-700'
-                          }`}
-                        >
+                        <span className={`px-2 py-2 text-xs font-medium rounded ${
+                          categories.find(c => c.slug === article.category)?.color || 'bg-white text-slate-700'
+                        }`}>
                           {article.category}
                         </span>
                       </div>
                       <h3 className="text-lg font-bold text-black group-hover:text-brand-blue-600 transition mb-2">
                         {article.title}
                       </h3>
-                      <p className="text-slate-700 text-sm line-clamp-2">{article.excerpt}</p>
+                      <p className="text-slate-700 text-sm line-clamp-2">
+                        {article.excerpt}
+                      </p>
                     </div>
                     <ArrowRight className="w-5 h-5 text-slate-700 group-hover:text-brand-blue-600 transition flex-shrink-0 mt-1" />
                   </div>
@@ -177,9 +177,7 @@ export default async function HelpCenterPage({
       {/* CTA */}
       <section className="py-12 border-t">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-2xl font-bold text-black mb-4">
-            Can't find what you're looking for?
-          </h2>
+          <h2 className="text-2xl font-bold text-black mb-4">Can't find what you're looking for?</h2>
           <p className="text-slate-700 mb-6">
             Our support team is here to help with any questions.
           </p>
@@ -192,7 +190,7 @@ export default async function HelpCenterPage({
             </Link>
             <a
               href="/support"
-              className="px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-slate-200 transition"
+              className="px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition"
             >
               {PLATFORM_DEFAULTS.supportPhone}
             </a>

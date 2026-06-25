@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
  * Body: { apprenticeId: string; userId: string }
  *
  * Writes user_id onto an apprentice record that was missing it.
- * Requires admin/super_admin/staff role.
+ * Requires admin/admin/staff role.
  */
 
 import { NextResponse } from 'next/server';

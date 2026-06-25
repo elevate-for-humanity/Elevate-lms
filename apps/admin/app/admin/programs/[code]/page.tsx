@@ -20,7 +20,7 @@ export async function generateMetadata({
 }
 
 export default async function ProgramPage({ params }: { params: Promise<{ code: string }> }) {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const { code } = await params;
   const db = await requireAdminClient();
   if (!db) notFound();

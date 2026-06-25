@@ -221,7 +221,7 @@ const categoryLabels: Record<string, string> = {
 };
 
 export default async function AdminIntegrationsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const integrations = INTEGRATIONS.map((i) => ({
     ...i,
     status: i.envVars.length > 0 ? getStatus(i.envVars) : i.status,

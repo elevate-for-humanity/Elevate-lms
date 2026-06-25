@@ -7,7 +7,7 @@
  *
  * Body: { settings: Record<string, string> }
  *
- * super_admin only — platform_settings controls live site behaviour.
+ * admin only — platform_settings controls live site behaviour.
  */
 
 import { NextRequest, NextResponse } from 'next/server';

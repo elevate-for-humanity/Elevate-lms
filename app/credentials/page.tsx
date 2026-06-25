@@ -16,7 +16,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
 import { PUBLIC_CREDENTIALS_DISPLAY } from '@/lib/site-credentials';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Credentials & Compliance | Elevate Workforce OS',
@@ -395,7 +395,7 @@ export default function CredentialsPage() {
                     alt={cred.name}
                     fill
                     sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw"
-                    className="object-cover" placeholder="blur"
+                    className="object-cover" 
                   />
                 </div>
                 <div className="p-4 flex flex-col flex-1">
@@ -440,7 +440,7 @@ export default function CredentialsPage() {
                     alt={cred.name}
                     fill
                     sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw"
-                    className="object-cover" placeholder="blur"
+                    className="object-cover" 
                   />
                   <span className="absolute top-3 left-3 bg-white/90 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-full">
                     {cred.field}
@@ -492,7 +492,7 @@ export default function CredentialsPage() {
                     alt={cred.name}
                     fill
                     sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw"
-                    className="object-cover" placeholder="blur"
+                    className="object-cover" 
                   />
                   <span className="absolute top-3 left-3 bg-white/90 text-amber-700 text-[10px] font-bold px-2.5 py-1 rounded-full">
                     {cred.field}

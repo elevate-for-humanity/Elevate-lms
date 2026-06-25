@@ -10,6 +10,6 @@ export const metadata: Metadata = {
 };
 
 export default async function CalendlyIntegrationPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   return <CalendlyClient />;
 }

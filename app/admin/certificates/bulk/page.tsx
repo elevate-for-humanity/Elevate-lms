@@ -18,7 +18,7 @@ export default async function BulkCertificatesPage({
 }: {
   searchParams: Promise<{ tab?: string }>;
 }) {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const { tab } = await searchParams;
   const activeTab = tab === 'manage' ? 'manage' : 'issue';
 

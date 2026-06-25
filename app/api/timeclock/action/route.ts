@@ -276,7 +276,7 @@ async function notifyClockIn(
   const { data: admins } = await supabase
     .from('profiles')
     .select('id')
-    .in('role', ['admin', 'super_admin', 'staff'])
+    .in('role', ['admin', 'staff'])
     .limit(200);
 
   if (admins?.length) {

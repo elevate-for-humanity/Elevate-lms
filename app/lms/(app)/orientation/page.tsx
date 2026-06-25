@@ -19,7 +19,7 @@ export const metadata = {
 
 export default async function OrientationPage() {
   const verified = await loadVerifiedPublicStats();
-  const { user, profile } = await requireRole(['student', 'admin', 'super_admin']);
+  const { user, profile } = await requireRole(['student', 'admin']);
 
   // If already completed, show completion message
   const isCompleted = profile.orientation_completed;

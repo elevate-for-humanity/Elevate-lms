@@ -68,8 +68,12 @@ export default function SchedulePage() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then((authRes) => { const user = authRes.data?.user; if (!user) return; {
-      if (!user) { router.push('/login?redirect=/onboarding/learner/schedule'); return; }
+    supabase.auth.getUser().then((authRes) => {
+      const user = authRes.data?.user;
+      if (!user) {
+        router.push('/login?redirect=/onboarding/learner/schedule');
+        return;
+      }
       supabase
         .from('profiles')
         .select('schedule_selected, schedule_preference')

@@ -118,7 +118,7 @@ export default async function CurriculumPage() {
             </p>
           </div>
           <Link
-            href="/admin/courses/create"
+            href="/admin/staff-portal/courses/create"
             className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-semibold rounded-lg transition"
           >
             <PlusCircle className="w-4 h-4" />

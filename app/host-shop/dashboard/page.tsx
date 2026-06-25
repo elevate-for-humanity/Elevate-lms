@@ -438,7 +438,7 @@ export default async function HostShopDashboardPage() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <ActionCard icon={Clock} title="Review Hours" description="Approve pending hours" href="/host-shop/dashboard/hours" color="bg-amber-100 text-amber-600" badge="12" />
                     <ActionCard icon={CheckCircle} title="Sign Off" description="Verify competencies" href="/host-shop/dashboard/competencies" color="bg-green-100 text-green-600" badge="8" />
-                    <ActionCard icon={Users} title="Add Apprentice" description="New enrollment" href="/host-shop/dashboard/apprentices/new" color="bg-blue-100 text-blue-600" />
+                    <ActionCard icon={Users} title="Add Apprentice" description="New enrollment" href="/host-shop/dashboard/apprentices" color="bg-blue-100 text-blue-600" />
                     <ActionCard icon={Calendar} title="Schedule" description="Set evaluations" href="/host-shop/dashboard/schedule" color="bg-purple-100 text-purple-600" />
                   </div>
                 </div>

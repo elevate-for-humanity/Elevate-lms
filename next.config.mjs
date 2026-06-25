@@ -1036,6 +1036,88 @@ const nextConfig = {
 
       // ── GEOGRAPHIC TRAINING SEO PAGES ─────────────────────────────────────
       // /career-training and /community-services are hub pages; state variants are SEO pages — keep all
+
+      // ── ADMIN HOST SHOP SUB-ROUTES ────────────────────────────────────────
+      { source: '/admin/host-shop/apprentices', destination: '/admin/host-shop', permanent: false },
+      { source: '/admin/host-shop/ojt', destination: '/admin/host-shop', permanent: false },
+      { source: '/admin/host-shop/compliance', destination: '/admin/host-shop', permanent: false },
+      { source: '/admin/host-shop/reports', destination: '/admin/host-shop', permanent: false },
+      { source: '/admin/hours-export', destination: '/admin/attendance/export', permanent: false },
+      { source: '/admin/instructor-credentials', destination: '/admin/training', permanent: false },
+      { source: '/admin/courses/create', destination: '/admin/staff-portal/courses/create', permanent: false },
+      { source: '/admin/courses', destination: '/admin/staff-portal/courses', permanent: false },
+
+      // ── PARTNERS PORTAL ROUTES ────────────────────────────────────────────
+      { source: '/partners/barber-host-shop', destination: '/host-shop', permanent: true },
+      { source: '/partners/barber-host-shop/apply', destination: '/host-shop/apply', permanent: true },
+      { source: '/partners/training-sites', destination: '/host-shop', permanent: true },
+      { source: '/partners/training-provider', destination: '/partner/dashboard', permanent: true },
+      { source: '/partners/workforce', destination: '/workforce-board', permanent: true },
+      { source: '/partners/join', destination: '/partner/apply', permanent: true },
+      { source: '/partners/apply', destination: '/partner/apply', permanent: true },
+
+      // ── CAREER SERVICES ───────────────────────────────────────────────────
+      { source: '/career-services/courses', destination: '/lms/dashboard', permanent: true },
+      { source: '/career-services/courses/my-courses', destination: '/lms/enroll', permanent: true },
+      { source: '/career-services/networking-events', destination: '/community-services', permanent: true },
+
+      // ── LMS ROUTES ───────────────────────────────────────────────────────
+      { source: '/lms/courses', destination: '/lms/dashboard', permanent: true },
+
+      // ── PWA REPORTS ──────────────────────────────────────────────────────
+      { source: '/pwa/barber/reports', destination: '/admin/reports', permanent: true },
+      { source: '/pwa/barber/reports/export', destination: '/admin/reports', permanent: true },
+      { source: '/pwa/shop-owner/reports', destination: '/admin/reports', permanent: true },
+
+      // ── HELP CENTER ──────────────────────────────────────────────────────
+      { source: '/help/courses', destination: '/lms/help', permanent: true },
+      { source: '/help/tutorials/accessing-courses', destination: '/lms/help', permanent: true },
+      { source: '/help/tutorials/how-to-apply', destination: '/apply', permanent: true },
+      { source: '/help/tutorials/submitting-assignments', destination: '/lms/help', permanent: true },
+      { source: '/help/tutorials/troubleshooting', destination: '/lms/help', permanent: true },
+
+      // ── DEFERRED/FUTURE FEATURES (DEAD LINKS) ────────────────────────────
+      // Apprentice portal
+      { source: '/apprentice/attendance', destination: '/lms/attendance', permanent: false },
+      { source: '/apprentice/profile', destination: '/lms/profile', permanent: false },
+      // FERPA
+      { source: '/ferpa/reports', destination: '/legal', permanent: false },
+      { source: '/ferpa/reports/generate', destination: '/legal', permanent: false },
+      { source: '/ferpa/requests/new', destination: '/legal/ferpa', permanent: false },
+      // Portal
+      { source: '/portal/admin/verify', destination: '/admin/dashboard', permanent: false },
+      { source: '/portal/student/dashboard', destination: '/lms/dashboard', permanent: false },
+      { source: '/portal/student/notifications', destination: '/lms/notifications', permanent: false },
+      { source: '/portal/student/profile', destination: '/lms/profile', permanent: false },
+      // Creator
+      { source: '/creator/dashboard', destination: '/admin/studio', permanent: false },
+      { source: '/creator/courses', destination: '/admin/studio', permanent: false },
+      { source: '/creator/courses/new', destination: '/admin/studio', permanent: false },
+      { source: '/creator/community', destination: '/community-services', permanent: false },
+      // Other deferred
+      { source: '/booth-rental/apply', destination: '/host-shop/apply', permanent: false },
+      { source: '/onboarding/staff', destination: '/admin/dashboard', permanent: false },
+      { source: '/courses/partners', destination: '/partners', permanent: false },
+      { source: '/programs/barber-apprenticeship/host-shops', destination: '/host-shop', permanent: false },
+      { source: '/programs/cpr-first-aid/payment/bnpl', destination: '/programs/cpr-first-aid', permanent: false },
+      { source: '/rise-foundation/get-involved', destination: '/community-services', permanent: false },
+      { source: '/mentor/sessions/new', destination: '/community-services', permanent: false },
+      { source: '/messages/new', destination: '/lms/chat', permanent: false },
+      { source: '/proctor/new', destination: '/admin/dashboard', permanent: false },
+      { source: '/program-holder/onboarding', destination: '/apply/program-holder', permanent: false },
+      { source: '/provider/programs/new', destination: '/admin/studio', permanent: false },
+      { source: '/shop/reports', destination: '/admin/reports', permanent: false },
+      { source: '/platform/licensing/request', destination: '/store/licenses', permanent: false },
+      { source: '/store/licenses/enterprise-license/trial', destination: '/store/licenses/enterprise-license', permanent: false },
+      { source: '/store/licenses/pro-license/trial', destination: '/store/licenses/pro-license', permanent: false },
+
+      // ── API ROUTES (ADMIN GATED) ─────────────────────────────────────────
+      { source: '/api/admin/catalog/export', destination: '/admin/catalog', permanent: false },
+      { source: '/api/admin/catalog/full', destination: '/admin/catalog', permanent: false },
+      { source: '/api/admin/catalog/summary', destination: '/admin/catalog', permanent: false },
+      { source: '/api/audit/export', destination: '/admin/audit', permanent: false },
+      { source: '/api/reports/participants', destination: '/admin/reports', permanent: false },
+      { source: '/api/reports/participants/export', destination: '/admin/reports', permanent: false },
     ];
   },
   async headers() {

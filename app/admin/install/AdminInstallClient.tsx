@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Smartphone, Monitor, Download, CheckCircle, Chrome, Apple } from 'lucide-react';
+import { Smartphone, Monitor, Download, CheckCircle, Globe, Apple } from 'lucide-react';
 
 type DeferredPromptEvent = Event & {
   prompt: () => Promise<void>;

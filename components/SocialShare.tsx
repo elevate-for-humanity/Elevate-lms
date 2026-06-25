@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Share2, Facebook, Linkedin, Mail, Check, Link as LinkIcon } from 'lucide-react';
+import { Share2, Globe, Mail, Check, Link as LinkIcon } from 'lucide-react';
 
 interface SocialShareProps {
   url: string;
@@ -85,20 +85,11 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
                 className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition"
               >
                 <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                  <Facebook className="w-4 h-4 text-white" />
+                  <Globe className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm font-medium text-black">Facebook</span>
               </a>
 
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition"
-              >
-                <div className="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center" />
-              </a>
-
-              {/* LinkedIn */}
               <a
                 href={shareLinks.linkedin}
                 target="_blank"
@@ -106,7 +97,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
                 className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition"
               >
                 <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                  <Linkedin className="w-4 h-4 text-white" />
+                  <Share2 className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm font-medium text-black">LinkedIn</span>
               </a>

@@ -126,7 +126,7 @@ export async function recordStepCompletion(
       certificateNumber = await issueCertificateIfEligible(userId, courseId, enrollmentId);
     } catch (certErr) {
       // Non-fatal — lesson completion is already recorded
-      logger.error('[engine] Certificate issuance failed (non-fatal):', certErr);
+      logger.warn('[engine] Certificate issuance failed (non-fatal)', { err: certErr });
     }
   }
 

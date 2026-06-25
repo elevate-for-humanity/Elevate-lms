@@ -195,7 +195,7 @@ export async function runPostApprovalActions(input: PostApprovalInput): Promise<
 
     logger.info('[post-approval] Enrollment email sent', { to: studentEmail, program: programTitle });
   } catch (err) {
-    logger.error('[post-approval] Enrollment email failed (non-fatal)', err);
+    logger.warn('[post-approval] Enrollment email failed (non-fatal)', { err });
   }
 
   // Teams notification — non-fatal

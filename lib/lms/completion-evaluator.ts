@@ -206,7 +206,7 @@ export async function completeProgramEnrollment(
       }
     }
   } catch (pdfErr) {
-    logger.error('[completion] PDF generation failed (non-fatal):', pdfErr);
+    logger.warn('[completion] PDF generation failed (non-fatal)', { err: pdfErr });
   }
 
   // 6. Issue certificate record via canonical issuer

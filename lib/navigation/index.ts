@@ -6,21 +6,29 @@ export const NAV_ITEMS: Array<{id: string; label: string; href?: string; subItem
 
 interface NavItemType { id: string; label: string; href?: string; subItems?: NavItemType[]; isHeader?: boolean }
 
-export function findDuplicateNavHrefs(items: NavItemType[]): string[] {
-  const hrefs: string[] = [];
-  for (const item of items) {
-    if (item.href) hrefs.push(item.href);
+export function findDuplicateNavHrefs(items?: NavItemType[]): NavItemType[] {
+  const itemsToCheck = items ?? NAV_ITEMS;
+  if (!itemsToCheck || itemsToCheck.length === 0) return [];
+  const seen = new Map<string, NavItemType>();
+  const duplicates: NavItemType[] = [];
+  
+  function processItem(item: NavItemType) {
+    if (item.href) {
+      if (seen.has(item.href)) {
+        duplicates.push(item);
+      } else {
+        seen.set(item.href, item);
+      }
+    }
     if (item.subItems) {
       for (const sub of item.subItems) {
-        if (sub.href) hrefs.push(sub.href);
+        processItem(sub);
       }
     }
   }
-  const seen = new Set<string>();
-  const duplicates: string[] = [];
-  for (const href of hrefs) {
-    if (seen.has(href)) duplicates.push(href);
-    seen.add(href);
+  
+  for (const item of itemsToCheck) {
+    processItem(item);
   }
   return duplicates;
 }

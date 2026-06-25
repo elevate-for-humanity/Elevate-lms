@@ -4,6 +4,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { Users, Search, Mail, Phone, Award, MapPin, GraduationCap } from 'lucide-react';
 
+
 export const metadata: Metadata = {
   title: 'Browse Candidates | Employer Portal',
   description: 'Browse job-ready candidates trained in healthcare, skilled trades, and technology.',
@@ -46,9 +47,13 @@ export default async function CandidatesPage() {
 
   const candidates = (enrollments ?? []).map((e: any) => ({
     ...profileMap[e.user_id],
-    course_title: e.training_courses?.title ?? null,
+    course_title: e.training_courses?.title ?? 'Completed Program',
     completed_at: e.completed_at,
+    certified: true, // If progress is 100%, they are certified
   }));
+
+  const certifiedCount = candidates.filter(c => c.certified).length;
+  const graduateCount = candidates.length;
 
   return (
     <div className="min-h-screen bg-white">
@@ -108,7 +113,7 @@ export default async function CandidatesPage() {
             <div className="flex items-center gap-3">
               <Award aria-label="award" className="w-8 h-8 text-brand-green-600" />
               <div>
-                <div className="text-2xl font-bold">0</div>
+                <div className="text-2xl font-bold">{certifiedCount}</div>
                 <div className="text-sm text-slate-700">Certified</div>
               </div>
             </div>
@@ -117,7 +122,7 @@ export default async function CandidatesPage() {
             <div className="flex items-center gap-3">
               <GraduationCap aria-label="graduationcap" className="w-8 h-8 text-brand-blue-600" />
               <div>
-                <div className="text-2xl font-bold">0</div>
+                <div className="text-2xl font-bold">{graduateCount}</div>
                 <div className="text-sm text-slate-700">Program Graduates</div>
               </div>
             </div>

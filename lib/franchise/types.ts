@@ -1,1 +1,3 @@
-export interface FranchiseTypes {}
+export interface FranchiseTypes {
+  id?: string;
+}

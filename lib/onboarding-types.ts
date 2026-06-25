@@ -1,1 +1,3 @@
-export interface OnboardingTypes {}
+export interface OnboardingTypes {
+  step?: number;
+}

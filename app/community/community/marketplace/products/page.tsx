@@ -1,11 +1,11 @@
 
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
   FileText, Download, Star, Tag, Search, Package,
 } from 'lucide-react';

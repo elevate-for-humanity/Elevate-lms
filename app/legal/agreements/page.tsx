@@ -4,11 +4,11 @@
 import { useEffect, useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import SignatureCanvas from 'signature_pad';
 import {
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
   FileText,
   Check,

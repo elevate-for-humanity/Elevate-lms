@@ -2,8 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import {
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import {
   AlertTriangle,
   ArrowRight,
   Building2,

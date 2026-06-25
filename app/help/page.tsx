@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import Image from 'next/image';
 import {
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
   BookOpen,
   Video,
   MessageCircle,

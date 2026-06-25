@@ -8,12 +8,12 @@ const fs = require('fs');
 const path = require('path');
 const v8 = require('v8');
 
-// Import structured logger
-const { createLogger } = require('../../lib/logger');
+// Import structured logger (use @ alias for standalone bundling)
+const { createLogger } = require('@/lib/logger');
 const log = createLogger('admin');
 
 // Import memory monitor
-const { startMonitoring, stopMonitoring, getMetrics } = require('../../lib/memory-monitor');
+const { startMonitoring, stopMonitoring, getMetrics } = require('@/lib/memory-monitor');
 
 // Suppress expected deployment noise from Next.js Server Action mismatches
 // These happen during deployment rollovers when users have old pages loaded

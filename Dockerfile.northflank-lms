@@ -3,9 +3,8 @@
 
 FROM node:22-bookworm AS builder
 
-# Cache invalidation marker
-# P0-3: Removed non-functional cache paths
-RUN echo "nf-cache-invalidate-20260625-no-cache-fix"
+# Cache invalidation marker - fresh build
+RUN echo "nf-cache-invalidate-20260625-8gb"
 
 # Install system deps for native modules (sharp, canvas, pdf)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -36,8 +35,8 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# P0-3: 12GB heap for build with 1,600+ pages
-ENV NODE_OPTIONS=--max-old-space-size=12288
+# Build memory - 8GB for 1,600+ pages
+ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=1
 ENV CI=true
@@ -60,9 +59,8 @@ ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-# P0-3: 12GB memory for large app builds
-# ESLint is disabled via next.config.mjs, no --no-lint flag needed
-RUN NODE_OPTIONS='--max-old-space-size=12288' pnpm next build
+# Build with 8GB memory
+RUN NODE_OPTIONS='--max-old-space-size=8192' pnpm next build
 
 # --- runtime stage ---
 FROM node:22-bookworm-slim

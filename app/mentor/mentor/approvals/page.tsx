@@ -131,7 +131,6 @@ export default async function MentorApprovalsPage({
     entries = result.entries;
   } catch {
     // API may fail if user is not authenticated or table doesn't exist
-    entries = [];
   }
 
   return (

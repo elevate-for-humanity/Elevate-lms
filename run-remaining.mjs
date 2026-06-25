@@ -51,7 +51,7 @@ async function runSQL(sql, attempt = 1) {
 }
 
 async function runFile(filename, delay = 600) {
-  console.log(`\n📦 ${filename}`);
+  console.warn(`\n📦 ${filename}`);
   const content = readFileSync(`/workspace/project/Elevate-lms/supabase/migrations/${filename}`, 'utf8');
   
   // Parse into statements
@@ -86,7 +86,7 @@ async function runFile(filename, delay = 600) {
     }
   }
   
-  console.log(`   ${statements.length} statements`);
+  console.warn(`   ${statements.length} statements`);
   
   let success = 0, skipped = 0, failed = 0, needsTable = 0;
   
@@ -107,18 +107,18 @@ async function runFile(filename, delay = 600) {
     else {
       failed++;
       if (failed <= 5) {
-        console.log(`\n❌ ${stmt.substring(0, 60)}...`);
-        console.log(`   ${result.error}`);
+        console.warn(`\n❌ ${stmt.substring(0, 60)}...`);
+        console.warn(`   ${result.error}`);
       }
     }
   }
   
-  console.log(`\n   ✅${success} ⏭️${skipped} ❌${failed} ⏳${needsTable} (need tables)`);
+  console.warn(`\n   ✅${success} ⏭️${skipped} ❌${failed} ⏳${needsTable} (need tables)`);
   return { success, skipped, failed, needsTable };
 }
 
 async function main() {
-  console.log('🚀 Running remaining migrations...\n');
+  console.warn('🚀 Running remaining migrations...\n');
   
   const files = [
     '20260810000001_ai_agents_dev_studio.sql',
@@ -137,12 +137,12 @@ async function main() {
     total.needsTable += result.needsTable;
   }
   
-  console.log(`\n${'═'.repeat(50)}`);
-  console.log(`TOTAL: ✅${total.success} ⏭️${total.skipped} ❌${total.failed}`);
-  console.log(`${'═'.repeat(50)}`);
+  console.warn(`\n${'═'.repeat(50)}`);
+  console.warn(`TOTAL: ✅${total.success} ⏭️${total.skipped} ❌${total.failed}`);
+  console.warn(`${'═'.repeat(50)}`);
   
   if (total.needsTable > 0) {
-    console.log(`\n⚠️  ${total.needsTable} statements need prerequisite tables`);
+    console.warn(`\n⚠️  ${total.needsTable} statements need prerequisite tables`);
   }
 }
 

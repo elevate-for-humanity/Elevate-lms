@@ -65,8 +65,21 @@ export function useBuildVersion() {
     if (initialized.current) return;
     initialized.current = true;
 
-    // Initial check on mount
-    checkForBuildMismatch();
+    // Initial check on mount - store version if not set
+    const storedVersion = sessionStorage.getItem(BUILD_VERSION_KEY);
+    
+    checkForBuildMismatch().then((reloaded) => {
+      // If we didn't reload, store the current version
+      if (!reloaded && !storedVersion) {
+        // Fetch and store the version
+        fetch('/api/health/build-version', { cache: 'no-store' })
+          .then(r => r.json())
+          .then(({ buildVersion }) => {
+            sessionStorage.setItem(BUILD_VERSION_KEY, buildVersion);
+          })
+          .catch(() => {});
+      }
+    });
 
     // Also check periodically (every minute) to catch long-lived sessions
     checkIntervalId = setInterval(checkForBuildMismatch, CHECK_INTERVAL_MS);

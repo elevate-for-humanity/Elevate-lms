@@ -2,21 +2,20 @@
   "name": "efh-autopilot",
   "version": "2.0.0",
   "private": true,
-  "packageManager": "pnpm@9.12.3",
   "engines": {
     "node": ">=20.11.1"
   },
   "scripts": {
     "dev": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack",
-    "build": "pnpm run build:lms:compile",
+    "build": "npm run build:lms:compile",
     "build:lms:compile": "npx cross-env BUILD_SCOPE=1 DISABLE_WEBPACK_FILESYSTEM_CACHE=1 NODE_OPTIONS='--max-old-space-size=12288' next build",
-    "build:admin": "cd apps/admin && pnpm build",
+    "build:admin": "cd apps/admin && npm run build",
     "start": "next start",
     "lint": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' eslint . --ext .js,.jsx,.ts,.tsx --cache --cache-location .eslintcache --quiet",
     "typecheck": "node scripts/typecheck-baseline.mjs",
     "typecheck:full": "npx cross-env NODE_OPTIONS=--max-old-space-size=8192 tsc --noEmit",
     "clean": "rimraf .next out node_modules",
-    "integrity:all": "pnpm run integrity:links && pnpm run integrity:media",
+    "integrity:all": "npm run integrity:links && npm run integrity:media",
     "integrity:links": "node scripts/check-internal-links.mjs",
     "integrity:media": "node scripts/audit-image-assets.mjs"
   },
@@ -38,7 +37,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^17.4.2",
     "eslint": "^8.57.1",
-    "eslint-config-next": "15.0.3",
+    "eslint-config-next": "15.5.19",
     "postcss": "^8.4.47",
     "rimraf": "^6.0.1",
     "tailwindcss": "^3.4.14",

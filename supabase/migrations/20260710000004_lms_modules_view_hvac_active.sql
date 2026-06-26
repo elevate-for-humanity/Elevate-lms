@@ -2,9 +2,13 @@
 -- Combines program modules (modules), course modules (course_modules), and
 -- staff training modules (training_modules) into a single queryable view.
 
--- Drop existing object if it exists (could be view or table)
-DROP VIEW IF EXISTS public.lms_modules;
-DROP TABLE IF EXISTS public.lms_modules;
+-- Drop existing object if it exists (use dynamic SQL to handle either view or table)
+DO $$
+BEGIN
+  EXECUTE 'DROP VIEW IF EXISTS public.lms_modules';
+EXCEPTION WHEN OTHERS THEN
+  EXECUTE 'DROP TABLE IF EXISTS public.lms_modules';
+END $$;
 
 -- Create view based on what columns exist in modules table
 DO $$

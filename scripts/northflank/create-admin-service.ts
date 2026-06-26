@@ -2,8 +2,8 @@
 /**
  * Create or update the elevate-admin combined service on Northflank.
  *
- *   pnpm tsx scripts/northflank/create-admin-service.ts --dry-run
- *   pnpm tsx scripts/northflank/create-admin-service.ts --execute
+ *   npx tsx scripts/northflank/create-admin-service.ts --dry-run
+ *   npx tsx scripts/northflank/create-admin-service.ts --execute
  *
  * Env:
  *   NORTHFLANK_API_TOKEN, NORTHFLANK_PROJECT_ID, NORTHFLANK_TEAM_ID
@@ -145,8 +145,8 @@ async function main() {
 
   console.log(`\nService "${serviceId}" saved. Northflank will build from branch ${branch}.`);
   console.log('Next:');
-  console.log('  1. pnpm tsx scripts/northflank/sync-env.ts --execute  (links secret to both services)');
-  console.log('  2. After domains verified: pnpm tsx scripts/northflank/configure-domains.ts --execute');
+  console.log('  1. npx tsx scripts/northflank/sync-env.ts --execute  (links secret to both services)');
+  console.log('  2. After domains verified: npx tsx scripts/northflank/configure-domains.ts --execute');
   console.log(`  3. export NORTHFLANK_ADMIN_SERVICE_ID=${serviceId}`);
 }
 

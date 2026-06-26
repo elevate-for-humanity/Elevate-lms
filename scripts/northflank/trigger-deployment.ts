@@ -4,9 +4,9 @@
  *
  * Use when builds succeed but deployedSHA is stale (e.g. disabledCD was true).
  *
- *   pnpm tsx scripts/northflank/trigger-deployment.ts elevate-admin
- *   pnpm tsx scripts/northflank/trigger-deployment.ts elevate-admin --sha 9291b43c...
- *   pnpm tsx scripts/northflank/trigger-deployment.ts elevate-lms --sha $(git rev-parse HEAD)
+ *   npx tsx scripts/northflank/trigger-deployment.ts elevate-admin
+ *   npx tsx scripts/northflank/trigger-deployment.ts elevate-admin --sha 9291b43c...
+ *   npx tsx scripts/northflank/trigger-deployment.ts elevate-lms --sha $(git rev-parse HEAD)
  */
 
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
@@ -19,7 +19,7 @@ function argValue(name: string): string | undefined {
 async function main() {
   const serviceId = process.argv[2];
   if (!serviceId || serviceId.startsWith('--')) {
-    console.error('Usage: pnpm tsx scripts/northflank/trigger-deployment.ts <service-id> [--sha <commit>]');
+    console.error('Usage: npx tsx scripts/northflank/trigger-deployment.ts <service-id> [--sha <commit>]');
     process.exit(1);
   }
 

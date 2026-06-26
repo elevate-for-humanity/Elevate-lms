@@ -8,9 +8,9 @@
  *   3. Static production defaults below
  *
  * Usage:
- *   pnpm tsx scripts/northflank/sync-env.ts --dry-run
- *   pnpm tsx scripts/northflank/sync-env.ts --execute
- *   pnpm tsx scripts/northflank/sync-env.ts --file exports/northflank-env.production.json --execute
+ *   npx tsx scripts/northflank/sync-env.ts --dry-run
+ *   npx tsx scripts/northflank/sync-env.ts --execute
+ *   npx tsx scripts/northflank/sync-env.ts --file exports/northflank-env.production.json --execute
  *
  * Env:
  *   NORTHFLANK_API_TOKEN, NORTHFLANK_PROJECT_ID
@@ -121,7 +121,7 @@ async function main() {
   const { dryRun, file, secretId } = parseArgs();
   const projectId = resolveProjectId();
   if (!projectId) {
-    console.error('Set NORTHFLANK_PROJECT_ID (run: pnpm tsx scripts/northflank/audit.ts)');
+    console.error('Set NORTHFLANK_PROJECT_ID (run: npx tsx scripts/northflank/audit.ts)');
     process.exit(1);
   }
 

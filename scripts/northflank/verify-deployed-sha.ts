@@ -3,8 +3,8 @@
  * Compare Northflank deployed SHA vs expected main commit.
  * Fails CI when production is still on an old image after a deploy workflow.
  *
- *   EXPECTED_SHA=$(git rev-parse origin/main) pnpm tsx scripts/northflank/verify-deployed-sha.ts
- *   pnpm tsx scripts/northflank/verify-deployed-sha.ts --trigger  # rebuild stale services
+ *   EXPECTED_SHA=$(git rev-parse origin/main) npx tsx scripts/northflank/verify-deployed-sha.ts
+ *   npx tsx scripts/northflank/verify-deployed-sha.ts --trigger  # rebuild stale services
  */
 
 import { execSync } from 'node:child_process';
@@ -139,7 +139,7 @@ async function main() {
 
   if (stale && !trigger) {
     console.error(
-      '\nProduction is behind main. Wait for in-flight builds or run:\n  pnpm tsx scripts/northflank/verify-deployed-sha.ts --trigger',
+      '\nProduction is behind main. Wait for in-flight builds or run:\n  npx tsx scripts/northflank/verify-deployed-sha.ts --trigger',
     );
     process.exit(1);
   }

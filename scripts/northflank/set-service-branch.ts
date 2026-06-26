@@ -2,7 +2,7 @@
 /**
  * Point a Northflank combined service at a git branch and optionally trigger a build.
  *
- *   pnpm tsx scripts/northflank/set-service-branch.ts elevate-lms cursor/northflank-setup-c4c6 --build
+ *   npx tsx scripts/northflank/set-service-branch.ts elevate-lms cursor/northflank-setup-c4c6 --build
  */
 
 import { combinedServicePath, nfFetch, projectApiPath, resolveProjectId } from './lib';
@@ -13,7 +13,7 @@ async function main() {
   const triggerBuild = process.argv.includes('--build');
   if (!serviceId || !branch) {
     console.error(
-      'Usage: pnpm tsx scripts/northflank/set-service-branch.ts <service-id> <branch> [--build]',
+      'Usage: npx tsx scripts/northflank/set-service-branch.ts <service-id> <branch> [--build]',
     );
     process.exit(1);
   }

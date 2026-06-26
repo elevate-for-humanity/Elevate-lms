@@ -2,8 +2,8 @@
 /**
  * Attach custom domains to Northflank service HTTP ports.
  *
- *   pnpm tsx scripts/northflank/configure-domains.ts --dry-run
- *   pnpm tsx scripts/northflank/configure-domains.ts --execute
+ *   npx tsx scripts/northflank/configure-domains.ts --dry-run
+ *   npx tsx scripts/northflank/configure-domains.ts --execute
  *
  * Env:
  *   NORTHFLANK_API_TOKEN, NORTHFLANK_PROJECT_ID
@@ -127,7 +127,7 @@ async function main() {
 
   if (!projectId || !lmsId) {
     console.error(
-      'Set NORTHFLANK_PROJECT_ID and NORTHFLANK_LMS_SERVICE_ID\nRun: pnpm tsx scripts/northflank/audit.ts',
+      'Set NORTHFLANK_PROJECT_ID and NORTHFLANK_LMS_SERVICE_ID\nRun: npx tsx scripts/northflank/audit.ts',
     );
     process.exit(1);
   }

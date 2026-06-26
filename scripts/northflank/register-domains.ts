@@ -2,8 +2,8 @@
 /**
  * Register Elevate production domains on the Northflank team (TXT verification required).
  *
- *   pnpm tsx scripts/northflank/register-domains.ts
- *   pnpm tsx scripts/northflank/register-domains.ts --verify
+ *   npx tsx scripts/northflank/register-domains.ts
+ *   npx tsx scripts/northflank/register-domains.ts --verify
  *
  * After adding TXT records at your DNS provider, run with --verify to poll Northflank verification.
  */
@@ -61,8 +61,8 @@ function printDnsInstructions(domains: TeamDomain[]) {
   }
   console.log(
     'Add each TXT record at your DNS host (Cloudflare/registrar), then:\n' +
-      '  pnpm tsx scripts/northflank/register-domains.ts --verify\n' +
-      '  pnpm tsx scripts/northflank/configure-domains.ts --execute\n',
+      '  npx tsx scripts/northflank/register-domains.ts --verify\n' +
+      '  npx tsx scripts/northflank/configure-domains.ts --execute\n',
   );
 }
 

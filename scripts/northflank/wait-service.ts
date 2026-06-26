@@ -3,9 +3,9 @@
  * Wait for a Northflank service deployment/build to settle.
  *
  * Usage:
- *   pnpm tsx scripts/northflank/wait-service.ts elevate-admin
- *   pnpm tsx scripts/northflank/wait-service.ts elevate-lms --timeout-ms 1200000
- *   pnpm tsx scripts/northflank/wait-service.ts elevate-admin --build-id <id>
+ *   npx tsx scripts/northflank/wait-service.ts elevate-admin
+ *   npx tsx scripts/northflank/wait-service.ts elevate-lms --timeout-ms 1200000
+ *   npx tsx scripts/northflank/wait-service.ts elevate-admin --build-id <id>
  */
 
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
@@ -197,7 +197,7 @@ async function printFailureDiagnostics(
 async function main() {
   const serviceId = process.argv[2];
   if (!serviceId || serviceId.startsWith('--')) {
-    console.error('Usage: pnpm tsx scripts/northflank/wait-service.ts <service-id> [--timeout-ms 900000] [--build-id <id>]');
+    console.error('Usage: npx tsx scripts/northflank/wait-service.ts <service-id> [--timeout-ms 900000] [--build-id <id>]');
     process.exit(1);
   }
 

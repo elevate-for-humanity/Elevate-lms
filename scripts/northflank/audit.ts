@@ -2,7 +2,7 @@
 /**
  * List Northflank projects, services, secret groups, and port/domains.
  *
- *   pnpm tsx scripts/northflank/audit.ts
+ *   npx tsx scripts/northflank/audit.ts
  *
  * Env:
  *   NORTHFLANK_API_TOKEN (required)

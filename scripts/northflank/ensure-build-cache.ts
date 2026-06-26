@@ -2,8 +2,8 @@
 /**
  * Ensure Northflank services BuildKit cache settings (disabled — ENOSPC on shared builders).
  *
- *   pnpm tsx scripts/northflank/ensure-build-cache.ts elevate-lms --execute
- *   pnpm tsx scripts/northflank/ensure-build-cache.ts --all --execute
+ *   npx tsx scripts/northflank/ensure-build-cache.ts elevate-lms --execute
+ *   npx tsx scripts/northflank/ensure-build-cache.ts --all --execute
  */
 
 import { combinedServicePatchPath, nfFetch, resolveProjectId } from './lib';

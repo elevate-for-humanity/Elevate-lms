@@ -6,9 +6,9 @@
  *   - Dockerfile path, BuildKit cache, runtime env, health probes on /api/ping:8080
  *
  * Usage:
- *   pnpm tsx scripts/northflank/configure-services.ts elevate-lms --dry-run
- *   pnpm tsx scripts/northflank/configure-services.ts elevate-admin --execute
- *   pnpm tsx scripts/northflank/configure-services.ts --all --execute
+ *   npx tsx scripts/northflank/configure-services.ts elevate-lms --dry-run
+ *   npx tsx scripts/northflank/configure-services.ts elevate-admin --execute
+ *   npx tsx scripts/northflank/configure-services.ts --all --execute
  */
 
 import {

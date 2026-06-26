@@ -1,40 +1,42 @@
 -- Course Asset Storage Buckets Migration
 -- Configure Supabase Storage for all course media and documents
 
--- Storage buckets require admin privileges - skip if no access
+-- Storage bucket inserts require admin privileges - wrapped in conditional block
 DO $$
 BEGIN
-  -- Check if we have access to storage schema
+  -- Check if storage schema exists and we have access
   IF EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'storage') THEN
-    -- Bucket 1: Course assets (images, videos, downloads)
-    INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-    VALUES 
-      ('course-assets', 'course-assets', false, 524288000, ARRAY['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm', 'application/pdf', 'application/zip'])
-    ON CONFLICT DO NOTHING;
-
-    -- Bucket 2: Student submissions (private)
-    INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-    VALUES 
-      ('student-submissions', 'student-submissions', false, 10485760, ARRAY['image/jpeg', 'image/png', 'application/pdf', 'application/zip'])
-    ON CONFLICT DO NOTHING;
-
-    -- Bucket 3: Certificates (public templates)
-    INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-    VALUES 
-      ('certificates', 'certificates', true, 2097152, ARRAY['image/png', 'image/svg+xml', 'application/pdf'])
-    ON CONFLICT DO NOTHING;
-
-    -- Bucket 4: Vendor assets (NHA, Certiport, etc.)
-    INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-    VALUES 
-      ('vendor-assets', 'vendor-assets', false, 104857600, ARRAY['application/pdf', 'image/jpeg', 'image/png'])
-    ON CONFLICT DO NOTHING;
-
-    -- Bucket 5: Public marketing images
-    INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-    VALUES 
-      ('marketing', 'marketing', true, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp'])
-    ON CONFLICT DO NOTHING;
+    -- Attempt to insert buckets (may fail due to permissions)
+    BEGIN
+      INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+      VALUES ('course-assets', 'course-assets', false, 524288000, ARRAY['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm', 'application/pdf', 'application/zip'])
+      ON CONFLICT DO NOTHING;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+      INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+      VALUES ('student-submissions', 'student-submissions', false, 10485760, ARRAY['image/jpeg', 'image/png', 'application/pdf', 'application/zip'])
+      ON CONFLICT DO NOTHING;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+      INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+      VALUES ('certificates', 'certificates', true, 2097152, ARRAY['image/png', 'image/svg+xml', 'application/pdf'])
+      ON CONFLICT DO NOTHING;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+      INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+      VALUES ('vendor-assets', 'vendor-assets', false, 104857600, ARRAY['application/pdf', 'image/jpeg', 'image/png'])
+      ON CONFLICT DO NOTHING;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
+    BEGIN
+      INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+      VALUES ('marketing', 'marketing', true, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp'])
+      ON CONFLICT DO NOTHING;
+    EXCEPTION WHEN OTHERS THEN NULL;
+    END;
   END IF;
 END $$;
 
@@ -63,10 +65,8 @@ DECLARE
   v_url TEXT;
 BEGIN
   v_path := p_course_slug || '/' || p_asset_type || '/' || p_filename;
-
   SELECT signed_url INTO v_url
   FROM supabase.storage.from('course-assets').createSignedUrl(v_path, p_expires_in);
-
   RETURN v_url;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

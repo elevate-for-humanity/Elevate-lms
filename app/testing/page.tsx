@@ -75,6 +75,14 @@ export default function TestingPage() {
       {/* Hero text — below image, never overlaid */}
       <section className="bg-white border-b border-slate-100 py-8">
         <div className="max-w-5xl mx-auto px-4">
+          {/* Authorized Testing Center Badge */}
+          <div className="flex items-center gap-3 mb-4">
+            <span className="inline-flex items-center gap-2 bg-brand-red-600 text-white text-sm font-bold px-4 py-1.5 rounded-full">
+              <span className="text-lg">🏆</span> Authorized Testing Center
+            </span>
+            <span className="text-xs text-slate-500">DOL Registered · ETPL Listed · ADA Compliant</span>
+          </div>
+
           {/* Pathway context — testing is step 3, not a standalone service */}
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-4">
             <Link href="/programs" className="hover:text-brand-red-600 transition-colors">
@@ -91,13 +99,55 @@ export default function TestingPage() {
             Testing &amp; Credential Exams
           </h1>
           <p className="text-slate-700 text-lg mb-1">
-            Authorized testing center for workforce certifications
+            Elevate for Humanity Authorized Testing Center
           </p>
           <p className="text-slate-500 text-sm max-w-2xl">
             Elevate provides training and proctored testing access. Certifications are issued by
             official credentialing bodies — NHA, ACT, Certiport, ESCO, and NRF — upon passing their
             exam.
           </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-wrap gap-3 mt-6">
+            <Link
+              href="/testing/book"
+              className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors"
+            >
+              <CalendarDays className="w-5 h-5" />
+              Schedule Exam
+            </Link>
+            <Link
+              href="/testing#available-exams"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors"
+            >
+              View All Exams
+            </Link>
+            <Link
+              href="/testing#policies"
+              className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-6 py-3 rounded-lg transition-colors"
+            >
+              Testing Policies
+            </Link>
+          </div>
+
+          {/* Trust Indicators */}
+          <div className="flex flex-wrap gap-4 mt-6 pt-6 border-t border-slate-100">
+            <div className="flex items-center gap-2 text-xs text-slate-600">
+              <span className="text-green-600">✓</span> Video Monitored
+            </div>
+            <div className="flex items-center gap-2 text-xs text-slate-600">
+              <span className="text-green-600">✓</span> Professional Proctors
+            </div>
+            <div className="flex items-center gap-2 text-xs text-slate-600">
+              <span className="text-green-600">✓</span> ADA Accommodations
+            </div>
+            <div className="flex items-center gap-2 text-xs text-slate-600">
+              <span className="text-green-600">✓</span> Climate Controlled
+            </div>
+            <div className="flex items-center gap-2 text-xs text-slate-600">
+              <span className="text-green-600">✓</span> Secure Lockers
+            </div>
+          </div>
         </div>
       </section>
 
@@ -119,7 +169,7 @@ export default function TestingPage() {
       </section>
 
       {/* PROVIDER CARDS — driven from CERT_PROVIDERS config */}
-      <section className="py-14">
+      <section className="py-14" id="available-exams">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl font-black text-slate-900 mb-2">Available Credential Exams</h2>
           <div className="flex flex-wrap gap-2 mb-10">
@@ -437,6 +487,56 @@ export default function TestingPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TESTING POLICIES */}
+      <section className="py-14 border-t border-slate-100" id="policies">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl font-black text-slate-900 mb-8">Testing Policies</h2>
+          
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-2">📅 Appointments</h3>
+              <p className="text-sm text-slate-600">All exams require an appointment. Walk-ins are not accepted. Schedule at least 24 hours in advance.</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-2">📝 ID Requirements</h3>
+              <p className="text-sm text-slate-600">Valid government-issued photo ID required. No ID = no exam. No exceptions.</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-2">🔒 Security</h3>
+              <p className="text-sm text-slate-600">All testing rooms are video monitored. Personal items must be stored in secure lockers.</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-2">⏰ Arrival</h3>
+              <p className="text-sm text-slate-600">Arrive 15 minutes early. Late arrivals may not be admitted and fees are non-refundable.</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-2">🔄 Rescheduling</h3>
+              <p className="text-sm text-slate-600">Reschedule with at least 24 hours notice. Fees are non-refundable once reserved.</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-2">♿ Accommodations</h3>
+              <p className="text-sm text-slate-600">ADA accommodations available. Contact us at least 72 hours before your exam.</p>
+            </div>
+          </div>
+
+          <div className="bg-amber-50 rounded-xl p-6 border border-amber-200">
+            <h3 className="font-bold text-amber-900 mb-3">⚠️ Important Notice</h3>
+            <ul className="text-sm text-amber-800 space-y-2">
+              <li>• Exam fees are non-refundable once a session is reserved</li>
+              <li>• Workforce-funded candidates (WIOA, WorkOne) may have fees covered — contact us first</li>
+              <li>• Retake eligibility and waiting periods are set by each credentialing provider</li>
+              <li>• Credentials are issued directly by the certifying body, not Elevate</li>
+            </ul>
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link href="/testing/accommodations" className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 font-medium">
+              View Accommodations Information →
+            </Link>
           </div>
         </div>
       </section>

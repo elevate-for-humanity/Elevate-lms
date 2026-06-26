@@ -22,6 +22,24 @@ function itemsFrom(key: string): NavItem[] {
  */
 export const headerNav: NavSection[] = [
   {
+    label: 'Testing',
+    href: '/testing',
+    items: [
+      { label: 'Testing Home', href: '/testing' },
+      { label: 'Schedule Exam', href: '/testing/book' },
+      { label: 'Certiport (MOS, IC3)', href: '/testing/certiport' },
+      { label: 'EPA 608 Universal', href: '/testing/epa608' },
+      { label: 'ACT WorkKeys / NCRC', href: '/testing/workkeys' },
+      { label: 'NHA Certifications', href: '/testing/nha' },
+      { label: 'NRF Rise Up', href: '/testing/riseup' },
+      { label: 'ASE Certification', href: '/testing/ase' },
+      { label: 'Midland Certification', href: '/testing/midland' },
+      { label: 'Testing Policies', href: '/testing#policies' },
+      { label: 'Accommodations', href: '/testing/accommodations' },
+      { label: 'For Employers', href: '/testing/for-employers' },
+    ],
+  },
+  {
     label: 'Programs',
     href: '/programs',
   },

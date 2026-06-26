@@ -36,7 +36,7 @@ ENV NODE_OPTIONS=--max-old-space-size=4096
 ENV BUILD_SCOPE=1
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV CI=true
-ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
+# Webpack cache enabled - faster incremental builds
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile

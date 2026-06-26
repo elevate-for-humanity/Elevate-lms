@@ -160,7 +160,7 @@ const nextConfig = {
   // Experimental features for better performance
   experimental: {
     workerThreads: false,
-    cpus: 4,
+    cpus: 2,  // Reduced from 4 to limit memory during builds
     optimizePackageImports: ['lucide-react', 'framer-motion', '@radix-ui/react-'],
     modularizeImports: {
       'lucide-react': {

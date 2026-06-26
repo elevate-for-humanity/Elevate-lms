@@ -37,7 +37,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      - run: npm ci
+      - run: npm install --legacy-peer-deps
 
       - name: Configure Northflank (LMS + admin)
         run: npx tsx scripts/northflank/configure-services.ts --all --execute

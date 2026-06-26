@@ -1,11 +1,11 @@
 # Dockerfile.northflank-admin
 # Fresh rewrite for Elevate Admin (apps/admin Next.js app)
 
+FROM node:22-bookworm AS builder
+
 # Cache invalidation marker
 # Fixed: inline logger/memory-monitor, pnpm matched to lockfile
 RUN echo "nf-cache-invalidate-20260626-fixes"
-
-FROM node:22-bookworm AS builder
 
 # Install system deps for native modules (sharp, canvas, pdf)
 RUN apt-get update && apt-get install -y --no-install-recommends \

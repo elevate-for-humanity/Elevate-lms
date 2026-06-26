@@ -4,7 +4,7 @@
 FROM node:22-bookworm AS builder
 
 # Cache invalidation marker
-# Fixed: pnpm 10.28.2, inline logger/memory-monitor
+# Fixed: pnpm 9.12.3 (matches lockfile), inline logger/memory-monitor
 RUN echo "nf-cache-invalidate-20260626-fixes"
 
 # Install system deps for native modules (sharp, canvas, pdf)

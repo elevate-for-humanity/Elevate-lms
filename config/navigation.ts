@@ -54,10 +54,6 @@ export const headerNav: NavSection[] = [
     ],
   },
   {
-    label: 'How It Works',
-    href: '/how-it-works',
-  },
-  {
     label: 'Partners',
     href: '/admin/partners',
     items: [

@@ -226,10 +226,10 @@ export default function TestingPage() {
                         Exams Available
                       </p>
                       <div className="grid sm:grid-cols-2 gap-x-4 gap-y-2">
-                        {provider.exams.map((exam) => {
+                        {provider.exams.slice(0, 6).map((exam) => {
                           const isObj = typeof exam === 'object' && exam !== null;
                           const label = isObj ? (exam as ExamDefinition).name : (exam as string);
-                          const desc = isObj ? (exam as ExamDefinition).description : undefined;
+                          const examDef = isObj ? (exam as ExamDefinition) : null;
                           return (
                             <div
                               key={label}
@@ -239,18 +239,22 @@ export default function TestingPage() {
                                 href={`/testing/${provider.key}`}
                                 className="flex items-start gap-2 hover:text-brand-red-600 group/exam min-w-0"
                               >
-                                <span className="text-slate-300 flex-shrink-0 select-none">—</span>
+                                <span className="text-brand-red-400 flex-shrink-0 mt-1">
+                                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                </span>
                                 <span>
                                   <span className="font-medium group-hover/exam:underline">{label}</span>
-                                  {desc && (
-                                    <span className="block text-xs text-slate-500 mt-0.5">{desc}</span>
+                                  {examDef?.durationMinutes && (
+                                    <span className="block text-xs text-slate-400 mt-0.5">
+                                      {examDef.durationMinutes} min
+                                    </span>
                                   )}
                                 </span>
                               </Link>
                               {provider.status === 'active' && (
                                 <Link
                                   href={`/testing/book?exam=${provider.key}&exam_name=${encodeURIComponent(label)}`}
-                                  className="inline-flex items-center gap-1 border border-brand-red-300 text-brand-red-700 hover:border-brand-red-400 text-xs font-semibold px-2.5 py-1 rounded-md whitespace-nowrap"
+                                  className="inline-flex items-center gap-1 bg-brand-red-100 hover:bg-brand-red-200 text-brand-red-700 text-xs font-semibold px-2.5 py-1 rounded-md whitespace-nowrap transition-colors"
                                 >
                                   Pay
                                 </Link>
@@ -258,33 +262,73 @@ export default function TestingPage() {
                             </div>
                           );
                         })}
+                        {provider.exams.length > 6 && (
+                          <Link href={`/testing/${provider.key}`} className="col-span-2 text-xs text-brand-blue-600 hover:text-brand-blue-700 font-medium mt-1">
+                            + {provider.exams.length - 6} more exams →
+                          </Link>
+                        )}
                       </div>
                     </div>
 
-                    {/* Fees */}
+                    {/* Fees with BNPL breakdown */}
                     {provider.fees && provider.fees.length > 0 ? (
                       <div className="mb-5">
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                           Exam Fees
                         </p>
-                        <div className="bg-slate-50 rounded-xl divide-y divide-slate-100 border border-slate-100">
-                          {provider.fees.map((fee) => (
+                        <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200 overflow-hidden">
+                          {provider.fees.slice(0, 3).map((fee, idx) => (
                             <div
                               key={fee.label}
-                              className="flex items-center justify-between gap-4 px-4 py-2.5"
+                              className="flex items-center justify-between gap-4 px-4 py-3"
                             >
                               <div>
-                                <p className="text-sm font-medium text-slate-800">{fee.label}</p>
+                                <p className="text-sm font-semibold text-slate-800">{fee.label}</p>
                                 {fee.note && (
-                                  <p className="text-xs text-slate-600 mt-0.5">{fee.note}</p>
+                                  <p className="text-xs text-slate-500 mt-0.5">{fee.note}</p>
                                 )}
                               </div>
-                              <span className="text-brand-red-600 font-black text-lg shrink-0">
-                                ${fee.amount}
-                              </span>
+                              <div className="text-right shrink-0">
+                                <span className="text-brand-red-600 font-black text-xl">
+                                  ${fee.amount}
+                                </span>
+                              </div>
                             </div>
                           ))}
+                          {provider.fees.length > 3 && (
+                            <Link href={`/testing/${provider.key}`} className="block text-center text-xs text-brand-blue-600 hover:text-brand-blue-700 py-2 border-t border-slate-200">
+                              View all {provider.fees.length} pricing options →
+                            </Link>
+                          )}
                         </div>
+                        
+                        {/* BNPL Breakdown */}
+                        {(() => {
+                          const minFee = Math.min(...provider.fees.map((f: any) => f.amount));
+                          const bnpl = getProvidersForAmount(minFee);
+                          if (!bnpl.length) return null;
+                          return (
+                            <div className="mt-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-green-200">
+                              <p className="text-xs font-semibold text-green-800 mb-2">
+                                💳 Pay in Installments Available:
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {bnpl.slice(0, 4).map((p) => (
+                                  <span
+                                    key={p.id}
+                                    className={`inline-flex items-center text-[11px] font-bold px-2 py-1 rounded-full ${p.badgeBg} ${p.badgeText}`}
+                                  >
+                                    {p.name}
+                                  </span>
+                                ))}
+                              </div>
+                              <p className="text-xs text-green-700 mt-2">
+                                As low as ${Math.ceil(minFee / 4)}/mo with qualifying plans
+                              </p>
+                            </div>
+                          );
+                        })()}
+
                         {provider.groupDiscount && (
                           <div className="flex items-start gap-2 mt-2 bg-brand-blue-50 rounded-lg px-3 py-2">
                             <Info className="w-3.5 h-3.5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
@@ -295,28 +339,6 @@ export default function TestingPage() {
                     ) : (
                       <p className="text-sm text-slate-500 italic mb-4">Contact us for pricing.</p>
                     )}
-
-                    {/* BNPL badges — shown when fees qualify */}
-                    {provider.fees && provider.fees.length > 0 && (() => {
-                      const minFee = Math.min(...provider.fees.map((f: any) => f.amount));
-                      const bnpl = getProvidersForAmount(minFee);
-                      if (!bnpl.length) return null;
-                      return (
-                        <div className="flex flex-wrap gap-1.5 mb-3">
-                          {bnpl.slice(0, 5).map((p) => (
-                            <span
-                              key={p.id}
-                              className={`inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full ${p.badgeBg} ${p.badgeText}`}
-                            >
-                              {p.name}
-                            </span>
-                          ))}
-                          <span className="inline-flex items-center text-[11px] text-slate-400 px-1">
-                            accepted at checkout
-                          </span>
-                        </div>
-                      );
-                    })()}
 
                     {/* Actions */}
                     <div className="flex flex-wrap gap-2">

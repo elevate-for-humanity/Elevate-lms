@@ -46,16 +46,6 @@ export const headerNavigation: NavGroup[] = [
         description: 'HVAC, Building Maintenance',
       },
       {
-        label: 'Barber Apprenticeship',
-        href: '/programs/barber-apprenticeship',
-        description: 'DOL-registered earn while you learn',
-      },
-      {
-        label: 'Cosmetology Apprenticeship',
-        href: '/programs/cosmetology-apprenticeship',
-        description: 'Indiana cosmetology license track',
-      },
-      {
         label: 'CDL Training',
         href: '/programs/cdl-training',
         description: 'Commercial Driver License',
@@ -71,9 +61,29 @@ export const headerNavigation: NavGroup[] = [
         description: 'IT and tech careers',
       },
       {
-        label: 'Apprenticeships',
-        href: '/programs/apprenticeships',
-        description: 'Earn while you learn programs',
+        label: 'Beauty & Cosmetology Apprenticeships',
+        href: '/programs/beauty-apprenticeships',
+        description: 'Barber, cosmetology, esthetician, nails',
+      },
+      {
+        label: 'Barber Apprenticeship',
+        href: '/programs/barber-apprenticeship',
+        description: 'DOL-registered earn while you learn',
+      },
+      {
+        label: 'Cosmetology Apprenticeship',
+        href: '/programs/cosmetology-apprenticeship',
+        description: 'Indiana cosmetology license track',
+      },
+      {
+        label: 'Esthetician Apprenticeship',
+        href: '/programs/esthetician-apprenticeship',
+        description: 'Skincare and spa treatments',
+      },
+      {
+        label: 'Nail Technician Apprenticeship',
+        href: '/programs/nail-technician-apprenticeship',
+        description: 'Manicures, pedicures, nail art',
       },
       {
         label: 'Find Your Path',
@@ -146,9 +156,9 @@ export const headerNavigation: NavGroup[] = [
         description: 'Build your workforce',
       },
       {
-        label: 'Partner Benefits',
-        href: '/employer/dashboard',
-        description: 'Why partner with us',
+        label: 'Host Shops',
+        href: '/partners/host-shops',
+        description: 'Barber, cosmetology, esthetician host shops',
       },
       {
         label: 'Employer Login',
@@ -174,6 +184,26 @@ export const headerNavigation: NavGroup[] = [
         label: 'Apprenticeship Licensing',
         href: '/pricing/sponsor-licensing',
         description: 'RAPIDS apprenticeship infrastructure - $750/mo',
+      },
+      {
+        label: 'Barber Host Shop',
+        href: '/barber-host-shop',
+        description: 'Host barber apprentices',
+      },
+      {
+        label: 'Cosmetology Host Shop',
+        href: '/cosmetology-host-shop',
+        description: 'Host cosmetology apprentices',
+      },
+      {
+        label: 'Esthetician Host Shop',
+        href: '/esthetician-host-shop',
+        description: 'Host esthetician apprentices',
+      },
+      {
+        label: 'Nail Tech Host Shop',
+        href: '/nail-host-shop',
+        description: 'Host nail technician apprentices',
       },
       {
         label: 'Program Holder Portal',

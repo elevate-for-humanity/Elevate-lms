@@ -2,8 +2,9 @@
 -- Combines program modules (modules), course modules (course_modules), and
 -- staff training modules (training_modules) into a single queryable view.
 
--- Drop existing view if it exists
+-- Drop existing object if it exists (could be view or table)
 DROP VIEW IF EXISTS public.lms_modules;
+DROP TABLE IF EXISTS public.lms_modules;
 
 -- Create view based on what columns exist in modules table
 DO $$
@@ -15,7 +16,6 @@ BEGIN
     SELECT 1 FROM information_schema.columns
     WHERE table_name = 'modules' AND table_schema = 'public' AND column_name = 'is_required'
   ) THEN
-    -- Full columns from modules
     EXECUTE $body$
       CREATE VIEW public.lms_modules WITH (security_invoker = true) AS
         SELECT m.id, m.title, m.description, m.program_id, NULL::uuid AS course_id,
@@ -37,7 +37,6 @@ BEGIN
     SELECT 1 FROM information_schema.columns
     WHERE table_name = 'modules' AND table_schema = 'public' AND column_name = 'duration_hours'
   ) THEN
-    -- Only duration_hours
     EXECUTE $body$
       CREATE VIEW public.lms_modules WITH (security_invoker = true) AS
         SELECT m.id, m.title, m.description, m.program_id, NULL::uuid AS course_id,
@@ -56,7 +55,6 @@ BEGIN
         FROM public.training_modules tm
     $body$;
   ELSE
-    -- Neither duration_hours nor is_required
     EXECUTE $body$
       CREATE VIEW public.lms_modules WITH (security_invoker = true) AS
         SELECT m.id, m.title, m.description, m.program_id, NULL::uuid AS course_id,

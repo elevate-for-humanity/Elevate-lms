@@ -111,36 +111,39 @@ CREATE TABLE IF NOT EXISTS public.ai_code_patterns (
 );
 
 -- ─── ai_repo_index ───────────────────────────────────────────────────────────
-DO $$
+DO $d$
 BEGIN
-  -- Check if ai_repo_index exists with old schema (from 00001)
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'ai_repo_index' AND table_schema = 'public') THEN
-    -- Table exists - add missing columns if not present
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS repo_path TEXT NOT NULL DEFAULT '' ;
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS file_hash TEXT;
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS language TEXT;
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS symbols JSONB NOT NULL DEFAULT '[]'::jsonb;
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb;
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
-    -- Migrate file_path to repo_path if needed
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'file_path') THEN
-      UPDATE public.ai_repo_index SET repo_path = file_path WHERE repo_path = '' OR repo_path IS NULL;
-      ALTER TABLE public.ai_repo_index DROP COLUMN IF EXISTS file_path;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'repo_path') THEN
+      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN repo_path TEXT NOT NULL DEFAULT ''''::text';
+      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN file_hash TEXT';
+      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN language TEXT';
+      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN symbols JSONB NOT NULL DEFAULT ''''[]''''::jsonb';
+      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN metadata JSONB NOT NULL DEFAULT ''''{}''''::jsonb';
+      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN created_at TIMESTAMPTZ NOT NULL DEFAULT now()';
+      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT now()';
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'file_path') THEN
+        EXECUTE 'UPDATE public.ai_repo_index SET repo_path = file_path WHERE repo_path IS NULL OR repo_path = ''''::text';
+        EXECUTE 'ALTER TABLE public.ai_repo_index DROP COLUMN file_path';
+      END IF;
     END IF;
     CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_repo_index_path ON public.ai_repo_index(repo_path);
   ELSE
-    -- Table does not exist - create it
     CREATE TABLE IF NOT EXISTS public.ai_repo_index (
-      id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      repo_path     TEXT NOT NULL,
-      file_hash     TEXT,
-      language      TEXT,
-      symbols       JSONB NOT NULL DEFAULT '[]'::jsonb,
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      repo_path TEXT NOT NULL,
+      file_hash TEXT,
+      language TEXT,
+      symbols JSONB NOT NULL DEFAULT '[]'::jsonb,
       last_indexed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-      metadata      JSONB NOT NULL DEFAULT '{}'::jsonb,
-      created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-      updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+      metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_repo_index_path ON public.ai_repo_index(repo_path);
+  END IF;
+END
+$d$;
     );
     CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_repo_index_path ON public.ai_repo_index(repo_path);
   END IF;

@@ -13,10 +13,9 @@ export const metadata: Metadata = {
 
 export default async function GrantsPage() {
   const supabase = await createClient();
+  
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     redirect('/login?redirect=/apps/grants&message=login-required');
   }
@@ -80,14 +79,14 @@ export default async function GrantsPage() {
           <Breadcrumbs items={[{ label: 'Apps', href: '/apps' }, { label: 'Grants' }]} />
         </div>
       </div>
-      <GrantsApp
-        user={user}
-        subscription={subscription}
-        opportunities={opportunities || []}
-        savedGrants={savedGrants || []}
-        applications={applications || []}
-        trialDaysRemaining={trialDaysRemaining}
-      />
+    <GrantsApp
+      user={user}
+      subscription={subscription}
+      opportunities={opportunities || []}
+      savedGrants={savedGrants || []}
+      applications={applications || []}
+      trialDaysRemaining={trialDaysRemaining}
+    />
     </div>
   );
 }

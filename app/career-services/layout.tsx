@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  robots: { index: false, follow: false },
   title: 'Career Services',
   description: 'Career counseling, job placement, and employment support.',
 };

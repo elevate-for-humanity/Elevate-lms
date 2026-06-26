@@ -1,67 +1,24 @@
-import type { Metadata } from 'next';
-import PublicLandingPage from '@/components/marketing/PublicLandingPage';
+import { buildMetadata } from '@/lib/cf-seo';
+import { siteConfig } from '@/content/cf-site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const revalidate = 3600;
+export const metadata = buildMetadata({
+  title: 'Interview Prep',
+  description: '{PLATFORM_DEFAULTS.orgName} career services — Interview Prep.',
+  path: '/career-services/interview-prep',
+});
 
-export const metadata: Metadata = {
-  title: 'Interview Preparation',
-  description: 'Free interview preparation for Elevate students and graduates. Mock interviews, industry-specific coaching, and salary negotiation guidance.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/career-services/interview-prep' },
-};
-
-export default function InterviewPrepPage() {
+export default function Page() {
   return (
-    <PublicLandingPage
-      config={{
-        breadcrumbs: [{ label: 'Career Services', href: '/career-services' }, { label: 'Interview Prep' }],
-        hero: {
-          image: '/images/pages/career-services-page-2.jpg',
-          tag: 'Interview Preparation',
-          tagColor: 'text-brand-blue-600',
-          title: 'Walk In Confident',
-          subtitle: 'Mock interviews, industry-specific coaching, and salary negotiation guidance — so you are ready when the opportunity comes.',
-        },
-        intro: {
-          heading: 'Industry-Specific Interview Coaching',
-          paragraphs: [
-            'Generic interview advice does not work for skilled trades, healthcare, or technical roles. Our coaching is specific to your field — the questions employers actually ask, the certifications they verify, and the red flags they watch for.',
-            'Available to all enrolled students and graduates at no cost.',
-          ],
-          image: '/images/pages/career-services-page-1.webp',
-        },
-        features: {
-          heading: 'What We Cover',
-          items: [
-            'Mock interviews with field-specific questions',
-            'STAR method coaching for behavioral questions',
-            'Technical question preparation by credential type',
-            'Professional appearance and presentation guidance',
-            'Salary research and negotiation strategy',
-            'Background check and reference preparation',
-            'Video interview practice for remote positions',
-            'Follow-up email and thank-you note templates',
-          ],
-        },
-        steps: {
-          heading: 'How It Works',
-          items: [
-            { title: 'Schedule a Session', desc: 'Contact career services to book a 45-minute interview prep session.' },
-            { title: 'Share Your Target Role', desc: 'Tell us the job title and employer so we can tailor the coaching.' },
-            { title: 'Run the Mock Interview', desc: 'We conduct a realistic interview and give detailed feedback.' },
-            { title: 'Refine and Repeat', desc: 'Most students do 2–3 sessions before their first real interview.' },
-          ],
-        },
-        cta: {
-          heading: 'Book Interview Prep',
-          subtitle: `Free for all enrolled students and graduates. Call ${PLATFORM_DEFAULTS.supportPhone} to book.`,
-          primaryLabel: 'Contact Career Services',
-          primaryHref: '/contact',
-          secondaryLabel: 'All Career Services',
-          secondaryHref: '/career-services',
-          bgColor: 'bg-brand-blue-700',
-        },
-      }}
-    />
+    <section className="mx-auto max-w-4xl px-4 py-16">
+      <h1 className="text-3xl font-bold">Interview Prep</h1>
+      <p className="mt-4 text-slate-700">
+        Available to all {PLATFORM_DEFAULTS.orgName} program graduates. Contact us to schedule your session.
+      </p>
+      <div className="mt-8 flex gap-4">
+        <a href={siteConfig.handoff.apply} className="rounded bg-black px-5 py-3 text-white hover:bg-gray-800">Apply Now</a>
+        <a href="/career-services" className="rounded border px-5 py-3 hover:bg-slate-50">All Services</a>
+      </div>
+    </section>
   );
 }

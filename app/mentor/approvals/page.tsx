@@ -5,12 +5,13 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = generateMetadata({
   title: 'Mentor Approvals',
-  description:
-    `Mentor Approvals - ${PLATFORM_DEFAULTS.orgName} workforce training and career development programs in Indianapolis.`,
+  description: 'Mentor Approvals - {PLATFORM_DEFAULTS.orgName} workforce training and career development programs in Indianapolis.',
   path: '/mentor/approvals',
 });
 
 export const dynamic = 'force-dynamic';
+
+
 
 type Profile = { id: string; full_name: string | null };
 
@@ -42,11 +43,11 @@ type Entry = {
 async function fetchJSON<T>(url: string): Promise<T> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000);
-
+  
   try {
-    const res = await fetch(url, {
+    const res = await fetch(url, { 
       cache: 'no-store',
-      signal: controller.signal,
+      signal: controller.signal 
     });
     clearTimeout(timeoutId);
     if (!res.ok) throw new Error(await res.text());
@@ -60,14 +61,14 @@ async function fetchJSON<T>(url: string): Promise<T> {
 async function postJSON<T>(url: string, data: any): Promise<T> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000);
-
+  
   try {
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
       body: JSON.stringify(data),
-      signal: controller.signal,
+      signal: controller.signal
     });
     clearTimeout(timeoutId);
     if (!res.ok) throw new Error(await res.text());
@@ -78,9 +79,12 @@ async function postJSON<T>(url: string, data: any): Promise<T> {
   }
 }
 
-async function actionServer(action: 'APPROVE' | 'REJECT' | 'LOCK', entry_id: string) {
+async function actionServer(
+  action: 'APPROVE' | 'REJECT' | 'LOCK',
+  entry_id: string
+) {
   'use server';
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
   await postJSON(`${baseUrl}/api/time/approve`, { action, entry_id });
 }
 
@@ -118,28 +122,27 @@ export default async function MentorApprovalsPage({
   if (to) qs.set('to', to);
 
   // Use absolute URL for server-side fetch
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
-  let entries: Entry[];
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+  let entries: Entry[] = [];
   try {
     const result = await fetchJSON<{ entries: Entry[] }>(
-      `${baseUrl}/api/time/approve?${qs.toString()}`,
+      `${baseUrl}/api/time/approve?${qs.toString()}`
     );
     entries = result.entries;
   } catch {
     // API may fail if user is not authenticated or table doesn't exist
-    entries = [];
   }
 
   return (
     <div className="p-6 space-y-4 max-w-7xl mx-auto">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Mentor', href: '/mentor' }, { label: 'Approvals' }]} />
+            <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: "Mentor", href: "/mentor" }, { label: "Approvals" }]} />
       </div>
-      <div className="flex flex-col gap-2">
+<div className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold text-black">Mentor Approvals</h1>
         <p className="text-sm text-black">
-          Review submitted hours, approve/reject, and lock once finalized. Locked entries cannot be
-          modified.
+          Review submitted hours, approve/reject, and lock once finalized.
+          Locked entries cannot be modified.
         </p>
       </div>
 
@@ -149,7 +152,9 @@ export default async function MentorApprovalsPage({
         method="get"
       >
         <div className="flex flex-col">
-          <label className="text-xs font-semibold mb-1 text-black">Status</label>
+          <label className="text-xs font-semibold mb-1 text-black">
+            Status
+          </label>
           <select
             name="status"
             defaultValue={status}
@@ -163,7 +168,9 @@ export default async function MentorApprovalsPage({
         </div>
 
         <div className="flex flex-col">
-          <label className="text-xs font-semibold mb-1 text-black">Funding Phase</label>
+          <label className="text-xs font-semibold mb-1 text-black">
+            Funding Phase
+          </label>
           <select
             name="funding_phase"
             defaultValue={funding_phase}
@@ -177,7 +184,9 @@ export default async function MentorApprovalsPage({
         </div>
 
         <div className="flex flex-col">
-          <label className="text-xs font-semibold mb-1 text-black">Hour Type</label>
+          <label className="text-xs font-semibold mb-1 text-black">
+            Hour Type
+          </label>
           <select
             name="hour_type"
             defaultValue={hour_type}
@@ -190,7 +199,9 @@ export default async function MentorApprovalsPage({
         </div>
 
         <div className="flex flex-col">
-          <label className="text-xs font-semibold mb-1 text-black">From</label>
+          <label className="text-xs font-semibold mb-1 text-black">
+            From
+          </label>
           <input
             name="from"
             defaultValue={from}
@@ -200,7 +211,9 @@ export default async function MentorApprovalsPage({
         </div>
 
         <div className="flex flex-col">
-          <label className="text-xs font-semibold mb-1 text-black">To</label>
+          <label className="text-xs font-semibold mb-1 text-black">
+            To
+          </label>
           <input
             name="to"
             defaultValue={to}
@@ -253,12 +266,18 @@ export default async function MentorApprovalsPage({
                   className="grid grid-cols-14 gap-2 px-4 py-3 text-sm items-start hover:bg-white transition"
                 >
                   <div className="col-span-3">
-                    <div className="font-semibold text-black">{apprenticeName}</div>
-                    <div className="text-xs text-slate-500">{e.enrollment_id.slice(0, 8)}</div>
+                    <div className="font-semibold text-black">
+                      {apprenticeName}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      {e.enrollment_id.slice(0, 8)}
+                    </div>
                   </div>
 
                   <div className="col-span-2">
-                    <div className="font-semibold text-black">{e.log_date}</div>
+                    <div className="font-semibold text-black">
+                      {e.log_date}
+                    </div>
                     <div className="text-xs text-slate-500">
                       {new Date(e.start_at).toLocaleTimeString('en-US', {
                         hour: 'numeric',
@@ -273,7 +292,9 @@ export default async function MentorApprovalsPage({
                   </div>
 
                   <div className="col-span-2">
-                    <div className="font-semibold text-black">{e.hour_type}</div>
+                    <div className="font-semibold text-black">
+                      {e.hour_type}
+                    </div>
                     <div
                       className={`text-xs inline-block px-2 py-0.5 rounded ${
                         e.status === 'SUBMITTED'
@@ -304,18 +325,24 @@ export default async function MentorApprovalsPage({
                   </div>
 
                   <div className="col-span-2">
-                    <div className="font-semibold text-black">{minutesToHrsMin(e.minutes)}</div>
+                    <div className="font-semibold text-black">
+                      {minutesToHrsMin(e.minutes)}
+                    </div>
                   </div>
 
                   <div className="col-span-2">
                     {e.lms_module_ref ? (
                       <div className="text-xs mb-1">
-                        <span className="font-semibold text-black">Elevate LMS:</span>{' '}
+                        <span className="font-semibold text-black">
+                          Elevate LMS:
+                        </span>{' '}
                         {e.lms_module_ref}
                       </div>
                     ) : null}
                     {e.activity_note ? (
-                      <div className="text-xs text-black">{e.activity_note}</div>
+                      <div className="text-xs text-black">
+                        {e.activity_note}
+                      </div>
                     ) : null}
                     {!e.lms_module_ref && !e.activity_note ? (
                       <div className="text-xs text-slate-400">—</div>
@@ -374,8 +401,8 @@ export default async function MentorApprovalsPage({
       </div>
 
       <div className="text-xs text-slate-500 bg-white p-3 rounded border border-slate-200">
-        <strong>Policy reminders:</strong> No backdated WIOA hours, weekly caps enforced by API,
-        lock entries after approval for audit safety.
+        <strong>Policy reminders:</strong> No backdated WIOA hours, weekly caps
+        enforced by API, lock entries after approval for audit safety.
       </div>
     </div>
   );

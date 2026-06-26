@@ -1,30 +1,36 @@
-'use client';
+"use client";
+import { createAdminClient } from '@/lib/supabase/admin';
+export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createBrowserClient } from '@supabase/ssr';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+const grantFundedPrograms = programs.filter((p) =>
+  p.fundingOptions.some(
+    (f) =>
+      f.toLowerCase().includes('wioa') ||
+      f.toLowerCase().includes('wrg') ||
+      f.toLowerCase().includes('jri') ||
+      f.toLowerCase().includes('workforce') ||
+      f.toLowerCase().includes('grant')
+  )
+);
+
+
 
 export default function GrantProgramsPage() {
   const [dbRows, setDbRows] = useState<any[]>([]);
   useEffect(() => {
     const supabase = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    supabase
-      .from('programs')
-      .select(
-        'id, slug, title, description, short_description, image_url, hero_image_url, funding_tags, wioa_approved, is_active',
-      )
-      .eq('is_active', true)
-      .eq('wioa_approved', true)
-      .order('title')
-      .then(({ data }) => {
-        if (data) setDbRows(data);
-      });
+    supabase.from('funding_sources').select('*').limit(50)
+      .then(({ data }) => { if (data) setDbRows(data); });
   }, []);
 
   return (
@@ -32,23 +38,20 @@ export default function GrantProgramsPage() {
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs
-            items={[{ label: 'Funding', href: '/funding' }, { label: 'Grant Programs' }]}
-          />
+          <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Grant Programs' }]} />
         </div>
       </div>
 
       {/* Hero Section */}
       <section className="relative h-[400px] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/heroes/lms-analytics.webp"
+          src="/images/heroes/lms-analytics.jpg"
           alt="Funded Training Programs"
           fill
           className="object-cover"
-          quality={90}
+          quality={100}
           priority
-          sizes="100vw" 
+          sizes="100vw"
         />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center text-white h-full flex flex-col justify-center drop-shadow-lg">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-md">
@@ -77,65 +80,87 @@ export default function GrantProgramsPage() {
       {/* What is ETPL/WRG */}
       <section className="py-16 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold mb-8">What Does ETPL Approved Mean?</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-8">
+            What Does ETPL Approved Mean?
+          </h2>
 
           <p className="text-lg text-black mb-6">
-            ETPL stands for <strong>Eligible Training Provider List</strong>. It means our programs
-            are approved by the state for Funded training through government funding programs like
-            WIOA, WRG, and JRI.
+            ETPL stands for <strong>Eligible Training Provider List</strong>. It
+            means our programs are approved by the state for Funded training
+            through government funding programs like WIOA, WRG, and JRI.
           </p>
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="text-lg font-bold mb-3 text-brand-blue-900">WIOA</h3>
-              <p className="text-sm text-black mb-2">Workforce Innovation and Opportunity Act</p>
+              <p className="text-sm text-black mb-2">
+                Workforce Innovation and Opportunity Act
+              </p>
               <p className="text-black">
-                Federal program providing free training for eligible adults and dislocated workers.
+                Federal program providing free training for eligible adults and
+                dislocated workers.
               </p>
             </div>
 
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="text-lg font-bold mb-3 text-brand-blue-900">WRG</h3>
-              <p className="text-sm text-black mb-2">Workforce Ready Grant (Indiana)</p>
+              <p className="text-sm text-black mb-2">
+                Workforce Ready Grant (Indiana)
+              </p>
               <p className="text-black">
-                State program covering short-term training (4-12 weeks) for Indiana residents.
+                State program covering short-term training (4-12 weeks) for
+                Indiana residents.
               </p>
             </div>
 
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="text-lg font-bold mb-3 text-brand-blue-900">JRI</h3>
-              <p className="text-sm text-black mb-2">Justice Reinvestment Initiative</p>
+              <p className="text-sm text-black mb-2">
+                Justice Reinvestment Initiative
+              </p>
               <p className="text-black">
-                Programs for individuals with criminal justice involvement seeking employment.
+                Programs for individuals with criminal justice involvement
+                seeking employment.
               </p>
             </div>
           </div>
 
           <div className="bg-brand-green-50 rounded-lg p-6">
-            <h3 className="text-lg font-bold mb-3 text-brand-green-900">What's Covered?</h3>
+            <h3 className="text-lg font-bold mb-3 text-brand-green-900">
+              What's Covered?
+            </h3>
             <ul className="space-y-2">
               <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold text-base">•</span>
+                <span className="text-brand-green-600 font-bold text-base">
+                  •
+                </span>
                 <span className="text-black">
                   <strong>100% Tuition</strong> - No cost to you
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold text-base">•</span>
+                <span className="text-brand-green-600 font-bold text-base">
+                  •
+                </span>
                 <span className="text-black">
                   <strong>Books & Materials</strong> - All included
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold text-base">•</span>
+                <span className="text-brand-green-600 font-bold text-base">
+                  •
+                </span>
                 <span className="text-black">
                   <strong>Certification Exams</strong> - Fees covered
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold text-base">•</span>
+                <span className="text-brand-green-600 font-bold text-base">
+                  •
+                </span>
                 <span className="text-black">
-                  <strong>No Payback Required</strong> - It's a grant, not a loan
+                  <strong>No Payback Required</strong> - It's a grant, not a
+                  loan
                 </span>
               </li>
             </ul>
@@ -146,41 +171,71 @@ export default function GrantProgramsPage() {
       {/* Available Programs */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold mb-8">ETPL Approved Programs</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-8">
+            ETPL Approved Programs
+          </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {dbRows.map((program: any) => (
+            {grantFundedPrograms.map((program: any) => (
               <div
                 key={program.slug}
                 className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow"
               >
                 <div className="relative h-48">
                   <Image
-                    src={
-                      program.hero_image_url ||
-                      program.image_url ||
-                      '/images/pages/admin-dashboard-hero.webp'
-                    }
-                    alt={`${program.title} program`}
+                    src={program.heroImage}
+                    alt={program.heroImageAlt}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-bold mb-2">{program.title}</h3>
+                  <h3 className="text-lg font-bold mb-2">{program.name}</h3>
                   <p className="text-black mb-4 line-clamp-2">
-                    {program.short_description || program.description}
+                    {program.shortDescription}
                   </p>
+
+                  <div className="space-y-2 mb-4">
+                    <p className="text-sm text-black">
+                      <strong>Duration:</strong> {program.duration}
+                    </p>
+                    <p className="text-sm text-black">
+                      <strong>Delivery:</strong> {program.delivery}
+                    </p>
+                    {program.price && (
+                      <div className="bg-slate-50 rounded p-3 mt-3">
+                        <p className="text-sm font-semibold text-black mb-1">
+                          Self-Pay Option (if funding not available):
+                        </p>
+                        <p className="text-lg font-bold text-black">
+                          ${program.price.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-black mt-1">
+                          Or split over 6 months: $
+                          {(program.price / 6).toFixed(2)}/month
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="bg-brand-green-50 rounded p-3 mb-4">
                     <p className="text-sm font-semibold text-brand-green-900 mb-1">
-                      • WIOA Approved — may be available at no cost
+                      • Available at no cost with:
                     </p>
+                    <ul className="text-xs text-black space-y-1">
+                      {program.fundingOptions.slice(0, 3).map((option, idx) => (
+                        <li key={idx}>• {option}</li>
+                      ))}
+                    </ul>
                   </div>
+
                   <Link
                     href={`/programs/${program.slug}`}
                     className="block w-full text-center bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
-                  >See Details</Link>
+                  >
+                    Learn More
+                  </Link>
                 </div>
               </div>
             ))}
@@ -202,8 +257,8 @@ export default function GrantProgramsPage() {
               </div>
               <h3 className="text-lg font-bold mb-2">Apply to Program</h3>
               <p className="text-black">
-                Choose your program and submit your application. We'll guide you through the
-                process.
+                Choose your program and submit your application. We'll guide you
+                through the process.
               </p>
             </div>
 
@@ -213,7 +268,8 @@ export default function GrantProgramsPage() {
               </div>
               <h3 className="text-lg font-bold mb-2">Check Eligibility</h3>
               <p className="text-black">
-                We'll help you determine which funding program you qualify for (WIOA, WRG, or JRI).
+                We'll help you determine which funding program you qualify for
+                (WIOA, WRG, or JRI).
               </p>
             </div>
 
@@ -223,7 +279,8 @@ export default function GrantProgramsPage() {
               </div>
               <h3 className="text-lg font-bold mb-2">Start Training</h3>
               <p className="text-black">
-                Once approved, start your training immediately. No tuition. No debt.
+                Once approved, start your training immediately. No tuition. No
+                debt.
               </p>
             </div>
           </div>
@@ -237,7 +294,10 @@ export default function GrantProgramsPage() {
             </Link>
             <p className="text-sm text-black mt-4">
               Questions?{' '}
-              <Link href="/contact" className="text-brand-orange-600 hover:underline">
+              <Link
+                href="/contact"
+                className="text-brand-orange-600 hover:underline"
+              >
                 Contact us
               </Link>{' '}
               or contact us at {PLATFORM_DEFAULTS.supportPhone}
@@ -253,13 +313,12 @@ export default function GrantProgramsPage() {
             Ready to Start Your Free Training?
           </h2>
           <p className="text-base md:text-lg text-brand-blue-100 mb-8">
-            Explore ETPL-approved programs that may be available at no cost through federal and
-            state funding.
+            Explore ETPL-approved programs that may be available at no cost through federal and state funding.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/check-eligibility"
-              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 text-lg"
+              href="/enroll"
+              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
             >
               Check Eligibility
             </Link>

@@ -1,9 +1,9 @@
 import Image from 'next/image';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import {
   ChevronRight,
   HelpCircle,
@@ -26,41 +26,34 @@ export const dynamic = 'force-dynamic';
 export default async function FerpaHelpPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/ferpa/help');
 
   const faqs = [
     {
       question: 'What is FERPA?',
-      answer:
-        'FERPA (Family Educational Rights and Privacy Act) is a federal law that protects the privacy of student education records. It applies to all schools that receive funds from the U.S. Department of Education.',
+      answer: 'FERPA (Family Educational Rights and Privacy Act) is a federal law that protects the privacy of student education records. It applies to all schools that receive funds from the U.S. Department of Education.',
     },
     {
       question: 'Who can access student records?',
-      answer:
-        "Generally, schools must have written permission from the student (or parent if under 18) to release any information from a student's education record. However, FERPA allows schools to disclose records without consent to school officials with legitimate educational interest, other schools to which a student is transferring, and certain other parties under specific conditions.",
+      answer: 'Generally, schools must have written permission from the student (or parent if under 18) to release any information from a student\'s education record. However, FERPA allows schools to disclose records without consent to school officials with legitimate educational interest, other schools to which a student is transferring, and certain other parties under specific conditions.',
     },
     {
       question: 'What is directory information?',
-      answer:
-        'Directory information is information that is generally not considered harmful if disclosed. It may include name, address, telephone number, email, date of birth, enrollment status, and similar information. Students can opt out of directory information disclosure.',
+      answer: 'Directory information is information that is generally not considered harmful if disclosed. It may include name, address, telephone number, email, date of birth, enrollment status, and similar information. Students can opt out of directory information disclosure.',
     },
     {
       question: 'How long do we have to respond to a records request?',
-      answer:
-        'Under FERPA, schools must provide access to education records within 45 days of receiving a request. However, best practice is to respond as quickly as possible.',
+      answer: 'Under FERPA, schools must provide access to education records within 45 days of receiving a request. However, best practice is to respond as quickly as possible.',
     },
     {
       question: 'What training is required for staff?',
-      answer:
-        'All staff members who have access to student education records should receive FERPA training. This includes understanding what constitutes an education record, who can access records, and how to properly handle and protect student information.',
+      answer: 'All staff members who have access to student education records should receive FERPA training. This includes understanding what constitutes an education record, who can access records, and how to properly handle and protect student information.',
     },
     {
       question: 'How do I report a FERPA violation?',
-      answer:
-        "If you believe there has been a FERPA violation, report it immediately to the FERPA Officer or administration. Violations can also be reported to the U.S. Department of Education's Student Privacy Policy Office.",
+      answer: 'If you believe there has been a FERPA violation, report it immediately to the FERPA Officer or administration. Violations can also be reported to the U.S. Department of Education\'s Student Privacy Policy Office.',
     },
   ];
 
@@ -87,24 +80,15 @@ export default async function FerpaHelpPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
-          src="/images/pages/ferpa-page-4.webp"
-          alt="FERPA compliance"
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority 
-        />
+        <Image src="/images/pages/ferpa-page-4.jpg" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
       </section>
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <nav className="flex items-center gap-2 text-sm text-slate-700 mb-4">
-            <Link href="/ferpa" className="hover:text-slate-900">
-              FERPA Portal
-            </Link>
+            <Link href="/ferpa" className="hover:text-slate-900">FERPA Portal</Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-slate-900 font-medium">Help</span>
           </nav>
@@ -125,7 +109,7 @@ export default async function FerpaHelpPage() {
                   <Link
                     key={index}
                     href={resource.link}
-                    className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 hover:shadow-md transition-shadow"
+                    className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
                   >
                     <Icon className="w-6 h-6 text-brand-blue-600 mb-2" />
                     <h3 className="font-semibold text-slate-900">{resource.title}</h3>
@@ -136,18 +120,20 @@ export default async function FerpaHelpPage() {
             </div>
 
             {/* FAQs */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-              <div className="px-6 py-4 border-b border-slate-200">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-slate-900">Frequently Asked Questions</h2>
               </div>
-              <div className="divide-y divide-slate-200">
+              <div className="divide-y divide-gray-200">
                 {faqs.map((faq, index) => (
                   <details key={index} className="group">
                     <summary className="px-6 py-4 cursor-pointer flex items-center justify-between hover:bg-white">
                       <span className="font-medium text-slate-900">{faq.question}</span>
                       <ChevronDown className="w-5 h-5 text-slate-700 group-open:rotate-180 transition-transform" />
                     </summary>
-                    <div className="px-6 pb-4 text-slate-700">{faq.answer}</div>
+                    <div className="px-6 pb-4 text-slate-700">
+                      {faq.answer}
+                    </div>
                   </details>
                 ))}
               </div>
@@ -157,7 +143,7 @@ export default async function FerpaHelpPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Contact */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-slate-900 mb-4">Contact FERPA Officer</h2>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
@@ -186,7 +172,7 @@ export default async function FerpaHelpPage() {
             </div>
 
             {/* External Resources */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-slate-900 mb-4">External Resources</h2>
               <div className="space-y-3">
                 <a

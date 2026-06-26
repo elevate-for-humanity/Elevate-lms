@@ -111,24 +111,25 @@ CREATE TABLE IF NOT EXISTS public.ai_code_patterns (
 );
 
 -- ─── ai_repo_index ───────────────────────────────────────────────────────────
-DO $d$
+DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'ai_repo_index' AND table_schema = 'public') THEN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'repo_path') THEN
-      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN repo_path TEXT NOT NULL DEFAULT ''''::text';
-      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN file_hash TEXT';
-      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN language TEXT';
-      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN symbols JSONB NOT NULL DEFAULT ''''[]''''::jsonb';
-      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN metadata JSONB NOT NULL DEFAULT ''''{}''''::jsonb';
-      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN created_at TIMESTAMPTZ NOT NULL DEFAULT now()';
-      EXECUTE 'ALTER TABLE public.ai_repo_index ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT now()';
-      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'file_path') THEN
-        EXECUTE 'UPDATE public.ai_repo_index SET repo_path = file_path WHERE repo_path IS NULL OR repo_path = ''''::text';
-        EXECUTE 'ALTER TABLE public.ai_repo_index DROP COLUMN file_path';
-      END IF;
+    -- Table exists - add missing columns if not present
+    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS repo_path TEXT NOT NULL DEFAULT '';
+    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS file_hash TEXT;
+    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS language TEXT;
+    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS symbols JSONB NOT NULL DEFAULT '[]'::jsonb;
+    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb;
+    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
+    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+    -- Migrate file_path to repo_path if needed
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'file_path') THEN
+      UPDATE public.ai_repo_index SET repo_path = file_path WHERE repo_path IS NULL OR repo_path = '';
+      ALTER TABLE public.ai_repo_index DROP COLUMN IF EXISTS file_path;
     END IF;
     CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_repo_index_path ON public.ai_repo_index(repo_path);
   ELSE
+    -- Table does not exist - create it
     CREATE TABLE IF NOT EXISTS public.ai_repo_index (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       repo_path TEXT NOT NULL,
@@ -142,13 +143,7 @@ BEGIN
     );
     CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_repo_index_path ON public.ai_repo_index(repo_path);
   END IF;
-END
-$d$;
-    );
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_repo_index_path ON public.ai_repo_index(repo_path);
-  END IF;
-END
-$$;
+END $$;
 
 -- ─── ai_file_snapshots ───────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.ai_file_snapshots (
@@ -262,20 +257,22 @@ CREATE INDEX IF NOT EXISTS idx_dev_audit_logs_actor ON public.dev_audit_logs(act
 CREATE INDEX IF NOT EXISTS idx_dev_audit_logs_resource ON public.dev_audit_logs(resource_type, resource_id);
 
 -- ─── RLS ─────────────────────────────────────────────────────────────────────
-ALTER TABLE public.ai_agents ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ai_tasks ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ai_task_steps ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ai_task_logs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ai_memory ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ai_code_patterns ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ai_repo_index ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ai_file_snapshots ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ai_diffs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ai_approvals ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ai_deployments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.dev_container_sessions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.dev_terminal_logs ENABLE ROW LEVEL SECURITY;
--- service_role full access
+-- Only enable RLS on tables that exist and don't already have it enabled
+DO $$
+DECLARE t TEXT;
+BEGIN
+  FOREACH t IN ARRAY ARRAY[
+    'ai_agents','ai_tasks','ai_task_steps','ai_task_logs','ai_memory',
+    'ai_code_patterns','ai_repo_index','ai_file_snapshots','ai_diffs',
+    'ai_approvals','ai_deployments','dev_container_sessions','dev_terminal_logs','dev_audit_logs'
+  ] LOOP
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = t AND table_schema = 'public') THEN
+      EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
+    END IF;
+  END LOOP;
+END $$;
+
+-- service_role full access (conditional)
 DO $$ DECLARE t TEXT; BEGIN
   FOREACH t IN ARRAY ARRAY[
     'ai_agents','ai_tasks','ai_task_steps','ai_task_logs','ai_memory',
@@ -299,18 +296,28 @@ DO $$ DECLARE t TEXT; BEGIN
     'ai_code_patterns','ai_repo_index','ai_file_snapshots','ai_diffs',
     'ai_approvals','ai_deployments','dev_container_sessions','dev_terminal_logs','dev_audit_logs'
   ] LOOP
-    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = t AND table_schema = 'public') THEN
-      EXECUTE format('DROP POLICY IF EXISTS dev_studio_admin_%s ON public.%I', t, t);
-      EXECUTE format(
-        'CREATE POLICY dev_studio_admin_%s ON public.%I FOR ALL TO authenticated USING (
-          EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role IN ('admin','super_admin')))
-          WITH CHECK (
-          EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND p.role IN ('admin','super_admin')))',
-        t, t
-      );
-    END IF;
+    EXECUTE format('DROP POLICY IF EXISTS dev_studio_admin_%s ON public.%I', t, t);
+    EXECUTE format(
+      $p$
+      CREATE POLICY dev_studio_admin_%s ON public.%I
+        FOR ALL TO authenticated
+        USING (
+          EXISTS (
+            SELECT 1 FROM public.profiles p
+            WHERE p.id = auth.uid() AND p.role IN ('admin', 'super_admin')
+          )
+        )
+        WITH CHECK (
+          EXISTS (
+            SELECT 1 FROM public.profiles p
+            WHERE p.id = auth.uid() AND p.role IN ('admin', 'super_admin')
+          )
+        )
+      $p$, t, t
+    );
   END LOOP;
 END $$;
+
 -- ─── Seed agents ─────────────────────────────────────────────────────────────
 INSERT INTO public.ai_agents (slug, name, description, capabilities, status)
 VALUES

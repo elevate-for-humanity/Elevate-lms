@@ -45,81 +45,89 @@ BEGIN
 END $$;
 
 -- 3. Update/Insert apprentices records for barber students
--- Find shop IDs
+-- First, find the barber apprenticeship program ID
 DO $$
 DECLARE
-  kountry_kutz_shop_id UUID;
-  elizabeth_shop_id UUID;
+  barber_program_id UUID;
+  cosmetology_program_id UUID;
 BEGIN
-  SELECT id INTO kountry_kutz_shop_id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1;
-  SELECT id INTO elizabeth_shop_id FROM shops WHERE name ILIKE '%elizabeth%' LIMIT 1;
+  SELECT id INTO barber_program_id FROM programs WHERE slug ILIKE '%barber%' LIMIT 1;
+  SELECT id INTO cosmetology_program_id FROM programs WHERE slug ILIKE '%cosmetology%' LIMIT 1;
   
-  RAISE NOTICE 'Kountry Kutz Shop ID: %', kountry_kutz_shop_id;
-  RAISE NOTICE 'Elizabeth Shop ID: %', elizabeth_shop_id;
+  RAISE NOTICE 'Barber Program ID: %', barber_program_id;
+  RAISE NOTICE 'Cosmetology Program ID: %', cosmetology_program_id;
 END $$;
 
--- Jordan White - Kountry Kutz
-INSERT INTO apprentices (user_id, status, program_slug, start_date, shop_id)
+-- Jordan White - Kountry Kutz (using program_enrollments)
+INSERT INTO apprentices (user_id, status, program_id, enrollment_date, shop_id)
 SELECT 
   p.id,
   'active',
-  'prestige-elevation-barber-curriculum',
+  (SELECT id FROM programs WHERE slug ILIKE '%barber%' LIMIT 1),
   '2026-02-26'::date,
   (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1)
 FROM profiles p
 WHERE p.email = 'jbwhite888@icloud.com'
 AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
-ON CONFLICT (user_id) DO UPDATE SET shop_id = (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1);
+ON CONFLICT (user_id) DO UPDATE SET 
+  shop_id = (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1),
+  enrollment_date = '2026-02-26'::date;
 
 -- Edgar Hernandez - Kountry Kutz
 UPDATE profiles SET role = 'apprentice' WHERE email = 'itisjoel24@gmail.com';
-INSERT INTO apprentices (user_id, status, program_slug, start_date, shop_id)
+INSERT INTO apprentices (user_id, status, program_id, enrollment_date, shop_id)
 SELECT 
   p.id,
   'active',
-  'prestige-elevation-barber-curriculum',
+  (SELECT id FROM programs WHERE slug ILIKE '%barber%' LIMIT 1),
   '2026-05-27'::date,
   (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1)
 FROM profiles p
 WHERE p.email = 'itisjoel24@gmail.com'
 AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
-ON CONFLICT (user_id) DO UPDATE SET shop_id = (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1);
+ON CONFLICT (user_id) DO UPDATE SET 
+  shop_id = (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1),
+  enrollment_date = '2026-05-27'::date;
 
 -- Natalia Roa - Kountry Kutz
 UPDATE profiles SET role = 'apprentice' WHERE email = 'natataroa@gmail.com';
-INSERT INTO apprentices (user_id, status, program_slug, start_date, shop_id)
+INSERT INTO apprentices (user_id, status, program_id, enrollment_date, shop_id)
 SELECT 
   p.id,
   'active',
-  'prestige-elevation-barber-curriculum',
+  (SELECT id FROM programs WHERE slug ILIKE '%barber%' LIMIT 1),
   '2026-05-03'::date,
   (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1)
 FROM profiles p
 WHERE p.email = 'natataroa@gmail.com'
 AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
-ON CONFLICT (user_id) DO UPDATE SET shop_id = (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1);
+ON CONFLICT (user_id) DO UPDATE SET 
+  shop_id = (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1),
+  enrollment_date = '2026-05-03'::date;
 
 -- Mercedes Wellington - Prestige Elevation
 UPDATE profiles SET role = 'apprentice' WHERE email = 'msanqin@gmail.com';
-INSERT INTO apprentices (user_id, status, program_slug, start_date, shop_id)
+INSERT INTO apprentices (user_id, status, program_id, enrollment_date, shop_id)
 SELECT 
   p.id,
   'active',
-  'prestige-elevation-barber-curriculum',
+  (SELECT id FROM programs WHERE slug ILIKE '%barber%' LIMIT 1),
   '2026-04-13'::date,
-  (SELECT id FROM shops WHERE name ILIKE '%prestige%elevation%' OR name ILIKE '%prestige%' LIMIT 1)
+  (SELECT id FROM shops WHERE name ILIKE '%prestige%' LIMIT 1)
 FROM profiles p
 WHERE p.email = 'msanqin@gmail.com'
 AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
-ON CONFLICT (user_id) DO UPDATE SET shop_id = (SELECT id FROM shops WHERE name ILIKE '%prestige%elevation%' OR name ILIKE '%prestige%' LIMIT 1);
+ON CONFLICT (user_id) DO UPDATE SET 
+  shop_id = (SELECT id FROM shops WHERE name ILIKE '%prestige%' LIMIT 1),
+  enrollment_date = '2026-04-13'::date;
 
 -- Elizabeth Powell - Cosmetology
 UPDATE profiles SET role = 'apprentice' WHERE email = 'elizabethpowell6262@gmail.com';
-INSERT INTO apprentices (user_id, status, program_slug, start_date)
+INSERT INTO apprentices (user_id, status, program_id, enrollment_date)
 SELECT 
   p.id,
   'active',
-  'cosmetology-apprenticeship',
+  (SELECT id FROM programs WHERE slug ILIKE '%cosmetology%' LIMIT 1),
   '2026-06-07'::date
 FROM profiles p
 WHERE p.email = 'elizabethpowell6262@gmail.com'

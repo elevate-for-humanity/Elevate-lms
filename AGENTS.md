@@ -136,3 +136,20 @@ grep "max-old-space-size" Dockerfile.*
 **You are too fast. Slow down and audit line by line.**
 
 Every character matters. A misplaced `#` or wrong version number can cause hours of debugging.
+
+---
+
+### ITERATIVE AUDIT UNTIL FIXED
+
+When an issue is found, do NOT stop. Continue auditing line by line until:
+
+1. ✅ ALL issues are identified
+2. ✅ ALL issues are fixed  
+3. ✅ System is as expected (matches, consistent, working)
+
+**Process:**
+```
+FIND ISSUE → FIX IT → AUDIT AGAIN → VERIFY FIXED → CHECK FOR MORE ISSUES → REPEAT
+```
+
+**Never assume "nothing else is wrong" without re-auditing after each fix.**

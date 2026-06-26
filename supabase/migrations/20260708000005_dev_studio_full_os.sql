@@ -111,19 +111,54 @@ CREATE TABLE IF NOT EXISTS public.ai_code_patterns (
 );
 
 -- ─── ai_repo_index ───────────────────────────────────────────────────────────
--- Idempotent: Creates table if not exists, or adds missing columns
-CREATE TABLE IF NOT EXISTS public.ai_repo_index (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  repo_path TEXT,
-  file_hash TEXT,
-  language TEXT,
-  symbols JSONB DEFAULT '[]'::jsonb,
-  last_indexed_at TIMESTAMPTZ DEFAULT now(),
-  metadata JSONB DEFAULT '{}'::jsonb,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_repo_index_path ON public.ai_repo_index(repo_path);
+-- Idempotent: Handle both new and existing tables with file_path column
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'ai_repo_index' AND table_schema = 'public') THEN
+    CREATE TABLE public.ai_repo_index (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      repo_path TEXT,
+      file_hash TEXT,
+      language TEXT,
+      symbols JSONB DEFAULT '[]'::jsonb,
+      last_indexed_at TIMESTAMPTZ DEFAULT now(),
+      metadata JSONB DEFAULT '{}'::jsonb,
+      created_at TIMESTAMPTZ DEFAULT now(),
+      updated_at TIMESTAMPTZ DEFAULT now()
+    );
+  ELSE
+    -- Table exists: add columns if missing, migrate file_path to repo_path
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'repo_path') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN repo_path TEXT;
+      UPDATE public.ai_repo_index SET repo_path = file_path WHERE file_path IS NOT NULL;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'file_hash') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN file_hash TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'language') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN language TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'symbols') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN symbols JSONB DEFAULT '[]'::jsonb;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'metadata') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN metadata JSONB DEFAULT '{}'::jsonb;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'created_at') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN created_at TIMESTAMPTZ DEFAULT now();
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'updated_at') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN updated_at TIMESTAMPTZ DEFAULT now();
+    END IF;
+  END IF;
+END $$;
+
+-- Create index separately (will be skipped if already exists)
+DO $$
+BEGIN
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_repo_index_path ON public.ai_repo_index(repo_path);
+EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
 
 -- ─── ai_file_snapshots ───────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.ai_file_snapshots (

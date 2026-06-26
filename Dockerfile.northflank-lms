@@ -5,7 +5,7 @@ FROM node:22-bookworm AS builder
 
 # Cache invalidation marker
 # P0-3: Increased memory to 12GB for 1,600+ page static generation
-RUN echo "nf-cache-invalidate-20260626-npm-fix"
+RUN echo "nf-cache-invalidate-20260625-p0-3-memory-fix"
 
 # Install system deps for native modules (sharp, canvas, pdf)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -19,10 +19,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     librsvg2-dev \
     && rm -rf /var/lib/apt/lists/*
 
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
+
+ENV PNPM_HOME="/app/.pnpm-home"
+ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /app
 
 # Copy manifests and source
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json apps/admin/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
@@ -31,7 +36,10 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+<<<<<<< HEAD
+=======
 # P0-3: 12GB heap for build with 1,600+ pages
+>>>>>>> origin/main
 ENV NODE_OPTIONS=--max-old-space-size=12288
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=1
@@ -44,7 +52,8 @@ ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=
 RUN mkdir -p /cache/.next && chmod 755 /cache/.next
 
 # Install dependencies
-RUN npm ci
+# Using --no-frozen-lockfile because lockfile may not match overrides in CI
+RUN pnpm install --no-frozen-lockfile
 
 # Build Next.js
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
@@ -57,7 +66,7 @@ ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 # P0-3: 12GB memory for large app builds
-RUN npm run build:lms:compile
+RUN pnpm build:lms:compile
 
 # --- runtime stage ---
 FROM node:22-bookworm-slim
@@ -83,7 +92,7 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/.next/server ./.next/server
 COPY --from=builder /app/public ./public
 
-# Copy full node_modules from builder (uses npm hoisting)
+# Copy full node_modules from builder (preserves pnpm symlinks)
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 8080

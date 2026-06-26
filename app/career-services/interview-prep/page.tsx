@@ -1,16 +1,14 @@
-import type { Metadata } from 'next';
-import PublicLandingPage from '@/components/marketing/PublicLandingPage';
+import { buildMetadata } from '@/lib/cf-seo';
+import { siteConfig } from '@/content/cf-site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const revalidate = 3600;
+export const metadata = buildMetadata({
+  title: 'Interview Prep',
+  description: '{PLATFORM_DEFAULTS.orgName} career services — Interview Prep.',
+  path: '/career-services/interview-prep',
+});
 
-export const metadata: Metadata = {
-  title: 'Interview Preparation',
-  description: 'Free interview preparation for Elevate students and graduates. Mock interviews, industry-specific coaching, and salary negotiation guidance.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/career-services/interview-prep' },
-};
-
-export default function InterviewPrepPage() {
+export default function Page() {
   return (
     <PublicLandingPage
       config={{

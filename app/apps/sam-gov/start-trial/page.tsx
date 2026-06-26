@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Building2, Check, Clock, Shield, Zap } from 'lucide-react';
-import { startAppTrial } from '@/lib/trial/start-app-trial';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,9 +12,9 @@ export const metadata: Metadata = {
   description: 'Start your 14-day free trial of SAM.gov Assistant.',
 };
 
-async function startTrial() {
+async function startTrial(formData: FormData) {
   'use server';
-
+  
   const supabase = await createClient();
   const user = safeGetUser(await supabase.auth.getUser());
   if (!user) redirect('/login?redirect=/apps/sam-gov/start-trial');
@@ -37,7 +37,59 @@ export default async function StartTrialPage() {
     .eq('app_slug', 'sam-gov')
     .maybeSingle();
 
-  if (existing) redirect('/apps/sam-gov');
+  if (existing) {
+    redirect('/apps/sam-gov');
+  }
+
+  // Create trial subscription
+  const trialEndsAt = new Date();
+  trialEndsAt.setDate(trialEndsAt.getDate() + 14);
+
+  const { error } = await db
+    .from('user_app_subscriptions')
+    .insert({
+      user_id: user.id,
+      app_slug: 'sam-gov',
+      plan: 'starter',
+      status: 'trial',
+      trial_ends_at: trialEndsAt.toISOString(),
+      current_period_start: new Date().toISOString(),
+      current_period_end: trialEndsAt.toISOString(),
+    });
+
+  if (error) {
+    console.error('Error creating trial:', error);
+    redirect('/apps/sam-gov/start-trial?error=failed');
+  }
+
+  redirect('/apps/sam-gov?welcome=true');
+}
+
+export default async function StartTrialPage() {
+  const supabase = await createClient();
+  const db = (await getAdminClient()) || supabase;
+  
+  if (!supabase) {
+    redirect('/error?message=service-unavailable');
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    redirect('/login?redirect=/apps/sam-gov/start-trial');
+  }
+
+  // Check if already has subscription
+  const { data: existing } = await db
+    .from('user_app_subscriptions')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('app_slug', 'sam-gov')
+    .maybeSingle();
+
+  if (existing) {
+    redirect('/apps/sam-gov');
+  }
 
   const features = [
     'Step-by-step registration wizard',
@@ -65,15 +117,15 @@ export default async function StartTrialPage() {
               <Clock className="w-4 h-4" />
               14-Day Free Trial
             </div>
-            <h2 className="text-2xl font-bold text-slate-900">Start Your Free Trial</h2>
-            <p className="text-slate-600 mt-2">No credit card required. Cancel anytime.</p>
+            <h2 className="text-2xl font-bold text-gray-900">Start Your Free Trial</h2>
+            <p className="text-gray-600 mt-2">No credit card required. Cancel anytime.</p>
           </div>
 
           <ul className="space-y-3 mb-8">
             {features.map((feature, i) => (
               <li key={i} className="flex items-center gap-3">
                 <Check className="w-5 h-5 text-brand-green-500 flex-shrink-0" />
-                <span className="text-slate-700">{feature}</span>
+                <span className="text-gray-700">{feature}</span>
               </li>
             ))}
           </ul>
@@ -87,9 +139,9 @@ export default async function StartTrialPage() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-500 mt-4">
+          <p className="text-center text-sm text-gray-500 mt-4">
             By starting a trial, you agree to our{' '}
-            <Link href="/legal" className="text-brand-blue-600 hover:underline">Terms of Service</Link>
+            <Link href="/terms-of-service" className="text-brand-blue-600 hover:underline">Terms of Service</Link>
           </p>
         </div>
 

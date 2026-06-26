@@ -15,13 +15,11 @@ export const metadata: Metadata = {
 
 export default async function SamGovPage() {
   const supabase = await createClient();
-
+  
   // Must have database connection
 
   // Must be logged in
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     redirect('/login?redirect=/apps/sam-gov&message=login-required');
   }
@@ -71,7 +69,7 @@ export default async function SamGovPage() {
   }
 
   // Fetch documents for all entities
-  const entityIds = entities?.map((e) => e.id) || [];
+  const entityIds = entities?.map(e => e.id) || [];
   let documents: any[] = [];
   if (entityIds.length > 0) {
     const { data: docs } = await supabase
@@ -103,14 +101,14 @@ export default async function SamGovPage() {
           <Breadcrumbs items={[{ label: 'Apps', href: '/apps' }, { label: 'SAM.gov' }]} />
         </div>
       </div>
-      <SamGovApp
-        user={user}
-        subscription={subscription}
-        entities={entities || []}
-        documents={documents}
-        alerts={alerts}
-        trialDaysRemaining={trialDaysRemaining}
-      />
+    <SamGovApp
+      user={user}
+      subscription={subscription}
+      entities={entities || []}
+      documents={documents}
+      alerts={alerts}
+      trialDaysRemaining={trialDaysRemaining}
+    />
     </div>
   );
 }

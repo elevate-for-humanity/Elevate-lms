@@ -1,39 +1,36 @@
-import { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight } from 'lucide-react';
-import HeroVideo from '@/components/marketing/HeroVideo';
-import SkillsGapAnalysis from '@/components/SkillsGapAnalysis';
-import VirtualCareerFair from '@/components/VirtualCareerFair';
-import { StudentSuccessCoaching } from '@/components/StudentSuccessCoaching';
-import WorkOneLocator from '@/components/WorkOneLocator';
-import LiveJobPostings from '@/components/careers/LiveJobPostings';
+import { buildMetadata } from '@/lib/cf-seo';
+import { siteConfig } from '@/content/cf-site';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
-
-export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/career-services' },
+export const metadata = buildMetadata({
   title: 'Career Services',
-  description:
-    'Resume building, interview prep, job fairs, and direct employer connections. We help you get hired after training.',
-};
+  description: 'Resume building, interview prep, job placement, and ongoing career support from {PLATFORM_DEFAULTS.orgName}.',
+  path: '/career-services',
+});
 
-export default async function CareerServicesPage() {
-  const supabase = await createClient();
-  
-  // Fetch real seeker stats
-  const { count: jobSeekerCount } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('employment_status', 'seeking');
+const services = [
+  { slug: 'resume-building', title: 'Resume Building', summary: 'Professional resume review and writing support for program graduates.' },
+  { slug: 'interview-prep', title: 'Interview Prep', summary: 'Mock interviews, coaching, and employer-readiness workshops.' },
+  { slug: 'job-placement', title: 'Job Placement', summary: 'Direct employer connections and hiring pipeline access for graduates.' },
+  { slug: 'career-counseling', title: 'Career Counseling', summary: 'One-on-one advising to map your career pathway and next steps.' },
+];
 
+export default function CareerServicesPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Career Services' }]} />
-        </div>
+    <section className="mx-auto max-w-6xl px-4 py-16">
+      <h1 className="text-3xl font-bold">Career Services</h1>
+      <p className="mt-4 text-slate-700">
+        Elevate graduates receive career support beyond the classroom — from resume help to direct employer connections.
+      </p>
+      <div className="mt-10 grid gap-6 md:grid-cols-2">
+        {services.map((s) => (
+          <article key={s.slug} className="rounded border p-6 hover:bg-slate-50">
+            <h2 className="text-xl font-semibold">{s.title}</h2>
+            <p className="mt-2 text-sm text-slate-700">{s.summary}</p>
+            <Link href={`/career-services/${s.slug}`} className="mt-4 inline-block text-sm underline">Learn more</Link>
+          </article>
+        ))}
       </div>
 
       <HeroVideo

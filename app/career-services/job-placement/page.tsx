@@ -1,16 +1,14 @@
-import type { Metadata } from 'next';
-import PublicLandingPage from '@/components/marketing/PublicLandingPage';
+import { buildMetadata } from '@/lib/cf-seo';
+import { siteConfig } from '@/content/cf-site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const revalidate = 3600;
-
-export const metadata: Metadata = {
+export const metadata = buildMetadata({
   title: 'Job Placement',
-  description: 'Job placement services for Elevate graduates. Employer connections, job leads, and placement support in healthcare, skilled trades, technology, and business.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/career-services/job-placement' },
-};
+  description: '{PLATFORM_DEFAULTS.orgName} career services — Job Placement.',
+  path: '/career-services/job-placement',
+});
 
-export default function JobPlacementPage() {
+export default function Page() {
   return (
     <PublicLandingPage
       config={{

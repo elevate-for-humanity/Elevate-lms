@@ -1,16 +1,14 @@
-import type { Metadata } from 'next';
-import PublicLandingPage from '@/components/marketing/PublicLandingPage';
+import { buildMetadata } from '@/lib/cf-seo';
+import { siteConfig } from '@/content/cf-site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const revalidate = 3600;
-
-export const metadata: Metadata = {
+export const metadata = buildMetadata({
   title: 'Resume Building',
-  description: 'Free resume building and review for Elevate students and graduates. Credential-focused resumes that get callbacks from Indiana employers.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/career-services/resume-building' },
-};
+  description: '{PLATFORM_DEFAULTS.orgName} career services — Resume Building.',
+  path: '/career-services/resume-building',
+});
 
-export default function ResumeBuildingPage() {
+export default function Page() {
   return (
     <PublicLandingPage
       config={{

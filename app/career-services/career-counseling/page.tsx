@@ -1,16 +1,14 @@
-import type { Metadata } from 'next';
-import PublicLandingPage from '@/components/marketing/PublicLandingPage';
+import { buildMetadata } from '@/lib/cf-seo';
+import { siteConfig } from '@/content/cf-site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const revalidate = 3600;
-
-export const metadata: Metadata = {
+export const metadata = buildMetadata({
   title: 'Career Counseling',
-  description: 'One-on-one career counseling for Elevate graduates and enrolled students. Career planning, credential pathways, and job search strategy.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/career-services/career-counseling' },
-};
+  description: '{PLATFORM_DEFAULTS.orgName} career services — Career Counseling.',
+  path: '/career-services/career-counseling',
+});
 
-export default function CareerCounselingPage() {
+export default function Page() {
   return (
     <PublicLandingPage
       config={{

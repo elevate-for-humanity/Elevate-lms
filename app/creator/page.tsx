@@ -1,7 +1,15 @@
 import { redirect } from 'next/navigation';
 
-export const metadata = { robots: { index: false, follow: false } };
+import { Metadata } from 'next';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export default function CreatorIndexPage() {
-  redirect('/creator/products');
+export const metadata: Metadata = {
+  title: 'Creator | {PLATFORM_DEFAULTS.orgName}',
+  description: '{PLATFORM_DEFAULTS.orgName} - Career training and workforce development programs.',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/creator',
+  },
+};
+export default function CreatorPage() {
+  redirect('/creator/dashboard');
 }

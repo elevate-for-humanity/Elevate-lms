@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Calendar, Clock, Video, MapPin, Plus } from 'lucide-react';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = { 
   title: 'Mentoring Sessions | Mentor Portal',
   description: 'Schedule and manage your mentoring sessions with mentees.',
 };
@@ -13,10 +13,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function MentorSessionsPage() {
   const supabase = await createClient();
+  
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/mentor/sessions');
 
   let upcomingSessions: any[] = [];
@@ -25,8 +24,7 @@ export default async function MentorSessionsPage() {
   // Get upcoming sessions
   const { data: upcoming } = await supabase
     .from('mentor_sessions')
-    .select(
-      `
+    .select(`
       id,
       scheduled_at,
       topic,
@@ -34,8 +32,7 @@ export default async function MentorSessionsPage() {
       meeting_url,
       mentee_id,
       profiles!mentor_sessions_mentee_id_fkey(full_name)
-    `,
-    )
+    `)
     .eq('mentor_id', user.id)
     .gte('scheduled_at', new Date().toISOString())
     .order('scheduled_at', { ascending: true })
@@ -59,16 +56,14 @@ export default async function MentorSessionsPage() {
   // Get past sessions
   const { data: past } = await supabase
     .from('mentor_sessions')
-    .select(
-      `
+    .select(`
       id,
       scheduled_at,
       topic,
       duration_minutes,
       mentee_id,
       profiles!mentor_sessions_mentee_id_fkey(full_name)
-    `,
-    )
+    `)
     .eq('mentor_id', user.id)
     .lt('scheduled_at', new Date().toISOString())
     .order('scheduled_at', { ascending: false })
@@ -91,10 +86,8 @@ export default async function MentorSessionsPage() {
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <nav className="flex items-center text-sm text-slate-600">
-            <Link href="/mentor/dashboard" className="hover:text-brand-blue-600">
-              Mentor Dashboard
-            </Link>
+          <nav className="flex items-center text-sm text-slate-700">
+            <Link href="/mentor/dashboard" className="hover:text-brand-blue-600">Mentor Dashboard</Link>
             <span className="mx-2">/</span>
             <span className="text-slate-900 font-medium">Sessions</span>
           </nav>
@@ -103,10 +96,7 @@ export default async function MentorSessionsPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-slate-900">Mentoring Sessions</h1>
-          <Link
-            href="/mentor/sessions/new"
-            className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700"
-          >
+          <Link href="/mentor/sessions/new" className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
             <Plus className="w-5 h-5" /> Schedule Session
           </Link>
         </div>
@@ -119,44 +109,25 @@ export default async function MentorSessionsPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <p className="font-semibold text-slate-900">{session.mentee}</p>
-                      <p className="text-sm text-slate-600">{session.topic}</p>
+                      <p className="text-sm text-slate-700">{session.topic}</p>
                     </div>
-                    {session.type === 'video' ? (
-                      <Video className="w-5 h-5 text-brand-blue-600" />
-                    ) : (
-                      <MapPin className="w-5 h-5 text-brand-green-600" />
-                    )}
+                    {session.type === 'video' ? <Video className="w-5 h-5 text-brand-blue-600" /> : <MapPin className="w-5 h-5 text-brand-green-600" />}
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-slate-600">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" /> {session.date}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" /> {session.time}
-                    </span>
+                  <div className="flex items-center gap-4 text-sm text-slate-700">
+                    <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {session.date}</span>
+                    <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {session.time}</span>
                   </div>
                   <div className="mt-4 flex gap-2">
-                    <Link
-                      href={session.meeting_url || '/mentor/sessions'}
-                      target="_blank"
-                      className="flex-1 text-center bg-brand-blue-600 text-white py-2 rounded-lg hover:bg-brand-blue-700"
-                    >
-                      Join
-                    </Link>
-                    <Link
-                      href={`/mentor/sessions/${session.id}/reschedule`}
-                      className="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-slate-700"
-                    >
-                      Reschedule
-                    </Link>
+                    <Link href={session.meeting_url || '/mentor/sessions'} target="_blank" className="flex-1 text-center bg-brand-blue-600 text-white py-2 rounded-lg hover:bg-brand-blue-700">Join</Link>
+                    <Link href={`/mentor/sessions/${session.id}/reschedule`} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-slate-50 text-slate-700">Reschedule</Link>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-              <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-500">No upcoming sessions scheduled</p>
+              <Calendar className="w-12 h-12 text-slate-700 mx-auto mb-3" />
+              <p className="text-slate-700">No upcoming sessions scheduled</p>
             </div>
           )}
         </div>
@@ -167,27 +138,19 @@ export default async function MentorSessionsPage() {
               <table className="w-full">
                 <thead className="bg-white">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
-                      Mentee
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
-                      Topic
-                    </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
-                      Duration
-                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Mentee</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Date</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Topic</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Duration</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="divide-y divide-gray-200">
                   {pastSessions.map((session) => (
                     <tr key={session.id} className="hover:bg-white">
                       <td className="px-6 py-4 font-medium text-slate-900">{session.mentee}</td>
-                      <td className="px-6 py-4 text-slate-600">{session.date}</td>
-                      <td className="px-6 py-4 text-slate-600">{session.topic}</td>
-                      <td className="px-6 py-4 text-slate-600">{session.duration}</td>
+                      <td className="px-6 py-4 text-slate-700">{session.date}</td>
+                      <td className="px-6 py-4 text-slate-700">{session.topic}</td>
+                      <td className="px-6 py-4 text-slate-700">{session.duration}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -195,8 +158,8 @@ export default async function MentorSessionsPage() {
             </div>
           ) : (
             <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-              <Clock className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="text-slate-500">No past sessions</p>
+              <Clock className="w-12 h-12 text-slate-700 mx-auto mb-3" />
+              <p className="text-slate-700">No past sessions</p>
             </div>
           )}
         </div>

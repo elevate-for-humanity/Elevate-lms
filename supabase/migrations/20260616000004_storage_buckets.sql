@@ -8,31 +8,31 @@ BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'storage') THEN
     -- Attempt to insert buckets (may fail due to permissions)
     BEGIN
-      INSERT INTO storage.buckets (id, name, "public", file_size_limit, allowed_mime_types)
+      INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
       VALUES ('course-assets', 'course-assets', false, 524288000, ARRAY['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm', 'application/pdf', 'application/zip'])
       ON CONFLICT DO NOTHING;
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
     BEGIN
-      INSERT INTO storage.buckets (id, name, "public", file_size_limit, allowed_mime_types)
+      INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
       VALUES ('student-submissions', 'student-submissions', false, 10485760, ARRAY['image/jpeg', 'image/png', 'application/pdf', 'application/zip'])
       ON CONFLICT DO NOTHING;
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
     BEGIN
-      INSERT INTO storage.buckets (id, name, "public", file_size_limit, allowed_mime_types)
+      INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
       VALUES ('certificates', 'certificates', true, 2097152, ARRAY['image/png', 'image/svg+xml', 'application/pdf'])
       ON CONFLICT DO NOTHING;
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
     BEGIN
-      INSERT INTO storage.buckets (id, name, "public", file_size_limit, allowed_mime_types)
+      INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
       VALUES ('vendor-assets', 'vendor-assets', false, 104857600, ARRAY['application/pdf', 'image/jpeg', 'image/png'])
       ON CONFLICT DO NOTHING;
     EXCEPTION WHEN OTHERS THEN NULL;
     END;
     BEGIN
-      INSERT INTO storage.buckets (id, name, "public", file_size_limit, allowed_mime_types)
+      INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
       VALUES ('marketing', 'marketing', true, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp'])
       ON CONFLICT DO NOTHING;
     EXCEPTION WHEN OTHERS THEN NULL;

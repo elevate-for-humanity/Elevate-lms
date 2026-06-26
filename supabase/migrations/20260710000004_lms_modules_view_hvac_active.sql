@@ -11,47 +11,45 @@ EXCEPTION WHEN OTHERS THEN
 END $$;
 
 -- Create view - query columns that exist in the actual tables
-EXECUTE $body$
-  CREATE VIEW public.lms_modules WITH (security_invoker = true) AS
-    SELECT 
-      m.id, 
-      m.title, 
-      m.description,
-      m.program_id, 
-      NULL::uuid AS course_id,
-      NULL::uuid AS training_module_id,
-      'program' AS source,
-      m.order_index,
-      m.created_at,
-      m.updated_at
-    FROM public.modules m
-    UNION ALL
-    SELECT 
-      cm.id, 
-      cm.title, 
-      cm.description,
-      NULL::uuid AS program_id, 
-      cm.course_id,
-      NULL::uuid AS training_module_id,
-      'course' AS source,
-      cm.order_index,
-      cm.created_at,
-      cm.updated_at
-    FROM public.course_modules cm
-    UNION ALL
-    SELECT 
-      stm.id, 
-      stm.title, 
-      stm.description,
-      NULL::uuid AS program_id, 
-      NULL::uuid AS course_id,
-      stm.id AS training_module_id,
-      'staff_training' AS source,
-      stm.order_index,
-      stm.created_at,
-      stm.updated_at
-    FROM public.staff_training_modules stm
-$body$;
+CREATE VIEW public.lms_modules WITH (security_invoker = true) AS
+  SELECT 
+    m.id, 
+    m.title, 
+    m.description,
+    m.program_id, 
+    NULL::uuid AS course_id,
+    NULL::uuid AS training_module_id,
+    'program' AS source,
+    m.order_index,
+    m.created_at,
+    m.updated_at
+  FROM public.modules m
+  UNION ALL
+  SELECT 
+    cm.id, 
+    cm.title, 
+    cm.description,
+    NULL::uuid AS program_id, 
+    cm.course_id,
+    NULL::uuid AS training_module_id,
+    'course' AS source,
+    cm.order_index,
+    cm.created_at,
+    cm.updated_at
+  FROM public.course_modules cm
+  UNION ALL
+  SELECT 
+    stm.id, 
+    stm.title, 
+    stm.description,
+    NULL::uuid AS program_id, 
+    NULL::uuid AS course_id,
+    stm.id AS training_module_id,
+    'staff_training' AS source,
+    stm.order_index,
+    stm.created_at,
+    stm.updated_at
+  FROM public.staff_training_modules stm;
 
 GRANT SELECT ON public.lms_modules TO authenticated;
 

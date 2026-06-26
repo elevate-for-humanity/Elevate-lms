@@ -110,70 +110,70 @@ CREATE TABLE IF NOT EXISTS public.ai_code_patterns (
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- ─── ai_repo_index ───────────────────────────────────────────────────────────
--- Create table if not exists (idempotent)
-CREATE TABLE IF NOT EXISTS public.ai_repo_index (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  repo_path TEXT,
-  file_hash TEXT,
-  language TEXT,
-  symbols JSONB DEFAULT '[]'::jsonb,
-  last_indexed_at TIMESTAMPTZ DEFAULT now(),
-  metadata JSONB DEFAULT '{}'::jsonb,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
+-- -- ─── ai_repo_index ───────────────────────────────────────────────────────────
+-- -- Create table if not exists (idempotent)
+-- CREATE TABLE IF NOT EXISTS public.ai_repo_index (
+--   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+--   repo_path TEXT,
+--   file_hash TEXT,
+--   language TEXT,
+--   symbols JSONB DEFAULT '[]'::jsonb,
+--   last_indexed_at TIMESTAMPTZ DEFAULT now(),
+--   metadata JSONB DEFAULT '{}'::jsonb,
+--   created_at TIMESTAMPTZ DEFAULT now(),
+--   updated_at TIMESTAMPTZ DEFAULT now()
+-- );
 
--- Add columns with exception handling (separate DO blocks to isolate errors)
-DO $$
-BEGIN
-  ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS repo_path TEXT;
-EXCEPTION WHEN OTHERS THEN NULL; END $$;
+-- -- Add columns with exception handling (separate DO blocks to isolate errors)
+-- DO $$
+-- BEGIN
+--   ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS repo_path TEXT;
+-- EXCEPTION WHEN OTHERS THEN NULL; END $$;
 
-DO $$
-BEGIN
-  ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS file_hash TEXT;
-EXCEPTION WHEN OTHERS THEN NULL; END $$;
+-- DO $$
+-- BEGIN
+--   ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS file_hash TEXT;
+-- EXCEPTION WHEN OTHERS THEN NULL; END $$;
 
-DO $$
-BEGIN
-  ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS language TEXT;
-EXCEPTION WHEN OTHERS THEN NULL; END $$;
+-- DO $$
+-- BEGIN
+--   ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS language TEXT;
+-- EXCEPTION WHEN OTHERS THEN NULL; END $$;
 
-DO $$
-BEGIN
-  ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS symbols JSONB DEFAULT '[]'::jsonb;
-EXCEPTION WHEN OTHERS THEN NULL; END $$;
+-- DO $$
+-- BEGIN
+--   ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS symbols JSONB DEFAULT '[]'::jsonb;
+-- EXCEPTION WHEN OTHERS THEN NULL; END $$;
 
-DO $$
-BEGIN
-  ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}'::jsonb;
-EXCEPTION WHEN OTHERS THEN NULL; END $$;
+-- DO $$
+-- BEGIN
+--   ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}'::jsonb;
+-- EXCEPTION WHEN OTHERS THEN NULL; END $$;
 
-DO $$
-BEGIN
-  ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();
-EXCEPTION WHEN OTHERS THEN NULL; END $$;
+-- DO $$
+-- BEGIN
+--   ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();
+-- EXCEPTION WHEN OTHERS THEN NULL; END $$;
 
-DO $$
-BEGIN
-  ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
-EXCEPTION WHEN OTHERS THEN NULL; END $$;
+-- DO $$
+-- BEGIN
+--   ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
+-- EXCEPTION WHEN OTHERS THEN NULL; END $$;
 
--- Migrate file_path to repo_path if needed
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'file_path') THEN
-    UPDATE public.ai_repo_index SET repo_path = file_path WHERE repo_path IS NULL AND file_path IS NOT NULL;
-    ALTER TABLE public.ai_repo_index DROP COLUMN IF EXISTS file_path;
-  END IF;
-EXCEPTION WHEN OTHERS THEN NULL; END $$;
+-- -- Migrate file_path to repo_path if needed
+-- DO $$
+-- BEGIN
+--   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'file_path') THEN
+--     UPDATE public.ai_repo_index SET repo_path = file_path WHERE repo_path IS NULL AND file_path IS NOT NULL;
+--     ALTER TABLE public.ai_repo_index DROP COLUMN IF EXISTS file_path;
+--   END IF;
+-- EXCEPTION WHEN OTHERS THEN NULL; END $$;
 
--- Create index
-DO $$
-BEGIN
-  CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_repo_index_path ON public.ai_repo_index(repo_path);
-EXCEPTION WHEN OTHERS THEN NULL; END $$;
+-- -- Create index
+-- DO $$
+-- BEGIN
+--   CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_repo_index_path ON public.ai_repo_index(repo_path);
+-- EXCEPTION WHEN OTHERS THEN NULL; END $$;
 
 -- ─── ai_file_snapshots ───────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.ai_file_snapshots (

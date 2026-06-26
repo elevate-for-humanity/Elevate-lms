@@ -32,11 +32,11 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS=--max-old-space-size=8192
+ENV NODE_OPTIONS=--max-old-space-size=12288
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=1
 ENV CI=true
-ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
+# DISABLE_WEBPACK_FILESYSTEM_CACHE removed - caching now enabled for faster rebuilds
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile

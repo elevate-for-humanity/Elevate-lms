@@ -34,7 +34,10 @@ WHERE id IN (
     AND (pe.program_slug ILIKE '%barber%' OR pe.program_slug ILIKE '%prestige%')
 );
 
--- 5. CREATE APPRENTICE RECORDS (user_id, status, program_id, shop_id)
+-- 5. CREATE APPRENTICE RECORDS (simple INSERT without ON CONFLICT)
+-- First add UNIQUE constraint on user_id
+ALTER TABLE apprentices ADD CONSTRAINT apprentices_user_id_key UNIQUE (user_id);
+
 -- Jordan White - Kountry Kutz
 INSERT INTO apprentices (user_id, status, program_id, shop_id)
 SELECT p.id, 'active', pr.id, s.id
@@ -42,10 +45,7 @@ FROM profiles p, programs pr, shops s
 WHERE p.email = 'jbwhite888@icloud.com' 
   AND pr.slug ILIKE '%barber%'
   AND s.name ILIKE '%kountry%kutz%'
-AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
-ON CONFLICT (user_id) DO UPDATE SET 
-  shop_id = (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1),
-  status = 'active';
+  AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id);
 
 -- Edgar Hernandez - Kountry Kutz
 INSERT INTO apprentices (user_id, status, program_id, shop_id)
@@ -54,10 +54,7 @@ FROM profiles p, programs pr, shops s
 WHERE p.email = 'itisjoel24@gmail.com' 
   AND pr.slug ILIKE '%barber%'
   AND s.name ILIKE '%kountry%kutz%'
-AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
-ON CONFLICT (user_id) DO UPDATE SET 
-  shop_id = (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1),
-  status = 'active';
+  AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id);
 
 -- Natalia Roa - Kountry Kutz
 INSERT INTO apprentices (user_id, status, program_id, shop_id)
@@ -66,10 +63,7 @@ FROM profiles p, programs pr, shops s
 WHERE p.email = 'natataroa@gmail.com' 
   AND pr.slug ILIKE '%barber%'
   AND s.name ILIKE '%kountry%kutz%'
-AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
-ON CONFLICT (user_id) DO UPDATE SET 
-  shop_id = (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1),
-  status = 'active';
+  AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id);
 
 -- Mercedes Wellington - Prestige Elevation
 INSERT INTO apprentices (user_id, status, program_id, shop_id)
@@ -78,10 +72,7 @@ FROM profiles p, programs pr, shops s
 WHERE p.email = 'msanqin@gmail.com' 
   AND pr.slug ILIKE '%barber%'
   AND s.name ILIKE '%prestige%'
-AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
-ON CONFLICT (user_id) DO UPDATE SET 
-  shop_id = (SELECT id FROM shops WHERE name ILIKE '%prestige%' LIMIT 1),
-  status = 'active';
+  AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id);
 
 -- Elizabeth Powell - Cosmetology
 INSERT INTO apprentices (user_id, status, program_id)
@@ -89,8 +80,7 @@ SELECT p.id, 'active', pr.id
 FROM profiles p, programs pr
 WHERE p.email = 'elizabethpowell6262@gmail.com' 
   AND pr.slug ILIKE '%cosmetology%'
-AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
-ON CONFLICT (user_id) DO UPDATE SET status = 'active';
+  AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id);
 
 -- 6. ADD APPRENTICE SITES FOR GEOFENCING
 -- Kountry Kutz site (Indianapolis coordinates)

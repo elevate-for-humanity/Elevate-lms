@@ -16,7 +16,8 @@ CREATE OR REPLACE VIEW public.lms_modules WITH (security_invoker = true) AS
     NULL::uuid AS course_id,
     m.module_type,
     m.order_index,
-    m.duration_hours,
+    CASE WHEN EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='modules' AND column_name='duration_hours')
+         THEN m.duration_hours ELSE NULL END AS duration_hours,
     m.is_required,
     m.created_at,
     m.updated_at,

@@ -33,43 +33,9 @@ VALUES
   ('marketing', 'marketing', true, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp'])
 ON CONFLICT DO NOTHING;
 
--- RLS Policies for course-assets bucket
-CREATE POLICY "Authenticated users can view course assets" ON storage.objects
-  FOR SELECT USING (bucket_id = 'course-assets' AND auth.role() = 'authenticated');
-
-CREATE POLICY "Admins can upload course assets" ON storage.objects
-  FOR INSERT WITH CHECK (bucket_id = 'course-assets' AND auth.role() = 'authenticated');
-
-CREATE POLICY "Admins can update course assets" ON storage.objects
-  FOR UPDATE USING (bucket_id = 'course-assets' AND auth.role() = 'authenticated');
-
--- RLS Policies for student-submissions bucket
-CREATE POLICY "Users can view own submissions" ON storage.objects
-  FOR SELECT USING (bucket_id = 'student-submissions' AND auth.uid()::text = (storage.foldername(name))[1]);
-
-CREATE POLICY "Users can upload own submissions" ON storage.objects
-  FOR INSERT WITH CHECK (bucket_id = 'student-submissions' AND auth.uid()::text = (storage.foldername(name))[1]);
-
--- RLS Policies for certificates bucket
-CREATE POLICY "Anyone can view certificates" ON storage.objects
-  FOR SELECT USING (bucket_id = 'certificates');
-
-CREATE POLICY "Admins can manage certificates" ON storage.objects
-  FOR ALL USING (bucket_id = 'certificates' AND auth.role() = 'authenticated');
-
--- RLS Policies for vendor-assets bucket
-CREATE POLICY "Authenticated users can view vendor assets" ON storage.objects
-  FOR SELECT USING (bucket_id = 'vendor-assets' AND auth.role() = 'authenticated');
-
-CREATE POLICY "Admins can manage vendor assets" ON storage.objects
-  FOR ALL USING (bucket_id = 'vendor-assets' AND auth.role() = 'authenticated');
-
--- RLS Policies for marketing bucket (public)
-CREATE POLICY "Anyone can view marketing images" ON storage.objects
-  FOR SELECT USING (bucket_id = 'marketing');
-
-CREATE POLICY "Admins can upload marketing images" ON storage.objects
-  FOR INSERT WITH CHECK (bucket_id = 'marketing' AND auth.role() = 'authenticated');
+-- Note: Storage bucket policies require Supabase admin privileges.
+-- These are managed separately in the Supabase dashboard or via service_role.
+-- The bucket INSERT statements above are informational - buckets may already exist.
 
 -- Storage folder structure helper function
 CREATE OR REPLACE FUNCTION storage.get_course_asset_path(

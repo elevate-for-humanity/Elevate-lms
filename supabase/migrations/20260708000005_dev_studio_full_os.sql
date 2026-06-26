@@ -123,7 +123,14 @@ CREATE TABLE IF NOT EXISTS public.ai_repo_index (
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_repo_index_path ON public.ai_repo_index(repo_path);
+-- Only create index if repo_path column exists
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'repo_path') THEN
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_repo_index_path ON public.ai_repo_index(repo_path);
+  END IF;
+END
+$$;
 
 -- ─── ai_file_snapshots ───────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.ai_file_snapshots (

@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
 ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -56,8 +56,8 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
 
 WORKDIR /app/apps/admin
-# P0-3: 12GB memory for admin builds
-RUN NODE_OPTIONS='--max-old-space-size=12288' NEXT_BUILD_CACHE=/cache/.next pnpm next build --no-lint
+# 8GB memory for admin builds
+RUN NODE_OPTIONS='--max-old-space-size=8192' NEXT_BUILD_CACHE=/cache/.next pnpm next build --no-lint
 WORKDIR /app
 
 # --- runtime stage ---

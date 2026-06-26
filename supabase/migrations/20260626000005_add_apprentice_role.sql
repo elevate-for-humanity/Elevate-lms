@@ -45,6 +45,19 @@ BEGIN
 END $$;
 
 -- 3. Update/Insert apprentices records for barber students
+-- Find shop IDs
+DO $$
+DECLARE
+  kountry_kutz_shop_id UUID;
+  elizabeth_shop_id UUID;
+BEGIN
+  SELECT id INTO kountry_kutz_shop_id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1;
+  SELECT id INTO elizabeth_shop_id FROM shops WHERE name ILIKE '%elizabeth%' LIMIT 1;
+  
+  RAISE NOTICE 'Kountry Kutz Shop ID: %', kountry_kutz_shop_id;
+  RAISE NOTICE 'Elizabeth Shop ID: %', elizabeth_shop_id;
+END $$;
+
 -- Jordan White - Kountry Kutz
 INSERT INTO apprentices (user_id, status, program_slug, start_date, shop_id)
 SELECT 
@@ -55,9 +68,38 @@ SELECT
   (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1)
 FROM profiles p
 WHERE p.email = 'jbwhite888@icloud.com'
-AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id);
+AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
+ON CONFLICT (user_id) DO UPDATE SET shop_id = (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1);
 
--- Mercedes Wellington - Prestige Elevation (shop_id)
+-- Edgar Hernandez - Kountry Kutz
+UPDATE profiles SET role = 'apprentice' WHERE email = 'itisjoel24@gmail.com';
+INSERT INTO apprentices (user_id, status, program_slug, start_date, shop_id)
+SELECT 
+  p.id,
+  'active',
+  'prestige-elevation-barber-curriculum',
+  '2026-05-27'::date,
+  (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1)
+FROM profiles p
+WHERE p.email = 'itisjoel24@gmail.com'
+AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
+ON CONFLICT (user_id) DO UPDATE SET shop_id = (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1);
+
+-- Natalia Roa - Kountry Kutz
+UPDATE profiles SET role = 'apprentice' WHERE email = 'natataroa@gmail.com';
+INSERT INTO apprentices (user_id, status, program_slug, start_date, shop_id)
+SELECT 
+  p.id,
+  'active',
+  'prestige-elevation-barber-curriculum',
+  '2026-05-03'::date,
+  (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1)
+FROM profiles p
+WHERE p.email = 'natataroa@gmail.com'
+AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
+ON CONFLICT (user_id) DO UPDATE SET shop_id = (SELECT id FROM shops WHERE name ILIKE '%kountry%kutz%' LIMIT 1);
+
+-- Mercedes Wellington - Prestige Elevation
 UPDATE profiles SET role = 'apprentice' WHERE email = 'msanqin@gmail.com';
 INSERT INTO apprentices (user_id, status, program_slug, start_date, shop_id)
 SELECT 
@@ -68,33 +110,8 @@ SELECT
   (SELECT id FROM shops WHERE name ILIKE '%prestige%elevation%' OR name ILIKE '%prestige%' LIMIT 1)
 FROM profiles p
 WHERE p.email = 'msanqin@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id);
-
--- Natalia Roa - Prestige Elevation
-UPDATE profiles SET role = 'apprentice' WHERE email = 'natataroa@gmail.com';
-INSERT INTO apprentices (user_id, status, program_slug, start_date, shop_id)
-SELECT 
-  p.id,
-  'active',
-  'prestige-elevation-barber-curriculum',
-  '2026-05-03'::date,
-  (SELECT id FROM shops WHERE name ILIKE '%prestige%elevation%' OR name ILIKE '%prestige%' LIMIT 1)
-FROM profiles p
-WHERE p.email = 'natataroa@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id);
-
--- Edgar Hernandez - Prestige Elevation
-UPDATE profiles SET role = 'apprentice' WHERE email = 'itisjoel24@gmail.com';
-INSERT INTO apprentices (user_id, status, program_slug, start_date, shop_id)
-SELECT 
-  p.id,
-  'active',
-  'prestige-elevation-barber-curriculum',
-  '2026-05-27'::date,
-  (SELECT id FROM shops WHERE name ILIKE '%prestige%elevation%' OR name ILIKE '%prestige%' LIMIT 1)
-FROM profiles p
-WHERE p.email = 'itisjoel24@gmail.com'
-AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id);
+AND NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = p.id)
+ON CONFLICT (user_id) DO UPDATE SET shop_id = (SELECT id FROM shops WHERE name ILIKE '%prestige%elevation%' OR name ILIKE '%prestige%' LIMIT 1);
 
 -- Elizabeth Powell - Cosmetology
 UPDATE profiles SET role = 'apprentice' WHERE email = 'elizabethpowell6262@gmail.com';
@@ -126,7 +143,7 @@ AND NOT EXISTS (
   SELECT 1 FROM apprentice_sites WHERE shop_id = shops.id
 );
 
--- Prestige Elevation site
+-- Elizabeth's shop site (for Mercedes Wellington)
 INSERT INTO apprentice_sites (name, latitude, longitude, radius_meters, shop_id, is_active)
 SELECT 
   'Prestige Elevation - Main Location',
@@ -136,7 +153,7 @@ SELECT
   id,
   true
 FROM shops
-WHERE (name ILIKE '%prestige%elevation%' OR name ILIKE '%prestige%')
+WHERE name ILIKE '%prestige%'
 AND NOT EXISTS (
   SELECT 1 FROM apprentice_sites WHERE shop_id = shops.id
 );

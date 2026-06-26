@@ -41,7 +41,27 @@ function BookingForm() {
   const typeParam = searchParams.get('type') ?? '';
   const examParam = searchParams.get('exam') ?? '';
 
-  const [selectedProvider, setSelectedProvider] = useState<CertProvider | null>(null);
+  // Find provider based on type URL param
+  const getInitialProvider = (): CertProvider | null => {
+    const typeMap: Record<string, string> = {
+      'certiport': 'certiport',
+      'nha': 'nha',
+      'workkeys': 'workkeys',
+      'epa608': 'epa608',
+      'riseup': 'riseup',
+      'servsafe': 'servsafe',
+      'hsi': 'hsi',
+      'osha': 'osha',
+      'esco': 'esco',
+    };
+    const providerKey = typeMap[typeParam.toLowerCase()];
+    if (providerKey) {
+      return ALL_PROVIDERS.find(p => p.key === providerKey) ?? null;
+    }
+    return null;
+  };
+
+  const [selectedProvider, setSelectedProvider] = useState<CertProvider | null>(getInitialProvider);
   const [proctoringMode, setProctoringMode] = useState('');
   const [orgType, setOrgType] = useState('');
   const [participantCount, setParticipantCount] = useState('1');

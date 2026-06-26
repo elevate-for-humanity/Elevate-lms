@@ -13,7 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getStripe } from '@/lib/stripe/client';
+import { stripe } from '@/lib/store/stripe';
 import { logger } from '@/lib/logger';
 import { 
   APPLICATION_FEE_PRICE_ID, 
@@ -67,7 +67,6 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const stripe = getStripe();
   if (!stripe) {
     logger.error('Application fee checkout: Stripe not configured');
     return NextResponse.json({ error: 'Payment not configured' }, { status: 503 });

@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import heroBanners from '@/content/heroBanners';
 import { HomeFundingStrip } from '@/components/home/HomeFundingStrip';
+import { WorkforceOSArchitecture } from '@/components/home/WorkforceOSArchitecture';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeOutcomes } from '@/components/home/HomeOutcomes';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
@@ -95,6 +96,7 @@ export default async function HomePage() {
     <>
       <HomeHeroVideo banner={banner} />
       <HomeFundingStrip />
+      <WorkforceOSArchitecture />
       <HomeCareerPathways />
       <Suspense fallback={<OutcomesSkeleton />}>
         <HomeOutcomes />

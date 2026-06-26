@@ -80,6 +80,45 @@ function resolveImageProvider(): AIImageProvider {
   throw new Error('No AI image provider available. Set OPENAI_API_KEY or STABILITY_API_KEY.');
 }
 
+// -- Chain Helpers --
+
+function getChatProviderChain(preferred?: AIProviderName): AIProvider[] {
+  const chain: AIProvider[] = [];
+
+  if (preferred && preferred !== 'none' && chatProviders[preferred]) {
+    const p = chatProviders[preferred]();
+    if (p.isAvailable()) chain.push(p);
+  }
+
+  for (const name of ['openai', 'gemini', 'groq', 'azure']) {
+    if (name === (preferred as string)) continue;
+    const p = chatProviders[name]();
+    if (p.isAvailable()) chain.push(p);
+  }
+
+  return chain;
+}
+
+function breakerForProvider(name: string) {
+  return (breakers as any)[name] || breakers.openai;
+}
+
+function isRetryableProviderError(err: any): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return !msg.includes('401') && !msg.includes('403') && !msg.includes('404');
+}
+
+function shouldTryNextProvider(err: any): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return (
+    msg.includes('429') ||
+    msg.includes('500') ||
+    msg.includes('503') ||
+    msg.includes('timeout') ||
+    msg.includes('unavailable')
+  );
+}
+
 // -- Public API --
 
 /**

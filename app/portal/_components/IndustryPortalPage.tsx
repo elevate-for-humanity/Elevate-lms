@@ -34,6 +34,7 @@ export interface IndustryPortalProps {
   accentColor: string;
   accentBg: string;
   userName: string;
+  hostShopName?: string;
   enrolledPrograms: PortalProgram[];
   availablePrograms: PortalProgram[];
   quickLinks: { name: string; href: string; icon: React.ElementType; description: string }[];
@@ -47,6 +48,7 @@ export default function IndustryPortalPage({
   accentColor,
   accentBg,
   userName,
+  hostShopName,
   enrolledPrograms,
   availablePrograms,
   quickLinks,
@@ -150,6 +152,12 @@ export default function IndustryPortalPage({
             <h2 className="text-xl font-bold text-slate-900 mb-2">
               Welcome to {industryLabel}
             </h2>
+            {hostShopName && (
+              <p className="text-brand-blue-600 font-bold mb-4 flex items-center justify-center gap-2">
+                <Building2 className="w-4 h-4" />
+                Verified Partner Shop: {hostShopName}
+              </p>
+            )}
             <p className="text-slate-500 text-sm mb-6 max-w-md mx-auto">
               You're enrolled in the {industryLabel} portal. Browse available programs below
               or continue your coursework.

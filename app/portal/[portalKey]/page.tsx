@@ -36,9 +36,20 @@ export default async function IndustryPortalPageRoute({
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name')
+    .select('full_name, organization_id')
     .eq('id', user.id)
     .maybeSingle();
+
+  // Fetch host shop if linked
+  let hostShopName = '';
+  if (profile?.organization_id) {
+    const { data: org } = await supabase
+      .from('organizations')
+      .select('name')
+      .eq('id', profile.organization_id)
+      .maybeSingle();
+    hostShopName = org?.name || '';
+  }
 
   const [enrollmentsRes, lessonsRes, certsRes] = await Promise.all([
     supabase
@@ -89,6 +100,7 @@ export default async function IndustryPortalPageRoute({
       accentColor={config.accentColor}
       accentBg={config.accentBg}
       userName={profile?.full_name ?? user.email ?? 'Student'}
+      hostShopName={hostShopName}
       enrolledPrograms={enrolledPrograms}
       availablePrograms={config.availablePrograms.map((p) => ({ ...p, progress: 0, status: 'not_started' as const }))}
       quickLinks={config.quickLinks}

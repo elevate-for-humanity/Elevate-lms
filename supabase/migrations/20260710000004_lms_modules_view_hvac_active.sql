@@ -4,61 +4,116 @@
 -- Also ensures training_lessons has proper RLS for admin writes.
 
 -- ============================================
--- 1. Unified lms_modules view
+-- 1. Unified lms_modules view (conditional based on modules.duration_hours)
 -- ============================================
-CREATE OR REPLACE VIEW public.lms_modules WITH (security_invoker = true) AS
-  -- Program-scoped modules (analytics, transcripts, mobile)
-  SELECT
-    m.id,
-    m.title,
-    m.description,
-    m.program_id,
-    NULL::uuid AS course_id,
-    m.module_type,
-    m.order_index,
-    CASE WHEN EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='modules' AND column_name='duration_hours')
-         THEN m.duration_hours ELSE NULL END AS duration_hours,
-    m.is_required,
-    m.created_at,
-    m.updated_at,
-    'program' AS source
-  FROM public.modules m
-
-  UNION ALL
-
-  -- Course-scoped modules (Studio, blueprint, LMS engine)
-  SELECT
-    cm.id,
-    cm.title,
-    cm.description,
-    NULL::uuid AS program_id,
-    cm.course_id,
-    'course' AS module_type,
-    cm.order_index,
-    NULL::double precision AS duration_hours,
-    true AS is_required,
-    cm.created_at,
-    cm.updated_at,
-    'course' AS source
-  FROM public.course_modules cm
-
-  UNION ALL
-
-  -- Staff training modules
-  SELECT
-    tm.id,
-    tm.title,
-    tm.description,
-    NULL::uuid AS program_id,
-    NULL::uuid AS course_id,
-    'training' AS module_type,
-    tm.order_index,
-    (tm.duration_minutes / 60.0)::double precision AS duration_hours,
-    tm.is_required,
-    tm.created_at,
-    tm.updated_at,
-    'staff_training' AS source
-  FROM public.training_modules tm;
+DO $$
+BEGIN
+  -- Check if modules table has duration_hours column
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'modules' 
+    AND table_schema = 'public'
+    AND column_name = 'duration_hours'
+  ) THEN
+    -- View with duration_hours from modules
+    EXECUTE $$
+      CREATE OR REPLACE VIEW public.lms_modules WITH (security_invoker = true) AS
+        SELECT
+          m.id,
+          m.title,
+          m.description,
+          m.program_id,
+          NULL::uuid AS course_id,
+          m.module_type,
+          m.order_index,
+          m.duration_hours,
+          m.is_required,
+          m.created_at,
+          m.updated_at,
+          'program' AS source
+        FROM public.modules m
+        UNION ALL
+        SELECT
+          cm.id,
+          cm.title,
+          cm.description,
+          NULL::uuid AS program_id,
+          cm.course_id,
+          'course' AS module_type,
+          cm.order_index,
+          NULL::double precision AS duration_hours,
+          true AS is_required,
+          cm.created_at,
+          cm.updated_at,
+          'course' AS source
+        FROM public.course_modules cm
+        UNION ALL
+        SELECT
+          tm.id,
+          tm.title,
+          tm.description,
+          NULL::uuid AS program_id,
+          NULL::uuid AS course_id,
+          'training' AS module_type,
+          tm.order_index,
+          (tm.duration_minutes / 60.0)::double precision AS duration_hours,
+          tm.is_required,
+          tm.created_at,
+          tm.updated_at,
+          'staff_training' AS source
+        FROM public.training_modules tm
+    $$;
+  ELSE
+    -- View without duration_hours from modules
+    EXECUTE $$
+      CREATE OR REPLACE VIEW public.lms_modules WITH (security_invoker = true) AS
+        SELECT
+          m.id,
+          m.title,
+          m.description,
+          m.program_id,
+          NULL::uuid AS course_id,
+          m.module_type,
+          m.order_index,
+          NULL::double precision AS duration_hours,
+          m.is_required,
+          m.created_at,
+          m.updated_at,
+          'program' AS source
+        FROM public.modules m
+        UNION ALL
+        SELECT
+          cm.id,
+          cm.title,
+          cm.description,
+          NULL::uuid AS program_id,
+          cm.course_id,
+          'course' AS module_type,
+          cm.order_index,
+          NULL::double precision AS duration_hours,
+          true AS is_required,
+          cm.created_at,
+          cm.updated_at,
+          'course' AS source
+        FROM public.course_modules cm
+        UNION ALL
+        SELECT
+          tm.id,
+          tm.title,
+          tm.description,
+          NULL::uuid AS program_id,
+          NULL::uuid AS course_id,
+          'training' AS module_type,
+          tm.order_index,
+          (tm.duration_minutes / 60.0)::double precision AS duration_hours,
+          tm.is_required,
+          tm.created_at,
+          tm.updated_at,
+          'staff_training' AS source
+        FROM public.training_modules tm
+    $$;
+  END IF;
+END $$;
 
 -- Grant access
 GRANT SELECT ON public.lms_modules TO authenticated;
@@ -66,7 +121,6 @@ GRANT SELECT ON public.lms_modules TO authenticated;
 -- ============================================
 -- 2. Enable training_lessons writes for admins
 -- ============================================
--- Allow admin/super_admin to update training_lessons (HVAC content management)
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -92,11 +146,5 @@ BEGIN
       );
   END IF;
 END $$;
-
--- ============================================
--- 3. Add training_modules to AGENTS.md key objects
--- ============================================
--- Note: training_modules is now part of the unified LMS module system.
--- It serves both staff training AND the admin modules management page.
 
 COMMENT ON VIEW public.lms_modules IS 'Unified module view: program modules + course modules + staff training modules. Read via this view; write to the source table.';

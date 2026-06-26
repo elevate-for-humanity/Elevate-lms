@@ -151,7 +151,7 @@ BEGIN
   -- 9. partner_enrollments
   IF EXISTS (SELECT 1 FROM public.partners WHERE id = v_cmi_partner_id) THEN
     INSERT INTO public.partner_enrollments
-      (partner_id, student_id, program_id, status
+      (partner_id, student_id, program_id, status, enrolled_at)
     VALUES
       (v_cmi_partner_id, v_app.user_id, v_program_id, 'active', CURRENT_DATE)
     ON CONFLICT (partner_id, student_id, program_id) DO UPDATE

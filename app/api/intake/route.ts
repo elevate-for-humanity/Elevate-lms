@@ -153,7 +153,7 @@ async function _POST(req: Request) {
   // public.applications (applications_own_read, users_own, etc.) were blocking
   // the post-insert SELECT even when using the service_role client, because
   // Check for duplicate submission: same email + program_slug within last 24 hours
-  const recentApplication = await supabase
+  const { data: recentApplication } = await supabase
     .from('applications')
     .select('id, created_at')
     .eq('email', intakeEmail?.toLowerCase())

@@ -104,14 +104,13 @@ END $$;
 -- Note: This assumes auth.users already exists with this email
 -- If not, you'll need to create the user first in Supabase Auth
 
--- 5. CREATE APPRENTICE RECORD FOR DEVIN
-INSERT INTO apprentices (user_id, status, program_id, shop_id
+-- 5. CREATE APPRENTICE RECORD FOR DEVIN (no enrollment_date column)
+INSERT INTO apprentices (user_id, status, program_id, shop_id)
 SELECT 
   (SELECT id FROM auth.users WHERE email = 'Dawgchopz@icloud.com'),
   'active',
   (SELECT id FROM programs WHERE slug ILIKE '%barber%' LIMIT 1),
-  (SELECT id FROM shops WHERE name ILIKE '%cals%' LIMIT 1),
-  '2026-06-26'::date
+  (SELECT id FROM shops WHERE name ILIKE '%cals%' LIMIT 1)
 WHERE EXISTS (SELECT 1 FROM auth.users WHERE email = 'Dawgchopz@icloud.com')
 AND NOT EXISTS (
   SELECT 1 FROM apprentices 

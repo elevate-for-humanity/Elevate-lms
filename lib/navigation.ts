@@ -40,17 +40,6 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   {
-    id: 'testing',
-    name: 'Testing',
-    href: '/testing',
-    subItems: [
-      { name: '— Credential Exams —', href: '/testing', isHeader: true },
-      { name: 'Testing Center overview', href: '/testing' },
-      { name: 'Schedule an exam', href: '/testing/book' },
-      { name: 'All exams & certifications →', href: '/testing', isSectionLink: true },
-    ],
-  },
-  {
     id: 'partner-solutions',
     name: 'Solutions',
     href: '/partners',
@@ -156,13 +145,16 @@ export const NAV_ITEMS: NavItem[] = [
     subItems: [
       { name: '— Registered programs —', href: '/apprenticeships', isHeader: true },
       { name: 'Overview & how it works', href: '/apprenticeships' },
-      { name: 'Barber Apprenticeship · $4,980', href: canonicalRoutes.programs.barberApprenticeship },
+      { name: 'Barber Apprenticeship', href: canonicalRoutes.programs.barberApprenticeship },
       { name: 'Cosmetology Apprenticeship', href: canonicalRoutes.programs.cosmetologyApprenticeship },
       { name: 'Esthetician Apprenticeship', href: canonicalRoutes.programs.estheticianApprenticeship },
       { name: 'Nail Technician Apprenticeship', href: '/programs/nail-technician-apprenticeship' },
       { name: 'Culinary Apprenticeship', href: '/programs/culinary-apprenticeship' },
-      { name: 'Host shop inquiry', href: '/forms/host-shop-inquiry' },
-      { name: 'Become an apprenticeship sponsor →', href: '/apprentice/sponsor', isSectionLink: true },
+      { name: '— Host Shops —', href: '/partners/host-shops', isHeader: true },
+      { name: 'Barber Host Shops', href: '/barber-host-shop' },
+      { name: 'Cosmetology Host Shops', href: '/cosmetology-host-shop' },
+      { name: 'Esthetician Host Shops', href: '/esthetician-host-shop' },
+      { name: 'Nail Tech Host Shops', href: '/nail-host-shop' },
     ],
   },
 
@@ -181,17 +173,16 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'ServSafe / Food Safety', href: '/testing/servsafe' },
       { name: 'HSI CPR / First Aid', href: '/testing/hsi' },
       { name: 'OSHA 10 / 30', href: '/testing/osha' },
+      { name: 'ASE Certification', href: '/testing/ase' },
       { name: 'All exams & certifications →', href: '/testing', isSectionLink: true },
       
-      { name: '— Exam info —', href: '/credentials', isHeader: true },
-      { name: 'Credentials & certifications', href: '/credentials' },
+      { name: '— Exam info —', href: '/testing/book', isHeader: true },
       { name: 'Schedule an exam', href: '/testing/book' },
-      { name: 'Testing policies', href: '/testing#policies' },
+      { name: 'Testing policies', href: '/testing/policies' },
       { name: 'Testing accommodations', href: '/testing/accommodations' },
       
       { name: '— For employers —', href: '/testing/for-employers', isHeader: true },
       { name: 'Bulk testing for employers', href: '/testing/for-employers' },
-      { name: 'Workforce assessments', href: '/testing/assessments' },
     ],
   },
 

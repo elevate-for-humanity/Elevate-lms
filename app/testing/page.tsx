@@ -25,13 +25,22 @@ export const metadata: Metadata = {
 };
 
 const PROVIDER_IMAGES: Record<string, string> = {
+  // EPA Section 608 - HVAC/Refrigeration
   esco: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-unit.webp',
+  // NRF Rise Up - Retail/Customer Service
   nrf: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/certifications-page-1.webp',
+  // Certiport - IT/Microsoft Office
   certiport: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/testing-page-1.webp',
+  // NHA - Healthcare Certifications
   nha: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant.webp',
+  // ACT WorkKeys - Workforce Assessments
   workkeys: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp',
+  // CareerSafe - Safety Certifications
   careersafe: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-emergency-health-safety-hero.webp',
+  // Midland - Drug & Alcohol Testing
   midland: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/competency-test-hero.webp',
+  // ASE - Automotive Service Excellence
+  ase: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/automotive-training.webp',
 };
 
 const CAPABILITY_LABELS: Record<string, string> = {

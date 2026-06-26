@@ -1,6 +1,10 @@
 # Dockerfile.northflank-admin
 # Fresh rewrite for Elevate Admin (apps/admin Next.js app)
 
+# Cache invalidation marker
+# Fixed: inline logger/memory-monitor, pnpm matched to lockfile
+RUN echo "nf-cache-invalidate-20260626-fixes"
+
 FROM node:22-bookworm AS builder
 
 # Install system deps for native modules (sharp, canvas, pdf)
@@ -16,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
 
 ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -41,6 +45,7 @@ ENV CI=true
 # Webpack cache enabled for faster incremental builds
 
 # Install dependencies
+# Using --no-frozen-lockfile because lockfile may not match overrides in CI
 RUN pnpm install --no-frozen-lockfile
 
 # Build Admin Next.js

@@ -35,7 +35,7 @@ BEGIN
         SELECT tm.id, tm.title, tm.description, NULL::uuid AS program_id, NULL::uuid AS course_id,
           'training' AS module_type, tm.order_index, (tm.duration_minutes / 60.0)::double precision AS duration_hours,
           tm.is_required, tm.created_at, tm.updated_at, 'staff_training' AS source
-        FROM public.training_modules tm
+        FROM public.staff_training_modules tm
     $body$;
   ELSIF EXISTS (
     SELECT 1 FROM information_schema.columns
@@ -56,7 +56,7 @@ BEGIN
         SELECT tm.id, tm.title, tm.description, NULL::uuid AS program_id, NULL::uuid AS course_id,
           'training' AS module_type, tm.order_index, (tm.duration_minutes / 60.0)::double precision AS duration_hours,
           tm.is_required, tm.created_at, tm.updated_at, 'staff_training' AS source
-        FROM public.training_modules tm
+        FROM public.staff_training_modules tm
     $body$;
   ELSE
     EXECUTE $body$
@@ -74,7 +74,7 @@ BEGIN
         SELECT tm.id, tm.title, tm.description, NULL::uuid AS program_id, NULL::uuid AS course_id,
           'training' AS module_type, tm.order_index, (tm.duration_minutes / 60.0)::double precision AS duration_hours,
           tm.is_required, tm.created_at, tm.updated_at, 'staff_training' AS source
-        FROM public.training_modules tm
+        FROM public.staff_training_modules tm
     $body$;
   END IF;
 END $$;

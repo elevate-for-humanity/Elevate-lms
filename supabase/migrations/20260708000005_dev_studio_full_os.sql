@@ -114,14 +114,28 @@ CREATE TABLE IF NOT EXISTS public.ai_code_patterns (
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'ai_repo_index' AND table_schema = 'public') THEN
-    -- Table exists - add missing columns if not present
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS repo_path TEXT NOT NULL DEFAULT '';
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS file_hash TEXT;
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS language TEXT;
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS symbols JSONB NOT NULL DEFAULT '[]'::jsonb;
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb;
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
-    ALTER TABLE public.ai_repo_index ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+    -- Table exists - add missing columns only if they don't exist
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'repo_path') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN repo_path TEXT NOT NULL DEFAULT '';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'file_hash') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN file_hash TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'language') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN language TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'symbols') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN symbols JSONB NOT NULL DEFAULT '[]'::jsonb;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'metadata') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN metadata JSONB NOT NULL DEFAULT '{}'::jsonb;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'created_at') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN created_at TIMESTAMPTZ NOT NULL DEFAULT now();
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'updated_at') THEN
+      ALTER TABLE public.ai_repo_index ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+    END IF;
     -- Migrate file_path to repo_path if needed
     IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'ai_repo_index' AND column_name = 'file_path') THEN
       UPDATE public.ai_repo_index SET repo_path = file_path WHERE repo_path IS NULL OR repo_path = '';

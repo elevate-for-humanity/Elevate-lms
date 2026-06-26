@@ -1,6 +1,6 @@
 -- Migration: Create lms_modules unified view + activate training_lessons writes
 -- Combines program modules (modules), course modules (course_modules), and
--- staff training modules (training_modules) into a single queryable view.
+-- staff training modules (staff_training_modules) into a single queryable view.
 
 -- Drop existing object if it exists (use dynamic SQL to handle either view or table)
 DO $$
@@ -10,74 +10,48 @@ EXCEPTION WHEN OTHERS THEN
   EXECUTE 'DROP TABLE IF EXISTS public.lms_modules';
 END $$;
 
--- Create view based on what columns exist in modules table
-DO $$
-BEGIN
-  IF EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'modules' AND table_schema = 'public' AND column_name = 'duration_hours'
-  ) AND EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'modules' AND table_schema = 'public' AND column_name = 'is_required'
-  ) THEN
-    EXECUTE $body$
-      CREATE VIEW public.lms_modules WITH (security_invoker = true) AS
-        SELECT m.id, m.title, m.description, m.program_id, NULL::uuid AS course_id,
-          m.module_type, m.order_index, m.duration_hours, m.is_required,
-          m.created_at, m.updated_at, 'program' AS source
-        FROM public.modules m
-        UNION ALL
-        SELECT cm.id, cm.title, cm.description, NULL::uuid AS program_id, cm.course_id,
-          'course' AS module_type, cm.order_index, NULL::double precision AS duration_hours,
-          true AS is_required, cm.created_at, cm.updated_at, 'course' AS source
-        FROM public.course_modules cm
-        UNION ALL
-        SELECT tm.id, tm.title, tm.description, NULL::uuid AS program_id, NULL::uuid AS course_id,
-          'training' AS module_type, tm.order_index, (tm.duration_minutes / 60.0)::double precision AS duration_hours,
-          tm.is_required, tm.created_at, tm.updated_at, 'staff_training' AS source
-        FROM public.staff_training_modules tm
-    $body$;
-  ELSIF EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'modules' AND table_schema = 'public' AND column_name = 'duration_hours'
-  ) THEN
-    EXECUTE $body$
-      CREATE VIEW public.lms_modules WITH (security_invoker = true) AS
-        SELECT m.id, m.title, m.description, m.program_id, NULL::uuid AS course_id,
-          m.module_type, m.order_index, m.duration_hours, true AS is_required,
-          m.created_at, m.updated_at, 'program' AS source
-        FROM public.modules m
-        UNION ALL
-        SELECT cm.id, cm.title, cm.description, NULL::uuid AS program_id, cm.course_id,
-          'course' AS module_type, cm.order_index, NULL::double precision AS duration_hours,
-          true AS is_required, cm.created_at, cm.updated_at, 'course' AS source
-        FROM public.course_modules cm
-        UNION ALL
-        SELECT tm.id, tm.title, tm.description, NULL::uuid AS program_id, NULL::uuid AS course_id,
-          'training' AS module_type, tm.order_index, (tm.duration_minutes / 60.0)::double precision AS duration_hours,
-          tm.is_required, tm.created_at, tm.updated_at, 'staff_training' AS source
-        FROM public.staff_training_modules tm
-    $body$;
-  ELSE
-    EXECUTE $body$
-      CREATE VIEW public.lms_modules WITH (security_invoker = true) AS
-        SELECT m.id, m.title, m.description, m.program_id, NULL::uuid AS course_id,
-          m.module_type, m.order_index, NULL::double precision AS duration_hours, true AS is_required,
-          m.created_at, m.updated_at, 'program' AS source
-        FROM public.modules m
-        UNION ALL
-        SELECT cm.id, cm.title, cm.description, NULL::uuid AS program_id, cm.course_id,
-          'course' AS module_type, cm.order_index, NULL::double precision AS duration_hours,
-          true AS is_required, cm.created_at, cm.updated_at, 'course' AS source
-        FROM public.course_modules cm
-        UNION ALL
-        SELECT tm.id, tm.title, tm.description, NULL::uuid AS program_id, NULL::uuid AS course_id,
-          'training' AS module_type, tm.order_index, (tm.duration_minutes / 60.0)::double precision AS duration_hours,
-          tm.is_required, tm.created_at, tm.updated_at, 'staff_training' AS source
-        FROM public.staff_training_modules tm
-    $body$;
-  END IF;
-END $$;
+-- Create view - query columns that exist in the actual tables
+EXECUTE $body$
+  CREATE VIEW public.lms_modules WITH (security_invoker = true) AS
+    SELECT 
+      m.id, 
+      m.title, 
+      m.description,
+      m.program_id, 
+      NULL::uuid AS course_id,
+      NULL::uuid AS training_module_id,
+      'program' AS source,
+      m.order_index,
+      m.created_at,
+      m.updated_at
+    FROM public.modules m
+    UNION ALL
+    SELECT 
+      cm.id, 
+      cm.title, 
+      cm.description,
+      NULL::uuid AS program_id, 
+      cm.course_id,
+      NULL::uuid AS training_module_id,
+      'course' AS source,
+      cm.order_index,
+      cm.created_at,
+      cm.updated_at
+    FROM public.course_modules cm
+    UNION ALL
+    SELECT 
+      stm.id, 
+      stm.title, 
+      stm.description,
+      NULL::uuid AS program_id, 
+      NULL::uuid AS course_id,
+      stm.id AS training_module_id,
+      'staff_training' AS source,
+      stm.order_index,
+      stm.created_at,
+      stm.updated_at
+    FROM public.staff_training_modules stm
+$body$;
 
 GRANT SELECT ON public.lms_modules TO authenticated;
 

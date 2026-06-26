@@ -6,8 +6,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 # PRODUCTION BUILD CONFIGURATION (Next.js 15 + React 19 Optimized)
-export NODE_OPTIONS='--max-old-space-size=8192'
-export DISABLE_WEBPACK_FILESYSTEM_CACHE=1
+export NODE_OPTIONS='--max-old-space-size=12288'
+export DISABLE_WEBPACK_FILESYSTEM_CACHE=
 export BUILD_SCOPE=1
 
 echo "=== Production Readiness Gate ==="

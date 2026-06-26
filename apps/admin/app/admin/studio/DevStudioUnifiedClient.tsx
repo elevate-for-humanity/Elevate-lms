@@ -28,6 +28,7 @@ import {
   Briefcase,
   Plug,
   Brain,
+  Workflow,
 } from 'lucide-react';
 import { getSkillsLoader, type Skill } from '@/lib/studio/skills-loader';
 
@@ -61,7 +62,7 @@ interface CourseBuilderProps {
   initialProgramId?: string;
 }
 
-type Workspace = 'studio' | 'command' | 'deploy' | 'files' | 'environments' | 'health' | 'secrets' | 'integrations';
+type Workspace = 'studio' | 'command' | 'deploy' | 'files' | 'environments' | 'health' | 'secrets' | 'integrations' | 'workflows';
 type StudioMode = 'ask' | 'run' | 'courses';
 
 const UnifiedEllieChat = dynamic(() => import('@/components/studio/UnifiedEllieChat'), {
@@ -72,6 +73,7 @@ const DevStudioEditorWorkspace = dynamic(
   { ssr: false },
 );
 const DeployPanel = dynamic(() => import('@/components/studio/DeployPanel'), { ssr: false });
+const WorkflowsPanel = dynamic(() => import('./workflows/WorkflowsClient'), { ssr: false });
 const DevContainerPanel = dynamic(() => import('@/components/studio/DevContainerPanel'), {
   ssr: false,
 });
@@ -94,6 +96,7 @@ const IntegrationsPanel = dynamic(
 
 const WORKSPACES: { id: Workspace; label: string; Icon: ElementType<{ className?: string }> }[] = [
   { id: 'studio', label: 'Studio', Icon: Bot },
+  { id: 'workflows', label: 'Workflows', Icon: Workflow },
   { id: 'command', label: 'Command', Icon: LayoutDashboard },
   { id: 'deploy', label: 'Deploy', Icon: Rocket },
   { id: 'files', label: 'Files', Icon: FolderOpen },
@@ -373,6 +376,7 @@ export default function DevStudioUnifiedClient({
                 onRunCommand={runTerminalCommand}
               />
             )}
+            {workspace === 'workflows' && <WorkflowsPanel embedded />}
             {workspace === 'command' && <CommandCenterPanel />}
             {workspace === 'deploy' && <DeployPanel workflowButtons={config?.workflowButtons} />}
             {workspace === 'files' && (

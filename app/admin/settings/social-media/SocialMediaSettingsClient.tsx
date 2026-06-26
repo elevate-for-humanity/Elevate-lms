@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import {
-  Globe, Instagram, Video as Video, Link,
+  Globe, MessageCircle, Video as Video, Link,
   CheckCircle2, XCircle, Loader2, RefreshCw, Unlink,
   ExternalLink, AlertTriangle, Send,
 } from 'lucide-react';
@@ -30,7 +30,7 @@ const PLATFORMS = [
   {
     id: 'instagram',
     label: 'Instagram',
-    Icon: Instagram,
+    Icon: MessageCircle,
     color: 'text-pink-600',
     bg: 'bg-pink-50',
     border: 'border-pink-200',

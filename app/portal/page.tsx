@@ -1,7 +1,13 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Redirect',
+  robots: { index: false, follow: false },
+};
+
 import { redirect } from 'next/navigation';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-export const metadata = { robots: { index: false, follow: false } };
-
-export default function PortalIndexPage() {
-  redirect('/portal/apprentice');
+export default function PortalPage() {
+  redirect('/portals');
 }

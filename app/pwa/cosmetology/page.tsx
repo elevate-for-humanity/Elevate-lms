@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
 
 import ApprenticeHome from '@/components/pwa/ApprenticeHome';

@@ -337,54 +337,12 @@ export const CLONE_LICENSES: StoreProduct[] = [
   },
 ];
 
-// Modular Add-Ons (Subscriptions)
-export const COMMUNITY_ADDONS: StoreProduct[] = [
-  {
-    id: 'community-hub',
-    slug: 'community-hub',
-    name: 'Community Hub Add-On',
-    description: 'Discussion forums, groups, and events.',
-    longDescription: 'Add engagement features to your platform.',
-    price: 99,
-    billingType: 'subscription',
-    licenseType: 'single',
-    appsIncluded: ['community-hub'],
-    features: ['Discussion forums', 'Groups', 'Leaderboards'],
-    idealFor: ['Engaged student communities'],
-    requiresApproval: false,
-  },
-  {
-    id: 'ai-advanced-agent',
-    slug: 'ai-advanced-agent',
-    name: 'AI Advanced Agent Suite',
-    description: 'Upgrade to high-performance AI agents.',
-    longDescription: 'Unlock specialized agents for grading and coaching.',
-    price: 49,
-    billingType: 'subscription',
-    licenseType: 'single',
-    appsIncluded: ['ai-tutor'],
-    features: ['Advanced Grading', 'Scenario Coaching'],
-    idealFor: ['Pro instructors'],
-    requiresApproval: false,
-  },
-];
-
-// Grant & Contract Automation Suite Add-ons (One-time)
-export const GRANT_CONTRACT_ADDONS: StoreProduct[] = [
-  {
-    id: 'grant-suite',
-    slug: 'grant-suite',
-    name: 'Grant Automation Suite',
-    description: 'AI-assisted grant narratives and tracking.',
-    longDescription: 'Automate your grant writing process.',
-    price: 1499,
-    billingType: 'one_time',
-    licenseType: 'single',
-    appsIncluded: ['compliance'],
-    features: ['Narrative generation', 'Pipeline tracking'],
-    idealFor: ['Nonprofits'],
-    requiresApproval: false,
-  },
+// All Products Aggregate (for Catalog)
+export const ALL_PRODUCTS: StoreProduct[] = [
+  ...WORKFORCE_PLATFORM_PLANS,
+  ...CLONE_LICENSES,
+  ...COMMUNITY_ADDONS,
+  ...GRANT_CONTRACT_ADDONS,
 ];
 // Aliases for backwards compatibility
 export const ALL_PRODUCTS = [...PLATFORM_APPS];

@@ -1,9 +1,9 @@
 // Stripe Integration for Course Payments and Subscriptions
 import type Stripe from 'stripe';
-import { getStripe } from '@/lib/stripe/client';
+import { getStripe, stripe as stripeInstance } from '@/lib/stripe/client';
 import { resilientStripe } from '@/lib/resilience/with-resilience';
 
-const stripe = getStripe();
+const stripe = stripeInstance;
 export interface CheckoutSessionParams {
   courseId: string;
   courseName: string;

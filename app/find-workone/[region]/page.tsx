@@ -7,11 +7,7 @@ import { getWorkOneRegion, WORKONE_REGIONS } from '@/data/workone/indiana-region
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
 
-export const dynamic = 'force-static';
-
-export function generateStaticParams() {
-  return WORKONE_REGIONS.map((r) => ({ region: r.slug }));
-}
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,

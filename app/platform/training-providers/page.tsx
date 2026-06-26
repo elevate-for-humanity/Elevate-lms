@@ -1,282 +1,293 @@
-export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { InstitutionalLegalNotice } from '@/components/marketing/InstitutionalLegalNotice';
-import {
-  GraduationCap,
-  DollarSign,
-  Users,
-  BarChart,
-  ArrowRight,
-  Shield,
+import { Header } from '@/components/ui/Header';
+import { Footer } from '@/components/ui/Footer';
+import { 
+  GraduationCap, 
+  Users, 
+  BarChart, 
+  DollarSign, 
+  CheckCircle,
   Globe,
+  Award,
+  BookOpen,
+  Settings,
+  TrendingUp,
+  Shield,
+  ChevronRight
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Training Provider Solutions',
-  description:
-    'Grow your training business with our LMS and student management platform. Access funded learners, automate compliance, and track outcomes.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/training-providers' },
-  robots: { index: false, follow: false },
-  openGraph: {
-    title: 'Training Provider Solutions',
-    description: 'Grow your training business with our LMS and student management platform.',
-    url: 'https://www.elevateforhumanity.org/platform/training-providers',
-    siteName: PLATFORM_DEFAULTS.orgName,
-    images: [
-      {
-        url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
-        width: 1200,
-        height: 630,
-        alt: 'Training Provider Solutions',
-      },
-    ],
-    type: 'website',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/platform/training-providers',
   },
+  title: 'Training Provider Portal | Elevate For Humanity',
+  description: 'Partner with us to deliver workforce training programs. Access our LMS platform, student management tools, and funding opportunities.',
 };
 
-const benefits = [
+const PORTAL_FEATURES = [
+  {
+    icon: BookOpen,
+    title: 'Course Management',
+    description: 'Create, upload, and manage your training courses with our intuitive course builder. Support for video, documents, quizzes, and interactive content.',
+  },
   {
     icon: Users,
-    title: 'Reach More Students',
-    description:
-      'Access our network of funded learners through WIOA, , and other workforce programs.',
-  },
-  {
-    icon: DollarSign,
-    title: 'Streamlined Payments',
-    description: 'Get paid faster with automated billing, invoicing, and funding reconciliation.',
-  },
-  {
-    icon: GraduationCap,
-    title: 'LMS Platform',
-    description:
-      'Deliver courses online with built-in video, quizzes, assignments, and progress tracking.',
+    title: 'Student Management',
+    description: 'Track student enrollment, progress, attendance, and completion rates. Manage cohorts and communicate with learners.',
   },
   {
     icon: BarChart,
-    title: 'Track Outcomes',
-    description:
-      'Measure and report student success with real-time analytics and DOL-ready reports.',
+    title: 'Analytics Dashboard',
+    description: 'Real-time insights into program performance, student outcomes, completion rates, and employment placement metrics.',
+  },
+  {
+    icon: DollarSign,
+    title: 'Revenue Management',
+    description: 'Track tuition payments, manage billing, process refunds, and access detailed financial reports.',
+  },
+  {
+    icon: Award,
+    title: 'Certification System',
+    description: 'Issue verifiable digital certificates and credentials. Track certification status and manage renewals.',
   },
   {
     icon: Shield,
-    title: 'Compliance Built-In',
-    description: 'Automated WIOA, FERPA, and ADA compliance documentation and audit trails.',
-  },
-  {
-    icon: Globe,
-    title: 'ETPL Integration',
-    description: 'Manage your Eligible Training Provider List status and program approvals.',
+    title: 'Compliance Tools',
+    description: 'Stay compliant with WIOA, ETPL, and accreditation requirements. Automated reporting and documentation.',
   },
 ];
 
-const howItWorks = [
-  {
-    step: '1',
-    title: 'Apply to Join',
-    description: 'Submit your organization details and program catalog for review.',
-  },
-  {
-    step: '2',
-    title: 'Onboard Your Programs',
-    description: 'We help you set up courses, pricing, and compliance documentation.',
-  },
-  {
-    step: '3',
-    title: 'Receive Referrals',
-    description: 'Funded learners are matched to your programs through workforce partners.',
-  },
-  {
-    step: '4',
-    title: 'Deliver & Report',
-    description: 'Teach using our LMS and let the platform handle outcome reporting.',
-  },
+const BENEFITS = [
+  'White-label LMS platform with your branding',
+  'Access to WIOA-funded student referrals',
+  'Automated compliance reporting',
+  'Student recruitment and marketing support',
+  'Employer partnership connections',
+  'Technical support and training',
 ];
 
-const stats = [
-  { value: '200+', label: 'Training Providers' },
-  { value: '15,000+', label: 'Students Served' },
-  { value: '92%', label: 'Completion Rate' },
-  { value: '$2.4M', label: 'Funding Processed' },
+const PROGRAM_TYPES = [
+  { name: 'Healthcare Training', examples: 'CNA, Medical Assistant, Phlebotomy' },
+  { name: 'Skilled Trades', examples: 'HVAC, Electrical, Welding, Plumbing' },
+  { name: 'Beauty & Cosmetology', examples: 'Barber, Cosmetology, Esthetician' },
+  { name: 'Business & IT', examples: 'Tax Prep, Bookkeeping, IT Support' },
+  { name: 'Transportation', examples: 'CDL, Forklift, Heavy Equipment' },
+  { name: 'Professional Services', examples: 'Real Estate, Insurance, Notary' },
 ];
 
 export default function TrainingProvidersPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs
-            items={[{ label: 'Platform', href: '/platform' }, { label: 'Training Providers' }]}
-          />
-        </div>
-      </div>
-      <div className="max-w-6xl mx-auto px-4 pb-2">
-        <p className="text-sm text-black font-medium">
-          Part of the{' '}
-          <Link href="/platform" className="text-brand-red-600 hover:underline">
-            Elevate Workforce Operating System
-          </Link>
-        </p>
-      </div>
-
-      {/* Hero */}
-      {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image
-            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/pathways-hero.webp"
-            alt="Training Provider Solutions"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw" 
-          />
-        </div>
-        <div className="bg-white py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
-              For Training Providers
-            </h1>
-            <p className="text-lg text-white max-w-3xl mx-auto">
-              Grow your training business, reach funded learners, and let the platform handle
-              compliance and reporting.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="py-12 bg-teal-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((s, i) => (
-              <div key={i} className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-teal-700">{s.value}</p>
-                <p className="text-black text-sm mt-1">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Why Partner With Us</h2>
-            <p className="text-lg text-black max-w-2xl mx-auto">
-              Everything you need to run funded training programs, from enrollment to employment
-              outcomes.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {benefits.map((b, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition flex items-start gap-4"
-              >
-                <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <b.icon className="w-6 h-6 text-teal-600" />
+    <>
+      <Header />
+      <main className="min-h-screen bg-white">
+        {/* Hero Section */}
+        <section className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
+          <div className="max-w-7xl mx-auto px-4 py-20 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-medium mb-6">
+                  <GraduationCap className="w-4 h-4" />
+                  <span>For Training Providers</span>
                 </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 mb-2">{b.title}</h3>
-                  <p className="text-black text-sm">{b.description}</p>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
+                  Training Provider Portal
+                </h1>
+                <p className="text-xl text-purple-100 mb-8 leading-relaxed">
+                  Partner with us to expand your reach, streamline operations, and connect your 
+                  programs with funded students and employer partners.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <Link
+                    href="/program-holder/dashboard"
+                    className="inline-flex items-center gap-2 bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-purple-50 transition shadow-lg"
+                  >
+                    Access Portal
+                  </Link>
+                  <Link
+                    href="/partners/training-provider"
+                    className="inline-flex items-center gap-2 bg-purple-500/30 backdrop-blur text-white px-8 py-4 rounded-xl font-bold hover:bg-purple-500/40 transition border border-white/30"
+                  >
+                    Become a Partner
+                  </Link>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">How It Works</h2>
-            <p className="text-lg text-black">Four steps to start receiving funded students.</p>
-          </div>
-          <div className="grid md:grid-cols-4 gap-8">
-            {howItWorks.map((item, i) => (
-              <div key={i} className="text-center">
-                <div className="w-14 h-14 bg-brand-blue-700 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                  {item.step}
+              <div className="relative hidden lg:block">
+                <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
+                  <Image
+                    src="/images/heroes/training-provider.jpg"
+                    alt="Training Provider Portal"
+                    fill
+                    className="object-cover"
+                    sizes="50vw"
+                    priority
+                  />
                 </div>
-                <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-black text-sm">{item.description}</p>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* What You Get */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-6">What You Get as a Provider</h2>
-              <div className="space-y-4">
-                {[
-                  'Branded course pages with your logo and content',
-                  'Student enrollment and progress tracking dashboard',
-                  'Automated attendance and hours verification',
-                  'Built-in compliance documentation (WIOA, FERPA)',
-                  'Direct payment processing and funding reconciliation',
-                  'Outcome tracking and DOL-ready reporting',
-                  'Marketing exposure to funded learner network',
-                  'Dedicated partner success manager',
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <span className="text-black flex-shrink-0">•</span>
-                    <span className="text-slate-700">{item}</span>
+        {/* Stats Bar */}
+        <section className="bg-slate-900 text-white py-8">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div>
+                <div className="text-4xl font-black">150+</div>
+                <div className="text-slate-400">Training Partners</div>
+              </div>
+              <div>
+                <div className="text-4xl font-black">50+</div>
+                <div className="text-slate-400">Program Types</div>
+              </div>
+              <div>
+                <div className="text-4xl font-black">10K+</div>
+                <div className="text-slate-400">Students Trained</div>
+              </div>
+              <div>
+                <div className="text-4xl font-black">$5M+</div>
+                <div className="text-slate-400">Funding Accessed</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Grid */}
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+                Powerful Provider Tools
+              </h2>
+              <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+                Everything you need to manage your training programs, students, and business operations.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {PORTAL_FEATURES.map((feature) => {
+                const IconComponent = feature.icon;
+                return (
+                  <div
+                    key={feature.title}
+                    className="bg-slate-50 rounded-2xl p-8 hover:shadow-lg transition"
+                  >
+                    <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
+                      <IconComponent className="w-7 h-7 text-purple-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-3">
+                      {feature.title}
+                    </h3>
+                    <p className="text-slate-600">
+                      {feature.description}
+                    </p>
                   </div>
-                ))}
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Program Types */}
+        <section className="py-20 bg-slate-50">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+                Programs We Support
+              </h2>
+              <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+                We partner with training providers across multiple industries and program types.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {PROGRAM_TYPES.map((program) => (
+                <div
+                  key={program.name}
+                  className="bg-white rounded-xl p-6 border border-slate-200 hover:border-purple-300 hover:shadow-md transition"
+                >
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">{program.name}</h3>
+                  <p className="text-slate-600 text-sm">{program.examples}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Benefits Section */}
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-6">
+                  Why Partner With Us?
+                </h2>
+                <p className="text-lg text-slate-600 mb-8">
+                  Join our network of training providers and gain access to students, funding, 
+                  technology, and employer connections that help your programs thrive.
+                </p>
+                
+                <div className="space-y-4">
+                  {BENEFITS.map((benefit, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-700">{benefit}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-8">
+                  <Link
+                    href="/partners/training-provider"
+                    className="inline-flex items-center gap-2 text-purple-600 font-bold hover:text-purple-700"
+                  >
+                    Learn More About Partnership
+                    <ChevronRight className="w-5 h-5" />
+                  </Link>
+                </div>
+              </div>
+              <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-xl">
+                <Image
+                  src="/images/business/training-classroom.jpg"
+                  alt="Training Classroom"
+                  fill
+                  className="object-cover"
+                  sizes="50vw"
+                />
               </div>
             </div>
-            <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
-              <Image
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-5.webp"
-                alt="Training provider partnership"
-                fill
-                sizes="100vw"
-                className="object-cover" 
-              />
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 bg-gradient-to-br from-purple-600 to-indigo-700 text-white">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <h2 className="text-3xl md:text-4xl font-black mb-6">
+              Ready to Grow Your Training Business?
+            </h2>
+            <p className="text-xl text-purple-100 mb-8">
+              Join our network of training providers and start connecting with funded students today.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link
+                href="/apply/program-holder"
+                className="inline-flex items-center gap-2 bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-purple-50 transition"
+              >
+                Apply to Partner
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 bg-purple-500/30 text-white px-8 py-4 rounded-xl font-bold hover:bg-purple-500/40 transition border border-white/30"
+              >
+                Schedule a Demo
+              </Link>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 bg-brand-blue-700 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Grow Your Training Business?</h2>
-          <p className="text-teal-100 text-lg mb-8">
-            Join our provider network and start receiving funded students.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link
-              href="/partners/apply"
-              className="px-8 py-4 bg-white text-teal-700 font-bold rounded-lg hover:bg-teal-50 transition inline-flex items-center gap-2"
-            >
-              Apply Now <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/contact"
-              className="px-8 py-4 border-2 border-white text-slate-900 font-bold rounded-lg hover:bg-white/10 transition"
-            >
-              Contact Sales
-            </Link>
-          </div>
-        </div>
-      </section>
-      <div className="max-w-4xl mx-auto px-4 pb-12">
-        <InstitutionalLegalNotice />
-      </div>
-    </div>
+        </section>
+      </main>
+      <Footer />
+    </>
   );
 }

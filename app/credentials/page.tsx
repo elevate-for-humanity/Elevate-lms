@@ -16,7 +16,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
 import { PUBLIC_CREDENTIALS_DISPLAY } from '@/lib/site-credentials';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Credentials & Compliance | Elevate Workforce OS',

@@ -7,7 +7,7 @@ import EventsEmptyState from '@/components/events/EventsEmptyState';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 export const revalidate = 3600;
 
 export const metadata: Metadata = {

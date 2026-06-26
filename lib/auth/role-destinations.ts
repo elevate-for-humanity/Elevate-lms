@@ -51,9 +51,7 @@ export const ROLE_DESTINATIONS: Record<string, string> = {
   // ── Platform admins ───────────────────────────────────────────────
   // Admin roles always land on the admin app, never the LMS
   admin: '/admin/dashboard',
-  admin: '/admin/dashboard',
   org_admin: '/admin/dashboard',
-  admin: '/admin/dev-studio',
 
   // ── Internal Elevate staff ────────────────────────────────────────
   staff: '/admin/staff-portal/dashboard',

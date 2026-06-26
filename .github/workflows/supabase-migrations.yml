@@ -50,7 +50,7 @@ jobs:
           }).then(r => r.json()).then(d => {
             const count = d[0]?.count;
             console.log('HVAC lms_lessons:', count);
-            if (parseInt(count) !== 95) process.exit(1);
+            if (parseInt(count) !== 96) process.exit(1);
           });
           "
 

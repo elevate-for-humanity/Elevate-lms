@@ -186,11 +186,11 @@ export default async function ScholarshipsPage() {
       <section className="relative h-[clamp(220px,34vw,390px)]">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image sizes="100vw"
-          src="/images/pages/success-stories-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/success-stories-hero.webp"
           alt="Scholarships and Financial Aid"
           fill
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">

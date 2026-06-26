@@ -2,8 +2,8 @@
 /**
  * Production deploy helper: enable BuildKit cache, point services at branch, trigger builds.
  *
- *   DEPLOY_BRANCH=main pnpm tsx scripts/northflank/deploy-live.ts --execute
- *   DEPLOY_BRANCH=cursor/fix-header-mobile-desktop-c4c6 pnpm tsx scripts/northflank/deploy-live.ts --execute
+ *   DEPLOY_BRANCH=main npx tsx scripts/northflank/deploy-live.ts --execute
+ *   DEPLOY_BRANCH=cursor/fix-header-mobile-desktop-c4c6 npx tsx scripts/northflank/deploy-live.ts --execute
  */
 
 import { combinedServicePath, nfFetch, projectApiPath, resolveProjectId } from './lib';
@@ -89,11 +89,11 @@ async function main() {
   }
 
   const { execSync } = await import('node:child_process');
-  execSync('pnpm exec tsx scripts/northflank/configure-services.ts --all --execute', {
+  execSync('npx tsx scripts/northflank/configure-services.ts --all --execute', {
     stdio: 'inherit',
     cwd: process.cwd(),
   });
-  execSync('pnpm exec tsx scripts/northflank/ensure-build-cache.ts --all --execute', {
+  execSync('npx tsx scripts/northflank/ensure-build-cache.ts --all --execute', {
     stdio: 'inherit',
     cwd: process.cwd(),
   });

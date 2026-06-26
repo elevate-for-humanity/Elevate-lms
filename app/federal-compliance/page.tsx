@@ -32,13 +32,13 @@ export default function FederalCompliancePage() {
       <section className="relative bg-slate-900 text-white overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="/images/pages/compliance-page-1.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/compliance-page-1.webp"
             alt="Federal compliance"
             fill
             className="object-cover opacity-30"
             priority
             sizes="100vw"
-            placeholder="empty"
+            
           />
         </div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-24">

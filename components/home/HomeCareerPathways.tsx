@@ -14,6 +14,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
 import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
 import { card, grid, layout } from '@/lib/page-design-tokens';
+import { getProgramPaymentPlan } from '@/lib/payments/payment-plan';
 
 // Featured programs shown on homepage - ordered by demand/visibility
 const FEATURED_SLUGS = [
@@ -52,12 +53,18 @@ function PathwayCard({ prog, priority }: { prog: ProgramSchema; priority?: boole
     prog.slug === 'welding' ||
     prog.slug === 'culinary-apprenticeship';
 
+  // Safe Image Source - Prevents build crashes on null sources
+  const imageSrc = prog.heroImage || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/logo.png';
+  
+  // Compute payment plan for this program
+  const paymentPlan = getProgramPaymentPlan(prog.slug);
+  
   return (
     <article className="group flex flex-col rounded-2xl overflow-hidden bg-white border border-slate-200 hover:border-brand-red-300 hover:shadow-lg transition-all hover:-translate-y-0.5">
       {/* Image */}
       <div className={card.programImage}>
         <Image
-          src={prog.heroImage}
+          src={imageSrc}
           alt={prog.heroImageAlt || prog.title}
           fill
           className={card.programImageFill}
@@ -116,19 +123,27 @@ function PathwayCard({ prog, priority }: { prog: ProgramSchema; priority?: boole
         </div>
 
         {/* CTAs */}
-        <div className="flex gap-2 mt-auto pt-2">
-          <Link
-            href={prog.cta?.applyHref || `/apply?program=${prog.slug}`}
-            className="flex-1 text-center py-2.5 rounded-xl bg-brand-red-600 hover:bg-brand-red-700 text-white text-sm font-bold transition-colors"
-          >
-            Apply Free
-          </Link>
-          <Link
-            href={`/programs/${prog.slug}`}
-            className="flex-1 text-center py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition-colors"
-          >
-            Details
-          </Link>
+        <div className="flex flex-col gap-2 mt-auto pt-2">
+          {paymentPlan && (
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter flex justify-between items-center px-1">
+              <span>Payment Plan</span>
+              <span className="text-brand-red-600">Starting at ${paymentPlan.weeklyPayment}/week</span>
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Link
+              href={prog.cta?.applyHref || `/apply?program=${prog.slug}`}
+              className="flex-1 text-center py-2.5 rounded-xl bg-brand-red-600 hover:bg-brand-red-700 text-white text-sm font-bold transition-colors"
+            >
+              Apply Free
+            </Link>
+            <Link
+              href={`/programs/${prog.slug}`}
+              className="flex-1 text-center py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition-colors"
+            >
+              Details
+            </Link>
+          </div>
         </div>
       </div>
     </article>

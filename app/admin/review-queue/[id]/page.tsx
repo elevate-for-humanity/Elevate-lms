@@ -33,6 +33,11 @@ export default async function ReviewDetailPage({ params }: { params: Promise<{ i
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect('/login');
+  }
+
+
   // Check admin role
   const { data: profile } = await supabase
     .from('profiles')
@@ -40,7 +45,7 @@ export default async function ReviewDetailPage({ params }: { params: Promise<{ i
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff'].includes(profile.role)) {
     redirect('/unauthorized');
   }
 

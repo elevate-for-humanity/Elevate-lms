@@ -61,7 +61,7 @@ export default function ProgramFundingProcessSection({ program }: Props) {
               ) : funding.isImpactFundable ? (
                 <>
                   This program is not on Indiana&apos;s ETPL for WIOA tuition. Indiana SNAP or TANF
-                  recipients may still qualify through <strong>FSSA IMPACT</strong> with a case-worker
+                  recipients may still qualify through <strong></strong> with a case-worker
                   referral.
                 </>
               ) : (
@@ -125,7 +125,7 @@ export default function ProgramFundingProcessSection({ program }: Props) {
 
         {funding.isImpactFundable && !funding.showWorkforceFundingProcess && (
           <div className="mt-8 bg-purple-50 border border-purple-200 rounded-xl p-6 text-sm text-purple-900">
-            <p className="font-bold mb-2">FSSA IMPACT pathway (Indiana only)</p>
+            <p className="font-bold mb-2"> pathway (Indiana only)</p>
             <p className="text-purple-800 leading-relaxed">
               Contact your FSSA or DFR case worker to request a training referral. IMPACT does not
               use the WorkOne WIOA intake form. Self-pay enrollment remains open to all states.

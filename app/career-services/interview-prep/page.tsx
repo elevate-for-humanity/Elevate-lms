@@ -1,22 +1,20 @@
-import type { Metadata } from 'next';
-import PublicLandingPage from '@/components/marketing/PublicLandingPage';
+import { buildMetadata } from '@/lib/cf-seo';
+import { siteConfig } from '@/content/cf-site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const revalidate = 3600;
+export const metadata = buildMetadata({
+  title: 'Interview Prep',
+  description: '{PLATFORM_DEFAULTS.orgName} career services — Interview Prep.',
+  path: '/career-services/interview-prep',
+});
 
-export const metadata: Metadata = {
-  title: 'Interview Preparation',
-  description: 'Free interview preparation for Elevate students and graduates. Mock interviews, industry-specific coaching, and salary negotiation guidance.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/career-services/interview-prep' },
-};
-
-export default function InterviewPrepPage() {
+export default function Page() {
   return (
     <PublicLandingPage
       config={{
         breadcrumbs: [{ label: 'Career Services', href: '/career-services' }, { label: 'Interview Prep' }],
         hero: {
-          image: '/images/pages/career-services-page-2.jpg',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
           tag: 'Interview Preparation',
           tagColor: 'text-brand-blue-600',
           title: 'Walk In Confident',
@@ -28,7 +26,7 @@ export default function InterviewPrepPage() {
             'Generic interview advice does not work for skilled trades, healthcare, or technical roles. Our coaching is specific to your field — the questions employers actually ask, the certifications they verify, and the red flags they watch for.',
             'Available to all enrolled students and graduates at no cost.',
           ],
-          image: '/images/pages/career-services-page-1.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp',
         },
         features: {
           heading: 'What We Cover',

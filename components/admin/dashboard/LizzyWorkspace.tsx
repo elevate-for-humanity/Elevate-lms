@@ -40,13 +40,13 @@ type ToolPanel =
   | 'video'
   | 'secrets';
 
-const UnifiedEllieChat = dynamic(() => import('@/components/dev-studio/UnifiedEllieChat'), {
+const UnifiedEllieChat = dynamic(() => import('@/components/studio/UnifiedEllieChat'), {
   ssr: false,
 });
-const DeployPanel = dynamic(() => import('@/components/dev-studio/DeployPanel'), { ssr: false });
-const DevContainerPanel = dynamic(() => import('@/components/dev-studio/DevContainerPanel'), { ssr: false });
-const ServicesPanel = dynamic(() => import('@/components/dev-studio/ServicesPanel'), { ssr: false });
-const SecretsPanel = dynamic(() => import('@/components/dev-studio/SecretsPanel'), { ssr: false });
+const DeployPanel = dynamic(() => import('@/components/studio/DeployPanel'), { ssr: false });
+const DevContainerPanel = dynamic(() => import('@/components/studio/DevContainerPanel'), { ssr: false });
+const ServicesPanel = dynamic(() => import('@/components/studio/ServicesPanel'), { ssr: false });
+const SecretsPanel = dynamic(() => import('@/components/studio/SecretsPanel'), { ssr: false });
 const LizzyFilesPanel = dynamic(() => import('./LizzyFilesPanel').then((m) => m.LizzyFilesPanel), { ssr: false });
 const LizzyUploadPanel = dynamic(() => import('./LizzyUploadPanel').then((m) => m.LizzyUploadPanel), { ssr: false });
 const LizzyErrorsPanel = dynamic(() => import('./LizzyErrorsPanel').then((m) => m.LizzyErrorsPanel), { ssr: false });

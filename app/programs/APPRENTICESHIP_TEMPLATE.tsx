@@ -36,7 +36,7 @@ export default function ApprenticeshipPage() {
           <HeroMediaFrame heightClass="h-[clamp(220px,34vw,390px)]">
             <CanonicalVideo
               src="/videos/barber-hero-final.mp4"
-              poster="/images/pages/barber-apprenticeship.webp"
+              poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship.webp"
               className="absolute inset-0 w-full h-full object-cover"
             />
           </HeroMediaFrame>

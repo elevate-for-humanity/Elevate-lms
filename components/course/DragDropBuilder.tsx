@@ -241,7 +241,7 @@ export default function DragDropBuilder({
   }, []);
 
   const handleAddModule = () => {
-    const module: CourseModule = {
+    const mod: CourseModule = {
       id: `module-${Date.now()}`,
       title: newModule.title || 'Untitled Module',
       type: newModule.type || 'video',
@@ -250,7 +250,7 @@ export default function DragDropBuilder({
       order: modules.length,
     };
 
-    setModules([...modules, module]);
+    setModules([...modules, mod]);
     setShowAddModal(false);
     setNewModule({ title: '', type: 'video', duration: 0, content: '' });
   };

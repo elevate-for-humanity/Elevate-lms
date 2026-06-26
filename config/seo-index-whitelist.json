@@ -62,7 +62,8 @@
     "/programs/barber-apprenticeship/apply",
     "/barber-and-beauty-apprenticeships",
     "/schools/mesmerized-by-beauty",
-    "/store/guides/licensing"
+    "/store/guides/licensing",
+    "/programs/:param/enrollment-success"
   ],
   "pending_review": [
     "/resources/understanding-tax-prep-fees",

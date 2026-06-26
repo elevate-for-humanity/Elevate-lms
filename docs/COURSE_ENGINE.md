@@ -162,7 +162,7 @@ videoConfig: {
   template:           'elevate-slide',
   instructorName:     'Marcus Johnson',
   instructorTitle:    'Lead Instructor',
-  instructorImagePath: '/images/instructors/marcus-johnson.jpg',
+  instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg',
   topBarColor:        '#f97316',   // orange top bar
   accentColor:        '#3b82f6',
   backgroundColor:    '#0f172a',   // dark navy

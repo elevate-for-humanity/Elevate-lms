@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/images/pages/social-media-1.webp',
+        url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/social-media-1.webp',
         width: 1200,
         height: 630,
         alt: 'Elevate For Humanity blog',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     title: 'Blog',
     description:
       `Workforce development insights, funding guides, credential explainers, and career training tips from ${PLATFORM_DEFAULTS.orgName}.`,
-    images: ['/images/pages/social-media-1.webp'],
+    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/social-media-1.webp'],
   },
 };
 

@@ -16,22 +16,22 @@ const OJT_BENEFITS = [
   {
     title: 'Wage Reimbursement',
     desc: 'Employers receive up to 50% of trainee wages reimbursed during the OJT period through WIOA funding.',
-    img: '/images/pages/funding-impact-3.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-impact-3.webp',
   },
   {
     title: 'Reduced Hiring Risk',
     desc: 'Try before you fully commit. OJT lets you evaluate a candidate on the job before permanent placement.',
-    img: '/images/pages/funding-impact-4.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-impact-4.webp',
   },
   {
     title: 'Customized Training',
     desc: 'Training plan is built around your specific job requirements — not a generic curriculum.',
-    img: '/images/pages/training-page-3.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-page-3.webp',
   },
   {
     title: 'WOTC Tax Credits',
     desc: 'Claim up to $9,600 per qualifying hire through the Work Opportunity Tax Credit program.',
-    img: '/images/pages/funding-impact-5.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-impact-5.webp',
   },
 ];
 
@@ -39,17 +39,17 @@ const APPRENTICESHIP = [
   {
     title: 'DOL Registered',
     desc: 'Elevate is a DOL Registered Apprenticeship Sponsor (RAPIDS: 2025-IN-132301). We handle compliance.',
-    img: '/images/pages/apprenticeships-page-1.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeships-page-1.webp',
   },
   {
     title: 'Employer Sponsors',
     desc: 'Your business becomes the training site. We provide the curriculum, credentials, and oversight.',
-    img: '/images/pages/apprenticeships-page-2.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeships-page-2.webp',
   },
   {
     title: 'Earn While You Learn',
     desc: 'Apprentices earn wages from day one while working toward a nationally recognized credential.',
-    img: '/images/pages/apprenticeship-structure.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeship-structure.webp',
   },
 ];
 
@@ -60,7 +60,7 @@ export default function OjtAndFundingPage() {
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden">
         <LazyVideo
           src="/videos/training-providers-hero.mp4"
-          poster="/images/pages/ojt-and-funding-page-1.webp"
+          poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/ojt-and-funding-page-1.webp"
           className="absolute inset-0 w-full h-full object-cover"
         />
       </section>
@@ -180,7 +180,7 @@ export default function OjtAndFundingPage() {
             </div>
             <div className="relative h-64 rounded-2xl overflow-hidden">
               <Image
-                src="/images/pages/for-employers-page-1.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/for-employers-page-1.webp"
                 alt="Employer OJT partnership"
                 fill
                 sizes="600px"

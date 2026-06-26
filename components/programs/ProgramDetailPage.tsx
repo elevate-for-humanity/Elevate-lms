@@ -86,6 +86,7 @@ export default function ProgramDetailPage({
   processSlot,
   children,
 }: Props) {
+  
   // Dev-time validation
   if (process.env.NODE_ENV === 'development') {
     const errors = validateProgram(p);
@@ -531,7 +532,7 @@ export default function ProgramDetailPage({
                     <h2 className="text-xl font-extrabold text-slate-900 mb-1">WIOA Eligible Technology Pathway</h2>
                     <p className="text-slate-600 text-sm leading-relaxed">
                       This program is approved on Indiana ETPL (Program ID {p.etplProgramId}) and may qualify for{' '}
-                      <strong>WIOA, WorkOne, Workforce Ready Grant, SNAP E&T, JRI, Vocational Rehabilitation,</strong> and approved workforce funding sources.
+                      <strong>WIOA, WorkOne, Workforce Ready Grant, JRI, Vocational Rehabilitation,</strong> and approved workforce funding sources.
                     </p>
                   </div>
                 </div>
@@ -709,7 +710,7 @@ export default function ProgramDetailPage({
               <div className="space-y-2">
                 {hasWIOAFunding && (
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {['WorkOne', 'WIOA', 'Trade Act', 'SNAP E&T', 'JRI'].map((prog) => (
+                    {['WorkOne', 'WIOA', 'Trade Act', 'JRI'].map((prog) => (
                       <span
                         key={prog}
                         className="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-lg"
@@ -721,7 +722,7 @@ export default function ProgramDetailPage({
                 )}
                 {hasImpactOnly && (
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {['FSSA IMPACT', 'SNAP E&T', 'Indiana Only'].map((prog) => (
+                    {['Indiana Only'].map((prog) => (
                       <span
                         key={prog}
                         className="bg-purple-100 text-purple-700 text-xs font-semibold px-2.5 py-1 rounded-lg"
@@ -739,7 +740,7 @@ export default function ProgramDetailPage({
                 </Link>
                 <p className="text-center text-xs text-slate-500 mt-1">
                   {hasImpactOnly
-                    ? 'Indiana SNAP/TANF recipients · must be referred by FSSA case worker'
+                    ? 'Indiana residents · contact WorkOne for funding options'
                     : 'Free to apply · no payment today · takes 2 minutes'}
                 </p>
               </div>
@@ -850,12 +851,11 @@ export default function ProgramDetailPage({
           {/* Indiana funding context — shown for IMPACT-only programs */}
           {hasImpactOnly && (
             <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm text-amber-900 max-w-3xl mx-auto">
-              <p className="font-bold mb-1">Indiana residents: funding is available through FSSA IMPACT</p>
+              <p className="font-bold mb-1">Indiana residents: additional funding may be available</p>
               <p className="text-amber-800 mb-3">
-                This program is not on Indiana&rsquo;s ETPL and does not qualify for WIOA or the
-                Workforce Ready Grant. However, Indiana SNAP and TANF recipients may qualify for
-                free training through the FSSA IMPACT (SNAP Employment &amp; Training) program.
-                Contact your FSSA/DFR case worker to request a training referral.
+                This program may not be on Indiana&rsquo;s ETPL and does not qualify for WIOA or the
+                Workforce Ready Grant. However, additional Indiana workforce funding sources may be available.
+                Contact your local WorkOne office to learn about eligibility.
               </p>
               <p className="text-amber-800">
                 <strong>Outside Indiana?</strong> Self-pay enrollment is available to everyone —

@@ -34,9 +34,9 @@ const checks = [
   }},
   { label: 'profiles_own_read RLS policy', check: () => policyExists('profiles', 'profiles_own_read') },
   { label: 'platform_secrets table', check: () => tableExists('platform_secrets') },
-  { label: 'super_admin profile for curvaturebodysculpting@gmail.com', check: async () => {
+  { label: 'admin profile for curvaturebodysculpting@gmail.com', check: async () => {
     const { data } = await db.from('profiles').select('role').eq('email', 'curvaturebodysculpting@gmail.com').maybeSingle();
-    return data?.role === 'super_admin';
+    return data?.role === 'admin';
   }},
 ];
 

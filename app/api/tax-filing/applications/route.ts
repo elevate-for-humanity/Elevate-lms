@@ -1,1 +1,3 @@
-export { POST, dynamic, runtime } from '@/app/api/tax/file-return/route';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export { POST } from '@/app/api/tax/file-return/route';

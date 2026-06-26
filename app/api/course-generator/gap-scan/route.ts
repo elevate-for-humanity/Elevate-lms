@@ -14,7 +14,7 @@ import { scanAllGaps, createDraftJobsFromGaps, type CourseGap } from '@/lib/ai/c
 
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_ROLES = new Set(['platform_owner', 'platform_admin', 'platform_operator', 'admin', 'super_admin', 'staff']);
+const ALLOWED_ROLES = new Set(['admin', 'staff']);
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = safeGetUser(await supabase.auth.getUser());
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = safeGetUser(await supabase.auth.getUser());
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

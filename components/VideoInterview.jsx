@@ -42,6 +42,7 @@ export default function VideoInterview() {
     } else if (recording && timeLeft === 0) {
       stopRecording();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recording, timeLeft]);
   const startRecording = async () => {
     try {

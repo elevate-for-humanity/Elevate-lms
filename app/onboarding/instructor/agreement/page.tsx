@@ -26,7 +26,7 @@ export default async function InstructorAgreementPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['instructor', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['instructor', 'admin', 'staff'].includes(profile.role)) {
     redirect('/onboarding/learner');
   }
 

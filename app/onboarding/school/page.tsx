@@ -38,7 +38,7 @@ export default async function SchoolOnboardingPage() {
 
   if (
     profile &&
-    !['program_holder', 'admin', 'super_admin', 'staff'].includes(profile.role ?? '')
+    !['program_holder', 'admin', 'staff'].includes(profile.role ?? '')
   ) {
     redirect('/onboarding/learner');
   }

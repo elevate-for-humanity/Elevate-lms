@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Our Mission',
     description:
       'Credential-bearing workforce training and community support for underserved populations.',
-    images: [{ url: '/images/pages/mission-hero.webp', width: 1200, height: 630 }],
+    images: [{ url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/mission-hero.webp', width: 1200, height: 630 }],
   },
 };
 
@@ -47,7 +47,7 @@ const CREDENTIALS = [
   'ETPL Approved — Indiana DWD',
   'DOL Registered Apprenticeship Sponsor',
   'WIOA / WRG / JRI Approved',
-  'FSSA IMPACT Participating Provider',
+  ' Participating Provider',
   'IRS VITA Free Tax Prep Site',
   'SAM.gov Registered — CAGE: 0Q856',
   'Certiport Authorized Testing Center',
@@ -69,12 +69,12 @@ export default function MissionPage() {
         <div className="absolute inset-0">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/images/pages/mission-hero.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/mission-hero.webp"
             alt={`${PLATFORM_DEFAULTS.orgName} mission`}
             fill
             className="object-cover opacity-40"
             priority
-            sizes="100vw" placeholder="empty"
+            sizes="100vw" 
           />
         </div>
         <div className="relative max-w-5xl mx-auto px-4 py-20">
@@ -103,7 +103,7 @@ export default function MissionPage() {
               they lack access.
             </p>
             <p className="text-slate-600 mb-4 leading-relaxed">
-              We close that gap. Through WIOA, Workforce Ready Grant, FSSA IMPACT, and JRI funding,
+              We close that gap. Through WIOA, Workforce Ready Grant, , and JRI funding,
               we make career training free or low-cost for the people who need it most. Every
               program ends with a recognized credential or state license — not just a certificate of
               completion.
@@ -115,11 +115,11 @@ export default function MissionPage() {
           </div>
           <div className="relative rounded-2xl overflow-hidden h-80">
             <Image
-              src="/images/pages/mission-page-1.webp"
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/mission-page-1.webp"
               alt={`${PLATFORM_DEFAULTS.orgName} training`}
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty"
+              sizes="(max-width: 768px) 100vw, 50vw" 
             />
           </div>
         </div>
@@ -150,11 +150,11 @@ export default function MissionPage() {
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div className="relative rounded-2xl overflow-hidden h-72 order-2 md:order-1">
             <Image
-              src="/images/pages/about-career-training.webp"
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp"
               alt="Learners in training"
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty"
+              sizes="(max-width: 768px) 100vw, 50vw" 
             />
           </div>
           <div className="order-1 md:order-2">
@@ -164,7 +164,7 @@ export default function MissionPage() {
                 'Adults seeking a career change or first career',
                 'Dislocated workers and laid-off employees',
                 'Justice-involved individuals re-entering the workforce',
-                'SNAP and TANF recipients through FSSA IMPACT',
+                'SNAP and TANF recipients through ',
                 'Veterans transitioning to civilian careers',
                 'Community members who need wraparound support',
               ].map((item) => (

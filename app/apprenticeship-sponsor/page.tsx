@@ -29,7 +29,7 @@ export default function ApprenticeshipSponsorPage() {
   return (
     <div className="min-h-screen bg-white">
       <HeroVideo
-        posterImage="/images/pages/apprenticeship-sponsor-page-1.webp"
+        posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeship-sponsor-page-1.webp"
         videoSrcDesktop={heroBanners['apprenticeship-sponsor'].videoSrcDesktop}
         voiceoverSrc={heroBanners['apprenticeship-sponsor'].voiceoverSrc}
         microLabel={heroBanners['apprenticeship-sponsor'].microLabel}

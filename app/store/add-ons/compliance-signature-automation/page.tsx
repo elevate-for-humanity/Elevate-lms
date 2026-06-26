@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PenTool, ArrowRight, FileText, Clock } from 'lucide-react';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Compliance & Signature Automation | Elevate Store',
   description: 'Digital signatures, MOU management, and compliance document workflows with full audit trail.',

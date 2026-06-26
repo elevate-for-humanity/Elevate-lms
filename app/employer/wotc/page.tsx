@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 const MAX_WOTC_PER_HIRE = 2400;
 
 export default async function EmployerWotcPage() {
-  const { user } = await requireRole(['employer', 'admin', 'super_admin']);
+  const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
 
   const { data: jobs } = await supabase

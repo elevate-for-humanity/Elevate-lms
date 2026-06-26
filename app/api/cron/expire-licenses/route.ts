@@ -28,7 +28,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (expErr) {
     logger.error('[cron/expire-licenses] Expire failed', expErr);
-    return NextResponse.json({ ok: false, error: expErr.message }, { status: 500 });
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 
   // Warn expiring soon

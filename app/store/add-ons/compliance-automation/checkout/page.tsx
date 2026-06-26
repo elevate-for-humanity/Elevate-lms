@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 import AddOnCheckout from '@/components/store/AddOnCheckout';
 import type { Metadata } from 'next';
@@ -11,7 +11,7 @@ export default function ComplianceAutomationCheckoutPage() {
     <AddOnCheckout
       productId="compliance-automation"
       productName="Compliance Automation"
-      productImage="/images/pages/admin-compliance-audit-hero.jpg"
+      productImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-compliance-audit-hero.jpg"
       backHref="/store/add-ons/compliance-automation"
       oneTimePrice={1297}
       monthlyPrice={374}

@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 // POST /api/lms/evidence/[evidenceId]/review
 // Instructor approves or rejects a lab/assignment submission.
-// Requires role: instructor, admin, super_admin, or staff.
+// Requires role: instructor, admin, admin, or staff.
 // Body: { status: 'approved' | 'rejected', feedback?: string }
 export async function POST(
   req: NextRequest,
@@ -29,7 +29,7 @@ export async function POST(
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['instructor', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['instructor', 'admin', 'staff'].includes(profile.role)) {
     return safeError('Forbidden', 403);
   }
 

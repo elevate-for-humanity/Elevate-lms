@@ -62,6 +62,11 @@ export default async function PayoutQueuePage({
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect('/login');
+  }
+
+
   const db = await requireAdminClient();
   if (!db) redirect('/admin/dashboard');
 
@@ -70,7 +75,7 @@ export default async function PayoutQueuePage({
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff'].includes(profile.role)) {
     redirect('/admin/dashboard');
   }
 

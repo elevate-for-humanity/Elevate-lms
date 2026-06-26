@@ -125,11 +125,11 @@ export default function K12SolutionsPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image sizes="100vw"
-            src="/images/pages/k12-hero.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/k12-hero.webp"
             alt="K-12 students in a career and technical education classroom"
             fill
             className="object-cover"
-            priority placeholder="empty"
+            priority 
           />
           <div className="absolute inset-0 bg-slate-900/50" />
           <div className="absolute inset-0 flex items-end">

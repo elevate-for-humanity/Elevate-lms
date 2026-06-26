@@ -4,8 +4,9 @@
  *
  * Use when builds succeed but deployedSHA is stale (e.g. disabledCD was true).
  *
- *   pnpm tsx scripts/northflank/trigger-deployment.ts elevate-admin
- *   pnpm tsx scripts/northflank/trigger-deployment.ts elevate-admin --sha 9291b43c...
+ *   npx tsx scripts/northflank/trigger-deployment.ts elevate-admin
+ *   npx tsx scripts/northflank/trigger-deployment.ts elevate-admin --sha 9291b43c...
+ *   npx tsx scripts/northflank/trigger-deployment.ts elevate-lms --sha $(git rev-parse HEAD)
  */
 
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
@@ -18,7 +19,7 @@ function argValue(name: string): string | undefined {
 async function main() {
   const serviceId = process.argv[2];
   if (!serviceId || serviceId.startsWith('--')) {
-    console.error('Usage: pnpm tsx scripts/northflank/trigger-deployment.ts <service-id> [--sha <commit>]');
+    console.error('Usage: npx tsx scripts/northflank/trigger-deployment.ts <service-id> [--sha <commit>]');
     process.exit(1);
   }
 
@@ -31,14 +32,22 @@ async function main() {
   const sha = argValue('--sha');
   const branch = process.env.DEPLOY_BRANCH || 'main';
 
-  const payload = {
+  const payload: Record<string, unknown> = {
     internal: {
       id: serviceId,
       branch,
-      buildSHA: sha ?? 'latest',
     },
     docker: { configType: 'default' as const },
   };
+
+  // Use specific SHA, or fallback to latest
+  if (sha) {
+    (payload.internal as Record<string, unknown>).buildSHA = sha;
+    console.log(`Deploying build for SHA: ${sha.slice(0, 12)}...`);
+  } else {
+    (payload.internal as Record<string, unknown>).buildSHA = 'latest';
+    console.log('Deploying latest build');
+  }
 
   await nfFetch(projectApiPath(projectId, `/services/${serviceId}/deployment`), {
     method: 'POST',

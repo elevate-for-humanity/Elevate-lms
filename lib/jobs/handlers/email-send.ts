@@ -118,8 +118,20 @@ async function sendEmail(payload: EmailPayload): Promise<void> {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`SendGrid API error: ${error}`);
+      const errorText = await response.text();
+      
+      // 401 = SendGrid API key is invalid/expired
+      // 403 = Forbidden (wrong permissions)
+      // These are configuration issues - log as warn, not error
+      if (response.status === 401 || response.status === 403) {
+        logger.warn('[Email] SendGrid auth failed - check SENDGRID_API_KEY', {
+          status: response.status,
+          error: errorText.substring(0, 200), // Truncate for logs
+        });
+        return; // Silent fail - don't crash on config issues
+      }
+      
+      throw new Error(`SendGrid API error ${response.status}: ${errorText}`);
     }
 
     return;

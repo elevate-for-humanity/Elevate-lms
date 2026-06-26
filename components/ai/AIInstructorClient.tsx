@@ -57,6 +57,7 @@ export function AIInstructorClient({
 
     utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message, autoPlay, onComplete]);
 
   const stopSpeaking = () => {

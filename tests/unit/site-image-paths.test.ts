@@ -3,34 +3,34 @@ import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
 
 describe('resolveSiteImagePath', () => {
   it('maps known broken webp paths to existing files', () => {
-    expect(resolveSiteImagePath('/images/pages/tax-preparation.webp')).toBe(
-      '/images/business/office-admin.webp',
+    expect(resolveSiteImagePath('https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp')).toBe(
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp',
     );
-    expect(resolveSiteImagePath('/images/pages/accessibility-hero.webp')).toBe(
-      '/images/pages/accessibility-hero.jpg',
+    expect(resolveSiteImagePath('https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/accessibility-hero.jpg')).toBe(
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/accessibility-hero.jpg',
     );
-    expect(resolveSiteImagePath('/images/pages/esthetician.webp')).toBe(
-      '/images/beauty/esthetician.webp',
+    expect(resolveSiteImagePath('https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/esthetician.webp')).toBe(
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/esthetician.webp',
     );
   });
 
   it('maps legacy .jpg paths to .webp from conversion manifest', () => {
-    expect(resolveSiteImagePath('/images/pages/pathways-page-6.jpg')).toBe(
-      '/images/pages/pathways-page-6.webp',
+    expect(resolveSiteImagePath('https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pathways-page-6.webp')).toBe(
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pathways-page-6.webp',
     );
-    expect(resolveSiteImagePath('/images/pages/how-it-works-hero.jpg')).toBe(
-      '/images/pages/how-it-works-hero.webp',
+    expect(resolveSiteImagePath('https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/how-it-works-hero.webp')).toBe(
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/how-it-works-hero.webp',
     );
   });
 
   it('returns unknown paths unchanged', () => {
-    expect(resolveSiteImagePath('/images/pages/hvac-technician.webp')).toBe(
-      '/images/pages/hvac-technician.webp',
+    expect(resolveSiteImagePath('https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp')).toBe(
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
     );
   });
 
   it('returns fallback for null/empty src', () => {
-    expect(resolveSiteImagePath(null)).toBe('/images/pages/prog-hero-main-2.webp');
-    expect(resolveSiteImagePath('')).toBe('/images/pages/prog-hero-main-2.webp');
+    expect(resolveSiteImagePath(null)).toBe('https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/prog-hero-main-2.webp');
+    expect(resolveSiteImagePath('')).toBe('https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/prog-hero-main-2.webp');
   });
 });

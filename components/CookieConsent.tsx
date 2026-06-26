@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
 
 export default function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false);
@@ -37,7 +38,7 @@ export default function CookieConsent() {
     }
   }, [mounted]);
 
-  const handleAccept = () => {
+  const handleAccept = useCallback(() => {
     // Set cookie (365 days expiry)
     const expiryDate = new Date();
     expiryDate.setFullYear(expiryDate.getFullYear() + 1);
@@ -54,7 +55,7 @@ export default function CookieConsent() {
         analytics_storage: 'granted',
       });
     }
-  };
+  }, []);
 
   const handleReject = () => {
     // Set cookie (365 days expiry)
@@ -75,10 +76,10 @@ export default function CookieConsent() {
     }
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     // Closing the banner = implicit accept (analytics stay granted by default)
     handleAccept();
-  };
+  }, [handleAccept]);
 
   const bannerRef = useRef<HTMLDivElement>(null);
   const firstFocusRef = useRef<HTMLButtonElement>(null);
@@ -104,7 +105,7 @@ export default function CookieConsent() {
       e.preventDefault();
       first.focus();
     }
-  }, []);
+  }, [handleClose]);
 
   useEffect(() => {
     if (isVisible) {
@@ -148,12 +149,12 @@ export default function CookieConsent() {
                     We use cookies to enhance your experience, analyze site traffic, and provide
                     personalized content. By clicking &ldquo;Accept&rdquo;, you consent to our use
                     of cookies.{' '}
-                    <a
+                    <Link
                       href="/legal/privacy"
                       className="text-brand-blue-600 hover:text-brand-blue-700 underline"
                     >
                       Learn more
-                    </a>
+                    </Link>
                   </p>
                 </div>
               </div>

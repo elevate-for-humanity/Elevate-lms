@@ -19,6 +19,9 @@ export default async function InstructorAnalyticsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   // Get courses assigned to this instructor
   const { data: myCourses } = await supabase
     .from('lms_courses')
@@ -53,7 +56,7 @@ export default async function InstructorAnalyticsPage() {
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image
-          src="/images/pages/instructor-page-1.jpg"
+          src="/images/pages/instructor-page-1.webp"
           alt="Instructor portal"
           fill
           sizes="100vw"

@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 
 import { Metadata } from 'next';
@@ -21,25 +21,25 @@ const features = [
   {
     title: 'Participant Intake & Eligibility',
     description: 'Automated eligibility verification with document upload and digital signatures.',
-    image: '/images/pages/wioa-meeting.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
     items: ['Digital intake forms', 'Eligibility checklist automation', 'Document management', 'E-signature integration'],
   },
   {
     title: 'Performance Metrics Tracking',
     description: 'Real-time tracking of all WIOA primary indicators of performance.',
-    image: '/images/pages/workforce-training.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp',
     items: ['Employment rate tracking', 'Median earnings calculation', 'Credential attainment', 'Measurable skill gains'],
   },
   {
     title: 'PIRL Data Export',
     description: 'One-click export to Participant Individual Record Layout format.',
-    image: '/images/pages/store-recommendations.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp',
     items: ['Automated field mapping', 'Data validation', 'Error checking', 'Batch export capability'],
   },
   {
     title: 'Quarterly & Annual Reports',
     description: 'Pre-built report templates for all required WIOA submissions.',
-    image: '/images/pages/job-placement.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/job-placement.webp',
     items: ['ETA-9169 reports', 'ETA-9170 reports', 'Custom report builder', 'Scheduled generation'],
   },
 ];
@@ -116,7 +116,7 @@ export default function WIOACompliancePage() {
       </div>
 {/* Avatar Guide at Top */}
       <AvatarGuide
-        avatarImage="/images/pages/store-recommendations.webp"
+        avatarImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp"
         avatarName="James"
         welcomeMessage="Welcome to our WIOA Compliance tools! I'm James, and I'll explain how we make WIOA compliance simple. Let me show you around."
         steps={wioaGuideSteps}
@@ -145,7 +145,7 @@ export default function WIOACompliancePage() {
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image src="/images/pages/store-compliance-wioa-hero.jpg" alt="WIOA Compliance" fill className="object-cover" priority sizes="100vw" placeholder="empty" />
+          <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-compliance-wioa-hero.jpg" alt="WIOA Compliance" fill className="object-cover" priority sizes="100vw"  />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -199,7 +199,7 @@ export default function WIOACompliancePage() {
                     alt={feature.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                   sizes="100vw" placeholder="empty" />
+                   sizes="100vw"  />
                   <h3 className="absolute bottom-4 left-4 text-xl font-bold text-slate-900">{feature.title}</h3>
                 </div>
                 <div className="p-6">
@@ -225,14 +225,14 @@ export default function WIOACompliancePage() {
           <h2 className="text-3xl font-black text-black mb-8 text-center">How It Works</h2>
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { step: '1', title: 'Setup', desc: 'Configure your program and eligibility criteria', image: '/images/pages/wioa-meeting.webp' },
-              { step: '2', title: 'Enroll', desc: 'Participants complete digital intake forms', image: '/images/pages/adult-learner.webp' },
-              { step: '3', title: 'Track', desc: 'Automatic performance metric tracking', image: '/images/pages/store-recommendations.webp' },
-              { step: '4', title: 'Report', desc: 'Generate PIRL exports and quarterly reports', image: '/images/pages/graduation-ceremony.webp' },
+              { step: '1', title: 'Setup', desc: 'Configure your program and eligibility criteria', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp' },
+              { step: '2', title: 'Enroll', desc: 'Participants complete digital intake forms', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/adult-learner.webp' },
+              { step: '3', title: 'Track', desc: 'Automatic performance metric tracking', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp' },
+              { step: '4', title: 'Report', desc: 'Generate PIRL exports and quarterly reports', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/graduation-ceremony.webp' },
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-brand-green-600">
-                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" placeholder="empty" />
+                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover"  />
                   <div className="absolute inset-0 bg-brand-green-600/60 flex items-center justify-center">
                     <span className="text-2xl font-black text-slate-900">{item.step}</span>
                   </div>
@@ -314,11 +314,11 @@ export default function WIOACompliancePage() {
               </div>
               <div className="relative h-64 rounded-xl overflow-hidden">
                 <Image
-                  src="/images/pages/store-compliance-wioa-detail.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-compliance-wioa-detail.webp"
                   alt="WIOA Resources"
                   fill
                   className="object-cover"
-                 sizes="100vw" placeholder="empty" />
+                 sizes="100vw"  />
               </div>
             </div>
           </div>

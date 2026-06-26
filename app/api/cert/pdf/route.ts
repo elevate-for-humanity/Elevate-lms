@@ -1,1 +1,2 @@
-export { GET, runtime } from '@/app/api/certificates/pdf/route';
+export const runtime = 'nodejs';
+export { GET } from '@/app/api/certificates/pdf/route';

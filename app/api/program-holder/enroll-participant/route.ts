@@ -36,7 +36,7 @@ async function _POST(req: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['program_holder', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['program_holder', 'admin', 'staff'].includes(profile.role)) {
     return safeError('Forbidden — program holder role required', 403);
   }
 
@@ -51,7 +51,7 @@ async function _POST(req: NextRequest) {
     programHolderId = holder?.id ?? null;
   }
 
-  if (!programHolderId && !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!programHolderId && !['admin', 'staff'].includes(profile.role)) {
     return safeError('No program holder record found for this user', 403);
   }
 

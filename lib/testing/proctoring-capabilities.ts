@@ -810,121 +810,45 @@ export const CERT_PROVIDERS: Record<string, CertProvider> = {
   },
   midland: {
     key: 'midland',
-    name: 'Midland Testing — HVAC/R Certifications',
+    name: 'Midland Testing',
+    capability: 'IN_PERSON_OR_PROVIDER_REMOTE',
+    description: 'Midland certification testing services',
+    exams: MIDLAND_FEES.map((f) => ({ name: f.label, amountCents: f.amount * 100 })),
+    status: 'available_through_partner',
+  },
+  ase: {
+    key: 'ase',
+    name: 'ASE Entry-Level Certification',
     capability: 'IN_PERSON_ONLY',
     description:
-      'Elevate is an authorized Midland testing partner for HVAC/R trade certifications. Midland provides nationally recognized written and practical assessments for heating, ventilation, air conditioning, and refrigeration technicians. Credentials are issued by Midland upon passing and are recognized by employers, contractors, and state licensing boards across the country.',
+      'The National Institute for Automotive Service Excellence (ASE) Entry-Level Certification. This credential validates that students have the technical knowledge for entry-level automotive service positions. Recognized by repair shops, dealerships, and fleet maintenance centers nationwide.',
     exams: [
       {
-        name: 'HVAC/R Technician — Core',
-        description:
-          'Covers foundational HVAC/R knowledge: electrical theory, refrigeration cycle, tools and safety, system components, and basic troubleshooting. Required before any specialty track assessment.',
-        durationMinutes: 60,
-        questionCount: 60,
-        amountCents: MIDLAND_PRICING.core.price * 100,
+        name: 'Automotive — Individual Seat',
+        description: 'Single user certification for ASE Entry-Level tracks.',
+        amountCents: 15200,
       },
       {
-        name: 'Air Conditioning & Heat Pumps',
-        description:
-          'Validates skills in residential and light commercial A/C and heat pump systems — system installation, charging, diagnosing faults, and heat pump reversing valve operation.',
-        durationMinutes: 60,
-        questionCount: 60,
-        amountCents: MIDLAND_PRICING.specialty.price * 100,
+        name: 'Site License — 30 User Bundle',
+        description: 'Authorized site license for 30 participants.',
+        amountCents: 299000,
       },
       {
-        name: 'Gas & Oil Heating',
-        description:
-          'Covers installation, service, and troubleshooting of forced-air gas furnaces, oil burners, and hydronic heating systems. Includes combustion analysis, venting, and safety controls.',
-        durationMinutes: 60,
-        questionCount: 60,
-        amountCents: MIDLAND_PRICING.specialty.price * 100,
-      },
-      {
-        name: 'Commercial Refrigeration',
-        description:
-          'Tests knowledge of commercial refrigeration systems — reach-in cases, walk-in coolers and freezers, condensing units, and supermarket systems. Includes system design, leak detection, and recovery procedures.',
-        durationMinutes: 60,
-        questionCount: 60,
-        amountCents: MIDLAND_PRICING.specialty.price * 100,
-      },
-      {
-        name: 'Light Commercial HVAC/R',
-        description:
-          'Covers rooftop units, split systems, packaged equipment, and light commercial refrigeration. Bridges the gap between residential service and full commercial systems.',
-        durationMinutes: 75,
-        questionCount: 75,
-        amountCents: MIDLAND_PRICING.specialty.price * 100,
-      },
+        name: 'Site License — 100 User Bundle',
+        description: 'Authorized site license for 100 participants.',
+        amountCents: 925000,
+      }
     ],
-    verifyUrl: 'https://www.midlandtesting.com/',
     status: 'active',
     fees: [
-      { label: 'Core assessment', amount: 50, note: 'Includes exam + Midland registration' },
-      {
-        label: 'Specialty track assessment',
-        amount: 60,
-        note: 'Includes exam + Midland registration',
-      },
+      { label: 'Individual Seat License', amount: 152, note: 'Includes ASE fee + $50 proctoring' },
+      { label: 'Site License (30 users)', amount: 2990, note: 'Corporate/School site license' },
+      { label: 'Site License (100 users)', amount: 9250, note: 'Enterprise site license' }
     ],
-    groupDiscount: 'Groups of 5+ — contact us for employer or cohort pricing',
-    ncrcJobProfiles: [
-      {
-        level: 'Core',
-        score: 'Entry HVAC/R',
-        color: 'amber',
-        jobs: [
-          {
-            title: 'HVAC/R Installer Helper',
-            note: 'Assists journeyman techs on residential installs',
-          },
-          {
-            title: 'Maintenance Technician',
-            note: 'Preventive maintenance, filter changes, basic service',
-          },
-          {
-            title: 'Refrigeration Apprentice',
-            note: 'Entry-level food service and cold storage work',
-          },
-        ],
-      },
-      {
-        level: 'A/C & Heat Pumps / Gas & Oil Heating',
-        score: 'Residential Service',
-        color: 'blue',
-        jobs: [
-          {
-            title: 'Residential HVAC Technician',
-            note: 'Full-service residential installs and repairs',
-          },
-          {
-            title: 'HVAC Service Tech',
-            note: 'Seasonal tune-ups, warranty service, emergency calls',
-          },
-          { title: 'Heat Pump Specialist', note: 'Inverter and variable-speed heat pump systems' },
-        ],
-      },
-      {
-        level: 'Commercial Refrigeration / Light Commercial HVAC',
-        score: 'Commercial Tech',
-        color: 'yellow',
-        jobs: [
-          {
-            title: 'Commercial Refrigeration Technician',
-            note: 'Grocery stores, restaurants, cold storage facilities',
-          },
-          {
-            title: 'Light Commercial HVAC Tech',
-            note: 'Rooftop units, small commercial split systems',
-          },
-          {
-            title: 'Facilities HVAC Tech',
-            note: 'Office buildings, schools, healthcare facilities',
-          },
-        ],
-      },
-    ],
-  },
+    groupDiscount: 'For bulk site licenses over 200 users, contact enterprise sales.'
+  }
 };
+
 
 /**
  * Returns which proctoring modes are available for a given provider.

@@ -24,13 +24,18 @@ export default async function AdminGradebookPage({
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect('/login');
+  }
+
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!['admin', 'super_admin', 'instructor'].includes(profile?.role || '')) {
+  if (!['admin', 'instructor'].includes(profile?.role || '')) {
     redirect('/unauthorized');
   }
 

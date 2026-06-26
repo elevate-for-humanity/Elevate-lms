@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
       {
-        url: '/images/pages/career-counseling.jpg',
+        url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg',
         width: 1200,
         height: 630,
         alt: 'Elevate career pathways',
@@ -36,7 +36,7 @@ const STAGES = [
   {
     num: 1,
     title: 'Eligibility & Barrier Removal',
-    image: '/images/pages/how-it-works-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/how-it-works-hero.webp',
     href: '/how-it-works',
     what: 'You register at Indiana Career Connect, schedule a WorkOne appointment, and meet with a case manager. They review your situation — income, employment history, barriers — and determine which funding you qualify for.',
     who: 'Anyone in Indiana looking for career training. Priority for unemployed, underemployed, veterans, justice-impacted individuals, and youth ages 16–24.',
@@ -47,7 +47,7 @@ const STAGES = [
   {
     num: 2,
     title: 'Cohort Training',
-    image: '/images/pages/pathways-page-4.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pathways-page-4.webp',
     href: '/pathways/training-model',
     what: 'You join a training cohort — a group of students who start and finish together. Training combines classroom instruction, hands-on lab work, and online coursework. Trades students work with real tools and equipment. Healthcare students do clinical rotations. CDL students get 160+ hours behind the wheel.',
     who: 'Enrolled participants who have completed eligibility screening and funding confirmation.',
@@ -59,7 +59,7 @@ const STAGES = [
   {
     num: 3,
     title: 'Industry Credential',
-    image: '/images/pages/testing-page-1.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/testing-page-1.webp',
     href: '/verify-credentials',
     what: 'At the end of training, you sit for a certification exam issued by a recognized third-party organization — not by Elevate. You earn a credential that employers across the country recognize and require for hiring.',
     who: 'Students who have completed their training program and met all requirements.',
@@ -71,7 +71,7 @@ const STAGES = [
   {
     num: 4,
     title: 'Apprenticeship & Job Placement',
-    image: '/images/pages/career-services-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-hero.webp',
     href: '/career-services/job-placement',
     what: 'Our career services team helps you build your resume, practice interviews, and connects you directly with employers who are hiring. For apprenticeship tracks (barber, building trades), you are placed with a host employer and earn wages while completing on-the-job training hours.',
     who: 'Graduates who have earned their credential. Apprentices who are completing on-the-job training hours.',
@@ -83,7 +83,7 @@ const STAGES = [
   {
     num: 5,
     title: 'Advancement & Upskilling',
-    image: '/images/pages/career-services-page-1.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp',
     href: '/career-services',
     what: 'After placement, you are not on your own. We track your employment at 6 months and 12 months. You keep access to the learning platform for continued education. Many graduates come back to stack additional credentials — for example, CNA to Medical Assistant to LPN to RN.',
     who: 'All program graduates. Ongoing support is included at no additional cost.',
@@ -97,7 +97,7 @@ const STAGES = [
 const PROGRAMS = [
   {
     name: 'CNA Certification',
-    image: '/images/pages/cna-nursing.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-nursing.webp',
     href: canonicalRoutes.programs.certifiedNursingAssistant,
     duration: '4–6 weeks',
     credential: 'Certified Nursing Assistant (CNA)',
@@ -109,7 +109,7 @@ const PROGRAMS = [
   },
   {
     name: 'CDL Commercial Driving',
-    image: '/images/pages/cdl-training.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-training.webp',
     href: '/programs/cdl-training',
     duration: '4–6 weeks (160+ hours)',
     credential: 'CDL Class A or Class B',
@@ -122,7 +122,7 @@ const PROGRAMS = [
   },
   {
     name: 'Barber Apprenticeship',
-    image: '/images/pages/barber-training.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-training.webp',
     href: '/programs/barber-apprenticeship',
     duration: '~18 months (1,500 hours)',
     credential: 'Indiana Barber License',
@@ -134,7 +134,7 @@ const PROGRAMS = [
   },
   {
     name: 'HVAC Technician',
-    image: '/images/pages/hvac-technician.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
     href: canonicalRoutes.programs.hvacTechnician,
     duration: '12–16 weeks',
     credential: 'EPA 608 + OSHA 30',
@@ -146,7 +146,7 @@ const PROGRAMS = [
   },
   {
     name: 'Electrical',
-    image: '/images/pages/electrical.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/electrical.webp',
     href: '/programs/electrical',
     duration: '12–16 weeks',
     credential: 'OSHA 10 + NCCER Electrical Level 1',
@@ -158,7 +158,7 @@ const PROGRAMS = [
   },
   {
     name: 'Welding',
-    image: '/images/pages/welding.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/welding.webp',
     href: '/programs/welding',
     duration: '12–16 weeks (400+ hours hands-on)',
     credential: 'AWS Welding Certifications + OSHA 10',
@@ -170,7 +170,7 @@ const PROGRAMS = [
   },
   {
     name: 'IT Support',
-    image: '/images/pages/it-help-desk.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/it-help-desk.webp',
     href: '/programs/it-help-desk',
     duration: '8–12 weeks',
     credential: 'IT Specialist — Device Configuration & Management',
@@ -182,7 +182,7 @@ const PROGRAMS = [
   },
   {
     name: 'Cybersecurity',
-    image: '/images/pages/cybersecurity.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity.webp',
     href: '/programs/cybersecurity-analyst',
     duration: '12–16 weeks',
     credential: 'IT Specialist — Cybersecurity',
@@ -207,12 +207,12 @@ export default function PathwaysPage() {
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/pathways-page-2.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pathways-page-2.webp"
           alt="Workforce training students in a classroom and lab setting"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
       </section>
       {/* ── Who We Are / What This Is ── */}
@@ -281,7 +281,7 @@ export default function PathwaysPage() {
                       alt={s.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 384px"
-                      className="object-cover" placeholder="empty"
+                      className="object-cover" 
                     />
                     <div className="absolute top-4 left-4 w-10 h-10 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
                       {s.num}
@@ -344,7 +344,7 @@ export default function PathwaysPage() {
                       alt={`${p.name} training`}
                       fill
                       sizes="(max-width: 1024px) 100vw, 320px"
-                      className="object-cover" placeholder="empty"
+                      className="object-cover" 
                     />
                   </div>
                   <div className="p-6 flex-1">
@@ -479,11 +479,11 @@ export default function PathwaysPage() {
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                 <Image
-                  src="/images/pages/funding.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding.webp"
                   alt="Funding navigation"
                   fill
                   sizes="80px"
-                  className="object-cover" placeholder="empty"
+                  className="object-cover" 
                 />
               </div>
               <div>
@@ -498,11 +498,11 @@ export default function PathwaysPage() {
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                 <Image
-                  src="/images/pages/certifications.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/certifications.webp"
                   alt="Credentials"
                   fill
                   sizes="80px"
-                  className="object-cover" placeholder="empty"
+                  className="object-cover" 
                 />
               </div>
               <div>
@@ -519,11 +519,11 @@ export default function PathwaysPage() {
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                 <Image
-                  src="/images/pages/employer-handshake.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-handshake.webp"
                   alt="Employer connections"
                   fill
                   sizes="80px"
-                  className="object-cover" placeholder="empty"
+                  className="object-cover" 
                 />
               </div>
               <div>
@@ -540,11 +540,11 @@ export default function PathwaysPage() {
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                 <Image
-                  src="/images/pages/mentorship-page-3.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/mentorship-page-3.webp"
                   alt="Ongoing support"
                   fill
                   sizes="80px"
-                  className="object-cover" placeholder="empty"
+                  className="object-cover" 
                 />
               </div>
               <div>

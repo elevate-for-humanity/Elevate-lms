@@ -38,13 +38,13 @@ export default async function CreateCoursePage() {
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/business/team-3.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/team-3.webp"
           alt="Create Course"
           fill
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw" 
         />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
@@ -133,12 +133,12 @@ export default async function CreateCoursePage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/business/team-4.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/team-4.webp"
                   alt="Create Course"
                   fill
                   className="object-cover"
                   quality={90}
-                  sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty"
+                  sizes="(max-width: 768px) 100vw, 50vw" 
                 />
               </div>
             </div>

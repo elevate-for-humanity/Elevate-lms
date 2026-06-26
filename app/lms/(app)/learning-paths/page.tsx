@@ -120,13 +120,13 @@ export default async function LearningPathsPage() {
       <section className="relative h-48 md:h-64 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/lms-page-4.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/lms-page-4.webp"
           alt="Learning Paths"
           fill
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw" 
         />
       </section>
 
@@ -159,12 +159,12 @@ export default async function LearningPathsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/lms-page-1.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/lms-page-1.webp"
                   alt="Learning Paths"
                   fill
                   className="object-cover"
                   quality={90}
-                  sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty"
+                  sizes="(max-width: 768px) 100vw, 50vw" 
                 />
               </div>
             </div>

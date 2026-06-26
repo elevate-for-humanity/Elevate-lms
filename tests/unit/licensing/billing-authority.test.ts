@@ -368,7 +368,7 @@ describe('billing-authority', () => {
 
   describe('isAdminRole', () => {
     it('returns true for admin roles', () => {
-      expect(isAdminRole('super_admin')).toBe(true);
+      expect(isAdminRole('admin')).toBe(true);
       expect(isAdminRole('admin')).toBe(true);
       expect(isAdminRole('org_admin')).toBe(true);
       expect(isAdminRole('executive')).toBe(true);

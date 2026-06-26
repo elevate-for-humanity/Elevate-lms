@@ -23,12 +23,12 @@ import {
 type MobileTab = 'ellie' | 'deploy' | 'health' | 'preview';
 type MorePanel = 'files' | 'services' | 'environments' | 'secrets' | null;
 
-const DeployPanel = dynamic(() => import('@/components/dev-studio/DeployPanel'), { ssr: false });
-const ServicesPanel = dynamic(() => import('@/components/dev-studio/ServicesPanel'), { ssr: false });
-const SecretsPanel = dynamic(() => import('@/components/dev-studio/SecretsPanel'), { ssr: false });
-const DevContainerPanel = dynamic(() => import('@/components/dev-studio/DevContainerPanel'), { ssr: false });
-const UnifiedEllieChat = dynamic(() => import('@/components/dev-studio/UnifiedEllieChat'), { ssr: false });
-const IframePreview = dynamic(() => import('@/components/dev-studio/IframePreview'), { ssr: false });
+const DeployPanel = dynamic(() => import('@/components/studio/DeployPanel'), { ssr: false });
+const ServicesPanel = dynamic(() => import('@/components/studio/ServicesPanel'), { ssr: false });
+const SecretsPanel = dynamic(() => import('@/components/studio/SecretsPanel'), { ssr: false });
+const DevContainerPanel = dynamic(() => import('@/components/studio/DevContainerPanel'), { ssr: false });
+const UnifiedEllieChat = dynamic(() => import('@/components/studio/UnifiedEllieChat'), { ssr: false });
+const IframePreview = dynamic(() => import('@/components/studio/IframePreview'), { ssr: false });
 
 const NAV: { id: MobileTab; label: string; Icon: ElementType<{ className?: string }> }[] = [
   { id: 'ellie', label: 'Ellie', Icon: Sparkles },

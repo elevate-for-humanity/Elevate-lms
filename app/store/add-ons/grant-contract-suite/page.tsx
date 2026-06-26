@@ -5,7 +5,7 @@ import {
   Upload, Search, ShieldCheck, PenTool, Download, ArrowRight, FileText, Briefcase, Sparkles,
 } from 'lucide-react';
 
-export const dynamic = 'force-static'; // deploy-trigger: 20260518174229
+export const dynamic = 'force-dynamic'; // deploy-trigger: 20260518174229
 
 export const metadata: Metadata = {
   title: 'Grant & Contract Automation Suite | Elevate Store',

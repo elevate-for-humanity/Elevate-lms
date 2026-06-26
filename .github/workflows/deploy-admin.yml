@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - 'app/admin/**'
       - 'app/api/admin/**'
       - 'apps/admin/**'
       - 'lib/**'
@@ -31,7 +32,7 @@ permissions:
 
 concurrency:
   group: northflank-admin-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy-admin:
@@ -65,7 +66,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies

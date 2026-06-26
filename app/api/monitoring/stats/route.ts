@@ -22,7 +22,7 @@ async function _GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    // Require super_admin for monitoring access — no environment bypass
+    // Require admin for monitoring access — no environment bypass
     const url = new URL(req.url);
     const orgId = url.searchParams.get('orgId');
 
@@ -32,7 +32,7 @@ async function _GET(req: Request) {
 
     const { role } = await requireOrgAdmin(req, orgId);
 
-    if (role !== 'super_admin') {
+    if (role !== 'admin') {
       return NextResponse.json({ error: 'Super admin access required' }, { status: 403 });
     }
 

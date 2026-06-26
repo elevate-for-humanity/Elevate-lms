@@ -2,8 +2,8 @@
 /**
  * Verify Northflank HTTP health probes for one service (or --all).
  *
- *   pnpm tsx scripts/northflank/verify-health-checks.ts elevate-admin
- *   pnpm tsx scripts/northflank/verify-health-checks.ts --all
+ *   npx tsx scripts/northflank/verify-health-checks.ts elevate-admin
+ *   npx tsx scripts/northflank/verify-health-checks.ts --all
  */
 
 import { execSync } from 'node:child_process';
@@ -24,7 +24,7 @@ async function main() {
     console.log(`\n=== ${serviceId} ===`);
     console.log('Applying health probe config for this service only...\n');
     const out = execSync(
-      `pnpm exec tsx scripts/northflank/configure-services.ts ${serviceId} --execute`,
+      `npx tsx scripts/northflank/configure-services.ts ${serviceId} --execute`,
       { encoding: 'utf8', cwd: process.cwd() },
     );
     console.log(out);

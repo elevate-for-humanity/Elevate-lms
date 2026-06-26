@@ -26,7 +26,7 @@ const FUNDING_SOURCES = [
     badgeColor: 'bg-amber-100 text-amber-700',
   },
   {
-    name: 'FSSA IMPACT',
+    name: '',
     full: 'Family & Social Services Administration',
     desc: 'Training support for SNAP and TANF participants.',
     badge: 'State',
@@ -121,7 +121,7 @@ export function HomeFunding() {
           {/* Right: image */}
           <div className="relative h-40 sm:h-48 lg:h-52 rounded-2xl overflow-hidden">
             <Image
-              src="/images/pages/funding-impact-1.webp"
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-impact-1.webp"
               alt="Funding advisor helping a student navigate WIOA eligibility"
               fill
               className="object-cover object-center"

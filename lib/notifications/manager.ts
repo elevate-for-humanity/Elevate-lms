@@ -101,14 +101,14 @@ export class NotificationManager {
       // Use service worker to show notification
       const registration = await navigator.serviceWorker.ready;
       await registration.showNotification(title, {
-        icon: '/icon-192.png',
-        badge: '/icon-72.png',
+        icon: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
+        badge: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-72.png',
         ...options,
       } as NotificationOptions);
     } else {
       // Fallback to regular notification
       new Notification(title, {
-        icon: '/icon-192.png',
+        icon: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
         ...options,
       });
     }

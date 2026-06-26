@@ -19,8 +19,8 @@ describe('getLicenseAccessMode — null license policy', () => {
     expect(result.reason).toBe('no_license_admin_bypass');
   });
 
-  it('super_admin with null license gets full access (explicit bypass policy)', () => {
-    const result = getLicenseAccessMode(null, 'super_admin');
+  it('admin with null license gets full access (explicit bypass policy)', () => {
+    const result = getLicenseAccessMode(null, 'admin');
     expect(result.mode).toBe('full');
     expect(result.reason).toBe('no_license_admin_bypass');
   });

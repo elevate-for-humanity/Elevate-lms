@@ -30,12 +30,12 @@ export default function WIOAEligibilityPage() {
       <section className="relative h-[220px] sm:h-[320px] md:h-[400px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/wioa-meeting.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp"
           alt="WIOA funded career training"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -67,7 +67,7 @@ export default function WIOAEligibilityPage() {
                 step: '1',
                 title: 'Register Online',
                 desc: 'Create your account at Indiana Career Connect — the state workforce portal.',
-                image: '/images/pages/homepage-why-elevate.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/homepage-why-elevate.webp',
                 cta: 'Register Now',
                 href: 'https://www.indianacareerconnect.com',
                 external: true,
@@ -76,7 +76,7 @@ export default function WIOAEligibilityPage() {
                 step: '2',
                 title: 'WorkOne Appointment',
                 desc: 'Schedule a meeting at your local WorkOne center. They determine your funding eligibility.',
-                image: '/images/pages/wioa-meeting.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
                 cta: 'Find WorkOne',
                 href: 'https://www.in.gov/dwd/workone/workone-locations/',
                 external: true,
@@ -85,7 +85,7 @@ export default function WIOAEligibilityPage() {
                 step: '3',
                 title: 'Start Training',
                 desc: 'Once approved, pick your program. WorkOne issues a voucher covering your costs.',
-                image: '/images/pages/homepage-why-elevate.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/homepage-why-elevate.webp',
                 cta: 'View Programs',
                 href: '/programs',
                 external: false,
@@ -101,7 +101,7 @@ export default function WIOAEligibilityPage() {
                     alt={item.title}
                     fill
                     sizes="100vw"
-                    className="object-cover" placeholder="empty"
+                    className="object-cover" 
                   />
                   <div className="absolute top-3 left-3 w-9 h-9 bg-brand-blue-700 rounded-full flex items-center justify-center text-white font-bold shadow">
                     {item.step}
@@ -141,10 +141,10 @@ export default function WIOAEligibilityPage() {
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { title: 'Tuition', image: '/images/pages/homepage-why-elevate.webp' },
-              { title: 'Books & Supplies', image: '/images/pages/homepage-why-elevate.webp' },
-              { title: 'Certification Exams', image: '/images/pages/wioa-meeting.webp' },
-              { title: 'Support Services', image: '/images/pages/comp-home-highlight-health.webp' },
+              { title: 'Tuition', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/homepage-why-elevate.webp' },
+              { title: 'Books & Supplies', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/homepage-why-elevate.webp' },
+              { title: 'Certification Exams', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp' },
+              { title: 'Support Services', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-highlight-health.webp' },
             ].map((item) => (
               <div
                 key={item.title}
@@ -156,7 +156,7 @@ export default function WIOAEligibilityPage() {
                     alt={item.title}
                     fill
                     sizes="100vw"
-                    className="object-cover" placeholder="empty"
+                    className="object-cover" 
                   />
                 </div>
                 <div className="p-3 text-center">
@@ -227,19 +227,19 @@ export default function WIOAEligibilityPage() {
                 title: 'Workforce Ready Grant',
                 desc: 'Indiana state grant for high-demand certifications. No income requirements.',
                 href: '/funding',
-                image: '/images/pages/wioa-meeting.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
               },
               {
                 title: 'Job Ready Indy',
                 desc: 'Funding for justice-involved individuals. Training, support, and job placement.',
                 href: '/partners/jri',
-                image: '/hero-images/jri-hero.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/jri-hero.webp',
               },
               {
                 title: 'Payment Plans',
                 desc: `Flexible payments and ${BNPL_PROVIDER_SUMMARY} for programs not covered by grants.`,
                 href: '/apply',
-                image: '/images/pages/wioa-meeting.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
               },
             ].map((item) => (
               <Link
@@ -253,7 +253,7 @@ export default function WIOAEligibilityPage() {
                     alt={item.title}
                     fill
                     sizes="100vw"
-                    className="object-cover" placeholder="empty"
+                    className="object-cover" 
                   />
                 </div>
                 <div className="p-4">

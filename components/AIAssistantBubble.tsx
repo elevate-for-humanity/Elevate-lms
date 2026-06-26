@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
+import { MessageCircle, MessageSquare, X, Send, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -188,7 +188,7 @@ export function AIAssistantBubble() {
           className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-[60] flex bg-brand-orange-600 text-white rounded-full p-4 shadow-2xl hover:bg-brand-orange-700 transition-all hover:scale-110"
           aria-label="Open AI assistant"
         >
-          <MessageCircle className="h-10 w-10" />
+          <MessageSquare className="h-10 w-10" />
           <span className="absolute -top-1 -right-1 bg-brand-green-500 w-4 h-4 rounded-full border-2 border-white" />
         </button>
       )}
@@ -210,7 +210,7 @@ export function AIAssistantBubble() {
           <div className="bg-gradient-to-r from-brand-orange-600 to-brand-orange-500 text-white p-4 md:rounded-t-2xl flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 rounded-full p-2">
-                <MessageCircle className="h-5 w-5" />
+                <MessageSquare className="h-5 w-5" />
               </div>
               <div>
                 <h3 className="font-bold text-lg">Elevate AI Assistant</h3>
@@ -314,5 +314,3 @@ export function AIAssistantBubble() {
     </>
   );
 }
-
-export default AIAssistantBubble;

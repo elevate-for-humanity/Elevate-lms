@@ -30,7 +30,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'super_admin', 'staff', 'org_admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'staff', 'org_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

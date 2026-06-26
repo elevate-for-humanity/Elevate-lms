@@ -28,7 +28,7 @@ import {
   ChevronRight,
   ScissorsIcon,
   Hammer,
-  Sparkles,
+  Sparkles, Globe,
   User,
 } from 'lucide-react';
 
@@ -48,6 +48,7 @@ const navItems = [
   { id: 'workbook', label: 'Workbook', href: '/apprentice/workbook', icon: BookOpen },
   { id: 'course', label: 'Video Training', href: '/apprentice/course', icon: Video },
   { id: 'timeclock', label: 'Clock Hours', href: '/apprentice/timeclock', icon: Clock },
+  { id: 'the-bosses', label: 'The Bosses (VR)', href: '/admin/staff-portal/vr', icon: Globe },
   { id: 'competencies', label: 'Skills', href: '/apprentice/competencies', icon: Scissors },
   { id: 'attendance', label: 'Attendance', href: '/apprentice/attendance', icon: Calendar },
   { id: 'documents', label: 'Documents', href: '/apprentice/documents', icon: FileText },
@@ -163,14 +164,17 @@ export default async function ApprenticePortalPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  // Demo data for the visual dashboard
-  // In production, these would come from actual queries
-  const programName = 'Indiana Barber Apprenticeship';
-  const programLevel = 'Year 1';
-  const instructorName = 'Instructor Assigned';
-  
+  // Real database stats for the apprentice
+  const { data: hourStats } = await supabase
+    .from('hour_entries')
+    .select('hours_claimed, accepted_hours, status')
+    .eq('user_id', user.id);
+
+  const hoursCompleted = hourStats?.reduce((sum, h) => sum + (Number(h.accepted_hours) || 0), 0) || 0;
+  const pendingHours = hourStats?.filter(h => h.status === 'pending').length || 0;
+
   const stats = {
-    hoursCompleted: 450,
+    hoursCompleted,
     hoursRequired: 2000,
     attendancePercent: 92,
     skillsMastered: 12,
@@ -194,7 +198,7 @@ export default async function ApprenticePortalPage() {
 
   const skills = [
     { name: 'Haircutting', icon: ScissorsIcon, percent: 80, color: 'bg-blue-100 text-blue-600' },
-    { name: 'Color Theory', icon: Sparkles, percent: 60, color: 'bg-purple-100 text-purple-600' },
+    { name: 'Color Theory', icon: Globe, percent: 60, color: 'bg-purple-100 text-purple-600' },
     { name: 'Sanitation', icon: CheckCircle, percent: 100, color: 'bg-green-100 text-green-600' },
     { name: 'Shaving', icon: Hammer, percent: 45, color: 'bg-amber-100 text-amber-600' },
   ];

@@ -17,6 +17,7 @@ export default defineConfig({
     include: ['tests/unit/**/*.test.ts', 'tests/unit/**/*.test.tsx'],
     exclude: ['node_modules', 'tests/e2e/**', '**/*.spec.ts'],
     setupFiles: ['./tests/setup.ts'],
+    testTimeout: 60000,
   },
   resolve: {
     alias: {

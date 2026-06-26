@@ -134,7 +134,7 @@ export function ComplianceGate({
           </div>
 
           <button
-            onClick={() => router.push(status?.redirectTo || '/student-portal/onboarding')}
+            onClick={() => router.push(status?.redirectTo || '/onboarding/learner')}
             className="w-full bg-brand-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-brand-blue-700 transition-colors"
           >
             Complete Requirements

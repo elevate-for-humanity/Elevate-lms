@@ -32,7 +32,7 @@ export default async function OnboardingPage() {
       .maybeSingle();
     if (data?.role === 'student') redirect('/onboarding/learner');
     else if (data?.role === 'program_holder') redirect('/program-holder/onboarding');
-    else if (data?.role === 'admin' || data?.role === 'super_admin')
+    else if (data?.role === 'admin' || data?.role === 'admin')
       redirect('/admin/dashboard');
   }
 
@@ -40,7 +40,7 @@ export default async function OnboardingPage() {
     <div className="min-h-screen bg-white">
       <section className="relative h-[400px] sm:h-[500px] w-full overflow-hidden">
         <Image
-          src="/images/pages/onboarding-page-2.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/onboarding-page-2.webp"
           alt={`Welcome to ${PLATFORM_DEFAULTS.orgName}`}
           fill
           className="object-cover"
@@ -71,7 +71,7 @@ export default async function OnboardingPage() {
             >
               <div className="relative h-40 overflow-hidden">
                 <Image
-                  src="/images/pages/about-career-training.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp"
                   alt="Student"
                   fill
                   sizes="100vw"
@@ -112,7 +112,7 @@ export default async function OnboardingPage() {
             >
               <div className="relative h-40 overflow-hidden">
                 <Image
-                  src="/images/pages/prog-hero-main-2.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/prog-hero-main-2.webp"
                   alt="Program Holder"
                   fill
                   sizes="100vw"
@@ -152,7 +152,7 @@ export default async function OnboardingPage() {
             >
               <div className="relative h-40 overflow-hidden">
                 <Image
-                  src="/images/pages/partner.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/partner.webp"
                   alt="Partner/Employer"
                   fill
                   sizes="100vw"

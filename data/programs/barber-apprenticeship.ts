@@ -16,7 +16,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   category: 'Personal Services',
   programType: 'apprenticeship',
 
-  heroImage: '/images/pages/barber-hero-main.webp',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-hero-main.webp',
   heroImageAlt: 'Barber apprentice training at a licensed barbershop',
   videoSrc: '/videos/barber-hero-final.mp4',
 
@@ -33,7 +33,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   },
   schedule: 'Flexible — 15–20 hrs/week (OJT at host shop + RTI online)',
   cohortSize: '8–12 apprentices per cohort',
-  fundingStatement: 'FSSA/SNAP E&T (IMPACT) eligible. Self-pay: $4,980 — $600 down, then weekly payments or BNPL.',
+  fundingStatement: 'FSSA/Gov Portal (IMPACT) eligible. Self-pay: $4,980 — $600 down, then weekly payments or BNPL.',
   selfPayCost: '$4,980',
   badge: 'DOL Registered',
   badgeColor: 'blue',
@@ -274,7 +274,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     etpl_approved: true,
     wrg_eligible: false,
     fundingNotes:
-      'DOL Registered Apprenticeship (RAPIDS). WIOA Title I eligible for dislocated workers and adults. IMPACT/SNAP E&T for eligible participants.',
+      'DOL Registered Apprenticeship (RAPIDS). WIOA Title I eligible for dislocated workers and adults. IMPACT/Gov Portal for eligible participants.',
   },
   enrollmentType: 'internal',
   partnerCourses: [

@@ -352,6 +352,6 @@ export function normalizeAdminDashboardData(
         typeof section === 'string',
     ),
     systemHealth: normalizeSystemHealth(input.systemHealth),
-    isSuperAdmin: input.isSuperAdmin === true || normalizeProfile(input.profile)?.role === 'super_admin',
+    isSuperAdmin: input.isSuperAdmin === true || normalizeProfile(input.profile)?.role === 'admin',
   };
 }

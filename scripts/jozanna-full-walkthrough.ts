@@ -154,7 +154,7 @@ async function main() {
   const slugs = [
     'hvac-technician', 'cna', 'phlebotomy', 'medical-assistant', 'ekg-technician',
     'cosmetology-apprenticeship', 'barbershop-apprenticeship', 'nail-technician-apprenticeship',
-    'cybersecurity-analyst', 'it-support', 'cdl-class-a', 'osha-10', 'tax-preparation',
+    'cybersecurity-analyst', 'it-support', 'cdl-class-a', 'osha-10', 
   ];
   const progResults = await Promise.all(slugs.map(async slug => {
     const r = await authedGet(`/programs/${slug}`);

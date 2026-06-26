@@ -56,17 +56,17 @@ const useCases = [
   {
     title: 'Workforce Boards',
     description: 'Track WIOA performance metrics, generate compliance reports, and monitor provider outcomes.',
-    image: '/images/pages/admin-analytics-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-analytics-hero.webp',
   },
   {
     title: 'Training Providers',
     description: 'Monitor student progress, identify at-risk learners, and optimize program delivery.',
-    image: '/images/pages/admin-analytics-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-analytics-hero.webp',
   },
   {
     title: 'Employers',
     description: 'Track apprentice performance, measure ROI on training investments, and forecast hiring needs.',
-    image: '/images/pages/admin-analytics-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-analytics-hero.webp',
   },
 ];
 
@@ -98,12 +98,12 @@ export default function AnalyticsProPage() {
       <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/store-addons-analytics-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-addons-analytics-hero.webp"
           alt="Analytics Pro"
           fill
           className="object-cover"
           priority
-         sizes="100vw" placeholder="empty" />
+         sizes="100vw"  />
         
       </section>
 
@@ -148,7 +148,7 @@ export default function AnalyticsProPage() {
                     alt={useCase.title}
                     fill
                     className="object-cover"
-                   sizes="100vw" placeholder="empty" />
+                   sizes="100vw"  />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-slate-900 mb-2">{useCase.title}</h3>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/training' },
@@ -19,7 +19,7 @@ const PROGRAM_AREAS = [
     title: 'Healthcare',
     desc: 'CNA, Medical Assistant, Phlebotomy, Peer Recovery Specialist. State and national certifications.',
     href: '/programs/healthcare',
-    image: '/images/pages/cna-patient-care.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-patient-care.jpg',
     credential: 'Indiana CNA License · PTCB CPhT',
     duration: '4–16 weeks',
   },
@@ -27,7 +27,7 @@ const PROGRAM_AREAS = [
     title: 'Skilled Trades',
     desc: 'HVAC, Electrical, Welding, Plumbing, CDL, Diesel Mechanic. Hands-on training with real equipment.',
     href: '/programs/skilled-trades',
-    image: '/images/pages/hvac-unit.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-unit.webp',
     credential: 'EPA 608 · OSHA · CDL Class A',
     duration: '3–12 weeks',
   },
@@ -35,7 +35,7 @@ const PROGRAM_AREAS = [
     title: 'Technology',
     desc: 'IT Help Desk, Cybersecurity, Web Development, Network Administration. Industry certifications.',
     href: '/programs/technology',
-    image: '/images/pages/it-helpdesk-desk.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/it-helpdesk-desk.webp',
     credential: 'CompTIA A+ · Security+ · Network+ (via Certiport)',
     duration: '6–12 weeks',
   },
@@ -43,7 +43,7 @@ const PROGRAM_AREAS = [
     title: 'CDL & Transportation',
     desc: 'Class A CDL training for commercial driving careers. One of the fastest paths to a $60K+ job.',
     href: '/programs/cdl-training',
-    image: '/images/pages/cdl-truck-highway.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-truck-highway.webp',
     credential: 'CDL Class A License',
     duration: '6 weeks',
   },
@@ -51,7 +51,7 @@ const PROGRAM_AREAS = [
     title: 'Barbering & Cosmetology',
     desc: 'DOL-registered apprenticeships in barbering, cosmetology, and nail technology. Earn while you learn.',
     href: '/programs/barber-apprenticeship',
-    image: '/images/pages/barber-hero-main.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-hero-main.webp',
     credential: 'Indiana Barber / Cosmetology License',
     duration: '20–52 weeks',
   },
@@ -59,7 +59,7 @@ const PROGRAM_AREAS = [
     title: 'Business & Professional',
     desc: 'Tax Preparation, Bookkeeping, Office Administration, Entrepreneurship. IRS and Certiport credentials.',
     href: '/programs/business-administration',
-    image: '/images/pages/bookkeeping-ledger.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/bookkeeping-ledger.webp',
     credential: 'IRS PTIN · QuickBooks Certified User',
     duration: '5–8 weeks',
   },
@@ -98,12 +98,12 @@ export default function TrainingPage() {
       <section className={`${heroTokens.imageWrap} w-full overflow-hidden`}>
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/training-page-3.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-page-3.webp"
           alt={`Career training programs at ${PLATFORM_DEFAULTS.orgName}`}
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw" 
         />
       </section>
 
@@ -166,7 +166,7 @@ export default function TrainingPage() {
                     alt={area.title}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500" placeholder="empty"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500" 
                   />
                 </div>
                 <div className="p-5">

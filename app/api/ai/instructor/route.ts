@@ -66,7 +66,7 @@ Keep responses concise (2-4 paragraphs max), practical, and encouraging. Focus o
 
       try {
         const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const user = safeGetUser(await supabase.auth.getUser());
         await supabase.from('ai_instructor_interactions').insert({
           user_id: user?.id || null, program_id: programId,
           instructor_id: instructorId, user_message: latest, assistant_response: reply,

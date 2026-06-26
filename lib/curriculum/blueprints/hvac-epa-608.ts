@@ -1,4 +1,12 @@
 /**
+ * hvac-epa-608 Blueprint
+ * 
+ * © 2026 Elevate for Humanity
+ * All Rights Reserved
+ *
+ * Version: 1.0.0
+ */
+/**
  * lib/curriculum/blueprints/hvac-epa-608.ts
  *
  * Canonical blueprint for the HVAC / EPA Section 608 program.
@@ -24,7 +32,7 @@ const HVAC_VIDEO_CONFIG: BlueprintVideoConfig = {
   template: 'elevate-slide',
   instructorName: 'Marcus Johnson',
   instructorTitle: 'Master HVAC Technician',
-  instructorImagePath: '/images/team/instructors/instructor-trades.jpg',
+  instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/instructors/instructor-trades.jpg',
   topBarColor: '#f97316',
   accentColor: '#3b82f6',
   backgroundColor: '#0f172a',

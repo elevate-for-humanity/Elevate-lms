@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Loader2, Send, Sparkles, Terminal } from 'lucide-react';
 import type { StudioRuntimeCompletion } from '@/lib/devstudio/studio-runtime';
-import DevStudioRuntimeStatus from '@/components/dev-studio/DevStudioRuntimeStatus';
+import DevStudioRuntimeStatus from '@/components/studio/DevStudioRuntimeStatus';
 
-const XTerminal = dynamic(() => import('@/components/dev-studio/XTerminal'), { ssr: false });
+const XTerminal = dynamic(() => import('@/components/studio/XTerminal'), { ssr: false });
 
 const QUICK_ACTIONS = [
   { label: 'Website deploy', command: 'Deploy the LMS service' },

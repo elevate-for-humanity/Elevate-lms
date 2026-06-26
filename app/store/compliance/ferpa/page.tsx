@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 
 import { Metadata } from 'next';
@@ -21,25 +21,25 @@ const features = [
   {
     title: 'Data Encryption',
     description: 'AES-256 encryption for all student data at rest and in transit.',
-    image: '/images/pages/admin-ferpa-training-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-ferpa-training-hero.webp',
     items: ['AES-256 encryption', 'TLS 1.3 in transit', 'Encrypted backups', 'Key rotation'],
   },
   {
     title: 'Access Controls',
     description: 'Role-based access control ensures only authorized users see student data.',
-    image: '/images/pages/admin-ferpa-training-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-ferpa-training-hero.webp',
     items: ['Role-based permissions', 'Multi-factor authentication', 'Session management', 'IP restrictions'],
   },
   {
     title: 'Audit Logging',
     description: 'Complete audit trail of all data access and modifications.',
-    image: '/images/pages/adult-learner.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/adult-learner.webp',
     items: ['Access logging', 'Change tracking', 'Export history', 'Compliance reports'],
   },
   {
     title: 'Consent Management',
     description: 'Digital consent forms and parent/guardian authorization workflows.',
-    image: '/images/pages/adult-learner.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/adult-learner.webp',
     items: ['Digital consent forms', 'Parent authorization', 'Opt-out tracking', 'Consent expiration'],
   },
 ];
@@ -71,7 +71,7 @@ export default function FERPACompliancePage() {
       </div>
 {/* Avatar Guide */}
       <AvatarGuide
-        avatarImage="/images/pages/store-recommendations.webp"
+        avatarImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp"
         avatarName="Sarah"
         welcomeMessage="Hi! I'm Sarah, and I'll explain how we protect student data under FERPA. Data privacy is serious business - let me show you our safeguards."
         steps={guideSteps}
@@ -101,7 +101,7 @@ export default function FERPACompliancePage() {
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image src="/images/pages/store-compliance-ferpa-hero.webp" alt="FERPA" fill className="object-cover" priority sizes="100vw" placeholder="empty" />
+          <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-compliance-ferpa-hero.webp" alt="FERPA" fill className="object-cover" priority sizes="100vw"  />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -123,7 +123,7 @@ export default function FERPACompliancePage() {
             {features.map((feature) => (
               <div key={feature.title} className="bg-white rounded-2xl overflow-hidden border-2 border-slate-200 hover:border-brand-blue-500 hover:shadow-xl transition-all group">
                 <div className="relative h-48 overflow-hidden">
-                  <Image src={feature.image} alt={feature.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" placeholder="empty" />
+                  <Image src={feature.image} alt={feature.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300"  />
                   <h3 className="absolute bottom-4 left-4 text-xl font-bold text-slate-900">{feature.title}</h3>
                 </div>
                 <div className="p-6">

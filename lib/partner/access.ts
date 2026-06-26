@@ -17,7 +17,7 @@ export async function getSessionUser() {
 }
 
 // Roles allowed to access the partner portal
-const PARTNER_ROLES = new Set(['partner', 'admin', 'super_admin']);
+const PARTNER_ROLES = new Set(['partner', 'admin']);
 
 export async function getMyPartnerContext() {
   const supabase = await createClient();

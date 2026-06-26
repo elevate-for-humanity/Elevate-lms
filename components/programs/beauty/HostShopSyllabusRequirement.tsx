@@ -1,13 +1,13 @@
 import Link from 'next/link';
-import type { BeautyApprenticeshipSlug } from '@/lib/beauty-apprenticeship/constants';
-import { BEAUTY_PROGRAM_SYLLABI } from '@/lib/beauty-apprenticeship/program-syllabus';
+import type { ApprenticeshipProgramSlug } from '@/lib/apprenticeship-programs/constants';
+import { APPRENTICESHIP_PROGRAM_SYLLABI } from '@/lib/apprenticeship-programs/program-syllabus';
 
 type Props = {
-  programSlug: BeautyApprenticeshipSlug;
+  programSlug: ApprenticeshipProgramSlug;
 };
 
 export default function HostShopSyllabusRequirement({ programSlug }: Props) {
-  const info = BEAUTY_PROGRAM_SYLLABI[programSlug];
+  const info = APPRENTICESHIP_PROGRAM_SYLLABI[programSlug];
   return (
     <section className="py-16 px-6 bg-brand-blue-50 border-y border-brand-blue-100">
       <div className="max-w-4xl mx-auto">

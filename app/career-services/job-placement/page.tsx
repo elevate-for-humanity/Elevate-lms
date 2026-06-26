@@ -1,22 +1,20 @@
-import type { Metadata } from 'next';
-import PublicLandingPage from '@/components/marketing/PublicLandingPage';
+import { buildMetadata } from '@/lib/cf-seo';
+import { siteConfig } from '@/content/cf-site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const revalidate = 3600;
-
-export const metadata: Metadata = {
+export const metadata = buildMetadata({
   title: 'Job Placement',
-  description: 'Job placement services for Elevate graduates. Employer connections, job leads, and placement support in healthcare, skilled trades, technology, and business.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/career-services/job-placement' },
-};
+  description: '{PLATFORM_DEFAULTS.orgName} career services — Job Placement.',
+  path: '/career-services/job-placement',
+});
 
-export default function JobPlacementPage() {
+export default function Page() {
   return (
     <PublicLandingPage
       config={{
         breadcrumbs: [{ label: 'Career Services', href: '/career-services' }, { label: 'Job Placement' }],
         hero: {
-          image: '/images/pages/career-services-page-3.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-3.webp',
           tag: 'Job Placement',
           tagColor: 'text-brand-blue-600',
           title: 'From Credential to Career',
@@ -28,7 +26,7 @@ export default function JobPlacementPage() {
             'Job placement is built into every Elevate program. We maintain active relationships with employers across Indiana who hire our graduates — and we make direct introductions when you are ready.',
             'Our placement team tracks every graduate for 90 days post-completion and works with you until you are employed in your field.',
           ],
-          image: '/images/pages/career-services-page-4.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-4.webp',
         },
         features: {
           heading: 'Placement Services',

@@ -118,6 +118,11 @@ export default async function SubmissionsOSPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect('/login');
+  }
+
+
   const db = await requireAdminClient();
 
   const { data: profile } = await db
@@ -126,7 +131,7 @@ export default async function SubmissionsOSPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff'].includes(profile.role)) {
     redirect('/admin');
   }
 

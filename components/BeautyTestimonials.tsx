@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Star, Quote } from 'lucide-react';
 
 interface BeautyTestimonial {
@@ -247,7 +248,7 @@ export default function BeautyTestimonials() {
 
         {/* CTA */}
         <div className="text-center mt-12">
-          <a
+          <Link
             href="/apply"
             className="inline-flex items-center px-8 py-4 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-lg transition-all transform hover:scale-105"
           >
@@ -255,7 +256,7 @@ export default function BeautyTestimonials() {
             <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
-          </a>
+          </Link>
         </div>
       </div>
     </section>

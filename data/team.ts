@@ -24,7 +24,7 @@ export const TEAM: TeamMember[] = [
     title: 'Founder & Chief Executive Officer',
     orgRole: 'Executive Leadership',
     bio: 'U.S. Army veteran (Unit Supply Specialist), IRS Enrolled Agent (EA), EFIN/PTIN holder, ERO, and SBIN-authorized federal tax software submitter. Elizabeth is also a licensed barber, Indiana substitute teacher, OSHA 10-Hour certified, EPA 608 Certified Proctor (ESCO #358010 and Mainstream Engineering), and Certiport Authorized Testing Center (CATC) operator. She founded Elevate for Humanity — a DOL Registered Apprenticeship Sponsor and Indiana ETPL/WIOA/WRG/JRI-approved workforce provider — and also leads Elevate tax operations and Selfish Inc., a 501(c)(3) nonprofit providing VITA free tax prep and community services.',
-    headshotSrc: '/images/team/elizabeth-greene-headshot.webp',
+    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/elizabeth-greene-headshot.webp',
     email: '',
   },
   {
@@ -33,7 +33,7 @@ export const TEAM: TeamMember[] = [
     title: 'Director of Enrollment & Beauty Industry Programs',
     orgRole: 'Enrollment & Instruction',
     bio: 'Jozanna is a multi-licensed beauty professional holding Nail Technician, Nail Instructor, and Esthetician licenses. She oversees the nail program at Textures Institute of Cosmetology and manages enrollment operations for Elevate for Humanity.',
-    headshotSrc: '/images/jozanna-george.jpg',
+    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/jozanna-george.jpg',
     email: 'jozanna@elevateforhumanity.org',
   },
   {
@@ -42,7 +42,7 @@ export const TEAM: TeamMember[] = [
     title: 'Executive Director of Financial Operations & Organizational Compliance',
     orgRole: 'Grants & Compliance',
     bio: 'Dr. Wilkes brings 24+ years of federal experience with DFAS, holding DoD Financial Management Certification Level II. She oversees financial operations and compliance at Elevate for Humanity.',
-    headshotSrc: '/images/carlina-wilkes.jpg',
+    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/carlina-wilkes.jpg',
     email: 'carlina@elevateforhumanity.org',
   },
   {
@@ -51,7 +51,7 @@ export const TEAM: TeamMember[] = [
     title: 'Director of Community Services',
     orgRole: 'Community & Supportive Services',
     bio: 'Leslie promotes low-barrier housing access and eviction prevention, helping families navigate housing challenges with her "reach one, teach one" philosophy.',
-    headshotSrc: '/images/leslie-wafford.webp',
+    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/leslie-wafford.webp',
     email: 'leslie@elevateforhumanity.org',
   },
   {
@@ -60,7 +60,7 @@ export const TEAM: TeamMember[] = [
     title: 'Social Media & Digital Engagement Coordinator',
     orgRole: 'Communications',
     bio: 'Delores manages digital communications, sharing student success stories and promoting program offerings to reach those who can benefit from funded training.',
-    headshotSrc: '/images/delores-reynolds.jpg',
+    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/delores-reynolds.jpg',
     email: 'delores@elevateforhumanity.org',
   },
   {
@@ -69,7 +69,7 @@ export const TEAM: TeamMember[] = [
     title: 'Program Coordinator',
     orgRole: 'Program Operations',
     bio: 'Clystjah supports program operations and student services, helping participants navigate enrollment and stay on track through their training programs.',
-    headshotSrc: '/images/clystjah-woodley.jpg',
+    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/clystjah-woodley.jpg',
     email: 'clystjah@elevateforhumanity.org',
   },
   {
@@ -86,7 +86,7 @@ export const TEAM: TeamMember[] = [
     title: 'Director of Healthcare Administration',
     orgRole: 'Healthcare Programs & Administration',
     bio: 'Naomi Jordan is the owner of Rebuilds Mind and Body Studio LLC, located at 6331 N Keystone Ave, Indianapolis, IN 46220. She holds active Indiana credentials as a Certified Nursing Assistant (CNA), Home Health Aide (HHA), Phlebotomy Technician, and Qualified Medication Aide (QMA). She serves as Director of Healthcare Administration at Elevate for Humanity, overseeing all healthcare program administration, clinical coordination, healthcare partner relationships, and curriculum compliance for CNA, HHA, Phlebotomy, QMA, Medical Assistant, Pharmacy Technician, and Peer Recovery Specialist programs.',
-    headshotSrc: '/images/naomi-jordan.jpg',
+    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/naomi-jordan.jpg',
     email: 'naomi@elevateforhumanity.org',
   },
   {
@@ -95,7 +95,7 @@ export const TEAM: TeamMember[] = [
     title: 'Testing Center Coordinator & Exam Proctor',
     orgRole: 'Credential Testing',
     bio: "Alberta Davis serves as a Testing Center Coordinator and Exam Proctor at Elevate for Humanity's Workforce Credential Testing Center in Indianapolis. She supports the administration of industry-recognized certification exams and workforce assessments for individuals, employers, schools, and workforce development partners.\n\nIn her role, Alberta coordinates testing appointments, prepares testing stations, and assists candidates through the check-in and identity verification process to ensure each testing session begins smoothly. As an exam proctor, she monitors in-person and live testing sessions to maintain compliance with certification provider policies and exam security standards.\n\nAlberta also assists with onsite testing events for partner organizations and workforce programs, helping expand access to credential testing opportunities across the community. Through her work, she helps maintain a secure, organized, and professional testing environment where candidates can focus on earning the certifications needed to advance in the workforce.",
-    headshotSrc: '/images/alberta-davis.jpg',
+    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/alberta-davis.webp',
     email: 'alberta@elevateforhumanity.org',
   },
 ];

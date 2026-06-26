@@ -20,15 +20,15 @@ export default async function FERPATrainingPage() {
     db
       .from('ferpa_training_records')
       .select(
-        'id, user_id, status, quiz_score, completed_at, expires_at, training_acknowledged, created_at',
+        'id, user_id, status, quiz_score, completed_at, expires_at, profiles(full_name, email, role)',
       )
-      .order('created_at', { ascending: false }),
+      .order('created_at', { ascending: false }) as any,
     db
       .from('profiles')
-      .select('id, full_name, email, role')
+      .select('id, full_name, email, role, created_at')
       .not('id', 'in', `(SELECT user_id FROM ferpa_training_records WHERE status = 'completed')`)
-      .in('role', ['staff', 'instructor', 'admin', 'super_admin'])
-      .order('full_name'),
+      .in('role', ['staff', 'instructor', 'admin'])
+      .order('full_name') as any,
   ]);
 
   return (

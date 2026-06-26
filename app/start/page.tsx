@@ -59,12 +59,12 @@ export default function StartPage() {
       <section className="relative overflow-hidden bg-brand-blue-700 text-white">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/how-it-works-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/how-it-works-hero.webp"
           alt="Career training students"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
         <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="max-w-2xl">

@@ -45,7 +45,6 @@ export const siteConfig = {
     instagram: 'https://instagram.com/elevateforhumanity',
     linkedin: 'https://linkedin.com/company/elevate-for-humanity',
     youtube: 'https://youtube.com/@elevateforhumanity',
-    twitter: 'https://twitter.com/elevate4humanity',
   },
 
   // Business hours
@@ -68,7 +67,7 @@ export const siteConfig = {
     defaultTitle: 'Elevate for Humanity | Workforce Infrastructure',
     defaultDescription:
       'Free workforce training programs in healthcare, skilled trades, and technology. WIOA-funded career pathways in Indianapolis.',
-    defaultImage: '/og-default.webp',
+    defaultImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp',
   },
 
   // Feature flags

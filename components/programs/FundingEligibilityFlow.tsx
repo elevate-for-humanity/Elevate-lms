@@ -91,14 +91,14 @@ const CFG = {
     ],
   },
   fssa: {
-    name: 'FSSA IMPACT',
+    name: '',
     agencyShort: 'FSSA / DFR',
     iccRequired: false,
     iccUrl: '',
     appointmentUrl: '',
     phone: '1-800-403-0864',
     timeEstimate: '1–3 weeks',
-    note: 'FSSA IMPACT is for current SNAP or TANF recipients. You must be referred by your FSSA case worker — you cannot self-apply.',
+    note: ' is for current SNAP or TANF recipients. You must be referred by your FSSA case worker — you cannot self-apply.',
     steps: [
       'Contact your FSSA/DFR case worker and request an IMPACT training referral',
       'Your case worker assesses your eligibility for training support',

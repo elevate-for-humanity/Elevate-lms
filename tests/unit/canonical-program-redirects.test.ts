@@ -32,7 +32,8 @@ describe('canonical program redirects', () => {
     const map = new Map(programRedirects.map((r) => [r.source, r.destination]));
     expect(map.get('/programs/cpr-aed')).toBe('/programs/cpr-first-aid');
     expect(map.get('/programs/reentry-specialist')).toBeUndefined();
-    expect(map.get('/programs/wioa')).toBe('/wioa-funded-training-indiana');
+    // /programs/wioa redirects to /wioa-eligibility (the funding page)
+    expect(map.get('/programs/wioa')).toBe('/wioa-eligibility');
     expect(map.get('/programs/workforce-readiness')).toBe('/programs/reentry-specialist');
   });
 });

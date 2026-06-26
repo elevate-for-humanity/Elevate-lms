@@ -56,7 +56,7 @@ import {
 // Role type
 export type UserRole =
   | 'admin'
-  | 'super_admin'
+  | 'admin'
   | 'student'
   | 'apprentice'
   | 'instructor'
@@ -369,7 +369,7 @@ export const ROLE_NAVIGATION: Record<UserRole, NavSection[]> = {
     },
   ],
 
-  super_admin: [
+  admin: [
     {
       id: 'main',
       items: [
@@ -426,7 +426,7 @@ export function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
 // Role display names
 export const ROLE_DISPLAY_NAMES: Record<UserRole, string> = {
   admin: 'Admin',
-  super_admin: 'Super Admin',
+  admin: 'Super Admin',
   student: 'Student',
   apprentice: 'Apprentice',
   instructor: 'Instructor',
@@ -463,5 +463,5 @@ export const ROLE_DEFAULT_ACTIONS: Record<UserRole, ActionItem[]> = {
   sponsor: [],
   host_shop: [],
   workforce: [],
-  super_admin: [],
+  admin: [],
 };

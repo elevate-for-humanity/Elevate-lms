@@ -10,7 +10,7 @@ export const revalidate = 60;
 export const metadata: Metadata = { title: 'Apprenticeships | Admin | Elevate For Humanity' };
 
 export default async function ApprenticeshipsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const [
@@ -21,7 +21,7 @@ export default async function ApprenticeshipsPage() {
   ] = await Promise.all([
     db.from('apprenticeship_enrollments').select('*', { count: 'exact', head: true }),
     db.from('apprenticeship_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-    db.from('progress_entries').select('*', { count: 'exact', head: true }).eq('status', 'pending').catch(() => ({ count: 0 })),
+    db.from('progress_entries').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     db.from('apprenticeship_enrollments')
       .select(`
         id, status, start_date, total_hours_required, total_hours_completed, created_at,

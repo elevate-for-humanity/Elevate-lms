@@ -27,7 +27,7 @@ export async function generateMetadata({
       type: 'website',
       images: [
         {
-          url: '/images/pages/social-media-1.webp',
+          url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/social-media-1.webp',
           width: 1200,
           height: 630,
           alt: `${category} blog category`,
@@ -38,7 +38,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: `${category} | Blog | Elevate For Humanity`,
       description: `Browse ${category} articles from Elevate For Humanity`,
-      images: ['/images/pages/social-media-1.webp'],
+      images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/social-media-1.webp'],
     },
   };
 }

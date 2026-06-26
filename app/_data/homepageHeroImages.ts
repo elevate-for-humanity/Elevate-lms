@@ -1,5 +1,5 @@
 export const homepageHeroImages = {
-  certificateOfCompletion: '/images/pages/homepage-why-elevate.webp',
-  topHeroBanner: '/images/pages/homepage-why-elevate.webp',
-  secondHeroBanner: '/images/pages/homepage-why-elevate.webp',
+  certificateOfCompletion: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/homepage-why-elevate.webp',
+  topHeroBanner: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/homepage-why-elevate.webp',
+  secondHeroBanner: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/homepage-why-elevate.webp',
 };

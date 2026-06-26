@@ -23,7 +23,12 @@ describe('marketing header visibility', () => {
   });
 
   it('app routes still use isAppRoute', () => {
-    expect(isAppRoute('/login')).toBe(true);
+    // /admin is in APP_ROUTE_PREFIXES
+    expect(isAppRoute('/admin')).toBe(true);
+    expect(isAppRoute('/admin/studio')).toBe(true);
+    expect(isAppRoute('/lms/dashboard')).toBe(true);
+    // /education is not in APP_ROUTE_PREFIXES (it's in CUSTOM_HEADER_ROUTE_PREFIXES)
     expect(isAppRoute('/education')).toBe(false);
+    expect(isAppRoute('/programs')).toBe(false);
   });
 });

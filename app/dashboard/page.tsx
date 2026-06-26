@@ -7,7 +7,7 @@ export const metadata = {
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) {
     redirect('/login?redirect=/dashboard');
@@ -25,7 +25,6 @@ export default async function DashboardPage() {
   // Role-based dashboard routing
   switch (role) {
     case 'admin':
-    case 'super_admin':
     case 'staff':
       redirect('/admin/dashboard');
       break;

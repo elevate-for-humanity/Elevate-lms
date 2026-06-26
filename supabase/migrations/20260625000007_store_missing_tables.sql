@@ -54,10 +54,10 @@ ALTER TABLE public.deployment_options ENABLE ROW LEVEL SECURITY;
 DROP policy if exists "deployment_options_public_read" on public.deployment_options;
 CREATE policy "deployment_options_public_read" on public.deployment_options FOR SELECT USING (true);
 
--- RLS: store_prices readable by authenticated users
+-- RLS: store_prices readable by everyone (public pricing display)
 ALTER TABLE public.store_prices ENABLE ROW LEVEL SECURITY;
-DROP policy if exists "store_prices_authenticated_read" on public.store_prices;
-CREATE policy "store_prices_authenticated_read" on public.store_prices FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "store_prices_authenticated_read" ON public.store_prices;
+CREATE POLICY "store_prices_public_read" ON public.store_prices FOR SELECT USING (true);
 
 -- View: joins store_products + store_prices
 CREATE OR REPLACE VIEW public.store_subscription_pricing AS

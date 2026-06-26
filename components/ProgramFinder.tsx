@@ -331,17 +331,17 @@ export default function ProgramFinder() {
                     </div>
 
                     <div className="flex gap-4">
-                      <a
+                      <Link
                         href={program.path}
-                        className="flex-1 px-6 py-3    text-white rounded-lg font-semibold hover: hover: transition-all text-center"
-                      >See Details</a>
-                      <a
+                        className="flex-1 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition-all text-center"
+                      >See Details</Link>
+                      <Link
                         href="/apply"
                         className="flex-1 px-6 py-3 bg-slate-100 text-black rounded-lg font-semibold hover:bg-slate-200 transition-all text-center flex items-center justify-center gap-2"
                       >
                         Apply Now
                         <ArrowRight className="w-5 h-5" />
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 </motion.div>

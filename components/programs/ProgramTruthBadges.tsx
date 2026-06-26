@@ -64,7 +64,7 @@ const FUNDING_COPY: Record<FundingType, { label: string; detail: string }> = {
       'Indiana state grant covering tuition for high-demand programs. Eligibility determined through WorkOne.',
   },
   impact: {
-    label: 'FSSA IMPACT',
+    label: '',
     detail:
       'Indiana Manpower Placement and Comprehensive Training — pays for training at no cost to current SNAP or TANF recipients. Contact FSSA at 800-403-0864 (press 3) or ask your DFR eligibility worker for a referral.',
   },

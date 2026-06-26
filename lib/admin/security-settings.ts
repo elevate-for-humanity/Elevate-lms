@@ -9,7 +9,7 @@
  *
  * Keys read:
  *   ip_allowlist          — comma-separated CIDRs/IPs (fallback for ADMIN_IP_ALLOWLIST)
- *   mfa_required          — 'true'/'false' — force MFA for admin/super_admin
+ *   mfa_required          — 'true'/'false' — force MFA for admin/admin
  *   session_timeout       — idle timeout in minutes (fallback for hardcoded 30)
  *   max_login_attempts    — lockout threshold (future use)
  *   lockout_duration_minutes — lockout window (future use)

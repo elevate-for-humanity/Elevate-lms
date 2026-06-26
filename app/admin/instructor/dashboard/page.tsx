@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 
 export default async function InstructorDashboard() {
   // Require instructor or admin role
-  const { user, profile } = await requireRole(['instructor', 'admin', 'super_admin']);
+  const { user, profile } = await requireRole(['instructor', 'admin']);
 
   const supabase = await createClient();
 
@@ -52,7 +52,7 @@ export default async function InstructorDashboard() {
 
   // ── Current path: program_enrollments (all non-legacy programs) ───────────
   // Admins see all; instructors see programs where they are assigned.
-  const isAdmin = profile.role === 'admin' || profile.role === 'super_admin';
+  const isAdmin = profile.role === 'admin' || profile.role === 'admin';
   let programEnrollQuery = supabase
     .from('program_enrollments')
     .select(

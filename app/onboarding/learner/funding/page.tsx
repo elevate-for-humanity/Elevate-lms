@@ -66,8 +66,12 @@ export default function FundingPage() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { router.push('/login?redirect=/onboarding/learner/funding'); return; }
+    supabase.auth.getUser().then((authRes) => {
+      const user = authRes.data?.user;
+      if (!user) {
+        router.push('/login?redirect=/onboarding/learner/funding');
+        return;
+      }
       supabase
         .from('profiles')
         .select('funding_confirmed, funding_source')

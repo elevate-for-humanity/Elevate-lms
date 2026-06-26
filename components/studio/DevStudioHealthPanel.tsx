@@ -5,7 +5,7 @@ import { Activity, AlertTriangle, ExternalLink, Loader2, RefreshCw, Server } fro
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-const NorthflankStatusPanel = dynamic(() => import('@/components/dev-studio/NorthflankStatusPanel'), {
+const NorthflankStatusPanel = dynamic(() => import('@/components/studio/NorthflankStatusPanel'), {
   ssr: false,
 });
 

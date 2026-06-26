@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 
 import { Metadata } from 'next';
@@ -20,25 +20,25 @@ const features = [
   {
     title: 'Automated Data Collection',
     description: 'Automatically capture participant data, outcomes, and metrics as they happen.',
-    image: '/images/pages/funding-page-1.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-page-1.jpg',
     items: ['Real-time data capture', 'Automatic calculations', 'Data validation', 'Error prevention'],
   },
   {
     title: 'Custom Report Templates',
     description: 'Pre-built templates for DOL, state agencies, and foundation reporting.',
-    image: '/images/pages/workforce-training.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp',
     items: ['DOL ETA reports', 'State-specific formats', 'Foundation templates', 'Custom builders'],
   },
   {
     title: 'Outcome Tracking',
     description: 'Track employment, wages, credentials, and other grant outcomes.',
-    image: '/images/pages/workforce-training.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp',
     items: ['Employment tracking', 'Wage verification', 'Credential attainment', 'Follow-up automation'],
   },
   {
     title: 'One-Click Exports',
     description: 'Export reports in any format required by your funders.',
-    image: '/images/pages/funding-page-1.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-page-1.jpg',
     items: ['Excel exports', 'PDF reports', 'CSV data files', 'API integrations'],
   },
 ];
@@ -67,7 +67,7 @@ export default function GrantReportingPage() {
     <div className="bg-white">
       {/* Avatar Guide */}
       <AvatarGuide
-        avatarImage="/images/pages/store-recommendations.webp"
+        avatarImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp"
         avatarName="Guide"
         welcomeMessage="Hey! I'm your guide. I used to spend 40 hours on quarterly reports. Now it takes 10 minutes. Let me show you how our grant reporting tools work."
         steps={guideSteps}
@@ -97,7 +97,7 @@ export default function GrantReportingPage() {
       <section className="relative w-full">
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image src="/images/pages/store-page-1.webp" alt="Grant Reporting" fill className="object-cover" priority sizes="100vw" placeholder="empty" />
+          <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-page-1.webp" alt="Grant Reporting" fill className="object-cover" priority sizes="100vw"  />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -119,7 +119,7 @@ export default function GrantReportingPage() {
             {features.map((feature) => (
               <div key={feature.title} className="bg-white rounded-2xl overflow-hidden border-2 border-slate-200 hover:border-brand-orange-500 hover:shadow-xl transition-all group">
                 <div className="relative h-48 overflow-hidden">
-                  <Image src={feature.image} alt={feature.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" placeholder="empty" />
+                  <Image src={feature.image} alt={feature.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300"  />
                   <h3 className="absolute bottom-4 left-4 text-xl font-bold text-slate-900">{feature.title}</h3>
                 </div>
                 <div className="p-6">
@@ -148,7 +148,7 @@ export default function GrantReportingPage() {
               { name: 'WIOA Title I', desc: 'Adult, Dislocated Worker, Youth' },
               { name: 'WIOA Title II', desc: 'Adult Education and Literacy' },
               { name: 'Perkins V', desc: 'Career and Technical Education' },
-              { name: 'SNAP E&T', desc: 'Employment and Training' },
+              { name: '', desc: 'Employment and Training' },
               { name: 'TANF', desc: 'Temporary Assistance' },
               { name: 'DOL Grants', desc: 'Competitive grants' },
               { name: 'State Grants', desc: 'State workforce funding' },

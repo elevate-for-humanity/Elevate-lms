@@ -4,12 +4,12 @@ export const CNA: ProgramSchema = {
   slug: 'cna',
   title: 'Certified Nursing Assistant (CNA)',
   subtitle:
-    'Indiana state CNA certification in 6 weeks. Clinical rotations at licensed healthcare facilities. State exam proctored on-site. FSSA IMPACT funding available for eligible participants. Self-pay: $2,500 (Sale: $1,850).',
+    'Indiana state CNA certification in 6 weeks. Clinical rotations at licensed healthcare facilities. State exam proctored on-site. FSSA Gov Portal funding available for eligible participants. Self-pay: $2,500 (Sale: $1,850).',
   sector: 'healthcare',
   category: 'Healthcare',
   programType: 'workforce',
 
-  heroImage: '/images/pages/cna-patient-care.jpg',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-patient-care.jpg',
   heroImageAlt: 'CNA student assisting a patient at a licensed healthcare facility in Indianapolis',
   videoSrc: '/videos/cna-hero.mp4',
 
@@ -28,7 +28,7 @@ export const CNA: ProgramSchema = {
   schedule: 'Mon–Fri, 30–40 hours per week',
   cohortSize: '8–12 participants per cohort',
   fundingStatement:
-    'FSSA IMPACT funding available for eligible participants (SNAP/TANF recipients). Covers tuition, books, and state exam fees when approved. Eligibility is not guaranteed. Self-pay: $2,500 (Sale: $1,850). BNPL available.',
+    'FSSA Gov Portal funding available for eligible participants (SNAP/TANF recipients). Covers tuition, books, and state exam fees when approved. Eligibility is not guaranteed. Self-pay: $2,500 (Sale: $1,850). BNPL available.',
   selfPayCost: '$1,850',
   regularPrice: '$2,500',
   salePrice: '$1,850',
@@ -201,9 +201,9 @@ export const CNA: ProgramSchema = {
         'Federal law establishing minimum training and competency standards for nursing assistants in Medicare/Medicaid facilities.',
     },
     {
-      standard: 'FSSA IMPACT Program',
+      standard: 'FSSA Gov Portal Program',
       description:
-        'Eligible training provider under the Indiana FSSA IMPACT program for SNAP and TANF recipients pursuing healthcare careers.',
+        'Eligible training provider under the Indiana FSSA Gov Portal program for SNAP and TANF recipients pursuing healthcare careers.',
     },
   ],
 
@@ -243,7 +243,7 @@ export const CNA: ProgramSchema = {
     {
       question: 'What funding is available?',
       answer:
-        'CNA is funded through the FSSA IMPACT program for eligible SNAP and TANF recipients. Many students pay $0. Eligibility is determined through FSSA intake. Self-pay tuition is $2,500 (currently on sale for $1,850). BNPL financing available through Affirm, Sezzle, Klarna, and more.',
+        'CNA is funded through the FSSA Gov Portal program for eligible SNAP and TANF recipients. Many students pay $0. Eligibility is determined through FSSA intake. Self-pay tuition is $2,500 (currently on sale for $1,850). BNPL financing available through Affirm, Sezzle, Klarna, and more.',
     },
     {
       question: 'Where are the clinical rotations?',
@@ -270,7 +270,7 @@ export const CNA: ProgramSchema = {
 
   metaTitle: 'CNA Program — Indiana State Certification in 4 Weeks | Elevate for Humanity',
   metaDescription:
-    'Indiana state CNA certification in 4 weeks. Clinical rotations at licensed facilities. State exam proctored on-site. FSSA IMPACT funding available for eligible participants. Self-pay: $2,500 (Sale: $1,850). Indianapolis.',
+    'Indiana state CNA certification in 4 weeks. Clinical rotations at licensed facilities. State exam proctored on-site. FSSA Gov Portal funding available for eligible participants. Self-pay: $2,500 (Sale: $1,850). Indianapolis.',
 
   enrollmentType: 'internal',
   deliveryModel: 'internal',
@@ -282,6 +282,6 @@ export const CNA: ProgramSchema = {
     fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. FSSA IMPACT covers eligible SNAP/TANF recipients. WIOA Title I Adult/Dislocated Worker funding available.',
+    fundingNotes: 'Indiana ETPL-listed. FSSA Gov Portal covers eligible SNAP/TANF recipients. WIOA Title I Adult/Dislocated Worker funding available.',
   },
 };

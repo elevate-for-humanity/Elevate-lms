@@ -41,7 +41,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !['admin'].includes(profile.role)) {
     throw APIErrors.forbidden('Only admins can verify documents');
   }
 

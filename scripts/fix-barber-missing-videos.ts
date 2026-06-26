@@ -35,7 +35,7 @@ const COURSE_ID = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
 
 // Instructor photo — Elizabeth Greene (real face, D-ID compatible)
 const INSTRUCTOR_PHOTO_URL =
-  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/avatars/barber/elizabeth-greene-headshot.jpg';
+  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/avatars/barber/elizabeth-greene-headshot.webp';
 
 const DID_API = 'https://api.d-id.com';
 const POLL_INTERVAL_MS = 6000;

@@ -12,7 +12,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ── Shared mock infrastructure ────────────────────────────────────────────────
 
-type Role = 'student' | 'instructor' | 'admin' | 'super_admin' | 'staff' | 'program_holder';
+type Role = 'student' | 'instructor' | 'admin' | 'admin' | 'staff' | 'program_holder';
 
 interface MockUser {
   id: string;
@@ -64,7 +64,7 @@ async function requireAdminActor(
   if (!db) throw new Error('Admin client failed to initialize');
   const result = await db.from('profiles').select('role').eq('id', user.id).single();
   if (result.error) throw new Error(`Profile fetch failed: ${result.error.message}`);
-  if (!['admin', 'super_admin'].includes(result.data?.role ?? '')) throw new Error('Forbidden');
+  if (!['admin'].includes(result.data?.role ?? '')) throw new Error('Forbidden');
   return { user, db };
 }
 
@@ -83,7 +83,7 @@ async function requireAdminOrStaff(
   if (!db) throw new Error('Admin client failed to initialize');
   const result = await db.from('profiles').select('role').eq('id', user.id).single();
   if (result.error) throw new Error(`Profile fetch failed: ${result.error.message}`);
-  if (!['admin', 'super_admin', 'staff'].includes(result.data?.role ?? ''))
+  if (!['admin', 'staff'].includes(result.data?.role ?? ''))
     throw new Error('Forbidden');
   return { user, db };
 }
@@ -102,7 +102,7 @@ async function requireAdminForVerification(
   if (!user) return { error: 'Not authenticated' };
   const result = await db.from('profiles').select('role').eq('id', user.id).single();
   if (result.error) throw new Error(`Actor profile fetch failed: ${result.error.message}`);
-  if (!['admin', 'super_admin'].includes(result.data?.role ?? '')) return { error: 'Forbidden' };
+  if (!['admin'].includes(result.data?.role ?? '')) return { error: 'Forbidden' };
   return { user, db };
 }
 
@@ -152,9 +152,9 @@ describe('admin/users/actions — requireAdminActor', () => {
     expect(result.user.id).toBe('admin-1');
   });
 
-  it('succeeds for super_admin', async () => {
+  it('succeeds for admin', async () => {
     const supabase = makeSupabaseMock({ id: 'super-1' });
-    const db = makeAdminDbMock({ role: 'super_admin' });
+    const db = makeAdminDbMock({ role: 'admin' });
     const result = await requireAdminActor(supabase, db);
     expect(result.user.id).toBe('super-1');
   });
@@ -231,9 +231,9 @@ describe('program-holders/verification — requireAdminForVerification', () => {
     expect((result as { user: MockUser }).user.id).toBe('admin-1');
   });
 
-  it('succeeds for super_admin', async () => {
+  it('succeeds for admin', async () => {
     const supabase = makeSupabaseMock({ id: 'super-1' });
-    const db = makeAdminDbMock({ role: 'super_admin' });
+    const db = makeAdminDbMock({ role: 'admin' });
     const result = await requireAdminForVerification(supabase, db);
     expect((result as { user: MockUser }).user.id).toBe('super-1');
   });

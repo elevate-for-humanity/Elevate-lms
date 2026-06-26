@@ -53,13 +53,13 @@ export default function EnrollmentOptions({
             </h3>
             <p className="text-slate-600 text-sm leading-relaxed mb-5 flex-1">
               {fundedNote ??
-                'WIOA, Workforce Ready Grant, and FSSA IMPACT funding may cover 100% of tuition, books, and exam fees for eligible Indiana residents. We help you apply for every option you qualify for.'}
+                'WIOA, Workforce Ready Grant, and  funding may cover 100% of tuition, books, and exam fees for eligible Indiana residents. We help you apply for every option you qualify for.'}
             </p>
             <div className="bg-slate-50 rounded-xl p-4 mb-5 text-xs text-slate-600 space-y-1">
               {[
                 'WIOA — Federal',
                 'Workforce Ready Grant — Indiana',
-                'FSSA IMPACT — SNAP/TANF recipients',
+                ' — SNAP/TANF recipients',
                 'Job Ready Indy — Indianapolis',
               ].map((f) => (
                 <div key={f} className="flex items-center gap-2">

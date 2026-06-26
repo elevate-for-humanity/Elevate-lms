@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useState } from 'react';
+import Link from 'next/link';
 import { CreditCard, DollarSign } from 'lucide-react';
 import { BNPL_PROVIDER_NAMES, BNPL_PROVIDER_SUMMARY } from '@/lib/bnpl-config';
 
@@ -67,9 +68,9 @@ export default function ProgramPaymentOptions({
         </p>
         <p className="text-sm text-black">
           Many students qualify for no-cost training through WIOA, WRG, or JRI.
-          <a href="/apply" className="text-brand-blue-600 underline font-bold ml-1">
+          <Link href="/apply" className="text-brand-blue-600 underline font-bold ml-1">
             Apply here to check eligibility
-          </a>
+          </Link>
         </p>
       </div>
 

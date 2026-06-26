@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 
 import { Metadata } from 'next';
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Grants Discovery & Management App',
     description: 'Find and manage federal, state, and foundation grants with AI-powered matching.',
-    images: ['/images/pages/homepage-why-elevate.webp'],
+    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/homepage-why-elevate.webp'],
     type: 'website',
   },
   alternates: {
@@ -86,7 +86,7 @@ export default function GrantsAppPage() {
                 <div className="aspect-video bg-white rounded-lg overflow-hidden relative">
                   <CanonicalVideo
                     src="/videos/training-providers-video-with-narration.mp4"
-                    poster="/images/pages/store-hero.webp"
+                    poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-hero.webp"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 </div>
@@ -136,7 +136,7 @@ export default function GrantsAppPage() {
           <div className="aspect-video bg-white rounded-2xl overflow-hidden relative">
             <CanonicalVideo
               src="/videos/training-providers-video-with-narration.mp4"
-              poster="/images/pages/store-hero.webp"
+              poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-hero.webp"
               className="absolute inset-0 w-full h-full object-cover"
             />
           </div>

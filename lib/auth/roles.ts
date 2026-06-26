@@ -7,7 +7,7 @@
  */
 
 export type TaxRole =
-  | 'super_admin'
+  | 'admin'
   | 'firm_owner'
   | 'office_manager'
   | 'preparer'
@@ -18,7 +18,7 @@ export type TaxRole =
 // Permission strings follow the pattern resource:action
 // '*' grants all permissions
 const PERMISSIONS: Record<TaxRole, string[]> = {
-  super_admin: ['*'],
+  admin: ['*'],
   firm_owner: [
     'returns:*',
     'clients:*',
@@ -99,5 +99,5 @@ export function canApprove(role: TaxRole): boolean {
  * Returns true if the role has any administrative capability.
  */
 export function isAdminRole(role: TaxRole): boolean {
-  return role === 'super_admin' || role === 'firm_owner' || role === 'office_manager';
+  return role === 'admin' || role === 'firm_owner' || role === 'office_manager';
 }

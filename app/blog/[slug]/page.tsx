@@ -102,7 +102,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       authors: [post.author_name],
       images: [
         {
-          url: post.image || '/images/pages/social-media-1.webp',
+          url: post.image || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/social-media-1.webp',
           width: 1200,
           height: 630,
           alt: post.title,
@@ -113,7 +113,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt,
-      images: [post.image || '/images/pages/social-media-1.webp'],
+      images: [post.image || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/social-media-1.webp'],
     },
   };
 }
@@ -146,13 +146,13 @@ export default async function BlogPostPage({ params }: { params: Params }) {
       <section className="relative h-48 md:h-64 flex items-end overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src={post.image || '/images/pages/social-media-1.webp'}
+          src={post.image || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/social-media-1.webp'}
           alt={post.title}
           fill
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
       </section>
 
@@ -199,11 +199,11 @@ export default async function BlogPostPage({ params }: { params: Params }) {
                 >
                   <div className="relative h-48 overflow-hidden">
                     <Image
-                      src={related.image || '/images/pages/social-media-1.webp'}
+                      src={related.image || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/social-media-1.webp'}
                       alt={related.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      sizes="100vw" placeholder="empty"
+                      sizes="100vw"
                     />
                   </div>
                   <div className="p-6">

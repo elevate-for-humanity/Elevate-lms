@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function EmployerPostingsPage() {
-  const { user } = await requireRole(['employer', 'admin', 'super_admin']);
+  const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
 
   const { data: postings } = await supabase

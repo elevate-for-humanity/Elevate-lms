@@ -94,12 +94,12 @@ export default async function BookingPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/images/pages/booking-page-1.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/booking-page-1.webp"
             alt="Hero image"
             fill
             className="object-cover"
             priority
-            sizes="100vw" placeholder="empty"
+            sizes="100vw" 
           />
         </div>
         <div className="bg-white py-10">
@@ -211,7 +211,7 @@ export default async function BookingPage() {
                         fill
                         sizes="80px"
                         className="object-cover"
-                        placeholder="empty"
+                        
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">

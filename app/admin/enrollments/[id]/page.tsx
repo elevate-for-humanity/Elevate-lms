@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
+  return {};
 }
 
 function Field({ label, value }: { label: string; value: string | null | undefined }) {
@@ -27,7 +28,7 @@ function fmtCents(cents: number | null) {
 }
 
 export default async function EnrollmentDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const { id } = await params;
   const db = await requireAdminClient();
 

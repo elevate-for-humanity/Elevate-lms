@@ -17,7 +17,7 @@ export default function WorkforcePartnersPage() {
       config={{
         breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Workforce Partners' }],
         hero: {
-          image: '/images/pages/about-career-training.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp',
           tag: 'Workforce Partners',
           tagColor: 'text-brand-blue-600',
           title: 'Connect Your Clients to Careers',
@@ -29,7 +29,7 @@ export default function WorkforcePartnersPage() {
             `${PLATFORM_DEFAULTS.orgName} is an Indiana ETPL-listed training provider and DOL Registered Apprenticeship Sponsor. We work directly with WorkOne centers, FSSA, reentry programs, and community organizations to enroll eligible participants in funded training.`,
             'Our programs are designed for WIOA co-enrollment, Workforce Ready Grant referrals, and JRI funding. We handle enrollment, training delivery, credential testing, and job placement — your team focuses on case management.',
           ],
-          image: '/images/pages/about-employer-partners.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-employer-partners.webp',
         },
         features: {
           heading: 'What Partners Get',
@@ -37,7 +37,7 @@ export default function WorkforcePartnersPage() {
             'ETPL-listed programs eligible for WIOA Individual Training Accounts',
             'DOL Registered Apprenticeship programs for OJT funding',
             'Workforce Ready Grant approved programs',
-            'JRI and FSSA IMPACT program co-enrollment support',
+            'JRI and  program co-enrollment support',
             'Real-time enrollment and progress reporting for case managers',
             'Dedicated partner liaison for referral coordination',
             'Flexible start dates and cohort scheduling',

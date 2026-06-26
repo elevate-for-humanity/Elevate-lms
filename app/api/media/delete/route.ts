@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    if (!profile || !['admin'].includes(profile.role)) {
       return Response.json(
         { error: 'Admin access required for delete operations' },
         { status: 403 },

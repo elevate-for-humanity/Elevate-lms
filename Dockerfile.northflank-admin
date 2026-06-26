@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
 
 ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -32,14 +32,16 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS=--max-old-space-size=4096
+
+# P0-3: 12GB heap for admin builds
+ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV BUILD_SCOPE=1
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV CI=true
-# Webpack cache enabled - faster incremental builds
+# Webpack cache enabled for faster incremental builds
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # Build Admin Next.js
 ARG NEXT_PUBLIC_SUPABASE_URL
@@ -54,7 +56,8 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
 
 WORKDIR /app/apps/admin
-RUN pnpm next build --no-lint
+# P0-3: 12GB memory for admin builds
+RUN NODE_OPTIONS='--max-old-space-size=12288' NEXT_BUILD_CACHE=/cache/.next pnpm next build --no-lint
 WORKDIR /app
 
 # --- runtime stage ---
@@ -70,6 +73,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=8080
+# Fixed: Runtime memory limit
+ENV NODE_OPTIONS=--max-old-space-size=4096
 
 WORKDIR /app
 
@@ -90,4 +95,4 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
 
-CMD ["node", "--max-http-header-size=32768", "apps/admin/server.js"]
+CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "apps/admin/server.js"]

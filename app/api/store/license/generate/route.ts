@@ -130,7 +130,7 @@ async function _POST(req: Request) {
         .eq('id', user.id)
         .maybeSingle();
 
-      if (!profile?.role || !['admin', 'super_admin'].includes(profile.role)) {
+      if (!profile?.role || !['admin'].includes(profile.role)) {
         logger.warn('Non-admin license generation attempt', {
           userId: user.id,
           role: profile?.role,

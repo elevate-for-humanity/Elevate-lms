@@ -187,10 +187,11 @@ export function LearningBarrierAnalyzer() {
     setBarriers(detectedBarriers);
     setStrugglingStudents(strugglingStudentData);
     setIsAnalyzing(false);
-    // Au remediation if enabled
+    // Auto remediation if enabled
     if (autoRemediationEnabled) {
       await deployAutoRemediation(detectedBarriers);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const deployAutoRemediation = async (barriers: LearningBarrier[]) => {
     for (const barrier of barriers) {

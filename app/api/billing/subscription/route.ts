@@ -30,8 +30,8 @@ async function _GET(req: NextRequest) {
 
     const ctx = await getOrgContext(supabase, user.id);
 
-    // Only org_admin and super_admin can view billing
-    if (!['org_admin', 'super_admin'].includes(ctx.role)) {
+    // Only org_admin and admin can view billing
+    if (!['org_admin', 'admin'].includes(ctx.role)) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 

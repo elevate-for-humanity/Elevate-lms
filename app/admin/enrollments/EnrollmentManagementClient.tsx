@@ -43,11 +43,17 @@ interface Cohort {
   status: string;
 }
 
+interface HostShop {
+  id: string;
+  name: string;
+}
+
 interface Props {
   initialEnrollments: Enrollment[];
   users: User[];
   courses: Course[];
   cohorts: Cohort[];
+  hostShops: HostShop[];
   stats: {
     total: number;
     active: number;
@@ -61,6 +67,7 @@ export default function EnrollmentManagementClient({
   users,
   courses,
   cohorts,
+  hostShops,
   stats,
 }: Props) {
   const [enrollments, setEnrollments] = useState<Enrollment[]>(initialEnrollments);
@@ -75,6 +82,7 @@ export default function EnrollmentManagementClient({
     user_id: '',
     course_id: '',
     cohort_id: '',
+    host_shop_id: '',
     status: 'active',
     progress: '0',
     at_risk: false,
@@ -85,6 +93,7 @@ export default function EnrollmentManagementClient({
       user_id: '',
       course_id: '',
       cohort_id: '',
+      host_shop_id: '',
       status: 'active',
       progress: '0',
       at_risk: false,
@@ -103,6 +112,7 @@ export default function EnrollmentManagementClient({
       user_id: enrollment.user_id,
       course_id: enrollment.course_id,
       cohort_id: (enrollment as any).cohort_id || '',
+      host_shop_id: (enrollment as any).host_shop_id || '',
       status: enrollment.status || 'active',
       progress: enrollment.progress?.toString() || '0',
       at_risk: enrollment.at_risk || false,
@@ -122,6 +132,7 @@ export default function EnrollmentManagementClient({
           status: formData.status,
           progress: parseInt(formData.progress) || 0,
           at_risk: formData.at_risk,
+          host_shop_id: formData.host_shop_id || null,
           completed_at: formData.status === 'completed' ? new Date().toISOString() : null,
         });
         setEnrollments(
@@ -132,6 +143,7 @@ export default function EnrollmentManagementClient({
                   status: formData.status,
                   progress: parseInt(formData.progress) || 0,
                   at_risk: formData.at_risk,
+                  host_shop_id: formData.host_shop_id || null,
                 }
               : e,
           ),
@@ -142,6 +154,7 @@ export default function EnrollmentManagementClient({
           course_id: formData.course_id,
           status: formData.status,
           progress: parseInt(formData.progress) || 0,
+          host_shop_id: formData.host_shop_id || null,
         });
         // Refresh page to show new enrollment with full join data
         window.location.reload();
@@ -537,6 +550,23 @@ export default function EnrollmentManagementClient({
                   {cohorts.map((cohort) => (
                     <option key={cohort.id} value={cohort.id}>
                       {cohort.name} ({cohort.code})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-900 mb-1">
+                  Host Shop (optional)
+                </label>
+                <select
+                  value={formData.host_shop_id}
+                  onChange={(e) => setFormData({ ...formData, host_shop_id: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg"
+                >
+                  <option value="">No host shop</option>
+                  {hostShops.map((shop) => (
+                    <option key={shop.id} value={shop.id}>
+                      {shop.name}
                     </option>
                   ))}
                 </select>

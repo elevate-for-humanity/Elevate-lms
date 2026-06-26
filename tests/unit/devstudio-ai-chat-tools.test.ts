@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TOOL_META } from '@/components/dev-studio/AIChat';
+import { TOOL_META } from '@/components/studio/AIChat';
 
 describe('Dev Studio AIChat tool metadata', () => {
   it('labels operational diagnostic tools explicitly', () => {

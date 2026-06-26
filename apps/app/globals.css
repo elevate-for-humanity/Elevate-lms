@@ -1,0 +1,2035 @@
+@import '../../../styles/design-tokens.css';
+@import '../../../styles/mitchy-theme.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   ADMIN PORTAL - INSTITUTIONAL TYPOGRAPHY
+   Enterprise-grade visual standards for audit-safe presentation
+   ============================================================================ */
+
+/* Admin portal base typography - minimum 16px, darker colors */
+[class*='/admin'] body,
+.admin-portal {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Override light grays with institutional dark tones */
+.admin-portal .text-gray-500,
+[class*='/admin'] .text-gray-500 {
+  color: #374151 !important; /* gray-700 */
+}
+
+.admin-portal .text-gray-600,
+[class*='/admin'] .text-gray-600 {
+  color: #1f2937 !important; /* gray-800 */
+}
+
+.admin-portal .text-gray-400,
+[class*='/admin'] .text-gray-400 {
+  color: #4b5563 !important; /* gray-600 */
+}
+
+/* Admin headings - always dark and authoritative */
+.admin-portal h1,
+.admin-portal h2,
+.admin-portal h3,
+.admin-portal h4,
+[class*='/admin'] h1,
+[class*='/admin'] h2,
+[class*='/admin'] h3,
+[class*='/admin'] h4 {
+  color: #111827; /* gray-900 */
+  font-weight: 600;
+}
+
+/* Admin body text minimum size */
+.admin-portal p,
+.admin-portal span,
+.admin-portal td,
+.admin-portal th,
+.admin-portal label,
+[class*='/admin'] p,
+[class*='/admin'] span,
+[class*='/admin'] td,
+[class*='/admin'] th,
+[class*='/admin'] label {
+  font-size: max(0.875rem, 14px);
+}
+
+/* Admin tables - clear, readable */
+.admin-portal table,
+[class*='/admin'] table {
+  font-size: 14px;
+}
+
+.admin-portal th,
+[class*='/admin'] th {
+  font-weight: 600;
+  color: #111827;
+  background-color: #f9fafb;
+}
+
+.admin-portal td,
+[class*='/admin'] td {
+  color: #374151;
+}
+
+/* ============================================================================
+   PREVENT FLASH OF UNSTYLED CONTENT ON FIRST LOAD
+   ============================================================================ */
+
+/* Show content immediately - no FOUC prevention needed */
+/* Fonts load fast enough with preconnect, no need to hide content */
+html,
+body {
+  opacity: 1;
+  background-color: #ffffff;
+  color: #0f172a; /* slate-950 — platform-wide default. Prevents light/missing text-color bugs. */
+}
+
+/* ============================================================================
+   OVERLAY FIX: Ensure closed Radix portals are hidden
+   ============================================================================ */
+[data-radix-portal] [data-state='closed'] {
+  display: none !important;
+}
+
+/* ============================================================================
+   BASE STYLES - Reset, Typography, Layout
+   ============================================================================ */
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* Ensure all text inherits the dark default unless explicitly overridden.
+     Fixes 7,900+ text-black / missing-color instances platform-wide. */
+  p,
+  li,
+  span,
+  td,
+  th,
+  label,
+  dt,
+  dd,
+  blockquote,
+  figcaption {
+    color: inherit;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: inherit;
+  }
+
+  /* BUTTON FIX: Ensure all buttons are easy to tap/click */
+  button,
+  [role='button'],
+  a.btn,
+  .btn,
+  input[type='submit'],
+  input[type='button'] {
+    min-height: 44px;
+    min-width: 44px;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  /* Links that look like buttons */
+  a[class*='bg-'],
+  a[class*='rounded'] {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  /* Accessibility: Enhanced Focus visible styles for WCAG AA compliance */
+  *:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* High contrast focus for better visibility */
+  @media (prefers-contrast: high) {
+    *:focus-visible {
+      outline: 4px solid #000;
+      outline-offset: 3px;
+    }
+  }
+
+  /* Skip to main content link */
+  .skip-to-main {
+    position: absolute;
+    left: -9999px;
+    z-index: 999;
+    padding: 1rem 1.5rem;
+    background-color: #2563eb;
+    color: white;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+  }
+
+  .skip-to-main:focus {
+    left: 0;
+    top: 0;
+  }
+
+  html,
+  body {
+    font-family:
+      var(--font-inter),
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      system-ui,
+      sans-serif !important;
+    /* Removed: color: #000000 !important; - let Tailwind handle colors */
+  }
+
+  /* REMOVED: Aggressive black text enforcement that broke the design */
+  /* Let Tailwind and component styles handle text colors properly */
+
+  /* Footer styling - allow proper dark background with light text */
+  footer {
+    /* Footer colors handled by Tailwind classes */
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body {
+    @apply bg-white text-slate-900 antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100dvh; /* Use dynamic viewport height for mobile */
+    display: flex;
+    flex-direction: column;
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /* Removed: background: #fff !important; - let components control their backgrounds */
+  }
+
+  /* Removed: section background override - let Tailwind classes work */
+
+  /* Removed: NUCLEAR white background enforcement - broke gradient sections */
+
+  /* Removed: backdrop-filter override - let design system work */
+
+  /* Removed: All gradient and overlay blocking - these broke hero sections and design elements */
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0;
+    padding: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold leading-snug;
+    margin-bottom: 0.75rem;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl font-semibold leading-snug;
+  }
+
+  h4 {
+    @apply text-lg md:text-xl font-semibold;
+  }
+
+  p {
+    @apply text-base md:text-lg leading-relaxed text-slate-900;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+    cursor: pointer;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+
+  /* Only apply to non-Next.js images */
+  img:not([data-nimg]) {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Focus-visible styles — only show on keyboard navigation, not mouse clicks */
+  *:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  .theme {
+    --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
+    --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+  }
+}
+
+/* ============================================================================
+   LAYOUT & CONTAINERS
+   ============================================================================ */
+
+/* Consistent container - matches SkilledUS */
+.container {
+  width: 100%;
+  max-width: 1152px; /* 6xl - consistent with SkilledUS */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Tighter section spacing - matches SkilledUS */
+section {
+  width: 100%;
+  margin: 0;
+  padding: 3rem 0; /* Reduced from 4rem */
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  section {
+    padding: 4rem 0;
+  }
+}
+
+/*
+ * Section rhythm — alternating backgrounds.
+ *
+ * Any <section> that immediately follows another <section> gets slate-50.
+ * This creates white → slate-50 → white → slate-50 alternation regardless
+ * of DOM nesting depth or page structure.
+ *
+ * Tailwind bg-* utilities (bg-slate-900, bg-brand-red-700, etc.) are in
+ * @layer utilities which has higher priority than @layer base, so explicit
+ * colored sections always override this rule automatically.
+ *
+ * Prerequisite: bg-white stripped from <section> tags (it's the browser
+ * default and would otherwise override this @layer base rule).
+ */
+@layer base {
+  section + section {
+    background-color: #f8fafc; /* slate-50 */
+  }
+}
+
+/* ============================================================================
+   COMPONENTS
+   ============================================================================ */
+
+@layer components {
+  /* Section spacing */
+  .section {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+
+  /* Container with padding */
+  .container-padded {
+    @apply mx-auto max-w-7xl px-4 md:px-6 lg:px-8;
+  }
+
+  /* Modern card */
+  .card {
+    @apply rounded-2xl bg-white shadow-card border border-slate-100;
+    background-color: var(--color-card-bg, #ffffff);
+    border-color: var(--color-card-border, #dee2e6);
+    color: var(--color-text-primary, #212529);
+  }
+
+  /* Interactive card with hover */
+  .card-interactive {
+    @apply card transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-card-hover;
+  }
+
+  /* Button variants */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ease-in-out;
+    min-height: 44px;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-orange-500 text-white shadow-md hover:bg-brand-orange-600 active:scale-95 focus:ring-4 focus:ring-brand-orange-100;
+  }
+
+  .btn-secondary {
+    @apply btn bg-brand-blue-600 text-white shadow-md hover:bg-brand-blue-700 active:scale-95 focus:ring-4 focus:ring-brand-blue-100;
+  }
+
+  .btn-outline {
+    @apply btn border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 active:scale-95 focus:ring-4 focus:ring-slate-100;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-slate-700 hover:bg-slate-100 active:bg-slate-200;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-card focus:border-brand-orange-500 focus:outline-none focus:ring-4 focus:ring-brand-orange-100 transition-all;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+  }
+
+  .badge-primary {
+    @apply badge bg-brand-blue-100 text-brand-blue-700;
+  }
+
+  .badge-success {
+    @apply badge bg-emerald-100 text-emerald-700;
+  }
+
+  .badge-warning {
+    @apply badge bg-amber-100 text-amber-700;
+  }
+
+  .badge-error {
+    @apply badge bg-brand-red-100 text-brand-red-700;
+  }
+}
+
+@layer utilities {
+  /* Smooth scroll */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+
+  /* Hide scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-orange-500 bg-clip-text text-transparent;
+  }
+}
+
+/* ============================================
+   ELEVATE CONNECTS BRAND THEME
+   Professional Light LMS Design System
+   ============================================ */
+
+:root {
+  /* Professional Brand Colors - Red, Blue, Orange, White */
+  --brand-red: #dc2626;
+  --brand-red-dark: #b91c1c;
+  --brand-red-light: #f87171;
+  --brand-red-soft: rgba(220, 38, 38, 0.1);
+
+  --brand-blue: #3b82f6; /* professional blue - PRIMARY */
+  --brand-blue-dark: #2563eb;
+  --brand-blue-darker: #1d4ed8;
+  --brand-blue-light: #60a5fa;
+  --brand-blue-soft: rgba(59, 130, 246, 0.1);
+
+  --brand-orange: #f97316; /* warm orange - ACCENT */
+  --brand-orange-dark: #ea580c;
+  --brand-orange-light: #fb923c;
+  --brand-orange-soft: rgba(249, 115, 22, 0.1);
+
+  --brand-white: #ffffff;
+
+  /* Primary = Blue (Trust, Education) */
+  --brand-primary: #3b82f6;
+  --brand-primary-dark: #2563eb;
+  --brand-primary-light: #60a5fa;
+  --brand-primary-soft: rgba(59, 130, 246, 0.1);
+
+  /* Secondary = Orange (Energy, Action) */
+  --brand-secondary: #f97316;
+  --brand-secondary-dark: #ea580c;
+  --brand-secondary-light: #fb923c;
+
+  /* Accent = Blue */
+  --brand-accent: #3b82f6;
+  --brand-accent-dark: #2563eb;
+  --brand-accent-light: #60a5fa;
+
+  /* Backgrounds - Clean, Modern */
+  --brand-bg: #ffffff;
+  --brand-bg-soft: #f8fafc; /* slate-50 */
+  --brand-bg-gray: #f1f5f9; /* slate-100 */
+  --brand-surface: #ffffff;
+  --brand-surface-hover: #f8fafc;
+
+  /* Borders */
+  --brand-border: #e5e7eb;
+  --brand-border-medium: #d1d5db;
+  --brand-border-dark: #9ca3af;
+
+  /* Text - Dark on Light */
+  --brand-text: #111827;
+  --brand-text-secondary: #374151;
+  --brand-text-muted: #4b5563;
+  --brand-text-light: #6b7280;
+
+  /* Shadows - Softer for light theme */
+  --brand-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --brand-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --brand-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --brand-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Border Radius */
+  --brand-radius-sm: 0.375rem;
+  --brand-radius-md: 0.5rem;
+  --brand-radius-lg: 0.75rem;
+  --brand-radius-xl: 1rem;
+  --brand-radius-pill: 999px;
+
+  /* Spacing */
+  --brand-space-xs: 0.5rem;
+  --brand-space-sm: 0.75rem;
+  --brand-space-md: 1rem;
+  --brand-space-lg: 1.5rem;
+  --brand-space-xl: 2rem;
+  --brand-space-2xl: 3rem;
+
+  --brand-font-sans:
+    var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue',
+    sans-serif;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Body styles consolidated in @layer base above */
+
+/* ============================================
+   LAYOUT COMPONENTS
+   ============================================ */
+
+/* App shell */
+.elevate-shell {
+  min-height: 100vh;
+  background: var(--brand-bg-soft);
+}
+
+/* Top navigation */
+.elevate-nav {
+  background: var(--brand-surface);
+  border-bottom: 1px solid var(--brand-border);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  box-shadow: var(--brand-shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.elevate-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--brand-text);
+}
+
+.elevate-logo-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--brand-radius-md);
+  background: linear-gradient(
+    135deg,
+    var(--brand-red) 0%,
+    var(--brand-orange) 50%,
+    var(--brand-blue) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+/* Hero section */
+.elevate-hero {
+  background: linear-gradient(135deg, var(--brand-red) 0%, var(--brand-orange) 100%);
+  color: white;
+  padding: 3rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.elevate-hero-content {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.elevate-hero-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.elevate-hero-subtitle {
+  font-size: 1.125rem;
+  opacity: 0.95;
+  margin-bottom: 2rem;
+  max-width: 600px;
+}
+
+.elevate-hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: var(--brand-radius-pill);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+/* Container */
+.elevate-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ============================================
+   BUTTON SYSTEM
+   ============================================ */
+
+/* Primary Button - Red */
+.elevate-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--brand-radius-md);
+  border: none;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, var(--brand-red) 0%, var(--brand-red-dark) 100%);
+  box-shadow: var(--brand-shadow-md);
+  transition: all 0.2s ease;
+}
+
+.elevate-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--brand-shadow-lg);
+  background: linear-gradient(135deg, var(--brand-red-light) 0%, var(--brand-red) 100%);
+}
+
+/* Secondary Button - Orange */
+.elevate-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--brand-radius-md);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border: 2px solid var(--brand-orange);
+  background: white;
+  color: var(--brand-orange);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.elevate-btn-secondary:hover {
+  background: var(--brand-orange);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--brand-shadow-md);
+}
+
+/* Accent Button - Blue */
+.elevate-btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--brand-radius-md);
+  border: none;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-blue-dark) 100%);
+  box-shadow: var(--brand-shadow-md);
+  transition: all 0.2s ease;
+}
+
+.elevate-btn-accent:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--brand-shadow-lg);
+}
+
+/* ============================================
+   CARD SYSTEM
+   ============================================ */
+
+.elevate-card {
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
+  border-radius: var(--brand-radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--brand-shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.elevate-card:hover {
+  box-shadow: var(--brand-shadow-md);
+  transform: translateY(-2px);
+}
+
+.elevate-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--brand-border);
+}
+
+.elevate-card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--brand-text);
+  margin: 0;
+}
+
+.elevate-card-subtitle {
+  font-size: 0.875rem;
+  color: var(--brand-text-muted);
+  margin-top: 0.25rem;
+}
+
+.elevate-card-content {
+  color: var(--brand-text-secondary);
+  line-height: 1.6;
+}
+
+/* Card variants */
+.elevate-card-red {
+  border-left: 4px solid var(--brand-red);
+}
+
+.elevate-card-orange {
+  border-left: 4px solid var(--brand-orange);
+}
+
+.elevate-card-blue {
+  border-left: 4px solid var(--brand-blue);
+}
+
+/* ============================================
+   BADGE / PILL SYSTEM
+   ============================================ */
+
+.elevate-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: var(--brand-radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--brand-bg-gray);
+  color: var(--brand-text-secondary);
+}
+
+.elevate-pill--red {
+  background: var(--brand-red-soft);
+  color: var(--brand-red-dark);
+  border: 1px solid var(--brand-red-light);
+}
+
+.elevate-pill--orange {
+  background: var(--brand-orange-soft);
+  color: var(--brand-orange-dark);
+  border: 1px solid var(--brand-orange-light);
+}
+
+.elevate-pill--blue {
+  background: var(--brand-blue-soft);
+  color: var(--brand-blue-dark);
+  border: 1px solid var(--brand-blue-light);
+}
+
+.elevate-pill--success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid #10b981;
+}
+
+.elevate-pill--warning {
+  background: var(--brand-orange-soft);
+  color: var(--brand-orange-dark);
+  border: 1px solid var(--brand-orange);
+}
+
+.elevate-pill--error {
+  background: var(--brand-red-soft);
+  color: var(--brand-red-dark);
+  border: 1px solid var(--brand-red);
+}
+
+.elevate-pill--info {
+  background: var(--brand-blue-soft);
+  color: var(--brand-blue-dark);
+  border: 1px solid var(--brand-blue);
+}
+
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
+
+/* Forms */
+.elevate-input,
+.elevate-textarea,
+.elevate-select {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.elevate-input:focus,
+.elevate-textarea:focus,
+.elevate-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.elevate-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   TABLE SYSTEM
+   ============================================ */
+
+/* Tables (for reports / caseload) */
+.elevate-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.elevate-table th,
+.elevate-table td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.elevate-table th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #1f2937;
+}
+
+.elevate-table tr:hover td {
+  background: #f8fafc;
+}
+
+/* ============================================
+   PAGE HEADINGS
+   ============================================ */
+
+/* Page headings */
+.elevate-page-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.elevate-page-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.elevate-page-subtitle {
+  font-size: 0.8rem;
+  color: var(--brand-text-muted);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.elevate-link {
+  color: var(--brand-secondary);
+  text-decoration: none;
+  transition: color 0.1s ease;
+}
+
+.elevate-link:hover {
+  color: var(--brand-primary);
+}
+
+.elevate-divider {
+  height: 1px;
+  background: var(--brand-border-subtle);
+  margin: 1rem 0;
+}
+
+/* ============================================
+   ACCESSIBILITY - REDUCED MOTION
+   ============================================ */
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .elevate-shell {
+    padding: 1rem;
+  }
+
+  .elevate-nav {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .elevate-hero {
+    padding: 1.2rem;
+  }
+
+  .elevate-hero-title {
+    font-size: 1.2rem;
+  }
+}
+
+/* ============================================
+   MOBILE / PWA OPTIMIZATIONS
+   ============================================ */
+
+/* Safe area insets for notched devices */
+.safe-area-inset-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-inset-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-area-inset-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Touch-friendly tap targets */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Prevent text selection on touch */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Touch manipulation */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Active state for mobile buttons */
+.active\:scale-98:active {
+  transform: scale(0.98);
+}
+
+.active\:scale-95:active {
+  transform: scale(0.95);
+}
+
+/* Smooth scrolling */
+.smooth-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile-optimized card grid */
+@media (max-width: 640px) {
+  .mobile-card-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .mobile-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* Pull-to-refresh indicator */
+.pull-to-refresh {
+  overscroll-behavior-y: contain;
+}
+
+/* Prevent zoom on input focus (iOS) */
+@media (max-width: 1024px) {
+  input[type='text'],
+  input[type='email'],
+  input[type='password'],
+  input[type='number'],
+  input[type='tel'],
+  input[type='url'],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Mobile video player optimizations */
+.mobile-video-container {
+  position: relative;
+  width: 100%;
+  max-width: 100vw;
+  aspect-ratio: 16 / 9;
+}
+
+.mobile-video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Bottom navigation spacing */
+.has-bottom-nav {
+  padding-bottom: 80px;
+}
+
+/* Landscape mode adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+  .mobile-nav-bottom {
+    display: none;
+  }
+
+  .has-bottom-nav {
+    padding-bottom: 0;
+  }
+}
+
+/* Haptic feedback simulation */
+@keyframes haptic-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.haptic-feedback:active {
+  animation: haptic-pulse 0.1s ease;
+}
+
+/* Loading skeleton for mobile */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Mobile-first utility classes */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Chat widget animations */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+/* ============================================================================
+   MOBILE RESPONSIVENESS - Consolidated from mobile-fixes.css
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  html,
+  body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .container,
+  .max-w-7xl,
+  .max-w-6xl,
+  .max-w-5xl {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Ensure images don't overflow on mobile - exclude absolute/fill images */
+  img:not([data-nimg='fill']):not([style*='absolute']) {
+    max-width: 100%;
+  }
+
+  /* Fix any absolute/fixed elements that might overflow - exclude images */
+  [class*='fixed']:not(img),
+  [class*='absolute']:not(img) {
+    max-width: 100vw;
+  }
+
+  /* Ensure text doesn't cause horizontal scroll */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Heading sizes - scoped to main content */
+  main h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  main h2 {
+    font-size: 1.75rem;
+    line-height: 1.3;
+  }
+
+  main h3 {
+    font-size: 1.5rem;
+  }
+
+  /* Grid override - only for content grids, not nav */
+  main .grid,
+  section .grid,
+  article .grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Touch targets - scoped to main content */
+  main button,
+  main .btn,
+  main a.btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem 1rem;
+    text-align: center;
+  }
+
+  /* Links in content areas only */
+  main a,
+  section a,
+  article a {
+    min-height: 44px;
+  }
+
+  /* Hero sections */
+  .hero,
+  [class*='hero'] {
+    padding: 2rem 1rem;
+    min-height: auto;
+  }
+
+  /* Cards */
+  main .card,
+  main [class*='card'] {
+    margin-bottom: 1rem;
+  }
+
+  .text-5xl {
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+
+  .text-6xl {
+    font-size: 3rem;
+    line-height: 1.1;
+  }
+
+  .flex-col button,
+  .flex-col .btn {
+    width: 100%;
+  }
+
+  section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .h-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  a,
+  button {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* Scoped to content areas - not header */
+  main .grid,
+  section .grid,
+  article .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  .h-screen {
+    height: -webkit-fill-available;
+  }
+}
+
+/* ============================================================================
+   PRINT STYLES - Essential only
+   ============================================================================ */
+
+@media print {
+  @page {
+    margin: 1cm;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  nav,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  img {
+    max-width: 100%;
+    page-break-inside: avoid;
+  }
+}
+
+/* Enhanced focus styles for accessibility */
+*:focus-visible {
+  outline: 3px solid #ea580c;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip navigation removed per user request */
+
+/* ============================================================================
+   MOBILE-SAFE CARD - Nuclear option for readability
+   ============================================================================ */
+
+.mobile-safe-card {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  opacity: 1 !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.mobile-safe-card * {
+  color: inherit !important;
+  opacity: 1 !important;
+}
+
+/* ============================
+   EFH POLISH PATCH (GLOBAL)
+   Safe: no routing/nav changes
+   ============================ */
+
+/* Body styles consolidated - single source of truth */
+/* background and color set in @layer base */
+
+/* background-color: transparent on main/section removed — it was overriding
+   the section + section alternation rule. Transparent is the browser default. */
+
+/* 2) Kill accidental transparency/blur that makes text look faint */
+[data-polish-solid],
+.polish-solid {
+  background: #ffffff !important;
+  opacity: 1 !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* If you used translucent backgrounds, this prevents unreadable text */
+.polish-solid * {
+  opacity: 1 !important;
+}
+
+/* 3) Consistent premium card look (use these utility classes in Tailwind) */
+:root {
+  --efh-card-bg: #ffffff;
+  --efh-card-border: #e2e8f0; /* slate-200 */
+  --efh-card-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+/* Optional helper class you can drop onto any card wrapper */
+.efh-card {
+  background: var(--efh-card-bg) !important;
+  border: 1px solid var(--efh-card-border) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--efh-card-shadow) !important;
+}
+
+/* Typography: let Tailwind classes control colors.
+   Previous global overrides forced dark text on hero sections and dark backgrounds. */
+
+/* Links - inherit color, don't force underline on hover (breaks nav/buttons) */
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* 5) Images: prevent "cheap" stretching - exclude Next.js Image */
+img:not([data-nimg]) {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Header CSS removed - component controls all header styles */
+
+/* ============================================================================
+   RESPONSIVE SCALING & FONT UPGRADE
+   Elevate For Humanity: Large Screen Optimization
+   ============================================================================ */
+
+/* 1️⃣ Expand layout width for larger screens - scoped to main content */
+main .container,
+main .wrapper,
+.main-content {
+  max-width: 90vw;
+  width: 100%;
+  margin: 0 auto;
+  padding-inline: 3vw;
+}
+
+/* 2️⃣ Improve readability - font size only, color in @layer base */
+body {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* 3️⃣ Scale text dynamically on very large screens */
+@media screen and (min-width: 1400px) {
+  body {
+    font-size: 18px;
+  }
+  h1 {
+    font-size: 2.6rem;
+  }
+  h2 {
+    font-size: 2rem;
+  }
+  h3 {
+    font-size: 1.4rem;
+  }
+}
+
+/* 4️⃣ Make hero/banner sections use more height */
+.hero,
+.banner,
+.page-header {
+  min-height: 80vh; /* Taller hero area */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* 5️⃣ Add spacing between homepage sections */
+section {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+/* 6️⃣ Adjust CTA buttons to scale with screen size */
+button,
+.btn,
+a.button {
+  font-size: 1rem;
+  padding: 0.8em 1.6em;
+  border-radius: 6px;
+}
+
+/* 7️⃣ Fix overly small footer text */
+footer {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  padding: 2rem 4vw;
+}
+
+/* 8️⃣ Ensure mobile remains clean */
+@media screen and (max-width: 768px) {
+  /* Scoped to main content - not header */
+  main .container,
+  main .wrapper,
+  .main-content {
+    max-width: 100%;
+    padding-inline: 5vw;
+  }
+  body {
+    font-size: 15px;
+  }
+  main section {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+}
+
+/* ============================================================================
+   COLOR & CONTRAST ENHANCEMENT (WCAG AA Compliant)
+   Scoped to content areas - header/nav use component styles
+   ============================================================================ */
+
+/* Headings in content areas */
+main h1,
+main h2,
+main h3,
+main h4,
+main h5,
+main h6,
+section h1,
+section h2,
+section h3,
+section h4,
+section h5,
+section h6,
+article h1,
+article h2,
+article h3,
+article h4,
+article h5,
+article h6 {
+  color: #0f172a; /* Near-black for maximum readability */
+}
+
+/* Paragraph text in content areas */
+main p,
+section p,
+article p {
+  color: #334155; /* Slate-700 equivalent, WCAG AA compliant */
+}
+
+/* Links with better contrast and hover states - scoped to content areas */
+main a,
+section a,
+article a {
+  color: #0369a1; /* Sky-700, accessible blue */
+  text-decoration: none;
+}
+
+main a:hover,
+section a:hover,
+article a:hover {
+  color: #0c4a6e; /* Sky-900, darker on hover */
+  text-decoration: underline;
+}
+
+/* Button text contrast */
+.btn-primary {
+  background-color: #ea580c; /* Orange-600 */
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #c2410c; /* Orange-700 */
+}
+
+.btn-secondary {
+  background-color: #2563eb; /* Blue-600 */
+  color: #ffffff;
+}
+
+.btn-secondary:hover {
+  background-color: #1d4ed8; /* Blue-700 */
+}
+
+/* Ensure sufficient contrast on colored backgrounds */
+.bg-brand-blue-600,
+.bg-brand-blue-700,
+.bg-brand-blue-800,
+.bg-brand-orange-600,
+.bg-brand-orange-700 {
+  color: #ffffff !important;
+}
+
+/* Footer text contrast - all white */
+footer,
+footer * {
+  color: #ffffff !important;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* ============================================================================
+   FIXED HEADER / NAVBAR STYLING
+   Removed - Let component styles control header appearance
+   ============================================================================ */
+
+/* Toast animations */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+/* ============================================================================
+   HEADER TEXT VISIBILITY FIX - MUST BE LAST
+   Prevents global color/filter rules from hiding header text.
+   Scoped to direct children and text elements — NOT dropdown containers,
+   which need opacity-0/invisible to toggle on hover.
+   ============================================================================ */
+header[role='banner'] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  background-color: #ffffff !important;
+}
+
+header[role='banner'] > div {
+  display: grid !important;
+  flex-direction: row !important;
+}
+
+header[role='banner'] nav[aria-label='Main navigation'] {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+}
+
+header[role='banner'] > div,
+header[role='banner'] a,
+header[role='banner'] span,
+header[role='banner'] button,
+header[role='banner'] img,
+header[role='banner'] svg {
+  -webkit-text-fill-color: unset !important;
+  background-clip: unset !important;
+}
+
+/* Header text colors - explicit colors for all elements */
+header[role='banner'] span,
+header[role='banner'] button {
+  color: #111827 !important; /* gray-900 */
+}
+
+header[role='banner'] nav {
+  color: #111827 !important;
+}
+
+/* Desktop nav links - must be visible */
+header[role='banner'] nav a {
+  color: #374151 !important; /* gray-700 */
+}
+
+header[role='banner'] nav a:hover {
+  color: #2563eb !important; /* blue-600 */
+}
+
+/* Active nav link */
+header[role='banner'] nav a[aria-current='page'] {
+  color: #2563eb !important; /* blue-600 */
+}
+
+/* Logo link */
+header[role='banner'] > div > a:first-child {
+  color: #111827 !important;
+}
+
+/* Sign in link */
+header[role='banner'] a.text-gray-700 {
+  color: #374151 !important;
+}
+
+/* Apply Now button - white text on blue background */
+header[role='banner'] a.bg-brand-blue-600,
+header[role='banner'] a.\!text-white {
+  color: #ffffff !important;
+}
+
+/* Mitchy-style animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+
+.animate-fade-in {
+  opacity: 0;
+  animation: fade-in 0.8s ease-out forwards;
+}
+
+.animate-slide-up {
+  opacity: 0;
+  animation: slide-up-reveal 0.8s ease-out forwards;
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse 25s linear infinite;
+}
+
+/* Animation delays */
+.animation-delay-100 {
+  animation-delay: 0.1s;
+}
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+.animation-delay-300 {
+  animation-delay: 0.3s;
+}
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+.animation-delay-500 {
+  animation-delay: 0.5s;
+}
+
+/* Card hover animations */
+.hover-lift {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================================================
+   BRAND COLOR AUDIT OVERRIDES
+   Enforce brand palette: Red, White, Orange, Blue
+   Fix washed-out grey text on light backgrounds
+   ============================================================================ */
+
+/*
+ * Grey text fix: text-gray-300/400/500 and text-slate-300/400/500 are too
+ * light on white/light backgrounds. Override to darker, readable values.
+ * Only applies on light backgrounds — dark containers (footer, nav, hero)
+ * are excluded via :not() selectors.
+ */
+
+/* Light-grey text overrides removed — Tailwind utility classes control text color.
+   Previous rules forced gray-300/400/500 to darker values, killing visual hierarchy. */
+
+/* zinc/neutral grey variants → same treatment */
+:where(main, section) .text-zinc-400,
+:where(main, section) .text-zinc-500,
+:where(main, section) .text-neutral-400,
+:where(main, section) .text-neutral-500 {
+  color: #374151;
+}
+
+/* --- Clean section backgrounds: remove off-brand colored tints --- */
+
+/* Sections with colored backgrounds that should be white or neutral */
+:where(main) section.bg-purple-50,
+:where(main) section.bg-pink-50,
+:where(main) section.bg-violet-50,
+:where(main) section.bg-indigo-50,
+:where(main) section.bg-teal-50,
+:where(main) section.bg-cyan-50,
+:where(main) section.bg-emerald-50,
+:where(main) section.bg-lime-50,
+:where(main) section.bg-amber-50,
+:where(main) section.bg-yellow-50,
+:where(main) section.bg-fuchsia-50,
+:where(main) section.bg-rose-50 {
+  background-color: #f8fafc; /* slate-50 — clean neutral */
+}
+
+/* --- Ensure brand-colored text stays on-brand --- */
+
+/* Links and accents should use brand blue, not random colors */
+:where(main) a.text-purple-600,
+:where(main) a.text-indigo-600,
+:where(main) a.text-teal-600,
+:where(main) a.text-cyan-600,
+:where(main) a.text-violet-600 {
+  color: #2563eb; /* brand blue-600 */
+}
+
+:where(main) a.text-purple-600:hover,
+:where(main) a.text-indigo-600:hover,
+:where(main) a.text-teal-600:hover,
+:where(main) a.text-cyan-600:hover,
+:where(main) a.text-violet-600:hover {
+  color: #1d4ed8; /* brand blue-700 */
+}
+
+/* --- Card subtitle/muted text: ensure readable --- */
+.elevate-card-subtitle,
+.elevate-page-subtitle {
+  color: #374151; /* gray-700 instead of muted gray */
+}
+
+/* --- Form labels: ensure readable on light backgrounds --- */
+.elevate-label {
+  color: #1f2937; /* gray-800 — readable on white */
+}
+
+/* --- Table header text: ensure readable --- */
+.elevate-table th {
+  color: #1f2937; /* gray-800 */
+}
+
+/* Trust badge/label overrides removed — Tailwind controls text color */
+
+@theme inline {
+  @keyframes shimmer-slide {
+    to {
+      transform: translate(calc(100cqw - 100%), 0);
+    }
+  }
+  @keyframes spin-around {
+    0% {
+      transform: translateZ(0) rotate(0);
+    }
+    15%,
+    35% {
+      transform: translateZ(0) rotate(90deg);
+    }
+    65%,
+    85% {
+      transform: translateZ(0) rotate(270deg);
+    }
+    100% {
+      transform: translateZ(0) rotate(360deg);
+    }
+  }
+}
+
+/* ── Lesson content tables ───────────────────────────────────────────────────
+   Ensures tables in .prose lesson content always render with visible structure,
+   even if inline style attributes are absent or stripped.
+   Inline styles from the DB take precedence via specificity.
+   --------------------------------------------------------------------------- */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.prose table thead {
+  background-color: #f8fafc;
+}
+
+.prose table th {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  text-align: left;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.prose table td {
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  vertical-align: top;
+}
+
+.prose table tr:nth-child(even) td {
+  background-color: #f8fafc;
+}
+
+.prose table tr:hover td {
+  background-color: #f1f5f9;
+}
+
+/* Mobile: allow horizontal scroll on narrow tables */
+@media (max-width: 640px) {
+  .prose table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Marketing chrome — attribute-based visibility control.
+   MarketingChromeGuard sets data-app-route="true" on the root div when the
+   client navigates to an app route. CSS handles the rest — no DOM removal. */
+
+[data-marketing-main] {
+  padding-top: 70px;
+}
+
+/* Hide all marketing chrome (header + footer) on app routes */
+[data-public-layout-root][data-app-route='true'] [data-marketing-chrome],
+body[data-app-route='true'] [data-marketing-chrome] {
+  display: none !important;
+}
+
+/* Re-show the footer on admin routes — admin portal has its own header
+   but shares the public footer */
+[data-public-layout-root][data-admin-route='true'] [data-marketing-footer],
+body[data-admin-route='true'] [data-marketing-footer] {
+  display: block !important;
+}
+
+[data-public-layout-root][data-app-route='true'] [data-marketing-main],
+body[data-app-route='true'] [data-marketing-main] {
+  padding-top: 0 !important;
+}
+
+@keyframes elevate-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

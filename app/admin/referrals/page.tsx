@@ -40,7 +40,7 @@ const AGENCY_LABELS: Record<string, string> = {
   vocational_rehabilitation: 'Vocational Rehabilitation',
   wioa:                     'WIOA',
   jri:                      'JRI',
-  snap_et:                  'SNAP E&T',
+  snap_et:                  '',
   fssa:                     'FSSA',
   other:                    'Other',
 };
@@ -50,7 +50,7 @@ export default async function ReferralsPage({
 }: {
   searchParams: Promise<{ status?: string; agency?: string }>;
 }) {
-  await requireRole(['admin', 'super_admin', 'staff', 'advisor']);
+  await requireRole(['admin', 'staff', 'advisor']);
   const params = await searchParams;
 
   const db = await requireAdminClient();

@@ -57,7 +57,7 @@ export default function LegalEntityStructurePage() {
             { label: 'Legal Entity Structure' },
           ],
           hero: {
-            image: '/images/pages/workforce-training.webp',
+            image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp',
             tag: 'Governance',
             title: 'Legal Entity Structure',
             subtitle:

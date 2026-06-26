@@ -5,9 +5,10 @@
  * Replaces the static "Pay for Test" link with AddExamToCartButton.
  */
 
-import { Clock, Users } from 'lucide-react';
+import { Clock, Users, CreditCard } from 'lucide-react';
 import type { ExamDefinition } from '@/lib/testing/proctoring-capabilities';
 import { AddExamToCartButton } from './TestingCart';
+import { getProvidersForAmount } from '@/lib/bnpl-config';
 
 interface ProviderExamListProps {
   providerKey: string;
@@ -27,10 +28,20 @@ export function ProviderExamList({ providerKey, exams, isActive }: ProviderExamL
         const ncrc = isObj ? (exam as ExamDefinition).ncrcLevel : undefined;
         const amountCents = isObj ? (exam as ExamDefinition).amountCents : undefined;
 
+        // Check for BNPL eligibility
+        const bnplProviders = amountCents ? getProvidersForAmount(amountCents / 100) : [];
+
         return (
           <div key={name} className="bg-slate-50 rounded-xl border border-slate-100 p-5">
             <div className="flex items-start justify-between gap-3 mb-2">
-              <h3 className="font-bold text-slate-900 text-base leading-snug">{name}</h3>
+              <div className="min-w-0">
+                <h3 className="font-bold text-slate-900 text-base leading-snug">{name}</h3>
+                {bnplProviders.length > 0 && (
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-1">
+                    BNPL Available: {bnplProviders.map(p => p.name).join(' · ')}
+                  </p>
+                )}
+              </div>
               {isActive && amountCents ? (
                 <AddExamToCartButton
                   examType={providerKey}

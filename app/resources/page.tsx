@@ -93,12 +93,12 @@ export default function ResourcesPage() {
       <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/resources-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/resources-page-1.webp"
           alt="Resource hub for students and partners"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
       </section>
       <section className="py-14 sm:py-20">

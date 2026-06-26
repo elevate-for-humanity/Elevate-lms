@@ -67,13 +67,13 @@ export default function HostShopApplyPage() {
 
       <section className={heroTokens.imageWrap} aria-label="Host shop application hero">
         <Image
-          src="/images/pages/barber-apprenticeship-hero.jpg"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship-hero.jpg"
           alt="Professional barbershop training environment"
           fill
           className="object-cover object-center"
           priority
           sizes={heroTokens.imageSizes}
-          placeholder="empty"
+          
         />
       </section>
 

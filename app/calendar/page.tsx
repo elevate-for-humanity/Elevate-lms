@@ -72,12 +72,12 @@ export default async function CalendarPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/images/pages/calendar-hero.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/calendar-hero.webp"
             alt="Calendar and Schedule"
             fill
             className="object-cover"
             priority
-            sizes="100vw" placeholder="empty"
+            sizes="100vw" 
           />
         </div>
         <div className="bg-white py-10">
@@ -95,11 +95,11 @@ export default async function CalendarPage() {
           <div className="bg-white rounded-xl overflow-hidden shadow-lg mb-8">
             <div className="relative h-32 overflow-hidden">
               <Image
-                src="/images/pages/lms-page-2.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/lms-page-2.webp"
                 alt="Sign in to view your schedule"
                 fill
                 sizes="100vw"
-                className="object-cover" placeholder="empty"
+                className="object-cover" 
               />
             </div>
             <div className="p-6 text-center">
@@ -135,11 +135,11 @@ export default async function CalendarPage() {
                           <div className="flex items-stretch">
                             <div className="relative w-24 flex-shrink-0 aspect-[4/3]">
                               <Image
-                                src="/images/pages/calendar-page-1.webp"
+                                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/calendar-page-1.webp"
                                 alt={enrollment.course?.title || 'Course'}
                                 fill
                                 sizes="100vw"
-                                className="object-cover" placeholder="empty"
+                                className="object-cover" 
                               />
                             </div>
                             <div className="flex-1 p-4">
@@ -166,11 +166,11 @@ export default async function CalendarPage() {
                       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
                         <div className="relative h-32 overflow-hidden">
                           <Image
-                            src="/images/pages/programs-catalog-hero.webp"
+                            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-catalog-hero.webp"
                             alt="Browse programs"
                             fill
                             sizes="100vw"
-                            className="object-cover" placeholder="empty"
+                            className="object-cover" 
                           />
                         </div>
                         <div className="p-6 text-center text-slate-700">
@@ -258,11 +258,11 @@ export default async function CalendarPage() {
               >
                 <div className="relative h-24 overflow-hidden">
                   <Image
-                    src="/images/pages/events-page-1.webp"
+                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/events-page-1.webp"
                     alt="Events"
                     fill
                     sizes="100vw"
-                    className="object-cover" placeholder="empty"
+                    className="object-cover" 
                   />
                 </div>
                 <div className="p-4 text-center">

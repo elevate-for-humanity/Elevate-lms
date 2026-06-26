@@ -4,7 +4,14 @@ import { logger } from '@/lib/logger';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { ChevronRight, Search, User, Shield, Eye, AlertCircle } from 'lucide-react';
+import {
+  ChevronRight,
+  Search,
+  User,
+  Shield,
+  Eye,
+  AlertCircle,
+} from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Search Records | FERPA Portal',
@@ -36,9 +43,8 @@ export default async function FerpaRecordsSearchPage({
   const params = await searchParams;
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/ferpa/records/search');
@@ -50,7 +56,7 @@ export default async function FerpaRecordsSearchPage({
     .eq('id', user.id)
     .maybeSingle();
 
-  const allowedRoles = ['admin', 'super_admin', 'ferpa_officer', 'registrar', 'staff'];
+  const allowedRoles = ['admin', 'ferpa_officer', 'registrar', 'staff'];
   if (!profile || !allowedRoles.includes(profile.role)) {
     redirect('/unauthorized');
   }
@@ -62,19 +68,17 @@ export default async function FerpaRecordsSearchPage({
 
   if (query.length >= 2) {
     searchPerformed = true;
-
+    
     let dbQuery = supabase
       .from('profiles')
-      .select(
-        `
+      .select(`
         id,
         full_name,
         email,
         phone,
         created_at,
         enrollments (id, status)
-      `,
-      )
+      `)
       .eq('role', 'student');
 
     if (searchType === 'email') {
@@ -95,16 +99,12 @@ export default async function FerpaRecordsSearchPage({
     }
 
     // Log the search for audit purposes
-    await supabase
-      .from('audit_logs')
-      .insert({
-        user_id: user.id,
-        action: 'ferpa_record_search',
-        details: { query, searchType, results_count: results.length },
-        ip_address: null,
-      })
-      .then(() => {})
-      .catch(() => {});
+    await supabase.from('audit_logs').insert({
+      user_id: user.id,
+      action: 'ferpa_record_search',
+      details: { query, searchType, results_count: results.length },
+      ip_address: null,
+    }).then(() => {}).catch(() => {});
   }
 
   const formatDate = (dateStr: string) => {
@@ -117,30 +117,27 @@ export default async function FerpaRecordsSearchPage({
 
   return (
     <div className="min-h-screen bg-white">
+
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/ferpa-page-7.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/ferpa-page-7.webp"
           alt="FERPA compliance"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
       </section>
       {/* Header */}
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-slate-700 mb-4">
-            <Link href="/ferpa" className="hover:text-slate-900">
-              FERPA Portal
-            </Link>
+            <Link href="/ferpa" className="hover:text-slate-900">FERPA Portal</Link>
             <ChevronRight className="w-4 h-4" />
-            <Link href="/ferpa/records" className="hover:text-slate-900">
-              Records
-            </Link>
+            <Link href="/ferpa/records" className="hover:text-slate-900">Records</Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-slate-900 font-medium">Search</span>
           </nav>
@@ -154,7 +151,7 @@ export default async function FerpaRecordsSearchPage({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search Form */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
           <form method="GET" className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
@@ -168,14 +165,12 @@ export default async function FerpaRecordsSearchPage({
                     id="q"
                     name="q"
                     defaultValue={query}
-                    className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                    placeholder="Enter student name or email..."
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     minLength={2}
                     required
                   />
                 </div>
-                <p className="mt-1 text-xs text-slate-700">
-                  Search by full student name or verified student email.
-                </p>
               </div>
               <div className="sm:w-48">
                 <label htmlFor="type" className="block text-sm font-medium text-slate-900 mb-1">
@@ -185,7 +180,7 @@ export default async function FerpaRecordsSearchPage({
                   id="type"
                   name="type"
                   defaultValue={searchType}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="all">All Fields</option>
                   <option value="name">Name Only</option>
@@ -211,8 +206,8 @@ export default async function FerpaRecordsSearchPage({
             <div>
               <h3 className="font-medium text-amber-800">FERPA Compliance Reminder</h3>
               <p className="text-sm text-amber-700 mt-1">
-                All searches are logged for audit purposes. Only search for records you have a
-                legitimate educational need to access. Minimum 2 characters required.
+                All searches are logged for audit purposes. Only search for records you have 
+                a legitimate educational need to access. Minimum 2 characters required.
               </p>
             </div>
           </div>
@@ -220,8 +215,8 @@ export default async function FerpaRecordsSearchPage({
 
         {/* Results */}
         {searchPerformed && (
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-            <div className="px-6 py-4 border-b border-slate-200">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-slate-900">
                 Search Results
                 <span className="ml-2 text-sm font-normal text-slate-700">
@@ -231,12 +226,12 @@ export default async function FerpaRecordsSearchPage({
             </div>
 
             {results.length > 0 ? (
-              <div className="divide-y divide-slate-200">
+              <div className="divide-y divide-gray-200">
                 {results.map((student) => (
                   <div key={student.id} className="px-6 py-4 hover:bg-white">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                           <User className="w-5 h-5 text-slate-700" />
                         </div>
                         <div>
@@ -275,12 +270,12 @@ export default async function FerpaRecordsSearchPage({
         )}
 
         {!searchPerformed && (
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <Shield className="w-16 h-16 text-slate-700 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-slate-900 mb-2">Search Student Records</h2>
             <p className="text-slate-700 max-w-md mx-auto">
-              Enter a student name or email address above to search education records. All searches
-              are logged for FERPA compliance.
+              Enter a student name or email address above to search education records.
+              All searches are logged for FERPA compliance.
             </p>
           </div>
         )}

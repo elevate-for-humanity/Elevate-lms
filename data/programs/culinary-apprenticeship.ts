@@ -7,7 +7,7 @@ export const CULINARY: ProgramSchema = {
   sector: 'personal-services',
   category: 'Culinary Arts',
   programType: 'apprenticeship',
-  heroImage: '/images/pages/culinary.webp',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/culinary.webp',
   heroImageAlt: 'Culinary apprentice preparing food in a professional kitchen',
   deliveryMode: 'in-person',
   deliveredBy: 'Partner',
@@ -241,6 +241,6 @@ export const CULINARY: ProgramSchema = {
     fssa_eligible: true,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes: 'DOL Registered Apprenticeship. FSSA IMPACT may be available. WIOA apprenticeship funding eligibility determined by Indiana DWD.',
+    fundingNotes: 'DOL Registered Apprenticeship. FSSA Gov Portal may be available. WIOA apprenticeship funding eligibility determined by Indiana DWD.',
   },
 };

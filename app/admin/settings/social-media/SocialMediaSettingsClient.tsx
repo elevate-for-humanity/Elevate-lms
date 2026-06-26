@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import {
-  Facebook, Instagram, Youtube, Linkedin,
+  Globe, MessageCircle, Video as Video, Link,
   CheckCircle2, XCircle, Loader2, RefreshCw, Unlink,
   ExternalLink, AlertTriangle, Send,
 } from 'lucide-react';
@@ -18,8 +18,8 @@ interface PlatformStatus {
 const PLATFORMS = [
   {
     id: 'facebook',
-    label: 'Facebook',
-    Icon: Facebook,
+    label: 'Globe',
+    Icon: Globe,
     color: 'text-blue-600',
     bg: 'bg-blue-50',
     border: 'border-blue-200',
@@ -30,7 +30,7 @@ const PLATFORMS = [
   {
     id: 'instagram',
     label: 'Instagram',
-    Icon: Instagram,
+    Icon: MessageCircle,
     color: 'text-pink-600',
     bg: 'bg-pink-50',
     border: 'border-pink-200',
@@ -41,7 +41,7 @@ const PLATFORMS = [
   {
     id: 'youtube',
     label: 'YouTube',
-    Icon: Youtube,
+    Icon: Video,
     color: 'text-red-600',
     bg: 'bg-red-50',
     border: 'border-red-200',
@@ -52,7 +52,7 @@ const PLATFORMS = [
   {
     id: 'linkedin',
     label: 'LinkedIn',
-    Icon: Linkedin,
+    Icon: Link,
     color: 'text-blue-700',
     bg: 'bg-blue-50',
     border: 'border-blue-200',

@@ -99,7 +99,7 @@ export async function loadBarberDashboardData(): Promise<BarberDashboardData> {
 
   if (
     profileRes.data?.role &&
-    !['student', 'admin', 'super_admin', 'staff', 'instructor'].includes(profileRes.data.role)
+    !['student', 'admin', 'staff', 'instructor'].includes(profileRes.data.role)
   ) {
     redirect('/unauthorized');
   }

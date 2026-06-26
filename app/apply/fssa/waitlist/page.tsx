@@ -111,7 +111,7 @@ export default function FssaWaitlistPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-lg font-bold text-slate-900">FSSA IMPACT — Waitlist</h1>
+            <h1 className="text-lg font-bold text-slate-900"> — Waitlist</h1>
             <p className="text-sm text-slate-500">{PLATFORM_DEFAULTS.orgName}</p>
           </div>
         </div>
@@ -123,9 +123,9 @@ export default function FssaWaitlistPage() {
           <div className="flex items-start gap-3">
             <Users className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
             <div>
-              <h2 className="font-bold text-blue-900 text-sm">About FSSA IMPACT Funding</h2>
+              <h2 className="font-bold text-blue-900 text-sm">About  Funding</h2>
               <p className="text-sm text-blue-700 mt-1">
-                FSSA IMPACT funding is administered through the Indiana Family and Social Services
+                 funding is administered through the Indiana Family and Social Services
                 Administration. Enrollment requires coordination with a WorkOne or FSSA case
                 manager. We cannot accept direct online applications — but we can add you to our
                 waitlist and work with your case manager to get you enrolled.

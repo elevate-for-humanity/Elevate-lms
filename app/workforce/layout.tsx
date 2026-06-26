@@ -17,11 +17,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const ALLOWED_ROLES = ['workforce_board', 'case_manager', 'admin', 'super_admin', 'staff', 'org_admin'];
+const ALLOWED_ROLES = ['workforce_board', 'case_manager', 'admin', 'staff', 'org_admin'];
 
 export default async function WorkforceLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) redirect('/login?redirect=/workforce/dashboard');
 

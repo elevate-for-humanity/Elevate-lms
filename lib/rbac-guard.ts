@@ -10,7 +10,6 @@ export type UserRole =
   | 'student'
   | 'advisor'
   | 'admin'
-  | 'super_admin'
   | 'partner'
   | 'program_holder'
   | 'employer'
@@ -75,7 +74,6 @@ const ROLE_HIERARCHY: Record<UserRole, number> = {
   workforce_board: 3,
   advisor: 4,
   admin: 5,
-  super_admin: 6,
 };
 
 export function hasRoleOrHigher(session: Session, minimumRole: UserRole): boolean {

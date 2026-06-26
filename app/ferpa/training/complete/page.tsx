@@ -8,7 +8,7 @@ import FERPATrainingForm from '@/components/compliance/FERPATrainingForm';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Complete FERPA Training',
+  title: 'Complete FERPA Training | Elevate For Humanity',
   description: 'Complete your required FERPA training and certification',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/ferpa/training/complete',
@@ -18,9 +18,7 @@ export const metadata: Metadata = {
 export default async function CompleteFERPATrainingPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/ferpa/training/complete');
 
   const { data: profile } = await supabase
@@ -39,15 +37,18 @@ export default async function CompleteFERPATrainingPage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/ferpa-page-12.jpg"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/ferpa-page-12.jpg"
           alt="FERPA compliance"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
       </section>
-      <FERPATrainingForm user={profile} existingTraining={existingTraining} />
+      <FERPATrainingForm
+        user={profile}
+        existingTraining={existingTraining}
+      />
     </>
   );
 }

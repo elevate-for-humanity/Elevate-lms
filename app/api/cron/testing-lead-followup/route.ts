@@ -29,8 +29,8 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .limit(100);
 
   if (error) {
-    logger.error('[cron/testing-lead-followup] DB error', { error: error.message });
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+    logger.error('[cron/testing-lead-followup] DB error', { error: 'Internal server error' });
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 
   const rows = leads ?? [];

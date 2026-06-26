@@ -86,7 +86,7 @@ export default function ProductRecommendations({
               <div className="flex-shrink-0">
                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-brand-orange-500">
                   <Image sizes="100vw"
-                    src="/images/pages/store-recommendations.webp"
+                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp"
                     alt="Sales Guide"
                     width={48}
                     height={48}

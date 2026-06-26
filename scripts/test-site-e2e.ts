@@ -209,9 +209,9 @@ async function main() {
   await testStaticAsset('Avatar Video - Trades Guide', '/videos/avatars/trades-guide.mp4');
   await testStaticAsset('Avatar Video - Financial Guide', '/videos/avatars/financial-guide.mp4');
   await testStaticAsset('Hero Video', '/videos/hero-home-fast.mp4');
-  await testStaticAsset('Image - Healthcare', '/images/healthcare/program-cna-training.jpg');
-  await testStaticAsset('Image - Trades', '/images/trades/hero-program-hvac.jpg');
-  await testStaticAsset('Image - Technology', '/images/technology/hero-programs-technology.jpg');
+  await testStaticAsset('Image - Healthcare', '/images/healthcare/program-cna-training.webp');
+  await testStaticAsset('Image - Trades', '/images/trades/hero-program-hvac.webp');
+  await testStaticAsset('Image - Technology', '/images/programs/cna-hero.webp');
 
   // ============================================================================
   // SUMMARY

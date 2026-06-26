@@ -215,7 +215,7 @@ function StudentPaymentCard({ programSlug, portalPath }: { programSlug: string |
 
         <div className="grid gap-3">
           <Link
-            href="/student-portal/billing"
+            href="/apprentice/billing"
             className="flex items-center justify-between p-4 bg-brand-blue-50 rounded-lg hover:bg-brand-blue-100 transition"
           >
             <div className="flex items-center gap-3">
@@ -229,7 +229,7 @@ function StudentPaymentCard({ programSlug, portalPath }: { programSlug: string |
           </Link>
 
           <Link
-            href="/student-portal/billing/history"
+            href="/billing"
             className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition"
           >
             <div className="flex items-center gap-3">
@@ -243,7 +243,7 @@ function StudentPaymentCard({ programSlug, portalPath }: { programSlug: string |
           </Link>
 
           <Link
-            href="/student-portal/billing/make-payment"
+            href="/enrollment"
             className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition"
           >
             <div className="flex items-center gap-3">

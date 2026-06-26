@@ -117,13 +117,13 @@ export default async function ProgramCatalogPage({
       <div className="border-t bg-white">
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden bg-slate-100">
           <Image
-            src="/images/heroes/student-catalog.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/student-catalog.webp"
             alt="Students reviewing workforce training program options"
             fill
             priority
             sizes="100vw"
             className="object-cover object-center"
-            placeholder="empty"
+            
           />
         </div>
         <div className="max-w-4xl mx-auto px-4 py-8">

@@ -35,7 +35,7 @@ export const plumbingBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'Kevin Marsh',
     instructorTitle: 'Master Plumber & NCCER Certified Instructor',
-    instructorImagePath: '/images/instructors/kevin-marsh.jpg',
+    instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     topBarColor: '#0ea5e9',
     accentColor: '#6b7280',
     backgroundColor: '#1e293b',

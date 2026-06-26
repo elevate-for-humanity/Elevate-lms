@@ -227,7 +227,7 @@ async function _POST(request: NextRequest) {
       const { data: admins } = await supabase
         .from('profiles')
         .select('email')
-        .in('role', ['admin', 'super_admin']);
+        .in('role', ['admin']);
 
       if (admins && admins.length > 0) {
         const { emailService } = await import('@/lib/notifications/email');

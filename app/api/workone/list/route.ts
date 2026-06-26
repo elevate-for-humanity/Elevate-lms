@@ -31,7 +31,7 @@ async function _GET(req: Request) {
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-    const adminRoles = ['admin', 'super_admin', 'staff'];
+    const adminRoles = ['admin', 'staff'];
     if (!profile || !adminRoles.includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

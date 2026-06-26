@@ -17,7 +17,7 @@ export default function PhilanthropyPage() {
       config={{
         breadcrumbs: [{ label: 'About', href: '/about' }, { label: 'Philanthropy' }],
         hero: {
-          image: '/images/pages/community-page-1.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/community-page-1.webp',
           tag: 'Philanthropy & Giving',
           tagColor: 'text-brand-blue-600',
           title: 'Invest in Indiana Careers',
@@ -30,7 +30,7 @@ export default function PhilanthropyPage() {
             `Most workforce training programs charge tuition that puts them out of reach for the people who need them most. ${PLATFORM_DEFAULTS.orgName} bridges that gap through WIOA funding, employer partnerships, and philanthropic support — but funding gaps remain for students who fall just outside eligibility thresholds.`,
             `Gifts to ${PLATFORM_DEFAULTS.orgName} directly fund training scholarships, tools and equipment, exam fees, and career placement services. Every dollar goes toward measurable outcomes: credentials earned, jobs secured, wages increased.`,
           ],
-          image: '/images/pages/community-page-2.webp',
+          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/community-page-2.webp',
         },
         features: {
           heading: 'How Your Gift Is Used',

@@ -54,12 +54,14 @@ const SentryInit = dynamic(
 
 // GlobalAvatar removed — inline video section was appearing unexpectedly on portal pages
 
-// Toast notifications — react-hot-toast uses CommonJS require('react') which
-// Turbopack resolves to null on the server. Must be client-only.
-const Toaster = dynamic(() => import('react-hot-toast').then((m) => m.Toaster), {
-  ssr: false,
-  loading: () => null,
-});
+// Toast notifications — use a client wrapper to avoid SSR issues with react-hot-toast
+const Toaster = dynamic(
+  () => import('@/components/ToasterWrapper').then((m) => m.default),
+  {
+    ssr: false,
+    loading: () => null,
+  }
+);
 
 const SearchDialog = dynamic(
   () => import('@/components/SearchDialog').then((mod) => ({ default: mod.SearchDialog })),
@@ -110,18 +112,7 @@ export default function ClientWidgets() {
   return (
     <>
       {/* Toast notifications */}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            borderRadius: '12px',
-            fontSize: '0.875rem',
-            padding: '12px 16px',
-          },
-          success: { iconTheme: { primary: '#22c55e', secondary: '#fff' } },
-          error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
-        }}
-      />
+      <Toaster />
 
       {/* Immediate: scroll unlock + version guard + sentry */}
       <ScrollUnlocker />

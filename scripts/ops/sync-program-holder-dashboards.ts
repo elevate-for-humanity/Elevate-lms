@@ -19,7 +19,7 @@ const HOLDER_PROGRAMS: Record<string, string[]> = {
   'info@centerofdestiny.org': [
     'business-startup',
     'bookkeeping',
-    'tax-preparation',
+    
     'business-administration',
     'entrepreneurship',
   ],
@@ -39,7 +39,7 @@ const HOLDER_PROGRAMS: Record<string, string[]> = {
     'software-development',
     'graphic-design',
     'bookkeeping',
-    'tax-preparation',
+    
     'office-administration',
     'business-administration',
     'entrepreneurship',

@@ -26,8 +26,8 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .limit(BATCH_SIZE);
 
   if (error) {
-    logger.error('[cron/embed-knowledge] DB error', { error: error.message });
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+    logger.error('[cron/embed-knowledge] DB error', { error: 'Internal server error' });
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 
   const rows = docs ?? [];

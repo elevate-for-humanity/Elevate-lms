@@ -11,21 +11,21 @@ const TESTIMONIALS: Testimonial[] = [
     role: 'CNA Graduate',
     quote:
       'Elevate covered my tuition, helped with childcare, and connected me to a full-time job in 6 weeks.',
-    avatar: '/people/sharon.jpg',
+    avatar: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
   },
   {
     name: 'Graduate',
     role: 'Welding Apprentice',
     quote:
       "The lab time and OSHA-10 got me hired fast. I'm earning while I learn with a clear path to journeyman.",
-    avatar: '/people/marcus.jpg',
+    avatar: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
   },
   {
     name: 'Alicia D.',
     role: 'Nail Technology',
     quote:
       'State-board prep and salon coaching gave me clients before I graduated. The support is real.',
-    avatar: '/people/alicia.jpg',
+    avatar: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
   },
 ];
 

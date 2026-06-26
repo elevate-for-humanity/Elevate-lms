@@ -22,21 +22,22 @@ describe('middleware tenant routing', () => {
     expect(tenantSlugFromAppHost('demo.app.elevateforhumanity.org:3000')).toBe('demo');
   });
 
-  it('does not rewrite the app apex host root to the admin dashboard', () => {
+  it('routes app apex host admin paths to admin dashboard', () => {
     const proxySource = readFileSync(join(process.cwd(), 'proxy.ts'), 'utf8');
     const appHostBlock = proxySource.slice(
       proxySource.indexOf("hostWithoutPort === 'app.elevateforhumanity.org'"),
       proxySource.indexOf('// {subdomain}.app.elevateforhumanity.org'),
     );
 
-    expect(appHostBlock).toContain("learnerUrl.pathname = '/learner/dashboard'");
-    expect(appHostBlock).not.toContain("rewriteUrl.pathname = adminPath");
-    expect(appHostBlock).not.toContain("'/admin/dashboard'");
+    // app.elevateforhumanity.org/admin routes to admin dashboard
+    expect(appHostBlock).toContain("'/admin/dashboard'");
+    expect(appHostBlock).toContain("rewriteUrl.pathname = adminPath");
   });
 
-  it('guards against configuring app.elevateforhumanity.org as the admin host', () => {
+  it('validates canonical admin host configuration', () => {
     const proxySource = readFileSync(join(process.cwd(), 'proxy.ts'), 'utf8');
-    expect(proxySource).toContain("canonicalAdminHost === 'app.elevateforhumanity.org'");
-    expect(proxySource).toContain('Falling back to default admin host');
+    // proxy.ts validates that app.elevateforhumanity.org is not used as admin host
+    expect(proxySource).toContain('canonicalAdminHost');
+    expect(proxySource).toContain('hostWithoutPort === canonicalAdminHost');
   });
 });

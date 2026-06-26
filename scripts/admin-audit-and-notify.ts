@@ -20,21 +20,21 @@ const FROM_NAME    = 'Elevate for Humanity';
 const { data: elevated } = await db
   .from('profiles')
   .select('id,email,full_name,role')
-  .in('role', ['super_admin', 'admin', 'staff']);
+  .in('role', ['admin', 'staff']);
 
 console.log('\nCurrent elevated accounts:');
 for (const p of elevated || []) {
   console.log(`  ${p.role.padEnd(14)} ${p.email}  (${p.full_name})`);
 }
 
-// ── 2. Only keep elizabthpowell6262@gmail.com as super_admin
-//       Downgrade everyone else who is admin/super_admin (not staff) ──────────
+// ── 2. Only keep elizabthpowell6262@gmail.com as admin
+//       Downgrade everyone else who is admin/admin (not staff) ──────────
 const KEEP_SUPER = 'elizabthpowell6262@gmail.com';
 const ELEVATE_ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-// Demote any other super_admin or admin to 'partner' unless it's the Elevate system account
+// Demote any other admin or admin to 'partner' unless it's the Elevate system account
 const toDowngrade = (elevated || []).filter(p =>
-  ['super_admin', 'admin'].includes(p.role) &&
+  ['admin'].includes(p.role) &&
   p.email !== KEEP_SUPER &&
   p.email !== ELEVATE_ADMIN_EMAIL  // keep system admin operational
 );
@@ -116,7 +116,7 @@ await new Promise<void>((resolve) => {
 const { data: final } = await db
   .from('profiles')
   .select('role,email,full_name')
-  .in('role', ['super_admin', 'admin'])
+  .in('role', ['admin'])
   .order('role');
 
 console.log('\nFinal admin accounts:');

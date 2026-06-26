@@ -51,7 +51,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 117,
     duration: '4-6 weeks',
     hours: 40,
-    image: '/images/pages/course-create-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     features: [
       'Official Microsoft curriculum',
       'Hands-on practice exercises',
@@ -88,7 +88,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 117,
     duration: '4-6 weeks',
     hours: 40,
-    image: '/images/pages/course-create-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     features: [
       'Official Microsoft curriculum',
       'Real-world data exercises',
@@ -125,7 +125,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 117,
     duration: '3-4 weeks',
     hours: 30,
-    image: '/images/pages/course-create-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     features: [
       'Official Microsoft curriculum',
       'Design templates included',
@@ -163,7 +163,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 150,
     duration: '6-8 weeks',
     hours: 60,
-    image: '/images/pages/course-create-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     features: [
       'Official Adobe curriculum',
       'Project-based learning',
@@ -196,7 +196,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 150,
     duration: '6-8 weeks',
     hours: 60,
-    image: '/images/pages/course-create-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     features: [
       'Official Adobe curriculum',
       'Project-based learning',
@@ -234,7 +234,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 117,
     duration: '4-6 weeks',
     hours: 40,
-    image: '/images/pages/course-create-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     features: [
       'Industry-aligned curriculum',
       'Hands-on security labs',
@@ -267,7 +267,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 117,
     duration: '6-8 weeks',
     hours: 50,
-    image: '/images/pages/course-create-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     features: [
       'Beginner-friendly curriculum',
       'Coding exercises and projects',
@@ -305,7 +305,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 85,
     duration: '1 day',
     hours: 2,
-    image: '/images/pages/cpr-mannequin.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cpr-mannequin.webp',
     features: [
       'Training mannequin shipped to your door',
       'Live instructor-led online session',
@@ -339,7 +339,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 85,
     duration: '1 day',
     hours: 2,
-    image: '/images/pages/cpr-first-aid.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cpr-first-aid.webp',
     features: [
       'Live instructor-led online session',
       'Train from the comfort of your home',
@@ -372,7 +372,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 100,
     duration: '1 day',
     hours: 4,
-    image: '/images/pages/cpr-aed.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cpr-aed.webp',
     features: [
       'Healthcare-specific training',
       'Team CPR scenarios',
@@ -406,7 +406,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 150,
     duration: '4-6 weeks',
     hours: 40,
-    image: '/images/pages/course-create-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     features: [
       'Official Intuit curriculum',
       'Real-world accounting scenarios',
@@ -440,7 +440,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 40,
     duration: 'Self-paced',
     hours: 2,
-    image: '/images/pages/course-create-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     features: [
       'State-approved curriculum',
       'Online self-paced learning',
@@ -474,7 +474,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 65,
     duration: '2-3 days',
     hours: 10,
-    image: '/images/pages/course-create-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     features: [
       'Official OSHA curriculum',
       'DOL wallet card included',
@@ -507,7 +507,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 135,
     duration: '1-2 weeks',
     hours: 30,
-    image: '/images/pages/course-create-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     features: [
       'Official OSHA curriculum',
       'DOL wallet card included',
@@ -541,7 +541,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 117,
     duration: '3-4 weeks',
     hours: 30,
-    image: '/images/pages/course-create-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
     features: [
       'Beginner-friendly curriculum',
       'Covers all computer basics',
@@ -576,7 +576,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 27,
     duration: 'Same day',
     hours: 2,
-    image: '/images/pages/hvac-technician.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
     features: [
       'All four exam sections included (Core + Type I + II + III)',
       'Online proctored exam — no travel required',
@@ -609,7 +609,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 45,
     duration: '15 weeks',
     hours: 90,
-    image: '/images/pages/training-classroom.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
     features: [
       '6-week structured certification prep curriculum',
       'Study kit provided free to every student',
@@ -639,7 +639,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 55,
     duration: '15 weeks',
     hours: 90,
-    image: '/images/pages/hvac-technician.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
     features: [
       'Complete 6-week EPA 608 prep curriculum',
       'Physical study kit shipped to your address',
@@ -674,7 +674,7 @@ export const COURSES: Course[] = [
     wholesaleCost: 0,
     duration: '640 hours (16 modules)',
     hours: 640,
-    image: '/images/pages/hvac-technician.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
     features: [
       '16 modules, 94 lessons — full 640-hour curriculum',
       'Interactive diagrams: refrigeration cycle, EPA 608, wiring, troubleshooting',

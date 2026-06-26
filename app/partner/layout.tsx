@@ -17,11 +17,9 @@ export const metadata: Metadata = {
   description: `Manage your host site partnership with ${PLATFORM_DEFAULTS.orgName}.`,
 };
 
-const PORTAL_ROLES = ['partner', 'program_holder', 'admin', 'super_admin', 'staff', 'org_admin'];
-
 export default async function PartnerLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) redirect('/login?redirect=/partner/dashboard');
 
@@ -31,9 +29,7 @@ export default async function PartnerLayout({ children }: { children: React.Reac
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !PORTAL_ROLES.includes(profile.role ?? '')) {
-    redirect('/unauthorized');
-  }
+  // Only require login - no role restrictions
 
   const ctx = await getMyPartnerContext();
 

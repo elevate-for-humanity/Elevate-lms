@@ -197,6 +197,7 @@ export function VoiceInput({ onCommand, className = '' }: VoiceInputProps) {
     // If no command matched
     speak("I didn't understand that command. Try saying 'help' to see what I can do.");
     if (onCommand) onCommand(command);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleListening = () => {

@@ -8,7 +8,7 @@ export const revalidate = 60;
 export const metadata: Metadata = { title: 'Integrations | Admin Settings' };
 
 export default async function IntegrationSettingsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
 
   const integrations = [
     {
@@ -28,7 +28,7 @@ export default async function IntegrationSettingsPage() {
     },
     {
       title: 'Social Media Accounts',
-      description: 'Connect Facebook, Instagram, YouTube, and Twitter/X accounts',
+      description: 'Connect Globe, Instagram, YouTube, and Globe/X accounts',
       href: '/admin/settings/social-media',
     },
   ];

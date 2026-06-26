@@ -36,7 +36,7 @@ async function _POST(request: NextRequest) {
 
     if (
       !profile ||
-      !['admin', 'super_admin', 'staff', 'program_holder', 'instructor'].includes(profile.role)
+      !['admin', 'staff', 'program_holder', 'instructor'].includes(profile.role)
     ) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

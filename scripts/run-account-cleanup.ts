@@ -16,7 +16,7 @@ const KEEP = [
   '70483e3b-30f1-4c58-8046-d068ab7356ee', // Mercedes Wellington
   '5f20c09c-7fd5-4aac-b2d2-aef12b78fbb2', // Adam Kriech
   '8e352e99-d552-4690-b8e7-8a560bb1f873', // Elizabeth Greene (partner)
-  '4994cf7e-98dc-4337-968b-243957fff6c9', // Elizabeth L. Greene (super_admin)
+  '4994cf7e-98dc-4337-968b-243957fff6c9', // Elizabeth L. Greene (admin)
   'b543fa81-69d4-4d6e-995a-e570e2aed0d2', // elevate4humanityedu
   '964dc85a-bce8-4e67-92eb-198ffafb2384', // curvaturebodysculpting
 ];

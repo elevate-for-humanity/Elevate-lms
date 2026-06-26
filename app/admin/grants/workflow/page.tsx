@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
@@ -38,13 +39,19 @@ export default async function GrantWorkflowPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect('/login?redirect=/admin/grants/workflow');
+  }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .maybeSingle();
 
-  await requireAdmin();
+  if (!profile || !['admin'].includes(profile.role)) {
+    redirect('/admin');
+  }
 
   const { grants, entities, applications } = await getWorkflowData();
 
@@ -62,7 +69,7 @@ export default async function GrantWorkflowPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/admin-grants-workflow-detail.jpg"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-grants-workflow-detail.webp"
           alt="Grant Workflow"
           fill
           className="object-cover"

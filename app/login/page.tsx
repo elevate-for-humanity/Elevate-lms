@@ -18,7 +18,7 @@ import { hydrateBrowserSupabaseConfig } from '@/lib/supabase/public-config';
 import { mapAuthError } from '@/lib/auth/map-auth-error';
 
 
-const ADMIN_LOGIN_ROLES = new Set(['super_admin', 'admin', 'staff', 'org_admin', 'platform_operator']);
+const ADMIN_LOGIN_ROLES = new Set(['admin', 'staff', 'org_admin', 'admin']);
 const ADMIN_ORIGIN = (process.env.NEXT_PUBLIC_ADMIN_URL || '').replace(/\/$/, '');
 
 function normalizePostLoginRedirect(target: string, role: string | null | undefined): string | null {
@@ -79,7 +79,7 @@ function LoginForm() {
     // Check if already logged in and redirect away
     async function checkSession() {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = safeGetUser(await supabase.auth.getUser());
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -337,13 +337,13 @@ function LoginForm() {
       <section className="relative h-[200px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/login-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/login-page-1.webp"
           alt={`${PLATFORM_DEFAULTS.orgName} login`}
           fill
           className="object-cover"
           priority
           quality={90}
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
       </section>
 

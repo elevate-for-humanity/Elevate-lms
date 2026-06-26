@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    const blockedRoles = ['program_holder', 'employer', 'partner', 'admin', 'super_admin', 'staff'];
+    const blockedRoles = ['program_holder', 'employer', 'partner', 'admin', 'staff'];
     if (profile?.role && blockedRoles.includes(profile.role)) {
       return NextResponse.json(
         { error: 'This onboarding flow is for learners only.' },

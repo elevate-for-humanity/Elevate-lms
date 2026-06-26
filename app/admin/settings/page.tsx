@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminSettingsPage() {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const db = await requireAdminClient();
 
   const { data: settingsRows } = await db
@@ -80,7 +80,7 @@ export default async function AdminSettingsPage() {
       href: '/admin/settings/social-media',
       fields: [
         {
-          label: 'Facebook',
+          label: 'Globe',
           value: settings['social_facebook_connected'] === 'true' ? 'Connected' : 'Not connected',
         },
         {
@@ -92,7 +92,7 @@ export default async function AdminSettingsPage() {
           value: settings['social_youtube_connected'] === 'true' ? 'Connected' : 'Not connected',
         },
         {
-          label: 'Twitter / X',
+          label: 'Globe / X',
           value: settings['social_twitter_connected'] === 'true' ? 'Connected' : 'Not connected',
         },
       ],
@@ -147,7 +147,7 @@ export default async function AdminSettingsPage() {
         })}
       </div>
 
-      {/* Raw settings table for super_admin */}
+      {/* Raw settings table for admin */}
       {settingsRows && settingsRows.length > 0 && (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100">

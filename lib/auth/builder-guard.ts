@@ -3,7 +3,7 @@
  *
  * Authorization guard for program/course builder routes.
  *
- * Platform admins (admin, super_admin, staff) can access any org's content.
+ * Platform admins (admin, admin, staff) can access any org's content.
  * Org members (org_owner, org_admin, program_manager, editor) can only access
  * their own org's content.
  *
@@ -29,7 +29,7 @@ export type BuilderAccess =
       error: NextResponse;
     };
 
-const PLATFORM_ADMIN_ROLES = ['admin', 'super_admin', 'platform_operator', 'staff'] as const;
+const PLATFORM_ADMIN_ROLES = ['admin', 'staff'] as const;
 const BUILDER_ORG_ROLES = [
   'org_owner',
   'org_admin',

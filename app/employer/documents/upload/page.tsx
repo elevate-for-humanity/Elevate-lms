@@ -74,7 +74,7 @@ const EMPLOYER_REQUIREMENTS = [
 ];
 
 export default async function UploadDocumentPage() {
-  await requireRole(['employer', 'admin', 'super_admin']);
+  await requireRole(['employer', 'admin']);
 
   return (
     <div className="min-h-screen bg-white">

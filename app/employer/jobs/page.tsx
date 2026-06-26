@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function EmployerJobsPage() {
-  const { user } = await requireRole(['employer', 'admin', 'super_admin']);
+  const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
 
   // Fetch profile — required for verified gating in JSX

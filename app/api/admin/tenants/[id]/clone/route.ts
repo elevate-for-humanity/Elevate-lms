@@ -8,7 +8,7 @@
  *   - Tenant settings
  *
  * The clone gets a fresh subdomain, empty user base, and no active runs.
- * Auth: super_admin only.
+ * Auth: admin only.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';

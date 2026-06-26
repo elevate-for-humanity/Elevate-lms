@@ -24,7 +24,9 @@ describe('SiteHeader', () => {
     expect(src).toContain('HeaderMobileMenu');
   });
 
-  it('has auth-aware links (login)', () => {
-    expect(src).toContain('login');
+  it('has auth-aware navigation via HeaderDesktopNav', () => {
+    // Header uses HeaderDesktopNav for desktop navigation which contains auth-aware links
+    expect(src).toContain('HeaderDesktopNav');
+    expect(src).toContain('NAV_ITEMS');
   });
 });

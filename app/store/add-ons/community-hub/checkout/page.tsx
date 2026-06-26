@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 import AddOnCheckout from '@/components/store/AddOnCheckout';
 import type { Metadata } from 'next';
@@ -11,7 +11,7 @@ export default function CommunityHubCheckoutPage() {
     <AddOnCheckout
       productId="community-hub"
       productName="Community Hub"
-      productImage="/images/pages/about-partners-hero.webp"
+      productImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partners-hero.webp"
       backHref="/store/add-ons/community-hub"
       oneTimePrice={1997}
       monthlyPrice={549}

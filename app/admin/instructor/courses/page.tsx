@@ -23,6 +23,9 @@ export default async function InstructorCoursesPage() {
     try {
       const { data: authData, error: authError } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
       if (authError) {
         error = 'Authentication error';
       } else {
@@ -54,7 +57,7 @@ export default async function InstructorCoursesPage() {
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image
-          src="/images/pages/instructor-page-7.jpg"
+          src="/images/pages/instructor-page-7.webp"
           alt="Instructor portal"
           fill
           sizes="100vw"

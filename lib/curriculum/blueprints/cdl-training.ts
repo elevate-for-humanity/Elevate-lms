@@ -1,4 +1,12 @@
 /**
+ * cdl-training Blueprint
+ * 
+ * © 2026 Elevate for Humanity
+ * All Rights Reserved
+ *
+ * Version: 1.0.0
+ */
+/**
  * lib/curriculum/blueprints/cdl-training.ts
  *
  * CDL Class A Training — DOT/FMCSA aligned.
@@ -35,7 +43,7 @@ export const cdlTrainingBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'James Holloway',
     instructorTitle: 'CDL Certified Instructor & Fleet Safety Expert',
-    instructorImagePath: '/images/instructors/james-holloway.jpg',
+    instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     topBarColor: '#f59e0b',
     accentColor: '#6b7280',
     backgroundColor: '#1e293b',

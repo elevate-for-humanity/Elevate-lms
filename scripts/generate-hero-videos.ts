@@ -59,7 +59,7 @@ const heroVideos: HeroVideoConfig[] = [
     outputFile: 'hvac-hero.mp4',
   },
   {
-    id: 'tax-preparation',
+    id: 
     title: 'Tax Preparation Training',
     script: `Become a certified tax professional with our comprehensive tax preparation program. Learn federal and state tax law, tax software, and client service skills. Tax preparers enjoy flexible schedules, seasonal income opportunities, and the satisfaction of helping families maximize their refunds. Our program prepares you for IRS certification and immediate employment. Start your tax preparation career with us.`,
     avatarId: 'Abigail_expressive_2024112501',

@@ -32,7 +32,7 @@ export default async function RecordAttendancePage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  const allowedRoles = ['partner', 'admin', 'super_admin', 'staff'];
+  const allowedRoles = ['partner', 'admin', 'staff'];
   if (!profile || !allowedRoles.includes(profile.role)) redirect('/unauthorized');
 
   // Resolve partner_id via partner_users (partners table has no user_id column)
@@ -81,12 +81,12 @@ export default async function RecordAttendancePage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/partner-page-3.jpg"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/partner-page-3.jpg"
           alt="Record attendance"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
       </section>
       {/* Breadcrumbs */}

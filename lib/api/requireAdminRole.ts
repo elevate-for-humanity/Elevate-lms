@@ -26,7 +26,7 @@ export async function requireAdminRole(): Promise<NextResponse | null> {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || (profile.role !== 'admin' && profile.role !== 'super_admin')) {
+  if (!profile || (profile.role !== 'admin' && profile.role !== 'admin')) {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
 

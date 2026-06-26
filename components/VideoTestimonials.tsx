@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, X, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
@@ -37,7 +38,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'Certified Healthcare Assistant at IU Health',
     salary: '$42,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/cna-clinical.jpg',
+    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-clinical.jpg',
     quote:
       'Elevate changed my life. I went from struggling to make ends meet to having a stable career in healthcare.',
     duration: '2:34',
@@ -51,7 +52,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'HVAC Technician at Carrier',
     salary: '$55,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/hvac-unit.webp',
+    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-unit.webp',
     quote:
       'The hands-on training prepared me for real-world work. I got hired before I even graduated!',
     duration: '3:12',
@@ -65,7 +66,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'Medical Coder at Community Health Network',
     salary: '$48,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/medical-assistant-desk.webp',
+    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant-desk.webp',
     quote:
       'I can work from home now and spend more time with my kids. This program gave me flexibility and financial security.',
     duration: '2:45',
@@ -79,7 +80,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'Commercial Truck Driver at Schneider',
     salary: '$65,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/cdl-cab-interior.webp',
+    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-cab-interior.webp',
     quote: 'In just 4 weeks, I got my CDL and doubled my income. Best decision I ever made.',
     duration: '2:18',
     graduationYear: '2024',
@@ -92,7 +93,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'Licensed Cosmetologist, Own Salon',
     salary: '$60,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/barber-styling-hair.webp',
+    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-styling-hair.webp',
     quote: 'I turned my passion into a career. Now I own my own salon and employ 3 other stylists!',
     duration: '3:45',
     graduationYear: '2023',
@@ -105,7 +106,7 @@ const testimonials: Testimonial[] = [
     afterJob: 'Phlebotomist at Eskenazi Health',
     salary: '$38,000/year',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    thumbnail: '/images/pages/phlebotomy-draw.webp',
+    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/phlebotomy-draw.webp',
     quote: 'The program was fast-paced but thorough. I felt confident on my first day at work.',
     duration: '2:56',
     graduationYear: '2024',
@@ -377,13 +378,13 @@ export default function VideoTestimonials() {
           className="mt-12 text-center"
         >
           <p className="text-xl text-black mb-6">Ready to write your own success story?</p>
-          <a
+          <Link
             href="/apply"
-            className="inline-flex items-center gap-2 px-8 py-4    text-white rounded-lg font-semibold hover: hover: transition-all shadow-lg hover:shadow-xl text-lg"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition-all shadow-lg hover:shadow-xl text-lg"
           >
             Start Your Application
             <ChevronRight className="w-5 h-5" />
-          </a>
+          </Link>
         </motion.div>
       </div>
 
@@ -456,18 +457,18 @@ export default function VideoTestimonials() {
                 </div>
 
                 <div className="mt-6 flex gap-4">
-                  <a
+                  <Link
                     href="/apply"
-                    className="flex-1 px-6 py-3    text-white rounded-lg font-semibold hover: hover: transition-all text-center"
+                    className="flex-1 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition-all text-center"
                   >
                     Apply Now
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/programs"
                     className="flex-1 px-6 py-3 bg-slate-100 text-black rounded-lg font-semibold hover:bg-slate-200 transition-all text-center"
                   >
                     View Programs
-                  </a>
+                  </Link>
                 </div>
               </div>
             </motion.div>

@@ -8,7 +8,7 @@ import { appendSessionEvent } from '@/lib/proctor/session-events';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { issueCertificateIfEligible } from '@/lib/lms/engine/certificate';
 
-const ALLOWED_ROLES = ['admin', 'super_admin', 'staff', 'instructor'];
+const ALLOWED_ROLES = ['admin', 'staff', 'instructor'];
 
 async function getProctor() {
   const supabase = await createClient();

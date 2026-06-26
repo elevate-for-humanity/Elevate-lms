@@ -1,14 +1,15 @@
 import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { Play, Clock, Lock, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'My Courses',
+  title: 'My Courses | {PLATFORM_DEFAULTS.orgName}',
   description: 'Access your purchased career courses.',
 };
 
@@ -16,15 +17,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function MyCoursesPage() {
   const supabase = await createClient();
-  const db = await requireAdminClient();
+  const db = await getAdminClient();
 
   if (!supabase) {
     redirect('/login?redirect=/career-services/courses/my-courses');
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) {
     redirect('/login?redirect=/career-services/courses/my-courses');
@@ -33,8 +32,7 @@ export default async function MyCoursesPage() {
   // Get user's purchased courses
   const { data: purchases } = await db
     .from('career_course_purchases')
-    .select(
-      `
+    .select(`
       *,
       course:career_courses(
         id,
@@ -45,8 +43,7 @@ export default async function MyCoursesPage() {
         duration_hours,
         lesson_count
       )
-    `,
-    )
+    `)
     .eq('user_id', user.id)
     .eq('status', 'completed');
 
@@ -57,21 +54,15 @@ export default async function MyCoursesPage() {
     .eq('is_active', true)
     .eq('is_bundle', false);
 
-  const purchasedCourseIds = purchases?.map((p) => p.course?.id) || [];
-  const unpurchasedCourses = allCourses?.filter((c) => !purchasedCourseIds.includes(c.id)) || [];
+  const purchasedCourseIds = purchases?.map(p => p.course?.id) || [];
+  const unpurchasedCourses = allCourses?.filter(c => !purchasedCourseIds.includes(c.id)) || [];
 
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs
-            items={[
-              { label: 'Career Services', href: '/career-services' },
-              { label: 'Courses', href: '/career-services/courses' },
-              { label: 'My Courses' },
-            ]}
-          />
+          <Breadcrumbs items={[{ label: 'Career Services', href: '/career-services' }, { label: 'Courses', href: '/career-services/courses' }, { label: 'My Courses' }]} />
         </div>
       </div>
 
@@ -86,13 +77,13 @@ export default async function MyCoursesPage() {
       <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Purchased Courses */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Your Courses</h2>
-
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Courses</h2>
+          
           {!purchases || purchases.length === 0 ? (
             <div className="bg-white rounded-xl border p-12 text-center">
-              <Lock className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">No courses yet</h3>
-              <p className="text-slate-600 mb-6">Purchase a course to start learning.</p>
+              <Lock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No courses yet</h3>
+              <p className="text-gray-600 mb-6">Purchase a course to start learning.</p>
               <Link
                 href="/career-services/courses"
                 className="inline-flex items-center bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700"
@@ -110,8 +101,8 @@ export default async function MyCoursesPage() {
                   className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition group"
                 >
                   <div className="relative h-40 overflow-hidden">
-                    <Image sizes="100vw"
-                      src={purchase.course?.image_url || '/images/pages/career-services-page-5.webp'}
+                    <Image
+                      src={purchase.course?.image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-5.webp'}
                       alt={purchase.course?.title}
                       fill
                       className="object-cover"
@@ -123,10 +114,10 @@ export default async function MyCoursesPage() {
                     </div>
                   </div>
                   <div className="p-5">
-                    <h3 className="font-bold text-slate-900 mb-1">{purchase.course?.title}</h3>
-                    <p className="text-sm text-slate-600 mb-3">{purchase.course?.subtitle}</p>
+                    <h3 className="font-bold text-gray-900 mb-1">{purchase.course?.title}</h3>
+                    <p className="text-sm text-gray-600 mb-3">{purchase.course?.subtitle}</p>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="flex items-center gap-1 text-slate-500">
+                      <span className="flex items-center gap-1 text-gray-500">
                         <Clock className="w-4 h-4" />
                         {purchase.course?.duration_hours} hours
                       </span>
@@ -145,7 +136,7 @@ export default async function MyCoursesPage() {
         {/* Recommended Courses */}
         {unpurchasedCourses.length > 0 && (
           <section>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Recommended for You</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Recommended for You</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {unpurchasedCourses.map((course: any) => (
                 <div
@@ -153,8 +144,8 @@ export default async function MyCoursesPage() {
                   className="bg-white rounded-xl shadow-sm border overflow-hidden"
                 >
                   <div className="relative h-40 overflow-hidden">
-                    <Image sizes="100vw"
-                      src={course.image_url || '/images/pages/apply-employer-hero.webp'}
+                    <Image
+                      src={course.image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-employer-hero.webp'}
                       alt={course.title}
                       fill
                       className="object-cover"
@@ -164,10 +155,10 @@ export default async function MyCoursesPage() {
                     </div>
                   </div>
                   <div className="p-5">
-                    <h3 className="font-bold text-slate-900 mb-1">{course.title}</h3>
-                    <p className="text-sm text-slate-600 mb-3">{course.subtitle}</p>
+                    <h3 className="font-bold text-gray-900 mb-1">{course.title}</h3>
+                    <p className="text-sm text-gray-600 mb-3">{course.subtitle}</p>
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1 text-sm text-slate-500">
+                      <span className="flex items-center gap-1 text-sm text-gray-500">
                         <Clock className="w-4 h-4" />
                         {course.duration_hours} hours
                       </span>

@@ -17,7 +17,7 @@ interface Slide {
 }
 const slides: Slide[] = [
   {
-    image: '/images/hero/hero-main-welcome.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero/hero-main-welcome.webp',
     title: PLATFORM_DEFAULTS.orgName,
     text: 'State-approved, federally aligned workforce training that opens doors to high-wage careers.',
     cta: {
@@ -26,7 +26,7 @@ const slides: Slide[] = [
     },
   },
   {
-    image: '/images/hero/hero-barber.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero/hero-barber.webp',
     title: 'DOL Registered Barber Apprenticeship',
     text: '2,000-hour barber apprenticeship. Earn while you learn. WIOA, WRG, and JRI fundable. Indiana state licensure.',
     cta: {
@@ -35,7 +35,7 @@ const slides: Slide[] = [
     },
   },
   {
-    image: '/images/hero/hero-healthcare.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero/hero-healthcare.jpg',
     title: 'Healthcare Training Programs',
     text: 'CNA certification through Choice Medical Institute. State-approved, workforce fundable, high-demand careers.',
     cta: {
@@ -44,7 +44,7 @@ const slides: Slide[] = [
     },
   },
   {
-    image: '/images/hero/hero-skilled-trades.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero/hero-skilled-trades.webp',
     title: 'Skilled Trades & Building Technician',
     text: 'HVAC, electrical, plumbing. Hands-on training for high-wage careers in construction and maintenance.',
     cta: {
@@ -53,7 +53,7 @@ const slides: Slide[] = [
     },
   },
   {
-    image: '/images/hero/hero-beauty-wellness.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero/hero-beauty-wellness.webp',
     title: 'Beauty & Esthetics Programs',
     text: 'Nails, esthetics, and cosmetology training with experienced instructors.',
     cta: {
@@ -62,7 +62,7 @@ const slides: Slide[] = [
     },
   },
   {
-    image: '/images/hero/hero-career-services.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero/hero-career-services.webp',
     title: 'Career Services & Support',
     text: 'Life coaching, mental health partnerships, and wraparound support to help you succeed.',
     cta: {
@@ -71,7 +71,7 @@ const slides: Slide[] = [
     },
   },
   {
-    image: '/images/hero/hero-hands-on-training.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero/hero-hands-on-training.webp',
     title: 'Hands-On Training',
     text: 'Real-world skills training with experienced instructors in state-of-the-art facilities.',
     cta: {
@@ -80,7 +80,7 @@ const slides: Slide[] = [
     },
   },
   {
-    image: '/images/hero/hero-tech-careers.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/training-provider-1.webp',
     title: 'Technology Career Pathways',
     text: 'IT training and technology skills for the digital economy.',
     cta: {
@@ -89,7 +89,7 @@ const slides: Slide[] = [
     },
   },
   {
-    image: '/images/hero/hero-business.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero/hero-business.webp',
     title: 'Business & Professional Skills',
     text: 'Office administration, customer service, and professional development training.',
     cta: {
@@ -98,7 +98,7 @@ const slides: Slide[] = [
     },
   },
   {
-    image: '/images/hero/hero-early-childhood.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero/hero-early-childhood.webp',
     title: 'Early Childhood Education',
     text: 'Childcare and early education training for rewarding careers working with children.',
     cta: {

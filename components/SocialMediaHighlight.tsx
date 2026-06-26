@@ -41,7 +41,7 @@ export default function SocialMediaHighlight() {
             Connect With Us
           </button>
 
-          <p className="mt-4 text-sm text-white/60">Facebook · Instagram · LinkedIn · YouTube</p>
+          <p className="mt-4 text-sm text-white/60">Globe · Instagram · LinkedIn · YouTube</p>
         </div>
       </section>
 

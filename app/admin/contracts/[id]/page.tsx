@@ -19,8 +19,12 @@ export default async function ContractDetailPage({
   const { id } = await params;
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user?.id) { redirect('/login'); }
+  const user = safeGetUser(await supabase.auth.getUser());
+
+  if (!user) {
+    redirect('/login');
+  }
+
 
   const db = await requireAdminClient();
 
@@ -30,7 +34,7 @@ export default async function ContractDetailPage({
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff'].includes(profile.role)) {
     redirect('/unauthorized');
   }
 
@@ -38,7 +42,7 @@ export default async function ContractDetailPage({
     .from('contract_templates')
     .select(`
       id, title, agency_name, source_type, file_name, file_type,
-      file_size, status, extraction_method, page_count, notes,
+      file_size, status, extraction_method, original_file_path, page_count, notes,
       created_at, updated_at,
       contract_template_fields (
         id, label, field_key, field_type, required,
@@ -59,22 +63,12 @@ export default async function ContractDetailPage({
   // Get signed URL for preview (private bucket — 1 hour)
   let previewUrl: string | null = null;
   try {
-    const { createClient: createStorageClient } = await import('@supabase/supabase-js');
-    const storageUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const storageKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (storageUrl && storageKey) {
-      const storage = createStorageClient(storageUrl, storageKey, { auth: { persistSession: false } });
-      const { data: fileData } = await db
-        .from('contract_templates')
-        .select('original_file_path')
-        .eq('id', id)
-        .maybeSingle();
-      if (fileData?.original_file_path) {
-        const { data: signed } = await storage.storage
-          .from('contracts')
-          .createSignedUrl(fileData.original_file_path, 3600);
-        previewUrl = signed?.signedUrl ?? null;
-      }
+    // Use admin client directly for contract storage
+    if (contract?.original_file_path) {
+      const { data: signed } = await db.storage
+        .from('contracts')
+        .createSignedUrl(contract.original_file_path, 3600);
+      previewUrl = signed?.signedUrl ?? null;
     }
   } catch { /* non-fatal */ }
 

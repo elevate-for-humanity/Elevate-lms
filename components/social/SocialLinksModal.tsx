@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
-import { X, Facebook, Instagram, Linkedin, Youtube, ExternalLink } from 'lucide-react';
+import { X, ExternalLink } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Youtube } from '../ui/BrandIcons';
 import { SOCIAL_LINKS } from '@/config/social-links';
 
 interface SocialLinksModalProps {

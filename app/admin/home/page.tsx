@@ -88,7 +88,7 @@ const FEATURES = [
 ];
 
 export default async function AdminHomePage() {
-  const auth = await requireRole(['admin', 'super_admin', 'staff', 'platform_operator']);
+  const auth = await requireRole(['admin', 'staff', 'admin']);
   const { profile } = auth;
   const firstName = profile.first_name || profile.full_name?.split(' ')[0] || 'Admin';
 
@@ -97,12 +97,12 @@ export default async function AdminHomePage() {
       {/* Hero Section */}
       <section className="relative h-72 sm:h-80 w-full overflow-hidden">
         <Image
-          src="/images/pages/admin-dashboard-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp"
           alt="Admin Portal"
           fill
           className="object-cover object-center"
           priority
-          placeholder="empty"
+          
         />
         <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/90 to-brand-blue-900/40" />
         <div className="relative z-10 flex h-full flex-col justify-center px-6 sm:px-12 max-w-6xl mx-auto">

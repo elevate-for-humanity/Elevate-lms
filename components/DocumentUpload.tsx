@@ -99,6 +99,11 @@ export default function DocumentUpload({
       const fileArray = Array.from(newFiles);
 
       fileArray.forEach((file) => {
+        if (files.length >= maxFiles) {
+          setError(`Maximum ${maxFiles} files allowed`);
+          return;
+        }
+
         const validationError = validateFile(file);
 
         if (validationError) {
@@ -119,6 +124,7 @@ export default function DocumentUpload({
         setFiles((prev) => [...prev, uploadedFile]);
         simulateUpload(uploadedFile.id);
       });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [files.length, maxFiles, maxSize, acceptedTypes],
   );
@@ -126,7 +132,7 @@ export default function DocumentUpload({
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
-  }, [validateFile]);
+  }, []);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();

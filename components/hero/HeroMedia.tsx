@@ -8,7 +8,7 @@ type Props = {
 };
 
 export default function HeroMedia({ posterImage, videoSrc }: Props) {
-  const poster = posterImage || '/images/og-default.jpg';
+  const poster = posterImage || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-default.jpg';
 
   return (
     <div className="relative w-full overflow-hidden rounded-3xl">

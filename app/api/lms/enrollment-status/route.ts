@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-    if (['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) {
+    if (['admin', 'staff'].includes(profile?.role ?? '')) {
       return NextResponse.json({
         enrolled: true,
         status: 'active',

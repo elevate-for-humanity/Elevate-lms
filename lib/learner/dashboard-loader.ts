@@ -36,6 +36,7 @@ export interface EnrollmentDTO {
   course_id: string | null;
   program_id: string | null;
   program_slug: string | null;
+  host_shop_id: string | null;
   status: string | null;
   enrollment_state: string | null;
   progress_percent: number | null;
@@ -48,6 +49,14 @@ export interface EnrollmentDTO {
     duration_hours: number | null;
     image: string | null;
     hero_image?: string | null;
+  } | null;
+  host_shop?: {
+    id: string;
+    name: string;
+    address?: string | null;
+    city?: string | null;
+    state?: string | null;
+    zip?: string | null;
   } | null;
   _isApprenticeship?: boolean;
 }
@@ -193,14 +202,14 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
   const warnings: string[] = [];
 
   // ── 1. IDENTITY ────────────────────────────────────────────────────
-  const { user, profile } = await requireRole(['student', 'admin', 'super_admin']);
+  const { user, profile } = await requireRole(['student', 'admin']);
   const supabase = await createClient();
 
   // ── 2. ENROLLMENTS (required) ──────────────────────────────────────
   const { data: programEnrollments, error: enrollmentError } = await supabase
     .from('program_enrollments')
     .select(
-      `id, course_id, program_id, program_slug,
+      `id, course_id, program_id, program_slug, host_shop_id,
        status, enrollment_state, progress_percent,
        enrolled_at, access_granted_at, cohort_id`,
     )
@@ -268,9 +277,27 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
 
   const apMap = new Map<string, any>((apprenticeshipPrograms ?? []).map((p: any) => [p.id, p]));
 
+  // ── 5.1 HOST SHOP DETAILS (manual join) ───────────────────────────
+  const hostShopIds = rows.map((e) => e.host_shop_id).filter(Boolean) as string[];
+  const { data: hostShopRows, error: hsErr } =
+    hostShopIds.length > 0
+      ? await supabase
+          .from('organizations')
+          .select('id, name, address, city, state, zip')
+          .in('id', hostShopIds)
+      : { data: [], error: null };
+
+  if (hsErr) {
+    warnings.push('organizations lookup failed');
+    logger.warn('loadLearnerDashboard: organizations lookup failed', hsErr);
+  }
+
+  const hostShopMap = new Map<string, any>((hostShopRows ?? []).map((hs: any) => [hs.id, hs]));
+
   // ── 6. NORMALIZE ENROLLMENTS ───────────────────────────────────────
   const normalizedEnrollments: EnrollmentDTO[] = rows.map((e: any) => {
     let courses: EnrollmentDTO['courses'] = null;
+    const host_shop = hostShopMap.get(e.host_shop_id) ?? null;
 
     if (e.course_id) {
       const course = courseMap.get(e.course_id) ?? trainingCourseMap.get(e.course_id);
@@ -288,12 +315,12 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
       const slug = e.program_slug?.toLowerCase() ?? '';
       // Map program slugs to hero images
       const heroImageMap: Record<string, string> = {
-        'barber-apprenticeship': '/images/pages/barber-apprenticeship-hero.jpg',
-        'cosmetology-apprenticeship': '/images/pages/cosmetology-apprenticeship-hero.webp',
-        'nail-technician-apprenticeship': '/images/pages/nail-tech-hero.webp',
-        'esthetician-apprenticeship': '/images/pages/nail-tech-hero.webp',
+        'barber-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship-hero.jpg',
+        'cosmetology-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-apprenticeship-hero.webp',
+        'nail-technician-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-tech-hero.webp',
+        'esthetician-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-tech-hero.webp',
       };
-      const hero_image = heroImageMap[slug] || '/images/pages/barber-apprenticeship-hero.jpg';
+      const hero_image = heroImageMap[slug] || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship-hero.jpg';
       courses = {
         id: ap.id,
         title: ap.name ?? 'Apprenticeship Program',
@@ -302,10 +329,10 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
         image: null,
         hero_image,
       };
-      return { ...e, courses, _isApprenticeship: true } as EnrollmentDTO;
+      return { ...e, courses, host_shop, _isApprenticeship: true } as EnrollmentDTO;
     }
 
-    return { ...e, courses } as EnrollmentDTO;
+    return { ...e, courses, host_shop } as EnrollmentDTO;
   });
 
   const seen = new Set<string>();

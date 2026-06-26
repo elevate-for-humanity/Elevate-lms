@@ -49,7 +49,7 @@ export default function AgentsClient() {
       {/* Hero Section */}
       <div className="relative h-[280px] w-full overflow-hidden">
         <Image
-          src="/images/pages/admin-ai-studio-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-ai-studio-hero.webp"
           alt="AI Agents"
           fill
           className="object-cover"
@@ -111,7 +111,7 @@ export default function AgentsClient() {
                   <div>
                     <p className="font-bold text-slate-900">{agent.name}</p>
                     <p className="text-xs text-slate-500 capitalize">
-                      {agent.role.replace(/_/g, ' ')}
+                      {agent.role?.replace(/_/g, ' ') ?? agent.slug ?? 'Agent'}
                     </p>
                   </div>
                 </div>

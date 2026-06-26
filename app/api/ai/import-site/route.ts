@@ -294,7 +294,7 @@ Return ONLY valid JSON.`;
     } catch (parseError) {
       logger.error('[import-site] JSON parse error', {
         raw: jsonStr.slice(0, 200),
-        error: parseError instanceof Error ? parseError.message : String(parseError)
+        error: 'Import failed'
       });
       throw new Error(`Failed to parse AI response as JSON`), { cause: parseError };
     }

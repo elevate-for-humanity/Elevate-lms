@@ -4,12 +4,53 @@
  * Single source of truth for Tailwind class patterns used across all
  * student-facing marketing and program pages.
  *
+ * =============================================================================
+ * DESIGN STANDARDS (ENFORCED)
+ * =============================================================================
+ *
+ * Hero Banners:
+ *   Desktop: 1920 × 800 px — Aspect Ratio: 21:9
+ *   Safe area: content centered at max 1400px
+ *   RULES: No gradient overlays, text left-aligned, CTA below headline
+ *
+ * Program Card Images:
+ *   Size: 800 × 450 px — Aspect Ratio: 16:9
+ *   RULES: ALL cards MUST have images (no generic icons like ✂️, 🏥)
+ *
+ * Program Detail Hero:
+ *   Size: 1600 × 600 px — Aspect Ratio: 8:3
+ *
+ * Dashboard Cards:
+ *   Size: 400 × 225 px — Aspect Ratio: 16:9
+ *
+ * Team/Instructor Photos:
+ *   Size: 800 × 800 px — Aspect Ratio: 1:1
+ *
+ * Layout Max Width: 1400px
+ *
+ * Spacing Scale (8px base):
+ *   8px, 16px, 24px, 32px, 48px, 64px, 96px
+ *   Section spacing: 96px
+ *   Card padding: 24px
+ *   Grid gap: 24px
+ *
+ * Navigation Target:
+ *   Programs | Funding | Students | Employers | Partners | Testing | Store | About | Apply
+ *
+ * =============================================================================
+ *
  * Rules:
  * - Import from here, never invent one-off class strings for these patterns.
  * - Do not add page-specific overrides here — extend the schema instead.
  * - All new student-facing pages must use these tokens.
  * - See docs/page-design-standard.md for the full system specification.
  * - Pixel targets for assets: lib/images/media-dimensions.ts
+ *
+ * VIOLATIONS (FIX REQUIRED):
+ *   - components/programs/VisualProgramTemplate.tsx:437 - Dark overlay on CTA
+ *   - components/programs/ProgramHero.tsx:57 - Text overlay on hero
+ *   - components/home/AnimatedHomePage.tsx - Full gradient background hero
+ *
  */
 
 // ─── Typography ──────────────────────────────────────────────────────────────

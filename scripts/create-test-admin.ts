@@ -42,7 +42,7 @@ async function main() {
     userId = existing.id;
 
     // Ensure role is admin
-    if (!['admin', 'super_admin'].includes(existing.role)) {
+    if (!['admin'].includes(existing.role)) {
       await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId);
       console.log('Updated role to admin');
     }

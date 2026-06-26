@@ -14,7 +14,7 @@ import { logger } from '@/lib/logger';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminShopsPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   let shops: any[] = [];
 
   try {

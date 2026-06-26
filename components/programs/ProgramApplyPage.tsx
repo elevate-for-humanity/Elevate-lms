@@ -360,8 +360,8 @@ export default function ProgramApplyPage({ program }: Props) {
   const fundingLabel: Record<string, string> = {
     wioa: 'WIOA (Workforce Innovation & Opportunity Act)',
     wrg: 'Workforce Ready Grant',
-    impact: 'FSSA IMPACT / Next Level Jobs',
-    fssa: 'FSSA IMPACT',
+    impact: ' / Next Level Jobs',
+    fssa: '',
     employer_paid: 'Employer Sponsored',
     self_pay: 'Self-Pay',
   };

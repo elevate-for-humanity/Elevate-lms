@@ -33,7 +33,7 @@ export async function GET(req: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'super_admin', 'sponsor', 'staff'].includes(profile.role)) {
+    if (!profile || !['admin', 'sponsor', 'staff'].includes(profile.role)) {
       return NextResponse.json(
         { error: 'Access denied. Admin or sponsor role required.' },
         { status: 403 },

@@ -57,14 +57,21 @@ describe('validateRedirect', () => {
 });
 
 describe('resolveRedirectLocation', () => {
-  it('preserves absolute trusted URLs', () => {
-    const target = '/admin/dashboard';
-    expect(resolveRedirectLocation(target, 'https://www.elevateforhumanity.org').href).toBe(target);
+  it('resolves relative paths against origin to absolute URL', () => {
+    // When target starts with /, it should be resolved against the origin
+    expect(
+      resolveRedirectLocation('/admin/dashboard', 'https://www.elevateforhumanity.org').href,
+    ).toBe('https://www.elevateforhumanity.org/admin/dashboard');
   });
 
-  it('resolves relative paths against origin', () => {
+  it('resolves portal paths to absolute URLs', () => {
     expect(
       resolveRedirectLocation('/portal/barber', 'https://www.elevateforhumanity.org').href,
     ).toBe('https://www.elevateforhumanity.org/portal/barber');
+  });
+
+  it('preserves already absolute URLs', () => {
+    const target = 'https://www.elevateforhumanity.org/admin/dashboard';
+    expect(resolveRedirectLocation(target, 'https://www.elevateforhumanity.org').href).toBe(target);
   });
 });

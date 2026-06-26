@@ -29,13 +29,18 @@ export default async function CurriculumCourseEditorPage({
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect('/login');
+  }
+
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) {
+  if (!['admin', 'staff'].includes(profile?.role ?? '')) {
     redirect('/unauthorized');
   }
 

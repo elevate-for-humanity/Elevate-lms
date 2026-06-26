@@ -24,6 +24,14 @@ async function _GET(req: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
+      // Check if it's a permission error
+      if (error.code === '42501' || error.message?.includes('permission denied')) {
+        logger.error('Products permission denied - applying RLS policies', error);
+        return NextResponse.json(
+          { error: 'Failed to fetch products', details: 'Database permission error - run migration 20260623000001_fix_products_permissions.sql' },
+          { status: 500 },
+        );
+      }
       logger.error('Supabase error:', error);
       return NextResponse.json(
         { error: 'Failed to fetch products', details: 'Internal server error' },

@@ -1,373 +1,345 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { createBrowserClient } from '@supabase/ssr';
-import {
-  Scissors,
-  Clock,
-  BookOpen,
-  TrendingUp,
-  AlertTriangle,
-  Loader2,
-  LogIn,
-  LogOut,
-  Award,
-  ChevronRight,
+import { 
+  Scissors, Clock, BookOpen, Award, Calendar, 
+  ChevronRight, Plus, User, Bell, Settings,
+  TrendingUp, AlertCircle, Loader2,
+  LogIn, UserPlus, FileText, CheckSquare
 } from 'lucide-react';
 
-interface DashboardData {
-  fullName: string | null;
-  ojlHours: number;
-  rtiHours: number;
-  requiredOjl: number;
-  requiredRti: number;
-  isClockedIn: boolean;
-  activeSessionStart: string | null;
-  onboardingComplete: boolean;
-  pendingOnboardingCount: number;
-  programSlug: string | null;
+const TARGET_HOURS = 2000;
+
+function formatHours(hours: number): string {
+  return hours.toLocaleString();
 }
 
-const REQUIRED_OJL = 1500;
-const REQUIRED_RTI = 500;
+interface ApprenticeData {
+  name: string;
+  totalHours: number;
+  weeklyHours: number;
+  startDate: string | null;
+  shopName: string;
+  nextMilestone: number;
+}
 
-export default function BarberPWAHome() {
-  const router = useRouter();
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [clockingIn, setClockingIn] = useState(false);
-
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
-
-  const load = useCallback(async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      router.replace('/login?redirect=/pwa/barber');
-      return;
-    }
-
-    const userId = session.user.id;
-
-    // Profile
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('full_name')
-      .eq('id', userId)
-      .maybeSingle();
-
-    // Active enrollment
-    const { data: enrollment } = await supabase
-      .from('program_enrollments')
-      .select(
-        'program_slug, orientation_completed_at, documents_submitted_at, stripe_subscription_id',
-      )
-      .eq('user_id', userId)
-      .eq('enrollment_state', 'active')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    // Approved hours
-    const { data: hourRows } = await supabase
-      .from('hour_entries')
-      .select('hours_claimed, accepted_hours, source_type')
-      .eq('user_id', userId)
-      .in('status', ['approved', 'locked']);
-
-    const OJL_TYPES = new Set(['ojl', 'host_shop', 'timeclock', 'manual']);
-    const RTI_TYPES = new Set(['rti', 'in_state_barber_school', 'continuing_education']);
-    let ojl = 0;
-    let rti = 0;
-    for (const row of hourRows ?? []) {
-      const hrs = Number(row.accepted_hours) || Number(row.hours_claimed) || 0;
-      if (OJL_TYPES.has(row.source_type)) ojl += hrs;
-      else if (RTI_TYPES.has(row.source_type)) rti += hrs;
-    }
-
-    // Active timeclock session
-    const { data: activeSession } = await supabase
-      .from('timeclock_sessions')
-      .select('id, clock_in_at')
-      .eq('user_id', userId)
-      .is('clock_out_at', null)
-      .order('clock_in_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    // Onboarding
-    const { data: docs } = await supabase
-      .from('documents')
-      .select('document_type, status')
-      .eq('user_id', userId);
-
-    const hasPhotoId = (docs ?? []).some((d) => d.document_type === 'photo_id');
-    const hasResidency = (docs ?? []).some(
-      (d) => d.document_type === 'proof_of_residency' || d.document_type === 'other',
-    );
-    const docsApproved =
-      (docs ?? []).length > 0 && (docs ?? []).every((d) => d.status === 'approved');
-    const hasPayment = !!enrollment?.stripe_subscription_id;
-
-    const onboardingItems = [
-      !!enrollment?.orientation_completed_at,
-      hasPhotoId,
-      hasResidency,
-      docsApproved,
-      hasPayment,
-    ];
-    const pendingOnboardingCount = onboardingItems.filter((v) => !v).length;
-
-    setData({
-      fullName: profile?.full_name ?? null,
-      ojlHours: ojl,
-      rtiHours: rti,
-      requiredOjl: REQUIRED_OJL,
-      requiredRti: REQUIRED_RTI,
-      isClockedIn: !!activeSession,
-      activeSessionStart: activeSession?.clock_in_at ?? null,
-      onboardingComplete: pendingOnboardingCount === 0,
-      pendingOnboardingCount,
-      programSlug: enrollment?.program_slug ?? null,
-    });
-    setLoading(false);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  const handleClockToggle = async () => {
-    setClockingIn(true);
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) return;
-
-    if (data?.isClockedIn) {
-      // Clock out — close the open session
-      await supabase
-        .from('timeclock_sessions')
-        .update({ clock_out_at: new Date().toISOString() })
-        .eq('user_id', session.user.id)
-        .is('clock_out_at', null);
-    } else {
-      // Clock in — open a new session
-      await supabase.from('timeclock_sessions').insert({
-        user_id: session.user.id,
-        clock_in_at: new Date().toISOString(),
-        program_slug: data?.programSlug ?? 'barber-apprenticeship',
-        source: 'pwa',
-      });
-    }
-
-    setClockingIn(false);
-    load();
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-10 h-10 text-amber-500 animate-spin" />
+// Public Landing Page Component
+function LandingPage() {
+  return (
+    <div className="min-h-screen bg-slate-900">
+      {/* Hero */}
+      <div className="bg-brand-blue-700 px-6 pt-16 pb-12 text-center">
+        <div className="w-20 h-20 bg-brand-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <Scissors className="w-10 h-10 text-white" />
+        </div>
+        <h1 className="text-3xl font-black text-white mb-3">Barber Apprentice</h1>
+        <p className="text-blue-200 text-lg max-w-xs mx-auto">
+          Track your hours, access training, and progress toward your barber license.
+        </p>
       </div>
-    );
-  }
 
-  if (!data) return null;
+      {/* Features */}
+      <div className="px-6 py-8 space-y-4">
+        <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
+          <div className="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Clock className="w-5 h-5 text-brand-green-400" />
+          </div>
+          <div>
+            <h3 className="text-white font-semibold">Track Your Hours</h3>
+            <p className="text-slate-500 text-sm">Log training hours and see your progress toward 2,000 hours.</p>
+          </div>
+        </div>
 
-  const ojlPercent = Math.min((data.ojlHours / data.requiredOjl) * 100, 100);
-  const rtiPercent = Math.min((data.rtiHours / data.requiredRti) * 100, 100);
-  const firstName = data.fullName?.split(' ')[0] ?? 'Apprentice';
+        <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
+          <div className="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center flex-shrink-0">
+            <BookOpen className="w-5 h-5 text-brand-blue-400" />
+          </div>
+          <div>
+            <h3 className="text-white font-semibold">Training Materials</h3>
+            <p className="text-slate-500 text-sm">Access Elevate LMS curriculum and instructional videos.</p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
+          <div className="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Award className="w-5 h-5 text-amber-400" />
+          </div>
+          <div>
+            <h3 className="text-white font-semibold">Earn Milestones</h3>
+            <p className="text-slate-500 text-sm">Unlock achievements as you progress through your apprenticeship.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Buttons */}
+      <div className="px-6 pb-8 space-y-3">
+        <Link
+          href="/login?redirect=/pwa/barber"
+          className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700"
+        >
+          <LogIn className="w-5 h-5" />
+          Sign In
+        </Link>
+        
+        <Link
+          href="/pwa/barber/enroll"
+          className="w-full flex items-center justify-center gap-2 bg-slate-700 text-white font-medium py-4 rounded-xl border border-slate-600 hover:bg-slate-600"
+        >
+          <UserPlus className="w-5 h-5" />
+          Enroll in Program
+        </Link>
+      </div>
+
+      {/* Footer */}
+      <div className="px-6 pb-8 text-center">
+        <p className="text-slate-500 text-sm">
+          Part of the USDOL Registered Barber Apprenticeship
+        </p>
+        <Link href="/" className="text-brand-blue-400 text-sm hover:underline">
+          elevateforhumanity.org
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// Dashboard Component (for logged-in users)
+function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLogout: () => void }) {
+  const totalHours = apprentice.totalHours || 0;
+  const progressPercent = (totalHours / TARGET_HOURS) * 100;
+  const hoursRemaining = TARGET_HOURS - totalHours;
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-24">
+    <div className="min-h-screen bg-white pb-20">
       {/* Header */}
-      <header className="bg-slate-800 px-4 pt-12 pb-5 safe-area-inset-top">
-        <div className="flex items-center justify-between">
+      <header className="bg-brand-blue-700 px-4 pt-12 pb-6 safe-area-inset-top">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
-              <Scissors className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
+              <User className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-slate-400 text-xs">Barber Apprenticeship</p>
-              <h1 className="text-white font-bold text-lg leading-tight">Hey, {firstName}</h1>
+              <p className="text-blue-200 text-sm">Welcome back,</p>
+              <h1 className="text-white font-bold text-lg">{apprentice.name}</h1>
             </div>
           </div>
-          {data.isClockedIn && (
-            <span className="flex items-center gap-1.5 bg-brand-green-500/20 text-brand-green-400 text-xs font-semibold px-3 py-1.5 rounded-full">
-              <span className="w-2 h-2 bg-brand-green-400 rounded-full animate-pulse" />
-              Clocked In
-            </span>
-          )}
+          <div className="flex gap-2">
+            <Link href="/pwa/barber/notifications" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+              <Bell className="w-5 h-5 text-white" />
+            </Link>
+            <Link href="/pwa/barber/settings" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+              <Settings className="w-5 h-5 text-white" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Progress Card */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-blue-200 text-sm">Progress to Licensure</span>
+            <span className="text-white font-bold">{progressPercent.toFixed(1)}%</span>
+          </div>
+          <div className="h-3 bg-slate-700 rounded-full overflow-hidden mb-3">
+            <div 
+              className="h-full bg-white rounded-full transition-all duration-500"
+              style={{ width: `${Math.min(progressPercent, 100)}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-white font-bold">{formatHours(totalHours)} hrs</span>
+            <span className="text-blue-200">{formatHours(TARGET_HOURS)} hrs goal</span>
+          </div>
         </div>
       </header>
 
-      <main className="px-4 py-5 space-y-4">
-        {/* Onboarding alert */}
-        {!data.onboardingComplete && (
-          <Link
-            href="/pwa/barber/onboarding"
-            className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/30 rounded-xl p-4"
-          >
-            <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
-            <div className="flex-1">
-              <p className="text-amber-300 font-semibold text-sm">
-                {data.pendingOnboardingCount} onboarding{' '}
-                {data.pendingOnboardingCount === 1 ? 'step' : 'steps'} remaining
-              </p>
-              <p className="text-amber-500 text-xs mt-0.5">Tap to complete →</p>
-            </div>
-          </Link>
+      {/* Main Content */}
+      <main className="px-4 py-6 space-y-6">
+
+        {/* What to do first */}
+        {totalHours === 0 && (
+          <div className="bg-brand-blue-600 rounded-xl p-4">
+            <p className="text-white font-bold mb-1">👋 Getting started</p>
+            <p className="text-blue-100 text-sm leading-relaxed">
+              Every day you train at your barbershop, log your hours here. You need <strong>2,000 total hours</strong> to qualify for your Indiana Barber License. Start with <strong>Check In</strong> below.
+            </p>
+          </div>
         )}
 
-        {/* Clock in/out card */}
-        <div className="bg-slate-800 rounded-2xl p-5">
-          <p className="text-slate-400 text-xs uppercase tracking-widest font-medium mb-3">
-            Timeclock
-          </p>
-          <button
-            onClick={handleClockToggle}
-            disabled={clockingIn}
-            className={`w-full flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-base transition disabled:opacity-50 ${
-              data.isClockedIn
-                ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
-                : 'bg-amber-500 text-white hover:bg-amber-400'
-            }`}
-          >
-            {clockingIn ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : data.isClockedIn ? (
-              <>
-                <LogOut className="w-5 h-5" /> Clock Out
-              </>
-            ) : (
-              <>
-                <LogIn className="w-5 h-5" /> Clock In
-              </>
-            )}
-          </button>
-          {data.isClockedIn && data.activeSessionStart && (
-            <p className="text-center text-slate-500 text-xs mt-2">
-              Session started{' '}
-              {new Date(data.activeSessionStart).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-slate-800 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="w-5 h-5 text-brand-blue-400" />
+              <span className="text-slate-500 text-sm">This Week</span>
+            </div>
+            <p className="text-2xl font-bold text-white">{apprentice.weeklyHours || 0} hrs</p>
+          </div>
+          <div className="bg-slate-800 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="w-5 h-5 text-emerald-400" />
+              <span className="text-slate-500 text-sm">Remaining</span>
+            </div>
+            <p className="text-2xl font-bold text-white">{formatHours(hoursRemaining)} hrs</p>
+          </div>
+        </div>
+
+        {/* Next Milestone */}
+        {apprentice.nextMilestone && (
+          <div className="bg-slate-700 border border-amber-400/50 rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center">
+                <Award className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="text-amber-200 text-sm">Next Milestone</p>
+                <p className="text-white font-bold">{formatHours(apprentice.nextMilestone)} Hours</p>
+              </div>
+              <div className="text-right">
+                <p className="text-amber-200 text-sm">
+                  {formatHours(Math.max(0, apprentice.nextMilestone - totalHours))} to go
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Quick Actions */}
+        <div className="space-y-3">
+          <h2 className="text-white font-bold text-lg">Quick Actions</h2>
+          
+          {/* Primary action — most important, do this daily */}
+          <Link href="/pwa/barber/checkin" className="flex items-center gap-4 bg-emerald-600 rounded-xl p-4 active:opacity-80">
+            <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center">
+              <CheckSquare className="w-6 h-6 text-white flex-shrink-0" />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-bold">Check In — Start Your Day</p>
+              <p className="text-emerald-100 text-sm">Tap this every morning when you arrive at the shop</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-emerald-200" />
+          </Link>
+
+          <Link href="/pwa/barber/hours/submit" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
+            <div className="w-12 h-12 bg-brand-blue-600 rounded-xl flex items-center justify-center">
+              <Plus className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-medium">Submit Hours</p>
+              <p className="text-slate-500 text-sm">End of day — log hours with photo proof for official records</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-500" />
+          </Link>
+
+          <Link href="/pwa/barber/log-hours" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
+            <div className="w-12 h-12 bg-slate-600 rounded-xl flex items-center justify-center">
+              <Clock className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-medium">Quick Log</p>
+              <p className="text-slate-500 text-sm">Missed a day? Add past hours manually</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-500" />
+          </Link>
+
+          <Link href="/pwa/barber/progress" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
+            <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-brand-blue-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-medium">View Progress</p>
+              <p className="text-slate-500 text-sm">Detailed hour breakdown</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-500" />
+          </Link>
+
+          <Link href="/pwa/barber/training" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
+            <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
+              <BookOpen className="w-6 h-6 text-brand-blue-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-medium">Training Materials</p>
+              <p className="text-slate-500 text-sm">Elevate LMS curriculum & videos</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-500" />
+          </Link>
+
+          <Link href="/pwa/barber/history" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
+            <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
+              <Calendar className="w-6 h-6 text-amber-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-medium">Hour History</p>
+              <p className="text-slate-500 text-sm">View all logged hours</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-500" />
+          </Link>
+
+          <Link href="/pwa/barber/milestones" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
+            <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
+              <Award className="w-6 h-6 text-amber-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-medium">Milestones</p>
+              <p className="text-slate-500 text-sm">Track achievements & rewards</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-500" />
+          </Link>
+
+          <Link href="/pwa/barber/reports" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
+            <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
+              <FileText className="w-6 h-6 text-slate-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-medium">Reports</p>
+              <p className="text-slate-500 text-sm">Export & view summaries</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-500" />
+          </Link>
+
+          <Link href="/pwa/barber/profile" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
+            <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
+              <User className="w-6 h-6 text-slate-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-white font-medium">My Profile</p>
+              <p className="text-slate-500 text-sm">View your apprentice profile</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-500" />
+          </Link>
+        </div>
+
+        {/* Shop Info */}
+        <div className="bg-slate-800 rounded-xl p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <Scissors className="w-5 h-5 text-brand-blue-400" />
+            <span className="text-slate-500 text-sm">Training Location</span>
+          </div>
+          <p className="text-white font-medium">{apprentice.shopName}</p>
+          {apprentice.startDate && (
+            <p className="text-slate-500 text-sm mt-1">
+              Started {new Date(apprentice.startDate).toLocaleDateString('en-US', { timeZone: 'UTC' })}
             </p>
           )}
         </div>
-
-        {/* Hours progress */}
-        <div className="bg-slate-800 rounded-2xl p-5 space-y-4">
-          <p className="text-slate-400 text-xs uppercase tracking-widest font-medium">
-            Hours Progress
-          </p>
-
-          {/* OJL */}
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-white text-sm font-medium">On-the-Job (OJL)</span>
-              <span className="text-slate-400 text-sm tabular-nums">
-                {data.ojlHours.toLocaleString()} / {data.requiredOjl.toLocaleString()}
-              </span>
-            </div>
-            <div className="h-2.5 bg-slate-700 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-amber-500 rounded-full transition-all duration-500"
-                style={{ width: `${ojlPercent}%` }}
-              />
-            </div>
-          </div>
-
-          {/* RTI */}
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-white text-sm font-medium">Related Technical (RTI)</span>
-              <span className="text-slate-400 text-sm tabular-nums">
-                {data.rtiHours.toLocaleString()} / {data.requiredRti.toLocaleString()}
-              </span>
-            </div>
-            <div className="h-2.5 bg-slate-700 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-blue-500 rounded-full transition-all duration-500"
-                style={{ width: `${rtiPercent}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Quick actions */}
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { label: 'Log Hours', href: '/apprentice/hours/log', icon: Clock },
-            { label: 'Log Service', href: '/apprentice/competencies/log', icon: Award },
-            { label: 'Training', href: '/pwa/barber/onboarding', icon: BookOpen },
-            { label: 'Progress', href: '/apprentice/competencies', icon: TrendingUp },
-          ].map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="bg-slate-800 rounded-xl p-4 flex items-center gap-3 hover:bg-slate-700 transition"
-            >
-              <div className="w-9 h-9 bg-slate-700 rounded-lg flex items-center justify-center shrink-0">
-                <item.icon className="w-4 h-4 text-amber-400" />
-              </div>
-              <span className="text-white text-sm font-medium">{item.label}</span>
-            </Link>
-          ))}
-        </div>
-
-        {/* Full portal link */}
-        <Link
-          href="/learner/dashboard"
-          className="flex items-center justify-between bg-slate-800 rounded-xl p-4 hover:bg-slate-700 transition"
-        >
-          <div className="flex items-center gap-3">
-            <span
-              className="w-5 h-5 rounded-full bg-amber-400 inline-block flex-shrink-0"
-              aria-hidden="true"
-            />
-            <div>
-              <p className="text-white text-sm font-semibold">Full Apprentice Portal</p>
-              <p className="text-slate-500 text-xs">Documents, handbook, state board & more</p>
-            </div>
-          </div>
-          <ChevronRight className="w-5 h-5 text-slate-500" />
-        </Link>
       </main>
 
-      {/* Bottom nav */}
+      {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-6 py-3 safe-area-inset-bottom">
         <div className="flex justify-around">
-          <button className="flex flex-col items-center gap-1 text-amber-400">
+          <Link href="/pwa/barber" className="flex flex-col items-center gap-1 text-brand-blue-400">
             <Scissors className="w-6 h-6" />
-            <span className="text-xs font-medium">Home</span>
-          </button>
-          <Link
-            href="/apprentice/timeclock"
-            className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition"
-          >
+            <span className="text-xs">Home</span>
+          </Link>
+          <Link href="/pwa/barber/log-hours" className="flex flex-col items-center gap-1 text-slate-400">
             <Clock className="w-6 h-6" />
-            <span className="text-xs">Clock</span>
+            <span className="text-xs">Log</span>
           </Link>
-          <Link
-            href="/pwa/barber/onboarding"
-            className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition"
-          >
+          <Link href="/pwa/barber/training" className="flex flex-col items-center gap-1 text-slate-400">
             <BookOpen className="w-6 h-6" />
-            <span className="text-xs">Training</span>
+            <span className="text-xs">Learn</span>
           </Link>
-          <Link
-            href="/apprentice/competencies"
-            className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200 transition"
-          >
+          <Link href="/pwa/barber/progress" className="flex flex-col items-center gap-1 text-slate-400">
             <TrendingUp className="w-6 h-6" />
             <span className="text-xs">Progress</span>
           </Link>
@@ -375,4 +347,95 @@ export default function BarberPWAHome() {
       </nav>
     </div>
   );
+}
+
+export default function BarberPWAHome() {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const [apprentice, setApprentice] = useState<ApprenticeData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/pwa/barber/progress');
+        
+        if (response.status === 401) {
+          setIsLoggedIn(false);
+          setLoading(false);
+          return;
+        }
+
+        if (response.status === 404) {
+          // Logged in but not enrolled
+          setIsLoggedIn(true);
+          setApprentice(null);
+          setLoading(false);
+          return;
+        }
+
+        if (response.ok) {
+          const data = await response.json();
+          setIsLoggedIn(true);
+          setApprentice({
+            name: data.apprentice?.name || 'Apprentice',
+            totalHours: data.apprentice?.totalHours || 0,
+            weeklyHours: data.apprentice?.weeklyHours || 0,
+            startDate: data.apprentice?.startDate || null,
+            shopName: data.apprentice?.shopName || 'Not assigned',
+            nextMilestone: data.apprentice?.nextMilestone || 500,
+          });
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err);
+        setIsLoggedIn(false);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    checkAuth();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-brand-blue-400 mx-auto mb-4 animate-spin" />
+          <p className="text-slate-500">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Not logged in - show landing page
+  if (!isLoggedIn) {
+    return <LandingPage />;
+  }
+
+  // Logged in but not enrolled
+  if (!apprentice) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <AlertCircle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-white mb-4">Not Enrolled</h1>
+          <p className="text-slate-400 mb-6">
+            You're signed in but not enrolled in the Barber Apprenticeship program.
+          </p>
+          <Link
+            href="/programs/barber-apprenticeship"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-medium"
+          >
+            Enroll Now
+            <ChevronRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Logged in and enrolled - show dashboard
+  return <Dashboard apprentice={apprentice} onLogout={() => setIsLoggedIn(false)} />;
 }

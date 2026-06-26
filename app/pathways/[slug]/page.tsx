@@ -8,19 +8,19 @@ import { PATHWAYS } from '@/lib/pathways/data';
 
 export const dynamic = 'force-dynamic';
 const SLUG_IMAGES: Record<string, string> = {
-  cna: '/images/pages/cna-nursing.webp',
-  cdl: '/images/pages/cdl-training.webp',
-  'barber-apprenticeship': '/images/pages/barber-training.webp',
-  hvac: '/images/pages/hvac-technician.webp',
-  electrical: '/images/pages/electrical.webp',
-  welding: '/images/pages/welding.webp',
-  'it-help-desk': '/images/pages/it-help-desk.webp',
-  'cybersecurity-analyst': '/images/pages/cybersecurity.webp',
-  'medical-assistant': '/images/pages/medical-assistant.webp',
-  phlebotomy: '/images/pages/phlebotomy.jpg',
-  plumbing: '/images/pages/plumbing.jpg',
-  healthcare: '/images/pages/healthcare-sector.webp',
-  technology: '/images/pages/technology-sector.webp',
+  cna: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-nursing.webp',
+  cdl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-training.webp',
+  'barber-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-training.webp',
+  hvac: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
+  electrical: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/electrical.webp',
+  welding: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/welding.webp',
+  'it-help-desk': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/it-help-desk.webp',
+  'cybersecurity-analyst': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity.webp',
+  'medical-assistant': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant.webp',
+  phlebotomy: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/phlebotomy.jpg',
+  plumbing: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp',
+  healthcare: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-sector.webp',
+  technology: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/technology-sector.webp',
 };
 
 export const metadata: Metadata = {
@@ -42,7 +42,7 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
   const pathway = dbPathway || PATHWAYS.find((p) => p.slug === slug);
   if (!pathway) return notFound();
 
-  const heroImage = SLUG_IMAGES[slug] ?? '/images/pages/programs-hero.webp';
+  const heroImage = SLUG_IMAGES[slug] ?? 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hero.webp';
 
   return (
     <main className="w-full">

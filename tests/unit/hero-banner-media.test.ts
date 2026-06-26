@@ -3,23 +3,23 @@ import { resolveHeroPosterSrc, DEFAULT_HERO_FALLBACK } from '@/lib/images/hero-b
 
 describe('resolveHeroPosterSrc', () => {
   it('uses banner poster with tax alias fallback chain', () => {
-    const src = resolveHeroPosterSrc('tax-preparation', {
+    const src = resolveHeroPosterSrc( {
       banner: {
-        pageKey: 'tax-preparation',
-        posterImage: '/images/pages/admin-tax-training-hero.webp',
+        pageKey: 
+        posterImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/training-provider-1.webp',
         belowHeroHeadline: 'x',
         belowHeroSubheadline: 'y',
         primaryCta: { label: 'Apply', href: '/apply' },
         analyticsName: 'tax',
       },
-      heroImage: '/images/pages/tax-preparation.jpg',
+      heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/professional-2.jpg',
     });
-    expect(src).toBe('/images/business/office-admin.webp');
+    expect(src).toBe('https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp');
   });
 
   it('falls back to program hero image when no banner', () => {
     const src = resolveHeroPosterSrc('barber-apprenticeship', {
-      heroImage: '/images/pages/barber-hero-main.webp',
+      heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-hero-main.webp',
     });
     expect(src).toContain('barber');
   });

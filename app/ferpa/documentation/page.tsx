@@ -3,7 +3,14 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { ChevronRight, FileText, Download, ExternalLink, FolderOpen, Search } from 'lucide-react';
+import {
+  ChevronRight,
+  FileText,
+  Download,
+  ExternalLink,
+  FolderOpen,
+  Search,
+} from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Documentation | FERPA Portal',
@@ -38,9 +45,8 @@ const DOCUMENT_TYPE_LABELS: Record<string, string> = {
 export default async function FerpaDocumentationPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/ferpa/documentation');
 
   const { data: profile } = await supabase
@@ -49,7 +55,7 @@ export default async function FerpaDocumentationPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  const allowedRoles = ['admin', 'super_admin', 'ferpa_officer', 'registrar', 'staff', 'student'];
+  const allowedRoles = ['admin', 'ferpa_officer', 'registrar', 'staff', 'student'];
   if (!profile || !allowedRoles.includes(profile.role)) redirect('/unauthorized');
 
   // Fetch documents based on role
@@ -97,24 +103,23 @@ export default async function FerpaDocumentationPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/ferpa-page-3.jpg"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/ferpa-page-3.jpg"
           alt="FERPA compliance"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
       </section>
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <nav className="flex items-center gap-2 text-sm text-slate-700 mb-4">
-            <Link href="/ferpa" className="hover:text-slate-900">
-              FERPA Portal
-            </Link>
+            <Link href="/ferpa" className="hover:text-slate-900">FERPA Portal</Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-slate-900 font-medium">Documentation</span>
           </nav>
@@ -124,14 +129,11 @@ export default async function FerpaDocumentationPage() {
               <p className="text-slate-700 mt-1">FERPA policies, forms, and resources</p>
             </div>
             <div className="relative">
-              <label htmlFor="ferpa-doc-search" className="block text-xs font-medium text-slate-700 mb-1">
-                Search documentation
-              </label>
-              <Search className="absolute left-3 top-[calc(50%+10px)] -translate-y-1/2 w-4 h-4 text-slate-700" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-700" />
               <input
-                id="ferpa-doc-search"
                 type="text"
-                className="pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 w-64"
+                placeholder="Search documents..."
+                className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 w-64"
               />
             </div>
           </div>
@@ -143,20 +145,17 @@ export default async function FerpaDocumentationPage() {
         {Object.keys(groupedDocs).length > 0 ? (
           <div className="space-y-8">
             {Object.entries(groupedDocs).map(([type, docs]) => (
-              <div key={type} className="bg-white rounded-xl shadow-sm border border-slate-200">
-                <div className="px-6 py-4 border-b border-slate-200 flex items-center gap-3">
+              <div key={type} className="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-3">
                   <FolderOpen className="w-5 h-5 text-brand-blue-600" />
                   <h2 className="text-lg font-semibold text-slate-900">
                     {DOCUMENT_TYPE_LABELS[type] || type}
                   </h2>
                   <span className="text-sm text-slate-700">({docs.length})</span>
                 </div>
-                <div className="divide-y divide-slate-200">
+                <div className="divide-y divide-gray-200">
                   {docs.map((doc) => (
-                    <div
-                      key={doc.id}
-                      className="px-6 py-4 flex items-center justify-between hover:bg-white"
-                    >
+                    <div key={doc.id} className="px-6 py-4 flex items-center justify-between hover:bg-white">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                           <FileText className="w-5 h-5 text-slate-700" />
@@ -189,18 +188,18 @@ export default async function FerpaDocumentationPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <FileText className="w-12 h-12 text-slate-700 mx-auto mb-4" />
             <p className="text-slate-700">No documents available</p>
           </div>
         )}
 
         {/* External Resources */}
-        <div className="mt-8 bg-white rounded-xl shadow-sm border border-slate-200">
-          <div className="px-6 py-4 border-b border-slate-200">
+        <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-slate-900">External Resources</h2>
           </div>
-          <div className="divide-y divide-slate-200">
+          <div className="divide-y divide-gray-200">
             {externalResources.map((resource, index) => (
               <a
                 key={index}

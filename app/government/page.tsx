@@ -51,7 +51,7 @@ export default async function GovernmentPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
           <LazyVideo
             src={VIDEO_HEROES.homepage}
-            poster="/images/pages/employer-hero.webp"
+            poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-hero.webp"
             className="absolute inset-0 w-full h-full object-cover pointer-events-none"
           />
         </div>
@@ -134,11 +134,11 @@ export default async function GovernmentPage() {
               <div className="relative h-48 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
                 <Image
-                  src="/images/pages/workforce-board.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-board.webp"
                   alt="Workforce Development Boards"
                   fill
                   className="object-cover"
-                  sizes="100vw" placeholder="empty"
+                  sizes="100vw" 
                 />
               </div>
               <div className="p-8">
@@ -173,11 +173,11 @@ export default async function GovernmentPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
               <div className="relative h-48 overflow-hidden">
                 <Image
-                  src="/images/pages/government-2.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-2.webp"
                   alt="State Agencies"
                   fill
                   className="object-cover"
-                  sizes="100vw" placeholder="empty"
+                  sizes="100vw" 
                 />
               </div>
               <div className="p-8">
@@ -210,11 +210,11 @@ export default async function GovernmentPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
               <div className="relative h-48 overflow-hidden">
                 <Image
-                  src="/images/pages/federal-funded.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/federal-funded.webp"
                   alt="Federal Programs"
                   fill
                   className="object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
                 />
               </div>
               <div className="p-8">
@@ -271,11 +271,11 @@ export default async function GovernmentPage() {
                 <div className="flex items-start gap-4">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/pages/admin-cafeteria-hero.webp"
+                      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-cafeteria-hero.webp"
                       alt="ETPL Training"
                       fill
                       className="object-cover"
-                      sizes="100vw" placeholder="empty"
+                      sizes="100vw" 
                     />
                   </div>
                   <div>
@@ -293,11 +293,11 @@ export default async function GovernmentPage() {
                 <div className="flex items-start gap-4">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/pages/apprenticeship.webp"
+                      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeship.webp"
                       alt="Apprenticeships"
                       fill
                       className="object-cover"
-                      sizes="100vw" placeholder="empty"
+                      sizes="100vw" 
                     />
                   </div>
                   <div>
@@ -313,11 +313,11 @@ export default async function GovernmentPage() {
                 <div className="flex items-start gap-4">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/pages/career-services.jpg"
+                      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services.jpg"
                       alt="Career Services"
                       fill
                       className="object-cover"
-                      sizes="100vw" placeholder="empty"
+                      sizes="100vw" 
                     />
                   </div>
                   <div>
@@ -335,11 +335,11 @@ export default async function GovernmentPage() {
                 <div className="flex items-start gap-4">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="/images/pages/admin-compliance-audit-hero.jpg"
+                      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-compliance-audit-hero.jpg"
                       alt="Compliance"
                       fill
                       className="object-cover"
-                      sizes="100vw" placeholder="empty"
+                      sizes="100vw" 
                     />
                   </div>
                   <div>
@@ -357,11 +357,11 @@ export default async function GovernmentPage() {
             <div className="space-y-6">
               <div className="relative h-64 rounded-2xl overflow-hidden">
                 <Image
-                  src="/images/pages/government-1.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-1.webp"
                   alt="DOL Program"
                   fill
                   className="object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
                 />
               </div>
               <div className="bg-white rounded-2xl p-8">
@@ -431,11 +431,11 @@ export default async function GovernmentPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
               <div className="relative h-40 overflow-hidden">
                 <Image
-                  src="/images/pages/government-page-1.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-page-1.webp"
                   alt="Proven Results"
                   fill
                   className="object-cover"
-                  sizes="100vw" placeholder="empty"
+                  sizes="100vw" 
                 />
               </div>
               <div className="p-6 text-center">
@@ -453,11 +453,11 @@ export default async function GovernmentPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
               <div className="relative h-40 overflow-hidden">
                 <Image
-                  src="/images/pages/government-3.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-3.webp"
                   alt="Priority Populations"
                   fill
                   className="object-cover"
-                  sizes="100vw" placeholder="empty"
+                  sizes="100vw" 
                 />
               </div>
               <div className="p-6 text-center">
@@ -475,11 +475,11 @@ export default async function GovernmentPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
               <div className="relative h-40 overflow-hidden">
                 <Image
-                  src="/images/pages/government-4.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-4.webp"
                   alt="Employer Partnerships"
                   fill
                   className="object-cover"
-                  sizes="100vw" placeholder="empty"
+                  sizes="100vw" 
                 />
               </div>
               <div className="p-6 text-center">
@@ -497,11 +497,11 @@ export default async function GovernmentPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
               <div className="relative h-40 overflow-hidden">
                 <Image
-                  src="/images/pages/government-5.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-5.webp"
                   alt="Transparent Reporting"
                   fill
                   className="object-cover"
-                  sizes="100vw" placeholder="empty"
+                  sizes="100vw" 
                 />
               </div>
               <div className="p-6 text-center">
@@ -538,49 +538,49 @@ export default async function GovernmentPage() {
                 name: 'WIOA Title I',
                 desc: 'Covers tuition, books, and support services for eligible adults, dislocated workers, and youth ages 16–24.',
                 icon: FileText,
-                image: '/images/pages/card-wioa.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/card-wioa.webp',
               },
               {
                 name: 'Workforce Ready Grant',
                 desc: 'Indiana state grant for high-demand certifications. Covers tuition and fees for eligible Indiana residents.',
                 icon: Award,
-                image: '/images/pages/funding-impact-1.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-impact-1.webp',
               },
               {
-                name: 'SNAP E&T',
+                name: '',
                 desc: 'Employment and Training funding for SNAP recipients pursuing job-ready credentials.',
                 icon: Users,
-                image: '/images/pages/funding-impact-2.jpg',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-impact-2.jpg',
               },
               {
                 name: 'TANF',
                 desc: 'Temporary Assistance for Needy Families — supports training for participants moving toward self-sufficiency.',
                 icon: Shield,
-                image: '/images/pages/government-3.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-3.webp',
               },
               {
                 name: 'Trade Adjustment Assistance',
                 desc: 'Federal funding for workers displaced by foreign trade. Covers retraining in high-demand fields.',
                 icon: Briefcase,
-                image: '/images/pages/government-4.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-4.webp',
               },
               {
                 name: 'Veterans Programs',
                 desc: 'GI Bill and VR&E approved programs for veterans and service members transitioning to civilian careers.',
                 icon: Award,
-                image: '/images/pages/government-5.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-5.webp',
               },
               {
                 name: 'Reentry Programs',
                 desc: 'Second chance training through Job Ready Indy and other reentry-focused funding for justice-involved individuals.',
                 icon: Users,
-                image: '/images/pages/community-page-1.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/community-page-1.webp',
               },
               {
                 name: 'Registered Apprenticeship',
                 desc: 'DOL-registered earn-and-learn programs with structured OJT and related instruction leading to journey-level credentials.',
                 icon: Building2,
-                image: '/images/pages/apprenticeship-hero.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeship-hero.webp',
               },
             ].map((item) => {
               const IconComponent = item.icon;
@@ -595,7 +595,7 @@ export default async function GovernmentPage() {
                       alt={item.name}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" placeholder="empty"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" 
                     />
                   </div>
                   <div className="p-5 flex flex-col flex-1">

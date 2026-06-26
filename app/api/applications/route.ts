@@ -142,7 +142,7 @@ async function claimIdempotencyKey(
     return { duplicate: true, samePayload };
   } catch (error) {
     logger.warn('[api/applications] idempotency check unavailable; continuing', {
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Application processing failed',
     });
     return { duplicate: false, samePayload: false };
   }
@@ -566,7 +566,7 @@ async function _POST(req: Request) {
           .eq('id', data.id);
         if (linkError) {
           logger.warn('[Applications] Failed to link user_id', {
-            error: linkError.message,
+            error: 'Internal server error',
             applicationId: data.id,
             userId,
           });
@@ -613,7 +613,7 @@ async function _POST(req: Request) {
       const fundingLabel: Record<string, string> = {
         wioa: 'WIOA (Workforce Innovation and Opportunity Act)',
         wrg: 'Workforce Ready Grant / Next Level Jobs',
-        fssa: 'FSSA IMPACT',
+        fssa: '',
       };
       const fundingName = fundingType ? fundingLabel[fundingType] || fundingType : null;
 

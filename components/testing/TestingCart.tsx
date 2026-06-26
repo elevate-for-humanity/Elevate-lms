@@ -1,272 +1,112 @@
 'use client';
 
-/**
- * Testing cart — lets users add multiple exams before checking out.
- *
- * Usage:
- *   1. Wrap the provider page in <TestingCartProvider>.
- *   2. Replace each "Pay for Test" link with <AddExamToCartButton>.
- *   3. <TestingCartBar> renders the sticky bottom bar automatically.
- */
+import React, { useState } from 'react';
+import { ShoppingCart, X, Plus, Minus, Loader2, CreditCard } from 'lucide-react';
+import { useCart } from '@/lib/store/use-cart';
+import { handleTestingCheckout } from '@/lib/store/actions';
 
+<<<<<<< HEAD
+export default function TestingCart() {
+  const { items, removeItem, updateQuantity, total, clearCart } = useCart();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+=======
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { ShoppingCart, X, Trash2, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+>>>>>>> origin/main
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+  const handleCheckout = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { url } = await handleTestingCheckout(items);
+      if (url) window.location.href = url;
+    } catch (err) {
+      setError('Checkout failed. Please try again.');
+      setLoading(false);
+    }
+  };
 
-export interface CartItem {
-  /** Provider key, e.g. 'nha', 'esco' */
-  examType: string;
-  /** Display name, e.g. 'Certified Phlebotomy Technician (CPT)' */
-  examName: string;
-  /** Price in cents */
-  amountCents: number;
-}
-
-interface CartContextValue {
-  items: CartItem[];
-  add: (item: CartItem) => void;
-  remove: (examName: string) => void;
-  clear: () => void;
-  has: (examName: string) => boolean;
-}
-
-// ─── Context ──────────────────────────────────────────────────────────────────
-
-const CartContext = createContext<CartContextValue | null>(null);
-
-export function useTestingCart(): CartContextValue {
-  const ctx = useContext(CartContext);
-  if (!ctx) throw new Error('useTestingCart must be used inside TestingCartProvider');
-  return ctx;
-}
-
-// ─── Provider ─────────────────────────────────────────────────────────────────
-
-export function TestingCartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-
-  const add = useCallback((item: CartItem) => {
-    setItems((prev) => {
-      if (prev.some((i) => i.examName === item.examName)) return prev;
-      return [...prev, item];
-    });
-  }, []);
-
-  const remove = useCallback((examName: string) => {
-    setItems((prev) => prev.filter((i) => i.examName !== examName));
-  }, []);
-
-  const clear = useCallback(() => setItems([]), []);
-
-  const has = useCallback(
-    (examName: string) => items.some((i) => i.examName === examName),
-    [items],
-  );
-
-  return (
-    <CartContext.Provider value={{ items, add, remove, clear, has }}>
-      {children}
-      <TestingCartBar />
-    </CartContext.Provider>
-  );
-}
-
-// ─── Add-to-cart button ───────────────────────────────────────────────────────
-
-interface AddExamToCartButtonProps {
-  examType: string;
-  examName: string;
-  amountCents: number;
-  /** Whether the provider is active (inactive providers show a disabled state) */
-  active?: boolean;
-}
-
-export function AddExamToCartButton({
-  examType,
-  examName,
-  amountCents,
-  active = true,
-}: AddExamToCartButtonProps) {
-  const { add, remove, has } = useTestingCart();
-  const inCart = has(examName);
-
-  if (!active) return null;
-
-  if (inCart) {
+  if (items.length === 0) {
     return (
-      <button
-        onClick={() => remove(examName)}
-        className="inline-flex items-center gap-1 bg-brand-green-50 border border-brand-green-300 text-brand-green-700 hover:bg-red-50 hover:border-red-300 hover:text-red-700 text-xs font-semibold px-2.5 py-1 rounded-md whitespace-nowrap transition-colors group"
-        title="Remove from cart"
-      >
-        <span className="group-hover:hidden">✓ In Cart</span>
-        <span className="hidden group-hover:inline">Remove</span>
-      </button>
+      <div className="bg-[#111114] border border-white/5 rounded-2xl p-8 text-center">
+        <ShoppingCart className="w-12 h-12 text-slate-700 mx-auto mb-4" />
+        <p className="text-slate-400">Your cart is empty.</p>
+      </div>
     );
   }
 
   return (
-    <button
-      onClick={() => add({ examType, examName, amountCents })}
-      className="inline-flex items-center gap-1 border border-brand-red-300 text-brand-red-700 hover:bg-brand-red-50 hover:border-brand-red-400 text-xs font-semibold px-2.5 py-1 rounded-md whitespace-nowrap transition-colors"
-    >
-      <ShoppingCart className="w-3 h-3" />
-      Add to Cart
-    </button>
-  );
-}
+    <div className="bg-[#111114] border border-white/5 rounded-2xl overflow-hidden flex flex-col h-full max-h-[600px]">
+      <div className="p-4 border-b border-white/5 flex items-center justify-between bg-white/5">
+        <h3 className="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wider">
+          <ShoppingCart className="w-4 h-4" />
+          Test Checkout
+        </h3>
+        <button onClick={clearCart} className="text-[10px] text-slate-500 hover:text-white uppercase font-bold">
+          Clear All
+        </button>
+      </div>
 
-// ─── Cart bar (sticky bottom) ─────────────────────────────────────────────────
-
-function TestingCartBar() {
-  const { items, remove, clear } = useTestingCart();
-  const [expanded, setExpanded] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Collapse when cart empties
-  useEffect(() => {
-    if (items.length === 0) setExpanded(false);
-  }, [items.length]);
-
-  if (items.length === 0) return null;
-
-  const totalCents = items.reduce((sum, i) => sum + i.amountCents, 0);
-  const totalDollars = (totalCents / 100).toFixed(2);
-
-  async function handleCheckout() {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // For multi-item carts, check out the first item and pass the rest as
-      // metadata. The checkout API currently handles one line item — we send
-      // the full list as a JSON metadata field so the webhook can record all
-      // exams on the booking.
-      const primary = items[0];
-
-      const res = await fetch('/api/testing/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          examType: primary.examType,
-          examName:
-            items.length === 1
-              ? primary.examName
-              : `${items.length} Exams — ${items.map((i) => i.examName).join(', ')}`,
-          feeCents: totalCents,
-          bookingType: 'individual',
-          participantCount: 1,
-          cartItems: items,
-        }),
-      });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error ?? `Checkout failed (${res.status})`);
-      }
-
-      const { url } = await res.json();
-      if (!url) throw new Error('No checkout URL returned');
-
-      window.location.href = url;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Checkout failed — please try again.');
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 shadow-2xl">
-      {/* Expanded item list */}
-      {expanded && (
-        <div className="bg-white border-t border-slate-200 max-h-64 overflow-y-auto">
-          <div className="max-w-3xl mx-auto px-4 py-3 space-y-2">
-            {items.map((item) => (
-              <div
-                key={item.examName}
-                className="flex items-center justify-between gap-3 py-2 border-b border-slate-100 last:border-0"
-              >
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-slate-900 truncate">{item.examName}</p>
-                  <p className="text-xs text-slate-500">${(item.amountCents / 100).toFixed(2)}</p>
-                </div>
-                <button
-                  onClick={() => remove(item.examName)}
-                  className="flex-shrink-0 p-1 text-slate-400 hover:text-red-600 transition-colors"
-                  title="Remove"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Main bar */}
-      <div className="bg-slate-900 text-white">
-        <div className="max-w-3xl mx-auto px-3 sm:px-4 py-3 flex items-center gap-2 sm:gap-3">
-          {/* Toggle expand */}
-          <button
-            onClick={() => setExpanded((v) => !v)}
-            className="flex items-center gap-2 flex-1 min-w-0 text-left"
-          >
-            <div className="relative flex-shrink-0">
-              <ShoppingCart className="w-5 h-5 text-white" />
-              <span className="absolute -top-1.5 -right-1.5 bg-brand-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
-                {items.length}
-              </span>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {items.map((item) => (
+          <div key={item.id} className="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5">
+            <div className="flex-1 min-w-0">
+              <h4 className="text-sm font-bold text-white truncate">{item.name}</h4>
+              <p className="text-xs text-slate-500">${item.price}</p>
             </div>
-            <span className="text-sm font-medium truncate hidden sm:block">
-              {items.length === 1 ? items[0].examName : `${items.length} exams selected`}
-            </span>
-            <span className="text-sm font-medium truncate sm:hidden">
-              {items.length} exam{items.length !== 1 ? 's' : ''}
-            </span>
-            {expanded ? (
-              <ChevronDown className="w-4 h-4 flex-shrink-0 text-slate-400" />
-            ) : (
-              <ChevronUp className="w-4 h-4 flex-shrink-0 text-slate-400" />
-            )}
-          </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                className="w-6 h-6 rounded bg-white/10 flex items-center justify-center hover:bg-white/20"
+              >
+                <Minus className="w-3 h-3 text-white" />
+              </button>
+              <span className="text-sm font-bold text-white min-w-[20px] text-center">{item.quantity}</span>
+              <button
+                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                className="w-6 h-6 rounded bg-white/10 flex items-center justify-center hover:bg-white/20"
+              >
+                <Plus className="w-3 h-3 text-white" />
+              </button>
+              <button
+                onClick={() => removeItem(item.id)}
+                className="ml-2 text-slate-500 hover:text-brand-red-500"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
 
-          {/* Total */}
-          <span className="text-base sm:text-lg font-extrabold flex-shrink-0">${totalDollars}</span>
-
-          {/* Clear */}
-          <button
-            onClick={clear}
-            className="flex-shrink-0 p-1.5 text-slate-400 hover:text-white transition-colors"
-            title="Clear cart"
-          >
-            <X className="w-4 h-4" />
-          </button>
-
-          {/* Checkout */}
-          <button
-            onClick={handleCheckout}
-            disabled={loading}
-            className="flex-shrink-0 flex items-center gap-1.5 bg-brand-red-600 hover:bg-brand-red-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold px-3 sm:px-5 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="hidden sm:inline">Processing…</span>
-              </>
-            ) : (
-              <>
-                <span className="hidden sm:inline">Pay & Book</span>
-                <span className="sm:hidden">Pay</span>
-              </>
-            )}
-          </button>
+      <div className="p-4 bg-white/5 border-t border-white/5">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-slate-400 text-sm">Total</span>
+          <span className="text-xl font-black text-white">${total.toFixed(2)}</span>
         </div>
+        
+        <button
+          onClick={handleCheckout}
+          disabled={loading}
+          className="w-full bg-brand-red-600 hover:bg-brand-red-700 disabled:opacity-50 text-white font-black py-3 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 text-sm uppercase tracking-widest"
+        >
+          {loading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <>
+              <CreditCard className="w-5 h-5" />
+              Pay & Initialize
+            </>
+          )}
+        </button>
 
-        {/* Error */}
         {error && (
+<<<<<<< HEAD
+          <p className="mt-3 text-xs text-red-400 text-center font-medium">{error}</p>
+=======
           <div className="bg-red-900/80 px-4 py-2 text-red-200 text-xs text-center">{error}</div>
+>>>>>>> origin/main
         )}
       </div>
     </div>

@@ -24,7 +24,7 @@ export function getRedisClient(): Redis | null {
 }
 
 // Rate limit configurations
-const RATE_LIMITS = {
+export const RATE_LIMITS = {
   auth: { requests: 5, window: '1 m' }, // 5 requests per minute
   payment: { requests: 10, window: '1 m' }, // 10 requests per minute
   contact: { requests: 3, window: '1 m' }, // 3 requests per minute
@@ -36,19 +36,49 @@ const RATE_LIMITS = {
   licenseValidate: { requests: 20, window: '1 m' }, // 20 validations per minute
 } as const;
 
+// Fallback in-memory rate limiter for when Redis is unavailable
+const inMemoryRateLimiters = new Map<string, { count: number; resetAt: number }>();
+
+export function checkInMemoryRateLimit(key: string, limit: number, windowMs: number): boolean {
+  const now = Date.now();
+  const entry = inMemoryRateLimiters.get(key);
+  
+  if (!entry || now > entry.resetAt) {
+    inMemoryRateLimiters.set(key, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  
+  if (entry.count >= limit) {
+    return false;
+  }
+  
+  entry.count++;
+  return true;
+}
+
 // Create rate limiters lazily
 function createRateLimiter(
   config: { requests: number; window: string },
   prefix: string,
 ): Ratelimit | null {
-  const r = getRedis();
-  if (!r) return null;
-  return new Ratelimit({
-    redis: r,
-    limiter: Ratelimit.slidingWindow(config.requests, config.window as any),
-    analytics: true,
-    prefix,
-  });
+  try {
+    const r = getRedis();
+    if (!r) return null;
+    
+    // Use fixed window for simpler, more reliable rate limiting
+    return new Ratelimit({
+      redis: r,
+      limiter: Ratelimit.fixedWindow(config.requests, config.window),
+      analytics: false,
+      prefix,
+    });
+  } catch (err) {
+    // Log and return null - callers will use in-memory fallback
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('[rate-limit] Failed to create limiter:', err);
+    }
+    return null;
+  }
 }
 
 // Lazy getters for rate limiters

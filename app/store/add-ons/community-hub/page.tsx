@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 
 import { Metadata } from 'next';
@@ -21,32 +21,32 @@ const features = [
   {
     title: 'Discussion Forums',
     description: 'Categorized forums for Q&A, announcements, and peer discussions. Students help each other, instructors post updates, and cohorts stay connected between sessions.',
-    image: '/images/pages/about-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partners-hero.webp',
   },
   {
     title: 'Member Groups',
     description: 'Create cohorts, study groups, and networking circles. Organize members by program, graduation year, or interest area with private group spaces.',
-    image: '/images/pages/about-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partners-hero.webp',
   },
   {
     title: 'Leaderboards',
     description: 'Gamified rankings to drive engagement and healthy competition. Track participation, course completion, and community contributions with visible rankings.',
-    image: '/images/pages/about-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partners-hero.webp',
   },
   {
     title: 'Points & Badges',
     description: 'Reward participation with points, badges, and achievements. Configurable point values for posts, replies, course completions, and event attendance.',
-    image: '/images/pages/about-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partners-hero.webp',
   },
   {
     title: 'Events Calendar',
     description: 'Schedule events, webinars, and meetups with RSVP tracking. Integrated with Zoom for virtual events and Google Calendar for reminders.',
-    image: '/images/pages/about-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partners-hero.webp',
   },
   {
     title: 'Analytics Dashboard',
     description: 'Real-time activity feed and engagement metrics. Track active members, post frequency, response times, and identify at-risk students before they disengage.',
-    image: '/images/pages/about-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partners-hero.webp',
   },
 ];
 
@@ -163,7 +163,7 @@ export default function CommunityHubPage() {
                     alt={feature.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" 
                   />
                   <div className="absolute bottom-3 left-4">
                     <h3 className="text-lg font-bold text-white">{feature.title}</h3>

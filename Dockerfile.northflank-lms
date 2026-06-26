@@ -3,6 +3,10 @@
 
 FROM node:22-bookworm AS builder
 
+# Cache invalidation marker
+# P0-3: Increased memory to 12GB for 1,600+ page static generation
+RUN echo "nf-cache-invalidate-20260625-p0-3-memory-fix"
+
 # Install system deps for native modules (sharp, canvas, pdf)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -16,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
 
 ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -32,14 +36,17 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# P0-3: 12GB heap for build with 1,600+ pages
 ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=1
 ENV CI=true
-# DISABLE_WEBPACK_FILESYSTEM_CACHE removed - caching now enabled for faster rebuilds
+# Webpack cache enabled for faster incremental builds
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+# Using --no-frozen-lockfile because lockfile may not match overrides in CI
+RUN pnpm install --no-frozen-lockfile
 
 # Build Next.js
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
@@ -51,7 +58,8 @@ ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-RUN pnpm next build --no-lint
+# P0-3: 12GB memory for large app builds
+RUN pnpm build:lms:compile
 
 # --- runtime stage ---
 FROM node:22-bookworm-slim
@@ -66,6 +74,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=8080
+# Runtime memory limit (4GB - leaving room for OS/native modules)
+ENV NODE_OPTIONS=--max-old-space-size=4096
 
 WORKDIR /app
 
@@ -83,4 +93,4 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
 
-CMD ["node", "--max-http-header-size=32768", "server.js"]
+CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "server.js"]

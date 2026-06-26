@@ -28,7 +28,7 @@ function extractHours(row: any): number {
 }
 
 export default async function EmployerApprenticesPage() {
-  const { user } = await requireRole(['employer', 'admin', 'super_admin']);
+  const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
 
   const { data: programs } = await supabase

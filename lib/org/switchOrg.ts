@@ -4,7 +4,7 @@ import { logAuditEvent } from '@/lib/audit';
 
 /**
  * Switch user's active organization
- * Only for super_admin or users with multiple org memberships
+ * Only for admin or users with multiple org memberships
  */
 export async function switchOrg(
   supabase: SupabaseClient,

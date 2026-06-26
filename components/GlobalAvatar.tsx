@@ -25,7 +25,7 @@ const avatarConfig: { pattern: RegExp; video: string; name: string }[] = [
     video: '/videos/avatars/financial-guide.mp4',
     name: 'Reports Guide',
   },
-  { pattern: /^\/student-portal/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Student Guide' },
+  { pattern: /^\/learner\/dashboard/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Student Guide' },
   { pattern: /^\/student/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Student Guide' },
   { pattern: /^\/instructor/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Instructor Guide' },
   {
@@ -139,7 +139,7 @@ export default function GlobalAvatar() {
     !pathname.startsWith('/admin') &&
     !pathname.startsWith('/lms') &&
     !pathname.startsWith('/learner') &&
-    !pathname.startsWith('/student-portal') &&
+    !pathname.startsWith('/learner/dashboard') &&
     !pathname.startsWith('/admin/instructor') &&
     !pathname.startsWith('/admin/staff-portal') &&
     !pathname.startsWith('/partner/dashboard') &&

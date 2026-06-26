@@ -2,8 +2,8 @@
 /**
  * Trigger a Northflank combined-service build from the current git branch.
  *
- *   pnpm tsx scripts/northflank/trigger-build.ts elevate-lms
- *   pnpm tsx scripts/northflank/trigger-build.ts elevate-admin
+ *   npx tsx scripts/northflank/trigger-build.ts elevate-lms
+ *   npx tsx scripts/northflank/trigger-build.ts elevate-admin
  */
 
 import fs from 'node:fs';
@@ -12,7 +12,7 @@ import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 async function main() {
   const serviceId = process.argv[2];
   if (!serviceId) {
-    console.error('Usage: pnpm tsx scripts/northflank/trigger-build.ts <service-id>');
+    console.error('Usage: npx tsx scripts/northflank/trigger-build.ts <service-id>');
     process.exit(1);
   }
   const projectId = resolveProjectId();

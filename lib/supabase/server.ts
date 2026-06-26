@@ -178,6 +178,19 @@ export function createPublicClient(): SupabaseClient<any> {
   }
 }
 
+/**
+ * Safely extract user from Supabase auth response.
+ * Prevents "Cannot read properties of null (reading 'id')" crash when data is null.
+ * 
+ * OLD (dangerous): const { data: { user } } = await supabase.auth.getUser();
+ * NEW (safe):       const user = safeGetUser(await supabase.auth.getUser());
+ */
+export function safeGetUser<T extends { user?: { id: string; email?: string | null } | null }>(
+  authRes: T
+): T['user'] extends undefined ? { id: string } | null : T['user'] {
+  return authRes.data?.user ?? null;
+}
+
 // createAdminClient was previously re-exported here for backward compatibility.
 // All call sites have been migrated to import requireAdminClient() directly from
 // '@/lib/supabase/admin'. This re-export is intentionally removed to prevent

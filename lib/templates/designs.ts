@@ -61,7 +61,7 @@ export const TEMPLATE_DESIGNS: TemplateDesign[] = [
     name: 'Modern Tech',
     description:
       'Clean, minimal design with subtle gradients. Perfect for tech-forward training providers.',
-    preview: '/templates/modern-tech.jpg',
+    preview: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     fonts: {
       heading: 'Inter',
       body: 'Inter',
@@ -105,7 +105,7 @@ export const TEMPLATE_DESIGNS: TemplateDesign[] = [
     id: 'professional',
     name: 'Professional',
     description: 'Trustworthy and established. Ideal for workforce boards and government programs.',
-    preview: '/templates/professional.jpg',
+    preview: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     fonts: {
       heading: 'Playfair Display',
       body: 'Source Sans 3',
@@ -149,7 +149,7 @@ export const TEMPLATE_DESIGNS: TemplateDesign[] = [
     name: 'Bold Energy',
     description:
       'High-contrast, energetic design. Great for youth programs and creative industries.',
-    preview: '/templates/bold-energy.jpg',
+    preview: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     fonts: {
       heading: 'Space Grotesk',
       body: 'DM Sans',
@@ -192,7 +192,7 @@ export const TEMPLATE_DESIGNS: TemplateDesign[] = [
     id: 'warm-community',
     name: 'Warm Community',
     description: 'Friendly and approachable. Perfect for nonprofits and community organizations.',
-    preview: '/templates/warm-community.jpg',
+    preview: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     fonts: {
       heading: 'Nunito',
       body: 'Nunito',
@@ -235,7 +235,7 @@ export const TEMPLATE_DESIGNS: TemplateDesign[] = [
     id: 'industrial',
     name: 'Industrial',
     description: 'Rugged and practical. Built for trade schools and vocational training.',
-    preview: '/templates/industrial.jpg',
+    preview: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     fonts: {
       heading: 'Oswald',
       body: 'Roboto',
@@ -279,7 +279,7 @@ export const TEMPLATE_DESIGNS: TemplateDesign[] = [
     id: 'healthcare',
     name: 'Healthcare',
     description: 'Clean and trustworthy. Designed for medical and healthcare training.',
-    preview: '/templates/healthcare.jpg',
+    preview: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     fonts: {
       heading: 'Plus Jakarta Sans',
       body: 'Plus Jakarta Sans',
@@ -322,7 +322,7 @@ export const TEMPLATE_DESIGNS: TemplateDesign[] = [
     id: 'academic',
     name: 'Academic',
     description: 'Traditional and scholarly. Suited for universities and certification programs.',
-    preview: '/templates/academic.jpg',
+    preview: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     fonts: {
       heading: 'Merriweather',
       body: 'Lato',
@@ -365,7 +365,7 @@ export const TEMPLATE_DESIGNS: TemplateDesign[] = [
     id: 'startup',
     name: 'Startup Fresh',
     description: 'Modern gradients and glass effects. Perfect for innovative training startups.',
-    preview: '/templates/startup.jpg',
+    preview: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     fonts: {
       heading: 'Outfit',
       body: 'Outfit',

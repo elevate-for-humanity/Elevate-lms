@@ -31,37 +31,37 @@ const FEATURES = [
     icon: Eye,
     title: 'Monitor Progress',
     desc: 'View lesson completion, quiz scores, and credential milestones in real time.',
-    image: '/images/pages/student-portal-page-2.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/learner-page-1.webp',
   },
   {
     icon: Calendar,
     title: 'Track Attendance',
     desc: 'See daily attendance records and receive alerts for absences or tardiness.',
-    image: '/images/pages/student-portal-page-3.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/learner-page-1.webp',
   },
   {
     icon: MessageSquare,
     title: 'Message Instructors',
     desc: "Send and receive messages directly with your student's instructors and advisors.",
-    image: '/images/pages/student-portal-page-4.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/student-catalog.webp',
   },
   {
     icon: Bell,
     title: 'Notifications',
     desc: 'Get alerts for grades, attendance events, upcoming exams, and program announcements.',
-    image: '/images/pages/student-portal-page-5.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/learner-page-1.webp',
   },
   {
     icon: BarChart3,
     title: 'Progress Reports',
     desc: 'Download detailed progress and performance reports at any time.',
-    image: '/images/pages/student-portal-page-6.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/learner-page-1.webp',
   },
   {
     icon: Shield,
     title: 'Secure & Private',
     desc: "FERPA-compliant access. Your student's data is protected and never shared.",
-    image: '/images/pages/student-portal-page-7.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/learner-page-1.webp',
   },
 ];
 
@@ -108,12 +108,12 @@ export default async function ParentPortalPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/images/pages/about-career-training.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp"
             alt="Parent and guardian portal"
             fill
             className="object-cover object-center"
             priority
-            sizes="100vw" placeholder="empty"
+            sizes="100vw" 
           />
         </div>
         <div className="bg-white border-t py-10 text-center px-4">
@@ -200,7 +200,7 @@ export default async function ParentPortalPage() {
                       alt={f.title}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 640px) 100vw, 33vw" placeholder="empty"
+                      sizes="(max-width: 640px) 100vw, 33vw" 
                     />
                     <div className="absolute top-3 left-3 w-9 h-9 rounded-full bg-white/90 flex items-center justify-center shadow">
                       <Icon className="w-4 h-4 text-brand-blue-600" />
@@ -258,11 +258,11 @@ export default async function ParentPortalPage() {
             </div>
             <div className="relative h-72 rounded-2xl overflow-hidden">
               <Image
-                src="/images/pages/about-supportive-services.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-supportive-services.webp"
                 alt="Supportive services for students and families"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty"
+                sizes="(max-width: 768px) 100vw, 50vw" 
               />
             </div>
           </div>

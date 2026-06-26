@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 /**
- * FSSA IMPACT application — archived.
+ *  application — archived.
  *
  * FSSA-funded enrollment is handled through WorkOne case managers.
  * Direct online applications are not accepted. Students with FSSA/TANF

@@ -165,7 +165,7 @@ async function _POST(req: Request) {
       const { data: admins } = await db
         .from('profiles')
         .select('id')
-        .in('role', ['admin', 'super_admin']);
+        .in('role', ['admin']);
 
       if (admins && admins.length > 0) {
         const notifications = admins.map((admin) => ({

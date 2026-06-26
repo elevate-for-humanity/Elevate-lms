@@ -1,4 +1,4 @@
-import AdminLoginForm from './LoginForm';
+import AdminLoginForm from '@/apps/admin/app/login/LoginForm';
 
 export const metadata = {
   title: 'Sign In — Elevate Admin',

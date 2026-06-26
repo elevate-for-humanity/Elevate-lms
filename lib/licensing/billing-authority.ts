@@ -403,7 +403,7 @@ export type AccessMode =
   | 'blocked_billing_issue'; // Subscription billing problem
 
 // Roles that get admin-level access during billing hold
-const ADMIN_ROLES = new Set(['super_admin', 'platform_operator', 'admin', 'org_admin', 'executive']);
+const ADMIN_ROLES = new Set(['admin', 'org_admin', 'executive']);
 
 export function isAdminRole(role: string | null | undefined): boolean {
   return !!role && ADMIN_ROLES.has(role);

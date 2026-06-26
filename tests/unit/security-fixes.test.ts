@@ -324,8 +324,8 @@ describe('Authentication Requirements', () => {
   });
 
   describe('Simulation Endpoint', () => {
-    it('should require super_admin role', () => {
-      // POST /api/simulate-user-journey requires super_admin
+    it('should require admin role', () => {
+      // POST /api/simulate-user-journey requires admin
       const requiresSuperAdmin = true;
       expect(requiresSuperAdmin).toBe(true);
     });

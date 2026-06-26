@@ -91,8 +91,12 @@ function ComplianceFlag({ ok, label }: { ok: boolean; label: string }) {
 export default async function BarberShopApplicationsPage() {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user?.id) { redirect('/login'); }
+  const user = safeGetUser(await supabase.auth.getUser());
+
+  if (!user) {
+    redirect('/login');
+  }
+
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -100,7 +104,7 @@ export default async function BarberShopApplicationsPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) redirect('/');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/');
 
   const { data: applications, error } = await supabase
     .from('barbershop_partner_applications')

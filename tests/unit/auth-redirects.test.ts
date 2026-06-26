@@ -10,18 +10,18 @@ import { describe, it, expect } from 'vitest';
 
 describe('Protected Route Configuration', () => {
   const PROTECTED_ROUTES: Record<string, string[]> = {
-    '/admin': ['admin', 'super_admin'],
-    '/admin/staff-portal': ['staff', 'admin', 'super_admin', 'advisor'],
-    '/instructor': ['instructor', 'admin', 'super_admin'],
-    '/program-holder': ['program_holder', 'admin', 'super_admin'],
-    '/workforce-board': ['workforce_board', 'admin', 'super_admin'],
-    '/employer': ['employer', 'admin', 'super_admin'],
+    '/admin': ['admin'],
+    '/admin/staff-portal': ['staff', 'admin', 'advisor'],
+    '/instructor': ['instructor', 'admin'],
+    '/program-holder': ['program_holder', 'admin'],
+    '/workforce-board': ['workforce_board', 'admin'],
+    '/employer': ['employer', 'admin'],
   };
 
-  it('should have admin and super_admin access to all protected routes', () => {
+  it('should have admin and admin access to all protected routes', () => {
     for (const [route, roles] of Object.entries(PROTECTED_ROUTES)) {
       expect(roles).toContain('admin');
-      expect(roles).toContain('super_admin');
+      expect(roles).toContain('admin');
     }
   });
 

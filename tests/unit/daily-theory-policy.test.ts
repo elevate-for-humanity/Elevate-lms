@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { scorePassesDailyTheory, theoryDateInTimeZone } from '@/lib/beauty-apprenticeship/daily-theory';
-import { DAILY_THEORY_PASSING_SCORE } from '@/lib/beauty-apprenticeship/constants';
+import { scorePassesDailyTheory, theoryDateInTimeZone } from '@/lib/apprenticeship-programs/daily-theory';
+import { DAILY_THEORY_PASSING_SCORE } from '@/lib/apprenticeship-programs/constants';
 
 describe('daily theory policy', () => {
   it('requires 70% to pass', () => {

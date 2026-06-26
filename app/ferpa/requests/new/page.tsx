@@ -5,38 +5,23 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, User, FileText, AlertCircle, Loader2 } from 'lucide-react';
+import {
+  ChevronRight,
+  User,
+  FileText,
+  AlertCircle,
+  Loader2,
+} from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { logger } from '@/lib/logger';
 
 const REQUEST_TYPES = [
-  {
-    value: 'student_access',
-    label: 'Student Access Request',
-    description: 'Student requesting their own records',
-  },
-  {
-    value: 'parent_access',
-    label: 'Parent/Guardian Access',
-    description: 'Parent or guardian requesting student records',
-  },
-  {
-    value: 'third_party',
-    label: 'Third Party Disclosure',
-    description: 'External party requesting student records',
-  },
+  { value: 'student_access', label: 'Student Access Request', description: 'Student requesting their own records' },
+  { value: 'parent_access', label: 'Parent/Guardian Access', description: 'Parent or guardian requesting student records' },
+  { value: 'third_party', label: 'Third Party Disclosure', description: 'External party requesting student records' },
   { value: 'transcript', label: 'Transcript Request', description: 'Official transcript request' },
-  {
-    value: 'verification',
-    label: 'Enrollment Verification',
-    description: 'Verify enrollment status',
-  },
+  { value: 'verification', label: 'Enrollment Verification', description: 'Verify enrollment status' },
   { value: 'subpoena', label: 'Legal/Subpoena', description: 'Court order or legal request' },
-  {
-    value: 'directory_opt_out',
-    label: 'Directory Opt-Out',
-    description: 'Opt out of directory information',
-  },
+  { value: 'directory_opt_out', label: 'Directory Opt-Out', description: 'Opt out of directory information' },
 ];
 
 const RECORD_TYPES = [
@@ -64,7 +49,7 @@ export default function NewFerpaRequestPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  
   const [formData, setFormData] = useState({
     request_type: '',
     requester_name: '',
@@ -79,11 +64,11 @@ export default function NewFerpaRequestPage() {
   });
 
   const handleRecordToggle = (record: string) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       records_requested: prev.records_requested.includes(record)
-        ? prev.records_requested.filter((r) => r !== record)
-        : [...prev.records_requested, record],
+        ? prev.records_requested.filter(r => r !== record)
+        : [...prev.records_requested, record]
     }));
   };
 
@@ -94,19 +79,19 @@ export default function NewFerpaRequestPage() {
 
     try {
       const supabase = createClient();
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      
+      const user = safeGetUser(await supabase.auth.getUser());
       if (!user) {
         router.push('/login?redirect=/ferpa/requests/new');
         return;
       }
 
-      const { error: insertError } = await supabase.from('ferpa_access_requests').insert({
-        ...formData,
-        requester_id: user.id,
-      });
+      const { error: insertError } = await supabase
+        .from('ferpa_access_requests')
+        .insert({
+          ...formData,
+          requester_id: user.id,
+        });
 
       if (insertError) {
         throw insertError;
@@ -114,7 +99,7 @@ export default function NewFerpaRequestPage() {
 
       router.push('/ferpa/requests?success=created');
     } catch (err) {
-      logger.error('Error creating request:', err);
+      console.error('Error creating request:', err);
       setError('Failed to create request. Please try again.');
     } finally {
       setLoading(false);
@@ -123,38 +108,29 @@ export default function NewFerpaRequestPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
-          src="/images/pages/ferpa-page-10.webp"
-          alt="FERPA compliance"
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority placeholder="empty"
-        />
+        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/ferpa-page-10.webp" alt="FERPA compliance" fill sizes="100vw" className="object-cover" priority />
       </section>
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Ferpa', href: '/ferpa' }, { label: 'New' }]} />
+            <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: "Ferpa", href: "/ferpa" }, { label: "New" }]} />
       </div>
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200">
+{/* Header */}
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <nav className="flex items-center gap-2 text-sm text-slate-700 mb-4">
-            <Link href="/ferpa" className="hover:text-slate-900">
-              FERPA Portal
-            </Link>
+            <Link href="/ferpa" className="hover:text-slate-900">FERPA Portal</Link>
             <ChevronRight className="w-4 h-4" />
-            <Link href="/ferpa/requests" className="hover:text-slate-900">
-              Requests
-            </Link>
+            <Link href="/ferpa/requests" className="hover:text-slate-900">Requests</Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-slate-900 font-medium">New Request</span>
           </nav>
 
           <h1 className="text-2xl font-bold text-slate-900">New Access Request</h1>
-          <p className="text-slate-700 mt-1">Submit a new FERPA records access request</p>
+          <p className="text-slate-700 mt-1">
+            Submit a new FERPA records access request
+          </p>
         </div>
       </div>
 
@@ -170,7 +146,7 @@ export default function NewFerpaRequestPage() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Request Type */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-slate-900 mb-4">Request Type</h2>
             <div className="grid gap-3">
               {REQUEST_TYPES.map((type) => (
@@ -179,7 +155,7 @@ export default function NewFerpaRequestPage() {
                   className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
                     formData.request_type === type.value
                       ? 'border-brand-blue-500 bg-brand-blue-50'
-                      : 'border-slate-200 hover:border-slate-300'
+                      : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   <input
@@ -201,7 +177,7 @@ export default function NewFerpaRequestPage() {
           </div>
 
           {/* Requester Information */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
               <User className="w-5 h-5" />
               Requester Information
@@ -209,10 +185,7 @@ export default function NewFerpaRequestPage() {
             <div className="grid gap-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label
-                    htmlFor="requester_name"
-                    className="block text-sm font-medium text-slate-900 mb-1"
-                  >
+                  <label htmlFor="requester_name" className="block text-sm font-medium text-slate-900 mb-1">
                     Full Name <span className="text-brand-red-500">*</span>
                   </label>
                   <input
@@ -220,41 +193,31 @@ export default function NewFerpaRequestPage() {
                     id="requester_name"
                     value={formData.requester_name}
                     onChange={(e) => setFormData({ ...formData, requester_name: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="requester_relationship"
-                    className="block text-sm font-medium text-slate-900 mb-1"
-                  >
+                  <label htmlFor="requester_relationship" className="block text-sm font-medium text-slate-900 mb-1">
                     Relationship to Student <span className="text-brand-red-500">*</span>
                   </label>
                   <select
                     id="requester_relationship"
                     value={formData.requester_relationship}
-                    onChange={(e) =>
-                      setFormData({ ...formData, requester_relationship: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                    onChange={(e) => setFormData({ ...formData, requester_relationship: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     required
                   >
                     <option value="">Select relationship</option>
                     {RELATIONSHIPS.map((rel) => (
-                      <option key={rel.value} value={rel.value}>
-                        {rel.label}
-                      </option>
+                      <option key={rel.value} value={rel.value}>{rel.label}</option>
                     ))}
                   </select>
                 </div>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label
-                    htmlFor="requester_email"
-                    className="block text-sm font-medium text-slate-900 mb-1"
-                  >
+                  <label htmlFor="requester_email" className="block text-sm font-medium text-slate-900 mb-1">
                     Email <span className="text-brand-red-500">*</span>
                   </label>
                   <input
@@ -262,15 +225,12 @@ export default function NewFerpaRequestPage() {
                     id="requester_email"
                     value={formData.requester_email}
                     onChange={(e) => setFormData({ ...formData, requester_email: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="requester_phone"
-                    className="block text-sm font-medium text-slate-900 mb-1"
-                  >
+                  <label htmlFor="requester_phone" className="block text-sm font-medium text-slate-900 mb-1">
                     Phone
                   </label>
                   <input
@@ -278,7 +238,7 @@ export default function NewFerpaRequestPage() {
                     id="requester_phone"
                     value={formData.requester_phone}
                     onChange={(e) => setFormData({ ...formData, requester_phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   />
                 </div>
               </div>
@@ -286,17 +246,14 @@ export default function NewFerpaRequestPage() {
           </div>
 
           {/* Student Information */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
               <User className="w-5 h-5" />
               Student Information
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label
-                  htmlFor="student_name"
-                  className="block text-sm font-medium text-slate-900 mb-1"
-                >
+                <label htmlFor="student_name" className="block text-sm font-medium text-slate-900 mb-1">
                   Student Name <span className="text-brand-red-500">*</span>
                 </label>
                 <input
@@ -304,15 +261,12 @@ export default function NewFerpaRequestPage() {
                   id="student_name"
                   value={formData.student_name}
                   onChange={(e) => setFormData({ ...formData, student_name: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   required
                 />
               </div>
               <div>
-                <label
-                  htmlFor="student_email"
-                  className="block text-sm font-medium text-slate-900 mb-1"
-                >
+                <label htmlFor="student_email" className="block text-sm font-medium text-slate-900 mb-1">
                   Student Email
                 </label>
                 <input
@@ -320,14 +274,14 @@ export default function NewFerpaRequestPage() {
                   id="student_email"
                   value={formData.student_email}
                   onChange={(e) => setFormData({ ...formData, student_email: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
           </div>
 
           {/* Records Requested */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
               <FileText className="w-5 h-5" />
               Records Requested
@@ -340,7 +294,7 @@ export default function NewFerpaRequestPage() {
                   className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
                     formData.records_requested.includes(record)
                       ? 'border-brand-blue-500 bg-brand-blue-50'
-                      : 'border-slate-200 hover:border-slate-300'
+                      : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   <input
@@ -356,25 +310,22 @@ export default function NewFerpaRequestPage() {
           </div>
 
           {/* Purpose */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-slate-900 mb-4">Purpose of Request</h2>
             <div className="space-y-4">
               <div>
                 <label htmlFor="purpose" className="block text-sm font-medium text-slate-900 mb-1">
-                  Explain the purpose for this records request{' '}
-                  <span className="text-brand-red-500">*</span>
+                  Explain the purpose for this records request <span className="text-brand-red-500">*</span>
                 </label>
                 <textarea
                   id="purpose"
                   value={formData.purpose}
                   onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
                   rows={4}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                  placeholder="Describe why these records are being requested..."
                   required
                 />
-                <p className="mt-1 text-xs text-slate-700">
-                  Include educational, compliance, or legal purpose details for review.
-                </p>
               </div>
               <div>
                 <label htmlFor="priority" className="block text-sm font-medium text-slate-900 mb-1">
@@ -384,7 +335,7 @@ export default function NewFerpaRequestPage() {
                   id="priority"
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="low">Low</option>
                   <option value="normal">Normal</option>
@@ -402,10 +353,9 @@ export default function NewFerpaRequestPage() {
               <div>
                 <h3 className="font-medium text-amber-800">FERPA Compliance Notice</h3>
                 <p className="text-sm text-amber-700 mt-1">
-                  By submitting this request, you certify that you have a legitimate educational
-                  interest or legal right to access the requested records. Fraudulent requests may
-                  result in legal action. Requests will be processed within 45 days per FERPA
-                  requirements.
+                  By submitting this request, you certify that you have a legitimate educational 
+                  interest or legal right to access the requested records. Fraudulent requests 
+                  may result in legal action. Requests will be processed within 45 days per FERPA requirements.
                 </p>
               </div>
             </div>
@@ -413,7 +363,10 @@ export default function NewFerpaRequestPage() {
 
           {/* Submit */}
           <div className="flex items-center justify-end gap-4">
-            <Link href="/ferpa/requests" className="px-4 py-2 text-slate-900 hover:text-slate-900">
+            <Link
+              href="/ferpa/requests"
+              className="px-4 py-2 text-slate-900 hover:text-slate-900"
+            >
               Cancel
             </Link>
             <button

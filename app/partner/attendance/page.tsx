@@ -30,7 +30,7 @@ export default async function PartnerAttendancePage() {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['partner', 'admin', 'super_admin', 'staff'].includes(profile.role))
+  if (!profile || !['partner', 'admin', 'staff'].includes(profile.role))
     redirect('/unauthorized');
 
   let sessions: any[] = [];
@@ -102,12 +102,12 @@ export default async function PartnerAttendancePage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden rounded-xl mb-6 -mx-4 sm:-mx-6 lg:-mx-8">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/partner-page-2.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/partner-page-2.webp"
           alt="Partner attendance"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
       </section>
       <div className="mb-6">

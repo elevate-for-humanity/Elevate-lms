@@ -18,37 +18,37 @@ const INCENTIVES = [
   {
     title: 'WOTC Tax Credit',
     desc: 'Up to $9,600 per qualifying hire through the Work Opportunity Tax Credit program.',
-    img: '/images/pages/funding-impact-1.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-impact-1.webp',
     alt: 'WOTC tax credit for employers',
   },
   {
     title: 'OJT Wage Reimbursement',
     desc: 'Reimburse up to 50% of wages during on-the-job training through WIOA funding.',
-    img: '/images/pages/funding-impact-2.jpg',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-impact-2.jpg',
     alt: 'OJT wage reimbursement',
   },
   {
     title: 'Registered Apprenticeship',
     desc: 'Sponsor apprentices through our DOL-registered program. We handle compliance and reporting.',
-    img: '/images/pages/apprenticeship-sponsor-page-1.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeship-sponsor-page-1.webp',
     alt: 'Registered apprenticeship sponsorship',
   },
   {
     title: 'Pre-Screened Candidates',
     desc: 'Graduates arrive credentialed, drug-tested, and work-ready. No cold recruiting.',
-    img: '/images/pages/hire-graduates-page-1.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hire-graduates-page-1.webp',
     alt: 'Pre-screened credentialed candidates',
   },
   {
     title: 'Credential Testing On-Site',
     desc: 'We proctor EPA 608, OSHA, WorkKeys, and more at our Indianapolis testing center.',
-    img: '/images/pages/certifications-page-1.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/certifications-page-1.webp',
     alt: 'On-site credential testing',
   },
   {
     title: 'Upskill Your Workforce',
     desc: 'WIOA-funded upskilling for current employees at no cost to eligible participants.',
-    img: '/images/pages/training-page-1.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-page-1.webp',
     alt: 'Workforce upskilling programs',
   },
 ];
@@ -57,25 +57,25 @@ const SECTORS = [
   {
     label: 'HVAC Technicians',
     credential: 'EPA 608 Universal',
-    img: '/images/pages/hvac-technician.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
   },
   {
     label: 'CNA / Healthcare',
     credential: 'Indiana State Board',
-    img: '/images/pages/healthcare-sector.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-sector.webp',
   },
   {
     label: 'CDL Drivers',
     credential: 'Indiana BMV Class A',
-    img: '/images/pages/cdl-training.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-training.webp',
   },
-  { label: 'IT Support', credential: 'CompTIA A+', img: '/images/pages/it-help-desk.webp' },
+  { label: 'IT Support', credential: 'CompTIA A+', img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/it-help-desk.webp' },
   {
     label: 'Barbers',
     credential: 'Indiana IPLA License',
-    img: '/images/pages/barber-hero-main.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-hero-main.webp',
   },
-  { label: 'Welders', credential: 'NCCER Core', img: '/images/pages/welding.webp' },
+  { label: 'Welders', credential: 'NCCER Core', img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/welding.webp' },
 ];
 
 const STEPS = [
@@ -83,25 +83,25 @@ const STEPS = [
     n: '1',
     title: 'Tell Us What You Need',
     desc: 'Share the roles, volume, and timeline. We match you to current and upcoming graduates.',
-    img: '/images/pages/contact-page-1.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/contact-page-1.webp',
   },
   {
     n: '2',
     title: 'Review Candidates',
     desc: 'We send pre-screened profiles. You interview who you want — no placement fees.',
-    img: '/images/pages/career-services-page-2.jpg',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
   },
   {
     n: '3',
     title: 'Hire & Access Incentives',
     desc: 'We handle WOTC paperwork, OJT agreements, and apprenticeship compliance.',
-    img: '/images/pages/employer-page-1.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-page-1.webp',
   },
   {
     n: '4',
     title: 'Ongoing Support',
     desc: 'Upskill your team, sponsor apprentices, or run group credential testing at our center.',
-    img: '/images/pages/training-page-2.webp',
+    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-page-2.webp',
   },
 ];
 
@@ -109,7 +109,7 @@ export default function EmployerPage() {
   return (
     <div className="min-h-screen bg-white">
       <HeroVideo
-        posterImage="/images/pages/employer-hero.webp"
+        posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-hero.webp"
         videoSrcDesktop={heroBanners.employer.videoSrcDesktop}
         voiceoverSrc={heroBanners.employer.voiceoverSrc}
         microLabel={heroBanners.employer.microLabel}
@@ -138,7 +138,7 @@ export default function EmployerPage() {
               >
                 <div className="relative h-40 flex-shrink-0">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                  <Image src={img} alt={alt} fill sizes="400px" className="object-cover" placeholder="empty" />
+                  {img && <Image src={img} alt={alt} fill sizes="400px" className="object-cover"  />}
                 </div>
                 <div className="p-4 flex-1">
                   <h3 className="font-bold text-slate-900 text-sm leading-tight mb-1">{title}</h3>
@@ -168,7 +168,7 @@ export default function EmployerPage() {
                     alt={label}
                     fill
                     sizes="200px"
-                    className="object-cover group-hover:scale-105 transition-transform duration-300" placeholder="empty"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300" 
                   />
                 </div>
                 <div className="p-2 bg-white">
@@ -192,7 +192,7 @@ export default function EmployerPage() {
             {STEPS.map(({ n, title, desc, img }) => (
               <div key={n} className="flex flex-col">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-3 flex-shrink-0">
-                  <Image src={img} alt={title} fill sizes="300px" className="object-cover" placeholder="empty" />
+                  <Image src={img} alt={title} fill sizes="300px" className="object-cover"  />
                   <div className="absolute top-3 left-3 w-8 h-8 rounded-full bg-brand-red-600 text-white font-extrabold text-sm flex items-center justify-center shadow">
                     {n}
                   </div>
@@ -243,11 +243,11 @@ export default function EmployerPage() {
             </div>
             <div className="relative h-64 rounded-2xl overflow-hidden">
               <Image
-                src="/images/pages/employers-page-1.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employers-page-1.webp"
                 alt="Employer partnership meeting"
                 fill
                 sizes="600px"
-                className="object-cover" placeholder="empty"
+                className="object-cover" 
               />
             </div>
           </div>

@@ -20,7 +20,7 @@ const STATUS_STYLE: Record<string, string> = {
 };
 
 export default async function EmployerApplicationsPage() {
-  const { user } = await requireRole(['employer', 'admin', 'super_admin']);
+  const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
 
   const { data: jobs } = await supabase

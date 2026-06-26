@@ -55,12 +55,12 @@ export default function EducatorHubPage() {
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/hero-images/how-it-works-hero.jpg"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/how-it-works-hero.webp"
             alt="Educator Hub"
             fill
             className="object-cover"
             priority
-            sizes="100vw" placeholder="empty"
+            sizes="100vw" 
           />
         </div>
         <div className="bg-white py-10">

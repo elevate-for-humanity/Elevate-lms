@@ -16,12 +16,13 @@ describe('portal auth route coverage (proxy.ts)', () => {
     '/dashboards',
     '/student-portal',
     '/instructor/',
-    '/employer/dashboard',
-    '/partner/dashboard',
+    // Use prefix patterns for nested routes
+    '/employer/',
+    '/partner/',
     '/case-manager/',
   ];
 
-  it.each(requiredAuthPrefixes)('AUTH_REQUIRED_ROUTES includes %s', (prefix) => {
+  it.each(requiredAuthPrefixes)('PROTECTED_ROUTES includes %s', (prefix) => {
     expect(proxySource).toContain(`'${prefix}'`);
   });
 

@@ -25,12 +25,12 @@ export default function FounderPage() {
       <section className="relative h-[280px] sm:h-[360px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/admin-audit-logs-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-audit-logs-hero.webp"
           alt={`${PLATFORM_DEFAULTS.orgName} founder`}
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
         <div className="absolute inset-0 flex items-center px-6">
           <div className="max-w-6xl mx-auto w-full">
@@ -53,12 +53,12 @@ export default function FounderPage() {
             {/* Founder hero photo */}
             <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="/images/team/founder/elizabeth-greene-founder-hero-01.jpg"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/founder/elizabeth-greene-founder-hero-01.jpg"
                 alt={`Elizabeth Greene, Founder and CEO of ${PLATFORM_DEFAULTS.orgName}`}
                 fill
                 className="object-cover object-top"
                 priority
-                sizes="(max-width: 1024px) 100vw, 50vw" placeholder="empty"
+                sizes="(max-width: 1024px) 100vw, 50vw" 
               />
             </div>
 

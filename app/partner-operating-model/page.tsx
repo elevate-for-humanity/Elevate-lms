@@ -42,7 +42,7 @@ const partnerTypes = [
   {
     icon: FileText,
     title: 'Workforce Agencies',
-    desc: 'WorkOne centers, FSSA offices, and other workforce agencies that refer participants and co-fund training through WIOA, WRG, or SNAP E&T.',
+    desc: 'WorkOne centers, FSSA offices, and other workforce agencies that refer participants and co-fund training through WIOA, WRG, or .',
     requirements: [
       'Signed Memorandum of Understanding (MOU)',
       'Participant referral and eligibility documentation',

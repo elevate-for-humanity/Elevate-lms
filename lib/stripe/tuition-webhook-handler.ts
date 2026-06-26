@@ -708,7 +708,7 @@ async function sendPaymentConfirmationEmail(
       <p>- ${PLATFORM_DEFAULTS.orgName}</p>
     `,
     })
-    .catch((err) => logger.error('Failed to send payment confirmation:', err));
+    .catch((err) => logger.warn('Failed to send payment confirmation (non-fatal)', { err }));
 }
 
 /**
@@ -747,7 +747,7 @@ async function sendPaymentCompletionEmail(studentId: string, programId: string):
       <p>- ${PLATFORM_DEFAULTS.orgName}</p>
     `,
     })
-    .catch((err) => logger.error('Failed to send completion email:', err));
+    .catch((err) => logger.warn('Failed to send completion email (non-fatal)', { err }));
 }
 
 /**
@@ -817,11 +817,13 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
 
   const { data: sub } = await supabase
     .from('tuition_subscriptions')
-    .select('installments_paid, total_installments, status')
+    .select('installments_paid, total_installments, status, student_id, program_id')
     .eq('stripe_subscription_id', subscription.id)
     .maybeSingle();
 
   if (sub) {
+    const studentId = sub.student_id;
+    const programId = sub.program_id;
     const isComplete = sub.installments_paid >= sub.total_installments;
 
     if (isComplete) {

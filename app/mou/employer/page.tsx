@@ -59,7 +59,7 @@ export default async function EmployerMOUPage() {
         <div className="max-w-2xl mx-auto px-4 py-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center text-sm">
           {[
             { icon: '✓', title: 'No cost', body: 'This is a hiring partnership only — no fees, no financial commitment.' },
-            { icon: '✓', title: 'State-funded graduates', body: 'Our graduates are trained through Indiana SNAP E&T — fully funded.' },
+            { icon: '✓', title: 'State-funded graduates', body: 'Our graduates are trained through Indiana  — fully funded.' },
             { icon: '✓', title: '5 minutes', body: 'Fill out your info, draw your signature, download your signed MOU.' },
           ].map((item) => (
             <div key={item.title} className="space-y-1">

@@ -49,7 +49,7 @@ export const medicalAssistantBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'Diana Torres, CMA',
     instructorTitle: 'Certified Medical Assistant & Healthcare Educator',
-    instructorImagePath: '/images/instructors/diana-torres.jpg',
+    instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     topBarColor: '#10b981',
     accentColor: '#0f172a',
     backgroundColor: '#f0fdf4',

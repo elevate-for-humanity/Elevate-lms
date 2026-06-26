@@ -21,13 +21,16 @@ export default async function InstructorSettingsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+
+  // Guard against null user
+  if (!user) redirect('/login');
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['instructor', 'admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !['instructor', 'admin'].includes(profile.role)) {
     redirect('/');
   }
 
@@ -36,7 +39,7 @@ export default async function InstructorSettingsPage() {
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image
-          src="/images/pages/instructor-page-12.jpg"
+          src="/images/pages/instructor-page-12.webp"
           alt="Instructor portal"
           fill
           sizes="100vw"

@@ -21,12 +21,17 @@ export default async function ProgramDashboardPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role))
+  if (!profile || !['admin', 'staff'].includes(profile.role))
     redirect('/unauthorized');
 
   // Load program

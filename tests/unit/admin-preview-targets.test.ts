@@ -6,21 +6,31 @@ describe('mergePreviewTargets', () => {
     const merged = mergePreviewTargets(
       [
         { label: 'Public Site', url: 'https://www.elevateforhumanity.org' },
-        { label: 'Admin', url: '' },
+        { label: 'Blog', url: 'https://www.elevateforhumanity.org/blog' },
       ],
       [
-        { label: 'Homepage', url: 'https://www.elevateforhumanity.org/' },
         { label: 'Programs', url: 'https://www.elevateforhumanity.org/programs' },
       ],
     );
-    expect(merged[0]?.label).toBe('Homepage');
-    expect(merged.some((t) => t.label === 'Programs')).toBe(true);
-    expect(merged.some((t) => t.label === 'Admin')).toBe(true);
+    // Config targets come first (Programs)
+    expect(merged[0]?.label).toBe('Programs');
+    // Dashboard targets appended if unique
+    expect(merged.some((t) => t.label === 'Public Site')).toBe(true);
+    expect(merged.some((t) => t.label === 'Blog')).toBe(true);
     expect(merged.length).toBe(3);
   });
 
   it('falls back to dashboard-only when config is empty', () => {
     const dashboard = [{ label: 'LMS', url: 'https://lms.example.com' }];
     expect(mergePreviewTargets(dashboard, undefined)).toEqual(dashboard);
+  });
+
+  it('dedupes targets with same origin+path', () => {
+    const merged = mergePreviewTargets(
+      [{ label: 'A', url: 'https://example.com' }],
+      [{ label: 'B', url: 'https://example.com/' }],
+    );
+    // Only one should survive dedup
+    expect(merged.length).toBe(1);
   });
 });

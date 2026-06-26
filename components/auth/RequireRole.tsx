@@ -16,7 +16,7 @@ export function RequireRole({ role, children, fallback }: RequireRoleProps) {
 
   useEffect(() => {
     const roles = Array.isArray(role) ? role : [role];
-    const roleParam = roles[0]; // Check first role, backend will check admin/super_admin too
+    const roleParam = roles[0]; // Check first role, backend will check admin/admin too
 
     fetch(`/api/auth/check-role?role=${roleParam}`)
       .then((res) => {

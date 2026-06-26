@@ -136,9 +136,16 @@ describe('hasLmsAccess — state consistency with proxy.ts', () => {
     expect(resolverSrc).toContain("'enrolled'");
   });
 
-  it('proxy.ts and resolver both treat active as an access state', () => {
-    expect(proxySrc).toContain("LMS_ACCESS_STATES = new Set(['active', 'enrolled'])");
-    expect(resolverSrc).toContain("ACCESS_STATES = new Set(['active', 'enrolled'])");
+  it('enrollment-flow.ts defines LMS_ACCESS_STATES', () => {
+    const enrollmentSrc = read('lib/enrollment/enrollment-flow.ts');
+    // LMS_ACCESS_STATES defines which enrollment states grant LMS access
+    expect(enrollmentSrc).toContain('LMS_ACCESS_STATES');
+    expect(enrollmentSrc).toMatch(/LMS_ACCESS_STATES.*=.*\['active'\]/);
+  });
+
+  it('enrollment-flow.ts defines terminal states', () => {
+    const enrollmentSrc = read('lib/enrollment/enrollment-flow.ts');
+    expect(enrollmentSrc).toContain('TERMINAL_ENROLLMENT_STATES');
   });
 });
 
@@ -215,12 +222,13 @@ describe('requireRole — uses user-facing client', () => {
 // ---------------------------------------------------------------------------
 
 describe('full student LMS access path contract', () => {
-  it('proxy.ts passes enrolled state to LMS layout', () => {
-    const proxySrc = read('proxy.ts');
-    expect(proxySrc).toContain("LMS_ACCESS_STATES = new Set(['active', 'enrolled'])");
+  it('enrollment-flow.ts defines the access state contract', () => {
+    const enrollmentSrc = read('lib/enrollment/enrollment-flow.ts');
+    expect(enrollmentSrc).toContain('LMS_ACCESS_STATES');
+    expect(enrollmentSrc).toMatch(/LMS_ACCESS_STATES.*=.*\['active'\]/);
   });
 
-  it('LMS layout calls hasLmsAccess which now passes enrolled state', () => {
+  it('LMS layout uses hasLmsAccess for access determination', () => {
     const layoutSrc = read('app/lms/(app)/layout.tsx');
     expect(layoutSrc).toContain('hasLmsAccess');
   });

@@ -12,14 +12,13 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function CandidatesPage() {
-  const { user } = await requireRole(['employer', 'admin', 'super_admin']);
+  const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
 
-  // Get completed/graduated candidates only — not all students
+  // Get completed/graduated candidates only
   const { data: enrollments } = await supabase
     .from('program_enrollments')
-    .select(
-      `
+    .select(`
       id,
       user_id,
       progress_percent,
@@ -28,27 +27,35 @@ export default async function CandidatesPage() {
         id,
         title
       )
-    `,
-    )
+    `)
     .eq('progress_percent', 100)
     .order('completed_at', { ascending: false })
     .limit(50);
 
-  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
   const userIds = [...new Set((enrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
+  
+  // Hydrate profiles
   const { data: profileRows } = userIds.length
     ? await supabase
         .from('profiles')
-        .select('id, full_name, email, phone, city, state')
+        .select('id, full_name, email, phone, city, state, is_certified')
         .in('id', userIds)
     : { data: [] };
+  
   const profileMap = Object.fromEntries((profileRows ?? []).map((p: any) => [p.id, p]));
 
-  const candidates = (enrollments ?? []).map((e: any) => ({
-    ...profileMap[e.user_id],
-    course_title: e.training_courses?.title ?? null,
-    completed_at: e.completed_at,
-  }));
+  const candidates = (enrollments ?? []).map((e: any) => {
+    const profile = profileMap[e.user_id] || {};
+    return {
+      ...profile,
+      course_title: e.training_courses?.title ?? 'Completed Program',
+      completed_at: e.completed_at,
+      certified: !!profile.is_certified,
+    };
+  });
+
+  const certifiedCount = candidates.filter(c => c.certified).length;
+  const graduateCount = candidates.length;
 
   return (
     <div className="min-h-screen bg-white">
@@ -71,6 +78,37 @@ export default async function CandidatesPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center gap-3">
+              <Users className="w-8 h-8 text-brand-blue-600" />
+              <div>
+                <div className="text-2xl font-bold">{candidates.length}</div>
+                <div className="text-sm text-slate-700">Available Candidates</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center gap-3">
+              <Award aria-label="award" className="w-8 h-8 text-brand-green-600" />
+              <div>
+                <div className="text-2xl font-bold">{certifiedCount}</div>
+                <div className="text-sm text-slate-700">Certified</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center gap-3">
+              <GraduationCap aria-label="graduationcap" className="w-8 h-8 text-brand-blue-600" />
+              <div>
+                <div className="text-2xl font-bold">{graduateCount}</div>
+                <div className="text-sm text-slate-700">Program Graduates</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Search */}
         <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
           <div className="flex flex-wrap gap-4">
@@ -80,45 +118,8 @@ export default async function CandidatesPage() {
                 <input
                   type="text"
                   placeholder="Search by name, skill, or certification..."
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 />
-              </div>
-            </div>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
-              <option value="">All Programs</option>
-              <option value="healthcare">Healthcare</option>
-              <option value="skilled-trades">Skilled Trades</option>
-              <option value="technology">Technology</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow-sm border p-4">
-            <div className="flex items-center gap-3">
-              <Users className="w-8 h-8 text-brand-blue-600" />
-              <div>
-                <div className="text-2xl font-bold">{candidates?.length || 0}</div>
-                <div className="text-sm text-slate-700">Available Candidates</div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border p-4">
-            <div className="flex items-center gap-3">
-              <Award aria-label="award" className="w-8 h-8 text-brand-green-600" />
-              <div>
-                <div className="text-2xl font-bold">0</div>
-                <div className="text-sm text-slate-700">Certified</div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm border p-4">
-            <div className="flex items-center gap-3">
-              <GraduationCap aria-label="graduationcap" className="w-8 h-8 text-brand-blue-600" />
-              <div>
-                <div className="text-2xl font-bold">0</div>
-                <div className="text-sm text-slate-700">Program Graduates</div>
               </div>
             </div>
           </div>
@@ -126,9 +127,9 @@ export default async function CandidatesPage() {
 
         {/* Candidates List */}
         <div className="space-y-4">
-          {candidates && candidates.length > 0 ? (
+          {candidates.length > 0 ? (
             candidates.map((candidate: any) => (
-              <div key={candidate.id} className="bg-white rounded-lg shadow-sm border p-6">
+              <div key={candidate.id || Math.random()} className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center">
@@ -138,6 +139,7 @@ export default async function CandidatesPage() {
                       <h3 className="text-lg font-semibold text-slate-900">
                         {candidate.full_name || 'Candidate'}
                       </h3>
+                      <p className="text-sm text-brand-blue-600 font-medium">{candidate.course_title}</p>
                       {(candidate.city || candidate.state) && (
                         <div className="flex items-center gap-1 text-sm text-slate-700 mt-1">
                           <MapPin className="w-4 h-4" />
@@ -148,35 +150,10 @@ export default async function CandidatesPage() {
                   </div>
 
                   <div className="flex gap-2">
-                    {profile.verified ? (
-                      <>
-                        {candidate.email && (
-                          <a
-                            href={`mailto:${candidate.email}`}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
-                          >
-                            <Mail className="w-4 h-4" />
-                            Contact
-                          </a>
-                        )}
-                        {candidate.phone && (
-                          <a
-                            href={`tel:${candidate.phone}`}
-                            className="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-white transition"
-                          >
-                            <Phone className="w-4 h-4" />
-                            Call
-                          </a>
-                        )}
-                      </>
-                    ) : (
-                      <Link
-                        href="/employer/verification"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg"
-                      >
-                        Verify to Contact
-                      </Link>
-                    )}
+                    <button className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition">
+                      <Mail className="w-4 h-4" />
+                      View Portfolio
+                    </button>
                   </div>
                 </div>
               </div>
@@ -185,15 +162,7 @@ export default async function CandidatesPage() {
             <div className="bg-white rounded-lg shadow-sm border p-12 text-center">
               <Users className="w-16 h-16 text-slate-700 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-slate-900 mb-2">No Candidates Yet</h3>
-              <p className="text-slate-700 mb-6">
-                Candidates will appear here as students complete their training programs.
-              </p>
-              <Link
-                href="/employer/dashboard"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
-              >
-                Back to Dashboard
-              </Link>
+              <p className="text-slate-700">Candidates will appear here once students complete their training.</p>
             </div>
           )}
         </div>

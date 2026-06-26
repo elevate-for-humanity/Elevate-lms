@@ -98,7 +98,7 @@ export async function GET(request: Request) {
             'student',
             'instructor',
             'admin',
-            'super_admin',
+            'admin',
             'org_admin',
             'staff',
             'program_holder',

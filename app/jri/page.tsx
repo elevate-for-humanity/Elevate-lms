@@ -42,37 +42,37 @@ export default function JRIPage() {
       title: 'Fully Funded Training',
       description:
         'Tuition, books, supplies, uniforms, and certification exams covered for eligible participants.',
-      image: '/images/pages/funding-page-1.jpg',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-page-1.jpg',
       alt: 'Funded workforce training program',
     },
     {
       title: 'Career Counseling',
       description: 'Work one-on-one with a dedicated career coach who understands your situation.',
-      image: '/images/pages/comp-pathway-classroom.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-pathway-classroom.webp',
       alt: 'One-on-one career counseling session',
     },
     {
       title: 'Job Placement',
       description: 'We connect you with employers committed to second-chance hiring.',
-      image: '/images/pages/about-employer-partners.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-employer-partners.webp',
       alt: 'Job placement and employer connections',
     },
     {
       title: 'Support Services',
       description: 'Transportation, childcare support, work clothing, and more.',
-      image: '/images/pages/comp-home-pathways-support.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-pathways-support.webp',
       alt: 'Supportive services for workforce participants',
     },
     {
       title: 'Flexible Scheduling',
       description: 'Day and evening classes to work around your commitments.',
-      image: '/images/pages/comp-pathway-healthcare.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-pathway-healthcare.webp',
       alt: 'Flexible day and evening class scheduling',
     },
     {
       title: 'Ongoing Mentorship',
       description: 'Stay connected with mentors even after graduation.',
-      image: '/images/pages/mentorship-page-1.webp',
+      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/mentorship-page-1.webp',
       alt: 'Ongoing mentorship after graduation',
     },
   ];
@@ -138,12 +138,12 @@ export default function JRIPage() {
       <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/jri-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/jri-hero.webp"
           alt="Job Ready Indy Program participants"
           fill
           className="object-cover"
           priority
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
         />
       </section>
       {/* Stats Section */}
@@ -187,7 +187,7 @@ export default function JRIPage() {
                     alt={benefit.alt}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
                   />
                 </div>
                 <div className="p-5">
@@ -224,7 +224,7 @@ export default function JRIPage() {
               <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="text-yellow-800 text-sm">
                   <strong>Note:</strong> Even if you don&apos;t meet all criteria, you may qualify
-                  for other funding programs like WIOA or SNAP E&T.
+                  for other funding programs like WIOA or .
                 </p>
               </div>
             </div>
@@ -433,7 +433,7 @@ export default function JRIPage() {
               },
               {
                 q: "What if I don't qualify for Job Ready Indy?",
-                a: 'You may still qualify for other funding programs like WIOA or SNAP E&T. Our team will help identify all available options for you.',
+                a: 'You may still qualify for other funding programs like WIOA or . Our team will help identify all available options for you.',
               },
               {
                 q: 'Will employers hire me with a record?',

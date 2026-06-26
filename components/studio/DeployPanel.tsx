@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Activity, AlertTriangle, CheckCircle2, ExternalLink, GitBranch, Loader2, Play, RefreshCw, Rocket, XCircle } from 'lucide-react';
-import PublishWebsiteDevPanel from '@/components/dev-studio/PublishWebsiteDevPanel';
+import PublishWebsiteDevPanel from '@/components/studio/PublishWebsiteDevPanel';
 
 type WorkflowKey = 'deploy-lms' | 'deploy-admin' | 'ci' | 'lint' | string;
 

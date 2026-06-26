@@ -1,11 +1,10 @@
-export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DocumentPage, DocumentSection, DocumentSignatureBlock } from '@/components/documents';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Training Network Partner Agreement',
+  title: 'Training Network Partner Agreement | {PLATFORM_DEFAULTS.orgName}',
   robots: { index: false, follow: false },
 };
 
@@ -13,71 +12,62 @@ export default function PartnerMOUPage() {
   return (
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
-        <Breadcrumbs
-          items={[
-            { label: 'Legal', href: '/legal' },
-            { label: 'Training Network Partner Agreement' },
-          ]}
-        />
+        <Breadcrumbs items={[{ label: 'Legal', href: '/legal' }, { label: 'Training Network Partner Agreement' }]} />
       </div>
       <DocumentPage
         documentType="Memorandum of Understanding"
         title="Training Network Partner Agreement"
-        subtitle={`${PLATFORM_DEFAULTS.orgName} Career & Technical Institute — Indiana Workforce Training Network`}
+        subtitle="{PLATFORM_DEFAULTS.orgName} Career & Technical Institute — Indiana Workforce Training Network"
         date="2025-01-01"
         version="3.0"
         confidential
       >
+
         <DocumentSection heading="Parties" number={1}>
           <p>
             This Memorandum of Understanding ("Agreement") is entered into between{' '}
-            <strong>
-              2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
-            </strong>{' '}
-            ("Program Owner" or "Elevate"), a workforce training provider operating under Indiana
-            law, and the collaborating organization identified at the time of execution
-            ("Collaborating Party").
+            <strong>2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName} Career &amp; Training Institute</strong>{' '}
+            ("Program Owner" or "Elevate"), a workforce training provider operating under Indiana law,
+            and the collaborating organization identified at the time of execution ("Collaborating Party").
           </p>
         </DocumentSection>
 
         <DocumentSection heading="Definition of Partnership — and Why This Is Not One" number={2}>
           <p>
-            For the purposes of clarity and legal precision, a <strong>"partnership"</strong> is
-            defined as a business relationship in which two or more parties jointly own and operate
-            a business enterprise, share governance authority, share profits and losses, and
-            maintain equal or negotiated control over business operations, including pricing,
-            staffing, branding, and strategic direction.
+            For the purposes of clarity and legal precision, a <strong>"partnership"</strong> is defined
+            as a business relationship in which two or more parties jointly own and operate a business
+            enterprise, share governance authority, share profits and losses, and maintain equal or
+            negotiated control over business operations, including pricing, staffing, branding, and
+            strategic direction.
           </p>
           <p className="mt-3">
-            <strong>
-              This Agreement does not create a partnership, joint venture, co-ownership arrangement,
-              franchise relationship, or employment relationship
-            </strong>{' '}
-            between the parties. No party shall represent itself as a partner, co-owner, co-founder,
-            or governing authority of the other in any public communication, grant application,
-            funding proposal, or legal document.
+            <strong>This Agreement does not create a partnership, joint venture, co-ownership
+            arrangement, franchise relationship, or employment relationship</strong> between the parties.
+            No party shall represent itself as a partner, co-owner, co-founder, or governing authority
+            of the other in any public communication, grant application, funding proposal, or legal
+            document.
           </p>
           <p className="mt-3">
             All program ownership, curriculum, intellectual property, tuition structures, credential
-            relationships, and operational systems remain the sole property and exclusive authority
-            of {PLATFORM_DEFAULTS.orgName}. The Collaborating Party participates solely in the role
-            designated in Section 5 of this Agreement.
+            relationships, and operational systems remain the sole property and exclusive authority of
+            {PLATFORM_DEFAULTS.orgName}. The Collaborating Party participates solely in the role designated
+            in Section 5 of this Agreement.
           </p>
         </DocumentSection>
 
         <DocumentSection heading="Nature of the Collaboration" number={3}>
           <p>
-            This Agreement establishes a collaborative training arrangement in which Elevate for
-            Humanity serves as the Program Owner and Primary Training Provider. The Collaborating
-            Party supports program delivery through facility hosting, program facilitation, or
-            student referral as defined in Section 5.
+            This Agreement establishes a collaborative training arrangement in which {PLATFORM_DEFAULTS.orgName}
+            serves as the Program Owner and Primary Training Provider. The Collaborating Party supports
+            program delivery through facility hosting, program facilitation, or student referral as
+            defined in Section 5.
           </p>
           <p className="mt-3">
-            Elevate retains sole authority over program design, curriculum, learning platforms,
-            tuition structures, credential alignment, branding, compliance standards, and all
-            student program policies. The Collaborating Party does not obtain ownership rights,
-            licensing rights, governance authority, or decision-making authority over the training
-            program or its operations through this Agreement.
+            Elevate retains sole authority over program design, curriculum, learning platforms, tuition
+            structures, credential alignment, branding, compliance standards, and all student program
+            policies. The Collaborating Party does not obtain ownership rights, licensing rights,
+            governance authority, or decision-making authority over the training program or its
+            operations through this Agreement.
           </p>
         </DocumentSection>
 
@@ -85,23 +75,22 @@ export default function PartnerMOUPage() {
           <p>
             {PLATFORM_DEFAULTS.orgName} operates a <strong>Training Network Model</strong> in which Elevate
             serves as the sole Program Owner and Primary Training Provider. Authorized organizations
-            participate as approved Training Network Sites for the purpose of delivering in-person
-            or hybrid components of the program under Elevate's standardized delivery model.
+            participate as approved Training Network Sites for the purpose of delivering in-person or
+            hybrid components of the program under Elevate's standardized delivery model.
           </p>
           <p className="mt-3">
             Elevate retains sole authority to expand the training program into additional states and
-            jurisdictions. Expansion into additional states or training regions may occur through
-            the approval of new Program Hosts or delivery sites without requiring approval from
-            existing collaborators.
+            jurisdictions. Expansion into additional states or training regions may occur through the
+            approval of new Program Hosts or delivery sites without requiring approval from existing
+            collaborators.
           </p>
           <p className="mt-3">
             Elevate operates as an eligible training provider under Indiana's INTraining / Eligible
-            Training Provider List (ETPL) system, administered by the Indiana Department of
-            Workforce Development (DWD). The Collaborating Party does not hold ETPL status
-            independently under this Agreement and may not represent itself as a training provider
-            for Elevate programs without written authorization. All programs delivered under this
-            Agreement must comply with federal nondiscrimination requirements under Title VI,
-            Section 504, the ADA, and WIOA.
+            Training Provider List (ETPL) system, administered by the Indiana Department of Workforce
+            Development (DWD). The Collaborating Party does not hold ETPL status independently under
+            this Agreement and may not represent itself as a training provider for Elevate programs
+            without written authorization. All programs delivered under this Agreement must comply with
+            federal nondiscrimination requirements under Title VI, Section 504, the ADA, and WIOA.
           </p>
         </DocumentSection>
 
@@ -127,18 +116,14 @@ export default function PartnerMOUPage() {
           </ul>
           <p className="font-semibold text-sm mt-3">Operational Requirements:</p>
           <ul>
-            <li>
-              Facility available for all scheduled training hours for the full cohort duration
-            </li>
+            <li>Facility available for all scheduled training hours for the full cohort duration</li>
             <li>Designated on-site coordinator assigned for each cohort</li>
             <li>Attendance monitoring and student supervision during in-person sessions</li>
             <li>Coordination with Elevate program staff</li>
           </ul>
           <p className="font-semibold text-sm mt-3">Compliance Requirements:</p>
           <ul>
-            <li>
-              General liability insurance (minimum $1,000,000 per occurrence / $2,000,000 aggregate)
-            </li>
+            <li>General liability insurance (minimum $1,000,000 per occurrence / $2,000,000 aggregate)</li>
             <li>Facility/property insurance covering the training space</li>
             <li>Workers' compensation coverage if facility staff are present during training</li>
             <li>Elevate named as additional insured on the facility liability policy</li>
@@ -152,16 +137,13 @@ export default function PartnerMOUPage() {
 
           <h4 className="font-bold text-slate-800 mt-6 mb-1">Tier 2 — Coordination Partner</h4>
           <p className="text-sm text-slate-600 mb-3">
-            Provides student coordination and supervision support. Does not provide a training
-            facility.
+            Provides student coordination and supervision support. Does not provide a training facility.
           </p>
           <p className="font-semibold text-sm">Responsibilities:</p>
           <ul>
             <li>Student coordination and communication throughout the program</li>
             <li>Attendance tracking and reporting to Elevate within 48 hours of each session</li>
-            <li>
-              Supervision support during hybrid or in-person sessions at Elevate-provided locations
-            </li>
+            <li>Supervision support during hybrid or in-person sessions at Elevate-provided locations</li>
             <li>Liaison between enrolled students and Elevate program staff</li>
           </ul>
           <p className="font-semibold text-sm mt-3">Compensation:</p>
@@ -183,32 +165,22 @@ export default function PartnerMOUPage() {
           </ul>
           <p className="font-semibold text-sm mt-3">Compensation:</p>
           <p className="text-sm">
-            A flat referral fee of <strong>$250 to $500 per enrolled student</strong> as specified
-            in Schedule A, paid upon confirmed enrollment and initial tuition payment. Referral
-            partners do not receive revenue share.
+            A flat referral fee of <strong>$250 to $500 per enrolled student</strong> as specified in
+            Schedule A, paid upon confirmed enrollment and initial tuition payment. Referral partners
+            do not receive revenue share.
           </p>
         </DocumentSection>
 
         <DocumentSection heading="Employer Participation" number={6}>
           <p>
             Employers participating in work-based learning, job shadowing, internships, or hiring
-            pipelines must comply with all applicable wage and labor laws. Employer participation
-            does not create a training provider relationship or entitle the employer to program
-            revenue.
+            pipelines must comply with all applicable wage and labor laws. Employer participation does
+            not create a training provider relationship or entitle the employer to program revenue.
           </p>
           <ul className="mt-3">
-            <li>
-              <strong>Option A — Paid Trainee:</strong> Employer pays the trainee an hourly wage
-              during the work-based learning period.
-            </li>
-            <li>
-              <strong>Option B — Work-Based Learning Stipend:</strong> Employer provides a stipend
-              during the training period.
-            </li>
-            <li>
-              <strong>Option C — Hire Upon Completion:</strong> Employer commits to hiring graduates
-              upon credential completion under a separate employer agreement.
-            </li>
+            <li><strong>Option A — Paid Trainee:</strong> Employer pays the trainee an hourly wage during the work-based learning period.</li>
+            <li><strong>Option B — Work-Based Learning Stipend:</strong> Employer provides a stipend during the training period.</li>
+            <li><strong>Option C — Hire Upon Completion:</strong> Employer commits to hiring graduates upon credential completion under a separate employer agreement.</li>
           </ul>
         </DocumentSection>
 
@@ -236,19 +208,16 @@ export default function PartnerMOUPage() {
 
         <DocumentSection heading="Program Ownership and Intellectual Property" number={8}>
           <p>
-            All curriculum materials, instructional content, learning management systems,
-            operational procedures, branding, credential alignments, and program methodologies used
-            in Elevate programs constitute{' '}
-            <strong>
-              proprietary intellectual property owned exclusively by {PLATFORM_DEFAULTS.orgName}
-            </strong>
-            .
+            All curriculum materials, instructional content, learning management systems, operational
+            procedures, branding, credential alignments, and program methodologies used in Elevate
+            programs constitute <strong>proprietary intellectual property owned exclusively by
+            {PLATFORM_DEFAULTS.orgName}</strong>.
           </p>
           <p className="mt-3">
-            Training Network Sites receive limited, non-transferable authorization to deliver
-            program components solely for the purpose of supporting approved training cohorts under
-            this Agreement. This authorization terminates automatically upon expiration or
-            termination of this Agreement.
+            Training Network Sites receive limited, non-transferable authorization to deliver program
+            components solely for the purpose of supporting approved training cohorts under this
+            Agreement. This authorization terminates automatically upon expiration or termination of
+            this Agreement.
           </p>
           <p className="mt-3">
             The Collaborating Party acquires no ownership interest, license, or right to replicate,
@@ -263,24 +232,13 @@ export default function PartnerMOUPage() {
             Elevate constitute proprietary intellectual property.
           </p>
           <p className="mt-3">
-            The Collaborating Party agrees that during the term of this Agreement and for a period
-            of <strong>three (3) years following termination</strong>, it will not directly or
-            indirectly:
+            The Collaborating Party agrees that during the term of this Agreement and for a period of{' '}
+            <strong>three (3) years following termination</strong>, it will not directly or indirectly:
           </p>
           <ul>
-            <li>
-              Replicate, reproduce, or develop a substantially similar training program using the
-              materials, systems, or methods provided through this collaboration
-            </li>
-            <li>
-              Solicit or redirect enrolled trainees, instructors, credential partners, or
-              participating employers into a competing program derived from the Elevate training
-              model
-            </li>
-            <li>
-              Use Elevate's program structure, curriculum framework, or credential relationships to
-              apply independently for ETPL status or workforce funding for a competing program
-            </li>
+            <li>Replicate, reproduce, or develop a substantially similar training program using the materials, systems, or methods provided through this collaboration</li>
+            <li>Solicit or redirect enrolled trainees, instructors, credential partners, or participating employers into a competing program derived from the Elevate training model</li>
+            <li>Use Elevate's program structure, curriculum framework, or credential relationships to apply independently for ETPL status or workforce funding for a competing program</li>
           </ul>
         </DocumentSection>
 
@@ -293,8 +251,7 @@ export default function PartnerMOUPage() {
           <p className="mt-3">
             The Collaborating Party may not modify program structure, tuition rates, curriculum
             materials, or credential requirements without written authorization from Elevate.
-            Unauthorized modifications constitute grounds for immediate termination under Section
-            12.
+            Unauthorized modifications constitute grounds for immediate termination under Section 12.
           </p>
         </DocumentSection>
 
@@ -302,8 +259,8 @@ export default function PartnerMOUPage() {
           <p>
             All students enrolled in Elevate programs remain participants of the Elevate training
             program regardless of the training location where in-person components are delivered.
-            Student records, enrollment data, and credential progress are maintained exclusively by
-            Elevate.
+            Student records, enrollment data, and credential progress are maintained exclusively
+            by Elevate.
           </p>
           <p className="mt-3">
             Collaborating Parties do not obtain ownership rights over student enrollment, tuition
@@ -315,8 +272,8 @@ export default function PartnerMOUPage() {
 
         <DocumentSection heading="Term and Termination" number={12}>
           <p>
-            This Agreement is effective for one (1) year from execution and renews automatically for
-            successive one-year terms unless either party provides 30 days written notice of
+            This Agreement is effective for one (1) year from execution and renews automatically
+            for successive one-year terms unless either party provides 30 days written notice of
             non-renewal.
           </p>
           <p className="mt-3">
@@ -328,9 +285,7 @@ export default function PartnerMOUPage() {
             <li>Misrepresents Elevate programs or credentials to students or funders</li>
             <li>Represents itself as a partner, co-owner, or governing authority of Elevate</li>
             <li>Operates outside its designated tier without written authorization</li>
-            <li>
-              Modifies curriculum, tuition, or program structure without written authorization
-            </li>
+            <li>Modifies curriculum, tuition, or program structure without written authorization</li>
             <li>Fails to remit required documentation within specified timeframes</li>
           </ul>
           <p className="mt-3">
@@ -340,21 +295,16 @@ export default function PartnerMOUPage() {
         </DocumentSection>
 
         <DocumentSection heading="Insurance Requirements" number={13}>
-          <p>
-            <strong>Elevate carries:</strong> professional liability, instructional liability, and
-            technology/LMS coverage.
-          </p>
-          <p className="mt-3">
-            <strong>Tier 1 Facility Hosts must carry:</strong>
-          </p>
+          <p><strong>Elevate carries:</strong> professional liability, instructional liability, and technology/LMS coverage.</p>
+          <p className="mt-3"><strong>Tier 1 Facility Hosts must carry:</strong></p>
           <ul>
             <li>General liability (minimum $1,000,000 per occurrence / $2,000,000 aggregate)</li>
             <li>Facility/property insurance covering the training space</li>
             <li>Workers' compensation if facility staff are present during training</li>
           </ul>
           <p className="mt-3">
-            Proof of insurance must be provided before the first cohort and upon each annual
-            renewal. Elevate must be named as additional insured on the Tier 1 facility policy.
+            Proof of insurance must be provided before the first cohort and upon each annual renewal.
+            Elevate must be named as additional insured on the Tier 1 facility policy.
           </p>
         </DocumentSection>
 
@@ -368,12 +318,9 @@ export default function PartnerMOUPage() {
 
         <DocumentSection heading="Program Owner Contact" number={15}>
           <p>
-            <strong>{PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute</strong>
-            <br />
-            2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName}
-            <br />
-            8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
-            <br />
+            <strong>{PLATFORM_DEFAULTS.orgName} Career &amp; Training Institute</strong><br />
+            2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName}<br />
+            8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240<br />
             Email: info@elevateforhumanity.org · Phone: {PLATFORM_DEFAULTS.supportPhone}
           </p>
         </DocumentSection>

@@ -74,7 +74,7 @@ const COURSES: CoursePreview[] = [
     lessonDefId: 'hvac-01-01',
   },
   {
-    id: 'tax-preparation',
+    id: 
     title: 'Tax Preparation',
     tagline: 'Prepare tax returns & run your own business',
     salary: '$35,000–$60,000/yr',

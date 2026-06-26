@@ -28,57 +28,72 @@ const WEBHOOK_PATHS = [
   '/api/csp-report',
 ];
 
+const CANONICAL_ADMIN_HOST = 'admin.elevateforhumanity.org';
+
+/** Canonical admin hostname for redirects. */
+function resolveCanonicalAdminHost(): string {
+  const fromEnv = (process.env.NEXT_PUBLIC_ADMIN_URL || '').trim();
+  if (fromEnv) {
+    try {
+      return new URL(fromEnv).host.toLowerCase();
+    } catch {
+      /* fall through */
+    }
+  }
+  return CANONICAL_ADMIN_HOST;
+}
+
 // Role-gated routes: key = path prefix, value = allowed roles.
 // Consolidated - use wildcard /prefix/ for group routes instead of individual paths.
 const PROTECTED_ROUTES: Record<string, string[]> = {
   // ── Employer Portal ───────────────────────────────────────────────
-  '/employer/':               ['employer', 'sponsor', 'admin', 'super_admin'],
+  '/employer/':               ['employer', 'sponsor', 'admin'],
 
   // ── Partner Portal ───────────────────────────────────────────────
-  '/partner/':                ['partner', 'partner_admin', 'admin', 'super_admin'],
+  '/partner/':                ['partner', 'partner_admin', 'admin'],
 
   // ── Program Holder Portal ─────────────────────────────────────────
-  '/program-holder/':         ['program_holder', 'admin', 'super_admin', 'staff', 'org_admin'],
+  '/program-holder/':         ['program_holder', 'admin', 'staff', 'org_admin'],
 
   // ── LMS / Student Portal ─────────────────────────────────────────
-  '/lms/':                     ['student', 'grant_client', 'partner', 'program_holder', 'admin', 'super_admin', 'staff', 'instructor'],
-  '/learner/':                 ['student', 'delegate', 'grant_client', 'admin', 'super_admin', 'staff', 'instructor'],
+  '/lms/':                     ['student', 'grant_client', 'partner', 'program_holder', 'admin', 'staff', 'instructor'],
+  '/learner/':                 ['student', 'delegate', 'grant_client', 'admin', 'staff', 'instructor'],
 
   // ── Mentor Portal ─────────────────────────────────────────────────
-  '/mentor/':                  ['mentor', 'admin', 'super_admin'],
+  '/mentor/':                  ['mentor', 'admin'],
 
   // ── Workforce / Case Management ──────────────────────────────────
-  '/workforce-board/':         ['workforce_board', 'admin', 'super_admin', 'staff'],
-  '/case-manager/':            ['case_manager', 'admin', 'super_admin', 'staff'],
+  '/workforce-board/':         ['workforce_board', 'admin', 'staff'],
+  '/case-manager/':            ['case_manager', 'admin', 'staff'],
 
   // ── Provider / Creator ───────────────────────────────────────────
-  '/provider/':                ['provider_admin', 'admin', 'super_admin'],
-  '/creator/':                 ['creator', 'admin', 'super_admin'],
+  '/provider/':                ['provider_admin', 'admin'],
+  '/creator/':                 ['creator', 'admin'],
 
   // ── Instructor ────────────────────────────────────────────────────
-  '/instructor/':              ['instructor', 'admin', 'super_admin', 'staff'],
+  '/instructor/':              ['instructor', 'admin', 'staff'],
 
   // ── Field Portals ─────────────────────────────────────────────────
-  '/portal/':                  ['student', 'partner', 'program_holder', 'admin', 'super_admin', 'staff', 'instructor'],
-  '/apprentice/':              ['student', 'partner', 'program_holder', 'admin', 'super_admin', 'staff', 'instructor'],
+  '/portal/':                  ['student', 'partner', 'program_holder', 'admin', 'staff', 'instructor'],
+  '/apprentice/':              ['student', 'partner', 'program_holder', 'admin', 'staff', 'instructor'],
 
   // ── Host Shop ────────────────────────────────────────────────────
-  '/admin/host-shop/':         ['host_shop', 'admin', 'super_admin', 'staff'],
+  '/admin/host-shop/':         ['host_shop', 'admin', 'staff'],
 
   // ── Orphaned routes needing protection ───────────────────────────
-  '/verify-identity':          ['student', 'admin', 'super_admin', 'staff'],
-  '/cm/':                      ['case_manager', 'admin', 'super_admin', 'staff'],
-  '/card':                     ['student', 'admin', 'super_admin', 'staff'],
-  '/career-services/':         ['student', 'admin', 'super_admin', 'staff'],
-  '/funding/confirm':          ['student', 'admin', 'super_admin', 'staff'],
-  '/ferpa/':                   ['student', 'admin', 'super_admin', 'staff'],
-  '/account/':                 ['student', 'admin', 'super_admin', 'staff'],
-  '/shop/':                    ['employer', 'admin', 'super_admin', 'staff'],
-  '/host-shop/':               ['host_shop', 'admin', 'super_admin', 'staff'],
-  '/file-manager/':            ['student', 'admin', 'super_admin', 'staff'],
-  '/parent-portal/':           ['parent', 'admin', 'super_admin', 'staff'],
-  '/billing':                  ['student', 'admin', 'super_admin', 'staff'],
-  '/license':                  ['student', 'admin', 'super_admin', 'staff'],
+  '/verify-identity':          ['student', 'admin', 'staff'],
+  '/cm/':                      ['case_manager', 'admin', 'staff'],
+  '/card':                     ['student', 'admin', 'staff'],
+  '/career-services/':         ['student', 'admin', 'staff'],
+  '/funding/confirm':          ['student', 'admin', 'staff'],
+  '/ferpa/':                   ['student', 'admin', 'staff'],
+  '/account/':                 ['student', 'admin', 'staff'],
+  '/shop/':                    ['employer', 'admin', 'staff'],
+  '/host-shop/':               ['host_shop', 'admin', 'staff'],
+  '/file-manager/':            ['student', 'admin', 'staff'],
+  '/parent-portal/':           ['parent', 'admin', 'staff'],
+  '/billing':                  ['student', 'admin', 'staff'],
+  '/license':                  ['student', 'admin', 'staff'],
 };
 
 /**
@@ -101,6 +116,7 @@ const PUBLIC_MARKETING_PREFIXES = [
   '/apply',
   '/for-employers',
   '/apprenticeship-sponsor',
+  '/pwa',
 ];
 
 /** Exact public routes (portal hub, role-specific login pages). */
@@ -284,6 +300,7 @@ export async function middleware(request: NextRequest) {
   const host = (request.headers.get('host') || '').toLowerCase();
   const hostWithoutPort = host.split(':')[0];
   const { pathname, search } = request.nextUrl;
+  const canonicalAdminHost = resolveCanonicalAdminHost();
 
   const requestHeaders = new Headers(request.headers);
 
@@ -440,7 +457,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      // For admin API routes, verify admin/super_admin/staff role + IP allowlist
+      // For admin API routes, verify admin/admin/staff role + IP allowlist
       if (pathname.startsWith('/api/admin/')) {
         const ipBlocked = await checkAdminIPAsync(request);
         if (ipBlocked) return ipBlocked;
@@ -453,7 +470,7 @@ export async function middleware(request: NextRequest) {
 
         if (
           !apiProfile?.role ||
-          !['admin', 'super_admin', 'org_admin', 'staff', 'platform_operator'].includes(apiProfile.role)
+          !['admin', 'org_admin', 'staff', 'admin'].includes(apiProfile.role)
         ) {
           return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
@@ -469,7 +486,7 @@ export async function middleware(request: NextRequest) {
 
         if (
           !apiProfile?.role ||
-          !['instructor', 'admin', 'super_admin'].includes(apiProfile.role)
+          !['instructor', 'admin'].includes(apiProfile.role)
         ) {
           return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }

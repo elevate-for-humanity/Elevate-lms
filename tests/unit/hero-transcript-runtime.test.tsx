@@ -13,7 +13,7 @@ describe('marketing hero transcript runtime behavior', () => {
   it('renders HeroPicture brand bug without leaking source comments into the DOM', () => {
     render(
       <HeroPicture
-        src="/images/hero.jpg"
+        src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp"
         alt="Training classroom"
         showBrandBug
         transcript="A still image transcript."
@@ -28,7 +28,7 @@ describe('marketing hero transcript runtime behavior', () => {
     render(
       <HeroVideo
         videoSrcDesktop="/videos/hero.mp4"
-        posterImage="/images/hero.jpg"
+        posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp"
         transcript="A video transcript."
       />,
     );

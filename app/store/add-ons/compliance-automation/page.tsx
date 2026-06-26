@@ -99,12 +99,12 @@ export default function ComplianceAutomationPage() {
       <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/store-addons-compliance-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-addons-compliance-hero.webp"
           alt="Compliance Automation"
           fill
           className="object-cover"
           priority
-         sizes="100vw" placeholder="empty" />
+         sizes="100vw"  />
         
       </section>
 

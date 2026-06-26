@@ -6,81 +6,81 @@
 export const imageManifest = {
   homepage: {
     hero: [
-      '/images/facility/lobby/lobby-hero-01.jpg',
-      '/images/facility/lobby/lobby-hero-02.jpg',
-      '/images/facility/atrium/atrium-overlook-01.jpg',
-      '/images/programs/marketing/elevate-collage-hero-01.jpg',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
     ],
     features: [
-      '/images/facility/cafe/cafe-counter-01.jpg',
-      '/images/facility/workbar/workbar-window-01.jpg',
-      '/images/facility/meeting-rooms-board/meeting-boardroom-01.jpg',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     ],
     dualImage: [
-      '/images/facility/lobby/lobby-hero-03.jpg',
-      '/images/facility/cafe/cafe-booths-01.jpg',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     ],
   },
 
   about: {
     hero: [
-      '/images/facility/atrium/atrium-overlook-02.jpg',
-      '/images/facility/lobby/lobby-hero-04.jpg',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     ],
     campus: [
-      '/images/facility/exterior-view/exterior-aerial-01.jpg',
-      '/images/facility/elevators/elevators-bank-01.jpg',
-      '/images/facility/breakroom/breakroom-01.jpg',
-      '/images/facility/waiting-area/waiting-area-01.jpg',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     ],
   },
 
   programs: {
-    overview: ['/images/programs/marketing/elevate-collage-hero-01.jpg'],
+    overview: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp'],
     healthcare: [
-      '/images/programs/healthcare/healthcare-lab-01.jpg',
-      '/images/programs/healthcare/healthcare-lab-02.jpg',
-      '/images/programs/healthcare/healthcare-lab-03.jpg',
-      '/images/programs/healthcare/healthcare-lab-04.jpg',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
     ],
   },
 
   campus: {
-    hero: '/images/facility/exterior-view/exterior-aerial-01.jpg',
+    hero: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     lobby: [
-      '/images/facility/lobby/lobby-hero-01.jpg',
-      '/images/facility/lobby/lobby-hero-02.jpg',
-      '/images/facility/lobby/lobby-detail-seating-01.jpg',
-      '/images/facility/lobby/lobby-detail-plant-01.jpg',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     ],
     cafe: [
-      '/images/facility/cafe/cafe-counter-01.jpg',
-      '/images/facility/cafe/cafe-booths-01.jpg',
-      '/images/facility/cafe/cafe-booths-02.jpg',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     ],
     workspaces: [
-      '/images/facility/workbar/workbar-window-01.jpg',
-      '/images/facility/workbar/workbar-window-02.jpg',
-      '/images/facility/art-office/office-art-wall-01.jpg',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     ],
     meetingRooms: [
-      '/images/facility/meeting-rooms-small/meeting-small-01.jpg',
-      '/images/facility/meeting-rooms-board/meeting-boardroom-01.jpg',
-      '/images/facility/meeting-rooms-board/meeting-boardroom-02.jpg',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     ],
     amenities: [
-      '/images/facility/breakroom/breakroom-01.jpg',
-      '/images/facility/waiting-area/waiting-area-01.jpg',
-      '/images/facility/balcony/balcony-holiday-01.jpg',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     ],
   },
 
   team: {
-    alina: '/images/team/alina-smith/alina-smith-bio-hero-01.jpg',
+    alina: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     founder: {
-      hero: '/images/team/elizabeth-greene-headshot.jpg',
-      portrait: '/images/team/founder/elizabeth-greene-founder-portrait-01.jpg',
-      wide: '/images/team/founder/elizabeth-greene-founder-wide-01.jpg',
+      hero: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/elizabeth-greene-headshot.webp',
+      portrait: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      wide: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
     },
   },
 };

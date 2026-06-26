@@ -53,12 +53,12 @@ export default async function VolunteerPage() {
       <div className="relative h-[40vh] min-h-[300px] flex items-center overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/volunteer-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/volunteer-page-1.webp"
           alt="Volunteer with Elevate"
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw" 
         />
       </div>
 

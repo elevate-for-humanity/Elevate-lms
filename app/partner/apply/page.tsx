@@ -133,12 +133,12 @@ export default function PartnerApplyPage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/employer-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-hero.webp"
           alt="Partner application"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
       </section>
       <div className="bg-slate-50 border-b">

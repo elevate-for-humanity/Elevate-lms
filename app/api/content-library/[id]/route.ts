@@ -1,6 +1,6 @@
 // Single content item operations for the Content Library admin UI.
 // DELETE removes the item (soft-delete via is_active=false).
-// Requires admin, super_admin, or staff role.
+// Requires admin, admin, or staff role.
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -28,7 +28,7 @@ export async function DELETE(
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+    if (!profile || !['admin', 'staff'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

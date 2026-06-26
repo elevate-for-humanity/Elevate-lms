@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function EmployeeDetailPage({ params }: Props) {
-  await requireRole(['admin', 'super_admin']);
+  await requireRole(['admin']);
   const { id } = await params;
   const supabase = await createClient();
 
@@ -86,8 +86,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
     .select('rate, payment_type, effective_date, notes, created_at')
     .eq('employee_id', id)
     .order('created_at', { ascending: false })
-    .limit(10)
-    .catch(() => ({ data: [] })) as { data: unknown[] };
+    .limit(10);
 
   const profile = employee.profiles as any;
   const department = employee.departments as any;

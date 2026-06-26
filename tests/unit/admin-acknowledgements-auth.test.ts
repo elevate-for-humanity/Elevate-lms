@@ -9,7 +9,7 @@ import { describe, it, expect } from 'vitest';
 
 // ── Extracted auth logic (mirrors the route's guard) ──────────────────────────
 
-type Role = 'admin' | 'super_admin' | 'staff' | 'student' | 'partner' | 'instructor';
+type Role = 'admin' | 'admin' | 'staff' | 'student' | 'partner' | 'instructor';
 
 interface AuthResult {
   allowed: boolean;
@@ -21,7 +21,7 @@ function checkAdminAccess(user: { id: string; role: Role } | null): AuthResult {
   if (!user) {
     return { allowed: false, status: 401, error: 'Unauthorized' };
   }
-  if (!['admin', 'super_admin', 'staff'].includes(user.role)) {
+  if (!['admin', 'staff'].includes(user.role)) {
     return { allowed: false, status: 403, error: 'Forbidden' };
   }
   return { allowed: true, status: 200 };
@@ -62,8 +62,8 @@ describe('Admin acknowledgements route — auth guard', () => {
     expect(result.allowed).toBe(true);
   });
 
-  it('returns 200 for super_admin role', () => {
-    const result = checkAdminAccess({ id: 'u5', role: 'super_admin' });
+  it('returns 200 for admin role', () => {
+    const result = checkAdminAccess({ id: 'u5', role: 'admin' });
     expect(result.status).toBe(200);
     expect(result.allowed).toBe(true);
   });

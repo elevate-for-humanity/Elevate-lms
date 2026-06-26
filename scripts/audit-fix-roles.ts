@@ -9,7 +9,7 @@
  *  4. Duplicate profile rows for the same auth id (shouldn't happen but reports if found)
  *
  * Valid roles (from AGENTS.md + codebase):
- *   student | instructor | admin | super_admin | staff |
+ *   student | instructor | admin | admin | staff |
  *   program_holder | provider_admin | case_manager | employer | partner | delegate
  *
  * Run: pnpm tsx scripts/audit-fix-roles.ts [--fix]
@@ -18,7 +18,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const VALID_ROLES = new Set([
-  'student', 'instructor', 'admin', 'super_admin', 'staff',
+  'student', 'instructor', 'admin', 'staff',
   'program_holder', 'provider_admin', 'case_manager', 'employer', 'partner', 'delegate',
 ]);
 

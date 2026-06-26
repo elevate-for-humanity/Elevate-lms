@@ -18,13 +18,13 @@ export type ProgramCategory =
  * Category default hero images
  */
 export const CATEGORY_HEROES: Record<ProgramCategory, string> = {
-  healthcare: '/hero-images/healthcare-hero.jpg',
-  'skilled-trades': '/hero-images/skilled-trades-hero.jpg',
-  technology: '/hero-images/technology-hero.jpg',
-  business: '/hero-images/business-hero.jpg',
-  beauty: '/hero-images/barber-beauty-cat-new.jpg',
-  transportation: '/hero-images/cdl-cat-new.jpg',
-  general: '/hero-images/programs-hero.jpg',
+  healthcare: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+  'skilled-trades': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/training-provider-1.webp',
+  technology: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/technology-hero.webp',
+  business: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/business-hero.webp',
+  beauty: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/barber-beauty-cat-new.jpg',
+  transportation: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/cdl-cat-new.jpg',
+  general: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
 };
 
 /**
@@ -32,49 +32,49 @@ export const CATEGORY_HEROES: Record<ProgramCategory, string> = {
  */
 export const PROGRAM_HEROES: Record<string, string> = {
   // Beauty & Barber
-  'barber-apprenticeship': '/hero-images/barber-hero.webp',
-  barber: '/hero-images/barber-hero.webp',
-  'cosmetology-apprenticeship': '/hero-images/barber-beauty-cat-new.jpg',
-  'esthetician-apprenticeship': '/hero-images/barber-beauty-cat-new.jpg',
-  'nail-technician-apprenticeship': '/hero-images/barber-beauty-cat-new.jpg',
-  beauty: '/hero-images/barber-beauty-cat-new.jpg',
+  'barber-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/barber-hero.webp',
+  barber: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/barber-hero.webp',
+  'cosmetology-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/barber-beauty-cat-new.jpg',
+  'esthetician-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/barber-beauty-cat-new.jpg',
+  'nail-technician-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/barber-beauty-cat-new.jpg',
+  beauty: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/barber-beauty-cat-new.jpg',
 
   // Healthcare
-  'cna-certification': '/hero-images/healthcare-hero.jpg',
-  cna: '/hero-images/healthcare-hero.jpg',
-  phlebotomy: '/hero-images/healthcare-hero.jpg',
-  'medical-assistant': '/hero-images/healthcare-hero.jpg',
-  'direct-support-professional': '/hero-images/healthcare-hero.jpg',
-  'drug-collector': '/hero-images/healthcare-hero.jpg',
-  'cpr-first-aid-hsi': '/hero-images/healthcare-hero.jpg',
-  healthcare: '/hero-images/healthcare-hero.jpg',
+  'cna-certification': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+  cna: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+  phlebotomy: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+  'medical-assistant': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+  'direct-support-professional': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+  'drug-collector': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+  'cpr-first-aid-hsi': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+  healthcare: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
 
   // Skilled Trades
-  'hvac-technician': '/images/pages/hvac-technician.webp',
-  hvac: '/images/pages/hvac-unit.webp',
-  'skilled-trades': '/hero-images/skilled-trades-hero.jpg',
+  'hvac-technician': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
+  hvac: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-unit.webp',
+  'skilled-trades': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/training-provider-1.webp',
 
   // Transportation
-  'cdl-training': '/images/pages/cdl-training.webp',
-  cdl: '/images/pages/cdl-truck-highway.webp',
-  'cdl-transportation': '/hero-images/cdl-cat-new.jpg',
+  'cdl-training': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-training.webp',
+  cdl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-truck-highway.webp',
+  'cdl-transportation': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/cdl-cat-new.jpg',
 
   // Technology
-  cybersecurity: '/hero-images/technology-hero.jpg',
-  'it-support': '/hero-images/technology-hero.jpg',
-  technology: '/hero-images/technology-hero.jpg',
+  cybersecurity: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/technology-hero.webp',
+  'it-support': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/technology-hero.webp',
+  technology: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/technology-hero.webp',
 
   // Business
-  'tax-preparation': '/hero-images/business-hero.jpg',
-  'tax-entrepreneurship': '/hero-images/business-hero.jpg',
-  business: '/hero-images/business-hero.jpg',
-  'business-financial': '/hero-images/business-hero.jpg',
+  
+  'tax-entrepreneurship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/business-hero.webp',
+  business: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/business-hero.webp',
+  'business-financial': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/business-hero.webp',
 
   // Special Programs
-  jri: '/hero-images/programs-hero.jpg',
-  'federal-funded': '/hero-images/programs-hero.jpg',
-  apprenticeships: '/hero-images/apprenticeships-hero.jpg',
-  'micro-programs': '/hero-images/programs-hero.jpg',
+  jri: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+  'federal-funded': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+  apprenticeships: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/apprenticeships-hero.webp',
+  'micro-programs': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
 };
 
 /**
@@ -115,7 +115,7 @@ export const PROGRAM_CATEGORIES: Record<string, ProgramCategory> = {
   technology: 'technology',
 
   // Business
-  'tax-preparation': 'business',
+  
   'tax-entrepreneurship': 'business',
   business: 'business',
   'business-financial': 'business',

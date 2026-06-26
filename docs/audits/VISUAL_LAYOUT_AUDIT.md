@@ -134,7 +134,7 @@ _None_
             src={MODULE_PHOTO[index] || MODULE_PHOTO[0]}
   `
 - L297 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-          src="/images/pages/hvac-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-hero.webp"
           alt=`
 - L444 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
                 src="/images/pages/comp-home-highlight-succ`
@@ -158,7 +158,7 @@ _None_
 - L105 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
 - L117 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
 - L53 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="/images/pages/barber-training.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-training.webp"
   `
 - L105 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
                 src="/images/pages/barber-gallery-2.webp"
@@ -175,7 +175,7 @@ _None_
 - L55 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
                 src="/images/pages/cosmetology-apprenticesh`
 - L110 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="/images/pages/cosmetology.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology.webp"
       `
 - L122 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
                 src="/images/pages/barber-styling-hair.webp`
@@ -186,13 +186,13 @@ _None_
 - L89 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
 - L99 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
 - L57 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="/images/pages/cosmetology-hero.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-hero.webp"
  `
 - L89 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="/images/pages/cosmetology-hero.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-hero.webp"
  `
 - L99 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="/images/pages/cosmetology-hero.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-hero.webp"
  `
 
 ### `app/programs/nail-technician-apprenticeship/host-shops/page.tsx` (7)
@@ -200,11 +200,11 @@ _None_
 - L57 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
 - L86 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
 - L93 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L57 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src="/images/pages/nail-technician.webp"
+- L57 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-technician.webp"
                 al`
-- L86 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src="/images/pages/nail-technician.webp"
+- L86 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-technician.webp"
                 al`
-- L93 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src="/images/pages/nail-technician.webp"
+- L93 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-technician.webp"
                 al`
 
 ### `app/workone-partner-packet/page.tsx` (6)
@@ -241,7 +241,7 @@ _None_
 - L46 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
 - L233 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
 - L46 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-            src="/images/pages/jri-hero.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/jri-hero.webp"
             a`
 - L233 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
                     src={program.image}
@@ -271,14 +271,14 @@ _None_
 - L54 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
           src="/images/pages/store-licensing-enterprise-her`
 - L418 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-          src="/images/business/team-4.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/team-4.webp"
           alt=`
 
 ### `app/store/licenses/school-license/page.tsx` (4)
 - L27 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
 - L286 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
 - L27 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-          src="/images/pages/about-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp"
           alt`
 - L286 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src={item.img} alt={item.title} fill`
 
@@ -420,7 +420,7 @@ _None_
           className="object-cover"
   `
 - L454 **empty-alt**: Empty image alt text — `<Image
-          src="/images/pages/admin-dashboard-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp"
           alt=""`
 
 ### `components/home/Pathways.tsx` (2)

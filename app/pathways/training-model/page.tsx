@@ -30,7 +30,7 @@ export default function TrainingModelPage() {
       {/* Visual hero */}
       <section className="relative h-[280px] sm:h-[360px] overflow-hidden">
         <Image
-          src="/images/pages/pathways-page-4.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pathways-page-4.webp"
           alt="Students in a hands-on training classroom"
           fill
           sizes="100vw"
@@ -79,7 +79,7 @@ export default function TrainingModelPage() {
               <div className="flex flex-col sm:flex-row">
                 <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0 overflow-hidden">
                   <Image
-                    src="/images/pages/pathways-page-10.webp"
+                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pathways-page-10.webp"
                     alt="Hands-on trades training"
                     fill
                     sizes="(max-width: 640px) 100vw, 256px"
@@ -116,7 +116,7 @@ export default function TrainingModelPage() {
               <div className="flex flex-col sm:flex-row">
                 <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0 overflow-hidden">
                   <Image
-                    src="/images/pages/pathways-page-11.webp"
+                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pathways-page-11.webp"
                     alt="CDL behind-the-wheel training"
                     fill
                     sizes="(max-width: 640px) 100vw, 256px"
@@ -153,7 +153,7 @@ export default function TrainingModelPage() {
               <div className="flex flex-col sm:flex-row">
                 <div className="relative h-48 sm:h-auto sm:w-64 flex-shrink-0 overflow-hidden">
                   <Image
-                    src="/images/pages/pathways-page-12.webp"
+                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pathways-page-12.webp"
                     alt="Online cybersecurity training"
                     fill
                     sizes="(max-width: 640px) 100vw, 256px"

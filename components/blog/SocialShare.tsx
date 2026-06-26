@@ -1,7 +1,8 @@
 'use client';
 import { logger } from '@/lib/logger';
 
-import { Facebook, Twitter, Linkedin, Link2, Mail, MessageCircle } from 'lucide-react';
+import { Mail, Link2 } from 'lucide-react';
+import { Facebook, Linkedin, Instagram, Share2 } from '../ui/BrandIcons';
 import { useState } from 'react';
 
 interface SocialShareProps {
@@ -19,7 +20,6 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
 
   const shareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-    twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
     email: `mailto:?subject=${encodedTitle}&body=${encodedDesc}%0A%0A${encodedUrl}`,
     whatsapp: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`,
@@ -50,16 +50,6 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
       </a>
 
       <a
-        href={shareLinks.twitter}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-sky-500 text-white hover:bg-sky-600 transition"
-        aria-label="Share on Twitter"
-      >
-        <Twitter className="w-5 h-5" />
-      </a>
-
-      <a
         href={shareLinks.linkedin}
         target="_blank"
         rel="noopener noreferrer"
@@ -74,9 +64,18 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
         target="_blank"
         rel="noopener noreferrer"
         className="w-10 h-10 flex items-center justify-center rounded-full bg-brand-green-500 text-white hover:bg-brand-green-600 transition"
-        aria-label="Share on WhatsApp"
+        aria-label="Share on Instagram"
       >
-        <MessageCircle className="w-5 h-5" />
+        <Instagram className="w-5 h-5" />
+      </a>
+
+      <a
+        href="#"
+        onClick={(e) => { e.preventDefault(); copyToClipboard(); }}
+        className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-500 text-white hover:bg-slate-600 transition"
+        aria-label="Share"
+      >
+        <Share2 className="w-5 h-5" />
       </a>
 
       <a

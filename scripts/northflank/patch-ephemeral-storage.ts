@@ -2,8 +2,8 @@
 /**
  * Apply build ephemeral storage (fixes ERR_PNPM_ENOSPC when unset / 0 MB).
  *
- *   NORTHFLANK_EPHEMERAL_STORAGE_MB=32768 pnpm tsx scripts/northflank/patch-ephemeral-storage.ts elevate-admin --execute
- *   pnpm tsx scripts/northflank/patch-ephemeral-storage.ts --all --execute
+ *   NORTHFLANK_EPHEMERAL_STORAGE_MB=32768 npx tsx scripts/northflank/patch-ephemeral-storage.ts elevate-admin --execute
+ *   npx tsx scripts/northflank/patch-ephemeral-storage.ts --all --execute
  */
 
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
@@ -75,7 +75,7 @@ async function main() {
   }
 
   if (!dryRun) {
-    console.log('\nDone. Verify: pnpm tsx scripts/northflank/inspect-services.ts');
+    console.log('\nDone. Verify: npx tsx scripts/northflank/inspect-services.ts');
   }
 }
 

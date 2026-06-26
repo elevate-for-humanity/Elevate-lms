@@ -7,8 +7,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Platform Features | Elevate LMS',
-  description:
-    'Explore the features of the Elevate LMS platform. Learning management, student tracking, employer portal, and more.',
+  description: 'Explore the features of the Elevate LMS platform. Learning management, student tracking, employer portal, and more.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/license/features',
   },
@@ -17,6 +16,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 export default async function FeaturesPage() {
   const supabase = await createClient();
+
 
   // Get features from database
   const { data: dbFeatures } = await supabase
@@ -103,8 +103,7 @@ export default async function FeaturesPage() {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Platform Features</h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Self-operating workforce infrastructure that runs the entire learner lifecycle — from
-            application to credential — without staff intervention.
+            Self-operating workforce infrastructure that runs the entire learner lifecycle — from application to credential — without staff intervention.
           </p>
         </div>
       </section>
@@ -139,14 +138,9 @@ export default async function FeaturesPage() {
       {/* Automated Self-Service Operations */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4 text-white">
-            Automated, Self-Service Operations
-          </h2>
+          <h2 className="text-3xl font-bold text-center mb-4 text-white">Automated, Self-Service Operations</h2>
           <p className="text-lg text-slate-300 text-center mb-8 max-w-3xl mx-auto">
-            This platform operates as a self-service workforce system. Enrollment triggers automated
-            workflows for eligibility, course assignment, progress tracking, compliance logging,
-            credential issuance, and reporting. Staff intervention is required only for
-            exceptions—not daily operations.
+            This platform operates as a self-service workforce system. Enrollment triggers automated workflows for eligibility, course assignment, progress tracking, compliance logging, credential issuance, and reporting. Staff intervention is required only for exceptions—not daily operations.
           </p>
           <div className="max-w-2xl mx-auto">
             <ul className="space-y-4">
@@ -156,9 +150,7 @@ export default async function FeaturesPage() {
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
                 <span className="text-slate-400 flex-shrink-0">•</span>
-                <span className="text-slate-200 text-lg">
-                  Rules-based progress and hour tracking
-                </span>
+                <span className="text-slate-200 text-lg">Rules-based progress and hour tracking</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
                 <span className="text-slate-400 flex-shrink-0">•</span>
@@ -166,15 +158,11 @@ export default async function FeaturesPage() {
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
                 <span className="text-slate-400 flex-shrink-0">•</span>
-                <span className="text-slate-200 text-lg">
-                  Auto-generated compliance and outcome reports
-                </span>
+                <span className="text-slate-200 text-lg">Auto-generated compliance and outcome reports</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
                 <span className="text-slate-400 flex-shrink-0">•</span>
-                <span className="text-slate-200 text-lg">
-                  Credential issuance with public verification
-                </span>
+                <span className="text-slate-200 text-lg">Credential issuance with public verification</span>
               </li>
             </ul>
           </div>
@@ -209,15 +197,15 @@ export default async function FeaturesPage() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Integrations</h2>
-          <p className="text-slate-700 mb-8">Connect with the tools you already use</p>
+          <p className="text-slate-700 mb-8">
+            Connect with the tools you already use
+          </p>
           <div className="flex flex-wrap justify-center gap-4">
-            {['Salesforce', 'Workday', 'ADP', 'Zoom', 'Google Workspace', 'Microsoft 365'].map(
-              (integration) => (
-                <span key={integration} className="bg-white px-4 py-2 rounded-lg text-slate-900">
-                  {integration}
-                </span>
-              ),
-            )}
+            {['Salesforce', 'Workday', 'ADP', 'Zoom', 'Google Workspace', 'Microsoft 365'].map((integration) => (
+              <span key={integration} className="bg-white px-4 py-2 rounded-lg text-slate-900">
+                {integration}
+              </span>
+            ))}
           </div>
         </div>
       </section>
@@ -225,8 +213,12 @@ export default async function FeaturesPage() {
       {/* CTA */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">See It In Action</h2>
-          <p className="text-white mb-8">Schedule a personalized demo to explore all features.</p>
+          <h2 className="text-3xl font-bold text-white mb-4">
+            See It In Action
+          </h2>
+          <p className="text-white mb-8">
+            Schedule a personalized demo to explore all features.
+          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href={ROUTES.schedule}

@@ -61,7 +61,7 @@ export function OptimizedImage({
         transition: 'opacity 0.3s ease-in-out',
         opacity: isLoading ? 0 : 1,
       }}
-      placeholder="blur"
+      
       blurDataURL={blurDataURL}
       onLoad={() => setIsLoading(false)}
       {...props}

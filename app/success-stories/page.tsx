@@ -21,14 +21,14 @@ export const metadata: Metadata = {
       'Inspiring stories from graduates who transformed their lives through workforce training.',
     url: 'https://www.elevateforhumanity.org/success-stories',
     siteName: PLATFORM_DEFAULTS.orgName,
-    images: [{ url: '/og-default.webp', width: 1200, height: 630, alt: 'Success Stories' }],
+    images: [{ url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp', width: 1200, height: 630, alt: 'Success Stories' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Success Stories - Real People, Real Results',
     description: 'Inspiring stories from workforce training graduates.',
-    images: ['/og-default.webp'],
+    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp'],
   },
 };
 
@@ -53,7 +53,7 @@ const successStories = [
     name: 'Sarah Martinez',
     age: 28,
     program: 'Medical Assistant',
-    image: '/images/heroes/workforce-partner-1.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/workforce-partner-1.webp',
     beforeJob: 'Retail cashier, $12/hour',
     afterJob: 'Medical Assistant at Community Health Center',
     salary: '$38,000/year',
@@ -68,7 +68,7 @@ const successStories = [
     name: 'James Wilson',
     age: 42,
     program: 'CDL Training',
-    image: '/images/heroes/workforce-partner-3.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/workforce-partner-3.webp',
     beforeJob: 'Laid off factory worker',
     afterJob: 'Class A CDL Driver for National Carrier',
     salary: '$65,000/year',
@@ -83,7 +83,7 @@ const successStories = [
     name: 'Destiny Brown',
     age: 22,
     program: 'Barber Apprenticeship',
-    image: '/images/barber-professional.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/barber-professional.webp',
     beforeJob: 'Fast food worker, $10/hour',
     afterJob: 'Licensed Barber, owns chair at local shop',
     salary: '$50,000+/year',
@@ -98,7 +98,7 @@ const successStories = [
     name: 'Robert Chen',
     age: 55,
     program: 'HVAC Technician',
-    image: '/images/heroes/workforce-partner-4.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/workforce-partner-4.webp',
     beforeJob: 'Unemployed, career change',
     afterJob: 'HVAC Technician at Commercial HVAC Company',
     salary: '$48,000/year',
@@ -113,7 +113,7 @@ const successStories = [
     name: 'Tamika Johnson',
     age: 31,
     program: 'CNA',
-    image: '/images/heroes/workforce-partner-2.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/workforce-partner-2.webp',
     beforeJob: 'Unemployed single mother',
     afterJob: 'CNA at Skilled Nursing Facility',
     salary: '$32,000/year + benefits',
@@ -128,7 +128,7 @@ const successStories = [
     name: 'David Rodriguez',
     age: 26,
     program: 'Workforce Readiness',
-    image: '/images/heroes/workforce-partner-5.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/workforce-partner-5.webp',
     beforeJob: 'Unemployed youth, no work history',
     afterJob: 'Customer Service Representative at Tech Company',
     salary: '$35,000/year',
@@ -143,7 +143,7 @@ const successStories = [
     name: 'Lisa Anderson',
     age: 38,
     program: 'Medical Assistant',
-    image: '/images/programs/workforce-readiness-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/workforce-readiness-hero.webp',
     beforeJob: 'Restaurant server, $25,000/year',
     afterJob: 'Medical Assistant at Family Practice',
     salary: '$40,000/year',
@@ -292,7 +292,7 @@ export default async function SuccessStoriesPage() {
                       fill
                       sizes="100vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      quality={90} placeholder="empty"
+                      quality={90} 
                     />
                     {story.videoContent && (
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">

@@ -32,7 +32,7 @@ const categories = [
 const funding = [
   { label: 'WIOA', desc: 'Workforce Innovation & Opportunity Act — federal funding for eligible participants.' },
   { label: 'Workforce Ready Grant', desc: 'Indiana state-funded training support for high-demand careers.' },
-  { label: 'FSSA Programs', desc: 'SNAP E&T, TANF, and support services for eligible participants.' },
+  { label: 'FSSA Programs', desc: ', TANF, and support services for eligible participants.' },
 ];
 
 export default function ForStudentsPage() {

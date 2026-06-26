@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 
 import { Metadata } from 'next';
@@ -19,7 +19,7 @@ const demos = [
     id: 'admin',
     title: 'Admin Dashboard',
     icon: Shield,
-    image: '/images/pages/career-counseling.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg',
     alt: 'Training program administrator reviewing enrollment data',
     href: '/store/demo/admin',
     description: 'This is what your staff sees every day. Watch how enrollment tracking, compliance reporting, and application management work inside the admin portal.',
@@ -29,7 +29,7 @@ const demos = [
     id: 'employer',
     title: 'Employer Portal',
     icon: Briefcase,
-    image: '/images/pages/employer-handshake.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-handshake.webp',
     alt: 'Employer reviewing candidate profiles from training programs',
     href: '/store/demo/employer',
     description: 'See what your employer partners see - how they track apprentices, view hiring incentives, and manage OJT contracts inside their portal.',
@@ -39,7 +39,7 @@ const demos = [
     id: 'learner',
     title: 'Student Experience',
     icon: GraduationCap,
-    image: '/images/pages/wioa-meeting.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
     alt: 'Students in a training classroom working on coursework',
     href: '/store/demo/student',
     description: 'What your students see when they log in. Their courses, progress bars, apprenticeship hours logged, and certificates earned. This is the experience that keeps them showing up.',
@@ -49,7 +49,7 @@ const demos = [
     id: 'workforce',
     title: 'Workforce Board View',
     icon: BarChart3,
-    image: '/images/pages/wioa-meeting.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
     alt: 'Workforce board staff reviewing program outcomes and funding data',
     href: '/store/demo/admin',
     description: 'Built for workforce boards and state agencies. WIOA eligibility, ITA tracking, PIRL reporting, and partner network management. The same admin dashboard, filtered for what matters to you.',
@@ -98,7 +98,7 @@ export default function StoreDemosPage() {
                 {/* Image */}
                 <div className="w-full md:w-1/2 relative rounded-2xl overflow-hidden shadow-lg aspect-video">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                  <Image src={demo.image} alt={demo.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" quality={90} placeholder="empty" />
+                  <Image src={demo.image} alt={demo.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" quality={90}  />
                   <Link href={demo.href} className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
                     <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
                       <Play className="w-7 h-7 text-brand-red-600 ml-1" />

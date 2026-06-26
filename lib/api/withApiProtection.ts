@@ -14,9 +14,9 @@
  * Auth levels:
  *   'public'  — no auth required. Must be explicitly declared.
  *   'user'    — any authenticated user
- *   'admin'   — admin | super_admin | staff | org_admin
- *   'staff'   — staff | admin | super_admin
- *   'instructor' — instructor | admin | super_admin | staff
+ *   'admin'   — admin | admin | staff | org_admin
+ *   'staff'   — staff | admin | admin
+ *   'instructor' — instructor | admin | admin | staff
  *   'system'  — cron/webhook — validated via CRON_SECRET or JOB_PROCESSOR_TOKEN header
  *
  * Rate limit tiers map to lib/api/withRateLimit.ts tiers.
@@ -44,9 +44,9 @@ export type ApiHandler = (
   context: { params: Record<string, string>; userId?: string; userRole?: string },
 ) => Promise<NextResponse> | NextResponse;
 
-const ADMIN_ROLES = new Set(['admin', 'super_admin', 'platform_operator', 'staff', 'org_admin']);
-const STAFF_ROLES = new Set(['staff', 'admin', 'super_admin']);
-const INSTRUCTOR_ROLES = new Set(['instructor', 'admin', 'super_admin', 'staff']);
+const ADMIN_ROLES = new Set(['admin', 'staff', 'org_admin']);
+const STAFF_ROLES = new Set(['staff', 'admin']);
+const INSTRUCTOR_ROLES = new Set(['instructor', 'admin', 'staff']);
 
 function defaultRateLimit(auth: AuthLevel): RateLimitTier {
   if (auth === 'public') return 'public';

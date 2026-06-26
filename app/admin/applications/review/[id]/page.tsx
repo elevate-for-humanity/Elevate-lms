@@ -61,6 +61,7 @@ type ReviewApplication = {
   program_slug?: string | null;
   source?: string | null;
   support_notes?: string | null;
+  review_notes?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
   revoked_at?: string | null;
@@ -207,7 +208,7 @@ export default async function ReviewApplicationPage({
       {/* HERO */}
       <div className="relative w-full h-[220px] sm:h-[280px]">
         <Image sizes="100vw"
-          src="/images/pages/admin-applicants-detail.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-applicants-detail.webp"
           alt="Review Application"
           fill
           priority

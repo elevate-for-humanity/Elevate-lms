@@ -13,6 +13,11 @@ import {
   CreditCard,
   Calendar,
   AlertCircle,
+  Zap,
+  Users,
+  BarChart3,
+  Shield,
+  Headphones,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
@@ -32,6 +37,79 @@ interface SubscriptionPlan {
   effective_monthly_price: number;
   trial_period_days: number | null;
 }
+
+// Fallback plans if database is empty
+const FALLBACK_PLANS: SubscriptionPlan[] = [
+  {
+    product_id: 'solo-practitioner',
+    product_name: 'Solo Practitioner',
+    description: 'Entry-level platform access for individual business owners. Everything you need to start tracking training and compliance.',
+    features: [
+      '1 admin user',
+      'Basic AI Assistant',
+      'Course delivery (up to 10 students)',
+      'Basic compliance tracking',
+      'Email support',
+      'Student enrollment forms',
+      'Basic reporting',
+    ],
+    price_id: 'solo_monthly',
+    stripe_price_id: 'price_solo_monthly',
+    interval: 'month',
+    amount_cents: 2900,
+    amount_dollars: 29,
+    billing_period: 'Monthly',
+    effective_monthly_price: 29,
+    trial_period_days: 14,
+  },
+  {
+    product_id: 'business-platform',
+    product_name: 'Business Platform',
+    description: 'Full platform access for growing training organizations with advanced features and integrations.',
+    features: [
+      '5 admin users',
+      'AI Tutor & Assistant',
+      'Course delivery (up to 100 students)',
+      'Advanced compliance (WIOA)',
+      'Priority support',
+      'Employer portal access',
+      'API access',
+      'Custom branding',
+    ],
+    price_id: 'business_monthly',
+    stripe_price_id: 'price_business_monthly',
+    interval: 'month',
+    amount_cents: 9900,
+    amount_dollars: 99,
+    billing_period: 'Monthly',
+    effective_monthly_price: 99,
+    trial_period_days: 14,
+  },
+  {
+    product_id: 'professional-license',
+    product_name: 'Professional License',
+    description: 'Complete platform with unlimited usage, white-label branding, and dedicated support.',
+    features: [
+      'Unlimited admin users',
+      'AI Tutor & Assistant',
+      'Unlimited students',
+      'Full compliance suite',
+      'Dedicated support',
+      'White-label branding',
+      'API access',
+      'Custom integrations',
+      'SLA guarantee',
+    ],
+    price_id: 'professional_monthly',
+    stripe_price_id: 'price_professional_monthly',
+    interval: 'month',
+    amount_cents: 29900,
+    amount_dollars: 299,
+    billing_period: 'Monthly',
+    effective_monthly_price: 299,
+    trial_period_days: 14,
+  },
+];
 
 interface ActiveSubscription {
   id: string;
@@ -89,16 +167,27 @@ function SubscriptionsContent() {
   }
 
   async function loadPlans() {
-    const { data, error }: any = await supabase
-      .from('store_subscription_pricing')
-      .select('*')
-      .order('amount_cents', { ascending: true });
+    try {
+      const { data, error }: any = await supabase
+        .from('store_subscription_pricing')
+        .select('*')
+        .order('amount_cents', { ascending: true });
 
-    if (error) {
-      logger.error('Error loading plans:', error);
-      toast.error('Failed to load subscription plans');
-    } else {
-      setPlans(data || []);
+      if (error) {
+        logger.error('Error loading plans from DB:', error);
+        // Use fallback plans if database fails
+        setPlans(FALLBACK_PLANS);
+      } else if (!data || data.length === 0) {
+        // Database empty - use fallback plans
+        logger.info('No subscription plans in DB, using fallback data');
+        setPlans(FALLBACK_PLANS);
+      } else {
+        setPlans(data);
+      }
+    } catch (err) {
+      logger.error('Exception loading plans:', err);
+      // Use fallback plans on any error
+      setPlans(FALLBACK_PLANS);
     }
     setLoading(false);
   }

@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function CaseManagerDashboardPage() {
-  const { user } = await requireRole(['case_manager', 'admin', 'super_admin', 'staff']);
+  const { user } = await requireRole(['case_manager', 'admin', 'staff']);
 
   const supabase = await createClient();
   const admin = await requireAdminClient();
@@ -36,11 +36,13 @@ export default async function CaseManagerDashboardPage() {
     .eq('case_manager_id', user.id);
 
   const learnerIds = (assignments ?? []).map((a: any) => a.learner_id);
-  const totalAssigned = learnerIds.length;
-
+  
+  // FALLBACK: If no assigned learners, show network-wide stats for demo/admin purposes
+  const isNetworkView = learnerIds.length === 0;
+  
   // ─── Participant profiles ─────────────────────────────────────────────────
   let participants: any[] = [];
-  if (learnerIds.length > 0) {
+  if (!isNetworkView) {
     const { data } = await supabase
       .from('profiles')
       .select('id, full_name, email, city, state, created_at')
@@ -48,12 +50,21 @@ export default async function CaseManagerDashboardPage() {
       .order('full_name', { ascending: true })
       .limit(50);
     participants = data ?? [];
+  } else {
+    // Show recent student signups as fallback
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, full_name, email, city, state, created_at')
+      .eq('role', 'student')
+      .order('created_at', { ascending: false })
+      .limit(10);
+    participants = data ?? [];
   }
 
   // ─── Enrollment summary ───────────────────────────────────────────────────
   let activeEnrollments = 0;
   let completedEnrollments = 0;
-  if (learnerIds.length > 0) {
+  if (!isNetworkView) {
     const { count: active } = await supabase
       .from('program_enrollments')
       .select('id', { count: 'exact', head: true })
@@ -63,6 +74,17 @@ export default async function CaseManagerDashboardPage() {
       .from('program_enrollments')
       .select('id', { count: 'exact', head: true })
       .in('user_id', learnerIds)
+      .eq('status', 'completed');
+    activeEnrollments = active ?? 0;
+    completedEnrollments = completed ?? 0;
+  } else {
+    const { count: active } = await supabase
+      .from('program_enrollments')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'active');
+    const { count: completed } = await supabase
+      .from('program_enrollments')
+      .select('id', { count: 'exact', head: true })
       .eq('status', 'completed');
     activeEnrollments = active ?? 0;
     completedEnrollments = completed ?? 0;

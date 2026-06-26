@@ -24,7 +24,7 @@ export function HomeFinalCTA() {
           id="final-cta-heading"
           className="text-lg sm:text-xl font-extrabold text-white mb-2 leading-snug"
         >
-          From where you are to where you want to be.
+          The Infrastructure for the Next Economy.
         </h2>
         <p className="text-red-50 text-xs sm:text-sm leading-relaxed mb-4 max-w-lg mx-auto">
           Apply once for training, funding, apprenticeship, certification, and employment — all in

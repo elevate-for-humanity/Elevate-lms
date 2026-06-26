@@ -30,15 +30,26 @@ export default async function IndustryPortalPageRoute({
 
   const config = PORTAL_CONFIGS[portalKey];
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) redirect(`/login?redirect=/portal/${portalKey}`);
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name')
+    .select('full_name, organization_id')
     .eq('id', user.id)
     .maybeSingle();
+
+  // Fetch host shop if linked
+  let hostShopName = '';
+  if (profile?.organization_id) {
+    const { data: org } = await supabase
+      .from('organizations')
+      .select('name')
+      .eq('id', profile.organization_id)
+      .maybeSingle();
+    hostShopName = org?.name || '';
+  }
 
   const [enrollmentsRes, lessonsRes, certsRes] = await Promise.all([
     supabase
@@ -57,7 +68,7 @@ export default async function IndustryPortalPageRoute({
       .eq('user_id', user.id),
   ]);
 
-  const enrollments = enrollmentsRes.data;
+  const enrollments = enrollmentsRes.data ?? [];
   const lessonRows = lessonsRes.data ?? [];
   const totalLessons = lessonsRes.count ?? lessonRows.length;
   const completedLessons = lessonRows.filter((l: any) => l.completed).length;
@@ -68,10 +79,18 @@ export default async function IndustryPortalPageRoute({
     slug: e.program_slug ?? e.program_id,
     credential: `${config.label} Credential`,
     progress: e.progress_percent ?? 0,
-    status: e.enrollment_state as 'active' | 'completed',
+    status: (e.enrollment_state ?? 'active') as 'active' | 'completed',
   }));
 
   const Icon = config.icon;
+
+  // Safe hours fetch to prevent crash on missing hours table
+  let hoursLogged = 0;
+  try {
+    hoursLogged = await getApprovedHoursByType(supabase, user.id).then((h) => (h.ojl || 0) + (h.rti || 0));
+  } catch (err) {
+    console.warn('Portal hours fetch failed', err);
+  }
 
   return (
     <IndustryPortalPage
@@ -81,6 +100,7 @@ export default async function IndustryPortalPageRoute({
       accentColor={config.accentColor}
       accentBg={config.accentBg}
       userName={profile?.full_name ?? user.email ?? 'Student'}
+      hostShopName={hostShopName}
       enrolledPrograms={enrolledPrograms}
       availablePrograms={config.availablePrograms.map((p) => ({ ...p, progress: 0, status: 'not_started' as const }))}
       quickLinks={config.quickLinks}
@@ -88,7 +108,7 @@ export default async function IndustryPortalPageRoute({
         totalLessons,
         completedLessons,
         certificatesEarned,
-        hoursLogged: await getApprovedHoursByType(supabase, user.id).then((h) => h.ojl + h.rti).catch(() => 0),
+        hoursLogged,
       }}
     />
   );

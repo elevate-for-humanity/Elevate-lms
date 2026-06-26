@@ -8,7 +8,7 @@ export const NAIL_TECH: ProgramSchema = {
   sector: 'personal-services',
   category: 'Nail Technology',
   programType: 'apprenticeship',
-  heroImage: '/images/pages/nail-technician.webp',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-technician.webp',
   heroImageAlt: 'Nail technician apprentice performing a manicure',
   deliveryMode: 'in-person',
   deliveredBy: 'Partner',
@@ -259,6 +259,6 @@ export const NAIL_TECH: ProgramSchema = {
     fssa_eligible: true,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes: 'DOL Registered Apprenticeship. FSSA IMPACT may be available. WIOA apprenticeship funding eligibility determined by Indiana DWD.',
+    fundingNotes: 'DOL Registered Apprenticeship. FSSA Gov Portal may be available. WIOA apprenticeship funding eligibility determined by Indiana DWD.',
   },
 };

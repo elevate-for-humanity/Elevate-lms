@@ -88,7 +88,7 @@ export const programs: Program[] = [
       'Install, maintain, and repair heating and cooling systems. Earn EPA 608 Universal certification — proctored on-site at our approved testing facility. 6–8 weeks classroom plus 2–4 weeks hands-on training.',
     longDescription:
       "The HVAC Technician program prepares students to diagnose, repair, and maintain heating, ventilation, air conditioning, and refrigeration systems. Training covers electrical fundamentals, refrigeration theory, system installation, and EPA 608 certification prep — proctored on-site.\n\nProgram Format:\n- 6–8 weeks classroom instruction at our Indianapolis training center\n- 2–4 weeks hands-on training and employer jobsite placement\n- 6 weeks total, 120 instructional hours\n- Hybrid: Online Related Technical Instruction via LMS + hands-on labs\n\nWhat You'll Learn:\n- HVAC system components and operation\n- Electrical testing and troubleshooting\n- Refrigeration cycle fundamentals\n- Equipment installation and repair\n- Preventative maintenance practices\n- Safety, EPA preparation, and customer communication\n\nCredentials:\n- EPA 608 Universal Certification (proctored on-site)\n- OSHA 30-Hour Construction Safety\n- CPR / First Aid\n\nCareer Outcomes:\n- HVAC Technician (entry-level)\n- Maintenance Technician\n- Building Operations Support",
-    heroImage: '/images/pages/hvac-technician.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
     heroImageAlt: 'HVAC student working on an air conditioning unit',
     heroVideo: '/videos/hvac-hero-final.mp4',
     duration: '6–8 weeks',
@@ -151,7 +151,7 @@ export const programs: Program[] = [
       'Get paid while you learn. Work in a real barbershop from day one, earning approximately $10/hour plus commissions while building your skills and clientele. Skip the $25,000 barber school debt. Graduate in 15-17 months ready to rent your own chair, work in a top shop, or open your own business.',
     longDescription:
       "The Indiana Barber Apprenticeship is a federally registered program allowing you to earn wages while training to become a licensed barber. Complete 2,000 hours of on-the-job training plus 144 hours of related instruction over 15-17 months.\n\nWhat You'll Learn:\n- Haircutting techniques: fades, tapers, lineups, beard work\n- Hot towel shaves and grooming\n- Sanitation and infection control\n- Client consultation and communication\n- Business management and shop operations\n- Building and maintaining clientele\n\nWho This Program Is For:\n- Individuals seeking a skilled trade career\n- Those who enjoy working with people\n- Adults needing stable, in-demand work\n- Career changers looking for entrepreneurial opportunities\n\nProgram Format:\n- Work at registered apprenticeship sponsor shop\n- Earn $10/hour base pay plus commissions and tips\n- Complete online theory coursework (3-4 hours/week)\n- Total time: 15-17 months\n\nFunding & Approvals:\n- WIOA Funding\n- Workforce Ready Grant\n- Job Ready Indy Funding for Justice-Involved Individuals\n- Employer sponsorship options\n- Self-pay with payment plans\n\nCareer Outcomes:\n- Indiana Registered Barber (licensed)\n- Chair rental - be your own boss\n- Barbershop employee with established clientele\n- Barbershop owner/entrepreneur\n- Earning potential: $35,000-$65,000+ per year",
-    heroImage: '/images/pages/barber-hero-main.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-hero-main.webp',
     heroImageAlt: 'Barber apprentice working with real clients in professional barbershop',
     heroVideo:
       'https://cms-artifacts.artlist.io/content/generated-video-v1/video__3/video-7b329d1f-3f92-4ec5-acdf-9d2d7ff6de5f.mp4?Expires=2083752835&Key-Pair-Id=K2ZDLYDZI2R1DF&Signature=PwinNDJ~aDGbHoMI8-Hfr28QIj7s~0mwzn92P-muIHO0bW86~4gW6MzRyslLtk~TOzdfX8aTYA9OeGF-sbBPwCBUw8gTpXO6QvhwpJsFW5DiLHnEP6q6vCTvQ-jEpwV20izIuWVSpY-txGY7bDGHhkSq6-wP26b0J-lstFIMwxRHQjJ9rKmX9i4pzNruZJEQ2ILvO-LdWivm98j5TMLm09HgYzesifHFPPzUzNH7NlYwwvIO2-NtXWEuixrQFdJ2Zt4ocgdmqP9auvaeYr9hbS~F6k6CBybWLlnGoLggGkluqp1vFzt-eIslYgFKl8m4Du4UFJawNl3KmcyA9uTWtA__',
@@ -233,7 +233,7 @@ export const programs: Program[] = [
       'Start your healthcare career in just 4-8 weeks. Learn patient care from experienced nurses and get certified to work in hospitals, nursing homes, assisted living, or home health. Enjoy stable income, flexible schedules, and a clear path to becoming an LPN or RN.',
     longDescription:
       "The CNA program provides foundational patient care training through structured instruction and supported clinical experiences. Students learn essential caregiving skills, communication, infection prevention, and daily living support. This program is ideal whether you are starting a healthcare career, returning to the workforce, or preparing for advanced roles such as QMA, LPN, or RN.\n\nWhat You'll Learn:\n- Vital signs and patient monitoring\n- Infection prevention and safety\n- Activities of daily living (ADLs)\n- Mobility, transfers, and comfort care\n- Professional communication and ethics\n\nWho This Program Is For:\n- Individuals who enjoy helping others\n- Students exploring healthcare careers\n- Adults needing stable, in-demand work\n- Anyone preparing for nursing pathways\n\nProgram Format:\n- Classroom + clinicals\n- Length: 4–8 weeks\n- Schedule: Day, evening, or weekend options\n\nFunding & Approvals:\n- Partner-delivered through an approved CNA training provider\n- Workforce funding may be available\n\nCareer Outcomes:\n- Certified Nursing Assistant\n- Patient Care Technician (with additional training)\n- Home Health Aide",
-    heroImage: '/images/pages/cna-clinical.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-clinical.jpg',
     heroImageAlt: 'CNA student practicing caregiving skills with an instructor',
     heroVideo: '/videos/cna-hero.mp4',
     duration: '4–8 weeks',
@@ -305,7 +305,7 @@ export const programs: Program[] = [
       "Get your Commercial Driver's License and start earning $50,000-$70,000+ per year. Professional CDL training prepares you for Class A or Class B licensing in just weeks. Trucking companies are desperate for drivers—many offer sign-on bonuses, benefits, and tuition reimbursement.",
     longDescription:
       "The CDL program builds the knowledge and skills required to safely operate commercial vehicles. Students receive classroom instruction along with hands-on yard and road training. This pathway is ideal for adults seeking stable income, benefits, and long-term growth in logistics and transportation.\n\nWhat You'll Learn:\n- Vehicle inspection and safety\n- Backing, shifting, turning, and road maneuvers\n- Trip planning and hours-of-service rules\n- Transportation regulations\n- Professional communication and job readiness\n\nWho This Program Is For:\n- Adults seeking high-earning roles\n- Individuals interested in transportation careers\n- Career changers needing a stable job pathway\n- Students who want a quick employment route\n\nProgram Format:\n- Classroom, yard practice, and road training\n- Length: Varies by partner\n- Schedule: Day/evening options\n\nFunding & Approvals:\n- Workforce funding options may be available\n- Employer reimbursement programs may apply\n\nCareer Outcomes:\n- CDL Class A or B Driver\n- Local, regional, or dedicated routes\n- Logistics and transportation support roles",
-    heroImage: '/images/pages/cdl-truck-highway.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-truck-highway.webp',
     heroImageAlt: 'CDL student practicing with a commercial truck',
     heroVideo: '/videos/cdl-hero.mp4',
     duration: 'Varies by partner',
@@ -367,7 +367,7 @@ export const programs: Program[] = [
       'Hands-on apprenticeship in OSHA compliance, holistic wellness cleaning, hazardous waste management, and infection control for critical sectors',
     longDescription:
       'The 2Exclusive Apprenticeship Program is a specialized training initiative focused on equipping participants with the advanced skills required for sanitation and infection control in high-risk environments such as hospitals, military bases, and government facilities. This program offers hands-on experience and in-depth training in areas such as OSHA compliance, holistic wellness cleaning, hazardous waste management, and infection control protocols.\n\nApprentices will gain expertise in safely handling hazardous materials, implementing eco-friendly cleaning practices, and ensuring regulatory compliance, all while promoting healthier and safer environments. With a strong emphasis on both technical proficiency and holistic well-being, this apprenticeship prepares participants to meet the unique demands of critical sectors, ensuring a highly skilled workforce ready to tackle the challenges of modern sanitation and safety.\n\nAll faculty members possess at least three to five years of professional experience in military or institutional cleaning. Instructors hold valid safety and compliance certifications such as OSHA 10/30, HAZMAT, or Certified Environmental Technician credentials, and demonstrate strong expertise in infection control, regulatory compliance, and holistic wellness cleaning practices.\n\nCredentialing Partners:\n• CareerSafe - OSHA 10/30 Safety Certification (https://careersafeonline.com)\n• U.S. Department of Labor - OSHA Training (https://osha.gov)\n• Certified Environmental Technician Programs\n• HAZMAT Certification Bodies\n\nCIP Code: 15.0501 - Heating, Ventilation, Air Conditioning and Refrigeration Engineering Technology/Technician',
-    heroImage: '/images/pages/hvac-tools.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-tools.webp',
     heroImageAlt: 'Sanitation technician in protective equipment working in healthcare facility',
     heroVideo: '/videos/hvac-hero-final.mp4',
     duration: 'Varies by apprenticeship track',
@@ -448,7 +448,7 @@ export const programs: Program[] = [
       'Hands-on entrepreneurship training with LLC formation, digital marketing, and real-world startup support',
     longDescription:
       "The Business Start-Up & Marketing Program with Rise Forward equips participants with hands-on skills to launch their own business ventures. Students will learn the fundamentals of entrepreneurship, digital marketing, LLC formation, business planning, customer service, and resume development. The program includes guided startup support, mentorship, and ends with a business match stipend and laptop kit to empower real-world implementation. Ideal for youth ready to explore self-employment and leadership pathways in today's economy.\n\nIn just 5 weeks, you'll gain industry-recognized certifications in retail operations and marketing, learn how to create a business plan, develop marketing strategies, form an LLC, and build your professional image and online presence. This program is designed for aspiring entrepreneurs ages 16+ who want to launch their own business or advance in retail management.\n\nCredentialing Partners:\n• National Retail Federation (NRF) - Business of Retail Certified Specialist (https://nrf.com)\n• National Retail Federation (NRF) - Retail Industry Fundamentals Specialist (https://nrf.com)\n• Rise Forward Foundation - Business Development Support (https://riseforwardfoundation.org)\n\nProgram Benefits:\n• Business match stipend upon completion\n• Laptop kit for business operations\n• One-on-one mentorship\n• LLC formation guidance\n• Professional resume development\n\nCIP Code: 52.0701 - Entrepreneurship/Entrepreneurial Studies",
-    heroImage: '/images/pages/business-sector.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/business-sector.webp',
     heroImageAlt: 'Young entrepreneur planning business strategy',
     heroVideo: '/videos/partner-business.mp4',
     duration: '5 weeks',
@@ -529,7 +529,7 @@ export const programs: Program[] = [
       'Comprehensive training with CPR/AED, First Aid, EMR, and OSHA 10 certifications for healthcare and public safety careers',
     longDescription:
       "The Emergency Health and Safety Technician Registered Apprenticeship program prepares individuals for life-saving response roles in schools, workplaces and emergency settings. This hybrid training includes CPR/AED, First Aid, OSHA-aligned safety education, and public health emergency awareness. Students graduate with nationally recognized certifications and are equipped for careers in healthcare, public safety, community response, and entry-level emergency technician pathways.\n\nIn just 4 weeks, you'll earn multiple industry-recognized certifications including Emergency Medical Responder (EMR), CPR/AED, First Aid, and OSHA 10. This fast-paced program combines classroom instruction with hands-on emergency response training, preparing you to save lives and ensure workplace safety.\n\nAll instructors hold CPR/AED & First Aid Instructor certification from the American Heart Association, Red Cross, or equivalent nationally recognized body. Instructors have a minimum of 2 years of experience in occupational safety, healthcare, or public safety.\n\nCredentialing Partners:\n• American Heart Association (AHA) - CPR/AED/First Aid (https://cpr.heart.org)\n• American Red Cross - CPR/AED/First Aid (https://redcross.org)\n• National Registry of Emergency Medical Technicians (NREMT) - EMR Certification (https://nremt.org)\n• CareerSafe - OSHA 10 Safety Certification (https://careersafeonline.com)\n\nCIP Code: 51.0999 - Allied Health Diagnostic, Intervention, and Treatment Professions",
-    heroImage: '/images/pages/cna-patient-care.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-patient-care.jpg',
     heroImageAlt: 'Emergency medical responder providing care',
     heroVideo: '/videos/healthcare-cna.mp4',
     duration: '4 weeks',
@@ -611,7 +611,7 @@ export const programs: Program[] = [
       'Accessible training for justice-involved individuals, career changers, and those with lived experience to become certified peer recovery coaches',
     longDescription:
       "The Public Safety Reentry Specialist Program prepares you to support individuals reentering society after incarceration or overcoming substance use challenges. In 45 days, you'll earn multiple certifications including Certified Peer Recovery Coach (CPRC), Certified Peer Support Professional, Certified Community Healthcare Worker (CCHW), CPR, and Rise Up career readiness. This program combines lived experience with professional training to help you make a meaningful impact in your community.\n\nThis program is designed to be inclusive and accessible to all learners—regardless of age, background, or education level. It welcomes youth ages 16+, adults seeking career change, justice-involved individuals reentering the workforce, and those receiving support through SNAP, WIOA, or other public assistance programs. No prior credential or diploma is required for enrollment. We provide built-in support, including tutoring, digital literacy training, and guided instruction to ensure all participants have the tools they need to succeed.\n\nInstructors hold Certified Peer Recovery Specialist (CPRS) credentials or equivalent, with subject matter experience in reentry, public safety, peer navigation, or crisis response. Program leadership holds credentials in trauma-informed coaching, CPR/AED instruction, and lived-experience mentorship for justice-impacted individuals.\n\nCredentialing Partners:\n• Indiana Certification Board (ICB) - Certified Peer Recovery Coach (CPRC) (https://indianacertificationboard.org)\n• National Alliance of Peer Specialists - Certified Peer Support Professional (https://na4ps.org)\n• Certified Community Healthcare Worker (CCHW) Programs\n• American Heart Association - CPR/AED (https://cpr.heart.org)\n• Rise Up - Career Readiness Certification (https://riseup.com)\n\nCIP Code: 43.0112 - Securities Services Administration/Management",
-    heroImage: '/images/pages/career-counseling.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg',
     heroImageAlt: 'Peer recovery coach providing support and mentorship',
     heroVideo: '/videos/career-services-hero.mp4',
     duration: '45 days (6-7 weeks)',
@@ -703,7 +703,7 @@ export const programs: Program[] = [
       'Start your own tax business or work for a firm in just 10 weeks. Get IRS VITA/TCE certified, learn QuickBooks and Microsoft 365, and gain real experience preparing taxes at an IRS-approved site. Earn $40,000-$60,000+ per year during tax season, with flexibility to work year-round or seasonally.',
     longDescription:
       "The Tax Preparation & Financial Services Certificate prepares individuals to understand federal and state taxation concepts and apply them in real-world settings. Participants complete training in tax law, return preparation, bookkeeping, and financial literacy, culminating in the IRS VITA/TCE certification. The program combines classroom instruction, online modules, and supervised practicum hours at an IRS-approved VITA site. Graduates gain the skills required for employment as Tax Preparers, Bookkeeping Assistants, and Financial Service Specialists in both private and community-based environments.\n\nThrough the IRS Link & Learn platform and Elevate for Humanity's financial training curriculum, students master key competencies in individual taxation, ethics, client intake, and electronic filing, while also building transferable skills in business communication, budgeting, and entrepreneurship.\n\nElevate for Humanity is an IRS VITA/TCE Approved Site, Indiana ETPL Approved Training Provider, SAM.gov Active Entity, E-Verify Employer, and Authorized IRS e-file provider. All instructors hold a 2-year degree from a credentialed institution or 2 years of relevant experience in tax preparation or financial services.\n\nCredentialing Partners:\n• Internal Revenue Service (IRS) - VITA/TCE Certification (/community-services)\n• IRS Link & Learn Taxes Platform (/community-services)\n• Intuit - QuickBooks Pro Advisor (https://quickbooks.intuit.com/accountants/)\n• Microsoft - Microsoft 365 Fundamentals (https://microsoft.com/learn)\n• Rise Up - Career Readiness Certification (https://riseup.com)\n\nCIP Code: 52.0302 - Accounting Technology/Technician and Bookkeeping",
-    heroImage: '/images/business/professional-2.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/professional-2.jpg',
     heroImageAlt: 'Tax preparer assisting client with tax return',
     heroVideo: '/videos/tax-career-paths.mp4',
     duration: '10 weeks',
@@ -795,7 +795,7 @@ export const programs: Program[] = [
       'Comprehensive phlebotomy training with hands-on clinical experience, national certification, and job placement assistance',
     longDescription:
       "The Phlebotomy Technician Certification program prepares you for a rewarding career in healthcare by teaching you the essential skills of blood collection and specimen processing. In just 6 weeks, you'll master venipuncture techniques, capillary puncture, specimen handling, and patient care. This program includes classroom instruction, hands-on lab practice, and a clinical externship at a real healthcare facility.\n\nYou'll earn your Certified Phlebotomy Technician (CPT) credential, CPR certification, and complete OSHA-compliant safety training through our HSI partnership, including bloodborne pathogens and infection control. Our program meets all requirements for national certification and prepares you for immediate employment in hospitals, clinics, laboratories, and blood donation centers.\n\nWith high demand for phlebotomists nationwide and excellent job growth projections, this is your opportunity to enter the healthcare field quickly with a valuable, portable credential. Our graduates work in diverse settings including hospitals, diagnostic laboratories, physician offices, blood banks, and mobile phlebotomy services.\n\nPartner Integration:\n• HSI (Health & Safety Institute) - Bloodborne Pathogens, Infection Control, CPR/AED\n• National Healthcareer Association (NHA) - CPT Certification Exam\n• Clinical externship sites - Local hospitals and laboratories\n\nCIP Code: 51.1009 - Phlebotomy Technician/Phlebotomist",
-    heroImage: '/images/pages/phlebotomy-draw.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/phlebotomy-draw.webp',
     heroImageAlt: 'Phlebotomy technician drawing blood from patient',
     heroVideo: '/videos/healthcare-cna.mp4',
     duration: '6 weeks (120 hours)',
@@ -875,7 +875,7 @@ export const programs: Program[] = [
       'One-day certification course in CPR, AED, and first aid. Required for healthcare, childcare, fitness, and many other careers.',
     longDescription:
       "The CPR, AED & First Aid Certification program provides essential emergency response training in a single day. Students learn adult, child, and infant CPR, automated external defibrillator (AED) operation, choking relief, and basic first aid. This certification is required for many healthcare, childcare, fitness, and public safety positions.\n\nWhat You'll Learn:\n- Adult, child, and infant CPR\n- AED operation and safety\n- Choking relief techniques\n- Basic first aid and wound care\n- Emergency response protocols\n- Hands-on practice with manikins and AED trainers\n\nWho This Program Is For:\n- Healthcare workers and students\n- Childcare providers and teachers\n- Fitness instructors and coaches\n- Anyone needing CPR certification for employment\n\nProgram Format:\n- In-person, hands-on training\n- Length: 1 day (4-8 hours)\n- Schedule: Multiple dates available\n\nFunding & Approvals:\n- ETPL Program ID: #10004674\n- WIOA Eligible\n- Workforce Ready Grant Eligible\n\nCareer Outcomes:\n- Required certification for healthcare positions\n- Childcare and education requirements\n- Fitness and recreation industry standard",
-    heroImage: '/images/pages/cna-patient-care.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-patient-care.jpg',
     heroImageAlt: 'CPR training with instructor and manikin',
     heroVideo: '/videos/cna-hero.mp4',
     duration: '1 day',
@@ -931,7 +931,7 @@ export const programs: Program[] = [
       'Accelerated 21-day program to become a certified medical assistant. Earn Certified Community Healthcare Worker (CCHW) certification and start your healthcare career.',
     longDescription:
       "The Medical Assistant program provides accelerated training in both clinical and administrative healthcare skills. In just 21 days, students learn vital signs, EKG, phlebotomy, medical records, patient care, and office procedures. This hybrid program combines online theory with hands-on clinical practice.\n\nWhat You'll Learn:\n- Clinical procedures (vital signs, EKG, phlebotomy)\n- Patient examination assistance\n- Electronic health records (EHR)\n- Infection control and safety\n- Medical terminology and anatomy\n- Appointment scheduling and billing\n- Professional patient communication\n- Medical office operations\n\nWho This Program Is For:\n- Career changers seeking healthcare careers\n- High school graduates entering workforce\n- Individuals wanting stable employment\n- Students preparing for nursing pathways\n\nProgram Format:\n- Hybrid: Online theory + clinical practicum\n- Length: 21 days\n- Schedule: Full-time intensive\n\nFunding & Approvals:\n- ETPL Program ID: #10004639\n- WIOA Eligible\n- Workforce Ready Grant Eligible\n\nCareer Outcomes:\n- Medical Assistant\n- Clinical Assistant\n- Healthcare Office Coordinator\n- Average salary: $32,000-$38,000/year",
-    heroImage: '/images/pages/medical-assistant-lab.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant-lab.webp',
     heroImageAlt: 'Medical assistant taking patient vital signs',
     heroVideo: '/videos/healthcare-cna.mp4',
     duration: '21 days',
@@ -994,7 +994,7 @@ export const programs: Program[] = [
       'Comprehensive 45-day program combining Certified Peer Recovery Coach (CPRC), Certified Peer Support Professional, and Certified Community Healthcare Worker (CCHW) certifications.',
     longDescription:
       "The Public Safety Reentry Specialist Program is designed specifically for justice-involved individuals seeking meaningful careers in behavioral health, addiction recovery, and community support. This comprehensive 45-day program combines three powerful certifications: Certified Peer Recovery Coach (CPRC), Certified Peer Support Professional, and Certified Community Healthcare Worker (CCHW).\n\nWhat You'll Learn:\n- Peer recovery coaching and support\n- Motivational interviewing techniques\n- Trauma-informed care\n- Crisis intervention and de-escalation\n- Community resource navigation\n- Relapse prevention strategies\n- Basic healthcare and vital signs\n- Professional boundaries and ethics\n- Documentation and case management\n\nWho This Program Is For:\n- Justice-involved individuals\n- Individuals in recovery\n- Career changers seeking purpose-driven work\n- Those passionate about helping others\n\nProgram Format:\n- Hybrid: Classroom + practicum\n- Length: 45 days\n- Schedule: Full-time\n\nFunding & Approvals:\n- ETPL Program ID: #10004666\n- WIOA Eligible\n- Job Ready Indy Eligible\n- Workforce Ready Grant Eligible\n\nCareer Outcomes:\n- Certified Peer Recovery Coach\n- Peer Support Specialist\n- Community Healthcare Worker\n- Reentry Navigator\n- Average salary: $32,000-$45,000/year",
-    heroImage: '/images/pages/career-counseling.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg',
     heroImageAlt: 'Peer recovery coach supporting client',
     heroVideo: '/videos/career-services-hero.mp4',
     duration: '45 days',
@@ -1067,7 +1067,7 @@ export const programs: Program[] = [
       'Become a certified drug and alcohol specimen collector for DOT and workplace testing programs in just 2 weeks.',
     longDescription:
       "The Drug & Alcohol Specimen Collector Certification program trains you to perform urine drug testing, breath alcohol testing, and oral fluid collection for DOT-regulated and non-DOT workplace testing programs. This intensive 2-week program covers federal regulations, collection procedures, chain of custody, and quality assurance.\n\nYou'll learn both DOT (Department of Transportation) and non-DOT collection procedures, making you qualified to work with transportation companies, employers, third-party administrators (TPAs), and drug testing facilities nationwide. The program includes hands-on training with actual collection devices and mock collections to ensure you're confident and compliant.\n\nUpon completion, you'll earn your Specimen Collector certification and be qualified to perform:\n• DOT urine drug testing\n• DOT breath alcohol testing\n• Non-DOT urine drug testing\n• Oral fluid (saliva) drug testing\n• Instant and lab-based testing\n\nThis is a high-demand career with flexible work options including full-time positions, part-time work, mobile collection services, and independent contractor opportunities. Many collectors earn $40,000-$60,000+ annually with the ability to set their own schedules.\n\nPartner Integration:\n• National Drug Screening - DOT compliance training and certification\n• Hands-on training with actual collection devices\n• Access to nationwide collector network",
-    heroImage: '/images/pages/healthcare-classroom.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
     heroImageAlt: 'Drug collector performing specimen collection',
     heroVideo: '/videos/healthcare-cna.mp4',
     duration: '2 weeks (40 hours)',
@@ -1140,7 +1140,7 @@ export const programs: Program[] = [
     heroSubtitle: 'Support business operations. Office management and organizational skills.',
     shortDescription: 'Support business operations. Office management and organizational skills.',
     longDescription: `Our Administrative Assistant program prepares you for a professional office career. You'll learn Microsoft Office Suite, business communication, scheduling, and office procedures. The program covers document preparation, meeting coordination, travel arrangements, and professional etiquette. You'll develop organizational skills and attention to detail. Administrative assistants are essential in every industry with stable employment.`,
-    heroImage: '/images/pages/admin-business-hero.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-business-hero.webp',
     heroImageAlt: `Administrative Assistant training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/partner-business.mp4',
     duration: '12 weeks',
@@ -1186,7 +1186,7 @@ export const programs: Program[] = [
     heroSubtitle: 'Repair and maintain vehicles. ASE certification and hands-on training.',
     shortDescription: 'Repair and maintain vehicles. ASE certification and hands-on training.',
     longDescription: `Our Automotive Technician program prepares you for a career servicing vehicles. You'll learn engine repair, electrical systems, brakes, suspension, and diagnostics. The program covers modern vehicle technology, computer diagnostics, and customer service. You'll gain extensive hands-on experience with real vehicles and prepare for ASE certification. Automotive technicians are always in demand with stable employment.`,
-    heroImage: '/images/pages/hvac-tools.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-tools.webp',
     heroImageAlt: `Automotive Technician training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/electrician-trades.mp4',
     duration: '32 weeks',
@@ -1234,7 +1234,7 @@ export const programs: Program[] = [
     shortDescription:
       'Prepare for entry-level employment as a Bookkeeping, Accounting, and Auditing Clerk (SOC 43-3031). 150 hours over 8 weeks. QuickBooks and MOS certifications included.',
     longDescription: `This program prepares individuals with no prior credentials for entry-level employment aligned with Bookkeeping, Accounting, and Auditing Clerk (SOC 43-3031). Students develop competency in accounting fundamentals, payroll support, accounts payable and receivable processing, financial reporting, and accounting software applications. The program includes preparation for the Intuit QuickBooks Certified User credential and Microsoft Office Specialist Associate certification.\n\nAssessment includes weekly written tests, practical lab examinations, a midterm examination, a capstone performance assessment, and industry certification examinations. Students must achieve a minimum score of 70% overall to complete the program.\n\nCIP Code: 52.0302 - Accounting Technology/Technician and Bookkeeping`,
-    heroImage: '/images/pages/business-sector.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/business-sector.webp',
     heroImageAlt: `Bookkeeping and accounting training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/partner-business.mp4',
     duration: '8 weeks',
@@ -1296,7 +1296,7 @@ export const programs: Program[] = [
     heroSubtitle: 'Bridge healthcare gaps',
     shortDescription: 'Bridge healthcare gaps',
     longDescription: `Training to bridge gaps between healthcare systems and underserved communities.`,
-    heroImage: '/images/pages/healthcare-grad.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-grad.jpg',
     heroImageAlt: `Community Healthcare Worker Program training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/healthcare-cna.mp4',
     duration: 'Varies',
@@ -1328,7 +1328,7 @@ export const programs: Program[] = [
     shortDescription:
       'State-licensed cosmetology apprenticeship program covering hair styling, coloring, skincare, nail care, and salon business management. Combines hands-on training with classroom instruction.',
     longDescription: `Our Cosmetology Apprenticeship program provides comprehensive training in all aspects of beauty services. Students learn hair cutting, coloring, chemical treatments, skincare, makeup application, and nail services while gaining hands-on experience in a real salon environment. The program meets Indiana State Board of Cosmetology requirements for licensure.`,
-    heroImage: '/images/pages/barber-apprenticeship.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship.webp',
     heroImageAlt: `Cosmetology Apprenticeship training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/cosmetology-salon.mp4',
     duration: '12–18 months',
@@ -1377,7 +1377,7 @@ export const programs: Program[] = [
     heroSubtitle: 'Professional cooking.',
     shortDescription: 'Professional cooking.',
     longDescription: `Learn culinary arts through hands-on apprenticeship training. Master cooking techniques, food safety, menu planning, and kitchen management.`,
-    heroImage: '/images/pages/training-classroom.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
     heroImageAlt: `Culinary Apprenticeship training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/program-hero.mp4',
     duration: '40 weeks',
@@ -1419,7 +1419,7 @@ export const programs: Program[] = [
     shortDescription:
       'Help customers and build relationships. Communication and problem-solving skills.',
     longDescription: `Our Customer Service Representative program prepares you for a people-focused career. You'll learn communication skills, conflict resolution, and customer relationship management. The program covers phone etiquette, email communication, CRM software, and handling difficult situations. You'll practice real scenarios and develop professional soft skills. Customer service roles offer stable employment with advancement opportunities.`,
-    heroImage: '/images/pages/career-counseling.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg',
     heroImageAlt: `Customer Service Representative training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/partner-business.mp4',
     duration: '8 weeks',
@@ -1467,7 +1467,7 @@ export const programs: Program[] = [
     shortDescription:
       'Protect organizations from cyber threats. Learn security analysis and threat detection.',
     longDescription: `Our Cybersecurity Analyst program prepares you for a high-demand career protecting digital assets. You'll learn network security, threat analysis, incident response, and security tools. The program covers ethical hacking, vulnerability assessment, and security best practices. You'll gain hands-on experience with real security scenarios and prepare for Security+ and CEH certifications. Cybersecurity offers excellent pay and job security.`,
-    heroImage: '/images/pages/cybersecurity-screen.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity-screen.jpg',
     heroImageAlt: `Cybersecurity Analyst training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/it-technology.mp4',
     duration: '24 weeks',
@@ -1515,7 +1515,7 @@ export const programs: Program[] = [
     shortDescription:
       'Analyze data to drive business decisions. Learn SQL, Excel, and visualization tools.',
     longDescription: `Our Data Analytics program teaches you to transform raw data into actionable insights. You'll learn SQL for database queries, Excel for analysis, and tools like Tableau and Power BI for visualization. The program covers statistics, data cleaning, and storytelling with data. You'll work with real datasets and build a portfolio of analysis projects. Data analysts are in high demand across all industries.`,
-    heroImage: '/images/pages/technology-sector.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/technology-sector.webp',
     heroImageAlt: `Data Analytics training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/it-technology.mp4',
     duration: '20 weeks',
@@ -1563,7 +1563,7 @@ export const programs: Program[] = [
     shortDescription:
       'Train to become a dental assistant. Chairside support and patient care in dental offices.',
     longDescription: `Our Dental Assistant program prepares you for a rewarding career in dental healthcare. You'll learn chairside assisting, dental radiography, infection control, and patient management.`,
-    heroImage: '/images/pages/medical-assistant-desk.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant-desk.webp',
     heroImageAlt: `Dental Assistant training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/healthcare-cna.mp4',
     duration: '12 weeks',
@@ -1609,7 +1609,7 @@ export const programs: Program[] = [
     heroSubtitle: 'Support individuals with disabilities',
     shortDescription: 'Support individuals with disabilities',
     longDescription: `DSP certification training preparing students to support individuals with disabilities.`,
-    heroImage: '/images/pages/healthcare-classroom.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
     heroImageAlt: `Direct Support Professional Training training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/healthcare-cna.mp4',
     duration: 'Varies',
@@ -1636,7 +1636,7 @@ export const programs: Program[] = [
     shortDescription:
       'DOL Registered Apprenticeship - Indiana. Healthcare Specialist pathway. RAPIDS Program: 2025-IN-132301.',
     longDescription: `Train to become an Emergency Medical Technician. Learn patient assessment, emergency care, trauma response, and ambulance operations.`,
-    heroImage: '/images/pages/cna-clinical.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-clinical.jpg',
     heroImageAlt: `Emergency Medical Technician Apprenticeship training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/healthcare-cna.mp4',
     duration: '12 weeks',
@@ -1678,7 +1678,7 @@ export const programs: Program[] = [
     shortDescription:
       'Start and grow your own business. Business planning, marketing, and management skills.',
     longDescription: `Our Entrepreneurship program teaches you to start and run a successful small business. You'll learn business planning, marketing, financial management, and operations.`,
-    heroImage: '/images/pages/admin-business-hero.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-business-hero.webp',
     heroImageAlt: `Entrepreneurship / Small Business training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/partner-business.mp4',
     duration: '16 weeks',
@@ -1727,7 +1727,7 @@ export const programs: Program[] = [
     shortDescription:
       'Operate forklifts and material handling equipment. Quick certification with immediate employment.',
     longDescription: `Our Forklift Operator program provides OSHA-compliant certification to operate forklifts safely. You'll learn equipment operation, load handling, safety procedures, and warehouse practices.`,
-    heroImage: '/images/pages/hvac-tools.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-tools.webp',
     heroImageAlt: `Forklift Operator training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/electrician-trades.mp4',
     duration: '1 weeks',
@@ -1775,7 +1775,7 @@ export const programs: Program[] = [
     shortDescription:
       'Sell insurance products and protect clients. Commission-based income with residual earnings.',
     longDescription: `Our Insurance Agent program prepares you for your state licensing exam and insurance sales career. You'll learn insurance products (life, health, property, casualty), underwriting, and risk assessment. The program covers sales techniques, client needs analysis, and policy servicing. You'll understand regulations, ethics, and building a client base. Insurance agents earn commission plus residual income from policy renewals.`,
-    heroImage: '/images/pages/business-sector.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/business-sector.webp',
     heroImageAlt: `Insurance Agent training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/partner-business.mp4',
     duration: '8 weeks',
@@ -1823,7 +1823,7 @@ export const programs: Program[] = [
     shortDescription:
       'Launch your IT career. Provide technical support and troubleshoot computer systems.',
     longDescription: `Our IT Support Specialist program prepares you for entry into the technology field. You'll learn computer hardware, software, networking, and troubleshooting. The program covers help desk operations, customer service, and technical problem-solving. You'll gain hands-on experience with real systems and prepare for Certiport IT Specialist certification. IT support roles offer stable employment with clear advancement paths.`,
-    heroImage: '/images/pages/it-helpdesk-desk.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/it-helpdesk-desk.webp',
     heroImageAlt: `IT Help Desk Technician training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/it-technology.mp4',
     duration: '8 weeks',
@@ -1871,7 +1871,7 @@ export const programs: Program[] = [
     shortDescription:
       'Professional life coaching certification program. Help others achieve their goals while building a rewarding career.',
     longDescription: `Become a certified life coach. Learn coaching methodologies, communication techniques, goal setting, and how to build a coaching practice.`,
-    heroImage: '/images/pages/career-counseling.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg',
     heroImageAlt: `Life Coach Certification training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/career-services-hero.mp4',
     duration: '12 weeks',
@@ -1912,7 +1912,7 @@ export const programs: Program[] = [
     shortDescription:
       'Operate production equipment and ensure quality. Essential manufacturing skills.',
     longDescription: `Our Manufacturing Technician program prepares you for production and quality roles in manufacturing. You'll learn machine operation, quality control, lean manufacturing, and safety procedures.`,
-    heroImage: '/images/pages/welding-sparks.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/welding-sparks.webp',
     heroImageAlt: `Manufacturing Technician training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/electrician-trades.mp4',
     duration: '12 weeks',
@@ -1960,7 +1960,7 @@ export const programs: Program[] = [
     shortDescription:
       'Professional nail technician training covering manicures, pedicures, nail art, acrylics, and salon sanitation.',
     longDescription: `Our Nail Technician program prepares students for a rewarding career in nail care. Learn manicures, pedicures, acrylic and gel nails, nail art, and proper sanitation techniques. Graduate ready to pass the state board exam and start working in salons or open your own business.`,
-    heroImage: '/images/pages/barber-styling-hair.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-styling-hair.webp',
     heroImageAlt: `Nail Technician training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/nail-tech.mp4',
     duration: '16 weeks',
@@ -2005,7 +2005,7 @@ export const programs: Program[] = [
     heroSubtitle: 'Retail fundamentals',
     shortDescription: 'Retail fundamentals',
     longDescription: `National Retail Federation training covering retail fundamentals and customer service.`,
-    heroImage: '/images/pages/training-classroom.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
     heroImageAlt: `NRF Rise Up Program training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/partner-business.mp4',
     duration: 'Varies',
@@ -2035,7 +2035,7 @@ export const programs: Program[] = [
     heroSubtitle: 'Support individuals in recovery',
     shortDescription: 'Support individuals in recovery',
     longDescription: `Training for individuals with lived experience to support others in recovery.`,
-    heroImage: '/images/pages/healthcare-grad.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-grad.jpg',
     heroImageAlt: `Peer Support Professional Program training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/career-services-hero.mp4',
     duration: 'Varies',
@@ -2067,7 +2067,7 @@ export const programs: Program[] = [
     shortDescription:
       'Become a certified pharmacy technician. Prepare and dispense medications under pharmacist supervision.',
     longDescription: `Our Pharmacy Technician program prepares you for a rewarding career in pharmacy settings. You'll learn medication preparation, prescription processing, inventory management, and pharmacy law.`,
-    heroImage: '/images/pages/phlebotomy-draw.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/phlebotomy-draw.webp',
     heroImageAlt: `Pharmacy Technician training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/healthcare-cna.mp4',
     duration: '16 weeks',
@@ -2115,7 +2115,7 @@ export const programs: Program[] = [
     shortDescription:
       'Help people buy and sell properties. Earn commission-based income with unlimited potential.',
     longDescription: `Our Real Estate Agent program prepares you for your state licensing exam and a successful real estate career. You'll learn property law, contracts, financing, and market analysis. The program covers listing properties, working with buyers, negotiation, and closing transactions. You'll understand ethics, fair housing, and professional practices. Real estate offers flexible schedules and unlimited income potential.`,
-    heroImage: '/images/pages/admin-business-hero.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-business-hero.webp',
     heroImageAlt: `Real Estate Agent training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/partner-business.mp4',
     duration: '12 weeks',
@@ -2161,7 +2161,7 @@ export const programs: Program[] = [
     heroSubtitle: 'Guide recovery journey',
     shortDescription: 'Guide recovery journey',
     longDescription: `Training to guide and support individuals through their recovery journey.`,
-    heroImage: '/images/pages/career-counseling.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg',
     heroImageAlt: `Recovery Coach Program training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/career-services-hero.mp4',
     duration: 'Varies',
@@ -2191,7 +2191,7 @@ export const programs: Program[] = [
     heroSubtitle: 'Infection prevention and sanitation protocols.',
     shortDescription: 'Infection prevention and sanitation protocols.',
     longDescription: `Infection prevention and sanitation protocols.`,
-    heroImage: '/images/pages/cna-patient-care.jpg',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-patient-care.jpg',
     heroImageAlt: `Sanitation & Infection Control training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/healthcare-cna.mp4',
     duration: 'Varies',
@@ -2223,7 +2223,7 @@ export const programs: Program[] = [
     shortDescription:
       'Install solar energy systems. Green career in renewable energy with strong growth.',
     longDescription: `Our Solar Panel Installation program prepares you for a career in renewable energy. You'll learn photovoltaic system design, electrical wiring, roof work, and safety procedures. The program covers system sizing, equipment selection, installation techniques, and maintenance. You'll gain hands-on experience with real solar installations and prepare for NABCEP certification. Solar installers are in high demand as clean energy adoption accelerates.`,
-    heroImage: '/images/pages/electrical.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/electrical.webp',
     heroImageAlt: `Solar Panel Installation training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/electrician-trades.mp4',
     duration: '12 weeks',
@@ -2272,7 +2272,7 @@ export const programs: Program[] = [
     shortDescription:
       'Build modern websites and web applications. Full-stack development training.',
     longDescription: `Our Web Development program teaches you to create professional websites and web applications. You'll learn HTML, CSS, JavaScript, and modern frameworks like React. The program covers both front-end design and back-end programming, databases, and deployment. You'll build a portfolio of real projects and learn industry-standard tools. Web developers are in high demand with flexible work options including remote positions.`,
-    heroImage: '/images/pages/technology-sector.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/technology-sector.webp',
     heroImageAlt: `Web Development training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/it-technology.mp4',
     duration: '24 weeks',
@@ -2322,7 +2322,7 @@ export const programs: Program[] = [
     shortDescription:
       'DOL Registered Apprenticeship - Indiana. 144 hours classroom + OJT. RAPIDS Program: 2025-IN-132301.',
     longDescription: `Youth culinary program for ages 16-24. Learn cooking fundamentals, food safety, and kitchen skills while earning industry credentials.`,
-    heroImage: '/images/pages/training-classroom.webp',
+    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
     heroImageAlt: 'Youth Culinary Apprenticeship training at Elevate for Humanity',
     heroVideo: '/videos/program-hero.mp4',
     duration: '8 weeks',

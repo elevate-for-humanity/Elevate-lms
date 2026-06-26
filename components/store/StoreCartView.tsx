@@ -164,7 +164,7 @@ export default function StoreCartView({ checkoutError, addParam }: StoreCartView
                 <div className="flex gap-4">
                   <div className="relative w-20 h-20 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src={item.product.image || '/images/pages/store-hero.webp'}
+                      src={item.product.image || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-hero.webp'}
                       alt={item.product.name}
                       fill
                       className="object-cover"

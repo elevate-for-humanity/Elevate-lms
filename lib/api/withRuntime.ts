@@ -75,7 +75,7 @@ export interface RuntimeOptions {
   /**
    * Auth requirement.
    *   'user'  — any authenticated user
-   *   'admin' — admin, super_admin, or staff
+   *   'admin' — admin, admin, or staff
    * Omit for public routes.
    */
   auth?: AuthMode;

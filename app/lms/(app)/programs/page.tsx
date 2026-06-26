@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 // are always fresh via the enrollment query.
 export const revalidate = 600;
 
-const DEFAULT_PROGRAM_IMAGE = '/images/pages/comp-home-hero-programs.jpg';
+const DEFAULT_PROGRAM_IMAGE = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp';
 
 export default async function LmsProgramsPage() {
   const supabase = await createClient();
@@ -54,11 +54,11 @@ export default async function LmsProgramsPage() {
             <Link href="/lms">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
               <Image sizes="100vw"
-                src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
                 alt={PLATFORM_DEFAULTS.orgName}
                 width={120}
                 height={32}
-                className="h-8 w-auto" placeholder="empty"
+                className="h-8 w-auto" 
               />
             </Link>
             <div className="flex items-center gap-3">
@@ -176,7 +176,7 @@ export default async function LmsProgramsPage() {
                         alt={p.title}
                         fill
                         className="object-cover group-hover:scale-105 transition duration-500"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
                       />
                       {p.funded && (
                         <span className="absolute top-3 left-3 bg-brand-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">

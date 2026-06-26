@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Smartphone, Monitor, Download, CheckCircle, Chrome, Apple } from 'lucide-react';
+import { Smartphone, Monitor, Download, CheckCircle, Globe, Apple } from 'lucide-react';
 
 type DeferredPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -17,7 +17,8 @@ export default function AdminInstallClient() {
 
   useEffect(() => {
     // Already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    // @ts-ignore - SSR check
+    if (typeof window !== 'undefined' && window.matchMedia?.('(display-mode: standalone)').matches) {
       setIsStandalone(true);
       return;
     }
@@ -29,20 +30,24 @@ export default function AdminInstallClient() {
     else setPlatform('desktop');
 
     // Capture install prompt (Chrome/Edge/Android)
+    // @ts-ignore - SSR check
     function onBeforeInstallPrompt(e: Event) {
       e.preventDefault();
       setDeferredPrompt(e as DeferredPromptEvent);
     }
+    // @ts-ignore - SSR check
     window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+    // @ts-ignore - SSR check
     return () => window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
   }, []);
 
-  async function handleInstall() {
+  async function handleInstall(): Promise<void> {
     if (!deferredPrompt) return;
     await deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === 'accepted') setInstalled(true);
     setDeferredPrompt(null);
+    return;
   }
 
   if (isStandalone || installed) {
@@ -113,11 +118,11 @@ export default function AdminInstallClient() {
           </div>
         )}
 
-        {/* Desktop — no prompt yet, show Chrome instructions */}
+        {/* Desktop — no prompt yet, show browser instructions */}
         {platform === 'desktop' && !deferredPrompt && (
           <div className="bg-slate-800 rounded-2xl p-5 mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <Chrome className="w-5 h-5 text-white" />
+              <Globe className="w-5 h-5 text-white" />
               <p className="text-white font-semibold text-sm">Install on Desktop</p>
             </div>
             <ol className="space-y-2 text-slate-300 text-sm">

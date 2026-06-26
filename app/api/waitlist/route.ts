@@ -20,7 +20,7 @@ const WAITLIST_PROGRAMS = new Set([
 ]);
 const PROGRAM_NAMES: Record<string, string> = {
   'barber-apprenticeship': 'Barber Apprenticeship',
-  'fssa': 'FSSA IMPACT — Workforce Training',
+  'fssa': ' — Workforce Training',
   'cosmetology-apprenticeship': 'Cosmetology Apprenticeship',
   'welding': 'Welding Technology',
   'electrical': 'Electrical Technician',

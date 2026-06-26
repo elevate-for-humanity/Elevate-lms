@@ -48,7 +48,7 @@ export default function StoreHeroVideo() {
             muted
             playsInline
             preload="metadata"
-            poster="/images/pages/store-licensing-hero.jpg"
+            poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-licensing-hero.jpg"
             onLoadedData={() => setIsLoaded(true)}
             onEnded={() => setHasEnded(true)}
             onError={() => setHasError(true)}

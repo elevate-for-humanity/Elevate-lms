@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     title: 'Mobile App',
     description:
       'Install our mobile app directly from your browser. Access programs, track progress, and stay connected on the go.',
-    images: ['/images/pages/technology-sector.webp'],
+    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/technology-sector.webp'],
   },
 };
 
@@ -42,13 +42,13 @@ export default async function MobileAppPage() {
       <section className="relative h-48 md:h-64 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/mobile-app-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/mobile-app-page-1.webp"
           alt="Mobile App"
           fill
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw" 
         />
       </section>
 

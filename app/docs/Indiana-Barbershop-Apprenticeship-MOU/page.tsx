@@ -22,28 +22,19 @@ export default function MOUPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
-  const [effectiveDate] = useState(
-    new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-  );
+  const [effectiveDate] = useState(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
 
   useEffect(() => {
     const supabase = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
     supabase.auth.getUser().then(({ data: { user: u } }) => {
       if (u) setUser({ id: u.id, email: u.email || '' });
     });
   }, []);
 
-  const canSubmit =
-    shopName &&
-    partnerName &&
-    supervisorName &&
-    supervisorLicense &&
-    compensationModel &&
-    signedByPartner &&
-    signedBySupervisor;
+  const canSubmit = shopName && partnerName && supervisorName && supervisorLicense && compensationModel && signedByPartner && signedBySupervisor;
 
   const handleSubmit = async () => {
     if (!canSubmit || !user) return;
@@ -53,36 +44,35 @@ export default function MOUPage() {
     try {
       const supabase = createBrowserClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
 
       // Try signed_documents table first, fall back gracefully
-      await supabase
-        .from('signed_documents')
-        .insert({
-          user_id: user.id,
-          document_type: 'partner_mou',
-          document_title: 'Indiana Barbershop Apprenticeship MOU',
-          signer_name: partnerName,
-          signer_email: user.email,
-          metadata: {
-            shop_name: shopName,
-            supervisor_name: supervisorName,
-            supervisor_license: supervisorLicense,
-            compensation_model: compensationModel,
-            partner_signature_id: partnerSignatureId,
-            supervisor_signature_id: supervisorSignatureId,
-            effective_date: effectiveDate,
-            signed_at: new Date().toISOString(),
-          },
-          status: 'signed',
+      await supabase.from('signed_documents').insert({
+        user_id: user.id,
+        document_type: 'partner_mou',
+        document_title: 'Indiana Barbershop Apprenticeship MOU',
+        signer_name: partnerName,
+        signer_email: user.email,
+        metadata: {
+          shop_name: shopName,
+          supervisor_name: supervisorName,
+          supervisor_license: supervisorLicense,
+          compensation_model: compensationModel,
+          partner_signature_id: partnerSignatureId,
+          supervisor_signature_id: supervisorSignatureId,
+          effective_date: effectiveDate,
           signed_at: new Date().toISOString(),
-        })
-        .then(()=>{}, ()=>{});
+        },
+        status: 'signed',
+        signed_at: new Date().toISOString(),
+      }).catch(() => {
+        // Table may not exist — signatures are already saved via SignatureInput
+      });
 
       setSubmitted(true);
     } catch {
-      setError(`Failed to submit. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
+      setError('Failed to submit. Please try again or call {PLATFORM_DEFAULTS.supportPhone}.');
     } finally {
       setSubmitting(false);
     }
@@ -95,36 +85,21 @@ export default function MOUPage() {
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-10 h-10 text-brand-green-600" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-4">MOU Signed Successfully</h1>
-          <p className="text-lg text-slate-600 mb-8">
-            Your Memorandum of Understanding has been digitally signed and recorded. You will
-            receive a confirmation email.
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">MOU Signed Successfully</h1>
+          <p className="text-lg text-gray-600 mb-8">
+            Your Memorandum of Understanding has been digitally signed and recorded. You will receive a confirmation email.
           </p>
-          <div className="bg-slate-50 rounded-xl p-6 max-w-md mx-auto mb-8 text-left">
-            <p className="text-sm text-slate-600">
-              <strong>Shop:</strong> {shopName}
-            </p>
-            <p className="text-sm text-slate-600">
-              <strong>Partner:</strong> {partnerName}
-            </p>
-            <p className="text-sm text-slate-600">
-              <strong>Supervisor:</strong> {supervisorName}
-            </p>
-            <p className="text-sm text-slate-600">
-              <strong>Date:</strong> {effectiveDate}
-            </p>
+          <div className="bg-gray-50 rounded-xl p-6 max-w-md mx-auto mb-8 text-left">
+            <p className="text-sm text-gray-600"><strong>Shop:</strong> {shopName}</p>
+            <p className="text-sm text-gray-600"><strong>Partner:</strong> {partnerName}</p>
+            <p className="text-sm text-gray-600"><strong>Supervisor:</strong> {supervisorName}</p>
+            <p className="text-sm text-gray-600"><strong>Date:</strong> {effectiveDate}</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/partner/onboarding"
-              className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700"
-            >
+            <Link href="/partner/onboarding" className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700">
               Continue to Partner Onboarding →
             </Link>
-            <Link
-              href="/partners/barber-host-shop"
-              className="px-6 py-3 border border-slate-300 rounded-lg font-medium hover:bg-slate-50"
-            >
+            <Link href="/partners/barbershop-apprenticeship" className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50">
               Back to Partner Info
             </Link>
           </div>
@@ -136,26 +111,15 @@ export default function MOUPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs
-          items={[
-            { label: 'Docs', href: '/docs' },
-            { label: 'Indiana Barbershop Apprenticeship MOU' },
-          ]}
-        />
+        <Breadcrumbs items={[{ label: 'Docs', href: '/docs' }, { label: 'Indiana Barbershop Apprenticeship MOU' }]} />
       </div>
 
-      <div className="print:hidden bg-slate-100 py-4 border-b">
+      <div className="print:hidden bg-gray-100 py-4 border-b">
         <div className="max-w-4xl mx-auto px-4 flex items-center justify-between">
-          <Link
-            href="/partners/barber-host-shop"
-            className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900"
-          >
+          <Link href="/partners/barbershop-apprenticeship" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900">
             <ArrowLeft className="w-4 h-4" /> Back to Partner Info
           </Link>
-          <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
-          >
+          <button onClick={() => window.print()} className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
             <Printer className="w-4 h-4" /> Print / Save as PDF
           </button>
         </div>
@@ -164,61 +128,33 @@ export default function MOUPage() {
       <div className="max-w-4xl mx-auto px-8 py-12 print:py-0 print:px-0">
         <div className="prose prose-sm max-w-none">
           <h1 className="text-center text-2xl font-bold mb-2">MEMORANDUM OF UNDERSTANDING</h1>
-          <h2 className="text-center text-lg font-semibold mb-1">
-            Indiana Barbershop Apprenticeship Program
-          </h2>
+          <h2 className="text-center text-lg font-semibold mb-1">Indiana Barbershop Apprenticeship Program</h2>
           <h3 className="text-center text-base mb-8">Worksite Partner Agreement</h3>
 
           <hr className="my-6" />
 
-          <p>
-            <strong>Between:</strong>
-          </p>
+          <p><strong>Between:</strong></p>
           <ul>
-            <li>
-              <strong>Sponsor:</strong> 2Exclusive LLC-S, DBA {PLATFORM_DEFAULTS.orgName} Career &amp;
-              Technical Institute (&quot;Sponsor&quot;)
-            </li>
-            <li>
-              <strong>Worksite Partner:</strong> {shopName || <em>(entered below)</em>}{' '}
-              (&quot;Shop&quot;)
-            </li>
+            <li><strong>Sponsor:</strong> 2Exclusive LLC-S, DBA {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute (&quot;Sponsor&quot;)</li>
+            <li><strong>Worksite Partner:</strong> {shopName || <em>(entered below)</em>} (&quot;Shop&quot;)</li>
           </ul>
-          <p>
-            <strong>Effective Date:</strong> {effectiveDate}
-          </p>
+          <p><strong>Effective Date:</strong> {effectiveDate}</p>
 
           <hr className="my-6" />
 
           <h2>1. PURPOSE</h2>
-          <p>
-            This Memorandum of Understanding (&quot;MOU&quot;) establishes the terms and conditions
-            under which the Shop will serve as a worksite partner for the Indiana Barbershop
-            Apprenticeship Program, a USDOL Registered Apprenticeship sponsored by 2Exclusive LLC-S
-            (DBA {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute).
-          </p>
+          <p>This Memorandum of Understanding (&quot;MOU&quot;) establishes the terms and conditions under which the Shop will serve as a worksite partner for the Indiana Barbershop Apprenticeship Program, a USDOL Registered Apprenticeship sponsored by 2Exclusive LLC-S (DBA {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute).</p>
 
           <h2>2. PROGRAM OVERVIEW</h2>
-          <p>
-            The Indiana Barbershop Apprenticeship Program is a structured training program that
-            combines:
-          </p>
+          <p>The Indiana Barbershop Apprenticeship Program is a structured training program that combines:</p>
           <ul>
-            <li>
-              <strong>2,000 hours</strong> of on-the-job training (OJT) at the worksite
-            </li>
-            <li>
-              <strong>Related Technical Instruction (RTI)</strong> coordinated by the Sponsor via
-              Prestige Elevation™ on the Elevate LMS
-            </li>
+            <li><strong>2,000 hours</strong> of on-the-job training (OJT) at the worksite</li>
+            <li><strong>Related Technical Instruction (RTI)</strong> coordinated by the Sponsor via Milady RISE</li>
             <li>Progressive skill development tracked through competency assessments</li>
           </ul>
 
           <h2>3. SPONSOR RESPONSIBILITIES</h2>
-          <p>
-            2Exclusive LLC-S (DBA {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute), as the
-            Sponsor of Record, agrees to:
-          </p>
+          <p>2Exclusive LLC-S (DBA {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute), as the Sponsor of Record, agrees to:</p>
           <h3>Registration &amp; Compliance</h3>
           <ul>
             <li>Maintain USDOL/RAPIDS registration for the apprenticeship program</li>
@@ -227,7 +163,7 @@ export default function MOUPage() {
           </ul>
           <h3>Related Instruction</h3>
           <ul>
-            <li>Coordinate and provide access to required online instruction (Elevate LMS RTI)</li>
+            <li>Coordinate and provide access to required online instruction (Milady RISE)</li>
             <li>Track completion of related instruction requirements</li>
             <li>Provide learning materials and resources at no cost to the Shop or apprentice</li>
           </ul>
@@ -255,9 +191,7 @@ export default function MOUPage() {
           <p>The Shop agrees to:</p>
           <h3>Supervision</h3>
           <ul>
-            <li>
-              Provide direct supervision by a licensed barber during all productive work hours
-            </li>
+            <li>Provide direct supervision by a licensed barber during all productive work hours</li>
             <li>Ensure the supervising barber has a minimum of 2 years licensed experience</li>
             <li>Maintain appropriate supervisor-to-apprentice ratios</li>
           </ul>
@@ -267,14 +201,12 @@ export default function MOUPage() {
             <li>Ensure all compensation meets or exceeds applicable minimum wage requirements</li>
             <li>Maintain accurate payroll records</li>
           </ul>
-          <p className="bg-yellow-50 p-3 border-l-4 border-yellow-500">
-            <strong>Note:</strong> Apprentices are paid employees. This is NOT unpaid labor.
-          </p>
+          <p className="bg-yellow-50 p-3 border-l-4 border-yellow-500"><strong>Note:</strong> Apprentices are paid employees. This is NOT unpaid labor.</p>
           <h3>Training &amp; Development</h3>
           <ul>
             <li>Provide structured on-the-job training opportunities</li>
             <li>Allow apprentice to practice and develop required competencies</li>
-            <li>Support apprentice completion of Elevate LMS RTI lessons and checkpoints</li>
+            <li>Support apprentice completion of Milady RISE coursework</li>
           </ul>
           <h3>Hour Verification</h3>
           <ul>
@@ -300,76 +232,39 @@ export default function MOUPage() {
           <h2>5. COMPENSATION MODELS</h2>
           <p>The Shop may compensate the apprentice using one of the following models:</p>
           <ul>
-            <li>
-              <strong>Hourly Wage:</strong> Fixed hourly rate for all hours worked
-            </li>
-            <li>
-              <strong>Commission:</strong> Percentage of services performed (must meet minimum wage
-              when averaged)
-            </li>
-            <li>
-              <strong>Hybrid:</strong> Base hourly rate plus commission on services
-            </li>
+            <li><strong>Hourly Wage:</strong> Fixed hourly rate for all hours worked</li>
+            <li><strong>Commission:</strong> Percentage of services performed (must meet minimum wage when averaged)</li>
+            <li><strong>Hybrid:</strong> Base hourly rate plus commission on services</li>
           </ul>
-          <p className="bg-amber-50 p-3 border-l-4 border-amber-500">
-            <strong>IMPORTANT:</strong> All compensation structures must comply with applicable
-            federal and Indiana wage and labor laws. Commission-based models must ensure the
-            apprentice earns at least minimum wage when averaged over the pay period.
-          </p>
+          <p className="bg-amber-50 p-3 border-l-4 border-amber-500"><strong>IMPORTANT:</strong> All compensation structures must comply with applicable federal and Indiana wage and labor laws. Commission-based models must ensure the apprentice earns at least minimum wage when averaged over the pay period.</p>
 
           <h2>6. TERM AND TERMINATION</h2>
-          <p>
-            <strong>Term:</strong> This MOU is effective from the date signed until the apprentice
-            completes the program or the agreement is terminated.
-          </p>
-          <p>
-            <strong>Termination by Either Party:</strong> Either party may terminate this MOU with
-            14 days written notice.
-          </p>
-          <p>
-            <strong>Immediate Termination:</strong> The Sponsor may immediately terminate this MOU
-            if the Shop fails to pay the apprentice as agreed, violates safety or labor regulations,
-            loses required licenses or insurance, or engages in misconduct affecting the apprentice.
-          </p>
-          <p>
-            <strong>Effect of Termination:</strong> Upon termination, the Sponsor will work to
-            reassign the apprentice to another approved worksite if possible.
-          </p>
+          <p><strong>Term:</strong> This MOU is effective from the date signed until the apprentice completes the program or the agreement is terminated.</p>
+          <p><strong>Termination by Either Party:</strong> Either party may terminate this MOU with 14 days written notice.</p>
+          <p><strong>Immediate Termination:</strong> The Sponsor may immediately terminate this MOU if the Shop fails to pay the apprentice as agreed, violates safety or labor regulations, loses required licenses or insurance, or engages in misconduct affecting the apprentice.</p>
+          <p><strong>Effect of Termination:</strong> Upon termination, the Sponsor will work to reassign the apprentice to another approved worksite if possible.</p>
 
           <h2>7. CONFIDENTIALITY</h2>
-          <p>
-            Both parties agree to maintain confidentiality of apprentice personal information and
-            business proprietary information, except as required for program administration or by
-            law.
-          </p>
+          <p>Both parties agree to maintain confidentiality of apprentice personal information and business proprietary information, except as required for program administration or by law.</p>
 
           <h2>8. INDEMNIFICATION</h2>
-          <p>
-            Each party agrees to indemnify and hold harmless the other party from claims arising
-            from their own negligence or willful misconduct in connection with this MOU.
-          </p>
+          <p>Each party agrees to indemnify and hold harmless the other party from claims arising from their own negligence or willful misconduct in connection with this MOU.</p>
 
           <h2>9. DISPUTE RESOLUTION</h2>
-          <p>
-            The parties agree to attempt to resolve any disputes through good faith negotiation. If
-            unresolved, disputes may be submitted to mediation before pursuing other remedies.
-          </p>
+          <p>The parties agree to attempt to resolve any disputes through good faith negotiation. If unresolved, disputes may be submitted to mediation before pursuing other remedies.</p>
 
           <h2>10. AMENDMENTS</h2>
           <p>This MOU may only be amended in writing signed by both parties.</p>
 
           <h2>11. ENTIRE AGREEMENT</h2>
-          <p>
-            This MOU constitutes the entire agreement between the parties regarding the subject
-            matter herein and supersedes all prior agreements and understandings.
-          </p>
+          <p>This MOU constitutes the entire agreement between the parties regarding the subject matter herein and supersedes all prior agreements and understandings.</p>
         </div>
 
         <hr className="my-8" />
 
         {/* Digital Signature Section */}
         <div className="print:hidden" id="sign">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Digital Signature</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Digital Signature</h2>
 
           {!user && (
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-8">
@@ -377,13 +272,8 @@ export default function MOUPage() {
                 <AlertCircle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-amber-900">Account Required</p>
-                  <p className="text-amber-800 mt-1">
-                    You must be signed in to digitally sign this MOU.
-                  </p>
-                  <Link
-                    href="/signup?redirect=/docs/Indiana-Barbershop-Apprenticeship-MOU"
-                    className="inline-block mt-3 px-5 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700"
-                  >
+                  <p className="text-amber-800 mt-1">You must be signed in to digitally sign this MOU.</p>
+                  <Link href="/signup?redirect=/docs/Indiana-Barbershop-Apprenticeship-MOU" className="inline-block mt-3 px-5 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700">
                     Create Account / Sign In →
                   </Link>
                 </div>
@@ -400,97 +290,53 @@ export default function MOUPage() {
                 </div>
               )}
 
-              <div className="bg-slate-50 rounded-xl p-6 space-y-4">
-                <h3 className="text-lg font-bold text-slate-900">Worksite Partner Information</h3>
+              <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+                <h3 className="text-lg font-bold text-gray-900">Worksite Partner Information</h3>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Shop Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={shopName}
-                      onChange={(e) => setShopName(e.target.value)}
-                      placeholder="Your barbershop name"
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Shop Name *</label>
+                    <input type="text" value={shopName} onChange={e => setShopName(e.target.value)} placeholder="Your barbershop name" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Owner / Authorized Signer Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={partnerName}
-                      onChange={(e) => setPartnerName(e.target.value)}
-                      placeholder="Full legal name"
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Owner / Authorized Signer Name *</label>
+                    <input type="text" value={partnerName} onChange={e => setPartnerName(e.target.value)} placeholder="Full legal name" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" />
                   </div>
                 </div>
               </div>
 
-              <div className="bg-slate-50 rounded-xl p-6 space-y-4">
-                <h3 className="text-lg font-bold text-slate-900">Supervising Barber</h3>
+              <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+                <h3 className="text-lg font-bold text-gray-900">Supervising Barber</h3>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Supervisor Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={supervisorName}
-                      onChange={(e) => setSupervisorName(e.target.value)}
-                      placeholder="Licensed barber name"
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Supervisor Name *</label>
+                    <input type="text" value={supervisorName} onChange={e => setSupervisorName(e.target.value)} placeholder="Licensed barber name" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Indiana License # *
-                    </label>
-                    <input
-                      type="text"
-                      value={supervisorLicense}
-                      onChange={(e) => setSupervisorLicense(e.target.value)}
-                      placeholder="License number"
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Indiana License # *</label>
+                    <input type="text" value={supervisorLicense} onChange={e => setSupervisorLicense(e.target.value)} placeholder="License number" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" />
                   </div>
                 </div>
               </div>
 
-              <div className="bg-slate-50 rounded-xl p-6 space-y-4">
-                <h3 className="text-lg font-bold text-slate-900">Compensation Model *</h3>
+              <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+                <h3 className="text-lg font-bold text-gray-900">Compensation Model *</h3>
                 <div className="grid md:grid-cols-3 gap-3">
                   {[
                     { value: 'hourly', label: 'Hourly Wage' },
                     { value: 'commission', label: 'Commission' },
                     { value: 'hybrid', label: 'Hybrid (Wage + Commission)' },
-                  ].map((model) => (
-                    <label
-                      key={model.value}
-                      className={`flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer ${compensationModel === model.value ? 'border-brand-blue-500 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
-                    >
-                      <input
-                        type="radio"
-                        name="compensation"
-                        value={model.value}
-                        checked={compensationModel === model.value}
-                        onChange={(e) => setCompensationModel(e.target.value)}
-                        className="text-brand-blue-600"
-                      />
-                      <span className="text-slate-700 font-medium">{model.label}</span>
+                  ].map(model => (
+                    <label key={model.value} className={`flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer ${compensationModel === model.value ? 'border-brand-blue-500 bg-brand-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                      <input type="radio" name="compensation" value={model.value} checked={compensationModel === model.value} onChange={e => setCompensationModel(e.target.value)} className="text-brand-blue-600" />
+                      <span className="text-gray-700 font-medium">{model.label}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-white border-2 border-slate-200 rounded-xl p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-1">Worksite Partner Signature</h3>
-                <p className="text-sm text-slate-600 mb-4">
-                  The shop owner or authorized representative must sign below.
-                </p>
+              <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Worksite Partner Signature</h3>
+                <p className="text-sm text-gray-600 mb-4">The shop owner or authorized representative must sign below.</p>
                 <SignatureInput
                   userName={partnerName || 'Enter name above'}
                   documentId="partner-mou"
@@ -501,13 +347,9 @@ export default function MOUPage() {
                 />
               </div>
 
-              <div className="bg-white border-2 border-slate-200 rounded-xl p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-1">
-                  Supervising Barber Signature
-                </h3>
-                <p className="text-sm text-slate-600 mb-4">
-                  The supervising licensed barber must sign below.
-                </p>
+              <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Supervising Barber Signature</h3>
+                <p className="text-sm text-gray-600 mb-4">The supervising licensed barber must sign below.</p>
                 <SignatureInput
                   userName={supervisorName || 'Enter name above'}
                   documentId="partner-mou-supervisor"
@@ -524,18 +366,14 @@ export default function MOUPage() {
                 className="w-full inline-flex items-center justify-center px-8 py-4 bg-brand-green-600 text-white rounded-lg font-bold hover:bg-brand-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {submitting ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Submitting...
-                  </>
+                  <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Submitting...</>
                 ) : (
-                  <>
-                    <CheckCircle className="w-5 h-5 mr-2" /> Sign &amp; Submit MOU
-                  </>
+                  <><CheckCircle className="w-5 h-5 mr-2" /> Sign &amp; Submit MOU</>
                 )}
               </button>
 
               {!canSubmit && (
-                <p className="text-sm text-slate-500 text-center">
+                <p className="text-sm text-gray-500 text-center">
                   Complete all fields and both signatures above to submit.
                 </p>
               )}
@@ -548,12 +386,7 @@ export default function MOUPage() {
           <div className="prose prose-sm max-w-none">
             <h2>SIGNATURES</h2>
             <div className="mt-8">
-              <p>
-                <strong>
-                  SPONSOR: 2Exclusive LLC-S (DBA {PLATFORM_DEFAULTS.orgName} Career &amp; Technical
-                  Institute)
-                </strong>
-              </p>
+              <p><strong>SPONSOR: 2Exclusive LLC-S (DBA {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute)</strong></p>
               <p className="mt-4">Signature: _________________________________</p>
               <p>Printed Name: _________________________________</p>
               <p>Title: _________________________________</p>
@@ -561,9 +394,7 @@ export default function MOUPage() {
             </div>
             <hr className="my-6" />
             <div className="mt-8">
-              <p>
-                <strong>WORKSITE PARTNER:</strong>
-              </p>
+              <p><strong>WORKSITE PARTNER:</strong></p>
               <p>Shop Name: _________________________________</p>
               <p className="mt-4">Signature: _________________________________</p>
               <p>Printed Name: _________________________________</p>
@@ -572,9 +403,7 @@ export default function MOUPage() {
             </div>
             <hr className="my-6" />
             <div className="mt-8">
-              <p>
-                <strong>SUPERVISING BARBER:</strong>
-              </p>
+              <p><strong>SUPERVISING BARBER:</strong></p>
               <p className="mt-4">Signature: _________________________________</p>
               <p>Printed Name: _________________________________</p>
               <p>Indiana License #: _________________________________</p>
@@ -583,7 +412,7 @@ export default function MOUPage() {
           </div>
         </div>
 
-        <div className="mt-8 text-center text-sm text-slate-500 print:mt-12">
+        <div className="mt-8 text-center text-sm text-gray-500 print:mt-12">
           <p>2Exclusive LLC-S (DBA {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute)</p>
           <p>Indianapolis, Indiana | www.elevateforhumanity.org</p>
           <p>RAPIDS Program ID: 2025-IN-132301</p>

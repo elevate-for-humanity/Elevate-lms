@@ -147,7 +147,7 @@ export default function LegalOnboardingPage() {
 
       // Write the canonical completion flag that the middleware gate reads.
       // profiles.onboarding_completed is the single source of truth —
-      // proxy.ts checks this field to allow access to /lms, /student-portal, etc.
+      // proxy.ts checks this field to allow access to /lms, /learner/dashboard, etc.
       const { error: profileError } = await supabase
         .from('profiles')
         .update({

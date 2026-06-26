@@ -4,20 +4,24 @@
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "voiceoverSrc": "/audio/heroes/home.mp3",
-    "microLabel": "Indianapolis, Indiana",
-    "belowHeroHeadline": "Workforce Infrastructure. Apprenticeships. Funding. Placement.",
-    "belowHeroSubheadline": "Elevate connects people to funded training, DOL-registered apprenticeships, industry credentials, and employment \u2014 often at no cost through WIOA or state funding.",
+    "microLabel": "The AI-Powered Workforce Operating System",
+    "belowHeroHeadline": "The AI-Powered Operating System for the Modern Workforce.",
+    "belowHeroSubheadline": "One unified platform for workforce development, apprenticeship management, and career advancement. Empowering learners, employers, and agencies to build talent pipelines at scale.",
     "primaryCta": {
-      "label": "Explore Career Pathways",
-      "href": "/programs"
+      "label": "Get Started",
+      "href": "/apply"
     },
     "secondaryCta": {
-      "label": "For Employers",
-      "href": "/for-employers",
+      "label": "For Employers & Agencies",
+      "href": "/partners",
       "variant": "secondary"
     },
-    "trustIndicators": [],
-    "transcript": "Elevate for Humanity is an AI-powered workforce operating system \u2014 not just a training provider. We handle credentialing, compliance tracking, employer placement, apprenticeship coordination, and funding documentation so agencies and participants can focus on outcomes.",
+    "trustIndicators": [
+      "AI-Driven Career Navigation",
+      "Automated Compliance Tracking",
+      "Blockchain-Verified Credentials"
+    ],
+    "transcript": "Elevate for Humanity is an AI-powered workforce operating system — not just a training provider. We automate the entire journey from recruitment to employment. Our platform handles credentialing, compliance tracking, employer placement, and apprenticeship coordination through a single unified ecosystem.",
     "analyticsName": "home"
   },
   "about": {
@@ -95,7 +99,9 @@
   },
   "healthcare": {
     "pageKey": "healthcare",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4",
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4",
+    "posterImage": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/images/cna-hero-poster.jpg",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "Healthcare Programs",
     "belowHeroHeadline": "Healthcare training that leads to certification.",
@@ -535,7 +541,9 @@
   },
   "cna": {
     "pageKey": "cna",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4",
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4",
+    "posterImage": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/images/cna-hero-poster.jpg",
     "voiceoverSrc": "/audio/heroes/cna.mp3",
     "microLabel": "Indiana CNA Certification",
     "credentialLabel": "Indiana CNA certification",

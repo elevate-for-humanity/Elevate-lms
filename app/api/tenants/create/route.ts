@@ -10,7 +10,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-const ADMIN_ROLES = ['admin', 'super_admin'];
+const ADMIN_ROLES = ['admin'];
 
 async function requireSuperAdmin() {
   const supabase = await createClient();

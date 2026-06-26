@@ -36,7 +36,7 @@ const FEATURED = [
     weeks: '12',
     credentials: '6',
     href: '/apply/student?program=hvac-technician',
-    image: '/images/pages/card-hvac.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/card-hvac.webp',
     tag: 'Trades',
   },
   {
@@ -45,7 +45,7 @@ const FEATURED = [
     weeks: '6',
     credentials: '2',
     href: '/apply/student?program=cna',
-    image: '/images/pages/card-cna.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/card-cna.webp',
     tag: 'Healthcare',
   },
   {
@@ -54,7 +54,7 @@ const FEATURED = [
     weeks: '4',
     credentials: '3',
     href: '/apply/student?program=cdl-training',
-    image: '/images/pages/card-cdl.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/card-cdl.webp',
     tag: 'Transportation',
   },
   {
@@ -63,7 +63,7 @@ const FEATURED = [
     weeks: '52',
     credentials: '4',
     href: '/apply/student?program=barber-apprenticeship',
-    image: '/images/pages/barber-apprenticeship.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship.webp',
     tag: 'Cosmetology',
   },
   {
@@ -72,7 +72,7 @@ const FEATURED = [
     weeks: '20',
     credentials: '4',
     href: '/apply/student?program=electrical',
-    image: '/images/pages/electrical.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/electrical.webp',
     tag: 'Trades',
   },
   {
@@ -81,7 +81,7 @@ const FEATURED = [
     weeks: '1',
     credentials: '2',
     href: '/apply/student?program=forklift',
-    image: '/images/pages/forklift.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/forklift.webp',
     tag: 'Logistics',
   },
 ];
@@ -247,7 +247,7 @@ export default async function EnrollmentPage() {
                     alt={p.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 640px) 100vw, 33vw" placeholder="empty"
+                    sizes="(max-width: 640px) 100vw, 33vw" 
                   />
                 </div>
                 <div className="p-5 flex flex-col flex-1">
@@ -370,11 +370,11 @@ export default async function EnrollmentPage() {
               </div>
               <div className="relative h-64 rounded-xl overflow-hidden">
                 <Image
-                  src="/images/pages/about-career-pathways.webp"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-pathways.webp"
                   alt="Career pathways for all students"
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty"
+                  sizes="(max-width: 768px) 100vw, 50vw" 
                 />
               </div>
             </div>

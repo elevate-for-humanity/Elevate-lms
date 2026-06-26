@@ -133,7 +133,7 @@ export default function StructuredData() {
           itemOffered: {
             '@type': 'Course',
             name: 'Peer Recovery Specialist',
-            description: 'Indiana DMHA-aligned peer recovery certification. FSSA IMPACT eligible.',
+            description: 'Indiana DMHA-aligned peer recovery certification.  eligible.',
             url: 'https://www.elevateforhumanity.org/programs/peer-recovery-specialist',
             provider: { '@id': 'https://www.elevateforhumanity.org/#organization' },
           },

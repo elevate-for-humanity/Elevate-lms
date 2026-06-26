@@ -15,7 +15,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <>
-      <AdminDashboardContent data={data} canAccessDevStudio={true} />
+      <AdminDashboardContent data={data} />
     </>
   );
 }

@@ -43,18 +43,18 @@ async function main() {
       
       userId = existing.id;
 
-      // Update role to super_admin if not already
-      if (existing.role !== 'super_admin') {
+      // Update role to admin if not already
+      if (existing.role !== 'admin') {
         const { error } = await supabase
           .from('profiles')
-          .update({ role: 'super_admin' })
+          .update({ role: 'admin' })
           .eq('id', userId);
         
         if (error) {
           console.error('Failed to update role:', error.message);
           process.exit(1);
         }
-        console.log(`✓ Updated role to super_admin`);
+        console.log(`✓ Updated role to admin`);
       }
     } else {
       // Create auth user
@@ -74,12 +74,12 @@ async function main() {
       console.log(`  ID: ${userId}`);
       console.log(`  Email: ${ADMIN_EMAIL}`);
 
-      // Create profile with super_admin role
+      // Create profile with admin role
       const { error: profileErr } = await supabase.from('profiles').upsert({
         id: userId,
         email: ADMIN_EMAIL,
         full_name: 'Platform Super Admin',
-        role: 'super_admin',
+        role: 'admin',
       });
 
       if (profileErr) {
@@ -87,7 +87,7 @@ async function main() {
         process.exit(1);
       }
 
-      console.log(`✓ Created profile with super_admin role`);
+      console.log(`✓ Created profile with admin role`);
     }
 
     // Verify the account

@@ -111,9 +111,9 @@ const checks: Array<{ file: string; check: () => Promise<boolean>; description: 
         .select('role')
         .eq('email', 'curvaturebodysculpting@gmail.com')
         .maybeSingle();
-      return data?.role === 'super_admin';
+      return data?.role === 'admin';
     },
-    description: 'curvaturebodysculpting@gmail.com has super_admin role',
+    description: 'curvaturebodysculpting@gmail.com has admin role',
   },
 ];
 

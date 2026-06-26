@@ -8,8 +8,8 @@
 export type UserRole =
   | 'student'
   | 'admin'
-  | 'super_admin'
-  | 'platform_operator'
+  | 'admin'
+  | 'admin'
   | 'staff'
   | 'employer'
   | 'workforce_board'

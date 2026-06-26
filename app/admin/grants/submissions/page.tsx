@@ -4,6 +4,7 @@
  */
 
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';
@@ -80,6 +81,11 @@ export default async function GrantSubmissionsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect('/login');
+  }
+
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
@@ -105,7 +111,7 @@ export default async function GrantSubmissionsPage() {
         {/* Hero Section */}
         <section className="relative h-48 md:h-64 overflow-hidden">
           <Image
-            src="/images/pages/admin-grants-submissions-detail.jpg"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-grants-submissions-detail.webp"
             alt="Grant Submissions"
             fill
             className="object-cover"

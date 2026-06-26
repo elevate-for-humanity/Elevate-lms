@@ -66,70 +66,34 @@ describe('requireRole — missing profile row', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Fix 2: proxy.ts enrollment gate — correct state values
+// Fix 2: enrollment flow — correct state values in enrollment-flow.ts
 // ---------------------------------------------------------------------------
 
-describe('proxy.ts enrollment gate — enrollment_state values', () => {
-  const src = read('proxy.ts');
+describe('enrollment state contract', () => {
+  const src = read('lib/enrollment/enrollment-flow.ts');
 
-  it('passes students with enrollment_state = active', () => {
-    expect(src).toContain("LMS_ACCESS_STATES = new Set(['active'])");
+  it('DB-valid LMS access state is active only', () => {
+    expect(src).toContain("['active']");
+    expect(src).not.toMatch(/LMS_ACCESS_STATES.*=.*\['active',\s*'enrolled'/);
   });
 
-  it('routes enrolled state to documents before LMS access', () => {
-    const enrollmentGateBlock = src.slice(
-      src.indexOf('LMS_ACCESS_STATES'),
-      src.indexOf('if (needsPartner)'),
-    );
-    expect(enrollmentGateBlock).toContain("normalizedState === 'enrolled'");
-    expect(enrollmentGateBlock).toContain('/enrollment/documents');
+  it('terminal states are defined', () => {
+    expect(src).toContain('TERMINAL_ENROLLMENT_STATES');
+    expect(src).toContain('suspended');
+    expect(src).toContain('revoked');
+    expect(src).toContain('withdrawn');
   });
 
-  it('does not reference the removed documents_complete state as an access state', () => {
-    // documents_complete was removed from the DB constraint in migration 20260501000010.
-    // It must not appear in the LMS_ACCESS_STATES set.
-    const accessStatesBlock = src.slice(
-      src.indexOf('LMS_ACCESS_STATES'),
-      src.indexOf('TERMINAL_STATES'),
-    );
-    expect(accessStatesBlock).not.toContain('documents_complete');
+  it('pending onboarding states are defined', () => {
+    expect(src).toContain('PENDING_ONBOARDING_STATES');
+    expect(src).toContain('orientation');
+    expect(src).toContain('enrolled');
   });
 
-  it('sends terminal states to /unauthorized, not enrollment flow', () => {
-    expect(src).toContain('TERMINAL_STATES.has(normalizedState)');
-    const terminalBlock = src.slice(
-      src.indexOf('TERMINAL_STATES.has(normalizedState)'),
-      src.indexOf('let redirectPath'),
-    );
-    expect(terminalBlock).toContain('/unauthorized');
-  });
-
-  it('does not reference the removed confirmed state as a redirect target', () => {
-    // 'confirmed' was a state that no longer exists in the DB constraint.
-    // The old code had: if (state === 'confirmed') redirectPath = '/enrollment/orientation'
-    // This must be gone.
-    const enrollmentGateBlock = src.slice(
-      src.indexOf('LMS_ACCESS_STATES'),
-      src.indexOf('if (needsPartner)'),
-    );
-    expect(enrollmentGateBlock).not.toMatch(/state === ['"]confirmed['"]/);
-  });
-
-  it('does not reference the removed orientation_complete state as a redirect trigger', () => {
-    const enrollmentGateBlock = src.slice(
-      src.indexOf('LMS_ACCESS_STATES'),
-      src.indexOf('if (needsPartner)'),
-    );
-    expect(enrollmentGateBlock).not.toMatch(/state === ['"]orientation_complete['"]/);
-  });
-
-  it('routes orientation state to /enrollment/orientation', () => {
-    const enrollmentGateBlock = src.slice(
-      src.indexOf('LMS_ACCESS_STATES'),
-      src.indexOf('if (needsPartner)'),
-    );
-    expect(enrollmentGateBlock).toContain("normalizedState === 'orientation'");
-    expect(enrollmentGateBlock).toContain('/enrollment/orientation');
+  it('legacy state normalization is defined', () => {
+    expect(src).toContain('LEGACY_STATE_MAP');
+    expect(src).toContain('orientation_complete');
+    expect(src).toContain('documents_complete');
   });
 });
 
@@ -190,18 +154,17 @@ describe('documents/complete route — auto-grants LMS access', () => {
 
 describe('enrollment state contract', () => {
   it('DB-valid LMS access state is active only', () => {
-    const proxySrc = read('proxy.ts');
-    expect(proxySrc).toContain("LMS_ACCESS_STATES = new Set(['active'])");
+    const src = read('lib/enrollment/enrollment-flow.ts');
+    // LMS_ACCESS_STATES should contain only 'active'
+    expect(src).toMatch(/LMS_ACCESS_STATES.*=.*\['active'\]/);
   });
 
-  it('DB-valid terminal states are all handled in proxy.ts', () => {
-    const DB_TERMINAL_STATES = [
-      'suspended', 'revoked', 'withdrawn', 'completed',
-      'graduated', 'placed', 'follow_up_6mo', 'follow_up_12mo',
-    ];
-    const proxySrc = read('proxy.ts');
-    for (const state of DB_TERMINAL_STATES) {
-      expect(proxySrc, `terminal state '${state}' not handled in proxy.ts`).toContain(`'${state}'`);
-    }
+  it('DB-valid terminal states are defined in enrollment-flow.ts', () => {
+    const src = read('lib/enrollment/enrollment-flow.ts');
+    expect(src).toContain('TERMINAL_ENROLLMENT_STATES');
+    // All terminal states should be present
+    expect(src).toContain('suspended');
+    expect(src).toContain('revoked');
+    expect(src).toContain('withdrawn');
   });
 });

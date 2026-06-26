@@ -46,7 +46,7 @@ export default async function ApprenticeLoginPage({
     <>
       <section className="relative h-[200px] w-full overflow-hidden">
         <Image
-          src="/images/beauty/hero-program-barber.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/hero-program-barber.webp"
           alt="Barber and beauty apprenticeship training"
           fill
           className="object-cover"

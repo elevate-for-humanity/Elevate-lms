@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { CreditCard, Lock, Check } from 'lucide-react';
@@ -177,13 +178,13 @@ function PaymentForm({
       {/* Terms */}
       <p className="text-xs text-slate-700 text-center">
         By completing this purchase, you agree to our{' '}
-        <a href="/legal" className="text-brand-blue-600 hover:underline">
+        <Link href="/legal" className="text-brand-blue-600 hover:underline">
           Terms of Service
-        </a>{' '}
+        </Link>{' '}
         and{' '}
-        <a href="/legal/privacy" className="text-brand-blue-600 hover:underline">
+        <Link href="/legal/privacy" className="text-brand-blue-600 hover:underline">
           Privacy Policy
-        </a>
+        </Link>
       </p>
     </form>
   );

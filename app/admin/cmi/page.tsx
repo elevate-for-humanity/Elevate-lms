@@ -36,15 +36,19 @@ export default async function CMIDashboardPage() {
   const supabase = await createClient();
   const db = (await requireAdminClient()) || supabase;
 
-  if (!supabase) redirect('/login?redirect=/admin/cmi');
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect('/login');
+  }
+
+
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
 
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff'].includes(profile.role)) {
     redirect('/admin');
   }
 

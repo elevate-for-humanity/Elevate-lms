@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 };
 
 export default async function InstructorPortalLanding() {
-  const { profile } = await requireRole(['instructor', 'admin', 'super_admin', 'staff']);
-  if (profile?.role === 'admin' || profile?.role === 'super_admin' || profile?.role === 'staff') {
+  const { profile } = await requireRole(['instructor', 'admin', 'staff']);
+  if (profile?.role === 'admin' || profile?.role === 'admin' || profile?.role === 'staff') {
     redirect('/admin/instructor/dashboard');
   }
 
@@ -37,7 +37,7 @@ export default async function InstructorPortalLanding() {
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image
-            src="/images/pages/instructor-hero.jpg"
+            src="/images/pages/instructor-hero.webp"
             alt="Instructor Portal"
             fill
             className="object-cover"
@@ -82,7 +82,7 @@ export default async function InstructorPortalLanding() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="/images/pages/instructor-page-3.jpg"
+                  src="/images/pages/instructor-page-3.webp"
                   alt="Student Roster"
                   fill
                   sizes="100vw"
@@ -97,7 +97,7 @@ export default async function InstructorPortalLanding() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="/images/pages/instructor-page-4.jpg"
+                  src="/images/pages/instructor-page-4.webp"
                   alt="Progress Tracking"
                   fill
                   sizes="100vw"
@@ -112,7 +112,7 @@ export default async function InstructorPortalLanding() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="/images/pages/instructor-grading.jpg"
+                  src="/images/pages/instructor-grading.webp"
                   alt="Grading"
                   fill
                   sizes="100vw"
@@ -127,7 +127,7 @@ export default async function InstructorPortalLanding() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="/images/pages/instructor-page-5.jpg"
+                  src="/images/pages/instructor-page-5.webp"
                   alt="Communication"
                   fill
                   sizes="100vw"
@@ -142,7 +142,7 @@ export default async function InstructorPortalLanding() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="/images/pages/certifications-page-1.jpg"
+                  src="/images/pages/certifications-page-1.webp"
                   alt="Certifications"
                   fill
                   sizes="100vw"

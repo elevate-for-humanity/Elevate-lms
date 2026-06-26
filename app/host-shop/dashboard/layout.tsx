@@ -13,25 +13,19 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const PORTAL_ROLES = ['host_shop', 'admin', 'super_admin', 'staff'];
+// Only require login - no role restrictions
 
 export default async function HostShopLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   if (!user) redirect('/login?redirect=/host-shop/dashboard');
 
-  const db = (await requireAdminClient()) ?? supabase;
-
-  const { data: profile } = await db
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role, full_name, first_name, last_name, avatar_url, email')
     .eq('id', user.id)
     .maybeSingle();
-
-  if (!profile || !PORTAL_ROLES.includes(profile.role ?? '')) {
-    redirect('/unauthorized');
-  }
 
   const { headers: headersList } = await import('next/headers');
   const headers = await headersList();

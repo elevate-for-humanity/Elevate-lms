@@ -26,6 +26,33 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   {
+    id: 'platform-os',
+    name: 'Platform',
+    href: '/platform/overview',
+    subItems: [
+      { name: '— The Workforce OS —', href: '/platform/overview', isHeader: true },
+      { name: 'Platform Overview', href: '/platform/overview' },
+      { name: 'AI Career Navigator', href: '/ai' },
+      { name: 'Apprenticeship Technology', href: '/apprenticeships' },
+      { name: 'Compliance Automation', href: '/store/add-ons/compliance-automation' },
+      { name: 'Blockchain Credentials', href: '/platform/verification' },
+      { name: 'Analytics & Reporting', href: '/platform/workforce-analytics' },
+    ],
+  },
+  {
+    id: 'partner-solutions',
+    name: 'Solutions',
+    href: '/partners',
+    subItems: [
+      { name: '— Ecosystem Solutions —', href: '/partners', isHeader: true },
+      { name: 'Employer Solutions', href: '/for-employers' },
+      { name: 'Workforce Agencies', href: '/for-agencies' },
+      { name: 'Government Partners', href: '/government' },
+      { name: 'Training Providers', href: '/for-providers' },
+      { name: 'Host Shop Network', href: '/partners/barber-host-shop' },
+    ],
+  },
+  {
     id: 'programs',
     name: 'Programs',
     href: '/programs',
@@ -118,17 +145,46 @@ export const NAV_ITEMS: NavItem[] = [
     subItems: [
       { name: '— Registered programs —', href: '/apprenticeships', isHeader: true },
       { name: 'Overview & how it works', href: '/apprenticeships' },
-      { name: 'Barber Apprenticeship · $4,980', href: canonicalRoutes.programs.barberApprenticeship },
+      { name: 'Barber Apprenticeship', href: canonicalRoutes.programs.barberApprenticeship },
       { name: 'Cosmetology Apprenticeship', href: canonicalRoutes.programs.cosmetologyApprenticeship },
       { name: 'Esthetician Apprenticeship', href: canonicalRoutes.programs.estheticianApprenticeship },
       { name: 'Nail Technician Apprenticeship', href: '/programs/nail-technician-apprenticeship' },
       { name: 'Culinary Apprenticeship', href: '/programs/culinary-apprenticeship' },
-      { name: 'Host shop inquiry', href: '/forms/host-shop-inquiry' },
-      { name: 'Become an apprenticeship sponsor →', href: '/apprentice/sponsor', isSectionLink: true },
+      { name: '— Host Shops —', href: '/partners/host-shops', isHeader: true },
+      { name: 'Barber Host Shops', href: '/barber-host-shop' },
+      { name: 'Cosmetology Host Shops', href: '/cosmetology-host-shop' },
+      { name: 'Esthetician Host Shops', href: '/esthetician-host-shop' },
+      { name: 'Nail Tech Host Shops', href: '/nail-host-shop' },
     ],
   },
 
-  // Testing tab removed - users access via /testing
+  {
+    id: 'testing',
+    name: 'Testing',
+    href: '/testing',
+    subItems: [
+      { name: '— Credential Exams —', href: '/testing', isHeader: true },
+      { name: 'Testing Center overview', href: '/testing' },
+      { name: 'Certiport (MOS, IC3)', href: '/testing/certiport' },
+      { name: 'ACT WorkKeys / NCRC', href: '/testing/workkeys' },
+      { name: 'EPA 608 Universal', href: '/testing/epa608' },
+      { name: 'NHA Certifications', href: '/testing/nha' },
+      { name: 'NRF Rise Up', href: '/testing/riseup' },
+      { name: 'ServSafe / Food Safety', href: '/testing/servsafe' },
+      { name: 'HSI CPR / First Aid', href: '/testing/hsi' },
+      { name: 'OSHA 10 / 30', href: '/testing/osha' },
+      { name: 'ASE Certification', href: '/testing/ase' },
+      { name: 'All exams & certifications →', href: '/testing', isSectionLink: true },
+      
+      { name: '— Exam info —', href: '/testing/book', isHeader: true },
+      { name: 'Schedule an exam', href: '/testing/book' },
+      { name: 'Testing policies', href: '/testing/policies' },
+      { name: 'Testing accommodations', href: '/testing/accommodations' },
+      
+      { name: '— For employers —', href: '/testing/for-employers', isHeader: true },
+      { name: 'Bulk testing for employers', href: '/testing/for-employers' },
+    ],
+  },
 
   {
     id: 'funding',

@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Youtube } from '../ui/BrandIcons';
 import { SOCIAL_LINKS } from '@/config/social-links';
 
 export function SocialLinks() {

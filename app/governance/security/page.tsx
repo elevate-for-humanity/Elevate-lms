@@ -51,7 +51,7 @@ export default function GovernanceSecurityPage() {
     <div className="min-h-screen bg-white">
       <section className="relative h-[240px] sm:h-[300px] overflow-hidden">
         <Image
-          src="/images/pages/governance-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/governance-page-1.webp"
           alt="Security and data protection governance"
           fill
           className="object-cover"

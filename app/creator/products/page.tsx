@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Creator Products',
+  title: 'Creator Products | Elevate For Humanity',
   description: 'Elevate For Humanity - Career training and workforce development',
 };
 
@@ -11,11 +11,11 @@ import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
-
+export const revalidate = 3600;
 export default async function CreatorProductsPage() {
   const { creator } = await requireCreator();
   const supabase = await createClient();
+
 
   // Fetch creator's products
   const { data: products } = await supabase
@@ -38,14 +38,16 @@ export default async function CreatorProductsPage() {
 
   return (
     <div className="min-h-screen bg-white py-8 px-4">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Creator', href: '/creator' }, { label: 'Products' }]} />
+            <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: "Creator", href: "/creator" }, { label: "Products" }]} />
       </div>
-      <div className="max-w-6xl mx-auto">
+<div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-2">My Products</h1>
-            <p className="text-black">Manage your digital products and track performance</p>
+            <p className="text-black">
+              Manage your digital products and track performance
+            </p>
           </div>
           <Link
             href="/creator/products"
@@ -128,11 +130,14 @@ export default async function CreatorProductsPage() {
 
                   <div className="p-4">
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-lg line-clamp-2">{product.title}</h3>
+                      <h3 className="font-semibold text-lg line-clamp-2">
+                        {product.title}
+                      </h3>
                       <span
                         className={`text-xs px-2 py-2 rounded ${
-                          statusColors[product.status as keyof typeof statusColors] ||
-                          statusColors.draft
+                          statusColors[
+                            product.status as keyof typeof statusColors
+                          ] || statusColors.draft
                         }`}
                       >
                         {product.status}
@@ -163,7 +168,7 @@ export default async function CreatorProductsPage() {
                     <div className="flex gap-2">
                       <Link
                         href={`/creator/products/${product.id}/edit`}
-                        className="flex-1 text-center border border-slate-300 text-black py-2 rounded hover:bg-white transition text-sm"
+                        className="flex-1 text-center border border-gray-300 text-black py-2 rounded hover:bg-white transition text-sm"
                       >
                         Edit
                       </Link>

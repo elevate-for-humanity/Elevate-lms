@@ -103,19 +103,19 @@ export default async function LicensesPage() {
           loop
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          poster="/images/pages/store-licensing-enterprise-hero.webp"
+          poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-licensing-enterprise-hero.webp"
         >
           <source src="/videos/training-providers-video-with-narration.mp4" type="video/mp4" />
         </video>
         {/* Fallback Image */}
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image sizes="100vw"
-          src="/images/pages/store-licensing-enterprise-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-licensing-enterprise-hero.webp"
           alt="Workforce training platform"
           fill
           className="object-cover -z-10"
           priority
-          quality={90} placeholder="empty"
+          quality={90} 
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-zinc-900/95 via-zinc-900/80 to-zinc-900/60" />
@@ -474,10 +474,10 @@ export default async function LicensesPage() {
       {/* CTA */}
       <section className="relative px-4 sm:px-6 lg:px-8 py-20 overflow-hidden">
         <Image sizes="100vw"
-          src="/images/business/team-4.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/team-4.webp"
           alt="Get started"
           fill
-          className="object-cover" placeholder="empty"
+          className="object-cover" 
         />
         <div className="absolute inset-0 bg-zinc-900/90" />
 

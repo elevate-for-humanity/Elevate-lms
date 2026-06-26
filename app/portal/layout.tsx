@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = safeGetUser(await supabase.auth.getUser());
 
   const headersList = await headers();
   const pathname = headersList.get('x-pathname') ?? '/portal';

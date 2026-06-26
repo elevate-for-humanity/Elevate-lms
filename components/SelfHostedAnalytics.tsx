@@ -21,46 +21,6 @@ function SelfHostedAnalyticsContent() {
   const pathname = usePathname();
   const searchParams = useSafeSearchParams();
 
-  useEffect(() => {
-    // Track page view
-    trackPageView();
-
-    // Track Web Vitals (performance)
-    if (typeof window !== 'undefined' && 'web-vitals' in window) {
-      import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
-        onCLS(sendToAnalytics);
-        onFID(sendToAnalytics);
-        onFCP(sendToAnalytics);
-        onLCP(sendToAnalytics);
-        onTTFB(sendToAnalytics);
-      });
-    }
-  }, [pathname, searchParams, sendToAnalytics, trackPageView]);
-
-  const trackPageView = async () => {
-    try {
-      const data = {
-        event: 'pageview',
-        path: pathname,
-        referrer: document.referrer,
-        user_agent: navigator.userAgent,
-        screen_width: window.innerWidth,
-        screen_height: window.innerHeight,
-        timestamp: new Date().toISOString(),
-      };
-
-      // Send to your own API endpoint
-      await fetch('/api/analytics/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-    } catch (error) {
-      /* Error handled silently */
-      // Silently fail - don't break the app
-    }
-  };
-
   const sendToAnalytics = useCallback(async (metric: any) => {
     try {
       const payload = {
@@ -80,7 +40,46 @@ function SelfHostedAnalyticsContent() {
     } catch {
       // Silently fail — analytics must never break the app
     }
-  }, []);
+  }, [pathname]);
+
+  const trackPageView = useCallback(async () => {
+    try {
+      const data = {
+        event: 'pageview',
+        path: pathname,
+        referrer: document.referrer,
+        user_agent: navigator.userAgent,
+        screen_width: window.innerWidth,
+        screen_height: window.innerHeight,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Send to your own API endpoint
+      await fetch('/api/analytics/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+    } catch {
+      // Silently fail - don't break the app
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    // Track page view
+    trackPageView();
+
+    // Track Web Vitals (performance)
+    if (typeof window !== 'undefined' && 'web-vitals' in window) {
+      import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+        onCLS(sendToAnalytics);
+        onFID(sendToAnalytics);
+        onFCP(sendToAnalytics);
+        onLCP(sendToAnalytics);
+        onTTFB(sendToAnalytics);
+      });
+    }
+  }, [pathname, searchParams, sendToAnalytics, trackPageView]);
 
   // No UI - just tracking
   return null;

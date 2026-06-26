@@ -1,252 +1,251 @@
-export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
+import { createClient } from '@/lib/supabase/server';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import {
-  Users,
-  BarChart,
-  FileText,
-  Settings,
-  ArrowRight,
-  GraduationCap,
-  Shield,
-  Clock,
-  Globe,
-} from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Partner Portal',
-  description:
-    'Manage students, track outcomes, and access reports through the partner portal. Tools for training providers, community organizations, and workforce partners.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/platform/partner-portal' },
-  openGraph: {
-    title: 'Partner Portal',
-    description: 'Manage students, track outcomes, and access reports through the partner portal.',
-    url: 'https://www.elevateforhumanity.org/platform/partner-portal',
-    siteName: PLATFORM_DEFAULTS.orgName,
-    images: [
-      { url: '/hero-images/pathways-hero.jpg', width: 1200, height: 630, alt: 'Partner Portal' },
-    ],
-    type: 'website',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/platform/partner-portal',
   },
+  title: 'Partner Portal | Elevate For Humanity',
+  description:
+    'Resources and tools for your success.',
 };
 
-const features = [
-  {
-    icon: Users,
-    title: 'Student Management',
-    description: 'Enroll students, track progress, manage records, and communicate with learners.',
-  },
-  {
-    icon: BarChart,
-    title: 'Analytics Dashboard',
-    description: 'Real-time performance metrics, completion rates, and outcome tracking.',
-  },
-  {
-    icon: FileText,
-    title: 'Reporting',
-    description: 'Generate compliance reports, outcome summaries, and funding documentation.',
-  },
-  {
-    icon: Settings,
-    title: 'Program Settings',
-    description: 'Configure your programs, courses, schedules, and enrollment requirements.',
-  },
-  {
-    icon: GraduationCap,
-    title: 'Course Delivery',
-    description: 'Deliver training through the built-in LMS with video, quizzes, and assignments.',
-  },
-  {
-    icon: Shield,
-    title: 'Compliance Tools',
-    description: 'Automated WIOA documentation, audit trails, and regulatory compliance.',
-  },
-];
+export default async function PartnerPortalPage() {
+  const supabase = await createClient();
 
-const partnerTypes = [
-  {
-    title: 'Training Providers',
-    description: 'Deliver courses and programs to funded learners.',
-    href: '/platform/training-providers',
-  },
-  {
-    title: 'Community Organizations',
-    description: 'Refer participants and provide wraparound services.',
-    href: '/partners/apply',
-  },
-  {
-    title: 'Workforce Boards',
-    description: 'Manage regional workforce development programs.',
-    href: '/platform/workforce-boards',
-  },
-  {
-    title: 'Employers',
-    description: 'Hire graduates and host apprentices.',
-    href: '/for-employers',
-  },
-];
-
-export default function PartnerPortalPage() {
+  if (!supabase) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
+          <p className="text-gray-600">Please try again later.</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Fetch partner portal features
+  const { data: features } = await supabase
+    .from('platform_features')
+    .select('*')
+    .eq('portal', 'partner');
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs
-            items={[{ label: 'Platform', href: '/platform' }, { label: 'Partner Portal' }]}
-          />
-        </div>
-      </div>
-      <div className="max-w-6xl mx-auto px-4 pb-2">
-        <p className="text-sm text-black font-medium">
-          Part of the{' '}
-          <Link href="/platform" className="text-brand-red-600 hover:underline">
-            Elevate Workforce Operating System
-          </Link>
-        </p>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <Breadcrumbs
+        items={[
+          { label: 'Platform', href: '/platform' },
+          { label: 'Partner Portal' },
+        ]}
+      />
+      {/* Hero Section */}
+      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
+        <Image
+          src="/images/pages/about-supportive-services.jpg"
+          alt="Partner Portal"
+          fill
+          className="object-cover"
+          quality={100}
+          priority
+          sizes="100vw"
+        />
 
-      {/* Hero */}
-      {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image
-            src="/hero-images/pathways-hero.jpg"
-            alt="Partner Portal"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw" placeholder="empty"
-          />
-        </div>
-        <div className="bg-white py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Partner Portal</h1>
-            <p className="text-lg text-white max-w-3xl mx-auto">
-              Everything you need to manage your training programs, track student outcomes, and stay
-              compliant.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Portal Features</h2>
-            <p className="text-lg text-black max-w-2xl mx-auto">
-              A single platform to manage every aspect of your workforce training partnership.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((f, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition"
-              >
-                <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <f.icon className="w-6 h-6 text-brand-blue-600" />
-                </div>
-                <h3 className="font-bold text-slate-900 mb-2">{f.title}</h3>
-                <p className="text-black text-sm">{f.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Partner Types */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Who Uses the Partner Portal</h2>
-            <p className="text-lg text-black">
-              Tailored experiences for every type of workforce partner.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {partnerTypes.map((p, i) => (
-              <Link
-                key={i}
-                href={p.href}
-                className="bg-white rounded-xl p-6 border hover:shadow-md transition flex items-start gap-4 group"
-              >
-                <div className="w-10 h-10 bg-brand-blue-700 text-white rounded-lg flex items-center justify-center font-bold flex-shrink-0">
-                  {i + 1}
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 mb-1 group-hover:text-brand-blue-600 transition">
-                    {p.title}
-                  </h3>
-                  <p className="text-black text-sm">{p.description}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* What You Get */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
-              <Image
-                src="/images/pages/platform-page-3.webp"
-                alt="Partner collaboration"
-                fill
-                sizes="100vw"
-                className="object-cover" placeholder="empty"
-              />
-            </div>
-            <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-6">What Partners Get</h2>
-              <div className="space-y-4">
-                {[
-                  'Dedicated partner dashboard with real-time metrics',
-                  'Student enrollment and progress management tools',
-                  'Automated compliance documentation and audit trails',
-                  'Built-in LMS for course delivery and assessments',
-                  'Funding reconciliation and payment tracking',
-                  'Direct communication channel with students and staff',
-                  'Custom branding for your program pages',
-                  'Priority support from our partner success team',
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <span className="text-black flex-shrink-0">•</span>
-                    <span className="text-slate-700">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 bg-brand-blue-700 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Become a Partner</h2>
-          <p className="text-white text-lg mb-8">
-            Join our network of training providers and community organizations.
+        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">Partner Portal</h1>
+          <p className="text-base md:text-lg md:text-xl mb-8 text-gray-100">
+            Your hub for training and career growth.
+            and development.
           </p>
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/partners/apply"
-              className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-brand-blue-50 transition inline-flex items-center gap-2"
+              href="/contact"
+              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
-              Apply Now <ArrowRight className="w-5 h-5" />
+              Get Started
             </Link>
             <Link
-              href="/partners"
-              className="px-8 py-4 border-2 border-white text-slate-900 font-bold rounded-lg hover:bg-white/10 transition"
+              href="/programs"
+              className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
-              Partner Sign In
+              View Programs
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Content Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-7xl mx-auto">
+            {/* Feature Grid */}
+            <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold mb-6">Partner Portal</h2>
+                <p className="text-black mb-6">
+                  Your hub for training and career growth.
+                  workforce training and career success.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start">
+                    <svg
+                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <span>100% free training programs</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg
+                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <span>Industry-standard certifications</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg
+                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <span>Career support and job placement</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
+                <Image
+                  src="/images/pages/about-employer-partners.jpg"
+                  alt="Partner Portal"
+                  fill
+                  className="object-cover"
+                  quality={100}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+            </div>
+
+            {/* Feature Cards */}
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-brand-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold mb-3">Learn</h3>
+                <p className="text-black">
+                  Access quality training programs
+                </p>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-brand-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold mb-3">Certify</h3>
+                <p className="text-black">Earn industry certifications</p>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-purple-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold mb-3">Work</h3>
+                <p className="text-black">Get hired in your field</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-brand-blue-700 text-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              Ready to Get Started?
+            </h2>
+            <p className="text-base md:text-lg text-blue-100 mb-8">
+              Join thousands who have launched successful careers through our
+              programs.
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link
+                href="/contact"
+                className="bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
+              >
+                Apply Now
+              </Link>
+              <Link
+                href="/programs"
+                className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 border-2 border-white text-lg"
+              >
+                Browse Programs
+              </Link>
+            </div>
           </div>
         </div>
       </section>

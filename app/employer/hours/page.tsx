@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function EmployerHoursPage() {
-  const { user } = await requireRole(['employer', 'admin', 'super_admin', 'sponsor']);
+  const { user } = await requireRole(['employer', 'admin', 'sponsor']);
   const supabase = await createClient();
 
   // Get stats from hour_entries
@@ -48,7 +48,7 @@ export default async function EmployerHoursPage() {
     <div className="min-h-screen bg-white">
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         <Image
-          src="/images/pages/employer-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-page-1.webp"
           alt="Employer hours management"
           fill
           sizes="100vw"

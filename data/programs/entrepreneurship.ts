@@ -7,7 +7,7 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
   sector: 'business',
   category: 'Entrepreneurship',
   programType: 'workforce',
-  heroImage: '/images/pages/entrepreneurship.webp',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/entrepreneurship.webp',
   heroImageAlt: 'Entrepreneur working on a business plan',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

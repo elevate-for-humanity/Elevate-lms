@@ -9,7 +9,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = {
   title: 'Grants & Scholarships | Get Your Training Paid For',
   description:
-    'Indiana residents may qualify for workforce funding through WIOA, Workforce Ready Grant, FSSA IMPACT, and other programs. Eligibility required. IMPACT covers training for current SNAP and TANF recipients at no cost.',
+    'Indiana residents may qualify for workforce funding through WIOA, Workforce Ready Grant, , and other programs. Eligibility required. IMPACT covers training for current SNAP and TANF recipients at no cost.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/grants' },
 };
 
@@ -29,12 +29,12 @@ export default function GrantsPage() {
       <section className="relative h-[clamp(190px,32vw,360px)] flex items-center overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/grants-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/grants-page-1.webp"
           alt="Students celebrating graduation"
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw" 
         />
       </section>
 
@@ -167,7 +167,7 @@ export default function GrantsPage() {
               </div>
             </div>
 
-            {/* FSSA IMPACT */}
+            {/*  */}
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
               <div className="flex flex-col md:flex-row md:items-start gap-6">
                 <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -175,7 +175,7 @@ export default function GrantsPage() {
                 </div>
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-3 mb-2">
-                    <h3 className="text-2xl font-bold text-slate-900">FSSA IMPACT</h3>
+                    <h3 className="text-2xl font-bold text-slate-900"></h3>
                     <span className="text-xs font-semibold uppercase tracking-wide bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full">
                       Indiana State
                     </span>
@@ -219,7 +219,7 @@ export default function GrantsPage() {
                       href="/fssa"
                       className="text-purple-700 font-semibold hover:underline inline-flex items-center gap-1 text-sm"
                     >
-                      FSSA IMPACT Program Page <ArrowRight className="w-4 h-4" />
+                       Program Page <ArrowRight className="w-4 h-4" />
                     </Link>
                     <Link
                       href="/fssa"
@@ -232,7 +232,7 @@ export default function GrantsPage() {
               </div>
             </div>
 
-            {/* SNAP E&T */}
+            {/*  */}
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
               <div className="flex flex-col md:flex-row md:items-start gap-6">
                 <div className="w-16 h-16 bg-brand-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -245,7 +245,7 @@ export default function GrantsPage() {
                   <p className="text-slate-600 mb-4">
                     If you receive SNAP benefits, you may qualify for funded job training plus
                     support services like transportation assistance and childcare referrals. Indiana
-                    residents only — eligibility is determined through your local SNAP E&T provider.
+                    residents only — eligibility is determined through your local  provider.
                   </p>
                   <div className="bg-white rounded-lg p-4 mb-4">
                     <h4 className="font-semibold text-slate-900 mb-2">You qualify if you:</h4>
@@ -265,7 +265,7 @@ export default function GrantsPage() {
                     href="/snap-et-partner"
                     className="text-brand-blue-600 font-semibold hover:underline inline-flex items-center gap-1"
                   >
-                    Learn About SNAP E&T <ArrowRight className="w-4 h-4" />
+                    Learn About  <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>

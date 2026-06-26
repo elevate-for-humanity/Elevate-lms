@@ -72,18 +72,18 @@ These are not all bugs: tests, legitimate mock interviews, and intentional place
 - `app/about/mission/page.tsx:157` — sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty"
 - `app/about/page.tsx:70` — {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
 - `app/about/page.tsx:77` — sizes="(max-width: 640px) 160px, 208px" placeholder="empty"
-- `app/about/page.tsx:162` — <Image src="/images/pages/about-career-training.webp" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" placeholder=
-- `app/about/page.tsx:181` — <Image src="/images/pages/about-funding-nav.webp" alt="Workforce funding options" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" placeholder="em
-- `app/about/page.tsx:199` — <Image src="/images/pages/about-employer-partners.webp" alt="Employer partnerships" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" placeholder="
-- `app/about/page.tsx:218` — <Image src="/images/pages/about-supportive-services.webp" alt="Supportive services" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" placeholder="
+- `app/about/page.tsx:162` — <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" placeholder=
+- `app/about/page.tsx:181` — <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-funding-nav.webp" alt="Workforce funding options" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" placeholder="em
+- `app/about/page.tsx:199` — <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-employer-partners.webp" alt="Employer partnerships" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" placeholder="
+- `app/about/page.tsx:218` — <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-supportive-services.webp" alt="Supportive services" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" placeholder="
 - `app/about/page.tsx:359` — <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 100vw, 50vw" quality={90} className="object-cover" placeholder="empty" />
 - `app/about/page.tsx:394` — <Image src={cred.logo} alt={cred.name} fill sizes="64px" className="object-contain" placeholder="empty" />
 - `app/about/page.tsx:459` — className="object-cover object-top" placeholder="empty"
 - `app/about/page.tsx:555` — quality={90} className="object-cover object-center" placeholder="empty"
 - `app/about/page.tsx:584` — <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover group-hover:scale-105 transition-transform duration-300" placehol
-- `app/about/page.tsx:608` — <Image src="/images/pages/about-partner-cta.webp" alt="Partner with Elevate" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" placeholder="empty" /
-- `app/about/page.tsx:620` — <Image src="/images/pages/employer-hero.webp" alt="Employer and community partners" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" placeholder="e
-- `app/about/page.tsx:632` — <Image src="/images/pages/job-placement.webp" alt="Career pathways" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" placeholder="empty" />
+- `app/about/page.tsx:608` — <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partner-cta.webp" alt="Partner with Elevate" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" placeholder="empty" /
+- `app/about/page.tsx:620` — <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-hero.webp" alt="Employer and community partners" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" placeholder="e
+- `app/about/page.tsx:632` — <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/job-placement.webp" alt="Career pathways" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" placeholder="empty" />
 - `app/about/partners/page.tsx:51` — {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
 - `app/about/partners/page.tsx:58` — sizes="100vw" placeholder="empty"
 - `app/about/partners/page.tsx:94` — placeholder="empty"

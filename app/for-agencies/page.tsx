@@ -39,7 +39,7 @@ const HOW_IT_WORKS = [
   {
     step: '1',
     title: 'Refer Your Client',
-    desc: 'Send clients to /apply or call us directly. We accept WorkOne referrals, FSSA IMPACT referrals, and direct walk-ins.',
+    desc: 'Send clients to /apply or call us directly. We accept WorkOne referrals,  referrals, and direct walk-ins.',
     icon: Users,
   },
   {
@@ -100,12 +100,12 @@ export default async function ForAgenciesPage() {
       <section className="relative h-[280px] sm:h-[360px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/government-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/government-1.webp"
           alt="Workforce agency partnership"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
         <div className="absolute inset-0 bg-slate-900/60" />
         <div className="absolute inset-0 flex items-end">
@@ -270,7 +270,7 @@ export default async function ForAgenciesPage() {
               {
                 icon: <FileText className="w-6 h-6 text-brand-red-600" />,
                 title: 'Funding Documentation',
-                body: 'WIOA, Workforce Ready Grant, FSSA IMPACT, and Job Ready Indy funding is tracked per participant with exportable documentation.',
+                body: 'WIOA, Workforce Ready Grant, , and Job Ready Indy funding is tracked per participant with exportable documentation.',
               },
             ].map((item) => (
               <div key={item.title} className="bg-slate-50 border border-slate-200 rounded-xl p-6">

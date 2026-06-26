@@ -190,8 +190,8 @@ export default function FssaApplicationForm() {
       {step === 1 && (
         <div className="space-y-6">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm font-semibold text-blue-800 mb-1">FSSA IMPACT Eligibility</p>
-            <p className="text-sm text-blue-700">This program is funded through Indiana&apos;s FSSA IMPACT program for SNAP and TANF recipients. You must currently receive at least one of these benefits to qualify.</p>
+            <p className="text-sm font-semibold text-blue-800 mb-1"> Eligibility</p>
+            <p className="text-sm text-blue-700">This program is funded through Indiana&apos;s  program for SNAP and TANF recipients. You must currently receive at least one of these benefits to qualify.</p>
           </div>
 
           <div className="space-y-3">

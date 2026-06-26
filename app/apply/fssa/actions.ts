@@ -142,7 +142,7 @@ Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/Indiana/Ind
     // Notify Elevate admin
     await sendEmail({
       to: 'elevate4humanityedu@gmail.com',
-      subject: `New FSSA IMPACT Application — ${data.firstName} ${data.lastName}`,
+      subject: `New  Application — ${data.firstName} ${data.lastName}`,
       html: `<pre style="font-family:monospace;font-size:14px">${applicationDetails}</pre><br><a href="https://www.elevateforhumanity.org/admin/applications">Review in Admin →</a>`,
       text: `${applicationDetails}\n\nReview at: https://www.elevateforhumanity.org/admin/applications`,
     }).catch((err) => logger.error('[fssa-apply] Failed to send admin notification email', { error: String(err) }));
@@ -155,12 +155,12 @@ Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/Indiana/Ind
     if (data.email) {
       await sendEmail({
         to: data.email,
-        subject: 'Application Received — FSSA IMPACT Program | Elevate for Humanity',
+        subject: 'Application Received —  Program | Elevate for Humanity',
         html: `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
   <h2 style="color:#1e293b">Application Received</h2>
   <p>Hi ${data.firstName},</p>
-  <p>We received your application for the <strong>FSSA IMPACT</strong> workforce training program. Here's what happens next:</p>
+  <p>We received your application for the <strong></strong> workforce training program. Here's what happens next:</p>
   <ol>
     <li><strong>Eligibility review</strong> — Our team will review your application and verify your SNAP/TANF status.</li>
     <li><strong>Case manager coordination</strong> — If you have an IMPACT case manager, we will contact them to confirm funding authorization.</li>
@@ -171,7 +171,7 @@ Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/Indiana/Ind
   <p>— Elevate for Humanity</p>
 </div>
         `.trim(),
-        text: `Hi ${data.firstName},\n\nWe received your FSSA IMPACT application. Here's what happens next:\n\n1. Eligibility review — Our team will review your application and verify your SNAP/TANF status.\n2. Case manager coordination — If you have an IMPACT case manager, we will contact them to confirm funding authorization.\n3. Enrollment decision — You will hear from us within 1–2 business days by phone or email.\n\nQuestions? Call (317) 559-4999 or email enroll@elevateforhumanity.org.\n\nThis application does not guarantee enrollment.\n\n— Elevate for Humanity`,
+        text: `Hi ${data.firstName},\n\nWe received your  application. Here's what happens next:\n\n1. Eligibility review — Our team will review your application and verify your SNAP/TANF status.\n2. Case manager coordination — If you have an IMPACT case manager, we will contact them to confirm funding authorization.\n3. Enrollment decision — You will hear from us within 1–2 business days by phone or email.\n\nQuestions? Call (317) 559-4999 or email enroll@elevateforhumanity.org.\n\nThis application does not guarantee enrollment.\n\n— Elevate for Humanity`,
       }).catch((err) => logger.error('[fssa-apply] Failed to send applicant confirmation email', { email: data.email, error: String(err) }));
     }
 

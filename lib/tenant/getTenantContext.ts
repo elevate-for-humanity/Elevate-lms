@@ -89,7 +89,7 @@ export async function validateTenantAccess(userId: string, tenantId: string): Pr
 
 /**
  * PATCH 4.3: Log super-admin cross-tenant access
- * Call this when a super_admin accesses data outside their tenant
+ * Call this when a admin accesses data outside their tenant
  */
 export async function logAdminAccess(
   targetTenantId: string | null,

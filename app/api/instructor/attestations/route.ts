@@ -29,7 +29,7 @@ const ALLOWED_ROLES = new Set([
   'program_director',
   'sponsor_admin',
   'admin',
-  'super_admin',
+  'admin',
 ]);
 
 const ATTESTATION_TYPES = new Set([
@@ -58,7 +58,7 @@ async function getInstructorProfile(db: any, userId: string) {
 
   // Map admin roles to attestation roles
   let instructorRole = profile.role;
-  if (profile.role === 'admin' || profile.role === 'super_admin') {
+  if (profile.role === 'admin' || profile.role === 'admin') {
     instructorRole = 'sponsor_admin';
   }
 
@@ -288,7 +288,7 @@ async function _GET(req: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'admin';
 
   if (!isAdmin) {
     // Non-admins: see own attestations (as instructor or student)

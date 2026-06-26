@@ -20,11 +20,11 @@ export default function LicensesPage() {
       <section className="relative h-[40vh] min-h-[300px]">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image sizes="100vw"
-          src="/images/pages/employer-hero.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-hero.webp"
           alt="Platform Licensing"
           fill
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
       </section>
 

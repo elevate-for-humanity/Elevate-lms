@@ -41,7 +41,27 @@ function BookingForm() {
   const typeParam = searchParams.get('type') ?? '';
   const examParam = searchParams.get('exam') ?? '';
 
-  const [selectedProvider, setSelectedProvider] = useState<CertProvider | null>(null);
+  // Find provider based on type URL param
+  const getInitialProvider = (): CertProvider | null => {
+    const typeMap: Record<string, string> = {
+      'certiport': 'certiport',
+      'nha': 'nha',
+      'workkeys': 'workkeys',
+      'epa608': 'epa608',
+      'riseup': 'riseup',
+      'servsafe': 'servsafe',
+      'hsi': 'hsi',
+      'osha': 'osha',
+      'esco': 'esco',
+    };
+    const providerKey = typeMap[typeParam.toLowerCase()];
+    if (providerKey) {
+      return ALL_PROVIDERS.find(p => p.key === providerKey) ?? null;
+    }
+    return null;
+  };
+
+  const [selectedProvider, setSelectedProvider] = useState<CertProvider | null>(getInitialProvider);
   const [proctoringMode, setProctoringMode] = useState('');
   const [orgType, setOrgType] = useState('');
   const [participantCount, setParticipantCount] = useState('1');
@@ -404,27 +424,37 @@ function BookingForm() {
           </div>
 
           {/* Calendly scheduling CTA */}
-          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-2xl p-6 mb-6 text-center">
-            <p className="font-bold text-brand-blue-900 mb-1">Next step: schedule your exam date</p>
-            <p className="text-brand-blue-700 text-sm mb-5">
-              Use the link below to pick a date and time. This is a single-use link — it expires
-              once used.
-            </p>
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-3xl overflow-hidden mb-8 shadow-sm">
+            <div className="px-6 py-4 border-b border-brand-blue-200 flex items-center justify-between">
+              <div>
+                <p className="font-bold text-brand-blue-900 mb-0.5">Final Step: Select Your Time</p>
+                <p className="text-brand-blue-700 text-xs">
+                  Your seat is reserved. Please pick your date and time below to complete the process.
+                </p>
+              </div>
+              {!calendlyLoading && (
+                <div className="flex items-center gap-1 text-[10px] font-bold text-brand-green-600 bg-brand-green-100 px-2 py-1 rounded-full uppercase tracking-widest">
+                  <CheckCircle className="w-3 h-3" /> Secure
+                </div>
+              )}
+            </div>
+
             {calendlyLoading ? (
-              <div className="flex items-center justify-center gap-2 text-brand-blue-600 text-sm py-2">
-                <span className="animate-spin inline-block w-4 h-4 border-2 border-brand-blue-400 border-t-transparent rounded-full" />
-                Loading your scheduling link…
+              <div className="flex flex-col items-center justify-center gap-4 py-20 text-brand-blue-600">
+                <span className="animate-spin inline-block w-8 h-8 border-4 border-brand-blue-400 border-t-transparent rounded-full" />
+                <p className="text-sm font-semibold animate-pulse">Generating your personal scheduling link…</p>
               </div>
             ) : (
-              <a
-                href={calendlyUrl!}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-brand-blue-700 hover:bg-brand-blue-800 text-white font-bold px-8 py-4 rounded-xl transition-colors text-base"
-              >
-                <CalendarDays className="w-5 h-5" />
-                Schedule Your Exam →
-              </a>
+              <div className="w-full min-h-[700px] bg-white">
+                <iframe
+                  src={`${calendlyUrl}?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=b91c1c`}
+                  width="100%"
+                  height="700"
+                  frameBorder="0"
+                  title="Schedule Testing Session"
+                  className="w-full h-full"
+                />
+              </div>
             )}
           </div>
 
@@ -560,25 +590,68 @@ function BookingForm() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
-        {/* Calendly quick-schedule option */}
-        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div className="flex-1">
-            <p className="font-bold text-brand-blue-900 text-sm mb-1">
-              Schedule directly on our calendar
-            </p>
-            <p className="text-brand-blue-700 text-xs leading-relaxed">
-              Pick a date and time that works for you. We'll confirm your exam and send
-              instructions.
-            </p>
-          </div>
-          <a
-            href={CALENDLY_CONFIG.testingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 inline-flex items-center gap-2 bg-brand-blue-700 hover:bg-brand-blue-800 text-white font-bold px-5 py-3 rounded-xl transition-colors text-sm whitespace-nowrap"
-          >
-            Open Calendar →
-          </a>
+        {/* Calendly embedded scheduling */}
+        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-lg mb-12">
+          {paid ? (
+            <>
+              <div className="bg-brand-green-600 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <p className="text-brand-green-100 text-xs font-bold uppercase tracking-widest mb-1">
+                    Payment Verified
+                  </p>
+                  <h2 className="text-white font-extrabold text-lg">Final Step: Select Your Time</h2>
+                </div>
+                <div className="flex items-center gap-1 text-[10px] font-bold text-white bg-white/20 px-2 py-1 rounded-full uppercase tracking-widest">
+                  <CheckCircle className="w-3 h-3" /> Secure
+                </div>
+              </div>
+              
+              <div className="w-full min-h-[700px] bg-white">
+                <iframe
+                  src={`${calendlyUrl}?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=b91c1c`}
+                  width="100%"
+                  height="700"
+                  frameBorder="0"
+                  title="Schedule Testing Session"
+                  className="w-full h-full"
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="bg-brand-blue-700 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <p className="text-brand-blue-100 text-xs font-bold uppercase tracking-widest mb-1">
+                    Authorized Testing Center
+                  </p>
+                  <h2 className="text-white font-extrabold text-lg">Reserve Your Exam Seat</h2>
+                </div>
+                <p className="text-white/80 text-xs sm:text-right max-w-xs leading-relaxed">
+                  Complete the form below and finish payment to unlock the official scheduling calendar.
+                </p>
+              </div>
+              
+              <div className="w-full bg-slate-50 relative p-12 text-center border-t border-slate-100">
+                 <div className="max-w-md mx-auto">
+                   <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                     <CreditCard className="w-8 h-8 text-brand-blue-600" />
+                   </div>
+                   <h3 className="text-xl font-extrabold text-slate-900 mb-2">Payment Required to Schedule</h3>
+                   <p className="text-slate-500 mb-8 leading-relaxed">
+                     To prevent unauthorized bookings, our official calendar is only available to confirmed candidates. Please fill out the form below to proceed to checkout.
+                   </p>
+                   <div className="h-3 bg-slate-200 rounded-full overflow-hidden mb-3">
+                     <div className="h-full bg-brand-blue-600" style={{ width: '33%' }} />
+                   </div>
+                   <div className="flex justify-between text-[10px] font-bold tracking-widest uppercase text-slate-400">
+                     <span className="text-brand-blue-600">1. Verification</span>
+                     <span>2. Payment</span>
+                     <span>3. Scheduling</span>
+                   </div>
+                 </div>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-3 mb-8">
@@ -1175,7 +1248,7 @@ function BookingForm() {
                   Workforce-funded in Indiana? Your fees may be covered.
                 </p>
                 <p className="text-xs text-brand-green-700 mb-2">
-                  Indiana participants using WIOA, WorkOne, SNAP E&T, or employer sponsorship may
+                  Indiana participants using WIOA, WorkOne, , or employer sponsorship may
                   qualify for fee coverage. We are expanding to additional regions. If funding is
                   not available yet, you can continue with self-pay checkout.
                 </p>

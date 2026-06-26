@@ -1,25 +1,17 @@
-/**
- * Safely extract error message from unknown error type
- */
-export function getErrorMessage(error: any): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  if (typeof error === 'string') {
-    return error;
-  }
+export function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
   if (error && typeof error === 'object' && 'message' in error) {
-    return String(error.message);
+    return String((error as { message: unknown }).message);
   }
   return 'An unexpected error occurred';
 }
 
-/**
- * Safely convert unknown error to Error instance
- */
-export function toError(error: any): Error {
-  if (error instanceof Error) {
-    return error;
+export function toError(error: unknown): Error {
+  if (error instanceof Error) return error;
+  if (typeof error === 'string') return new Error(error);
+  if (error && typeof error === 'object' && 'message' in error) {
+    return new Error(String((error as { message: unknown }).message));
   }
-  return new Error(getErrorMessage(error));
+  return new Error('An unexpected error occurred');
 }

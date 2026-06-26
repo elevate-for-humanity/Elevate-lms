@@ -28,7 +28,7 @@ const WIOA_TYPE_STYLES: Record<string, string> = {
 };
 
 export default async function FundingPage() {
-  await requireRole(['admin', 'super_admin', 'staff']);
+  await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
   const soon = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -39,14 +39,14 @@ export default async function FundingPage() {
         'id, voucher_id, participant_name, wioa_type, fund_stream, service_name, ' +
         'voucher_date, voucher_expire_date, total_voucher_amount, payments_to_date, ' +
         'status, is_final, remittance_email',
-        { count: 'exact' },
       )
+      .count('exact')
       .order('voucher_date', { ascending: false })
-      .limit(100),
-    db.from('ita_vouchers').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
-    db.from('ita_vouchers').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      .limit(100) as any,
+    db.from('ita_vouchers').select('id', { count: 'exact', head: true }).eq('status', 'approved') as any,
+    db.from('ita_vouchers').select('id', { count: 'exact', head: true }).eq('status', 'pending') as any,
     db.from('ita_vouchers').select('id', { count: 'exact', head: true })
-      .eq('status', 'approved').lte('voucher_expire_date', soon),
+      .eq('status', 'approved').lte('voucher_expire_date', soon) as any,
     // All enrolled students with payment data
     db.from('program_enrollments')
       .select('id, user_id, full_name, email, program_slug, payment_status, amount_paid_cents, funding_source, payout_status, payout_amount, payout_due_date, access_granted_at, enrolled_at')

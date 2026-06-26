@@ -152,13 +152,13 @@ export default async function VerifyCertificatePage({
       <section className="relative h-48 md:h-64 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/verify-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/verify-page-1.webp"
           alt="Certificate verification"
           fill
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
       </section>
 
@@ -281,7 +281,7 @@ export default async function VerifyCertificatePage({
                     alt="QR Code"
                     width={192}
                     height={192}
-                    unoptimized placeholder="empty" sizes="(max-width: 768px) 100vw, 50vw"
+                    unoptimized sizes="(max-width: 768px) 100vw, 50vw"
                   />
                 </div>
               </div>

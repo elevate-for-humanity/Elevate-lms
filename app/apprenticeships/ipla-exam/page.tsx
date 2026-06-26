@@ -67,12 +67,12 @@ export default function IPLAExamSignup() {
       <section className="relative h-[40vh] min-h-[280px] max-h-[400px]">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/apprenticeships-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeships-page-1.webp"
           alt="Barber apprentice preparing for licensing exam"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 to-brand-blue-900/20" />
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">

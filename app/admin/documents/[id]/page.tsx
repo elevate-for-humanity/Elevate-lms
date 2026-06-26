@@ -19,8 +19,12 @@ export default async function DocumentDetailPage({
   const { id } = await params;
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user?.id) { redirect('/login'); }
+  const user = safeGetUser(await supabase.auth.getUser());
+
+  if (!user) {
+    redirect('/login');
+  }
+
 
   const db = await requireAdminClient();
 
@@ -29,7 +33,7 @@ export default async function DocumentDetailPage({
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['admin', 'staff'].includes(profile.role)) {
     redirect('/unauthorized');
   }
 

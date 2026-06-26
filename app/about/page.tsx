@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     description: 'A workforce development institute providing funded career training in Indianapolis, Indiana. Founded by Elizabeth Greene.',
     url: 'https://www.elevateforhumanity.org/about',
     siteName: PLATFORM_DEFAULTS.orgName,
-    images: [{ url: '/images/team/elizabeth-greene-headshot.webp', width: 800, height: 1080, alt: `Elizabeth Greene, Founder of ${PLATFORM_DEFAULTS.orgName}` }],
+    images: [{ url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/elizabeth-greene-headshot.webp', width: 800, height: 1080, alt: `Elizabeth Greene, Founder of ${PLATFORM_DEFAULTS.orgName}` }],
     type: 'website',
   },
 };
@@ -69,12 +69,12 @@ export default async function AboutPage() {
           <div className="relative w-40 h-40 sm:w-52 sm:h-52 flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border border-slate-200">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
             <Image
-              src="/images/team/elizabeth-greene.webp"
+              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/elizabeth-greene.webp"
               alt={`Elizabeth Greene, Founder & CEO of ${PLATFORM_DEFAULTS.orgName}`}
               fill
               className="object-cover object-top"
               priority
-              sizes="(max-width: 640px) 160px, 208px" placeholder="empty"
+              sizes="(max-width: 640px) 160px, 208px" 
             />
           </div>
           {/* Page identity */}
@@ -159,7 +159,7 @@ export default async function AboutPage() {
           <div className="space-y-8">
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/pages/about-career-training.webp" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" placeholder="empty" />
+                <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp" alt="Career training programs" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover"  />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Career Training Programs</h3>
@@ -178,7 +178,7 @@ export default async function AboutPage() {
 
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/pages/about-funding-nav.webp" alt="Workforce funding options" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" placeholder="empty" />
+                <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-funding-nav.webp" alt="Workforce funding options" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover"  />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Funding Navigation</h3>
@@ -196,7 +196,7 @@ export default async function AboutPage() {
 
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/pages/about-employer-partners.webp" alt="Employer partnerships" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" placeholder="empty" />
+                <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-employer-partners.webp" alt="Employer partnerships" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover"  />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Job Placement &amp; Employer Partnerships</h3>
@@ -215,7 +215,7 @@ export default async function AboutPage() {
 
             <div className="flex flex-col sm:flex-row gap-5">
               <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 rounded-lg overflow-hidden">
-                <Image src="/images/pages/about-supportive-services.webp" alt="Supportive services" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover" placeholder="empty" />
+                <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-supportive-services.webp" alt="Supportive services" fill sizes="(max-width: 640px) 100vw, 224px" quality={90} className="object-cover"  />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg mb-2">Supportive Services</h3>
@@ -325,38 +325,38 @@ export default async function AboutPage() {
             {[
               {
                 title: 'Justice-Involved Individuals',
-                image: '/images/pages/funding-page-2.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/funding-page-2.webp',
                 desc: 'People on probation, parole, or recently released. Job Ready Indy funding covers training, supplies, and supportive services at no cost. We work directly with community corrections and reentry programs across Central Indiana.',
               },
               {
                 title: 'Low-Income Adults & Dislocated Workers',
-                image: '/images/pages/wioa-meeting.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
                 desc: 'Indiana residents who meet WIOA income guidelines or receive public assistance (SNAP, TANF, Medicaid). WIOA funding covers tuition, books, supplies, and in some cases transportation and childcare.',
               },
               {
                 title: 'Veterans',
-                image: '/images/pages/career-counseling.jpg',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg',
                 desc: 'Military veterans transitioning to civilian careers. Veterans receive priority enrollment and may qualify for additional funding through VA education benefits combined with WIOA.',
               },
               {
                 title: 'Young Adults (16–24)',
-                image: '/images/pages/career-services-page-2.jpg',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
                 desc: 'Young people who are not sure what to do after high school. WIOA Youth funding covers career training that leads to a credential and a job in weeks, not years.',
               },
               {
                 title: 'Career Changers',
-                image: '/images/pages/workforce-training.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp',
                 desc: 'Anyone looking to enter a new field. The Workforce Ready Grant covers high-demand certification programs for Indiana residents regardless of income level.',
               },
               {
                 title: 'Employers & Workforce Partners',
-                image: '/images/pages/for-employers-page-1.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/for-employers-page-1.webp',
                 desc: 'Organizations that need trained, credentialed workers. We run custom training cohorts for your hiring needs and handle all the funding paperwork.',
               },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                 <div className="relative h-40 overflow-hidden">
-                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 100vw, 50vw" quality={90} className="object-cover" placeholder="empty" />
+                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 100vw, 50vw" quality={90} className="object-cover"  />
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
@@ -391,7 +391,7 @@ export default async function AboutPage() {
             ].map((cred) => (
               <div key={cred.name} className="bg-white rounded-lg border border-slate-200 p-5 text-center">
                 <div className="relative w-16 h-16 mx-auto mb-3 overflow-hidden">
-                  <Image src={cred.logo} alt={cred.name} fill sizes="64px" className="object-contain" placeholder="empty" />
+                  <Image src={cred.logo} alt={cred.name} fill sizes="64px" className="object-contain"  />
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm">{cred.name}</h3>
                 <p className="text-brand-red-600 text-xs font-semibold mb-2">{cred.role}</p>
@@ -451,12 +451,12 @@ export default async function AboutPage() {
             <div className="flex flex-col sm:flex-row">
               <div className="relative w-48 h-48 sm:w-56 sm:h-64 flex-shrink-0 overflow-hidden mx-auto sm:mx-0">
                 <Image
-                  src="/images/team/founder/elizabeth-greene-founder-hero-01.jpg"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/founder/elizabeth-greene-founder-hero-01.jpg"
                   alt={`Elizabeth Greene, Founder & CEO of ${PLATFORM_DEFAULTS.orgName}`}
                   fill
                   sizes="(max-width: 640px) 192px, 224px"
                   quality={95}
-                  className="object-cover object-top" placeholder="empty"
+                  className="object-cover object-top" 
                 />
               </div>
               <div className="p-6 flex-1">
@@ -548,11 +548,11 @@ export default async function AboutPage() {
               >
                 <div className="relative w-full aspect-[3/4] max-w-7xl mx-auto rounded-xl overflow-hidden mb-4 shadow-md group-hover:shadow-xl transition-shadow">
                   <Image
-                    src={member.headshotSrc || '/images/pages/about-hero.webp'}
+                    src={member.headshotSrc || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp'}
                     alt={member.name}
                     fill
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    quality={90} className="object-cover object-center" placeholder="empty"
+                    quality={90} className="object-cover object-center" 
                   />
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm sm:text-base">{member.name}</h3>
@@ -572,16 +572,16 @@ export default async function AboutPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Programs at a Glance</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { name: 'CNA Certification', duration: '4–6 weeks', image: '/images/pages/about-hero.webp', href: '/programs/cna' },
-              { name: 'CDL Training', duration: '4–6 weeks', image: '/images/pages/about-hero.webp', href: '/programs/cdl-training' },
-              { name: 'HVAC Technician', duration: '6–8 weeks', image: '/images/pages/about-hero.webp', href: '/programs/hvac-technician' },
-              { name: 'Electrical', duration: '12–16 weeks', image: '/images/pages/about-hero.webp', href: '/programs/electrical' },
-              { name: 'Barber Apprenticeship', duration: '~18 months', image: '/images/pages/about-hero.webp', href: '/programs/barber-apprenticeship' },
-              { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: '/images/pages/about-hero.webp', href: '/programs/technology' },
+              { name: 'CNA Certification', duration: '4–6 weeks', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp', href: '/programs/cna' },
+              { name: 'CDL Training', duration: '4–6 weeks', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp', href: '/programs/cdl-training' },
+              { name: 'HVAC Technician', duration: '6–8 weeks', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp', href: '/programs/hvac-technician' },
+              { name: 'Electrical', duration: '12–16 weeks', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp', href: '/programs/electrical' },
+              { name: 'Barber Apprenticeship', duration: '~18 months', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp', href: '/programs/barber-apprenticeship' },
+              { name: 'IT & Cybersecurity', duration: '8–16 weeks', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp', href: '/programs/technology' },
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group bg-white rounded-lg border border-slate-200 overflow-hidden hover:shadow-md transition">
                 <div className="relative h-36 overflow-hidden">
-                  <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover group-hover:scale-105 transition-transform duration-300" placeholder="empty" />
+                  <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover group-hover:scale-105 transition-transform duration-300"  />
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-slate-900 text-sm">{p.name}</h3>
@@ -605,7 +605,7 @@ export default async function AboutPage() {
           <div className="grid sm:grid-cols-3 gap-6">
             <Link href="/for-providers" className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
-                <Image src="/images/pages/about-partner-cta.webp" alt="Partner with Elevate" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" placeholder="empty" />
+                <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partner-cta.webp" alt="Partner with Elevate" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover"  />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Partner With Us</h3>
@@ -617,7 +617,7 @@ export default async function AboutPage() {
             </Link>
             <Link href="/about/partners" className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
-                <Image src="/images/pages/employer-hero.webp" alt="Employer and community partners" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" placeholder="empty" />
+                <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-hero.webp" alt="Employer and community partners" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover"  />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Our Partners</h3>
@@ -629,7 +629,7 @@ export default async function AboutPage() {
             </Link>
             <Link href="/pathways" className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
-                <Image src="/images/pages/job-placement.webp" alt="Career pathways" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" placeholder="empty" />
+                <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/job-placement.webp" alt="Career pathways" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover"  />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 mb-2">Career Pathways Framework</h3>

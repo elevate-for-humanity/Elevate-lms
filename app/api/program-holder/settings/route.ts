@@ -7,7 +7,7 @@ import { safeError, safeInternalError } from '@/lib/api/safe-error';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_ROLES = ['program_holder', 'admin', 'super_admin', 'staff'];
+const ALLOWED_ROLES = ['program_holder', 'admin', 'staff'];
 
 export async function PATCH(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');

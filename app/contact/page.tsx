@@ -103,13 +103,13 @@ function ContactPageInner() {
       <div className="relative h-[200px] sm:h-[260px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/contact-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/contact-page-1.webp"
           alt={`${PLATFORM_DEFAULTS.orgName} contact`}
           fill
           sizes="100vw"
           quality={90}
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
       </div>
       <div className="bg-white border-b border-slate-200 py-8 px-6">

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { requireAdmin } from '@/lib/auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { getAdminDocumentUrlByPath } from '@/lib/admin/document-access';
 import Link from 'next/link';
 import { FileText, Upload, ChevronRight, Download, ArrowRight } from 'lucide-react';
 import SamGrantAutoFillPanel from './SamGrantAutoFillPanel';
@@ -30,6 +31,7 @@ function fmtBytes(bytes: number) {
 export default async function DocumentsPage() {
   await requireAdmin();
   const db = await requireAdminClient();
+  const adminUser = (db as any)._authUser;
 
   const { data: documents, count } = await db
     .from('documents')
@@ -49,19 +51,32 @@ export default async function DocumentsPage() {
     'tax-documents',
   ];
 
-  const docs = await Promise.all(
-    (documents ?? []).map(async (doc: any) => {
-      if (doc.file_url || doc.url) return doc;
-      if (!doc.file_path) return doc;
-      // Infer bucket from path prefix (e.g. "enrollment-documents/uuid/file.pdf")
+  // Collect file paths that need URLs
+  const docsNeedingUrls = (documents ?? []).filter(
+    (doc: any) => !doc.file_url && !doc.url && doc.file_path
+  );
+
+  const signedUrls = await getAdminDocumentUrlByPath({
+    adminId: adminUser?.id || 'system',
+    filePaths: docsNeedingUrls.map((doc: any) => {
       const bucket = ALLOWED_BUCKETS.find((b) => doc.file_path.startsWith(b + '/')) ?? 'documents';
       const pathInBucket = doc.file_path.startsWith(bucket + '/')
         ? doc.file_path.slice(bucket.length + 1)
         : doc.file_path;
-      const { data } = await db.storage.from(bucket).createSignedUrl(pathInBucket, 300);
-      return { ...doc, file_url: data?.signedUrl ?? null };
+      return { bucket, path: pathInBucket, documentId: doc.id };
     }),
-  );
+    context: 'admin_documents_page',
+  });
+
+  const docs = (documents ?? []).map((doc: any) => {
+    if (doc.file_url || doc.url) return doc;
+    if (!doc.file_path) return doc;
+    const bucket = ALLOWED_BUCKETS.find((b) => doc.file_path.startsWith(b + '/')) ?? 'documents';
+    const pathInBucket = doc.file_path.startsWith(bucket + '/')
+      ? doc.file_path.slice(bucket.length + 1)
+      : doc.file_path;
+    return { ...doc, file_url: signedUrls[pathInBucket] ?? null };
+  });
 
   return (
     <div className="max-w-7xl mx-auto py-8 space-y-6 px-4 sm:px-6 lg:px-8">

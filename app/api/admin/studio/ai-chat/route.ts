@@ -78,31 +78,29 @@ export async function POST(request: NextRequest) {
 
   const encoder = new TextEncoder();
 
-  const readable = new ReadableStream({
-    async start(controller) {
-      const send = (obj: Record<string, unknown>) =>
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(obj)}\n\n`));
+  async function* streamGenerator(): AsyncIterable<Uint8Array> {
+    const send = (obj: Record<string, unknown>) =>
+      encoder.encode(`data: ${JSON.stringify(obj)}\n\n`);
 
-      try {
-        for await (const event of aiChatWithTools({
-          model: 'gpt-4.1-mini',
-          messages: [{ role: 'system', content: systemPrompt }, ...safeMessages],
-          tools: STUDIO_TOOLS as Parameters<typeof aiChatWithTools>[0]['tools'],
-          temperature: 0.7,
-          maxTokens: 1200,
-        })) {
-          send(event);
-        }
-        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-      } catch (err) {
-        logger.error('[studio/ai-chat] stream error', err instanceof Error ? err : undefined, { courseId });
-        send({ type: 'delta', content: '\n\nSorry, the AI assistant encountered an error. Please try again.' });
-        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-      } finally {
-        controller.close();
+    try {
+      for await (const event of aiChatWithTools({
+        model: 'gpt-4.1-mini',
+        messages: [{ role: 'system', content: systemPrompt }, ...safeMessages],
+        tools: STUDIO_TOOLS as Parameters<typeof aiChatWithTools>[0]['tools'],
+        temperature: 0.7,
+        maxTokens: 1200,
+      })) {
+        yield send(event);
       }
-    },
-  });
+      yield encoder.encode('data: [DONE]\n\n');
+    } catch (err) {
+      logger.error('[studio/ai-chat] stream error', err instanceof Error ? err : undefined, { courseId });
+      yield send({ type: 'delta', content: '\n\nSorry, the AI assistant encountered an error. Please try again.' });
+      yield encoder.encode('data: [DONE]\n\n');
+    }
+  }
+
+  const readable = ReadableStream.from(streamGenerator());
 
   return new Response(readable, {
     headers: {

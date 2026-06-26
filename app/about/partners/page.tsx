@@ -50,12 +50,12 @@ export default async function PartnersPage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/images/pages/about-partners-hero.webp"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partners-hero.webp"
             alt="Partners background"
             fill
             className="object-cover"
             priority
-            sizes="100vw" placeholder="empty"
+            sizes="100vw" 
           />
         </div>
         <div className="bg-white py-10">
@@ -91,7 +91,7 @@ export default async function PartnersPage() {
                         height={60}
                         className="object-contain"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                        placeholder="empty"
+                        
                         sizes="(max-width: 768px) 100vw, 50vw"
                       />
                     </div>
@@ -126,7 +126,7 @@ export default async function PartnersPage() {
                         height={60}
                         className="object-contain"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                        placeholder="empty"
+                        
                         sizes="(max-width: 768px) 100vw, 50vw"
                       />
                     </div>
@@ -170,7 +170,7 @@ export default async function PartnersPage() {
                           height={60}
                           className="object-contain"
                           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                        placeholder="empty"
+                        
                         sizes="(max-width: 768px) 100vw, 50vw"
                         />
                       </div>

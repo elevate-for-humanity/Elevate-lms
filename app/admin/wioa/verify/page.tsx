@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { requireAdmin } from '@/lib/auth';
+import { requireAdmin, getCurrentUser } from '@/lib/auth';
 import { getAdminDocumentUrl } from '@/lib/admin/document-access';
 import Link from 'next/link';
 import {
@@ -36,6 +36,7 @@ export default async function WIOAVerifyPage({
   const supabase = await createClient();
   const params = await searchParams;
   const participantId = params.id;
+  const { user } = await getCurrentUser();
 
   // If no participant ID, show list of pending verifications
   if (!participantId) {

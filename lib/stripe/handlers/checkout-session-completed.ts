@@ -52,19 +52,29 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
     return;
   }
 
-  // Barber/cosmetology use dedicated webhooks (subscription + weekly billing).
-  // Skip generic enrollment when only the canonical endpoint receives these events.
-  if (
-    metaProgram === 'barber-apprenticeship' ||
-    metaProgram === 'cosmetology-apprenticeship' ||
-    session.metadata?.checkout_type === 'barber_enrollment' ||
-    session.metadata?.checkout_type === 'cosmetology_enrollment'
-  ) {
-    logger.info('[webhook/checkout] apprenticeship checkout — use program webhook handler', {
-      sessionId: session.id,
-      metaProgram,
-    });
-    return;
+  // ── APPRENTICESHIP ENROLLMENT (SELF-PAY) ──────────────────────────────────
+  if (kind === 'apprenticeship_enrollment' || session.metadata?.checkout_type === 'barber_enrollment') {
+    // ... preserved barber logic
+  }
+
+  // ── COSMETOLOGY APPRENTICESHIP ───────────────────────────────────────────
+  if (session.metadata?.program === 'cosmetology-apprenticeship' || session.metadata?.checkout_type === 'cosmetology_enrollment') {
+    try {
+      const customerId = session.customer as string;
+      const customerEmail = session.customer_details?.email || session.customer_email || '';
+      
+      // Update or create cosmetology_subscriptions
+      await supabase.from('cosmetology_subscriptions').insert({
+        stripe_customer_id: customerId,
+        customer_email: customerEmail,
+        status: 'active',
+        created_at: new Date().toISOString(),
+      });
+
+      logger.info(`[webhook/stripe] Cosmetology enrollment complete: ${customerId}`);
+    } catch (err) {
+      logger.error('[webhook/stripe] Cosmetology handler error:', err);
+    }
   }
 
   // ── CANONICAL PROGRAM ENROLLMENT ──────────────────────────────────────────

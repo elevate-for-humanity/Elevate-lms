@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 
 const AIAssistantBubble = dynamic(
-  () => import('@/components/AIAssistantBubble').then((m) => ({ default: m.AIAssistantBubble })),
+  () => import('@/components/AIAssistantBubble').then((m) => m.AIAssistantBubble),
   { ssr: false, loading: () => null },
 );
 

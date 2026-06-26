@@ -23,7 +23,7 @@ async function _GET(request: NextRequest, { params }: { params: Promise<{ userId
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  const isAdmin = ['admin', 'super_admin', 'staff', 'org_admin'].includes(profile?.role ?? '');
+  const isAdmin = ['admin', 'staff', 'org_admin'].includes(profile?.role ?? '');
   if (!isAdmin && user.id !== userId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }

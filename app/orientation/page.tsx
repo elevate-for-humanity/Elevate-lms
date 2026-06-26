@@ -25,13 +25,13 @@ export default async function OrientationPage() {
       <section className="relative h-[280px] md:h-[350px] lg:h-[400px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/orientation-page-1.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/orientation-page-1.webp"
           alt="Orientation session"
           fill
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw" 
         />
       </section>
       {/* Title + Intro */}

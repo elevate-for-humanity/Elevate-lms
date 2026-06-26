@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -64,8 +65,10 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+type StatusBadgeConfig = { label: string; cls: string; Icon: React.ElementType };
+
 function StatusBadge({ status }: { status: string }) {
-  const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG['uploaded'];
+  const cfg: StatusBadgeConfig = STATUS_CONFIG[status] ?? STATUS_CONFIG['uploaded'] as StatusBadgeConfig;
   const { label, cls, Icon } = cfg;
   return (
     <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${cls}`}>

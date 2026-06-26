@@ -1,2 +1,4 @@
 // PUBLIC ROUTE: re-export of public intake lead capture for compatibility.
-export { POST, dynamic, runtime } from '@/app/api/intake/leads/route';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export { POST } from '@/app/api/intake/leads/route';

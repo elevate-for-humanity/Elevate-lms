@@ -65,7 +65,7 @@ CREATE POLICY "Staff can view all acceptances"
     EXISTS (
       SELECT 1 FROM profiles 
       WHERE id = auth.uid() 
-      AND role IN ('admin', 'staff', 'super_admin')
+      AND role IN ('admin', 'staff', 'admin')
     )
   );
 

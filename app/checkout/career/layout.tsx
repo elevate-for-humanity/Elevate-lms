@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Checkout | Career',
   description: `${PLATFORM_DEFAULTS.orgName} - Career training and workforce development programs.`,

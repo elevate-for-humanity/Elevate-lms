@@ -95,12 +95,12 @@ export default async function ParentDashboardPage() {
       <section className="relative h-40 sm:h-56 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/about-career-training.webp"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp"
           alt=""
           fill
           className="object-cover object-center"
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw" 
         />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent" />
       </section>

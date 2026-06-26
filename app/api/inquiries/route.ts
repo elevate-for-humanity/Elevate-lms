@@ -1,5 +1,8 @@
-// Fixed inquiry route - uses applications table with service role key directly
-import { createClient } from '@supabase/supabase-js';
+// Fixed inquiry route - resilient three-tier retry logic + proper auditing
+import { getAdminClient } from '@/lib/supabase/admin';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { logger } from '@/lib/logger';
+import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -10,35 +13,26 @@ async function _POST(req: Request) {
     const body = await req.json();
 
     if (!body.name || !body.email) {
-      return new Response(JSON.stringify({ error: 'Name and email are required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
     }
 
-    // Create Supabase client with service role key directly
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const db = await getAdminClient();
 
-    if (!supabaseUrl || !supabaseKey) {
-      return new Response(JSON.stringify({ error: 'Database not configured' }), {
-        status: 503,
-        headers: { 'Content-Type': 'application/json' }
-      });
+    if (!db) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
     }
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const nameParts = body.name.trim().split(' ');
     const firstName = nameParts[0] || 'Unknown';
     const lastName = nameParts.slice(1).join(' ') || 'Inquiry';
     const programId = body.program || body.program_interest || 'general-inquiry';
 
-    // Insert directly to applications table
-    const insertData = {
+    // Core insert payload
+    const corePayload: Record<string, any> = {
       first_name: firstName,
       last_name: lastName,
-      email: body.email.toLowerCase(),
+      full_name: body.name.trim(),
+      email: body.email.toLowerCase().trim(),
       phone: body.phone || 'N/A',
       city: body.city || 'Not provided',
       zip: body.zip || '00000',
@@ -46,42 +40,97 @@ async function _POST(req: Request) {
       status: 'submitted',
       source: 'inquiry_form',
       contact_preference: body.contactPreference || 'email',
+      normalized_email: body.email.toLowerCase().trim(),
+      normalized_phone: (body.phone || '').replace(/\D/g, ''),
     };
 
-    const { data, error } = await supabase
+    let { data, error }: any = await db
       .from('applications')
-      .insert(insertData)
+      .insert(corePayload)
       .select('id, email')
-      .single();
+      .maybeSingle();
 
-    if (error) {
-      console.error('Inquiry insert error:', error);
-      return new Response(JSON.stringify({ 
-        error: 'Failed to save inquiry',
-        details: error.message
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
+    // Three-tier retry for resilient inserts
+    const isRetryableError = (e: any) =>
+      e &&
+      (e.code === '42703' ||
+        e.code === '23514' ||
+        e.code === '23502' ||
+        e.message?.includes('column') ||
+        e.message?.includes('constraint') ||
+        e.message?.includes('check') ||
+        e.message?.includes('violates'));
+
+    // Tier 2 — strip extended columns
+    if (isRetryableError(error)) {
+      logger.warn('[api/inquiries] Tier-2 retry — stripping extended columns', {
+        code: error.code,
+        message: error.message,
       });
+      const tier2 = await db
+        .from('applications')
+        .insert({
+          ...corePayload,
+          normalized_email: undefined,
+          normalized_phone: undefined,
+          full_name: undefined,
+        })
+        .select('id, email')
+        .maybeSingle();
+      data = tier2.data;
+      error = tier2.error;
     }
 
-    return new Response(JSON.stringify({
+    // Tier 3 — absolute baseline
+    if (isRetryableError(error)) {
+      logger.warn('[api/inquiries] Tier-3 retry — baseline columns only', {
+        code: error.code,
+        message: error.message,
+      });
+      const tier3 = await db
+        .from('applications')
+        .insert({
+          first_name: firstName,
+          last_name: lastName,
+          email: body.email.toLowerCase().trim(),
+          phone: body.phone || 'N/A',
+          city: body.city || 'Not provided',
+          zip: body.zip || '00000',
+          program_interest: programId,
+          status: 'submitted',
+          source: 'inquiry_form',
+          contact_preference: body.contactPreference || 'email',
+        })
+        .select('id, email')
+        .maybeSingle();
+      data = tier3.data;
+      error = tier3.error;
+    }
+
+    if (error || !data) {
+      logger.error('[api/inquiries] All insert tiers failed', undefined, {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        email: body.email,
+      });
+      return NextResponse.json({ 
+        error: 'Failed to save inquiry',
+        details: error?.message 
+      }, { status: 500 });
+    }
+
+    return NextResponse.json({
       ok: true,
       id: data.id,
       email: data.email,
       program: programId,
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    }, { status: 200 });
 
   } catch (error) {
-    console.error('Inquiry error:', error);
-    return new Response(JSON.stringify({ error: 'Unexpected error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    logger.error('[api/inquiries] Unexpected error', error instanceof Error ? error : undefined);
+    return NextResponse.json({ error: 'Unexpected error' }, { status: 500 });
   }
 }
 
-export const POST = _POST;
+export const POST = withApiAudit('/api/inquiries', _POST);

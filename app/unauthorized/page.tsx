@@ -7,7 +7,7 @@ const WWW_ORIGIN =
   process.env.NEXT_PUBLIC_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 const ADMIN_ORIGIN =
   process.env.NEXT_PUBLIC_ADMIN_URL || '';
-const ADMIN_PORTAL_ROLES = new Set(['admin', 'super_admin', 'staff', 'org_admin', 'platform_operator']);
+const ADMIN_PORTAL_ROLES = new Set(['admin', 'staff', 'org_admin', 'admin']);
 
 export default function UnauthorizedPage() {
   const [email, setEmail] = useState<string | null>(null);
@@ -108,7 +108,7 @@ export default function UnauthorizedPage() {
           >
             Return to admin dashboard
           </a>
-        ) : portalHref && role && !['admin', 'super_admin', 'staff', 'org_admin', 'platform_operator', 'instructor'].includes(role) ? (
+        ) : portalHref && role && !['admin', 'staff', 'org_admin', 'admin', 'instructor'].includes(role) ? (
           <a
             href={portalHref}
             className="block w-full mb-3 px-4 py-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-medium rounded-lg transition-colors text-center"

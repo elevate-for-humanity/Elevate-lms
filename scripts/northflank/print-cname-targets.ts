@@ -2,7 +2,7 @@
 /**
  * Print Northflank CNAME targets for Durable DNS (after TXT verification).
  *
- *   pnpm tsx scripts/northflank/print-cname-targets.ts
+ *   npx tsx scripts/northflank/print-cname-targets.ts
  */
 
 import { nfFetch, resolveTeamId } from './lib';
@@ -47,7 +47,7 @@ async function main() {
 
   console.log('Full runbook: docs/northflank-dns-durable.md');
   console.log('After DNS propagates:');
-  console.log('  pnpm tsx scripts/northflank/configure-domains.ts --execute\n');
+  console.log('  npx tsx scripts/northflank/configure-domains.ts --execute\n');
 }
 
 main().catch((e) => {

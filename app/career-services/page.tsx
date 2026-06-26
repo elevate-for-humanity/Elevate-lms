@@ -1,38 +1,43 @@
-import { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight } from 'lucide-react';
-import HeroVideo from '@/components/marketing/HeroVideo';
-import SkillsGapAnalysis from '@/components/SkillsGapAnalysis';
-import VirtualCareerFair from '@/components/VirtualCareerFair';
-import { StudentSuccessCoaching } from '@/components/StudentSuccessCoaching';
-import WorkOneLocator from '@/components/WorkOneLocator';
-import LiveJobPostings from '@/components/careers/LiveJobPostings';
+import { buildMetadata } from '@/lib/cf-seo';
+import { siteConfig } from '@/content/cf-site';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-static';
-
-export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/career-services' },
+export const metadata = buildMetadata({
   title: 'Career Services',
-  description:
-    'Resume building, interview prep, job fairs, and direct employer connections. We help you get hired after training.',
-};
+  description: 'Resume building, interview prep, job placement, and ongoing career support from {PLATFORM_DEFAULTS.orgName}.',
+  path: '/career-services',
+});
+
+const services = [
+  { slug: 'resume-building', title: 'Resume Building', summary: 'Professional resume review and writing support for program graduates.' },
+  { slug: 'interview-prep', title: 'Interview Prep', summary: 'Mock interviews, coaching, and employer-readiness workshops.' },
+  { slug: 'job-placement', title: 'Job Placement', summary: 'Direct employer connections and hiring pipeline access for graduates.' },
+  { slug: 'career-counseling', title: 'Career Counseling', summary: 'One-on-one advising to map your career pathway and next steps.' },
+];
 
 export default function CareerServicesPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Career Services' }]} />
-        </div>
+    <section className="mx-auto max-w-6xl px-4 py-16">
+      <h1 className="text-3xl font-bold">Career Services</h1>
+      <p className="mt-4 text-slate-700">
+        Elevate graduates receive career support beyond the classroom — from resume help to direct employer connections.
+      </p>
+      <div className="mt-10 grid gap-6 md:grid-cols-2">
+        {services.map((s) => (
+          <article key={s.slug} className="rounded border p-6 hover:bg-slate-50">
+            <h2 className="text-xl font-semibold">{s.title}</h2>
+            <p className="mt-2 text-sm text-slate-700">{s.summary}</p>
+            <Link href={`/career-services/${s.slug}`} className="mt-4 inline-block text-sm underline">Learn more</Link>
+          </article>
+        ))}
       </div>
 
       <HeroVideo
         videoSrcDesktop="/videos/career-services-hero.mp4"
-        posterImage="/images/pages/career-services-hero.webp"
+        posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-hero.webp"
         voiceoverSrc="/audio/heroes/career-services.mp3"
-        microLabel="Career Services"
+        microLabel={`Career Services — Supporting ${jobSeekerCount || 0} Job Seekers`}
         analyticsName="career-services"
       />
 
@@ -47,22 +52,22 @@ export default function CareerServicesPage() {
               {
                 title: 'Resume Building',
                 desc: 'Work one-on-one with a career advisor to build a professional resume tailored to your industry. We format, proofread, and optimize for applicant tracking systems.',
-                image: '/images/pages/resume-building-hero.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/resume-building-hero.webp',
               },
               {
                 title: 'Interview Preparation',
                 desc: 'Practice with mock interviews, get feedback on your answers, and learn how to present yourself confidently. We cover behavioral, technical, and situational questions.',
-                image: '/images/pages/networking-hero.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/networking-hero.webp',
               },
               {
                 title: 'Job Fairs & Hiring Events',
                 desc: 'Attend exclusive hiring events where our employer partners interview and hire on the spot. We host events monthly across Indiana.',
-                image: '/images/pages/job-placement.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/job-placement.webp',
               },
               {
                 title: 'Direct Employer Connections',
                 desc: 'We match you with employers in your field who are actively hiring. Many of our graduates receive job offers before they finish training.',
-                image: '/images/pages/career-services-hero.webp',
+                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-hero.webp',
               },
             ].map((item) => (
               <div
@@ -76,7 +81,7 @@ export default function CareerServicesPage() {
                     alt={item.title}
                     fill
                     sizes="100vw"
-                    className="object-cover" placeholder="empty"
+                    className="object-cover" 
                   />
                 </div>
                 <div className="py-3 pr-3 sm:p-5 flex-1">

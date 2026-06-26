@@ -113,7 +113,7 @@ export default async function MetricsPage() {
             <div className="flex items-start gap-3">
               <span className="text-brand-green-600 font-bold">•</span>
               <div>
-                <strong>SNAP E&T:</strong> Supplemental Nutrition Assistance Program Employment &
+                <strong>:</strong> Supplemental Nutrition Assistance Program Employment &
                 Training approved
               </div>
             </div>

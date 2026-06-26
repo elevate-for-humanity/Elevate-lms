@@ -26,7 +26,7 @@ export default function robots(): MetadataRoute.Robots {
           '/admin/',
           '/lms/',
           '/dashboard/',
-          '/student-portal/',
+          '/learner/dashboard/',
           '/admin/staff-portal/',
           '/partner/',
 

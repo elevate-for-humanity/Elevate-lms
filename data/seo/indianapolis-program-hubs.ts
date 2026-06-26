@@ -105,7 +105,7 @@ export const CNA_TRAINING_INDIANAPOLIS: IndianapolisProgramHubConfig = {
     bullets: [
       'WIOA Title I — adults and dislocated workers',
       'Workforce Ready Grant — when CNA is on the eligible credential list',
-      'FSSA IMPACT — qualifying public-assistance referrals',
+      'FSSA Gov Portal — qualifying public-assistance referrals',
       'Job Ready Indy — Marion County residents',
       'Self-pay and payment plans when funding is not available',
     ],

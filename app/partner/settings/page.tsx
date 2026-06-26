@@ -65,7 +65,7 @@ export default async function PartnerSettingsPage() {
     <div>
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden rounded-xl mb-6 -mx-4 sm:-mx-6 lg:-mx-8">
         <Image
-          src="/images/pages/partner-page-13.jpg"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/partner-page-13.jpg"
           alt="Partner settings"
           fill
           sizes="100vw"

@@ -1,18 +1,23 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { ChevronRight, Search, Filter, ShoppingCart, Star, Package } from 'lucide-react';
+import {
+  ChevronRight,
+  Search,
+  Filter,
+  ShoppingCart,
+  Star,
+  Package,
+} from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
-import { getAdminClient } from '@/lib/supabase/admin';
 
 export const metadata: Metadata = {
   title: 'Products | Elevate Shop',
   description: 'Browse professional tools, supplies, and learning materials.',
 };
 
-export const dynamic = 'force-dynamic';
-
+export const revalidate = 3600;
 interface Product {
   id: string;
   name: string;
@@ -29,26 +34,13 @@ interface Product {
 export default async function ProductsPage() {
   const supabase = await createClient();
 
-  const runProductsQuery = async (client: any) =>
-    client
-      .from('products')
-      .select('*')
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
 
   // Fetch products from database
-  let { data: productsData, error } = await runProductsQuery(supabase);
-
-  // Some environments block anon/authenticated reads on products. Fall back to
-  // service-role read for this public catalog page.
-  if (error && (error.code === '42501' || error.message?.includes('permission denied'))) {
-    const admin = await getAdminClient();
-    if (admin) {
-      const fallback = await runProductsQuery(admin);
-      productsData = fallback.data;
-      error = fallback.error;
-    }
-  }
+  const { data: productsData, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false });
 
   if (error) {
     logger.error('Error fetching products:', error.message);
@@ -68,7 +60,7 @@ export default async function ProductsPage() {
   }));
 
   // Get unique categories from products
-  const categories = ['All', ...new Set(products.map((p) => p.category).filter(Boolean))];
+  const categories = ['All', ...new Set(products.map(p => p.category).filter(Boolean))];
 
   return (
     <div className="min-h-screen bg-white">
@@ -79,23 +71,23 @@ export default async function ProductsPage() {
         </div>
       </div>
 
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-slate-900">Products</h1>
-              <p className="text-slate-600 mt-1">Professional tools and learning materials</p>
+              <p className="text-slate-700 mt-1">Professional tools and learning materials</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-700" />
                 <input
                   type="text"
                   placeholder="Search products..."
-                  className="pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 w-64"
+                  className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 w-64"
                 />
               </div>
-              <button className="inline-flex items-center gap-2 px-3 py-2 border border-slate-300 rounded-lg hover:bg-white">
+              <button className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-white">
                 <Filter className="w-4 h-4" />
                 Filter
               </button>
@@ -121,7 +113,7 @@ export default async function ProductsPage() {
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   category === 'All'
                     ? 'bg-brand-blue-600 text-white'
-                    : 'bg-white text-slate-700 border border-slate-300 hover:bg-white'
+                    : 'bg-white text-slate-900 border border-gray-300 hover:bg-white'
                 }`}
               >
                 {category}
@@ -134,12 +126,9 @@ export default async function ProductsPage() {
         {products.length > 0 ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
-              >
+              <div key={product.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
                 <div className="h-40 bg-white flex items-center justify-center relative">
-                  <Package className="w-16 h-16 text-slate-300" />
+                  <Package className="w-16 h-16 text-slate-700" />
                   {!product.in_stock && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="px-3 py-1 bg-white text-slate-900 rounded-full text-sm font-medium">
@@ -154,25 +143,23 @@ export default async function ProductsPage() {
                   )}
                 </div>
                 <div className="p-4">
-                  <span className="text-xs text-slate-500">{product.category}</span>
+                  <span className="text-xs text-slate-700">{product.category}</span>
                   <h3 className="font-semibold text-slate-900 mt-1 line-clamp-1">{product.name}</h3>
-                  <p className="text-sm text-slate-500 mt-1 line-clamp-2">{product.description}</p>
+                  <p className="text-sm text-slate-700 mt-1 line-clamp-2">{product.description}</p>
                   {product.rating > 0 && (
                     <div className="flex items-center gap-2 mt-2">
                       <div className="flex items-center gap-1">
                         <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                         <span className="text-sm font-medium text-slate-900">{product.rating}</span>
                       </div>
-                      <span className="text-sm text-slate-500">({product.reviews_count})</span>
+                      <span className="text-sm text-slate-700">({product.reviews_count})</span>
                     </div>
                   )}
                   <div className="flex items-center justify-between mt-4">
                     <div className="flex items-center gap-2">
                       <span className="text-lg font-bold text-slate-900">${product.price}</span>
                       {product.original_price && (
-                        <span className="text-sm text-slate-500 line-through">
-                          ${product.original_price}
-                        </span>
+                        <span className="text-sm text-slate-500 line-through">${product.original_price}</span>
                       )}
                     </div>
                     <button
@@ -187,12 +174,10 @@ export default async function ProductsPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
-            <Package className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+            <Package className="w-16 h-16 text-slate-700 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-slate-900 mb-2">No products available</h2>
-            <p className="text-slate-600 mb-6">
-              No products available yet. Contact us to request learning materials.
-            </p>
+            <p className="text-slate-700 mb-6">No products available yet. Contact us to request learning materials.</p>
             <Link href="/shop" className="text-brand-blue-600 hover:underline">
               Return to Shop
             </Link>

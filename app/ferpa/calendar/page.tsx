@@ -3,7 +3,13 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { ChevronRight, Calendar, Clock, AlertCircle, Plus, CheckCircle } from 'lucide-react';
+import {
+  ChevronRight,
+  Calendar,
+  Clock,
+  AlertCircle,
+  Plus,
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Calendar | FERPA Portal',
@@ -36,9 +42,8 @@ const EVENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
 export default async function FerpaCalendarPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/ferpa/calendar');
 
   const { data: profile } = await supabase
@@ -47,7 +52,7 @@ export default async function FerpaCalendarPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  const allowedRoles = ['admin', 'super_admin', 'ferpa_officer', 'registrar', 'staff'];
+  const allowedRoles = ['admin', 'ferpa_officer', 'registrar', 'staff'];
   if (!profile || !allowedRoles.includes(profile.role)) redirect('/unauthorized');
 
   // Fetch upcoming events
@@ -114,24 +119,23 @@ export default async function FerpaCalendarPage() {
 
   return (
     <div className="min-h-screen bg-white">
+
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/ferpa-page-1.jpg"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/ferpa-page-1.jpg"
           alt="FERPA compliance"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority 
         />
       </section>
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <nav className="flex items-center gap-2 text-sm text-slate-700 mb-4">
-            <Link href="/ferpa" className="hover:text-slate-900">
-              FERPA Portal
-            </Link>
+            <Link href="/ferpa" className="hover:text-slate-900">FERPA Portal</Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-slate-900 font-medium">Calendar</span>
           </nav>
@@ -158,19 +162,12 @@ export default async function FerpaCalendarPage() {
             </div>
             <div className="space-y-3">
               {(overdueEvents as CalendarEvent[]).map((event) => (
-                <div
-                  key={event.id}
-                  className="flex items-center justify-between bg-white rounded-lg p-3 border border-brand-red-200"
-                >
+                <div key={event.id} className="flex items-center justify-between bg-white rounded-lg p-3 border border-brand-red-200">
                   <div>
                     <p className="font-medium text-slate-900">{event.title}</p>
-                    <p className="text-sm text-brand-red-600">
-                      Due: {formatDate(event.start_date)}
-                    </p>
+                    <p className="text-sm text-brand-red-600">Due: {formatDate(event.start_date)}</p>
                   </div>
-                  <button className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
-                    Mark Complete
-                  </button>
+                  <button className="text-sm text-brand-blue-600 hover:text-brand-blue-700">Mark Complete</button>
                 </div>
               ))}
             </div>
@@ -180,15 +177,14 @@ export default async function FerpaCalendarPage() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Upcoming Events */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-              <div className="px-6 py-4 border-b border-slate-200">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-slate-900">Upcoming Events</h2>
               </div>
               {events && events.length > 0 ? (
-                <div className="divide-y divide-slate-200">
+                <div className="divide-y divide-gray-200">
                   {(events as CalendarEvent[]).map((event) => {
-                    const typeConfig =
-                      EVENT_TYPE_CONFIG[event.event_type] || EVENT_TYPE_CONFIG.other;
+                    const typeConfig = EVENT_TYPE_CONFIG[event.event_type] || EVENT_TYPE_CONFIG.other;
                     return (
                       <div key={event.id} className="px-6 py-4 hover:bg-white">
                         <div className="flex items-start justify-between">
@@ -198,9 +194,7 @@ export default async function FerpaCalendarPage() {
                                 {new Date(event.start_date).getDate()}
                               </p>
                               <p className="text-xs text-slate-700 uppercase">
-                                {new Date(event.start_date).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                })}
+                                {new Date(event.start_date).toLocaleDateString('en-US', { month: 'short' })}
                               </p>
                             </div>
                             <div>
@@ -209,9 +203,7 @@ export default async function FerpaCalendarPage() {
                                 <p className="text-sm text-slate-700 mt-1">{event.description}</p>
                               )}
                               <div className="flex items-center gap-3 mt-2">
-                                <span
-                                  className={`px-2 py-0.5 rounded text-xs font-medium ${typeConfig.color}`}
-                                >
+                                <span className={`px-2 py-0.5 rounded text-xs font-medium ${typeConfig.color}`}>
                                   {typeConfig.label}
                                 </span>
                                 {!event.all_day && (
@@ -242,11 +234,11 @@ export default async function FerpaCalendarPage() {
 
           {/* Standard Deadlines */}
           <div>
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-              <div className="px-6 py-4 border-b border-slate-200">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-slate-900">Standard Deadlines</h2>
               </div>
-              <div className="divide-y divide-slate-200">
+              <div className="divide-y divide-gray-200">
                 {standardDeadlines.map((deadline, index) => (
                   <div key={index} className="px-6 py-4">
                     <h3 className="font-medium text-slate-900">{deadline.title}</h3>

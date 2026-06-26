@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
     if (!job_id) return NextResponse.json({ error: 'job_id required' }, { status: 400 });
 
     // Only admins/staff/employers can query candidates
-    if (!['admin', 'super_admin', 'staff', 'employer'].includes(auth.role ?? '')) {
+    if (!['admin', 'staff', 'employer'].includes(auth.role ?? '')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

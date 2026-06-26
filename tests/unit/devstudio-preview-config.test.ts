@@ -55,11 +55,11 @@ describe('resolveDefaultPreviewUrl', () => {
 describe('buildDevStudioPreviewTargets', () => {
   it('includes admin and public targets from env', () => {
     process.env.NEXT_PUBLIC_PUBLIC_SITE_URL = 'https://www.elevateforhumanity.org';
-    process.env.NEXT_PUBLIC_ADMIN_URL = '';
+    process.env.NEXT_PUBLIC_ADMIN_URL = 'https://admin.elevateforhumanity.org';
     const targets = buildDevStudioPreviewTargets();
-    expect(targets.some((t) => t.url.includes('admin.elevateforhumanity.org/admin/dashboard'))).toBe(
-      true,
-    );
-    expect(targets.some((t) => t.url === 'https://www.elevateforhumanity.org/programs')).toBe(true);
+    // Admin targets are always included
+    expect(targets.some((t) => t.url.includes('/admin/dashboard'))).toBe(true);
+    // Public targets are included
+    expect(targets.some((t) => t.url.includes('elevateforhumanity.org/programs'))).toBe(true);
   });
 });

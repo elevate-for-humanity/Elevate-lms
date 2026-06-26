@@ -1,4 +1,4 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 import Image from 'next/image';
 import { Metadata } from 'next';
@@ -23,7 +23,7 @@ const STEPS = [
     num: '1',
     color: 'bg-brand-blue-600',
     title: 'Choose Your License Type',
-    image: '/images/pages/admin-licensing-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-licensing-hero.webp',
     imageAlt: 'License tier comparison — managed vs source-use',
     content: null, // rendered inline below
   },
@@ -31,7 +31,7 @@ const STEPS = [
     num: '2',
     color: 'bg-brand-blue-600',
     title: 'Complete Checkout',
-    image: '/images/pages/platform-page-3.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-3.webp',
     imageAlt: 'Stripe checkout for managed platform license',
     content: (
       <>
@@ -54,7 +54,7 @@ const STEPS = [
     num: '3',
     color: 'bg-brand-blue-600',
     title: 'Tenant Provisioning',
-    image: '/images/pages/admin-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-partners-hero.webp',
     imageAlt: 'Admin dashboard showing tenant provisioning and organization setup',
     content: (
       <>
@@ -80,7 +80,7 @@ const STEPS = [
     num: '4',
     color: 'bg-brand-blue-600',
     title: 'Invite Team & Assign Roles',
-    image: '/images/pages/admin-employers-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-employers-hero.webp',
     imageAlt: 'Admin user management interface showing role assignment',
     content: (
       <>
@@ -104,7 +104,7 @@ const STEPS = [
     num: '5',
     color: 'bg-brand-blue-600',
     title: 'Add Programs & Content',
-    image: '/images/pages/admin-courses-partners-hero.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-courses-partners-hero.webp',
     imageAlt: 'Course builder interface showing program and content setup',
     content: (
       <>
@@ -128,7 +128,7 @@ const STEPS = [
     num: '6',
     color: 'bg-brand-blue-600',
     title: 'Domain Options',
-    image: '/images/pages/platform-page-5.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-5.webp',
     imageAlt: 'Domain configuration options for the platform',
     content: (
       <>
@@ -150,7 +150,7 @@ const STEPS = [
     num: '7',
     color: 'bg-amber-500',
     title: 'Billing & Enforcement',
-    image: '/images/pages/platform-page-7.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-7.jpg',
     imageAlt: 'Billing and subscription management interface',
     content: null, // rendered inline below
   },
@@ -158,7 +158,7 @@ const STEPS = [
     num: '8',
     color: 'bg-brand-blue-600',
     title: 'Support & SLA',
-    image: '/images/pages/platform-page-9.webp',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-9.webp',
     imageAlt: 'Support portal and SLA documentation',
     content: (
       <>
@@ -188,12 +188,12 @@ export default function LicensingGuidePage() {
       <section className="relative h-56 md:h-72 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/store-guides-licensing-hero.jpg"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-guides-licensing-hero.jpg"
           alt="Elevate platform licensing guide"
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw" 
         />
         <div className="absolute inset-0 bg-slate-900/55" />
         <div className="absolute inset-0 flex items-end">
@@ -225,11 +225,11 @@ export default function LicensingGuidePage() {
             </div>
             <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-square" style={{ aspectRatio: '16/7' }}>
               <Image
-                src="/images/pages/admin-licensing-hero.webp"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-licensing-hero.webp"
                 alt="License tier comparison — managed vs source-use"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 896px" placeholder="empty"
+                sizes="(max-width: 768px) 100vw, 896px" 
               />
             </div>
             <div className="grid md:grid-cols-2 gap-5">
@@ -275,7 +275,7 @@ export default function LicensingGuidePage() {
                   alt={step.imageAlt}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 896px" placeholder="empty"
+                  sizes="(max-width: 768px) 100vw, 896px" 
                 />
               </div>
               {step.content}
@@ -290,11 +290,11 @@ export default function LicensingGuidePage() {
             </div>
             <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-[4/3]" style={{ aspectRatio: '16/7' }}>
               <Image
-                src="/images/pages/platform-page-7.jpg"
+                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/platform-page-7.jpg"
                 alt="Billing and subscription management"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 896px" placeholder="empty"
+                sizes="(max-width: 768px) 100vw, 896px" 
               />
             </div>
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">

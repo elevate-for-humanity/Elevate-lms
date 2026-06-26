@@ -8,7 +8,7 @@ export const ESTHETICIAN_APPRENTICESHIP: ProgramSchema = {
   sector: 'personal-services',
   category: 'Esthetics',
   programType: 'apprenticeship',
-  heroImage: '/images/beauty/esthetician.webp',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/esthetician.webp',
   heroImageAlt: 'Esthetician apprentice performing a professional facial treatment',
   videoSrc: '/videos/esthetician-spa.mp4',
   deliveryMode: 'in-person',
@@ -215,6 +215,6 @@ export const ESTHETICIAN_APPRENTICESHIP: ProgramSchema = {
     wrg_eligible: false,
     jobReadyIndyEligible: false,
     fundingNotes:
-      'DOL Registered Apprenticeship. FSSA IMPACT may be available. WIOA eligibility determined by Indiana DWD.',
+      'DOL Registered Apprenticeship. FSSA Gov Portal may be available. WIOA eligibility determined by Indiana DWD.',
   },
 };

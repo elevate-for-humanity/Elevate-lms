@@ -7,7 +7,7 @@ export const SOFTWARE_DEV: ProgramSchema = {
   sector: 'technology',
   category: 'Software Development',
   programType: 'workforce',
-  heroImage: '/images/pages/software-development.jpg',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/software-development.jpg',
   heroImageAlt: 'Software development student writing code',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

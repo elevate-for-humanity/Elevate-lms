@@ -82,24 +82,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
   const { id } = await params;
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // Redirect to login if not authenticated
-  if (!user?.id) {
-    redirect('/login');
-  }
-
   const db = await requireAdminClient();
-  const { data: adminProfile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!['admin', 'super_admin', 'staff'].includes(adminProfile?.role ?? ''))
-    redirect('/unauthorized');
-
   // Load student profile
   const { data: student } = await db
     .from('profiles')
@@ -320,7 +303,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
             ) : (
               <div className="divide-y divide-slate-50">
                 {enrollments.map((e) => (
-                  <div key={e.id} className="flex items-center gap-3 px-5 py-3">
+                  <div key={e.id ?? 'enrollment'} className="flex items-center gap-3 px-5 py-3">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-slate-800 truncate">
                         {programNames[e.program_id] || e.program_id?.slice(0, 8) || '—'}
@@ -346,23 +329,43 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
           {/* Voucher & Payout Tracking — one panel per enrollment that has voucher activity */}
           {await Promise.all(
             enrollments
-              .filter((e) => e.voucher_paid_date || e.voucher_issued_date || e.student_start_date)
+              .filter((e) => e && (e.voucher_paid_date || e.voucher_issued_date || e.student_start_date))
               .map(async (e) => {
-                const { data: auditRows } = await supabase
+<<<<<<< HEAD
+                const { data: auditRows } = await db
                   .from('enrollment_voucher_audit')
                   .select(
                     'id, enrollment_id, changed_by, field_changed, old_value, new_value, changed_at, notes',
                   )
                   .eq('enrollment_id', e.id)
                   .order('changed_at', { ascending: false });
+=======
+                const enrollmentId = e.id;
+                const { data: auditRows } = enrollmentId
+                  ? await supabase
+                      .from('enrollment_voucher_audit')
+                      .select(
+                        'id, enrollment_id, changed_by, field_changed, old_value, new_value, changed_at, notes',
+                      )
+                      .eq('enrollment_id', enrollmentId)
+                      .order('changed_at', { ascending: false })
+                  : { data: [] };
+>>>>>>> origin/main
                 return (
                   <EnrollmentVoucherPanel
-                    key={e.id}
+                    key={enrollmentId ?? 'voucher'}
                     data={{
+<<<<<<< HEAD
                       enrollment_id: e.id,
-                      student_name: profile?.full_name ?? '—',
+                      student_name: student?.full_name ?? '—',
                       program_name:
-                        programNames[e.program_id] || e.program_slug || e.id.slice(0, 8),
+                        programNames[e.program_id] || e.program_slug || (e.id ? e.id.slice(0, 8) : '—'),
+=======
+                      enrollment_id: enrollmentId ?? '',
+                      student_name: student.full_name ?? name,
+                      program_name:
+                        programNames[e.program_id] || e.program_slug || (enrollmentId ? enrollmentId.slice(0, 8) : '—'),
+>>>>>>> origin/main
                       partner_name: null,
                       student_start_date: e.student_start_date,
                       voucher_issued_date: e.voucher_issued_date,

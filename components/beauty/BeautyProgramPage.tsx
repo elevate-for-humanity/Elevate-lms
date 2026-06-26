@@ -40,7 +40,7 @@ export default function BeautyProgramPage({ program, campuses = DEFAULT_CAMPUSES
   useEffect(() => {
     const interval = setInterval(() => setActiveTestimonial((prev) => (prev + 1) % testimonials.length), 6000);
     return () => clearInterval(interval);
-  }, []);
+  }, [testimonials.length]);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 80);
@@ -70,10 +70,10 @@ export default function BeautyProgramPage({ program, campuses = DEFAULT_CAMPUSES
   ];
 
   const programs = [
-    { slug: 'barber-apprenticeship', title: 'Barbering Program', desc: 'Launch your career in barbering', image: '/images/beauty/program-barber-training.webp' },
-    { slug: 'cosmetology-apprenticeship', title: 'Cosmetology Program', desc: 'Learn professional techniques', image: '/images/beauty/cosmetology.webp' },
-    { slug: 'esthetician-apprenticeship', title: 'Esthetics Program', desc: 'Specialize in skin care', image: '/images/beauty/esthetician.webp' },
-    { slug: 'nail-technician-apprenticeship', title: 'Nail Technology Program', desc: 'Master nail artistry', image: '/images/beauty/program-beauty-training.webp' },
+    { slug: 'barber-apprenticeship', title: 'Barbering Program', desc: 'Launch your career in barbering', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/program-barber-training.webp' },
+    { slug: 'cosmetology-apprenticeship', title: 'Cosmetology Program', desc: 'Learn professional techniques', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/cosmetology.webp' },
+    { slug: 'esthetician-apprenticeship', title: 'Esthetics Program', desc: 'Specialize in skin care', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/esthetician.webp' },
+    { slug: 'nail-technician-apprenticeship', title: 'Nail Technology Program', desc: 'Master nail artistry', image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/program-beauty-training.webp' },
   ];
 
   return (
@@ -82,7 +82,7 @@ export default function BeautyProgramPage({ program, campuses = DEFAULT_CAMPUSES
       <nav className={`beauty-nav ${isScrolled ? 'scrolled' : ''}`}>
         <div className="nav-container">
           <Link href="/" className="nav-logo">
-            <img src="/images/logo.png" alt="Elevate" />
+            <img src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/logo.png" alt="Elevate" />
           </Link>
           <div className="nav-actions">
             <Link href={`/programs/${program.slug}/apply`} className="btn-nav btn-apply">Apply Now</Link>
@@ -346,7 +346,7 @@ export default function BeautyProgramPage({ program, campuses = DEFAULT_CAMPUSES
         <div className="container">
           <div className="footer-grid">
             <div className="footer-brand">
-              <img src="/images/logo.png" alt="Elevate" className="footer-logo" />
+              <img src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/logo.png" alt="Elevate" className="footer-logo" />
               <p>Elevate for Humanity Career & Technical Institute</p>
             </div>
             <div className="footer-contact">

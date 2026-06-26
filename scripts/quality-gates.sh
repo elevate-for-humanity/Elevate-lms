@@ -134,7 +134,9 @@ echo ""
 # =============================================================================
 echo "Checking for unauthorized createSignedUrl in admin paths..."
 
-UNAUTHORIZED_SIGNING=$(grep -rn "createSignedUrl" --include="*.ts" --include="*.tsx" app/admin/ 2>/dev/null | grep -v "api/admin/documents/signed-url" || true)
+# Allow: api/admin/documents/signed-url (endpoint), contracts bucket (contract templates)
+# Only block direct createSignedUrl for documents bucket in non-API admin pages
+UNAUTHORIZED_SIGNING=$(grep -rn "createSignedUrl" --include="*.ts" --include="*.tsx" app/admin/ 2>/dev/null | grep -v "api/admin/documents/signed-url" | grep -v "contracts/" | grep -v "from('contracts')" || true)
 
 if [ -n "$UNAUTHORIZED_SIGNING" ]; then
   echo -e "${RED}❌ FAIL:${NC} Direct createSignedUrl found in admin paths (must use getAdminDocumentUrl):"

@@ -9,7 +9,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   category: 'Certifications',
   programType: 'certification',
 
-  heroImage: '/images/pages/hvac-unit.webp',
+  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-unit.webp',
   heroImageAlt: 'HVAC technician servicing a rooftop unit in Indianapolis',
   videoSrc: '/videos/hvac-hero.mp4',
 
@@ -277,6 +277,6 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
     fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. WIOA, WRG, and FSSA IMPACT funding available. NHA EPA 608 certification program.',
+    fundingNotes: 'Indiana ETPL-listed. WIOA, WRG, and FSSA Gov Portal funding available. NHA EPA 608 certification program.',
   },
 };

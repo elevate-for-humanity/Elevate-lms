@@ -1,1 +1,4 @@
-export { POST, dynamic, maxDuration, runtime } from '@/app/api/stripe/create-checkout/route';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 300;
+export { POST } from '@/app/api/stripe/create-checkout/route';

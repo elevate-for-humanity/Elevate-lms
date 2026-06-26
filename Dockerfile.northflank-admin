@@ -4,7 +4,7 @@
 FROM node:22-bookworm AS builder
 
 # Cache invalidation marker
-# Fixed: inline logger/memory-monitor, pnpm matched to lockfile
+# Fixed: pnpm 9.12.3 (matches lockfile), inline logger/memory-monitor
 RUN echo "nf-cache-invalidate-20260626-fixes"
 
 # Install system deps for native modules (sharp, canvas, pdf)
@@ -37,7 +37,7 @@ COPY . .
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build: 8GB heap for admin builds
+# Build memory: 8GB heap for builds
 ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV BUILD_SCOPE=1
 ENV NEXT_STANDALONE_OUTPUT=1
@@ -78,7 +78,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=8080
-# Fixed: Runtime memory limit
+# Runtime memory limit (4GB - leaving room for OS/native modules)
 ENV NODE_OPTIONS=--max-old-space-size=4096
 
 WORKDIR /app

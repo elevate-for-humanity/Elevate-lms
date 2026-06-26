@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { requireRole } from '@/lib/auth/require-role';
 import {
   Building2,
   Users,
@@ -235,6 +236,18 @@ export default async function HostShopDashboardPage() {
     redirect('/login?redirect=/host-shop/dashboard');
   }
 
+  // Get user profile to check if admin
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('organization_id, role')
+    .eq('id', user.id)
+    .single();
+
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+  
+  // For admin, show all host shop data; for regular users, show their organization
+  const shopOrgId = isAdmin ? null : profile?.organization_id;
+
   // Demo data for the visual dashboard
   const shopInfo = {
     name: 'Elevate Barbershop',
@@ -246,15 +259,25 @@ export default async function HostShopDashboardPage() {
   };
 
   // Real database stats for the host shop
-  const { data: apprenticeCount } = await supabase
-    .from('profiles')
-    .select('id', { count: 'exact' })
-    .eq('host_shop_id', user.id);
+  // Admin sees all data, regular users see their org's data
+  const { data: apprenticeCount } = shopOrgId 
+    ? await supabase
+        .from('profiles')
+        .select('id', { count: 'exact' })
+        .eq('organization_id', shopOrgId)
+    : await supabase
+        .from('profiles')
+        .select('id', { count: 'exact' })
+        .not('organization_id', 'is', null);
 
-  const { data: pendingHours } = await supabase
-    .from('hour_entries')
-    .select('id', { count: 'exact' })
-    .eq('status', 'pending');
+  // For admin, show all pending hours; for regular users, filter by their org
+  const { data: pendingHours } = isAdmin
+    ? await supabase.from('hour_entries').select('id', { count: 'exact' })
+    : await supabase
+        .from('hour_entries')
+        .select('id', { count: 'exact' })
+        .eq('status', 'pending')
+        .eq('host_shop_id', shopOrgId);
 
   const stats = {
     activeApprentices: apprenticeCount?.length || 0,

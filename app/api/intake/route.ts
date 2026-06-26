@@ -152,6 +152,31 @@ async function _POST(req: Request) {
   // Root cause of mirror failures: overlapping RESTRICTIVE SELECT policies on
   // public.applications (applications_own_read, users_own, etc.) were blocking
   // the post-insert SELECT even when using the service_role client, because
+  // Check for duplicate submission: same email + program_slug within last 24 hours
+  const recentApplication = await supabase
+    .from('applications')
+    .select('id, created_at')
+    .eq('email', intakeEmail?.toLowerCase())
+    .eq('program_slug', clean(programInterest))
+    .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+    .maybeSingle();
+
+  if (recentApplication) {
+    logger.info('[Intake API] Duplicate submission blocked', {
+      email: intakeEmail,
+      program_slug: programInterest,
+      existing_id: recentApplication.id,
+    });
+    return NextResponse.json(
+      {
+        error: 'You already submitted an application for this program within the last 24 hours.',
+        duplicate: true,
+        application_id: recentApplication.id,
+      },
+      { status: 409 },
+    );
+  }
+
   // Supabase evaluates RESTRICTIVE policies on the `public` and `authenticated`
   // roles before checking the service_role PERMISSIVE policy.
   //

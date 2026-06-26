@@ -188,6 +188,11 @@ function IntakeForm({ programs = [] }: { programs?: Program[] }) {
     e.preventDefault();
     setError('');
 
+    // Prevent double-submit: exit if already loading or submitted
+    if (loading || submitted) {
+      return;
+    }
+
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
 
@@ -221,14 +226,20 @@ function IntakeForm({ programs = [] }: { programs?: Program[] }) {
         setSubmittedProgram((data.program_interest as string) || '');
         setSubmitted(true);
         setFundingTag(result.funding_tag || '');
+      } else if (res.status === 409) {
+        // Duplicate submission - show friendly message
+        setError('You already submitted an application for this program. Check your email for confirmation, or contact support if you need assistance.');
+        setLoading(false);
       } else {
         setError(result.error || 'Something went wrong. Please try again.');
+        setLoading(false); // Re-enable on error
       }
     } catch {
       setError('Network error. Please check your connection and try again.');
+      setLoading(false); // Re-enable on error
     }
 
-    setLoading(false);
+    // Don't set loading false on success - submitted state prevents resubmit
   }
 
   if (submitted) {

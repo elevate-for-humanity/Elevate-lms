@@ -2,6 +2,10 @@
   "name": "efh-autopilot",
   "version": "2.0.0",
   "private": true,
+  "packageManager": "pnpm@9.12.3",
+  "engines": {
+    "node": ">=20.11.1"
+  },
   "scripts": {
     "dev": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack",
     "build": "pnpm run build:lms:compile",

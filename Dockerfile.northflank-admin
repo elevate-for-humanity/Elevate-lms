@@ -32,12 +32,9 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-<<<<<<< HEAD
-ENV NODE_OPTIONS=--max-old-space-size=8192
-=======
+
 # P0-3: 12GB heap for admin builds
 ENV NODE_OPTIONS=--max-old-space-size=12288
->>>>>>> origin/main
 ENV BUILD_SCOPE=1
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV CI=true

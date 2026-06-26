@@ -9,16 +9,12 @@
   "scripts": {
     "dev": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack",
     "build": "pnpm run build:lms:compile",
-    "build:lms:compile": "BUILD_SCOPE=1 NODE_OPTIONS='--max-old-space-size=12288' next build",
-    "build:admin": "cd apps/admin && pnpm build",
+    "build:lms:compile": "npx cross-env BUILD_SCOPE=1 NODE_OPTIONS='--max-old-space-size=12288' next build",
     "start": "next start",
-    "lint": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' eslint . --ext .js,.jsx,.ts,.tsx --cache --cache-location .eslintcache --quiet",
-    "typecheck": "node scripts/typecheck-baseline.mjs",
-    "typecheck:full": "npx cross-env NODE_OPTIONS=--max-old-space-size=8192 tsc --noEmit",
-    "clean": "rimraf .next out node_modules",
-    "integrity:all": "pnpm run integrity:links && pnpm run integrity:media",
-    "integrity:links": "node scripts/check-internal-links.mjs",
-    "integrity:media": "node scripts/audit-image-assets.mjs"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf .next out node_modules pnpm-lock.yaml",
+    "cache:clean": "rimraf .next/cache"
   },
   "dependencies": {
     "next": "15.0.3",
@@ -28,8 +24,7 @@
     "@supabase/supabase-js": "^2.46.1",
     "@supabase/ssr": "^0.5.1",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.4",
-    "lucide": "^0.454.0"
+    "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
     "typescript": "^5.6.3",
@@ -41,7 +36,6 @@
     "eslint": "^8.57.1",
     "eslint-config-next": "15.0.3",
     "cross-env": "^7.0.3",
-    "rimraf": "^6.0.1",
-    "tsx": "^4.19.2"
+    "rimraf": "^6.0.1"
   }
 }

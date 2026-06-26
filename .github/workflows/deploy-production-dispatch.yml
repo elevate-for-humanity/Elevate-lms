@@ -32,38 +32,34 @@ jobs:
         with:
           ref: main
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9.12.3
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
+          cache: npm
 
-      - run: pnpm install --no-frozen-lockfile
+      - run: npm ci
 
       - name: Configure Northflank (LMS + admin)
-        run: pnpm tsx scripts/northflank/configure-services.ts --all --execute
+        run: npx tsx scripts/northflank/configure-services.ts --all --execute
 
       - name: Verify health probes on /api/ping
-        run: pnpm tsx scripts/northflank/verify-health-checks.ts --all
+        run: npx tsx scripts/northflank/verify-health-checks.ts --all
 
       - name: Set branches to main
         run: |
-          pnpm tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_LMS_SERVICE_ID" main
-          pnpm tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_ADMIN_SERVICE_ID" main
+          npx tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_LMS_SERVICE_ID" main
+          npx tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_ADMIN_SERVICE_ID" main
 
       - name: Trigger builds
         run: |
-          pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_LMS_SERVICE_ID"
-          pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
+          npx tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_LMS_SERVICE_ID"
+          npx tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
       - name: Wait for admin
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 1200000
+        run: npx tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 1200000
 
       - name: Wait for LMS
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --timeout-ms 3600000
+        run: npx tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --timeout-ms 3600000
 
       - name: Verify both SHAs match main
-        run: pnpm tsx scripts/northflank/verify-deployed-sha.ts
+        run: npx tsx scripts/northflank/verify-deployed-sha.ts

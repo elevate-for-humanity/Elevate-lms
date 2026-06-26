@@ -55,7 +55,7 @@ BEGIN
     WHERE user_id = target_user_id;
     
     -- Insert apprentice if doesn't exist
-    INSERT INTO apprentices (user_id, status, program_id, shop_id, enrollment_date)
+    INSERT INTO apprentices (user_id, status, program_id, shop_id
     SELECT target_user_id, 'active', target_program_id, target_shop_id, NOW()::date
     WHERE NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = target_user_id);
     

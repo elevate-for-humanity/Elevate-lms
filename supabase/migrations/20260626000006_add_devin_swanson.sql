@@ -105,7 +105,7 @@ END $$;
 -- If not, you'll need to create the user first in Supabase Auth
 
 -- 5. CREATE APPRENTICE RECORD FOR DEVIN
-INSERT INTO apprentices (user_id, status, program_id, shop_id, enrollment_date)
+INSERT INTO apprentices (user_id, status, program_id, shop_id
 SELECT 
   (SELECT id FROM auth.users WHERE email = 'Dawgchopz@icloud.com'),
   'active',

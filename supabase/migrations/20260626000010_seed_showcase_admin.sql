@@ -71,7 +71,7 @@ BEGIN
         enrollment_date = NOW()::date
     WHERE user_id = target_user_id;
     
-    INSERT INTO apprentices (user_id, status, program_id, shop_id, hours_completed, enrollment_date)
+    INSERT INTO apprentices (user_id, status, program_id, shop_id, hours_completed
     SELECT target_user_id, 'active', target_program_id, target_shop_id, 45, NOW()::date
     WHERE NOT EXISTS (SELECT 1 FROM apprentices WHERE user_id = target_user_id)
     RETURNING id INTO target_apprentice_id;
@@ -99,7 +99,7 @@ BEGIN
             amount_paid_at_checkout = 40000  -- $400
         WHERE user_id = target_user_id;
         
-        INSERT INTO barber_subscriptions (user_id, full_tuition_amount, amount_paid_at_checkout, weekly_payment_cents, remaining_balance, payment_status, fully_paid, setup_fee_paid, next_payment_date, enrollment_date)
+        INSERT INTO barber_subscriptions (user_id, full_tuition_amount, amount_paid_at_checkout, weekly_payment_cents, remaining_balance, payment_status, fully_paid, setup_fee_paid, next_payment_date
         SELECT target_user_id, 498000, 40000, 15000, 458000, 'active', false, true, NOW() + INTERVAL '14 days', NOW()::date
         WHERE NOT EXISTS (SELECT 1 FROM barber_subscriptions WHERE user_id = target_user_id);
     END IF;

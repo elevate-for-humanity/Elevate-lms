@@ -174,7 +174,7 @@ BEGIN
   -- ON CONFLICT now backed by uq_partner_enrollments_partner_student_program.
   IF EXISTS (SELECT 1 FROM public.partners WHERE id = v_cmi_partner_id) THEN
     INSERT INTO public.partner_enrollments
-      (partner_id, student_id, program_id, status, enrollment_date)
+      (partner_id, student_id, program_id, status
     VALUES
       (v_cmi_partner_id, v_app.user_id, v_program_id, 'active', CURRENT_DATE)
     ON CONFLICT (partner_id, student_id, program_id) DO UPDATE

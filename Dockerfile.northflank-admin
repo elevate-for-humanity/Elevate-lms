@@ -88,7 +88,7 @@ COPY --from=builder /app/apps/admin/.next/server ./apps/admin/.next/server
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/apps/admin/public ./apps/admin/public
 
-# Copy full node_modules from builder (preserves pnpm symlinks)
+# Copy full node_modules from builder (uses npm hoisting)
 COPY --from=builder /app/node_modules ./node_modules
 
 COPY --from=builder /app/apps/admin/server.js ./apps/admin/server.js

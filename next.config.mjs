@@ -99,6 +99,12 @@ const nextConfig = {
   outputFileTracingExcludes: {
     '*': [...sharedStandaloneTraceExcludes, ...lmsOnlyStandaloneTraceExcludes],
   },
+
+  // Force-include critical server-side files in standalone output
+  outputFileTracingIncludes: {
+    '/api/**': ['lib/logger.ts'],
+    '/admin/**': ['lib/logger.ts', 'lib/memory-monitor.ts'],
+  },
 };
 
 export default nextConfig;

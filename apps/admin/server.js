@@ -8,12 +8,43 @@ const fs = require('fs');
 const path = require('path');
 const v8 = require('v8');
 
-// Import structured logger (use @ alias for standalone bundling)
-const { createLogger } = require('@/lib/logger');
+// Inline logger to avoid @ alias issues in standalone
+function createLogger(prefix) {
+  const format = (level, msg, ctx = {}) => {
+    const ts = new Date().toISOString();
+    const ctxStr = Object.keys(ctx).length ? ' ' + JSON.stringify(ctx) : '';
+    console.log(`[${ts}] [${level}] [${prefix}] ${msg}${ctxStr}`);
+  };
+  return {
+    info: (msg, ctx) => format('INFO', msg, ctx),
+    warn: (msg, ctx) => format('WARN', msg, ctx),
+    error: (msg, ctx) => format('ERROR', msg, ctx),
+    debug: (msg, ctx) => format('DEBUG', msg, ctx),
+    serverStart: (host, port, ctx) => format('INFO', `Server starting on ${host}:${port}`, ctx),
+    serverStop: (signal, uptime, ctx) => format('INFO', `Server stopped (${signal}) uptime=${uptime}s`, ctx),
+    rejection: (id, type, ctx) => format(type === 'suppressed' ? 'WARN' : 'ERROR', `Unhandled rejection [${id}] ${type}`, ctx),
+    recovery: (id, action, ctx) => format('INFO', `Recovery [${id}] ${action}`, ctx),
+  };
+}
 const log = createLogger('admin');
 
-// Import memory monitor
-const { startMonitoring, stopMonitoring, getMetrics } = require('@/lib/memory-monitor');
+// Inline memory monitor
+let memoryInterval = null;
+function startMonitoring(shutdownFn, logFn) {
+  memoryInterval = setInterval(() => {
+    const mem = process.memoryUsage();
+    if (mem.heapUsed > 3 * 1024 * 1024 * 1024) {
+      logFn('warn', 'High memory usage', { heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024) });
+    }
+  }, 30000);
+}
+function stopMonitoring() {
+  if (memoryInterval) clearInterval(memoryInterval);
+}
+function getMetrics() {
+  const mem = process.memoryUsage();
+  return { heapUsed: mem.heapUsed, heapTotal: mem.heapTotal, rss: mem.rss };
+}
 
 // Suppress expected deployment noise from Next.js Server Action mismatches
 // These happen during deployment rollovers when users have old pages loaded

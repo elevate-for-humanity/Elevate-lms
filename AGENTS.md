@@ -8,11 +8,12 @@ When investigating ANY build failure, memory spike, or system error:
 
 ---
 
-### PROMPT TEMPLATE FOR FILES COMPARISON
+### FULL AUDIT PROMPT (Use This Every Time)
 
 ```
 AUDIT LINE BY LINE - Side by side comparison of [FILE_A] and [FILE_B]
 
+RULES:
 1. Use `diff -y` or `paste` to show BOTH files side by side, line by line
 2. For EVERY line that differs (EVEN comments), report:
    - Exact line numbers in each file
@@ -22,23 +23,30 @@ AUDIT LINE BY LINE - Side by side comparison of [FILE_A] and [FILE_B]
 3. Do NOT skip ANY differences - even 1 character matters
 4. After showing all differences, provide a FIXED summary table
 5. Ask before making any fixes
+6. ITERATIVE FIXING: After each fix, RE-AUDIT to verify fixed and check for MORE issues
+7. Keep auditing until system is as expected (all fixed, all matching, all working)
 
-Example format:
+FORMAT:
 | Line | FILE_A | FILE_B | Status |
 |------|--------|--------|--------|
 | 40 | comment A | comment B | ⚠️ |
 | 41 | ENV X=1 | ENV X=1 | ✅ |
 
+PROCESS:
+FIND ISSUE → FIX IT → AUDIT AGAIN → VERIFY FIXED → CHECK FOR MORE ISSUES → REPEAT
+
 COMMON MISTAKES TO AVOID:
 - Don't say "nothing is wrong" without running the comparison
 - Don't skip comments - they often indicate bugs
 - Don't assume similar = same - verify EVERY character
+- Don't stop after finding ONE issue - keep looking
+- Don't assume a fix is complete without re-auditing
 - When in doubt, run the diff
 ```
 
 ---
 
-### PROMPT TEMPLATE FOR SINGLE FILE AUDIT
+### SINGLE FILE AUDIT PROMPT
 
 ```
 AUDIT [FILENAME] LINE BY LINE
@@ -55,8 +63,10 @@ AUDIT [FILENAME] LINE BY LINE
    - Incorrect paths
    - Environment variable mismatches
    - Port conflicts
+   - Missing or misplaced cache invalidation markers
 4. Report line-by-line in table format
-5. Ask before fixing
+5. ITERATIVE FIXING: After each fix, RE-AUDIT to verify
+6. Keep going until system is as expected
 ```
 
 ---

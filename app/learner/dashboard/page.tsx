@@ -26,6 +26,8 @@ import {
   Calendar,
   FileText,
   ScrollText,
+  Building2,
+  MapPin,
 } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { getOnboardingBannerCopy } from '@/lib/enrollment/enrollment-flow';
@@ -34,6 +36,7 @@ import heroBanners from '@/content/heroBanners';
 import BillingCard, { type BillingSummary } from '@/components/learner/BillingCard';
 import { ResendMagicLinkForm } from '@/components/auth/ResendMagicLinkForm';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { JobMatchSection } from '@/components/careers/JobMatchSection';
 
 export const metadata: Metadata = {
   title: 'Learner Dashboard | Elevate LMS',
@@ -52,6 +55,11 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
   const sp = await searchParams;
 
   const profileAny = profile as any;
+  const onboardingDone = profileAny.onboarding_completed;
+
+  // Safety check: verify enrollment data exists before rendering trackers
+  const hasEnrollments = enrollments && enrollments.length > 0;
+  const firstEnrollment = hasEnrollments ? enrollments[0] : null;
 
   // Check if student has completed onboarding but not yet been granted access
   if (profile?.role === 'student') {
@@ -678,10 +686,47 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
               fundingSource={(workoneApp as any)?.requested_funding_source ?? undefined}
             />
 
+            {/* Host Shop — for apprenticeship students */}
+            {hasEnrollments && activeEnrollments.find(e => e._isApprenticeship && e.host_shop) && (
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+                <div className="p-6 border-b border-slate-200">
+                  <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-brand-blue-600" />
+                    Your Host Shop
+                  </h2>
+                </div>
+                <div className="p-6">
+                  {activeEnrollments.filter(e => e._isApprenticeship && e.host_shop).map((e: any) => (
+                    <div key={e.id} className="space-y-3">
+                      <p className="font-bold text-slate-900">{e.host_shop.name}</p>
+                      {e.host_shop.address && (
+                        <p className="text-sm text-slate-700 flex items-start gap-2">
+                          <MapPin className="w-4 h-4 text-slate-400 mt-0.5" />
+                          {e.host_shop.address}<br />
+                          {e.host_shop.city}, {e.host_shop.state} {e.host_shop.zip}
+                        </p>
+                      )}
+                      <div className="pt-2 border-t border-slate-100">
+                        <Link 
+                          href={`/portal/${e.program_slug?.replace(/-apprenticeship$/, '')}/ojt`}
+                          className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1"
+                        >
+                          View OJT Details <ChevronRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Job Match Section — AI-powered workforce matching */}
+            {hasEnrollments && <JobMatchSection userId={user.id} />}
+
             {/* DOL Competency Tracker — for apprenticeship students */}
-            {enrollments && enrollments.length > 0 && (
+            {hasEnrollments && (
               <DOLCompetencyTracker
-                programSlug={enrollments[0].program_slug || 'barber'}
+                programSlug={firstEnrollment.program_slug || 'barber'}
                 userId={user.id}
               />
             )}

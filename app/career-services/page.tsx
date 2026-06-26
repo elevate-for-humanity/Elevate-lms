@@ -19,7 +19,15 @@ export const metadata: Metadata = {
     'Resume building, interview prep, job fairs, and direct employer connections. We help you get hired after training.',
 };
 
-export default function CareerServicesPage() {
+export default async function CareerServicesPage() {
+  const supabase = await createClient();
+  
+  // Fetch real seeker stats
+  const { count: jobSeekerCount } = await supabase
+    .from('profiles')
+    .select('*', { count: 'exact', head: true })
+    .eq('employment_status', 'seeking');
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
@@ -32,7 +40,7 @@ export default function CareerServicesPage() {
         videoSrcDesktop="/videos/career-services-hero.mp4"
         posterImage="/images/pages/career-services-hero.webp"
         voiceoverSrc="/audio/heroes/career-services.mp3"
-        microLabel="Career Services"
+        microLabel={`Career Services — Supporting ${jobSeekerCount || 0} Job Seekers`}
         analyticsName="career-services"
       />
 

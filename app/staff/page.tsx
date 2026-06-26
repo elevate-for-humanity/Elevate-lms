@@ -73,12 +73,23 @@ export default async function StaffPortalLanding() {
     { label: 'Settings', href: '/staff/settings', icon: Settings, desc: 'Preferences' },
   ];
 
+  // Fetch real counts from DB
+  const { count: studentCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student');
+  const { count: activeAttendanceCount } = await supabase.from('attendance_hours').select('*', { count: 'exact', head: true }).eq('status', 'present');
+
+  const stats = [
+    { label: 'Active Students', value: studentCount || 0, icon: Users, color: 'text-brand-blue-600' },
+    { label: 'Recent Attendance', value: activeAttendanceCount || 0, icon: ClipboardList, color: 'text-brand-green-600' },
+    { label: 'Pending Graduations', value: 0, icon: Award, color: 'text-amber-600' },
+  ];
+
   const onboardingItems = [
     { label: 'Orientation Video', href: '/onboarding/staff/orientation', done: !!user },
     { label: 'Employee Handbook', href: '/employee/handbook', done: handbookDone },
     { label: 'Payroll & W-9 Setup', href: '/onboarding/payroll-setup', done: payrollDone },
     { label: 'Skills Assessment', href: '/staff/skills', done: skillsCount >= 5 },
   ];
+
   const onboardingComplete = onboardingItems.filter((i) => i.done).length;
 
   return (

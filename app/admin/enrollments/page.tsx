@@ -82,6 +82,11 @@ export default async function AdminEnrollmentsPage({
     .select('id, name, code, status')
     .eq('status', 'active')
     .order('name');
+  const { data: hostShops } = await db
+    .from('organizations')
+    .select('id, name')
+    .eq('is_active', true)
+    .order('name');
 
   const allEnrollments = enrollments;
   const stats = {
@@ -179,6 +184,7 @@ export default async function AdminEnrollmentsPage({
         users={users || []}
         courses={(coursesRaw || []).map((c: any) => ({ id: c.id, title: c.title }))}
         cohorts={cohortsRaw || []}
+        hostShops={(hostShops || []).map((s: any) => ({ id: s.id, name: s.name }))}
         stats={stats}
       />
     </AdminPageShell>

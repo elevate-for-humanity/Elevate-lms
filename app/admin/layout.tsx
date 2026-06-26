@@ -11,10 +11,6 @@ export const dynamic = 'force-dynamic';
  */
 export default async function AdminGroupLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
-<<<<<<< HEAD
-  const db = await requireAdminClient();
-=======
->>>>>>> origin/main
 
   const { data: { user }, error } = await supabase.auth.getUser();
 
@@ -26,40 +22,22 @@ export default async function AdminGroupLayout({ children }: { children: ReactNo
       const u = new URL(rawUrl, 'http://localhost');
       returnPath = u.pathname + (u.search || '');
     } catch { /* use default */ }
-<<<<<<< HEAD
-  }
-  const loginRedirect = `/login?redirect=${encodeURIComponent(returnPath)}`;
-
-  if (!supabase) {
-    redirect(loginRedirect);
+    
+    redirect(`/login?redirect=${encodeURIComponent(returnPath)}`);
   }
 
-  const { data: { user }, error } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
-
-
-  if (error || !user) {
-    redirect(loginRedirect);
-  }
-
-  // Check for admin role in profiles
-  const { data: profile } = await db
+  // Check for admin/staff/instructor role in profiles
+  const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
 
-  const adminRoles = ['admin', 'super_admin'];
+  const allowedRoles = ['admin', 'super_admin', 'staff', 'instructor', 'host_shop'];
   const isEmergencyAdmin = user.email === 'elizabethpowell6262@gmail.com';
   
-  if (!isEmergencyAdmin && (!profile || !profile.role || !adminRoles.includes(profile.role))) {
+  if (!isEmergencyAdmin && (!profile || !profile.role || !allowedRoles.includes(profile.role))) {
     redirect('/unauthorized');
-=======
-    redirect(`/login?redirect=${encodeURIComponent(returnPath)}`);
->>>>>>> origin/main
   }
 
   return <>{children}</>;

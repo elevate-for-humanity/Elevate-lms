@@ -21,6 +21,9 @@ const nextConfig = {
   // Disable source maps in production builds — saves ~500MB heap during build
   productionSourceMap: false,
   
+  // Build stability for OOM issues
+  staticPageGenerationTimeout: 1000,
+  
   reactStrictMode: true,
   poweredByHeader: false,
   trailingSlash: false,
@@ -36,6 +39,9 @@ const nextConfig = {
   },
 
   experimental: {
+    // Only use 1 worker for static generation to avoid RAM spikes
+    cpus: 1,
+    workerThreads: false,
     serverActions: {
       allowedOrigins: [
         'www.elevateforhumanity.org',

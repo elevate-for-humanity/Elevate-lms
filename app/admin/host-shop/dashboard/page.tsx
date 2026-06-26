@@ -241,11 +241,10 @@ export default async function HostShopDashboardPage() {
   // Safety check: if no apprentices are assigned yet, show a clean empty state rather than crashing on empty data
   const hasApprentices = apprentices && apprentices.length > 0;
 
-  // Calculate stats
-  const totalOJT = apprentices.reduce((sum, a) => sum + a.ojt_hours, 0);
-  const totalRTI = apprentices.reduce((sum, a) => sum + a.rti_lessons, 0);
-  const completedCount = apprentices.filter(a => a.completion_percentage >= 100).length;
-  const approvedWOTC = wotcCredits.filter(w => w.status === 'approved').reduce((sum, w) => sum + (w.amount || 0), 0);
+  const totalOJT = hasApprentices ? apprentices.reduce((sum, a) => sum + a.ojt_hours, 0) : 0;
+  const totalRTI = hasApprentices ? apprentices.reduce((sum, a) => sum + a.rti_lessons, 0) : 0;
+  const completedCount = hasApprentices ? apprentices.filter(a => a.completion_percentage >= 100).length : 0;
+  const approvedWOTC = wotcCredits ? wotcCredits.filter((w: any) => w.status === 'approved').reduce((sum: number, w: any) => sum + (w.amount || 0), 0) : 0;
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 max-w-[1600px] mx-auto">

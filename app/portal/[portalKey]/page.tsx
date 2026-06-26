@@ -57,7 +57,7 @@ export default async function IndustryPortalPageRoute({
       .eq('user_id', user.id),
   ]);
 
-  const enrollments = enrollmentsRes.data;
+  const enrollments = enrollmentsRes.data ?? [];
   const lessonRows = lessonsRes.data ?? [];
   const totalLessons = lessonsRes.count ?? lessonRows.length;
   const completedLessons = lessonRows.filter((l: any) => l.completed).length;
@@ -68,10 +68,18 @@ export default async function IndustryPortalPageRoute({
     slug: e.program_slug ?? e.program_id,
     credential: `${config.label} Credential`,
     progress: e.progress_percent ?? 0,
-    status: e.enrollment_state as 'active' | 'completed',
+    status: (e.enrollment_state ?? 'active') as 'active' | 'completed',
   }));
 
   const Icon = config.icon;
+
+  // Safe hours fetch to prevent crash on missing hours table
+  let hoursLogged = 0;
+  try {
+    hoursLogged = await getApprovedHoursByType(supabase, user.id).then((h) => (h.ojl || 0) + (h.rti || 0));
+  } catch (err) {
+    console.warn('Portal hours fetch failed', err);
+  }
 
   return (
     <IndustryPortalPage
@@ -88,7 +96,7 @@ export default async function IndustryPortalPageRoute({
         totalLessons,
         completedLessons,
         certificatesEarned,
-        hoursLogged: await getApprovedHoursByType(supabase, user.id).then((h) => h.ojl + h.rti).catch(() => 0),
+        hoursLogged,
       }}
     />
   );

@@ -23,12 +23,20 @@ export default async function SupportPage() {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: tickets } = user ? await supabase
-    .from('support_tickets')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(5) : { data: null };
+  let tickets: any[] = [];
+  try {
+    if (user) {
+      const { data } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+      tickets = data || [];
+    }
+  } catch (err) {
+    console.error('Failed to fetch support tickets', err);
+  }
 
   const supportOptions = [
     { icon: MessageSquare, title: 'Live Chat', desc: 'Chat with our support team', href: '/support/chat', available: 'Mon-Fri 9am-5pm EST' },

@@ -1,282 +1,253 @@
-export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
+import { createClient } from '@/lib/supabase/server';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import {
-  BarChart,
-  TrendingUp,
-  Users,
-  FileText,
-  ArrowRight,
-  PieChart,
-  Activity,
-  Target,
-  Download,
-} from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Workforce Analytics',
-  description:
-    'Data-driven insights for workforce development. Real-time dashboards, DOL reporting, and outcome tracking for workforce boards and training providers.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/platform/workforce-analytics' },
-  openGraph: {
-    title: 'Workforce Analytics',
-    description: 'Data-driven insights for workforce development decision making.',
-    url: 'https://www.elevateforhumanity.org/platform/workforce-analytics',
-    siteName: PLATFORM_DEFAULTS.orgName,
-    images: [
-      {
-        url: '/hero-images/technology-hero.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Workforce Analytics',
-      },
-    ],
-    type: 'website',
+  alternates: {
+    canonical:
+      'https://www.elevateforhumanity.org/platform/workforce-analytics',
   },
+  title: 'Workforce Analytics | Elevate For Humanity',
+  description:
+    'Resources and tools for your success.',
 };
 
-const metrics = [
-  { label: 'Participants Served', value: '12,450', change: '+15%' },
-  { label: 'Completion Rate', value: '87%', change: '+3%' },
-  { label: 'Employment Rate', value: '78%', change: '+5%' },
-  { label: 'Avg Wage Gain', value: '$4.50/hr', change: '+8%' },
-];
+export default async function WorkforceAnalyticsPage() {
+  const supabase = await createClient();
 
-const features = [
-  {
-    icon: PieChart,
-    title: 'Real-Time Dashboards',
-    description:
-      'Live metrics on enrollment, completion, employment, and wage outcomes across all programs.',
-  },
-  {
-    icon: FileText,
-    title: 'DOL-Ready Reports',
-    description: 'Pre-built report templates for WIOA quarterly and annual performance reporting.',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Trend Analysis',
-    description:
-      'Track performance over time with historical data, cohort comparisons, and forecasting.',
-  },
-  {
-    icon: Target,
-    title: 'Goal Tracking',
-    description: 'Set and monitor performance targets for each program, provider, and region.',
-  },
-  {
-    icon: Activity,
-    title: 'Early Warning System',
-    description: 'Automated alerts when students are at risk of dropping out or falling behind.',
-  },
-  {
-    icon: Download,
-    title: 'Data Export',
-    description: 'Export data in CSV, Excel, or PDF format for external reporting and analysis.',
-  },
-];
-
-const reportTypes = [
-  {
-    title: 'WIOA Performance',
-    description: 'Quarterly and annual performance metrics for DOL reporting.',
-  },
-  {
-    title: 'Enrollment Pipeline',
-    description: 'Track applications, enrollments, and waitlists across programs.',
-  },
-  {
-    title: 'Completion & Credentials',
-    description: 'Monitor credential attainment and program completion rates.',
-  },
-  {
-    title: 'Employment Outcomes',
-    description: 'Post-program employment, retention, and wage data.',
-  },
-  { title: 'Provider Scorecard', description: 'Compare training provider performance and ROI.' },
-  {
-    title: 'Demographic Analysis',
-    description: 'Participation and outcomes by age, race, gender, and barriers.',
-  },
-];
-
-export default function WorkforceAnalyticsPage() {
+  if (!supabase) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
+          <p className="text-gray-600">Please try again later.</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Fetch analytics data
+  const { data: analytics } = await supabase
+    .from('workforce_analytics')
+    .select('*')
+    .order('date', { ascending: false })
+    .limit(30);
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs
-            items={[{ label: 'Platform', href: '/platform' }, { label: 'Workforce Analytics' }]}
-          />
-        </div>
-      </div>
-      <div className="max-w-6xl mx-auto px-4 pb-2">
-        <p className="text-sm text-black font-medium">
-          Part of the{' '}
-          <Link href="/platform" className="text-brand-red-600 hover:underline">
-            Elevate Workforce Operating System
-          </Link>
-        </p>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <Breadcrumbs
+        items={[
+          { label: 'Platform', href: '/platform' },
+          { label: 'Workforce Analytics' },
+        ]}
+      />
+      {/* Hero Section */}
+      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
+        <Image
+          src="/images/pages/plumbing.jpg"
+          alt="Workforce Analytics"
+          fill
+          className="object-cover"
+          quality={100}
+          priority
+          sizes="100vw"
+        />
 
-      {/* Hero */}
-      {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image
-            src="/hero-images/technology-hero.webp"
-            alt="Workforce Analytics"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw" 
-          />
-        </div>
-        <div className="bg-white py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Analytics</h1>
-            <p className="text-lg text-white max-w-3xl mx-auto">
-              Data-driven insights for better workforce outcomes. Track participants from enrollment
-              to employment.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Live Metrics */}
-      <section className="py-12 bg-indigo-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-center text-sm font-medium text-indigo-600 uppercase tracking-wider mb-6">
-            Platform Metrics
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {metrics.map((m, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 shadow-sm border text-center">
-                <p className="text-3xl font-bold text-slate-900">{m.value}</p>
-                <p className="text-black text-sm mb-2">{m.label}</p>
-                <span className="text-brand-green-600 text-sm font-medium">{m.change} YoY</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Analytics Features</h2>
-            <p className="text-lg text-black max-w-2xl mx-auto">
-              Everything you need to measure, report, and improve workforce development outcomes.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((f, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition"
-              >
-                <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-                  <f.icon className="w-6 h-6 text-indigo-600" />
-                </div>
-                <h3 className="font-bold text-slate-900 mb-2">{f.title}</h3>
-                <p className="text-black text-sm">{f.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Report Types */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Built-In Report Types</h2>
-            <p className="text-lg text-black">
-              Pre-configured reports ready for federal and state reporting requirements.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {reportTypes.map((r, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 border">
-                <div className="flex items-start gap-3">
-                  <span className="text-black flex-shrink-0">•</span>
-                  <div>
-                    <h3 className="font-bold text-slate-900 mb-1">{r.title}</h3>
-                    <p className="text-black text-sm">{r.description}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Integration */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="relative h-[350px] rounded-2xl overflow-hidden shadow-xl">
-              <Image
-                src="/images/pages/platform-page-6.webp"
-                alt="Analytics dashboard"
-                fill
-                sizes="100vw"
-                className="object-cover" 
-              />
-            </div>
-            <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-6">
-                Integrated With Your Workflow
-              </h2>
-              <p className="text-black mb-6">
-                Analytics are built into every part of the platform. No separate tools or manual
-                data entry required.
-              </p>
-              <div className="space-y-3">
-                {[
-                  'Automatic data collection from LMS and enrollment systems',
-                  'Real-time sync with attendance and progress tracking',
-                  'Integration with state workforce databases',
-                  'API access for custom reporting and BI tools',
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <span className="text-black flex-shrink-0">•</span>
-                    <span className="text-slate-700">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 bg-brand-blue-700 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">See Your Data in Action</h2>
-          <p className="text-indigo-100 text-lg mb-8">
-            Schedule a demo to see how our analytics platform can transform your workforce
-            reporting.
+        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">Workforce Analytics</h1>
+          <p className="text-base md:text-lg md:text-xl mb-8 text-gray-100">
+            Your hub for training and career growth.
+            workforce training and career success.
           </p>
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="px-8 py-4 bg-white text-indigo-700 font-bold rounded-lg hover:bg-indigo-50 transition inline-flex items-center gap-2"
+              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
-              Schedule Demo <ArrowRight className="w-5 h-5" />
+              Get Started
             </Link>
             <Link
-              href="/store/compliance"
-              className="px-8 py-4 border-2 border-white text-slate-900 font-bold rounded-lg hover:bg-white/10 transition"
+              href="/programs"
+              className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
-              Compliance Tools
+              View Programs
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Content Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-7xl mx-auto">
+            {/* Feature Grid */}
+            <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold mb-6">Workforce Analytics</h2>
+                <p className="text-black mb-6">
+                  Your hub for
+                  career workforce training and career success.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start">
+                    <svg
+                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <span>100% free training programs</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg
+                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <span>Industry-standard certifications</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg
+                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <span>Career support and job placement</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
+                <Image
+                  src="/images/pages/electrical.jpg"
+                  alt="Workforce Analytics"
+                  fill
+                  className="object-cover"
+                  quality={100}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+            </div>
+
+            {/* Feature Cards */}
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-brand-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold mb-3">Learn</h3>
+                <p className="text-black">
+                  Access quality training programs
+                </p>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-brand-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold mb-3">Certify</h3>
+                <p className="text-black">Earn industry certifications</p>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg
+                    className="w-6 h-6 text-purple-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold mb-3">Work</h3>
+                <p className="text-black">Get hired in your field</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-brand-blue-700 text-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              Ready to Get Started?
+            </h2>
+            <p className="text-base md:text-lg text-blue-100 mb-8">
+              Join thousands who have launched successful careers through our
+              programs.
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link
+                href="/contact"
+                className="bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
+              >
+                Apply Now
+              </Link>
+              <Link
+                href="/programs"
+                className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 border-2 border-white text-lg"
+              >
+                Browse Programs
+              </Link>
+            </div>
           </div>
         </div>
       </section>

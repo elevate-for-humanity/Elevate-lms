@@ -1,22 +1,23 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-
-export const dynamic = 'force-dynamic';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/platform/partner-portal',
+    canonical: 'https://www.elevateforhumanity.org/platform/student-portal/handbook',
   },
-  title: 'Partner Portal | Elevate For Humanity',
+  title: 'Student Handbook | Student Portal | Elevate For Humanity',
   description:
-    'Resources and tools for your success.',
+    'Student handbook with policies, procedures, rights, responsibilities, and resources for {PLATFORM_DEFAULTS.orgName} students.',
 };
 
-export default async function PartnerPortalPage() {
+export default async function HandbookPage() {
   const supabase = await createClient();
 
   if (!supabase) {
@@ -30,24 +31,26 @@ export default async function PartnerPortalPage() {
     );
   }
   
-  // Fetch partner portal features
-  const { data: features } = await supabase
-    .from('platform_features')
+  // Fetch handbook content
+  const { data: handbook } = await supabase
+    .from('handbooks')
     .select('*')
-    .eq('portal', 'partner');
+    .eq('type', 'student')
+    .single();
   return (
     <div className="min-h-screen bg-gray-50">
       <Breadcrumbs
         items={[
           { label: 'Platform', href: '/platform' },
-          { label: 'Partner Portal' },
+          { label: 'Student Portal', href: '/platform/student-portal' },
+          { label: 'Handbook' },
         ]}
       />
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/pages/about-supportive-services.jpg"
-          alt="Partner Portal"
+          src="/images/pages/success-stories-hero.jpg"
+          alt="Handbook"
           fill
           className="object-cover"
           quality={100}
@@ -56,10 +59,10 @@ export default async function PartnerPortalPage() {
         />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">Partner Portal</h1>
-          <p className="text-base md:text-lg md:text-xl mb-8 text-gray-100">
-            Your hub for training and career growth.
-            and development.
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">Handbook</h1>
+          <p className="text-base md:text-lg mb-8 text-gray-100">
+            Access your dashboard and
+            development.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -85,10 +88,10 @@ export default async function PartnerPortalPage() {
             {/* Feature Grid */}
             <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-6">Partner Portal</h2>
+                <h2 className="text-2xl md:text-3xl font-bold mb-6">Handbook</h2>
                 <p className="text-black mb-6">
                   Your hub for training and career growth.
-                  workforce training and career success.
+                  and development.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start">
@@ -143,8 +146,8 @@ export default async function PartnerPortalPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/about-employer-partners.jpg"
-                  alt="Partner Portal"
+                  src="/images/heroes/community.jpg"
+                  alt="Handbook"
                   fill
                   className="object-cover"
                   quality={100}

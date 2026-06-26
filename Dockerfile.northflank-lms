@@ -36,10 +36,7 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-<<<<<<< HEAD
-=======
 # P0-3: 12GB heap for build with 1,600+ pages
->>>>>>> origin/main
 ENV NODE_OPTIONS=--max-old-space-size=12288
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=1

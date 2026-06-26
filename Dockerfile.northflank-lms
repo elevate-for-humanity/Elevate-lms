@@ -37,7 +37,7 @@ COPY . .
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# P0-3: 12GB heap for build with 1,600+ pages
+# Build memory: 8GB heap for builds
 ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=1
@@ -58,7 +58,7 @@ ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-# P0-3: 12GB memory for large app builds
+# Build: 8GB memory for large app builds
 RUN pnpm build:lms:compile
 
 # --- runtime stage ---

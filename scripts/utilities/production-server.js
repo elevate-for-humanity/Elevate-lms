@@ -33,8 +33,15 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',') 
   : ['https://elevateforhumanity.org', 'https://www.elevateforhumanity.org'];
 
-// Middleware
-app.use(compression());
+// Middleware - compression with Node 22 compatible filter
+app.use(compression({
+  level: 6,
+  threshold: 1024,
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) return false;
+    return true;
+  },
+}));
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);

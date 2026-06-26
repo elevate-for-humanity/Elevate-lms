@@ -11,11 +11,18 @@ const app = express();
 const PORT = process.env.VIDEO_API_PORT || 3001;
 
 // Middleware - exclude streaming/SSE responses from compression
-// Note: compression v1.8.1+ has API changes with Node 22, using simplified filter
+// compression v1.8+ with Node 22: use filter function instead of flush option
 app.use(compression({
-  // Only compress text-based responses, skip binary/streams
   level: 6,
   threshold: 1024,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  filter: (req: any, res: any) => {
+    // Don't compress streams or binary responses
+    if (req.headers['x-no-compression']) return false;
+    const contentType = res.getHeader('Content-Type') || '';
+    if (typeof contentType === 'string' && contentType.includes('stream')) return false;
+    return compression.filter(req, res);
+  },
 }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));

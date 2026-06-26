@@ -11,7 +11,15 @@ const PORT = process.env.PORT || 5000;
 const logger = pino({ level: process.env.LOG_LEVEL || 'info' });
 app.use(pinoHttp({ logger }));
 app.use(helmet());
-app.use(compression());
+// compression with Node 22 compatible filter
+app.use(compression({
+  level: 6,
+  threshold: 1024,
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) return false;
+    return true;
+  },
+}));
 app.use(express.json({ limit: '1mb' }));
 
 // Basic health endpoint

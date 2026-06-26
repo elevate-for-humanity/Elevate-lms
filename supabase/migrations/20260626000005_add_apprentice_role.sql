@@ -35,8 +35,7 @@ WHERE id IN (
 );
 
 -- 5. CREATE APPRENTICE RECORDS (simple INSERT without ON CONFLICT)
--- First add UNIQUE constraint on user_id
-ALTER TABLE apprentices ADD CONSTRAINT apprentices_user_id_key UNIQUE (user_id);
+-- Note: apprentices_user_id_key constraint already exists
 
 -- Jordan White - Kountry Kutz
 INSERT INTO apprentices (user_id, status, program_id, shop_id)

@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS public.ai_code_patterns (
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'ai_repo_index' AND table_schema = 'public') THEN
-    CREATE TABLE public.ai_repo_index (
+    CREATE TABLE IF NOT EXISTS public.ai_repo_index (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       repo_path TEXT,
       file_hash TEXT,

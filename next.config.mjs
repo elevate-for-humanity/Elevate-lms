@@ -102,8 +102,14 @@ const nextConfig = {
 
   // Force-include critical server-side files in standalone output
   outputFileTracingIncludes: {
-    '/api/**': ['lib/logger.ts'],
-    '/admin/**': ['lib/logger.ts', 'lib/memory-monitor.ts'],
+    '/api/**': ['lib/logger.ts', 'lib/supabase/**/*'],
+    '/admin/**': ['lib/logger.ts', 'lib/memory-monitor.ts', 'lib/supabase/**/*'],
+    '/**': [
+      'lib/logger.ts',
+      'lib/supabase/**/*',
+      'lib/license/**/*',
+      'components/ui/Breadcrumbs*',
+    ],
   },
 };
 

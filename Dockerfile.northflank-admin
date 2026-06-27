@@ -60,9 +60,9 @@ ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
 
-WORKDIR /app/apps/admin
-# 8GB memory for admin builds
-RUN NODE_OPTIONS='--max-old-space-size=8192' NEXT_BUILD_CACHE=/cache/.next pnpm next build --no-lint
+WORKDIR /app
+# Build Admin Next.js from root (ensures pnpm can find devDependencies like tailwindcss)
+RUN NODE_OPTIONS='--max-old-space-size=8192' NEXT_BUILD_CACHE=/cache/.next pnpm --filter @elevate/admin build --no-lint
 WORKDIR /app
 
 # --- runtime stage ---

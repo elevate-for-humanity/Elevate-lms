@@ -71,36 +71,36 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Configure Northflank LMS service only
-        run: npx tsx scripts/northflank/configure-services.ts "$NORTHFLANK_LMS_SERVICE_ID" --execute
+        run: ./node_modules/.bin/tsx scripts/northflank/configure-services.ts "$NORTHFLANK_LMS_SERVICE_ID" --execute
 
       - name: Patch LMS build ephemeral storage
-        run: npx tsx scripts/northflank/patch-ephemeral-storage.ts "$NORTHFLANK_LMS_SERVICE_ID" --execute
+        run: ./node_modules/.bin/tsx scripts/northflank/patch-ephemeral-storage.ts "$NORTHFLANK_LMS_SERVICE_ID" --execute
 
       - name: Verify LMS health probes on /api/ping
-        run: npx tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_LMS_SERVICE_ID"
+        run: ./node_modules/.bin/tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_LMS_SERVICE_ID"
 
       - name: Point LMS service at main
-        run: npx tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_LMS_SERVICE_ID" "$DEPLOY_BRANCH"
+        run: ./node_modules/.bin/tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_LMS_SERVICE_ID" "$DEPLOY_BRANCH"
 
       - name: Trigger LMS build
         id: trigger_lms_build
-        run: npx tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_LMS_SERVICE_ID"
+        run: ./node_modules/.bin/tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_LMS_SERVICE_ID"
 
       - name: Wait for LMS build to complete
-        run: npx tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --build-id "${{ steps.trigger_lms_build.outputs.build_id }}" --timeout-ms 3600000
+        run: ./node_modules/.bin/tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --build-id "${{ steps.trigger_lms_build.outputs.build_id }}" --timeout-ms 3600000
 
       - name: Roll out latest LMS image
-        run: npx tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_LMS_SERVICE_ID"
+        run: ./node_modules/.bin/tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_LMS_SERVICE_ID"
 
       - name: Wait for LMS deployment
-        run: npx tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --timeout-ms 600000
+        run: ./node_modules/.bin/tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --timeout-ms 600000
 
       - name: Verify deployed SHA matches main
         env:
           EXPECTED_SHA: ${{ github.sha }}
         run: |
           # If deploy is stale due to concurrent workflows, trust SUCCESS/COMPLETED status
-          npx tsx scripts/northflank/verify-deployed-sha.ts elevate-lms --trust-deploy-status
+          ./node_modules/.bin/tsx scripts/northflank/verify-deployed-sha.ts elevate-lms --trust-deploy-status
 
       - name: Smoke LMS
         run: |

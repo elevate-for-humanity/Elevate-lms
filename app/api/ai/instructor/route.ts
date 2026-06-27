@@ -5,7 +5,7 @@
  */
 import { NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
-import {, safeGetUser, createClient} from '@/lib/supabase/server';
+import { safeGetUser, createClient} from '@/lib/supabase/server';
 import { getInstructorByProgramId, getInstructorById } from '@/lms-data/instructors';
 import { allPrograms } from '@/lms-data/programs';
 import { logger } from '@/lib/logger';

@@ -4,7 +4,7 @@ import { logger } from '@/lib/logger';
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
-import {, safeGetUser, createClient} from '@/lib/supabase/server';
+import { safeGetUser, createClient} from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 

@@ -8,7 +8,7 @@ export const metadata: Metadata = generateInternalMetadata({
   path: '/shop/onboarding/documents',
 });
 
-import {, safeGetUser, createClient} from '@/lib/supabase/server';
+import { safeGetUser, createClient} from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { ShopDocumentUpload } from '@/components/shop/ShopDocumentUpload';
 

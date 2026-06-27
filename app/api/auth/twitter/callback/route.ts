@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {, safeGetUser, createClient} from '@/lib/supabase/server';
+import { safeGetUser, createClient} from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';

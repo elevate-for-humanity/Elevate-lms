@@ -39,7 +39,7 @@ export default function CareerServicesPage() {
         voiceoverSrc="/audio/heroes/career-services.mp3"
         microLabel={`Career Services — Supporting ${jobSeekerCount || 0} Job Seekers`}
         analyticsName="career-services"
-      />
+      ></HeroVideo>
 
       {/* What We Offer — stacked on mobile */}
       <section className="py-8 sm:py-14">

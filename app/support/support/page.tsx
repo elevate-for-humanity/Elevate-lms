@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import {, safeGetUser, createClient} from '@/lib/supabase/server';
+import { safeGetUser, createClient} from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { LifeBuoy, MessageSquare, Phone, Mail, FileText, Clock } from 'lucide-react';

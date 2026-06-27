@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import {, safeGetUser, createClient} from '@/lib/supabase/server';
+import { safeGetUser, createClient} from '@/lib/supabase/server';
 
 export const metadata = {
   robots: { index: false, follow: false },

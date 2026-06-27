@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
-import {, safeGetUser, createClient} from '@/lib/supabase/server';
+import { safeGetUser, createClient} from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
 import FERPATrainingForm from '@/components/compliance/FERPATrainingForm';

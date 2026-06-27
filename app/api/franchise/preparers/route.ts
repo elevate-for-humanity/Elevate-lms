@@ -1,6 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import {, safeGetUser, createClient} from '@/lib/supabase/server';
+import { safeGetUser, createClient} from '@/lib/supabase/server';
 import { preparerService } from '@/lib/franchise/preparer-service';
 import { CreatePreparerInput } from '@/lib/franchise/types';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

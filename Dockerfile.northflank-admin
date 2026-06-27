@@ -34,7 +34,6 @@ COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 COPY . .
 
-ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Build memory: 8GB heap for builds
@@ -44,7 +43,7 @@ ENV NEXT_STANDALONE_OUTPUT=1
 ENV CI=true
 # Webpack cache enabled for faster incremental builds
 
-# Install dependencies
+# Install dependencies (devDependencies included since NODE_ENV is not set to production yet)
 # Using --no-frozen-lockfile because lockfile may not match overrides in CI
 RUN pnpm install --no-frozen-lockfile
 
@@ -59,6 +58,7 @@ ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
+ENV NODE_ENV=production
 
 WORKDIR /app
 # Build Admin Next.js

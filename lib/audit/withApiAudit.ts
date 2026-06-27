@@ -17,7 +17,7 @@
 import { writeApiAuditEvent, type ActorType } from '@/lib/audit/api-audit';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
-import * as Sentry from '@/lib/observability/sentry-stub';
+import * as Sentry from '@sentry/nextjs';
 
 interface WithApiAuditOptions {
   actor_type?: ActorType;

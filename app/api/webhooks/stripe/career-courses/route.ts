@@ -6,7 +6,7 @@ import { headers } from 'next/headers';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type Stripe from 'stripe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import * as Sentry from '@/lib/observability/sentry-stub';
+import * as Sentry from '@sentry/nextjs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';

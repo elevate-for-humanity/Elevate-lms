@@ -1,4 +1,4 @@
-// import { withSentryConfig } from '@sentry/nextjs'; // TEMP: disabled until package installs
+import { withSentryConfig } from '@sentry/nextjs';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -101,27 +101,28 @@ const nextConfig = {
   },
 
   // Force-include critical server-side files in standalone output
-// NOTE: Paths are relative to project root, not @/ alias
   outputFileTracingIncludes: {
     '/api/**': [
-      './lib/logger.ts',
-      './lib/supabase/**/*.ts',
-      './lib/license/**/*.ts',
+      'lib/logger.ts',
+      'lib/supabase/**/*.ts',
+      'lib/license/**/*.ts',
+      'lib/auth/**/*.ts',
+      'lib/db/**/*.ts',
     ],
     '/admin/**': [
-      './lib/logger.ts',
-      './lib/memory-monitor.ts',
-      './lib/supabase/**/*.ts',
-      './lib/license/**/*.ts',
+      'lib/logger.ts',
+      'lib/memory-monitor.ts',
+      'lib/supabase/**/*.ts',
+      'lib/license/**/*.ts',
+      'lib/auth/**/*.ts',
+      'lib/db/**/*.ts',
     ],
     '/**': [
-      './lib/**/*.ts',
-      './lib/**/*.tsx',
-      './components/ui/Breadcrumbs.tsx',
-      './app/**/*.ts',
-      './app/**/*.tsx',
+      'lib/**/*',
+      'components/**/*',
+      'app/**/*',
     ],
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig);

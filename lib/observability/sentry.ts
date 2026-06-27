@@ -1,4 +1,4 @@
-import * as Sentry from '@/lib/observability/sentry-stub';
+import * as Sentry from '@sentry/nextjs';
 import { CorrelationContext } from './correlation';
 
 /**

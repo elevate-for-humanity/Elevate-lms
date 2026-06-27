@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import * as Sentry from '@/lib/observability/sentry-stub';
+import * as Sentry from '@sentry/nextjs';
 
 // Server Action ID mismatch — happens when production deploys a new build while
 // users still have the old page loaded. The old action IDs don't exist in

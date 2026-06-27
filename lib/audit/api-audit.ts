@@ -30,7 +30,7 @@
 import { logAuditEvent, getRequestMetadata } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
-import * as Sentry from '@/lib/observability/sentry-stub';
+import * as Sentry from '@sentry/nextjs';
 
 // Unique request ID for correlation across audit entries and logs.
 let requestCounter = 0;

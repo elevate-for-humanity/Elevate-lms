@@ -51,7 +51,14 @@ export async function generateMetadata({
 
 export default async function ProgramDetailPage({ params }: { params: Promise<{ program: string }> }) {
   const { program } = await params;
-  const loaded = await loadProgramForPage(program);
+  
+  let loaded;
+  try {
+    loaded = await loadProgramForPage(program);
+  } catch (e) {
+    console.error('[ProgramDetailPage] loadProgramForPage error:', e);
+    throw e;
+  }
 
   if (!loaded) {
     return notFound();
@@ -60,29 +67,36 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
   const { program: mergedProgram } = loaded;
   const banner = heroBanners[mergedProgram.slug] ?? null;
 
-  return (
-    <>
-      <ProgramStructuredData
-        program={{
-          id: mergedProgram.slug,
-          name: mergedProgram.title,
-          slug: mergedProgram.slug,
-          description: mergedProgram.subtitle,
-          duration_weeks: mergedProgram.durationWeeks,
-          price: parseInt(mergedProgram.selfPayCost.replace(/[^0-9]/g, ''), 10) || undefined,
-          image_url: mergedProgram.heroImage,
-          category: mergedProgram.category,
-          outcomes: mergedProgram.outcomes.map((o) => o.statement),
-        }}
-      />
-      <ProgramDetailPageComponent
-        program={mergedProgram}
-        banner={banner}
-        announcement={
-          mergedProgram.slug === 'cdl-training' ? <CdlEnrollmentOpenBanner /> : undefined
-        }
-      />
-      <OnetLaborData slug={mergedProgram.slug} />
-    </>
-  );
+  console.log('[ProgramDetailPage] Rendering program:', mergedProgram.slug, mergedProgram.title);
+  
+  try {
+    return (
+      <>
+        <ProgramStructuredData
+          program={{
+            id: mergedProgram.slug,
+            name: mergedProgram.title,
+            slug: mergedProgram.slug,
+            description: mergedProgram.subtitle,
+            duration_weeks: mergedProgram.durationWeeks,
+            price: parseInt(mergedProgram.selfPayCost.replace(/[^0-9]/g, ''), 10) || undefined,
+            image_url: mergedProgram.heroImage,
+            category: mergedProgram.category,
+            outcomes: mergedProgram.outcomes.map((o) => o.statement),
+          }}
+        />
+        <ProgramDetailPageComponent
+          program={mergedProgram}
+          banner={banner}
+          announcement={
+            mergedProgram.slug === 'cdl-training' ? <CdlEnrollmentOpenBanner /> : undefined
+          }
+        />
+        <OnetLaborData slug={mergedProgram.slug} />
+      </>
+    );
+  } catch (e) {
+    console.error('[ProgramDetailPage] Render error:', e);
+    throw e;
+  }
 }

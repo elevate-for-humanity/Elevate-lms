@@ -43,7 +43,11 @@
   "apps": {
     "admin": {
       "dependencies": {
-        "react-hot-toast": "^2.6.0"
+        "react-hot-toast": "^2.6.0",
+        "@tiptap/react": "^2.4.0",
+        "@tiptap/starter-kit": "^2.4.0",
+        "@tiptap/extension-placeholder": "^2.4.0",
+        "@tiptap/extension-character-count": "^2.4.0"
       }
     }
   }

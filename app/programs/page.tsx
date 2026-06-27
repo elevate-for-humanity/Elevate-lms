@@ -183,7 +183,7 @@ export default async function ProgramsPage() {
                   <Link key={p.slug} href={`/programs/${p.slug}`}
                     className="group flex flex-col rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-slate-300 transition-all duration-200 bg-white">
                     <div className={card.programImage}>
-                      {resolveSiteImagePath(PROGRAM_IMAGES[p.slug] ?? getProgramCardImage(p.slug)) && </Image src={resolveSiteImagePath(PROGRAM_IMAGES[p.slug] ?? getProgramCardImage(p.slug))} alt={p.title} fill />
+                      <Image src={resolveSiteImagePath(PROGRAM_IMAGES[p.slug] ?? getProgramCardImage(p.slug))} alt={p.title} fill
                         className={card.programImageFill}
                         sizes={IMAGE_SIZES.programCard}  />
                       {p.funding_eligible&&(

@@ -187,6 +187,6 @@ export default function CareerServicesPage() {
           </div>
         </div>
       </section>
-    </div>
+    </section>
   );
 }

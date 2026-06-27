@@ -93,7 +93,7 @@ export default async function OutcomesPage() {
                 <div key={p.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                   {image && (
                     <div className="relative h-48 sm:h-64 overflow-hidden">
-                      {image && <Image src={image} alt={p.title} fill sizes="100vw" className="object-cover" />}}
+                      <Image src={image} alt={p.title} fill sizes="100vw" className="object-cover" />
                     </div>
                   )}
                   <div className="p-6 sm:p-8">

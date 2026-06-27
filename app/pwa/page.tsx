@@ -88,7 +88,7 @@ export default function PWAIndexPage() {
           <Link key={app.href} href={app.href} className="block bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden hover:border-slate-500 transition-colors">
             <div className="flex items-center gap-4 p-4">
               <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
-                {app.image && <Image src={app.image} alt={app.name} fill className="object-cover" sizes="56px" />}}
+                {app.image && <Image src={app.image} alt={app.name} fill className="object-cover" sizes="56px" />}
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-lg font-bold text-slate-900 truncate">{app.name}</h2>

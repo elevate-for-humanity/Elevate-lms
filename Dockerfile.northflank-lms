@@ -61,8 +61,7 @@ ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
 ENV NODE_ENV=production
 
 # P0-3: 12GB memory for large app builds.
-# Added --no-lint and disabled TS checks during build to guarantee compilation.
-RUN npx cross-env BUILD_SCOPE=1 NODE_OPTIONS='--max-old-space-size=12288' next build --no-lint
+RUN pnpm build:lms:compile
 
 # --- runtime stage ---
 FROM node:22-bookworm-slim

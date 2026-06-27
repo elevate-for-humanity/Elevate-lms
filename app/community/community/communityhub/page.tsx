@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Users, MessageSquare, Calendar, BookOpen, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';

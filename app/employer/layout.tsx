@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';

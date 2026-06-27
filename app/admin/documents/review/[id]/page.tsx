@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { DocumentReviewForm } from '@/components/admin/DocumentReviewForm';
 import { getAdminDocumentUrl } from '@/lib/admin/document-access';

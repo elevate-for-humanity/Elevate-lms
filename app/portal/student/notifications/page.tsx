@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, Bell, CheckCircle, Info, AlertTriangle, Award, BookOpen, Calendar } from 'lucide-react';

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { ApprenticeSubNav } from '@/components/portal/ApprenticeSubNav';
 import { resolveApprenticeNavConfig } from '@/lib/portal/apprentice-nav-config';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';

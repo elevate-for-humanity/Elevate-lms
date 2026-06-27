@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { Settings, User, Bell, Building } from 'lucide-react';

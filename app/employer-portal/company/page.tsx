@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Building, MapPin, Users, Globe, Phone, Mail, Edit, Camera, Award, Briefcase, AlertCircle } from 'lucide-react';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 

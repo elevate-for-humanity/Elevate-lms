@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { buildLoginRedirect } from '@/lib/lms/redirect';
 import { StudentToolsStrip } from '@/components/lms/dashboard/StudentToolsStrip';
 import Link from 'next/link';

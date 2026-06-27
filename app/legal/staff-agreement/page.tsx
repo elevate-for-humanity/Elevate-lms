@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DocumentPage, DocumentSection, DocumentSignatureBlock } from '@/components/documents';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 

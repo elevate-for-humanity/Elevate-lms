@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { getHostShopBoard } from '@/lib/partner/board';
 import Link from 'next/link';
 import { AlertCircle, CheckCircle, Clock, FileText, TrendingUp, Users } from 'lucide-react';

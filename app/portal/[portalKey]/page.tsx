@@ -1,5 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import IndustryPortalPage from '../_components/IndustryPortalPage';
 import { getApprovedHoursByType } from '@/lib/hours/get-approved-hours';
 import { PORTAL_CONFIGS, VALID_PORTAL_KEYS } from './portal-config';

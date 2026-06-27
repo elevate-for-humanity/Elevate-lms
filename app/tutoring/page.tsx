@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import TutoringClient from './TutoringClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { allowedRolesForPortalPath } from '@/lib/portal/apprentice-access';
 
 export const dynamic = 'force-dynamic';

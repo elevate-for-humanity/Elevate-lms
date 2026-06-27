@@ -86,12 +86,10 @@ export const sharedStandaloneTraceExcludes = [
   '**/node_modules/happy-dom/**',
   '**/node_modules/.pnpm/happy-dom*/**',
   // TypeScript sources — compiled output lives under .next/server
+  // NOTE: Do NOT exclude lib/**, components/**, types/** — Next.js needs these
+  // for standalone output when using path aliases (@/, ~/, etc.)
   'app/**/*.tsx',
   'app/**/*.ts',
-  'components/**/*.tsx',
-  'components/**/*.ts',
-  'lib/**/*.ts',
-  'lib/**/*.tsx',
 ];
 
 /**

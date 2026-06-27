@@ -5,7 +5,8 @@ FROM node:22-bookworm AS builder
 
 # Cache invalidation marker
 # Fixed: pnpm 9.12.3 (matches lockfile), inline logger/memory-monitor
-RUN echo "nf-cache-invalidate-20260626-fixes"
+# Updated: 2026-06-27 - force rebuild with outputFileTracingIncludes fixes
+RUN echo "nf-cache-invalidate-20260627-tracing-fix"
 
 # Install system deps for native modules (sharp, canvas, pdf)
 RUN apt-get update && apt-get install -y --no-install-recommends \

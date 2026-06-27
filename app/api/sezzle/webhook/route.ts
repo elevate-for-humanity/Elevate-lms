@@ -22,7 +22,7 @@ import { flagCertificatesOnRefund } from '@/lib/certificates/flag-on-refund';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 import crypto from 'crypto';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import * as Sentry from '@sentry/nextjs';
+import * as Sentry from '@/lib/observability/sentry-stub';
 import { BARBER_PROGRAM_ID, BARBER_COURSE_ID } from '@/lib/barber/pricing';
 
 export const runtime = 'nodejs';

@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import * as Sentry from '@sentry/nextjs';
+import * as Sentry from '@/lib/observability/sentry-stub';
 
 export function captureError(error: Error, context?: Record<string, any>) {
   logger.error('Error:', error);

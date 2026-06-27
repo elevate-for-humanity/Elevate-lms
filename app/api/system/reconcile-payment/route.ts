@@ -19,7 +19,7 @@ import { getStripe, stripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import * as Sentry from '@sentry/nextjs';
+import * as Sentry from '@/lib/observability/sentry-stub';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';

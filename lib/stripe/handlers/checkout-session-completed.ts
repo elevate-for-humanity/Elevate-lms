@@ -21,7 +21,7 @@ import {
 import { handleTestingCheckoutSession } from '@/lib/stripe/handlers/testing-checkout-completed';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { logger } from '@/lib/logger';
-import * as Sentry from '@sentry/nextjs';
+import * as Sentry from '@/lib/observability/sentry-stub';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const handleCheckoutSessionCompleted: StripeEventHandler = async (

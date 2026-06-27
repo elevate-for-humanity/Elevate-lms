@@ -1,4 +1,4 @@
-import { withSentryConfig } from '@sentry/nextjs';
+// import { withSentryConfig } from '@sentry/nextjs'; // TEMP: disabled until package installs
 import fs from 'node:fs';
 import path from 'node:path';
 

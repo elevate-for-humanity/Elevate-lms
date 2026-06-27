@@ -53,7 +53,7 @@ import {
   constructStripeEventWithAnySecret,
   getCanonicalStripeWebhookSecrets,
 } from '@/lib/stripe/construct-webhook-event';
-import * as Sentry from '@sentry/nextjs';
+import * as Sentry from '@/lib/observability/sentry-stub';
 import { sendEmail } from '@/lib/email/service';
 import {
   ProgramEnrollmentMeta,

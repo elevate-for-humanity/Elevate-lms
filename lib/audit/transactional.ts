@@ -21,7 +21,7 @@
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
-import * as Sentry from '@sentry/nextjs';
+import * as Sentry from '@/lib/observability/sentry-stub';
 
 export type MutationOperation = 'insert' | 'update' | 'upsert' | 'delete';
 

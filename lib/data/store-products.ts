@@ -341,7 +341,5 @@ export const CLONE_LICENSES: StoreProduct[] = [
 export const ALL_PRODUCTS: StoreProduct[] = [
   ...WORKFORCE_PLATFORM_PLANS,
   ...CLONE_LICENSES,
-  ...COMMUNITY_ADDONS,
-  ...GRANT_CONTRACT_ADDONS,
 ];
 export const STORE_PRODUCTS = [...WORKFORCE_PLATFORM_PLANS];

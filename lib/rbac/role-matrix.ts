@@ -26,3 +26,15 @@ export const LMS_INSTRUCTOR_ROLES = ['instructor', 'admin'] as const;
 
 // API role sets
 export const API_ADMIN_ROLES = ['admin', 'staff'] as const;
+
+// ── Permission sets ─────────────────────────────────────────────────────────────────
+export const PERMISSIONS = {
+  access_devstudio: ['admin', 'staff'] as string[],
+  access_workflows: ['admin', 'staff'] as string[],
+  manage_users: ['admin', 'staff'] as string[],
+  manage_content: ['admin', 'staff', 'instructor'] as string[],
+};
+
+export function hasPermission(userRoles: string[], permission: keyof typeof PERMISSIONS): boolean {
+  return userRoles.some((role) => PERMISSIONS[permission].includes(role));
+}

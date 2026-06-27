@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   const endpoint = url.pathname.split('/').pop();
 
   try {
-    const { createClient } = await import('@/lib/supabase/server');
+    const { createClient, safeGetUser } = await import('@/lib/supabase/server');
     const { requireAdminClient } = await import('@/lib/supabase/admin');
     const { getPlatformMap, checkAllHealth, getPlatformLogs, getIntegrations } = await import('@/lib/control-plane');
     const { logger } = await import('@/lib/logger');
@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
 // POST /api/devstudio/control-plane/action
 export async function POST(req: NextRequest) {
   try {
-    const { createClient } = await import('@/lib/supabase/server');
+    const { createClient, safeGetUser } = await import('@/lib/supabase/server');
     const { requireAdminClient } = await import('@/lib/supabase/admin');
     const { executeControlAction, approveAction } = await import('@/lib/control-plane');
     const { logger } = await import('@/lib/logger');

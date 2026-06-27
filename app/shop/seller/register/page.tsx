@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Store, Loader2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/client';
+import { safeGetUser } from '@/lib/supabase/server';
 
 export default function SellerRegisterPage() {
   const [formData, setFormData] = useState({ name: '', email: '', storeName: '', description: '' });

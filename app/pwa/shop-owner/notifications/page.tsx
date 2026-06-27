@@ -7,6 +7,7 @@ import {
   AlertCircle, FileText, Trash2, Check, Loader2, 
   BellOff, Building2
 } from 'lucide-react';
+import { safeGetUser } from '@/lib/supabase/client';
 
 type NotificationType = 'hours_submitted' | 'apprentice_joined' | 'report_ready' | 'reminder' | 'system';
 

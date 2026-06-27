@@ -175,3 +175,11 @@ export function createBrowserClient(): SupabaseClient<any> {
 
 // Legacy export for backwards compatibility
 export const createClient = createBrowserClient;
+
+// safeGetUser helper for client components
+export function safeGetUser<T extends { user?: { id: string; email?: string | null } | null }>(
+  result: T
+): T['user'] {
+  if (!result) return null;
+  return result.user ?? null;
+}

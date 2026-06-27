@@ -1,5 +1,10 @@
 export const dynamic = 'force-dynamic';
 
+import { Metadata, Viewport } from 'next';
+import { redirect } from 'next/navigation';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
+import { getAdminClient, checkBarberSuspension } from '@/lib/barber/admin';
+
 export const metadata: Metadata = {
   title: 'Elevate Barber Apprentice',
   description: 'Track your barber apprenticeship hours and progress',

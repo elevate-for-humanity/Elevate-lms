@@ -7,6 +7,7 @@ import {
   AlertCircle, BookOpen, Calendar, Trash2, 
   Check, Loader2, BellOff
 } from 'lucide-react';
+import { safeGetUser } from '@/lib/supabase/client';
 
 type NotificationType = 'hours_approved' | 'hours_rejected' | 'milestone' | 'reminder' | 'training' | 'system';
 

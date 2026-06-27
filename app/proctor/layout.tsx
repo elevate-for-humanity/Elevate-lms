@@ -1,19 +1,11 @@
 import React from 'react';
-import { safeGetUser } from '@/lib/supabase/server';
 import { Metadata } from 'next';
-import { safeGetUser } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { safeGetUser } from '@/lib/supabase/server';
 import { Shield, ClipboardList, Plus, ArrowLeft } from 'lucide-react';
-import { safeGetUser } from '@/lib/supabase/server';
+import { safeGetUser, createSupabaseServerClient } from '@/lib/supabase/server';
 import { requireUser } from '@/lib/auth/require-user';
-import { safeGetUser } from '@/lib/supabase/server';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { safeGetUser } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { safeGetUser } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 

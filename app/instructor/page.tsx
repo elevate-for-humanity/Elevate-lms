@@ -1,13 +1,5 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-
-export const metadata: Metadata = {
-  title: 'Instructor Portal | Elevate For Humanity',
-  description: 'Instructor resources and management portal.',
-};
-
-import { Metadata } from 'next';
-import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { Users, BookOpen, ClipboardCheck, GraduationCap, Clock, ChevronRight } from 'lucide-react';
 

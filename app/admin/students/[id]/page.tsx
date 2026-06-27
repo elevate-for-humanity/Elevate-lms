@@ -331,7 +331,6 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
             enrollments
               .filter((e) => e && (e.voucher_paid_date || e.voucher_issued_date || e.student_start_date))
               .map(async (e) => {
-<<<<<<< HEAD
                 const { data: auditRows } = await db
                   .from('enrollment_voucher_audit')
                   .select(
@@ -339,33 +338,14 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                   )
                   .eq('enrollment_id', e.id)
                   .order('changed_at', { ascending: false });
-=======
-                const enrollmentId = e.id;
-                const { data: auditRows } = enrollmentId
-                  ? await supabase
-                      .from('enrollment_voucher_audit')
-                      .select(
-                        'id, enrollment_id, changed_by, field_changed, old_value, new_value, changed_at, notes',
-                      )
-                      .eq('enrollment_id', enrollmentId)
-                      .order('changed_at', { ascending: false })
-                  : { data: [] };
->>>>>>> origin/main
                 return (
                   <EnrollmentVoucherPanel
-                    key={enrollmentId ?? 'voucher'}
+                    key={e.id ?? 'voucher'}
                     data={{
-<<<<<<< HEAD
                       enrollment_id: e.id,
                       student_name: student?.full_name ?? '—',
                       program_name:
                         programNames[e.program_id] || e.program_slug || (e.id ? e.id.slice(0, 8) : '—'),
-=======
-                      enrollment_id: enrollmentId ?? '',
-                      student_name: student.full_name ?? name,
-                      program_name:
-                        programNames[e.program_id] || e.program_slug || (enrollmentId ? enrollmentId.slice(0, 8) : '—'),
->>>>>>> origin/main
                       partner_name: null,
                       student_start_date: e.student_start_date,
                       voucher_issued_date: e.voucher_issued_date,

@@ -4,6 +4,9 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Building2, Check, Clock, Shield, Zap } from 'lucide-react';
+import { startAppTrial } from '@/lib/apps/trial';
+import { safeGetUser } from '@/lib/supabase/server';
+import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,46 +25,6 @@ async function startTrial(formData: FormData) {
   const result = await startAppTrial(user.id, 'sam-gov');
   if (result.status === 'exists') redirect('/apps/sam-gov');
   if (result.status === 'error') redirect('/apps/sam-gov/start-trial?error=failed');
-  redirect('/apps/sam-gov?welcome=true');
-}
-
-export default async function StartTrialPage() {
-  const supabase = await createClient();
-  const user = safeGetUser(await supabase.auth.getUser());
-  if (!user) redirect('/login?redirect=/apps/sam-gov/start-trial');
-
-  const { data: existing } = await supabase
-    .from('user_app_subscriptions')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('app_slug', 'sam-gov')
-    .maybeSingle();
-
-  if (existing) {
-    redirect('/apps/sam-gov');
-  }
-
-  // Create trial subscription
-  const trialEndsAt = new Date();
-  trialEndsAt.setDate(trialEndsAt.getDate() + 14);
-
-  const { error } = await db
-    .from('user_app_subscriptions')
-    .insert({
-      user_id: user.id,
-      app_slug: 'sam-gov',
-      plan: 'starter',
-      status: 'trial',
-      trial_ends_at: trialEndsAt.toISOString(),
-      current_period_start: new Date().toISOString(),
-      current_period_end: trialEndsAt.toISOString(),
-    });
-
-  if (error) {
-    console.error('Error creating trial:', error);
-    redirect('/apps/sam-gov/start-trial?error=failed');
-  }
-
   redirect('/apps/sam-gov?welcome=true');
 }
 

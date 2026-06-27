@@ -80,7 +80,7 @@ export default async function StudyGroupsPage() {
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex-shrink-0">
                     {discussion.author?.avatar_url ? (
-                      <Image src={discussion.author.avatar_url} alt="Author avatar" width={40} height={40} className="w-full h-full rounded-full object-cover" />
+                      {discussion.author.avatar_url && <Image src={discussion.author.avatar_url} alt="Author avatar" width={40} height={40} className="w-full h-full rounded-full object-cover" />}}
                     ) : (
                       <User className="w-5 h-5 text-black" />
                     )}

@@ -57,7 +57,7 @@ export default async function StorePWAPage() {
               <Link key={product.id} href={`/store/${product.slug || product.id}`} className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
                 <div className="relative h-28 bg-white overflow-hidden">
                   {product.image_url ? (
-                    <Image src={product.image_url} alt={product.name} fill className="object-cover"  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                    {product.image_url && <Image src={product.image_url} alt={product.name} fill className="object-cover"  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />}}
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-400 text-3xl">🛒</div>
                   )}
@@ -88,7 +88,7 @@ export default async function StorePWAPage() {
             <Link key={product.id} href={`/store/${product.slug || product.id}`} className="flex items-center gap-3 bg-white rounded-xl border border-slate-200 p-3 hover:border-brand-red-300">
               <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                 {product.image_url ? (
-                  <Image src={product.image_url} alt={product.name} width={48} height={48} className="object-cover w-full h-full" />
+                  {product.image_url && <Image src={product.image_url} alt={product.name} width={48} height={48} className="object-cover w-full h-full" />}}
                 ) : (
                   <span className="text-xl">📦</span>
                 )}

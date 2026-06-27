@@ -109,6 +109,12 @@ const adminConfig = {
     '*': sharedStandaloneTraceExcludes,
   },
 
+  // Force-include critical server-side files in standalone output
+  outputFileTracingIncludes: {
+    '/api/**': ['lib/logger.ts', 'lib/memory-monitor.ts'],
+    '/admin/**': ['lib/logger.ts', 'lib/memory-monitor.ts'],
+  },
+
   serverExternalPackages: [
     // Remotion — /api/admin/generate-lesson-videos (dynamic import of remotion-render)
     'remotion',

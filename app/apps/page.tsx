@@ -8,6 +8,8 @@ import { Building2, DollarSign, Layout, Lock, ArrowRight, Star,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: 'My Apps | {PLATFORM_DEFAULTS.orgName}',

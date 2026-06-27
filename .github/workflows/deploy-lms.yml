@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+      - 'fix/**'
+      - 'chore/**'
     paths:
       - 'app/**'
       - '!app/admin/**'
@@ -30,6 +32,11 @@ on:
       - 'package.json'
       - '.github/workflows/deploy-lms.yml'
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy (defaults to main)'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -48,7 +55,6 @@ jobs:
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
       NORTHFLANK_LMS_SERVICE_ID: ${{ secrets.NORTHFLANK_LMS_SERVICE_ID || 'elevate-lms' }}
       NORTHFLANK_TARGET_SERVICE: lms
-      DEPLOY_BRANCH: main
       NORTHFLANK_EPHEMERAL_STORAGE_MB: '32768'
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -79,8 +85,8 @@ jobs:
       - name: Verify LMS health probes on /api/ping
         run: ./node_modules/.bin/tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_LMS_SERVICE_ID"
 
-      - name: Point LMS service at main
-        run: ./node_modules/.bin/tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_LMS_SERVICE_ID" "$DEPLOY_BRANCH"
+      - name: Point LMS service at current branch
+        run: ./node_modules/.bin/tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_LMS_SERVICE_ID" "${{ github.ref_name }}"
 
       - name: Trigger LMS build
         id: trigger_lms_build

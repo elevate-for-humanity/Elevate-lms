@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack",
     "build": "pnpm run build:lms:compile",
-    "build:lms:compile": "npx cross-env BUILD_SCOPE=1 NODE_OPTIONS='--max-old-space-size=12288' next build",
+    "build:lms:compile": "pnpm exec cross-env BUILD_SCOPE=1 NODE_OPTIONS='--max-old-space-size=12288' next build --no-lint",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",

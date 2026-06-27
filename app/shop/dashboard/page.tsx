@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ShoppingBag, DollarSign, Package, Users, BarChart3 } from 'lucide-react';

@@ -15,6 +15,8 @@
  * Add new tables there, not here.
  */
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { PRE_AUTH_TABLES } from '@/lib/pre-auth-tables';

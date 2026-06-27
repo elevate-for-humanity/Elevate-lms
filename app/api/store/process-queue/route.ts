@@ -1,3 +1,5 @@
+import { createClient } from '@/lib/supabase/server';
+
 import { processFulfillmentQueue, getQueueStats } from '@/lib/store/fulfillment-queue';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

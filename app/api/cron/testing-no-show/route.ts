@@ -3,6 +3,8 @@
  * Flag exam sessions scheduled for yesterday that were never started (no-show).
  * Notifies the proctor and writes an admin alert.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

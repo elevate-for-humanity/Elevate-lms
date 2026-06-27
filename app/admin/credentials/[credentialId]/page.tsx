@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { Metadata } from 'next';
 import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';

@@ -2,6 +2,8 @@
  * GET /api/cron/inactivity-reminders
  * Send reminders to enrolled learners who haven't logged any lesson activity in 7+ days.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

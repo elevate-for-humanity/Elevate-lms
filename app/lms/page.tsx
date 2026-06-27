@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { redirect } from 'next/navigation';
 import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { buildLoginRedirect } from '@/lib/lms/redirect';
@@ -83,7 +85,7 @@ export default async function LmsRootPage() {
             {programs.map((p) => (
               <div key={p.slug} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-md transition group">
                 <div className="relative aspect-[16/9] overflow-hidden">
-                  <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition duration-500" sizes="(max-width: 640px) 100vw, 33vw" />
+                  {p.image && <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition duration-500" sizes="(max-width: 640px) 100vw, 33vw"  />}
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-base mb-1">{p.title}</h3>

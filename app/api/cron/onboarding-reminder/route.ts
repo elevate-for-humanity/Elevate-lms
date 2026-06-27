@@ -3,6 +3,8 @@
  * GET /api/cron/onboarding-reminder
  * Remind new users (< 7 days old) who haven't started onboarding at all.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

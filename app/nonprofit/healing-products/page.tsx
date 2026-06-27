@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import Link from 'next/link';
 import { Metadata } from 'next';
 import Image from 'next/image';

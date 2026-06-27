@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 

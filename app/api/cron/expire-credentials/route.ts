@@ -2,6 +2,8 @@
  * GET /api/cron/expire-credentials
  * Expire credentials past their expiry date and notify holders.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

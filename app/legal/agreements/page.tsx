@@ -1,6 +1,8 @@
 'use client';
 
 
+import { createClient } from '@/lib/supabase/server';
+
 import { useEffect, useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -375,13 +377,12 @@ function LegalAgreementsContent() {
 
           {/* Agreement image header */}
           <div className="relative h-48 sm:h-56 overflow-hidden">
-            <Image
-              src={currentDef?.img || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/enrollment-agreement.webp'}
+            {currentDef?.img || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/enrollment-agreement.webp' && <Image src={currentDef?.img || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/enrollment-agreement.webp'}
               alt={currentAgreement.title}
               fill
               sizes="(max-width: 768px) 100vw, 672px"
               className="object-cover"
-            />
+             />}
             
             <div className="absolute bottom-0 left-0 right-0 p-5 flex items-end gap-4">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0 border border-white/30">
@@ -553,7 +554,7 @@ function LegalAgreementsContent() {
           ].map((badge) => (
             <div key={badge.label} className="relative rounded-xl overflow-hidden border border-slate-200 aspect-[4/3]">
               <div className="relative h-20">
-                <Image src={badge.img} alt={badge.label} fill sizes="33vw" className="object-cover" />
+                {badge.img && <Image src={badge.img} alt={badge.label} fill sizes="33vw" className="object-cover"  />}
                 
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-white text-xs font-bold text-center px-2 leading-tight">{badge.label}</span>

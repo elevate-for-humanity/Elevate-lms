@@ -1,5 +1,7 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/server';
+
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';

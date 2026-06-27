@@ -4,8 +4,10 @@
  * POST /api/course-generator/gap-scan/generate-drafts - Create draft jobs from gaps
  */
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import {, safeGetUser, createClient} from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

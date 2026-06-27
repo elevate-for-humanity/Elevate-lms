@@ -1,5 +1,7 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/server';
+
 import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { MessageSquare, Search, Star, Send, Paperclip, MoreVertical, CheckCheck, Loader2 } from 'lucide-react';

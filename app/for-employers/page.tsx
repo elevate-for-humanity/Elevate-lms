@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/public';
 import Link from 'next/link';

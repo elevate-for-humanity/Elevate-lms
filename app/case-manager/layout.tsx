@@ -1,7 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import {, safeGetUser, createClient} from '@/lib/supabase/server';
 import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { PlatformShell } from '@/components/platform/PlatformShell';

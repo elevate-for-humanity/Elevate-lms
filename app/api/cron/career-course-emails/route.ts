@@ -2,6 +2,8 @@
  * GET /api/cron/career-course-emails
  * Send weekly progress emails to career course enrollees.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

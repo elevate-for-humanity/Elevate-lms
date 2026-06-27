@@ -8,6 +8,8 @@
  * ADMIN_IP_ALLOWLIST or an auth guard before exposing publicly.
  */
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';

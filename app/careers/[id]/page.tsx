@@ -1,5 +1,7 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/server';
+
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { use, useState } from 'react';
 import Link from 'next/link';

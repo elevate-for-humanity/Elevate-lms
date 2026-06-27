@@ -1,4 +1,6 @@
 // PUBLIC ROUTE: marketing funnel lead capture
+import { db } from '@/lib/db';
+
 import { safeInternalError } from '@/lib/api/safe-error';
 
 import { NextRequest, NextResponse } from 'next/server';

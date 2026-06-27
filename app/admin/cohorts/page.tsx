@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { requireAdmin } from '@/lib/auth';
 import { Metadata } from 'next';
 import { requireAdminClient } from '@/lib/supabase/admin';

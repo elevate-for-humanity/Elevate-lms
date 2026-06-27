@@ -6,6 +6,8 @@
  * Invite table: org_invites (canonical — do not use org_invitations).
  */
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';

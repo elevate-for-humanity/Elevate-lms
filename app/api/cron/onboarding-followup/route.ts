@@ -2,6 +2,8 @@
  * GET /api/cron/onboarding-followup
  * Follow up with users who started onboarding but haven't completed it in 48h.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

@@ -2,6 +2,8 @@
  * GET /api/cron/payment-monitoring
  * Monitor for failed/stuck payments and alert operations team.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

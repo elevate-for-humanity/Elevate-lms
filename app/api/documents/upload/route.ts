@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { internalFetch } from '@/lib/api/internal-fetch';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';

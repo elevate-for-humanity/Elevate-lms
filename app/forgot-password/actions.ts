@@ -1,6 +1,6 @@
 'use server';
 
-import { requireAdminClient } from '@/lib/supabase/admin';
+import{ requireAdminClient, getAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';

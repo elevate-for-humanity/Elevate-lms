@@ -1,5 +1,7 @@
 // PUBLIC ROUTE: testing appointment booking
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAdminClient } from '@/lib/supabase/admin';

@@ -1,7 +1,7 @@
 import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import {, safeGetUser, createClient} from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import type Stripe from 'stripe';
 import { BARBER_PRICING, calculateWeeklyPayment, getBillingCycleAnchor } from '@/lib/programs/pricing';

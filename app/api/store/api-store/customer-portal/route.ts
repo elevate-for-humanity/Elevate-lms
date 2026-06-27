@@ -1,4 +1,6 @@
 // PUBLIC ROUTE: Stripe customer portal redirect
+import { createClient } from '@/lib/supabase/server';
+
 import { stripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 

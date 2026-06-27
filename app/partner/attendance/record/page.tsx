@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';

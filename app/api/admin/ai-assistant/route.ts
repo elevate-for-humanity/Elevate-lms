@@ -5,6 +5,8 @@
 // Uses runAITask() → aiChat() with RAG context + knowledge graph injection.
 // Conversation history is stored in ai_conversation_memory (keyed by sessionId).
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

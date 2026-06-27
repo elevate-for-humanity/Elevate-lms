@@ -3,6 +3,8 @@
  * Find knowledge base documents without embeddings and queue them for embedding.
  * Writes a platform event per document so the embedding worker can pick them up.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

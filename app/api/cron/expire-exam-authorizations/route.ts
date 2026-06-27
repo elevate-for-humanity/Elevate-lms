@@ -2,6 +2,8 @@
  * GET /api/cron/expire-exam-authorizations
  * Expire exam_authorizations that have passed their expiry date.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

@@ -1,3 +1,5 @@
+import { getAdminClient } from '@/lib/supabase/admin';
+
 export const dynamic = 'force-dynamic';
 
 async function getInstructorData() {

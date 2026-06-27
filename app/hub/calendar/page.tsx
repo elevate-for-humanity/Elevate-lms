@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import {, safeGetUser, createClient} from '@/lib/supabase/server';
 import { getUpcomingEvents } from '@/lib/data/events';
 import EventCard from '@/components/events/EventCard';
 import EventsEmptyState from '@/components/events/EventsEmptyState';

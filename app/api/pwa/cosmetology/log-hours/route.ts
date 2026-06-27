@@ -1,4 +1,6 @@
 // AUTH: Enforced inside handler (createClient + getUser check)
+import { createClient } from '@/lib/supabase/server';
+
 import { NextRequest } from 'next/server';
 import { handleLogHours } from '@/lib/api/apprentice-hours-handler';
 

@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { NextRequest } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { safeError, safeInternalError, safeOk } from '@/lib/api/safe-error';

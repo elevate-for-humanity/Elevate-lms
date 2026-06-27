@@ -1,5 +1,7 @@
 'use client';
 
+import { safeGetUser } from '@/lib/supabase/server';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 

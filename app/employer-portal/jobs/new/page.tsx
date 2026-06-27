@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { safeGetUser } from '@/lib/supabase/server';
+import { safeGetUser, createClient} from '@/lib/supabase/server';
 import { Briefcase, MapPin, DollarSign, Clock, Users, ArrowLeft, Save, Eye, Loader2 } from 'lucide-react';
 
 const BENEFITS = [

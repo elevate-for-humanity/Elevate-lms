@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Control Plane API Routes
  * GET /api/devstudio/control-plane/map - Get platform map
@@ -6,6 +7,10 @@
  * GET /api/devstudio/control-plane/logs - Get platform logs
  * GET /api/devstudio/control-plane/integrations - Get integrations
  */
+
+import { db } from '@/lib/db';
+
+import { safeGetUser, createClient} from '@/lib/supabase/server';
 
 import { NextRequest, NextResponse } from 'next/server';
 

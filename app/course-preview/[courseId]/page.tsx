@@ -2,6 +2,8 @@
 
 // Auth enforced server-side in app/course-preview/layout.tsx.
 
+import { createClient } from '@/lib/supabase/server';
+
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';

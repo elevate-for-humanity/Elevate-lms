@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 /**

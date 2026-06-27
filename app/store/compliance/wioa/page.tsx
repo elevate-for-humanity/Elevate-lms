@@ -194,12 +194,11 @@ export default function WIOACompliancePage() {
             {features.map((feature) => (
               <div key={feature.title} className="bg-white rounded-2xl overflow-hidden border-2 border-slate-200 hover:border-brand-green-500 hover:shadow-xl transition-all group">
                 <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src={feature.image}
+                  {feature.image && <Image src={feature.image}
                     alt={feature.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                   sizes="100vw"  />
+                   sizes="100vw"   />}
                   <h3 className="absolute bottom-4 left-4 text-xl font-bold text-slate-900">{feature.title}</h3>
                 </div>
                 <div className="p-6">
@@ -232,7 +231,7 @@ export default function WIOACompliancePage() {
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-brand-green-600">
-                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover"  />
+                  {item.image && <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover"   />}
                   <div className="absolute inset-0 bg-brand-green-600/60 flex items-center justify-center">
                     <span className="text-2xl font-black text-slate-900">{item.step}</span>
                   </div>

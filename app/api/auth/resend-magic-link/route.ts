@@ -13,6 +13,8 @@
  * PUBLIC ROUTE: no session required (user may not be signed in yet).
  */
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';

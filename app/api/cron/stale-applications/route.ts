@@ -2,6 +2,8 @@
  * GET /api/cron/stale-applications
  * Archive applications that have been in 'submitted' status for > 30 days with no action.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

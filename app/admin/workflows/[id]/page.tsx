@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '@/lib/authGuards';

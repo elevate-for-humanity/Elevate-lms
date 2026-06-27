@@ -1,6 +1,8 @@
 // PUBLIC ROUTE: CDL student/sponsor MOU PDF generation — no auth required.
 // Referral partners and students sign via /mou/cdl without needing an account.
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

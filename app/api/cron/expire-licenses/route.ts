@@ -2,6 +2,8 @@
  * GET /api/cron/expire-licenses
  * Expire licenses past their expiry date and warn holders 30 days before.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

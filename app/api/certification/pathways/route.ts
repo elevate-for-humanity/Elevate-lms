@@ -4,6 +4,8 @@
 // Used by the student dashboard to show pathway selection after training completion.
 // Public-facing data — no sensitive fields returned.
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

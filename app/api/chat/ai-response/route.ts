@@ -3,6 +3,8 @@
  * This endpoint is preserved for backwards compatibility.
  * Migration: runAITask({ task: 'general_chat' | 'instructor_support', ... })
  */
+import { createClient } from '@/lib/supabase/server';
+
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 

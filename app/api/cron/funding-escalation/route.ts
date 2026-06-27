@@ -3,6 +3,8 @@
  * GET /api/cron/funding-escalation
  * Escalate funding assignments that have been pending > 7 days to critical alert.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

@@ -14,6 +14,8 @@
  * a full cron scheduler — sufficient for 5-min polling cadence.
  */
 
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { executeWorkflow } from '@/lib/workflows/engine';

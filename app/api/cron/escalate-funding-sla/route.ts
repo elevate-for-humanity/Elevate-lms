@@ -3,6 +3,8 @@
  * GET /api/cron/escalate-funding-sla
  * Escalate funding SLA breaches — assignments pending > SLA threshold get critical alerts.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

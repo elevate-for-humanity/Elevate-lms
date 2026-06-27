@@ -2,6 +2,8 @@
  * GET /api/cron/school-application-followup
  * Follow up on submitted applications that have had no status change in 48h.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

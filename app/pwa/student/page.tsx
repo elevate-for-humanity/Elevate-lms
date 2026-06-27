@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import {, safeGetUser, createClient} from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 

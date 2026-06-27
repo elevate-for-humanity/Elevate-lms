@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';

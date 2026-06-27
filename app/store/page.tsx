@@ -170,7 +170,7 @@ export default function StorePage() {
               <div key={item.title} className="border border-slate-200 rounded-xl overflow-hidden flex flex-col md:flex-row">
                 <div className="relative w-full md:w-48 h-40 md:h-auto flex-shrink-0 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                  <Image src={item.img} alt={item.title} fill quality={85} className="object-cover" sizes="(max-width: 768px) 100vw, 200px"  />
+                  {item.img && <Image src={item.img} alt={item.title} fill quality={85} className="object-cover" sizes="(max-width: 768px) 100vw, 200px"   />}
                 </div>
                 <div className="p-6">
                   <h3 className="font-bold text-slate-900 text-lg mb-2">{item.title}</h3>

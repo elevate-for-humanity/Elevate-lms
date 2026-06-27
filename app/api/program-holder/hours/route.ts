@@ -10,6 +10,8 @@
  *   limit   — max rows (default: 50, max: 200)
  */
 
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';

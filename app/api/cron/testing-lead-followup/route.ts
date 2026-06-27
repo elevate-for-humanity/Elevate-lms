@@ -3,6 +3,8 @@
  * Follow up with exam leads (prospects who expressed interest in testing)
  * that haven't converted to a scheduled session within 7 days.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

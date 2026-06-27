@@ -18,6 +18,8 @@
  *   6. Emit platform event for audit trail
  */
 
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/service';

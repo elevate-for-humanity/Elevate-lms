@@ -200,7 +200,7 @@ export default function JriPage() {
             ].map((program, i) => (
               <div key={i} className="bg-white rounded-xl overflow-hidden shadow-lg border group hover:shadow-xl transition-shadow">
                 <div className="relative h-48">
-                  <Image src={program.image} alt={program.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  {program.image && <Image src={program.image} alt={program.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300"  />}
                   <div className="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                     JRI FUNDED
                   </div>

@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';

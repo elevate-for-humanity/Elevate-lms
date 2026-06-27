@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { hero as heroTokens } from '@/lib/page-design-tokens';
 import type { Metadata } from 'next';
 import Link from 'next/link';

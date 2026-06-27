@@ -1,5 +1,7 @@
 // GET   /api/placements/[id]  — fetch single placement
 // PATCH /api/placements/[id]  — update verification status or details
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/admin/guards';

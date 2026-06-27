@@ -1,6 +1,8 @@
 // PUBLIC ROUTE: Partner site integration wizard — generates embed scripts for external sites.
 // Saves the integration request as a partner application for follow-up.
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

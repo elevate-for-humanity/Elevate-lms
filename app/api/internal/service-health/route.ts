@@ -7,6 +7,8 @@
  * Protected by CRON_SECRET (x-internal-secret header or ?secret= param).
  * Returns HTTP 200 with per-service status; never throws.
  */
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';

@@ -1,6 +1,8 @@
 'use server';
 
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
+
+import{ requireAdminClient, getAdminClient } from '@/lib/supabase/admin';
 import { randomBytes } from 'crypto';
 import { revalidatePath } from 'next/cache';
 import { sendEmail } from '@/lib/email';

@@ -3,6 +3,8 @@
  * Flush pending notifications: mark stale unread notifications as expired,
  * emit platform event for notification backlog if count is high.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

@@ -4,6 +4,8 @@
  * Auth: case_manager who owns the record, or admin/staff.
  */
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';

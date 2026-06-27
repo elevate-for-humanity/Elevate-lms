@@ -2,6 +2,8 @@
  * GET /api/cron/memory-cleanup
  * Purge AI conversation memory older than 90 days and orphaned embeddings.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

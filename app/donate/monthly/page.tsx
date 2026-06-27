@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';

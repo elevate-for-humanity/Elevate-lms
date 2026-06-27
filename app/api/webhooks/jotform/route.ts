@@ -1,4 +1,6 @@
 // PUBLIC ROUTE: inbound JotForm webhook (authenticated by secret token in URL)
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

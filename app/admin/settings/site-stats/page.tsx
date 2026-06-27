@@ -1,6 +1,8 @@
+import { db } from '@/lib/db';
+
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createAdminClient } from '@/lib/supabase/admin';
+import{ createAdminClient, getAdminClient } from '@/lib/supabase/admin';
 import SiteStatsClient from './SiteStatsClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 

@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { safeInternalError } from '@/lib/api/safe-error';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';

@@ -2,6 +2,8 @@
  * GET /api/cron/barber-billing
  * Process monthly barber program subscription billing cycles.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

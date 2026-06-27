@@ -2,6 +2,8 @@
  * GET /api/cron/process-provisioning-jobs
  * Process pending provisioning_jobs rows — retry failed jobs, timeout stale ones.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

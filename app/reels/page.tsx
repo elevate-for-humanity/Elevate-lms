@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Phone, ArrowRight, Newspaper } from 'lucide-react';

@@ -2,6 +2,8 @@
 // GET  /api/barber/practicals  — student's practical progress
 // POST /api/barber/practicals  — submit a practical for review
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';

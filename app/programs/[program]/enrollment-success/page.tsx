@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Sparkles, BookOpen, Clock, Phone, Shield } from 'lucide-react';
-import { createClient } from '@/lib/supabase/server';
+import {, safeGetUser, createClient} from '@/lib/supabase/server';
 import { getBeautyProgram, colorClasses } from '@/lib/programs/beauty-programs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 

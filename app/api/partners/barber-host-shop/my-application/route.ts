@@ -1,4 +1,6 @@
 // Authenticated: returns the barbershop apprenticeship application for the logged-in user
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';

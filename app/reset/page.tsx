@@ -1,5 +1,9 @@
 'use client';
 
+import { db } from '@/lib/db';
+
+import { createClient } from '@/lib/supabase/server';
+
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';

@@ -2,6 +2,8 @@
  * GET /api/cron/webhook-health-check
  * Verify critical external webhook endpoints are reachable and responding.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

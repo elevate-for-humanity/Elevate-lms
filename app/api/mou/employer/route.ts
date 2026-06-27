@@ -1,6 +1,8 @@
 // PUBLIC ROUTE: Employer MOU PDF generation — no auth required.
 // Partners sign via /mou/employer without needing an account.
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

@@ -134,7 +134,7 @@ export default function TutoringClient({ tutors }: { tutors: { id: string; full_
             ].map((item, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="bg-white rounded-2xl overflow-hidden shadow-sm">
                 <div className="relative h-40 overflow-hidden">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" sizes="100vw" />
+                  {item.image && <Image src={item.image} alt={item.title} fill className="object-cover" sizes="100vw"  />}
                   <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">{item.step}</div>
                 </div>
                 <div className="p-5">
@@ -157,7 +157,7 @@ export default function TutoringClient({ tutors }: { tutors: { id: string; full_
             {subjects.map((s, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="bg-white rounded-2xl overflow-hidden">
                 <div className="relative h-48 overflow-hidden">
-                  <Image src={s.image} alt={s.title} fill className="object-cover" sizes="100vw" />
+                  {s.image && <Image src={s.image} alt={s.title} fill className="object-cover" sizes="100vw"  />}
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2">{s.title}</h3>

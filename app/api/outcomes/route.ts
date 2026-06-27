@@ -1,5 +1,7 @@
 // Authenticated route: record and retrieve employment outcomes for WIOA performance reporting.
 
+import { db } from '@/lib/db';
+
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';

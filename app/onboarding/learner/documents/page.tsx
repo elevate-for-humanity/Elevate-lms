@@ -1,5 +1,7 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/server';
+
 import { useEffect, useState, useRef } from 'react';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { useRouter } from 'next/navigation';

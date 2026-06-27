@@ -3,6 +3,8 @@
 // here would insert one row per page load, overwhelming the audit table with noise
 // and causing cascading timeouts. Bot/prerender traffic amplifies this further.
 // DMCA detections are logged separately to unauthorized_access_log.
+import { db } from '@/lib/db';
+
 import { safeInternalError } from '@/lib/api/safe-error';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';

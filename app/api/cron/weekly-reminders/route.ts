@@ -3,6 +3,8 @@
  * Send weekly progress reminders to enrolled learners with < 50% completion.
  * Runs Monday mornings.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

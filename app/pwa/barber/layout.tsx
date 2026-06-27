@@ -1,5 +1,7 @@
 export const dynamic = 'force-dynamic';
 
+import { getAdminClient } from '@/lib/supabase/admin';
+
 import { Metadata, Viewport } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient, safeGetUser } from '@/lib/supabase/server';

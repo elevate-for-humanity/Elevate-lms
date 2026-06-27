@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { requireRole } from '@/lib/auth/require-role';
 import { Metadata } from 'next';
 import Link from 'next/link';

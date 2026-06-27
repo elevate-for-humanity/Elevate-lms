@@ -11,6 +11,8 @@
  *   - Mark reminder as sent
  */
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';

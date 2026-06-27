@@ -3,6 +3,8 @@
  * Complete history of all submitted grants
  */
 
+import { db } from '@/lib/db';
+
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdminClient } from '@/lib/supabase/admin';

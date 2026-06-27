@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 // app/api/exams/submit/route.ts

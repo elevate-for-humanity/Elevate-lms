@@ -11,6 +11,8 @@
 //   - job_postings.education_required matches the program title/credential name
 //
 // This is intentionally conservative. Expand matching criteria incrementally.
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/admin/guards';

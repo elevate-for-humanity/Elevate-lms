@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 /**
  * POST /api/credentials/exam-checkout

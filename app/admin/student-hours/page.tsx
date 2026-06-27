@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';

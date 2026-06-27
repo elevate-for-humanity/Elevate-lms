@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { safeInternalError } from '@/lib/api/safe-error';
 import { internalFetch } from '@/lib/api/internal-fetch';
 import { NextResponse } from 'next/server';

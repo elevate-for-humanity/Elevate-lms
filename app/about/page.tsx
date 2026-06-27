@@ -356,7 +356,7 @@ export default async function AboutPage() {
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                 <div className="relative h-40 overflow-hidden">
-                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 100vw, 50vw" quality={90} className="object-cover"  />
+                  {item.image && <Image src={item.image} alt={item.title} fill sizes="(max-width: 640px) 100vw, 50vw" quality={90} className="object-cover"   />}
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
@@ -391,7 +391,7 @@ export default async function AboutPage() {
             ].map((cred) => (
               <div key={cred.name} className="bg-white rounded-lg border border-slate-200 p-5 text-center">
                 <div className="relative w-16 h-16 mx-auto mb-3 overflow-hidden">
-                  <Image src={cred.logo} alt={cred.name} fill sizes="64px" className="object-contain"  />
+                  {cred.logo && <Image src={cred.logo} alt={cred.name} fill sizes="64px" className="object-contain"   />}
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm">{cred.name}</h3>
                 <p className="text-brand-red-600 text-xs font-semibold mb-2">{cred.role}</p>
@@ -547,13 +547,12 @@ export default async function AboutPage() {
                 className="group text-center"
               >
                 <div className="relative w-full aspect-[3/4] max-w-7xl mx-auto rounded-xl overflow-hidden mb-4 shadow-md group-hover:shadow-xl transition-shadow">
-                  <Image
-                    src={member.headshotSrc || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp'}
+                  {member.headshotSrc || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp' && <Image src={member.headshotSrc || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp'}
                     alt={member.name}
                     fill
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     quality={90} className="object-cover object-center" 
-                  />
+                   />}
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm sm:text-base">{member.name}</h3>
                 <p className="text-black text-xs sm:text-sm mt-1 leading-snug">{member.title}</p>
@@ -581,7 +580,7 @@ export default async function AboutPage() {
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group bg-white rounded-lg border border-slate-200 overflow-hidden hover:shadow-md transition">
                 <div className="relative h-36 overflow-hidden">
-                  <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover group-hover:scale-105 transition-transform duration-300"  />
+                  {p.image && <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover group-hover:scale-105 transition-transform duration-300"   />}
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-slate-900 text-sm">{p.name}</h3>

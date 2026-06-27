@@ -1,6 +1,8 @@
 // PUBLIC ROUTE: LTI launch — authenticated by LTI JWT
 // app/api/lti/launch/route.ts
 // LTI 1.3 launch endpoint — verifies state nonce (CSRF) + JWT signature via JWKS.
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 

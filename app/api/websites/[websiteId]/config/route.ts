@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { saveWebsiteConfig } from '@/lib/websites/save-site-config';

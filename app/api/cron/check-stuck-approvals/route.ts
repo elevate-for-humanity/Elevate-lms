@@ -2,6 +2,8 @@
  * GET /api/cron/check-stuck-approvals
  * Alert on approval_chain_instances stuck in pending > 48h.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

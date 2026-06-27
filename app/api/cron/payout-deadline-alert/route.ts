@@ -2,6 +2,8 @@
  * GET /api/cron/payout-deadline-alert
  * Alert on payout_schedules due within 48h that are still pending.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

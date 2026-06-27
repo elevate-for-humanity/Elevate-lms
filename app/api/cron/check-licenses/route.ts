@@ -2,6 +2,8 @@
  * GET /api/cron/check-licenses
  * Verify license status against DB — flag any active licenses with missing required fields.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

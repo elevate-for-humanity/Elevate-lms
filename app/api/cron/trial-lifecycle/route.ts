@@ -2,6 +2,8 @@
  * GET /api/cron/trial-lifecycle
  * Manage trial organization lifecycle: warn at day 7, expire at day 14, clean up at day 30.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

@@ -9,6 +9,8 @@
  * Requires authentication. Unauthenticated users are redirected to login.
  */
 
+import { db } from '@/lib/db';
+
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';

@@ -19,6 +19,8 @@
  * Gated by CRON_SECRET header.
  */
 
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/service';

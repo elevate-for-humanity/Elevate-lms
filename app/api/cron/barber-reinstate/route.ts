@@ -2,6 +2,8 @@
  * GET /api/cron/barber-reinstate
  * Reinstate barber subscriptions that were suspended and have since paid.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

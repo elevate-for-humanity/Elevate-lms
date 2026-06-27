@@ -1,4 +1,6 @@
 // PUBLIC ROUTE: returns published programs for the eligibility check funnel
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createPublicClient } from '@/lib/supabase/public';
 import { safeInternalError } from '@/lib/api/safe-error';

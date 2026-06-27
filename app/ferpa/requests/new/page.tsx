@@ -1,5 +1,7 @@
 'use client';
 
+import { safeGetUser, createClient} from '@/lib/supabase/server';
+
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';

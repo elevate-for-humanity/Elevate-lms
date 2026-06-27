@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/auth/require-api-role';

@@ -1,5 +1,7 @@
 'use server';
 
+import { db } from '@/lib/db';
+
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';

@@ -1,3 +1,7 @@
+import { db } from '@/lib/db';
+
+import { createClient } from '@/lib/supabase/server';
+
 import { Metadata } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import { resolveBarberLessonVideoUrl } from '@/lib/barber/resolve-lesson-video-url';

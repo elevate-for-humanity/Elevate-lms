@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { Metadata } from 'next';
 import { getAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';

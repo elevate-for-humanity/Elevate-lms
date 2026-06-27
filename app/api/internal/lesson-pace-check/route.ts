@@ -17,6 +17,8 @@
  * Gated by CRON_SECRET via withRuntime({ cron: "x-header" }).
  */
 
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { emitEvent } from '@/lib/platform/events';

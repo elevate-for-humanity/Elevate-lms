@@ -1,7 +1,7 @@
 
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import {, safeGetUser, createClient} from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Calendar, Plus, XCircle, AlertCircle, CheckCircle, Clock } from 'lucide-react';

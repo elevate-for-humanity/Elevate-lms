@@ -2,6 +2,8 @@
  * GET /api/cron/enrollment-automation
  * Auto-advance approved applications to enrolled status and provision LMS access.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

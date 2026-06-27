@@ -6,6 +6,8 @@
 // that user's account. An authenticated user could delete any other user's
 // account by supplying a different email. Now the deletion is always scoped
 // to the authenticated session user.
+import { createClient } from '@/lib/supabase/server';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';

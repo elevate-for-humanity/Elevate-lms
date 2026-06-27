@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { safeGetUser } from '@/lib/supabase/server';
+import { safeGetUser, createClient} from '@/lib/supabase/server';
 import { CheckCircle2, ArrowLeft, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 

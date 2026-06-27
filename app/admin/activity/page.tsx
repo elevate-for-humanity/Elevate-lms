@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import type React from 'react';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';

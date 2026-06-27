@@ -4,6 +4,8 @@
  * Process pending instructor verdicts (lab/assignment sign-offs) older than 5 days.
  * Escalates to admin if still unreviewed.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

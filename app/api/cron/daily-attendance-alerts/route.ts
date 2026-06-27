@@ -3,6 +3,8 @@
  * GET /api/cron/daily-attendance-alerts
  * Alert instructors and admins about students with attendance issues today.
  */
+import { db } from '@/lib/db';
+
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';

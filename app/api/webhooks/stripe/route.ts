@@ -28,6 +28,8 @@
  *
  */
 
+import { db } from '@/lib/db';
+
 import type Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';

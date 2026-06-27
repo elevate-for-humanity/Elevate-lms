@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { logger } from '@/lib/logger';
 import { resolveHvacCourseId } from '@/lib/courses/resolvers';
 import { checkEligibilityAndAuthorize } from '@/lib/services/exam-eligibility';

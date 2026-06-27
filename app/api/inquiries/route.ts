@@ -1,4 +1,6 @@
 // Fixed inquiry route - resilient three-tier retry logic + proper auditing
+import { db } from '@/lib/db';
+
 import { getAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';

@@ -3,6 +3,8 @@
 // PATCH /api/barber/session       — heartbeat (keep-alive + activity signals)
 // DELETE /api/barber/session      — end session, credit hours
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';

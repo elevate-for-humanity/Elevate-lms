@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
+import {, safeGetUser, createClient} from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';

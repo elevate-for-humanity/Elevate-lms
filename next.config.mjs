@@ -101,14 +101,25 @@ const nextConfig = {
   },
 
   // Force-include critical server-side files in standalone output
+// NOTE: Paths are relative to project root, not @/ alias
   outputFileTracingIncludes: {
-    '/api/**': ['lib/logger.ts', 'lib/supabase/**/*'],
-    '/admin/**': ['lib/logger.ts', 'lib/memory-monitor.ts', 'lib/supabase/**/*'],
+    '/api/**': [
+      './lib/logger.ts',
+      './lib/supabase/**/*.ts',
+      './lib/license/**/*.ts',
+    ],
+    '/admin/**': [
+      './lib/logger.ts',
+      './lib/memory-monitor.ts',
+      './lib/supabase/**/*.ts',
+      './lib/license/**/*.ts',
+    ],
     '/**': [
-      'lib/logger.ts',
-      'lib/supabase/**/*',
-      'lib/license/**/*',
-      'components/ui/Breadcrumbs*',
+      './lib/**/*.ts',
+      './lib/**/*.tsx',
+      './components/ui/Breadcrumbs.tsx',
+      './app/**/*.ts',
+      './app/**/*.tsx',
     ],
   },
 };

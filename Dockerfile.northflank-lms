@@ -44,9 +44,8 @@ ENV NEXT_STANDALONE_OUTPUT=1
 ENV CI=true
 # Webpack cache enabled for faster incremental builds
 
-# Install dependencies (devDependencies included since NODE_ENV is not set to production yet)
-# Using --no-frozen-lockfile because lockfile may not match overrides in CI
-RUN pnpm install --no-frozen-lockfile
+# Install dependencies (Strict Frozen Lockfile - Verified Stable)
+RUN pnpm install --frozen-lockfile
 
 # Build Next.js
 ARG NEXT_PUBLIC_SUPABASE_URL

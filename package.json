@@ -17,15 +17,13 @@
     "cache:clean": "rimraf .next/cache"
   },
   "dependencies": {
-    "@sentry/nextjs": "10.32.1",
-    "@supabase/ssr": "^0.5.1",
-    "@supabase/supabase-js": "^2.46.1",
-    "clsx": "^2.1.1",
-    "dotenv": "^16.4.5",
+    "next": "15.0.3",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
     "lucide-react": "^0.454.0",
     "next": "15.0.3",
-    "react": "19.0.0-rc-66210214-20241030",
-    "react-dom": "19.0.0-rc-66210214-20241030",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
     "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {

@@ -42,6 +42,7 @@ const adminConfig = {
     // This ensures lib/logger.ts is included in standalone output
     if (isServer) {
       config.resolve.alias['@/lib/logger'] = path.join(ROOT, 'lib/logger.ts');
+      config.resolve.alias['@/lib/supabase'] = path.join(ROOT, 'lib/supabase');
     }
     // Keep peak memory stable during admin builds on low-RAM runners.
     config.parallelism = 1;

@@ -186,6 +186,23 @@ const nextConfig = {
     '*': [...sharedStandaloneTraceExcludes, ...lmsOnlyStandaloneTraceExcludes],
   },
 
+  // CRITICAL: Include lib/supabase in standalone builds
+  // This fixes "safeGetUser is not defined" and other runtime errors
+  outputFileTracingIncludes: {
+    '/api/**': ['lib/supabase/**', 'lib/logger.ts'],
+    '/admin/**': ['lib/supabase/**', 'lib/logger.ts'],
+    '/lms/**': ['lib/supabase/**', 'lib/logger.ts'],
+    '/apprentice/**': ['lib/supabase/**', 'lib/logger.ts'],
+    '/employer/**': ['lib/supabase/**', 'lib/logger.ts'],
+    '/partner/**': ['lib/supabase/**', 'lib/logger.ts'],
+    '/program-holder/**': ['lib/supabase/**', 'lib/logger.ts'],
+    '/case-manager/**': ['lib/supabase/**', 'lib/logger.ts'],
+    '/host-shop/**': ['lib/supabase/**', 'lib/logger.ts'],
+    '/store/**': ['lib/supabase/**', 'lib/logger.ts'],
+    '/auth/**': ['lib/supabase/**', 'lib/logger.ts'],
+    '/**': ['lib/supabase/**', 'lib/logger.ts', 'lib/supabase/**/*.ts'],
+  },
+
   async redirects() {
     const canonicalRoutesPath = path.join(process.cwd(), 'lib/routes/canonical-routes.json');
     const canonicalConfig = JSON.parse(fs.readFileSync(canonicalRoutesPath, 'utf8'));

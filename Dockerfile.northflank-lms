@@ -25,8 +25,8 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# 12GB heap limit for large route counts
-ENV NODE_OPTIONS=--max-old-space-size=12288
+# 8GB heap limit - compatible with Northflank plan
+ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=1
 ENV CI=true

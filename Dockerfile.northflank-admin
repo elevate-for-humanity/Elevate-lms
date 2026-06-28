@@ -1,5 +1,5 @@
 # Dockerfile.northflank-admin
-# Optimized for nf-compute-400 (4GB RAM) / apps/admin
+# Optimized for nf-compute-400 (8GB RAM) / apps/admin
 # Using Next.js Standalone Mode with Buildkit
 
 FROM node:22-bookworm AS builder
@@ -37,8 +37,8 @@ ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-# 4GB heap for nf-compute-400
-ENV NODE_OPTIONS=--max-old-space-size=3072
+# 6GB heap for nf-compute-400 (8GB total, 2GB for OS)
+ENV NODE_OPTIONS=--max-old-space-size=6144
 ENV NEXT_STANDALONE_OUTPUT=1
 
 RUN pnpm --filter @elevate/admin build

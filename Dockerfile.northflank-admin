@@ -36,8 +36,8 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build memory: 12GB heap for builds
-ENV NODE_OPTIONS=--max-old-space-size=12288
+# Build memory: 8GB heap for builds
+ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV BUILD_SCOPE=1
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV CI=true

@@ -100,27 +100,10 @@ const nextConfig = {
     '*': [...sharedStandaloneTraceExcludes, ...lmsOnlyStandaloneTraceExcludes],
   },
 
-  // Force-include critical server-side files in standalone output
+  // Minimal tracing for standalone output to save memory during build
   outputFileTracingIncludes: {
     '/api/**': [
-      'lib/logger.ts',
-      'lib/supabase/**/*.ts',
-      'lib/license/**/*.ts',
-      'lib/auth/**/*.ts',
-      'lib/db/**/*.ts',
-    ],
-    '/admin/**': [
-      'lib/logger.ts',
-      'lib/memory-monitor.ts',
-      'lib/supabase/**/*.ts',
-      'lib/license/**/*.ts',
-      'lib/auth/**/*.ts',
-      'lib/db/**/*.ts',
-    ],
-    '/**': [
-      'lib/**/*',
-      'components/**/*',
-      'app/**/*',
+      'lib/supabase/*.ts',
     ],
   },
 };

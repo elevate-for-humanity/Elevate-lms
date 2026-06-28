@@ -1,0 +1,9 @@
+{
+  "buildEngineConfiguration": {
+    "buildEngine": "buildkit"
+  },
+  "vcsData": {
+    "dockerFilePath": "/Dockerfile.northflank-lms",
+    "dockerWorkDir": "/"
+  }
+}

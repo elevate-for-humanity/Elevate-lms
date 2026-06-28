@@ -1,32 +1,24 @@
-# Dockerfile.northflank-lms
-# Optimized for 8GB Heap / LMS routes ONLY
+# Dockerfile.marketing
+# Specialized for Public Pages / (marketing) / store
 FROM node:22-bookworm AS builder
 
 WORKDIR /app
 COPY . .
 
-# Quarantine non-LMS routes to save memory
-ENV BUILD_SCOPE=LMS
+# Run the splitter to remove heavy Admin/LMS routes
+ENV BUILD_SCOPE=MARKETING
 RUN node scripts/split-app.mjs
 
+# Build with 8GB Limit (Safe within plan)
 ENV NODE_OPTIONS=--max-old-space-size=8192
 RUN corepack enable && pnpm install --no-frozen-lockfile
 RUN pnpm run build:lms:compile
 
-# --- Runtime stage ---
 FROM node:22-bookworm-slim AS runner
-
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl fonts-liberation && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
-ENV NODE_ENV=production
 ENV PORT=8080
-ENV HOSTNAME=0.0.0.0
-
-# Copy standalone build
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-
 EXPOSE 8080
 CMD ["node", "server.js"]

@@ -16,9 +16,9 @@
     "clean": "rimraf .next out node_modules pnpm-lock.yaml"
   },
   "dependencies": {
-    "next": "15.0.3",
-    "react": "19.0.0-rc-66210214-20241030",
-    "react-dom": "19.0.0-rc-66210214-20241030",
+    "next": "15.5.15",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
     "lucide-react": "^0.454.0",
     "@supabase/supabase-js": "^2.46.1",
     "@supabase/ssr": "^0.5.1",

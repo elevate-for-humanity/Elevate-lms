@@ -311,7 +311,9 @@ export async function middleware(request: NextRequest) {
   requestHeaders.set('x-pathname', pathname);
 
   function nextWithPathname() {
-    return NextResponse.next({ request: { headers: requestHeaders } });
+    // Next.js 15 stability fix: avoid complex request header clones in middleware 
+    // if no changes are needed.
+    return NextResponse.next();
   }
 
   const isLocalHost =

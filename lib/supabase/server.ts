@@ -185,9 +185,9 @@ export function createPublicClient(): SupabaseClient<any> {
  * OLD (dangerous): const { data: { user } } = await supabase.auth.getUser();
  * NEW (safe):       const user = safeGetUser(await supabase.auth.getUser());
  */
-export function safeGetUser<T extends { user?: { id: string; email?: string | null } | null }>(
+export function safeGetUser<T extends { data: { user?: { id: string; email?: string | null } | null } }>(
   authRes: T
-): T['user'] extends undefined ? { id: string } | null : T['user'] {
+): T['data']['user'] extends undefined ? { id: string } | null : T['data']['user'] {
   return authRes.data?.user ?? null;
 }
 

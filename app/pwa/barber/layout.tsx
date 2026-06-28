@@ -5,7 +5,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { Metadata, Viewport } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient, safeGetUser } from '@/lib/supabase/server';
-import { getAdminClient, checkBarberSuspension } from '@/lib/barber/admin';
+import { checkBarberSuspension } from '@/lib/barber/admin';
 
 export const metadata: Metadata = {
   title: 'Elevate Barber Apprentice',

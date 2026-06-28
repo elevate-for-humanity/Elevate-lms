@@ -111,8 +111,8 @@ const adminConfig = {
 
   // Force-include critical server-side files in standalone output
   outputFileTracingIncludes: {
-    '/api/**': ['lib/logger.ts', 'lib/memory-monitor.ts'],
-    '/admin/**': ['lib/logger.ts', 'lib/memory-monitor.ts'],
+    '/api/**': ['lib/logger.ts'],
+    '/admin/**': ['lib/logger.ts'],
   },
 
   serverExternalPackages: [

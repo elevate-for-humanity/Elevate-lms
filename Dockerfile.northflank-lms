@@ -1,5 +1,5 @@
 # Dockerfile.northflank-lms
-# Optimized for 8GB Heap / 1,746 Routes
+# Optimized for 8GB Heap / 461 Routes
 # Using Next.js Standalone Mode
 
 FROM node:22-bookworm AS builder
@@ -25,7 +25,7 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# 8GB heap limit
+# 8GB heap limit (461 routes require more memory)
 ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=1
@@ -45,7 +45,7 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-# Compile with safety checks
+# Compile Next.js application
 RUN pnpm run build:lms:compile
 
 # --- Runtime stage ---

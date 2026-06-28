@@ -13,9 +13,6 @@ const path = require('path');
 const { createLogger } = require('../lib/logger');
 const log = createLogger('lms');
 
-// Import memory monitor
-const { startMonitoring, stopMonitoring, getMetrics } = require('../lib/memory-monitor');
-
 // Suppress expected deployment noise from Next.js Server Action mismatches
 const SUPPRESSED_ERROR_PATTERNS = [
   /Failed to find Server Action/i,
@@ -178,11 +175,7 @@ async function gracefulShutdown(signal) {
     event: 'shutdown_start',
     signal,
     rejectionMetrics: { total: rejectionMetrics.total, suppressed: rejectionMetrics.suppressed, unhandled: rejectionMetrics.unhandled, recoveries: rejectionMetrics.recoveryCount },
-    memoryMetrics: getMetrics(),
   });
-
-  // Stop memory monitoring
-  stopMonitoring();
 
   // Stop accepting new connections immediately
   if (serverProcess && !serverProcess.killed) {

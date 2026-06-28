@@ -1,0 +1,7 @@
+Splitting the monolithic app into 4 specialized containers to stay within 8GB limit:
+1. Elevate Marketing: Public pages and store.
+2. Elevate Admin: Staff and administrative portals.
+3. Elevate LMS: Student and instructor portals.
+4. Elevate Assets: Static images and videos.
+
+Architecture finalized: Sunday, Jun 28, 2026, 11:55:00

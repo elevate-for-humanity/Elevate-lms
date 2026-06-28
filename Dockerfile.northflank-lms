@@ -34,7 +34,7 @@ ENV CI=true
 # Re-enable Webpack cache for 8GB stability
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=
 
-# Install dependencies (Strict Frozen Lockfile)
+# Install dependencies (Strict Frozen Lockfile - Verified Stable)
 RUN pnpm install --frozen-lockfile
 
 # Build Next.js

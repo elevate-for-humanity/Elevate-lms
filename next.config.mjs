@@ -214,11 +214,6 @@ const nextConfig = {
         destination: '/images/alberta-davis.webp',
         permanent: true,
       },
-      {
-        source: '/images/facilities-new/facility-2.jpg',
-        destination: '/images/facilities-new/facility-1.webp',
-        permanent: true,
-      },
     );
 
     return [

@@ -1,23 +1,43 @@
-import { nfFetch, projectApiPath } from './lib';
+#!/usr/bin/env tsx
+/**
+ * Trigger a Northflank combined-service build from the current git branch.
+ *
+ *   npx tsx scripts/northflank/trigger-build.ts elevate-lms
+ *   npx tsx scripts/northflank/trigger-build.ts elevate-admin
+ */
 
-const projectId = 'elevate-platform';
-const serviceId = 'elevate-lms-build';
+import fs from 'node:fs';
+import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 
 async function main() {
-  console.log(`Triggering deployment for ${serviceId}...`);
-  
-  // Northflank API for triggering builds is often POST /projects/{id}/services/{id}/builds
-  const buildPath = `/services/combined/${serviceId}/builds`;
-  
-  try {
-    const res = await nfFetch(projectApiPath(projectId, buildPath), {
-      method: 'POST',
-      body: JSON.stringify({})
-    });
-    console.log('✅ Build triggered successfully:', res);
-  } catch (e) {
-    console.error('❌ Failed to trigger build:', e);
+  const serviceId = process.argv[2];
+  if (!serviceId) {
+    console.error('Usage: npx tsx scripts/northflank/trigger-build.ts <service-id>');
+    process.exit(1);
+  }
+  const projectId = resolveProjectId();
+  if (!projectId) {
+    console.error('Set NORTHFLANK_PROJECT_ID');
+    process.exit(1);
+  }
+  const build = await nfFetch<{
+    id: string;
+    branch?: string;
+    status?: string;
+    sha?: string;
+    concluded?: boolean;
+  }>(projectApiPath(projectId, `/services/${serviceId}/build`), {
+    method: 'POST',
+    body: JSON.stringify({}),
+  });
+  console.log(`Triggered build for ${serviceId}:`, build);
+
+  if (process.env.GITHUB_OUTPUT && build.id) {
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, `build_id=${build.id}\n`, 'utf8');
   }
 }
 
-main();
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

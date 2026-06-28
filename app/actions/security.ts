@@ -12,7 +12,13 @@ interface SecurityEvent {
   data: Record<string, unknown>;
 }
 
-import { getSeverity, CRITICAL_EVENTS } from '@/lib/security-utils';
+const CRITICAL_EVENTS = new Set(['AUTOMATION_DETECTED', 'IFRAME_EMBEDDING_DETECTED']);
+
+function getSeverity(eventType: string): string {
+  if (CRITICAL_EVENTS.has(eventType)) return 'critical';
+  if (['RAPID_NAVIGATION', 'CONSOLE_ACCESS'].includes(eventType)) return 'high';
+  return 'medium';
+}
 
 export async function logSecurityEventAction(event: SecurityEvent): Promise<void> {
   try {

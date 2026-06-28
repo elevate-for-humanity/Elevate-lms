@@ -7,7 +7,7 @@ import { WorkforceOSArchitecture } from '@/components/home/WorkforceOSArchitectu
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeOutcomes } from '@/components/home/HomeOutcomes';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // Revalidate every 5 minutes — allows live enrollment stats to refresh

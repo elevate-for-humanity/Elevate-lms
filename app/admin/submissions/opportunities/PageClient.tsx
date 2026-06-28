@@ -8,7 +8,7 @@
  * and links to per-opportunity profiling.
  */
 
-import { createClient } from '@/lib/supabase/server';
+
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';

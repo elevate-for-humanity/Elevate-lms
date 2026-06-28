@@ -2,10 +2,13 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+import { createClient } from '@/lib/supabase/server';
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import Stripe from 'stripe';
+
 import { logger } from '@/lib/logger';
 
 const stripeKey = process.env.STRIPE_SECRET_KEY;
@@ -17,15 +20,10 @@ const stripe = stripeKey
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-const getServiceSupabase = async () => {
-  if (!supabaseUrl || !supabaseKey) return null;
-  const { createClient: createBaseClient } = await import('@supabase/supabase-js');
-  return createBaseClient(supabaseUrl, supabaseKey);
-};
+const supabase =
+  supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 export async function POST(request: NextRequest) {
-  const supabase = await getServiceSupabase();
   if (!stripe || !supabase) {
     return NextResponse.json(
       { error: 'Stripe or Supabase not configured' },

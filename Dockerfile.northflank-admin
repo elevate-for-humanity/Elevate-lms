@@ -23,8 +23,8 @@ COPY packages/ui/package.json packages/ui/package.json
 COPY . .
 
 ENV NODE_ENV=production
-# 8GB heap limit - compatible with Northflank plan
-ENV NODE_OPTIONS=--max-old-space-size=8192
+# 12GB heap limit
+ENV NODE_OPTIONS=--max-old-space-size=12288
 ENV NEXT_STANDALONE_OUTPUT=1
 
 RUN pnpm install --no-frozen-lockfile

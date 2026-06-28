@@ -1,18 +1,18 @@
 # Dockerfile.northflank-admin
-# Optimized for 8GB Heap / apps/admin
+# Optimized for 12GB Heap / apps/admin
 
 FROM node:22-bookworm AS builder
 
 # Cache invalidation
-RUN echo "nf-cache-invalidate-20260627-admin-final"
+RUN echo "nf-cache-invalidate-20260628-admin-oom-fix"
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 build-essential ca-certificates libcairo2-dev libpango1.0-dev \
     libjpeg-dev libgif-dev librsvg2-dev && rm -rf /var/lib/apt/lists/*
 
-# Stable PNPM 9.12.3
-RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
+# Stable PNPM (match package.json)
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -23,10 +23,11 @@ COPY packages/ui/package.json packages/ui/package.json
 COPY . .
 
 ENV NODE_ENV=production
-ENV NODE_OPTIONS=--max-old-space-size=8192
+# 12GB heap limit
+ENV NODE_OPTIONS=--max-old-space-size=12288
 ENV NEXT_STANDALONE_OUTPUT=1
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # Build Admin
 ARG NEXT_PUBLIC_SUPABASE_URL

@@ -2,7 +2,7 @@
   "name": "efh-autopilot",
   "type": "module",
   "version": "2.0.0",
-  "packageManager": "pnpm@9.12.3",
+  "packageManager": "pnpm@10.28.2",
   "engines": {
     "node": ">=20.11.1"
   },
@@ -261,7 +261,7 @@
     "verify:system": "tsx scripts/verify-system.ts",
     "link:hvac-videos": "tsx scripts/link-hvac-videos.ts",
     "verify": "pnpm typecheck && pnpm lint && pnpm build && pnpm smoke",
-    "smoke": "node -e \"require('fs').access('.next', err => { if (err) { console.error('G¥î .next not found GÇö run pnpm build first'); process.exit(1); } else console.log('G£à Build OK'); })\"",
+    "smoke": "node -e \"require('fs').access('.next', err => { if (err) { console.error('Î“Â¥Ã® .next not found Î“Ã‡Ã¶ run pnpm build first'); process.exit(1); } else console.log('Î“Â£Ã  Build OK'); })\"",
     "clean:full": "rimraf node_modules dist .vite .turbo .next out && pnpm store prune",
     "autopilot": "node workers/start-autopilot.js",
     "autopilot:bg": "node workers/start-autopilot.js &",
@@ -354,10 +354,10 @@
     "robots:gen": "node tools/robots-gen.cjs",
     "autopilot:migrate": "node scripts/autopilot-migrate.mjs",
     "autopilot:setup": "node scripts/autopilot-ultimate.mjs",
-    "autopilot:fix": "npm run format && npm run fix:brand && npm run sitemap:gen && npm run robots:gen && npm run tokens:guard && echo 'G£à Auto-fixes complete'",
-    "autopilot:check": "npm run lint && npm run typecheck && npm run tokens:guard && npm run build && echo 'G£à All checks passed'",
-    "lms:setup": "tsx scripts/lms-setup.ts || node scripts/lms-setup.js || echo 'GÜán+Å LMS setup script not found - skipping'",
-    "lms:fix-types": "tsc --pretty false --noEmit || echo 'GÜán+Å Type errors found'",
+    "autopilot:fix": "npm run format && npm run fix:brand && npm run sitemap:gen && npm run robots:gen && npm run tokens:guard && echo 'Î“Â£Ã  Auto-fixes complete'",
+    "autopilot:check": "npm run lint && npm run typecheck && npm run tokens:guard && npm run build && echo 'Î“Â£Ã  All checks passed'",
+    "lms:setup": "tsx scripts/lms-setup.ts || node scripts/lms-setup.js || echo 'Î“ÃœÃ¡âˆ©â••Ã… LMS setup script not found - skipping'",
+    "lms:fix-types": "tsc --pretty false --noEmit || echo 'Î“ÃœÃ¡âˆ©â••Ã… Type errors found'",
     "build:admin": "pnpm --filter @elevate/admin build",
     "build:lms": "pnpm run build:lms:phased",
     "build:lms:checks": "BUILD_SCOPE=1 node scripts/check-redirect-conflicts.mjs && node scripts/guard-public-routes.mjs",
@@ -374,9 +374,9 @@
     "build:all": "pnpm run build:separate",
     "lms:check": "pnpm lint && pnpm test && pnpm lms:fix-types",
     "lms:build": "pnpm lms:check && pnpm build",
-    "lms:migrations": "echo '=ƒôï Run migrations at /admin/migrations or use Supabase CLI'",
-    "lms:activate": "pnpm lms:setup && pnpm lms:migrations && echo 'G£à LMS activated'",
-    "autopilot:prepush": "npm run lint && npm run typecheck && npm run tokens:guard && echo 'G£à Pre-push checks passed'",
+    "lms:migrations": "echo 'â‰¡Æ’Ã´Ã¯ Run migrations at /admin/migrations or use Supabase CLI'",
+    "lms:activate": "pnpm lms:setup && pnpm lms:migrations && echo 'Î“Â£Ã  LMS activated'",
+    "autopilot:prepush": "npm run lint && npm run typecheck && npm run tokens:guard && echo 'Î“Â£Ã  Pre-push checks passed'",
     "clean": "rimraf dist coverage .cache",
     "clean:fast": "rimraf .turbo .next/cache dist build coverage .cache",
     "clean:all": "pnpm clean:fast && rimraf node_modules && pnpm store prune",
@@ -402,7 +402,7 @@
     "migrate:ai": "node scripts/run-ai-instructor-migration.mjs",
     "test:affirm": "node scripts/test-affirm-payment.mjs",
     "check:stripe": "bash scripts/pull-and-check-stripe.sh",
-    "check-env": "node -e \"if (!require(\\\"fs\\\").existsSync(\\\".env.local\\\")) { console.error(\\\"G¥î .env.local not found! Run: ./setup-env.sh\\\"); process.exit(1); } else { console.log(\\\"G£à .env.local exists\\\"); }\"",
+    "check-env": "node -e \"if (!require(\\\"fs\\\").existsSync(\\\".env.local\\\")) { console.error(\\\"Î“Â¥Ã® .env.local not found! Run: ./setup-env.sh\\\"); process.exit(1); } else { console.log(\\\"Î“Â£Ã  .env.local exists\\\"); }\"",
     "dev:fast": "bash scripts/dev-fast.sh",
     "dev:kill-port": "bash scripts/kill-port.sh 3000",
     "lint:reliability": "node scripts/guard-no-fake-success.mjs",
@@ -456,9 +456,9 @@
       "workerd"
     ],
     "_buildScriptNotes": {
-      "ffmpeg-static": "GPL-3.0. Used only as a webpack external (never imported directly). Binary path resolved via @ffmpeg-installer/ffmpeg (LGPL-2.1) at runtime. SaaS deployment GÇö no distribution obligation triggered.",
+      "ffmpeg-static": "GPL-3.0. Used only as a webpack external (never imported directly). Binary path resolved via @ffmpeg-installer/ffmpeg (LGPL-2.1) at runtime. SaaS deployment Î“Ã‡Ã¶ no distribution obligation triggered.",
       "node-pty": "fly-containers/terminal-server only. Build script intentionally blocked on Netlify.",
-      "tesseract.js": "WASM-based GÇö no native binary needed. Build script downloads lang data at runtime."
+      "tesseract.js": "WASM-based Î“Ã‡Ã¶ no native binary needed. Build script downloads lang data at runtime."
     },
     "overrides": {
       "basic-ftp": "^6.0.0",

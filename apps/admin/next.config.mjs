@@ -6,7 +6,7 @@
  * imported via the @/* path alias which resolves to ../../*.
  *
  * Route scope: ~675 routes (admin, instructor, staff, analytics, cron,
- * reports, export, audit) — down from 2,706 in the monolith.
+ * reports, export, audit) â€” down from 2,706 in the monolith.
  */
 
 import path from 'path';
@@ -32,7 +32,7 @@ const adminConfig = {
     parallelServerBuildTraces: false,
   },
 
-  // edge-tts ships index.ts as its entry (uncompiled TS) — same as root LMS config.
+  // edge-tts ships index.ts as its entry (uncompiled TS) â€” same as root LMS config.
   transpilePackages: ['edge-tts'],
 
   // Resolve @/* to repo root so shared lib/, components/, types/ work
@@ -48,11 +48,11 @@ const adminConfig = {
     return config;
   },
 
-  // Canonical route redirects — legacy aliases forward to canonical paths
+  // Canonical route redirects â€” legacy aliases forward to canonical paths
   async redirects() {
     return [
-      // ── Lizzy control plane (retired dev-studio / ai-console admin routes) ──
-      // Do NOT redirect /admin/dashboard → itself (infinite loop).
+      // â”€â”€ Lizzy control plane (retired dev-studio / ai-console admin routes) â”€â”€
+      // Do NOT redirect /admin/dashboard â†’ itself (infinite loop).
       { source: '/admin/ai-console', destination: '/admin/dashboard', permanent: true },
       { source: '/admin/ai-console/:path*', destination: '/admin/dashboard', permanent: true },
       { source: '/admin/ai-studio', destination: '/admin/dashboard', permanent: true },
@@ -63,7 +63,7 @@ const adminConfig = {
       { source: '/admin/analytics-dashboard', destination: '/admin/analytics', permanent: true },
       { source: '/admin/payments', destination: '/admin/integrations/stripe', permanent: true },
       { source: '/admin/security', destination: '/admin/settings/security', permanent: true },
-      // ── Studio consolidation — all legacy course/quiz/video/AI surfaces → studio ──
+      // â”€â”€ Studio consolidation â€” all legacy course/quiz/video/AI surfaces â†’ studio â”€â”€
       { source: '/admin/quizzes', destination: '/admin/studio', permanent: true },
       { source: '/admin/quizzes/:path*', destination: '/admin/studio', permanent: true },
       { source: '/admin/copilot', destination: '/admin/studio', permanent: true },
@@ -80,7 +80,7 @@ const adminConfig = {
         destination: '/admin/studio/:courseId',
         permanent: true,
       },
-      // document-center → documents (canonical)
+      // document-center â†’ documents (canonical)
       {
         source: '/admin/document-center',
         destination: '/admin/documents',
@@ -91,7 +91,7 @@ const adminConfig = {
         destination: '/admin/documents/:path*',
         permanent: true,
       },
-      // submissions/org → settings/organization-profile (canonical)
+      // submissions/org â†’ settings/organization-profile (canonical)
       {
         source: '/admin/submissions/org',
         destination: '/admin/settings/organization-profile',
@@ -100,10 +100,10 @@ const adminConfig = {
     ];
   },
 
-  // Standalone output — trace files from repo root so shared lib/ etc. are included
+  // Standalone output â€” trace files from repo root so shared lib/ etc. are included
   outputFileTracingRoot: ROOT,
 
-  // Same monorepo-wide excludes as LMS — keeps playwright/puppeteer/three/etc.
+  // Same monorepo-wide excludes as LMS â€” keeps playwright/puppeteer/three/etc.
   // out of standalone. Admin keeps Remotion (see lmsOnly excludes in shared module).
   outputFileTracingExcludes: {
     '*': sharedStandaloneTraceExcludes,
@@ -116,7 +116,7 @@ const adminConfig = {
   },
 
   serverExternalPackages: [
-    // Remotion — /api/admin/generate-lesson-videos (dynamic import of remotion-render)
+    // Remotion â€” /api/admin/generate-lesson-videos (dynamic import of remotion-render)
     'remotion',
     '@remotion/bundler',
     '@remotion/renderer',
@@ -125,7 +125,7 @@ const adminConfig = {
     '@rspack/binding',
     '@rspack/binding-linux-x64-gnu',
     'esbuild',
-    // Sentry + OpenTelemetry — dynamic require() patterns break webpack
+    // Sentry + OpenTelemetry â€” dynamic require() patterns break webpack
     '@sentry/nextjs',
     '@sentry/node',
     '@sentry/node-core',
@@ -138,7 +138,7 @@ const adminConfig = {
     '@opentelemetry/semantic-conventions',
     'sharp',
     // edge-tts: transpilePackages only (conflicts if also listed here)
-    // ws — custom server.js only
+    // ws â€” custom server.js only
     'ws',
     // Document OCR / extract admin APIs
     'tesseract.js',

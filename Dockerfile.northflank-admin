@@ -1,16 +1,18 @@
 # Dockerfile.northflank-admin
 # Optimized for 8GB Heap / Admin routes ONLY
+# REVERTED TO GREEN BUILD LOGIC (115c099)
 
 FROM node:22-bookworm AS builder
 
 # Cache invalidation
-RUN echo "nf-cache-invalidate-20260629-admin-v1"
+RUN echo "nf-cache-invalidate-20260629-admin-v2"
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 build-essential ca-certificates && rm -rf /var/lib/apt/lists/*
+    python3 build-essential ca-certificates libcairo2-dev libpango1.0-dev \
+    libjpeg-dev libgif-dev librsvg2-dev && rm -rf /var/lib/apt/lists/*
 
-# Stable PNPM 9.12.3
+# Stable PNPM
 RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
 
 WORKDIR /app
@@ -20,32 +22,34 @@ COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 
-# Install dependencies - NO frozen lockfile
+# 1. Install dependencies - NO frozen lockfile
 ENV NODE_ENV=production
 RUN pnpm install --no-frozen-lockfile
 
-# Copy all source
+# 2. Copy source
 COPY . .
 
-# Quarantine non-Admin routes
+# 3. SPLIT optimization
 ENV BUILD_SCOPE=ADMIN
 RUN node scripts/split-app.mjs
 
-# 6GB heap for safety
+# 4. Build with 6GB heap
 ENV NODE_OPTIONS=--max-old-space-size=6144
 ENV NEXT_STANDALONE_OUTPUT=1
-
 RUN pnpm --filter @elevate/admin build
 
-# --- Runtime stage ---
+# --- Runner ---
 FROM node:22-bookworm-slim AS runner
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl fonts-liberation && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
+
 COPY --from=builder /app/apps/admin/.next/standalone ./
 COPY --from=builder /app/apps/admin/.next/static ./apps/admin/.next/static
 COPY --from=builder /app/apps/admin/public ./apps/admin/public
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/node_modules ./node_modules
+
 EXPOSE 8080
 CMD ["node", "apps/admin/server.js"]

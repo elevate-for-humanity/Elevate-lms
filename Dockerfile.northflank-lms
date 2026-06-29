@@ -1,17 +1,18 @@
 # Dockerfile.northflank-lms
-# Optimized for nf-compute-400 (8GB RAM)
-# Using Next.js Standalone Mode with Buildkit
+# Optimized for 8GB Heap / LMS routes ONLY
+# REVERTED TO GREEN BUILD LOGIC (115c099) with SPLIT optimization
 
 FROM node:22-bookworm AS builder
 
 # Cache invalidation
-RUN echo "nf-cache-invalidate-20260629-v1"
+RUN echo "nf-cache-invalidate-20260629-lms-v2"
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 build-essential ca-certificates && rm -rf /var/lib/apt/lists/*
+    python3 build-essential ca-certificates libcairo2-dev libpango1.0-dev \
+    libjpeg-dev libgif-dev librsvg2-dev && rm -rf /var/lib/apt/lists/*
 
-# Stable PNPM 9.12.3
+# Stable PNPM (matches your package.json)
 RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
 
 WORKDIR /app
@@ -23,23 +24,21 @@ COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 
-# Install dependencies - NO frozen lockfile to bypass sync errors
+# 1. Install dependencies - MUST use --no-frozen-lockfile to match last green build
 ENV NODE_ENV=production
 ENV CI=true
 RUN pnpm install --no-frozen-lockfile
 
-# Copy source code
+# 2. Copy source code
 COPY . .
 
-# Quarantine non-LMS routes to save memory
+# 3. SPLIT optimization: Quarantine non-LMS routes to stay under 8GB
 ENV BUILD_SCOPE=LMS
 RUN node scripts/split-app.mjs
 
-# 6GB heap for safety within 8GB container
+# 4. Build with 6GB heap for safety
 ENV NODE_OPTIONS=--max-old-space-size=6144
 ENV NEXT_STANDALONE_OUTPUT=1
-
-# Compile Next.js
 RUN pnpm run build:lms:compile
 
 # --- Runner ---
@@ -48,8 +47,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 WORKDIR /app
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
+
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
+
+# REQUIRED: Copy node_modules to prevent runtime "Module not found" errors
+COPY --from=builder /app/node_modules ./node_modules
+
 EXPOSE 8080
 CMD ["node", "server.js"]

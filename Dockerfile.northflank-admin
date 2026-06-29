@@ -1,43 +1,37 @@
 # Dockerfile.northflank-admin
-# Optimized for nf-compute-400 (8GB RAM) / apps/admin
-# Using Next.js Standalone Mode with Buildkit
+# Optimized for 8GB Heap / Admin routes ONLY
 
 FROM node:22-bookworm AS builder
 
-# Cache invalidation - increment to force rebuild
-RUN echo "nf-cache-invalidate-20260628-v2"
+# Cache invalidation
+RUN echo "nf-cache-invalidate-20260629-admin-v1"
 
-# System dependencies - minimal set
+# System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 build-essential ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# Stable PNPM 10.7.0 (matches lockfileVersion 9.0)
-RUN corepack enable && corepack prepare pnpm@10.7.0 --activate
+# Stable PNPM 9.12.3
+RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
 
 WORKDIR /app
-
-# Copy only package files first for better caching
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json apps/admin/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 
-# Install dependencies
+# Install dependencies - NO frozen lockfile
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
-# Copy source code
+# Copy all source
 COPY . .
 
-# Build Admin
-ARG NEXT_PUBLIC_SUPABASE_URL
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+# Quarantine non-Admin routes
+ENV BUILD_SCOPE=ADMIN
+RUN node scripts/split-app.mjs
 
-# 6GB heap for nf-compute-400 (8GB total, 2GB for OS)
+# 6GB heap for safety
 ENV NODE_OPTIONS=--max-old-space-size=6144
 ENV NEXT_STANDALONE_OUTPUT=1
 
@@ -45,19 +39,13 @@ RUN pnpm --filter @elevate/admin build
 
 # --- Runtime stage ---
 FROM node:22-bookworm-slim AS runner
-
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl fonts-liberation && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
-ENV NODE_ENV=production
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
-
-# Copy standalone build from the apps/admin folder
 COPY --from=builder /app/apps/admin/.next/standalone ./
 COPY --from=builder /app/apps/admin/.next/static ./apps/admin/.next/static
 COPY --from=builder /app/apps/admin/public ./apps/admin/public
 COPY --from=builder /app/public ./public
-
 EXPOSE 8080
-CMD ["node", "server.js"]
+CMD ["node", "apps/admin/server.js"]

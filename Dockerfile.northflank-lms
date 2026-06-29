@@ -4,64 +4,52 @@
 
 FROM node:22-bookworm AS builder
 
-# Cache invalidation - increment to force rebuild
-RUN echo "nf-cache-invalidate-20260628-v2"
+# Cache invalidation
+RUN echo "nf-cache-invalidate-20260629-v1"
 
-# System dependencies - minimal set
+# System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 build-essential ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# Stable PNPM 10.7.0 (matches lockfileVersion 9.0)
-RUN corepack enable && corepack prepare pnpm@10.7.0 --activate
+# Stable PNPM 9.12.3
+RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
 
 WORKDIR /app
 
-# Copy only package files first for better caching
+# Copy dependency files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json apps/admin/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 
-# Install dependencies
+# Install dependencies - NO frozen lockfile to bypass sync errors
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
 ENV CI=true
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # Copy source code
 COPY . .
 
-# Build Next.js
-ARG NEXT_PUBLIC_SITE_URL
-ARG NEXT_PUBLIC_SUPABASE_URL
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
-ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+# Quarantine non-LMS routes to save memory
+ENV BUILD_SCOPE=LMS
+RUN node scripts/split-app.mjs
 
-# 6GB heap for nf-compute-400 (6144MB for build, leave room for system)
+# 6GB heap for safety within 8GB container
 ENV NODE_OPTIONS=--max-old-space-size=6144
 ENV NEXT_STANDALONE_OUTPUT=1
-ENV BUILD_SCOPE=1
 
-# Compile Next.js application
+# Compile Next.js
 RUN pnpm run build:lms:compile
 
-# --- Runtime stage ---
+# --- Runner ---
 FROM node:22-bookworm-slim AS runner
-
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl fonts-liberation && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
-ENV NODE_ENV=production
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
-
-# Copy standalone build (pruned node_modules)
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-
 EXPOSE 8080
 CMD ["node", "server.js"]

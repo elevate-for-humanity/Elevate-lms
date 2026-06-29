@@ -107,12 +107,12 @@ export default async function MarketplaceTermsPage() {
             <p className="mt-3">
               Refund requests must be submitted within 7 days of purchase.
               Contact{' '}
-              <a
+              <Link
                 href="/contact"
                 className="text-brand-blue-600 hover:underline"
               >
                 our contact form
-              </a>{' '}
+              </Link>{' '}
               with your order details.
             </p>
           </section>
@@ -215,12 +215,12 @@ export default async function MarketplaceTermsPage() {
             <h2 className="text-2xl font-bold mb-3">13. Privacy</h2>
             <p>
               Your purchase information is handled according to our{' '}
-              <a
+              <Link
                 href="/legal/privacy"
                 className="text-brand-blue-600 hover:underline"
               >
                 Privacy Policy
-              </a>
+              </Link>
               . We collect:
             </p>
             <ul className="list-disc pl-6 space-y-2">
@@ -254,12 +254,12 @@ export default async function MarketplaceTermsPage() {
             </p>
             <p className="mt-2">
               <strong>Email:</strong>{' '}
-              <a
+              <Link
                 href="/contact"
                 className="text-brand-blue-600 hover:underline"
               >
                 our contact form
-              </a>
+              </Link>
             </p>
           </section>
 

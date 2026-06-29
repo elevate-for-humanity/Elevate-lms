@@ -189,7 +189,6 @@ export default async function ProgramsPage() {
                     <Card className="h-full hover:shadow-lg transition-shadow duration-200 hover:border-brand-blue-300">
                       {program.image_url || program.cover_url || program.hero_image ? (
                         <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={program.image_url || program.cover_url || program.hero_image || ''}
                             alt={program.title}

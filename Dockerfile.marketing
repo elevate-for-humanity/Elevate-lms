@@ -5,7 +5,12 @@
 FROM node:22-bookworm AS builder
 
 # Cache invalidation
-RUN echo "nf-cache-invalidate-20260629-marketing-v3"
+RUN echo "nf-cache-invalidate-20260629-marketing-v4"
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 build-essential ca-certificates libcairo2-dev libpango1.0-dev \
+    libjpeg-dev libgif-dev librsvg2-dev && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -22,7 +27,7 @@ RUN node scripts/split-app.mjs
 # Stable PNPM
 RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
 
-# 1. Install dependencies
+# 1. Install ALL dependencies
 RUN pnpm install --no-frozen-lockfile
 
 # 2. Build with 6GB Limit
@@ -30,12 +35,13 @@ ENV NODE_OPTIONS=--max-old-space-size=6144
 ENV NEXT_STANDALONE_OUTPUT=1
 RUN pnpm run build:lms:compile
 
-# --- Runner ---
+# --- Runner Stage ---
 FROM node:22-bookworm-slim AS runner
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl fonts-liberation && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
+ENV NODE_ENV=production
 
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
@@ -44,8 +50,4 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 8080
-
-HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -sf http://127.0.0.1:8080/api/health/northflank || exit 1
-
 CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "server.js"]

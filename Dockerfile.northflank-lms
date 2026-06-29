@@ -1,42 +1,39 @@
 # Dockerfile.northflank-lms
 # Optimized for 8GB Heap / LMS routes ONLY
-# REVERTED TO GREEN BUILD LOGIC (115c099) with SPLIT optimization
+# REVERTED TO GREEN BUILD LOGIC (115c099)
 
 FROM node:22-bookworm AS builder
 
 # Cache invalidation
-RUN echo "nf-cache-invalidate-20260629-lms-v2"
+RUN echo "nf-cache-invalidate-20260629-lms-v3"
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 build-essential ca-certificates libcairo2-dev libpango1.0-dev \
     libjpeg-dev libgif-dev librsvg2-dev && rm -rf /var/lib/apt/lists/*
 
-# Stable PNPM (matches your package.json)
+# Stable PNPM
 RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
 
 WORKDIR /app
-
-# Copy dependency files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json apps/admin/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 
-# 1. Install dependencies - MUST use --no-frozen-lockfile to match last green build
+# 1. Install dependencies - NO frozen lockfile
 ENV NODE_ENV=production
-ENV CI=true
 RUN pnpm install --no-frozen-lockfile
 
-# 2. Copy source code
+# 2. Copy source
 COPY . .
 
-# 3. SPLIT optimization: Quarantine non-LMS routes to stay under 8GB
+# 3. SPLIT optimization
 ENV BUILD_SCOPE=LMS
 RUN node scripts/split-app.mjs
 
-# 4. Build with 6GB heap for safety
+# 4. Build with 6GB heap
 ENV NODE_OPTIONS=--max-old-space-size=6144
 ENV NEXT_STANDALONE_OUTPUT=1
 RUN pnpm run build:lms:compile
@@ -48,12 +45,16 @@ WORKDIR /app
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
 
+# Exact COPY structure from GREEN build
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/.next/server ./.next/server
 COPY --from=builder /app/public ./public
-
-# REQUIRED: Copy node_modules to prevent runtime "Module not found" errors
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 8080
-CMD ["node", "server.js"]
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+  CMD curl -sf http://127.0.0.1:8080/api/health/northflank || exit 1
+
+CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "server.js"]

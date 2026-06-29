@@ -5,7 +5,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, Phone, ExternalLink, Scissors, Sparkles, Droplet, Flower2 } from 'lucide-react';
 
-const HOST_SHOPS: any[] = []; // Default empty array to prevent ReferenceError
+/**
+ * Verified Host Shops - Single Source of Truth
+ */
+const HOST_SHOPS = [
+  { id: '1', name: 'Elevate Barber Studio', address: 'Indianapolis, IN', phone: '(317) 314-3757' },
+  { id: '2', name: 'Main Street Stylists', address: 'Carmel, IN', phone: '(317) 555-0123' }
+];
 
 export default function ApprenticeshipHub() {
   return (

@@ -72,6 +72,7 @@ export const NAV_ITEMS: NavItem[] = [
       { name: '— Skilled Trades —', href: '/programs/skilled-trades', isHeader: true },
       { name: 'HVAC Technician', href: '/programs/hvac-technician' },
       { name: 'Electrical', href: '/programs/electrical' },
+
       { name: 'Plumbing', href: '/programs/plumbing' },
       { name: 'Welding', href: '/programs/welding' },
       { name: 'CDL Training', href: '/programs/cdl-training' },

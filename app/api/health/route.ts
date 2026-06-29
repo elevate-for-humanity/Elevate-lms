@@ -191,3 +191,4 @@ async function _GET(request: Request) {
 }
 // No audit wrapper — this route is called frequently by platform health checks.
 export const GET = withRuntime(_GET);
+

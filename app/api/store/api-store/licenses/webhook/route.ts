@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { headers } from 'next/headers';
 import { generateLicenseWelcomeEmail } from '@/lib/email-templates/license-welcome';
@@ -289,3 +290,4 @@ function getRepoUrl(licenseType: string): string {
   };
   return repos[licenseType] || repos.single;
 }
+

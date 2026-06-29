@@ -189,3 +189,4 @@ export async function POST(req: NextRequest) {
     return safeInternalError(err, 'Failed to create checkout session');
   }
 }
+

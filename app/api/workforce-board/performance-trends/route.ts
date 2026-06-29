@@ -76,3 +76,4 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/workforce-board/performance-trends', _GET);
+

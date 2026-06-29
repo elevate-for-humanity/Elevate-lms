@@ -7,6 +7,7 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -138,3 +139,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Instructor unavailable' }, { status: 500 });
   }
 }
+

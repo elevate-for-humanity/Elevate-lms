@@ -41,3 +41,4 @@ export async function POST(request: NextRequest) {
     return safeInternalError(error, 'Report generation failed');
   }
 }
+

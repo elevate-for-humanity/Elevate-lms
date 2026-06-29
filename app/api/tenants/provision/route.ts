@@ -58,3 +58,4 @@ async function _POST(request: Request) {
   return NextResponse.json({ tenant });
 }
 export const POST = withApiAudit('/api/tenants/provision', _POST);
+

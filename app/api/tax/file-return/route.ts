@@ -33,3 +33,4 @@ export async function POST(request: NextRequest) {
     return safeInternalError(error, 'Tax return request failed');
   }
 }
+

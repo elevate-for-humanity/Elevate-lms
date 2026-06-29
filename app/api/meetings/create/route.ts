@@ -2,6 +2,7 @@ import { safeInternalError } from '@/lib/api/safe-error';
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -98,3 +99,4 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/meetings/create', _POST);
+

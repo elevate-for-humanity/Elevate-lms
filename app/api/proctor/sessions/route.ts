@@ -1,8 +1,10 @@
+export const dynamic = 'force-dynamic';
 import { db } from '@/lib/db';
 
 import { safeInternalError } from '@/lib/api/safe-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -226,3 +228,5 @@ async function _POST(req: NextRequest) {
 }
 export const GET = withApiAudit('/api/proctor/sessions', _GET);
 export const POST = withApiAudit('/api/proctor/sessions', _POST);
+
+

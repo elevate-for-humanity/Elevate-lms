@@ -17,6 +17,7 @@ import { db } from '@/lib/db';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -164,3 +165,4 @@ async function _POST(request: Request) {
 }
 
 export const POST = withApiAudit('/api/program-holder/hours/approve', _POST, { critical: true });
+

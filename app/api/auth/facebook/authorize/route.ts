@@ -52,3 +52,4 @@ async function _GET(request: NextRequest) {
   return response;
 }
 export const GET = withApiAudit('/api/auth/facebook/authorize', _GET);
+

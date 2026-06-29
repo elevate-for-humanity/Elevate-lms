@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 // PUBLIC ROUTE: v1 import — API-key gated
 import { logger } from '@/lib/logger';
 /**
@@ -7,6 +8,7 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { validateApiKey } from '@/lib/licensing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -414,3 +416,5 @@ export async function GET(request: NextRequest) {
     },
   });
 }
+
+

@@ -75,3 +75,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/testing-lead-followup] followed up', { followed });
   return NextResponse.json({ ok: true, followed });
 });
+

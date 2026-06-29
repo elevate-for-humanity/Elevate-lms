@@ -46,3 +46,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/payout-deadline-alert] Done', { alerted: upcoming.length, total_cents: totalCents });
   return NextResponse.json({ ok: true, alerted: upcoming.length, total_cents: totalCents });
 });
+

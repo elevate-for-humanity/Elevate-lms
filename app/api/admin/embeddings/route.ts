@@ -36,3 +36,4 @@ export async function POST(request: NextRequest) {
   const result = await embedCourseLessons(db, courseId, { force });
   return NextResponse.json(result);
 }
+

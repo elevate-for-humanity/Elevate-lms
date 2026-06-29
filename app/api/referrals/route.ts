@@ -152,3 +152,4 @@ async function _POST(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/referrals', _GET);
 export const POST = withApiAudit('/api/referrals', _POST);
+

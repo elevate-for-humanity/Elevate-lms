@@ -61,3 +61,4 @@ async function _GET(req: NextRequest) {
   );
 }
 export const GET = withApiAudit('/api/programs/featured', _GET);
+

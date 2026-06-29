@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 /**
  * POST /api/auth/2fa/verify
  *
@@ -6,6 +7,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
 import { verify2FAToken, verifyBackupCode } from '@/lib/auth/two-factor';
@@ -28,3 +30,5 @@ export async function POST(req: NextRequest) {
   if (!valid) return safeError('Invalid or expired code', 401);
   return NextResponse.json({ ok: true });
 }
+
+

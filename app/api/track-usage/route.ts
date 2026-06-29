@@ -442,3 +442,4 @@ export async function GET(request: NextRequest) {
     official_domains: officialDomains,
   });
 }
+

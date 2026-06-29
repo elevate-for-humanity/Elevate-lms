@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -192,3 +193,4 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/apprenticeship/hours/reject', _POST, { critical: true });
+

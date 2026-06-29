@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
@@ -69,3 +70,4 @@ export async function GET(req: NextRequest) {
     mou_signed: !!npa.mou_signed_at,
   });
 }
+

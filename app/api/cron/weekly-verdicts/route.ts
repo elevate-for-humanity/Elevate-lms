@@ -66,3 +66,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/weekly-verdicts] escalated', { escalated });
   return NextResponse.json({ ok: true, escalated });
 });
+

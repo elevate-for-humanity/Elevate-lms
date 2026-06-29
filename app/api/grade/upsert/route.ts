@@ -1,6 +1,7 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -87,3 +88,4 @@ async function _POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 export const POST = withApiAudit('/api/grade/upsert', _POST);
+

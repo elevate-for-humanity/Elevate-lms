@@ -177,3 +177,4 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
   logger.info('Testing reminders processed', { sent, failed: failed.length });
   return NextResponse.json({ ok: true, sent, failed: failed.length });
 });
+

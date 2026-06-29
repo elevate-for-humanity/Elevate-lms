@@ -94,3 +94,4 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/leaderboard', _GET);
+

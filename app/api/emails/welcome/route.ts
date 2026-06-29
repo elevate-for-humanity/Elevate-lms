@@ -78,3 +78,4 @@ async function _POST(request: Request) {
   }
 }
 export const POST = withApiAudit('/api/emails/welcome', _POST);
+

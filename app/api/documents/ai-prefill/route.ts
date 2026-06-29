@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError } from '@/lib/api/safe-error';
@@ -285,3 +286,4 @@ export async function PATCH(request: NextRequest) {
     return safeInternalError();
   }
 }
+

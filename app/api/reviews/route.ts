@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -147,3 +148,4 @@ async function _POST(request: Request) {
 }
 export const GET = withApiAudit('/api/reviews', _GET);
 export const POST = withApiAudit('/api/reviews', _POST);
+

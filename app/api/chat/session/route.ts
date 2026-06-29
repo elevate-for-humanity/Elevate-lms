@@ -58,3 +58,4 @@ async function _POST(request: Request) {
   return NextResponse.json({ session_id: data.id });
 }
 export const POST = withApiAudit('/api/chat/session', _POST);
+

@@ -3,6 +3,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { searchEntities } from '@/lib/integrations/sam-gov';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -98,3 +99,4 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   return POST(request);
 }
+

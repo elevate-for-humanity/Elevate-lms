@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { safeGetUser, createClient} from '@/lib/supabase/server';
+import { createClient} from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -32,3 +33,5 @@ export async function PATCH(request: NextRequest) {
 
   return NextResponse.json({ success: true });
 }
+
+

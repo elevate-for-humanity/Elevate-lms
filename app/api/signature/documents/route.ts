@@ -2,6 +2,7 @@ import { safeInternalError } from '@/lib/api/safe-error';
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -72,3 +73,4 @@ async function _POST(request: Request) {
   });
 }
 export const POST = withApiAudit('/api/signature/documents', _POST);
+

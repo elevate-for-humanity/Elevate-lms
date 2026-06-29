@@ -10,6 +10,7 @@ import { db } from '@/lib/db';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getOrgContext } from '@/lib/org/getOrgContext';
 import { requireOrgAccess } from '@/lib/auth/org-guard';
@@ -193,3 +194,4 @@ async function _GET(req: NextRequest) {
 
 export const GET = withRuntime(withApiAudit('/api/org/invite', _GET));
 export const POST = withRuntime(withApiAudit('/api/org/invite', _POST));
+

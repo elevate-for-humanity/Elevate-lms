@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 /**
  * Intake Workflow API
  *
@@ -7,6 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { validateIntakeCompletion } from '@/lib/enrollment/funding-enforcement';
 import { IntakeStatus, FundingPathway } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -324,3 +326,5 @@ async function _PATCH(request: NextRequest) {
 export const GET = withApiAudit('/api/intake/workflow', _GET);
 export const POST = withApiAudit('/api/intake/workflow', _POST);
 export const PATCH = withApiAudit('/api/intake/workflow', _PATCH);
+
+

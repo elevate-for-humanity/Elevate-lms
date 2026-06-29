@@ -95,3 +95,4 @@ export const DELETE = withRuntime({ auth: 'admin' }, async (req) => {
   if (error) return safeInternalError(error, 'Failed to cancel slot');
   return NextResponse.json({ success: true });
 });
+

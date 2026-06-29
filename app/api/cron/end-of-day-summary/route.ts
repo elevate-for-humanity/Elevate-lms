@@ -56,3 +56,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/end-of-day-summary] sent', { enrollCount, completeCount, paymentCount, alertCount });
   return NextResponse.json({ ok: true, enrollCount, completeCount, paymentCount, alertCount });
 });
+

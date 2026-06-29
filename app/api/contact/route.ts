@@ -202,3 +202,4 @@ async function sendEmailNotification(data: z.infer<typeof ContactSchema>) {
   }
 }
 export const POST = withApiAudit('/api/contact', _POST);
+

@@ -5,6 +5,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { resolveAuthenticatedLandingDestination } from '@/lib/auth/landing-destination';
 import { readRedirectParam, validateRedirect } from '@/lib/auth/validate-redirect';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -40,3 +41,4 @@ async function _GET(request: NextRequest) {
   }
 }
 export const GET = withApiAudit('/api/auth/landing', _GET);
+

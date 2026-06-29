@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { COMPLIANCE_THRESHOLDS } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -332,3 +333,4 @@ async function _PATCH(request: NextRequest) {
 export const GET = withApiAudit('/api/compliance-audit', _GET);
 export const POST = withApiAudit('/api/compliance-audit', _POST);
 export const PATCH = withApiAudit('/api/compliance-audit', _PATCH);
+

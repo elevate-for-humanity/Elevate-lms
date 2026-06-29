@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -82,3 +83,4 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ payments: all, totalPaidCents: totalPaid });
 }
+

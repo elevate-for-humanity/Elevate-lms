@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 /**
  * GET /api/internal/course-health
  *
@@ -10,6 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { safeInternalError } from '@/lib/api/safe-error';
 
 type HealthStatus = 'PASS' | 'FAIL';
@@ -190,3 +192,5 @@ export async function GET(_request: NextRequest) {
     return safeInternalError(error, 'Course health check failed');
   }
 }
+
+

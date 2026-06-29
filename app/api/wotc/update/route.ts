@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
@@ -124,3 +125,4 @@ async function _GET(request: Request) {
 
 export const GET = withApiAudit('/api/wotc/update', _GET);
 export const POST = withApiAudit('/api/wotc/update', _POST);
+

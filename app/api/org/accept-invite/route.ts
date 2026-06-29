@@ -12,6 +12,7 @@ import { db } from '@/lib/db';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { bindUserToOrg } from '@/lib/org/bindUserToOrg';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
@@ -168,3 +169,4 @@ async function _POST(req: NextRequest) {
 
 export const GET = withApiAudit('/api/org/accept-invite', _GET);
 export const POST = withApiAudit('/api/org/accept-invite', _POST);
+

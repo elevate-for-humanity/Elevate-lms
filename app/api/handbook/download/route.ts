@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { safeGetUser, createClient} from '@/lib/supabase/server';
+import { createClient} from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
 
@@ -29,3 +30,5 @@ async function handler(req: Request) {
 }
 
 export const GET = withRuntime(withApiAudit('/api/handbook/download', handler));
+
+

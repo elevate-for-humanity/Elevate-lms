@@ -32,3 +32,4 @@ export async function GET(request: NextRequest) {
     return safeInternalError(error, 'Admin users list failed');
   }
 }
+

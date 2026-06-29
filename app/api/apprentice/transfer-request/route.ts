@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -154,3 +155,4 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       : 'Transfer request submitted. Document verification is required before hours can be credited.',
   });
 });
+

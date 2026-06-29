@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 
 import { NextResponse } from 'next/server';
 
@@ -128,3 +129,4 @@ async function _PATCH(req: Request) {
 export const GET = withApiAudit('/api/ojt/submit', _GET, { critical: true });
 export const POST = withApiAudit('/api/ojt/submit', _POST, { critical: true });
 export const PATCH = withApiAudit('/api/ojt/submit', _PATCH, { critical: true });
+

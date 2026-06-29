@@ -49,3 +49,4 @@ export async function GET(req: NextRequest) {
     return safeInternalError(err, 'Enforcement check failed');
   }
 }
+

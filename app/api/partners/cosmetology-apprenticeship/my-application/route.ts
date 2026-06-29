@@ -3,3 +3,4 @@
 export const dynamic = 'force-dynamic';
 
 export { GET } from '../../cosmetology-host-shop/my-application/route';
+

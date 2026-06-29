@@ -47,3 +47,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/embed-knowledge] queued for embedding', { queued });
   return NextResponse.json({ ok: true, queued });
 });
+

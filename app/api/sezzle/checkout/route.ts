@@ -17,6 +17,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { sezzle, SezzleSessionRequest } from '@/lib/sezzle/client';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { resolvePaymentAmount } from '@/lib/payments/resolve-amount';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -357,3 +358,4 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/sezzle/checkout', _GET);
 export const POST = withApiAudit('/api/sezzle/checkout', _POST);
+

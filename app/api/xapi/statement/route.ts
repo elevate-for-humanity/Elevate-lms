@@ -123,3 +123,4 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/xapi/statement', _GET);
 export const POST = withApiAudit('/api/xapi/statement', _POST);
+

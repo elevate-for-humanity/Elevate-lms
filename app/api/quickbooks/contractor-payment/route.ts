@@ -238,3 +238,4 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'QuickBooks payment failed');
   }
 }
+

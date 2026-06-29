@@ -91,3 +91,4 @@ async function _POST(req: NextRequest) {
 }
 export const GET = withApiAudit('/api/forums/threads', _GET);
 export const POST = withApiAudit('/api/forums/threads', _POST);
+

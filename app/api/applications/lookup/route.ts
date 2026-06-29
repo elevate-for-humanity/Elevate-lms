@@ -67,3 +67,4 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ id: data.id, status: data.status, intake_stage: data.intake_stage });
 }
+

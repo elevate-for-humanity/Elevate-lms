@@ -53,3 +53,4 @@ async function _POST(request: Request) {
   });
 }
 export const POST = withApiAudit('/api/account/delete', _POST);
+

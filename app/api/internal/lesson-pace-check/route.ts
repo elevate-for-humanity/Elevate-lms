@@ -235,3 +235,4 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
   logger.info('[lesson-pace-check] Run complete', { flagged, total: enrollments.length });
   return NextResponse.json({ ok: true, flagged, total: enrollments.length });
 });
+

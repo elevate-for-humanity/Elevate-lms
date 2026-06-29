@@ -71,3 +71,4 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Upload failed');
   }
 }
+

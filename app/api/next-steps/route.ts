@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -227,3 +228,4 @@ async function _PATCH(req: Request) {
 }
 export const GET = withApiAudit('/api/next-steps', _GET);
 export const PATCH = withApiAudit('/api/next-steps', _PATCH);
+

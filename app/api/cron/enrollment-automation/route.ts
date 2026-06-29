@@ -87,3 +87,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/enrollment-automation] Done', { enrolled });
   return NextResponse.json({ ok: true, enrolled });
 });
+

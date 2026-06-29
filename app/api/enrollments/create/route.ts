@@ -16,6 +16,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -230,3 +231,4 @@ export const POST = withApiAudit(
   '/api/enrollments/create',
   _POST as unknown as (req: Request, ...args: any[]) => Promise<Response>,
 );
+

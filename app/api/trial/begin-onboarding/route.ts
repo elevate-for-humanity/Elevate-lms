@@ -89,3 +89,4 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/trial/begin-onboarding', _POST);
+

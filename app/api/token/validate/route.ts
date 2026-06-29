@@ -79,3 +79,4 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/token/validate', _GET);
 export const POST = withApiAudit('/api/token/validate', _POST);
+

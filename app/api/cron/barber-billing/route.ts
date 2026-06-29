@@ -91,3 +91,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/barber-billing] Done', { processed, failed });
   return NextResponse.json({ ok: true, processed, failed });
 });
+

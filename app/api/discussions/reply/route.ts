@@ -1,5 +1,7 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -49,3 +51,5 @@ async function _POST(req: Request) {
 }
 
 export const POST = withApiAudit('/api/discussions/reply', _POST);
+
+

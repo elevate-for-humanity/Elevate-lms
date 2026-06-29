@@ -119,3 +119,4 @@ async function _POST(request: Request) {
 }
 export const GET = withApiAudit('/api/messages', _GET);
 export const POST = withApiAudit('/api/messages', _POST);
+

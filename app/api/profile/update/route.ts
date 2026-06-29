@@ -1,7 +1,9 @@
+export const dynamic = 'force-dynamic';
 import { db } from '@/lib/db';
 
 import { safeInternalError } from '@/lib/api/safe-error';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
@@ -97,3 +99,5 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/profile/update', _GET);
 export const POST = withApiAudit('/api/profile/update', _POST);
+
+

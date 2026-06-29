@@ -94,3 +94,4 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Suboffice application submission failed');
   }
 }
+

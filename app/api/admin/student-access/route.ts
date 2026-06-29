@@ -39,3 +39,4 @@ export async function POST(req: NextRequest) {
     return safeInternalError(err, 'Student access check failed');
   }
 }
+

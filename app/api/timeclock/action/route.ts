@@ -1,6 +1,8 @@
+export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -744,3 +746,5 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/timeclock/action', _POST);
+
+

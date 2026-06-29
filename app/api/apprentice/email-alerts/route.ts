@@ -1,5 +1,6 @@
 // PUBLIC ROUTE: apprentice email alert subscription
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -163,3 +164,4 @@ async function _GET(request: Request) {
 }
 export const GET = withApiAudit('/api/apprentice/email-alerts', _GET);
 export const POST = withApiAudit('/api/apprentice/email-alerts', _POST);
+

@@ -54,3 +54,4 @@ async function _GET(request: NextRequest) {
   return response;
 }
 export const GET = withApiAudit('/api/auth/linkedin/authorize', _GET);
+

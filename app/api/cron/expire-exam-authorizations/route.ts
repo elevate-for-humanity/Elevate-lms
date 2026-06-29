@@ -56,3 +56,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/expire-exam-authorizations] Done', { expired: ids.length });
   return NextResponse.json({ ok: true, expired: ids.length });
 });
+

@@ -42,3 +42,4 @@ export async function GET(request: NextRequest) {
     return safeInternalError(error, 'Supabase debug check failed');
   }
 }
+

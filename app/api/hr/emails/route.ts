@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { hrEmailTemplates, HrEmailStep, HrEmailParams } from '@/lib/email/templates/hr-emails';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -108,3 +109,4 @@ function stepToStatus(step: HrEmailStep): string {
 }
 
 export const POST = withApiAudit('/api/hr/emails', _POST);
+

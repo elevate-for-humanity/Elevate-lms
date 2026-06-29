@@ -12,6 +12,7 @@ import { db } from '@/lib/db';
 import { randomBytes } from 'crypto';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getStripe, stripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
@@ -330,3 +331,4 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/enroll/auto', _POST);
+

@@ -100,3 +100,4 @@ async function _POST(request: NextRequest) {
 export const POST = withRuntime(
   withApiAudit('/api/license/webhook', _POST, { actor_type: 'webhook', skip_body: true }),
 );
+

@@ -132,3 +132,4 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ placement: record }, { status: 201 });
 }
+

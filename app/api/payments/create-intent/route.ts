@@ -1,6 +1,8 @@
+export const dynamic = 'force-dynamic';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -65,3 +67,5 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/payments/create-intent', _POST));
+
+

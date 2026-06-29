@@ -31,3 +31,4 @@ export async function GET(request: NextRequest) {
     return safeInternalError(error, 'Credential report failed');
   }
 }
+

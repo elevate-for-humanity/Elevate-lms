@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -201,3 +202,4 @@ async function _POST(request: Request) {
 }
 export const GET = withApiAudit('/api/progress', _GET);
 export const POST = withApiAudit('/api/progress', _POST);
+

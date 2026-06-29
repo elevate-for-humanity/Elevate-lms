@@ -28,3 +28,4 @@ async function _GET(request: Request) {
   return NextResponse.json(jwks);
 }
 export const GET = withApiAudit('/api/lti/jwks', _GET);
+

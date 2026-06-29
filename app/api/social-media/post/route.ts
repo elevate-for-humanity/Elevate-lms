@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getSocialTokens } from '@/lib/social/token-resolver';
@@ -210,3 +211,4 @@ async function _GET(request: NextRequest) {
 
 export const GET = withApiAudit('/api/social-media/post', _GET);
 export const POST = withApiAudit('/api/social-media/post', _POST);
+

@@ -4,6 +4,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -269,3 +270,4 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/partner/applications', _GET);
 export const POST = withApiAudit('/api/partner/applications', _POST);
+

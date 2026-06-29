@@ -106,3 +106,4 @@ async function persistToSupabase(params: Record<string, string>) {
     logger.error('[QB callback] Supabase persist failed:', err);
   }
 }
+

@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { aiChat } from '@/lib/ai/ai-service';
 import { logger } from '@/lib/logger';
@@ -71,3 +72,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'AI service unavailable' }, { status: 503 });
   }
 }
+

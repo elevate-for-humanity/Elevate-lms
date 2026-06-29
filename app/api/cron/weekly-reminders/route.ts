@@ -65,3 +65,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/weekly-reminders] sent', { sent });
   return NextResponse.json({ ok: true, sent });
 });
+

@@ -220,3 +220,4 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   logger.info('Job batch processed', { ...results, total: jobs.length });
   return NextResponse.json({ ok: true, processed: jobs.length, ...results });
 }
+

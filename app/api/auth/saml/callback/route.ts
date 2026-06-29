@@ -126,3 +126,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(`${loginUrl}?error=saml_invalid`);
   }
 }
+

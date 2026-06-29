@@ -2,6 +2,7 @@ import { safeInternalError } from '@/lib/api/safe-error';
 import { NextResponse } from 'next/server';
 import { getStripe, stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -110,3 +111,4 @@ async function handler(req: Request) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/stripe/create-checkout', handler));
+

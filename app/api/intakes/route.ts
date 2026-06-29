@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { IntakeCreateSchema } from '@/lib/validators/course';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -107,3 +108,4 @@ async function _GET(request: Request) {
 }
 export const GET = withApiAudit('/api/intakes', _GET);
 export const POST = withApiAudit('/api/intakes', _POST);
+

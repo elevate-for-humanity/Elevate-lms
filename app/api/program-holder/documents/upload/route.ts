@@ -5,6 +5,7 @@ import { internalFetch } from '@/lib/api/internal-fetch';
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import {
   isProgramHolderUploadDocumentType,
@@ -267,3 +268,4 @@ async function _POST(req: Request) {
 }
 
 export const POST = withApiAudit('/api/program-holder/documents/upload', _POST);
+

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { generateLicenseKey, hashLicenseKey } from '@/lib/store/license';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
@@ -216,3 +217,4 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/store/license/generate', _POST);
+

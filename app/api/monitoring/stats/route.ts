@@ -75,3 +75,4 @@ async function _GET(req: Request) {
   }
 }
 export const GET = withApiAudit('/api/monitoring/stats', _GET);
+

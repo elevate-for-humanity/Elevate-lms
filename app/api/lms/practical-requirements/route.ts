@@ -35,3 +35,4 @@ export async function GET(request: NextRequest) {
   if (error) return safeDbError(error, 'Failed to fetch practical requirements');
   return NextResponse.json({ requirement: data ?? null });
 }
+

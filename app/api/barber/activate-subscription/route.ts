@@ -1,7 +1,9 @@
+export const dynamic = 'force-dynamic';
 import { db } from '@/lib/db';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getStripe } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -144,3 +146,5 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Failed to activate subscription');
   }
 }
+
+

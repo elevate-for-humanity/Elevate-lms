@@ -19,3 +19,4 @@ async function _GET(request: Request) {
   });
 }
 export const GET = withApiAudit('/api/v1/health', _GET);
+

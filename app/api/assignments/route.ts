@@ -118,3 +118,4 @@ async function _POST(request: Request) {
 }
 export const GET = withApiAudit('/api/assignments', _GET);
 export const POST = withApiAudit('/api/assignments', _POST);
+

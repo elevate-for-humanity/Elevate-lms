@@ -166,3 +166,4 @@ Respond with ONLY valid JSON, no markdown.`;
   logger.info('[ai-operator] Run complete', { triaged, autoResolved });
   return NextResponse.json({ ok: true, triaged, autoResolved });
 });
+

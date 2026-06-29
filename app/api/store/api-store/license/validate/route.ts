@@ -145,3 +145,4 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/store/license/validate', _POST);
+

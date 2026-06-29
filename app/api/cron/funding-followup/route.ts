@@ -83,3 +83,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/funding-followup] Done', { notified });
   return NextResponse.json({ ok: true, notified });
 });
+

@@ -86,3 +86,4 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Account claim failed');
   }
 }
+

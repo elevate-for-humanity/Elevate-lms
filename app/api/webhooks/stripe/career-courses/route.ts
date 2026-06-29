@@ -145,3 +145,4 @@ export const POST = withApiAudit('/api/webhooks/stripe/career-courses', _POST, {
   skip_body: true,
   critical: true,
 });
+

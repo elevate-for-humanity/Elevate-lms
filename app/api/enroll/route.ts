@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { completeEnrollment } from '@/lib/enrollment/complete-enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -160,3 +161,4 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/enroll', _POST);
+

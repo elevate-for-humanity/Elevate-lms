@@ -158,3 +158,4 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
   logger.info('[workflow-schedule-processor] Run complete', { fired, skipped });
   return NextResponse.json({ ok: true, fired, skipped });
 });
+

@@ -6,6 +6,7 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -477,3 +478,4 @@ export const POST = withApiAudit('/api/webhooks/store', _POST, {
   actor_type: 'webhook',
   skip_body: true,
 });
+

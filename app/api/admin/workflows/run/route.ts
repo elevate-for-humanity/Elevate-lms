@@ -24,3 +24,4 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(result, { status: result.status === 'failed' ? 500 : 200 });
 }
+

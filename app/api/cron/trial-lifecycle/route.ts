@@ -81,3 +81,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/trial-lifecycle] Done', { warned, expired: expired?.length ?? 0, archived: archived ?? 0 });
   return NextResponse.json({ ok: true, warned, expired: expired?.length ?? 0, archived: archived ?? 0 });
 });
+

@@ -1,7 +1,8 @@
 import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { safeGetUser, createClient} from '@/lib/supabase/server';
+import { createClient} from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { checkNewMilestone } from '@/lib/pwa/milestones';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -149,3 +150,5 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/pwa/barber/log-hours', _POST, { critical: true });
+
+

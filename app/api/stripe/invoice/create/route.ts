@@ -107,3 +107,4 @@ async function _GET(request: Request) {
 }
 export const GET = withRuntime(withApiAudit('/api/stripe/invoice/create', _GET));
 export const POST = withRuntime(withApiAudit('/api/stripe/invoice/create', _POST));
+

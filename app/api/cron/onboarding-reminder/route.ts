@@ -71,3 +71,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/onboarding-reminder] Done', { reminded, new_users: newUsers.length, not_started: notStarted.length });
   return NextResponse.json({ ok: true, reminded, new_users: newUsers.length, not_started: notStarted.length });
 });
+

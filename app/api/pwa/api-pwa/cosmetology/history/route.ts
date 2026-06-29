@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { safeGetUser, createClient} from '@/lib/supabase/server';
+import { createClient} from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { requireCosmetologyEnrollment } from '@/lib/pwa/cosmetology-auth';
@@ -52,3 +53,5 @@ async function _GET(request: Request) {
 }
 
 export const GET = withApiAudit('/api/pwa/cosmetology/history', _GET);
+
+

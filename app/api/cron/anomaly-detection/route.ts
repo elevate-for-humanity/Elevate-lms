@@ -177,3 +177,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   return NextResponse.json({ ok: true, anomalies: anomalies.length, fired, critical: critical.length });
 });
+

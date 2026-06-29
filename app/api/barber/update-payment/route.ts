@@ -12,6 +12,7 @@ import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { getStripe } from '@/lib/stripe/client';
 import { createPaymentMethodUpdatePortalSession } from '@/lib/stripe/payment-method-portal';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -80,3 +81,4 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Failed to create billing portal session');
   }
 }
+

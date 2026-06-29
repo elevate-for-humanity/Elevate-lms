@@ -552,3 +552,4 @@ export const POST = withApiAudit('/api/sezzle/webhook', _POST, {
   actor_type: 'webhook',
   skip_body: true,
 });
+

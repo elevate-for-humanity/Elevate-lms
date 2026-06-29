@@ -1,6 +1,7 @@
 // PUBLIC ROUTE: Stripe checkout completion — payment verified via sessionId before any DB write
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -279,3 +280,4 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/enroll/complete', _POST);
+

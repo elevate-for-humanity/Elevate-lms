@@ -47,3 +47,4 @@ async function _GET(req: NextRequest) {
   }
 }
 export const GET = withApiAudit('/api/gamification/leaderboard', _GET);
+

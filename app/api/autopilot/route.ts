@@ -191,3 +191,4 @@ async function _DELETE(request: NextRequest) {
 export const GET = withApiAudit('/api/autopilot', _GET);
 export const POST = withApiAudit('/api/autopilot', _POST);
 export const DELETE = withApiAudit('/api/autopilot', _DELETE);
+

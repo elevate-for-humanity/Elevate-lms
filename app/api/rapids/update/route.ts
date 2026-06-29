@@ -90,3 +90,4 @@ async function _GET(request: Request) {
 }
 export const GET = withApiAudit('/api/rapids/update', _GET, { critical: true });
 export const POST = withApiAudit('/api/rapids/update', _POST, { critical: true });
+

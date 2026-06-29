@@ -1,7 +1,9 @@
+export const dynamic = 'force-dynamic';
 import { db } from '@/lib/db';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { safeGetUser, createClient} from '@/lib/supabase/server';
+import { createClient} from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -86,3 +88,6 @@ export async function GET(request: NextRequest) {
   if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   return NextResponse.json({ logs: data });
 }
+
+
+

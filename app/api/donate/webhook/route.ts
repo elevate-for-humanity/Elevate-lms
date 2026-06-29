@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 import { getStripe, stripe } from '@/lib/stripe/client';
@@ -197,3 +198,4 @@ async function _POST(request: Request) {
 export const POST = withRuntime(
   withApiAudit('/api/donations/webhook', _POST, { actor_type: 'webhook', skip_body: true }),
 );
+

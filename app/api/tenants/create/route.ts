@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { auditLog } from '@/lib/auditLog';
 import { updateTenantLicense } from '@/lib/licensing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -120,3 +121,4 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

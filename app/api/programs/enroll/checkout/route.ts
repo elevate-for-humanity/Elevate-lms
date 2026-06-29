@@ -22,6 +22,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -241,3 +242,4 @@ export async function GET() {
       'On checkout.session.completed, student_enrollments is created with status=active',
   });
 }
+

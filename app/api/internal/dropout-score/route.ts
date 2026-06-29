@@ -146,3 +146,4 @@ Respond with ONLY valid JSON, no markdown, no explanation. Example: {"score":72,
   logger.info('[dropout-score] Run complete', { scored, failed, total: rows.length });
   return NextResponse.json({ ok: true, scored, failed, total: rows.length });
 });
+

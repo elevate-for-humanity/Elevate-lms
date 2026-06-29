@@ -48,3 +48,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/stale-applications] Archived stale applications', { archived: archived ?? ids.length });
   return NextResponse.json({ ok: true, archived: archived ?? ids.length });
 });
+

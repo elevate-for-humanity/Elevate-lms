@@ -38,3 +38,4 @@ export async function POST(request: NextRequest) {
   if (error) return safeDbError(error, 'Failed to record check-in');
   return NextResponse.json({ success: true });
 }
+

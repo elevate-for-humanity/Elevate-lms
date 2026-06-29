@@ -1,5 +1,7 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -224,3 +226,5 @@ You are the ${PLATFORM_DEFAULTS.orgName} AI Assistant - a warm, helpful guide fo
   }
 }
 export const POST = withRuntime(withApiAudit('/api/ai-chat', _POST));
+
+

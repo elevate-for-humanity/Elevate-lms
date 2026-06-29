@@ -1,6 +1,7 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import webpush from 'web-push';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -209,3 +210,4 @@ async function getTargetUsers(supabase: any, targetAudience: string) {
   return data || [];
 }
 export const POST = withApiAudit('/api/notifications/broadcast', _POST);
+

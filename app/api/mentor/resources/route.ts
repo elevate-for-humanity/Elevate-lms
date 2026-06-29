@@ -60,3 +60,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(data, { status: 201 });
   } catch (err) { return safeInternalError(err, 'Failed to create resource'); }
 }
+

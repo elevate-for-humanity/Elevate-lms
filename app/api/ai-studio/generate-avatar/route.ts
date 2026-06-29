@@ -282,3 +282,4 @@ async function generateWithSynthesia(
   throw new Error('Synthesia generation timeout');
 }
 export const POST = withApiAudit('/api/ai-studio/generate-avatar', _POST);
+

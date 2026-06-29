@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -148,3 +149,4 @@ async function _POST(req: NextRequest) {
   return Response.json(updated);
 }
 export const POST = withApiAudit('/api/program-holder/mou/sign', _POST);
+

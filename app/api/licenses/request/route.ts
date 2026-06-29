@@ -1,7 +1,9 @@
+export const dynamic = 'force-dynamic';
 // PUBLIC ROUTE: public license request form
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -116,3 +118,5 @@ This request was submitted via the Platform Licensing page.
   }
 }
 export const POST = withRuntime(withApiAudit('/api/licenses/request', _POST));
+
+

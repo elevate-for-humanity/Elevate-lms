@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
@@ -65,3 +66,4 @@ export async function GET(_req: NextRequest) {
 
   return NextResponse.json({ programSlug: slugFromEnrollment });
 }
+

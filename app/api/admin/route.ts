@@ -12,3 +12,4 @@ export async function GET(request: NextRequest) {
   if (auth.error) return auth.error;
   return NextResponse.json({ ok: true, namespace: 'admin', user: { id: auth.id, role: auth.role }, endpoints: ['/api/admin/users', '/api/admin/reports/generate', '/api/admin/impersonate'] });
 }
+

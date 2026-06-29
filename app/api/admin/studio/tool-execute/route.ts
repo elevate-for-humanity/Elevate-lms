@@ -66,3 +66,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, message: 'Tool execution failed' }, { status: 500 });
   }
 }
+

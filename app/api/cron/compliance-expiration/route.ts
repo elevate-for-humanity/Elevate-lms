@@ -80,3 +80,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/compliance-expiration] Done', { warned, flagged });
   return NextResponse.json({ ok: true, warned, flagged });
 });
+

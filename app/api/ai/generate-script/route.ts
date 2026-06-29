@@ -55,3 +55,4 @@ Write the complete script now:`;
   }
 }
 export const POST = withApiAudit('/api/ai/generate-script', _POST);
+

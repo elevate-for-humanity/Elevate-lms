@@ -76,3 +76,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/barber-reinstate] Done', { reinstated });
   return NextResponse.json({ ok: true, reinstated });
 });
+

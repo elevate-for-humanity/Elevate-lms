@@ -1,6 +1,8 @@
+export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -56,3 +58,5 @@ async function _GET(request: NextRequest) {
   }
 }
 export const GET = withApiAudit('/api/checkin/status', _GET);
+
+

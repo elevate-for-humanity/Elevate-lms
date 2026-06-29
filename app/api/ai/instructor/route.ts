@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 /**
  * @deprecated Route to lib/ai/orchestrator.ts for new callers.
  * This endpoint is preserved for backwards compatibility.
@@ -5,7 +6,8 @@
  */
 import { NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
-import { safeGetUser, createClient} from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { getInstructorByProgramId, getInstructorById } from '@/lms-data/instructors';
 import { allPrograms } from '@/lms-data/programs';
 import { logger } from '@/lib/logger';
@@ -91,3 +93,6 @@ Keep responses concise (2-4 paragraphs max), practical, and encouraging. Focus o
   }
 }
 export const POST = withRuntime(withApiAudit('/api/ai/instructor', _POST));
+
+
+

@@ -7,6 +7,7 @@
 // supplying a different email. Now the export is always scoped to the
 // authenticated session user — the request body email is ignored.
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -87,3 +88,4 @@ export async function POST(req: NextRequest) {
     },
   });
 }
+

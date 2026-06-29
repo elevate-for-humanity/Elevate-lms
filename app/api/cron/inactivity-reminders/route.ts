@@ -71,3 +71,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/inactivity-reminders] Done', { reminded });
   return NextResponse.json({ ok: true, reminded });
 });
+

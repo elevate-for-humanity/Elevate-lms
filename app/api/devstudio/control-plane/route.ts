@@ -10,7 +10,8 @@ import { logger } from '@/lib/logger';
 
 import { db } from '@/lib/db';
 
-import { safeGetUser, createClient} from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -132,3 +133,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+

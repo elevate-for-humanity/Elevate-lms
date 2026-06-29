@@ -7,3 +7,4 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 export { POST } from '../../barber-host-shop/apply/route';
+

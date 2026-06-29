@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
 
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 /**
@@ -210,3 +211,4 @@ async function reconcileApplication(db: SupabaseClient, applicationId: string, a
     action: 'enrolled',
   });
 }
+

@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -303,3 +304,4 @@ function parseLooseDate(dateStr: string): Date | null {
   }
 }
 export const POST = withApiAudit('/api/onboarding/validate-document', _POST);
+

@@ -2,6 +2,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { APP_STORE_PRODUCTS } from '@/lib/stripe/app-store-products';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -241,3 +242,4 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/checkout/learner', _POST));
+

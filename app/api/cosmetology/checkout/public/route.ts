@@ -198,3 +198,4 @@ async function _GET(request: NextRequest) {
 
 export const GET = withApiAudit('/api/cosmetology/checkout/public', _GET);
 export const POST = withApiAudit('/api/cosmetology/checkout/public', _POST);
+

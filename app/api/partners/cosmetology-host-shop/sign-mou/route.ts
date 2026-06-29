@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
@@ -131,3 +132,4 @@ export async function POST(req: NextRequest) {
   logger.info(`Cosmetology MOU signed: partner ${partner.id} — ${salon_name}`);
   return NextResponse.json({ success: true, enrollmentId: enrollResult.enrollmentId ?? null }, { status: 200 });
 }
+

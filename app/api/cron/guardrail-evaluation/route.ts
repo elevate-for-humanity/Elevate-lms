@@ -56,3 +56,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/guardrail-evaluation] evaluated', { total, uniqueUsers, byType });
   return NextResponse.json({ ok: true, total, uniqueUsers, byType });
 });
+

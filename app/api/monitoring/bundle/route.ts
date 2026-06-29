@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -231,3 +232,4 @@ async function _GET(req: Request) {
 }
 
 export const GET = withRuntime(withApiAudit('/api/monitoring/bundle', _GET));
+

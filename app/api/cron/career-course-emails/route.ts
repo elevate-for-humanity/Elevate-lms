@@ -56,3 +56,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/career-course-emails] Done', { sent });
   return NextResponse.json({ ok: true, sent });
 });
+

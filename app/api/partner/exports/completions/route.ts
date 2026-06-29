@@ -1,7 +1,9 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { getMyPartnerContext } from '@/lib/partner/access';
 import { getPartnerStudentsWithTraining } from '@/lib/partner/students';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -137,3 +139,5 @@ async function logExportAudit(
   }
 }
 export const GET = withApiAudit('/api/partner/exports/completions', _GET);
+
+

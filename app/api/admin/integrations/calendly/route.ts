@@ -160,3 +160,4 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Calendly API request failed');
   }
 }
+

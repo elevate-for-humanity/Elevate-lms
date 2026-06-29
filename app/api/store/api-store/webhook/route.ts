@@ -7,6 +7,7 @@ import { db } from '@/lib/db';
 import { verifyWebhookSignature } from '@/lib/store/stripe';
 import { generateLicenseKey, hashLicenseKey } from '@/lib/store/license';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -234,3 +235,4 @@ export async function POST(req: Request) {
     return Response.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }
+

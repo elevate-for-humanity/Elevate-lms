@@ -45,3 +45,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/memory-cleanup] purged', result);
   return NextResponse.json({ ok: true, ...result });
 });
+

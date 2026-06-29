@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -7,6 +8,7 @@ import { parseBody } from '@/lib/api-helpers';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import {
   createCoursePaymentIntent,
   createSubscriptionPaymentIntent,
@@ -308,3 +310,5 @@ async function _POST(request: NextRequest) {
 }
 export const GET = withRuntime(withApiAudit('/api/payments', _GET));
 export const POST = withRuntime(withApiAudit('/api/payments', _POST));
+
+

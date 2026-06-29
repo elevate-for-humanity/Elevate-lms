@@ -57,3 +57,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/daily-attendance-alerts] Done', { absences: absences.length });
   return NextResponse.json({ ok: true, absences: absences.length });
 });
+

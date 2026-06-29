@@ -10,6 +10,7 @@ export const maxDuration = 10;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -126,3 +127,4 @@ async function sendSecurityAlert(data: Record<string, any>) {
   */
 }
 export const POST = withApiAudit('/api/security/log', _POST);
+

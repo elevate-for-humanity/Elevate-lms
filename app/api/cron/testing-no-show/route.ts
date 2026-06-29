@@ -76,3 +76,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/testing-no-show] flagged', { flagged });
   return NextResponse.json({ ok: true, flagged });
 });
+

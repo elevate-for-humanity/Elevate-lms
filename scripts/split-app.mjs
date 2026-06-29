@@ -22,6 +22,8 @@ const excludeConfig = {
   LMS: ['admin', 'mission-control', 'intelligence', 'partner', 'case-manager', '(marketing)', 'blog']
 };
 
+const whitelist = ['api', 'auth', '(auth)', 'layout.tsx', 'page.tsx', 'globals.css', 'not-found.tsx', 'loading.tsx', 'error.tsx', 'health', 'data'];
+
 const toRemove = excludeConfig[scope];
 
 if (!toRemove) {
@@ -30,17 +32,46 @@ if (!toRemove) {
 }
 
 console.log(`=== Surgical Split v3: Scope ${scope} ===`);
+console.log(`Working directory: ${appDir}`);
 
+// 1. Remove explicitly excluded directories
 toRemove.forEach(target => {
-  const fullPath = path.join(appDir, target);
+  if (whitelist.includes(target)) {
+    console.log(`Skipping whitelisted target: ${target}`);
+    return;
+  }
+  const fullPath = path.resolve(appDir, target);
+  
   if (fs.existsSync(fullPath)) {
-    console.log(`Removing non-target route: ${target}`);
     try {
-      // Use rmSync to avoid the EXDEV error. We are in a temporary builder stage, 
-      // so deleting these files is safe and permanent for this build instance.
+      console.log(`Removing excluded target: ${target} -> ${fullPath}`);
       fs.rmSync(fullPath, { recursive: true, force: true });
-    } catch (e) {
-      console.log(`Failed to remove ${target}: ${e.message}`);
+    } catch (err) {
+      console.error(`Failed to remove ${target}: ${err.message}`);
+    }
+  }
+});
+
+// 2. Comprehensive Cleanup: Remove any other folders not in scope (Aggressive mode)
+// This ensures that for LMS, we don't have thousands of legacy folders bloating the build.
+const currentFolders = fs.readdirSync(appDir);
+currentFolders.forEach(folder => {
+  const fullPath = path.join(appDir, folder);
+  if (!fs.lstatSync(fullPath).isDirectory()) return;
+
+  // Preserve whitelist and the scope-specific folders we WANT
+  const preserve = [...whitelist, 'lms', 'admin', '(marketing)', '(public)'];
+  
+  if (scope === 'MARKETING' && folder === 'lms') return;
+  if (scope === 'ADMIN' && folder === 'admin') return;
+  if (scope === 'LMS' && folder === 'lms') return;
+
+  if (!preserve.includes(folder) && !toRemove.includes(folder)) {
+    try {
+      console.log(`Aggressive Clean: Removing ${folder}`);
+      fs.rmSync(fullPath, { recursive: true, force: true });
+    } catch (err) {
+      // Ignore errors for system files
     }
   }
 });

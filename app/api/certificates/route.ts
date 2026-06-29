@@ -105,3 +105,4 @@ async function _POST(request: Request) {
 }
 export const GET = withApiAudit('/api/certificates', _GET);
 export const POST = withApiAudit('/api/certificates', _POST);
+

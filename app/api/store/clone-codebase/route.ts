@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { cloneRepository } from '@/lib/store/stripe-products';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -74,3 +75,4 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/store/clone-codebase', _POST);
+

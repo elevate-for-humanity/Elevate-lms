@@ -48,3 +48,4 @@ async function _DELETE(request: NextRequest) {
 }
 
 export const DELETE = withRuntime(_DELETE);
+

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { getOrgContext } from '@/lib/org/getOrgContext';
 import { getOrgSubscription, getLicenseStatus } from '@/lib/billing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -52,3 +53,4 @@ async function _GET(req: NextRequest) {
   }
 }
 export const GET = withApiAudit('/api/billing/subscription', _GET);
+

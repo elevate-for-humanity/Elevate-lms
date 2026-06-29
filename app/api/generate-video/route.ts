@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 /**
  * POST /api/generate-video
  *
@@ -21,6 +22,7 @@ import { mkdir, writeFile, readFile, unlink, mkdtemp } from 'fs/promises';
 import { bundle } from '@remotion/bundler';
 import { renderMedia, selectComposition } from '@remotion/renderer';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -376,3 +378,5 @@ export async function GET(request: NextRequest) {
     scene_count: Array.isArray(data.scene_data) ? data.scene_data.length : null,
   });
 }
+
+

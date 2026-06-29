@@ -200,3 +200,4 @@ async function _GET(request: Request) {
 }
 export const GET = withApiAudit('/api/chatbot/lead', _GET);
 export const POST = withApiAudit('/api/chatbot/lead', _POST);
+

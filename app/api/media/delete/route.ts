@@ -1,5 +1,6 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 
 import { toErrorMessage } from '@/lib/safe';
 import { logger } from '@/lib/logger';
@@ -86,3 +87,4 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Failed to delete file' }, { status: 500 });
   }
 }
+

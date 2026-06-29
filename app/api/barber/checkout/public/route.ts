@@ -334,3 +334,4 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/barber/checkout/public', _GET);
 export const POST = withApiAudit('/api/barber/checkout/public', _POST);
+

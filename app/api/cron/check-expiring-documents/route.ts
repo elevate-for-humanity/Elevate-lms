@@ -52,3 +52,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/check-expiring-documents] Done', { total_warned });
   return NextResponse.json({ ok: true, total_warned });
 });
+

@@ -1,6 +1,7 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -35,3 +36,4 @@ async function _GET(request: Request) {
   return Response.json(data || []);
 }
 export const GET = withApiAudit('/api/delegates/holders', _GET);
+

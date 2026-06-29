@@ -39,3 +39,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/process-notifications] Done', { stale_found: staleCount, marked_read: updated });
   return NextResponse.json({ ok: true, stale_found: staleCount ?? 0, marked_read: updated ?? 0 });
 });
+

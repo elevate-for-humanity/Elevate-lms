@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { emitEvent } from '@/lib/events/emit';
@@ -223,3 +224,4 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/enrollments/create-enforced', _POST);
+

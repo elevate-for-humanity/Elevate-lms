@@ -30,3 +30,4 @@ async function _GET(request: Request) {
 }
 export const GET = withApiAudit('/api/autopilots/deploy', _GET);
 export const POST = withApiAudit('/api/autopilots/deploy', _POST);
+

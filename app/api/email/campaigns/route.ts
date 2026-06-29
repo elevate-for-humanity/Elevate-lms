@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -77,3 +78,4 @@ async function _POST(req: Request) {
 }
 export const GET = withApiAudit('/api/email/campaigns', _GET);
 export const POST = withApiAudit('/api/email/campaigns', _POST);
+

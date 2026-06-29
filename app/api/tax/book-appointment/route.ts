@@ -32,3 +32,4 @@ export async function POST(request: NextRequest) {
     return safeInternalError(error, 'Tax appointment request failed');
   }
 }
+

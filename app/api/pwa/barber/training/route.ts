@@ -1,7 +1,8 @@
 import { logger } from '@/lib/logger';
 
 import { NextResponse } from 'next/server';
-import { safeGetUser, createClient} from '@/lib/supabase/server';
+import { createClient} from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { getCourseBySlug } from '@/lib/courses/definitions';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -162,3 +163,5 @@ async function _POST(request: Request) {
 }
 export const GET = withApiAudit('/api/pwa/barber/training', _GET);
 export const POST = withApiAudit('/api/pwa/barber/training', _POST);
+
+

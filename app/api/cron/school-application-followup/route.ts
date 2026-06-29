@@ -68,3 +68,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/school-application-followup] Done', { followed_up });
   return NextResponse.json({ ok: true, followed_up });
 });
+

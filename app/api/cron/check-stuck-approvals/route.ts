@@ -54,3 +54,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/check-stuck-approvals] Done', { stuck: stuck.length });
   return NextResponse.json({ ok: true, stuck: stuck.length });
 });
+

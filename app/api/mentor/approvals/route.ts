@@ -95,3 +95,4 @@ export async function POST(req: NextRequest) {
     return safeInternalError(err, 'Failed to process approval');
   }
 }
+

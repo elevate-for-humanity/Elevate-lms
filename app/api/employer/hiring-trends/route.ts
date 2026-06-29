@@ -72,3 +72,4 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/employer/hiring-trends', _GET);
+

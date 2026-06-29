@@ -1,8 +1,10 @@
+export const dynamic = 'force-dynamic';
 // PUBLIC ROUTE: generic public form submission
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError, safeError } from '@/lib/api/safe-error';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'contact');
@@ -34,3 +36,5 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Failed to process submission');
   }
 }
+
+

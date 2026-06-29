@@ -19,3 +19,4 @@ export const POST = withRuntime({ secrets: [...ENV.STRIPE_TESTING_WEBHOOK] }, as
   );
   return forwardStripeWebhookToCanonical(req as NextRequest, 'testing/webhook');
 });
+

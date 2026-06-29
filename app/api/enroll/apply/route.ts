@@ -5,6 +5,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { orchestrateEnrollment } from '@/lib/enrollment/orchestrate-enrollment';
 import { sendApplicationConfirmation, sendAdminApplicationNotification } from '@/lib/email/service';
 import { checkRateLimit, verifyTurnstileToken } from '@/lib/turnstile';
@@ -265,3 +266,4 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/enroll/apply', _POST);
+

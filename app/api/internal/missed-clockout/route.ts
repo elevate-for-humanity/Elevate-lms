@@ -250,3 +250,4 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
   logger.info('[missed-clockout] Run complete', { closed, failed: failed.length });
   return NextResponse.json({ ok: true, closed, failed: failed.length });
 });
+

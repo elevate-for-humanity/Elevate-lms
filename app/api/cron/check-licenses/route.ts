@@ -57,3 +57,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/check-licenses] Done', { flagged, expiring_in_60_days: expiringSoon ?? 0 });
   return NextResponse.json({ ok: true, flagged, expiring_in_60_days: expiringSoon ?? 0 });
 });
+

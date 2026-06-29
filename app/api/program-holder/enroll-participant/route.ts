@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { checkMOUStatusServer } from '@/lib/mou-checks';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -156,3 +157,4 @@ async function _POST(req: NextRequest) {
 }
 
 export const POST = withApiAudit('/api/program-holder/enroll-participant', _POST);
+

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
@@ -183,3 +184,4 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     message: `${successCount} document(s) ${action === 'approve' ? 'verified' : 'rejected'}${failCount > 0 ? `, ${failCount} failed` : ''}`,
   });
 });
+

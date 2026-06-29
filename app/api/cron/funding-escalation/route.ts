@@ -67,3 +67,4 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/funding-escalation] Done', { escalated: escalations.length });
   return NextResponse.json({ ok: true, escalated: escalations.length });
 });
+

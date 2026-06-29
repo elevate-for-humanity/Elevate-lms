@@ -1,6 +1,7 @@
 // PUBLIC ROUTE: Store checkout — licensing gate via validateCheckoutAuthorization + rate limit
 import { createCheckoutSession } from '@/lib/store/stripe';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { validateCheckoutAuthorization } from '@/lib/store/licensing-mode';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -82,3 +83,4 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/store/checkout', _POST);
+

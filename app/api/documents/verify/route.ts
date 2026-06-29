@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
@@ -194,3 +195,4 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     },
   });
 });
+

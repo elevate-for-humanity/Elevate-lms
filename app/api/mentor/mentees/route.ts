@@ -50,3 +50,4 @@ export async function GET(req: NextRequest) {
     return safeInternalError(err, 'Failed to fetch mentees');
   }
 }
+

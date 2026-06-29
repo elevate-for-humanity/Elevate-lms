@@ -128,3 +128,4 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
   logger.info('[workflow-event-processor] Run complete', { processed, triggered });
   return NextResponse.json({ ok: true, processed, triggered });
 });
+

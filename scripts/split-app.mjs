@@ -2,10 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 /**
- * Surgical Route Splitter v2
+ * Surgical Route Splitter v3 - Cross-Device Compatible
  * 
- * Instead of an 'Include' strategy which deleted 90% of the site, 
- * we use an 'Exclude' strategy to remove only the heavy portal blocks.
+ * Uses 'fs.rmSync' with {recursive: true, force: true} which is compatible 
+ * with Docker volume boundaries.
  */
 
 const scope = process.env.BUILD_SCOPE; 
@@ -17,75 +17,32 @@ if (!scope || scope === 'ASSETS') {
 }
 
 const excludeConfig = {
-  MARKETING: [
-    'admin',
-    'apprentice',
-    'instructor',
-    'mission-control',
-    'partner',
-    'student-portal',
-    'case-manager',
-    'intelligence',
-    'dev-studio',
-    'onboarding/instructor',
-    'onboarding/employer',
-    'program-holder'
-  ],
-  ADMIN: [
-    '(marketing)',
-    '(public)',
-    'apprentice',
-    'instructor',
-    'student-portal',
-    'programs',
-    'healthcare',
-    'skilled-trades',
-    'blog',
-    'about',
-    'apply',
-    'testing'
-  ],
-  LMS: [
-    'admin',
-    'mission-control',
-    'intelligence',
-    'dev-studio',
-    'partner',
-    'case-manager',
-    '(marketing)',
-    'about',
-    'blog',
-    'contact'
-  ]
+  MARKETING: ['admin', 'apprentice', 'instructor', 'mission-control', 'partner', 'student-portal', 'case-manager', 'intelligence'],
+  ADMIN: ['(marketing)', '(public)', 'apprentice', 'instructor', 'student-portal', 'programs', 'healthcare', 'skilled-trades'],
+  LMS: ['admin', 'mission-control', 'intelligence', 'partner', 'case-manager', '(marketing)', 'blog']
 };
 
-// CRITICAL: Explicit Whitelist for System Routes
-const whitelist = ['api', 'layout.tsx', 'globals.css', 'favicon.ico'];
-
-const toRemove = excludeConfig[scope].filter(target => !whitelist.includes(target));
+const toRemove = excludeConfig[scope];
 
 if (!toRemove) {
   console.error(`Invalid scope: ${scope}`);
   process.exit(1);
 }
 
-console.log(`=== Surgical Split: Scope ${scope} ===`);
+console.log(`=== Surgical Split v3: Scope ${scope} ===`);
 
 toRemove.forEach(target => {
   const fullPath = path.join(appDir, target);
   if (fs.existsSync(fullPath)) {
-    console.log(`Quarantining: ${target}`);
-    // Use a unique prefix to avoid collisions
-    const parent = path.dirname(fullPath);
-    const base = path.basename(fullPath);
-    const newPath = path.join(parent, `__split_${scope}_${base}`);
-    
+    console.log(`Removing non-target route: ${target}`);
     try {
-      fs.renameSync(fullPath, newPath);
+      // Use rmSync to avoid the EXDEV error. We are in a temporary builder stage, 
+      // so deleting these files is safe and permanent for this build instance.
+      fs.rmSync(fullPath, { recursive: true, force: true });
     } catch (e) {
-      console.log(`Failed to rename ${target}: ${e.message}`);
+      console.log(`Failed to remove ${target}: ${e.message}`);
     }
   }
 });
 
-console.log('✅ Split complete. Build now contains all necessary "Programs" and public pages.');
+console.log('✅ Split complete.');

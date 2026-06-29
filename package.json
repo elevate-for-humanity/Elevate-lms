@@ -263,7 +263,7 @@
     "dev:with-autopilot": "pnpm autopilot:bg && pnpm dev",
     "predev": "bash scripts/setup-env-auto.sh",
     "dev": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack",
-    "build:lms:compile": "npx cross-env BUILD_SCOPE=1 NODE_OPTIONS='--max-old-space-size=8192' next build",
+    "build:lms:compile": "npx cross-env BUILD_SCOPE=1 NODE_OPTIONS='--max-old-space-size=6144' next build",
     "lint": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' eslint . --ext .js,.jsx,.ts,.tsx --cache --cache-location .eslintcache --quiet",
     "healthcheck": "bash scripts/run-full-healthcheck.sh .",
     "lint:brand": "node scripts/reviewer.js src",

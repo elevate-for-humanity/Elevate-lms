@@ -80,7 +80,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Configure Northflank LMS service only
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_LMS_SERVICE_ID" --execute

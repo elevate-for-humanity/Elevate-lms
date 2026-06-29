@@ -78,7 +78,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Configure Marketing service (www)
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --execute

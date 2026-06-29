@@ -29,7 +29,9 @@ const whitelist = [
   // Public marketing pages that must survive the MARKETING build
   'about', 'apply', 'admin', 'student', 'portals', 'testing', 'store',
   // SEO/static pages
-  'contact', 'legal', 'login', 'signup'
+  'contact', 'legal', 'login', 'signup',
+  // Programs for public browse (dynamic routes)
+  'programs'
 ];
 
 const toRemove = excludeConfig[scope];

@@ -65,13 +65,16 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Pharmacy Technician', href: '/programs/pharmacy-technician' },
       { name: 'Home Health Aide', href: '/programs/home-health-aide' },
       { name: 'Peer Recovery Specialist', href: '/programs/peer-recovery-specialist' },
+      { name: 'Direct Support Professional', href: '/programs/direct-support-professional' },
       { name: 'Drug & Alcohol Collector', href: '/programs/drug-alcohol-specimen-collector' },
       { name: 'CPR / First Aid', href: '/programs/cpr-first-aid' },
       { name: 'All Healthcare →', href: '/programs/healthcare', isSectionLink: true },
 
       { name: '— Skilled Trades —', href: '/programs/skilled-trades', isHeader: true },
       { name: 'HVAC Technician', href: '/programs/hvac-technician' },
+      { name: 'Building Services Technician', href: '/programs/building-services-technician' },
       { name: 'Electrical', href: '/programs/electrical' },
+
 
       { name: 'Plumbing', href: '/programs/plumbing' },
       { name: 'Welding', href: '/programs/welding' },

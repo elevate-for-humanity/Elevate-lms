@@ -1,14 +1,14 @@
-import { db } from '@/lib/db';
+import { safeGetUser, db } from '@/lib/db';
 
-import { redirect } from 'next/navigation';
-import { createClient, safeGetUser } from '@/lib/supabase/server';
-import { buildLoginRedirect } from '@/lib/lms/redirect';
-import { StudentToolsStrip } from '@/components/lms/dashboard/StudentToolsStrip';
+import { safeGetUser, redirect } from 'next/navigation';
+import { safeGetUser, createClient, safeGetUser } from '@/lib/supabase/server';
+import { safeGetUser, buildLoginRedirect } from '@/lib/lms/redirect';
+import { safeGetUser, StudentToolsStrip } from '@/components/lms/dashboard/StudentToolsStrip';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import { Clock, Award, ChevronRight } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { safeGetUser, Clock, Award, ChevronRight } from 'lucide-react';
+import { safeGetUser, PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +27,7 @@ const STEPS = [
 
 export default async function LmsRootPage() {
   const supabase = await createClient();
-  const user = safeGetUser(await supabase.auth.getUser());
+  const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect('/learner/dashboard');
 
   const { requireAdminClient } = await import('@/lib/supabase/admin');

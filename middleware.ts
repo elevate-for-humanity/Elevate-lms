@@ -4,9 +4,8 @@
 // config is defined here (not re-exported from proxy.ts) because Next.js
 // requires static analysis of the config export and cannot follow re-exports.
 //
-// nodejs runtime required: proxy.ts imports @upstash/redis which uses
-// Node.js crypto internally — incompatible with the default Edge runtime.
-export const runtime = 'nodejs';
+// nodejs runtime removed: reverting to standard edge for stability
+export const runtime = 'edge';
 
 export { middleware as default } from './proxy';
 

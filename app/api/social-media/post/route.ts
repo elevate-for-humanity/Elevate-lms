@@ -20,7 +20,7 @@ async function _POST(request: NextRequest) {
 
   const supabase = await createClient();
   const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
-  if (authError || !user) return safeError('Unauthorized', 401);
+  if (!user) return safeError('Unauthorized', 401);
 
   const body = await parseBody<Record<string, unknown>>(request);
   const { platform, content, title, media_url, scheduled_for } = body as {
@@ -194,7 +194,7 @@ async function _GET(request: NextRequest) {
 
   const supabase = await createClient();
   const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
-  if (authError || !user) return safeError('Unauthorized', 401);
+  if (!user) return safeError('Unauthorized', 401);
 
   const { searchParams } = new URL(request.url);
   const platform = searchParams.get('platform');

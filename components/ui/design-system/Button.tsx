@@ -64,10 +64,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     // If asChild is true, render children directly with className applied
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children, {
+      return React.cloneElement(children as React.ReactElement<any>, {
         className: combinedClassName,
         ...props,
-      } as string);
+      });
     }
 
     return (

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -403,8 +403,8 @@ export default function FundingPage() {
             <Link href="/contact">
               <Button size="lg">Contact Us</Button>
             </Link>
-            <a href={`tel:${PLATFORM_DEFAULTS.phone}`}>
-              <Button size="lg" variant="outline">Call {PLATFORM_DEFAULTS.phone}</Button>
+            <a href={`tel:${PLATFORM_DEFAULTS.supportPhone}`}>
+              <Button size="lg" variant="outline">Call {PLATFORM_DEFAULTS.supportPhone}</Button>
             </a>
           </div>
         </div>
@@ -414,8 +414,8 @@ export default function FundingPage() {
       <footer className="bg-slate-900 text-slate-400 py-8">
         <div className="container mx-auto px-4 text-center">
           <p>{PLATFORM_DEFAULTS.orgName}</p>
-          <p className="text-sm mt-2">{PLATFORM_DEFAULTS.address}</p>
-          <p className="text-sm mt-1">{PLATFORM_DEFAULTS.phone} | {PLATFORM_DEFAULTS.email}</p>
+          <p className="text-sm mt-2">{PLATFORM_DEFAULTS.siteUrl}</p>
+          <p className="text-sm mt-1">{PLATFORM_DEFAULTS.supportPhone} | {PLATFORM_DEFAULTS.supportEmail}</p>
         </div>
       </footer>
     </div>

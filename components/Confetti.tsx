@@ -42,7 +42,7 @@ export default function Confetti({
   const [pieces, setPieces] = useState<ConfettiPiece[]>([]);
   const [isActive, setIsActive] = useState(active);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     if (active) {
       // Generate confetti pieces
       const newPieces: ConfettiPiece[] = Array.from({ length: pieceCount }, (_, i) => ({
@@ -112,7 +112,7 @@ export function ConfettiCannon({
 }: Omit<ConfettiProps, 'pieceCount'>) {
   const [isActive, setIsActive] = useState(active);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     if (active) {
       setIsActive(true);
       const timer = setTimeout(() => {
@@ -221,7 +221,7 @@ export function ConfettiCannon({
 export function ConfettiBurst({ active = true, duration = 2000, pieceCount = 40 }: ConfettiProps) {
   const [isActive, setIsActive] = useState(active);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     if (active) {
       setIsActive(true);
       const timer = setTimeout(() => {

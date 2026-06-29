@@ -19,9 +19,9 @@ export function AIAssistantBubble() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     // Only show the welcome bubble once per session
-    if (sessionStorage.getItem('ai-bubble-shown')) return;
+    if (sessionStorage.getItem('ai-bubble-shown')) return () => {};
     const timer = setTimeout(() => {
       setShowWelcome(true);
       sessionStorage.setItem('ai-bubble-shown', '1');
@@ -52,8 +52,8 @@ export function AIAssistantBubble() {
     setShowWelcome(false);
   };
 
-  useEffect(() => {
-    if (!isOpen) return;
+  useEffect((): (() => void) => {
+    if (!isOpen) return () => {};
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setIsOpen(false);
     };

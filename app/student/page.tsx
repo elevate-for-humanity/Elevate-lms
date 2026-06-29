@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { 
   GraduationCap,
@@ -240,7 +240,7 @@ export default async function StudentPage() {
       <footer className="bg-slate-900 text-slate-400 py-6">
         <div className="container mx-auto px-4 text-center">
           <p>{PLATFORM_DEFAULTS.orgName} Student Portal</p>
-          <p className="text-sm mt-1">{PLATFORM_DEFAULTS.phone} | {PLATFORM_DEFAULTS.email}</p>
+          <p className="text-sm mt-1">{PLATFORM_DEFAULTS.supportPhone} | {PLATFORM_DEFAULTS.supportEmail}</p>
         </div>
       </footer>
     </div>

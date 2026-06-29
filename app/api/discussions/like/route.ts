@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { safeGetUser } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { safeError } from '@/lib/api/safe-error';
 
 // POST /api/discussions/like
 // Increments likes on program_discussions — matches app/programs/[program]/discussions/[threadId]/page.tsx
@@ -13,7 +14,7 @@ async function _POST(req: Request) {
   try {
     const supabase = await createClient();
     const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 

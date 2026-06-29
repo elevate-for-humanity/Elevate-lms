@@ -452,9 +452,17 @@ export interface InteractionSpecs {
   includeFlashcards: boolean;
   includeClickToReveal: boolean;
   includeDragDrop: boolean;
+  includeMatching?: boolean;
+  includeCaseStudies?: boolean;
+  includeSimulations?: boolean;
+  includeDecisionTrees?: boolean;
   knowledgeCheckCount: number;
   scenarioCount: number;
   flashcardCount: number;
+  matchingCount?: number;
+  caseStudyCount?: number;
+  simulationCount?: number;
+  decisionTreeCount?: number;
 }
 
 // ─── Enrollment-Based Features ────────────────────────────────────────────────

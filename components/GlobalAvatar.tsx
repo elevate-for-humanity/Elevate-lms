@@ -97,12 +97,12 @@ export default function GlobalAvatar() {
   const isExcluded = excludedPatterns.some((p) => p.test(pathname));
 
   // Reset on page change
-  useEffect(() => {
+  useEffect((): (() => void) => {
     setHasPlayed(false);
   }, [pathname]);
 
   // Auto-play with sound on scroll into view
-  useEffect(() => {
+  useEffect((): (() => void) => {
     const el = containerRef.current;
     if (!el || isExcluded || !config) return;
 

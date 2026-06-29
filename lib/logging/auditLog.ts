@@ -3,9 +3,11 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 
 export interface AuditLogEntry {
   actorId?: string;
+  actorUserId?: string;
   actorRole?: string;
   action: string;
   entity: string;
+  targetType?: string;
   entityId?: string;
   metadata?: Record<string, any>;
   ipAddress?: string;

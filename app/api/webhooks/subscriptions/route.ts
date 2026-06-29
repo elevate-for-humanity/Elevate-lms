@@ -92,7 +92,7 @@ async function _POST(request: NextRequest) {
         break;
       }
       case 'invoice.payment_succeeded': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = event.data.object as Stripe.Invoice & { subscription?: string | { id: string } | null };
         // Handle subscription as object or string (Stripe SDK v19+)
         const subscriptionId = typeof invoice.subscription === 'object' ? invoice.subscription?.id : invoice.subscription;
         logger.info('Invoice payment succeeded', { invoiceId: invoice.id, subscriptionId });
@@ -113,7 +113,7 @@ async function _POST(request: NextRequest) {
         break;
       }
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = event.data.object as Stripe.Invoice & { subscription?: string | { id: string } | null };
         const subscriptionId = typeof invoice.subscription === 'object' ? invoice.subscription?.id : invoice.subscription;
         logger.warn('Invoice payment failed', { invoiceId: invoice.id, subscriptionId });
         if (adminDb && subscriptionId) {

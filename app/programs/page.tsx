@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { createPublicClient } from '@/lib/supabase/public';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -291,8 +291,8 @@ export default async function ProgramsPage() {
       <footer className="bg-slate-900 text-slate-400 py-8">
         <div className="container mx-auto px-4 text-center">
           <p>{PLATFORM_DEFAULTS.orgName}</p>
-          <p className="text-sm mt-2">{PLATFORM_DEFAULTS.address}</p>
-          <p className="text-sm mt-1">{PLATFORM_DEFAULTS.phone} | {PLATFORM_DEFAULTS.email}</p>
+          <p className="text-sm mt-2">{PLATFORM_DEFAULTS.siteUrl}</p>
+          <p className="text-sm mt-1">{PLATFORM_DEFAULTS.supportPhone} | {PLATFORM_DEFAULTS.supportEmail}</p>
         </div>
       </footer>
     </div>

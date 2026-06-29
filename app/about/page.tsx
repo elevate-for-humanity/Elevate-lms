@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { 
   Target, 
   Users, 
@@ -250,8 +250,8 @@ export default function AboutPage() {
       <footer className="bg-slate-100 py-8">
         <div className="container mx-auto px-4 text-center text-slate-500">
           <p>{PLATFORM_DEFAULTS.orgName}</p>
-          <p className="text-sm mt-2">{PLATFORM_DEFAULTS.address}</p>
-          <p className="text-sm">{PLATFORM_DEFAULTS.phone} | {PLATFORM_DEFAULTS.email}</p>
+          <p className="text-sm mt-2">{PLATFORM_DEFAULTS.siteUrl}</p>
+          <p className="text-sm">{PLATFORM_DEFAULTS.supportPhone} | {PLATFORM_DEFAULTS.supportEmail}</p>
         </div>
       </footer>
     </div>

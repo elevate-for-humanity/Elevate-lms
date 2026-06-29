@@ -18,6 +18,7 @@ import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { safeError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
@@ -34,7 +35,7 @@ async function _GET(request: Request) {
 
     const supabase = await createClient();
     const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
   const supabase = await createClient();
   const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
-  if (authError || !user) return safeError('Unauthorized', 401);
+  if (!user) return safeError('Unauthorized', 401);
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get('status');
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
   const supabase = await createClient();
   const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
-  if (authError || !user) return safeError('Unauthorized', 401);
+  if (!user) return safeError('Unauthorized', 401);
 
   // Verify employer role
   const { data: profile } = await supabase
@@ -98,7 +98,7 @@ export async function PATCH(request: NextRequest) {
 
   const supabase = await createClient();
   const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
-  if (authError || !user) return safeError('Unauthorized', 401);
+  if (!user) return safeError('Unauthorized', 401);
 
   let body: unknown;
   try { body = await request.json(); } catch { return safeError('Invalid JSON', 400); }

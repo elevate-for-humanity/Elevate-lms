@@ -94,7 +94,7 @@ async function _POST(request: NextRequest) {
       }
 
       case 'invoice.payment_succeeded': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = event.data.object as Stripe.Invoice & { subscription?: string | { id: string } | null };
         // Stripe SDK v19+ returns subscription as object or string
         const subscriptionId = typeof invoice.subscription === 'object' 
           ? (invoice.subscription as { id?: string })?.id 
@@ -108,7 +108,7 @@ async function _POST(request: NextRequest) {
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = event.data.object as Stripe.Invoice & { subscription?: string | { id: string } | null };
         // Stripe SDK v19+ returns subscription as object or string
         const subscriptionId = typeof invoice.subscription === 'object' 
           ? (invoice.subscription as { id?: string })?.id 

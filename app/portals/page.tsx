@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { 
   GraduationCap,
@@ -222,7 +222,7 @@ export default function PortalsPage() {
                   Need Help?
                 </h3>
                 <p className="text-slate-600 ml-10">
-                  Contact our support team at {PLATFORM_DEFAULTS.email} or call {PLATFORM_DEFAULTS.phone}.
+                  Contact our support team at {PLATFORM_DEFAULTS.supportEmail} or call {PLATFORM_DEFAULTS.supportPhone}.
                 </p>
               </div>
             </div>
@@ -267,8 +267,8 @@ export default function PortalsPage() {
       <footer className="bg-slate-900 text-slate-400 py-8">
         <div className="container mx-auto px-4 text-center">
           <p>{PLATFORM_DEFAULTS.orgName}</p>
-          <p className="text-sm mt-2">{PLATFORM_DEFAULTS.address}</p>
-          <p className="text-sm mt-1">{PLATFORM_DEFAULTS.phone} | {PLATFORM_DEFAULTS.email}</p>
+          <p className="text-sm mt-2">{PLATFORM_DEFAULTS.siteUrl}</p>
+          <p className="text-sm mt-1">{PLATFORM_DEFAULTS.supportPhone} | {PLATFORM_DEFAULTS.supportEmail}</p>
         </div>
       </footer>
     </div>

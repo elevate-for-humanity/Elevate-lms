@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { 
   Shield,
@@ -192,8 +192,8 @@ export default async function AdminPage() {
                 <div className="pt-4 border-t">
                   <p className="text-sm text-slate-500 text-center">
                     Need access? Contact your system administrator or email{' '}
-                    <a href={`mailto:${PLATFORM_DEFAULTS.email}`} className="text-brand-blue-600 hover:underline">
-                      {PLATFORM_DEFAULTS.email}
+                    <a href={`mailto:${PLATFORM_DEFAULTS.supportEmail}`} className="text-brand-blue-600 hover:underline">
+                      {PLATFORM_DEFAULTS.supportEmail}
                     </a>
                   </p>
                 </div>
@@ -222,7 +222,7 @@ export default async function AdminPage() {
       <footer className="bg-slate-900 text-slate-400 py-6 mt-12">
         <div className="container mx-auto px-4 text-center">
           <p>{PLATFORM_DEFAULTS.orgName} Admin Portal</p>
-          <p className="text-sm mt-1">{PLATFORM_DEFAULTS.phone} | {PLATFORM_DEFAULTS.email}</p>
+          <p className="text-sm mt-1">{PLATFORM_DEFAULTS.supportPhone} | {PLATFORM_DEFAULTS.supportEmail}</p>
         </div>
       </footer>
     </div>

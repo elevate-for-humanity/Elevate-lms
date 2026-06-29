@@ -8,6 +8,7 @@ import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { aiChat } from '@/lib/ai/ai-service';
 import { logger } from '@/lib/logger';
+import { safeError } from '@/lib/api/safe-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -18,10 +19,9 @@ export async function POST(request: NextRequest) {
   if (limited) return limited;
 
   const supabase = await createClient();
-  const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const authRes = await supabase.auth.getUser();
+  if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401);
+  const user = authRes.data.user;
 
   let body: { skills?: string };
   try {

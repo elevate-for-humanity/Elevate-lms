@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { safeError } from '@/lib/api/safe-error';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -125,7 +126,7 @@ async function _POST(req: Request) {
       const supabase = await createClient();
       const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
       
-      if (authError || !user) {
+      if (!user) {
         logger.warn('Unauthorized license generation attempt', { ip: clientIp });
         return Response.json(
           { error: 'Authentication required' },

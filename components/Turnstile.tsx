@@ -76,7 +76,7 @@ export default function Turnstile({ onVerify, onError, onExpire, formId }: Turns
     });
   }, [handleError, handleExpire, handleVerify]);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     // Skip if no site key configured. Use a sentinel token so forms can proceed
     // when Turnstile is not enabled; server routes treat it as a missing token and
     // only block when APPLICATION_TURNSTILE_REQUIRED is explicitly enabled.

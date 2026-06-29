@@ -183,7 +183,7 @@ export async function handleCheckoutCompleted(
  */
 export async function handleInvoicePaid(
   event: Stripe.Event,
-  invoice: Stripe.Invoice,
+  invoice: Stripe.Invoice & { subscription?: string | { id?: string } | null },
 ): Promise<LinkResult> {
   const customerId = invoice.customer as string;
   // Stripe SDK v19+ returns subscription as object or string
@@ -320,7 +320,7 @@ export async function handleSubscriptionDeleted(
  */
 export async function handlePaymentFailed(
   event: Stripe.Event,
-  invoice: Stripe.Invoice,
+  invoice: Stripe.Invoice & { subscription?: string | { id?: string } | null },
 ): Promise<LinkResult> {
   // Stripe SDK v19+ returns subscription as object or string
   const subscriptionId = typeof invoice.subscription === 'object'

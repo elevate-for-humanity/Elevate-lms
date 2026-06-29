@@ -1,3 +1,4 @@
+import type Stripe from 'stripe';
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 /**

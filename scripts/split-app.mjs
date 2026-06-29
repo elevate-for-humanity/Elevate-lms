@@ -27,7 +27,7 @@ const whitelist = [
   'not-found.tsx', 'loading.tsx', 'error.tsx', 'health', 'data', 
   'funding', 'barber-and-beauty-apprenticeships', 'partner',
   // Public marketing pages that must survive the MARKETING build
-  'about', 'apply', 'admin', 'student', 'portals', 'testing', 'store',
+  'about', 'apply', 'admin', 'student', 'portals', 'testing', 'store', 'blog', 'contact', 'legal', 'careers', 'resources',
   // SEO/static pages
   'contact', 'legal', 'login', 'signup',
   // Programs for public browse (dynamic routes)

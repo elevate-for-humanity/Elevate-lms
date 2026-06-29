@@ -3,13 +3,16 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { safeGetUser } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { safeError } from '@/lib/api/safe-error';
 
 async function _POST(req: Request) {
   try {
     const supabase = await createClient();
-      const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+    const authRes = await supabase.auth.getUser();
+    if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401);
+    const user = authRes.data.user;
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 

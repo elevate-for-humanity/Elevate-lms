@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -324,7 +324,7 @@ export default function ApplyPage() {
             </Link>
           </div>
           <p className="text-blue-300 mt-6 text-sm">
-            Questions? Call us at {PLATFORM_DEFAULTS.phone} or email {PLATFORM_DEFAULTS.email}
+            Questions? Call us at {PLATFORM_DEFAULTS.supportPhone} or email {PLATFORM_DEFAULTS.supportEmail}
           </p>
         </div>
       </section>
@@ -333,8 +333,8 @@ export default function ApplyPage() {
       <footer className="bg-slate-900 text-slate-400 py-8">
         <div className="container mx-auto px-4 text-center">
           <p>{PLATFORM_DEFAULTS.orgName}</p>
-          <p className="text-sm mt-2">{PLATFORM_DEFAULTS.address}</p>
-          <p className="text-sm mt-1">{PLATFORM_DEFAULTS.phone} | {PLATFORM_DEFAULTS.email}</p>
+          <p className="text-sm mt-2">{PLATFORM_DEFAULTS.siteUrl}</p>
+          <p className="text-sm mt-1">{PLATFORM_DEFAULTS.supportPhone} | {PLATFORM_DEFAULTS.supportEmail}</p>
         </div>
       </footer>
     </div>

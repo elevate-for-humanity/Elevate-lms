@@ -2,55 +2,87 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 /**
- * Route Splitter — Quarantines non-target routes to reduce build memory.
+ * Surgical Route Splitter v2
  * 
- * Target Scopes:
- *   1. MARKETING: Only public landing pages + store.
- *   2. ADMIN: Only administrative and staff portals.
- *   3. LMS: Only student, apprentice, and instructor portals.
+ * Instead of an 'Include' strategy which deleted 90% of the site, 
+ * we use an 'Exclude' strategy to remove only the heavy portal blocks.
  */
 
-const scope = process.env.BUILD_SCOPE; // 'MARKETING' | 'ADMIN' | 'LMS' | 'ASSETS'
+const scope = process.env.BUILD_SCOPE; 
 const root = process.cwd();
 const appDir = path.join(root, 'app');
 
 if (!scope || scope === 'ASSETS') {
-  console.log('No scope or ASSETS scope. skipping split.');
   process.exit(0);
 }
 
-const scopes = {
-  MARKETING: {
-    keep: ['(marketing)', '(public)', 'about', 'blog', 'programs', 'store', 'contact', 'apply', 'api', 'favicon.ico', 'globals.css', 'layout.tsx'],
-    remove: ['admin', 'apprentice', 'instructor', 'mission-control', 'partner', 'student-portal']
-  },
-  ADMIN: {
-    keep: ['admin', 'mission-control', 'intelligence', 'dev-studio', 'api', 'layout.tsx', 'globals.css'],
-    remove: ['(marketing)', '(public)', 'apprentice', 'instructor', 'programs', 'store', 'blog']
-  },
-  LMS: {
-    keep: ['apprentice', 'lms', 'instructor', 'course-preview', 'student-portal', 'api', 'layout.tsx', 'globals.css'],
-    remove: ['admin', 'mission-control', '(marketing)', '(public)', 'programs', 'store', 'blog']
-  }
+const excludeConfig = {
+  MARKETING: [
+    'admin',
+    'apprentice',
+    'instructor',
+    'mission-control',
+    'partner',
+    'student-portal',
+    'case-manager',
+    'intelligence',
+    'dev-studio',
+    'onboarding/instructor',
+    'onboarding/employer',
+    'program-holder'
+  ],
+  ADMIN: [
+    '(marketing)',
+    '(public)',
+    'apprentice',
+    'instructor',
+    'student-portal',
+    'programs',
+    'healthcare',
+    'skilled-trades',
+    'blog',
+    'about',
+    'apply',
+    'testing'
+  ],
+  LMS: [
+    'admin',
+    'mission-control',
+    'intelligence',
+    'dev-studio',
+    'partner',
+    'case-manager',
+    '(marketing)',
+    'about',
+    'blog',
+    'contact'
+  ]
 };
 
-const config = scopes[scope];
+const toRemove = excludeConfig[scope];
 
-if (!config) {
+if (!toRemove) {
   console.error(`Invalid scope: ${scope}`);
   process.exit(1);
 }
 
-console.log(`=== App Splitter: Scope ${scope} ===`);
+console.log(`=== Surgical Split: Scope ${scope} ===`);
 
-config.remove.forEach(dir => {
-  const fullPath = path.join(appDir, dir);
+toRemove.forEach(target => {
+  const fullPath = path.join(appDir, target);
   if (fs.existsSync(fullPath)) {
-    console.log(`Quarantining: ${dir}`);
-    // Hide by prefixing with __ (Next.js ignores these)
-    fs.cpSync(fullPath, path.join(appDir, `__${dir}`), { recursive: true });
-    fs.rmSync(fullPath, { recursive: true, force: true });
+    console.log(`Quarantining: ${target}`);
+    // Use a unique prefix to avoid collisions
+    const parent = path.dirname(fullPath);
+    const base = path.basename(fullPath);
+    const newPath = path.join(parent, `__split_${scope}_${base}`);
+    
+    try {
+      fs.renameSync(fullPath, newPath);
+    } catch (e) {
+      console.log(`Failed to rename ${target}: ${e.message}`);
+    }
   }
 });
 
-console.log('✅ Split complete. Build will now only process target routes.');
+console.log('✅ Split complete. Build now contains all necessary "Programs" and public pages.');

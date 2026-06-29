@@ -77,6 +77,7 @@ export const NAV_ITEMS: NavItem[] = [
 
 
 
+
       { name: 'Plumbing', href: '/programs/plumbing' },
       { name: 'Welding', href: '/programs/welding' },
       { name: 'CDL Training', href: '/programs/cdl-training' },

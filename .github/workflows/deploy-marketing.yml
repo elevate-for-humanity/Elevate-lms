@@ -80,11 +80,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Configure Marketing service (www)
-        run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --execute
-
-      - name: Configure Dockerfile path for marketing
-        run: pnpm tsx scripts/northflank/set-dockerfile.ts "$NORTHFLANK_MARKETING_SERVICE_ID" "/Dockerfile.marketing"
+      # Note: Ensure elevate-lms-build service is set to "external-git" build mode
+      # with Dockerfile path /Dockerfile.marketing in Northflank dashboard before running
 
       - name: Point Marketing service at main
         run: pnpm tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_MARKETING_SERVICE_ID" "$DEPLOY_BRANCH"

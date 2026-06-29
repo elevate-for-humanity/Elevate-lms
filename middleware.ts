@@ -4,8 +4,8 @@
 // config is defined here (not re-exported from proxy.ts) because Next.js
 // requires static analysis of the config export and cannot follow re-exports.
 //
-// nodejs runtime removed: reverting to standard edge for stability
-export const runtime = 'edge';
+// Fixed: use experimental-edge for Next.js 15 compatibility
+export const runtime = 'experimental-edge';
 
 export { middleware as default } from './proxy';
 

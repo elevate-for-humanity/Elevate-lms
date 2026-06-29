@@ -311,7 +311,7 @@ export async function middleware(request: NextRequest) {
   requestHeaders.set('x-pathname', pathname);
 
   function nextWithPathname() {
-    return NextResponse.next({ request: { headers: requestHeaders } });
+    return NextResponse.next();
   }
 
   const isLocalHost =

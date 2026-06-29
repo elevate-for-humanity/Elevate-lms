@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { createClient, safeGetUser } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
 import {
   FileText,
   Upload,

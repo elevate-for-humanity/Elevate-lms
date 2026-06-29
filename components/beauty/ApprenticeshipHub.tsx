@@ -217,6 +217,7 @@ const PROGRAM_ICONS: Record<string, React.ReactNode> = {
 };
 
 // HOST_SHOPS loaded dynamically from database
+const HOST_SHOPS: any[] = [];
 
 const TESTIMONIALS = [
   { id: 1, name: 'Destiny Williams', role: 'Licensed Barber', image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=200', quote: 'I went from BROKE to BANKABLE in just 12 months! This program gave me a career that pays my bills AND feeds my soul. Now I own my own shop!', rating: 5, location: 'Atlanta, GA', earnings: '$65K+ / year' },

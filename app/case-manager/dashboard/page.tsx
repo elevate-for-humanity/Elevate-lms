@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import {
@@ -26,6 +26,7 @@ export default async function CaseManagerDashboardPage() {
   const { user } = await requireRole(['case_manager', 'admin', 'staff']);
 
   const supabase = await createClient();
+  const dbUser = safeGetUser(await supabase.auth.getUser());
   const admin = await requireAdminClient();
   const db = admin || supabase;
 
@@ -36,6 +37,7 @@ export default async function CaseManagerDashboardPage() {
     .eq('case_manager_id', user.id);
 
   const learnerIds = (assignments ?? []).map((a: any) => a.learner_id);
+  const totalAssigned = assignments?.length || 0;
   
   // FALLBACK: If no assigned learners, show network-wide stats for demo/admin purposes
   const isNetworkView = learnerIds.length === 0;

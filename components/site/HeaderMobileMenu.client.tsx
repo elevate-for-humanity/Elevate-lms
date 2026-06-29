@@ -224,7 +224,8 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                                     </button>
                                     {categoryOpen ? (
                                       <div className="pl-2 pb-2 border-l border-slate-200 ml-1">
-                                        {column.map((subItem) => (
+                                        {column.map((subItem) => 
+                                          !subItem ? null : (
                                           <MobileSubLink
                                             key={`${subItem.name}-${subItem.href}`}
                                             subItem={subItem}

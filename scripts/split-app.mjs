@@ -22,7 +22,7 @@ const excludeConfig = {
   LMS: ['admin', 'mission-control', 'intelligence', 'partner', 'case-manager', '(marketing)', 'blog']
 };
 
-const whitelist = ['api', 'auth', '(auth)', 'layout.tsx', 'page.tsx', 'globals.css', 'not-found.tsx', 'loading.tsx', 'error.tsx', 'health', 'data'];
+const whitelist = ['api', 'auth', '(auth)', 'layout.tsx', 'page.tsx', 'globals.css', 'not-found.tsx', 'loading.tsx', 'error.tsx', 'health', 'data', 'funding', 'barber-and-beauty-apprenticeships', 'partner'];
 
 const toRemove = excludeConfig[scope];
 

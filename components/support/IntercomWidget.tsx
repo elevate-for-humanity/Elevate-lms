@@ -12,8 +12,8 @@ declare global {
 }
 
 export function IntercomWidget({ user }: { user?: { id: string; email: string; name?: string } }) {
-  useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_INTERCOM_APP_ID) return;
+  useEffect((): (() => void) => {
+    if (!process.env.NEXT_PUBLIC_INTERCOM_APP_ID) return () => {};
 
     const appId = process.env.NEXT_PUBLIC_INTERCOM_APP_ID;
 

@@ -58,10 +58,10 @@ async function subscribeToPush(): Promise<boolean> {
 export function PushRegistration() {
   const [showBanner, setShowBanner] = useState(false);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+  useEffect((): (() => void) => {
+    if (typeof window === 'undefined') return () => {};
     if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
-    if (!VAPID_PUBLIC_KEY) return;
+    if (!VAPID_PUBLIC_KEY) return () => {};
 
     const permission = Notification.permission;
 
@@ -71,13 +71,13 @@ export function PushRegistration() {
       return;
     }
 
-    if (permission === 'denied') return;
+    if (permission === 'denied') return () => {};
 
     // permission === 'default' — check cooldown before showing banner
     const lastPrompt = localStorage.getItem('elevate-push-prompt-at');
     if (lastPrompt) {
       const daysSince = (Date.now() - parseInt(lastPrompt, 10)) / (1000 * 60 * 60 * 24);
-      if (daysSince < PROMPT_COOLDOWN_DAYS) return;
+      if (daysSince < PROMPT_COOLDOWN_DAYS) return () => {};
     }
 
     const timer = setTimeout(() => setShowBanner(true), PROMPT_DELAY_MS);

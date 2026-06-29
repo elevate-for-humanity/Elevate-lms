@@ -34,21 +34,21 @@ export default function LessonVideoWithSimulation({
   const teaching = simulation.teaching;
   const minimumReached = watchedSeconds >= minimumTimeSeconds;
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     if (minimumReached && !minimumReported) {
       setMinimumReported(true);
       onMinimumTimeReached?.();
     }
   }, [minimumReached, minimumReported, onMinimumTimeReached]);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) return () => {};
 
     let intervalId: ReturnType<typeof setInterval> | null = null;
 
     const startTracking = () => {
-      if (intervalId) return;
+      if (intervalId) return () => {};
       intervalId = setInterval(() => {
         if (!video.paused && !video.ended) {
           setWatchedSeconds((prev) => prev + 1);

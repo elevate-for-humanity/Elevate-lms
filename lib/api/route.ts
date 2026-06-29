@@ -19,7 +19,7 @@
  */
 
 import { serverError } from '@/lib/api/responses';
-import { logger } from '@/lib/logger';
+import { log } from '@/lib/logger';
 
 export async function handleRoute<T>(fn: () => Promise<T>): Promise<T | Response> {
   try {
@@ -37,7 +37,7 @@ export async function handleRoute<T>(fn: () => Promise<T>): Promise<T | Response
 
     const message = error instanceof Error ? error.message : String(error);
 
-    logger.error('[handleRoute] Unhandled route error:', message);
+    log.error('[handleRoute] Unhandled route error:', message);
 
     return serverError('INTERNAL_SERVER_ERROR', message) as unknown as T;
   }

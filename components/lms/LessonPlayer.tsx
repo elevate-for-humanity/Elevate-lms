@@ -91,7 +91,7 @@ export default function LessonPlayer({
   }, [mediaKind]);
 
   // Reset state when URL changes
-  React.useEffect(() => {
+  React.useEffect((): (() => void) => {
     setIsPlaying(false);
     setHasStarted(false);
     setCurrentTime(0);
@@ -103,9 +103,9 @@ export default function LessonPlayer({
   }, [videoUrl]);
 
   // Media event listeners
-  React.useEffect(() => {
+  React.useEffect((): (() => void) => {
     const v = getMedia();
-    if (!v) return;
+    if (!v) return () => {};
 
     const onPlay = () => {
       setIsPlaying(true);
@@ -171,7 +171,7 @@ export default function LessonPlayer({
   }, [onComplete, onProgress, getMedia, videoUrl, mediaKind]);
 
   // Fullscreen listener
-  React.useEffect(() => {
+  React.useEffect((): (() => void) => {
     const onChange = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', onChange);
     return () => document.removeEventListener('fullscreenchange', onChange);
@@ -186,7 +186,7 @@ export default function LessonPlayer({
     }
   }, [isPlaying]);
 
-  React.useEffect(() => {
+  React.useEffect((): (() => void) => {
     if (!isPlaying) setShowControls(true);
     else resetControlsTimer();
     return () => {
@@ -198,7 +198,7 @@ export default function LessonPlayer({
 
   const play = async () => {
     const v = getMedia();
-    if (!v) return;
+    if (!v) return () => {};
     setIsLoading(true);
     setHasStarted(true);
     try {
@@ -211,14 +211,14 @@ export default function LessonPlayer({
 
   const togglePlay = async () => {
     const v = getMedia();
-    if (!v) return;
+    if (!v) return () => {};
     if (v.paused) await play();
     else v.pause();
   };
 
   const restart = async () => {
     const v = getMedia();
-    if (!v) return;
+    if (!v) return () => {};
     v.currentTime = 0;
     setEnded(false);
     await play();
@@ -226,21 +226,21 @@ export default function LessonPlayer({
 
   const toggleMute = () => {
     const v = getMedia();
-    if (!v) return;
+    if (!v) return () => {};
     v.muted = !muted;
     setMuted(!muted);
   };
 
   const toggleFullscreen = async () => {
     const el = containerRef.current;
-    if (!el) return;
+    if (!el) return () => {};
     if (document.fullscreenElement) await document.exitFullscreen();
     else await el.requestFullscreen();
   };
 
   const skip = (seconds: number) => {
     const v = getMedia();
-    if (!v) return;
+    if (!v) return () => {};
     const target = v.currentTime + seconds;
     v.currentTime = Math.max(0, Math.min(maxWatchedRef.current + 2, target));
   };
@@ -252,7 +252,7 @@ export default function LessonPlayer({
     target: HTMLDivElement,
   ) => {
     const v = getMedia();
-    if (!v || !duration) return;
+    if (!v || !duration) return () => {};
     const rect = target.getBoundingClientRect();
     const clientX =
       'touches' in e ? (e.touches[0]?.clientX ?? e.changedTouches[0]?.clientX ?? 0) : e.clientX;
@@ -280,9 +280,9 @@ export default function LessonPlayer({
   const progressPct = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   // Keyboard shortcuts
-  React.useEffect(() => {
+  React.useEffect((): (() => void) => {
     const handler = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return () => {};
       switch (e.key) {
         case ' ':
         case 'k':

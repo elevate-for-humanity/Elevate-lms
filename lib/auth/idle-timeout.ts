@@ -16,7 +16,7 @@ function resetTimer(onTimeout: () => void, timeoutMs: number) {
 }
 
 export function initIdleTimeout(onTimeout: () => void, timeoutMs = DEFAULT_IDLE_TIMEOUT_MS) {
-  if (initialized || typeof window === 'undefined') return;
+  if (initialized || typeof window === 'undefined') return () => {};
   initialized = true;
 
   const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];

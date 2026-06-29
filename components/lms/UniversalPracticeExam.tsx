@@ -116,8 +116,8 @@ export default function UniversalPracticeExam() {
     [timeLeft],
   );
 
-  useEffect(() => {
-    if (state !== 'active') return;
+  useEffect((): (() => void) => {
+    if (state !== 'active') return () => {};
     timerRef.current = setInterval(() => {
       setTimeLeft((t) => {
         if (t <= 1) {
@@ -133,10 +133,10 @@ export default function UniversalPracticeExam() {
   }, [state, finish]);
 
   // Save missed questions on results
-  useEffect(() => {
-    if (state !== 'results') return;
+  useEffect((): (() => void) => {
+    if (state !== 'results') return () => {};
     const missed = EXAM_QUESTIONS.filter((q) => answers[q.globalIndex] !== q.answer);
-    if (!missed.length) return;
+    if (!missed.length) return () => {};
     try {
       const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
       const now = Date.now();

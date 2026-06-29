@@ -23,7 +23,7 @@ export default function LessonRecap({ topics, lessonTitle }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Start animation when component scrolls into view
-  useEffect(() => {
+  useEffect((): (() => void) => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !started) {
@@ -38,9 +38,9 @@ export default function LessonRecap({ topics, lessonTitle }: Props) {
   }, [started]);
 
   // Fade in topics one by one
-  useEffect(() => {
-    if (!started) return;
-    if (visibleCount >= topics.length) return;
+  useEffect((): (() => void) => {
+    if (!started) return () => {};
+    if (visibleCount >= topics.length) return () => {};
 
     const timer = setTimeout(() => {
       setVisibleCount((c) => c + 1);

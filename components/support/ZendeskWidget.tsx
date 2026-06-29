@@ -12,8 +12,8 @@ declare global {
 }
 
 export function ZendeskWidget({ user }: { user?: { id: string; email: string; name?: string } }) {
-  useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_ZENDESK_KEY) return;
+  useEffect((): (() => void) => {
+    if (!process.env.NEXT_PUBLIC_ZENDESK_KEY) return () => {};
 
     const script = document.createElement('script');
     script.id = 'ze-snippet';

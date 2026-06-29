@@ -31,7 +31,7 @@ function useSpeech() {
   const [isMuted, setIsMuted] = useState(false);
   const synthRef = useRef<SpeechSynthesis | null>(null);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       synthRef.current = window.speechSynthesis;
     }
@@ -39,7 +39,7 @@ function useSpeech() {
 
   const speak = useCallback(
     (text: string) => {
-      if (!synthRef.current || isMuted) return;
+      if (!synthRef.current || isMuted) return () => {};
 
       try {
         synthRef.current.cancel();
@@ -88,17 +88,17 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
   const { speak, stop, isSpeaking, isMuted, toggleMute } = useSpeech();
 
   // Auto-open and greet on first visit (or every visit if not dismissed)
-  useEffect(() => {
+  useEffect((): (() => void) => {
     if (forceOpen) {
       setIsOpen(true);
       return;
     }
 
-    if (typeof window === 'undefined') return;
-    if (hasAutoOpened) return;
+    if (typeof window === 'undefined') return () => {};
+    if (hasAutoOpened) return () => {};
 
     const completed = localStorage.getItem(GUIDE_STORAGE_KEYS.COMPLETED);
-    if (completed) return;
+    if (completed) return () => {};
 
     // Open guide chat — speech deferred until user interacts
     const timer = setTimeout(() => {
@@ -154,7 +154,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
 
   const handleConfirm = useCallback(
     (startTour: boolean) => {
-      if (!selectedChoice) return;
+      if (!selectedChoice) return () => {};
 
       if (typeof window !== 'undefined') {
         localStorage.setItem(GUIDE_STORAGE_KEYS.COMPLETED, 'true');

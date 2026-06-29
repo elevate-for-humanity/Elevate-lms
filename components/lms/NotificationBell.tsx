@@ -30,7 +30,7 @@ export function NotificationBell() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) return;
+    if (!user) return () => {};
 
     const { data } = await supabase
       .from('notifications')
@@ -53,13 +53,13 @@ export function NotificationBell() {
     }
   }, []);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     void fetchNotifications();
 
     // Subscribe to realtime notifications
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
+      if (!user) return () => {};
       const unsubscribe = subscribeToNotifications(user.id, (payload) => {
         const newNotif = payload as any;
         setNotifications((prev) => [
@@ -98,7 +98,7 @@ export function NotificationBell() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) return () => {};
     await markAllNotificationsRead(user.id);
     setNotifications(notifications.map((n) => ({ ...n, read: true })));
   };

@@ -27,7 +27,7 @@ import { readRedirectParam, validateRedirect } from '@/lib/auth/validate-redirec
 export default function AuthRedirectHandler() {
   const router = useRouter();
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     // Only act when the URL contains a Supabase auth hash fragment
     const hash = window.location.hash;
     if (!hash.includes('access_token') && !hash.includes('error_code')) return;
@@ -57,7 +57,7 @@ export default function AuthRedirectHandler() {
     // The Supabase client automatically exchanges the hash fragment for a
     // session on init. Listen for the resulting SIGNED_IN event.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event !== 'SIGNED_IN' || !session?.user) return;
+      if (event !== 'SIGNED_IN' || !session?.user) return () => {};
 
       subscription.unsubscribe();
 

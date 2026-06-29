@@ -60,7 +60,7 @@ export default function Turnstile({ onVerify, onError, onExpire, formId }: Turns
   }, [onExpire]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const renderWidget = useCallback(() => {
-    if (!containerRef.current || !window.turnstile || !SITE_KEY) return;
+    if (!containerRef.current || !window.turnstile || !SITE_KEY) return () => {};
 
     // Remove existing widget if any
     if (widgetIdRef.current) {

@@ -92,6 +92,8 @@ export type AuditEvent = {
   tenantId?: string | null;
   userId?: string | null;
   actor_id?: string | null; // Alias for userId - used in database schema
+  target_type?: string | null; // Type of the target entity (snake_case for DB)
+  target_id?: string | null; // ID of the target entity
   action: string;
   resourceType?: string | null;
   resourceId?: string | null;

@@ -18,37 +18,37 @@ export default function SignaturePad({ onSave, width = 500, height = 200 }: Sign
   const [isEmpty, setIsEmpty] = useState(true);
 
   useEffect((): (() => void) => {
-    if (canvasRef.current) {
-      const pad = new SignatureCanvas(canvasRef.current, {
-        backgroundColor: 'rgb(255, 255, 255)',
-        penColor: 'rgb(0, 0, 0)',
-      });
+    if (!canvasRef.current) return () => {};
+    
+    const pad = new SignatureCanvas(canvasRef.current, {
+      backgroundColor: 'rgb(255, 255, 255)',
+      penColor: 'rgb(0, 0, 0)',
+    });
 
-      pad.addEventListener('endStroke', () => {
-        setIsEmpty(pad.isEmpty());
-      });
+    pad.addEventListener('endStroke', () => {
+      setIsEmpty(pad.isEmpty());
+    });
 
-      setSignaturePad(pad);
+    setSignaturePad(pad);
 
-      // Handle window resize
-      const handleResize = () => {
-        if (canvasRef.current && pad) {
-          const ratio = Math.max(window.devicePixelRatio || 1, 1);
-          canvasRef.current.width = canvasRef.current.offsetWidth * ratio;
-          canvasRef.current.height = canvasRef.current.offsetHeight * ratio;
-          canvasRef.current.getContext('2d')?.scale(ratio, ratio);
-          pad.clear();
-        }
-      };
+    // Handle window resize
+    const handleResize = () => {
+      if (canvasRef.current && pad) {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvasRef.current.width = canvasRef.current.offsetWidth * ratio;
+        canvasRef.current.height = canvasRef.current.offsetHeight * ratio;
+        canvasRef.current.getContext('2d')?.scale(ratio, ratio);
+        pad.clear();
+      }
+    };
 
-      handleResize();
-      window.addEventListener('resize', handleResize);
+    handleResize();
+    window.addEventListener('resize', handleResize);
 
-      return () => {
-        window.removeEventListener('resize', handleResize);
-        pad.off();
-      };
-    }
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      pad.off();
+    };
   }, []);
 
   const handleClear = () => {

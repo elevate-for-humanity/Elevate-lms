@@ -76,8 +76,8 @@ export default function TimedPracticeExam({
   );
 
   // Countdown timer
-  useEffect(() => {
-    if (state !== 'active') return;
+  useEffect((): (() => void) => {
+    if (state !== 'active') return () => {};
     timerRef.current = setInterval(() => {
       setTimeLeft((t) => {
         if (t <= 1) {
@@ -93,10 +93,10 @@ export default function TimedPracticeExam({
   }, [state, finish]);
 
   // Save missed questions to localStorage for spaced repetition
-  useEffect(() => {
-    if (state !== 'results') return;
+  useEffect((): (() => void) => {
+    if (state !== 'results') return () => {};
     const missed = exam.filter((_, i) => answers[i] !== exam[i].answer);
-    if (!missed.length) return;
+    if (!missed.length) return () => {};
     try {
       const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
       const now = Date.now();
@@ -123,7 +123,7 @@ export default function TimedPracticeExam({
   }, [state, exam, answers, onComplete, passingScore, sectionName]);
 
   const selectAnswer = (qi: number, oi: number) => {
-    if (state !== 'active') return;
+    if (state !== 'active') return () => {};
     setAnswers((a) => ({ ...a, [qi]: oi }));
   };
 

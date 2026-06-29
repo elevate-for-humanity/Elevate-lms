@@ -40,7 +40,7 @@ export function useBuildVersion() {
         headers: { 'Cache-Control': 'no-cache' },
       });
       
-      if (!response.ok) return;
+      if (!response.ok) return () => {};
       
       const { buildVersion: serverVersion } = await response.json();
       const storedVersion = sessionStorage.getItem(BUILD_VERSION_KEY);
@@ -61,8 +61,8 @@ export function useBuildVersion() {
     return false;
   }, []);
 
-  useEffect(() => {
-    if (initialized.current) return;
+  useEffect((): (() => void) => {
+    if (initialized.current) return () => {};
     initialized.current = true;
 
     // Initial check on mount - store version if not set
@@ -113,6 +113,6 @@ export function isStaleBuild(): boolean {
  * Force reload to sync with current build
  */
 export function syncWithCurrentBuild(): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') return () => {};
   window.location.reload();
 }

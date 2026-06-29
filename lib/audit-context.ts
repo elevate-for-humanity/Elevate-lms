@@ -5,6 +5,7 @@
 
 interface AuditContext {
   actorId?: string;
+  actorUserId?: string;
   systemActor?: string;
   requestId?: string;
   metadata?: Record<string, unknown>;

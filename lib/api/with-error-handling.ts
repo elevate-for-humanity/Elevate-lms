@@ -1,4 +1,4 @@
-import { logger } from '@/lib/logger';
+import { log } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { APIError } from './api-error';
 import { ErrorCode } from './error-codes';
@@ -18,9 +18,9 @@ async function logErrorToSentry(error: Error, context: Record<string, any>) {
         },
         extra: context,
       });
-    } catch (error) {
+    } catch (err) {
       // Sentry not available, log to console
-      logger.error('[Sentry Error]', error);
+      log.error('[Sentry Error]', err);
     }
   }
 }
@@ -59,7 +59,7 @@ function sanitizeError(error: any): { message: string; code: string } {
 /**
  * Logs error with context
  */
-function logError(error: any, context: Record<string, any>) {
+function logApiError(error: any, context: Record<string, any>) {
   const timestamp = new Date().toISOString();
   const errorInfo = {
     timestamp,
@@ -74,7 +74,7 @@ function logError(error: any, context: Record<string, any>) {
         : String(error),
   };
 
-  logger.error('[API Error]', JSON.stringify(errorInfo, null, 2));
+  log.error('[API Error]', errorInfo);
 
   // Log to Sentry
   if (error instanceof Error) {
@@ -108,7 +108,7 @@ export function withErrorHandling<T = any>(
 
       // Handle APIError
       if (error instanceof APIError) {
-        logError(error, {
+        logApiError(error, {
           route,
           method,
           statusCode: error.statusCode,
@@ -120,7 +120,7 @@ export function withErrorHandling<T = any>(
       }
 
       // Handle unknown errors
-      logError(error, {
+      logApiError(error, {
         route,
         method,
         statusCode: 500,
@@ -163,7 +163,7 @@ export function withErrorHandlingParams<T = any>(
       const duration = Date.now() - startTime;
 
       if (error instanceof APIError) {
-        logError(error, {
+        logApiError(error, {
           route,
           method,
           statusCode: error.statusCode,
@@ -174,7 +174,7 @@ export function withErrorHandlingParams<T = any>(
         return NextResponse.json(error.toJSON(), { status: error.statusCode });
       }
 
-      logError(error, {
+      logApiError(error, {
         route,
         method,
         statusCode: 500,

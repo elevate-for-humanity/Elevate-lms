@@ -40,7 +40,7 @@ export default function AvatarGuide({
 
   // Typing effect
   useEffect((): (() => void) => {
-    if (!isVisible) return;
+    if (!isVisible) return () => {};
 
     setDisplayedText('');
     setIsTyping(true);
@@ -87,6 +87,7 @@ export default function AvatarGuide({
         };
       }
     }
+    return () => {};
   }, [currentStep, steps]);
 
   const handleNext = () => {

@@ -40,7 +40,7 @@ export function DocumentSignatureBlock({
   const [signerEmail, setSignerEmail] = useState('');
 
   // Pre-fill name and check if already signed
-  useEffect(() => {
+  useEffect((): (() => void) => {
     import('@/lib/supabase/client').then(({ createClient }) => {
       const supabase = createClient();
       supabase?.auth.getUser().then(async ({ data }) => {
@@ -70,8 +70,8 @@ export function DocumentSignatureBlock({
   }, [agreementType, agreementVersion]);
 
   // Init signature pad
-  useEffect(() => {
-    if (method !== 'drawn' || !canvasRef.current || pad) return;
+  useEffect((): (() => void) => {
+    if (method !== 'drawn' || !canvasRef.current || pad) return () => {};
     const instance = new SignatureCanvas(canvasRef.current, {
       backgroundColor: 'rgb(255,255,255)',
       penColor: 'rgb(15,23,42)',
@@ -80,7 +80,7 @@ export function DocumentSignatureBlock({
       if (!instance.isEmpty()) setDrawn(instance.toDataURL('image/png'));
     });
     const resize = () => {
-      if (!canvasRef.current) return;
+      if (!canvasRef.current) return () => {};
       const ratio = Math.max(window.devicePixelRatio || 1, 1);
       canvasRef.current.width = canvasRef.current.offsetWidth * ratio;
       canvasRef.current.height = canvasRef.current.offsetHeight * ratio;

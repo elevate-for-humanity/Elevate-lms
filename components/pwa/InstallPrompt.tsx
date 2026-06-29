@@ -20,11 +20,11 @@ function InstallPrompt({ appName, appDescription, themeColor = '#7c3aed' }: Inst
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     // Check if already installed
     const standalone = window.matchMedia('(display-mode: standalone)').matches;
     setIsStandalone(standalone);
-    if (standalone) return;
+    if (standalone) return () => {};
 
     // Check if iOS
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -32,7 +32,7 @@ function InstallPrompt({ appName, appDescription, themeColor = '#7c3aed' }: Inst
 
     // Only show once — if dismissed, respect it
     const dismissed = localStorage.getItem('pwa_install_dismissed');
-    if (dismissed) return;
+    if (dismissed) return () => {};
 
     let promptReady = false;
     let scrolledEnough = false;
@@ -81,7 +81,7 @@ function InstallPrompt({ appName, appDescription, themeColor = '#7c3aed' }: Inst
   }, []);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) return () => {};
 
     await deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;

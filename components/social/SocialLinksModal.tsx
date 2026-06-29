@@ -51,8 +51,8 @@ export default function SocialLinksModal({ isOpen, onClose }: SocialLinksModalPr
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   // Close on ESC
-  useEffect(() => {
-    if (!isOpen) return;
+  useEffect((): (() => void) => {
+    if (!isOpen) return () => {};
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
@@ -61,12 +61,12 @@ export default function SocialLinksModal({ isOpen, onClose }: SocialLinksModalPr
   }, [isOpen, onClose]);
 
   // Focus trap
-  useEffect(() => {
-    if (!isOpen) return;
+  useEffect((): (() => void) => {
+    if (!isOpen) return () => {};
     closeButtonRef.current?.focus();
 
     const modal = modalRef.current;
-    if (!modal) return;
+    if (!modal) return () => {};
 
     const focusable = modal.querySelectorAll<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
@@ -75,7 +75,7 @@ export default function SocialLinksModal({ isOpen, onClose }: SocialLinksModalPr
     const last = focusable[focusable.length - 1];
 
     const trap = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return;
+      if (e.key !== 'Tab') return () => {};
       if (e.shiftKey) {
         if (document.activeElement === first) {
           e.preventDefault();
@@ -94,7 +94,7 @@ export default function SocialLinksModal({ isOpen, onClose }: SocialLinksModalPr
   }, [isOpen]);
 
   // Prevent body scroll when open
-  useEffect(() => {
+  useEffect((): (() => void) => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';

@@ -98,17 +98,17 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
 
   const closeMenu = () => setIsOpen(false);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     setIsOpen(false);
     setExpandedSection(firstItemKey);
     setExpandedCategory(null);
   }, [pathname, firstItemKey]);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     if (!isOpen) {
       document.body.style.overflow = '';
       return;

@@ -104,13 +104,13 @@ export default function GlobalAvatar() {
   // Auto-play with sound on scroll into view
   useEffect((): (() => void) => {
     const el = containerRef.current;
-    if (!el || isExcluded || !config) return;
+    if (!el || isExcluded || !config) return () => {};
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting || hasPlayed) return;
+        if (!entry.isIntersecting || hasPlayed) return () => {};
         const video = videoRef.current;
-        if (!video) return;
+        if (!video) return () => {};
 
         video.muted = false;
         video.play().catch(() => {

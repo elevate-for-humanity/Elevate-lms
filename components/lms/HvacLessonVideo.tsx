@@ -66,7 +66,7 @@ export default function HvacLessonVideo({
   const [audioReady, setAudioReady] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
 
-  useEffect(() => {
+  useEffect((): (() => void) => {
     // Priority 1: YouTube URL — render embed directly, no HEAD check needed
     if (dbVideoUrl && /youtube\.com|youtu\.be/.test(dbVideoUrl)) {
       setMode('youtube' as MediaMode);
@@ -147,7 +147,7 @@ export default function HvacLessonVideo({
   const togglePlay = useCallback(() => {
     const vid = videoRef.current;
     const aud = audioRef.current;
-    if (!vid || !aud) return;
+    if (!vid || !aud) return () => {};
 
     if (isPlaying) {
       vid.pause();
@@ -167,7 +167,7 @@ export default function HvacLessonVideo({
 
   const handleAudioTimeUpdate = useCallback(() => {
     const aud = audioRef.current;
-    if (!aud) return;
+    if (!aud) return () => {};
     setCurrentTime(aud.currentTime);
     const pct = aud.duration > 0 ? (aud.currentTime / aud.duration) * 100 : 0;
     onProgress?.(pct);
@@ -192,7 +192,7 @@ export default function HvacLessonVideo({
 
   const seek = useCallback((seconds: number) => {
     const aud = audioRef.current;
-    if (!aud) return;
+    if (!aud) return () => {};
     aud.currentTime = Math.max(0, Math.min(aud.duration, aud.currentTime + seconds));
   }, []);
 

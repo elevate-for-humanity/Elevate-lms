@@ -3,11 +3,10 @@ import type { Metadata } from 'next';
 import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import heroBanners from '@/content/heroBanners';
 import { HomeFundingStrip } from '@/components/home/HomeFundingStrip';
-import { WorkforceOSArchitecture } from '@/components/home/WorkforceOSArchitecture';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeOutcomes } from '@/components/home/HomeOutcomes';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
-import { Skeleton } from '@/components/ui/Skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // Revalidate every 5 minutes — allows live enrollment stats to refresh
@@ -38,7 +37,7 @@ export const metadata: Metadata = {
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
       {
-        url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+        url: '/images/pages/admin-dashboard-hero.webp',
         width: 1200,
         height: 630,
         alt: `${PLATFORM_DEFAULTS.orgName} workforce training`,
@@ -51,7 +50,7 @@ export const metadata: Metadata = {
     title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training & Apprenticeships`,
     description:
       'Funded training, DOL-registered apprenticeships, and job placement — often at no cost.',
-    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp'],
+    images: ['/images/pages/admin-dashboard-hero.webp'],
   },
 };
 
@@ -96,7 +95,6 @@ export default async function HomePage() {
     <>
       <HomeHeroVideo banner={banner} />
       <HomeFundingStrip />
-      <WorkforceOSArchitecture />
       <HomeCareerPathways />
       <Suspense fallback={<OutcomesSkeleton />}>
         <HomeOutcomes />

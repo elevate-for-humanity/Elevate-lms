@@ -1,14 +1,12 @@
-import { safeGetUser, db } from '@/lib/db';
-
-import { safeGetUser, redirect } from 'next/navigation';
-import { safeGetUser, createClient, safeGetUser } from '@/lib/supabase/server';
-import { safeGetUser, buildLoginRedirect } from '@/lib/lms/redirect';
-import { safeGetUser, StudentToolsStrip } from '@/components/lms/dashboard/StudentToolsStrip';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { buildLoginRedirect } from '@/lib/lms/redirect';
+import { StudentToolsStrip } from '@/components/lms/dashboard/StudentToolsStrip';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import { safeGetUser, Clock, Award, ChevronRight } from 'lucide-react';
-import { safeGetUser, PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { Clock, Award, ChevronRight } from 'lucide-react';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +41,7 @@ export default async function LmsRootPage() {
     desc: p.excerpt || p.description?.slice(0, 120) || '',
     duration: p.duration_weeks ? `${p.duration_weeks} weeks` : '—',
     credential: p.credential_name || p.credential || '—',
-    image: p.image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-unit.webp',
+    image: p.image_url || '/images/pages/hvac-unit.webp',
     slug: p.slug,
   }));
 
@@ -51,7 +49,7 @@ export default async function LmsRootPage() {
     <div className="min-h-screen bg-white">
       <nav className="bg-white border-b border-slate-100 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <Link href="/"><Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt={PLATFORM_DEFAULTS.orgName} width={120} height={32} className="h-8 w-auto" sizes="(max-width: 768px) 100vw, 50vw" /></Link>
+          <Link href="/"><Image src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt={PLATFORM_DEFAULTS.orgName} width={120} height={32} className="h-8 w-auto" sizes="(max-width: 768px) 100vw, 50vw" /></Link>
           <div className="flex items-center gap-3">
             <Link href="/lms/programs" className="text-sm text-slate-600 hover:text-slate-900 font-medium hidden sm:block">Browse Programs</Link>
             <Link href="/login" className="text-sm text-slate-600 hover:text-slate-900 font-medium border border-slate-200 px-3 py-1.5 rounded-lg">Sign In</Link>
@@ -85,7 +83,7 @@ export default async function LmsRootPage() {
             {programs.map((p) => (
               <div key={p.slug} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-md transition group">
                 <div className="relative aspect-[16/9] overflow-hidden">
-                  {p.image && <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition duration-500" sizes="(max-width: 640px) 100vw, 33vw"  />}
+                  <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition duration-500" sizes="(max-width: 640px) 100vw, 33vw" />
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-base mb-1">{p.title}</h3>

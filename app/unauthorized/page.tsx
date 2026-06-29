@@ -1,8 +1,8 @@
 'use client';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+
 import { getRoleDestination } from '@/lib/auth/role-destinations';
 
 const WWW_ORIGIN =

@@ -186,6 +186,11 @@ const nextConfig = {
     '*': [...sharedStandaloneTraceExcludes, ...lmsOnlyStandaloneTraceExcludes],
   },
 
+  // Include lib/supabase in standalone builds to fix runtime errors
+  outputFileTracingIncludes: {
+    '/**': ['lib/supabase/**', 'lib/logger.ts'],
+  },
+
   async redirects() {
     const canonicalRoutesPath = path.join(process.cwd(), 'lib/routes/canonical-routes.json');
     const canonicalConfig = JSON.parse(fs.readFileSync(canonicalRoutesPath, 'utf8'));
@@ -212,11 +217,6 @@ const nextConfig = {
       {
         source: '/images/alberta-davis.jpg',
         destination: '/images/alberta-davis.webp',
-        permanent: true,
-      },
-      {
-        source: '/images/facilities-new/facility-2.jpg',
-        destination: '/images/facilities-new/facility-1.webp',
         permanent: true,
       },
     );

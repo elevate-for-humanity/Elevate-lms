@@ -1,6 +1,6 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/server';
+
 
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';

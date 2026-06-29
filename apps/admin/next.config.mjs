@@ -36,8 +36,13 @@ const adminConfig = {
   transpilePackages: ['edge-tts'],
 
   // Resolve @/* to repo root so shared lib/, components/, types/ work
-  webpack(config) {
+  webpack(config, { isServer }) {
     config.resolve.alias['@'] = ROOT;
+    // For standalone server.js, resolve @/lib/* to TypeScript files for bundling
+    if (isServer) {
+      config.resolve.alias['@/lib/logger'] = path.join(ROOT, 'lib/logger.ts');
+      config.resolve.alias['@/lib/supabase'] = path.join(ROOT, 'lib/supabase');
+    }
     // Keep peak memory stable during admin builds on low-RAM runners.
     config.parallelism = 1;
     // Northflank's allowed ephemeral build storage is not large enough for
@@ -111,8 +116,8 @@ const adminConfig = {
 
   // Force-include critical server-side files in standalone output
   outputFileTracingIncludes: {
-    '/api/**': ['lib/logger.ts', 'lib/memory-monitor.ts'],
-    '/admin/**': ['lib/logger.ts', 'lib/memory-monitor.ts'],
+    '/api/**': ['lib/logger.ts'],
+    '/admin/**': ['lib/logger.ts'],
   },
 
   serverExternalPackages: [

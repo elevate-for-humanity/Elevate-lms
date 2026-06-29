@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
+
 import { logger } from '@/lib/logger';
 
 const stripeKey = process.env.STRIPE_SECRET_KEY;

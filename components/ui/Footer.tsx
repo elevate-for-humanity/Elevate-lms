@@ -1,1 +1,3 @@
-export default function Footer() { return null; }
+import Footer from '@/components/site/ServerFooter';
+export { Footer };
+export default Footer;

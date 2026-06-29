@@ -1,0 +1,20 @@
+{
+  "buildEngineConfiguration": {
+    "buildEngine": "buildkit"
+  },
+  "vcsData": {
+    "dockerFilePath": "/Dockerfile.northflank-lms",
+    "dockerWorkDir": "/"
+  },
+  "billing": {
+    "deploymentPlan": "nf-compute-400"
+  },
+  "deployment": {
+    "healthCheck": {
+      "enabled": true,
+      "path": "/api/health/northflank",
+      "port": 8080,
+      "protocol": "HTTP"
+    }
+  }
+}

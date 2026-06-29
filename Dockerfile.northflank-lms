@@ -34,6 +34,10 @@ ENV BUILD_SCOPE=LMS
 RUN node scripts/split-app.mjs
 
 # 4. Build with 6GB heap for safety
+ARG COMMIT_SHA=unknown
+ARG BUILD_TIME=unknown
+ENV NEXT_PUBLIC_COMMIT_SHA=$COMMIT_SHA
+ENV NEXT_PUBLIC_BUILD_TIME=$BUILD_TIME
 ENV NODE_OPTIONS=--max-old-space-size=6144
 ENV NEXT_STANDALONE_OUTPUT=1
 RUN pnpm run build:lms:compile

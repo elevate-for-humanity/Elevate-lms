@@ -67,9 +67,9 @@ export default function HeaderDesktopNav({ items }: HeaderDesktopNavProps) {
                 {/* Group sub-items by section headers into columns */}
                 {(() => {
                   // Split into columns at each isHeader boundary
-                  const columns: typeof item.subItems[] = [];
-                  let current: typeof item.subItems = [];
-                  for (const sub of item.subItems) {
+                  const columns: SubItem[][] = [];
+                  let current: SubItem[] = [];
+                  for (const sub of item.subItems!) {
                     if (sub.isHeader && current.length > 0) {
                       columns.push(current);
                       current = [sub];
@@ -84,14 +84,14 @@ export default function HeaderDesktopNav({ items }: HeaderDesktopNavProps) {
                   if (columns.length <= 1) {
                     return (
                       <div className="flex flex-col min-w-[180px]">
-                        {item.subItems.map((sub) =>
-                          sub.isHeader ? (
+                        {item.subItems!.map((sub) =>
+                          !sub ? null : sub.isHeader ? (
                             <p key={sub.name} className="text-xs font-extrabold text-brand-red-600 uppercase tracking-wide px-2 pt-3 pb-1 first:pt-0">
                               {sub.name.replace(/—/g, '').trim()}
                             </p>
                           ) : (
-                            <Link key={sub.href + sub.name} href={sub.href} prefetch={false}
-                              {...(isExternal(sub.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                            <Link key={(sub.href || '') + sub.name} href={sub.href || '#'} prefetch={false}
+                              {...(isExternal(sub.href || '') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                               className="text-sm text-slate-700 hover:text-brand-blue-600 hover:bg-slate-50 rounded-lg px-2 py-1.5 transition-colors whitespace-nowrap">
                               {sub.name}
                             </Link>
@@ -107,19 +107,19 @@ export default function HeaderDesktopNav({ items }: HeaderDesktopNavProps) {
                       {columns.map((col, ci) => (
                         <div key={ci} className={`flex flex-col min-w-[160px] ${ci > 0 ? 'pl-6' : ''}`}>
                           {col.map((sub) =>
-                            sub.isHeader ? (
+                            !sub ? null : sub.isHeader ? (
                               <p key={sub.name} className="text-xs font-extrabold text-brand-red-600 uppercase tracking-wide px-1 pb-2">
                                 {sub.name.replace(/—/g, '').trim()}
                               </p>
                             ) : sub.isSectionLink ? (
-                              <Link key={sub.href + sub.name} href={sub.href} prefetch={false}
-                                {...(isExternal(sub.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                              <Link key={(sub.href || '') + sub.name} href={sub.href || '#'} prefetch={false}
+                                {...(isExternal(sub.href || '') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                                 className="text-xs font-bold text-brand-red-600 hover:text-brand-red-700 px-1 py-1 mt-1 transition-colors whitespace-nowrap">
                                 {sub.name}
                               </Link>
                             ) : (
-                              <Link key={sub.href + sub.name} href={sub.href} prefetch={false}
-                                {...(isExternal(sub.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                              <Link key={(sub.href || '') + sub.name} href={sub.href || '#'} prefetch={false}
+                                {...(isExternal(sub.href || '') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                                 className="text-sm text-slate-700 hover:text-brand-blue-600 hover:bg-slate-50 rounded-lg px-1 py-1.5 transition-colors whitespace-nowrap">
                                 {sub.name}
                               </Link>

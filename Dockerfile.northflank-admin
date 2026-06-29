@@ -10,8 +10,8 @@ RUN echo "nf-cache-invalidate-20260629-admin-v1"
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 build-essential ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# Stable PNPM 9.12.3
-RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
+# Stable PNPM 10.7.0 (matches lockfileVersion 9.0)
+RUN corepack enable && corepack prepare pnpm@10.7.0 --activate
 
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./

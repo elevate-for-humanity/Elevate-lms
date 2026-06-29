@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const CANONICAL_ADMIN_HOST = 'admin.elevateforhumanity.org';
 
@@ -15,14 +14,13 @@ function resolveCanonicalAdminHost(): string {
 }
 
 export async function middleware(request: NextRequest) {
-  const host = (request.headers.get('host') || '').toLowerCase();
-  const hostWithoutPort = host.split(':')[0];
   const { pathname } = request.nextUrl;
-  const canonicalAdminHost = resolveCanonicalAdminHost();
-
+  
+  // Basic trace ID propagation
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-pathname', pathname);
 
-  // Standard stability fix: avoid complex clones
+  // Standard Next.js 15 stability fix: 
+  // Simply return Next() without complex header cloning if not needed.
   return NextResponse.next();
 }

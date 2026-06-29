@@ -1,1 +1,3 @@
-export default function Header() { return null; }
+import Header from '@/components/site/Header';
+export { Header };
+export default Header;

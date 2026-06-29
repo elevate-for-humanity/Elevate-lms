@@ -1,11 +1,11 @@
 // lib/automation/progressSync.ts
-import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getPartnerClient, PartnerType } from '../partners';
 
-function getSupabaseClient() {
-  const cookieStore = cookies();
+async function getSupabaseClient() {
+  const { cookies } = await import('next/headers');
+  const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

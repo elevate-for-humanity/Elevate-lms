@@ -1,6 +1,6 @@
 'use server';
 
-export async function submitStudentApplication(formData: {
+export async function submitStudentApplication(_formData: {
   firstName: string;
   lastName: string;
   email: string;
@@ -11,6 +11,6 @@ export async function submitStudentApplication(formData: {
   programSlug?: string;
   programTitle?: string;
 }): Promise<{ success: boolean; message: string }> {
-  console.log('submitStudentApplication called:', formData);
+  // TODO: Implement actual application submission logic
   return { success: true, message: 'Application submitted successfully' };
 }

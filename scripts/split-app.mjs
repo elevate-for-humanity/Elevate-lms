@@ -70,7 +70,7 @@ currentFolders.forEach(folder => {
   if (!fs.lstatSync(fullPath).isDirectory()) return;
 
   // Preserve whitelist and the scope-specific folders we WANT
-  const preserve = [...whitelist, 'lms', 'admin', '(marketing)', '(public)'];
+  const preserve = [...whitelist, 'lms', 'admin', '(marketing)', '(public)', 'data'];
   
   if (scope === 'MARKETING' && folder === 'lms') return;
   if (scope === 'ADMIN' && folder === 'admin') return;

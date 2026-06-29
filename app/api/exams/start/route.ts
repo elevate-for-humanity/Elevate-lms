@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
 
 import { selectQuestionsForExamAttempt } from '@/lib/assessments/selectQuestions';
-import { getProctoringLaunchUrl } from '@/lib/integrations/proctoring';
+import { getProctoringLaunchUrl, type ProctoringProvider } from '@/lib/integrations/proctoring';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -95,7 +95,7 @@ async function _POST(request: Request) {
   const proctoringUrl =
     exam.proctoring_required && exam.proctoring_provider
       ? getProctoringLaunchUrl({
-          provider: exam.proctoring_provider as string,
+          provider: exam.proctoring_provider as ProctoringProvider,
           examId: exam.id,
           attemptId: attempt.id,
           studentId,

@@ -1,6 +1,9 @@
 import { db } from '@/lib/db';
 
+import { createClient } from '@/lib/supabase/server';
+
 import { Metadata } from 'next';
+
 import { resolveBarberLessonVideoUrl } from '@/lib/barber/resolve-lesson-video-url';
 import { BARBER_COURSE_ID } from '@/lib/barber/constants';
 
@@ -25,8 +28,7 @@ export default async function BarberVideosPreviewPage() {
     );
   }
 
-  const { createClient: createBaseClient } = await import('@supabase/supabase-js');
-  const db = createBaseClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+  const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
   const { data: lessons } = await db
     .from('course_lessons')
     .select('slug, title, video_url, order_index')

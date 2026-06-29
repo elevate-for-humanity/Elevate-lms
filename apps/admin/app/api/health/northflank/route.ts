@@ -1,37 +1,24 @@
+/**
+ * Northflank Health Check Endpoint
+ * 
+ * This endpoint is designed for Northflank's health check system.
+ * It does NOT check database connections or external services.
+ * It only verifies that the Node.js process is running.
+ * 
+ * Configure in Northflank: Path = /api/health/northflank
+ */
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
-
-/**
- * Northflank Health Check Endpoint - Admin Service
- * 
- * Confirms the application is alive and can serve requests.
- * Returns diagnostics for environment variables to troubleshoot configuration issues.
- */
 export async function GET() {
-  const checkEnv = (key: string) => {
-    const val = process.env[key];
-    return {
-      present: !!val,
-      length: val ? val.length : 0,
-      isPlaceholder: val === 'placeholder' || val === 'build-placeholder',
-    };
-  };
-
-  const status = {
-    status: 'ok',
+  return NextResponse.json({
+    status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'elevate-admin',
-    node_env: process.env.NODE_ENV,
-    port: process.env.PORT || '8080 (default)',
-    env_diagnostics: {
-      SUPABASE_URL: checkEnv('NEXT_PUBLIC_SUPABASE_URL'),
-      SUPABASE_ANON_KEY: checkEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
-      SUPABASE_SERVICE_ROLE_KEY: checkEnv('SUPABASE_SERVICE_ROLE_KEY'),
-      STRIPE_SECRET_KEY: checkEnv('STRIPE_SECRET_KEY'),
-      SSN_SALT: checkEnv('SSN_SALT'),
+    uptime: process.uptime(),
+    nodeVersion: process.version,
+    memory: {
+      used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+      total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+      unit: 'MB'
     }
-  };
-
-  return NextResponse.json(status, { status: 200 });
+  }, { status: 200 });
 }

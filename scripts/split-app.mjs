@@ -59,7 +59,10 @@ const excludeConfig = {
   ]
 };
 
-const toRemove = excludeConfig[scope];
+// CRITICAL: Explicit Whitelist for System Routes
+const whitelist = ['api', 'layout.tsx', 'globals.css', 'favicon.ico'];
+
+const toRemove = excludeConfig[scope].filter(target => !whitelist.includes(target));
 
 if (!toRemove) {
   console.error(`Invalid scope: ${scope}`);

@@ -5,7 +5,7 @@
 FROM node:22-bookworm AS builder
 
 # Cache invalidation
-RUN echo "nf-cache-invalidate-20260629-lms-v4"
+RUN echo "nf-cache-invalidate-20260629-lms-v5"
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -19,7 +19,6 @@ WORKDIR /app
 
 # Copy dependency files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/admin/package.json apps/admin/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
@@ -46,17 +45,14 @@ WORKDIR /app
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
 ENV NODE_ENV=production
+ENV NODE_OPTIONS=--max-old-space-size=4096
 
+# Standalone output artifacts
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/.next/server ./.next/server
 COPY --from=builder /app/public ./public
-
-# REQUIRED: Copy node_modules to prevent runtime "Module not found" errors
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 8080
 CMD ["node", "server.js"]
-/node_modules
-
-EXPOSE 8080
-CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "server.js"]

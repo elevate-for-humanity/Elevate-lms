@@ -136,8 +136,9 @@ export function getAllNavItems(): NavItem[] {
   // Remove duplicates by href
   const seen = new Set<string>();
   return items.filter((item: any) => {
-    if (seen.has(item.href)) return false;
-    seen.add(item.href);
+    const href = item?.href;
+    if (!href || seen.has(href)) return false;
+    seen.add(href);
     return true;
   });
 }

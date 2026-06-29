@@ -48,7 +48,8 @@ config.remove.forEach(dir => {
   if (fs.existsSync(fullPath)) {
     console.log(`Quarantining: ${dir}`);
     // Hide by prefixing with __ (Next.js ignores these)
-    fs.renameSync(fullPath, path.join(appDir, `__${dir}`));
+    fs.cpSync(fullPath, path.join(appDir, `__${dir}`), { recursive: true });
+    fs.rmSync(fullPath, { recursive: true, force: true });
   }
 });
 

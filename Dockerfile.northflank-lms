@@ -5,7 +5,7 @@
 FROM node:22-bookworm AS builder
 
 # Cache invalidation
-RUN echo "nf-cache-invalidate-20260629-lms-v6"
+RUN echo "nf-cache-invalidate-20260629-lms-v7"
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \

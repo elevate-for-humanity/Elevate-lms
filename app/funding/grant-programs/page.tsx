@@ -11,12 +11,19 @@ export const metadata: Metadata = {
 
 export default async function GrantProgramsPage() {
   const supabase = await createClient();
-  const { data: programs } = await supabase
-    .from('programs')
-    .select('id, title, slug, description, short_description, image_url, hero_image_url, wioa_approved')
-    .eq('is_active', true)
-    .eq('wioa_approved', true)
-    .order('title');
+  let programs: any[] = [];
+  
+  try {
+    const { data } = await supabase
+      .from('programs')
+      .select('id, title, slug, description, short_description, image_url, hero_image_url, wioa_approved')
+      .eq('is_active', true)
+      .eq('wioa_approved', true)
+      .order('title');
+    programs = data || [];
+  } catch (e) {
+    console.error('Failed to fetch programs:', e);
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -38,7 +45,7 @@ export default async function GrantProgramsPage() {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {(programs || []).map((p) => (
+            {programs.map((p) => (
               <div key={p.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-md transition">
                 <div className="relative aspect-video">
                   <Image 

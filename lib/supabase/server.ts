@@ -1,6 +1,9 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+/**
+ * Standard Supabase Server Client
+ */
 export async function createClient() {
   const cookieStore = await cookies();
 
@@ -19,8 +22,6 @@ export async function createClient() {
             );
           } catch {
             // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
           }
         },
       },
@@ -29,8 +30,38 @@ export async function createClient() {
 }
 
 /**
+ * Service Role Client - Bypass RLS for administrative tasks.
+ */
+export async function createSupabaseServerClient() {
+  const { createClient: createBaseClient } = await import('@supabase/supabase-js');
+  return createBaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  );
+}
+
+/**
+ * Public Client - No-auth client for public data.
+ */
+export async function createPublicClient() {
+  const { createClient: createBaseClient } = await import('@supabase/supabase-js');
+  return createBaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { persistSession: false } }
+  );
+}
+
+/**
+ * Check if Supabase is correctly configured in the environment.
+ */
+export function isSupabaseConfigured(): boolean {
+  return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+}
+
+/**
  * Safely extract user from Supabase auth response.
- * Prevents "Cannot read properties of null (reading 'id')" crash.
  */
 export function safeGetUser(authRes: any): { id: string; email?: string | null } | null {
   return authRes?.data?.user ?? null;

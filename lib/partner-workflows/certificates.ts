@@ -3,7 +3,7 @@
  * Generates completion certificates for partner certifications
  */
 
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
 
 export interface CertificateData {
   studentName: string;
@@ -30,7 +30,7 @@ export function generateCertificateNumber(providerType: string, studentId: strin
 export async function createCertificate(
   enrollmentId: string,
 ): Promise<{ success: boolean; certificateId?: string; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     // Fetch enrollment details
@@ -166,7 +166,7 @@ function calculateExpirationDate(providerType: string): string | null {
 export async function generateCertificatePDF(
   certificateId: string,
 ): Promise<{ success: boolean; pdfUrl?: string; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     // Fetch certificate details
@@ -219,7 +219,7 @@ export async function verifyCertificate(certificateNumber: string): Promise<{
   certificate?: CertificateData;
   error?: string;
 }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const { data: certificate, error } = await supabase
@@ -271,7 +271,7 @@ export async function verifyCertificate(certificateNumber: string): Promise<{
  * Get all certificates for a student
  */
 export async function getStudentCertificates(studentId: string): Promise<CertificateData[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: certificates } = await supabase
     .from('partner_certificates')
@@ -300,7 +300,7 @@ export async function revokeCertificate(
   certificateId: string,
   reason: string,
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const { error } = await supabase

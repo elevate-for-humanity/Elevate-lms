@@ -120,7 +120,7 @@ jobs:
           for i in $(seq 1 20); do
             status=$(curl -sk --max-time 10 -o /tmp/lms-health.json -w "%{http_code}" https://app.elevateforhumanity.org/api/ping || true)
             body=$(cat /tmp/lms-health.json 2>/dev/null || true)
-            if [ "$status" = "200" ] && echo "$body" | grep -q '"ok":true'; then
+            if [ "$status" = "200" ] && echo "$body" | grep -qE '"ok":true|"status":"(ok|healthy)"'; then
               echo "LMS liveness passed."
               exit 0
             fi

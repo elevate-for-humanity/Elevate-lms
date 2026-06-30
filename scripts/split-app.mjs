@@ -33,6 +33,10 @@ const ALWAYS_KEEP_DIRS = new Set([
   'content'
 ]);
 
+// Only actually delete in CI/Docker builds (not locally)
+const DRY_RUN = process.env.CI !== 'true' && process.env.DOCKER !== 'true';
+console.log(`Mode: ${DRY_RUN ? 'DRY RUN (no deletions)' : 'LIVE (will delete files)'}`);
+
 // Route prefixes to exclude for each scope
 const ROUTE_EXCLUSIONS = {
   MARKETING: [
@@ -245,11 +249,13 @@ for (const target of toRemove) {
     if (isReferenced) {
       console.log(`⚠️  PRESERVE ${target} (still referenced by imports)`);
     } else {
-      try {
-        console.log(`Removing excluded route: ${target}`);
-        fs.rmSync(fullPath, { recursive: true, force: true });
-      } catch (err) {
-        console.error(`Failed to remove ${target}: ${err.message}`);
+      console.log(`Would remove: ${target}`);
+      if (!DRY_RUN) {
+        try {
+          fs.rmSync(fullPath, { recursive: true, force: true });
+        } catch (err) {
+          console.error(`Failed to remove ${target}: ${err.message}`);
+        }
       }
     }
   }
@@ -293,8 +299,10 @@ for (const folder of currentFolders) {
   if (isReferenced) {
     console.log(`✓ KEEP ${folder} (referenced by imports)`);
   } else {
-    console.log(`🗑️  Remove unreferenced route: ${folder}`);
-    fs.rmSync(fullPath, { recursive: true, force: true });
+    console.log(`Would remove: ${folder}`);
+    if (!DRY_RUN) {
+      fs.rmSync(fullPath, { recursive: true, force: true });
+    }
   }
 }
 

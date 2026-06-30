@@ -20,7 +20,7 @@ const features = [
   {
     title: 'Automated Data Collection',
     description: 'Automatically capture participant data, outcomes, and metrics as they happen.',
-    image: '/images/pages/funding-page-1.jpg',
+    image: '/images/pages/funding-page-1.webp',
     items: ['Real-time data capture', 'Automatic calculations', 'Data validation', 'Error prevention'],
   },
   {
@@ -38,7 +38,7 @@ const features = [
   {
     title: 'One-Click Exports',
     description: 'Export reports in any format required by your funders.',
-    image: '/images/pages/funding-page-1.jpg',
+    image: '/images/pages/funding-page-1.webp',
     items: ['Excel exports', 'PDF reports', 'CSV data files', 'API integrations'],
   },
 ];

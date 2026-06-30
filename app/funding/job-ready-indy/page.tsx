@@ -19,7 +19,7 @@ export default function JobReadyIndyPage() {
     <div className="min-h-screen bg-white">
       <PageVideoHero
         videoSrc="/videos/training-providers-hero.mp4"
-        posterSrc="/images/pages/funding-page-4.jpg"
+        posterSrc="/images/pages/admin-wioa-hero.webp"
         posterAlt="Funding Job Ready Indy — {PLATFORM_DEFAULTS.orgName}"
         size="marketing"
       />

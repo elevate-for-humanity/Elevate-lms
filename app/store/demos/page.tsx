@@ -19,7 +19,7 @@ const demos = [
     id: 'admin',
     title: 'Admin Dashboard',
     icon: Shield,
-    image: '/images/pages/career-counseling.jpg',
+    image: '/images/pages/career-counseling.webp',
     alt: 'Training program administrator reviewing enrollment data',
     href: '/store/demo/admin',
     description: 'This is what your staff sees every day. Watch how enrollment tracking, compliance reporting, and application management work inside the admin portal.',

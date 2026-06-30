@@ -46,7 +46,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
                 <div className="flex items-start gap-3">
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg"
+                      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.webp"
                       alt="Job placement"
                       fill
                       className="object-cover"
@@ -185,7 +185,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
             <div className="bg-slate-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg"
+                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.webp"
                   alt="Career counseling"
                   fill
                   className="object-cover"

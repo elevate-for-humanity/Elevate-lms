@@ -62,7 +62,7 @@ export default function BarberApprenticeshipClient({ program: p, heroBanner: b, 
     <div className="min-h-screen bg-white">
       {/* ═══ HERO ═══ */}
       <HeroPicture
-        src={b?.posterImage ?? '/images/pages/barber-hero-main.jpg'}
+        src={b?.posterImage ?? '/images/pages/barber-hero-new.webp'}
         alt="Licensed barber cutting hair in a professional barbershop"
         microLabel={b?.microLabel ?? 'DOL Apprenticeship'}
         analyticsName={b?.analyticsName ?? 'barber-apprenticeship'}

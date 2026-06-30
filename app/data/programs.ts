@@ -151,7 +151,7 @@ export const programs: Program[] = [
       'Get paid while you learn. Work in a real barbershop from day one, earning approximately $10/hour plus commissions while building your skills and clientele. Skip the $25,000 barber school debt. Graduate in 15-17 months ready to rent your own chair, work in a top shop, or open your own business.',
     longDescription:
       "The Indiana Barber Apprenticeship is a federally registered program allowing you to earn wages while training to become a licensed barber. Complete 2,000 hours of on-the-job training plus 144 hours of related instruction over 15-17 months.\n\nWhat You'll Learn:\n- Haircutting techniques: fades, tapers, lineups, beard work\n- Hot towel shaves and grooming\n- Sanitation and infection control\n- Client consultation and communication\n- Business management and shop operations\n- Building and maintaining clientele\n\nWho This Program Is For:\n- Individuals seeking a skilled trade career\n- Those who enjoy working with people\n- Adults needing stable, in-demand work\n- Career changers looking for entrepreneurial opportunities\n\nProgram Format:\n- Work at registered apprenticeship sponsor shop\n- Earn $10/hour base pay plus commissions and tips\n- Complete online theory coursework (3-4 hours/week)\n- Total time: 15-17 months\n\nFunding & Approvals:\n- WIOA Funding\n- Workforce Ready Grant\n- Job Ready Indy Funding for Justice-Involved Individuals\n- Employer sponsorship options\n- Self-pay with payment plans\n\nCareer Outcomes:\n- Indiana Registered Barber (licensed)\n- Chair rental - be your own boss\n- Barbershop employee with established clientele\n- Barbershop owner/entrepreneur\n- Earning potential: $35,000-$65,000+ per year",
-    heroImage: '/images/pages/barber-hero-main.jpg',
+    heroImage: '/images/pages/barber-hero-new.webp',
     heroImageAlt: 'Barber apprentice working with real clients in professional barbershop',
     heroVideo:
       'https://cms-artifacts.artlist.io/content/generated-video-v1/video__3/video-7b329d1f-3f92-4ec5-acdf-9d2d7ff6de5f.mp4?Expires=2083752835&Key-Pair-Id=K2ZDLYDZI2R1DF&Signature=PwinNDJ~aDGbHoMI8-Hfr28QIj7s~0mwzn92P-muIHO0bW86~4gW6MzRyslLtk~TOzdfX8aTYA9OeGF-sbBPwCBUw8gTpXO6QvhwpJsFW5DiLHnEP6q6vCTvQ-jEpwV20izIuWVSpY-txGY7bDGHhkSq6-wP26b0J-lstFIMwxRHQjJ9rKmX9i4pzNruZJEQ2ILvO-LdWivm98j5TMLm09HgYzesifHFPPzUzNH7NlYwwvIO2-NtXWEuixrQFdJ2Zt4ocgdmqP9auvaeYr9hbS~F6k6CBybWLlnGoLggGkluqp1vFzt-eIslYgFKl8m4Du4UFJawNl3KmcyA9uTWtA__',
@@ -701,7 +701,7 @@ export const programs: Program[] = [
       'Accessible training for justice-involved individuals, career changers, and those with lived experience to become certified peer recovery coaches',
     longDescription:
       "The Public Safety Reentry Specialist Program prepares you to support individuals reentering society after incarceration or overcoming substance use challenges. In 45 days, you'll earn multiple certifications including Certified Peer Recovery Coach (CPRC), Certified Peer Support Professional, Certified Community Healthcare Worker (CCHW), CPR, and Rise Up career readiness. This program combines lived experience with professional training to help you make a meaningful impact in your community.\n\nThis program is designed to be inclusive and accessible to all learners—regardless of age, background, or education level. It welcomes youth ages 16+, adults seeking career change, justice-involved individuals reentering the workforce, and those receiving support through SNAP, WIOA, or other public assistance programs. No prior credential or diploma is required for enrollment. We provide built-in support, including tutoring, digital literacy training, and guided instruction to ensure all participants have the tools they need to succeed.\n\nInstructors hold Certified Peer Recovery Specialist (CPRS) credentials or equivalent, with subject matter experience in reentry, public safety, peer navigation, or crisis response. Program leadership holds credentials in trauma-informed coaching, CPR/AED instruction, and lived-experience mentorship for justice-impacted individuals.\n\nCredentialing Partners:\n• Indiana Certification Board (ICB) - Certified Peer Recovery Coach (CPRC) (https://indianacertificationboard.org)\n• National Alliance of Peer Specialists - Certified Peer Support Professional (https://na4ps.org)\n• Certified Community Healthcare Worker (CCHW) Programs\n• American Heart Association - CPR/AED (https://cpr.heart.org)\n• Rise Up - Career Readiness Certification (https://riseup.com)\n\nCIP Code: 43.0112 - Securities Services Administration/Management",
-    heroImage: '/images/pages/career-counseling.jpg',
+    heroImage: '/images/pages/career-counseling.webp',
     heroImageAlt: 'Peer recovery coach providing support and mentorship',
     heroVideo: '/videos/career-services-hero.mp4',
     duration: '45 days (6-7 weeks)',
@@ -1148,7 +1148,7 @@ export const programs: Program[] = [
       'Comprehensive 45-day program combining Certified Peer Recovery Coach (CPRC), Certified Peer Support Professional, and Certified Community Healthcare Worker (CCHW) certifications.',
     longDescription:
       "The Public Safety Reentry Specialist Program is designed specifically for justice-involved individuals seeking meaningful careers in behavioral health, addiction recovery, and community support. This comprehensive 45-day program combines three powerful certifications: Certified Peer Recovery Coach (CPRC), Certified Peer Support Professional, and Certified Community Healthcare Worker (CCHW).\n\nWhat You'll Learn:\n- Peer recovery coaching and support\n- Motivational interviewing techniques\n- Trauma-informed care\n- Crisis intervention and de-escalation\n- Community resource navigation\n- Relapse prevention strategies\n- Basic healthcare and vital signs\n- Professional boundaries and ethics\n- Documentation and case management\n\nWho This Program Is For:\n- Justice-involved individuals\n- Individuals in recovery\n- Career changers seeking purpose-driven work\n- Those passionate about helping others\n\nProgram Format:\n- Hybrid: Classroom + practicum\n- Length: 45 days\n- Schedule: Full-time\n\nFunding & Approvals:\n- ETPL Program ID: #10004666\n- WIOA Eligible\n- Job Ready Indy Eligible\n- Workforce Ready Grant Eligible\n\nCareer Outcomes:\n- Certified Peer Recovery Coach\n- Peer Support Specialist\n- Community Healthcare Worker\n- Reentry Navigator\n- Average salary: $32,000-$45,000/year",
-    heroImage: '/images/pages/career-counseling.jpg',
+    heroImage: '/images/pages/career-counseling.webp',
     heroImageAlt: 'Peer recovery coach supporting client',
     heroVideo: '/videos/career-services-hero.mp4',
     duration: '45 days',
@@ -1573,7 +1573,7 @@ export const programs: Program[] = [
     shortDescription:
       'Help customers and build relationships. Communication and problem-solving skills.',
     longDescription: `Our Customer Service Representative program prepares you for a people-focused career. You'll learn communication skills, conflict resolution, and customer relationship management. The program covers phone etiquette, email communication, CRM software, and handling difficult situations. You'll practice real scenarios and develop professional soft skills. Customer service roles offer stable employment with advancement opportunities.`,
-    heroImage: '/images/pages/career-counseling.jpg',
+    heroImage: '/images/pages/career-counseling.webp',
     heroImageAlt: `Customer Service Representative training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/partner-business.mp4',
     duration: '8 weeks',
@@ -2101,7 +2101,7 @@ export const programs: Program[] = [
     shortDescription:
       'Professional life coaching certification program. Help others achieve their goals while building a rewarding career.',
     longDescription: `Become a certified life coach. Learn coaching methodologies, communication techniques, goal setting, and how to build a coaching practice.`,
-    heroImage: '/images/pages/career-counseling.jpg',
+    heroImage: '/images/pages/career-counseling.webp',
     heroImageAlt: `Life Coach Certification training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/career-services-hero.mp4',
     duration: '12 weeks',
@@ -2421,7 +2421,7 @@ export const programs: Program[] = [
     heroSubtitle: 'Guide recovery journey',
     shortDescription: 'Guide recovery journey',
     longDescription: `Training to guide and support individuals through their recovery journey.`,
-    heroImage: '/images/pages/career-counseling.jpg',
+    heroImage: '/images/pages/career-counseling.webp',
     heroImageAlt: `Recovery Coach Program training at ${PLATFORM_DEFAULTS.orgName}`,
     heroVideo: '/videos/career-services-hero.mp4',
     duration: 'Varies',

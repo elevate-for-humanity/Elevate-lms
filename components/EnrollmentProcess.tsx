@@ -31,7 +31,7 @@ const steps = [
       { icon: '\uD83D\uDCCD', label: 'In-Person', sub: 'Visit a WorkOne center near you' },
       { icon: '\uD83D\uDCBB', label: 'Virtual', sub: 'Schedule a video call appointment' },
     ],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg',
+    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.webp',
     alt: 'Career advisor meeting with student',
   },
   {

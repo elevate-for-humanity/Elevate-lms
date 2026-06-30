@@ -88,7 +88,7 @@ export default function StoreDigitalPage() {
             <div className="bg-white rounded-2xl overflow-hidden">
               <StoreProductVideo
                 src="/videos/store/store-sam-gov.mp4"
-                poster="/images/pages/store-digital-detail1.jpg"
+                poster="/images/pages/store-digital-detail1.webp"
                 alt="SAM.gov Assistant demo"
                 label="SAM.gov Walkthrough"
               />

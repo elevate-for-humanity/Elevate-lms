@@ -150,7 +150,7 @@ const STEPS = [
     num: '7',
     color: 'bg-amber-500',
     title: 'Billing & Enforcement',
-    image: '/images/pages/platform-page-7.jpg',
+    image: '/images/pages/admin-analytics-hero.webp',
     imageAlt: 'Billing and subscription management interface',
     content: null, // rendered inline below
   },
@@ -188,7 +188,7 @@ export default function LicensingGuidePage() {
       <section className="relative h-56 md:h-72 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/store-guides-licensing-hero.jpg"
+          src="/images/pages/admin-business-hero.webp"
           alt="Elevate platform licensing guide"
           fill
           className="object-cover"
@@ -290,7 +290,7 @@ export default function LicensingGuidePage() {
             </div>
             <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-[4/3]" style={{ aspectRatio: '16/7' }}>
               <Image
-                src="/images/pages/platform-page-7.jpg"
+                src="/images/pages/admin-analytics-hero.webp"
                 alt="Billing and subscription management"
                 fill
                 className="object-cover"

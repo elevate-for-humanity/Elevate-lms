@@ -39,7 +39,7 @@ export default function StoreCoursesPage() {
       <section className="relative w-full">
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image src="/images/pages/store-courses-hero.jpg" alt="Certification courses" fill sizes="100vw" className="object-cover" priority quality={85} placeholder="empty" />
+          <Image src="/images/pages/admin-courses-partners-hero.webp" alt="Certification courses" fill sizes="100vw" className="object-cover" priority quality={85} placeholder="empty" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

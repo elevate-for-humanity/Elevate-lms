@@ -66,7 +66,7 @@ export async function POST(req: Request) {
       subject: `Your sign-in link — ${PLATFORM_DEFAULTS.orgName}`,
       content: [
         {
-          type: 'text/html`,
+          type: 'text/html',
           value: `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px;background:#fff;">
   // IMAGE-CONTRACT: allow raw img because legacy markup

@@ -229,7 +229,7 @@ async function _POST(req: Request) {
 
     // Program state gate — reject submissions for waitlisted or closed programs
     const enrollmentState = await getProgramEnrollmentState(supabase, program);
-    if (enrollmentState === `waitlist') {
+    if (enrollmentState === 'waitlist') {
       return NextResponse.json(
         {
           error: 'This program is currently waitlisted. Join the waitlist to be notified when the next cohort opens.',

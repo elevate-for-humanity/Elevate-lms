@@ -103,7 +103,7 @@ async function _POST(req: Request) {
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #ea580c;">Application Received!</h2>
               <p>Hi ${body.firstName},</p>
-              <p>We`ve received your WIOA application for our <strong>${body.program}</strong> program.</p>
+              <p>We've received your WIOA application for our <strong>${body.program}</strong> program.</p>
 
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Reference Number:</p>

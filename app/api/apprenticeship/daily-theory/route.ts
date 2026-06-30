@@ -6,7 +6,7 @@ import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import {
   DAILY_THEORY_PASSING_SCORE,
   isBeautyApprenticeshipSlug,
-} from '@/lib/beauty-apprenticeship/constants';
+} from '@/lib/apprenticeship-programs/constants';
 import {
   dailyTheoryBlockedMessage,
   scorePassesDailyTheory,

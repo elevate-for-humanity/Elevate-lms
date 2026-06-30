@@ -10,7 +10,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { canCreditTheoryHoursForDate } from '@/lib/beauty-apprenticeship/check-daily-theory-credit';
 import { dailyTheoryBlockedMessage } from '@/lib/beauty-apprenticeship/daily-theory';
-import { DAILY_THEORY_PASSING_SCORE } from '@/lib/beauty-apprenticeship/constants';
+import { DAILY_THEORY_PASSING_SCORE } from '@/lib/apprenticeship-programs/constants';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

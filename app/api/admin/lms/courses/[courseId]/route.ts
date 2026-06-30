@@ -1,14 +1,7 @@
-/**
- * PATCH /api/admin/lms/courses/[courseId] — update a course
- * DELETE /api/admin/lms/courses/[courseId] — archive a course
- */
 import { type NextRequest } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
-import {
-  PATCH as adminPATCH,
-  DELETE as adminDELETE,
-} from '@/apps/admin/app/api/admin/lms/courses/[courseId]/route';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -18,7 +11,19 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ c
   if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
-  return adminPATCH(request, context);
+  
+  const { courseId } = await context.params;
+  const body = await request.json();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('courses')
+    .update(body)
+    .eq('id', courseId)
+    .select()
+    .single();
+  
+  if (error) return Response.json({ error: error.message }, { status: 500 });
+  return Response.json(data);
 }
 
 export async function DELETE(request: NextRequest, context: { params: Promise<{ courseId: string }> }) {
@@ -26,5 +31,14 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
   if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
-  return adminDELETE(request, context);
+  
+  const { courseId } = await context.params;
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('courses')
+    .update({ status: 'archived' })
+    .eq('id', courseId);
+  
+  if (error) return Response.json({ error: error.message }, { status: 500 });
+  return Response.json({ success: true });
 }

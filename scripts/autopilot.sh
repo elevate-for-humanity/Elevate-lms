@@ -29,9 +29,9 @@ fi
 # Keep these pointed at the real route owners so the gate does not require
 # legacy redirect shims just to pass.
 REQUIRED_CANONICAL_ROUTE_FILES=(
-  "app/partner/dashboard/page.tsx"
+  "apps/partner/app/partner/dashboard/page.tsx"
   "apps/admin/app/admin/staff-portal/dashboard/page.tsx"
-  "app/admin/dashboard/page.tsx"
+  "apps/admin/app/admin/dashboard/page.tsx"
 )
 
 missing=0

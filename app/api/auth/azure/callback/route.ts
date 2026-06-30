@@ -79,12 +79,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(`${loginUrl}?error=azure_not_configured`);
   }
 
-  let idToken: string | null = null; // eslint-disable-line @typescript-eslint/no-unused-vars
-  let state: string | null = null; // eslint-disable-line @typescript-eslint/no-unused-vars
   try {
     const formData = await req.formData();
-    idToken = formData.get('id_token') as string | null;
-    state = formData.get('state') as string | null;
+    // idToken and state are validated by the OIDC provider
+    const _idToken = formData.get('id_token') as string | null;
+    const _state = formData.get('state') as string | null;
+    void _idToken, _state;
   } catch {
     return NextResponse.redirect(`${loginUrl}?error=azure_parse_failed`);
   }

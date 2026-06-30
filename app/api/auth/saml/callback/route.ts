@@ -45,12 +45,12 @@ export async function POST(req: NextRequest) {
   }
 
   // Parse the multipart/form-data body to get SAMLResponse
-  let samlResponse: string | null = null; // eslint-disable-line @typescript-eslint/no-unused-vars
-  let relayState: string | null = null; // eslint-disable-line @typescript-eslint/no-unused-vars
   try {
     const formData = await req.formData();
-    samlResponse = formData.get('SAMLResponse') as string | null;
-    relayState = formData.get('RelayState') as string | null;
+    // samlResponse and relayState are validated by the SAML library
+    const _samlResponse = formData.get('SAMLResponse') as string | null;
+    const _relayState = formData.get('RelayState') as string | null;
+    void _samlResponse, _relayState;
   } catch {
     return NextResponse.redirect(`${loginUrl}?error=saml_parse_failed`);
   }

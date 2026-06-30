@@ -659,7 +659,7 @@ export default function StudentApplicationForm({
                   team before submitting.
                 </p>
                 <a
-                  href="tel:${PLATFORM_DEFAULTS.supportPhone}"
+                  href={`tel:${PLATFORM_DEFAULTS.supportPhone}`}
                   className="inline-block mt-2 text-red-700 font-bold text-sm underline"
                 >
                   ${PLATFORM_DEFAULTS.supportPhone}

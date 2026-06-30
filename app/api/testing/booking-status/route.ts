@@ -37,13 +37,12 @@ export const GET = withRuntime(
     // to call Stripe to get the mapping.
     const stripeKey = ctx.env.STRIPE_SECRET_KEY;
 
-    let paymentIntentId: string | null = null;
     try {
       const stripe = await getStripeServer();
       const session = await stripe.checkout.sessions.retrieve(sessionId, {
         expand: [],
       });
-      paymentIntentId = (session.payment_intent as string) ?? null;
+      const paymentIntentId = (session.payment_intent as string) ?? null;
     } catch {
       // Session not found or Stripe error — return not-found gracefully
       return NextResponse.json({ found: false });

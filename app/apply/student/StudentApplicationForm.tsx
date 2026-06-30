@@ -659,17 +659,17 @@ export default function StudentApplicationForm({
                   team before submitting.
                 </p>
                 <a
-                  href={`tel:${PLATFORM_DEFAULTS.supportPhone}`}
+                  href="tel:${PLATFORM_DEFAULTS.supportPhone}"
                   className="inline-block mt-2 text-red-700 font-bold text-sm underline"
                 >
-                  {PLATFORM_DEFAULTS.supportPhone}
+                  ${PLATFORM_DEFAULTS.supportPhone}
                 </a>
               </div>
             </div>
           )}
 
           {/* Conditional banner */}
-          {eligibilityDecision?.status === 'conditional_review' && (
+          {eligibilityDecision?.status === `conditional_review' && (
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex gap-3 items-start">
               <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>

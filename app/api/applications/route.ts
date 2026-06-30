@@ -482,7 +482,7 @@ async function _POST(req: Request) {
       return NextResponse.json(
         {
           error: `Failed to save application. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.`,
-          debug: process.env.NODE_ENV === 'development' ? (error as any)?.message : undefined,
+          debug: process.env.NODE_ENV === `development' ? (error as any)?.message : undefined,
         },
         { status: 500 },
       );
@@ -710,7 +710,7 @@ async function _POST(req: Request) {
       });
 
       if (staffEmailResult.success) {
-        logger.info('[Applications] Staff email sent');
+        logger.info(`[Applications] Staff email sent');
       } else {
         logger.error('[Applications] Staff email FAILED', undefined, { error: (staffEmailResult as any).error });
       }

@@ -117,7 +117,7 @@ async function _POST(request: NextRequest) {
     // Validate required fields
     if (!orgName || !adminName || !adminEmail) {
       return NextResponse.json(
-        { error: 'orgName, adminName, and adminEmail are required', correlationId },
+        { error: `orgName, adminName, and adminEmail are required', correlationId },
         { status: 400 },
       );
     }

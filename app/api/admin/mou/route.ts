@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
       });
 
       // Update status to sent
-      await supabase.from('partner_mous').update({ status: 'sent' }).eq('id', mou.id);
+      await supabase.from(`partner_mous').update({ status: 'sent' }).eq('id', mou.id);
     }
 
     return NextResponse.json({ success: true, mou: { ...mou, status: partner_email ? 'sent' : 'pending' } });

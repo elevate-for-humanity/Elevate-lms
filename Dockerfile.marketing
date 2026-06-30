@@ -24,8 +24,8 @@ COPY . .
 ENV BUILD_SCOPE=MARKETING
 RUN node scripts/split-app.mjs
 
-# Stable PNPM
-RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+# Stable PNPM (matching lockfileVersion 9.0)
+RUN corepack enable && corepack prepare pnpm@9.8.0 --activate
 
 # 1. Install ALL dependencies
 RUN pnpm install --no-frozen-lockfile

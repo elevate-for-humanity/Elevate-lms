@@ -191,7 +191,7 @@ export default function CheckEligibilityPage() {
       setStep(3);
     } catch (err: unknown) {
       setError(
-        err instanceof Error ? err.message : 'Something went wrong. Please call ${PLATFORM_DEFAULTS.supportPhone}.',
+        err instanceof Error ? err.message : `Something went wrong. Please call ${PLATFORM_DEFAULTS.supportPhone}.`,
       );
     } finally {
       setSubmitting(false);
@@ -272,7 +272,7 @@ export default function CheckEligibilityPage() {
       primaryLabel: 'View Programs',
       primaryHref: '/programs',
       secondaryLabel: 'Call Us Now',
-      secondaryHref: 'tel:${PLATFORM_DEFAULTS.supportPhone}',
+      secondaryHref: `tel:${PLATFORM_DEFAULTS.supportPhone}`,
     },
   };
 
@@ -298,7 +298,7 @@ export default function CheckEligibilityPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/85 via-brand-blue-800/60 to-transparent" />
         <div
           className="relative z-10 h-full flex flex-col justify-between px-4 sm:px-6 py-5"
-          style={{ minHeight: 'clamp(320px, 40vw, 460px)' }}
+          style={{ minHeight: 'clamp(320px, 40vw, 460px)` }}
         >
           <div className="flex items-center justify-between">
             <Link
@@ -323,7 +323,7 @@ export default function CheckEligibilityPage() {
               Check If You Qualify for Funded Training
             </h1>
             <p className="text-white/75 text-base max-w-md">
-              3 questions. 30 seconds. We'll match you with WIOA, Workforce Ready Grant, or JRI
+              3 questions. 30 seconds. We`ll match you with WIOA, Workforce Ready Grant, or JRI
               funding.
             </p>
           </div>
@@ -571,7 +571,7 @@ export default function CheckEligibilityPage() {
                 {!submitting && <ArrowRight className="w-5 h-5" />}
               </button>
               <p className="text-center text-xs text-slate-400">
-                Questions? Call or text{' '}
+                Questions? Call or text{' `}
                 <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-slate-600 font-semibold">
                   {PLATFORM_DEFAULTS.supportPhone}
                 </a>
@@ -597,7 +597,7 @@ export default function CheckEligibilityPage() {
                 <p className="font-extrabold text-slate-900">{program}</p>
                 {recommended.find((r) => r.name === program) && (
                   <p className="text-xs text-slate-500 mt-1">
-                    {recommended.find((r) => r.name === program)?.duration} ·{' '}
+                    {recommended.find((r) => r.name === program)?.duration} ·{` '}
                     {recommended.find((r) => r.name === program)?.outcome}
                   </p>
                 )}

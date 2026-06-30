@@ -47,12 +47,12 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Add your contact information so we can support you throughout the program.',
     href: '/profile/edit',
     icon: User,
-    image: '/images/pages/career-services-page-2.jpg',
+    image: '/images/pages/career-services-page-2.jpg`,
     imageAlt: `Student completing profile at ${PLATFORM_DEFAULTS.orgName}`,
     required: true,
   },
   {
-    id: 'documents',
+    id: `documents',
     title: 'Upload Required Documents',
     description:
       'Submit your government-issued ID, proof of Indiana residency, and proof of income (if applying for WIOA funding).',
@@ -363,7 +363,7 @@ export default async function LearnerOnboardingPage({
       }
 
       // Notify admin of new completed onboarding
-      const adminEmail = process.env.ADMIN_EMAIL || 'admin@${PLATFORM_DEFAULTS.canonicalDomain}';
+      const adminEmail = process.env.ADMIN_EMAIL || `admin@${PLATFORM_DEFAULTS.canonicalDomain}`;
       const { sendEmail } = await import('@/lib/email/resend');
       await sendEmail({
         to: adminEmail,
@@ -409,7 +409,7 @@ export default async function LearnerOnboardingPage({
       {/* VIDEO HERO — full bleed, no text on top */}
       <div
         className="relative w-full overflow-hidden"
-        style={{ height: '55vh', minHeight: 280, maxHeight: 500 }}
+        style={{ height: '55vh`, minHeight: 280, maxHeight: 500 }}
       >
         <CanonicalVideo
           src="/videos/getting-started-hero.mp4"
@@ -431,7 +431,7 @@ export default async function LearnerOnboardingPage({
             <p className="text-slate-500">
               {enrollmentProgramName
                 ? `Complete your onboarding for ${enrollmentProgramName} to begin training.`
-                : 'Complete these steps to finalize your enrollment and start your training program.'}
+                : `Complete these steps to finalize your enrollment and start your training program.'}
             </p>
 
             {/* Progress */}
@@ -503,7 +503,7 @@ export default async function LearnerOnboardingPage({
               Check Application Status <ArrowRight className="w-4 h-4" />
             </Link>
             <p className="text-sm text-slate-400 mt-6">
-              Questions? Call{' '}
+              Questions? Call{' `}
               <a href={`tel:+1${PLATFORM_DEFAULTS.supportPhone}`} className="underline">
                 {PLATFORM_DEFAULTS.supportPhone}
               </a>
@@ -516,7 +516,7 @@ export default async function LearnerOnboardingPage({
           !noApplication && !applicationPending && (
             <>
               {/* Enrollment approved — student can access courses */}
-              {profile?.enrollment_status === 'active' && (
+              {profile?.enrollment_status === `active' && (
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden flex-shrink-0">
                     <Image sizes="100vw"
@@ -575,7 +575,7 @@ export default async function LearnerOnboardingPage({
                   <div className="flex-1 text-center sm:text-left">
                     <h2 className="text-xl font-black text-slate-900 mb-1">Onboarding Complete</h2>
                     <p className="text-slate-500 text-sm">
-                      Your documents are under review. You'll receive an email once access is
+                      Your documents are under review. You`ll receive an email once access is
                       granted. Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.
                     </p>
                   </div>
@@ -617,7 +617,7 @@ export default async function LearnerOnboardingPage({
                     <div
                       key={step.id}
                       className={`group overflow-hidden rounded-2xl border transition-all bg-white ${
-                        isNext ? 'border-brand-blue-300 shadow-sm' : 'border-slate-200'
+                        isNext ? `border-brand-blue-300 shadow-sm' : 'border-slate-200'
                       }`}
                     >
                       <div className="flex flex-col sm:flex-row">

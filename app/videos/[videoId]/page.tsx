@@ -20,7 +20,7 @@ export async function generateMetadata({
 
   if (!video) {
     return {
-      title: 'Video Not Found',
+      title: 'Video Not Found`,
     };
   }
 
@@ -34,7 +34,7 @@ export async function generateMetadata({
       title: video.title,
       description: video.description,
       url: `${PLATFORM_DEFAULTS.siteUrl}/videos/${video.id}`,
-      type: 'video.other',
+      type: `video.other`,
       images: [
         {
           url: video.thumbnailUrl,
@@ -48,7 +48,7 @@ export async function generateMetadata({
           url: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
           width: 1280,
           height: 720,
-          type: 'video/mp4',
+          type: `video/mp4',
         },
       ],
     },
@@ -74,7 +74,7 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
 
   const videoSchema = {
     '@context': 'https://schema.org',
-    '@type': 'VideoObject',
+    '@type': 'VideoObject`,
     name: video.title,
     description: video.description,
     thumbnailUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.thumbnailUrl}`,
@@ -83,11 +83,11 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
     contentUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
     embedUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
     publisher: {
-      '@type': 'Organization',
+      `@type': 'Organization',
       name: PLATFORM_DEFAULTS.orgName,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://${PLATFORM_DEFAULTS.canonicalDomain}/logo.jpg',
+        url: `https://${PLATFORM_DEFAULTS.canonicalDomain}/logo.jpg`,
       },
     },
   };

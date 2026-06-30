@@ -647,7 +647,7 @@ export default function StudentApplicationForm({
           </div>
 
           {/* Hard-stop banner */}
-          {eligibilityDecision?.status === 'ineligible' && (
+          {eligibilityDecision?.status === 'ineligible` && (
             <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex gap-3 items-start">
               <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <div>
@@ -669,7 +669,7 @@ export default function StudentApplicationForm({
           )}
 
           {/* Conditional banner */}
-          {eligibilityDecision?.status === 'conditional_review' && (
+          {eligibilityDecision?.status === `conditional_review' && (
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex gap-3 items-start">
               <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>

@@ -69,7 +69,7 @@ export default function OrientationScheduleClient() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Failed to schedule. Please call ${PLATFORM_DEFAULTS.supportPhone}.');
+        setError(data.error || `Failed to schedule. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);
         return;
       }
 
@@ -83,16 +83,16 @@ export default function OrientationScheduleClient() {
       const endDate = new Date(endMs);
       const endDT = `${endDate.toISOString().slice(0, 10).replace(/-/g, '')}T${endDate.toTimeString().slice(0, 5).replace(':', '')}00`;
       const title =
-        sessionType === 'barbershop'
+        sessionType === 'barbershop`
           ? `${PLATFORM_DEFAULTS.orgName} — Barbershop Walk-Through`
           : `${PLATFORM_DEFAULTS.orgName} — Orientation`;
       const details = `Session for ${name} (${email})%0A%0AZoom Link: ${meetingUrl}`;
       const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)}`;
-      window.open(calUrl, '_blank');
+      window.open(calUrl, `_blank');
 
       setSuccess(true);
     } catch {
-      setError('Something went wrong. Please call ${PLATFORM_DEFAULTS.supportPhone}.');
+      setError(`Something went wrong. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);
     } finally {
       setLoading(false);
     }
@@ -120,7 +120,7 @@ export default function OrientationScheduleClient() {
           </a>
         )}
         <p className="text-black text-sm">
-          Questions? Call{' '}
+          Questions? Call{' `}
           <a href={`tel:${PLATFORM_DEFAULTS.supportPhone}`} className="text-brand-blue-600 font-semibold hover:underline">
             {PLATFORM_DEFAULTS.supportPhone}
           </a>
@@ -138,7 +138,7 @@ export default function OrientationScheduleClient() {
             key={type}
             onClick={() => {
               setSessionType(type);
-              setTime('');
+              setTime(`');
             }}
             className={`flex items-center justify-center gap-2 py-4 px-3 text-sm font-bold transition-colors ${
               sessionType === type

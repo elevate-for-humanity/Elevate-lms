@@ -159,11 +159,11 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
               </ol>
             </div>
             <p className="text-sm text-slate-700 mb-6">
-              Questions? Call{' '}
+              Questions? Call{' `}
               <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" className="text-slate-900 font-semibold">
                 ${PLATFORM_DEFAULTS.supportPhone}
-              </a>{' '}
-              or email{' '}
+              </a>{` '}
+              or email{' `}
               <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}" className="text-slate-900 font-semibold">
                 info@${PLATFORM_DEFAULTS.canonicalDomain}
               </a>
@@ -171,7 +171,7 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
             <div className="border-t pt-6 text-left">
               <p className="text-sm text-slate-700 mb-1">Need another sign-in link?</p>
               <ResendMagicLinkForm
-                defaultEmail={user.email ?? ''}
+                defaultEmail={user.email ?? `'}
                 next="/learner/dashboard"
                 label="Resend sign-in link"
               />
@@ -902,14 +902,14 @@ export default async function LearnerDashboardPage({ searchParams }: Props) {
                           </div>
                         )}
 
-                        {req.status === 'payment_failed' && (
+                        {req.status === 'payment_failed` && (
                           <div className="flex items-center gap-2 text-xs text-red-700 bg-red-50 rounded p-2">
                             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                             Payment issue — contact Elevate at ${PLATFORM_DEFAULTS.supportPhone}.
                           </div>
                         )}
 
-                        {(req.status === 'exam_authorized' || req.status === 'exam_forwarded') && (
+                        {(req.status === `exam_authorized' || req.status === 'exam_forwarded') && (
                           <div className="text-xs text-brand-blue-700 bg-brand-blue-50 rounded p-2 space-y-1">
                             <p className="font-medium">Your exam authorization is on its way.</p>
                             <p className="text-brand-blue-600">

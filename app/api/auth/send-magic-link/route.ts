@@ -63,10 +63,10 @@ export async function POST(req: Request) {
       personalizations: [{ to: [{ email: email.trim() }] }],
       from: { email: PLATFORM_DEFAULTS.emailFromAddress, name: PLATFORM_DEFAULTS.orgName },
       reply_to: { email: 'elevate4humanityedu@gmail.com' },
-      subject: 'Your sign-in link — ${PLATFORM_DEFAULTS.orgName}',
+      subject: `Your sign-in link — ${PLATFORM_DEFAULTS.orgName}`,
       content: [
         {
-          type: 'text/html',
+          type: 'text/html`,
           value: `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px;background:#fff;">
   // IMAGE-CONTRACT: allow raw img because legacy markup
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
       Sign In Now
     </a>
   </div>
-  <p style="color:#94a3b8;font-size:13px;">This link expires in 1 hour. If you didn't request this, you can safely ignore it.</p>
+  <p style="color:#94a3b8;font-size:13px;">This link expires in 1 hour. If you didn`t request this, you can safely ignore it.</p>
   <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
   <p style="color:#94a3b8;font-size:12px;">Elevate for Humanity · Indianapolis, IN</p>
 </div>`,

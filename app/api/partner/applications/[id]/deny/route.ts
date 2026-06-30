@@ -60,7 +60,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: application.contact_email,
-          subject: 'Partner Application Update - ${PLATFORM_DEFAULTS.orgName}',
+          subject: `Partner Application Update - ${PLATFORM_DEFAULTS.orgName}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #1e3a8a;">Partner Application Update</h2>
@@ -75,7 +75,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
                 <p style="margin: 0;"><strong>Reason:</strong> ${reason}</p>
               </div>
               `
-                  : ''
+                  : '`
               }
               
               <p>If you believe this decision was made in error or if your circumstances have changed, please feel free to:</p>
@@ -93,7 +93,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
         }),
       });
     } catch (emailError) {
-      logger.warn('Failed to send denial email:', emailError);
+      logger.warn(`Failed to send denial email:', emailError);
     }
 
     return NextResponse.json({ success: true });

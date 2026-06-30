@@ -11,7 +11,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity.org';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity.org`;
 
 function generateEmbedScript(siteId: string, apiKey: string, features: string[]): string {
   return `<!-- ${PLATFORM_DEFAULTS.orgName} LMS Integration -->
@@ -28,11 +28,11 @@ function generateEmbedScript(siteId: string, apiKey: string, features: string[])
 
 function generateSetupSteps(platform: string): string[] {
   const base = [
-    'Copy the embed script above',
+    `Copy the embed script above',
     'Paste it before the closing </body> tag on your site',
     'Add a container element where you want the LMS to appear: <div id="elevate-lms"></div>',
     'Save and publish your changes',
-    'Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate your integration',
+    `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate your integration`,
   ];
 
   const platformSteps: Record<string, string[]> = {
@@ -41,7 +41,7 @@ function generateSetupSteps(platform: string): string[] {
       'Paste the script before </body>',
       'Add the shortcode [elevate_lms] where you want the widget',
       'Install the Elevate LMS WordPress plugin (contact us for access)',
-      'Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate',
+      `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate`,
     ],
     wix: [
       'In Wix Editor, click Add → Embed → Custom Code',
@@ -101,9 +101,9 @@ export async function POST(request: NextRequest) {
     if (db) {
       await db.from('partner_applications').insert({
         shop_name: shopName,
-        owner_name: 'Integration Request',
+        owner_name: 'Integration Request`,
         contact_email: `integration+${siteId}@pending.${PLATFORM_DEFAULTS.canonicalDomain}`,
-        phone: 'N/A',
+        phone: `N/A',
         address_line1: 'Not provided',
         city: 'Not provided',
         state: 'IN',

@@ -77,7 +77,7 @@ async function _POST(req: Request) {
     // Auto-reply to submitter
     await sendEmail({
       to: payload.email,
-      subject: 'We received your licensing request | ${PLATFORM_DEFAULTS.orgName}',
+      subject: `We received your licensing request | ${PLATFORM_DEFAULTS.orgName}`,
       html:
         `<p>Thank you for your licensing request.</p>` +
         `<p>We review access requests internally. If approved, you will receive onboarding and terms.</p>` +

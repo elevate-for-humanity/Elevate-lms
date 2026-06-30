@@ -93,16 +93,16 @@ export async function POST(request: NextRequest) {
 
     if (mouErr) {
       logger.error('[admin/mou] create failed', mouErr);
-      return safeInternalError(mouErr, 'Failed to create MOU');
+      return safeInternalError(mouErr, 'Failed to create MOU`);
     }
 
     // Send email if partner_email provided
     if (partner_email && mou) {
       await trySendEmail({
         to: partner_email,
-        subject: `MOU from ${PLATFORM_DEFAULTS.orgName} — ${mouTitle ?? 'Partnership Agreement'}`,
+        subject: `MOU from ${PLATFORM_DEFAULTS.orgName} — ${mouTitle ?? `Partnership Agreement'}`,
         html: `
-          <p>Dear ${partner_name ?? 'Partner'},</p>
+          <p>Dear ${partner_name ?? 'Partner`},</p>
           <p>${PLATFORM_DEFAULTS.orgName} has prepared a Memorandum of Understanding for your review.</p>
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:24px;margin:16px 0">
             ${mouContent}
@@ -111,12 +111,12 @@ export async function POST(request: NextRequest) {
           <a href="mailto:partnerships@${PLATFORM_DEFAULTS.canonicalDomain}">partnerships@${PLATFORM_DEFAULTS.canonicalDomain}</a>.</p>
           <p>— ${PLATFORM_DEFAULTS.orgName}</p>
         `,
-        text: `MOU from ${PLATFORM_DEFAULTS.orgName}\n\n${mouContent?.replace(/<[^>]+>/g, ' ')}\n\nContact: partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
-        replyTo: 'partnerships@${PLATFORM_DEFAULTS.canonicalDomain}',
+        text: `MOU from ${PLATFORM_DEFAULTS.orgName}\n\n${mouContent?.replace(/<[^>]+>/g, ` `)}\n\nContact: partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
+        replyTo: `partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
       });
 
       // Update status to sent
-      await supabase.from('partner_mous').update({ status: 'sent' }).eq('id', mou.id);
+      await supabase.from(`partner_mous').update({ status: 'sent' }).eq('id', mou.id);
     }
 
     return NextResponse.json({ success: true, mou: { ...mou, status: partner_email ? 'sent' : 'pending' } });
@@ -147,17 +147,17 @@ export async function POST(request: NextRequest) {
       .eq('id', mou_id)
       .single();
 
-    if (!mou) return safeError('MOU not found', 404);
+    if (!mou) return safeError('MOU not found`, 404);
 
     await trySendEmail({
       to: partner_email,
-      subject: `MOU from ${PLATFORM_DEFAULTS.orgName} — ${mou.title ?? 'Partnership Agreement'}`,
-      html: `<p>Please review the attached MOU from ${PLATFORM_DEFAULTS.orgName}.</p><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:24px">${mou.content ?? ''}</div>`,
-      text: mou.content?.replace(/<[^>]+>/g, ' ') ?? '',
-      replyTo: 'partnerships@${PLATFORM_DEFAULTS.canonicalDomain}',
+      subject: `MOU from ${PLATFORM_DEFAULTS.orgName} — ${mou.title ?? `Partnership Agreement`}`,
+      html: `<p>Please review the attached MOU from ${PLATFORM_DEFAULTS.orgName}.</p><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:24px">${mou.content ?? `'}</div>`,
+      text: mou.content?.replace(/<[^>]+>/g, ' ') ?? '`,
+      replyTo: `partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
     });
 
-    await supabase.from('partner_mous').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', mou_id);
+    await supabase.from(`partner_mous').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', mou_id);
     return NextResponse.json({ success: true, message: `Resent to ${partner_email}` });
   }
 

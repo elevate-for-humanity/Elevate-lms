@@ -115,7 +115,7 @@ async function _GET(request: NextRequest) {
     );
   } catch (err: any) {
     error = 'Internal server error';
-    statusCode = 500;
+    // statusCode = 500;
     logger.error('API Error:', err instanceof Error ? err : new Error(String(err)));
     return NextResponse.json(apiResponse(false, null, error), { status: 500 });
   }
@@ -184,7 +184,7 @@ async function _POST(request: NextRequest) {
     return NextResponse.json(apiResponse(true, course), { status: 201 });
   } catch (err: any) {
     error = 'Internal server error';
-    statusCode = 500;
+    // statusCode = 500;
     logger.error('API Error:', err instanceof Error ? err : new Error(String(err)));
     return NextResponse.json(apiResponse(false, null, error), { status: 500 });
   }

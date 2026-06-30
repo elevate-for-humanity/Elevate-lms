@@ -93,7 +93,7 @@ async function _POST(req: Request) {
           <p><strong>Type:</strong> ${data.meetingType === 'virtual' ? 'Virtual Meeting (Google Meet)' : 'Phone Call'}</p>
           <p><strong>Date:</strong> ${dateStr}</p>
           <p><strong>Time:</strong> ${data.time}</p>
-          ${data.notes ? `<p><strong>Notes:</strong><br>${data.notes}</p>` : ''}
+          ${data.notes ? `<p><strong>Notes:</strong><br>${data.notes}</p>` : '`}
           <hr>
           <p><em>Submitted from ${PLATFORM_DEFAULTS.canonicalDomain}/schedule/meeting</em></p>
         `,
@@ -102,11 +102,11 @@ async function _POST(req: Request) {
       // Confirmation email to the requester
       await sendEmail({
         to: data.email,
-        subject: 'Meeting Request Received — ${PLATFORM_DEFAULTS.orgName}',
+        subject: `Meeting Request Received — ${PLATFORM_DEFAULTS.orgName}',
         html: `
           <h2>Your Meeting Request Has Been Received</h2>
           <p>Hi ${data.name.split(' ')[0]},</p>
-          <p>We received your request for a <strong>${data.meetingType === 'virtual' ? 'virtual meeting' : 'phone call'}</strong>.</p>
+          <p>We received your request for a <strong>${data.meetingType === 'virtual' ? 'virtual meeting' : 'phone call`}</strong>.</p>
           <p><strong>Requested Date:</strong> ${dateStr}<br>
           <strong>Requested Time:</strong> ${data.time}</p>
           <p>Our team will confirm your meeting within 1 business day. If the requested time is unavailable, we will suggest alternatives.</p>
@@ -119,7 +119,7 @@ async function _POST(req: Request) {
       if (process.env.ADMIN_SMS_GATEWAY) {
         await sendEmail({
           to: process.env.ADMIN_SMS_GATEWAY,
-          subject: 'Meeting',
+          subject: `Meeting',
           html: `${data.name}\n${data.meetingType}\n${dateStr} ${data.time}`,
         }).catch((err) => logger.warn('[booking] SMS alert failed:', err));
       }

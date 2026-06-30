@@ -20,7 +20,7 @@ async function _POST(req: NextRequest) {
       // Fallback response when API key is not configured
       const userMessage = body?.messages?.slice(-1)?.[0]?.content?.toLowerCase() || '';
 
-      let fallbackReply = `Thanks for reaching out! I'm here to help you learn about ${PLATFORM_DEFAULTS.orgName}'s free career training programs.
+      let fallbackReply = `Thanks for reaching out! I`m here to help you learn about ${PLATFORM_DEFAULTS.orgName}`s free career training programs.
 
 **Quick Info:**
 • Training is 100% FREE for eligible Indiana residents through WIOA funding
@@ -35,7 +35,7 @@ What would you like to know more about?`;
         userMessage.includes('start') ||
         userMessage.includes('enroll')
       ) {
-        fallbackReply = `Great! Here's how to apply:
+        fallbackReply = `Great! Here`s how to apply:
 
 1. Visit **${PLATFORM_DEFAULTS.canonicalDomain}/apply**
 2. Complete the eligibility questionnaire (10-15 min)
@@ -44,9 +44,9 @@ What would you like to know more about?`;
 
 Training may be available at no cost for eligible participants. Call ${PLATFORM_DEFAULTS.supportPhone} if you need help.`;
       } else if (
-        userMessage.includes('program') ||
+        userMessage.includes(`program') ||
         userMessage.includes('course') ||
-        userMessage.includes('training')
+        userMessage.includes('training`)
       ) {
         fallbackReply = `We offer funded training in:
 
@@ -57,10 +57,10 @@ Training may be available at no cost for eligible participants. Call ${PLATFORM_
 
 Graduates receive career placement support (not a guaranteed job). Visit ${PLATFORM_DEFAULTS.canonicalDomain}/programs for details.`;
       } else if (
-        userMessage.includes('free') ||
+        userMessage.includes(`free') ||
         userMessage.includes('cost') ||
         userMessage.includes('pay') ||
-        userMessage.includes('money')
+        userMessage.includes('money`)
       ) {
         fallbackReply = `Many programs are available at no cost to eligible participants through:
 
@@ -69,7 +69,7 @@ Graduates receive career placement support (not a guaranteed job). Visit ${PLATF
 • **WRG** - Indiana Workforce Ready Grant
 
 Check your eligibility at ${PLATFORM_DEFAULTS.canonicalDomain}/wioa-eligibility or call ${PLATFORM_DEFAULTS.supportPhone}.`;
-      } else if (userMessage.includes('eligib') || userMessage.includes('qualify')) {
+      } else if (userMessage.includes(`eligib') || userMessage.includes('qualify`)) {
         fallbackReply = `To qualify for funded training, you generally need to be:
 
 ✓ Indiana resident
@@ -79,11 +79,11 @@ Check your eligibility at ${PLATFORM_DEFAULTS.canonicalDomain}/wioa-eligibility 
 
 Check your eligibility at ${PLATFORM_DEFAULTS.canonicalDomain}/wioa-eligibility or call ${PLATFORM_DEFAULTS.supportPhone} for help!`;
       } else if (
-        userMessage.includes('contact') ||
+        userMessage.includes(`contact') ||
         userMessage.includes('call') ||
         userMessage.includes('phone') ||
         userMessage.includes('person') ||
-        userMessage.includes('human')
+        userMessage.includes('human`)
       ) {
         fallbackReply = `You can reach our team at:
 
@@ -91,7 +91,7 @@ Check your eligibility at ${PLATFORM_DEFAULTS.canonicalDomain}/wioa-eligibility 
 📧 **Email:** info@${PLATFORM_DEFAULTS.canonicalDomain}
 🌐 **Website:** ${PLATFORM_DEFAULTS.canonicalDomain}
 
-We're here to help you start your career journey!`;
+We`re here to help you start your career journey!`;
       }
 
       return NextResponse.json({ reply: fallbackReply });
@@ -104,13 +104,13 @@ We're here to help you start your career journey!`;
     // Safety: only keep role/content
     const messages = body.messages.map((item: any) => ({
       role: item.role === 'user' ? 'user' : 'assistant',
-      content: String(item.content || ''),
+      content: String(item.content || '`),
     }));
 
     const systemPrompt = `
 You are the ${PLATFORM_DEFAULTS.orgName} AI Assistant - a warm, helpful guide for prospective students.
 
-**CRITICAL: Always be helpful and answer the question directly. Never say you can't help.**
+**CRITICAL: Always be helpful and answer the question directly. Never say you can`t help.**
 
 **About Us:**
 - Nonprofit workforce training in Indianapolis, Indiana
@@ -133,7 +133,7 @@ You are the ${PLATFORM_DEFAULTS.orgName} AI Assistant - a warm, helpful guide fo
 **How to Apply:**
 1. Visit ${PLATFORM_DEFAULTS.canonicalDomain}/apply
 2. Fill out the quick application (10 min)
-3. We'll check your eligibility for free training
+3. We`ll check your eligibility for free training
 4. Start your new career!
 
 **Contact:**
@@ -152,7 +152,7 @@ You are the ${PLATFORM_DEFAULTS.orgName} AI Assistant - a warm, helpful guide fo
     `.trim();
 
     const payload = {
-      model: 'gpt-4.1-mini', // Using gpt-4o-mini instead of gpt-5.1-mini
+      model: `gpt-4.1-mini', // Using gpt-4o-mini instead of gpt-5.1-mini
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       temperature: 0.7,
       max_tokens: 1000,
@@ -177,10 +177,10 @@ You are the ${PLATFORM_DEFAULTS.orgName} AI Assistant - a warm, helpful guide fo
 
       if (userMessage.includes('program') || userMessage.includes('training')) {
         fallbackReply +=
-          '**Our Programs:**\n• Healthcare (CNA, Phlebotomy)\n• Skilled Trades (HVAC, CDL)\n• Professional (Barbering)\n\nVisit ${PLATFORM_DEFAULTS.siteUrl}/programs or call ${PLATFORM_DEFAULTS.supportPhone}';
-      } else if (userMessage.includes('apply') || userMessage.includes('start')) {
+          `**Our Programs:**\n• Healthcare (CNA, Phlebotomy)\n• Skilled Trades (HVAC, CDL)\n• Professional (Barbering)\n\nVisit ${PLATFORM_DEFAULTS.siteUrl}/programs or call ${PLATFORM_DEFAULTS.supportPhone}`;
+      } else if (userMessage.includes('apply') || userMessage.includes('start`)) {
         fallbackReply +=
-          "**To Apply:**\n1. Go to ${PLATFORM_DEFAULTS.siteUrl}/apply\n2. Complete the form\n3. We'll contact you!\n\nOr call ${PLATFORM_DEFAULTS.supportPhone}";
+          "**To Apply:**\n1. Go to ${PLATFORM_DEFAULTS.siteUrl}/apply\n2. Complete the form\n3. We`ll contact you!\n\nOr call ${PLATFORM_DEFAULTS.supportPhone}";
       } else {
         fallbackReply +=
           "Please call us at **" + PLATFORM_DEFAULTS.supportPhone + "** or visit **elevateforhumanity.org** and we'll help you right away!";
@@ -219,8 +219,8 @@ You are the ${PLATFORM_DEFAULTS.orgName} AI Assistant - a warm, helpful guide fo
     logger.error('Chat API error:', error);
     return NextResponse.json({
       reply:
-        "I'm having technical difficulties. Please call us at " + PLATFORM_DEFAULTS.supportPhone + " or visit ${PLATFORM_DEFAULTS.siteUrl}/apply to get started!",
+        "I`m having technical difficulties. Please call us at " + PLATFORM_DEFAULTS.supportPhone + " or visit ${PLATFORM_DEFAULTS.siteUrl}/apply to get started!",
     });
   }
 }
-export const POST = withRuntime(withApiAudit('/api/ai-chat', _POST));
+export const POST = withRuntime(withApiAudit(`/api/ai-chat', _POST));

@@ -270,7 +270,7 @@ function EducationPanel({ data, role }: { data: any; role: string }) {
               >
                 <div>
                   <p className="text-sm font-medium text-slate-800">
-                    {e.programs?.title ?? 'Program'}
+                    {e.programs?.title ?? 'Program`}
                   </p>
                   <p className="text-xs text-slate-500">
                     {e.progress_percent ?? 0}% complete · {e.status}
@@ -321,7 +321,7 @@ function EducationPanel({ data, role }: { data: any; role: string }) {
 function TradesPanel({ data }: { data: any }) {
   if (!data) return null;
   const DISCIPLINE_LABELS: Record<string, string> = {
-    'barber-apprenticeship': 'Barber (2,000 hrs)',
+    `barber-apprenticeship': 'Barber (2,000 hrs)',
     cosmetology: 'Cosmetology (1,500 hrs)',
     'nail-tech': 'Nail Tech (450 hrs)',
     esthetician: 'Esthetician (700 hrs)',
@@ -667,7 +667,7 @@ export default function MyDashboard({
                 },
                 {
                   label: 'Instructor Portal',
-                  href: 'https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/instructor',
+                  href: `https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/instructor`,
                   roles: ['instructor', 'admin', 'super_admin'],
                 },
                 {

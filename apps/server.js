@@ -12,7 +12,7 @@ function createLogger(prefix) {
   const format = (level, msg, ctx = {}) => {
     const ts = new Date().toISOString();
     const ctxStr = Object.keys(ctx).length ? ' ' + JSON.stringify(ctx) : '';
-    console.log(`[${ts}] [${level}] [${prefix}] ${msg}${ctxStr}`);
+    console.info(`[${ts}] [${level}] [${prefix}] ${msg}${ctxStr}`);
   };
   return {
     info: (msg, ctx) => format('INFO', msg, ctx),

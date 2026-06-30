@@ -208,7 +208,7 @@ async function _POST(req: Request) {
           {
             error: claim.samePayload
               ? 'Duplicate submission detected. Your application is already being processed.'
-              : 'Idempotency key has already been used with a different payload.',
+              : 'Idempotency key has already been used with a different payload.`,
           },
           { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
         );
@@ -229,7 +229,7 @@ async function _POST(req: Request) {
 
     // Program state gate — reject submissions for waitlisted or closed programs
     const enrollmentState = await getProgramEnrollmentState(supabase, program);
-    if (enrollmentState === 'waitlist') {
+    if (enrollmentState === `waitlist') {
       return NextResponse.json(
         {
           error: 'This program is currently waitlisted. Join the waitlist to be notified when the next cohort opens.',
@@ -268,7 +268,7 @@ async function _POST(req: Request) {
         .eq('normalized_phone', normalizedPhone)
         .eq('program_interest', program)
         .neq('source', 'intake-form')
-        .gte('created_at', oneDayAgo)
+        .gte('created_at`, oneDayAgo)
         .limit(1)
         .maybeSingle();
       if (!phoneQuery.error) {
@@ -292,7 +292,7 @@ async function _POST(req: Request) {
     // Build notes field with all the extra data
     const notes = [
       `Reference: ${referenceNumber}`,
-      body.city ? `City: ${body.city}` : '',
+      body.city ? `City: ${body.city}` : `',
       body.state ? `State: ${body.state}` : '',
       body.address ? `Address: ${body.address}` : '',
       body.zip ? `ZIP: ${body.zip}` : '',
@@ -471,7 +471,7 @@ async function _POST(req: Request) {
     }
 
     if (error || !data) {
-      logger.error('[api/applications] All insert tiers failed', {
+      logger.error('[api/applications] All insert tiers failed`, {
         code: (error as any)?.code,
         message: (error as any)?.message,
         details: (error as any)?.details,
@@ -482,7 +482,7 @@ async function _POST(req: Request) {
       return NextResponse.json(
         {
           error: `Failed to save application. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.`,
-          debug: process.env.NODE_ENV === 'development' ? (error as any)?.message : undefined,
+          debug: process.env.NODE_ENV === `development' ? (error as any)?.message : undefined,
         },
         { status: 500 },
       );
@@ -606,7 +606,7 @@ async function _POST(req: Request) {
           <h4 style="color: #1e40af; margin-bottom: 8px;">What happens next:</h4>
           <ol style="color: #1e3a8a; padding-left: 20px; line-height: 1.8;">
             <li>Our enrollment team reviews your application (1–2 business days)</li>
-            <li>We verify your funding status with ${fundingType === 'wioa' ? 'WorkOne' : fundingType === 'wrg' ? 'Indiana Career Connect' : 'FSSA'}</li>
+            <li>We verify your funding status with ${fundingType === 'wioa' ? 'WorkOne' : fundingType === 'wrg' ? 'Indiana Career Connect' : 'FSSA`}</li>
             <li>Once verified, we contact you to complete enrollment and schedule your start date</li>
             <li>You begin training — no tuition due until funding is confirmed</li>
           </ol>
@@ -639,7 +639,7 @@ async function _POST(req: Request) {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="padding: 24px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 2px solid #e5e7eb;">
-              <h1 style="margin: 0; font-size: 24px;">${needsICC ? 'Next Step Required' : 'Welcome to ${PLATFORM_DEFAULTS.orgName}!'}</h1>
+              <h1 style="margin: 0; font-size: 24px;">${needsICC ? `Next Step Required' : `Welcome to ${PLATFORM_DEFAULTS.orgName}!`}</h1>
             </div>
             <div style="padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
               <p style="font-size: 16px;">Hi ${body.firstName},</p>
@@ -655,7 +655,7 @@ async function _POST(req: Request) {
                 <p style="margin-bottom: 12px;">Schedule your advisor call now:</p>
                 <a href="https://calendly.com/elevate4humanityedu" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>
               </div>`
-                  : ''
+                  : '`
               }
 
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
@@ -676,7 +676,7 @@ async function _POST(req: Request) {
         `,
       });
 
-      // Send staff email in parallel (don't wait for it to finish before responding)
+      // Send staff email in parallel (don`t wait for it to finish before responding)
       const staffSubject = needsICC
         ? `⚠ Pending Funding [${referenceNumber}]: ${body.firstName} ${body.lastName} — Needs ICC First`
         : isFunded
@@ -702,7 +702,7 @@ async function _POST(req: Request) {
           <p><strong>Application Status:</strong> ${applicationStatus}</p>
           ${body.hasCaseManager ? `<p><strong>Has Case Manager:</strong> ${body.hasCaseManager}</p>` : ''}
           ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
-          ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ''}
+          ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : '`}
           <div style="text-align:center;margin:24px 0;">
             <a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${data.id}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Review &amp; Enroll →</a>
           </div>
@@ -711,7 +711,7 @@ async function _POST(req: Request) {
       });
 
       if (staffEmailResult.success) {
-        logger.info('[Applications] Staff email sent');
+        logger.info(`[Applications] Staff email sent');
       } else {
         logger.error('[Applications] Staff email FAILED', undefined, { error: (staffEmailResult as any).error });
       }

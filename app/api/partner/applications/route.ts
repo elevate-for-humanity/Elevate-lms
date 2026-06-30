@@ -130,7 +130,7 @@ async function _POST(request: NextRequest) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: email,
-          subject: 'Partner Shop Application Received - ${PLATFORM_DEFAULTS.orgName}',
+          subject: `Partner Shop Application Received - ${PLATFORM_DEFAULTS.orgName}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #1e3a8a;">Partner Shop Application Received</h2>
@@ -148,7 +148,7 @@ async function _POST(request: NextRequest) {
               <ol>
                 <li>Our team will review your application within 1-3 business days</li>
                 <li>You'll receive an email with your approval status</li>
-                <li>Once approved, you'll get a link to access your Partner Dashboard</li>
+                <li>Once approved, you`ll get a link to access your Partner Dashboard</li>
               </ol>
               
               <p>Questions? Call us at <a href="tel:${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a></p>
@@ -159,7 +159,7 @@ async function _POST(request: NextRequest) {
         }),
       });
     } catch (emailError) {
-      logger.warn('Failed to send confirmation email:', emailError);
+      logger.warn(`Failed to send confirmation email:', emailError);
     }
 
     // Send notification to admin

@@ -56,7 +56,7 @@ function confirmationEmailHtml(name: string, startTime: string, examQuestion: st
   const time = date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
-    timeZone: 'America/Indiana/Indianapolis',
+    timeZone: 'America/Indiana/Indianapolis`,
   });
 
   return `
@@ -82,7 +82,7 @@ function confirmationEmailHtml(name: string, startTime: string, examQuestion: st
       </tr>
       <tr style="background: #f8fafc;">
         <td style="padding: 10px 12px; font-weight: bold;">Exam</td>
-        <td style="padding: 10px 12px;">${examQuestion || 'See confirmation'}</td>
+        <td style="padding: 10px 12px;">${examQuestion || `See confirmation'}</td>
       </tr>
       <tr>
         <td style="padding: 10px 12px; font-weight: bold;">Location</td>
@@ -113,7 +113,7 @@ function cancellationEmailHtml(name: string, startTime: string): string {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric',
+    day: 'numeric`,
   });
   return `
 <!DOCTYPE html>
@@ -135,7 +135,7 @@ function cancellationEmailHtml(name: string, startTime: string): string {
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
 
-export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }, async (req) => {
+export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: `api' }, async (req) => {
   const rawBody = await req.text();
   const signature = req.headers.get('calendly-webhook-signature');
 
@@ -242,7 +242,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
         .send({
           from: `Elevate Testing Center <${TESTING_CENTER.email}>`,
           to: inviteeEmail,
-          subject: 'Your Testing Appointment is Confirmed — ${PLATFORM_DEFAULTS.orgName}',
+          subject: `Your Testing Appointment is Confirmed — ${PLATFORM_DEFAULTS.orgName}`,
           html: confirmationEmailHtml(inviteeName, startTime, examAnswer),
         })
         .catch((err) => logger.error('Confirmation email failed', err));
@@ -321,7 +321,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
         .send({
           from: `Elevate Testing Center <${TESTING_CENTER.email}>`,
           to: inviteeEmail,
-          subject: 'Testing Appointment Canceled — ${PLATFORM_DEFAULTS.orgName}',
+          subject: `Testing Appointment Canceled — ${PLATFORM_DEFAULTS.orgName}`,
           html: cancellationEmailHtml(inviteeName, startTime),
         })
         .catch((err) => logger.error('Cancellation email failed', err));

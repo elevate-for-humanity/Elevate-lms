@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     await sendEmail({
       to: email,
-      subject: 'Your sign-in link — ${PLATFORM_DEFAULTS.orgName}',
+      subject: `Your sign-in link — ${PLATFORM_DEFAULTS.orgName}`,
       html: `
         <div style="max-width:600px;margin:0 auto;font-family:Georgia,serif;color:#1a1a1a;background:#ffffff">
           <div style="text-align:center;padding:32px 24px 24px">

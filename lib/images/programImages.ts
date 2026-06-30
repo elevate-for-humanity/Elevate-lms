@@ -55,27 +55,27 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   // ── Welding ──────────────────────────────────────────────────────────────
   welding: {
     card: `${P}/welding-sparks.webp`,
-    hero: `${P}/welding-torch.webp`,
+    hero: `${P}/welding-sparks.webp`,
     alt: 'Welder producing sparks on a metal workpiece in a fabrication shop',
   },
 
   // ── Plumbing ─────────────────────────────────────────────────────────────
   plumbing: {
     card: `${P}/plumbing-pipes.webp`,
-    hero: `${P}/plumbing-tools.webp`,
+    hero: `${P}/plumbing-pipes.webp`,
     alt: 'Plumber installing pipes during a commercial plumbing job',
   },
 
   // ── Construction Trades ──────────────────────────────────────────────────
   'construction-trades-certification': {
     card: `${P}/construction-trades.webp`,
-    hero: `${P}/electrical-wiring.webp`,
+    hero: `${P}/electrical-wiring.jpg`,
     alt: 'Construction trades student working on a framing project',
   },
 
   // ── CNA / Healthcare ─────────────────────────────────────────────────────
   cna: {
-    card: `${P}/cna-patient-care.webp`,
+    card: `${P}/cna-patient-care.jpg`,
     hero: `${P}/cna-vitals.webp`,
     alt: 'CNA student checking patient vitals in a clinical simulation lab',
   },
@@ -96,7 +96,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   'sanitation-infection-control': {
     card: `${P}/sanitation.webp`,
-    hero: `${P}/cna-clinical.webp`,
+    hero: `${P}/cna-clinical.jpg`,
     alt: 'Healthcare worker following infection control procedures',
   },
 
@@ -109,8 +109,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
 
   // ── Barber / Cosmetology ─────────────────────────────────────────────────
   'barber-apprenticeship': {
-    card: `${P}/barber-fade-cut.webp`,
-    hero: `${P}/barber-clippers-work.webp`,
+    card: `${P}/barber-fade.webp`,
+    hero: `${P}/barber-shop-interior.webp`,
     alt: 'Barber apprentice executing a fade cut on a client',
   },
   'cosmetology-apprenticeship': {
@@ -136,37 +136,37 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'IT help desk technician supporting a user at a workstation',
   },
   'cybersecurity-analyst': {
-    card: `${P}/cybersecurity-screen.webp`,
-    hero: `${P}/cybersecurity-code.webp`,
+    card: `${P}/cybersecurity-screen.jpg`,
+    hero: `${P}/cybersecurity-code.jpg`,
     alt: 'Cybersecurity analyst monitoring a security dashboard',
   },
   'network-administration': {
-    card: `${P}/network-administration.webp`,
-    hero: `${P}/it-networking.webp`,
+    card: `${P}/network-administration.jpg`,
+    hero: `${P}/it-helpdesk-desk.webp`,
     alt: 'Network administrator configuring network equipment',
   },
   'network-support-technician': {
     card: `${P}/networking-hero.webp`,
-    hero: `${P}/it-hardware.webp`,
+    hero: `${P}/it-help-desk.webp`,
     alt: 'Network support technician troubleshooting a connection',
   },
   'software-development': {
-    card: `${P}/software-development.webp`,
+    card: `${P}/software-development.jpg`,
     hero: `${P}/web-development.webp`,
     alt: 'Software development student writing code',
   },
   'web-development': {
     card: `${P}/web-development.webp`,
-    hero: `${P}/software-development.webp`,
+    hero: `${P}/software-development.jpg`,
     alt: 'Web development student building a site',
   },
   'graphic-design': {
     card: `${P}/graphic-design.webp`,
-    hero: `${P}/cad-drafting.webp`,
+    hero: `${P}/graphic-design.webp`,
     alt: 'Graphic design student working in Adobe Creative Suite',
   },
   'cad-drafting': {
-    card: `${P}/cad-drafting.webp`,
+    card: `${P}/graphic-design.webp`,
     hero: `${P}/graphic-design.webp`,
     alt: 'CAD drafting student working on technical drawings',
   },
@@ -198,8 +198,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Business administration student in a professional setting',
   },
   'office-administration': {
-    card: `${P}/office-admin-desk.webp`,
-    hero: `${P}/office-administration.webp`,
+    card: `${P}/office-admin-desk.jpg`,
+    hero: `${P}/office-admin-desk.jpg`,
     alt: 'Office administrator working at a professional workstation',
   },
   'project-management': {

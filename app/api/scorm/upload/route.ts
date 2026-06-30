@@ -63,7 +63,7 @@ async function _POST(req: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!['admin', 'instructor'].includes(profile?.role || '')) {
+    if (!['admin', 'super_admin', 'instructor'].includes(profile?.role || '')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -183,4 +183,3 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/scorm/upload', _POST);
-

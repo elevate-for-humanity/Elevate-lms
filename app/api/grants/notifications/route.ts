@@ -152,4 +152,3 @@ async function _PATCH(req: NextRequest) {
 export const GET = withApiAudit('/api/grants/notifications', _GET);
 export const POST = withApiAudit('/api/grants/notifications', _POST);
 export const PATCH = withApiAudit('/api/grants/notifications', _PATCH);
-

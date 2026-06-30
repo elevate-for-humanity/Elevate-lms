@@ -294,7 +294,7 @@ Return ONLY valid JSON.`;
     } catch (parseError) {
       logger.error('[import-site] JSON parse error', {
         raw: jsonStr.slice(0, 200),
-        error: 'Import failed'
+        error: parseError instanceof Error ? parseError.message : String(parseError)
       });
       throw new Error(`Failed to parse AI response as JSON`), { cause: parseError };
     }
@@ -339,4 +339,3 @@ Return ONLY valid JSON.`;
   }
 }
 export const POST = withApiAudit('/api/ai/import-site', _POST);
-

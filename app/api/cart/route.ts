@@ -3,7 +3,6 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { getCart, addToCart, updateCartItem, removeFromCart } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -171,4 +170,3 @@ export const GET = withApiAudit('/api/cart', _GET);
 export const POST = withApiAudit('/api/cart', _POST);
 export const PATCH = withApiAudit('/api/cart', _PATCH);
 export const DELETE = withApiAudit('/api/cart', _DELETE);
-

@@ -116,4 +116,3 @@ ${parsed.modules?.map((mod: any, i: number) => `${i + 1}. ${mod.title || mod}`).
   }
 }
 export const POST = withApiAudit('/api/autopilots/build-courses', _POST);
-

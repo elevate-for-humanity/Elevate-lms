@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -10,7 +8,7 @@ import { checkCompetencyGate } from '@/lib/lms/competency-gate';
 
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_ROLES = ['instructor', 'admin', 'staff'];
+const ALLOWED_ROLES = ['instructor', 'admin', 'super_admin', 'staff'];
 const VALID_STATUSES = ['under_review', 'approved', 'rejected', 'revision_requested'] as const;
 type ReviewStatus = (typeof VALID_STATUSES)[number];
 
@@ -152,4 +150,3 @@ export async function PATCH(request: NextRequest) {
 
   return NextResponse.json({ submission: updated });
 }
-

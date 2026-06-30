@@ -1,8 +1,5 @@
-import { db } from '@/lib/db';
-
 import { internalFetch } from '@/lib/api/internal-fetch';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -248,4 +245,3 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
     documents,
   });
 });
-

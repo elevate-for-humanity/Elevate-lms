@@ -148,4 +148,3 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withRuntime(withApiAudit('/api/waitlist', _GET));
 export const POST = withRuntime(withApiAudit('/api/waitlist', _POST));
-

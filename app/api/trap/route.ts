@@ -70,4 +70,3 @@ async function _POST(req: NextRequest) {
 }
 export const GET = withApiAudit('/api/trap', _GET);
 export const POST = withApiAudit('/api/trap', _POST);
-

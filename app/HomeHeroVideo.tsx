@@ -102,7 +102,7 @@ export default function HomeHeroVideo() {
     <div ref={containerRef} className="relative w-full h-full">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
       <Image
-        src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero-poster.webp"
+        src="/images/hero-poster.webp"
         alt={`${PLATFORM_DEFAULTS.orgName} career training`}
         fill
         priority

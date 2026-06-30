@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -11,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 type ExportType = 'learners' | 'enrollments' | 'completions' | 'credentials' | 'placements';
 const EXPORT_TYPES = new Set<ExportType>(['learners', 'enrollments', 'completions', 'credentials', 'placements']);
-const EXPORT_ROLES = new Set(['provider_admin', 'admin', 'staff']);
+const EXPORT_ROLES = new Set(['provider_admin', 'admin', 'super_admin', 'staff']);
 
 function toCsv(rows: Record<string, unknown>[]): string {
   if (!rows.length) return 'status\nno rows\n';
@@ -137,4 +135,3 @@ export async function POST(request: NextRequest) {
     return safeInternalError(error, 'Provider export failed');
   }
 }
-

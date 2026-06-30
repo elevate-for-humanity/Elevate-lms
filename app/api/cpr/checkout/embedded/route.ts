@@ -84,4 +84,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Checkout failed. Please try again.' }, { status: 500 });
   }
 }
-

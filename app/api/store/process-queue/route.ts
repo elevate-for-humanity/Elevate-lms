@@ -1,6 +1,3 @@
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
-
 import { processFulfillmentQueue, getQueueStats } from '@/lib/store/fulfillment-queue';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -43,7 +40,7 @@ async function _POST(req: Request) {
         .eq('id', user.id)
         .maybeSingle();
 
-      if (!profile || !['admin'].includes(profile.role)) {
+      if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
         return Response.json({ error: 'Forbidden' }, { status: 403 });
       }
     }
@@ -78,4 +75,3 @@ async function _GET(request: Request) {
 }
 export const GET = withRuntime(withApiAudit('/api/store/process-queue', _GET));
 export const POST = withRuntime(withApiAudit('/api/store/process-queue', _POST));
-

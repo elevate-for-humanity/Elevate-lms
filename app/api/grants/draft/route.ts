@@ -102,4 +102,3 @@ Focus on workforce, community impact, and elevation if applicable.`;
   }
 }
 export const POST = withApiAudit('/api/grants/draft', _POST);
-

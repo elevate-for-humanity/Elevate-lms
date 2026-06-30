@@ -142,7 +142,7 @@ async function claimIdempotencyKey(
     return { duplicate: true, samePayload };
   } catch (error) {
     logger.warn('[api/applications] idempotency check unavailable; continuing', {
-      error: 'Application processing failed',
+      error: error instanceof Error ? error.message : String(error),
     });
     return { duplicate: false, samePayload: false };
   }
@@ -566,7 +566,7 @@ async function _POST(req: Request) {
           .eq('id', data.id);
         if (linkError) {
           logger.warn('[Applications] Failed to link user_id', {
-            error: 'Internal server error',
+            error: linkError.message,
             applicationId: data.id,
             userId,
           });
@@ -789,4 +789,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/applications', _POST);
-

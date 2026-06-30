@@ -162,4 +162,3 @@ export async function POST(request: NextRequest) {
 
   return safeError('Unknown action', 400);
 }
-

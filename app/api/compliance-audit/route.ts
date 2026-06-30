@@ -6,7 +6,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { COMPLIANCE_THRESHOLDS } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -34,7 +33,7 @@ async function _GET(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile?.role || !['admin'].includes(profile.role)) {
+  if (!profile?.role || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
 
@@ -83,7 +82,7 @@ async function _POST(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile?.role || !['admin'].includes(profile.role)) {
+  if (!profile?.role || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
 
@@ -247,7 +246,7 @@ async function _PATCH(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile?.role || !['admin'].includes(profile.role)) {
+  if (!profile?.role || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
 
@@ -333,4 +332,3 @@ async function _PATCH(request: NextRequest) {
 export const GET = withApiAudit('/api/compliance-audit', _GET);
 export const POST = withApiAudit('/api/compliance-audit', _POST);
 export const PATCH = withApiAudit('/api/compliance-audit', _PATCH);
-

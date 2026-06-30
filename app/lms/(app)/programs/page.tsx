@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 // are always fresh via the enrollment query.
 export const revalidate = 600;
 
-const DEFAULT_PROGRAM_IMAGE = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp';
+const DEFAULT_PROGRAM_IMAGE = '/images/pages/admin-dashboard-hero.webp';
 
 export default async function LmsProgramsPage() {
   const supabase = await createClient();
@@ -54,7 +54,7 @@ export default async function LmsProgramsPage() {
             <Link href="/lms">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
               <Image sizes="100vw"
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
+                src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
                 alt={PLATFORM_DEFAULTS.orgName}
                 width={120}
                 height={32}

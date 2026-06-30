@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 /**
  * @deprecated Route to lib/ai/orchestrator.ts for new callers.
  * This endpoint is preserved for backwards compatibility.
@@ -7,7 +6,6 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { getInstructorByProgramId, getInstructorById } from '@/lms-data/instructors';
 import { allPrograms } from '@/lms-data/programs';
 import { logger } from '@/lib/logger';
@@ -68,7 +66,7 @@ Keep responses concise (2-4 paragraphs max), practical, and encouraging. Focus o
 
       try {
         const supabase = await createClient();
-        const user = safeGetUser(await supabase.auth.getUser());
+        const { data: { user } } = await supabase.auth.getUser();
         await supabase.from('ai_instructor_interactions').insert({
           user_id: user?.id || null, program_id: programId,
           instructor_id: instructorId, user_message: latest, assistant_response: reply,
@@ -93,6 +91,3 @@ Keep responses concise (2-4 paragraphs max), practical, and encouraging. Focus o
   }
 }
 export const POST = withRuntime(withApiAudit('/api/ai/instructor', _POST));
-
-
-

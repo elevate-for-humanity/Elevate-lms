@@ -111,4 +111,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/chat/message', _POST);
-

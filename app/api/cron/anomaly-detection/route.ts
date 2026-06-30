@@ -11,8 +11,6 @@
  *
  * Runs every 30 minutes via scheduler.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -177,4 +175,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   return NextResponse.json({ ok: true, anomalies: anomalies.length, fired, critical: critical.length });
 });
-

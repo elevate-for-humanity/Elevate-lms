@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 import { detectAIBot, isRateLimited, logRequest } from '@/lib/security/ai-protection';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -48,4 +47,3 @@ async function _POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 export const POST = withApiAudit('/api/security/scan-event', _POST);
-

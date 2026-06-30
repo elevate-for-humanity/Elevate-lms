@@ -607,4 +607,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/partners/barber-host-shop/apply', _POST);
-

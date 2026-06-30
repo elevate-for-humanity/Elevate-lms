@@ -2,7 +2,6 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { getStripe, stripe } from '@/lib/stripe/client';
 import { CERTIPORT_EXAMS, CertiportExamCode } from '@/lib/partners/certiport';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -215,4 +214,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/certiport-exam/request', _POST);
-

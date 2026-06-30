@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -68,7 +67,7 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'staff'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -106,4 +105,3 @@ async function _POST(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/social/schedule', _GET);
 export const POST = withApiAudit('/api/social/schedule', _POST);
-

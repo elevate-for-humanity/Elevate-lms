@@ -1,9 +1,6 @@
 // Authenticated: returns the barbershop apprenticeship application for the logged-in user
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
@@ -70,4 +67,3 @@ export async function GET(req: NextRequest) {
     mou_signed: !!bpa.mou_signed_at,
   });
 }
-

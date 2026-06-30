@@ -4,7 +4,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { aiChat } from '@/lib/ai/ai-service';
 import { logger } from '@/lib/logger';
@@ -18,7 +17,7 @@ export async function POST(request: NextRequest) {
   if (limited) return limited;
 
   const supabase = await createClient();
-  const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -72,4 +71,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'AI service unavailable' }, { status: 503 });
   }
 }
-

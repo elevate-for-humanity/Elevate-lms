@@ -39,4 +39,3 @@ async function _GET() {
 }
 
 export const GET = withRuntime(_GET);
-

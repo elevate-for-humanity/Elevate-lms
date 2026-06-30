@@ -8,8 +8,6 @@
  * Rate-limited to prevent abuse. No auth required (key is the secret).
  */
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { executeWorkflow } from '@/lib/workflows/engine';

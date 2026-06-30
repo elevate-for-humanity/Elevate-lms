@@ -1,8 +1,6 @@
 // PUBLIC ROUTE: look up an existing application by email + program
 // Used when a returning applicant tries to pay but already has an application on file.
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -67,4 +65,3 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ id: data.id, status: data.status, intake_stage: data.intake_stage });
 }
-

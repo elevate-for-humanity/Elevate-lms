@@ -74,4 +74,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/email/send', _POST));
-

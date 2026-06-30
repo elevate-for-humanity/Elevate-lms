@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 /**
  * POST /api/micro-classes/webhook
@@ -228,4 +226,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ received: true });
 }
-

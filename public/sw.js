@@ -14,8 +14,8 @@ const OFFLINE_URL = '/offline.html';
 const PRECACHE_ASSETS = [
   '/',
   '/offline.html',
-  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
-  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-512.png',
+  '/icon-192.png',
+  '/icon-512.png',
   '/manifest.webmanifest',
 ];
 
@@ -301,8 +301,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || 'You have a new notification',
-    icon: data.icon || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
-    badge: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
+    icon: data.icon || '/icon-192.png',
+    badge: '/icon-192.png',
     vibrate: [100, 50, 100],
     tag: data.tag || 'default',
     renotify: true,

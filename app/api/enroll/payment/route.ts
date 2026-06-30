@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
 import { getStripeMethodsForAmount } from '@/lib/bnpl-config';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -154,4 +153,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/enroll/payment', _POST));
-

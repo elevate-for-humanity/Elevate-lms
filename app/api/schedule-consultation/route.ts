@@ -187,4 +187,3 @@ ${zoomUrl ? `<p><a href="${zoomUrl}">Join Zoom Meeting</a> (ID: ${zoomId})</p>` 
   }
 }
 export const POST = withApiAudit('/api/schedule-consultation', _POST);
-

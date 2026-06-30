@@ -1,0 +1,43 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="grad-admin-ma" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E67E22;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E67E22;stop-opacity:0.7" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#grad-admin-ma)"/>
+  
+  <!-- Pattern overlay -->
+  <rect width="1200" height="800" fill="url(#grad-admin-ma)" opacity="0.1"/>
+  
+  <!-- Icon circle -->
+  <circle cx="600" cy="300" r="120" fill="white" opacity="0.2"/>
+  <circle cx="600" cy="300" r="100" fill="white" opacity="0.3"/>
+  
+  <!-- Icon -->
+  <text x="600" y="340" font-size="80" text-anchor="middle" fill="white" filter="url(#shadow)">
+    📋
+  </text>
+  
+  <!-- Title -->
+  <text x="600" y="500" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="white" filter="url(#shadow)">
+    Administrative Medical Assistant
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="560" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="white" opacity="0.9">
+    WIOA-Approved Training Program
+  </text>
+  
+  <!-- Bottom bar -->
+  <rect y="720" width="1200" height="80" fill="black" opacity="0.3"/>
+  <text x="600" y="770" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="white">
+    ELEVATE FOR HUMANITY
+  </text>
+</svg>

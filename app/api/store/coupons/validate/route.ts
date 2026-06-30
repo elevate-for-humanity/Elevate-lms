@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 /**
  * Coupon Validation API
  * POST /api/store/coupons/validate
@@ -6,8 +5,7 @@ export const dynamic = 'force-dynamic';
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { validateCoupon } from '@/lib/store/coupons';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function _POST(request: NextRequest) {
@@ -19,7 +17,7 @@ async function _POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id;
 
     const result = await validateCoupon(code, userId, purchaseAmountCents);
@@ -45,6 +43,3 @@ async function _POST(request: NextRequest) {
 }
 
 export const POST = withApiAudit('/api/store/coupons/validate', _POST);
-
-
-

@@ -11,8 +11,6 @@
  * Auth: admin only (called server-side or via admin panel).
  */
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
@@ -241,4 +239,3 @@ export async function GET(request: NextRequest) {
     },
   });
 }
-

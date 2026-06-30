@@ -35,4 +35,3 @@ export async function POST(request: Request): Promise<Response> {
     headers: response.headers,
   });
 }
-

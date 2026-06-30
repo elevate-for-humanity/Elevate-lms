@@ -2,8 +2,6 @@
  * GET /api/cron/trial-lifecycle
  * Manage trial organization lifecycle: warn at day 7, expire at day 14, clean up at day 30.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -81,4 +79,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/trial-lifecycle] Done', { warned, expired: expired?.length ?? 0, archived: archived ?? 0 });
   return NextResponse.json({ ok: true, warned, expired: expired?.length ?? 0, archived: archived ?? 0 });
 });
-

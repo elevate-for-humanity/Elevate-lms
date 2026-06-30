@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
 
@@ -12,7 +11,7 @@ async function handler(req: Request) {
   try {
     const supabase = await createClient();
     
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -30,5 +29,3 @@ async function handler(req: Request) {
 }
 
 export const GET = withRuntime(withApiAudit('/api/handbook/download', handler));
-
-

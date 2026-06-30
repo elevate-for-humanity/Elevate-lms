@@ -10,7 +10,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { issueCertificate } from '@/lib/certificates/issue-certificate';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -83,7 +82,7 @@ async function _POST(req: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    const isAdmin = profile?.role === 'admin' || profile?.role === 'admin';
+    const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
     if (enrollment.user_id !== user.id && !isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -145,4 +144,3 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/enrollments/complete-program', _POST);
-

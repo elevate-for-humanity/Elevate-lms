@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { resend } from '@/lib/resend';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
@@ -202,4 +201,3 @@ async function getRecipients(supabase: any, listType: string) {
   return data || [];
 }
 export const POST = withApiAudit('/api/email/campaigns/send', _POST);
-

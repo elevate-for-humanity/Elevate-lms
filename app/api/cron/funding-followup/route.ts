@@ -3,8 +3,6 @@
  * Follow up on pending funding assignments — notify students and staff
  * when funding approval has been pending > 3 days.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -34,7 +32,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/funding-followup] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   let notified = 0;
@@ -83,4 +81,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/funding-followup] Done', { notified });
   return NextResponse.json({ ok: true, notified });
 });
-

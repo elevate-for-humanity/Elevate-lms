@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -323,4 +322,3 @@ async function _GET(req: Request) {
 }
 export const GET = withApiAudit('/api/time/entries', _GET);
 export const POST = withApiAudit('/api/time/entries', _POST);
-

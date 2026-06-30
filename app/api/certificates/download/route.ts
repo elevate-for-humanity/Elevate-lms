@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -55,7 +54,7 @@ async function _GET(request: NextRequest) {
       .maybeSingle();
 
     const isOwner = certificate.user_id === user.id;
-    const isAdmin = profile?.role === 'admin' || profile?.role === 'admin';
+    const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
 
     if (!isOwner && !isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -126,4 +125,3 @@ async function _POST(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/certificates/download', _GET);
 export const POST = withApiAudit('/api/certificates/download', _POST);
-

@@ -245,4 +245,3 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Failed to submit application');
   }
 }
-

@@ -3,8 +3,6 @@
 // Generates a state + nonce, stores them in a signed HttpOnly cookie,
 // then redirects the platform to the authorization endpoint.
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -83,4 +81,3 @@ async function _GET(request: Request) {
 }
 
 export const GET = withApiAudit('/api/lti/login', _GET);
-

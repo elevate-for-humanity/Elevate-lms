@@ -8,6 +8,7 @@
 // Consumed by: components/site/Header.tsx → HeaderMainNav (horizontal + dropdowns on md+, mobile hamburger)
 
 import { canonicalRoutes } from '@/lib/routes/canonical-routes';
+import { PROGRAM_REGISTRY } from '@/lib/registry/programs';
 
 export interface NavSubItem {
   name: string;

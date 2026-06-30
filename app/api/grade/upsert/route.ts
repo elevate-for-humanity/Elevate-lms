@@ -1,7 +1,6 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -32,7 +31,7 @@ async function _POST(req: Request) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const gradingRoles = ['instructor', 'admin', 'staff'];
+  const gradingRoles = ['instructor', 'admin', 'super_admin', 'staff'];
   if (!profile?.role || !gradingRoles.includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -88,4 +87,3 @@ async function _POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 export const POST = withApiAudit('/api/grade/upsert', _POST);
-

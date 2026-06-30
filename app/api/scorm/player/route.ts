@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -27,4 +25,3 @@ export async function GET(request: NextRequest) {
     return safeInternalError(error, 'SCORM player lookup failed');
   }
 }
-

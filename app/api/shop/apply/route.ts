@@ -2,7 +2,6 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
 import { resend } from '@/lib/resend';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -162,4 +161,3 @@ Welcome to the ${PLATFORM_DEFAULTS.orgName} network!
     return NextResponse.json({ error: 'Application failed' }, { status: 500 });
   }
 }
-

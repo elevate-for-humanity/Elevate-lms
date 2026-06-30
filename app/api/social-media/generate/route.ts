@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { safeInternalError } from '@/lib/api/safe-error';
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -13,8 +11,6 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 
 const PROGRAM_INFO = {
   barber: 'DOL Registered Apprenticeship. 2,000 hours for barber, 1,500 for cosmetology. Earn while learning. State-licensed. WIOA-fundable.',
@@ -35,10 +31,10 @@ async function _POST(req: Request) {
 
     const { createClient } = await import('@/lib/supabase/server');
     const supabase = await createClient();
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const { data: prof } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-    if (!prof || !['admin', 'staff'].includes(prof.role)) {
+    if (!prof || !['admin', 'super_admin', 'staff'].includes(prof.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -95,5 +91,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/social-media/generate', _POST);
-
-

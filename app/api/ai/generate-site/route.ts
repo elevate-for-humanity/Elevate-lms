@@ -261,4 +261,3 @@ function getDefaultConfig(name: string, type: string) {
   };
 }
 export const POST = withApiAudit('/api/ai/generate-site', _POST);
-

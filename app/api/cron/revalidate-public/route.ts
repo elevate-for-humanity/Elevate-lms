@@ -29,4 +29,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     timestamp: new Date().toISOString(),
   });
 });
-

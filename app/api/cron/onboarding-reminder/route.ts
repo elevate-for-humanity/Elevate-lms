@@ -3,8 +3,6 @@
  * GET /api/cron/onboarding-reminder
  * Remind new users (< 7 days old) who haven't started onboarding at all.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -31,7 +29,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/onboarding-reminder] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   if (!newUsers?.length) return NextResponse.json({ ok: true, reminded: 0 });
@@ -71,4 +69,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/onboarding-reminder] Done', { reminded, new_users: newUsers.length, not_started: notStarted.length });
   return NextResponse.json({ ok: true, reminded, new_users: newUsers.length, not_started: notStarted.length });
 });
-

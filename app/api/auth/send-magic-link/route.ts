@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -102,4 +100,3 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ ok: true });
 }
-

@@ -11,8 +11,6 @@
  *   - Mark reminder as sent
  */
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
@@ -177,4 +175,3 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
   logger.info('Testing reminders processed', { sent, failed: failed.length });
   return NextResponse.json({ ok: true, sent, failed: failed.length });
 });
-

@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 // PUBLIC ROUTE: v1 tenant branding — API-key gated
 /**
  * Tenant Branding API
@@ -7,7 +6,6 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { validateApiKey } from '@/lib/licensing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -221,5 +219,3 @@ async function _POST(request: NextRequest) {
 export const GET = withApiAudit('/api/v1/tenant/branding', _GET);
 export const POST = withApiAudit('/api/v1/tenant/branding', _POST);
 export const PATCH = withApiAudit('/api/v1/tenant/branding', _PATCH);
-
-

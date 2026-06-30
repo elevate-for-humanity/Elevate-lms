@@ -39,7 +39,7 @@ async function _POST(req: NextRequest) {
     if (session instanceof Response) return session;
 
     // Role check
-    const roleCheck = requireRoleAPI(session, ['admin', 'advisor']);
+    const roleCheck = requireRoleAPI(session, ['admin', 'super_admin', 'advisor']);
     if (roleCheck instanceof Response) return roleCheck;
 
     // Parse body
@@ -119,4 +119,3 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/credentials/issue', _POST);
-

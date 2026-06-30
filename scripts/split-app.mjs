@@ -2,78 +2,80 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 /**
- * Surgical Route Splitter v3 - Cross-Device Compatible
+ * Surgical Build Excluder v4 - Non-Destructive Relocation
  * 
- * Uses 'fs.rmSync' with {recursive: true, force: true} which is compatible 
- * with Docker volume boundaries.
+ * Instead of deleting files, this script temporarily moves excluded 
+ * directories to '.exclude/' during the build phase. This ensures 
+ * the repository remains the single source of truth.
  */
 
 const scope = process.env.BUILD_SCOPE; 
 const root = process.cwd();
 const appDir = path.join(root, 'app');
+const excludeDir = path.join(root, '.exclude');
+
+// Ensure exclude directory exists
+if (!fs.existsSync(excludeDir)) {
+  fs.mkdirSync(excludeDir);
+}
 
 if (!scope || scope === 'ASSETS') {
+  console.log('No BUILD_SCOPE set or scope is ASSETS. Skipping exclusion.');
   process.exit(0);
 }
 
-const excludeConfig = {
-  MARKETING: ['admin', 'apprentice', 'instructor', 'mission-control', 'partner', 'student-portal', 'case-manager', 'intelligence'],
-  ADMIN: ['(marketing)', '(public)', 'apprentice', 'instructor', 'student-portal', 'programs', 'healthcare', 'skilled-trades'],
-  LMS: ['admin', 'mission-control', 'intelligence', 'partner', 'case-manager', '(marketing)', 'blog']
+const config = {
+  MARKETING: {
+    include: ['about', 'programs', 'funding', 'blog', 'store', 'contact', 'careers', 'resources', 'forms', 'pricing', 'faq', 'how-it-works', 'impact', 'success-stories', 'testing', 'legal'],
+    base: ['page.tsx', 'layout.tsx', 'globals.css', 'not-found.tsx', 'loading.tsx', 'error.tsx']
+  },
+  ADMIN: {
+    include: ['admin', 'admin-login', 'analytics', 'reports', 'audit-logs', 'case-manager', 'governance', 'security', 'credentials', 'platform'],
+    base: ['layout.tsx', 'globals.css', 'not-found.tsx', 'loading.tsx', 'error.tsx']
+  },
+  LMS: {
+    include: ['lms', 'partner', 'learner', 'instructor', 'apprenticeships', 'barber-and-beauty-apprenticeships', 'calendar', 'messages', 'certificates', 'testing', 'legal', 'resources', 'store', 'blog'],
+    base: ['layout.tsx', 'globals.css', 'not-found.tsx', 'loading.tsx', 'error.tsx']
+  }
 };
 
-const whitelist = ['api', 'auth', '(auth)', 'layout.tsx', 'page.tsx', 'globals.css', 'not-found.tsx', 'loading.tsx', 'error.tsx', 'health', 'data', 'funding', 'barber-and-beauty-apprenticeships', 'partner'];
+const sharedWhitelist = ['api', 'auth', '(auth)', '(public)', 'health', 'data', 'lib'];
 
-const toRemove = excludeConfig[scope];
-
-if (!toRemove) {
+const currentScope = config[scope];
+if (!currentScope) {
   console.error(`Invalid scope: ${scope}`);
   process.exit(1);
 }
 
-console.log(`=== Surgical Split v3: Scope ${scope} ===`);
-console.log(`Working directory: ${appDir}`);
+console.log(`=== Build Exclusion v4: Scope ${scope} ===`);
 
-// 1. Remove explicitly excluded directories
-toRemove.forEach(target => {
-  if (whitelist.includes(target)) {
-    console.log(`Skipping whitelisted target: ${target}`);
+const allFolders = fs.readdirSync(appDir);
+
+allFolders.forEach(folder => {
+  const fullPath = path.join(appDir, folder);
+  if (!fs.lstatSync(fullPath).isDirectory()) {
+    // If it's a base file we need, keep it.
+    if (currentScope.base.includes(folder) || sharedWhitelist.includes(folder)) return;
+  }
+
+  // If it's a directory we need, keep it.
+  if (currentScope.include.includes(folder) || sharedWhitelist.includes(folder)) {
+    console.log(`[Include] ${folder}`);
     return;
   }
-  const fullPath = path.resolve(appDir, target);
-  
-  if (fs.existsSync(fullPath)) {
-    try {
-      console.log(`Removing excluded target: ${target} -> ${fullPath}`);
-      fs.rmSync(fullPath, { recursive: true, force: true });
-    } catch (err) {
-      console.error(`Failed to remove ${target}: ${err.message}`);
+
+  // Otherwise, move to .exclude
+  const targetPath = path.join(excludeDir, folder);
+  try {
+    // If target already exists in .exclude (from a previous failed run), remove it first
+    if (fs.existsSync(targetPath)) {
+      fs.rmSync(targetPath, { recursive: true, force: true });
     }
+    fs.renameSync(fullPath, targetPath);
+    console.log(`[Exclude] ${folder} (moved to .exclude/)`);
+  } catch (err) {
+    console.error(`Failed to exclude ${folder}: ${err.message}`);
   }
 });
 
-// 2. Comprehensive Cleanup: Remove any other folders not in scope (Aggressive mode)
-// This ensures that for LMS, we don't have thousands of legacy folders bloating the build.
-const currentFolders = fs.readdirSync(appDir);
-currentFolders.forEach(folder => {
-  const fullPath = path.join(appDir, folder);
-  if (!fs.lstatSync(fullPath).isDirectory()) return;
-
-  // Preserve whitelist and the scope-specific folders we WANT
-  const preserve = [...whitelist, 'lms', 'admin', '(marketing)', '(public)'];
-  
-  if (scope === 'MARKETING' && folder === 'lms') return;
-  if (scope === 'ADMIN' && folder === 'admin') return;
-  if (scope === 'LMS' && folder === 'lms') return;
-
-  if (!preserve.includes(folder) && !toRemove.includes(folder)) {
-    try {
-      console.log(`Aggressive Clean: Removing ${folder}`);
-      fs.rmSync(fullPath, { recursive: true, force: true });
-    } catch (err) {
-      // Ignore errors for system files
-    }
-  }
-});
-
-console.log('✅ Split complete.');
+console.log('✅ Build context localized. (Excluded files are in .exclude/)');

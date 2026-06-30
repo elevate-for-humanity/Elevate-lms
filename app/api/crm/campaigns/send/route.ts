@@ -3,7 +3,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { resend } from '@/lib/resend';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -37,7 +36,7 @@ async function _POST(request: NextRequest) {
 
     if (
       !profile ||
-      !['admin', 'staff', 'program_holder', 'instructor'].includes(profile.role)
+      !['admin', 'super_admin', 'staff', 'program_holder', 'instructor'].includes(profile.role)
     ) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -213,4 +212,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/crm/campaigns/send', _POST);
-

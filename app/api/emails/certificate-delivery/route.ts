@@ -165,4 +165,3 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/emails/certificate-delivery', _POST));
-

@@ -2,8 +2,6 @@
  * GET /api/cron/expire-licenses
  * Expire licenses past their expiry date and warn holders 30 days before.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -30,7 +28,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (expErr) {
     logger.error('[cron/expire-licenses] Expire failed', expErr);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: expErr.message }, { status: 500 });
   }
 
   // Warn expiring soon
@@ -63,4 +61,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/expire-licenses] Done', { expired: expired?.length ?? 0, warned });
   return NextResponse.json({ ok: true, expired: expired?.length ?? 0, warned });
 });
-

@@ -20,8 +20,6 @@
  *   { ok: false, error, errors_per_attempt? }
  */
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireAdmin } from '@/lib/admin/guards';
@@ -266,4 +264,3 @@ export async function POST(request: NextRequest) {
     normalization_applied: normalization,
   });
 }
-

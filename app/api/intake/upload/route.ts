@@ -89,4 +89,3 @@ export async function POST(request: NextRequest) {
   // Signed URLs are generated on demand by admin review pages.
   return NextResponse.json({ url: path }, { status: 200 });
 }
-

@@ -1,19 +1,16 @@
 /**
  * POST /api/case-manager/reports/wioa/export
  * Returns a CSV of WIOA outcome metrics for the case manager's caseload.
- * Auth: case_manager, admin, admin, staff.
+ * Auth: case_manager, admin, super_admin, staff.
  */
-
-import { db } from '@/lib/db';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-const ALLOWED_ROLES = ['case_manager', 'admin', 'staff'];
+const ALLOWED_ROLES = ['case_manager', 'admin', 'super_admin', 'staff'];
 
 export const dynamic = 'force-dynamic';
 
@@ -138,4 +135,3 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'POST /api/case-manager/reports/wioa/export');
   }
 }
-

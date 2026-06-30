@@ -1,6 +1,5 @@
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -44,4 +43,3 @@ async function _GET(request: Request) {
   });
 }
 export const GET = withApiAudit('/api/program-holder/status', _GET);
-

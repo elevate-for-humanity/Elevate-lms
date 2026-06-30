@@ -11,8 +11,6 @@
  *   4. Return QB transaction ID for audit trail
  */
 
-import { getAdminClient } from '@/lib/supabase/admin';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -238,4 +236,3 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'QuickBooks payment failed');
   }
 }
-

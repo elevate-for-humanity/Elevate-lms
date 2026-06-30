@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { logger } from '@/lib/logger';
@@ -6,7 +5,6 @@ import { toErrorMessage } from '@/lib/safe';
 import { v4 as uuidv4 } from 'uuid';
 import { generateCourseVideo, getAvailableServices } from '@/lib/video/generate';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
 
@@ -226,5 +224,3 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withRuntime(withApiAudit('/api/video/generate', _GET));
 export const POST = withRuntime(withApiAudit('/api/video/generate', _POST));
-
-

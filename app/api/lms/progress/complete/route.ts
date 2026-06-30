@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 
 import { requireApiRole } from '@/lib/auth/require-api-role';
@@ -33,7 +31,7 @@ async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    const auth = await requireApiRole(['student', 'admin']);
+    const auth = await requireApiRole(['student', 'admin', 'super_admin']);
     if (auth instanceof NextResponse) return auth;
 
     const { user, db } = auth;
@@ -508,4 +506,3 @@ export const POST = withApiAudit(
   '/api/lms/progress/complete',
   _POST as unknown as (req: Request, ...args: any[]) => Promise<Response>,
 );
-

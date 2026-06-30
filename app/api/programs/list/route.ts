@@ -6,7 +6,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -42,4 +41,3 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 export const GET = withApiAudit('/api/programs/list', _GET);
-

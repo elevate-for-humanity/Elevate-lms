@@ -8,10 +8,8 @@
  * Accepts multipart/form-data with a `file` field (PDF/image, max 10 MB).
  */
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
-import { safeGetUser, createClient} from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
@@ -31,7 +29,7 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const user = safeGetUser(await supabase.auth.getUser());
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return safeError('Unauthenticated', 401);
 
   const { courseId } = await params;

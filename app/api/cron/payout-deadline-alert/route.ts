@@ -2,8 +2,6 @@
  * GET /api/cron/payout-deadline-alert
  * Alert on payout_schedules due within 48h that are still pending.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -30,7 +28,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/payout-deadline-alert] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   if (!upcoming?.length) return NextResponse.json({ ok: true, alerted: 0 });
@@ -46,4 +44,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/payout-deadline-alert] Done', { alerted: upcoming.length, total_cents: totalCents });
   return NextResponse.json({ ok: true, alerted: upcoming.length, total_cents: totalCents });
 });
-

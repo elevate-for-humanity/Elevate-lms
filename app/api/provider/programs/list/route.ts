@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -9,7 +7,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const LIST_ROLES = new Set(['provider_admin', 'admin', 'staff']);
+const LIST_ROLES = new Set(['provider_admin', 'admin', 'super_admin', 'staff']);
 
 export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -65,4 +63,3 @@ export async function GET(request: NextRequest) {
     return safeInternalError(error, 'Provider program list failed');
   }
 }
-

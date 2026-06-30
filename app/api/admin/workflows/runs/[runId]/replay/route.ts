@@ -4,10 +4,8 @@
  * Re-executes a failed or cancelled workflow run using the original trigger payload.
  * Guards against double-fire: returns 409 if the workflow already has a 'running' run.
  *
- * Auth: admin / admin only.
+ * Auth: admin / super_admin only.
  */
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';

@@ -7,11 +7,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { aiChat } from '@/lib/ai/ai-service';
 import { toErrorMessage } from '@/lib/safe';
@@ -197,4 +194,3 @@ async function _GET(req: Request) {
 }
 export const GET = withApiAudit('/api/ai/chat', _GET);
 export const POST = withApiAudit('/api/ai/chat', _POST);
-

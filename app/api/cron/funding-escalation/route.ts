@@ -3,8 +3,6 @@
  * GET /api/cron/funding-escalation
  * Escalate funding assignments that have been pending > 7 days to critical alert.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -31,7 +29,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/funding-escalation] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   if (!escalations?.length) return NextResponse.json({ ok: true, escalated: 0 });
@@ -67,4 +65,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/funding-escalation] Done', { escalated: escalations.length });
   return NextResponse.json({ ok: true, escalated: escalations.length });
 });
-

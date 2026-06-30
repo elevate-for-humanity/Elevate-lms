@@ -1,8 +1,5 @@
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { parseBody } from '@/lib/api-helpers';
 import { getCurrentUser } from '@/lib/auth';
@@ -225,4 +222,3 @@ async function _POST(request: Request) {
 
 export const GET = withApiAudit('/api/achievements', _GET);
 export const POST = withApiAudit('/api/achievements', _POST);
-

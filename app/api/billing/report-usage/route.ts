@@ -72,4 +72,3 @@ async function _POST(request: Request) {
   return NextResponse.json({ reported: updates.length });
 }
 export const POST = withApiAudit('/api/billing/report-usage', _POST);
-

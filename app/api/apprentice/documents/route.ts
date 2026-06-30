@@ -3,7 +3,6 @@ import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -228,7 +227,7 @@ async function _POST(request: NextRequest) {
       const { data: admins } = await supabase
         .from('profiles')
         .select('email')
-        .in('role', ['admin']);
+        .in('role', ['admin', 'super_admin']);
 
       if (admins && admins.length > 0) {
         const { emailService } = await import('@/lib/notifications/email');
@@ -345,4 +344,3 @@ async function _DELETE(request: NextRequest) {
 export const GET = withApiAudit('/api/apprentice/documents', _GET);
 export const POST = withApiAudit('/api/apprentice/documents', _POST);
 export const DELETE = withApiAudit('/api/apprentice/documents', _DELETE);
-

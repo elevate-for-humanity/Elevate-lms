@@ -8,12 +8,9 @@
  * ADMIN_IP_ALLOWLIST or an auth guard before exposing publicly.
  */
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
 import { safeInternalError } from '@/lib/api/safe-error';
@@ -157,4 +154,3 @@ export async function GET(request: NextRequest) {
     return safeInternalError(err, 'System health check failed');
   }
 }
-

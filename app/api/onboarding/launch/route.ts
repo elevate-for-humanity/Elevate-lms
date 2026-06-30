@@ -1,6 +1,4 @@
 // PUBLIC ROUTE: one-shot business launch (workspace + website + optional LMS seed)
-import { db } from '@/lib/db';
-
 import { NextRequest } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError, safeOk } from '@/lib/api/safe-error';
@@ -162,4 +160,3 @@ async function _POST(request: NextRequest) {
 }
 
 export const POST = withRuntime(withApiAudit('/api/onboarding/launch', _POST));
-

@@ -1,6 +1,5 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 
 import { toErrorMessage } from '@/lib/safe';
 import { logger } from '@/lib/logger';
@@ -41,7 +40,7 @@ export async function POST(req: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return Response.json(
         { error: 'Admin access required for delete operations' },
         { status: 403 },
@@ -87,4 +86,3 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Failed to delete file' }, { status: 500 });
   }
 }
-

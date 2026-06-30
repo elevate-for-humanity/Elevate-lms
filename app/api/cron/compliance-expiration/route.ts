@@ -3,8 +3,6 @@
  * GET /api/cron/compliance-expiration
  * Warn on attendance_records and documents approaching compliance deadlines.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -80,4 +78,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/compliance-expiration] Done', { warned, flagged });
   return NextResponse.json({ ok: true, warned, flagged });
 });
-

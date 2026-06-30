@@ -4,11 +4,8 @@
  * POST /api/course-generator/gap-scan/generate-drafts - Create draft jobs from gaps
  */
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -17,7 +14,7 @@ import { scanAllGaps, createDraftJobsFromGaps, type CourseGap } from '@/lib/ai/c
 
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_ROLES = new Set(['admin', 'staff']);
+const ALLOWED_ROLES = new Set(['platform_owner', 'platform_admin', 'platform_operator', 'admin', 'super_admin', 'staff']);
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,7 +22,7 @@ export async function POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -101,7 +98,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -139,5 +136,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-
-

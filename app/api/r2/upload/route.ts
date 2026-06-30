@@ -2,7 +2,6 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadToR2, getContentType, isR2Configured } from '@/lib/cloudflare-r2';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -39,7 +38,7 @@ async function _POST(req: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (profile?.role !== 'admin' && profile?.role !== 'admin') {
+    if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -87,4 +86,3 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/r2/upload', _POST);
-

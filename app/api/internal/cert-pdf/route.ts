@@ -132,4 +132,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'PDF generation failed' }, { status: 500 });
   }
 }
-

@@ -1,5 +1,3 @@
-import { getAdminClient } from '@/lib/supabase/admin';
-
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -106,4 +104,3 @@ async function persistToSupabase(params: Record<string, string>) {
     logger.error('[QB callback] Supabase persist failed:', err);
   }
 }
-

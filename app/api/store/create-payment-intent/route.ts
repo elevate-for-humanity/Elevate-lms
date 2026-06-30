@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { stripe } from '@/lib/stripe/client';
@@ -7,7 +6,6 @@ import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 export const maxDuration = 60;
 
 async function _POST(request: NextRequest) {
@@ -66,5 +64,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/store/create-payment-intent', _POST);
-
-

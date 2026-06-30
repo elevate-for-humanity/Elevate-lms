@@ -161,4 +161,3 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/ai-tutor/public', _POST);
-

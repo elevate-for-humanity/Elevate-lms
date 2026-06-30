@@ -16,4 +16,3 @@ async function _POST(request: NextRequest) {
 }
 
 export const POST = withApiAudit('/api/enrollments/checkout', _POST);
-

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { recommendationEngine } from '@/lib/recommendations/engine';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -75,4 +74,3 @@ async function _GET(request: NextRequest) {
   }
 }
 export const GET = withApiAudit('/api/lms/recommendations', _GET);
-

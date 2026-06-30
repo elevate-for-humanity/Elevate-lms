@@ -1,4 +1,3 @@
-import { logger } from '@/lib/logger';
 /**
  * Control Plane API Routes
  * GET /api/devstudio/control-plane/map - Get platform map
@@ -8,17 +7,12 @@ import { logger } from '@/lib/logger';
  * GET /api/devstudio/control-plane/integrations - Get integrations
  */
 
-import { db } from '@/lib/db';
-
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
-
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-const ALLOWED_ROLES = new Set(['admin']);
+const ALLOWED_ROLES = new Set(['platform_owner', 'platform_admin', 'platform_operator']);
 
 // GET /api/devstudio/control-plane/map
 export async function GET(req: NextRequest) {
@@ -26,13 +20,13 @@ export async function GET(req: NextRequest) {
   const endpoint = url.pathname.split('/').pop();
 
   try {
-    const { createClient, safeGetUser } = await import('@/lib/supabase/server');
+    const { createClient } = await import('@/lib/supabase/server');
     const { requireAdminClient } = await import('@/lib/supabase/admin');
     const { getPlatformMap, checkAllHealth, getPlatformLogs, getIntegrations } = await import('@/lib/control-plane');
     const { logger } = await import('@/lib/logger');
 
     const supabase = await createClient();
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -86,13 +80,13 @@ export async function GET(req: NextRequest) {
 // POST /api/devstudio/control-plane/action
 export async function POST(req: NextRequest) {
   try {
-    const { createClient, safeGetUser } = await import('@/lib/supabase/server');
+    const { createClient } = await import('@/lib/supabase/server');
     const { requireAdminClient } = await import('@/lib/supabase/admin');
     const { executeControlAction, approveAction } = await import('@/lib/control-plane');
     const { logger } = await import('@/lib/logger');
 
     const supabase = await createClient();
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -133,5 +127,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-
-

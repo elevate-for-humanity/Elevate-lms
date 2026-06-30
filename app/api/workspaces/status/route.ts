@@ -32,4 +32,3 @@ async function _GET(request: NextRequest) {
 }
 
 export const GET = withRuntime(_GET);
-

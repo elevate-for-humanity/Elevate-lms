@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 // app/api/account/export/route.ts
@@ -125,4 +123,3 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/account/export', _GET);
-

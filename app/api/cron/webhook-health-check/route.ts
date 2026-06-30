@@ -2,8 +2,6 @@
  * GET /api/cron/webhook-health-check
  * Verify critical external webhook endpoints are reachable and responding.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -67,4 +65,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/webhook-health-check] Done', { total: results.length, failed: failed.length, results });
   return NextResponse.json({ ok: failed.length === 0, total: results.length, failed: failed.length, results });
 });
-

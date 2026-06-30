@@ -2,8 +2,6 @@
  * GET /api/cron/check-stuck-approvals
  * Alert on approval_chain_instances stuck in pending > 48h.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -29,7 +27,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/check-stuck-approvals] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   if (!stuck?.length) return NextResponse.json({ ok: true, stuck: 0 });
@@ -54,4 +52,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/check-stuck-approvals] Done', { stuck: stuck.length });
   return NextResponse.json({ ok: true, stuck: stuck.length });
 });
-

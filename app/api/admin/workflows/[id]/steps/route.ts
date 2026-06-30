@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -23,7 +21,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   logAdminAudit({ action: AdminAction.WORKFLOW_STEP_ADDED, actorId: auth.id, entityType: 'workflow_steps', entityId: data.id, metadata: { workflow_id: id, action_type, step_order }, req: request }).catch(() => {});
 

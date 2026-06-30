@@ -2,7 +2,6 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { MASTER_AVATAR_PROMPT, getPageScript, getStatusScript } from '@/lib/avatar-scripts';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -228,4 +227,3 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/chat/avatar-assistant', _GET);
 export const POST = withApiAudit('/api/chat/avatar-assistant', _POST);
-

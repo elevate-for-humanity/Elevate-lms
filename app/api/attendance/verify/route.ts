@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -159,4 +158,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/attendance/verify', _POST);
-

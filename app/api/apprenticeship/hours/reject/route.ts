@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -47,7 +46,7 @@ async function notifyHourRejected(
   const { data: admins } = await adminDb
     .from('profiles')
     .select('id')
-    .in('role', ['admin', 'staff'])
+    .in('role', ['admin', 'super_admin', 'staff'])
     .limit(200);
 
   if (admins?.length) {
@@ -106,7 +105,7 @@ async function _POST(req: Request) {
       .eq('user_id', user.id)
       .maybeSingle();
 
-    const isAdmin = profile?.role && ['admin'].includes(profile.role);
+    const isAdmin = profile?.role && ['admin', 'super_admin'].includes(profile.role);
     const isPartner = !!partnerUser;
 
     if (!isAdmin && !isPartner) {
@@ -193,4 +192,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/apprenticeship/hours/reject', _POST, { critical: true });
-

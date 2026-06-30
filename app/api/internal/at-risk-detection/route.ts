@@ -14,8 +14,6 @@
  * Gated by CRON_SECRET header via withRuntime({ cron: "x-header" }).
  */
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/service';
@@ -195,4 +193,3 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
   logger.info('[at-risk-detection] Run complete', { detected, escalated });
   return NextResponse.json({ ok: true, detected, escalated });
 });
-

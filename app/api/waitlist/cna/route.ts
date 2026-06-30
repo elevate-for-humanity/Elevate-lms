@@ -1,6 +1,4 @@
 // PUBLIC ROUTE: CNA program waitlist form
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -50,4 +48,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ success: true }, { status: 201 });
 }
-

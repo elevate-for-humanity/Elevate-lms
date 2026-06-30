@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiAuthGuard } from '@/lib/admin/guards';
@@ -33,4 +31,3 @@ export async function POST(request: NextRequest) {
     return safeInternalError(error, 'Tax return request failed');
   }
 }
-

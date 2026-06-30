@@ -21,4 +21,3 @@ export async function GET(request: NextRequest) {
     return safeInternalError(err, 'Failed to load host shops');
   }
 }
-

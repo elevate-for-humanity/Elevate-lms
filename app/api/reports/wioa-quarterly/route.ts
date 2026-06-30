@@ -33,4 +33,3 @@ export async function GET(request: NextRequest) {
     return safeInternalError(error, 'WIOA quarterly report failed');
   }
 }
-

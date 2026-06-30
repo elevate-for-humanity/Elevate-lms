@@ -16,8 +16,6 @@
  *   behind = deficit > (required_ojl * 0.10)
  */
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getApprovedHoursByType } from '@/lib/hours/get-approved-hours';
@@ -207,4 +205,3 @@ export const GET = withRuntime({ cron: "x-header" }, async () => {
   logger.info('[low-hours-pace] complete', { checked, atRisk: atRiskList.length });
   return NextResponse.json({ checked, atRisk: atRiskList.length, atRiskList });
 });
-

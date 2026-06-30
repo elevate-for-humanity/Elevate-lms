@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -48,7 +47,7 @@ async function notifyHourDecision(
   const { data: admins } = await adminDb
     .from('profiles')
     .select('id')
-    .in('role', ['admin', 'staff'])
+    .in('role', ['admin', 'super_admin', 'staff'])
     .limit(200);
 
   if (admins?.length) {
@@ -374,4 +373,3 @@ async function _PUT(req: Request) {
 }
 export const POST = withApiAudit('/api/apprenticeship/hours/approve', _POST, { critical: true });
 export const PUT = withApiAudit('/api/apprenticeship/hours/approve', _PUT, { critical: true });
-

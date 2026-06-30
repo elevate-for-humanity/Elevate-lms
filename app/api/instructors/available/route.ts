@@ -2,7 +2,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { AI_INSTRUCTORS } from '@/lib/ai-instructors';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -72,7 +71,7 @@ async function _GET(request: Request) {
       id: instructor.id,
       name: instructor.full_name || 'Instructor',
       title: 'Senior Instructor',
-      avatar: instructor.avatar_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/avatar-default.svg',
+      avatar: instructor.avatar_url || '/images/avatar-default.svg',
       specialties: ['Career Training', 'Professional Development'],
       rating: 4.8,
       totalSessions: 50,
@@ -119,4 +118,3 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/instructors/available', _GET);
-

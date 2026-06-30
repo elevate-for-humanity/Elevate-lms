@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { safeError, safeInternalError, safeDbError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -26,7 +25,7 @@ export async function GET(request: NextRequest) {
   if (limited) return limited;
 
   const supabase = await createClient();
-  const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return safeError('Unauthorized', 401);
 
   const { searchParams } = new URL(request.url);
@@ -54,7 +53,7 @@ export async function POST(request: NextRequest) {
   if (limited) return limited;
 
   const supabase = await createClient();
-  const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return safeError('Unauthorized', 401);
 
   // Verify employer role
@@ -64,7 +63,7 @@ export async function POST(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['employer', 'admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['employer', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
     return safeError('Forbidden', 403);
   }
 
@@ -97,7 +96,7 @@ export async function PATCH(request: NextRequest) {
   if (limited) return limited;
 
   const supabase = await createClient();
-  const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return safeError('Unauthorized', 401);
 
   let body: unknown;
@@ -122,4 +121,3 @@ export async function PATCH(request: NextRequest) {
 
   return NextResponse.json({ interview: data });
 }
-

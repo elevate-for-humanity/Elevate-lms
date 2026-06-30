@@ -1,10 +1,8 @@
-export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import type Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -214,5 +212,3 @@ async function _GET(request: Request) {
 }
 export const GET = withApiAudit('/api/license/upgrade', _GET);
 export const POST = withApiAudit('/api/license/upgrade', _POST);
-
-

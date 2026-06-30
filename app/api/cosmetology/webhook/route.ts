@@ -443,4 +443,3 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
 }
 
 export const POST = withRuntime(withApiAudit('/api/cosmetology/webhook', _POST, { actor_type: 'webhook' }));
-

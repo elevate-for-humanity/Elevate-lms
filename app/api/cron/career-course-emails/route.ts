@@ -2,8 +2,6 @@
  * GET /api/cron/career-course-emails
  * Send weekly progress emails to career course enrollees.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -30,7 +28,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/career-course-emails] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   let sent = 0;
@@ -56,4 +54,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/career-course-emails] Done', { sent });
   return NextResponse.json({ ok: true, sent });
 });
-

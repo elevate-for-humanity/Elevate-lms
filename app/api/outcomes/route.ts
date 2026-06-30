@@ -1,7 +1,5 @@
 // Authenticated route: record and retrieve employment outcomes for WIOA performance reporting.
 
-import { db } from '@/lib/db';
-
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -29,7 +27,7 @@ async function _GET(req: NextRequest) {
   const program_slug = searchParams.get('program_slug');
 
   // Students can only see their own outcomes
-  const isAdmin = ['admin', 'staff'].includes(auth.role ?? '');
+  const isAdmin = ['admin', 'super_admin', 'staff'].includes(auth.role ?? '');
   const userId = isAdmin && requestedUserId ? requestedUserId : auth.id;
 
   let query = db
@@ -76,7 +74,7 @@ async function _POST(req: NextRequest) {
   if (!db) return safeError('Service unavailable', 503);
 
   // Admins can record outcomes for any user; students record their own
-  const isAdmin = ['admin', 'staff'].includes(auth.role ?? '');
+  const isAdmin = ['admin', 'super_admin', 'staff'].includes(auth.role ?? '');
   const userId = isAdmin && body.user_id ? (body.user_id as string) : auth.id;
 
   const { data, error } = await db
@@ -153,4 +151,3 @@ async function _PATCH(req: NextRequest) {
 export const GET   = withApiAudit(_GET,   { action: 'api:get:/api/outcomes' });
 export const POST  = withApiAudit(_POST,  { action: 'api:post:/api/outcomes' });
 export const PATCH = withApiAudit(_PATCH, { action: 'api:patch:/api/outcomes' });
-

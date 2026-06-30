@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -16,7 +14,7 @@ export async function DELETE(
   const { stepId } = await params;
   const db = await requireAdminClient();
   const { error } = await db.from('workflow_steps').delete().eq('id', stepId);
-  if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ deleted: true });
 }
 
@@ -36,6 +34,6 @@ export async function PATCH(
     .eq('id', stepId)
     .select()
     .single();
-  if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ step: data });
 }

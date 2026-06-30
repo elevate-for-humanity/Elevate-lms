@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
@@ -88,4 +87,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/quizzes/save', _POST);
-

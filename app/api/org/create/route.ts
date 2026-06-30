@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { bindUserToOrg } from '@/lib/org/bindUserToOrg';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -96,4 +95,3 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/org/create', _POST);
-

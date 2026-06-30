@@ -29,4 +29,3 @@ async function _GET(req: NextRequest) {
   return NextResponse.json(data || []);
 }
 export const GET = withApiAudit('/api/chat/messages', _GET);
-

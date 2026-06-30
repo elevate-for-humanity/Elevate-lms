@@ -5,8 +5,6 @@
  * before showing the payment page. Public — no auth required (application ID
  * is a UUID and acts as a bearer token for this read-only check).
  */
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

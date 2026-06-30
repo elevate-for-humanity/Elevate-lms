@@ -8,7 +8,7 @@
  *   - Apprentices with no activity in the last 7 days (at-risk)
  *
  * Scoped to the employer's own apprentices via profiles.employer_id.
- * Admins and admins see all apprentices.
+ * Admins and super_admins see all apprentices.
  *
  * Response shape:
  * {
@@ -20,11 +20,8 @@
  * }
  */
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -39,7 +36,7 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { data: profile } = await supabase
@@ -48,12 +45,12 @@ async function _GET(request: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['employer', 'admin', 'staff'].includes(profile.role)) {
+    if (!profile || !['employer', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Admins see all; employers are scoped to their own apprentices
-    const isAdmin = ['admin', 'staff'].includes(profile.role);
+    const isAdmin = ['admin', 'super_admin', 'staff'].includes(profile.role);
     const db = await requireAdminClient();
 
     // ── Resolve apprentice user IDs for this employer ─────────────────────────
@@ -257,5 +254,3 @@ async function _GET(request: Request) {
 }
 
 export const GET = withApiAudit('/api/employer/workforce/live', _GET);
-
-

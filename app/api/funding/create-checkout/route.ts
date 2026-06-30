@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getStripe, stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -139,4 +138,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/funding/create-checkout', _POST);
-

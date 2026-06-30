@@ -144,4 +144,3 @@ export const POST = withApiAudit('/api/webhooks', _POST, {
   actor_type: 'webhook',
   skip_body: true,
 });
-

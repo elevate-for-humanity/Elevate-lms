@@ -14,8 +14,6 @@
  * Gated by CRON_SECRET via withRuntime({ cron: "x-header" }).
  */
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { aiChat } from '@/lib/ai/ai-service';
@@ -166,4 +164,3 @@ Respond with ONLY valid JSON, no markdown.`;
   logger.info('[ai-operator] Run complete', { triaged, autoResolved });
   return NextResponse.json({ ok: true, triaged, autoResolved });
 });
-

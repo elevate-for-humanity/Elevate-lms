@@ -3,8 +3,6 @@
  * Send weekly progress reminders to enrolled learners with < 50% completion.
  * Runs Monday mornings.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -29,8 +27,8 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .limit(300);
 
   if (error) {
-    logger.error('[cron/weekly-reminders] DB error', { error: 'Internal server error' });
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    logger.error('[cron/weekly-reminders] DB error', { error: error.message });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   let sent = 0;
@@ -65,4 +63,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/weekly-reminders] sent', { sent });
   return NextResponse.json({ ok: true, sent });
 });
-

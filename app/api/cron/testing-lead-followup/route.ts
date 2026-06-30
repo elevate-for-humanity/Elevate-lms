@@ -3,8 +3,6 @@
  * Follow up with exam leads (prospects who expressed interest in testing)
  * that haven't converted to a scheduled session within 7 days.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -31,8 +29,8 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .limit(100);
 
   if (error) {
-    logger.error('[cron/testing-lead-followup] DB error', { error: 'Internal server error' });
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    logger.error('[cron/testing-lead-followup] DB error', { error: error.message });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   const rows = leads ?? [];
@@ -75,4 +73,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/testing-lead-followup] followed up', { followed });
   return NextResponse.json({ ok: true, followed });
 });
-

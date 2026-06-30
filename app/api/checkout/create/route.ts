@@ -2,7 +2,6 @@
 import { getStripe, stripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -130,4 +129,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/checkout/create', _POST);
-

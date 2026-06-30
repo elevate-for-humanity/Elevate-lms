@@ -12,8 +12,6 @@
  *   5. Email admin
  */
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { syncProgressEntryToHourEntries } from '@/lib/timeclock/sync-to-hour-entries';
@@ -158,4 +156,3 @@ export const GET = withRuntime({ cron: "x-header" }, async () => {
   logger.info('[missed-checkins] complete', { processed, total: shifts.length });
   return NextResponse.json({ processed, total: shifts.length, results });
 });
-

@@ -20,10 +20,6 @@ function isServerActionMismatch(error: Error & { digest?: string } | null | unde
   );
 }
 
-// Rate-limit reloads to prevent infinite loops
-const RELOAD_COOLDOWN_MS = 5000; // Don't reload more than once every 5 seconds
-let lastReloadTime = 0;
-
 export default function GlobalError({
   error,
   reset,
@@ -32,32 +28,20 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    const now = Date.now();
-    
-    // Check if this is a Server Action mismatch
+    // Log ALL errors to console for debugging (both dev and production)
+    console.error('=== GLOBAL ERROR CAUGHT ===');
+    console.error('Error message:', error?.message || 'No error message');
+    console.error('Error name:', error?.name || 'No error name');
+    console.error('Error stack:', error?.stack || 'No stack trace');
+    console.error('Error digest:', error?.digest || 'No digest');
+    console.error('========================');
+
+    // Auto-reload on Server Action ID mismatch (deployment rollover)
     if (isServerActionMismatch(error)) {
-      // Don't log as error - this is expected during deployments
-      // Only log at info level in dev
-      if (process.env.NODE_ENV === 'development') {
-        console.info('[GlobalError] Server Action mismatch (expected during deployment)');
-      }
-      
-      // Rate-limit reloads to prevent hammering
-      if (now - lastReloadTime > RELOAD_COOLDOWN_MS) {
-        lastReloadTime = now;
-        console.info('[GlobalError] Reloading page to sync with new build...');
-        window.location.reload();
-      }
+      console.log('Server action mismatch detected, reloading...');
+      window.location.reload();
       return;
     }
-
-    // Log actual errors appropriately
-    console.error('[GlobalError] Unexpected error:', {
-      message: error?.message || 'No error message',
-      name: error?.name || 'No error name',
-      digest: error?.digest || 'No digest',
-      stack: error?.stack || 'No stack trace',
-    });
 
     // Capture error with Sentry
     Sentry.captureException(error, {

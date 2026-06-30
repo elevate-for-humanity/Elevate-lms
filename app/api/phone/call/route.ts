@@ -2,7 +2,6 @@
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -138,4 +137,3 @@ async function notifyTeam(callbackData: Record<string, any>) {
   // });
 }
 export const POST = withApiAudit('/api/phone/call', _POST);
-

@@ -199,4 +199,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/license/checkout', _POST));
-

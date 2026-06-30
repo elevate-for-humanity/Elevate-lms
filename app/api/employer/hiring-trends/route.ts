@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/auth/require-api-role';
@@ -13,7 +11,7 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const auth = await requireApiRole(['employer', 'admin']);
+    const auth = await requireApiRole(['employer', 'admin', 'super_admin']);
     if (auth instanceof NextResponse) return auth;
 
     // Employer needs cross-user apprentice data; role gate is the auth boundary
@@ -72,4 +70,3 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/employer/hiring-trends', _GET);
-

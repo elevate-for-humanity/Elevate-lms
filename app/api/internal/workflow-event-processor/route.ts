@@ -14,8 +14,6 @@
  * Gated by CRON_SECRET header via withRuntime({ cron: "x-header" }).
  */
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { executeWorkflow } from '@/lib/workflows/engine';
@@ -118,7 +116,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
     if (markErr) {
       logger.warn('[workflow-event-processor] Failed to mark event processed', {
         event_id: event.id,
-        error: 'Internal server error',
+        error: markErr.message,
       });
     } else {
       processed++;
@@ -128,4 +126,3 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
   logger.info('[workflow-event-processor] Run complete', { processed, triggered });
   return NextResponse.json({ ok: true, processed, triggered });
 });
-

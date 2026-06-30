@@ -1,8 +1,6 @@
-export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -83,7 +81,7 @@ async function _POST(request: NextRequest) {
     if (error) {
       logger.error('Error creating trial:', error);
       return NextResponse.json(
-        { error: 'Failed to create trial', detail: 'Unknown error' },
+        { error: 'Failed to create trial', detail: error.message },
         { status: 500 },
       );
     }
@@ -100,5 +98,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/apps/trial/start', _POST);
-
-

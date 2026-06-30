@@ -41,4 +41,3 @@ async function _GET(request: Request) {
   return NextResponse.json(config);
 }
 export const GET = withApiAudit('/api/lti/config', _GET);
-

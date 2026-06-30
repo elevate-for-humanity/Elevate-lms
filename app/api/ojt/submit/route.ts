@@ -1,6 +1,3 @@
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
-
 import { NextResponse } from 'next/server';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -30,7 +27,7 @@ async function requireAdminAccess() {
   }
 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!profile?.role || !['admin', 'staff'].includes(profile.role)) {
+  if (!profile?.role || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
     return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
   }
 
@@ -129,4 +126,3 @@ async function _PATCH(req: Request) {
 export const GET = withApiAudit('/api/ojt/submit', _GET, { critical: true });
 export const POST = withApiAudit('/api/ojt/submit', _POST, { critical: true });
 export const PATCH = withApiAudit('/api/ojt/submit', _PATCH, { critical: true });
-

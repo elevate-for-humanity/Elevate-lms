@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 // PUBLIC ROUTE: testing booking status by token
 /**
@@ -105,4 +103,3 @@ export const GET = withRuntime(
     });
   },
 );
-

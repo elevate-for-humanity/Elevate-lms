@@ -14,8 +14,6 @@
  * a full cron scheduler — sufficient for 5-min polling cadence.
  */
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { executeWorkflow } from '@/lib/workflows/engine';
@@ -158,4 +156,3 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
   logger.info('[workflow-schedule-processor] Run complete', { fired, skipped });
   return NextResponse.json({ ok: true, fired, skipped });
 });
-

@@ -1,7 +1,5 @@
 // app/api/xapi/statement/route.ts
 // xAPI Learning Record Store (LRS) endpoint
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { parseBody } from '@/lib/api-helpers';
@@ -123,4 +121,3 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/xapi/statement', _GET);
 export const POST = withApiAudit('/api/xapi/statement', _POST);
-

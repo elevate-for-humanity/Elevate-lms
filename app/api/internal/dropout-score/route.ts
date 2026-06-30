@@ -10,8 +10,6 @@
  * Gated by CRON_SECRET via withRuntime({ cron: "x-header" }).
  */
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { aiChat } from '@/lib/ai/ai-service';
@@ -137,7 +135,7 @@ Respond with ONLY valid JSON, no markdown, no explanation. Example: {"score":72,
     } catch (err) {
       logger.warn('[dropout-score] AI scoring failed for student', {
         user_id: row.user_id,
-        error: 'Internal server error',
+        error: err instanceof Error ? err.message : String(err),
       });
       failed++;
     }
@@ -146,4 +144,3 @@ Respond with ONLY valid JSON, no markdown, no explanation. Example: {"score":72,
   logger.info('[dropout-score] Run complete', { scored, failed, total: rows.length });
   return NextResponse.json({ ok: true, scored, failed, total: rows.length });
 });
-

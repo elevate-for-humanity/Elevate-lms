@@ -40,4 +40,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/stripe/connect/onboard', _POST));
-

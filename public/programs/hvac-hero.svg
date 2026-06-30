@@ -1,0 +1,25 @@
+<svg width="1600" height="900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="hvac-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EA580C;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C2410C;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#hvac-grad)"/>
+  <g opacity="0.1">
+    <circle cx="200" cy="200" r="150" fill="white"/>
+    <circle cx="1400" cy="700" r="200" fill="white"/>
+  </g>
+  <text x="80" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="bold" fill="white">
+    HVAC Technician
+  </text>
+  <text x="80" y="460" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="bold" fill="white">
+    Training
+  </text>
+  <text x="80" y="540" font-family="system-ui, -apple-system, sans-serif" font-size="32" fill="rgba(255,255,255,0.9)">
+    Learn heating, cooling, and refrigeration systems
+  </text>
+  <text x="80" y="820" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="600" fill="rgba(255,255,255,0.8)">
+    ELEVATE FOR HUMANITY • WIOA APPROVED
+  </text>
+</svg>

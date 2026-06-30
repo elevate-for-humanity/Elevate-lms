@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -217,4 +216,3 @@ async function sendProgramHolderFullWelcomeEmail(opts: {
     logger.error('[onboarding-complete] Welcome email threw', err as Error);
   }
 }
-

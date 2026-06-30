@@ -1,9 +1,6 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { hrEmailTemplates, HrEmailStep, HrEmailParams } from '@/lib/email/templates/hr-emails';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -36,13 +33,13 @@ async function _POST(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  // Require admin or admin
+  // Require admin or super_admin
   const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin'].includes(profile.role)) {
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -109,4 +106,3 @@ function stepToStatus(step: HrEmailStep): string {
 }
 
 export const POST = withApiAudit('/api/hr/emails', _POST);
-

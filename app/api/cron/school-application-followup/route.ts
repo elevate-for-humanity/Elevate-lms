@@ -2,8 +2,6 @@
  * GET /api/cron/school-application-followup
  * Follow up on submitted applications that have had no status change in 48h.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -29,7 +27,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/school-application-followup] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   let followed_up = 0;
@@ -68,4 +66,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/school-application-followup] Done', { followed_up });
   return NextResponse.json({ ok: true, followed_up });
 });
-

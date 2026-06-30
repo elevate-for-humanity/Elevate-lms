@@ -1,8 +1,6 @@
-export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { getCatalogProduct } from '@/lib/store/db';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -195,5 +193,3 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/licenses/checkout', _GET);
 export const POST = withApiAudit('/api/licenses/checkout', _POST);
-
-

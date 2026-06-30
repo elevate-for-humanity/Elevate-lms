@@ -1,7 +1,5 @@
-export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -161,5 +159,3 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/ojt/hours', _GET, { critical: true });
 export const POST = withApiAudit('/api/ojt/hours', _POST, { critical: true });
-
-

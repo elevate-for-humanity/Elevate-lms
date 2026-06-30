@@ -342,4 +342,3 @@ export async function GET() {
     events: ['invitee.created', 'invitee.canceled'],
   });
 }
-

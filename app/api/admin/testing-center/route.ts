@@ -63,4 +63,3 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({ bookings: bookings ?? [], sessions: sessions ?? [], slots: slots ?? [], stats });
 }
-

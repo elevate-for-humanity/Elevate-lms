@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -159,4 +158,3 @@ async function processVendorPayment(params: {
   }
 }
 export const POST = withApiAudit('/api/payments/split', _POST);
-

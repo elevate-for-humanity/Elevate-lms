@@ -52,4 +52,3 @@ async function _GET(request: NextRequest) {
 }
 
 export const GET = withApiAudit('/api/auth/instagram/authorize', _GET);
-

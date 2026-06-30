@@ -10,8 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
@@ -30,7 +29,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const supabase = await createClient();
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return safeError('Unauthorized', 401);
 
     const supabaseAdmin = await requireAdminClient();
@@ -116,5 +115,3 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Upload failed');
   }
 }
-
-

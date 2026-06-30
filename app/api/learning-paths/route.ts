@@ -67,4 +67,3 @@ async function _POST(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/learning-paths', _GET);
 export const POST = withApiAudit('/api/learning-paths', _POST);
-

@@ -3,8 +3,6 @@
  * Find knowledge base documents without embeddings and queue them for embedding.
  * Writes a platform event per document so the embedding worker can pick them up.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -28,8 +26,8 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .limit(BATCH_SIZE);
 
   if (error) {
-    logger.error('[cron/embed-knowledge] DB error', { error: 'Internal server error' });
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    logger.error('[cron/embed-knowledge] DB error', { error: error.message });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   const rows = docs ?? [];
@@ -47,4 +45,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/embed-knowledge] queued for embedding', { queued });
   return NextResponse.json({ ok: true, queued });
 });
-

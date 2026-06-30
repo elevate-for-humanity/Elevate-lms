@@ -109,4 +109,3 @@ async function _POST(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/onboarding', _GET);
 export const POST = withApiAudit('/api/onboarding', _POST);
-

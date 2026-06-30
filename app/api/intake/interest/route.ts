@@ -128,4 +128,3 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/intake/interest', _POST);
-

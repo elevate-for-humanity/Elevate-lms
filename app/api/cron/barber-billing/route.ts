@@ -2,8 +2,6 @@
  * GET /api/cron/barber-billing
  * Process monthly barber program subscription billing cycles.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -30,7 +28,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/barber-billing] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   if (!due?.length) return NextResponse.json({ ok: true, processed: 0 });
@@ -91,4 +89,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/barber-billing] Done', { processed, failed });
   return NextResponse.json({ ok: true, processed, failed });
 });
-

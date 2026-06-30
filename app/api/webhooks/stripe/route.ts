@@ -28,8 +28,6 @@
  *
  */
 
-import { db } from '@/lib/db';
-
 import type Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
@@ -1141,4 +1139,3 @@ export const POST = withApiAudit('/api/webhooks/stripe', _POST, {
   actor_type: 'webhook',
   skip_body: true,
 });
-

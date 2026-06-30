@@ -1,8 +1,5 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { resolveLatestEnrollment } from '@/lib/enrollment/resolver';
@@ -26,7 +23,7 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = await createClient();
-  const user = safeGetUser(await supabase.auth.getUser());
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -41,7 +38,7 @@ export async function GET(req: NextRequest) {
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-    if (['admin', 'staff'].includes(profile?.role ?? '')) {
+    if (['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) {
       return NextResponse.json({
         enrolled: true,
         status: 'active',
@@ -114,5 +111,3 @@ export async function GET(req: NextRequest) {
     approved: false,
   });
 }
-
-

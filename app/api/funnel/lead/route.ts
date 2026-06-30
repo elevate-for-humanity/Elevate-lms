@@ -1,6 +1,4 @@
 // PUBLIC ROUTE: marketing funnel lead capture
-import { db } from '@/lib/db';
-
 import { safeInternalError } from '@/lib/api/safe-error';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -154,4 +152,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ success: true, applicationId });
 }
-

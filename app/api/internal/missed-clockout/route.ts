@@ -18,8 +18,6 @@
  *   6. Emit platform event for audit trail
  */
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/service';
@@ -250,4 +248,3 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
   logger.info('[missed-clockout] Run complete', { closed, failed: failed.length });
   return NextResponse.json({ ok: true, closed, failed: failed.length });
 });
-

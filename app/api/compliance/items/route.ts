@@ -74,4 +74,3 @@ async function _PATCH(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/compliance/items', _GET, { critical: true });
 export const PATCH = withApiAudit('/api/compliance/items', _PATCH, { critical: true });
-

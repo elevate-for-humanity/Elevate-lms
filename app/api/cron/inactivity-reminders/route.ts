@@ -2,8 +2,6 @@
  * GET /api/cron/inactivity-reminders
  * Send reminders to enrolled learners who haven't logged any lesson activity in 7+ days.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -33,7 +31,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/inactivity-reminders] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   let reminded = 0;
@@ -71,4 +69,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/inactivity-reminders] Done', { reminded });
   return NextResponse.json({ ok: true, reminded });
 });
-

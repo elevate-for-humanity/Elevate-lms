@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -29,8 +27,8 @@ type ProviderProgram = {
 const SUBMIT_ROLES = new Set([
   'provider_admin',
   'admin',
-  'admin',
-  'admin',
+  'super_admin',
+  'platform_operator',
   'staff',
   'org_admin',
 ]);
@@ -144,4 +142,3 @@ export async function POST(request: NextRequest) {
     return safeInternalError(error, 'Provider program submission failed');
   }
 }
-

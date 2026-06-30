@@ -3,8 +3,6 @@
  * GET /api/cron/escalate-funding-sla
  * Escalate funding SLA breaches — assignments pending > SLA threshold get critical alerts.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -31,7 +29,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/escalate-funding-sla] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   if (!breaches?.length) return NextResponse.json({ ok: true, escalated: 0 });
@@ -67,4 +65,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/escalate-funding-sla] Done', { escalated: breaches.length });
   return NextResponse.json({ ok: true, escalated: breaches.length });
 });
-

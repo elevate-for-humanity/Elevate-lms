@@ -9,7 +9,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { ErrorCode } from '@/lib/api/error-codes';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { APIError } from '@/lib/api/api-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -93,4 +92,3 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 export const POST = withApiAudit('/api/auth/signup', _POST);
-

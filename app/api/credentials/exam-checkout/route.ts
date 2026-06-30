@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 /**
  * POST /api/credentials/exam-checkout
@@ -145,4 +143,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ url: session.url });
 }
-

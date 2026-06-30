@@ -15,7 +15,6 @@ import { CopyrightProtection } from '@/components/CopyrightProtection';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { GoogleAds } from '@/components/analytics/google-ads';
 import RootWidgets from '@/components/layout/RootWidgets';
-import BuildVersionSync from '@/components/BuildVersionSync';
 import { generateChromeSuppressionScript } from '@/lib/layout/app-routes';
 
 import PWAManager from '@/components/PWAManager';
@@ -82,7 +81,7 @@ export const metadata: Metadata = {
       'Learn job-ready skills through career training programs in healthcare, skilled trades, CDL, and technology. Training at no cost to eligible Indiana residents through WIOA and state funding.',
     images: [
       {
-        url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-image.jpg',
+        url: '/images/og-image.jpg',
         width: 1200,
         height: 630,
         alt: `${PLATFORM_DEFAULTS.orgName} — workforce training programs in Indianapolis`,
@@ -95,7 +94,7 @@ export const metadata: Metadata = {
     title: `${PLATFORM_DEFAULTS.orgName} | Career Training at No Cost for Eligible Participants`,
     description:
       'Learn job-ready skills through career training programs in healthcare, skilled trades, CDL, and technology. Training at no cost to eligible Indiana residents through WIOA and state funding.',
-    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-image.jpg'],
+    images: ['/images/og-image.jpg'],
   },
 
   robots: {
@@ -127,11 +126,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon.ico', type: 'image/x-icon', sizes: '32x32' },
-      { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/favicon.png', type: 'image/png', sizes: '192x192' },
-      { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png', type: 'image/png', sizes: '192x192' },
-      { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-512.png', type: 'image/png', sizes: '512x512' },
+      { url: '/favicon.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
     ],
-    apple: [{ url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
     shortcut: '/favicon.ico',
   },
 };
@@ -150,8 +149,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
 
-        <link rel="icon" href="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/favicon.png" type="image/png" sizes="192x192" />
-        <link rel="apple-touch-icon" href="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/apple-touch-icon.png" sizes="180x180" />
+        <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <meta name="theme-color" content="#dc2626" />
         {/* Organization structured data — tells Google Knowledge Panel the correct logo */}
         <script
@@ -238,7 +237,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <SkipToContent />
         <GoogleAnalytics />
-        <BuildVersionSync />
         <GoogleAds />
         <PWAManager />
         <InstallPromptBanner />

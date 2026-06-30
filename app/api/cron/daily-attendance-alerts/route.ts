@@ -3,8 +3,6 @@
  * GET /api/cron/daily-attendance-alerts
  * Alert instructors and admins about students with attendance issues today.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -30,7 +28,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/daily-attendance-alerts] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   if (!absences?.length) {
@@ -57,4 +55,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/daily-attendance-alerts] Done', { absences: absences.length });
   return NextResponse.json({ ok: true, absences: absences.length });
 });
-

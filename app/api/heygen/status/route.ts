@@ -33,7 +33,7 @@ async function _GET(request: NextRequest) {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: 'Request failed' },
+        { error: data.message || 'Failed to get video status' },
         { status: response.status },
       );
     }
@@ -50,4 +50,3 @@ async function _GET(request: NextRequest) {
   }
 }
 export const GET = withApiAudit('/api/heygen/status', _GET);
-

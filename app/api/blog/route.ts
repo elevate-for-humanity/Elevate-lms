@@ -71,4 +71,3 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/blog', _GET);
-

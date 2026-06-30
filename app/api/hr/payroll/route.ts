@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { auditPiiAccess } from '@/lib/auditLog';
@@ -344,4 +343,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

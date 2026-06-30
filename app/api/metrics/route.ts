@@ -31,4 +31,3 @@ export function incrementRequestCount() {
   requestCount++;
 }
 export const GET = withApiAudit('/api/metrics', _GET);
-

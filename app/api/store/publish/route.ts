@@ -2,7 +2,6 @@ import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -105,4 +104,3 @@ async function createStripeProduct(product: ProductInput) {
   return stripeProduct;
 }
 export const POST = withApiAudit('/api/store/publish', _POST);
-

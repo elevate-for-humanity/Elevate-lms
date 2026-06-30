@@ -53,4 +53,3 @@ async function _GET(request: NextRequest) {
   return response;
 }
 export const GET = withApiAudit('/api/auth/youtube/authorize', _GET);
-

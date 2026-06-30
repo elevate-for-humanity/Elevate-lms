@@ -1,6 +1,3 @@
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
-
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 
@@ -83,4 +80,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/store/customer-portal', _POST);
-

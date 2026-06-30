@@ -147,4 +147,3 @@ async function _POST(request: NextRequest) {
 }
 
 export const POST = withApiAudit('/api/webhooks/subscriptions', _POST, { actor_type: 'webhook', skip_body: true });
-

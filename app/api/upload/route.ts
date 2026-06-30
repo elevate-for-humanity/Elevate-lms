@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -55,7 +54,7 @@ async function _POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) return safeError('Authentication required', 401);
 
     const formData = await request.formData();
@@ -136,11 +135,11 @@ async function _DELETE(request: Request) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) return safeError('Authentication required', 401);
 
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-    if (!profile || !['admin', 'staff'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
       return safeError('Forbidden', 403);
     }
 
@@ -162,4 +161,3 @@ async function _DELETE(request: Request) {
 
 export const POST = withApiAudit('/api/upload', _POST);
 export const DELETE = withApiAudit('/api/upload', _DELETE);
-

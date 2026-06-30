@@ -83,4 +83,3 @@ async function _GET(request: Request) {
 }
 export const GET = withApiAudit('/api/xapi', _GET);
 export const POST = withApiAudit('/api/xapi', _POST);
-

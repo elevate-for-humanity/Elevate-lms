@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 /**
  * AI Assistant Chat API
@@ -10,7 +9,6 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { isAiDegradedError } from '@/lib/ai/degraded';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -85,7 +83,7 @@ export async function POST(req: NextRequest) {
 
         if (conversationError) {
           logger.warn('AI Assistant conversation create failed', {
-            error: 'Internal server error',
+            error: conversationError.message,
           });
         }
         convId = newConv?.id ?? null;
@@ -131,7 +129,7 @@ export async function POST(req: NextRequest) {
     } catch (aiError) {
       if (isAiDegradedError(aiError)) {
         logger.warn('AI Assistant degraded; using guided fallback', {
-          error: 'Internal server error',
+          error: aiError instanceof Error ? aiError.message : String(aiError),
         });
       } else {
         logger.error('AI Assistant model unavailable; using guided fallback:', aiError);
@@ -176,5 +174,3 @@ export async function GET() {
     description: 'Powers the AIAssistantBubble chat widget',
   });
 }
-
-

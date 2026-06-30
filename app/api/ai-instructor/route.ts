@@ -1,9 +1,6 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -171,4 +168,3 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/ai-instructor', _GET);
 export const POST = withApiAudit('/api/ai-instructor', _POST);
-

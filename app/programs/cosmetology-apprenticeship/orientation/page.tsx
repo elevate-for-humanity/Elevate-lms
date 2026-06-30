@@ -110,7 +110,7 @@ export default async function CosmetologyOrientationPage() {
   const db = await getAdminClient();
 
   // Load enrollment and subscription status
-  let enrollmentStatus // eslint-disable-line @typescript-eslint/no-unused-vars /* eslint-disable-line @typescript-eslint/no-unused-vars */: string | null = null;
+  let enrollmentStatus: string | null = null; // eslint-disable-line @typescript-eslint/no-unused-vars
   let subscriptionStatus: string | null = null;
   let firstName = '';
 

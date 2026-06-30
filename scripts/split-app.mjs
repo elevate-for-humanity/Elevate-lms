@@ -83,6 +83,63 @@ const SHARED_ROUTES = new Set([
   'barber-and-beauty-apprenticeships'
 ]);
 
+// Scope-specific routes that should be kept
+const SCOPE_ROUTES = {
+  MARKETING: new Set([
+    '(marketing)',
+    '(public)',
+    'about',
+    'apply',
+    'admin',
+    'student',
+    'portals',
+    'store',
+    'programs',
+    'contact',
+    'login',
+    'signup',
+    'legal',
+    'health',
+    'testing',
+    'certificates',
+    'videos'
+  ]),
+  ADMIN: new Set([
+    'admin',
+    'api',
+    'auth',
+    '(auth)',
+    'legal',
+    'health',
+    'data',
+    'funding',
+    'testing',
+    'certificates',
+    'videos',
+    'login',
+    'signup',
+    'forgot-password'
+  ]),
+  LMS: new Set([
+    'lms',
+    'api',
+    'auth',
+    '(auth)',
+    'legal',
+    'health',
+    'data',
+    'funding',
+    'testing',
+    'certificates',
+    'videos',
+    'login',
+    'signup',
+    'forgot-password',
+    'barber-and-beauty-apprenticeships',
+    'programs'
+  ])
+};
+
 const toRemove = ROUTE_EXCLUSIONS[scope];
 
 if (!toRemove) {
@@ -213,6 +270,12 @@ for (const folder of currentFolders) {
 
   if (SHARED_ROUTES.has(folder)) {
     console.log(`✓ KEEP ${folder} (shared route)`);
+    continue;
+  }
+
+  // Check scope-specific routes
+  if (SCOPE_ROUTES[scope]?.has(folder)) {
+    console.log(`✓ KEEP ${folder} (${scope} route)`);
     continue;
   }
 

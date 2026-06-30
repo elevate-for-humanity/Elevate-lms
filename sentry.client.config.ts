@@ -6,6 +6,22 @@ import * as Sentry from '@sentry/nextjs';
 
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN || '';
 
+// Error patterns to ignore on client (reduces noise)
+const IGNORE_ERROR_PATTERNS = [
+  // Next.js image optimization for missing images
+  /isn't a valid image/,
+  
+  // Network-related errors
+  /Failed to fetch/,
+  /NetworkError/,
+  
+  // Aborted requests (client navigation away)
+  /aborted/,
+  
+  // Chrome extension errors
+  /chrome-extension/,
+];
+
 if (dsn) {
   Sentry.init({
     dsn,
@@ -24,6 +40,9 @@ if (dsn) {
     // This sets the sample rate to be 10%. You may want this to be 100% while
     // in development and sample at a lower rate in production
     replaysSessionSampleRate: 0.1,
+
+    // Ignore noisy error patterns
+    ignoreErrors: IGNORE_ERROR_PATTERNS,
 
     // You can remove this option if you're not planning to use the Sentry Session Replay feature:
     integrations: [

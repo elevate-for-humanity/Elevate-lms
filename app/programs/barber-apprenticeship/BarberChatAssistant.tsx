@@ -75,7 +75,7 @@ We'll help match you with a shop based on:
 
 Already have a shop in mind? They can apply to become a partner training site.`,
 
-  'start|begin|enroll|apply': `**Ready to start?** Here`s how:
+  'start|begin|enroll|apply': `**Ready to start?** Here's how:
 
 1. Apply at /forms/barber-apprenticeship-inquiry
 2. Speak with an enrollment advisor

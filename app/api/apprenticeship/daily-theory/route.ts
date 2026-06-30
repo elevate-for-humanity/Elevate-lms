@@ -5,7 +5,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import {
   DAILY_THEORY_PASSING_SCORE,
-  isBeautyApprenticeshipSlug,
+  isApprenticeshipProgramSlug,
 } from '@/lib/apprenticeship-programs/constants';
 import {
   dailyTheoryBlockedMessage,
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
   if (!user) return safeError('Unauthorized', 401);
 
   const programSlug = request.nextUrl.searchParams.get('program_slug') ?? '';
-  if (!isBeautyApprenticeshipSlug(programSlug)) {
+  if (!isApprenticeshipProgramSlug(programSlug)) {
     return safeError('Invalid program_slug', 400);
   }
 
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     const score = Number(body.score);
     const lessonId = body.lesson_id as string | undefined;
 
-    if (!isBeautyApprenticeshipSlug(programSlug)) {
+    if (!isApprenticeshipProgramSlug(programSlug)) {
       return safeError('Invalid program_slug', 400);
     }
     if (!Number.isFinite(score) || score < 0 || score > 100) {

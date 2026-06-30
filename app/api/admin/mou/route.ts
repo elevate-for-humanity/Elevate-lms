@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   const supabase = await getAdminClient();
   if (!supabase) return safeInternalError(new Error('DB unavailable'), 'Failed');
 
-  // ── CREATE ──────────────────────────────────────────────────────────────────
+  // ---- CREATE ------------------------------------------------------------------------------------------------------------------------------------
   if (action === 'create') {
     const { template_id, title, content, partner_name, partner_email, expiry_date } = body as Record<string, string>;
 
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     if (partner_email && mou) {
       await trySendEmail({
         to: partner_email,
-        subject: `MOU from ${PLATFORM_DEFAULTS.orgName} — ${mouTitle ?? "Partnership Agreement"}`,
+        subject: `MOU from ${PLATFORM_DEFAULTS.orgName} - ${mouTitle ?? "Partnership Agreement"}`,
         html: `
           <p>Dear ${partner_name ?? 'Partner'},</p>
           <p>${PLATFORM_DEFAULTS.orgName} has prepared a Memorandum of Understanding for your review.</p>
@@ -109,20 +109,20 @@ export async function POST(request: NextRequest) {
           </div>
           <p>Please review and reply to this email to confirm your agreement, or contact us at
           <a href="mailto:partnerships@${PLATFORM_DEFAULTS.canonicalDomain}">partnerships@${PLATFORM_DEFAULTS.canonicalDomain}</a>.</p>
-          <p>— ${PLATFORM_DEFAULTS.orgName}</p>
+          <p>- ${PLATFORM_DEFAULTS.orgName}</p>
         `,
         text: `MOU from ${PLATFORM_DEFAULTS.orgName}\n\n${mouContent?.replace(/<[^>]+>/g, ` `)}\n\nContact: partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
-        replyTo: `partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
+        replyTo: 'partnerships@' + PLATFORM_DEFAULTS.canonicalDomain,
       });
 
       // Update status to sent
-      await supabase.from(`partner_mous').update({ status: 'sent' }).eq('id', mou.id);
+      await supabase.from('partner_mous').update({ status: 'sent' }).eq('id', mou.id);
     }
 
     return NextResponse.json({ success: true, mou: { ...mou, status: partner_email ? 'sent' : 'pending' } });
   }
 
-  // ── VOID ────────────────────────────────────────────────────────────────────
+  // ---- VOID ----------------------------------------------------------------------------------------------------------------------------------------
   if (action === 'void') {
     const { mou_id } = body as { mou_id: string };
     if (!mou_id) return safeError('mou_id required', 400);
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   }
 
-  // ── RESEND ──────────────────────────────────────────────────────────────────
+  // ---- RESEND ------------------------------------------------------------------------------------------------------------------------------------
   if (action === 'resend') {
     const { mou_id, partner_email } = body as { mou_id: string; partner_email: string };
     if (!mou_id || !partner_email) return safeError('mou_id and partner_email required', 400);
@@ -151,14 +151,14 @@ export async function POST(request: NextRequest) {
 
     await trySendEmail({
       to: partner_email,
-      subject: `MOU from ${PLATFORM_DEFAULTS.orgName} - ${mou.title ?? "Partnership Agreement"}`,
-      html: `<p>Please review the attached MOU from ${PLATFORM_DEFAULTS.orgName}.</p><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:24px">${mou.content ?? ''}</div>`,
+      subject: 'MOU from ' + PLATFORM_DEFAULTS.orgName + ' - ' + (mou.title ?? 'Partnership Agreement'),
+      html: '<p>Please review the attached MOU from ' + PLATFORM_DEFAULTS.orgName + '.</p><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:24px">' + (mou.content ?? '') + '</div>',
       text: mou.content?.replace(/<[^>]+>/g, ' ') ?? '',
-      replyTo: `partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
+      replyTo: 'partnerships@' + PLATFORM_DEFAULTS.canonicalDomain,
     });
 
     await supabase.from('partner_mous').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', mou_id);
-    return NextResponse.json({ success: true, message: `Resent to ${partner_email}` });
+    return NextResponse.json({ success: true, message: 'Resent to ' + partner_email });
   }
 
   return safeError('Unknown action', 400);

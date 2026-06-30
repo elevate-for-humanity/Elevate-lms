@@ -54,7 +54,7 @@ export default function MedicalAssistantEnrollPage() {
       const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (!data.enrollmentId || !uuidPattern.test(data.enrollmentId)) throw new Error(`Enrollment could not be confirmed. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);
 
-      if (paymentOption === `affirm') {
+      if (paymentOption === 'affirm') {
         const r = await fetch('/api/affirm/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: PROGRAM.price * 100, programId: PROGRAM.slug, programSlug: PROGRAM.slug, programName: PROGRAM.name, enrollmentId: data.enrollmentId, email: formData.email, firstName: formData.firstName, lastName: formData.lastName }) });
         const d = await r.json(); if (d.url) { window.location.href = d.url; return; }
       } else if (paymentOption === 'sezzle') {
@@ -77,7 +77,7 @@ export default function MedicalAssistantEnrollPage() {
             <ArrowLeft className="w-4 h-4" /> Back to Medical Assistant Program
           </Link>
           <h1 className="text-3xl font-bold text-white">{PROGRAM.name}</h1>
-          <p className="text-slate-300 mt-2">CCMA certification in 12 weeks · Clinical + administrative training</p>
+          <p className="text-slate-300 mt-2">CCMA certification in 12 weeks - Clinical + administrative training</p>
           <span className="text-2xl font-bold text-white mt-3 inline-block">${PROGRAM.price.toLocaleString()}</span>
         </div>
       </div>
@@ -110,7 +110,7 @@ export default function MedicalAssistantEnrollPage() {
             {step === 2 && (
               <div className="space-y-5">
                 <h2 className="text-xl font-bold">Choose Your Payment Option</h2>
-                <p className="text-slate-600 text-sm">Total tuition: <strong>${PROGRAM.price.toLocaleString()}</strong> · WIOA funding may cover 100%</p>
+                <p className="text-slate-600 text-sm">Total tuition: <strong>${PROGRAM.price.toLocaleString()}</strong> - WIOA funding may cover 100%</p>
                 <div className="space-y-3">
                   <label className={`block p-5 border-2 rounded-xl cursor-pointer transition ${paymentOption === 'payment-plan' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'}`}>
                     <input type="radio" name="po" value="payment-plan" checked={paymentOption === 'payment-plan'} onChange={() => setPaymentOption('payment-plan')} className="sr-only" />
@@ -129,14 +129,14 @@ export default function MedicalAssistantEnrollPage() {
                   </label>
                   <label className={`block p-5 border-2 rounded-xl cursor-pointer transition ${paymentOption === 'affirm' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'}`}>
                     <input type="radio" name="po" value="affirm" checked={paymentOption === 'affirm'} onChange={() => setPaymentOption('affirm')} className="sr-only" />
-                    <div className="flex items-center justify-between"><div><div className="flex items-center gap-2"><span className="font-bold text-lg">Affirm</span><span className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-xs font-medium">BNPL</span></div><p className="text-slate-700 mt-1">As low as <strong>${Math.round(PROGRAM.price / 12)}/mo</strong> × 12 months · 0% APR</p></div>{paymentOption === 'affirm' && <CheckCircle className="w-5 h-5 text-brand-blue-600" />}</div>
+                    <div className="flex items-center justify-between"><div><div className="flex items-center gap-2"><span className="font-bold text-lg">Affirm</span><span className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-xs font-medium">BNPL</span></div><p className="text-slate-700 mt-1">As low as <strong>${Math.round(PROGRAM.price / 12)}/mo</strong> × 12 months - 0% APR</p></div>{paymentOption === 'affirm' && <CheckCircle className="w-5 h-5 text-brand-blue-600" />}</div>
                   </label>
                   <label className={`block p-5 border-2 rounded-xl cursor-pointer transition ${paymentOption === 'sezzle' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'}`}>
                     <input type="radio" name="po" value="sezzle" checked={paymentOption === 'sezzle'} onChange={() => setPaymentOption('sezzle')} className="sr-only" />
                     <div className="flex items-center justify-between"><div><div className="flex items-center gap-2"><span className="font-bold text-lg">Sezzle</span><span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs font-medium">BNPL</span></div><p className="text-slate-700 mt-1">4 interest-free payments of <strong>${(PROGRAM.price / 4).toFixed(2)}</strong></p></div>{paymentOption === 'sezzle' && <CheckCircle className="w-5 h-5 text-brand-blue-600" />}</div>
                   </label>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-slate-500"><Shield className="w-4 h-4" /><span>All payments secure · Call {PLATFORM_DEFAULTS.supportPhone} for help</span></div>
+                <div className="flex items-center gap-2 text-xs text-slate-500"><Shield className="w-4 h-4" /><span>All payments secure - Call {PLATFORM_DEFAULTS.supportPhone} for help</span></div>
                 <div className="flex gap-3">
                   <button onClick={() => setStep(1)} className="px-6 py-3 border border-slate-300 rounded-lg font-semibold hover:bg-slate-50">Back</button>
                   <button onClick={handleSubmit} disabled={isSubmitting} className="flex-1 bg-brand-blue-600 text-white py-3 rounded-lg font-bold hover:bg-brand-blue-700 disabled:opacity-50">{isSubmitting ? 'Processing...' : paymentOption === 'affirm' ? 'Continue with Affirm' : paymentOption === 'sezzle' ? 'Continue with Sezzle' : 'Continue to Payment'}</button>

@@ -13,7 +13,7 @@ import { provisionAccount } from '@/lib/enrollment/provision-account';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-// approveApplication is called by /api/admin/applications/[id]/approve — not here
+// approveApplication is called by /api/admin/applications/[id]/approve - not here
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -56,9 +56,9 @@ function corsHeadersForOrigin(origin: string, allowedOrigins: Set<string>) {
 
 async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
-  // No secret configured — skip verification (dev / unconfigured environments)
+  // No secret configured - skip verification (dev / unconfigured environments)
   if (!secret) return true;
-  // No token sent — fail only when secret is configured
+  // No token sent - fail only when secret is configured
   if (!token) return false;
 
   try {
@@ -134,7 +134,7 @@ export async function OPTIONS(req: Request) {
   });
 }
 
-// Public endpoint — anonymous application submissions
+// Public endpoint - anonymous application submissions
 async function _POST(req: Request) {
   try {
     const allowedOrigins = getAllowedOrigins();
@@ -227,7 +227,7 @@ async function _POST(req: Request) {
       );
     }
 
-    // Program state gate — reject submissions for waitlisted or closed programs
+    // Program state gate - reject submissions for waitlisted or closed programs
     const enrollmentState = await getProgramEnrollmentState(supabase, program);
     if (enrollmentState === 'waitlist') {
       return NextResponse.json(
@@ -247,7 +247,7 @@ async function _POST(req: Request) {
     }
 
     // Dedup: block same email + program within 24 hours.
-    // Excludes intake-form mirrors — those are pre-application inquiries, not submissions.
+    // Excludes intake-form mirrors - those are pre-application inquiries, not submissions.
     // Allows re-application after the window (e.g. student applies months later).
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: recentApp } = await supabase
@@ -316,13 +316,13 @@ async function _POST(req: Request) {
       body.hasCaseManager ? `Has Case Manager: ${body.hasCaseManager}` : '',
       body.caseManagerAgency ? `Case Manager Agency: ${body.caseManagerAgency}` : '',
       body.supportNeeds ? `Support Needs: ${body.supportNeeds}` : '',
-      // Transfer hours are stored in transfer_hours_claimed column — not duplicated here.
+      // Transfer hours are stored in transfer_hours_claimed column - not duplicated here.
     ]
       .filter(Boolean)
       .join('\n');
 
     // Insert into applications table
-    // Parse claimed transfer hours — stored in structured column, not notes.
+    // Parse claimed transfer hours - stored in structured column, not notes.
     // Does not affect pricing. Progress credit only.
     const transferHoursClaimed = Math.max(
       0,
@@ -332,7 +332,7 @@ async function _POST(req: Request) {
     // Determine application status based on funding type and eligibility.
     // WIOA / WRG / FSSA applications require admin approval before enrollment.
     // Students who have not yet been to Indiana Career Connect are saved as
-    // 'pending_funding' — they must complete the ICC process and reapply.
+    // 'pending_funding' - they must complete the ICC process and reapply.
     const FUNDED_TYPES = ['wioa', 'wrg', 'fssa'];
     const fundingType = body.fundingType || body.fundingInterest || null;
     const eligibilityStatus = body.fundingEligibilityStatus || null;
@@ -341,17 +341,17 @@ async function _POST(req: Request) {
 
     let applicationStatus: string;
     if (needsICC) {
-      // Has not been to ICC yet — hold application, send them to ICC first
+      // Has not been to ICC yet - hold application, send them to ICC first
       applicationStatus = 'pending_funding';
     } else if (isFunded) {
-      // Has ICC approval or is in process — needs admin review before enrollment
+      // Has ICC approval or is in process - needs admin review before enrollment
       applicationStatus = 'pending_admin_review';
     } else {
-      // Self-pay, employer, unsure — standard submitted flow
+      // Self-pay, employer, unsure - standard submitted flow
       applicationStatus = 'submitted';
     }
 
-    // Core insert payload — columns confirmed to exist in all environments
+    // Core insert payload - columns confirmed to exist in all environments
     const corePayload: Record<string, any> = {
       first_name: body.firstName,
       last_name: body.lastName,
@@ -385,7 +385,7 @@ async function _POST(req: Request) {
       .select()
       .maybeSingle();
 
-    // Three-tier retry — each tier strips more columns to handle DB environments
+    // Three-tier retry - each tier strips more columns to handle DB environments
     // where migrations haven't been applied yet.
     //
     // Tier 1 (corePayload): all columns including recent migrations
@@ -393,7 +393,7 @@ async function _POST(req: Request) {
     //         normalized_email/phone, county_of_residence, household_income, family_size,
     //         modality_preference, transfer_hours_claimed, type)
     // Tier 3 (baseline): only the 15 columns present in the original schema baseline
-    //         (20260227000003) — this MUST succeed or the DB is broken
+    //         (20260227000003) - this MUST succeed or the DB is broken
     //
     // Error codes:
     //   42703 = unknown column
@@ -410,9 +410,9 @@ async function _POST(req: Request) {
         e.message?.includes('check') ||
         e.message?.includes('violates'));
 
-    // Tier 2 — strip columns from post-baseline migrations
+    // Tier 2 - strip columns from post-baseline migrations
     if (isRetryableError(error)) {
-      logger.warn('[api/applications] Tier-2 retry — stripping extended columns', {
+      logger.warn('[api/applications] Tier-2 retry - stripping extended columns', {
         code: error.code,
         message: error.message,
       });
@@ -421,7 +421,7 @@ async function _POST(req: Request) {
         .insert({
           ...corePayload,
           // Strip columns added in migrations that may not be live yet.
-          // Keep this list in sync with corePayload — any column not in the
+          // Keep this list in sync with corePayload - any column not in the
           // baseline schema (20260227000003) must be stripped here.
           normalized_email: undefined,
           normalized_phone: undefined,
@@ -443,9 +443,9 @@ async function _POST(req: Request) {
       error = tier2.error;
     }
 
-    // Tier 3 — absolute baseline: only columns guaranteed in 20260227000003
+    // Tier 3 - absolute baseline: only columns guaranteed in 20260227000003
     if (isRetryableError(error)) {
-      logger.warn('[api/applications] Tier-3 retry — baseline columns only', {
+      logger.warn('[api/applications] Tier-3 retry - baseline columns only', {
         code: error.code,
         message: error.message,
       });
@@ -482,7 +482,7 @@ async function _POST(req: Request) {
       return NextResponse.json(
         {
           error: `Failed to save application. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.`,
-          debug: process.env.NODE_ENV === `development' ? (error as any)?.message : undefined,
+          debug: process.env.NODE_ENV === 'development' ? (error as any)?.message : undefined,
         },
         { status: 500 },
       );
@@ -509,7 +509,7 @@ async function _POST(req: Request) {
       const provision = await provisionAccount({
         db: supabase,
         email: body.email,
-        fullName: `${body.firstName || ''} ${body.lastName || ''}`.trim() || body.email,
+        fullName: (body.firstName + ' ' + body.lastName).trim() || body.email,
         phone: body.phone || null,
         programName,
         programSlug,
@@ -536,14 +536,14 @@ async function _POST(req: Request) {
       }
     }
 
-    logger.info('[Applications] Saved — pending admin review', {
+    logger.info('[Applications] Saved - pending admin review', {
       applicationId: data.id,
       fundingType,
       eligibilityStatus,
       applicationStatus,
     });
 
-    // Send email notifications — direct call, no self-fetch
+    // Send email notifications - direct call, no self-fetch
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
     let emailStatus: { student: string; staff: string } = {
       student: 'not-attempted',
@@ -558,16 +558,14 @@ async function _POST(req: Request) {
 
       // Build password setup section (only for new users)
       const passwordSection = passwordSetupLink
-        ? `
-            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
-              <h3 style="margin-top: 0; color: #065f46;">Your Student Account Is Ready</h3>
-              <p style="margin-bottom: 16px;">We created your student portal account. Set your password to log in:</p>
-              <p style="text-align: center; margin: 16px 0;">
-                <a href="${passwordSetupLink}" style="display: inline-block; background: #ea580c; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Set Your Password &amp; Log In</a>
-              </p>
-              <p style="color: #64748b; font-size: 13px; margin-bottom: 0;">This link expires in 24 hours. After setting your password, you can log in anytime at <a href="${siteUrl}/login" style="color: #059669;">${siteUrl}/login</a></p>
-            </div>
-      `
+        ? '<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">' +
+          '<h3 style="margin-top: 0; color: #065f46;">Your Student Account Is Ready</h3>' +
+          '<p style="margin-bottom: 16px;">We created your student portal account. Set your password to log in:</p>' +
+          '<p style="text-align: center; margin: 16px 0;">' +
+            '<a href="' + passwordSetupLink + '" style="display: inline-block; background: #ea580c; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Set Your Password &amp; Log In</a>' +
+          '</p>' +
+          '<p style="color: #64748b; font-size: 13px; margin-bottom: 0;">This link expires in 24 hours. After setting your password, you can log in anytime at <a href="' + siteUrl + '/login" style="color: #059669;">' + siteUrl + '/login</a></p>' +
+        '</div>'
         : '';
 
       // Confirmation + onboarding email to applicant
@@ -582,7 +580,7 @@ async function _POST(req: Request) {
       const nextStepsHtml = needsICC
         ? `
         <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0;">
-          <h3 style="margin-top: 0; color: #92400e;">Action Required — Complete Indiana Career Connect First</h3>
+          <h3 style="margin-top: 0; color: #92400e;">Action Required - Complete Indiana Career Connect First</h3>
           <p style="color: #78350f;">You selected <strong>${fundingName}</strong> as your funding option. Before we can enroll you, you must complete the Indiana Career Connect process and receive your funding approval.</p>
           <h4 style="color: #92400e; margin-bottom: 8px;">Your next steps:</h4>
           <ol style="color: #78350f; padding-left: 20px; line-height: 1.8;">
@@ -590,7 +588,7 @@ async function _POST(req: Request) {
             <li>Complete your profile and upload your resume</li>
             <li>Schedule an appointment at your nearest WorkOne center</li>
             <li>Receive your funding approval letter (ITA, WRG approval, or FSSA authorization)</li>
-            <li><strong>Come back and reapply</strong> — your application will be fast-tracked once you have your approval letter</li>
+            <li><strong>Come back and reapply</strong> - your application will be fast-tracked once you have your approval letter</li>
           </ol>
           <p style="margin-bottom: 12px; color: #78350f;"><strong>Need help?</strong> Our enrollment team can walk you through the process.</p>
           <a href="https://www.indianacareerconnect.com" style="display: inline-block; background: #1d4ed8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-right: 8px;">Go to Indiana Career Connect</a>
@@ -601,21 +599,21 @@ async function _POST(req: Request) {
         : isFunded
           ? `
         <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 20px; margin: 20px 0;">
-          <h3 style="margin-top: 0; color: #1e40af;">Application Received — Pending Admin Review</h3>
+          <h3 style="margin-top: 0; color: #1e40af;">Application Received - Pending Admin Review</h3>
           <p style="color: #1e3a8a;">You selected <strong>${fundingName}</strong> as your funding option. Your application has been received and is pending review by our enrollment team.</p>
           <h4 style="color: #1e40af; margin-bottom: 8px;">What happens next:</h4>
           <ol style="color: #1e3a8a; padding-left: 20px; line-height: 1.8;">
             <li>Our enrollment team reviews your application (1–2 business days)</li>
             <li>We verify your funding status with ${fundingType === 'wioa' ? 'WorkOne' : fundingType === 'wrg' ? 'Indiana Career Connect' : 'FSSA'}</li>
             <li>Once verified, we contact you to complete enrollment and schedule your start date</li>
-            <li>You begin training — no tuition due until funding is confirmed</li>
+            <li>You begin training - no tuition due until funding is confirmed</li>
           </ol>
         </div>
         ${passwordSection}
       `
           : `
         <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:20px;margin:20px 0;">
-          <h3 style="margin-top:0;color:#14532d;">Application Received — Under Review</h3>
+          <h3 style="margin-top:0;color:#14532d;">Application Received - Under Review</h3>
           <p style="color:#166534;">Your application for <strong>${body.program}</strong> has been received. Our enrollment team will review it and reach out within 1–2 business days.</p>
           <ol style="color:#166534;padding-left:20px;line-height:1.8;">
             <li>Enrollment team reviews your application</li>
@@ -628,10 +626,10 @@ async function _POST(req: Request) {
       `;
 
       const emailSubject = needsICC
-        ? `Action Required — Complete Indiana Career Connect to Enroll [Ref: ${referenceNumber}]`
+        ? `Action Required - Complete Indiana Career Connect to Enroll [Ref: ${referenceNumber}]`
         : isFunded
-          ? `Application Received — Pending Review [Ref: ${referenceNumber}]`
-          : `Welcome to ${PLATFORM_DEFAULTS.orgName} — ${body.program} [Ref: ${referenceNumber}]`;
+          ? `Application Received - Pending Review [Ref: ${referenceNumber}]`
+          : `Welcome to ${PLATFORM_DEFAULTS.orgName} - ${body.program} [Ref: ${referenceNumber}]`;
 
       const studentEmailResult = await sendEmail({
         to: body.email,
@@ -639,7 +637,7 @@ async function _POST(req: Request) {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="padding: 24px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 2px solid #e5e7eb;">
-              <h1 style="margin: 0; font-size: 24px;">${needsICC ? 'Next Step Required' : `Welcome to ${PLATFORM_DEFAULTS.orgName}!`}</h1>
+              <h1 style="margin: 0; font-size: 24px;">${needsICC ? 'Next Step Required' : 'Welcome to ' + PLATFORM_DEFAULTS.orgName + '!'}</h1>
             </div>
             <div style="padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
               <p style="font-size: 16px;">Hi ${body.firstName},</p>
@@ -677,9 +675,9 @@ async function _POST(req: Request) {
 
       // Send staff email in parallel (don't wait for it to finish before responding)
       const staffSubject = needsICC
-        ? `⚠ Pending Funding [${referenceNumber}]: ${body.firstName} ${body.lastName} — Needs ICC First`
+        ? `! Pending Funding [${referenceNumber}]: ${body.firstName} ${body.lastName} - Needs ICC First`
         : isFunded
-          ? `🔵 Admin Review Required [${referenceNumber}]: ${body.firstName} ${body.lastName} — ${fundingName}`
+          ? `🔵 Admin Review Required [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${fundingName}`
           : `New Application [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${body.program}`;
 
       const staffEmailResult = await sendEmail({
@@ -687,7 +685,7 @@ async function _POST(req: Request) {
         subject: staffSubject,
         html: `
           <h2>New Application Received</h2>
-          ${needsICC ? `<div style="background:#fffbeb;border:2px solid #f59e0b;border-radius:8px;padding:16px;margin-bottom:16px;"><strong>⚠ ACTION: Student has NOT been to Indiana Career Connect.</strong> Do NOT enroll. Student has been emailed instructions to complete ICC and reapply.</div>` : ''}
+          ${needsICC ? `<div style="background:#fffbeb;border:2px solid #f59e0b;border-radius:8px;padding:16px;margin-bottom:16px;"><strong>! ACTION: Student has NOT been to Indiana Career Connect.</strong> Do NOT enroll. Student has been emailed instructions to complete ICC and reapply.</div>` : ''}
           ${isFunded && !needsICC ? `<div style="background:#eff6ff;border:2px solid #3b82f6;border-radius:8px;padding:16px;margin-bottom:16px;"><strong>🔵 ADMIN REVIEW REQUIRED before enrollment.</strong> Verify ${fundingName} approval with the agency before approving this application.</div>` : ''}
           <p><strong>Reference:</strong> ${referenceNumber}</p>
           <p><strong>Name:</strong> ${body.firstName} ${body.lastName}</p>
@@ -703,14 +701,14 @@ async function _POST(req: Request) {
           ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
           ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ""}
           <div style="text-align:center;margin:24px 0;">
-            <a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${data.id}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Review &amp; Enroll →</a>
+            <a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${data.id}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Review &amp; Enroll -></a>
           </div>
           <p style="font-size:12px;color:#6b7280;text-align:center;">Application ID: ${data.id}</p>
         `,
       });
 
       if (staffEmailResult.success) {
-        logger.info(`[Applications] Staff email sent');
+        logger.info('[Applications] Staff email sent');
       } else {
         logger.error('[Applications] Staff email FAILED', undefined, { error: (staffEmailResult as any).error });
       }

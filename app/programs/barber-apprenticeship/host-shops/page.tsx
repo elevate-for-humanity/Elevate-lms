@@ -162,7 +162,7 @@ export default async function HostShopsPage() {
                 'Maintain a safe, professional training environment',
                 'Agree to verify apprentice attendance and progress',
                 'Follow program guidelines and documentation requirements',
-                'Use the published program syllabus so floor coaching matches the apprentice’s daily LMS theory module',
+                'Use the published program syllabus so floor coaching matches the apprentice\'s daily LMS theory module',
                 'Carry appropriate business insurance',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">

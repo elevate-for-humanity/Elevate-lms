@@ -216,7 +216,7 @@ export default function BarberApprenticeshipClient({ program: p, heroBanner: b, 
       {/* ═══ TRAINING DELIVERY (RTI / OJT / Progress / Oversight) ═══ */}
       {/* Removed — training delivery info is in the stats strip + overview */}
 
-      {/* ═══ CREDENTIAL PATHWAY + WHAT YOU’LL LEARN + WORKPLACE TRAINING ═══ */}
+      {/* ═══ CREDENTIAL PATHWAY + WHAT YOU'LL LEARN + WORKPLACE TRAINING ═══ */}
       {/* Credentials already shown in inline section above */}
 
       {/* ═══ PARTNERSHIP / CAREER PATHWAYS / TRANSFER HOURS ═══ */}
@@ -234,7 +234,7 @@ export default function BarberApprenticeshipClient({ program: p, heroBanner: b, 
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-2">Funding</p>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Funding &amp; Payment Options</h2>
           <p className="text-slate-600 mb-8 max-w-3xl">
-            Total program tuition is <strong>$4,980</strong>. You don’t pay anything to apply. After review, we work with you on the option that fits.
+            Total program tuition is <strong>$4,980</strong>. You don't pay anything to apply. After review, we work with you on the option that fits.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[

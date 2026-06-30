@@ -11,7 +11,7 @@ import { XCircle, AlertCircle, CheckCircle, ChevronRight, Save } from 'lucide-re
 import { useApplicationDraft } from '@/hooks/useApplicationDraft';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-// ── Step definitions ──────────────────────────────────────────────────────────
+// ---- Step definitions --------------------------------------------------------------------------------------------------------------------
 const STEPS = [
   { id: 1, label: 'Application Type' },
   { id: 2, label: 'Personal Info' },
@@ -32,7 +32,7 @@ function getStepSequence(type: 'inquiry' | 'enrollment' | '') {
   return [1] as StepId[];
 }
 
-// ── Progress bar ──────────────────────────────────────────────────────────────
+// ---- Progress bar ----------------------------------------------------------------------------------------------------------------------------
 function ProgressBar({
   currentStep,
   applicationType,
@@ -87,7 +87,7 @@ function ProgressBar({
         })}
       </div>
       <p className="mt-3 text-xs text-slate-500 text-center sm:hidden">
-        Step {currentIndex + 1} of {visibleSteps.length} — {STEPS.find((s) => s.id === currentStep)?.label}
+        Step {currentIndex + 1} of {visibleSteps.length} - {STEPS.find((s) => s.id === currentStep)?.label}
       </p>
     </div>
   );
@@ -95,10 +95,10 @@ function ProgressBar({
 
 const programGroups = getActiveProgramsByCategory();
 
-// Programs that have a waitlist — show waitlist link instead of enrollment form
+// Programs that have a waitlist - show waitlist link instead of enrollment form
 const WAITLIST_PROGRAMS = new Set(['barber-apprenticeship']);
 
-// ── Eligibility screening state ───────────────────────────────────────────────
+// ---- Eligibility screening state ----------------------------------------------------------------------------------------------
 interface EligibilityAnswers {
   // Funding
   hasSnap: boolean | null;
@@ -163,7 +163,7 @@ const EMPTY_ELIGIBILITY: EligibilityAnswers = {
   agreesAttendance: false,
 };
 
-// ── Decision engine ───────────────────────────────────────────────────────────
+// ---- Decision engine ----------------------------------------------------------------------------------------------------------------------
 type EligibilityStatus = 'eligible' | 'conditional_review' | 'ineligible' | 'incomplete';
 
 interface EligibilityDecision {
@@ -174,7 +174,7 @@ interface EligibilityDecision {
 function evaluateEligibility(a: EligibilityAnswers): EligibilityDecision {
   const codes: string[] = [];
 
-  // Hard stops — ineligible
+  // Hard stops - ineligible
   if (a.isAdult === false) codes.push('UNDER_18');
   if (a.isIndianaResident === false) codes.push('NON_INDIANA_RESIDENT');
   if (a.workAuthorized === false) codes.push('NO_WORK_AUTH');
@@ -201,7 +201,7 @@ function evaluateEligibility(a: EligibilityAnswers): EligibilityDecision {
   return { status: 'eligible', reasonCodes: [] };
 }
 
-// ── YesNo helper ─────────────────────────────────────────────────────────────
+// ---- YesNo helper --------------------------------------------------------------------------------------------------------------------------
 function YesNo({
   value,
   onChange,
@@ -320,7 +320,7 @@ export default function StudentApplicationForm({
   function validateStep(): string | null {
     if (currentStep === 1 && !applicationType) return 'Please select an application type to continue.';
     if (currentStep === 2) {
-      // Basic validation — full validation happens on submit
+      // Basic validation - full validation happens on submit
       const form = document.querySelector('form') as HTMLFormElement | null;
       if (!form) return null;
       const firstName = (form.querySelector('[name="firstName"]') as HTMLInputElement)?.value?.trim();
@@ -362,7 +362,7 @@ export default function StudentApplicationForm({
 
     const formData = new FormData(e.currentTarget);
 
-    // Honeypot — hidden field bots fill in; silently redirect home
+    // Honeypot - hidden field bots fill in; silently redirect home
     if (formData.get('website_url')) {
       router.push('/');
       return;
@@ -459,7 +459,7 @@ export default function StudentApplicationForm({
         trackEvent('application_complete', 'conversion', data.programInterest);
         clearDraft(); // remove saved draft on successful submission
 
-        // Inquiry path — thank you page, no payment
+        // Inquiry path - thank you page, no payment
         if (applicationType === 'inquiry') {
           router.push(
             `/apply/confirmation?ref=${encodeURIComponent(result.referenceNumber || '')}&program=${encodeURIComponent(data.programInterest || '')}`,
@@ -467,13 +467,13 @@ export default function StudentApplicationForm({
           return;
         }
 
-        // WorkOne-pending — applicant needs to visit WorkOne before enrollment
+        // WorkOne-pending - applicant needs to visit WorkOne before enrollment
         if (result.status === 'pending_workone') {
           router.push('/apply/pending-workone');
           return;
         }
 
-        // Enrollment path — application is submitted and pending review.
+        // Enrollment path - application is submitted and pending review.
         // Redirect to success page; admin reviews and grants LMS access after funding verification.
         router.push(
           `/apply/success?ref=${encodeURIComponent(result.referenceNumber || '')}&program=${encodeURIComponent(data.programInterest)}&pw=1`,
@@ -496,7 +496,7 @@ export default function StudentApplicationForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Honeypot — invisible to real users, bots fill it in */}
+      {/* Honeypot - invisible to real users, bots fill it in */}
       <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
         <label htmlFor="website_url">Website</label>
         <input type="text" id="website_url" name="website_url" tabIndex={-1} autoComplete="off" />
@@ -546,7 +546,7 @@ export default function StudentApplicationForm({
         </div>
       )}
 
-      {/* Step 1 — Application type */}
+      {/* Step 1 - Application type */}
       {currentStep === 1 && (<div className="bg-white border border-slate-200 rounded-lg p-6">
         <h2 className="text-xl font-bold text-black mb-1">What would you like to do?</h2>
         <p className="text-sm text-black mb-4">Select an option to get started.</p>
@@ -556,7 +556,7 @@ export default function StudentApplicationForm({
           onChange={(e) => setApplicationType(e.target.value as 'inquiry' | 'enrollment')}
           className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent bg-white text-sm"
         >
-          <option value="">— Select an option —</option>
+          <option value="">- Select an option -</option>
           <option value="inquiry">I want to learn more / request information (Inquiry)</option>
           <option value="enrollment">I am ready to enroll in a program (Enrollment)</option>
         </select>
@@ -587,7 +587,7 @@ export default function StudentApplicationForm({
                 href={`/apply/waitlist/${selectedProgram}`}
                 className="inline-block bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors"
               >
-                Join the Waitlist →
+                Join the Waitlist -&gt;
               </Link>
             </div>
           )}
@@ -596,7 +596,7 @@ export default function StudentApplicationForm({
         {applicationType === 'enrollment' && (
           <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
             <p className="text-sm font-semibold text-amber-800 mb-2">
-              Important — Enrollment requires payment or verified funding
+              Important - Enrollment requires payment or verified funding
             </p>
             <p className="text-sm text-amber-700 leading-relaxed">
               Enrollment is not finalized until payment is received or funding is verified. If you
@@ -612,7 +612,7 @@ export default function StudentApplicationForm({
                 rel="noopener noreferrer"
                 className="underline font-semibold"
               >
-                Find your WorkOne office →
+                Find your WorkOne office -&gt;
               </a>
             </p>
           </div>
@@ -633,7 +633,7 @@ export default function StudentApplicationForm({
         </div>
       )}
 
-      {/* ELIGIBILITY & SUPPORT NEEDS SCREENING — Step 4 */}
+      {/* ELIGIBILITY & SUPPORT NEEDS SCREENING - Step 4 */}
       {currentStep === 4 && applicationType === 'enrollment' && (
         <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-8">
           <div>
@@ -659,7 +659,7 @@ export default function StudentApplicationForm({
                   team before submitting.
                 </p>
                 <a
-                  href="tel:${PLATFORM_DEFAULTS.supportPhone}"
+                  href={`tel:${PLATFORM_DEFAULTS.supportPhone}`}
                   className="inline-block mt-2 text-red-700 font-bold text-sm underline"
                 >
                   ${PLATFORM_DEFAULTS.supportPhone}
@@ -669,7 +669,7 @@ export default function StudentApplicationForm({
           )}
 
           {/* Conditional banner */}
-          {eligibilityDecision?.status === `conditional_review' && (
+          {eligibilityDecision?.status === 'conditional_review' && (
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex gap-3 items-start">
               <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
@@ -839,7 +839,7 @@ export default function StudentApplicationForm({
                 onChange={(e) => setElig('educationLevel', e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
               >
-                <option value="">— Select —</option>
+                <option value="">- Select -</option>
                 <option value="no_diploma">No diploma / GED</option>
                 <option value="ged">GED / HiSET</option>
                 <option value="hs_diploma">High school diploma</option>
@@ -969,7 +969,7 @@ export default function StudentApplicationForm({
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                What days or times are you unavailable? (optional — helps us plan)
+                What days or times are you unavailable? (optional - helps us plan)
               </label>
               <input
                 type="text"
@@ -1094,7 +1094,7 @@ export default function StudentApplicationForm({
             onClick={goBack}
             className="min-h-[48px] px-6 py-3 bg-white border-2 border-slate-300 text-slate-700 font-semibold rounded-lg hover:border-slate-400 transition-colors"
           >
-            ← Back
+            &larr; Back
           </button>
           <button
             type="button"
@@ -1116,7 +1116,7 @@ export default function StudentApplicationForm({
         </div>
       )}
 
-      {/* Personal Information — Step 2 */}
+      {/* Personal Information - Step 2 */}
       {currentStep === 2 && applicationType && (
         <>
           {/* Personal Information */}
@@ -1298,7 +1298,7 @@ export default function StudentApplicationForm({
               onClick={goBack}
               className="min-h-[48px] px-6 py-3 bg-white border-2 border-slate-300 text-slate-700 font-semibold rounded-lg hover:border-slate-400 transition-colors"
             >
-              ← Back
+              &larr; Back
             </button>
             <button
               type="button"
@@ -1311,7 +1311,7 @@ export default function StudentApplicationForm({
         </>
       )}
 
-      {/* Program Interest — Step 3 */}
+      {/* Program Interest - Step 3 */}
       {currentStep === 3 && applicationType && (
         <>
           <div className="bg-white border border-slate-200 rounded-lg p-6">
@@ -1411,7 +1411,7 @@ export default function StudentApplicationForm({
               onClick={goBack}
               className="min-h-[48px] px-6 py-3 bg-white border-2 border-slate-300 text-slate-700 font-semibold rounded-lg hover:border-slate-400 transition-colors"
             >
-              ← Back
+              &larr; Back
             </button>
             <button
               type="button"
@@ -1424,7 +1424,7 @@ export default function StudentApplicationForm({
         </>
       )}
 
-      {/* Review & Submit — Step 5 */}
+      {/* Review & Submit - Step 5 */}
       {currentStep === 5 && applicationType && (
         <>
           {/* Summary card */}
@@ -1462,7 +1462,7 @@ export default function StudentApplicationForm({
 
             {applicationType === 'enrollment' && !eligibilitySubmitted && (
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
-                ⚠️ You skipped the eligibility check. Go back to Step 4 to complete it before submitting.
+                !️ You skipped the eligibility check. Go back to Step 4 to complete it before submitting.
               </div>
             )}
           </div>
@@ -1474,7 +1474,7 @@ export default function StudentApplicationForm({
               onClick={goBack}
               className="min-h-[48px] px-6 py-3 bg-white border-2 border-slate-300 text-slate-700 font-semibold rounded-lg hover:border-slate-400 transition-colors"
             >
-              ← Back
+              &larr; Back
             </button>
             <button
               type="submit"
@@ -1482,7 +1482,7 @@ export default function StudentApplicationForm({
               className="inline-flex items-center gap-2 flex-1 sm:flex-none min-h-[48px] px-10 py-3 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors justify-center"
             >
               {loading
-                ? 'Submitting…'
+                ? 'Submitting...'
                 : applicationType === 'inquiry'
                   ? 'Submit Inquiry'
                   : 'Submit Application'}

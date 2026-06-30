@@ -203,7 +203,7 @@ export async function POST(request: NextRequest) {
         </div>
         <div style="background:#fff;padding:32px;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px">
           <p style="margin-top:0">Hi ${contactName},</p>
-          <p>Thank you for applying to partner with <strong>${PLATFORM_DEFAULTS.orgName}</strong>. We`ve received your application for <strong>${orgName}</strong> and our team will review it within <strong>3-5 business days</strong>.</p>
+          <p>Thank you for applying to partner with <strong>${PLATFORM_DEFAULTS.orgName}</strong>. We've received your application for <strong>${orgName}</strong> and our team will review it within <strong>3-5 business days</strong>.</p>
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:20px;margin:20px 0">
             <p style="margin:0 0 8px;font-size:13px;font-weight:bold;color:#64748b;text-transform:uppercase;letter-spacing:.05em">Application Summary</p>
             <table style="width:100%;font-size:14px;border-collapse:collapse">
@@ -216,14 +216,14 @@ export async function POST(request: NextRequest) {
           <p>If you have questions in the meantime, reply to this email or contact us at <a href="mailto:partnerships@${PLATFORM_DEFAULTS.canonicalDomain}" style="color:#b91c1c">partnerships@${PLATFORM_DEFAULTS.canonicalDomain}</a>.</p>
           <p style="margin-bottom:0">- The ${PLATFORM_DEFAULTS.orgName} Team</p>
         </div>
-        <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:16px">© ${new Date().getFullYear()} ${PLATFORM_DEFAULTS.orgName} · <a href={PLATFORM_DEFAULTS.siteUrl} style="color:#94a3b8">elevateforhumanity.org</a></p>
+        <p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:16px">© ${new Date().getFullYear()} ${PLATFORM_DEFAULTS.orgName} - <a href={PLATFORM_DEFAULTS.siteUrl} style="color:#94a3b8">elevateforhumanity.org</a></p>
       </div>`;
 
     const emailResult = await trySendEmail({
       to: contactEmail as string,
       subject: `Application received - ${orgName} | ${PLATFORM_DEFAULTS.orgName}`,
       html: applicantHtml,
-      text: `Hi ${contactName},\n\nThank you for applying to partner with ${PLATFORM_DEFAULTS.orgName}. We`ve received your application for ${orgName} and will review it within 3-5 business days.\n\nReference ID: ${applicationId}\n\nQuestions? Email partnerships@${PLATFORM_DEFAULTS.canonicalDomain}\n\n- The ${PLATFORM_DEFAULTS.orgName} Team`,
+      text: `Hi ${contactName},\n\nThank you for applying to partner with ${PLATFORM_DEFAULTS.orgName}. We've received your application for ${orgName} and will review it within 3-5 business days.\n\nReference ID: ${applicationId}\n\nQuestions? Email partnerships@${PLATFORM_DEFAULTS.canonicalDomain}\n\n- The ${PLATFORM_DEFAULTS.orgName} Team`,
       replyTo: `partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
     });
 
@@ -234,14 +234,14 @@ export async function POST(request: NextRequest) {
 
     // Internal notification to partnerships team
     await trySendEmail({
-      to: 'partnerships@elevateforhumanity.org`,
+      to: 'partnerships@elevateforhumanity.org',
       subject: `New provider application - ${orgName}`,
-      html: `<p>New provider application received.</p><p><strong>Org:</strong> ${orgName}<br><strong>Type:</strong> ${orgType}<br><strong>Contact:</strong> ${contactName} &lt;${contactEmail}&gt;<br><strong>Phone:</strong> ${contactPhone}<br><strong>ID:</strong> ${applicationId}</p><p><a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications">Review in Admin →</a></p>`,
+      html: `<p>New provider application received.</p><p><strong>Org:</strong> ${orgName}<br><strong>Type:</strong> ${orgType}<br><strong>Contact:</strong> ${contactName} &lt;${contactEmail}&gt;<br><strong>Phone:</strong> ${contactPhone}<br><strong>ID:</strong> ${applicationId}</p><p><a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications">Review in Admin -></a></p>`,
       text: `New provider application: ${orgName} (${orgType})\nContact: ${contactName} <${contactEmail}>\nPhone: ${contactPhone}\nID: ${applicationId}\n\nReview: https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications`,
     });
 
     return NextResponse.json({ success: true, applicationId }, { status: 201 });
   } catch (err) {
-    return safeInternalError(err, `Failed to submit application');
+    return safeInternalError(err, `Failed to submit application`);
   }
 }

@@ -16,7 +16,7 @@ import {
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/** GET ?program_slug=barber-apprenticeship — today’s daily theory status */
+/** GET ?program_slug=barber-apprenticeship — today's daily theory status */
 export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;

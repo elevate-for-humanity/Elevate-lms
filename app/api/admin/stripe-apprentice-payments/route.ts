@@ -125,9 +125,9 @@ export async function POST(request: NextRequest) {
 
   let body: { customerIds?: string[]; actions?: ApprenticeBillingAction[] } = {};
   try {
-    body = await request.json();
+    _body = await request.json();
   } catch {
-    body = {};
+    _body = {};
   }
 
   const customerIds = body.customerIds?.length ? body.customerIds : [...JORDAN_AND_NATALIA];

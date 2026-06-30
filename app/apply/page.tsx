@@ -79,7 +79,7 @@ export default async function ApplyPage({
           <span className="text-slate-300">|</span>
           <Link href="/apply/employer" className="text-slate-500 hover:text-slate-800 transition-colors">Employer</Link>
           <Link href="/apply/program-holder" className="text-slate-500 hover:text-slate-800 transition-colors">Training Provider</Link>
-          <Link href="/partners/apply" className="text-slate-500 hover:text-slate-800 transition-colors">Agency / Partner</Link>
+          <Link href="/apply" className="text-slate-500 hover:text-slate-800 transition-colors">Agency / Partner</Link>
         </div>
       </div>
 

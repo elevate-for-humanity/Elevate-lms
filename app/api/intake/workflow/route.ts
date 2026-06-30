@@ -161,7 +161,7 @@ async function _PATCH(request: NextRequest) {
 
   switch (step) {
     case 'identity':
-      updateData = {
+      _updateData = {
         identity_verified: stepData.verified,
         identity_verified_at: stepData.verified ? new Date().toISOString() : null,
         identity_document_type: stepData.documentType,
@@ -173,7 +173,7 @@ async function _PATCH(request: NextRequest) {
       break;
 
     case 'workforce_screening':
-      updateData = {
+      _updateData = {
         workforce_screening_completed: true,
         workforce_screening_at: new Date().toISOString(),
         workforce_eligible: stepData.eligible,
@@ -186,7 +186,7 @@ async function _PATCH(request: NextRequest) {
       break;
 
     case 'employer_screening':
-      updateData = {
+      _updateData = {
         employer_screening_completed: true,
         employer_screening_at: new Date().toISOString(),
         employer_eligible: stepData.eligible,
@@ -205,7 +205,7 @@ async function _PATCH(request: NextRequest) {
 
     case 'financial_readiness':
       // Only for structured tuition pathway
-      updateData = {
+      _updateData = {
         financial_readiness_completed: true,
         financial_readiness_at: new Date().toISOString(),
         can_pay_down_payment: stepData.canPayDownPayment,
@@ -234,7 +234,7 @@ async function _PATCH(request: NextRequest) {
       break;
 
     case 'program_readiness':
-      updateData = {
+      _updateData = {
         program_readiness_completed: true,
         program_readiness_at: new Date().toISOString(),
         start_date_confirmed: stepData.startDateConfirmed,
@@ -258,7 +258,7 @@ async function _PATCH(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid funding pathway' }, { status: 400 });
       }
 
-      updateData = {
+      _updateData = {
         funding_pathway: pathway,
         funding_pathway_assigned_at: new Date().toISOString(),
         funding_pathway_assigned_by: user.id,
@@ -270,7 +270,7 @@ async function _PATCH(request: NextRequest) {
         return NextResponse.json({ error: 'Signature required' }, { status: 400 });
       }
 
-      updateData = {
+      _updateData = {
         acknowledgment_signed: true,
         acknowledgment_signed_at: new Date().toISOString(),
         acknowledgment_signature_data: stepData.signatureData,

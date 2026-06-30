@@ -86,7 +86,7 @@ export default async function ConfirmFundingPage({
           ]}
         />
         <Link
-          href="/onboarding/learner"
+          href="/funding/confirm"
           className="text-sm text-brand-blue-600 flex items-center gap-1 mt-4 mb-4"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Onboarding

@@ -64,7 +64,7 @@ export default function EstheticianApplyIndexPage() {
           />
 
           <Link
-            href="/partners/esthetician-apprenticeship/apply"
+            href="/programs/esthetician-apprenticeship/apply"
             className="flex items-start gap-5 p-6 bg-white border-2 border-slate-200 rounded-xl hover:border-pink-400 hover:shadow-md transition-all group"
           >
             <div className="w-12 h-12 rounded-full bg-pink-50 group-hover:bg-pink-100 flex items-center justify-center shrink-0 transition-colors">

@@ -122,7 +122,7 @@ export default function BarberApprenticeshipClient({ program: p, heroBanner: b, 
               </button>
             ) : (
               <Link
-                href="/pwa/barber/onboarding"
+                href="/programs/barber-apprenticeship/orientation"
                 className="inline-flex items-center justify-center rounded-xl border border-brand-blue-600 px-6 py-3 text-base font-semibold text-brand-blue-700 transition-colors hover:bg-brand-blue-50"
               >
                 Open Mobile App View

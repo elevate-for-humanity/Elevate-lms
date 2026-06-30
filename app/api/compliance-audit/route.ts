@@ -262,7 +262,7 @@ async function _PATCH(request: NextRequest) {
   switch (action) {
     case 'update_manual_entries':
       // Update manual review sections
-      updateData = {
+      _updateData = {
         script_samples_reviewed: actionData?.scriptSamplesReviewed,
         script_deviations_found: actionData?.scriptDeviationsFound,
         intake_files_reviewed: actionData?.intakeFilesReviewed,
@@ -274,7 +274,7 @@ async function _PATCH(request: NextRequest) {
       break;
 
     case 'sign_admissions_lead':
-      updateData = {
+      _updateData = {
         admissions_lead_signed: true,
         admissions_lead_signed_at: new Date().toISOString(),
         admissions_lead_id: user.id,
@@ -282,7 +282,7 @@ async function _PATCH(request: NextRequest) {
       break;
 
     case 'sign_program_director':
-      updateData = {
+      _updateData = {
         program_director_signed: true,
         program_director_signed_at: new Date().toISOString(),
         program_director_id: user.id,
@@ -290,7 +290,7 @@ async function _PATCH(request: NextRequest) {
       break;
 
     case 'sign_executive':
-      updateData = {
+      _updateData = {
         executive_signed: true,
         executive_signed_at: new Date().toISOString(),
         executive_id: user.id,
@@ -312,7 +312,7 @@ async function _PATCH(request: NextRequest) {
       break;
 
     case 'submit_for_signoff':
-      updateData = {
+      _updateData = {
         status: 'pending_signoff',
       };
       break;

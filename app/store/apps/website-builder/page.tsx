@@ -73,7 +73,7 @@ export default function WebsiteBuilderAppPage() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href="/apps/website-builder/start-trial"
+                  href="/store/apps/website-builder"
                   className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
                 >
                   Start 14-day free trial
@@ -159,12 +159,12 @@ export default function WebsiteBuilderAppPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/apps/website-builder/start-trial"
+              href="/store/apps/website-builder"
               className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold"
             >
               Start Free Trial
             </Link>
-            <Link href="/apps/website-builder" className="border border-slate-300 hover:bg-slate-50 text-slate-900 px-8 py-4 rounded-lg font-bold">
+            <Link href="/store/apps/website-builder" className="border border-slate-300 hover:bg-slate-50 text-slate-900 px-8 py-4 rounded-lg font-bold">
               Open Website Builder
             </Link>
           </div>

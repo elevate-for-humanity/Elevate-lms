@@ -70,7 +70,7 @@ export default function GrantsAppPage() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href="/apps/grants/start-trial"
+                  href="/store/apps/grants"
                   className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
                 >
                   Start 14-day free trial
@@ -151,7 +151,7 @@ export default function GrantsAppPage() {
           <h2 className="text-3xl font-bold mb-4">Start Finding Grants Today</h2>
           <p className="text-slate-700 mb-8">14-day individual free trial — no credit card. Subscribe monthly when you are ready.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/apps/grants/start-trial" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold">
+            <Link href="/store/apps/grants" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold">
               Start Free Trial
             </Link>
             <Link href="/contact" className="border border-slate-300 hover:bg-white text-slate-900 px-8 py-4 rounded-lg font-bold">

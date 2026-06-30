@@ -89,7 +89,7 @@ export default async function EnrollmentSuccessPage() {
                 Track your apprenticeship progress, submit assignments, and access course materials.
               </p>
               <Link
-                href="/learner/dashboard"
+                href="/student/dashboard"
                 className="inline-block px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold text-sm"
               >
                 Go to Dashboard
@@ -108,7 +108,7 @@ export default async function EnrollmentSuccessPage() {
 
           <div className="space-y-3">
             <Link
-              href="/learner/dashboard"
+              href="/student/dashboard"
               className="block w-full px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold text-center"
             >
               View My Dashboard

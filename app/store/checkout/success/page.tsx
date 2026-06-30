@@ -164,7 +164,7 @@ function CheckoutSuccessContent() {
             You can manage your subscription, update payment methods, or cancel anytime from your account settings.
           </p>
           <Link
-            href="/account/billing"
+            href="/store/licenses"
             className="text-sm text-brand-blue-600 font-medium hover:underline"
           >
             Manage Billing →

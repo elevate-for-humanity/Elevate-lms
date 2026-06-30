@@ -200,13 +200,13 @@ async function _PATCH(request: NextRequest) {
 
   switch (action) {
     case 'send_agreement':
-      updateData = {
+      _updateData = {
         status: 'agreement_sent',
       };
       break;
 
     case 'sign_agreement':
-      updateData = {
+      _updateData = {
         agreement_signed: true,
         agreement_signed_at: new Date().toISOString(),
         agreement_document_url: actionData?.documentUrl,
@@ -223,7 +223,7 @@ async function _PATCH(request: NextRequest) {
       const hireDate = new Date(actionData.hireDate);
       const nextMonth = new Date(hireDate.getFullYear(), hireDate.getMonth() + 1, 1);
 
-      updateData = {
+      _updateData = {
         hire_date: actionData.hireDate,
         hire_confirmed: true,
         hire_confirmed_at: new Date().toISOString(),
@@ -270,7 +270,7 @@ async function _PATCH(request: NextRequest) {
       nextDue.setMonth(nextDue.getMonth() + 1);
       nextDue.setDate(1);
 
-      updateData = {
+      _updateData = {
         reimbursements_received: newReimbursementsReceived,
         total_reimbursed: newTotalReimbursed,
         last_reimbursement_at: new Date().toISOString(),

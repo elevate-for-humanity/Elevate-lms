@@ -134,7 +134,7 @@ export default async function ConfirmationPage({
             {/* Next steps */}
             <div className="mt-8 pt-8 border-t border-slate-200 flex flex-col sm:flex-row gap-3">
               <Link
-                href="/onboarding/learner"
+                href="/funding/confirm"
                 className="inline-flex items-center justify-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm"
               >
                 Start Onboarding

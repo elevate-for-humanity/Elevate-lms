@@ -316,13 +316,13 @@ export default async function HostShopsPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/forms/host-shop-inquiry"
+              href="/programs/barber-apprenticeship/host-shops"
               className="bg-white text-slate-900 px-8 py-4 rounded-lg font-bold transition hover:bg-white"
             >
               General Inquiry
             </Link>
             <Link
-              href="/partners/barber-host-shop/apply"
+              href="/programs/barber-apprenticeship/apply"
               className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold transition"
             >
               Enroll as a Host Shop

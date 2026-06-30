@@ -78,7 +78,7 @@ export function BarberEnrollment() {
                 ))}
               </ul>
               <div className="flex flex-wrap gap-3">
-                <Link href="/partners/barber-host-shop/apply" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-xl transition-colors text-sm">
+                <Link href="/programs/barber-apprenticeship/apply" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-xl transition-colors text-sm">
                   Apply as Partner Shop <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link href="/programs/barber-apprenticeship/host-shops" className="inline-flex items-center gap-2 border-2 border-slate-300 hover:border-brand-blue-400 text-slate-700 font-bold px-6 py-3 rounded-xl transition-colors text-sm">See Details</Link>

@@ -226,7 +226,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
                   interview prep included.
                 </p>
                 <Link
-                  href="/employer/dashboard"
+                  href="/admin/employers"
                   aria-label="Link"
                   className="text-brand-orange-700 font-semibold hover:underline"
                 >

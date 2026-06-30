@@ -75,7 +75,7 @@ Respond with a JSON object:
 
 Respond with ONLY valid JSON, no markdown.`;
 
-  let triaged = 0;
+  let _triaged = 0;
   let autoResolved = 0;
 
   try {
@@ -138,7 +138,7 @@ Respond with ONLY valid JSON, no markdown.`;
       autoResolved = ids.length;
     }
 
-    triaged = events.length;
+    _triaged = events.length;
 
     // Emit summary event
     await emitEvent('ai.operator_triage', 'ai', {

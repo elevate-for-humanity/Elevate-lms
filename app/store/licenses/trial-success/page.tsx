@@ -74,7 +74,7 @@ function TrialSuccessContent() {
                   Access the complete Next.js codebase from your dashboard.
                 </p>
                 <Link 
-                  href="/account/licenses" 
+                  href="/store/licenses" 
                   className="text-blue-600 text-sm font-medium hover:underline inline-flex items-center gap-1"
                 >
                   Go to My Licenses <ArrowRight className="w-4 h-4" />
@@ -124,7 +124,7 @@ function TrialSuccessContent() {
         <div className="text-center text-sm text-slate-500">
           <p>
             Need to cancel? Go to{' '}
-            <Link href="/account/billing" className="text-blue-600 hover:underline">
+            <Link href="/store/licenses" className="text-blue-600 hover:underline">
               Account → Billing
             </Link>
             {' '}anytime before your trial ends.

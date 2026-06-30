@@ -67,7 +67,7 @@ export default function CosmetologyApplyIndexPage() {
 
           {/* Partner salon card — no funding gate needed */}
           <Link
-            href="/partners/cosmetology-host-shop/apply"
+            href="/programs/cosmetology-apprenticeship/apply"
             className="flex items-start gap-5 p-6 bg-white border-2 border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-md transition-all group"
           >
             <div className="w-12 h-12 rounded-full bg-brand-blue-50 group-hover:bg-brand-blue-100 flex items-center justify-center shrink-0 transition-colors">

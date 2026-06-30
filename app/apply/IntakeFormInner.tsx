@@ -975,7 +975,7 @@ function IntakeForm({ programs = [] }: { programs?: Program[] }) {
                 privacy policy
               </Link>
               {' '}and{' '}
-              <Link href="/impact/methodology" className="text-brand-red-600 underline">
+              <Link href="/about#methodology" className="text-brand-red-600 underline">
                 impact methodology
               </Link>
               .

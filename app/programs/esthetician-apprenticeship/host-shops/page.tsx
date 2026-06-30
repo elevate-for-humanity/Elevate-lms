@@ -153,7 +153,7 @@ export default function EstheticianHostShopsPage() {
             within 3 business days.
           </p>
           <Link
-            href="/partners/esthetician-apprenticeship/apply"
+            href="/programs/esthetician-apprenticeship/apply"
             className="inline-flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white font-bold px-8 py-4 rounded-xl transition-colors text-lg"
           >
             Apply as Host Spa →

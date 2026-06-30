@@ -291,13 +291,13 @@ export default function CosmetologyHostSalonsPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/forms/host-shop-inquiry?program=cosmetology-apprenticeship"
+              href="/programs/cosmetology-apprenticeship/host-shops"
               className="bg-white text-slate-900 border-2 border-slate-900 px-8 py-4 rounded-lg font-bold transition hover:bg-slate-50"
             >
               General Inquiry
             </Link>
             <Link
-              href="/partners/cosmetology-host-shop"
+              href="/programs/cosmetology-apprenticeship"
               className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold transition"
             >
               Enroll as a Host Salon

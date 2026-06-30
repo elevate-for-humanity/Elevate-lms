@@ -42,7 +42,7 @@ export default function CosmetologyApplySuccessPage() {
 
           <div className="space-y-3">
             <Link
-              href="/learner/dashboard"
+              href="/student/dashboard"
               className="block w-full px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold"
             >
               Go to Dashboard

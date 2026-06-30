@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
   let state: string | null = null;
   try {
     const formData = await req.formData();
-    idToken = formData.get('id_token') as string | null;
+    _idToken = formData.get('id_token') as string | null;
     state   = formData.get('state') as string | null;
   } catch {
     return NextResponse.redirect(`${loginUrl}?error=azure_parse_failed`);

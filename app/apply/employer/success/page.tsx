@@ -63,7 +63,7 @@ export default async function EmployerApplicationSuccess() {
             You can begin employer onboarding now while we review your application.
           </p>
           <Link
-            href="/onboarding/employer"
+            href="/apply/employer/success"
             className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-xl transition-colors w-full justify-center"
           >
             Start Employer Onboarding <ArrowRight className="w-4 h-4" />

@@ -194,14 +194,14 @@ export default async function CosmetologyOrientationPage() {
 
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/learner/dashboard"
+                href="/student/dashboard"
                 className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors"
               >
                 Go to My Dashboard
                 <ChevronRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/portal/documents"
+                href="/programs/cosmetology-apprenticeship/orientation#documents"
                 className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-slate-900 font-semibold px-6 py-3 rounded-lg border border-white/20 transition-colors"
               >
                 View My Documents
@@ -325,7 +325,7 @@ export default async function CosmetologyOrientationPage() {
               <p className="font-bold text-brand-green-900">Payment Plan Active</p>
               <p className="text-brand-green-700 text-sm">
                 Your weekly payment plan is set up and active. You can view your payment schedule in your{' '}
-                <Link href="/account/billing" className="underline font-semibold">billing settings</Link>.
+                <Link href="/store/licenses" className="underline font-semibold">billing settings</Link>.
               </p>
             </div>
           </div>
@@ -378,7 +378,7 @@ export default async function CosmetologyOrientationPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/learner/dashboard"
+              href="/student/dashboard"
               className="inline-flex items-center gap-2 bg-white text-brand-red-600 font-bold px-8 py-3.5 rounded-lg hover:bg-red-50 transition-colors"
             >
               Go to My Dashboard

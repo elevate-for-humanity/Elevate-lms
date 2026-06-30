@@ -124,7 +124,7 @@ export default async function StaffPortalLanding() {
                 </p>
               </div>
               <Link
-                href="/onboarding/staff"
+                href="/admin/staff-portal"
                 className="text-sm text-brand-blue-600 hover:underline font-medium flex items-center gap-1"
               >
                 View All <ChevronRight className="w-3.5 h-3.5" />
@@ -192,7 +192,7 @@ export default async function StaffPortalLanding() {
                 Sign In
               </Link>
               <Link
-                href="/onboarding/staff"
+                href="/admin/staff-portal"
                 className="px-6 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200"
               >
                 New Staff Onboarding

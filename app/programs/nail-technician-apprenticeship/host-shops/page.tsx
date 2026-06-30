@@ -144,7 +144,7 @@ export default function NailHostShopsPage() {
             within 3 business days.
           </p>
           <Link
-            href="/partners/nail-technician-apprenticeship/apply"
+            href="/programs/nail-technician-apprenticeship/apply"
             className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-4 rounded-xl transition-colors text-lg"
           >
             Apply as Host Salon →

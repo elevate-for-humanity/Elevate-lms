@@ -185,7 +185,7 @@ export default async function ProgramsPage() {
             {programs.length} credential-bearing programs · 4-12 weeks · WIOA &amp; WRG funding available
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/orientation/schedule" className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-red-700 transition-colors">
+            <Link href="/programs/cosmetology-apprenticeship/orientation" className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-red-700 transition-colors">
               Schedule Free Orientation
             </Link>
             <Link href="/programs/catalog" className="inline-flex items-center gap-2 rounded-lg bg-white/10 border border-white/30 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/20 transition-colors">
@@ -300,7 +300,7 @@ export default async function ProgramsPage() {
             Schedule a free orientation. We&apos;ll match you to the right program, check your funding eligibility, and get you enrolled.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link href="/orientation/schedule" className="rounded-lg bg-brand-red-600 px-8 py-3 font-semibold text-white hover:bg-brand-red-700 transition-colors">
+            <Link href="/programs/cosmetology-apprenticeship/orientation" className="rounded-lg bg-brand-red-600 px-8 py-3 font-semibold text-white hover:bg-brand-red-700 transition-colors">
               Schedule Free Orientation
             </Link>
             <Link href="/contact" className="rounded-lg border border-white/30 px-8 py-3 font-semibold text-white hover:bg-white/10 transition-colors">

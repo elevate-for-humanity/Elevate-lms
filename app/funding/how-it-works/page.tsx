@@ -167,7 +167,7 @@ export default function FundingHowItWorksPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/orientation/schedule"
+              href="/programs/cosmetology-apprenticeship/orientation"
               className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg"
             >
               Orientation Schedule

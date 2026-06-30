@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   let relayState: string | null = null;
   try {
     const formData = await req.formData();
-    samlResponse = formData.get('SAMLResponse') as string | null;
+    _samlResponse = formData.get('SAMLResponse') as string | null;
     relayState   = formData.get('RelayState') as string | null;
   } catch {
     return NextResponse.redirect(`${loginUrl}?error=saml_parse_failed`);

@@ -89,10 +89,10 @@ export const GET = withRuntime({ cron: true }, async () => {
     if (weeksElapsed < 2 || weeksRemaining <= 0) continue;
 
     // Get actual approved OJL hours
-    let actualOjl = 0;
+    let _actualOjl = 0;
     try {
       const hours = await getApprovedHoursByType(db as any, enroll.user_id);
-      actualOjl = hours.ojl;
+      _actualOjl = hours.ojl;
     } catch {
       continue;
     }

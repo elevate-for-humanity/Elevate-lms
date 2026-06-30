@@ -101,7 +101,7 @@ export default function FundingConfirmClient({ currentFundingSource, alreadyConf
             .
           </p>
           <Link
-            href="/onboarding/learner"
+            href="/funding/confirm"
             className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition"
           >
             Back to Onboarding <ArrowRight className="w-4 h-4" />
@@ -115,7 +115,7 @@ export default function FundingConfirmClient({ currentFundingSource, alreadyConf
     <div className="min-h-screen bg-white">
       <div className="max-w-2xl mx-auto px-4 py-10">
         <Link
-          href="/onboarding/learner"
+          href="/funding/confirm"
           className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900 mb-6"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Onboarding

@@ -475,7 +475,7 @@ export default async function ApplicationSuccessPage({
               Track your application status
             </Link>
             <Link
-              href="/onboarding/learner"
+              href="/funding/confirm"
               className="text-brand-blue-600 hover:underline text-sm font-medium block"
             >
               Already have an account? Go to onboarding →

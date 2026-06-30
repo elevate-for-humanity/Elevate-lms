@@ -376,7 +376,7 @@ export default async function StudentApplicationPage({
               Training Provider
             </Link>
             <Link
-              href="/onboarding/staff"
+              href="/admin/staff-portal"
               className="text-brand-blue-600 hover:underline font-semibold text-sm"
             >
               Staff Application

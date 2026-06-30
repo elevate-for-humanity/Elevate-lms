@@ -65,7 +65,7 @@ export default function NailApplyIndexPage() {
           />
 
           <Link
-            href="/partners/nail-technician-apprenticeship/apply"
+            href="/programs/nail-technician-apprenticeship/apply"
             className="flex items-start gap-5 p-6 bg-white border-2 border-slate-200 rounded-xl hover:border-purple-400 hover:shadow-md transition-all group"
           >
             <div className="w-12 h-12 rounded-full bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center shrink-0 transition-colors">

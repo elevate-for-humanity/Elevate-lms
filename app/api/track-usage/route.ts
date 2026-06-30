@@ -127,7 +127,11 @@ export async function POST(request: NextRequest) {
       status: 'ok',
       message: 'Tracking recorded',
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    // Ignore "aborted" errors - client disconnected before response sent (expected behavior)
+    if (error instanceof Error && error.message === 'aborted') {
+      return new NextResponse(null, { status: 499 }); // Client Closed Request
+    }
     logger.error('Tracking error:', error);
     return NextResponse.json({ error: 'Tracking failed' }, { status: 500 });
   }

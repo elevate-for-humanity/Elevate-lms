@@ -101,9 +101,9 @@ export async function POST(request: NextRequest) {
     if (db) {
       await db.from("partner_applications").insert({
         shop_name: shopName,
-        owner_name: "Integration Request`,
+        owner_name: "Integration Request",
         contact_email: `integration+${siteId}@pending.${PLATFORM_DEFAULTS.canonicalDomain}`,
-        phone: `N/A",
+        phone: "N/A",
         address_line1: "Not provided",
         city: "Not provided",
         state: "IN",

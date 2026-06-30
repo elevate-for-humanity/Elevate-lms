@@ -95,7 +95,7 @@ async function _POST(req: Request) {
     try {
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/send-email`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: body.email,
           subject: `Application Received [Ref: ${referenceNumber}] - ${PLATFORM_DEFAULTS.orgName}`,

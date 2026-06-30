@@ -208,7 +208,7 @@ async function _POST(req: Request) {
           {
             error: claim.samePayload
               ? 'Duplicate submission detected. Your application is already being processed.'
-              : 'Idempotency key has already been used with a different payload.`,
+              : 'Idempotency key has already been used with a different payload.',
           },
           { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
         );
@@ -655,8 +655,7 @@ async function _POST(req: Request) {
                 <p style="margin-bottom: 12px;">Schedule your advisor call now:</p>
                 <a href="https://calendly.com/elevate4humanityedu" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>
               </div>`
-                  : '`
-              }
+                  : ""}
 
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Reference Number:</p>
@@ -702,7 +701,7 @@ async function _POST(req: Request) {
           <p><strong>Application Status:</strong> ${applicationStatus}</p>
           ${body.hasCaseManager ? `<p><strong>Has Case Manager:</strong> ${body.hasCaseManager}</p>` : ''}
           ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
-          ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : '`}
+          ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ""}
           <div style="text-align:center;margin:24px 0;">
             <a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${data.id}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Review &amp; Enroll →</a>
           </div>

@@ -93,7 +93,7 @@ async function _POST(req: Request) {
           <p><strong>Type:</strong> ${data.meetingType === 'virtual' ? 'Virtual Meeting (Google Meet)' : 'Phone Call'}</p>
           <p><strong>Date:</strong> ${dateStr}</p>
           <p><strong>Time:</strong> ${data.time}</p>
-          ${data.notes ? `<p><strong>Notes:</strong><br>${data.notes}</p>` : '`}
+          ${data.notes ? `<p><strong>Notes:</strong><br>${data.notes}</p>` : ""}
           <hr>
           <p><em>Submitted from ${PLATFORM_DEFAULTS.canonicalDomain}/schedule/meeting</em></p>
         `,

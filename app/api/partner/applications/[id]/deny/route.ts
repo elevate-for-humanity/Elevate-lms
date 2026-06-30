@@ -75,8 +75,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
                 <p style="margin: 0;"><strong>Reason:</strong> ${reason}</p>
               </div>
               `
-                  : '`
-              }
+                  : ""}
               
               <p>If you believe this decision was made in error or if your circumstances have changed, please feel free to:</p>
               <ul>

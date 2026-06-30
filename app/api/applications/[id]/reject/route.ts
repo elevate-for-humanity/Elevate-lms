@@ -74,7 +74,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
         <h2>Hello ${application.first_name},</h2>
         <p>Thank you for your interest in ${PLATFORM_DEFAULTS.orgName}.</p>
         <p>After reviewing your application, we are unable to offer you admission at this time.</p>
-        ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : '`}
+        ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ""}
         <p>This decision does not reflect on your potential. We encourage you to:</p>
         <ul>
           <li>Reapply in the future when circumstances change</li>

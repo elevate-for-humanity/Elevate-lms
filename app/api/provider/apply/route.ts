@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
             <table style="width:100%;font-size:14px;border-collapse:collapse">
               <tr><td style="padding:4px 0;color:#64748b;width:40%">Organization</td><td style="padding:4px 0;font-weight:600">${orgName}</td></tr>
               <tr><td style="padding:4px 0;color:#64748b">Type</td><td style="padding:4px 0;font-weight:600">${String(orgType).replace(/_/g, ' ')}</td></tr>
-              <tr><td style="padding:4px 0;color:#64748b">Contact</td><td style="padding:4px 0;font-weight:600">${contactName}${contactTitle ? `, ${contactTitle}` : '`}</td></tr>
+              <tr><td style="padding:4px 0;color:#64748b">Contact</td><td style="padding:4px 0;font-weight:600">${contactName}${contactTitle ? `, ${contactTitle}` : ""}</td></tr>
               <tr><td style="padding:4px 0;color:#64748b">Reference ID</td><td style="padding:4px 0;font-family:monospace;font-size:12px">${applicationId}</td></tr>
             </table>
           </div>

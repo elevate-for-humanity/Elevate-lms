@@ -48,7 +48,7 @@ export async function generateMetadata({
           url: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
           width: 1280,
           height: 720,
-          type: `video/mp4',
+          type: 'video/mp4',
         },
       ],
     },
@@ -83,7 +83,7 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
     contentUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
     embedUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
     publisher: {
-      `@type': 'Organization',
+      '@type': 'Organization',
       name: PLATFORM_DEFAULTS.orgName,
       logo: {
         '@type': 'ImageObject',

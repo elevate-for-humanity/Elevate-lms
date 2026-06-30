@@ -39,6 +39,7 @@ export const GET = withRuntime(
 
     const paymentIntentId = session.payment_intent as string;
     const stripe = await getStripeServer();
+    try {
       const session = await stripe.checkout.sessions.retrieve(sessionId, {
         expand: [],
       });

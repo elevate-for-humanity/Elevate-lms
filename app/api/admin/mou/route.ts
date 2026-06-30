@@ -150,14 +150,14 @@ export async function POST(request: NextRequest) {
 
     await trySendEmail({
       to: partner_email,
-      subject: 'MOU from ' + PLATFORM_DEFAULTS.orgName + ' - ' + (mou.title ?? 'Partnership Agreement'),
-      html: '<p>Please review the attached MOU from ' + PLATFORM_DEFAULTS.orgName + '.</p><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:24px">' + (mou.content ?? '') + '</div>',
+      subject: `MOU from ${PLATFORM_DEFAULTS.orgName} — ${mou.title ?? 'Partnership Agreement'}`,
+      html: `<p>Please review the attached MOU from ${PLATFORM_DEFAULTS.orgName}.</p><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:24px">${mou.content ?? ''}</div>`,
       text: mou.content?.replace(/<[^>]+>/g, ' ') ?? '',
       replyTo: 'partnerships@' + PLATFORM_DEFAULTS.canonicalDomain,
     });
 
     await supabase.from('partner_mous').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', mou_id);
-    return NextResponse.json({ success: true, message: 'Resent to ' + partner_email });
+    return NextResponse.json({ success: true, message: `Resent to ${partner_email}` });
   }
 
   return safeError('Unknown action', 400);

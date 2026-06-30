@@ -194,7 +194,7 @@ export default async function CosmetologyOrientationPage() {
 
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/student/dashboard"
+                href="/apply/success"
                 className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors"
               >
                 Go to My Dashboard
@@ -378,7 +378,7 @@ export default async function CosmetologyOrientationPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/student/dashboard"
+              href="/apply/success"
               className="inline-flex items-center gap-2 bg-white text-brand-red-600 font-bold px-8 py-3.5 rounded-lg hover:bg-red-50 transition-colors"
             >
               Go to My Dashboard

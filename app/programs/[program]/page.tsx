@@ -1,8 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-
-export const revalidate = 3600; // program detail pages are static content — revalidate hourly
 import { createPublicClient } from '@/lib/supabase/public';
 import { programs as staticPrograms } from '@/content/cf-programs';
 import { getStaticProgram } from '@/data/programs/index';
@@ -18,10 +16,14 @@ import { hero as heroTokens } from '@/lib/page-design-tokens';
 import { getProgramOgImage } from '@/lib/programs/og-images';
 import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import LiveJobPostings from '@/components/careers/LiveJobPostings';
 
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = PLATFORM_DEFAULTS.siteUrl;
+
+// Programs that show live job postings on their detail page
+const LIVE_JOBS_PROGRAM_SLUGS = new Set(['barber-apprenticeship', 'cosmetology-apprenticeship']);
 
 // Slugs that have a dedicated /programs/{slug}/apply page.
 // All others fall back to /apply?program={slug} (generic intake).

@@ -85,13 +85,13 @@ const FALLBACK_RESPONSES: Record<string, string> = {
   apply:
     "Ready to apply? Visit elevateforhumanity.org/apply or call ' + PLATFORM_DEFAULTS.supportPhone + '. You'll need a valid ID and proof of income. The process takes about 15 minutes!",
   default:
-    "I`m here to help! We offer FREE career training in healthcare, skilled trades, technology, and more. Call ${PLATFORM_DEFAULTS.supportPhone} or visit /apply to get started. What would you like to know?",
+    "I'm here to help! We offer FREE career training in healthcare, skilled trades, technology, and more. Call ${PLATFORM_DEFAULTS.supportPhone} or visit /apply to get started. What would you like to know?",
 };
 
 function getFallbackResponse(message: string): string {
   const lowerMsg = message.toLowerCase();
   if (
-    lowerMsg.includes(`program') ||
+    lowerMsg.includes('program') ||
     lowerMsg.includes('course') ||
     lowerMsg.includes('training') ||
     lowerMsg.includes('offer')

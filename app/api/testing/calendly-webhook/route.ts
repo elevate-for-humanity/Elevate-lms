@@ -82,7 +82,7 @@ function confirmationEmailHtml(name: string, startTime: string, examQuestion: st
       </tr>
       <tr style="background: #f8fafc;">
         <td style="padding: 10px 12px; font-weight: bold;">Exam</td>
-        <td style="padding: 10px 12px;">${examQuestion || `See confirmation'}</td>
+        <td style="padding: 10px 12px;">${examQuestion || 'See confirmation'}</td>
       </tr>
       <tr>
         <td style="padding: 10px 12px; font-weight: bold;">Location</td>
@@ -113,7 +113,7 @@ function cancellationEmailHtml(name: string, startTime: string): string {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric`,
+    day: 'numeric',
   });
   return `
 <!DOCTYPE html>
@@ -135,7 +135,7 @@ function cancellationEmailHtml(name: string, startTime: string): string {
 
 // ─── Handler ──────────────────────────────────────────────────────────────────
 
-export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: `api' }, async (req) => {
+export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }, async (req) => {
   const rawBody = await req.text();
   const signature = req.headers.get('calendly-webhook-signature');
 

@@ -119,7 +119,7 @@ async function _POST(req: Request) {
       if (process.env.ADMIN_SMS_GATEWAY) {
         await sendEmail({
           to: process.env.ADMIN_SMS_GATEWAY,
-          subject: `Meeting',
+          subject: 'Meeting',
           html: `${data.name}\n${data.meetingType}\n${dateStr} ${data.time}`,
         }).catch((err) => logger.warn('[booking] SMS alert failed:', err));
       }

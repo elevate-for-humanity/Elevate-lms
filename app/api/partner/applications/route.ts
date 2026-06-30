@@ -148,7 +148,7 @@ async function _POST(request: NextRequest) {
               <ol>
                 <li>Our team will review your application within 1-3 business days</li>
                 <li>You'll receive an email with your approval status</li>
-                <li>Once approved, you`ll get a link to access your Partner Dashboard</li>
+                <li>Once approved, you'll get a link to access your Partner Dashboard</li>
               </ol>
               
               <p>Questions? Call us at <a href="tel:${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a></p>

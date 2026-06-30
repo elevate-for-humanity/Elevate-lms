@@ -555,7 +555,7 @@ async function insertApplication(payload: {
         `<li>Visit <a href="https://www.indianacareerconnect.com" style="color:#1a1a1a;font-weight:bold">www.indianacareerconnect.com</a> and create an account</li>`,
         `<li>Schedule an appointment with your local WorkOne office</li>`,
         `<li>Let them know you`d like to enroll in <strong>${programLabel}</strong> at ${PLATFORM_DEFAULTS.orgName}</li>`,
-        `<li>They`ll confirm your eligibility and issue a training voucher</li>`,
+        `<li> They'll confirm your eligibility and issue a training voucher</li>`,
         `</ol>`,
 
         // Divider

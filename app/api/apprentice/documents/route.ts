@@ -3,7 +3,6 @@ import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -42,51 +41,20 @@ async function _GET(request: NextRequest) {
       logger.error('[Documents API] Types error:', typesError);
     }
 
-    // Get student's uploaded documents from apprentice_documents table
+    // Get student's uploaded documents — filter by program_slug stored in metadata
     const { data: uploadedDocuments, error: docsError } = await supabase
-      .from('apprentice_documents')
-      .select('id, document_type, document_type_id, file_name, file_path, file_url, file_size_bytes, mime_type, status, rejection_reason, uploaded_at, program_slug')
-      .eq('student_id', user.id)
-      .order('uploaded_at', { ascending: false });
+      .from('documents')
+      .select('id, document_type, file_name, file_url, status, created_at, metadata')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
 
     if (docsError) {
       logger.error('[Documents API] Docs error:', docsError);
     }
 
-    // Generate signed URLs for viewing documents
-    const documentsWithUrls = await Promise.all(
-      (uploadedDocuments || []).map(async (doc) => {
-        const storagePath = doc.file_path || doc.file_url;
-        let signedUrl: string | null = null;
-        if (storagePath) {
-          try {
-            const { data: signedData } = await supabase.storage
-              .from('documents')
-              .createSignedUrl(storagePath, 3600); // 1 hour expiry
-            signedUrl = signedData?.signedUrl || null;
-          } catch (urlError) {
-            logger.error('[Documents API] Signed URL error:', urlError);
-          }
-        }
-        return {
-          id: doc.id,
-          document_type_id: doc.document_type_id,
-          document_type: doc.document_type,
-          file_name: doc.file_name,
-          file_path: storagePath,
-          file_size_bytes: doc.file_size_bytes,
-          mime_type: doc.mime_type,
-          status: doc.status,
-          rejection_reason: doc.rejection_reason,
-          uploaded_at: doc.uploaded_at,
-          signed_url: signedUrl,
-        };
-      })
-    );
-
     return NextResponse.json({
       documentTypes: documentTypes || [],
-      uploadedDocuments: documentsWithUrls,
+      uploadedDocuments: uploadedDocuments || [],
     });
   } catch (error) {
     logger.error('[Documents API] Error:', error);
@@ -171,44 +139,30 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
     }
 
+    // Bucket is private — store file_path only, generate signed URLs on-demand
+
     // Delete any existing document of this type for this user (replace)
-    const { data: existingDocs } = await supabase
-      .from('apprentice_documents')
-      .select('id, file_path')
-      .eq('student_id', user.id)
+    await supabase
+      .from('documents')
+      .delete()
+      .eq('user_id', user.id)
       .eq('document_type', docType.document_type);
 
-    // Delete old storage files
-    if (existingDocs) {
-      for (const oldDoc of existingDocs) {
-        const oldPath = oldDoc.file_path;
-        if (oldPath) {
-          const pathInBucket = oldPath.startsWith('documents/') ? oldPath.slice('documents/'.length) : oldPath;
-          await supabase.storage.from('documents').remove([pathInBucket]);
-        }
-      }
-      // Delete old records
-      await supabase.from('apprentice_documents').delete()
-        .eq('student_id', user.id)
-        .eq('document_type', docType.document_type);
-    }
-
-    // Create document record in apprentice_documents table
+    // Create document record — columns match live documents schema
     const { data: docRecord, error: recordError } = await supabase
-      .from('apprentice_documents')
+      .from('documents')
       .insert({
-        student_id: user.id,
-        document_type_id: docType.id,
-        program_slug: programSlug,
+        user_id: user.id,
         document_type: docType.document_type,
         file_name: file.name,
-        file_path: storagePath, // Full path in storage bucket
+        file_url: null,
         file_size_bytes: file.size,
         mime_type: file.type,
         status: 'pending',
+        metadata: programSlug ? { program_slug: programSlug } : null,
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (recordError) {
       logger.error('[Documents API] Record error:', recordError);
@@ -228,7 +182,7 @@ async function _POST(request: NextRequest) {
       const { data: admins } = await supabase
         .from('profiles')
         .select('email')
-        .in('role', ['admin']);
+        .in('role', ['admin', 'super_admin']);
 
       if (admins && admins.length > 0) {
         const { emailService } = await import('@/lib/notifications/email');
@@ -293,10 +247,10 @@ async function _DELETE(request: NextRequest) {
 
     // Get document to verify ownership and get file path
     const { data: doc } = await supabase
-      .from('apprentice_documents')
+      .from('documents')
       .select('*')
       .eq('id', docId)
-      .eq('student_id', user.id)
+      .eq('user_id', user.id)
       .maybeSingle();
 
     if (!doc) {
@@ -308,15 +262,18 @@ async function _DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Cannot delete approved documents' }, { status: 400 });
     }
 
-    // Delete from storage
-    const storagePath: string | undefined = doc.file_path || doc.file_url || undefined;
+    // Delete from storage — path stored in metadata.storage_path (file_url is null for private bucket)
+    const storagePath: string | undefined = doc.metadata?.storage_path ?? doc.file_url ?? undefined;
     if (storagePath) {
-      const pathInBucket = storagePath.startsWith('documents/') ? storagePath.slice('documents/'.length) : storagePath;
+      // Strip bucket prefix if present (e.g. "documents/user-id/...")
+      const pathInBucket = storagePath.startsWith('documents/')
+        ? storagePath.slice('documents/'.length)
+        : storagePath;
       await supabase.storage.from('documents').remove([pathInBucket]);
     }
 
-    // Delete record from apprentice_documents
-    const { error } = await supabase.from('apprentice_documents').delete().eq('id', docId);
+    // Delete record
+    const { error } = await supabase.from('documents').delete().eq('id', docId);
 
     if (error) {
       logger.error('[Documents API] Delete error:', error);
@@ -345,4 +302,3 @@ async function _DELETE(request: NextRequest) {
 export const GET = withApiAudit('/api/apprentice/documents', _GET);
 export const POST = withApiAudit('/api/apprentice/documents', _POST);
 export const DELETE = withApiAudit('/api/apprentice/documents', _DELETE);
-

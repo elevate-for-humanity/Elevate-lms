@@ -1,7 +1,6 @@
 // PUBLIC ROUTE: Store checkout — licensing gate via validateCheckoutAuthorization + rate limit
 import { createCheckoutSession } from '@/lib/store/stripe';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { validateCheckoutAuthorization } from '@/lib/store/licensing-mode';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -73,7 +72,7 @@ async function _POST(req: Request) {
       stripePriceId: resolvedStripePriceId,
       email,
       successUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/store/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/store/checkout/cancel`,
+      cancelUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/store/cancel`,
     });
 
     return Response.json({ sessionId: session.id, url: session.url });
@@ -83,4 +82,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/store/checkout', _POST);
-

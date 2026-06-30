@@ -12,8 +12,6 @@
  *   5. Email admin
  */
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { syncProgressEntryToHourEntries } from '@/lib/timeclock/sync-to-hour-entries';
@@ -27,7 +25,7 @@ export const dynamic = 'force-dynamic';
 const AUTO_CLOSE_HOURS = 10;
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export const GET = withRuntime({ cron: "x-header" }, async () => {
+export const GET = withRuntime({ cron: true }, async () => {
   const db = await requireAdminClient();
   const cutoff = new Date(Date.now() - AUTO_CLOSE_HOURS * 3600 * 1000).toISOString();
 
@@ -158,4 +156,3 @@ export const GET = withRuntime({ cron: "x-header" }, async () => {
   logger.info('[missed-checkins] complete', { processed, total: shifts.length });
   return NextResponse.json({ processed, total: shifts.length, results });
 });
-

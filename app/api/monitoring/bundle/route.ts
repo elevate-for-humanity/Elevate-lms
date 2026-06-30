@@ -1,8 +1,5 @@
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -57,7 +54,7 @@ async function _GET(req: Request) {
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-    if (!profile || !['admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -232,4 +229,3 @@ async function _GET(req: Request) {
 }
 
 export const GET = withRuntime(withApiAudit('/api/monitoring/bundle', _GET));
-

@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -32,7 +30,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'staff', 'org_admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin', 'staff', 'org_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -71,7 +69,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
     // Send rejection email
     await sendEmail({
       to: application.email,
-      subject: `Application Update - ${PLATFORM_DEFAULTS.orgName}`,
+      subject: 'Application Update - ${PLATFORM_DEFAULTS.orgName}',
       html: `
         <h2>Hello ${application.first_name},</h2>
         <p>Thank you for your interest in ${PLATFORM_DEFAULTS.orgName}.</p>

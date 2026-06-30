@@ -2,7 +2,6 @@ import { safeInternalError } from '@/lib/api/safe-error';
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { getTenantContext, TenantContextError } from '@/lib/tenant';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -61,4 +60,3 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/partner/enrollments', _GET);
-

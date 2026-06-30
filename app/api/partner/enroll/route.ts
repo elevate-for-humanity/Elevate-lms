@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
@@ -222,4 +221,3 @@ async function _GET(request: Request) {
 }
 export const GET = withApiAudit('/api/partner/enroll', _GET);
 export const POST = withApiAudit('/api/partner/enroll', _POST);
-

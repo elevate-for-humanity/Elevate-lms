@@ -1,9 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { auditPiiAccess } from '@/lib/auditLog';
-import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -200,7 +198,6 @@ export async function POST(request: NextRequest) {
       verification,
     });
   } catch (error) {
-    logger.error('[api/verification/submit] POST failed', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -237,8 +234,6 @@ export async function GET(request: NextRequest) {
       verification: { status, documents: docs || [] },
     });
   } catch (error) {
-    logger.error('[api/verification/submit] GET failed', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

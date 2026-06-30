@@ -1,0 +1,250 @@
+import { Metadata } from 'next';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Calendar, Clock, Save } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'New Report | Program Holder Portal',
+  description: 'Submit a new compliance report',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/program-holder/reports/new',
+  },
+};
+
+export default async function NewReportPage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect('/login');
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (!profile || !['program_holder','admin','super_admin','staff'].includes(profile.role)) redirect('/login');
+
+  // Get program holder record via profiles.program_holder_id
+  const holderId = profile.program_holder_id;
+  if (!holderId) redirect('/program-holder/onboarding');
+
+  const { data: programHolder } = await supabase
+    .from('program_holders')
+    .select('id, organization_name')
+    .eq('id', holderId)
+    .maybeSingle();
+
+  if (!programHolder) redirect('/program-holder/onboarding');
+
+  // Get active students for the report
+  const { data: students } = await supabase
+    .from('program_holder_students')
+    .select('*, student:profiles!student_id(first_name, last_name)')
+    .eq('program_holder_id', programHolder.id)
+    .eq('status', 'active');
+
+  return (
+    <div className="min-h-screen bg-white">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Reports" }]} />
+        </div>
+      {/* Hero Section */}
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
+        <Image
+          src="/images/pages/program-holder-page-3.jpg"
+          alt="New Report"
+          fill
+          className="object-cover"
+          quality={90}
+          priority
+          sizes="100vw" placeholder="empty"
+        />
+
+      </section>
+
+      {/* Content Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg shadow-sm border p-8">
+              <form method="POST">
+                {/* Report Period */}
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-black mb-6">
+                    Report Period
+                  </h2>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-2">
+                        Week Ending Date
+                      </label>
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                        <input
+                          type="date"
+                          name="week_ending"
+                          required
+                          className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-2">
+                        Total Hours This Week
+                      </label>
+                      <div className="relative">
+                        <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                        <input
+                          type="number"
+                          name="hours_worked"
+                          min="0"
+                          step="0.5"
+                          required
+                          placeholder="40"
+                          className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Student Information */}
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-black mb-6">
+                    Student Progress
+                  </h2>
+                  {students && students.length > 0 ? (
+                    <div className="space-y-4">
+                      {students.map((enrollment) => (
+                        <div
+                          key={enrollment.id}
+                          className="p-4 bg-white rounded-lg border border-slate-200"
+                        >
+                          <div className="font-medium text-black mb-2">
+                            {enrollment.student?.first_name}{' '}
+                            {enrollment.student?.last_name}
+                          </div>
+                          <textarea
+                            name={`student_${enrollment.id}_notes`}
+                            rows={2}
+                            placeholder="Progress notes for this student..."
+                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-black">
+                      No active students to report on.
+                    </p>
+                  )}
+                </div>
+
+                {/* Activities & Notes */}
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-black mb-6">
+                    Activities & Notes
+                  </h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-2">
+                        Skills Practiced
+                      </label>
+                      <textarea
+                        name="skills_practiced"
+                        rows={3}
+                        placeholder="Describe the skills and competencies practiced this week..."
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-2">
+                        Challenges or Issues
+                      </label>
+                      <textarea
+                        name="challenges"
+                        rows={3}
+                        placeholder="Note any challenges, concerns, or issues that arose..."
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-2">
+                        Additional Notes
+                      </label>
+                      <textarea
+                        name="notes"
+                        rows={4}
+                        placeholder="Any additional information or observations..."
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href="/program-holder/reports"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-semibold rounded-lg transition-colors"
+                  >
+                    <Save className="h-5 w-5 mr-2" />
+                    Save Report (Contact Support)
+                  </Link>
+                  <Link
+                    href="/program-holder/reports"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-white text-black font-semibold rounded-lg border-2 border-slate-300 transition-colors"
+                  >
+                    Cancel
+                  </Link>
+                </div>
+              </form>
+
+              {/* Note about submission */}
+              <div className="mt-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+                <p className="text-sm text-brand-blue-800">
+                  <strong>Note:</strong> Report submission is currently handled
+                  manually. Please contact support at{' '}
+                  <a
+                    href="/contact"
+                    className="underline"
+                  >
+                    our contact form
+                  </a>{' '}
+                  to submit your report.
+                </p>
+              </div>
+            </div>
+
+            {/* Help Text */}
+            <div className="mt-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-brand-blue-900 mb-2">
+                Reporting Guidelines
+              </h3>
+              <ul className="text-brand-blue-800 space-y-2 text-sm">
+                <li>• Reports are due every Monday for the previous week</li>
+                <li>
+                  • Include total hours worked and progress for each student
+                </li>
+                <li>• Note any challenges or concerns that need attention</li>
+                <li>
+                  • Contact support if you need help completing this report
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

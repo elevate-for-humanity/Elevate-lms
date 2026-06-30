@@ -1,9 +1,6 @@
 // PUBLIC ROUTE: returns the cosmetology partner application for the logged-in user
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
@@ -38,11 +35,5 @@ export async function GET(req: NextRequest) {
   if (error) return safeError('Failed to load application', 500);
   if (!data) return NextResponse.json(null, { status: 200 });
 
-  return NextResponse.json({
-    ...data,
-    shop_name: data.name,
-    salon_legal_name: data.legal_name ?? data.name,
-    salon_name: data.name,
-  });
+  return NextResponse.json(data);
 }
-

@@ -2,8 +2,6 @@
  * GET /api/cron/process-provisioning-jobs
  * Process pending provisioning_jobs rows — retry failed jobs, timeout stale ones.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -55,4 +53,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/process-provisioning-jobs] Done', { timed_out: timedOut ?? 0, retried, pending_backlog: pending ?? 0 });
   return NextResponse.json({ ok: true, timed_out: timedOut ?? 0, retried, pending_backlog: pending ?? 0 });
 });
-

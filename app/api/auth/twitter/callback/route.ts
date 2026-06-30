@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -63,7 +62,7 @@ async function _GET(request: NextRequest) {
     const userData = await userRes.json();
 
     const supabase = await createClient();
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return redirect('error=unauthorized');
 
     const { error: saveError } = await supabase.from('social_media_settings').upsert({
@@ -90,5 +89,3 @@ async function _GET(request: NextRequest) {
 }
 
 export const GET = withApiAudit('/api/auth/twitter/callback', _GET);
-
-

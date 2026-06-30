@@ -83,4 +83,3 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ success: true, url, path }, { status: 200 });
 }
-

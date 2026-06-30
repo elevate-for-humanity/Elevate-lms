@@ -1,6 +1,5 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
@@ -32,7 +31,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin'].includes(profile.role)) {
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     throw APIErrors.forbidden('Only admins can verify documents');
   }
 
@@ -195,4 +194,3 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     },
   });
 });
-

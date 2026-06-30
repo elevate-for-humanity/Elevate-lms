@@ -3,8 +3,6 @@
 // here would insert one row per page load, overwhelming the audit table with noise
 // and causing cascading timeouts. Bot/prerender traffic amplifies this further.
 // DMCA detections are logged separately to unauthorized_access_log.
-import { db } from '@/lib/db';
-
 import { safeInternalError } from '@/lib/api/safe-error';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
@@ -67,18 +65,10 @@ const getOfficialDomains = () => {
     domain,
     // Primary domain
     PLATFORM_DEFAULTS.canonicalDomain,
-    'elevateforhumanity.org',
-    'www.elevateforhumanity.org',
+    PLATFORM_DEFAULTS.canonicalDomain,
     // Second owned domain
     'www.elevateforhumanityeducation.com',
     'elevateforhumanityeducation.com',
-    // All legitimate subdomains - NOT clones!
-    'app.elevateforhumanity.org',      // LMS portal
-    '',     // Admin panel
-    'api.elevateforhumanity.org',      // API subdomain
-    'demo.elevateforhumanity.org',     // Demo site
-    'collab.elevateforhumanity.org',   // Collaboration tools
-    'yourorg.elevateforhumanity.org', // White-label/org subdomain
     // Dev environments — excluded in production
     ...(process.env.NODE_ENV !== 'production' ? ['localhost'] : []),
   ];
@@ -264,6 +254,8 @@ async function sendDMCATakedown(data: { domain: string; url: string; timestamp: 
 
   // Known hosting provider abuse emails by domain pattern
   const abuseContacts: Record<string, string> = {
+    'vercel.app': 'dmca@vercel.com',
+    'vercel.com': 'dmca@vercel.com',
     'netlify.app': 'abuse@netlify.com',
     'netlify.com': 'abuse@netlify.com',
     'github.io': 'dmca@github.com',
@@ -442,4 +434,3 @@ export async function GET(request: NextRequest) {
     official_domains: officialDomains,
   });
 }
-

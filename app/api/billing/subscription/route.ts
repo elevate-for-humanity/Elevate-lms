@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { getOrgContext } from '@/lib/org/getOrgContext';
 import { getOrgSubscription, getLicenseStatus } from '@/lib/billing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -31,8 +30,8 @@ async function _GET(req: NextRequest) {
 
     const ctx = await getOrgContext(supabase, user.id);
 
-    // Only org_admin and admin can view billing
-    if (!['org_admin', 'admin'].includes(ctx.role)) {
+    // Only org_admin and super_admin can view billing
+    if (!['org_admin', 'super_admin'].includes(ctx.role)) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
@@ -53,4 +52,3 @@ async function _GET(req: NextRequest) {
   }
 }
 export const GET = withApiAudit('/api/billing/subscription', _GET);
-

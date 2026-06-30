@@ -4,7 +4,6 @@ import { getStripe, stripe } from '@/lib/stripe/client';
 import { getCatalogProduct } from '@/lib/store/db';
 import { STRIPE_PRICE_IDS, isPriceConfigured } from '@/lib/stripe/price-map';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { injectFailureRedirect } from '@/lib/api/failure-injection';
@@ -123,7 +122,7 @@ async function handler(req: Request) {
           quantity: 1,
         },
       ],
-      success_url: `${siteUrl}/onboarding/learner?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${siteUrl}/dashboard/onboarding?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/platform/${product.slug}`,
       metadata: {
         // Standardized metadata for grant/license compliance
@@ -153,4 +152,3 @@ async function handler(req: Request) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/stripe/checkout', handler));
-

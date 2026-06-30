@@ -156,7 +156,7 @@ async function _POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            `Payment processing is temporarily unavailable. Please contact admissions at info@${PLATFORM_DEFAULTS.canonicalDomain}.`,
+            'Payment processing is temporarily unavailable. Please contact admissions at info@${PLATFORM_DEFAULTS.canonicalDomain}.',
         },
         { status: 503 },
       );
@@ -250,4 +250,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/enroll/checkout', _POST);
-

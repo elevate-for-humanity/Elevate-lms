@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -45,7 +43,7 @@ async function _PATCH(req: NextRequest, { params }: { params: Promise<{ id: stri
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!['admin'].includes(profile?.role ?? '')) {
+  if (!['admin', 'super_admin'].includes(profile?.role ?? '')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

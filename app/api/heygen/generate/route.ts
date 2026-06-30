@@ -76,7 +76,7 @@ async function _POST(request: NextRequest) {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: 'Request failed' },
+        { error: data.message || 'Failed to generate video' },
         { status: response.status },
       );
     }
@@ -93,4 +93,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/heygen/generate', _POST);
-

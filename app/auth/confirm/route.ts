@@ -1,11 +1,9 @@
-import { db } from '@/lib/db';
-
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type { EmailOtpType } from '@supabase/supabase-js';
-import { readRedirectParam, resolveRedirectLocation, validateRedirect } from '@/lib/auth/validate-redirect';
+import { validateRedirect } from '@/lib/auth/validate-redirect';
 import { logger } from '@/lib/logger';
 
 /**
@@ -18,7 +16,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as EmailOtpType | null;
-  const next = validateRedirect(readRedirectParam(searchParams), '/');
+  const next = validateRedirect(searchParams.get('next'), '/');
 
   if (token_hash && type) {
     const supabase = await createClient();
@@ -63,15 +61,17 @@ export async function GET(request: NextRequest) {
                 userId: user.id,
                 error: fetchError.message,
               });
-              // Skip linking on lookup failure — continue to redirect below.
-            } else {
+              // unlinked is null when fetchError is set — skip linking rather than
+              // proceeding with a non-null assertion that would throw.
+              return undefined;
+            }
 
             const pendingCount = unlinked?.length ?? 0;
             let linkedCount = 0;
             let subLinkedCount = 0;
 
-            if (pendingCount > 0 && unlinked) {
-              for (const row of unlinked) {
+            if (pendingCount > 0) {
+              for (const row of unlinked!) {
                 const { error: linkError } = await db
                   .from('program_enrollments')
                   .update({ user_id: user.id })
@@ -117,14 +117,13 @@ export async function GET(request: NextRequest) {
               // dashboard redirect, send them to their program's enrollment-success
               // page instead. Driven by program_slug so this works for future programs.
               if (redirectTo === '/learner/dashboard?verified=true') {
-                const firstSlug = unlinked.find((r) => r.program_slug)?.program_slug;
+                const firstSlug = unlinked!.find((r) => r.program_slug)?.program_slug;
                 if (firstSlug) {
                   redirectTo = `/programs/${firstSlug}/enrollment-success`;
                 }
               }
-            } else if (!fetchError) {
+            } else {
               logger.info('[auth/confirm] no pending enrollments to link', { userId: user.id });
-            }
             }
 
             // Reconcile remaining pre-auth tables (applications, barber_subscriptions).
@@ -201,7 +200,7 @@ export async function GET(request: NextRequest) {
       const CANONICAL = process.env.NEXT_PUBLIC_SITE_URL
         ? process.env.NEXT_PUBLIC_SITE_URL
         : new URL(request.url).origin;
-      return NextResponse.redirect(resolveRedirectLocation(redirectTo, CANONICAL));
+      return NextResponse.redirect(new URL(redirectTo, CANONICAL));
     }
 
     // verifyOtp failed — token expired or already used. This is expected user

@@ -6,9 +6,6 @@
 // user's data. An authenticated user could export any other user's data by
 // supplying a different email. Now the export is always scoped to the
 // authenticated session user — the request body email is ignored.
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
@@ -88,4 +85,3 @@ export async function POST(req: NextRequest) {
     },
   });
 }
-

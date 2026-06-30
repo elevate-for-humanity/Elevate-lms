@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getStripe, stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -19,7 +18,7 @@ async function _POST(req: Request) {
 
     const { apiRequireAdmin } = await import('@/lib/admin/guards');
     try {
-      const auth = await apiRequireAdmin(req);
+      const auth = await apiRequireAdmin(request);
       if (auth.error) return auth.error;
     } catch (e) {
       return e instanceof Response
@@ -89,7 +88,6 @@ async function _POST(req: Request) {
       success_url: `${siteUrl}/funding/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/funding/canceled`,
       metadata: {
-        kind: 'funded_enrollment',
         // Standardized metadata for grant/license compliance
         payment_type: 'funded_enrollment',
         funding_source: fundingSource,
@@ -139,4 +137,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/funding/create-checkout', _POST);
-

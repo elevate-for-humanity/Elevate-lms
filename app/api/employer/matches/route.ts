@@ -11,8 +11,6 @@
 //   - job_postings.education_required matches the program title/credential name
 //
 // This is intentionally conservative. Expand matching criteria incrementally.
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/admin/guards';
@@ -115,7 +113,7 @@ export async function GET(req: NextRequest) {
     if (!job_id) return NextResponse.json({ error: 'job_id required' }, { status: 400 });
 
     // Only admins/staff/employers can query candidates
-    if (!['admin', 'staff', 'employer'].includes(auth.role ?? '')) {
+    if (!['admin', 'super_admin', 'staff', 'employer'].includes(auth.role ?? '')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -200,4 +198,3 @@ export async function GET(req: NextRequest) {
     { status: 400 },
   );
 }
-

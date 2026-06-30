@@ -1,7 +1,5 @@
-export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -12,7 +10,7 @@ async function _POST(req: Request) {
   if (rateLimited) return rateLimited;
   try {
     const supabase = await createClient();
-    const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
@@ -51,5 +49,3 @@ async function _POST(req: Request) {
 }
 
 export const POST = withApiAudit('/api/discussions/reply', _POST);
-
-

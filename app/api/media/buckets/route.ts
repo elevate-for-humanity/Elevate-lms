@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -28,7 +27,7 @@ async function _GET(request: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -60,4 +59,3 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/media/buckets', _GET);
-

@@ -13,22 +13,22 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#dc2626',
     categories: ['education', 'business'],
     icons: [
-      { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-72.png', sizes: '72x72', type: 'image/png', purpose: 'any' },
-      { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-96.png', sizes: '96x96', type: 'image/png', purpose: 'any' },
-      { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-128.png', sizes: '128x128', type: 'image/png', purpose: 'any' },
-      { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-144.png', sizes: '144x144', type: 'image/png', purpose: 'any' },
-      { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-152.png', sizes: '152x152', type: 'image/png', purpose: 'any' },
-      { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-384.png', sizes: '384x384', type: 'image/png', purpose: 'any' },
+      { src: '/icon-72.png', sizes: '72x72', type: 'image/png', purpose: 'any' },
+      { src: '/icon-96.png', sizes: '96x96', type: 'image/png', purpose: 'any' },
+      { src: '/icon-128.png', sizes: '128x128', type: 'image/png', purpose: 'any' },
+      { src: '/icon-144.png', sizes: '144x144', type: 'image/png', purpose: 'any' },
+      { src: '/icon-152.png', sizes: '152x152', type: 'image/png', purpose: 'any' },
+      { src: '/icon-384.png', sizes: '384x384', type: 'image/png', purpose: 'any' },
       // 192 and 512 serve both any + maskable
-      { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-      { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192-maskable.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
-      { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-      { src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+      { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: '/icon-192-maskable.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+      { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: '/icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
     ],
     // Chrome 119+ requires screenshots to show the install prompt
     screenshots: [
       {
-        src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/screenshots/home-narrow.jpg',
+        src: '/screenshots/home-narrow.jpg',
         sizes: '1080x1920',
         // @ts-expect-error — form_factor is valid per spec, not yet in Next.js types
         form_factor: 'narrow',
@@ -36,7 +36,7 @@ export default function manifest(): MetadataRoute.Manifest {
         label: 'Elevate for Humanity — career training programs',
       },
       {
-        src: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/screenshots/home-wide.jpg',
+        src: '/screenshots/home-wide.jpg',
         sizes: '1920x1080',
         // @ts-expect-error — form_factor is valid per spec, not yet in Next.js types
         form_factor: 'wide',

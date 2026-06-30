@@ -1,9 +1,6 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { checkMOUStatusServer } from '@/lib/mou-checks';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -39,7 +36,7 @@ async function _POST(req: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['program_holder', 'admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['program_holder', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
     return safeError('Forbidden — program holder role required', 403);
   }
 
@@ -54,7 +51,7 @@ async function _POST(req: NextRequest) {
     programHolderId = holder?.id ?? null;
   }
 
-  if (!programHolderId && !['admin', 'staff'].includes(profile.role)) {
+  if (!programHolderId && !['admin', 'super_admin', 'staff'].includes(profile.role)) {
     return safeError('No program holder record found for this user', 403);
   }
 
@@ -157,4 +154,3 @@ async function _POST(req: NextRequest) {
 }
 
 export const POST = withApiAudit('/api/program-holder/enroll-participant', _POST);
-

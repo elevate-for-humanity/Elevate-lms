@@ -1,5 +1,5 @@
 // Funding eligibility check endpoint.
-// Evaluates a participant's eligibility for WIOA, WRG, JRI, , and employer-sponsored funding.
+// Evaluates a participant's eligibility for WIOA, WRG, JRI, FSSA IMPACT, and employer-sponsored funding.
 // Used by /check-eligibility page and workforce board eligibility view.
 //
 // GOVERNANCE: INTAKE_ONLY
@@ -60,14 +60,14 @@ function evaluate(input: EligibilityInput) {
     cta: '/funding/wrg',
   });
 
-  //  ( / TANF)
+  // FSSA IMPACT (SNAP E&T / TANF)
   const fssaEligible = !!(input.receiving_snap || input.receiving_tanf);
   results.push({
-    stream: '',
+    stream: 'FSSA IMPACT',
     eligible: fssaEligible,
     reason: fssaEligible
-      ? 'You may qualify for  training support through  or TANF.'
-      : ' requires active SNAP or TANF benefits.',
+      ? 'You may qualify for FSSA IMPACT training support through SNAP E&T or TANF.'
+      : 'FSSA IMPACT requires active SNAP or TANF benefits.',
     cta: '/fssa',
   });
 
@@ -150,4 +150,3 @@ export async function GET(request: NextRequest) {
     return safeInternalError(err, 'Eligibility check failed');
   }
 }
-

@@ -2,7 +2,6 @@ import { safeInternalError } from '@/lib/api/safe-error';
 import { NextRequest } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -47,4 +46,3 @@ async function _POST(req: NextRequest) {
   return Response.json({ ok: true });
 }
 export const POST = withApiAudit('/api/delegates/update', _POST);
-

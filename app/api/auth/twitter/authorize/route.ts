@@ -53,4 +53,3 @@ async function _GET(request: NextRequest) {
 }
 
 export const GET = withApiAudit('/api/auth/twitter/authorize', _GET);
-

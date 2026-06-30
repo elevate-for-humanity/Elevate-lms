@@ -1,6 +1,4 @@
 // PUBLIC ROUTE: inbound JotForm webhook (authenticated by secret token in URL)
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -113,4 +111,3 @@ export async function POST(request: NextRequest) {
   // ── 5. Return 200 immediately so JotForm stops retrying ──────────────────
   return NextResponse.json({ received: true });
 }
-

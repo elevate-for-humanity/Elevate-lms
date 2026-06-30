@@ -1,0 +1,30 @@
+import { Metadata } from 'next';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export const metadata: Metadata = {
+  title: 'Funding Options | Free Career Training',
+  description:
+    'Explore funding options for career training including WIOA, Job Ready Indy, and state programs. Most adults qualify for Funded training.',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/funding',
+  },
+  openGraph: {
+    title: 'Funding Options for Free Career Training',
+    description:
+      'WIOA, Job Ready Indy, and state funding programs. Most adults qualify for Funded training.',
+    url: 'https://www.elevateforhumanity.org/funding',
+    siteName: PLATFORM_DEFAULTS.orgName,
+    images: [{ url: '/og-default.webp', width: 1200, height: 630, alt: 'Career Training Funding' }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Funding Options for Free Career Training',
+    description: 'WIOA, Job Ready Indy, and state funding programs for free career training.',
+    images: ['/og-default.webp'],
+  },
+};
+
+export default function FundingLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

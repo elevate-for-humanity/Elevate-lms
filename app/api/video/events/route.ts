@@ -1,7 +1,6 @@
 // PUBLIC ROUTE: video event tracking — rate-limited
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { getVideoById, VideoPlaybackEvent } from '@/lib/video/registry';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -92,4 +91,3 @@ function generateSessionId(): string {
   return `vs_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }
 export const POST = withApiAudit('/api/video/events', _POST);
-

@@ -2,7 +2,6 @@ import { safeInternalError } from '@/lib/api/safe-error';
 // app/api/payroll/export/route.ts
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -93,4 +92,3 @@ async function _GET(request: Request) {
   });
 }
 export const GET = withApiAudit('/api/payroll/export', _GET);
-

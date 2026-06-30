@@ -37,10 +37,10 @@ async function _GET(request: NextRequest) {
     ]);
 
     // Merge results, store results first, then index results that aren't duplicates
-    const storeHrefs = new Set((storeResults as any[]).map((r: any) => r?.href || r?.url));
+    const storeHrefs = new Set((storeResults as any[]).map((r: any) => r.href || r.url));
     const merged = [
       ...(storeResults as any[]),
-      ...indexResults.filter((r) => r?.href && !storeHrefs.has(r.href)),
+      ...indexResults.filter((r) => !storeHrefs.has(r.href)),
     ].slice(0, limit);
 
     return NextResponse.json({ results: merged });
@@ -50,4 +50,3 @@ async function _GET(request: NextRequest) {
   }
 }
 export const GET = withApiAudit('/api/search', _GET);
-

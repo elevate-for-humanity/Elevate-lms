@@ -18,7 +18,7 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     // Use the public-facing host for redirects so they work behind proxies/Gitpod tunnels
-    const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'localhost:3000';
+    const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || process.env.NEXT_PUBLIC_SITE_URL?.replace(/^https?:\/\//, '') || 'localhost:3000';
     const proto = req.headers.get('x-forwarded-proto') || 'https';
     const baseUrl = `${proto}://${host}`;
 
@@ -111,7 +111,7 @@ async function _POST(req: Request) {
       };
     });
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
     // Build metadata — include LMS fields so webhook can fulfill enrollment
     const sessionMetadata: Record<string, string> = {

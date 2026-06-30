@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
@@ -61,7 +59,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     let authorized = false;
-    let authPath: string;
+    let authPath = '';
     // verifiedShopId (stored in verified_shop_id) is only populated for shop supervisor approvals; partner approvals leave it null.
     let verifiedShopId: string | null = null;
     let supervisorRowId: string | null = null;
@@ -171,4 +169,3 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Rep verification failed');
   }
 }
-

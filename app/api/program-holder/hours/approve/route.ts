@@ -2,7 +2,7 @@
  * POST /api/program-holder/hours/approve
  *
  * Allows a program_holder to approve or reject pending OJL hour entries
- * that belong to their program. Admins and admins can approve any entry.
+ * that belong to their program. Admins and super_admins can approve any entry.
  *
  * Body: { hour_id: string, action: 'approve' | 'reject', rejection_reason?: string }
  *
@@ -13,11 +13,8 @@
  * On reject:  sets status='rejected', rejection_reason
  */
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -46,7 +43,7 @@ async function _POST(request: Request) {
     }
 
     const supabase = await createClient();
-    const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -57,11 +54,11 @@ async function _POST(request: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['program_holder', 'admin'].includes(profile.role)) {
+    if (!profile || !['program_holder', 'admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const isAdmin = ['admin'].includes(profile.role);
+    const isAdmin = ['admin', 'super_admin'].includes(profile.role);
 
     // Resolve program_holder_id — prefer profiles link, fall back to program_holders table
     let programHolderId: string | null = profile.program_holder_id ?? null;
@@ -165,4 +162,3 @@ async function _POST(request: Request) {
 }
 
 export const POST = withApiAudit('/api/program-holder/hours/approve', _POST, { critical: true });
-

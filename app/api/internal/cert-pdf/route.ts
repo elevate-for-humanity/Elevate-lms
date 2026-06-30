@@ -4,7 +4,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
 
-// PUBLIC ROUTE: internal-only — called from /api/cert/pdf on the same runtime container.
+// PUBLIC ROUTE: internal-only — called from /api/cert/pdf on the same ECS container.
 // Not exposed externally (no auth header needed — same-origin fetch only).
 
 export async function POST(req: NextRequest) {
@@ -132,4 +132,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'PDF generation failed' }, { status: 500 });
   }
 }
-

@@ -1,8 +1,6 @@
-export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import {
   getNextRequiredAction,
   getActionRoute,
@@ -75,5 +73,3 @@ async function _GET(req: Request) {
   }
 }
 export const GET = withApiAudit('/api/enrollment/next-action', _GET);
-
-

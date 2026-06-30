@@ -1,8 +1,3 @@
-import { db } from '@/lib/db';
-
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
-
 import type { SupabaseClient } from '@supabase/supabase-js';
 /**
  * POST /api/system/reconcile-payment
@@ -63,7 +58,7 @@ export async function POST(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const isAdmin = ['admin', 'staff'].includes(profile?.role ?? '');
+  const isAdmin = ['admin', 'super_admin', 'staff'].includes(profile?.role ?? '');
 
   if (!isAdmin) {
     const { data: app } = await db
@@ -211,4 +206,3 @@ async function reconcileApplication(db: SupabaseClient, applicationId: string, a
     action: 'enrolled',
   });
 }
-

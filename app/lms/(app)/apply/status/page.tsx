@@ -1,7 +1,5 @@
 'use client';
 
-
-
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';

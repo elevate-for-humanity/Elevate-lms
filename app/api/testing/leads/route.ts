@@ -13,8 +13,6 @@
  * Returns: { success: true, id: string }
  */
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -125,4 +123,3 @@ export async function PATCH(req: NextRequest) {
 
   return NextResponse.json({ success: true });
 }
-

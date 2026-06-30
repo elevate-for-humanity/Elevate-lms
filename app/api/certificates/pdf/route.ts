@@ -1,10 +1,6 @@
-export const dynamic = 'force-dynamic';
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -52,7 +48,7 @@ async function _GET(req: NextRequest) {
   const origin = req.headers.get('origin') || PLATFORM_DEFAULTS.siteUrl;
   const verifyUrl = `${origin}/verify/${cert.verification_code || cert.serial}`;
 
-  // Generate PDF via internal API route (runs on same runtime container)
+  // Generate PDF via internal API route (runs on same ECS container)
   const pdfResponse = await fetch(`${origin}/api/internal/cert-pdf`, {
     method: 'POST',
     headers: {
@@ -85,5 +81,3 @@ async function _GET(req: NextRequest) {
   });
 }
 export const GET = withApiAudit('/api/cert/pdf', _GET);
-
-

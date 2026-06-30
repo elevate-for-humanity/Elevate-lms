@@ -2,7 +2,6 @@ import { safeInternalError } from '@/lib/api/safe-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -103,4 +102,3 @@ async function _POST(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/notes', _GET);
 export const POST = withApiAudit('/api/notes', _POST);
-

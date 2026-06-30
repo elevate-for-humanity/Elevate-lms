@@ -111,4 +111,3 @@ async function _POST(req: NextRequest) {
 }
 export const GET = withApiAudit('/api/gamification/badges', _GET);
 export const POST = withApiAudit('/api/gamification/badges', _POST);
-

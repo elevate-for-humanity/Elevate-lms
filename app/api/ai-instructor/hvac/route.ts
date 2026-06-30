@@ -6,9 +6,6 @@
  * what he's teaching, then calls Gemini and returns his response.
  */
 
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -139,4 +136,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Instructor unavailable' }, { status: 500 });
   }
 }
-

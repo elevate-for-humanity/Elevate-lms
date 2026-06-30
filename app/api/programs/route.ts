@@ -1,6 +1,4 @@
 // PUBLIC ROUTE: public programs catalog
-import { db } from '@/lib/db';
-
 import { createPublicClient } from '@/lib/supabase/public';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
@@ -67,4 +65,3 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/programs', _GET);
-

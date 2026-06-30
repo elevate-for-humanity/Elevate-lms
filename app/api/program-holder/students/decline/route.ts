@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { sendStudentDeclineNotification } from '@/lib/email/service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -137,4 +136,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/program-holder/students/decline', _POST);
-

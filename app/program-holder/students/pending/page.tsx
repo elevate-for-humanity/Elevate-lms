@@ -1,0 +1,233 @@
+import { Metadata } from 'next';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { UserPlus, Mail, Phone, XCircle } from 'lucide-react';
+import AcceptDeclineButtons from './AcceptDeclineButtons';
+
+export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Pending Applications | Program Holder Portal',
+  description: 'Review pending student applications',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/program-holder/students/pending',
+  },
+};
+
+export default async function PendingStudentsPage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect('/login');
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (!profile || !['program_holder', 'admin', 'super_admin', 'staff'].includes(profile.role))
+    redirect('/login');
+
+  // Get program holder record via profiles.program_holder_id
+  const holderId = profile.program_holder_id;
+  if (!holderId) redirect('/program-holder/onboarding');
+
+  const { data: programHolder } = await supabase
+    .from('program_holders')
+    .select('id')
+    .eq('id', holderId)
+    .maybeSingle();
+
+  if (!programHolder) redirect('/program-holder/onboarding');
+
+  // Fetch pending applications
+  // Note: This assumes there's an applications table or pending status in enrollments
+  // For now, we'll check for enrollments with 'pending' status
+  const { data: pendingApplications, count } = await supabase
+    .from('program_holder_students')
+    .select(
+      `
+      *,
+      student:profiles!student_id(
+        id,
+        first_name,
+        last_name,
+        email,
+        phone
+      ),
+      program:programs(
+        name,
+        slug
+      )
+    `,
+      { count: 'exact' },
+    )
+    .eq('program_holder_id', programHolder.id)
+    .in('status', ['pending', 'submitted', 'under_review'])
+    .order('enrolled_at', { ascending: false, nullsFirst: false });
+
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs
+          items={[{ label: 'Program Holder', href: '/program-holder' }, { label: 'Students' }]}
+        />
+      </div>
+      {/* Hero Section */}
+      <section className="relative h-48 md:h-64 overflow-hidden">
+        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
+        <Image
+          src="/images/pages/program-holder-page-5.webp"
+          alt="Pending Applications"
+          fill
+          className="object-cover"
+          quality={90}
+          priority
+          sizes="100vw" placeholder="empty"
+        />
+      </section>
+
+      {/* Content Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-7xl mx-auto">
+            {/* Stats */}
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <UserPlus className="h-11 w-11 text-brand-orange-600" />
+                  <h3 className="text-sm font-medium text-black">Pending Applications</h3>
+                </div>
+                <p className="text-3xl font-bold text-brand-orange-600">{count || 0}</p>
+              </div>
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-slate-500 flex-shrink-0">•</span>
+                  <h3 className="text-sm font-medium text-black">This Week</h3>
+                </div>
+                <p className="text-3xl font-bold text-brand-green-600">
+                  {pendingApplications?.filter((a) => {
+                    const weekAgo = new Date();
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    return new Date(a.enrolled_at) >= weekAgo;
+                  }).length || 0}
+                </p>
+              </div>
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <XCircle className="h-11 w-11 text-black" />
+                  <h3 className="text-sm font-medium text-black">Awaiting Review</h3>
+                </div>
+                <p className="text-3xl font-bold text-black">{count || 0}</p>
+              </div>
+            </div>
+
+            {/* Applications List */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-black">Applications to Review</h2>
+                <Link
+                  href="/program-holder/students"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
+                >
+                  View All Students →
+                </Link>
+              </div>
+
+              {pendingApplications && pendingApplications.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-3 px-4 font-semibold text-black">Student</th>
+                        <th className="text-left py-3 px-4 font-semibold text-black">Program</th>
+                        <th className="text-left py-3 px-4 font-semibold text-black">Applied</th>
+                        <th className="text-left py-3 px-4 font-semibold text-black">Contact</th>
+                        <th className="text-left py-3 px-4 font-semibold text-black">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pendingApplications.map((application) => (
+                        <tr
+                          key={application.id}
+                          className="border-b hover:bg-white transition-colors"
+                        >
+                          <td className="py-3 px-4">
+                            <div className="font-medium text-black">
+                              {application.student?.first_name} {application.student?.last_name}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-black">
+                            {application.program?.name || 'N/A'}
+                          </td>
+                          <td className="py-3 px-4 text-black">
+                            {new Date(application.enrolled_at).toLocaleDateString()}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex gap-2">
+                              {application.student?.email && (
+                                <a
+                                  href={`mailto:${application.student.email}`}
+                                  className="text-brand-blue-600 hover:text-brand-blue-700"
+                                  title="Email"
+                                >
+                                  <Mail className="h-4 w-4" />
+                                </a>
+                              )}
+                              {application.student?.phone && (
+                                <a
+                                  href={`tel:${application.student.phone}`}
+                                  className="text-brand-blue-600 hover:text-brand-blue-700"
+                                  title="Phone"
+                                >
+                                  <Phone className="h-4 w-4" />
+                                </a>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <AcceptDeclineButtons enrollmentId={application.id} />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <UserPlus className="h-16 w-16 text-slate-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-black mb-2">No Pending Applications</h3>
+                  <p className="text-black mb-6">
+                    There are no student applications waiting for review.
+                  </p>
+                  <Link
+                    href="/program-holder/students"
+                    className="inline-flex items-center px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition-colors"
+                  >
+                    View All Students
+                  </Link>
+                </div>
+              )}
+
+              <div className="mt-6 flex justify-between items-center">
+                <Link
+                  href="/program-holder/students"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
+                >
+                  ← Back to All Students
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

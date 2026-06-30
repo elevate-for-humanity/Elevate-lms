@@ -1,8 +1,5 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getLearnerProgress } from '@/lib/lms/engine';
@@ -72,4 +69,3 @@ export const GET = withApiAudit(
   '/api/lms/progress',
   _GET as unknown as (req: Request, ...args: any[]) => Promise<Response>,
 );
-

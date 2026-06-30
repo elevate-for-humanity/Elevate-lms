@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ADMIN_ROLES = ['admin', 'admin', 'org_admin', 'staff'];
+const ADMIN_ROLES = ['admin', 'super_admin', 'org_admin', 'staff'];
 
 /**
  * Called immediately after signInWithPassword on the admin-login page.
@@ -42,4 +41,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
-

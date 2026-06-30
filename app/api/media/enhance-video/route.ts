@@ -7,7 +7,6 @@ import { promisify } from 'util';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -53,7 +52,7 @@ async function _POST(request: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -233,4 +232,3 @@ async function _GET(request: Request) {
 }
 export const GET = withApiAudit('/api/media/enhance-video', _GET);
 export const POST = withApiAudit('/api/media/enhance-video', _POST);
-

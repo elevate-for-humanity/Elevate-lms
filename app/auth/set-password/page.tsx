@@ -1,7 +1,5 @@
 'use client';
 
-
-
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AlertCircle, CheckCircle, Eye, EyeOff, Loader2 } from 'lucide-react';

@@ -1,9 +1,6 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -18,7 +15,7 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await parseBody<Record<string, any>>(request);
@@ -96,5 +93,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/onboarding/payroll-setup', _POST);
-
-

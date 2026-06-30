@@ -59,4 +59,3 @@ async function _POST(request: Request) {
   return NextResponse.json({ ok: true });
 }
 export const POST = withApiAudit('/api/support/ticket', _POST);
-

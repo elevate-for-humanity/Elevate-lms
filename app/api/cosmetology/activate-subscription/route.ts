@@ -1,9 +1,5 @@
-export const dynamic = 'force-dynamic';
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getStripe } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -77,26 +73,24 @@ export async function POST(request: NextRequest) {
     nextFriday.setUTCHours(15, 0, 0, 0); // 10:00 AM ET = 15:00 UTC
 
     const weeklyAmountCents = sub.weekly_payment_cents;
-
-    // Create product and price for this program
-    const product = await stripe.products.create({
-      name: 'Cosmetology Apprenticeship — Weekly Tuition',
-      metadata: { program: 'cosmetology-apprenticeship' },
-    });
-
-    const price = await stripe.prices.create({
-      product: product.id,
-      unit_amount: weeklyAmountCents,
-      currency: 'usd',
-      recurring: { interval: 'week', interval_count: 1 },
-    });
-
     const stripeSubscription = await stripe.subscriptions.create({
       customer: sub.stripe_customer_id,
       default_payment_method: paymentMethodId,
       billing_cycle_anchor: Math.floor(nextFriday.getTime() / 1000),
       proration_behavior: 'none',
-      items: [{ price: price.id }],
+      items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Cosmetology Apprenticeship — Weekly Tuition',
+              metadata: { program: 'cosmetology-apprenticeship', user_id: user.id },
+            },
+            unit_amount: weeklyAmountCents,
+            recurring: { interval: 'week', interval_count: 1 },
+          },
+        },
+      ],
       metadata: {
         user_id: user.id,
         program: 'cosmetology-apprenticeship',
@@ -137,5 +131,3 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Failed to activate subscription');
   }
 }
-
-

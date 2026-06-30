@@ -29,4 +29,3 @@ async function forwardToCanonical(request: NextRequest): Promise<NextResponse> {
 }
 
 export const POST = forwardToCanonical;
-

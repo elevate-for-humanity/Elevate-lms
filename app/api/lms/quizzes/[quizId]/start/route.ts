@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { logger } from '@/lib/logger';
 import { requireApiRole } from '@/lib/auth/require-api-role';
 import { NextRequest, NextResponse } from 'next/server';
@@ -10,10 +8,10 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ quizI
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await requireApiRole(['student', 'admin']);
-  if (auth instanceof NextResponse) return auth;
+  const auth = await requireApiRole(['student', 'admin', 'super_admin']);
+  if (auth.error) return auth.error;
 
-  const { user, db, profile } = auth;
+  const { user, db } = auth;
   const { quizId } = await params;
 
   // Check if quiz exists and resolve course_id for enrollment check.
@@ -34,11 +32,11 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ quizI
   //
   // Path 1: quiz has course_id → check program_enrollments.course_id directly
   // Path 2: quiz has lesson_id → resolve course via curriculum_lessons → course_modules → courses → program_id
-  // Path 3: admin/admin bypass (they can start any quiz)
+  // Path 3: admin/super_admin bypass (they can start any quiz)
   //
   // If no ownership can be resolved, fail closed.
 
-  const isAdmin = profile?.role === 'admin' || profile?.role === 'admin';
+  const isAdmin = auth.role === 'admin' || auth.role === 'super_admin';
   let enrolled = isAdmin; // admins bypass enrollment check
 
   if (!enrolled) {

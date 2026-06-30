@@ -235,4 +235,3 @@ async function _POST_ARCHIVED(req: NextRequest) {
  *
  * export const POST = withApiAudit('/api/intake/application', _POST);
  */
-

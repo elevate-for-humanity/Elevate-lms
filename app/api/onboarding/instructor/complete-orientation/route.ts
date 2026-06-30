@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -25,7 +23,7 @@ export async function POST(req: NextRequest) {
     .eq('id', auth.id)
     .maybeSingle();
 
-  if (!profile || !['instructor', 'admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['instructor', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
     return safeError('Forbidden', 403);
   }
 
@@ -42,4 +40,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ ok: true });
 }
-

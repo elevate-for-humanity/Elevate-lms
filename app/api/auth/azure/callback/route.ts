@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 // PUBLIC ROUTE: Azure AD OAuth initiation/callback — rate-limited
 /**
  * POST /api/auth/azure/callback
@@ -22,7 +21,6 @@ export const dynamic = 'force-dynamic';
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
@@ -81,8 +79,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(`${loginUrl}?error=azure_not_configured`);
   }
 
-  let idToken: string | null;
-  let state: string | null;
+  let idToken: string | null = null;
+  let state: string | null = null;
   try {
     const formData = await req.formData();
     idToken = formData.get('id_token') as string | null;
@@ -142,5 +140,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(`${loginUrl}?error=azure_invalid`);
   }
 }
-
-

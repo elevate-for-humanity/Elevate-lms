@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -121,9 +120,9 @@ async function _POST(req: NextRequest) {
   yesterdayDate.setDate(todayDate.getDate() - 1);
   const yesterdayStr = yesterdayDate.toISOString().slice(0, 10);
 
-  let currentStreak: number;
-  let longestStreak: number;
-  let lastActiveDate: string | null;
+  let currentStreak = 0;
+  let longestStreak = 0;
+  let lastActiveDate: string | null = null;
 
   const reachedGoalToday = secondsToday >= dailyGoalSeconds;
 
@@ -242,4 +241,3 @@ async function _POST(req: NextRequest) {
   });
 }
 export const POST = withApiAudit('/api/activity/watch-tick', _POST);
-

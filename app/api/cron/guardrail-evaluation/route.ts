@@ -2,8 +2,6 @@
  * GET /api/cron/guardrail-evaluation
  * Evaluate AI guardrail violations from the last 24h and alert admin on patterns.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -25,8 +23,8 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    logger.error('[cron/guardrail-evaluation] DB error', { error: 'Internal server error' });
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    logger.error('[cron/guardrail-evaluation] DB error', { error: error.message });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   const rows = violations ?? [];
@@ -56,4 +54,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/guardrail-evaluation] evaluated', { total, uniqueUsers, byType });
   return NextResponse.json({ ok: true, total, uniqueUsers, byType });
 });
-

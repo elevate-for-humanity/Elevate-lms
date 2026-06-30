@@ -1,11 +1,9 @@
-export const dynamic = 'force-dynamic';
 // Upload a certification document (PDF, image) for a learner's certification record.
 // Called by CertificationTracker when a learner uploads proof of an external cert.
 // Stores the file in the `documents` bucket and updates the certifications row.
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -71,7 +69,7 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to update certification record' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, url: urlData.publicUrl, file_path: filePath });
+    return NextResponse.json({ success: true, url: signed.signedUrl, file_path: filePath });
   } catch (err) {
     logger.error('Certification upload handler error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -79,5 +77,3 @@ async function _POST(request: NextRequest) {
 }
 
 export const POST = withApiAudit('/api/certifications/upload', _POST);
-
-

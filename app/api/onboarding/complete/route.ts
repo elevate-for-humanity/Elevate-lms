@@ -1,10 +1,7 @@
-import { db } from '@/lib/db';
-
 import { safeInternalError } from '@/lib/api/safe-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { approveApplication } from '@/lib/enrollment/approve';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
@@ -374,4 +371,3 @@ async function _POST(request: NextRequest) {
 }
 
 export const POST = withApiAudit('/api/onboarding/complete', _POST);
-

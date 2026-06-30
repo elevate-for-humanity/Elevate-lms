@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 /**
  * GET /api/internal/course-health
  *
@@ -6,12 +5,11 @@ export const dynamic = 'force-dynamic';
  * A course with ANY blocking issue returns status: "FAIL".
  * Publish is blocked when health.status !== "PASS".
  *
- * Protected: admin or admin only.
+ * Protected: admin or super_admin only.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { safeInternalError } from '@/lib/api/safe-error';
 
 type HealthStatus = 'PASS' | 'FAIL';
@@ -58,7 +56,7 @@ export async function GET(_request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -192,5 +190,3 @@ export async function GET(_request: NextRequest) {
     return safeInternalError(error, 'Course health check failed');
   }
 }
-
-

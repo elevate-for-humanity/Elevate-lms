@@ -11,8 +11,6 @@
  * Body: { bookingId: string, email: string, examName: string }
  */
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
@@ -152,4 +150,3 @@ export const POST = withRuntime({ auth: 'admin' }, async (req) => {
 
   return NextResponse.json({ success: true, holdId: hold.id });
 });
-

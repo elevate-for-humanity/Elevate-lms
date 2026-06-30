@@ -11,8 +11,6 @@
  *   4. Return QB transaction ID for audit trail
  */
 
-import { getAdminClient } from '@/lib/supabase/admin';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -131,17 +129,9 @@ async function qbRequest(method: string, path: string, body?: unknown) {
   return data;
 }
 
-function sanitizeQBString(value: string): string {
-  // QuickBooks query language escapes: strip control chars, escape backslashes then single quotes
-  // eslint-disable-next-line no-control-regex
-  const cleaned = value.replace(/[\u0000-\u001f\u007f]/g, '');
-  return cleaned.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-}
-
 async function findOrCreateVendor(name: string, email: string) {
-  // Search by email — sanitize to prevent query injection
-  const safeEmail = sanitizeQBString(email);
-  const query = `SELECT * FROM Vendor WHERE PrimaryEmailAddr = '${safeEmail}' MAXRESULTS 1`;
+  // Search by email
+  const query = `SELECT * FROM Vendor WHERE PrimaryEmailAddr = '${email.replace(/'/g, "\\'")}' MAXRESULTS 1`;
   const search = await qbRequest('GET', `query?query=${encodeURIComponent(query)}`);
   const existing = search?.QueryResponse?.Vendor?.[0];
   if (existing) return existing;
@@ -238,4 +228,3 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'QuickBooks payment failed');
   }
 }
-

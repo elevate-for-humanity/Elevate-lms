@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { logger } from '@/lib/logger';
 import { requireApiRole } from '@/lib/auth/require-api-role';
 import { NextRequest, NextResponse } from 'next/server';
@@ -16,8 +14,8 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ quizI
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
 
-  const auth = await requireApiRole(['student', 'admin']);
-  if (auth instanceof NextResponse) return auth;
+  const auth = await requireApiRole(['student', 'admin', 'super_admin']);
+  if (auth.error) return auth.error;
 
   const { user, db } = auth;
   const { quizId } = await params;

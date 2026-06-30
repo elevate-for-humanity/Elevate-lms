@@ -2,7 +2,6 @@ import { safeInternalError } from '@/lib/api/safe-error';
 import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { uploadComplianceEvidenceFile } from '@/lib/storage/complianceEvidence';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -90,4 +89,3 @@ async function _POST(request: Request) {
   return NextResponse.json({ evidence });
 }
 export const POST = withApiAudit('/api/compliance/evidence', _POST, { critical: true });
-

@@ -19,4 +19,3 @@ export async function GET(request: NextRequest) {
   if (auth.error) return auth.error;
   return auditLogsGET(request);
 }
-

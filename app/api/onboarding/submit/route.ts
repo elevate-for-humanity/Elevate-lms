@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import {
   OnboardingData,
   generateCompleteOnboardingPackage,
@@ -276,4 +275,3 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/onboarding/submit', _GET);
 export const POST = withApiAudit('/api/onboarding/submit', _POST);
-

@@ -124,4 +124,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/partner-courses/create-checkout', _POST);
-

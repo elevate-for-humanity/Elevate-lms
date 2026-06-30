@@ -3,8 +3,6 @@
  * GET /api/cron/funding-escalation
  * Escalate funding assignments that have been pending > 7 days to critical alert.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -31,7 +29,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/funding-escalation] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   if (!escalations?.length) return NextResponse.json({ ok: true, escalated: 0 });
@@ -46,16 +44,16 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       severity: 'critical',
       message: `Funding assignment for ${profile?.full_name ?? row.student_id} (${source?.name ?? 'unknown source'}) has been pending ${daysWaiting} days — ESCALATED`,
       metadata: { assignment_id: row.id, student_id: row.student_id, days_waiting: daysWaiting },
-    })
+    }).onConflict('id').ignore().catch(() => {});
 
-    await emitEvent('funding.escalated', 'payment', {
+    await emitEvent('funding.escalated', 'funding', {
       severity: 'error',
       actor_type: 'cron',
       subject_id: row.student_id,
       subject_type: 'student',
       payload: { assignment_id: row.id, days_waiting: daysWaiting },
       message: `Funding escalated: ${profile?.full_name ?? row.student_id} — ${daysWaiting} days pending`,
-    })
+    }).catch(() => {});
   }
 
   await sendEmail({
@@ -67,4 +65,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/funding-escalation] Done', { escalated: escalations.length });
   return NextResponse.json({ ok: true, escalated: escalations.length });
 });
-

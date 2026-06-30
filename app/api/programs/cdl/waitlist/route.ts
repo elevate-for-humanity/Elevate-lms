@@ -24,4 +24,3 @@ export async function POST(request: NextRequest) {
 
   return redirectToApply(request, 303);
 }
-

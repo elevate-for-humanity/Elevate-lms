@@ -4,8 +4,6 @@
  * Process pending instructor verdicts (lab/assignment sign-offs) older than 5 days.
  * Escalates to admin if still unreviewed.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -32,8 +30,8 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .limit(100);
 
   if (error) {
-    logger.error('[cron/weekly-verdicts] DB error', { error: 'Internal server error' });
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    logger.error('[cron/weekly-verdicts] DB error', { error: error.message });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   const rows = stale ?? [];
@@ -66,4 +64,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/weekly-verdicts] escalated', { escalated });
   return NextResponse.json({ ok: true, escalated });
 });
-

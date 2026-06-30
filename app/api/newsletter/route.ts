@@ -4,9 +4,9 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { headers } from 'next/headers';
+import crypto from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { hashIp } from '@/lib/api/get-client-ip';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -25,6 +25,10 @@ const ratelimit =
         prefix: 'newsletter',
       })
     : null;
+
+function hashIp(ip: string): string {
+  return crypto.createHash('sha256').update(ip).digest('hex').slice(0, 16);
+}
 
 async function _POST(req: Request) {
   const rateLimited = await applyRateLimit(req, 'api');
@@ -90,4 +94,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/newsletter', _POST);
-

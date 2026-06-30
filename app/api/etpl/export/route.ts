@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { auditExport } from '@/lib/auditLog';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -34,7 +33,7 @@ export async function GET(req: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'sponsor', 'staff'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin', 'sponsor', 'staff'].includes(profile.role)) {
       return NextResponse.json(
         { error: 'Access denied. Admin or sponsor role required.' },
         { status: 403 },
@@ -72,4 +71,3 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

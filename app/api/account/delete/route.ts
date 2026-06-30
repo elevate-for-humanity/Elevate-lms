@@ -1,6 +1,4 @@
 // app/api/account/delete/route.ts
-import { db } from '@/lib/db';
-
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
@@ -53,4 +51,3 @@ async function _POST(request: Request) {
   });
 }
 export const POST = withApiAudit('/api/account/delete', _POST);
-

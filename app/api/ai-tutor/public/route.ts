@@ -1,12 +1,12 @@
 // PUBLIC ROUTE: public AI tutor for prospective students
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { PROGRAMS, buildSystemPrompt } from '@/lib/ai/programRegistry';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { getClientIp, hashIp } from '@/lib/api/get-client-ip';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,6 +23,24 @@ function isAllowedOrigin(origin: string): boolean {
   if (process.env.NODE_ENV !== 'production') return true;
 
   return false;
+}
+
+function getClientIp(req: NextRequest): string {
+  return (
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    req.headers.get('cf-connecting-ip') ||
+    'unknown'
+  );
+}
+
+function hashIp(ip: string): string {
+  const salt = process.env.LOG_SALT || 'elevate-public-tutor';
+  return crypto
+    .createHash('sha256')
+    .update(ip + salt)
+    .digest('hex')
+    .slice(0, 16);
 }
 
 function containsPII(text: string): boolean {
@@ -161,4 +179,3 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/ai-tutor/public', _POST);
-

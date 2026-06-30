@@ -3,9 +3,6 @@
  * This endpoint is preserved for backwards compatibility.
  * Migration: runAITask({ task: 'general_chat' | 'instructor_support', ... })
  */
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
-
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -175,4 +172,3 @@ Keep responses concise but helpful. Use bullet points for clarity when listing i
   }
 }
 export const POST = withApiAudit('/api/chat/ai-response', _POST);
-

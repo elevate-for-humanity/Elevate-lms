@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -76,7 +75,7 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'staff'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -107,7 +106,7 @@ async function _POST(request: NextRequest) {
         content,
         excerpt: excerpt || content.substring(0, 200) + '...',
         category: category || 'News',
-        image: image || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/social-media-1.webp',
+        image: image || '/images/pages/social-media-1.webp',
         tags: tags || [],
         status: status || 'draft',
         author_id: user.id,
@@ -131,4 +130,3 @@ async function _POST(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/blog/posts', _GET);
 export const POST = withApiAudit('/api/blog/posts', _POST);
-

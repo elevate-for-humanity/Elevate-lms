@@ -1,11 +1,8 @@
-export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { canSubmitDocuments, hasLmsAccess, normalizeEnrollmentState } from '@/lib/enrollment/enrollment-flow';
 
 async function _POST(req: Request) {
   try {
@@ -31,7 +28,7 @@ async function _POST(req: Request) {
     // Verify ownership and current state
     const { data: enrollment, error: fetchError } = await supabase
       .from('program_enrollments')
-      .select('id, user_id, enrollment_state, program_id, program_slug, email, full_name')
+      .select('id, user_id, enrollment_state, program_id, email, full_name')
       .eq('id', enrollment_id)
       .maybeSingle();
 
@@ -43,17 +40,16 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const state = normalizeEnrollmentState(enrollment.enrollment_state);
-
-    if (hasLmsAccess(state)) {
-      return NextResponse.json({
-        success: true,
-        message: 'Documents already submitted',
-        redirect: '/learner/dashboard',
-      });
-    }
-
-    if (!canSubmitDocuments(state)) {
+    // Orientation gate — single source of truth is enrollments.enrollment_state.
+    // profiles.orientation_completed is a denormalized cache; do not gate on it here.
+    if (enrollment.enrollment_state !== 'orientation_complete') {
+      if (enrollment.enrollment_state === 'active') {
+        return NextResponse.json({
+          success: true,
+          message: 'Documents already submitted',
+          redirect: '/dashboard',
+        });
+      }
       return NextResponse.json(
         {
           error: 'Cannot submit documents from current state',
@@ -169,7 +165,7 @@ async function _POST(req: Request) {
     return NextResponse.json({
       success: true,
       message: 'Documents submitted. Enrollment activated.',
-      redirect: '/learner/dashboard',
+      redirect: '/dashboard',
     });
   } catch (err) {
     logger.error('Documents complete error:', err);
@@ -177,5 +173,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/enrollment/documents/complete', _POST);
-
-

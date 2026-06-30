@@ -2,8 +2,6 @@
 // AUTH: Intentionally public — orientation booking is open to prospective students
 // before they have an account. Rate-limited to 3 req/min via 'contact' tier.
 
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { createZoomMeeting } from '@/lib/integrations/zoom';
 import { sendEmail } from '@/lib/email';
@@ -190,4 +188,3 @@ ${meeting.id ? `<span style="color:#6b7280;font-size:12px">Meeting ID: ${meeting
   }
 }
 export const POST = withApiAudit('/api/orientation/schedule', _POST);
-

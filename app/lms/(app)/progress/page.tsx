@@ -177,7 +177,7 @@ export default async function ProgressPage() {
         <LmsHeroBanner
           title="My Progress"
           subtitle={`${stats.completedLessons} lessons completed across ${stats.totalCourses} courses. ${overallProgress}% overall completion.`}
-          image="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-7.webp"
+          image="/images/pages/career-services-page-7.webp"
           eyebrow="Learning Analytics"
           cta={{ label: 'Continue Learning', href: '/lms/courses' }}
         />
@@ -287,12 +287,12 @@ export default async function ProgressPage() {
                           <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center flex-shrink-0 relative overflow-hidden">
                             {enrollment.courses?.thumbnail_url ? (
                               <Image
-                                alt={enrollment.courses.title || 'Course thumbnail'}
+                                alt="Progress indicator"
                                 src={enrollment.courses.thumbnail_url}
+                                alt={enrollment.courses.title || 'Course thumbnail'}
                                 fill
                                 className="object-cover rounded-xl"
-                                sizes="64px"
-                                
+                                sizes="64px" placeholder="empty"
                               />
                             ) : (
                               <BookOpen className="w-8 h-8 text-slate-400" />

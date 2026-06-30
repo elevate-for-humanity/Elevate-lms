@@ -1,13 +1,10 @@
-export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { success, failure } from '@/lib/api/safe-handler';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { PRE_DOCUMENTS_STATES } from '@/lib/enrollment/enrollment-flow';
 
 async function _POST(req: Request) {
   try {
@@ -31,12 +28,16 @@ async function _POST(req: Request) {
     let targetId: string | null = enrollmentId ?? null;
 
     if (!targetId) {
+      // Find the most recent enrollment that hasn't had documents submitted yet.
+      // 'orientation_complete' is the canonical pre-documents state.
+      // 'onboarding' and 'orientation' are earlier states that may also be valid
+      // if the student skipped the orientation step (legacy flows).
       const { data: pending } = await supabase
         .from('program_enrollments')
         .select('id')
         .eq('user_id', user.id)
         .is('documents_submitted_at', null)
-        .in('enrollment_state', [...PRE_DOCUMENTS_STATES])
+        .in('enrollment_state', ['orientation_complete', 'onboarding', 'orientation', 'enrolled'])
         .order('enrolled_at', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -92,5 +93,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/enrollment/submit-documents', _POST);
-
-

@@ -3,7 +3,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { resend } from '@/lib/resend';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -125,4 +124,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/instructor/campaigns/send', _POST);
-

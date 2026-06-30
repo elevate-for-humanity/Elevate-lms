@@ -7,7 +7,6 @@ export const maxDuration = 10;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -124,7 +123,7 @@ View full details: ${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteU
 This is an automated alert from ${PLATFORM_DEFAULTS.orgName} Security System.
   `;
 
-  logger.info('[EMAIL ALERT]: ' + emailContent);
+  logger.info('[EMAIL ALERT]', emailContent);
 
   // Email sending via SendGrid when configured
   // Set SENDGRID_API_KEY and ALERT_EMAIL in environment variables
@@ -214,4 +213,3 @@ export async function GET() {
     ],
   });
 }
-

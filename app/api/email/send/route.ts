@@ -26,8 +26,8 @@ async function _POST(req: Request) {
   }
 
 
-  let emailTo: string;
-  let emailSubject: string;
+  let emailTo = '';
+  let emailSubject = '';
 
   try {
     const body = await req.json();
@@ -74,4 +74,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/email/send', _POST));
-

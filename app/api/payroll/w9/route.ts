@@ -154,4 +154,3 @@ export async function POST(request: NextRequest) {
     payroll_profile_id: payrollProfileId,
   });
 }
-

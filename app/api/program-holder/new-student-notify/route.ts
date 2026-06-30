@@ -7,10 +7,7 @@ const FROM = 'onboarding@elevateforhumanity.org';
 
 // AUTH_EXEMPT: Internal server-to-server route. Secured via INTERNAL_API_SECRET shared secret.
 // Called internally after a new HVAC enrollment is created.
-/**
- * Sends Indy On Demand Services an email with the new student's details.
- * Indy On Demand Services is the primary instructor/co-delivery partner.
- */
+// Sends David an email with the new student's details.
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
@@ -32,10 +29,10 @@ export async function POST(request: NextRequest) {
 <div style="max-width:560px;margin:0 auto;padding:40px 20px;">
   <div style="background:#1e3a5f;border-radius:12px 12px 0 0;padding:28px 30px;text-align:center;">
     <h1 style="color:white;margin:0;font-size:20px;font-weight:700;">New Student Enrolled</h1>
-    <p style="color:#93c5fd;margin:6px 0 0 0;font-size:14px;">INDY ON DEMAND SERVICES — ${programName ?? 'HVAC Program'}</p>
+    <p style="color:#93c5fd;margin:6px 0 0 0;font-size:14px;">Indy On Demand Services LLC — ${programName ?? 'HVAC Program'}</p>
   </div>
   <div style="background:white;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;padding:32px 30px;">
-    <p style="margin-top:0;">Hi Indy On Demand Services,</p>
+    <p style="margin-top:0;">Hi David,</p>
     <p>A new student has been enrolled in your HVAC program and added to your portal.</p>
     <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:20px;margin:20px 0;">
       <p style="margin:0 0 8px 0;font-size:15px;"><strong>👤 Name:</strong> ${studentName ?? '—'}</p>
@@ -64,7 +61,7 @@ export async function POST(request: NextRequest) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      personalizations: [{ to: [{ email: 'indyondemandservices@gmail.com', name: 'Indy On Demand Services' }] }],
+      personalizations: [{ to: [{ email: 'indyondemandservices@gmail.com', name: 'David Nazaire' }] }],
       from: { email: FROM, name: PLATFORM_DEFAULTS.orgName },
       reply_to: { email: 'elizabethpowell6262@gmail.com', name: 'Elizabeth Greene' },
       subject: `New HVAC Student: ${studentName ?? 'New Enrollment'}`,
@@ -79,4 +76,3 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ sent: true });
 }
-

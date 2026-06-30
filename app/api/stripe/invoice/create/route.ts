@@ -13,10 +13,11 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
-  const auth = await apiRequireAdmin(req);
+  const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
   try {
+
     const body = await req.json();
     const { employer_id, customerId, amount, description } = body;
 
@@ -39,9 +40,9 @@ async function _POST(req: Request) {
       );
     }
 
+    const Stripe = (await import('stripe')).default;
     const stripe = getStripe();
-    if (!stripe)
-      return NextResponse.json({ error: 'Payment processing not configured' }, { status: 503 });
+    if (!stripe) return NextResponse.json({ error: 'Payment processing not configured' }, { status: 503 });
 
     // Create invoice item
     const invoiceItem = await stripe.invoiceItems.create({
@@ -92,6 +93,7 @@ async function _GET(request: Request) {
   if (auth.error) return auth.error;
 
   try {
+
     const supabase = await requireAdminClient();
 
     const { data, error }: any = await supabase.from('invoices').select('*');
@@ -107,4 +109,3 @@ async function _GET(request: Request) {
 }
 export const GET = withRuntime(withApiAudit('/api/stripe/invoice/create', _GET));
 export const POST = withRuntime(withApiAudit('/api/stripe/invoice/create', _POST));
-

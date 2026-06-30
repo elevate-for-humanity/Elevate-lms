@@ -163,4 +163,3 @@ function getFallbackResponse(message: string): string {
   return 'Thanks for reaching out! I can help you with information about our programs, applying, funding, or connecting you with our team. What would you like to know? Or, I can transfer you to a specialist - just let me know!';
 }
 export const POST = withApiAudit('/api/receptionist', _POST);
-

@@ -1,0 +1,170 @@
+export const dynamic = 'force-dynamic';
+import { Metadata } from 'next';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import {
+  ArrowRight,
+  ExternalLink,
+  GraduationCap,
+  DollarSign,
+  Briefcase,
+  Shield,
+} from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Resources',
+  description:
+    'Workforce training resources, funding guides, career tools, and external links for students, employers, and partners.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/resources' },
+};
+
+const sections = [
+  {
+    title: 'For Students',
+    icon: GraduationCap,
+    links: [
+      { label: 'Apply for Training', href: '/apply/student', external: false },
+      { label: 'Check Funding Eligibility', href: '/check-eligibility', external: false },
+      { label: 'View All Programs', href: '/programs', external: false },
+      { label: 'Career Services', href: '/career-services', external: false },
+      { label: 'FAQ', href: '/faq', external: false },
+    ],
+  },
+  {
+    title: 'Funding & Financial Aid',
+    icon: DollarSign,
+    links: [
+      { label: 'WIOA Funding', href: '/funding', external: false },
+      { label: 'Workforce Ready Grant (WRG)', href: '/funding', external: false },
+      { label: 'Job-Ready Incentive (Job Ready Indy)', href: '/funding/jri', external: false },
+      { label: 'DOL Apprenticeship', href: '/funding/dol', external: false },
+      {
+        label: 'Indiana Career Connect',
+        href: 'https://www.indianacareerconnect.com',
+        external: true,
+      },
+    ],
+  },
+  {
+    title: 'For Employers',
+    icon: Briefcase,
+    links: [
+      { label: 'Employer Portal', href: '/employer/dashboard', external: false },
+      { label: 'Post a Job', href: '/employer/dashboard', external: false },
+      { label: 'Apprenticeship Partnerships', href: '/employer/dashboard', external: false },
+      { label: 'WOTC Tax Credits', href: 'https://www.dol.gov/agencies/eta/wotc', external: true },
+    ],
+  },
+  {
+    title: 'External Resources',
+    icon: ExternalLink,
+    links: [
+      { label: 'WorkOne Indiana', href: 'https://www.workoneindy.com', external: true },
+      { label: 'Indiana DWD', href: 'https://www.in.gov/dwd', external: true },
+      { label: 'Next Level Jobs', href: 'https://nextleveljobs.org', external: true },
+      { label: 'OSHA Training', href: 'https://www.osha.gov', external: true },
+      { label: 'U.S. DOL Apprenticeship', href: 'https://www.apprenticeship.gov', external: true },
+    ],
+  },
+  {
+    title: 'Policies & Compliance',
+    icon: Shield,
+    links: [
+      { label: 'Privacy Policy', href: '/legal/privacy', external: false },
+      { label: 'Terms of Service', href: '/legal', external: false },
+      { label: 'Accessibility', href: '/accessibility', external: false },
+      { label: 'Disclosures', href: '/legal/disclosures', external: false },
+      { label: 'Governance', href: '/governance', external: false },
+    ],
+  },
+];
+
+export default function ResourcesPage() {
+  return (
+    <div className="min-h-screen bg-white">
+      {' '}
+      <div className="bg-white border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[{ label: 'Resources' }]} />
+        </div>
+      </div>
+      {/* Hero Image */}
+      <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
+        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
+        <Image
+          src="/images/pages/resources-page-1.webp"
+          alt="Resource hub for students and partners"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority placeholder="empty"
+        />
+      </section>
+      <section className="py-14 sm:py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3">
+            Resources
+          </h1>
+          <p className="text-lg text-slate-600 max-w-2xl">
+            Guides, tools, and links for students, employers, and partners.
+          </p>
+        </div>
+      </section>
+      <section className="py-14 sm:py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {sections.map((section) => {
+              const Icon = section.icon;
+              return (
+                <div key={section.title}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <Icon className="w-5 h-5 text-brand-blue-600" />
+                    <h2 className="font-bold text-slate-900 text-lg">{section.title}</h2>
+                  </div>
+                  <ul className="space-y-2">
+                    {section.links.map((link) => (
+                      <li key={link.label}>
+                        {link.external ? (
+                          <a
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-brand-blue-600 hover:underline text-sm flex items-center gap-1"
+                          >
+                            {link.label} <ExternalLink className="w-3 h-3" />
+                          </a>
+                        ) : (
+                          <Link
+                            href={link.href}
+                            className="text-brand-blue-600 hover:underline text-sm"
+                          >
+                            {link.label}
+                          </Link>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+      <section className="py-14 sm:py-20 border-t">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-2xl font-bold text-slate-900 mb-3">Need Help?</h2>
+          <p className="text-slate-600 mb-6">
+            Can&apos;t find what you&apos;re looking for? Contact our team.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold transition"
+          >
+            Contact Us <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
+}

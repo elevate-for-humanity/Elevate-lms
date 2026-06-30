@@ -1,12 +1,10 @@
-export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 /**
  * AI Career Counseling Chat API
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -50,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     if (!message) return NextResponse.json({ error: 'Message is required' }, { status: 400 });
 
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
 
     let convId = conversationId;
     if (!convId) {
@@ -120,6 +118,3 @@ function generateSuggestions(response: string, profile: any): string[] {
 export async function GET() {
   return NextResponse.json({ name: 'AI Career Counseling API', version: '1.0.0', description: 'Personalized career guidance powered by AI' });
 }
-
-
-

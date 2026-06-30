@@ -20,7 +20,7 @@ async function _GET(_req: NextRequest, { params }: { params: Promise<{ slug: str
     return NextResponse.json({ error: 'Invalid slug' }, { status: 400 });
   }
 
-  let product;
+  let product = null;
   try {
     product = await getCatalogProduct(slug);
   } catch {

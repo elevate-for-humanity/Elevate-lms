@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/auth/require-api-role';
@@ -14,8 +12,8 @@ async function _GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const auth = await requireApiRole(['student', 'admin']);
-    if (auth instanceof NextResponse) return auth;
+    const auth = await requireApiRole(['student', 'admin', 'super_admin']);
+    if (auth.error) return auth.error;
 
     const { user, db } = auth;
 
@@ -279,4 +277,3 @@ function formatEventDate(dateStr: string): string {
   return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 }
 export const GET = withApiAudit('/api/learner/dashboard', _GET);
-

@@ -3,7 +3,6 @@
 // app/api/mobile/profile/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -118,4 +117,3 @@ async function _GET(request: NextRequest) {
   }
 }
 export const GET = withApiAudit('/api/mobile/profile', _GET);
-

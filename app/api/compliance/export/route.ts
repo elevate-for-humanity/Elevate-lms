@@ -1,8 +1,6 @@
-export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
@@ -14,7 +12,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * - Onboarding progress
  * - Compliance audit logs
  *
- * Access restricted to admin and admin roles.
+ * Access restricted to admin and super_admin roles.
  */
 
 export async function GET(request: NextRequest) {
@@ -39,7 +37,7 @@ export async function GET(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin'].includes(profile.role)) {
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
   }
 
@@ -350,7 +348,7 @@ export async function POST(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin'].includes(profile.role)) {
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
   }
 
@@ -401,5 +399,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to generate compliance report' }, { status: 500 });
   }
 }
-
-

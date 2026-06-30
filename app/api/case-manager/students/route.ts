@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 
 import { NextResponse } from 'next/server';
 import { toErrorMessage } from '@/lib/safe';
@@ -111,4 +110,3 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/case-manager/students', _GET);
-

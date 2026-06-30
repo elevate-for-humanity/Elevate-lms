@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getSocialTokens } from '@/lib/social/token-resolver';
@@ -19,7 +18,7 @@ async function _POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return safeError('Unauthorized', 401);
 
   const body = await parseBody<Record<string, unknown>>(request);
@@ -193,7 +192,7 @@ async function _GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return safeError('Unauthorized', 401);
 
   const { searchParams } = new URL(request.url);
@@ -211,4 +210,3 @@ async function _GET(request: NextRequest) {
 
 export const GET = withApiAudit('/api/social-media/post', _GET);
 export const POST = withApiAudit('/api/social-media/post', _POST);
-

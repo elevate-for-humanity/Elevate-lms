@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
@@ -86,4 +84,3 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Account claim failed');
   }
 }
-

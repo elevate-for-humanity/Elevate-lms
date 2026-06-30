@@ -2,8 +2,6 @@
  * GET /api/cron/end-of-day-summary
  * Send a daily operations summary to admin: enrollments, completions, payments, alerts.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -56,4 +54,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/end-of-day-summary] sent', { enrollCount, completeCount, paymentCount, alertCount });
   return NextResponse.json({ ok: true, enrollCount, completeCount, paymentCount, alertCount });
 });
-

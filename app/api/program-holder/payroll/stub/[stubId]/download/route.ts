@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -74,7 +72,7 @@ export async function GET(
     `Gross Pay:  $${Number(stub.gross_pay ?? 0).toFixed(2)}`,
     `Net Pay:    $${Number(stub.net_pay ?? 0).toFixed(2)}`,
     '',
-    `For questions contact: billing@${PLATFORM_DEFAULTS.canonicalDomain}`,
+    'For questions contact: billing@${PLATFORM_DEFAULTS.canonicalDomain}',
   ].join('\n');
 
   return new NextResponse(text, {

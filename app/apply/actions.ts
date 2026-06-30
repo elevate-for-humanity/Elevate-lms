@@ -1,16 +1,1363 @@
 'use server';
 
-export async function submitStudentApplication(_formData: {
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { randomBytes } from 'crypto';
+import { revalidatePath } from 'next/cache';
+import { sendEmail } from '@/lib/email';
+import { logger } from '@/lib/logger';
+
+import { sendWorkOneHoldEmail } from '@/lib/email/workone-hold';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+// info@elevateforhumanity.org removed — domain MX points to Resend/SES inbound
+// but no mailbox exists there, so emails bounce and get re-suppressed in a loop.
+// Use only the Gmail address until MX records are updated or Resend forwarding is configured.
+const ADMIN_EMAILS = ['elevate4humanityedu@gmail.com'];
+
+async function sendEmailDirect(to: string, subject: string, html: string) {
+  try {
+    const result = await sendEmail({ to, subject, html });
+    return result.success;
+  } catch (err) {
+    logger.error('[Email] Send failed:', err instanceof Error ? err.message : err);
+    return false;
+  }
+}
+
+/**
+ * Resolve program_interest to a course UUID.
+ */
+async function resolveCourseId(supabase: any, programInterest: string): Promise<string | null> {
+  if (!programInterest) return null;
+  const normalized = programInterest.toLowerCase().replace(/-/g, ' ').trim();
+  const ALIASES: Record<string, string> = {
+    'cna certification': 'cna training',
+    cna: 'cna training',
+    'cosmetology apprenticeship': 'hair stylist esthetician apprenticeship',
+    accounting: 'bookkeeping',
+    'home health aide': 'direct support professional',
+    entrepreneurship: 'entrepreneurship small business',
+    phlebotomy: 'phlebotomy technician',
+    'barber apprenticeship': 'barber',
+    'hvac technician': 'hvac technician',
+    hvac: 'hvac technician',
+    'hvac tech': 'hvac technician',
+  };
+  const { data: courses } = await supabase.from('lms_courses').select('id, course_name');
+  if (!courses?.length) return null;
+  const exact = courses.find((c: any) => c.course_name?.toLowerCase() === normalized);
+  if (exact) return exact.id;
+  const alias = ALIASES[normalized];
+  if (alias) {
+    const m = courses.find((c: any) => c.course_name?.toLowerCase().includes(alias));
+    if (m) return m.id;
+  }
+  const partial = courses.find((c: any) => {
+    const t = (c.course_name || '').toLowerCase();
+    return t.includes(normalized) || normalized.includes(t.replace(/\(.*\)/, '').trim());
+  });
+  return partial?.id || null;
+}
+
+/**
+ * Creates an auth account and profile so the student can log in and complete
+ * onboarding. Application stays 'pending' until onboarding is complete and
+ * documents are verified, then auto-enrolls.
+ *
+ * Flow: pending → onboarding → docs verified → approved → enrolled
+ */
+async function createStudentAccount(
+  supabase: any,
+  applicationId: string,
+  email: string,
+  firstName: string,
+  lastName: string,
+  programInterest: string,
+  userPassword?: string,
+  profileRole: string = 'student',
+  onboardingPath: string = '/onboarding/learner',
+): Promise<{
+  userId?: string;
+  accountCreated: boolean;
+  magicLink?: string | null;
+  programId?: string | null;
+}> {
+  try {
+    const normalizedEmail = email.toLowerCase().trim();
+    let userId: string | null = null;
+
+    // Use the password the student provided on the application form.
+    // Fall back to a generated password only if none was provided (e.g. admin-initiated enrollment).
+    // Math.random() is predictable — use randomBytes for the fallback password.
+    const password = userPassword || (() => `EFH-${randomBytes(8).toString('hex')}-Temp!`)();
+
+    // Check profiles first
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', normalizedEmail)
+      .maybeSingle();
+
+    if (existingProfile?.id) {
+      userId = existingProfile.id;
+      // Update password and ensure role is set correctly (trigger may have defaulted to 'student')
+      await Promise.all([
+        supabase.auth.admin.updateUserById(userId, { password }),
+        supabase.from('profiles').update({ role: profileRole }).eq('id', userId),
+      ]);
+    } else {
+      // Create new auth user with student-provided password
+      const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+        email: normalizedEmail,
+        password,
+        email_confirm: true,
+        user_metadata: {
+          full_name: `${firstName} ${lastName}`,
+          first_name: firstName,
+          last_name: lastName,
+        },
+      });
+
+      if (newUser?.user) {
+        userId = newUser.user.id;
+        await supabase.from('profiles').upsert(
+          {
+            id: userId,
+            email: normalizedEmail,
+            first_name: firstName,
+            last_name: lastName,
+            full_name: `${firstName} ${lastName}`,
+            role: profileRole,
+          },
+          { onConflict: 'id' },
+        );
+      } else if (createError) {
+        // User exists in auth but not profiles — look up directly by email
+        const { data: authLookup } = await supabase
+          .rpc('get_user_id_by_email', { user_email: normalizedEmail })
+          .maybeSingle();
+        if (authLookup?.id) {
+          userId = authLookup.id;
+        } else {
+          // Fallback: single-page listUsers filtered lookup
+          const { data: batch } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+          const found = batch?.users?.find((u: any) => u.email?.toLowerCase() === normalizedEmail);
+          if (found) userId = found.id;
+        }
+        if (userId) {
+          await Promise.all([
+            supabase.auth.admin.updateUserById(userId, { password }),
+            supabase.from('profiles').upsert(
+              {
+                id: userId,
+                email: normalizedEmail,
+                first_name: firstName,
+                last_name: lastName,
+                full_name: `${firstName} ${lastName}`,
+                role: profileRole,
+              },
+              { onConflict: 'id' },
+            ),
+          ]);
+        }
+      }
+    }
+
+    if (!userId) {
+      logger.error('Account creation failed — could not create user', { email: normalizedEmail });
+      return { accountCreated: false };
+    }
+
+    // Resolve course, program, and generate magic link in parallel
+    const slug = programInterest.toLowerCase().replace(/\s+/g, '-').trim();
+    const [courseId, programResult, linkResult] = await Promise.all([
+      resolveCourseId(supabase, programInterest),
+      supabase.from('programs').select('id').eq('slug', slug).maybeSingle(),
+      supabase.auth.admin
+        .generateLink({
+          type: 'magiclink',
+          email: normalizedEmail,
+          options: {
+            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/auth/callback?redirect=${encodeURIComponent(onboardingPath)}`,
+          },
+        })
+        .catch((err: any) => {
+          logger.warn('Could not generate magic link', err);
+          return null;
+        }),
+    ]);
+
+    const programId = programResult?.data?.id || courseId || null;
+    const magicLink =
+      linkResult && 'data' in linkResult ? linkResult.data?.properties?.action_link || null : null;
+
+    // Link user to application
+    await supabase
+      .from('applications')
+      .update({ user_id: userId, program_id: programId })
+      .eq('id', applicationId);
+
+    logger.info('Student account created — awaiting onboarding completion for enrollment', {
+      applicationId,
+      userId,
+      email: normalizedEmail,
+      programId,
+    });
+    return { userId, accountCreated: true, magicLink, programId };
+  } catch (err) {
+    logger.error('Account creation failed', err as Error);
+    return { accountCreated: false };
+  }
+}
+
+/**
+ * Application submission.
+ * On submit: save application (pending) → create auth user → send onboarding email.
+ * Enrollment is automatic after onboarding + document verification.
+ * All inserts use admin client (service role) to bypass RLS.
+ */
+
+export type ApplicationRole = 'student' | 'program_holder' | 'employer' | 'staff' | 'instructor';
+
+export interface BaseApplicationData {
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
-  zipCode: string;
-  requestedFundingSource: string;
-  goals: string;
-  programSlug?: string;
-  programTitle?: string;
-}): Promise<{ success: boolean; message: string }> {
-  // TODO: Implement actual application submission logic
-  return { success: true, message: 'Application submitted successfully' };
+  role: ApplicationRole;
+}
+
+export interface StudentApplicationData extends BaseApplicationData {
+  role: 'student';
+  password: string;
+  dateOfBirth?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  programInterest?: string;
+  employmentStatus?: string;
+  educationLevel?: string;
+  goals?: string;
+  /** 'inquiry' = information request only, no enrollment created.
+   *  'enrollment' = intent to enroll — requires payment or verified funding. */
+  applicationType?: 'inquiry' | 'enrollment' | string;
+  /** Override the default source tag written to the applications table. */
+  source?: string;
+  // Funding eligibility fields
+  requestedFundingSource?: string;
+  householdSize?: number | null;
+  annualIncomeUsd?: number | null;
+  justiceInvolved?: boolean;
+  hasEmployerSponsor?: boolean;
+  hasWorkOneApproval?: boolean;
+  workoneApprovalRef?: string | null;
+  eligibilityData?: {
+    // Funding
+    hasSnap?: boolean | null;
+    hasTanf?: boolean | null;
+    hasReferral?: boolean | null;
+    referralSource?: string;
+    caseManagerName?: string;
+    caseManagerEmail?: string;
+    otherFundingSource?: string;
+    // Residency / age
+    isAdult?: boolean | null;
+    isIndianaResident?: boolean | null;
+    // Education
+    educationLevel?: string;
+    hasDiplomaOrGed?: boolean | null;
+    enrolledInGed?: boolean | null;
+    // Legal
+    workAuthorized?: boolean | null;
+    activeWarrant?: boolean | null;
+    pendingCharges?: boolean | null;
+    onProbationParole?: boolean | null;
+    legalNotes?: string;
+    // Readiness
+    canAttendSchedule?: boolean | null;
+    hasTransportationPlan?: boolean | null;
+    canMeetPhysical?: boolean | null;
+    willingToFollowRules?: boolean | null;
+    willingJobReadiness?: boolean | null;
+    unavailableTimes?: string;
+    motivation?: string;
+    // Acknowledgments
+    agreesVerification?: boolean;
+    agreesAttendance?: boolean;
+    // Computed fields added by the form
+    eligibilityStatus?: string;
+    eligibilityReasonCodes?: string[];
+    supportNeedsTransport?: boolean;
+    supportNeedsOther?: boolean;
+    // Legacy fields
+    recommended?: string;
+    options?: { source: string; status: string }[];
+  } | null;
+}
+
+export interface ProgramHolderApplicationData extends BaseApplicationData {
+  role: 'program_holder';
+  organizationName: string;
+  organizationType?: string;
+  website?: string;
+  numberOfStudents?: string;
+  programsOffered?: string;
+  partnershipGoals?: string;
+}
+
+export interface EmployerApplicationData extends BaseApplicationData {
+  role: 'employer';
+  password: string;
+  companyName: string;
+  industry?: string;
+  companySize?: string;
+  website?: string;
+  hiringNeeds?: string;
+  positionsAvailable?: string;
+}
+
+export interface StaffApplicationData extends BaseApplicationData {
+  role: 'staff' | 'instructor';
+  position: string;
+  experience?: string;
+  education?: string;
+  certifications?: string;
+  availability?: string;
+  coverLetter?: string;
+}
+
+export type ApplicationData =
+  | StudentApplicationData
+  | ProgramHolderApplicationData
+  | EmployerApplicationData
+  | StaffApplicationData;
+
+function generateReferenceNumber(): string {
+  return `EFH-${Date.now().toString(36).toUpperCase()}`;
+}
+
+async function insertApplication(payload: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password?: string;
+  city: string;
+  zip: string;
+  programInterest: string;
+  supportNotes: string;
+  source: string;
+  fundingType?: string | null;
+}): Promise<
+  | { success: true; applicationId: string; referenceNumber: string; email?: string }
+  | { success: false; error: string }
+> {
+  let supabase: Awaited<ReturnType<typeof requireAdminClient>> | null = null;
+  let persistenceFailureReason = 'unknown';
+  try {
+    supabase = await requireAdminClient();
+  } catch (err) {
+    persistenceFailureReason =
+      err instanceof Error ? `admin client init failed: ${err.message}` : 'admin client init failed';
+    logger.error('[Apply] getAdminClient failed in insertApplication', err);
+  }
+
+  // Fallback: if admin client failed, try the public service-role client
+  if (!supabase) {
+    try {
+      const { createClient: createServerClient } = await import('@/lib/supabase/server');
+      supabase = await createServerClient() as any;
+      logger.warn('[Apply] Using server client fallback for insertApplication');
+    } catch (err) {
+      logger.error('[Apply] Server client fallback also failed', err);
+    }
+  }
+  const referenceNumber = generateReferenceNumber();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+  const programLabel = payload.programInterest.replace(/-/g, ' ');
+
+  // Auto-enrollment: insert application, create account, enroll in courses, send onboarding email.
+
+  async function sendEnrollmentEmails(magicLink?: string | null) {
+    const onboardingUrl = `${siteUrl}/onboarding/learner`;
+    const ctaLink = magicLink || `${siteUrl}/login`;
+    const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
+
+    // ── Shared email chrome — clean white layout, single accent ──
+    const emailHeader = [
+      `<div style="max-width:600px;margin:0 auto;font-family:Georgia,serif;color:#1a1a1a;background:#ffffff">`,
+      `<div style="text-align:center;padding:32px 24px 24px">`,
+      // IMAGE-CONTRACT: allow raw img because email HTML template (not JSX)
+      `<img src="${logoUrl}" alt="${PLATFORM_DEFAULTS.orgName}" width="160" style="max-width:160px;height:auto" />`,
+      `</div>`,
+      `<div style="padding:0 32px 32px">`,
+    ].join('');
+    const emailFooter = [
+      `<div style="border-top:1px solid #e0e0e0;margin-top:32px;padding-top:20px;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#999">`,
+      `<p style="margin:0 0 4px">${PLATFORM_DEFAULTS.orgName} Career & Technical Institute</p>`,
+      `<p style="margin:0 0 4px">8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>`,
+      `<p style="margin:0"><a href="${siteUrl}" style="color:#999;text-decoration:underline">${PLATFORM_DEFAULTS.canonicalDomain}</a> &nbsp;|&nbsp; ${PLATFORM_DEFAULTS.supportPhone}</p>`,
+      `</div>`,
+      `</div></div>`,
+    ].join('');
+
+    // ── ETPL program lists ──
+    const etplPrograms = [
+      'Building Maintenance',
+      'Building Maintenance Technician',
+      'Business Startup & Marketing',
+      "CDL (Commercial Driver's License)",
+      'Cybersecurity',
+      'Cybersecurity Fundamentals',
+      'Drug & Alcohol Specimen Collector',
+      'Electrical Apprenticeship',
+      'Emergency Health & Safety Tech',
+      'Home Health Aide',
+      'HVAC Technician',
+      'IT Support Specialist',
+      'Medical Assistant',
+      'Peer Recovery Specialist',
+      'Phlebotomy Technician',
+      'Plumbing Apprenticeship',
+      'Public Safety Reentry Specialist',
+      'Welding Certification',
+    ];
+    const waitlistPrograms = [
+      'Barber Apprenticeship',
+      'Beauty Career Educator',
+      'CNA (Certified Nursing Assistant)',
+      'Cosmetology Apprenticeship',
+      'Esthetician Apprenticeship',
+      'Nail Technician',
+      'Tax Preparation',
+    ];
+
+    const etplList = etplPrograms.map((p) => `<li style="padding:1px 0">${p}</li>`).join('');
+    const waitlistList = waitlistPrograms
+      .map((p) => `<li style="padding:1px 0">${p}</li>`)
+      .join('');
+
+    // Login reminder — no password in email, student set it on the form
+    const credentialsBlock = [
+      `<table style="width:100%;border-collapse:collapse;margin:20px 0;border:1px solid #e0e0e0">`,
+      `<tr style="background:#f9f9f9"><td colspan="2" style="padding:12px 16px;font-weight:bold;font-size:14px;border-bottom:1px solid #e0e0e0">Your Login</td></tr>`,
+      `<tr><td style="padding:10px 16px;color:#666;width:80px;border-bottom:1px solid #f0f0f0">Email</td><td style="padding:10px 16px;border-bottom:1px solid #f0f0f0">${payload.email}</td></tr>`,
+      `<tr><td style="padding:10px 16px;color:#666">Password</td><td style="padding:10px 16px">The password you created on the application form</td></tr>`,
+      `</table>`,
+      `<p style="margin:0 0 20px;font-size:13px;color:#888;font-family:Arial,sans-serif">Forgot your password? Reset it anytime at <a href="${siteUrl}/reset-password" style="color:#888">${siteUrl}/reset-password</a></p>`,
+    ].join('');
+
+    // Admin notification FIRST — send before student email so serverless
+    // timeout doesn't prevent admin from being notified about new applications.
+    const adminSubject = `[NEW APPLICATION] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`;
+    const adminHtml = [
+      emailHeader,
+      `<h3>New ${payload.source.replace(/-/g, ' ')}</h3>`,
+      `<p style="color:#16a34a"><strong>Status: APPROVED — applicant account created and enrolled automatically</strong></p>`,
+      `<table style="border-collapse:collapse;width:100%;max-width:500px">`,
+      `<tr><td style="padding:6px;font-weight:bold">Name</td><td style="padding:6px">${payload.firstName} ${payload.lastName}</td></tr>`,
+      `<tr><td style="padding:6px;font-weight:bold">Email</td><td style="padding:6px"><a href="mailto:${payload.email}">${payload.email}</a></td></tr>`,
+      `<tr><td style="padding:6px;font-weight:bold">Phone</td><td style="padding:6px"><a href="tel:${payload.phone}">${payload.phone}</a></td></tr>`,
+      `<tr><td style="padding:6px;font-weight:bold">Program</td><td style="padding:6px">${programLabel}</td></tr>`,
+      `<tr><td style="padding:6px;font-weight:bold">City / ZIP</td><td style="padding:6px">${payload.city} ${payload.zip}</td></tr>`,
+      `<tr><td style="padding:6px;font-weight:bold">Reference</td><td style="padding:6px">${referenceNumber}</td></tr>`,
+      payload.supportNotes
+        ? `<tr><td style="padding:6px;font-weight:bold">Details</td><td style="padding:6px">${payload.supportNotes}</td></tr>`
+        : '',
+      `</table>`,
+      supabase ? `<p><a href="${siteUrl}/admin/applications">View All Applications</a></p>` : '',
+      emailFooter,
+    ]
+      .filter(Boolean)
+      .join('');
+
+    await Promise.allSettled(
+      ADMIN_EMAILS.map((addr) => sendEmailDirect(addr, adminSubject, adminHtml)),
+    ).then((results) => {
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          logger.error(`[Apply] Admin notification to ${ADMIN_EMAILS[i]} failed:`, r.reason);
+        }
+      });
+    });
+
+    // Barber Apprenticeship requires payment before onboarding.
+    // Student welcome email is sent by the Stripe webhook after checkout.session.completed.
+    // Only the admin notification fires here.
+    const isPaymentGated = payload.programInterest.toLowerCase().includes('barber');
+    if (isPaymentGated) {
+      logger.info(
+        '[Apply] Skipping student welcome email — payment-gated program, webhook will send after payment',
+        { email: payload.email },
+      );
+      return;
+    }
+
+    // Send student confirmation email
+    await sendEmailDirect(
+      payload.email,
+      `Welcome to ${PLATFORM_DEFAULTS.orgName} — ${programLabel} [${referenceNumber}]`,
+      [
+        emailHeader,
+
+        `<h2 style="font-weight:normal;font-size:22px;margin:0 0 20px;color:#1a1a1a">Hi ${payload.firstName},</h2>`,
+
+        `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">Thank you for your interest in <strong>${programLabel}</strong> at ${PLATFORM_DEFAULTS.orgName}. We received your inquiry and we'd love to help you take the next step.</p>`,
+
+        `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">We've created your account. You can log in using the email and password you provided on the application form.</p>`,
+
+        // Onboarding — first thing after greeting
+        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Your Next Steps</h3>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">Log in and complete your onboarding to secure your spot:</p>`,
+        `<ol style="margin:0 0 20px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
+        `<li>Complete your profile</li>`,
+        `<li>Upload your documents (photo ID, proof of residency)</li>`,
+        `<li>Confirm your funding source</li>`,
+        `<li>Select your schedule</li>`,
+        `<li>Complete orientation</li>`,
+        `</ol>`,
+
+        `<div style="text-align:center;margin:24px 0">`,
+        `<a href="${ctaLink}" style="display:inline-block;padding:14px 40px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-weight:bold;font-size:15px">Log In &amp; Start Onboarding</a>`,
+        `</div>`,
+        `<p style="text-align:center;font-size:12px;color:#999;font-family:Arial,sans-serif;margin:0 0 24px">For the best experience, please use a laptop, desktop, or iPad.</p>`,
+
+        // Divider
+        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
+
+        // Credentials
+        credentialsBlock,
+
+        // CTA — schedule meeting
+        `<div style="text-align:center;margin:28px 0">`,
+        `<a href="${siteUrl}/schedule-consultation" style="display:inline-block;padding:14px 40px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-weight:bold;font-size:15px">Schedule a Meeting with an Advisor</a>`,
+        `</div>`,
+        `<p style="text-align:center;font-size:13px;color:#888;font-family:Arial,sans-serif;margin:-12px 0 24px">We'll walk you through your options — no commitment required.</p>`,
+
+        // Divider
+        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
+
+        // Funding section
+        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">How Funding Works</h3>`,
+
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">Many of our programs are listed on Indiana's <strong>Eligible Training Provider List (ETPL)</strong>, which means they can be fully funded through WIOA or other workforce grants — at no cost to you.</p>`,
+
+        // ETPL programs
+        `<p style="font-size:14px;font-weight:bold;margin:20px 0 8px">Programs eligible for federal funding:</p>`,
+        `<ul style="margin:0 0 16px;padding-left:20px;font-size:13px;color:#444;font-family:Arial,sans-serif;line-height:1.8">`,
+        etplList,
+        `</ul>`,
+
+        // IndianaCareerConnect instructions
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 8px"><strong>If your program is on this list</strong>, here's what to do:</p>`,
+        `<ol style="margin:0 0 16px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
+        `<li>Visit <a href="https://www.indianacareerconnect.com" style="color:#1a1a1a;font-weight:bold">www.indianacareerconnect.com</a> and create an account</li>`,
+        `<li>Schedule an appointment with your local WorkOne office</li>`,
+        `<li>Let them know you'd like to enroll in <strong>${programLabel}</strong> at ${PLATFORM_DEFAULTS.orgName}</li>`,
+        `<li>They'll confirm your eligibility and issue a training voucher</li>`,
+        `</ol>`,
+
+        // Divider
+        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
+
+        // Waiting list
+        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Programs Pending ETPL Approval</h3>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 8px">The following programs are in the process of being added to the ETPL. Once approved, they'll be eligible for federal funding. In the meantime, you can join the waiting list and we'll notify you as soon as funding opens up:</p>`,
+        `<ul style="margin:0 0 16px;padding-left:20px;font-size:13px;color:#444;font-family:Arial,sans-serif;line-height:1.8">`,
+        waitlistList,
+        `</ul>`,
+
+        // Divider
+        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
+
+        // Self-pay
+        `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Don't Want to Wait? Start Now</h3>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">If you'd rather not wait for funding approval — or if your program isn't on the ETPL yet — you can begin classes right away with one of these options:</p>`,
+        `<ul style="margin:0 0 16px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
+        `<li><strong>Self-Pay</strong> — pay tuition upfront and start immediately</li>`,
+        `<li><strong>Buy Now, Pay Later</strong> — split your tuition into monthly payments</li>`,
+        `<li><strong>Deposit + Payment Plan</strong> — put down a deposit and pay the balance over time</li>`,
+        `</ul>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 16px">To discuss which option works best for you, <a href="${siteUrl}/schedule-consultation" style="color:#1a1a1a;font-weight:bold">schedule a Zoom meeting</a> with our enrollment team or call us at <strong>${PLATFORM_DEFAULTS.supportPhone}</strong>.</p>`,
+
+        // Closing
+        `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 8px">If you have any questions at all, just reply to this email or give us a call at <strong>${PLATFORM_DEFAULTS.supportPhone}</strong>. We're here to help.</p>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 4px">Looking forward to working with you,</p>`,
+        `<p style="font-size:14px;margin:0 0 4px"><strong>The ${PLATFORM_DEFAULTS.orgName} Team</strong></p>`,
+        `<p style="font-size:12px;color:#999;font-family:Arial,sans-serif;margin:16px 0 0">Ref: ${referenceNumber}</p>`,
+
+        emailFooter,
+      ].join(''),
+    ).catch((err) => {
+      logger.error(
+        '[Apply] Student confirmation email failed:',
+        err instanceof Error ? err.message : err,
+      );
+    });
+  }
+
+  // Path A: DB available — insert application, admin enrolls later
+  if (supabase) {
+    try {
+      // Resolve program_id from slug so admin dashboard can approve without guessing
+      const programSlug = payload.programInterest.toLowerCase().replace(/\s+/g, '-').trim();
+      const { data: programRow } = await supabase
+        .from('programs')
+        .select('id')
+        .eq('slug', programSlug)
+        .maybeSingle();
+
+      const insertPayload = {
+        first_name: payload.firstName,
+        last_name: payload.lastName,
+        email: payload.email,
+        phone: payload.phone,
+        city: payload.city,
+        zip: payload.zip,
+        program_interest: payload.programInterest,
+        program_slug: programRow?.id ? programSlug : null,
+        program_id: programRow?.id || null,
+        support_notes: `Reference: ${referenceNumber} | ${payload.supportNotes}`,
+        reference_number: referenceNumber,
+        status: 'submitted',
+        source: payload.source,
+        type: payload.source === 'program-holder-application' ? 'program_holder'
+            : payload.source === 'employer-application' ? 'employer'
+            : payload.source === 'staff-application' ? 'staff'
+            : 'student',
+        funding_type: payload.fundingType || null,
+      };
+
+      const tryInsert = async () =>
+        supabase
+          .from('applications')
+          .insert(insertPayload)
+          .select('id')
+          .maybeSingle();
+
+      let { data, error } = await tryInsert();
+      if (error) {
+        logger.warn('[Application] First DB insert attempt failed, retrying once', {
+          email: payload.email,
+          source: payload.source,
+          referenceNumber,
+          error: error.message,
+        });
+        const retryResult = await tryInsert();
+        data = retryResult.data;
+        error = retryResult.error;
+      }
+
+      if (error) {
+        persistenceFailureReason = `applications insert failed: ${error.message}`;
+        logger.error(
+          '[Application] DB insert failed',
+          new Error(error.message),
+          {
+            email: payload.email,
+            source: payload.source,
+            referenceNumber,
+            pgCode: error.code,
+            pgDetails: error.details,
+            pgHint: error.hint,
+          },
+        );
+      } else {
+        // Derive the profile role and onboarding destination from the application source.
+        // These are passed into createStudentAccount so the profile is written correctly
+        // on first creation — no post-hoc correction needed.
+        const roleBySource: Record<string, string> = {
+          'student-application': 'student',
+          'employer-application': 'employer',
+          'staff-application': 'staff',
+          'program-holder-application': 'program_holder',
+        };
+        const onboardingBySource: Record<string, string> = {
+          'student-application': '/onboarding/learner',
+          'employer-application': '/onboarding/employer',
+          'staff-application': '/onboarding/staff',
+          'program-holder-application': '/program-holder/onboarding',
+        };
+        const profileRole = roleBySource[payload.source] ?? 'student';
+        const onboardingPath = onboardingBySource[payload.source] ?? '/onboarding/learner';
+
+        // Create auth account so the applicant can log in immediately.
+        const accountResult = await createStudentAccount(
+          supabase,
+          data.id,
+          payload.email,
+          payload.firstName,
+          payload.lastName,
+          payload.programInterest,
+          payload.password,
+          profileRole,
+          onboardingPath,
+        );
+
+        // Audit log — non-blocking
+        Promise.resolve(
+          supabase.from('audit_logs').insert({
+            event_type: 'application_submitted',
+            resource_type: 'application',
+            resource_id: data.id,
+            metadata: {
+              email: payload.email,
+              program: payload.programInterest,
+              source: payload.source,
+              funding_type: payload.fundingType || null,
+              reference_number: referenceNumber,
+            },
+          })
+        ).catch((err: unknown) => logger.warn('[Apply] Audit log failed (non-fatal)', err));
+
+        // Application lands in admin queue as 'submitted' — admin reviews and approves.
+        // Approval requires funding verification or a paid Stripe session before enrollment.
+        logger.info('[Apply] Application submitted, pending admin review', {
+          applicationId: data.id,
+          userId: accountResult.userId,
+        });
+
+        await sendEnrollmentEmails(accountResult.magicLink);
+        revalidatePath('/admin/applications');
+        return {
+          success: true,
+          status: 'submitted' as const,
+          applicationId: data.id,
+          referenceNumber,
+          email: payload.email,
+        };
+      }
+    } catch (error) {
+      persistenceFailureReason =
+        error instanceof Error ? `insertApplication exception: ${error.message}` : 'insertApplication exception';
+      logger.error(
+        '[Application] DB error before persistence',
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          email: payload.email,
+          source: payload.source,
+          referenceNumber,
+          reason: persistenceFailureReason,
+        },
+      );
+    }
+  }
+
+  // Path B: hard failure — never report success when no DB record exists.
+  logger.error(
+    `[Application] Submission failed before persistence [ref=${referenceNumber}] [source=${payload.source}] [email=${payload.email}] [reason=${persistenceFailureReason}]`,
+    new Error(persistenceFailureReason),
+    {
+      email: payload.email,
+      source: payload.source,
+      referenceNumber,
+      reason: persistenceFailureReason,
+    },
+  );
+  await Promise.all(
+    ADMIN_EMAILS.map((to) =>
+      sendEmailDirect(
+        to,
+        `Application submission failed: ${payload.email}`,
+        `<p>A learner submission failed before database persistence.</p>
+         <p><strong>Reference:</strong> ${referenceNumber}</p>
+         <p><strong>Email:</strong> ${payload.email}</p>
+         <p><strong>Source:</strong> ${payload.source}</p>
+         <p><strong>Reason:</strong> ${persistenceFailureReason}</p>
+         <p><strong>Name:</strong> ${payload.firstName} ${payload.lastName}</p>
+         <p><strong>Phone:</strong> ${payload.phone}</p>
+         <p><strong>Program:</strong> ${payload.programInterest}</p>
+         <p><strong>Funding:</strong> ${payload.fundingType || 'n/a'}</p>
+         <p><strong>City/ZIP:</strong> ${payload.city} ${payload.zip}</p>
+         <p><strong>Notes:</strong> ${payload.supportNotes || 'n/a'}</p>
+         <p>Please follow up manually.</p>`,
+      ),
+    ),
+  ).catch((err) => logger.warn('[Apply] Failed to send DB failure alert email', err));
+
+  return {
+    success: false,
+    error:
+      'We could not save your application right now. Please try again in a moment or call ${PLATFORM_DEFAULTS.supportPhone} so we can assist immediately.',
+  };
+}
+
+export async function submitStudentApplication(data: StudentApplicationData) {
+  const result = await insertApplication({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    password: data.password,
+    city: data.city || 'Not provided',
+    zip: data.zipCode || '00000',
+    programInterest: data.programInterest || 'Not specified',
+    fundingType: data.requestedFundingSource || null,
+    supportNotes: [
+      data.employmentStatus ? `Employment: ${data.employmentStatus}` : '',
+      data.educationLevel ? `Education: ${data.educationLevel}` : '',
+      data.goals ? `Goals: ${data.goals}` : '',
+      data.dateOfBirth ? `DOB: ${data.dateOfBirth}` : '',
+      data.address ? `Address: ${data.address}` : '',
+      data.state ? `State: ${data.state}` : '',
+      data.requestedFundingSource ? `Funding: ${data.requestedFundingSource}` : '',
+      data.householdSize ? `Household: ${data.householdSize}` : '',
+      data.annualIncomeUsd ? `Income: $${data.annualIncomeUsd}` : '',
+    ]
+      .filter(Boolean)
+      .join(' | '),
+    source: data.source || 'student-application',
+  });
+
+  if (!result.success) return result;
+
+  // Persist funding eligibility fields and set status for WorkOne-pending applications
+  let supabase: Awaited<ReturnType<typeof requireAdminClient>> | null = null;
+  try {
+    supabase = await requireAdminClient();
+  } catch (err) {
+    logger.error(
+      '[Apply] getAdminClient failed in submitStudentApplication — eligibility fields not persisted',
+      err,
+    );
+  }
+  if (supabase && result.applicationId) {
+    const requestedSource = data.requestedFundingSource ?? 'self_pay';
+    const needsWorkOne =
+      ['workone', 'workforce_ready_grant'].includes(requestedSource) && !data.hasWorkOneApproval;
+
+    const elig = data.eligibilityData;
+    // 'incomplete' is not a valid eligibility_status value — use 'pending' as the default
+    const eligStatus = elig?.eligibilityStatus ?? 'pending';
+    const fundingStatus =
+      elig?.hasSnap || elig?.hasTanf || elig?.hasReferral
+        ? 'pending'
+        : elig?.otherFundingSource
+          ? 'pending'
+          : 'none';
+    const readinessStatus =
+      eligStatus === 'eligible'
+        ? 'ready'
+        : eligStatus === 'conditional_review'
+          ? 'conditional'
+          : 'not_ready';
+
+    const { error: updateErr } = await supabase
+      .from('applications')
+      .update({
+        requested_funding_source: requestedSource,
+        household_size: data.householdSize ?? null,
+        annual_income_usd: data.annualIncomeUsd ?? null,
+        justice_involved: data.justiceInvolved ?? false,
+        has_employer_sponsor: data.hasEmployerSponsor ?? false,
+        has_workone_approval: data.hasWorkOneApproval ?? false,
+        workone_approval_ref: data.workoneApprovalRef ?? null,
+        recommended_funding_source: data.eligibilityData?.recommended ?? requestedSource,
+        eligibility_data: data.eligibilityData ?? null,
+        eligibility_status: needsWorkOne ? 'pending_workone' : eligStatus,
+        funding_status: fundingStatus,
+        readiness_status: readinessStatus,
+        support_needs_transport: elig?.supportNeedsTransport ?? false,
+        support_needs_other: elig?.supportNeedsOther ?? false,
+        case_manager_name: elig?.caseManagerName ?? null,
+        case_manager_email: elig?.caseManagerEmail ?? null,
+        referral_source: elig?.referralSource ?? null,
+        eligibility_evaluated_at: new Date().toISOString(),
+        status: needsWorkOne ? 'pending_workone' : 'submitted',
+      })
+      .eq('id', result.applicationId);
+
+    // Insert structured eligibility review record
+    if (elig && !updateErr) {
+      const { error: eligReviewErr } = await supabase
+        .from('application_eligibility_reviews')
+        .insert({
+          application_id: result.applicationId,
+          funding_snap: elig.hasSnap,
+          funding_tanf: elig.hasTanf,
+          referral_partner: elig.hasReferral,
+          referral_source: elig.referralSource || null,
+          case_manager_name: elig.caseManagerName || null,
+          case_manager_email: elig.caseManagerEmail || null,
+          other_funding_source: elig.otherFundingSource || null,
+          age_confirmed: elig.isAdult,
+          indiana_resident: elig.isIndianaResident,
+          education_level: elig.educationLevel || null,
+          has_diploma_or_ged: elig.hasDiplomaOrGed,
+          enrolled_in_ged_program: elig.enrolledInGed,
+          work_authorized: elig.workAuthorized,
+          active_warrant: elig.activeWarrant,
+          pending_charges: elig.pendingCharges,
+          probation_or_parole: elig.onProbationParole,
+          legal_notes: elig.legalNotes || null,
+          can_attend_schedule: elig.canAttendSchedule,
+          has_transportation_plan: elig.hasTransportationPlan,
+          can_meet_physical: elig.canMeetPhysical,
+          willing_to_follow_rules: elig.willingToFollowRules,
+          willing_job_readiness: elig.willingJobReadiness,
+          unavailable_times: elig.unavailableTimes || null,
+          motivation: elig.motivation || null,
+          support_needs_transport: elig.supportNeedsTransport ?? false,
+          support_needs_other: elig.supportNeedsOther ?? false,
+          agrees_attendance_policy: elig.agreesAttendance,
+          agrees_verification_policy: elig.agreesVerification,
+          eligibility_status: eligStatus,
+          eligibility_reason_codes: elig.eligibilityReasonCodes ?? [],
+        });
+      if (eligReviewErr) {
+        logger.error('[Apply] Failed to insert application_eligibility_reviews', eligReviewErr);
+      }
+    }
+
+    if (updateErr) {
+      logger.error('[Apply] Failed to persist funding eligibility fields', updateErr);
+    }
+
+    // Send WorkOne hold email — non-blocking, failure does not abort the submission
+    if (needsWorkOne && !updateErr) {
+      sendWorkOneHoldEmail({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        programName: data.programInterest || 'your selected program',
+        referenceNumber: result.referenceNumber,
+      }).catch((err) => logger.error('[Apply] WorkOne hold email failed', err));
+    }
+
+    return {
+      success: true,
+      applicationId: result.applicationId,
+      referenceNumber: result.referenceNumber,
+      email: result.email || data.email,
+      // Signal to the form so it can redirect to the right page
+      status: needsWorkOne ? 'pending_workone' : 'submitted',
+    };
+  }
+
+  return {
+    success: true,
+    applicationId: result.applicationId,
+    referenceNumber: result.referenceNumber,
+    email: result.email || data.email,
+    status: 'submitted',
+  };
+}
+
+export async function submitProgramHolderApplication(data: ProgramHolderApplicationData) {
+  // Server-side validation — browser required attrs are not enforcement
+  const firstName = data.firstName?.trim();
+  const lastName = data.lastName?.trim();
+  const email = data.email?.trim().toLowerCase();
+  const phone = data.phone?.trim();
+  const organizationName = data.organizationName?.trim();
+
+  if (!firstName || !lastName || !email || !phone || !organizationName) {
+    return {
+      success: false,
+      error:
+        'Required fields missing: first name, last name, email, phone, and organization name are all required.',
+    };
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { success: false, error: 'Please provide a valid email address.' };
+  }
+
+  const result = await insertApplication({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    city: 'Not provided',
+    zip: '00000',
+    programInterest: 'Program Holder',
+    supportNotes: [
+      `Organization: ${data.organizationName}`,
+      data.organizationType ? `Type: ${data.organizationType}` : '',
+      data.website ? `Website: ${data.website}` : '',
+      data.numberOfStudents ? `Students: ${data.numberOfStudents}` : '',
+      data.programsOffered ? `Programs: ${data.programsOffered}` : '',
+      data.partnershipGoals ? `Goals: ${data.partnershipGoals}` : '',
+    ]
+      .filter(Boolean)
+      .join(' | '),
+    source: 'program-holder-application',
+  });
+
+  if (result.success) {
+    // Create program_holders row and set role immediately — no admin approval needed.
+    // Entire provisioning block is wrapped in try/catch so a failure here
+    // never blocks the user from reaching the confirmation page.
+    try {
+      let adminDb: Awaited<ReturnType<typeof requireAdminClient>> | null = null;
+      try {
+        adminDb = await requireAdminClient();
+      } catch (err) {
+        logger.error('[Apply] getAdminClient failed in submitProgramHolderApplication', err);
+      }
+      if (adminDb) {
+        const provisioned = await ensureProgramHolderAccount(adminDb, data);
+        if (provisioned.userId) {
+          logger.info('[Apply] Program holder approved on submit', {
+            userId: provisioned.userId,
+            holderId: provisioned.holderId,
+            org: provisioned.organizationName,
+          });
+
+          // Send password setup link so they can access onboarding immediately.
+          await sendProgramHolderWelcomeEmail(adminDb, {
+            email: provisioned.email,
+            firstName: data.firstName,
+            organizationName: provisioned.organizationName,
+            referenceNumber: result.referenceNumber,
+          });
+        }
+      }
+    } catch (provisionErr) {
+      // Non-fatal: application was already saved. Admin can manually provision.
+      logger.error('[Apply] Program holder provisioning failed (non-fatal)', provisionErr);
+    }
+
+    return {
+      success: true,
+      applicationId: result.applicationId,
+      referenceNumber: result.referenceNumber,
+      redirectTo: `/apply/program-holder/confirmation`,
+    };
+  }
+  return result;
+}
+
+async function ensureProgramHolderAccount(
+  adminDb: any,
+  data: ProgramHolderApplicationData,
+): Promise<{
+  userId: string | null;
+  holderId: string | null;
+  email: string;
+  organizationName: string;
+}> {
+  const normalizedEmail = data.email.toLowerCase().trim();
+  const fullName = `${data.firstName} ${data.lastName}`.trim();
+  const organizationName = data.organizationName?.trim() || fullName || 'Program Holder';
+  const phone = data.phone?.trim() || null;
+
+  let userId: string | null = null;
+  const { data: existingProfile } = await adminDb
+    .from('profiles')
+    .select('id')
+    .eq('email', normalizedEmail)
+    .maybeSingle();
+
+  if (existingProfile?.id) {
+    userId = existingProfile.id;
+  }
+
+  if (!userId) {
+    const tempPassword = randomBytes(18).toString('base64url');
+    const { data: newUser, error: createError } = await adminDb.auth.admin.createUser({
+      email: normalizedEmail,
+      password: tempPassword,
+      email_confirm: true,
+      user_metadata: {
+        role: 'program_holder',
+        full_name: fullName,
+        first_name: data.firstName,
+        last_name: data.lastName,
+      },
+    });
+
+    if (newUser?.user?.id) {
+      userId = newUser.user.id;
+    } else if (createError) {
+      logger.info('[Apply] Auth user may already exist, searching', {
+        email: normalizedEmail,
+        error: createError.message,
+      });
+
+      let page = 1;
+      while (!userId) {
+        const { data: batch } = await adminDb.auth.admin.listUsers({
+          page,
+          perPage: 100,
+        });
+        if (!batch?.users?.length) break;
+        const found = batch.users.find((u: any) => u.email?.toLowerCase() === normalizedEmail);
+        if (found) {
+          userId = found.id;
+          break;
+        }
+        page++;
+      }
+    }
+  }
+
+  if (!userId) {
+    logger.error('[Apply] Unable to provision program holder auth account', {
+      email: normalizedEmail,
+      organizationName,
+    });
+    return { userId: null, holderId: null, email: normalizedEmail, organizationName };
+  }
+
+  await adminDb.from('profiles').upsert(
+    {
+      id: userId,
+      email: normalizedEmail,
+      full_name: fullName || organizationName,
+      role: 'program_holder',
+      phone,
+    },
+    { onConflict: 'id', ignoreDuplicates: false },
+  );
+
+  const { data: holderRow } = await adminDb
+    .from('program_holders')
+    .upsert(
+      {
+        user_id: userId,
+        organization_name: organizationName,
+        contact_name: fullName || organizationName,
+        contact_email: normalizedEmail,
+        contact_phone: phone,
+        status: 'approved',
+        approved_at: new Date().toISOString(),
+        name: organizationName,
+      },
+      { onConflict: 'user_id', ignoreDuplicates: false },
+    )
+    .select('id')
+    .maybeSingle();
+
+  if (holderRow?.id) {
+    await adminDb
+      .from('profiles')
+      .update({
+        role: 'program_holder',
+        program_holder_id: holderRow.id,
+      })
+      .eq('id', userId);
+  } else {
+    await adminDb.from('profiles').update({ role: 'program_holder' }).eq('id', userId);
+  }
+
+  return { userId, holderId: holderRow?.id ?? null, email: normalizedEmail, organizationName };
+}
+
+async function sendProgramHolderWelcomeEmail(
+  adminDb: any,
+  opts: { email: string; firstName: string; organizationName: string; referenceNumber: string },
+) {
+  const sgKey = process.env.SENDGRID_API_KEY;
+  if (!sgKey) {
+    logger.warn('[Apply] SENDGRID_API_KEY not set — skipping program holder password setup email');
+    return;
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+
+  // Generate a password setup link — recovery links work for both new and existing accounts
+  // without requiring an invite-specific flow, while still forcing a password reset.
+  // The full welcome email fires separately after all onboarding steps are complete.
+  let setupLink = `${siteUrl}/login`;
+  const redirectTo = `${siteUrl}/auth/confirm?next=/auth/set-password`;
+  try {
+    const { data: linkData } = await adminDb.auth.admin.generateLink({
+      type: 'recovery',
+      email: opts.email,
+      options: { redirectTo },
+    });
+    if (linkData?.properties?.action_link) {
+      setupLink = linkData.properties.action_link;
+    }
+  } catch (err) {
+    logger.warn('[Apply] Could not generate password setup link for program holder', err);
+    // Fallback: magic link to set-password
+    try {
+      const { data: linkData } = await adminDb.auth.admin.generateLink({
+        type: 'magiclink',
+        email: opts.email,
+        options: { redirectTo },
+      });
+      if (linkData?.properties?.action_link) setupLink = linkData.properties.action_link;
+    } catch {
+      /* fallback to default setup link */
+    }
+  }
+
+  const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
+
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;font-family:Arial,sans-serif;background:#f8fafc">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 20px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+        <tr><td style="padding:28px 32px;text-align:center;border-bottom:1px solid #e2e8f0">
+          // IMAGE-CONTRACT: allow raw img because legacy markup
+          <img src="${logoUrl}" alt="${PLATFORM_DEFAULTS.orgName}" width="140" style="max-width:140px;height:auto" />
+        </td></tr>
+        <tr><td style="padding:32px">
+          <h2 style="color:#1a1a1a;font-size:20px;margin:0 0 16px">Hi ${opts.firstName} — set your password to begin onboarding</h2>
+          <p style="color:#334155;font-size:15px;line-height:1.7;margin:0 0 16px">
+            Your Program Holder account for <strong>${opts.organizationName}</strong> has been created with
+            <strong>${PLATFORM_DEFAULTS.orgName}</strong>. Click below to set your password — you will need it to
+            log in and complete your onboarding steps.
+          </p>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td align="center" style="padding:8px 0 28px">
+              <a href="${setupLink}" style="display:inline-block;background:#1d4ed8;color:#fff;text-decoration:none;padding:14px 36px;border-radius:6px;font-weight:bold;font-size:16px">
+                Set My Password →
+              </a>
+            </td></tr>
+          </table>
+          <div style="background:#f1f5f9;border-radius:6px;padding:16px 20px;margin:0 0 24px">
+            <p style="color:#475569;font-size:13px;font-weight:bold;margin:0 0 8px">After setting your password, complete these onboarding steps:</p>
+            <ol style="color:#475569;font-size:13px;line-height:1.9;margin:0;padding-left:18px">
+              <li>Sign the Memorandum of Understanding (MOU)</li>
+              <li>Acknowledge the Program Holder Handbook</li>
+              <li>Acknowledge Rights &amp; Responsibilities</li>
+              <li>Upload required documents (syllabus, business license, insurance)</li>
+            </ol>
+          </div>
+          <p style="color:#64748b;font-size:13px;line-height:1.7;margin:0 0 8px">
+            <strong>This link expires in 24 hours.</strong> If it expires, go to
+            <a href="${siteUrl}/login" style="color:#1d4ed8">${siteUrl}/login</a> and use
+            "Forgot Password" to get a new one. Questions? Call
+            <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color:#1d4ed8">${PLATFORM_DEFAULTS.supportPhone}</a> or email
+            <a href="mailto:elevate4humanityedu@gmail.com" style="color:#1d4ed8">elevate4humanityedu@gmail.com</a>.
+          </p>
+          <p style="color:#94a3b8;font-size:12px;margin:20px 0 0">Ref: ${opts.referenceNumber}</p>
+        </td></tr>
+        <tr><td style="background:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0">
+          <p style="color:#94a3b8;font-size:12px;margin:0">${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute</p>
+          <p style="color:#94a3b8;font-size:12px;margin:4px 0">8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240</p>
+          <p style="color:#94a3b8;font-size:12px;margin:4px 0">${PLATFORM_DEFAULTS.supportPhone}</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+
+  try {
+    const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${sgKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: { email: PLATFORM_DEFAULTS.emailFromAddress, name: PLATFORM_DEFAULTS.orgName },
+        reply_to: { email: 'elevate4humanityedu@gmail.com', name: PLATFORM_DEFAULTS.orgName },
+        personalizations: [{ to: [{ email: opts.email, name: opts.firstName }] }],
+        subject: `Welcome — Complete Your Program Holder Onboarding [${opts.referenceNumber}]`,
+        content: [{ type: 'text/html', value: html }],
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      logger.error('[Apply] Program holder welcome email failed', new Error(body));
+    } else {
+      logger.info('[Apply] Program holder welcome email sent', { email: opts.email });
+    }
+  } catch (err) {
+    logger.error('[Apply] Program holder welcome email threw', err as Error);
+  }
+}
+
+export async function submitEmployerApplication(data: EmployerApplicationData) {
+  const result = await insertApplication({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    password: data.password,
+    city: 'Not provided',
+    zip: '00000',
+    programInterest: 'Employer Partnership',
+    supportNotes: [
+      `Company: ${data.companyName}`,
+      data.industry ? `Industry: ${data.industry}` : '',
+      data.companySize ? `Size: ${data.companySize}` : '',
+      data.website ? `Website: ${data.website}` : '',
+      data.hiringNeeds ? `Hiring: ${data.hiringNeeds}` : '',
+      data.positionsAvailable ? `Positions: ${data.positionsAvailable}` : '',
+    ]
+      .filter(Boolean)
+      .join(' | '),
+    source: 'employer-application',
+  });
+
+  if (result.success) {
+    return {
+      success: true,
+      applicationId: result.applicationId,
+      referenceNumber: result.referenceNumber,
+      redirectTo: `/onboarding/employer`,
+    };
+  }
+  return result;
+}
+
+export async function submitStaffApplication(data: StaffApplicationData) {
+  const result = await insertApplication({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    city: 'Not provided',
+    zip: '00000',
+    programInterest: `Staff: ${data.position}`,
+    supportNotes: [
+      `Role: ${data.role}`,
+      `Position: ${data.position}`,
+      data.experience ? `Experience: ${data.experience}` : '',
+      data.education ? `Education: ${data.education}` : '',
+      data.certifications ? `Certifications: ${data.certifications}` : '',
+      data.availability ? `Availability: ${data.availability}` : '',
+      data.coverLetter ? 'Cover letter provided' : '',
+    ]
+      .filter(Boolean)
+      .join(' | '),
+    source: 'staff-application',
+  });
+
+  if (result.success) {
+    return {
+      success: true,
+      applicationId: result.applicationId,
+      referenceNumber: result.referenceNumber,
+      redirectTo: `/onboarding/staff`,
+    };
+  }
+  return result;
+}
+
+export async function getApplicationStatus(identifier: string) {
+  let supabase: Awaited<ReturnType<typeof requireAdminClient>> | null = null;
+  try {
+    supabase = await requireAdminClient();
+  } catch (err) {
+    logger.error('[Apply] getAdminClient failed in getApplicationStatus', err);
+  }
+  if (!supabase) return null;
+
+  const { data: byRef } = await supabase
+    .from('applications')
+    .select('*')
+    .ilike('support_notes', `%${identifier}%`)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (byRef) return byRef;
+
+  const { data: byEmail } = await supabase
+    .from('applications')
+    .select('*')
+    .eq('email', identifier)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  return byEmail;
 }

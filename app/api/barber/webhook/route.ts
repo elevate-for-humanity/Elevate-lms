@@ -1,9 +1,7 @@
-export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import type Stripe from 'stripe';
 import { BARBER_PRICING, calculateWeeklyPayment, getBillingCycleAnchor } from '@/lib/programs/pricing';
@@ -66,7 +64,7 @@ async function notifyPaymentSucceeded(
   const { data: adminUsers } = await supabase
     .from('profiles')
     .select('id')
-    .in('role', ['admin', 'staff'])
+    .in('role', ['admin', 'super_admin', 'staff'])
     .limit(200);
 
   if (adminUsers?.length) {
@@ -142,7 +140,7 @@ async function _POST(request: NextRequest) {
   const signature = request.headers.get('stripe-signature');
 
   if (!signature) {
-    return NextResponse.json({ received: true, warning: 'no_signature' }, { status: 200 });
+    return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
   }
 
   let event: Stripe.Event;
@@ -165,7 +163,7 @@ async function _POST(request: NextRequest) {
     event = constructStripeEventWithAnySecret(stripe, body, signature, webhookSecrets);
   } catch (err) {
     logger.error('Webhook signature verification failed:', err);
-    return NextResponse.json({ received: true, warning: 'invalid_signature' }, { status: 200 });
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
   // Webhook handlers must use the admin (service role) client — there is no user session.
@@ -370,7 +368,7 @@ async function _POST(request: NextRequest) {
             // No application_id — send legacy welcome email
             try {
             const { sendEmail } = await import('@/lib/email/sendgrid');
-            let paymentSummary: string;
+            let paymentSummary = '';
             if (fullyPaid) {
               if (bnplProvider) {
                 paymentSummary = `• Paid via ${bnplProvider.charAt(0).toUpperCase() + bnplProvider.slice(1)}: $${BARBER_PRICING.fullPrice.toLocaleString()}<br>
@@ -1183,7 +1181,7 @@ async function _PUT(request: NextRequest) {
     }
 
     // Verify admin access
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -1194,7 +1192,7 @@ async function _PUT(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -1269,6 +1267,3 @@ async function _PUT(request: NextRequest) {
 }
 export const POST = withRuntime(withApiAudit('/api/barber/webhook', _POST, { actor_type: 'webhook' }));
 export const PUT = withRuntime(withApiAudit('/api/barber/webhook', _PUT, { actor_type: 'webhook' }));
-
-
-

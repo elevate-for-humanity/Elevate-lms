@@ -1,9 +1,5 @@
-export const dynamic = 'force-dynamic';
-import { db } from '@/lib/db';
-
 import { safeInternalError } from '@/lib/api/safe-error';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { NextRequest, NextResponse } from 'next/server';
@@ -44,7 +40,7 @@ async function _POST(request: NextRequest) {
         user_agent: request.headers.get('user-agent') || 'unknown',
       });
       if (error) {
-        logger.error('[Compliance] Handbook acknowledgment failed: ' + error.message);
+        logger.error('[Compliance] Handbook acknowledgment failed:', error.message);
         return NextResponse.json(
           { success: false, error: 'Failed to record acknowledgment' },
           { status: 500 },
@@ -92,7 +88,7 @@ async function _POST(request: NextRequest) {
         .single();
 
       if (error) {
-        logger.error('[Compliance] Agreement acceptance failed: ' + error.message, { code: error.code });
+        logger.error('[Compliance] Agreement acceptance failed:', error.message, error.code);
         // Race condition — another request inserted between our check and insert
         if (error.code === '23505') {
           const { data: race } = await db
@@ -120,7 +116,7 @@ async function _POST(request: NextRequest) {
         })
         .eq('id', user.id);
       if (error) {
-        logger.error('[Compliance] Onboarding update failed: ' + error.message);
+        logger.error('[Compliance] Onboarding update failed:', error.message);
         return NextResponse.json({ success: false, error: 'Failed to update' }, { status: 500 });
       }
       return NextResponse.json({ success: true });
@@ -191,5 +187,3 @@ async function _GET(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/compliance/record', _GET);
 export const POST = withApiAudit('/api/compliance/record', _POST);
-
-

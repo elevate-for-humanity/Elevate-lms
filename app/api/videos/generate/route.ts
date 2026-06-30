@@ -1,11 +1,11 @@
-export const dynamic = 'force-dynamic';
 /**
  * POST /api/videos/generate
  *
  * Accepts a lesson_id from the admin course builder, creates a video_jobs row,
  * then fires the render pipeline asynchronously (non-blocking response).
  *
- * The render runs in the background on the container (Remotion + ffmpeg).
+ * The render runs in the background on the container which has
+ * ffmpeg, chromium, and Remotion's native binaries available.
  *
  * Flow:
  *   Admin POST lesson_id
@@ -19,7 +19,6 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
@@ -150,5 +149,3 @@ async function runRender(opts: {
     await markFailed(jobId, msg);
   }
 }
-
-

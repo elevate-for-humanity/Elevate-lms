@@ -1,9 +1,6 @@
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { auditLog } from '@/lib/auditLog';
 import { updateTenantLicense } from '@/lib/licensing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -13,7 +10,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-const ADMIN_ROLES = ['admin'];
+const ADMIN_ROLES = ['admin', 'super_admin'];
 
 async function requireSuperAdmin() {
   const supabase = await createClient();
@@ -121,4 +118,3 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

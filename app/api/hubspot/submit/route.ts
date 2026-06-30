@@ -100,4 +100,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/hubspot/submit', _POST);
-

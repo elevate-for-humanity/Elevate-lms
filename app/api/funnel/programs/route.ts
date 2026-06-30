@@ -1,6 +1,4 @@
 // PUBLIC ROUTE: returns published programs for the eligibility check funnel
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createPublicClient } from '@/lib/supabase/public';
 import { safeInternalError } from '@/lib/api/safe-error';
@@ -31,4 +29,3 @@ export async function GET(request: NextRequest) {
     return safeInternalError(err as Error, 'Failed to load programs');
   }
 }
-

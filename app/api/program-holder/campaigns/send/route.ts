@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -31,7 +29,7 @@ export async function POST(request: NextRequest) {
     .eq('id', userId)
     .maybeSingle();
 
-  if (!profile || !['program_holder', 'admin'].includes(profile.role)) {
+  if (!profile || !['program_holder', 'admin', 'super_admin'].includes(profile.role)) {
     return safeError('Forbidden', 403);
   }
 
@@ -96,4 +94,3 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Failed to send campaign emails');
   }
 }
-

@@ -1,13 +1,9 @@
-export const dynamic = 'force-dynamic';
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-async function _GET() {
+async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   try {
@@ -32,5 +28,3 @@ async function _GET() {
   }
 }
 export const GET = withApiAudit('/api/media/files', _GET);
-
-

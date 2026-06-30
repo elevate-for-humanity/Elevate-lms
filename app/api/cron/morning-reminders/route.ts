@@ -2,8 +2,6 @@
  * GET /api/cron/morning-reminders
  * Daily 8 AM: remind students of today's scheduled sessions and pending tasks.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -63,11 +61,10 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       link: `/lms/courses/${row.course_id}`,
       read: false,
       idempotency_key: `morning-reminder-${row.user_id}-${row.course_id}-${today}`,
-    })
+    }).onConflict('idempotency_key').ignore().catch(() => {});
     reminded++;
   }
 
   logger.info('[cron/morning-reminders] Done', { reminded });
   return NextResponse.json({ ok: true, reminded });
 });
-

@@ -97,13 +97,13 @@ export default async function IntegrationsPage() {
       <section className="relative h-48 md:h-64 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/lms-page-3.webp"
+          src="/images/pages/lms-page-3.webp"
           alt="Integrations"
           fill
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" 
+          sizes="100vw" placeholder="empty"
         />
       </section>
 
@@ -136,12 +136,12 @@ export default async function IntegrationsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/lms-page-10.webp"
+                  src="/images/pages/lms-page-10.webp"
                   alt="Platform integrations"
                   fill
                   className="object-cover"
                   quality={90}
-                  sizes="(max-width: 768px) 100vw, 50vw" 
+                  sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty"
                 />
               </div>
             </div>

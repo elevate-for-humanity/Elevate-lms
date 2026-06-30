@@ -43,7 +43,7 @@ async function _POST(req: Request) {
       // Create Stripe products/prices on the fly
       for (const course of missingStripe) {
         const product = await stripe.products.create({
-          name: course.title,
+          name: course.course_name,
           metadata: {
             course_id: course.id,
             course_slug: course.slug,
@@ -144,4 +144,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/checkout/career-courses', _POST);
-

@@ -1,8 +1,6 @@
 // DELETE /api/org/invite/[inviteId] — revoke a pending org invitation
 // Auth: org_admin or higher for the invite's organization.
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';

@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 // Creates a Stripe PaymentIntent for the Stripe Elements checkout flow.
 // Called by CheckoutFlow.tsx before confirming a card payment client-side.
 // Returns { clientSecret } which the client passes to stripe.confirmCardPayment().
@@ -6,7 +5,6 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -69,5 +67,3 @@ async function _POST(req: NextRequest) {
 }
 
 export const POST = withApiAudit('/api/checkout/create-payment-intent', _POST);
-
-

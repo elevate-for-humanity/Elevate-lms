@@ -126,4 +126,3 @@ async function _GET(request: NextRequest) {
 
 export const GET = withApiAudit('/api/compliance/automation', _GET);
 export const POST = withApiAudit('/api/compliance/automation', _POST);
-

@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
   if (workflowId) q = q.eq('workflow_id', workflowId) as typeof q;
 
   const { data, error } = await q;
-  if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ runs: data ?? [] });
 }
-

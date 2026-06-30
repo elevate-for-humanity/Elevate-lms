@@ -1,7 +1,5 @@
 'use client';
 
-
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -110,7 +108,7 @@ export default function AcceptInvitePage({ params }: { params: { token: string }
       }
 
       // Success - redirect to organization dashboard
-      router.push('/learner/dashboard');
+      router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to accept invitation');
       setAccepting(false);

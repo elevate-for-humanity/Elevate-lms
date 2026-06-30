@@ -2,9 +2,16 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import heroBanners from '@/content/heroBanners';
-import { HomeFundingStrip } from '@/components/home/HomeFundingStrip';
+import MarqueeBanner from '@/components/MarqueeBanner';
+import { HomeTrustBar } from '@/components/home/HomeTrustBar';
+import { HomeHowItWorks } from '@/components/home/HomeHowItWorks';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
+import { HomeApprenticeshipInfra } from '@/components/home/HomeApprenticeshipInfra';
+import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeOutcomes } from '@/components/home/HomeOutcomes';
+import { HomePlatformPreview } from '@/components/home/HomePlatformPreview';
+import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
+import { HomeSegmentedCTA } from '@/components/home/HomeSegmentedCTA';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -14,16 +21,20 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: `${PLATFORM_DEFAULTS.orgName} | The AI-Powered Workforce Operating System`,
+  title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training, Apprenticeships & Funding — Indianapolis`,
   description:
-    'A unified platform for recruitment, apprenticeship tracking, and verified credentialing. Empowering employers and agencies to build talent pipelines at scale through AI automation.',
+    'DOL-registered apprenticeship sponsor and WIOA-approved training provider. Funded training in healthcare, skilled trades, CDL, technology, and more — often at no cost. Apply today.',
   keywords: [
-    'AI workforce development',
-    'workforce operating system',
-    'apprenticeship management software',
-    'automated compliance tracking',
-    'blockchain verified credentials',
-    'WIOA training platform',
+    'workforce training Indianapolis',
+    'WIOA training Indiana',
+    'DOL registered apprenticeship',
+    'ETPL approved training provider',
+    'funded career training Indiana',
+    'apprenticeship programs Indianapolis',
+    'HVAC training Indianapolis',
+    'CNA training Indianapolis',
+    'CDL training Indiana',
+    'free job training Marion County',
     PLATFORM_DEFAULTS.orgName,
   ],
   alternates: {
@@ -32,12 +43,12 @@ export const metadata: Metadata = {
   openGraph: {
     title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training, Apprenticeships & Funding`,
     description:
-      'DOL-registered apprenticeship sponsor. Training in healthcare, skilled trades, CDL, and technology — many programs can be FREE if you qualify through WIOA or state funding.',
+      'DOL-registered apprenticeship sponsor. Funded training in healthcare, skilled trades, CDL, and technology — often at no cost through WIOA or state funding.',
     url: PLATFORM_DEFAULTS.siteUrl,
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
       {
-        url: '/images/pages/admin-dashboard-hero.webp',
+        url: '/images/pages/comp-home-hero.webp',
         width: 1200,
         height: 630,
         alt: `${PLATFORM_DEFAULTS.orgName} workforce training`,
@@ -50,7 +61,7 @@ export const metadata: Metadata = {
     title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training & Apprenticeships`,
     description:
       'Funded training, DOL-registered apprenticeships, and job placement — often at no cost.',
-    images: ['/images/pages/admin-dashboard-hero.webp'],
+    images: ['/images/pages/comp-home-hero.webp'],
   },
 };
 
@@ -93,12 +104,59 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* ── 1. HERO ─────────────────────────────────────────────────────── */}
       <HomeHeroVideo banner={banner} />
-      <HomeFundingStrip />
+
+      {/* ── 1b. ROTATING MARQUEE BANNER ─────────────────────────────────── */}
+      <MarqueeBanner />
+
+      {/* ── 2. HOW ELEVATE WORKS ────────────────────────────────────────── */}
+      {/* 6-step operational pipeline: Apply → Funding → Training →
+          Apprenticeship → Credential → Employment */}
+      <HomeHowItWorks />
+
+      {/* ── 4. CAREER PATHWAYS ──────────────────────────────────────────── */}
+      {/* 8 featured program cards with credential, funding, and
+          apprenticeship flags. Sector quick-links below. */}
       <HomeCareerPathways />
+
+      {/* ── 5. APPRENTICESHIP + EMPLOYER INFRASTRUCTURE ─────────────────── */}
+      {/* Dual-column: learner OJT benefits + employer capabilities.
+          RAPIDS, wage reimbursement, compliance — in human language. */}
+      <HomeApprenticeshipInfra />
+
+      {/* ── 6. FUNDING & ACCESSIBILITY ──────────────────────────────────── */}
+      {/* WIOA, Workforce Ready Grant, FSSA IMPACT, Job Ready Indy,
+          OJT reimbursement, payment plans. "Most learners pay $0." */}
+      <HomeFunding />
+
+      {/* ── 7. OUTCOMES + SUCCESS STORIES ───────────────────────────────── */}
+      {/* Live enrollment stats from /api/enrollment-stats.
+          Testimonials from /api/testimonials (featured=true).
+          Falls back to static content if APIs unavailable. */}
       <Suspense fallback={<OutcomesSkeleton />}>
         <HomeOutcomes />
       </Suspense>
+
+      {/* ── 8. PLATFORM PREVIEW ─────────────────────────────────────────── */}
+      {/* Learner portal, employer dashboard, workforce analytics screenshots.
+          System capabilities listed — framed as "supporting student success." */}
+      <HomePlatformPreview />
+
+      {/* ── 8b. EMPLOYER STRIP ──────────────────────────────────────────── */}
+      <HomeEmployerStrip />
+
+      {/* ── 9. SEGMENTED CTA ────────────────────────────────────────────── */}
+      {/* Separate entry funnels: Learners / Employers / Workforce Agencies /
+          Training Partners. Each routes to its own journey. */}
+      <HomeSegmentedCTA />
+
+      {/* ── 9b. ACCREDITATIONS & PARTNER LOGOS (before final CTA) ───────── */}
+      <HomeTrustBar />
+
+      {/* ── 10. FINAL CTA ───────────────────────────────────────────────── */}
+      {/* "From where you are to where you want to be."
+          Apply Now + Check Eligibility + phone number. */}
       <HomeFinalCTA />
     </>
   );

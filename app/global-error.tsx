@@ -5,67 +5,50 @@ import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import * as Sentry from '@sentry/nextjs';
 
-// Server Action ID mismatch — happens when production deploys a new build while
+// Server Action ID mismatch — happens when ECS deploys a new build while
 // users still have the old page loaded. The old action IDs don't exist in
 // the new build. Hard reload fetches the new page with new action IDs.
-function isServerActionMismatch(error: Error & { digest?: string } | null | undefined): boolean {
-  if (!error) return false;
-  const msg = error.message || '';
-  const digest = error.digest || '';
+function isServerActionMismatch(error: Error): boolean {
   return (
-    msg.includes('Failed to find Server Action') ||
-    msg.includes('server-action') ||
-    msg.includes('This request might be from an older') ||
-    digest.includes('NEXT_NOT_FOUND')
+    error.message?.includes('Failed to find Server Action') ||
+    error.message?.includes('server-action') ||
+    error.digest?.includes('NEXT_NOT_FOUND') === false &&
+    error.message?.includes('This request might be from an older')
   );
 }
-
-// Rate-limit reloads to prevent infinite loops
-const RELOAD_COOLDOWN_MS = 5000; // Don't reload more than once every 5 seconds
-let lastReloadTime = 0;
 
 export default function GlobalError({
   error,
   reset,
 }: {
-  error: Error & { digest?: string } | null | undefined;
+  error: Error & { digest?: string };
   reset: () => void;
 }) {
   useEffect(() => {
-    const now = Date.now();
-    
-    // Check if this is a Server Action mismatch
+    // Auto-reload on Server Action ID mismatch (deployment rollover)
     if (isServerActionMismatch(error)) {
-      // Don't log as error - this is expected during deployments
-      // Only log at info level in dev
-      if (process.env.NODE_ENV === 'development') {
-        console.info('[GlobalError] Server Action mismatch (expected during deployment)');
-      }
-      
-      // Rate-limit reloads to prevent hammering
-      if (now - lastReloadTime > RELOAD_COOLDOWN_MS) {
-        lastReloadTime = now;
-        console.info('[GlobalError] Reloading page to sync with new build...');
-        window.location.reload();
-      }
+      window.location.reload();
       return;
     }
 
-    // Log actual errors appropriately
-    console.error('[GlobalError] Unexpected error:', {
-      message: error?.message || 'No error message',
-      name: error?.name || 'No error name',
-      digest: error?.digest || 'No digest',
-      stack: error?.stack || 'No stack trace',
-    });
-
     // Capture error with Sentry
-    Sentry.captureException(error, {
-      extra: {
-        digest: error?.digest,
-        errorBoundary: 'global',
-      },
-    });
+    Sentry.captureException(error);
+
+    // Log error to console for debugging
+    console.error('=== GLOBAL ERROR CAUGHT ===');
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('Error digest:', error.digest);
+    console.error('========================');
+
+    // Send to Sentry if configured
+    if (typeof window !== 'undefined' && window.Sentry) {
+      window.Sentry.captureException(error, {
+        tags: {
+          errorBoundary: 'global',
+        },
+      });
+    }
   }, [error]);
 
   return (
@@ -111,7 +94,7 @@ export default function GlobalError({
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <button
-                onClick={() => window.location.reload()}
+                onClick={reset}
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <RefreshCw className="h-5 w-5" />

@@ -6,7 +6,6 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { normalizeProgramInterest } from '@/lib/intake/normalize-program-interest';
 import { resolveZip } from '@/lib/intake/normalize-zip';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { isValidEmail } from '@/lib/validate';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -28,6 +27,10 @@ interface IntakePayload {
   zip_code?: string;
   postal_code?: string;
   postalCode?: string;
+}
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 /**
@@ -132,8 +135,8 @@ export async function POST(request: NextRequest) {
         last_name: intakeLastName,
         email: normalizedEmail,
         normalized_email: normalizedEmail,
-        normalized_phone: (body.phone?.trim() || '').replace(/\D/g, '') || null,
-        phone: body.phone?.trim() || '',
+        normalized_phone: (body.phone || '').replace(/\D/g, '') || null,
+        phone: body.phone?.trim() || null,
         city: 'Not provided',
         zip: zipCode,
         program_interest: programInterest || null,
@@ -213,13 +216,12 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    await Promise.resolve(
-      supabase
-        .from('notification_outbox')
-        .insert(notifications)
-    ).catch((err) => {
-      logger.warn('Failed to queue intake notifications', err);
-    });
+    await supabase
+      .from('notification_outbox')
+      .insert(notifications)
+      .catch((err) => {
+        logger.warn('Failed to queue intake notifications', err);
+      });
 
     return NextResponse.json({
       success: true,
@@ -232,4 +234,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unexpected server error.' }, { status: 500 });
   }
 }
-

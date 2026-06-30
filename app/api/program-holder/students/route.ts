@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { getProgramHolderStudents } from '@/lib/program-holder-access';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -28,7 +27,7 @@ async function _GET(request: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    const allowedRoles = ['program_holder', 'admin', 'staff'];
+    const allowedRoles = ['program_holder', 'admin', 'super_admin', 'staff'];
     if (!profile || !allowedRoles.includes(profile.role ?? '')) {
       return NextResponse.json(
         { error: 'Forbidden - Program holder access only' },
@@ -58,4 +57,3 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/program-holder/students', _GET);
-

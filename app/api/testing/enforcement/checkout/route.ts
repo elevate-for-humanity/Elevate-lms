@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 // PUBLIC ROUTE: enforcement testing checkout
 /**
@@ -108,4 +106,3 @@ export const POST = withRuntime(
     }
   },
 );
-

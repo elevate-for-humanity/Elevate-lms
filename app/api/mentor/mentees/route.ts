@@ -10,7 +10,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError, safeDbError } from '@/lib/api/safe-error';
 
-const ALLOWED_ROLES = ['mentor', 'admin'];
+const ALLOWED_ROLES = ['mentor', 'admin', 'super_admin'];
 
 export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
@@ -50,4 +50,3 @@ export async function GET(req: NextRequest) {
     return safeInternalError(err, 'Failed to fetch mentees');
   }
 }
-

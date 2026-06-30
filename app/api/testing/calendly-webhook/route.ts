@@ -16,8 +16,6 @@
  * Calendly → Integrations → Webhooks).
  */
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
@@ -244,7 +242,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
         .send({
           from: `Elevate Testing Center <${TESTING_CENTER.email}>`,
           to: inviteeEmail,
-          subject: `Your Testing Appointment is Confirmed — ${PLATFORM_DEFAULTS.orgName}`,
+          subject: 'Your Testing Appointment is Confirmed — ${PLATFORM_DEFAULTS.orgName}',
           html: confirmationEmailHtml(inviteeName, startTime, examAnswer),
         })
         .catch((err) => logger.error('Confirmation email failed', err));
@@ -323,7 +321,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
         .send({
           from: `Elevate Testing Center <${TESTING_CENTER.email}>`,
           to: inviteeEmail,
-          subject: `Testing Appointment Canceled — ${PLATFORM_DEFAULTS.orgName}`,
+          subject: 'Testing Appointment Canceled — ${PLATFORM_DEFAULTS.orgName}',
           html: cancellationEmailHtml(inviteeName, startTime),
         })
         .catch((err) => logger.error('Cancellation email failed', err));
@@ -343,4 +341,3 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
 
   return NextResponse.json({ ok: true, skipped: `unhandled event: ${eventType}` });
 });
-

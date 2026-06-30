@@ -113,7 +113,7 @@ async function _POST(request: NextRequest) {
     // 5. Create tenant branding (default)
     await supabase.from('tenant_branding').insert({
       tenant_id: tenant.id,
-      logo_url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      logo_url: '/default-logo.png',
       primary_color: '#16a34a',
       secondary_color: '#ea580c',
     });
@@ -433,4 +433,3 @@ function generateSetupGuideEmail(data: any): string {
   `;
 }
 export const POST = withRuntime(withApiAudit('/api/onboarding/provision-tenant', _POST));
-

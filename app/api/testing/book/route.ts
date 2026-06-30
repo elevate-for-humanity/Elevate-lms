@@ -1,7 +1,5 @@
 // PUBLIC ROUTE: testing appointment booking
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -303,4 +301,3 @@ export const POST = withRuntime({ rateLimit: 'contact' }, async (req) => {
 
   return NextResponse.json({ success: true, confirmationCode, addOn: hasAddOn });
 });
-

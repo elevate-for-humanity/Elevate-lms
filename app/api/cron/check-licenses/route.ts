@@ -2,8 +2,6 @@
  * GET /api/cron/check-licenses
  * Verify license status against DB — flag any active licenses with missing required fields.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -25,7 +23,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/check-licenses] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   let flagged = 0;
@@ -41,7 +39,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       severity: 'warning',
       message: `License ${lic.id} (${lic.license_type ?? 'unknown type'}) missing required fields: ${missing}`,
       metadata: { license_id: lic.id, holder_id: lic.holder_id, missing_fields: missing },
-    })
+    }).onConflict('id').ignore().catch(() => {});
 
     flagged++;
   }
@@ -57,4 +55,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/check-licenses] Done', { flagged, expiring_in_60_days: expiringSoon ?? 0 });
   return NextResponse.json({ ok: true, flagged, expiring_in_60_days: expiringSoon ?? 0 });
 });
-

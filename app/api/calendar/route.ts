@@ -2,7 +2,6 @@ import { safeInternalError } from '@/lib/api/safe-error';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -155,4 +154,3 @@ export const GET = withApiAudit('/api/calendar', _GET);
 export const POST = withApiAudit('/api/calendar', _POST);
 export const PUT = withApiAudit('/api/calendar', _PUT);
 export const DELETE = withApiAudit('/api/calendar', _DELETE);
-

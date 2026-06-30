@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -152,4 +151,3 @@ async function _DELETE(request: NextRequest) {
 export const GET = withApiAudit('/api/files', _GET);
 export const POST = withApiAudit('/api/files', _POST);
 export const DELETE = withApiAudit('/api/files', _DELETE);
-

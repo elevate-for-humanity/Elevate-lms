@@ -2,8 +2,6 @@
  * GET /api/cron/payment-monitoring
  * Monitor for failed/stuck payments and alert operations team.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -32,7 +30,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/payment-monitoring] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   // Payout schedules past due
@@ -66,4 +64,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/payment-monitoring] Done', { unresolved_failures: failureCount, overdue_payouts: overdueCount });
   return NextResponse.json({ ok: true, unresolved_failures: failureCount, overdue_payouts: overdueCount });
 });
-

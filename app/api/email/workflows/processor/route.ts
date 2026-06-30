@@ -2,7 +2,6 @@ import { safeInternalError } from '@/lib/api/safe-error';
 // CRON ROUTE: processes triggered email workflows — called every 5 min by cron
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { resend } from '@/lib/resend';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
@@ -323,4 +322,3 @@ async function _POST(req: Request) {
 }
 export const GET = withApiAudit('/api/email/workflows/processor', _GET);
 export const POST = withApiAudit('/api/email/workflows/processor', _POST);
-

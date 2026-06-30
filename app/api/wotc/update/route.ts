@@ -1,9 +1,6 @@
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
@@ -12,7 +9,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-const ADMIN_ROLES = ['admin', 'staff'];
+const ADMIN_ROLES = ['admin', 'super_admin', 'staff'];
 
 async function requireAdminUser() {
   const supabase = await createClient();
@@ -125,4 +122,3 @@ async function _GET(request: Request) {
 
 export const GET = withApiAudit('/api/wotc/update', _GET);
 export const POST = withApiAudit('/api/wotc/update', _POST);
-

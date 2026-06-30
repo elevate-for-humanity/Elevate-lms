@@ -1,8 +1,5 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
@@ -10,7 +7,7 @@ import { safeError, safeInternalError } from '@/lib/api/safe-error';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_ROLES = ['program_holder', 'admin', 'staff'];
+const ALLOWED_ROLES = ['program_holder', 'admin', 'super_admin', 'staff'];
 
 export async function PATCH(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
@@ -82,4 +79,3 @@ export async function PATCH(req: NextRequest) {
 
   return NextResponse.json({ success: true });
 }
-

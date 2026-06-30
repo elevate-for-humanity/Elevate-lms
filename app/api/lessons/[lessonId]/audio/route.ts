@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync } from 'fs';
 import { mkdir, writeFile, readFile } from 'fs/promises';
 import path from 'path';
 import { logger } from '@/lib/logger';
@@ -289,6 +289,7 @@ type Params = Promise<{ lessonId: string }>;
 
 async function _GET(request: NextRequest, { params }: { params: Params }) {
   const { lessonId } = await params;
+
 
   const auth = await apiAuthGuard(request);
 

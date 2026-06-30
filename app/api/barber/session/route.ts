@@ -3,17 +3,14 @@
 // PATCH /api/barber/session       — heartbeat (keep-alive + activity signals)
 // DELETE /api/barber/session      — end session, credit hours
 
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { canCreditTheoryHoursForDate } from '@/lib/apprenticeship-programs/check-daily-theory-credit';
-import { dailyTheoryBlockedMessage } from '@/lib/apprenticeship-programs/daily-theory';
-import { DAILY_THEORY_PASSING_SCORE } from '@/lib/apprenticeship-programs/constants';
+import { canCreditTheoryHoursForDate } from '@/lib/beauty-apprenticeship/check-daily-theory-credit';
+import { dailyTheoryBlockedMessage } from '@/lib/beauty-apprenticeship/daily-theory';
+import { DAILY_THEORY_PASSING_SCORE } from '@/lib/beauty-apprenticeship/constants';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -124,9 +121,10 @@ export async function PATCH(request: NextRequest) {
       .eq('id', session_id);
 
     if (video_seconds) {
-      await Promise.resolve(
-        db.rpc('increment_session_video', { p_session_id: session_id, p_seconds: video_seconds })
-      ).then(() => {}).catch(() => {}); // non-critical
+      await db
+        .rpc('increment_session_video', { p_session_id: session_id, p_seconds: video_seconds })
+        .then(() => {})
+        .catch(() => {}); // non-critical
     }
 
     return NextResponse.json({ ok: true, idle_gap: additionalIdle });
@@ -248,4 +246,3 @@ export async function DELETE(request: NextRequest) {
     return safeInternalError(err, 'Failed to end session');
   }
 }
-

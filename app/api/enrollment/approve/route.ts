@@ -1,7 +1,5 @@
-export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -130,5 +128,3 @@ async function _POST() {
   }
 }
 export const POST = withApiAudit('/api/enrollment/approve', _POST, { critical: true });
-
-

@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 /**
  * POST /api/micro-classes/webhook
@@ -44,7 +42,7 @@ export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get('stripe-signature');
   if (!sig) {
-    return NextResponse.json({ received: true, warning: 'no_signature' }, { status: 200 });
+    return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
   }
 
   let event: Stripe.Event;
@@ -53,7 +51,7 @@ export async function POST(req: NextRequest) {
     event = _s!.webhooks.constructEvent(body, sig, webhookSecret);
   } catch {
     logger.warn('[micro-classes/webhook] Signature verification failed');
-    return NextResponse.json({ received: true, warning: 'invalid_signature' }, { status: 200 });
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
   if (event.type !== 'checkout.session.completed') {
@@ -228,4 +226,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ received: true });
 }
-

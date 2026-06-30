@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -47,7 +46,7 @@ async function _GET(request: Request) {
         .eq('id', user.id)
         .maybeSingle();
 
-      if (!profile || !['admin'].includes(profile.role)) {
+      if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
@@ -148,4 +147,3 @@ async function _POST(request: Request) {
 }
 export const GET = withApiAudit('/api/reviews', _GET);
 export const POST = withApiAudit('/api/reviews', _POST);
-

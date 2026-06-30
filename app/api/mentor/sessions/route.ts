@@ -10,7 +10,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError, safeDbError } from '@/lib/api/safe-error';
 import { emitEvent } from '@/lib/platform/events';
 
-const ALLOWED_ROLES = ['mentor', 'admin'];
+const ALLOWED_ROLES = ['mentor', 'admin', 'super_admin'];
 
 export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
@@ -81,4 +81,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(data, { status: 201 });
   } catch (err) { return safeInternalError(err, 'Failed to create session'); }
 }
-

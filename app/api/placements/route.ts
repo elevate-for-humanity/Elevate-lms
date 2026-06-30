@@ -1,7 +1,5 @@
 // GET  /api/placements  — list placements (admin/staff/case_manager/provider_admin)
 // POST /api/placements  — create a placement record (admin/staff/case_manager)
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/admin/guards';
@@ -132,4 +130,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ placement: record }, { status: 201 });
 }
-

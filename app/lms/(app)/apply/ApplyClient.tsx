@@ -1,6 +1,4 @@
 'use client';
-
-
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -34,7 +32,6 @@ export default function StudentApplicationPage({ programs = [] }: { programs?: P
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [turnstileToken, setTurnstileToken] = useState('');
   const [success, setSuccess] = useState(false);
   const [qualificationMessage, setQualificationMessage] = useState('');
 
@@ -141,12 +138,6 @@ export default function StudentApplicationPage({ programs = [] }: { programs?: P
     setSubmitting(true);
     setError('');
 
-    if (!turnstileToken) {
-      setError('Please complete the security check before submitting.');
-      setSubmitting(false);
-      return;
-    }
-
     if (isFundedFlow && !formData.funding_readiness) {
       setError('Please complete the funding eligibility progress section before submitting.');
       setSubmitting(false);
@@ -165,7 +156,6 @@ export default function StudentApplicationPage({ programs = [] }: { programs?: P
           program: formData.program,
           source: 'lms_portal',
           fundingType: formData.funding_source || null,
-          turnstileToken,
           fundingEligibilityStatus:
             formData.funding_readiness === 'not-started'
               ? 'needs_appointment'
@@ -563,15 +553,10 @@ export default function StudentApplicationPage({ programs = [] }: { programs?: P
         </div>
 
         {/* Submit */}
-        <div className="pt-4 space-y-4">
-          <Turnstile
-            onVerify={setTurnstileToken}
-            onExpire={() => setTurnstileToken('')}
-            formId="lms-apply"
-          />
+        <div className="pt-4">
           <button
             type="submit"
-            disabled={submitting || !turnstileToken}
+            disabled={submitting}
             className="w-full bg-emerald-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-emerald-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
           >
             {submitting ? 'Submitting...' : 'Submit Application'}

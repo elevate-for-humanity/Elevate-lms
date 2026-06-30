@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 /**
  * POST /api/videos/regenerate
  *
@@ -14,7 +13,6 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -158,5 +156,3 @@ async function runRender(opts: {
     await markFailed(jobId, failMsg);
   }
 }
-
-

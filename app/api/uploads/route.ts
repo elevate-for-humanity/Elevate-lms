@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -141,4 +140,3 @@ async function _DELETE(request: NextRequest) {
 export const GET = withApiAudit('/api/uploads', _GET);
 export const POST = withApiAudit('/api/uploads', _POST);
 export const DELETE = withApiAudit('/api/uploads', _DELETE);
-

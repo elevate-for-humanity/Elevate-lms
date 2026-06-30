@@ -11,10 +11,8 @@
  *   3. Mark the event processed_at = now() so it is not re-dispatched.
  *
  * Processes up to BATCH_SIZE events per run to bound execution time.
- * Gated by CRON_SECRET header via withRuntime({ cron: "x-header" }).
+ * Gated by CRON_SECRET header via withRuntime({ cron: true }).
  */
-
-import { db } from '@/lib/db';
 
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -43,7 +41,7 @@ function eventMatchesFilter(
   return true;
 }
 
-export const POST = withRuntime({ cron: "x-header" }, async () => {
+export const POST = withRuntime({ cron: true }, async () => {
   const db = await requireAdminClient();
 
   // Load unprocessed events oldest-first, bounded by BATCH_SIZE
@@ -118,7 +116,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
     if (markErr) {
       logger.warn('[workflow-event-processor] Failed to mark event processed', {
         event_id: event.id,
-        error: 'Internal server error',
+        error: markErr.message,
       });
     } else {
       processed++;
@@ -128,4 +126,3 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
   logger.info('[workflow-event-processor] Run complete', { processed, triggered });
   return NextResponse.json({ ok: true, processed, triggered });
 });
-

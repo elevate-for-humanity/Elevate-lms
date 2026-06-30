@@ -37,4 +37,3 @@ async function _POST(request: NextRequest) {
 }
 
 export const POST = withApiAudit('/api/ecosystem/url-health', _POST);
-

@@ -2,8 +2,6 @@
  * GET /api/cron/check-expiring-documents
  * 7-day and 3-day expiry warnings for all compliance documents.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -52,4 +50,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/check-expiring-documents] Done', { total_warned });
   return NextResponse.json({ ok: true, total_warned });
 });
-

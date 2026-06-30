@@ -2,8 +2,6 @@
  * GET /api/cron/onboarding-followup
  * Follow up with users who started onboarding but haven't completed it in 48h.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -31,7 +29,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/onboarding-followup] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   // Deduplicate by user_id — only send one email per user
@@ -54,7 +52,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       link: '/onboarding',
       read: false,
       idempotency_key: `onboarding-followup-${row.user_id}-${today}`,
-    })
+    }).onConflict('idempotency_key').ignore().catch(() => {});
 
     await sendEmail({
       to: profile.email,
@@ -68,4 +66,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/onboarding-followup] Done', { followed_up });
   return NextResponse.json({ ok: true, followed_up });
 });
-

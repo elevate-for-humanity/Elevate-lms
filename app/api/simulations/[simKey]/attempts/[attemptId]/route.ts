@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -165,6 +163,4 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
     return NextResponse.json({ attempt: completed });
   }
-
-  return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
 }

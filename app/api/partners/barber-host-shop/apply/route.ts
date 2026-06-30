@@ -4,12 +4,10 @@ import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import crypto from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { getClientIp, hashIp } from '@/lib/api/get-client-ip';
-import { isValidEmail, isValidPhone } from '@/lib/validate';
-import { provisionPartnerFromBarberApplication } from '@/lib/partners/provision-barber-partner';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -88,6 +86,22 @@ const REQUIRED_FIELDS = [
 const VALID_COMPENSATION_MODELS = ['hourly', 'hybrid'];
 const VALID_WC_STATUSES = ['verified', 'exempt', 'none'];
 
+function validateEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validatePhone(phone: string): boolean {
+  return /^[\d\s\-()\\+]{10,}$/.test(phone);
+}
+
+function hashIP(ip: string): string {
+  return crypto
+    .createHash('sha256')
+    .update(ip + process.env.IP_HASH_SALT || 'efh-salt')
+    .digest('hex')
+    .slice(0, 16);
+}
+
 async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
@@ -108,12 +122,12 @@ async function _POST(req: Request) {
     }
 
     // Validate email
-    if (!isValidEmail(body.contactEmail)) {
+    if (!validateEmail(body.contactEmail)) {
       return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
     }
 
     // Validate phone
-    if (!isValidPhone(body.contactPhone)) {
+    if (!validatePhone(body.contactPhone)) {
       return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 });
     }
 
@@ -267,16 +281,16 @@ async function _POST(req: Request) {
     }
 
     const approvalHoldReasons: string[] = [];
-    if (body.hasGeneralLiability !== 'yes')
-      approvalHoldReasons.push('General liability not confirmed');
+    if (body.hasGeneralLiability !== 'yes') approvalHoldReasons.push('General liability not confirmed');
     if (wcStatus === 'none') approvalHoldReasons.push("Workers' compensation missing");
     if (!insuranceCoiFilePath) approvalHoldReasons.push('Insurance certificate not uploaded');
     const insuranceStatus = approvalHoldReasons.length > 0 ? 'rejected' : 'pending';
-    const insuranceReasonCodes = approvalHoldReasons.map(
-      (r) => `MISSING:${r.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`,
-    );
+    const insuranceReasonCodes = approvalHoldReasons.map((r) => `MISSING:${r.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`);
 
-    const ipRaw = getClientIp(req);
+    const ipRaw =
+      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      req.headers.get('x-real-ip') ||
+      'unknown';
 
     // Insert application
     const { data, error } = await supabase
@@ -318,18 +332,13 @@ async function _POST(req: Request) {
         can_supervise_and_verify: body.canSuperviseAndVerify === 'yes',
         mou_acknowledged: body.mouAcknowledged,
         consent_acknowledged: body.consentAcknowledged,
-        notes:
-          [
-            body.notes?.trim() || null,
-            shopLicenseDocumentPath
-              ? `shop_license_document_path=${shopLicenseDocumentPath}`
-              : null,
-            approvalHoldReasons.length
-              ? `approval_hold_reasons=${approvalHoldReasons.join('; ')}`
-              : null,
-          ]
-            .filter(Boolean)
-            .join('\n') || null,
+        notes: [
+          body.notes?.trim() || null,
+          shopLicenseDocumentPath ? `shop_license_document_path=${shopLicenseDocumentPath}` : null,
+          approvalHoldReasons.length ? `approval_hold_reasons=${approvalHoldReasons.join('; ')}` : null,
+        ]
+          .filter(Boolean)
+          .join('\n') || null,
         signature_data: body.signatureData || null,
         // EIN
         ein: body.ein?.trim() || null,
@@ -350,9 +359,7 @@ async function _POST(req: Request) {
         consent_signer_name: body.consentSignerName?.trim() || body.contactName.trim(),
         source_url: req.headers.get('referer') || null,
         user_agent: req.headers.get('user-agent') || null,
-        ip_hash: hashIp(ipRaw),
-        status: 'approved',
-        reviewed_at: new Date().toISOString(),
+        ip_hash: hashIP(ipRaw),
       })
       .select()
       .maybeSingle();
@@ -500,97 +507,6 @@ async function _POST(req: Request) {
       html: partnerWelcomeHtml,
     }).catch((err) => logger.error('Failed to send admin copy of partner welcome email', err));
 
-    // Create or update the partner login profile so the host shop can access
-    // onboarding/forms after submission instead of only appearing in admin.
-    try {
-      const normalizedEmail = body.contactEmail.toLowerCase().trim();
-      const { data: existingUsers } = await supabase.auth.admin.listUsers();
-      const existingUser = existingUsers?.users?.find(
-        (user: { email?: string }) => user.email?.toLowerCase() === normalizedEmail,
-      );
-      const invited = existingUser
-        ? null
-        : await supabase.auth.admin.inviteUserByEmail(normalizedEmail, {
-            redirectTo: `${PLATFORM_DEFAULTS.siteUrl}/partners/barber-host-shop/forms`,
-            data: {
-              full_name: body.contactName,
-              role: 'partner',
-              partner_type: 'barber_host_shop',
-              partner_application_id: data.id,
-            },
-          });
-      const userId = existingUser?.id || invited?.data?.user?.id;
-      if (userId) {
-        const [firstName = body.contactName, ...lastNameParts] = body.contactName.split(' ');
-        await supabase.from('profiles').upsert(
-          {
-            id: userId,
-            email: normalizedEmail,
-            first_name: firstName,
-            last_name: lastNameParts.join(' ') || null,
-            full_name: body.contactName,
-            role: 'partner',
-          },
-          { onConflict: 'id' },
-        );
-
-        const provisioned = await provisionPartnerFromBarberApplication(supabase, data, {
-          linkUserId: userId,
-        });
-
-        if (provisioned?.partnerId) {
-          const initialDocs = [
-            shopLicenseDocumentPath
-              ? {
-                  partner_id: provisioned.partnerId,
-                  document_type: 'barbershop_license',
-                  program_id: 'barber',
-                  file_name: body.shopLicenseFileName,
-                  file_url: shopLicenseDocumentPath,
-                  file_type: body.shopLicenseFileData?.split(';')[0]?.replace('data:', '') || 'application/octet-stream',
-                  status: 'pending',
-                }
-              : null,
-            insuranceCoiFilePath
-              ? {
-                  partner_id: provisioned.partnerId,
-                  document_type: 'liability_insurance',
-                  program_id: 'barber',
-                  file_name: body.insuranceFileName || 'insurance-coi.pdf',
-                  file_url: insuranceCoiFilePath,
-                  file_type: body.insuranceFileData?.split(';')[0]?.replace('data:', '') || 'application/octet-stream',
-                  status: 'pending',
-                }
-              : null,
-            einDocumentPath
-              ? {
-                  partner_id: provisioned.partnerId,
-                  document_type: 'ein_letter',
-                  program_id: 'barber',
-                  file_name: body.einFileName || 'ein-letter.pdf',
-                  file_url: einDocumentPath,
-                  file_type: body.einFileData?.split(';')[0]?.replace('data:', '') || 'application/octet-stream',
-                  status: 'pending',
-                }
-              : null,
-          ].filter(Boolean);
-
-          if (initialDocs.length) {
-            const documentTypes = initialDocs.map((doc: any) => doc.document_type);
-            await supabase
-              .from('partner_documents')
-              .delete()
-              .eq('partner_id', provisioned.partnerId)
-              .in('document_type', documentTypes)
-              .then(undefined, () => undefined);
-            await supabase.from('partner_documents').insert(initialDocs).then(undefined, () => undefined);
-          }
-        }
-      }
-    } catch (accountErr) {
-      logger.error('Failed to create/update barbershop partner account', accountErr as Error);
-    }
-
     return NextResponse.json({
       success: true,
       message: 'Application submitted successfully',
@@ -607,4 +523,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/partners/barber-host-shop/apply', _POST);
-

@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -35,4 +33,3 @@ export async function GET(request: NextRequest) {
   if (error) return safeDbError(error, 'Failed to fetch practical requirements');
   return NextResponse.json({ requirement: data ?? null });
 }
-

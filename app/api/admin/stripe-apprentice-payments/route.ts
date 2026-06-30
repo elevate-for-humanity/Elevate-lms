@@ -93,6 +93,7 @@ export async function GET(request: NextRequest) {
             amountDueCents: i.amount_due,
             amountPaidFormatted: formatCents(i.amount_paid),
             status: i.status,
+            paid: i.paid,
             created: new Date(i.created * 1000).toISOString(),
             description: i.description,
             hostedInvoiceUrl: i.hosted_invoice_url,
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
   }
 
-  let body: { customerIds?: string[]; actions?: ApprenticeBillingAction[] };
+  let body: { customerIds?: string[]; actions?: ApprenticeBillingAction[] } = {};
   try {
     body = await request.json();
   } catch {
@@ -150,4 +151,3 @@ export async function POST(request: NextRequest) {
 function formatCents(cents: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
 }
-

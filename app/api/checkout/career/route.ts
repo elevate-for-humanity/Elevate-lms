@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 
 import { getStripe, stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PRICES } from '@/lib/stripe/prices';
@@ -52,4 +51,3 @@ async function _POST(request: Request) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/checkout/career', _POST));
-

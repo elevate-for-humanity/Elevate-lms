@@ -2,7 +2,6 @@ import { internalFetch } from '@/lib/api/internal-fetch';
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { ensureDigitalBinder } from '@/lib/enrollment/ensure-digital-binder';
@@ -93,6 +92,7 @@ async function _POST(req: Request) {
       .insert({
         user_id: user.id,
         enrollment_id: enrollmentId,
+        digital_binder_id: binderId,
         file_name: file.name,
         document_type: documentType,
         file_url: signed.signedUrl,
@@ -100,7 +100,6 @@ async function _POST(req: Request) {
         file_size: file.size,
         mime_type: file.type,
         status: 'pending_review',
-        metadata: { digital_binder_id: binderId },
       })
       .select()
       .maybeSingle();
@@ -156,7 +155,7 @@ async function _POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      document: document || { file_url: signed.signedUrl, file_path: fileName },
+      document: document || { file_url: urlData.publicUrl },
       path: fileName,
     });
   } catch (error) {
@@ -165,4 +164,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/enrollment/upload-document', _POST);
-

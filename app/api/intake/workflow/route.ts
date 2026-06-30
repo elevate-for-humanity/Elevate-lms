@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 /**
  * Intake Workflow API
  *
@@ -8,7 +7,6 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { validateIntakeCompletion } from '@/lib/enrollment/funding-enforcement';
 import { IntakeStatus, FundingPathway } from '@/types/enrollment';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -151,14 +149,14 @@ async function _PATCH(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const isStaff = profile?.role && ['admin', 'advisor', 'admin'].includes(profile.role);
+  const isStaff = profile?.role && ['admin', 'advisor', 'super_admin'].includes(profile.role);
 
   if (intake.user_id !== user.id && !isStaff) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 
   // Process step update
-  let updateData;
+  let updateData: Record<string, any> = {};
   let newStatus: IntakeStatus = intake.status;
 
   switch (step) {
@@ -326,5 +324,3 @@ async function _PATCH(request: NextRequest) {
 export const GET = withApiAudit('/api/intake/workflow', _GET);
 export const POST = withApiAudit('/api/intake/workflow', _POST);
 export const PATCH = withApiAudit('/api/intake/workflow', _PATCH);
-
-

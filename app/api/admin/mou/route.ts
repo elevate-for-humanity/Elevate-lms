@@ -69,7 +69,8 @@ export async function POST(request: NextRequest) {
           .from('partners')
           .insert({ name: partner_name, email: partner_email ?? null, status: 'pending', created_at: new Date().toISOString() })
           .select('id')
-          .single();
+          .single()
+          .catch(() => ({ data: null }));
         partnerId = newPartner?.id ?? null;
       }
     }
@@ -111,7 +112,7 @@ export async function POST(request: NextRequest) {
           <p>— ${PLATFORM_DEFAULTS.orgName}</p>
         `,
         text: `MOU from ${PLATFORM_DEFAULTS.orgName}\n\n${mouContent?.replace(/<[^>]+>/g, ' ')}\n\nContact: partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
-        replyTo: `partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
+        replyTo: 'partnerships@${PLATFORM_DEFAULTS.canonicalDomain}',
       });
 
       // Update status to sent
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
       subject: `MOU from ${PLATFORM_DEFAULTS.orgName} — ${mou.title ?? 'Partnership Agreement'}`,
       html: `<p>Please review the attached MOU from ${PLATFORM_DEFAULTS.orgName}.</p><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:24px">${mou.content ?? ''}</div>`,
       text: mou.content?.replace(/<[^>]+>/g, ' ') ?? '',
-      replyTo: `partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
+      replyTo: 'partnerships@${PLATFORM_DEFAULTS.canonicalDomain}',
     });
 
     await supabase.from('partner_mous').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', mou_id);
@@ -162,4 +163,3 @@ export async function POST(request: NextRequest) {
 
   return safeError('Unknown action', 400);
 }
-

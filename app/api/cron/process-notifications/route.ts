@@ -3,8 +3,6 @@
  * Flush pending notifications: mark stale unread notifications as expired,
  * emit platform event for notification backlog if count is high.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -33,10 +31,9 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/process-notifications] Update failed', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   logger.info('[cron/process-notifications] Done', { stale_found: staleCount, marked_read: updated });
   return NextResponse.json({ ok: true, stale_found: staleCount ?? 0, marked_read: updated ?? 0 });
 });
-

@@ -151,4 +151,3 @@ async function _POST(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/moderation', _GET);
 export const POST = withApiAudit('/api/moderation', _POST);
-

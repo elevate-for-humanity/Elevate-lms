@@ -1,7 +1,6 @@
 import { safeInternalError } from '@/lib/api/safe-error';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import webpush from 'web-push';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -75,8 +74,8 @@ async function _POST(req: Request) {
             const payload = JSON.stringify({
               title,
               body,
-              icon: icon || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192x192.png',
-              badge: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192x192.png',
+              icon: icon || '/icon-192x192.png',
+              badge: '/icon-192x192.png',
               url: url || '/',
               timestamp: Date.now(),
             });
@@ -210,4 +209,3 @@ async function getTargetUsers(supabase: any, targetAudience: string) {
   return data || [];
 }
 export const POST = withApiAudit('/api/notifications/broadcast', _POST);
-

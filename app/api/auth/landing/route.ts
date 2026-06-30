@@ -1,44 +1,74 @@
-import { NextRequest, NextResponse } from 'next/server';
+// app/api/auth/landing/route.ts
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { resolveAuthenticatedLandingDestination } from '@/lib/auth/landing-destination';
-import { readRedirectParam, validateRedirect } from '@/lib/auth/validate-redirect';
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
-
+import { getRoleDestination } from '@/lib/auth/role-destinations';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-async function _GET(request: NextRequest) {
-  const rateLimited = await applyRateLimit(request, 'auth');
+async function _GET(request: Request) {
+  const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
+  const cookieStore = await cookies();
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          try {
+            cookieStore.set({ name, value, ...options });
+          } catch (error) {
+            // Handle cookie setting errors
+            logger.error('Error setting cookie:', error);
+          }
+        },
+        remove(name: string, options: CookieOptions) {
+          try {
+            cookieStore.set({ name, value: '', ...options });
+          } catch (error) {
+            // Handle cookie removal errors
+            logger.error('Error removing cookie:', error);
+          }
+        },
+      },
+    },
+  );
 
   try {
-    const supabase = await createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'Not authenticated', redirectTo: '/login' },
-        { status: 401 },
-      );
+      return NextResponse.json({ redirectTo: '/login' });
     }
 
-    const explicitRedirect = validateRedirect(readRedirectParam(request.nextUrl.searchParams), '');
-    const landing = await resolveAuthenticatedLandingDestination(supabase, user);
-    return NextResponse.json({
-      ...landing,
-      redirectTo: explicitRedirect || landing.redirectTo,
-    });
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (error || !profile) {
+      logger.error('Error fetching profile:', error);
+      return NextResponse.json({ redirectTo: '/login' });
+    }
+
+    const redirectTo = getRoleDestination(profile.role as string);
+    return NextResponse.json({ redirectTo });
   } catch (error) {
     logger.error('Auth landing error:', error);
     return NextResponse.json({ error: 'Authentication error' }, { status: 500 });
   }
 }
 export const GET = withApiAudit('/api/auth/landing', _GET);
-

@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 /**
  * Universal OCR Extraction API
  *
@@ -17,7 +16,6 @@ export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
@@ -98,7 +96,7 @@ export async function POST(req: NextRequest) {
       await getOCRFunctions();
 
     let result: any;
-    let rawText: string;
+    let rawText = '';
 
     // Handle based on document type
     if (file.type === 'application/pdf') {
@@ -191,5 +189,3 @@ export async function GET() {
     usage: 'POST with multipart/form-data: file, documentType, programContext',
   });
 }
-
-

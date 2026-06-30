@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -38,7 +37,7 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -151,4 +150,3 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/blog/generate', _POST);
-

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 // are always fresh via the enrollment query.
 export const revalidate = 600;
 
-const DEFAULT_PROGRAM_IMAGE = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp';
+const DEFAULT_PROGRAM_IMAGE = '/images/pages/comp-home-hero-programs.jpg';
 
 export default async function LmsProgramsPage() {
   const supabase = await createClient();
@@ -54,11 +54,11 @@ export default async function LmsProgramsPage() {
             <Link href="/lms">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
               <Image sizes="100vw"
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
+                src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
                 alt={PLATFORM_DEFAULTS.orgName}
                 width={120}
                 height={32}
-                className="h-8 w-auto" 
+                className="h-8 w-auto" placeholder="empty"
               />
             </Link>
             <div className="flex items-center gap-3">
@@ -120,7 +120,7 @@ export default async function LmsProgramsPage() {
               WorkOne / WIOA — Schedule Appointment →
             </a>
             <Link
-              href="/snap-et-partner"
+              href="/funding/state-programs"
               className="inline-flex items-center gap-1.5 bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-blue-800 transition"
             >
               FSSA / SNAP &amp; TANF Benefits →
@@ -176,7 +176,7 @@ export default async function LmsProgramsPage() {
                         alt={p.title}
                         fill
                         className="object-cover group-hover:scale-105 transition duration-500"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" 
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
                       />
                       {p.funded && (
                         <span className="absolute top-3 left-3 bg-brand-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">

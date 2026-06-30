@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { safeInternalError } from '@/lib/api/safe-error';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -85,4 +83,3 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/checkout/marketplace', _POST));
-

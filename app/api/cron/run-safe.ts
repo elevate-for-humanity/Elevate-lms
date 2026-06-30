@@ -25,4 +25,3 @@ export async function runSafe(
     throw error;
   }
 }
-

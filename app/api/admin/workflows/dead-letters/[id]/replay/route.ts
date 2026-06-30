@@ -5,10 +5,8 @@
  * with the original payload. Marks the dead-letter row as 'replayed'
  * so it no longer appears in the active dead-letter queue.
  *
- * Auth: admin / admin only.
+ * Auth: admin / super_admin only.
  */
-import { db } from '@/lib/db';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';

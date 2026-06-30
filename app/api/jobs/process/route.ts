@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 /**
@@ -220,4 +218,3 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   logger.info('Job batch processed', { ...results, total: jobs.length });
   return NextResponse.json({ ok: true, processed: jobs.length, ...results });
 }
-

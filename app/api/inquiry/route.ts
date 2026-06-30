@@ -4,7 +4,6 @@ import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -210,4 +209,3 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/inquiry', _POST);
-

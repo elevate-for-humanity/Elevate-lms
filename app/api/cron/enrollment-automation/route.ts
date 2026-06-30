@@ -2,8 +2,6 @@
  * GET /api/cron/enrollment-automation
  * Auto-advance approved applications to enrolled status and provision LMS access.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -28,7 +26,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/enrollment-automation] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   let enrolled = 0;
@@ -87,4 +85,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/enrollment-automation] Done', { enrolled });
   return NextResponse.json({ ok: true, enrolled });
 });
-

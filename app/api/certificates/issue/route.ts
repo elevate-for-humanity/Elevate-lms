@@ -1,6 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { randomBytes } from 'node:crypto';
 import { logger } from '@/lib/logger';
@@ -42,6 +41,9 @@ async function _POST(req: NextRequest) {
 
   if (!adminDb) {
     return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
+  }
+  if (!adminDb) {
+    return new Response('Server configuration error', { status: 500 });
   }
 
   const { user_id, course_id, expires_at } = await req.json();
@@ -110,7 +112,7 @@ async function _POST(req: NextRequest) {
       course_id,
       serial,
       student_name: learner?.email?.split('@')[0] || 'Learner',
-      course_name: course.title,
+      course_name: course.course_name,
       completion_date: new Date().toISOString().split('T')[0],
       issued_at: new Date().toISOString(),
       expires_at: expires_at_calc,
@@ -139,4 +141,3 @@ async function _POST(req: NextRequest) {
   return Response.json({ ok: true, serial });
 }
 export const POST = withApiAudit('/api/cert/issue', _POST);
-

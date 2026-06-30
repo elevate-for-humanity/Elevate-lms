@@ -2,7 +2,6 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -48,7 +47,7 @@ async function _GET(request: NextRequest) {
     if (!adminClient) {
       return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
     }
-    const isAdmin = profile?.role && ['admin', 'staff'].includes(profile.role);
+    const isAdmin = profile?.role && ['admin', 'super_admin', 'staff'].includes(profile.role);
 
     let query = adminClient
       .from('support_tickets')
@@ -144,4 +143,3 @@ async function _POST(request: NextRequest) {
 }
 export const GET = withApiAudit('/api/support/tickets', _GET);
 export const POST = withApiAudit('/api/support/tickets', _POST);
-

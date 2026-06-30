@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/auth/require-api-role';
@@ -13,8 +11,8 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const auth = await requireApiRole(['workforce_board', 'admin', 'org_admin']);
-    if (auth instanceof NextResponse) return auth;
+    const auth = await requireApiRole(['workforce_board', 'admin', 'super_admin', 'org_admin']);
+    if (auth.error) return auth.error;
 
     const { db } = auth;
 
@@ -76,4 +74,3 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/workforce-board/performance-trends', _GET);
-

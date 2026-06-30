@@ -3,8 +3,6 @@
  * Follow up on pending funding assignments — notify students and staff
  * when funding approval has been pending > 3 days.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -34,7 +32,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/funding-followup] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   let notified = 0;
@@ -45,21 +43,14 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     const email = profile?.email;
     const daysPending = Math.floor((Date.now() - new Date(row.created_at).getTime()) / 86400000);
 
-    const insertNotification = async () => {
-      try {
-        await db.from('notifications').insert({
-          user_id: row.student_id,
-          type: 'system',
-          title: 'Funding approval pending',
-          message: `Your ${source?.name ?? 'funding'} application has been pending for ${daysPending} days. Our team is following up.`,
-          read: false,
-          idempotency_key: `funding-followup-${row.id}-${new Date().toISOString().split('T')[0]}`,
-        });
-      } catch (e: unknown) {
-        logger.warn('[cron/funding-followup] Notification insert failed', { error: String(e) });
-      }
-    };
-    await insertNotification();
+    await db.from('notifications').insert({
+      user_id: row.student_id,
+      type: 'system',
+      title: 'Funding approval pending',
+      message: `Your ${source?.name ?? 'funding'} application has been pending for ${daysPending} days. Our team is following up.`,
+      read: false,
+      idempotency_key: `funding-followup-${row.id}-${new Date().toISOString().split('T')[0]}`,
+    }).onConflict('idempotency_key').ignore().catch((e: unknown) => logger.warn('[cron/funding-followup] Notification insert failed', { error: String(e) }));
 
     if (email) {
       await sendEmail({
@@ -83,4 +74,3 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   logger.info('[cron/funding-followup] Done', { notified });
   return NextResponse.json({ ok: true, notified });
 });
-

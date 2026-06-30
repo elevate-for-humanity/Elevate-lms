@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -171,7 +170,7 @@ async function sendViaSendGrid(to: string[], subject: string, html: string, text
         },
         body: JSON.stringify({
           personalizations: [{ to: [{ email }] }],
-          from: { email: SENDGRID_FROM, name: `Elizabeth Greene — ${PLATFORM_DEFAULTS.orgName}` },
+          from: { email: SENDGRID_FROM, name: 'Elizabeth Greene — ${PLATFORM_DEFAULTS.orgName}' },
           reply_to: { email: 'elevate4humanityedu@gmail.com', name: 'Elizabeth Greene' },
           subject,
           content: [
@@ -218,7 +217,7 @@ export async function POST(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin'].includes(profile.role)) {
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
 
@@ -259,4 +258,3 @@ export async function POST(request: NextRequest) {
     results,
   });
 }
-

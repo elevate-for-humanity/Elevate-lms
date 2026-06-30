@@ -2,8 +2,6 @@
  * GET /api/cron/trial-lifecycle
  * Manage trial organization lifecycle: warn at day 7, expire at day 14, clean up at day 30.
  */
-import { db } from '@/lib/db';
-
 import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -41,9 +39,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
         html: `<p>Hi,</p><p>Your trial for <strong>${org.name}</strong> expires in 7 days. Upgrade now to keep access to all features.</p><p><a href="https://www.elevateforhumanity.org/billing/upgrade">Upgrade →</a></p><p>— Elevate for Humanity</p>`,
       }).catch((e: unknown) => logger.warn('[cron/trial-lifecycle] Warn email failed', { org_id: org.id, error: String(e) }));
     }
-    await Promise.resolve(
-      db.from('organizations').update({ trial_warned_at: now.toISOString() }).eq('id', org.id)
-    ).catch(() => {});
+    await db.from('organizations').update({ trial_warned_at: now.toISOString() }).eq('id', org.id).catch(() => {});
     warned++;
   }
 
@@ -69,16 +65,13 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   }
 
   // Archive expired orgs at day 30
-  const archivedResult = await db
+  const { count: archived } = await db
     .from('organizations')
     .update({ status: 'archived', updated_at: now.toISOString() })
     .eq('status', 'trial_expired')
     .lt('updated_at', day30)
-    .select('id');
-
-  const archived = archivedResult.count ?? archivedResult.data?.length ?? 0;
+    .select('id', { count: 'exact', head: true });
 
   logger.info('[cron/trial-lifecycle] Done', { warned, expired: expired?.length ?? 0, archived: archived ?? 0 });
   return NextResponse.json({ ok: true, warned, expired: expired?.length ?? 0, archived: archived ?? 0 });
 });
-

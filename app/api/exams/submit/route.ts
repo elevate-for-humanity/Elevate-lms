@@ -1,5 +1,3 @@
-import { db } from '@/lib/db';
-
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 // app/api/exams/submit/route.ts
@@ -108,4 +106,3 @@ async function _POST(request: Request) {
   });
 }
 export const POST = withApiAudit('/api/exams/submit', _POST);
-

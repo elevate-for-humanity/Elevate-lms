@@ -5,7 +5,13 @@ import { getPartnerClient, PartnerType } from '../partners';
 
 async function getSupabaseClient() {
   const { cookies } = await import('next/headers');
-  const cookieStore = await cookies();
+  let cookieStore;
+  try {
+    cookieStore = await cookies();
+  } catch {
+    // cookies() called outside request context
+    throw new Error('Cannot create client outside request context');
+  }
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

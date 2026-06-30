@@ -37,7 +37,7 @@ export const GET = withRuntime(
     // to call Stripe to get the mapping.
     const stripeKey = ctx.env.STRIPE_SECRET_KEY;
 
-    let paymentIntentId: string | null = null;
+    const paymentIntentId =
     try {
       const stripe = await getStripeServer();
       const session = await stripe.checkout.sessions.retrieve(sessionId, {

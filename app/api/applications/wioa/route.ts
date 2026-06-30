@@ -115,7 +115,7 @@ async function _POST(req: Request) {
               <ol style="line-height: 1.8;">
                 <li>We review your application and verify WIOA eligibility</li>
                 <li>An advisor will contact you within 1-2 business days via ${body.preferredContact}</li>
-                <li>We`ll discuss program details, funding confirmation, and next steps</li>
+                <li>We'll discuss program details, funding confirmation, and next steps</li>
               </ol>
 
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">

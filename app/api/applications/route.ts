@@ -268,7 +268,7 @@ async function _POST(req: Request) {
         .eq('normalized_phone', normalizedPhone)
         .eq('program_interest', program)
         .neq('source', 'intake-form')
-        .gte('created_at`, oneDayAgo)
+        .gte('created_at', oneDayAgo)
         .limit(1)
         .maybeSingle();
       if (!phoneQuery.error) {

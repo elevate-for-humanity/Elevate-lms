@@ -106,7 +106,7 @@ async function _POST(req: Request) {
         html: `
           <h2>Your Meeting Request Has Been Received</h2>
           <p>Hi ${data.name.split(' ')[0]},</p>
-          <p>We received your request for a <strong>${data.meetingType === 'virtual' ? 'virtual meeting' : 'phone call`}</strong>.</p>
+          <p>We received your request for a <strong>${data.meetingType === 'virtual' ? 'virtual meeting' : 'phone call'}</strong>.</p>
           <p><strong>Requested Date:</strong> ${dateStr}<br>
           <strong>Requested Time:</strong> ${data.time}</p>
           <p>Our team will confirm your meeting within 1 business day. If the requested time is unavailable, we will suggest alternatives.</p>

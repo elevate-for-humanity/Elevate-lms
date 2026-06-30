@@ -80,7 +80,7 @@ export async function POST(req: Request) {
       Sign In Now
     </a>
   </div>
-  <p style="color:#94a3b8;font-size:13px;">This link expires in 1 hour. If you didn`t request this, you can safely ignore it.</p>
+  <p style="color:#94a3b8;font-size:13px;">This link expires in 1 hour. If you didn't request this, you can safely ignore it.</p>
   <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
   <p style="color:#94a3b8;font-size:12px;">Elevate for Humanity · Indianapolis, IN</p>
 </div>`,

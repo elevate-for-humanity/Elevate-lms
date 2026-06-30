@@ -45,8 +45,8 @@ export async function POST(req: NextRequest) {
   }
 
   // Parse the multipart/form-data body to get SAMLResponse
-  let samlResponse: string | null = null;
-  let relayState: string | null = null;
+  const _samlResponse =
+  const _relayState =
   try {
     const formData = await req.formData();
     _samlResponse = formData.get('SAMLResponse') as string | null;

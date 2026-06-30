@@ -221,7 +221,7 @@ async function _POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            'Service temporarily unavailable. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.',
+            `Service temporarily unavailable. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.`,
         },
         { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
@@ -280,7 +280,7 @@ async function _POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            'An application for this program was already submitted with this email in the last 24 hours. Please call ${PLATFORM_DEFAULTS.supportPhone} if you need to make changes.',
+            `An application for this program was already submitted with this email in the last 24 hours. Please call ${PLATFORM_DEFAULTS.supportPhone} if you need to make changes.`,
         },
         { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
@@ -509,7 +509,7 @@ async function _POST(req: Request) {
       const provision = await provisionAccount({
         db: supabase,
         email: body.email,
-        fullName: `${body.first_name || ''} ${body.last_name || ''}`.trim() || body.email,
+        fullName: `${body.firstName || ''} ${body.lastName || ''}`.trim() || body.email,
         phone: body.phone || null,
         programName,
         programSlug,

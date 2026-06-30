@@ -110,7 +110,7 @@ export default async function CosmetologyOrientationPage() {
   const db = await getAdminClient();
 
   // Load enrollment and subscription status
-  let _enrollmentStatus: string | null = null;
+  let enrollmentStatus /* eslint-disable-line @typescript-eslint/no-unused-vars */: string | null = null;
   let subscriptionStatus: string | null = null;
   let firstName = '';
 
@@ -134,12 +134,12 @@ export default async function CosmetologyOrientationPage() {
         .maybeSingle(),
     ]);
 
-    _enrollmentStatus = enrollmentRes.data?.status ?? null;
+    enrollmentStatus /* eslint-disable-line @typescript-eslint/no-unused-vars */ = enrollmentRes.data?.status ?? null;
     firstName = profileRes.data?.first_name ?? '';
     subscriptionStatus = subRes.data?.status ?? null;
 
     // If not enrolled at all, redirect to program page
-    if (!_enrollmentStatus) {
+    if (!enrollmentStatus /* eslint-disable-line @typescript-eslint/no-unused-vars */) {
       redirect('/programs/cosmetology-apprenticeship');
     }
 

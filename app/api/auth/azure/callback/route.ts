@@ -79,12 +79,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(`${loginUrl}?error=azure_not_configured`);
   }
 
-  const _idToken =
-  const _state =
+  let idToken: string | null = null;
+  let state: string | null = null;
   try {
     const formData = await req.formData();
-    _idToken = formData.get('id_token') as string | null;
-    state   = formData.get('state') as string | null;
+    idToken = formData.get('id_token') as string | null;
+    state = formData.get('state') as string | null;
   } catch {
     return NextResponse.redirect(`${loginUrl}?error=azure_parse_failed`);
   }

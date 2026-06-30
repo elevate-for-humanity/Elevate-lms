@@ -64,9 +64,11 @@ for (const file of files) {
 }
 
 if (missing.size > 0) {
-  const msg = 'Found ' + missing.size + ' broken imports:';
-  console.warn(msg);
+  const err = new Error('Found ' + missing.size + ' broken imports');
+  // @ts-ignore
+  err.missing = Array.from(missing.keys());
+  console.error(err.message);
   for (const [k] of missing) {
-    console.warn('  ' + k);
+    console.error('  ' + k);
   }
 }

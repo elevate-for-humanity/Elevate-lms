@@ -137,7 +137,7 @@ async function _POST(req: Request) {
     // Send notification to admin
     try {
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/send-email`, {
-        method: `POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: 'elevate4humanityedu@gmail.com',

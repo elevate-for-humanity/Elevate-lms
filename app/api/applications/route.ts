@@ -639,7 +639,7 @@ async function _POST(req: Request) {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="padding: 24px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 2px solid #e5e7eb;">
-              <h1 style="margin: 0; font-size: 24px;">${needsICC ? `Next Step Required' : `Welcome to ${PLATFORM_DEFAULTS.orgName}!`}</h1>
+              <h1 style="margin: 0; font-size: 24px;">${needsICC ? 'Next Step Required' : `Welcome to ${PLATFORM_DEFAULTS.orgName}!`}</h1>
             </div>
             <div style="padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
               <p style="font-size: 16px;">Hi ${body.firstName},</p>

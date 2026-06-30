@@ -113,7 +113,7 @@ function cancellationEmailHtml(name: string, startTime: string): string {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric`,
+    day: 'numeric',
   });
   return `
 <!DOCTYPE html>

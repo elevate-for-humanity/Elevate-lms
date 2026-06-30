@@ -74,7 +74,7 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
 
   const videoSchema = {
     '@context': 'https://schema.org',
-    '@type': 'VideoObject`,
+    '@type': 'VideoObject',
     name: video.title,
     description: video.description,
     thumbnailUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.thumbnailUrl}`,

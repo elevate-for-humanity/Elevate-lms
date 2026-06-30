@@ -114,7 +114,7 @@ Indianapolis, Indiana`;
 
 // Wave definitions
 const WAVES: Record<string, string[]> = {
-  `1': [
+  '1': [
     'info@chipindy.org',
     'gethelp@holyfamilyshelter.net',
     'info@doverecoveryhouse.org',

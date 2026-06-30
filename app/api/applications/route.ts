@@ -471,7 +471,7 @@ async function _POST(req: Request) {
     }
 
     if (error || !data) {
-      logger.error('[api/applications] All insert tiers failed`, {
+      logger.error('[api/applications] All insert tiers failed', {
         code: (error as any)?.code,
         message: (error as any)?.message,
         details: (error as any)?.details,
@@ -606,7 +606,7 @@ async function _POST(req: Request) {
           <h4 style="color: #1e40af; margin-bottom: 8px;">What happens next:</h4>
           <ol style="color: #1e3a8a; padding-left: 20px; line-height: 1.8;">
             <li>Our enrollment team reviews your application (1–2 business days)</li>
-            <li>We verify your funding status with ${fundingType === 'wioa' ? 'WorkOne' : fundingType === 'wrg' ? 'Indiana Career Connect' : 'FSSA`}</li>
+            <li>We verify your funding status with ${fundingType === 'wioa' ? 'WorkOne' : fundingType === 'wrg' ? 'Indiana Career Connect' : 'FSSA'}</li>
             <li>Once verified, we contact you to complete enrollment and schedule your start date</li>
             <li>You begin training — no tuition due until funding is confirmed</li>
           </ol>

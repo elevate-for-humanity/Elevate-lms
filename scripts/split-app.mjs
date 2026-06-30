@@ -2,13 +2,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 /**
- * Surgical Route Splitter v3 - Cross-Device Compatible
- * 
- * Uses 'fs.rmSync' with {recursive: true, force: true} which is compatible 
- * with Docker volume boundaries.
+ * Dependency-Aware Route Splitter v4
+ *
+ * Fixes: Module not found errors by ensuring deleted routes don't break imports.
+ *
+ * Key principles:
+ * 1. NEVER delete shared code (components/, lib/, hooks/, etc.)
+ * 2. Only prune route entry points, never their dependencies
+ * 3. Validate imports before completing
  */
 
-const scope = process.env.BUILD_SCOPE; 
+const scope = process.env.BUILD_SCOPE;
 const root = process.cwd();
 const appDir = path.join(root, 'app');
 
@@ -16,74 +20,253 @@ if (!scope || scope === 'ASSETS') {
   process.exit(0);
 }
 
-const excludeConfig = {
-  MARKETING: ['admin', 'apprentice', 'instructor', 'mission-control', 'partner', 'student-portal', 'case-manager', 'intelligence'],
-  ADMIN: ['(marketing)', '(public)', 'apprentice', 'instructor', 'student-portal', 'programs', 'healthcare', 'skilled-trades'],
-  LMS: ['admin', 'mission-control', 'intelligence', 'partner', 'case-manager', '(marketing)', 'blog']
+// Shared code that should NEVER be deleted
+const ALWAYS_KEEP_DIRS = new Set([
+  'components',
+  'lib',
+  'hooks',
+  'utils',
+  'providers',
+  'contexts',
+  'types',
+  'styles',
+  'content'
+]);
+
+// Route prefixes to exclude for each scope
+const ROUTE_EXCLUSIONS = {
+  MARKETING: [
+    'admin',
+    'mission-control',
+    'intelligence',
+    'case-manager',
+    'lms'
+  ],
+  ADMIN: [
+    '(marketing)',
+    '(public)',
+    'programs',
+    'lms',
+    'store',
+    'apply'
+  ],
+  LMS: [
+    'admin',
+    'mission-control',
+    'intelligence',
+    'partner',
+    'case-manager',
+    '(marketing)',
+    'blog',
+    'store',
+    'apply',
+    'about'
+  ]
 };
 
-const whitelist = [
-  'api', 'auth', '(auth)', 'layout.tsx', 'page.tsx', 'globals.css', 
-  'not-found.tsx', 'loading.tsx', 'error.tsx', 'health', 'data', 
-  'funding', 'barber-and-beauty-apprenticeships', 'partner',
-  // Public marketing pages that must survive the MARKETING build
-  'about', 'apply', 'admin', 'student', 'portals', 'testing', 'store',
-  // SEO/static pages
-  'contact', 'legal', 'login', 'signup',
-  // Programs for public browse (dynamic routes)
-  'programs'
-];
+// Routes that should be kept regardless of scope (shared/public)
+const SHARED_ROUTES = new Set([
+  'api',
+  'auth',
+  '(auth)',
+  'legal',
+  'health',
+  'data',
+  'funding',
+  'testing',
+  'certificates',
+  'videos',
+  'login',
+  'signup',
+  'forgot-password',
+  'verify-credentials',
+  'barber-and-beauty-apprenticeships'
+]);
 
-const toRemove = excludeConfig[scope];
+const toRemove = ROUTE_EXCLUSIONS[scope];
 
 if (!toRemove) {
   console.error(`Invalid scope: ${scope}`);
   process.exit(1);
 }
 
-console.log(`=== Surgical Split v3: Scope ${scope} ===`);
+console.log(`=== Dependency-Aware Split v4: Scope ${scope} ===`);
 console.log(`Working directory: ${appDir}`);
 
-// 1. Remove explicitly excluded directories
-toRemove.forEach(target => {
-  if (whitelist.includes(target)) {
-    console.log(`Skipping whitelisted target: ${target}`);
-    return;
+// Build dependency graph - find all imports in retained code
+function getAllSourceFiles(dir, extensions = ['.ts', '.tsx', '.js', '.jsx']) {
+  const files = [];
+  if (!fs.existsSync(dir)) return files;
+
+  function walk(currentDir) {
+    const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name !== 'node_modules' && !entry.name.startsWith('.')) {
+          walk(fullPath);
+        }
+      } else if (extensions.some(ext => entry.name.endsWith(ext))) {
+        files.push(fullPath);
+      }
+    }
   }
-  const fullPath = path.resolve(appDir, target);
-  
+  walk(dir);
+  return files;
+}
+
+function extractImports(fileContent) {
+  const imports = [];
+  const importRegex = /import\s+(?:[\w*{}\s,]+from\s+)?['"]([^'"]+)['"]/g;
+  let match;
+  while ((match = importRegex.exec(fileContent)) !== null) {
+    imports.push(match[1]);
+  }
+  const requireRegex = /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+  while ((match = requireRegex.exec(fileContent)) !== null) {
+    imports.push(match[1]);
+  }
+  return imports;
+}
+
+function resolveAlias(importPath, baseDir) {
+  if (!importPath.startsWith('@/')) return null;
+  const relative = importPath.slice(2);
+  const resolved = path.join(root, relative);
+  const exts = ['.ts', '.tsx', '.js', '.jsx', '/index.ts', '/index.tsx'];
+  for (const ext of exts) {
+    if (fs.existsSync(resolved + ext)) {
+      return resolved + ext;
+    }
+  }
+  return fs.existsSync(resolved) ? resolved : null;
+}
+
+console.log('Building dependency graph...');
+const sourceFiles = getAllSourceFiles(root, ['.ts', '.tsx', '.js', '.jsx']);
+const projectFiles = sourceFiles.filter(f => !f.includes('node_modules'));
+
+const referencedPaths = new Set();
+for (const file of projectFiles) {
+  try {
+    const content = fs.readFileSync(file, 'utf-8');
+    const imports = extractImports(content);
+    for (const imp of imports) {
+      if (imp.startsWith('@/')) {
+        const resolved = resolveAlias(imp, path.dirname(file));
+        if (resolved) {
+          referencedPaths.add(resolved);
+          let dir = path.dirname(resolved);
+          while (dir !== root && dir !== path.join(root, 'app') && dir !== path.join(root, 'components') && dir !== path.join(root, 'lib')) {
+            referencedPaths.add(dir);
+            dir = path.dirname(dir);
+          }
+        }
+      }
+    }
+  } catch {
+    // Skip unreadable files
+  }
+}
+console.log(`Found ${referencedPaths.size} referenced paths`);
+
+// Remove only route entry points that are excluded
+console.log('\nRemoving excluded routes...');
+for (const target of toRemove) {
+  const fullPath = path.join(appDir, target);
   if (fs.existsSync(fullPath)) {
-    try {
-      console.log(`Removing excluded target: ${target} -> ${fullPath}`);
-      fs.rmSync(fullPath, { recursive: true, force: true });
-    } catch (err) {
-      console.error(`Failed to remove ${target}: ${err.message}`);
+    let isReferenced = referencedPaths.has(fullPath);
+    if (!isReferenced) {
+      const filesInDir = getAllSourceFiles(fullPath);
+      for (const file of filesInDir) {
+        if (referencedPaths.has(file)) {
+          isReferenced = true;
+          break;
+        }
+      }
+    }
+    if (isReferenced) {
+      console.log(`⚠️  PRESERVE ${target} (still referenced by imports)`);
+    } else {
+      try {
+        console.log(`Removing excluded route: ${target}`);
+        fs.rmSync(fullPath, { recursive: true, force: true });
+      } catch (err) {
+        console.error(`Failed to remove ${target}: ${err.message}`);
+      }
     }
   }
-});
+}
 
-// 2. Comprehensive Cleanup: Remove any other folders not in scope (Aggressive mode)
-// This ensures that for LMS, we don't have thousands of legacy folders bloating the build.
+// Aggressive cleanup ONLY for routes, NOT shared code
+console.log('\nAggressive cleanup (routes only)...');
 const currentFolders = fs.readdirSync(appDir);
-currentFolders.forEach(folder => {
+for (const folder of currentFolders) {
   const fullPath = path.join(appDir, folder);
-  if (!fs.lstatSync(fullPath).isDirectory()) return;
+  if (!fs.lstatSync(fullPath).isDirectory()) continue;
 
-  // Preserve whitelist and the scope-specific folders we WANT
-  const preserve = [...whitelist, 'lms', 'admin', '(marketing)', '(public)', 'data'];
-  
-  if (scope === 'MARKETING' && folder === 'lms') return;
-  if (scope === 'ADMIN' && folder === 'admin') return;
-  if (scope === 'LMS' && folder === 'lms') return;
+  // NEVER delete shared code directories
+  if (ALWAYS_KEEP_DIRS.has(folder)) {
+    console.log(`🛡️  PRESERVE ${folder} (shared code)`);
+    continue;
+  }
 
-  if (!preserve.includes(folder) && !toRemove.includes(folder)) {
-    try {
-      console.log(`Aggressive Clean: Removing ${folder}`);
-      fs.rmSync(fullPath, { recursive: true, force: true });
-    } catch (err) {
-      // Ignore errors for system files
+  if (SHARED_ROUTES.has(folder)) {
+    console.log(`✓ KEEP ${folder} (shared route)`);
+    continue;
+  }
+
+  let isReferenced = referencedPaths.has(fullPath);
+  if (!isReferenced) {
+    const filesInDir = getAllSourceFiles(fullPath);
+    for (const file of filesInDir) {
+      if (referencedPaths.has(file)) {
+        isReferenced = true;
+        break;
+      }
     }
   }
-});
 
-console.log('✅ Split complete.');
+  if (isReferenced) {
+    console.log(`✓ KEEP ${folder} (referenced by imports)`);
+  } else {
+    console.log(`🗑️  Remove unreferenced route: ${folder}`);
+    fs.rmSync(fullPath, { recursive: true, force: true });
+  }
+}
+
+// Validate - check for broken imports
+console.log('\nValidating imports...');
+const missingImports = [];
+const remainingFiles = getAllSourceFiles(appDir, ['.ts', '.tsx']);
+
+for (const file of remainingFiles) {
+  try {
+    const content = fs.readFileSync(file, 'utf-8');
+    const imports = extractImports(content);
+    for (const imp of imports) {
+      if (imp.startsWith('@/')) {
+        const resolved = resolveAlias(imp, path.dirname(file));
+        if (!resolved || !fs.existsSync(resolved)) {
+          missingImports.push({ file, import: imp });
+        }
+      }
+    }
+  } catch {
+    // Skip unreadable files
+  }
+}
+
+if (missingImports.length > 0) {
+  console.error('\n❌ BROKEN IMPORTS DETECTED:');
+  missingImports.slice(0, 20).forEach(({ file, import: imp }) => {
+    console.error(`  ${path.relative(root, file)}: ${imp}`);
+  });
+  if (missingImports.length > 20) {
+    console.error(`  ... and ${missingImports.length - 20} more`);
+  }
+  console.error('\nAborting build due to broken imports.');
+  process.exit(1);
+}
+
+console.log('✅ Split complete - all imports validated.');

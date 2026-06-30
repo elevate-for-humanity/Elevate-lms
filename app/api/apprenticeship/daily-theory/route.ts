@@ -11,7 +11,7 @@ import {
   dailyTheoryBlockedMessage,
   scorePassesDailyTheory,
   theoryDateInTimeZone,
-} from '@/lib/beauty-apprenticeship/daily-theory';
+} from '@/lib/apprenticeship-programs/daily-theory';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

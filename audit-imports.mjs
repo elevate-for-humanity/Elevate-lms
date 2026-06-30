@@ -60,12 +60,13 @@ for (const file of files) {
         }
       }
     }
-  } catch {}
+  } catch (e) { /* ignore */ }
 }
 
-if (missing.size === 0) {
-  console.log('✅ No broken imports found!');
-} else {
-  console.log(`❌ Found ${missing.size} broken imports:`);
-  for (const [k] of missing) console.log('  ' + k);
+if (missing.size > 0) {
+  const msg = 'Found ' + missing.size + ' broken imports:';
+  console.warn(msg);
+  for (const [k] of missing) {
+    console.warn('  ' + k);
+  }
 }

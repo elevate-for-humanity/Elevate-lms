@@ -186,7 +186,7 @@ async function _PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'referralId and action required' }, { status: 400 });
   }
 
-  let updateData: Record<string, any> = {};
+  let updateData: Record<string, any>;
 
   switch (action) {
     case 'update_status':

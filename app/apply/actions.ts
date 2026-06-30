@@ -573,7 +573,7 @@ async function insertApplication(payload: {
 
         // Self-pay
         `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Don't Want to Wait? Start Now</h3>`,
-        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">If you'd rather not wait for funding approval — or if your program isn`t on the ETPL yet — you can begin classes right away with one of these options:</p>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">If you'd rather not wait for funding approval — or if your program isn't on the ETPL yet — you can begin classes right away with one of these options:</p>`,
         `<ul style="margin:0 0 16px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
         `<li><strong>Self-Pay</strong> — pay tuition upfront and start immediately</li>`,
         `<li><strong>Buy Now, Pay Later</strong> — split your tuition into monthly payments</li>`,

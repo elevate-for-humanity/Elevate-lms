@@ -5,7 +5,23 @@ import { cookies } from 'next/headers';
  * Standard Supabase Server Client
  */
 export async function createClient() {
-  const cookieStore = await cookies();
+  let cookieStore;
+  try {
+    cookieStore = await cookies();
+  } catch {
+    // cookies() called outside request context (build/static generation)
+    // Return a minimal client that won't crash
+    return createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return []; },
+          setAll() { /* no-op */ },
+        },
+      }
+    );
+  }
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

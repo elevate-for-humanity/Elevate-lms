@@ -405,7 +405,6 @@ const nextConfig = {
       { source: '/verifycertificate/:path*', destination: '/verify/:path*', permanent: true },
       { source: '/dashboards/:path*', destination: '/lms/:path*', permanent: true },
       { source: '/portal', destination: '/portals', permanent: true },
-      { source: '/learners/:path*', destination: '/lms/:path*', permanent: true },
       { source: '/receptionist/:path*', destination: '/admin/staff-portal/:path*', permanent: true },
       { source: '/forum/:path*', destination: '/blog', permanent: true },
       { source: '/about/founder', destination: '/about/team', permanent: true },

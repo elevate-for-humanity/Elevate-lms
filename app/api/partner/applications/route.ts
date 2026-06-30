@@ -159,7 +159,7 @@ async function _POST(request: NextRequest) {
         }),
       });
     } catch (emailError) {
-      logger.warn(`Failed to send confirmation email:', emailError);
+      logger.warn(`Failed to send confirmation email:`, emailError);
     }
 
     // Send notification to admin

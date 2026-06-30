@@ -75,8 +75,8 @@ async function sendTrialWelcomeEmail(
   await resend.emails.send({
     from: `Elevate LMS <${PLATFORM_DEFAULTS.emailFromAddress}>`,
     to: email,
-    subject: `Your 14-day trial is ready — ${orgName}`,
-    headers: { 'X-Correlation-ID`: correlationId },
+    subject: `Your 14-day trial is ready - ${orgName}`,
+    headers: { 'X-Correlation-ID': correlationId },
     html: `
       <h1>Your trial is live.</h1>
       <p>Organization: <strong>${orgName}</strong></p>

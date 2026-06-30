@@ -375,7 +375,7 @@ async function insertApplication(payload: {
   }
   const referenceNumber = generateReferenceNumber();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
-  const programLabel = payload.programInterest.replace(/-/g, ' `);
+  const programLabel = payload.programInterest.replace(/-/g, ' ');
 
   // Auto-enrollment: insert application, create account, enroll in courses, send onboarding email.
 

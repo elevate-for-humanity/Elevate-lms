@@ -79,8 +79,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(`${loginUrl}?error=azure_not_configured`);
   }
 
-  let idToken: string | null = null;
-  let state: string | null = null;
+  let idToken: string | null = null; // eslint-disable-line @typescript-eslint/no-unused-vars
+  let state: string | null = null; // eslint-disable-line @typescript-eslint/no-unused-vars
   try {
     const formData = await req.formData();
     idToken = formData.get('id_token') as string | null;

@@ -45,8 +45,8 @@ export async function POST(req: NextRequest) {
   }
 
   // Parse the multipart/form-data body to get SAMLResponse
-  let samlResponse: string | null = null;
-  let relayState: string | null = null;
+  let samlResponse: string | null = null; // eslint-disable-line @typescript-eslint/no-unused-vars
+  let relayState: string | null = null; // eslint-disable-line @typescript-eslint/no-unused-vars
   try {
     const formData = await req.formData();
     samlResponse = formData.get('SAMLResponse') as string | null;

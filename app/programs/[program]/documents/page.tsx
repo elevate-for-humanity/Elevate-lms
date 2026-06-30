@@ -90,7 +90,7 @@ export default function BeautyDocumentsPage() {
     try {
       const res = await fetch('/api/enrollment/submit-documents', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ program: cfg.slug }),
       });
       const data = await res.json();

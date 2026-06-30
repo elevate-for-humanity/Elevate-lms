@@ -56,7 +56,7 @@ function confirmationEmailHtml(name: string, startTime: string, examQuestion: st
   const time = date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
-    timeZone: 'America/Indiana/Indianapolis`,
+    timeZone: 'America/Indiana/Indianapolis',
   });
 
   return `

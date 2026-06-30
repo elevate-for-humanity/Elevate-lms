@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
             uploaded_at: new Date().toISOString(),
           })),
         )
-        .catch((err) => logger.warn('[provider/apply] doc metadata save failed`, err));
+        .catch((err) => logger.warn('[provider/apply] doc metadata save failed', err));
     }
 
     // Confirmation email to applicant

@@ -50,7 +50,7 @@ export default function MedicalAssistantEnrollPage() {
         body: JSON.stringify({ ...formData, programSlug: PROGRAM.slug, programName: PROGRAM.name, paymentOption, paymentPlan: paymentOption === 'payment-plan' ? { downPayment: customDown, weeklyPayment, weeks: customWeeks } : null }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Enrollment failed`);
+      if (!res.ok) throw new Error(data.error || 'Enrollment failed');
       const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (!data.enrollmentId || !uuidPattern.test(data.enrollmentId)) throw new Error(`Enrollment could not be confirmed. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);
 

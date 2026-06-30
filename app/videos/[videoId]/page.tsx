@@ -20,7 +20,7 @@ export async function generateMetadata({
 
   if (!video) {
     return {
-      title: 'Video Not Found`,
+      title: 'Video Not Found',
     };
   }
 

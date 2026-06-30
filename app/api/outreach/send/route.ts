@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const SENDGRID_KEY = process.env.SENDGRID_KEY || process.env.SENDGRID_API_KEY;
-const SENDGRID_FROM = process.env.SENDGRID_FROM || 'elevate4humanityedu@gmail.com`;
+const SENDGRID_FROM = process.env.SENDGRID_FROM || 'elevate4humanityedu@gmail.com';
 
 const PARTNERSHIP_HTML = `<!DOCTYPE html>
 <html lang="en">

@@ -1,3 +1,4 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 /**
  * Control Plane API Routes
@@ -10,8 +11,6 @@ import { logger } from '@/lib/logger';
 
 import { db } from '@/lib/db';
 
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 
 import { NextRequest, NextResponse } from 'next/server';
 

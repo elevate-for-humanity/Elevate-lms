@@ -1,3 +1,4 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 /**
  * GET /api/pwa/nail-tech/progress
  *
@@ -9,8 +10,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { validateProgressResponse, type ApprenticeProgressResponse } from '@/lib/api/apprentice-progress-contract';

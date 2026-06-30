@@ -1,8 +1,7 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 // PUBLIC ROUTE: public store product catalog
 import { NextRequest, NextResponse } from 'next/server';
 
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

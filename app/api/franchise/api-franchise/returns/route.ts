@@ -1,8 +1,7 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { returnService } from '@/lib/franchise/return-service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

@@ -1,8 +1,7 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { officeService } from '@/lib/franchise/office-service';
 import { CreateOfficeInput } from '@/lib/franchise/types';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

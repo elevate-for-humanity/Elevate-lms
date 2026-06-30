@@ -1,8 +1,7 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 // PUBLIC ROUTE: public community join form
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 async function _POST(request: NextRequest) {

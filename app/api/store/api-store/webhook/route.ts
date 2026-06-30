@@ -1,3 +1,4 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -6,8 +7,6 @@ import { db } from '@/lib/db';
 
 import { verifyWebhookSignature } from '@/lib/store/stripe';
 import { generateLicenseKey, hashLicenseKey } from '@/lib/store/license';
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';

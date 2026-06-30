@@ -1,5 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { generateLicenseKey, hashLicenseKey } from '@/lib/store/license';
 

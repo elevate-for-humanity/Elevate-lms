@@ -1,5 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { getJobMatches } from '@/lib/hub/job-matching';
 

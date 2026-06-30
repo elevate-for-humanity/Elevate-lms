@@ -3,7 +3,6 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';

@@ -1,8 +1,7 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient} from '@/lib/supabase/server';
-import { safeGetUser } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { checkNewMilestone } from '@/lib/pwa/milestones';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

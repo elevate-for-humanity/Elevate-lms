@@ -22,7 +22,7 @@ COPY . .
 
 # Run the splitter
 ENV BUILD_SCOPE=MARKETING
-RUN node scripts/split-app.mjs
+CI=true node scripts/split-app.mjs
 
 # Stable PNPM (matching lockfileVersion 9.0)
 RUN corepack enable && corepack prepare pnpm@9.8.0 --activate

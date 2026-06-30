@@ -38,11 +38,7 @@ export const GET = withRuntime(
     const stripeKey = ctx.env.STRIPE_SECRET_KEY;
 
     const paymentIntentId = session.payment_intent as string;
-  } catch {
-    return NextResponse.json({ error: "Invalid session" }, { status: 400 });
-  }
-  try {
-      const stripe = await getStripeServer();
+    const stripe = await getStripeServer();
       const session = await stripe.checkout.sessions.retrieve(sessionId, {
         expand: [],
       });

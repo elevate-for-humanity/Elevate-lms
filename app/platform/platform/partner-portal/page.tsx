@@ -229,7 +229,7 @@ export default async function PartnerPortalPage() {
               Ready to Get Started?
             </h2>
             <p className="text-base md:text-lg text-blue-100 mb-8">
-              Join thousands who have launched successful careers through our
+              Join our community who have launched successful careers through our
               programs.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">

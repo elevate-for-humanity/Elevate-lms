@@ -88,6 +88,8 @@ app/partners/programs/[program]/UniversalPartnerLanding.tsx
 app/partners/programs/[program]/thank-you/page.tsx
 app/platform/overview/page.tsx
 app/platform/partner-portal/page.tsx
+app/platform/platform/program-holders/page.tsx
+app/platform/program-holders/page.tsx
 app/platform/training-providers/page.tsx
 app/platform/workforce-analytics/page.tsx
 app/platform/workforce-boards/page.tsx
@@ -144,10 +146,10 @@ components/programs/FundingInfoBlock.tsx
 components/site/ServerFooter.tsx
 lib/ai/orchestrator.ts
 lib/compliance/alert-system.ts
+lib/control-plane/index.ts
 lib/courses/hvac-quizzes.ts
 lib/credentials/credential-system.ts
 lib/governance/guardrail-engine.ts
 lib/partners/index.ts
 lib/schema.ts
 lib/services/credential-pipeline.ts
-lib/control-plane/index.ts

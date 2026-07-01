@@ -112,7 +112,9 @@ export default function BeautyApplyPage() {
 
       if (fundingType === 'self_pay') {
         const link = paymentPlan === 'full' ? links.full : links.deposit;
-        window.location.href = `${link}?prefilled_email=${encodeURIComponent(email)}`;
+        if (typeof window !== 'undefined') {
+          window.location.href = `${link}?prefilled_email=${encodeURIComponent(email)}`;
+        }
         return;
       }
 

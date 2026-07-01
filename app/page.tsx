@@ -1,20 +1,23 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import heroBanners from '@/content/heroBanners';
 import MarqueeBanner from '@/components/MarqueeBanner';
-import { HomeTrustBar } from '@/components/home/HomeTrustBar';
-import { HomeHowItWorks } from '@/components/home/HomeHowItWorks';
-import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
-import { HomeApprenticeshipInfra } from '@/components/home/HomeApprenticeshipInfra';
-import { HomeFunding } from '@/components/home/HomeFunding';
-import { HomeOutcomes } from '@/components/home/HomeOutcomes';
-import { HomePlatformPreview } from '@/components/home/HomePlatformPreview';
-import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
-import { HomeSegmentedCTA } from '@/components/home/HomeSegmentedCTA';
-import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+// Below-the-fold sections: lazy load to improve initial page render
+const HomeTrustBar = dynamic(() => import('@/components/home/HomeTrustBar'), { ssr: true });
+const HomeHowItWorks = dynamic(() => import('@/components/home/HomeHowItWorks'), { ssr: true });
+const HomeCareerPathways = dynamic(() => import('@/components/home/HomeCareerPathways'), { ssr: true });
+const HomeApprenticeshipInfra = dynamic(() => import('@/components/home/HomeApprenticeshipInfra'), { ssr: true });
+const HomeFunding = dynamic(() => import('@/components/home/HomeFunding'), { ssr: true });
+const HomeOutcomes = dynamic(() => import('@/components/home/HomeOutcomes'), { ssr: true });
+const HomePlatformPreview = dynamic(() => import('@/components/home/HomePlatformPreview'), { ssr: true });
+const HomeEmployerStrip = dynamic(() => import('@/components/home/HomeEmployerStrip'), { ssr: true });
+const HomeSegmentedCTA = dynamic(() => import('@/components/home/HomeSegmentedCTA'), { ssr: true });
+const HomeFinalCTA = dynamic(() => import('@/components/home/HomeFinalCTA'), { ssr: true });
 
 // Revalidate every 5 minutes — allows live enrollment stats to refresh
 // without a full rebuild.

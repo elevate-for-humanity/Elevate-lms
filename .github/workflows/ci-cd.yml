@@ -23,7 +23,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: pnpm install --no-frozen-lockfile
 
       # tsconfig.json writes tsBuildInfoFile to .next/cache/tsbuildinfo.json.
       # Caching that path (not the root .tsbuildinfo) lets tsc skip unchanged files.
@@ -171,7 +171,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: pnpm install --no-frozen-lockfile
 
       - name: Lint changed files only
         run: |

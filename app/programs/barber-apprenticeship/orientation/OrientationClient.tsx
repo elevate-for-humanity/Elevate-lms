@@ -9,6 +9,7 @@ import {
 import { formatCurrency } from '@/lms-data/orientationConfig';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PRESTIGE_ELEVATION_BARBER_CURRICULUM } from '@/lib/barber/branding';
 
 export interface BarberPaymentSummary {
   downPayment: number;

@@ -56,7 +56,7 @@ async function _POST(request: NextRequest) {
         .maybeSingle();
 
       if (program) {
-        context = `Program: ${program.title ?? program.title}\nDescription: ${program.description}\nOutcomes: ${program.outcomes?.join(', ')}\n`;
+        context = `Program: ${program.title}\nDescription: ${program.description}\nOutcomes: ${program.outcomes?.join(', ')}\n`;
       }
     }
 

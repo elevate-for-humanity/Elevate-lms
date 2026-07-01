@@ -68,7 +68,7 @@ async function notifyHourRejected(
       },
       idempotency_key: `hours-rejected-admin-${hourId}-${admin.id}`,
     }));
-    await adminDb.from('notifications').insert(rows)
+    await adminDb.from('notifications').insert(rows);
   }
 }
 

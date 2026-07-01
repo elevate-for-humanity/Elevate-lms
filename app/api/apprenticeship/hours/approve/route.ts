@@ -68,7 +68,7 @@ async function notifyHourDecision(
       },
       idempotency_key: `hours-${action}-admin-${hourId}-${admin.id}`,
     }));
-    await adminDb.from('notifications').insert(adminRows)
+    await adminDb.from('notifications').insert(adminRows);
   }
 }
 

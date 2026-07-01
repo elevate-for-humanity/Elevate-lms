@@ -27,42 +27,42 @@ const SECTOR_PRESENTATION: Record<
   healthcare: {
     title: 'Healthcare',
     href: '/programs/healthcare',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-patient-care.jpg',
+    image: '/images/pages/cna-patient-care.jpg',
     description:
       'CNA, Medical Assistant, Phlebotomy, and more. Hands-on clinical training for in-demand healthcare careers.',
   },
   trades: {
     title: 'Skilled Trades',
     href: '/programs/skilled-trades',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
+    image: '/images/pages/hvac-technician.webp',
     description:
       'HVAC, Electrical, Welding, Plumbing, and Construction. Earn industry certifications and start working.',
   },
   technology: {
     title: 'Technology',
     href: '/programs/technology',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity.webp',
+    image: '/images/pages/cybersecurity.webp',
     description:
       'Cybersecurity, IT Support, Software Development, and Networking. Launch a career in tech.',
   },
   beauty: {
     title: 'Beauty & Cosmetology',
     href: '/programs/barber-apprenticeship',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship.webp',
+    image: '/images/pages/barber-apprenticeship.webp',
     description:
       'Barber apprenticeships and cosmetology training. Learn from licensed professionals in real shop settings.',
   },
   business: {
     title: 'Business & Finance',
     href: '/programs/business',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp',
+    image: '/images/business/office-admin.webp',
     description:
       'Bookkeeping, Office Administration, and Entrepreneurship programs.',
   },
   apprenticeship: {
     title: 'Apprenticeships',
     href: '/programs',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/skilled-trades-sector.webp',
+    image: '/images/pages/skilled-trades-sector.webp',
     description: 'DOL-registered earn-while-you-learn pathways across licensed trades.',
   },
 };
@@ -101,7 +101,7 @@ export async function getMarketingProgramSectors(): Promise<{
       sectionKey,
       title: preset?.title ?? label,
       href: preset?.href ?? '/programs',
-      image: preset?.image ?? 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs-hero-vibrant.webp',
+      image: preset?.image ?? '/images/programs-hero-vibrant.webp',
       description: preset?.description ?? `Explore ${label} programs.`,
       tags: rows.slice(0, 4).map((r) => r.title),
       programCount: rows.length,
@@ -117,7 +117,7 @@ export async function getMarketingProgramSectors(): Promise<{
       sectionKey: 'cdl',
       title: 'CDL & Transportation',
       href: '/programs/cdl-training',
-      image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-truck-highway.webp',
+      image: '/images/pages/cdl-truck-highway.webp',
       description:
         'Commercial Driving License training with job placement. Class A and Class B CDL programs.',
       tags: cdlRows.slice(0, 3).map((r) => r.title),

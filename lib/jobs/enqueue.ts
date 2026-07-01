@@ -70,7 +70,7 @@ export async function enqueueJob(
     }
     // Non-dedupe errors are logged but do not throw — a failed enqueue must
     // never cause the certificate issuance response to fail.
-    logger.warn('Failed to enqueue job (non-fatal)', { error: (error as Error).message, type });
+    logger.error('Failed to enqueue job (non-fatal)', error as Error, { type });
     return 'error';
   }
 

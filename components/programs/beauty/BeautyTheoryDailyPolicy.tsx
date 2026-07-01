@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { DAILY_THEORY_POLICY } from '@/lib/apprenticeship-programs/theory-policy';
+import { DAILY_THEORY_POLICY } from '@/lib/beauty-apprenticeship/theory-policy';
 
 type Props = {
   programTitle: string;

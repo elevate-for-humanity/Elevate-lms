@@ -306,7 +306,7 @@ export function ProgramDetails({ program }: { program: Program }) {
           <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
             <CanonicalVideo
               src="/videos/hero-home.mp4"
-              poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-cohort.webp"
+              poster="/images/pages/training-cohort.webp"
               className="absolute inset-0 w-full h-full object-cover"
             />
           </div>

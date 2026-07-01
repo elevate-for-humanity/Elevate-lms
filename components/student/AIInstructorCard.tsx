@@ -52,7 +52,7 @@ export function AIInstructorCard(props: {
           <Image
             alt="AI instructor"
             loading="lazy"
-            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/elizabeth-greene-headshot.webp"
+            src="/images/team/elizabeth-greene-headshot.webp"
             alt="Elizabeth Greene"
             fill
             sizes="100vw"

@@ -63,7 +63,7 @@ export const PROGRAM_SOC_MAP: Record<string, string> = {
   'project-management': '11-9199.00',    // Managers, All Other
   'entrepreneurship': '11-1011.00',      // Chief Executives
   'graphic-design': '27-1024.00',        // Graphic Designers
-         // Tax Preparers
+  'tax-preparation': '13-2082.00',       // Tax Preparers
   'tax-prep-financial-services': '13-2082.00',
 
   // ── Hospitality / Other ───────────────────────────────────────────────────

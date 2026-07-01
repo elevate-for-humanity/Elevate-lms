@@ -14,7 +14,7 @@ export function SEO({
   title,
   description,
   canonical,
-  ogImage = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-image.jpg',
+  ogImage = '/images/og-image.jpg',
   ogType = 'website',
   noindex = false,
 }: SEOProps) {

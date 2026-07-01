@@ -186,7 +186,7 @@ export default function ProgramDetailPage({
                 microLabel={p.badge ?? p.category}
                 belowHeroHeadline={p.title}
                 belowHeroSubheadline={p.subtitle}
-                ctas={primaryCTA?.href ? [{ label: primaryCTA.label, href: primaryCTA.href }] : undefined}
+                ctas={primaryCTA ? [{ label: primaryCTA.label, href: primaryCTA.href }] : undefined}
               />
             );
           })()}
@@ -292,7 +292,7 @@ export default function ProgramDetailPage({
                     </div>
                   )}
 
-                  {primaryCTA && primaryCTA.href && (
+                  {primaryCTA && (
                     <>
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
                         {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
@@ -876,9 +876,9 @@ export default function ProgramDetailPage({
           <div className="mt-8 rounded-xl border border-slate-200 bg-white p-5">
             <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4">Next Step</p>
             <div className="flex flex-col sm:flex-row gap-3">
-              {primaryCTA && primaryCTA.href && (
+              {primaryCTA && (
                 <Link
-                  href={primaryCTA.href}
+                  href={primaryCTA.external ? primaryCTA.href : '#apply'}
                   target={primaryCTA.external ? '_blank' : '_self'}
                   rel={primaryCTA.external ? 'noopener noreferrer' : undefined}
                   className="inline-flex items-center justify-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-5 py-3 rounded-lg transition-colors text-sm"
@@ -1017,7 +1017,7 @@ export default function ProgramDetailPage({
           {/* Two distinct paths — applicant vs enrolled */}
           <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">
             {/* Primary CTA — driven by enrollmentType */}
-            {primaryCTA && primaryCTA.href && (
+            {primaryCTA && (
               <div className="flex flex-col items-center gap-1.5">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   {primaryCTA.external ? 'Enrollment' : 'New Applicant'}

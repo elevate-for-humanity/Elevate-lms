@@ -21,7 +21,6 @@ export interface JobPost {
   job_type: 'full_time' | 'part_time' | 'contract' | 'internship';
   required_certifications: string[];
   required_programs: string[];
-  soc_code?: string;
   preferred_skills: string[];
   posted_at: string;
   expires_at?: string;
@@ -75,8 +74,6 @@ export async function getJobMatches(userId: string, limit = 10): Promise<JobMatc
 
   const completedProgramSlugs =
     completedEnrollments?.map((e) => (e.programs as any)?.slug).filter(Boolean) || [];
-  const completedSOCs = 
-    completedEnrollments?.map((e) => (e.programs as any)?.soc_code).filter(Boolean) || [];
   const certNames = certifications?.map((c) => c.certification_name) || [];
 
   // Get active job posts
@@ -101,12 +98,6 @@ export async function getJobMatches(userId: string, limit = 10): Promise<JobMatc
     const employer = job.employers as any;
     let score = 0;
     const reasons: string[] = [];
-
-    // Check SOC code match (O*NET)
-    if (job.soc_code && completedSOCs.includes(job.soc_code)) {
-      score += 50;
-      reasons.push('O*NET Job Match: Matches your certified occupation code');
-    }
 
     // Check program match
     const requiredPrograms = job.required_programs || [];

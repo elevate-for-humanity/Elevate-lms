@@ -184,7 +184,7 @@ export default function UniversalMarketingPage({
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="relative h-[400px] rounded-xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-universal-hero.webp"
+                  src="/images/pages/comp-universal-hero.webp"
                   alt="Take action today"
                   fill
                   className="object-cover"

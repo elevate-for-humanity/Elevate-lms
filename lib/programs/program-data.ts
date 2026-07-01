@@ -332,8 +332,10 @@ export const PROGRAMS: Program[] = [
     careerOutcomes: ['Peer Recovery Coach', 'Reentry Specialist', 'Community Health Worker'],
   },
   {
+    id: 'tax-preparation-financial',
     intrainingId: '#10004627',
     name: 'Tax Preparation & Financial Service Career',
+    slug: 'tax-preparation-financial',
     price: 4950,
     duration: '10 weeks',
     durationDays: 70,

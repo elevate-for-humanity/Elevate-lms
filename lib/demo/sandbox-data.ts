@@ -14,7 +14,7 @@ export const DEMO_ORGANIZATION = {
   contact_name: 'Demo Admin',
   contact_email: 'info@elevateforhumanity.org',
   branding: {
-    logo_url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/demos-hero.webp',
+    logo_url: '/images/pages/demos-hero.webp',
     primary_color: '#4F46E5',
     secondary_color: '#10B981',
   },

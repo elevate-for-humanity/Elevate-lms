@@ -104,7 +104,7 @@ export const PROGRAM_LABELS: Record<string, string> = {
   'cdl-transportation': 'CDL & Transportation',
   'direct-support-professional': 'Direct Support Professional',
   'drug-collector': 'Drug Collector',
-  
+  'tax-preparation': 'Tax Preparation',
   'tax-entrepreneurship': 'Tax Entrepreneurship',
   jri: 'Justice-Involved Reentry',
   'micro-programs': 'Micro Programs',

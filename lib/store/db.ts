@@ -314,10 +314,15 @@ export async function getProduct(slug: string): Promise<Product | null> {
   const supabase = await createClient();
   if (!supabase) return null;
 
-  // Fetch product without implicit joins to avoid FK relationship errors
   const { data, error } = await supabase
     .from('products')
-    .select('*')
+    .select(
+      `
+      *,
+      product_images (*),
+      product_variants (*)
+    `,
+    )
     .eq('slug', slug)
     .eq('is_active', true)
     .maybeSingle();
@@ -327,19 +332,7 @@ export async function getProduct(slug: string): Promise<Product | null> {
     return null;
   }
 
-  if (!data) return null;
-
-  // Manually fetch related data
-  const [imagesResult, variantsResult] = await Promise.all([
-    supabase.from('product_images').select('*').eq('product_id', data.id).order('position', { ascending: true }),
-    supabase.from('product_variants').select('*').eq('product_id', data.id).order('price', { ascending: true }),
-  ]);
-
-  return {
-    ...data,
-    product_images: imagesResult.data || [],
-    product_variants: variantsResult.data || [],
-  };
+  return data;
 }
 
 /**

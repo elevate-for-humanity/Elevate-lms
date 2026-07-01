@@ -142,7 +142,7 @@ export function getHeaderNav(): NavItem[] {
 }
 
 export function getAllRoutes(): string[] {
-  return NAV.map((item) => item?.href).filter(Boolean) as string[];
+  return NAV.map((item) => item.href);
 }
 
 export function getNavGroups(): NavItem['group'][] {

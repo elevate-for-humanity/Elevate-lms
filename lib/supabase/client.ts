@@ -173,13 +173,5 @@ export function createBrowserClient(): SupabaseClient<any> {
   }
 }
 
-import { safeGetUser as safeGetUserShared } from './shared';
-
 // Legacy export for backwards compatibility
 export const createClient = createBrowserClient;
-
-/**
- * Safely extract user from Supabase auth response.
- * Prevents "Cannot read properties of null (reading 'id')" crash when data is null.
- */
-export const safeGetUser = safeGetUserShared;

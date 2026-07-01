@@ -8,7 +8,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: 'Federal Workforce Funding Programs',
   description:
-    'Federal funding sources for workforce training in Indiana — WIOA, Pell Grants, SNAP E&T, and more. Check eligibility and apply.',
+    'Federal funding sources for workforce training in Indiana — WIOA, Pell Grants, , and more. Check eligibility and apply.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/federal-programs' },
 };
 
@@ -21,11 +21,11 @@ const PROGRAMS = [
     href: '/funding/wioa',
   },
   {
-    name: 'SNAP Employment & Training (SNAP E&T)',
+    name: 'SNAP Employment & Training ()',
     tag: 'Federal / FSSA',
     who: 'Current SNAP recipients in Indiana.',
     covers:
-      'Full tuition and supportive services at no cost. Elevate is a SNAP E&T approved provider.',
+      'Full tuition and supportive services at no cost. Elevate is a  approved provider.',
     href: '/snap-et-partner',
   },
   {

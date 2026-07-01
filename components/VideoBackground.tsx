@@ -12,7 +12,7 @@ interface VideoBackgroundProps {
 
 export function VideoBackground({
   videoUrl,
-  poster = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-default.jpg',
+  poster = '/images/og-default.jpg',
   className = '',
   children,
 }: VideoBackgroundProps) {

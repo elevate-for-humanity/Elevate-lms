@@ -58,12 +58,7 @@ async function resolveUser(request: NextRequest): Promise<{ userId: string; role
   try {
     const { createServerClient } = await import('@supabase/ssr');
     const { cookies } = await import('next/headers');
-    let cookieStore;
-    try {
-      cookieStore = await cookies();
-    } catch {
-      return null; // cookies() called outside request context
-    }
+    const cookieStore = await cookies();
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

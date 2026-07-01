@@ -28,47 +28,47 @@ interface ProgramImageEntry {
 export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   // ── HVAC ─────────────────────────────────────────────────────────────────
   'hvac-technician': {
-    card: `${P}/hvac-unit.webp`,
-    hero: `${P}/hvac-technician.webp`,
+    card: `${P}/hvac-unit.jpg`,
+    hero: `${P}/hvac-technician.jpg`,
     alt: 'HVAC technician servicing a rooftop condenser unit',
   },
 
   // ── CDL / Commercial Driving ─────────────────────────────────────────────
   'cdl-training': {
-    card: `${P}/cdl-truck-highway.webp`,
-    hero: `${P}/cdl-truck-highway.webp`,
+    card: `${P}/cdl-truck-highway.jpg`,
+    hero: `${P}/cdl-truck-highway.jpg`,
     alt: 'CDL student performing a pre-trip inspection on a commercial truck',
   },
   'diesel-mechanic': {
-    card: `${P}/diesel-mechanic.webp`,
-    hero: `${P}/cdl-cab-interior.webp`,
+    card: `${P}/diesel-mechanic.jpg`,
+    hero: `${P}/cdl-cab-interior.jpg`,
     alt: 'Diesel mechanic working on a commercial vehicle engine',
   },
 
   // ── Electrical ───────────────────────────────────────────────────────────
   electrical: {
-    card: `${P}/electrical-panel.webp`,
-    hero: `${P}/electrical-conduit.webp`,
+    card: `${P}/electrical-panel.jpg`,
+    hero: `${P}/electrical-conduit.jpg`,
     alt: 'Electrician wiring a breaker panel during installation',
   },
 
   // ── Welding ──────────────────────────────────────────────────────────────
   welding: {
-    card: `${P}/welding-sparks.webp`,
-    hero: `${P}/welding-sparks.webp`,
+    card: `${P}/welding-sparks.jpg`,
+    hero: `${P}/welding-torch.jpg`,
     alt: 'Welder producing sparks on a metal workpiece in a fabrication shop',
   },
 
   // ── Plumbing ─────────────────────────────────────────────────────────────
   plumbing: {
-    card: `${P}/plumbing-pipes.webp`,
-    hero: `${P}/plumbing-pipes.webp`,
+    card: `${P}/plumbing-pipes.jpg`,
+    hero: `${P}/plumbing-tools.jpg`,
     alt: 'Plumber installing pipes during a commercial plumbing job',
   },
 
   // ── Construction Trades ──────────────────────────────────────────────────
   'construction-trades-certification': {
-    card: `${P}/construction-trades.webp`,
+    card: `${P}/construction-trades.jpg`,
     hero: `${P}/electrical-wiring.jpg`,
     alt: 'Construction trades student working on a framing project',
   },
@@ -76,22 +76,22 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   // ── CNA / Healthcare ─────────────────────────────────────────────────────
   cna: {
     card: `${P}/cna-patient-care.jpg`,
-    hero: `${P}/cna-vitals.webp`,
+    hero: `${P}/cna-vitals.jpg`,
     alt: 'CNA student checking patient vitals in a clinical simulation lab',
   },
   'medical-assistant': {
-    card: `${P}/medical-assistant-lab.webp`,
-    hero: `${P}/medical-assistant-real.webp`,
+    card: `${P}/medical-assistant-lab.jpg`,
+    hero: `${P}/medical-assistant-real.jpg`,
     alt: 'Medical assistant working in a clinical setting',
   },
   phlebotomy: {
-    card: `${P}/phlebotomy-draw.webp`,
-    hero: `${P}/phlebotomy-real.webp`,
+    card: `${P}/phlebotomy-draw.jpg`,
+    hero: `${P}/phlebotomy-real.jpg`,
     alt: 'Phlebotomist performing a blood draw procedure',
   },
   'pharmacy-technician': {
-    card: `${P}/pharmacy-tech.webp`,
-    hero: `${P}/pharmacy-technician.webp`,
+    card: `${P}/pharmacy-tech.jpg`,
+    hero: `${P}/pharmacy-technician.jpg`,
     alt: 'Pharmacy technician preparing medications',
   },
   'sanitation-infection-control': {
@@ -102,37 +102,37 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
 
   // ── CPR / First Aid ──────────────────────────────────────────────────────
   'cpr-first-aid': {
-    card: `${P}/cpr-mannequin.webp`,
-    hero: `${P}/cpr-training-real.webp`,
+    card: `${P}/cpr-mannequin.jpg`,
+    hero: `${P}/cpr-training-real.jpg`,
     alt: 'CPR certification training on a mannequin',
   },
 
   // ── Barber / Cosmetology ─────────────────────────────────────────────────
   'barber-apprenticeship': {
-    card: `${P}/barber-fade.webp`,
-    hero: `${P}/barber-shop-interior.webp`,
+    card: `${P}/barber-fade-cut.jpg`,
+    hero: `${P}/barber-clippers-work.jpg`,
     alt: 'Barber apprentice executing a fade cut on a client',
   },
   'cosmetology-apprenticeship': {
-    card: `${P}/cosmetology.webp`,
+    card: `${P}/cosmetology.jpg`,
     hero: `${P}/cosmetology-apprenticeship-hero.webp`,
     alt: 'Cosmetology student practicing hair styling techniques',
   },
   'nail-technician-apprenticeship': {
-    card: `${P}/nail-technician.webp`,
+    card: `${P}/nail-technician.jpg`,
     hero: `${P}/nail-tech-hero.webp`,
     alt: 'Nail technician apprentice performing a manicure',
   },
   'esthetician-apprenticeship': {
-    card: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/esthetician.webp',
-    hero: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/esthetician.webp',
+    card: '/images/beauty/esthetician.webp',
+    hero: '/images/beauty/esthetician.webp',
     alt: 'Esthetician apprentice performing a professional facial treatment',
   },
 
   // ── Technology ───────────────────────────────────────────────────────────
   'it-help-desk': {
-    card: `${P}/it-helpdesk-desk.webp`,
-    hero: `${P}/it-help-desk.webp`,
+    card: `${P}/it-helpdesk-desk.jpg`,
+    hero: `${P}/it-help-desk.jpg`,
     alt: 'IT help desk technician supporting a user at a workstation',
   },
   'cybersecurity-analyst': {
@@ -142,83 +142,83 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   'network-administration': {
     card: `${P}/network-administration.jpg`,
-    hero: `${P}/it-helpdesk-desk.webp`,
+    hero: `${P}/it-networking.jpg`,
     alt: 'Network administrator configuring network equipment',
   },
   'network-support-technician': {
-    card: `${P}/networking-hero.webp`,
-    hero: `${P}/it-help-desk.webp`,
+    card: `${P}/networking-hero.jpg`,
+    hero: `${P}/it-hardware.jpg`,
     alt: 'Network support technician troubleshooting a connection',
   },
   'software-development': {
     card: `${P}/software-development.jpg`,
-    hero: `${P}/web-development.webp`,
+    hero: `${P}/web-development.jpg`,
     alt: 'Software development student writing code',
   },
   'web-development': {
-    card: `${P}/web-development.webp`,
+    card: `${P}/web-development.jpg`,
     hero: `${P}/software-development.jpg`,
     alt: 'Web development student building a site',
   },
   'graphic-design': {
-    card: `${P}/graphic-design.webp`,
-    hero: `${P}/graphic-design.webp`,
+    card: `${P}/graphic-design.jpg`,
+    hero: `${P}/cad-drafting.jpg`,
     alt: 'Graphic design student working in Adobe Creative Suite',
   },
   'cad-drafting': {
-    card: `${P}/graphic-design.webp`,
-    hero: `${P}/graphic-design.webp`,
+    card: `${P}/cad-drafting.jpg`,
+    hero: `${P}/graphic-design.jpg`,
     alt: 'CAD drafting student working on technical drawings',
   },
 
   // ── Business / Finance ───────────────────────────────────────────────────
   'tax-preparation': {
-    card: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp',
-    hero: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/professional-2.jpg',
+    card: '/images/business/office-admin.webp',
+    hero: '/images/business/professional-2.jpg',
     alt: 'Tax preparer working with a client on financial documents',
   },
   bookkeeping: {
-    card: `${P}/bookkeeping-ledger.webp`,
-    hero: `${P}/bookkeeping.webp`,
+    card: `${P}/bookkeeping-ledger.jpg`,
+    hero: `${P}/bookkeeping.jpg`,
     alt: 'Bookkeeping student working with financial records',
   },
   'finance-bookkeeping-accounting': {
-    card: `${P}/bookkeeping.webp`,
-    hero: `${P}/bookkeeping-ledger.webp`,
+    card: `${P}/bookkeeping.jpg`,
+    hero: `${P}/bookkeeping-ledger.jpg`,
     alt: 'Finance and accounting student reviewing financial statements',
   },
   entrepreneurship: {
-    card: `${P}/entrepreneurship.webp`,
-    hero: `${P}/business-sector.webp`,
+    card: `${P}/entrepreneurship.jpg`,
+    hero: `${P}/business-sector.jpg`,
     alt: 'Entrepreneur working on a business plan',
   },
   business: {
-    card: `${P}/business-sector.webp`,
-    hero: `${P}/entrepreneurship.webp`,
+    card: `${P}/business-sector.jpg`,
+    hero: `${P}/entrepreneurship.jpg`,
     alt: 'Business administration student in a professional setting',
   },
   'office-administration': {
     card: `${P}/office-admin-desk.jpg`,
-    hero: `${P}/office-admin-desk.jpg`,
+    hero: `${P}/office-administration.jpg`,
     alt: 'Office administrator working at a professional workstation',
   },
   'project-management': {
-    card: `${P}/project-management.webp`,
-    hero: `${P}/business-sector.webp`,
+    card: `${P}/project-management.jpg`,
+    hero: `${P}/business-sector.jpg`,
     alt: 'Project manager leading a team meeting',
   },
 
   // ── Culinary ─────────────────────────────────────────────────────────────
   'culinary-apprenticeship': {
-    card: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/culinary.webp',
-    hero: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/culinary.webp',
+    card: '/images/pages/culinary.webp',
+    hero: '/images/pages/culinary.webp',
     alt: 'Culinary apprentice preparing food in a professional kitchen',
   },
 
   // ── Forklift ─────────────────────────────────────────────────────────────
   forklift: {
-    card: `${P}/forklift.webp`,
-    hero: `${P}/cdl-loading-dock.webp`,
+    card: `${P}/forklift.jpg`,
+    hero: `${P}/cdl-loading-dock.jpg`,
     alt: 'Forklift operator certification training',
   },
 };

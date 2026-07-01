@@ -33,7 +33,7 @@ export async function loadApprenticePortalData(programSlug: string) {
       icon: require('lucide-react').GraduationCap,
       accentBg: 'bg-blue-600',
       accentText: 'text-blue-600',
-      heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeship-hero.webp',
+      heroImage: '/images/pages/apprenticeship-hero.webp',
       shopLabel: 'Host Shop',
       requiredOjl: 2000,
       requiredRti: 0,

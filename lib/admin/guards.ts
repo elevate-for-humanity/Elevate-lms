@@ -66,12 +66,11 @@ export type GuardedUser = {
 export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
   try {
     const supabase = await createClient();
-    const authRes = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authRes.error || !authRes.data.user) {
+    if (authError || !user) {
       return { id: '', email: null, role: null, error: unauthorized() };
     }
-    const user = authRes.data.user;
 
     const { data: profile, error: profileError } = await supabase
       .from('profiles')

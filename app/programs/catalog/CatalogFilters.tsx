@@ -6,24 +6,22 @@ import { useCallback } from 'react';
 // All URL construction happens client-side — functions cannot cross the
 // server/client boundary in Next.js App Router.
 
-type Current = { q: string; category: string; wioa: boolean; provider: string };
+type Current = { q: string; category: string; wioa: boolean };
 
 function buildUrl(
   current: Current,
-  overrides: Partial<{ q: string; category: string; wioa: string; provider: string; page: string }>,
+  overrides: Partial<{ q: string; category: string; wioa: string; page: string }>,
 ) {
   const merged = {
     q: overrides.q !== undefined ? overrides.q : current.q,
     category: overrides.category !== undefined ? overrides.category : current.category,
     wioa: overrides.wioa !== undefined ? overrides.wioa : current.wioa ? 'true' : '',
-    provider: overrides.provider !== undefined ? overrides.provider : current.provider,
     page: overrides.page ?? '1',
   };
   const sp = new URLSearchParams();
   if (merged.q) sp.set('q', merged.q);
   if (merged.category) sp.set('category', merged.category);
   if (merged.wioa === 'true') sp.set('wioa', 'true');
-  if (merged.provider) sp.set('provider', merged.provider);
   if (merged.page && merged.page !== '1') sp.set('page', merged.page);
   const qs = sp.toString();
   return `/programs/catalog${qs ? `?${qs}` : ''}`;
@@ -106,7 +104,7 @@ export default function CatalogFilters({
         </div>
       </div>
 
-      {(current.q || current.category || current.wioa || current.provider) && (
+      {(current.q || current.category || current.wioa) && (
         <button
           onClick={() => go('/programs/catalog')}
           className="text-xs text-black hover:text-black transition"

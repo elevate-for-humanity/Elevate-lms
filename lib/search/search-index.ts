@@ -54,7 +54,7 @@ export const SEARCH_INDEX: SearchItem[] = [
       'apprentice',
       'license',
     ],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: 'WIOA Funded',
     badge: 'WIOA Eligible',
   },
@@ -76,7 +76,7 @@ export const SEARCH_INDEX: SearchItem[] = [
       'clinical',
       'hospital',
     ],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: 'WIOA Funded',
     badge: 'WIOA Eligible',
   },
@@ -96,7 +96,7 @@ export const SEARCH_INDEX: SearchItem[] = [
       'epa',
       'technician',
     ],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: 'WIOA Funded',
     badge: 'WIOA Eligible',
   },
@@ -117,7 +117,7 @@ export const SEARCH_INDEX: SearchItem[] = [
       'transportation',
       'logistics',
     ],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: 'WIOA Funded',
     badge: 'WIOA Eligible',
   },
@@ -129,7 +129,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'program',
     audiences: ['students', 'everyone'],
     keywords: ['bookkeeping', 'quickbooks', 'accounting', 'finance', 'business'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: 'WIOA Funded',
   },
 
@@ -145,7 +145,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'license',
     audiences: ['organizations', 'developers'],
     keywords: ['lms', 'platform', 'license', 'core', 'basic', 'starter', 'learning management'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: '$4,999',
   },
   {
@@ -166,7 +166,7 @@ export const SEARCH_INDEX: SearchItem[] = [
       'lms',
       'platform',
     ],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: '$15,000',
     badge: 'Most Popular',
   },
@@ -179,7 +179,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'license',
     audiences: ['organizations'],
     keywords: ['enterprise', 'multi-site', 'api', 'integration', 'custom', 'large', 'organization'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp',
+    image: '/images/pages/store-recommendations.webp',
     price: '$50,000',
   },
   {
@@ -190,7 +190,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'license',
     audiences: ['developers'],
     keywords: ['developer', 'source code', 'self-host', 'github', 'clone', 'agency', 'code'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: '$299',
   },
   {
@@ -202,7 +202,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'license',
     audiences: ['developers'],
     keywords: ['developer', 'pro', 'commercial', 'source code', 'white-label', 'resell'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: '$999',
   },
 
@@ -218,7 +218,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'tool',
     audiences: ['organizations'],
     keywords: ['wioa', 'compliance', 'pirl', 'workforce', 'reporting', 'tracking', 'dol'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg',
+    image: '/images/pages/career-counseling.jpg',
     price: '$1,999',
   },
   {
@@ -230,7 +230,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'tool',
     audiences: ['organizations'],
     keywords: ['ferpa', 'privacy', 'student data', 'encryption', 'compliance', 'security'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: '$999',
   },
   {
@@ -242,7 +242,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'tool',
     audiences: ['organizations'],
     keywords: ['grant', 'reporting', 'federal', 'state', 'dol', 'export', 'outcomes'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: '$999',
   },
   {
@@ -254,7 +254,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'tool',
     audiences: ['organizations', 'students'],
     keywords: ['ai', 'tutor', 'artificial intelligence', 'chatbot', 'support', 'learning', '24/7'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: '$999',
     badge: 'New',
   },
@@ -270,7 +270,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'product',
     audiences: ['students', 'everyone'],
     keywords: ['tools', 'equipment', 'kit', 'professional', 'hvac', 'barber', 'shears'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
   },
   {
     id: 'shop-apparel',
@@ -280,7 +280,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'product',
     audiences: ['students', 'everyone'],
     keywords: ['scrubs', 'uniform', 'apparel', 'clothing', 'medical', 'hoodie', 'shirt'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
   },
   {
     id: 'shop-books',
@@ -290,7 +290,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'product',
     audiences: ['students', 'everyone'],
     keywords: ['books', 'study', 'guide', 'textbook', 'exam', 'prep', 'materials'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
   },
 
   // ============================================
@@ -304,7 +304,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'resource',
     audiences: ['students'],
     keywords: ['workbook', 'download', 'pdf', 'study', 'materials', 'free'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     price: 'Free',
   },
   {
@@ -315,7 +315,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     category: 'resource',
     audiences: ['students', 'everyone'],
     keywords: ['courses', 'marketplace', 'online', 'learning', 'training', 'expert'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
   },
 
   // ============================================

@@ -32,7 +32,7 @@ const HVAC_VIDEO_CONFIG: BlueprintVideoConfig = {
   template: 'elevate-slide',
   instructorName: 'Marcus Johnson',
   instructorTitle: 'Master HVAC Technician',
-  instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/instructors/instructor-trades.jpg',
+  instructorImagePath: '/images/team/instructors/instructor-trades.jpg',
   topBarColor: '#f97316',
   accentColor: '#3b82f6',
   backgroundColor: '#0f172a',

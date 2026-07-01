@@ -49,7 +49,7 @@ export const entrepreneurshipBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'Elevate Business Coach',
     instructorTitle: 'Certified ESB Instructor',
-    instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+    instructorImagePath: '/images/instructors/business-coach.jpg',
     topBarColor: '#0ea5e9',
     accentColor: '#0284c7',
     backgroundColor: '#0f172a',

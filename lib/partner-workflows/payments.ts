@@ -6,7 +6,7 @@ import 'server-only';
  */
 
 import { stripe } from '@/lib/stripe/client';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export interface PaymentRequest {
@@ -31,7 +31,7 @@ export interface PaymentResult {
  */
 export async function createPartnerPaymentSession(request: PaymentRequest): Promise<PaymentResult> {
   try {
-    const supabase = await createClient();
+    const supabase = createClient();
 
     // Fetch provider details
     const { data: provider } = await supabase
@@ -134,7 +134,7 @@ export async function createPartnerPaymentSession(request: PaymentRequest): Prom
  * Handle successful payment webhook from Stripe
  */
 export async function handlePaymentSuccess(sessionId: string): Promise<void> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // Retrieve session from Stripe
   const session = await stripe.checkout.sessions.retrieve(sessionId);
@@ -195,7 +195,7 @@ export async function handlePaymentSuccess(sessionId: string): Promise<void> {
  * Handle failed payment
  */
 export async function handlePaymentFailure(sessionId: string): Promise<void> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   const session = await stripe.checkout.sessions.retrieve(sessionId);
   const enrollmentId = session.metadata?.enrollment_id;
@@ -232,7 +232,7 @@ export async function getProviderPricing(providerId: string): Promise<{
   currency: string;
   requiresPayment: boolean;
 }> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   const { data: provider } = await supabase
     .from('partner_lms_providers')
@@ -255,7 +255,7 @@ export async function getProviderPricing(providerId: string): Promise<{
  * Check if student has already paid for a provider
  */
 export async function hasStudentPaid(studentId: string, providerId: string): Promise<boolean> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   const { data: enrollments } = await supabase
     .from('partner_lms_enrollments')
@@ -274,7 +274,7 @@ export async function createPaymentLink(
   providerId: string,
   amount: number,
 ): Promise<{ url: string; id: string }> {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   const { data: provider } = await supabase
     .from('partner_lms_providers')

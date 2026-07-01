@@ -20,7 +20,7 @@ import CanonicalVideo from '@/components/video/CanonicalVideo';
  * <HeroSection
  *   title="Program Title"
  *   subtitle="Brief description"
- *   image="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp"
+ *   image="/images/pages/workforce-training.webp"
  *   variant="split"
  *   ctaPrimary={{ label: "Apply Now", href: "/apply" }}
  * />
@@ -97,7 +97,7 @@ export function HeroSection({
         {/* Video background - NO overlay, NO gradient */}
         <CanonicalVideo
           src={videoSrc ?? ''}
-          poster={videoPoster ?? 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-default.jpg'}
+          poster={videoPoster ?? '/images/og-default.jpg'}
           className="absolute inset-0 w-full h-full object-cover"
         />
 

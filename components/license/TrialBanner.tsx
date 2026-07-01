@@ -52,7 +52,7 @@ export function LicenseBanner({ license, onDismiss }: LicenseBannerProps) {
             </div>
             <div className="flex items-center gap-3">
               <Link
-                href="/store/licenses"
+                href="/account/billing"
                 className="bg-brand-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition-colors"
               >
                 Manage Billing
@@ -92,7 +92,7 @@ export function LicenseBanner({ license, onDismiss }: LicenseBannerProps) {
               </div>
             </div>
             <Link
-              href="/store/licenses"
+              href="/account/billing"
               className="bg-amber-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-amber-700 transition-colors"
             >
               Update Payment Method
@@ -201,7 +201,7 @@ export function TrialExpiredModal({ onClose }: { onClose: () => void }) {
           </p>
           <div className="space-y-3">
             <Link
-              href="/store/licenses"
+              href="/account/billing"
               className="block w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 transition-colors"
             >
               Manage Billing

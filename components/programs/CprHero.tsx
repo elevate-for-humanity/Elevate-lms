@@ -66,7 +66,7 @@ export default function CprHero() {
       >
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cpr-training-real.webp"
+          src="/images/pages/cpr-training-real.webp"
           alt="CPR training session"
           fill
           priority

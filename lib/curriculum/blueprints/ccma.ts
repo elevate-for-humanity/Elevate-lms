@@ -24,7 +24,7 @@ const CCMA_VIDEO_CONFIG: BlueprintVideoConfig = {
   template: 'elevate-slide',
   instructorName: 'Dr. Aisha Williams',
   instructorTitle: 'Certified Clinical Medical Assistant Instructor',
-  instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/instructors/instructor-medical.jpg',
+  instructorImagePath: '/images/team/instructors/instructor-medical.jpg',
   topBarColor: '#0ea5e9',
   accentColor: '#6366f1',
   backgroundColor: '#0f172a',

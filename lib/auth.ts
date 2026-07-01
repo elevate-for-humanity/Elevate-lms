@@ -38,16 +38,7 @@ export async function createServerSupabaseClient() {
     return null;
   }
 
-  let cookieStore;
-  try {
-    cookieStore = await cookies();
-  } catch {
-    // cookies() called outside request context (build/static generation)
-    // Return client without cookie support
-    return createServerClient(supabaseUrl, supabaseAnonKey, {
-      auth: { persistSession: false },
-    });
-  }
+  const cookieStore = await cookies();
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {

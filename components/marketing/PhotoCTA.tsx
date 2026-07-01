@@ -12,7 +12,7 @@ export function PhotoCTA() {
             <div className="relative h-40 overflow-hidden rounded-2xl sm:h-48">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
               <Image
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-photo-cta-1.webp"
+                src="/images/pages/comp-photo-cta-1.webp"
                 alt="Barber apprenticeship in action"
                 fill
                 className="object-cover"
@@ -21,7 +21,7 @@ export function PhotoCTA() {
             </div>
             <div className="relative h-40 overflow-hidden rounded-2xl sm:h-48">
               <Image
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp"
+                src="/images/pages/training-classroom.webp"
                 alt="Healthcare student in lab coat"
                 fill
                 className="object-cover"
@@ -30,7 +30,7 @@ export function PhotoCTA() {
             </div>
             <div className="relative h-40 overflow-hidden rounded-2xl sm:h-48">
               <Image
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-photo-cta-2.webp"
+                src="/images/pages/comp-photo-cta-2.webp"
                 alt="HVAC technician training"
                 fill
                 className="object-cover"
@@ -39,7 +39,7 @@ export function PhotoCTA() {
             </div>
             <div className="relative h-40 overflow-hidden rounded-2xl sm:h-48">
               <Image
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-photo-cta-3.webp"
+                src="/images/pages/comp-photo-cta-3.webp"
                 alt="Classroom and coaching"
                 fill
                 className="object-cover"

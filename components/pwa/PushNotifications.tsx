@@ -267,19 +267,19 @@ export interface AppNotification {
 // Helper to create notification payloads
 export function createNotificationPayload(notification: AppNotification) {
   const icons: Record<NotificationType, string> = {
-    hours_approved: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
-    hours_rejected: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
-    milestone_reached: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
-    weekly_reminder: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
-    new_apprentice: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
-    compliance_warning: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+    hours_approved: '/icons/check-circle.png',
+    hours_rejected: '/icons/x-circle.png',
+    milestone_reached: '/icons/award.png',
+    weekly_reminder: '/icons/clock.png',
+    new_apprentice: '/icons/user-plus.png',
+    compliance_warning: '/icons/alert-triangle.png',
   };
 
   return {
     title: notification.title,
     body: notification.body,
-    icon: icons[notification.type] || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
-    badge: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
+    icon: icons[notification.type] || '/icon-192.png',
+    badge: '/icon-192.png',
     tag: notification.type,
     url: notification.url || '/',
     data: notification.data,

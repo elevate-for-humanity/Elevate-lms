@@ -100,12 +100,7 @@ async function sendViaSendGrid(
 
     if (!resp.ok) {
       const data = await resp.json().catch(() => ({}));
-      // 401/403 = auth issues - log as warn (config problem, not runtime error)
-      if (resp.status === 401 || resp.status === 403) {
-        logger.warn(`[Email] SendGrid auth failed (${resp.status}) — check SENDGRID_API_KEY in Northflank secrets`, data);
-      } else {
-        logger.error(`[Email] SendGrid ${resp.status}:`, data);
-      }
+      logger.error(`[Email] SendGrid ${resp.status}:`, data);
       return {
         success: false,
         error: `SendGrid error ${resp.status}: ${JSON.stringify(data)}`,

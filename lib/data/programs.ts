@@ -6,7 +6,7 @@
 import { createClient } from '@/lib/supabase/server';
 
 function getDefaultHeroImage(slug: string): string {
-  return 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp';
+  return '/images/pages/admin-dashboard-hero.webp';
 }
 
 function formatDuration(weeks?: number): string {

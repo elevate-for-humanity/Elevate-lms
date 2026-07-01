@@ -3,11 +3,10 @@
  * Do not use third-party curriculum vendor names in learner UI.
  */
 
+import { BARBER_COURSE_ID } from '@/lib/barber/constants';
+
 export const PRESTIGE_ELEVATION_BARBER_CURRICULUM =
   'Prestige Elevation Barber Curriculum';
-
-/** Hardcoded to avoid circular imports */
-const BARBER_COURSE_ID = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
 
 /** Short label for nav tabs and compact UI */
 export const PRESTIGE_ELEVATION_BARBER_CURRICULUM_SHORT = 'Prestige Elevation Course';

@@ -57,17 +57,17 @@ export default function MainNav() {
               <div className="absolute top-full left-0 bg-white shadow-xl rounded-xl border border-slate-100 p-4 min-w-[220px] z-50">
                 <div className="flex flex-col gap-1">
                   {item.subItems!.map((sub) =>
-                    !sub ? null : sub.isHeader ? (
+                    sub.isHeader ? (
                       <p
-                        key={(sub.href || '') + sub.name}
+                        key={sub.href + sub.name}
                         className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-3 mb-1 first:mt-0 px-2"
                       >
                         {sub.name.replace(/^—\s*/, '').replace(/\s*—$/, '')}
                       </p>
                     ) : (
                       <Link
-                        key={(sub.href || '') + sub.name}
-                        href={sub.href || '#'}
+                        key={sub.href + sub.name}
+                        href={sub.href}
                         prefetch={false}
                         className="text-sm text-slate-700 hover:text-brand-blue-600 hover:bg-slate-50 rounded-lg px-2 py-1.5 transition-colors"
                       >

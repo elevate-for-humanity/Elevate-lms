@@ -10,10 +10,38 @@ import { useRouter } from 'next/navigation';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import Link from 'next/link';
 import Image from 'next/image';
-import { validateRedirect } from '@/lib/auth/validate-redirect';
+import { readRedirectParam, validateRedirect } from '@/lib/auth/validate-redirect';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
+import { resolvePortalForUser } from '@/lib/portal/router';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { hydrateBrowserSupabaseConfig } from '@/lib/supabase/public-config';
+import { mapAuthError } from '@/lib/auth/map-auth-error';
+
+
+const ADMIN_LOGIN_ROLES = new Set(['admin', 'staff', 'org_admin', 'admin']);
+const ADMIN_ORIGIN = (process.env.NEXT_PUBLIC_ADMIN_URL || '').replace(/\/$/, '');
+
+function normalizePostLoginRedirect(target: string, role: string | null | undefined): string | null {
+  if (!target) return null;
+  const isAdminRole = ADMIN_LOGIN_ROLES.has(String(role ?? ''));
+
+  try {
+    if (target.startsWith('https://')) {
+      const url = new URL(target);
+      const isAdminHost = url.hostname === '';
+      if (isAdminHost) return isAdminRole ? url.toString() : null;
+      return target;
+    }
+
+    if (target.startsWith('/admin')) {
+      return isAdminRole ? `${ADMIN_ORIGIN}${target}` : null;
+    }
+  } catch {
+    return null;
+  }
+
+  return target;
+}
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -36,7 +64,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSafeSearchParams();
   // Support both 'next' and 'redirect' params for backward compatibility
-  const rawNext = searchParams.get('next') || searchParams.get('redirect') || '';
+  const rawNext = readRedirectParam(searchParams) || '';
   const next = validateRedirect(rawNext, '');
   const reason = searchParams.get('reason');
 
@@ -48,6 +76,25 @@ function LoginForm() {
       const supabase = createClient();
       supabase.auth.signOut().catch(() => {});
     }
+    // Check if already logged in and redirect away
+    async function checkSession() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+        const role = profile?.role || 'student';
+        if (role === 'student') {
+          window.location.href = '/learner/dashboard';
+        } else {
+          window.location.href = getRoleDestination(role);
+        }
+      }
+    }
+    checkSession();
   }, [reason]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -56,16 +103,32 @@ function LoginForm() {
     setError('');
 
     try {
-      const hydrated = await hydrateBrowserSupabaseConfig();
-      if (!hydrated) {
-        setError(
-          'Sign-in is temporarily unavailable (site configuration). Please try again later or contact support.',
-        );
-        setLoading(false);
+      // Check if already logged in - redirect to dashboard
+      const supabase = createClient();
+      const { data: { user: existingUser } } = await supabase.auth.getUser();
+      if (existingUser) {
+        // Already logged in - fetch profile and redirect
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role, onboarding_completed, portal_type')
+          .eq('id', existingUser.id)
+          .maybeSingle();
+        
+        const role = profile?.role || 'student';
+        if (role === 'student') {
+          window.location.href = await resolvePortalForUser(supabase, existingUser.id);
+        } else {
+          window.location.href = getRoleDestination(role);
+        }
         return;
       }
 
-      const supabase = createClient();
+      const hydrated = await hydrateBrowserSupabaseConfig();
+      if (!hydrated) {
+        setError(mapAuthError('site configuration'));
+        setLoading(false);
+        return;
+      }
 
       const { data, error }: any = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -85,8 +148,9 @@ function LoginForm() {
 
       if (profileError) {
         // profile fetch failed — non-fatal, user still authenticated
-        setError('Unable to load your profile. Please try again or contact support.');
-        setLoading(false);
+        // Default to student role and continue with login flow
+        const dest = getRoleDestination('student');
+        window.location.href = dest;
         return;
       }
 
@@ -96,13 +160,18 @@ function LoginForm() {
         return;
       }
 
-      // Explicit redirect param takes priority
-      if (next) {
-        window.location.href = next;
+      const role = profile.role;
+
+      // Explicit redirect param takes priority only after role-aware admin-domain normalization.
+      // This prevents www /login?redirect=/admin/dashboard from trapping admins on the wrong host
+      // and prevents non-admin users from being sent into an admin unauthorized loop.
+      const resolvedRedirect = normalizePostLoginRedirect(next, role);
+      if (resolvedRedirect) {
+        window.location.href = resolvedRedirect;
         return;
       }
 
-      const role = profile.role;
+
       const onboardingDone = profile.onboarding_completed === true;
 
       // Employer: gate on onboarding before dashboard.
@@ -111,11 +180,9 @@ function LoginForm() {
         return;
       }
 
-      // Students: route to their industry portal if portal_type is cached.
+      // Students: slug-aware portal (barber, cosmetology, …) then category fallback.
       if (role === 'student') {
-        const studentDest = profile.portal_type
-          ? `/portal/${profile.portal_type}`
-          : '/learner/dashboard';
+        const studentDest = await resolvePortalForUser(supabase, data.user.id);
         const twoFARes2 = await fetch('/api/auth/2fa/status');
         if (twoFARes2.ok) {
           const { enabled } = await twoFARes2.json();
@@ -150,12 +217,8 @@ function LoginForm() {
       window.location.href = dest;
     } catch (err: any) {
       // Supabase error objects have non-enumerable properties — extract explicitly
-      let msg = err?.message || err?.error_description || err?.msg || 'Invalid email or password';
-      if (msg === 'Supabase not configured') {
-        msg =
-          'Sign-in is temporarily unavailable (site configuration). Please try again later or contact support.';
-      }
-      setError(msg);
+      const raw = err?.message || err?.error_description || err?.msg || 'Invalid email or password';
+      setError(mapAuthError(raw));
     } finally {
       setLoading(false);
     }
@@ -189,7 +252,11 @@ function LoginForm() {
     setLinkError('');
     try {
       const redirectTo = next
-        ? `${window.location.origin}${next}`
+        ? next.startsWith('https://')
+          ? next
+          : next.startsWith('/admin')
+            ? `${ADMIN_ORIGIN}${next}`
+            : `${window.location.origin}${next}`
         : `${window.location.origin}/learner/dashboard`;
       const res = await fetch('/api/auth/send-magic-link', {
         method: 'POST',
@@ -276,7 +343,7 @@ function LoginForm() {
           className="object-cover"
           priority
           quality={90}
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
       </section>
 
@@ -463,7 +530,7 @@ function LoginForm() {
                   { label: 'Apprentice Portal', dest: '/portal/apprentice', highlight: true },
                   { label: 'Student Portal', dest: '/learner/dashboard' },
                   { label: 'Program Holder', dest: '/program-holder/dashboard' },
-                  { label: 'Instructor', dest: 'https://admin.elevateforhumanity.org/admin/instructor/dashboard' },
+                  { label: 'Instructor', dest: '/admin/instructor/dashboard' },
                   { label: 'Employer', dest: '/employer/dashboard' },
                   { label: 'Partner Portal', dest: '/partner/dashboard' },
                   { label: 'Staff Portal', dest: '/admin/staff-portal/dashboard' },
@@ -482,9 +549,9 @@ function LoginForm() {
                     {item.label}
                   </Link>
                 ))}
-                {/* Admin portal lives on admin.elevateforhumanity.org — never on the LMS */}
+                {/* Admin portal lives on  — never on the LMS */}
                 <a
-                  href="https://admin.elevateforhumanity.org/login"
+                  href="/login"
                   className="text-center px-4 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center col-span-2"
                 >
                   Admin Portal →

@@ -54,7 +54,7 @@ const FUNDING_SOURCES = [
   {
     name: 'State Grant Programs',
     desc: 'Indiana state workforce development grants including Next Level Jobs Workforce Ready Grant and employer training grants.',
-    href: '/funding/state-programs',
+    href: '/funding',
   },
   {
     name: 'Job Ready Indy',
@@ -81,7 +81,7 @@ export default function FundingHowItWorksPage() {
             fill
             className="object-cover"
             priority
-            sizes="100vw" placeholder="empty"
+            sizes="100vw" 
           />
         </div>
         <div className="bg-white py-10">
@@ -167,7 +167,7 @@ export default function FundingHowItWorksPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/programs/cosmetology-apprenticeship/orientation"
+              href="/orientation/schedule"
               className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg"
             >
               Orientation Schedule

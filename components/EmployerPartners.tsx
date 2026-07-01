@@ -204,7 +204,7 @@ export default function EmployerPartners({
           </div>
           {showCTA && (
             <div className="text-center mt-6">
-              <Link href="/admin/employers" className="text-brand-blue-600 hover:underline font-medium">
+              <Link href="/employer/dashboard" className="text-brand-blue-600 hover:underline font-medium">
                 View all partners →
               </Link>
             </div>
@@ -406,7 +406,7 @@ export default function EmployerPartners({
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/admin/employers"
+                href="/employer/dashboard"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-semibold hover:bg-slate-100 transition-all shadow-lg text-lg"
               >
                 Become a Partner

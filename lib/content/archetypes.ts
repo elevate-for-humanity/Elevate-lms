@@ -32,7 +32,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Your Learning Dashboard',
       description:
         'Track your program progress, view assignments, access course materials, and manage your career development pathway.',
-      imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-clinical.jpg',
+      imageSrc: '/images/pages/cna-clinical.jpg',
       imageAlt: 'Student reviewing course materials and tracking progress',
       actions: [
         { label: 'View My Courses', href: '/lms/courses', variant: 'primary' },
@@ -47,7 +47,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Administrative Control Panel',
       description:
         'Manage applications, review enrollments, oversee program compliance, and generate reports for state workforce agencies.',
-      imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
+      imageSrc: '/images/pages/hvac-technician.webp',
       imageAlt: 'Administrator reviewing applications and compliance reports',
       actions: [
         {
@@ -62,7 +62,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Staff Operations Dashboard',
       description:
         'Process student applications, coordinate with training providers, track participant outcomes, and maintain program documentation.',
-      imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-truck-highway.webp',
+      imageSrc: '/images/pages/cdl-truck-highway.webp',
       imageAlt: 'Staff member coordinating with training providers',
       actions: [
         {
@@ -81,7 +81,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Employer Partnership Portal',
       description:
         'Post job opportunities, review qualified candidates, coordinate work-based learning placements, and track apprentice progress.',
-      imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-hero-main.webp',
+      imageSrc: '/images/pages/barber-hero-main.webp',
       imageAlt: 'Employer reviewing candidate profiles',
       actions: [
         {
@@ -100,7 +100,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Training Provider Dashboard',
       description:
         'Manage program enrollments, submit progress reports, coordinate with employers, and maintain compliance with state requirements.',
-      imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/it-helpdesk-desk.webp',
+      imageSrc: '/images/pages/it-helpdesk-desk.webp',
       imageAlt: 'Training provider managing program enrollments',
       actions: [
         {
@@ -119,7 +119,7 @@ export function getDashboardContent(role: string): PageContent {
       title: 'Program Holder Portal',
       description:
         'Manage apprentice enrollments, submit weekly reports, track compliance requirements, and coordinate with state workforce agencies.',
-      imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/welding-sparks.webp',
+      imageSrc: '/images/pages/welding-sparks.webp',
       imageAlt: 'Program holder reviewing apprentice progress reports',
       actions: [
         {
@@ -150,7 +150,7 @@ export function getProgramContent(programSlug: string): PageContent {
     title: 'Registered Apprenticeship Program',
     description:
       'Earn while you learn through our DOL-registered apprenticeship program. Receive hands-on training, industry credentials, and job placement support.',
-    imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    imageSrc: '/images/pages/training-classroom.webp',
     imageAlt: 'Apprentice receiving hands-on training from experienced instructor',
     actions: [
       {
@@ -181,7 +181,7 @@ export function getPolicyContent(policyType: string): PageContent {
       title: 'Privacy Policy',
       description:
         'How we collect, use, and protect your personal information in compliance with federal and state privacy regulations.',
-      imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/for-employers-page-1.webp',
+      imageSrc: '/images/pages/for-employers-page-1.webp',
       imageAlt: 'Secure data protection and privacy compliance',
       breadcrumbs: [
         { label: 'Home', href: '/' },
@@ -192,7 +192,7 @@ export function getPolicyContent(policyType: string): PageContent {
       title: 'Terms of Service',
       description:
         `Terms and conditions governing your use of ${PLATFORM_DEFAULTS.orgName} services, programs, and digital platforms.`,
-      imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/business-sector.webp',
+      imageSrc: '/images/pages/business-sector.webp',
       imageAlt: 'Legal agreement and terms documentation',
       breadcrumbs: [
         { label: 'Home', href: '/' },

@@ -174,7 +174,7 @@ export function HomeHeroWithVoiceover({
         muted
         playsInline
         preload="metadata"
-        poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/hero-poster.webp"
+        poster="/images/hero-poster.webp"
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
       >
         <source src={config.video_src} type="video/mp4" />

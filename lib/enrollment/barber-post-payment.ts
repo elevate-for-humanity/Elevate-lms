@@ -219,7 +219,7 @@ export async function runBarberPostPayment(
 
     steps['crm_reminder'] = 'ok';
   } catch (err) {
-    logger.warn('[barber-post-payment] CRM reminder failed (non-fatal)', { err });
+    logger.error('[barber-post-payment] CRM reminder failed (non-fatal)', err);
     steps['crm_reminder'] = 'failed';
   }
 
@@ -318,7 +318,7 @@ export async function runBarberPostPayment(
 
     steps['admin_email'] = 'ok';
   } catch (err) {
-    logger.warn('[barber-post-payment] Admin notification email failed (non-fatal)', { err });
+    logger.error('[barber-post-payment] Admin notification email failed (non-fatal)', err);
     steps['admin_email'] = 'failed';
   }
 

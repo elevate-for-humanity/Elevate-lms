@@ -3,7 +3,7 @@
  * Do not add redirects; update inbound links to a live program instead.
  */
 export const ARCHIVED_PROGRAM_SLUGS = new Set([
-  
+  'tax-preparation',
   'tax-prep',
   'tax-preparation-financial',
   'tax-preparation-vita',

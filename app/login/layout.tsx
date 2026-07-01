@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Header from '@/components/site/Header';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
@@ -8,6 +9,17 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/login',
   },
+  openGraph: {
+    title: `Sign In | ${PLATFORM_DEFAULTS.orgName}`,
+    description: `Sign in to access your training programs, career services, and workforce development tools.`,
+    images: [{ url: '/images/og-image.jpg', width: 1200, height: 630, alt: `${PLATFORM_DEFAULTS.orgName} — Sign In` }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Sign In | ${PLATFORM_DEFAULTS.orgName}`,
+    description: `Sign in to access your training programs, career services, and workforce development tools.`,
+    images: ['/images/og-image.jpg'],
+  },
   robots: {
     index: false,
     follow: false,
@@ -15,11 +27,10 @@ export const metadata: Metadata = {
 };
 
 export default function LoginLayout({ children }: { children: React.ReactNode }) {
-  // MarketingChromeGuard hides header/footer on /login via data-app-route.
-  // This layout provides the dark centered shell for the auth form.
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
-      {children}
-    </div>
+    <>
+      <Header />
+      <div className="min-h-screen bg-slate-50">{children}</div>
+    </>
   );
 }

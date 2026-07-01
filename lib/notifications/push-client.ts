@@ -170,8 +170,8 @@ export class PushNotificationClient {
       throw new Error('Notification permission not granted');
     }
     await this.registration.showNotification(title, {
-      icon: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192x192.png',
-      badge: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-72.png',
+      icon: '/icon-192x192.png',
+      badge: '/icon-72.png',
       ...options,
     });
   }

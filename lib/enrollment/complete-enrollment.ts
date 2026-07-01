@@ -135,7 +135,7 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
         },
       })
       .then(() => {})
-      .catch((err: unknown) => logger.warn('Audit log failed (non-fatal)', { err }));
+      .catch((err: unknown) => logger.error('Audit log failed', err));
 
     return {
       success: true,

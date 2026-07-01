@@ -38,7 +38,7 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   // Professional Services Courses
   'barber-license': PRICES.BARBER,
   'cosmetology-license': PRICES.COSMETOLOGY,
-  
+  'tax-preparation': PRICES.TAX_PREP,
   'tax-prep-financial-services': 'price_1TM739H4a2yrVOt5aGFKqYPH', // $0 WIOA
   'tax-prep-financial-services-full': 'price_1TM739H4a2yrVOt5rAT6QPPF', // $4,950 self-pay
 

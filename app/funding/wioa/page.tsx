@@ -52,7 +52,7 @@ export default async function WioaPage() {
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw" 
         />
       </section>
 

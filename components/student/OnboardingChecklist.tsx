@@ -94,7 +94,7 @@ export function OnboardingChecklist({ onboarding }: OnboardingChecklistProps) {
               done={onboarding.handbook_reviewed}
               label="Review Student Handbook"
               action="Review"
-              href="/funding/confirm#handbook"
+              href="/onboarding/learner/handbook"
             />
             <OnboardingItem
               done={onboarding.lms_orientation_completed}

@@ -346,7 +346,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[260px] sm:h-[320px] lg:h-[360px] rounded-xl overflow-hidden shadow-2xl">
               <Image
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-program-template.webp"
+                src="/images/pages/comp-program-template.webp"
                 alt="Start your training today"
                 fill
                 className="object-cover"

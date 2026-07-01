@@ -1,44 +1,50 @@
-import { cn } from '@/lib/utils';
-import { forwardRef } from 'react';
+import React from 'react';
 
 export interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'default' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline';
-  className?: string;
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'warning'
+    | 'error'
+    | 'info'
+    | 'destructive'
+    | 'outline';
   size?: 'sm' | 'md' | 'lg';
+  className?: string;
 }
 
-const variantClasses = {
-  default: 'bg-slate-900 text-white',
-  secondary: 'bg-slate-100 text-slate-900',
-  success: 'bg-green-100 text-green-800',
-  warning: 'bg-yellow-100 text-yellow-800',
-  danger: 'bg-red-100 text-red-800',
-  outline: 'border border-slate-300 text-slate-700',
+export const Badge: React.FC<BadgeProps> = ({
+  children,
+  variant = 'default',
+  size = 'md',
+  className = '',
+}) => {
+  const variants = {
+    default: 'bg-slate-100 text-black',
+    primary: 'bg-brand-blue-100 text-brand-blue-700',
+    secondary: 'bg-slate-200 text-black',
+    success: 'bg-brand-green-100 text-brand-green-700',
+    warning: 'bg-yellow-100 text-yellow-700',
+    error: 'bg-brand-red-100 text-brand-red-700',
+    info: 'bg-cyan-100 text-cyan-700',
+    destructive: 'bg-brand-red-100 text-brand-red-700',
+    outline: 'bg-white border border-slate-300 text-black',
+  };
+
+  const sizes = {
+    sm: 'px-2 py-0.5 text-xs',
+    md: 'px-2.5 py-2 text-sm',
+    lg: 'px-3 py-2.5 text-base',
+  };
+
+  return (
+    <span
+      className={`inline-flex items-center font-semibold rounded-full ${variants[variant]} ${sizes[size]} ${className}`}
+    >
+      {children}
+    </span>
+  );
 };
-
-const sizeClasses = {
-  sm: 'text-xs px-2 py-0.5',
-  md: 'text-sm px-2.5 py-0.5',
-  lg: 'text-base px-3 py-1',
-};
-
-export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ children, variant = 'default', size = 'md', className }, ref) => {
-    return (
-      <span
-        ref={ref}
-        className={cn(
-          'inline-flex items-center rounded-full font-medium',
-          variantClasses[variant],
-          sizeClasses[size],
-          className
-        )}
-      >
-        {children}
-      </span>
-    );
-  }
-);
-
-Badge.displayName = 'Badge';

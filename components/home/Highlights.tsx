@@ -11,7 +11,7 @@ export default function Highlights() {
           <div className="relative overflow-hidden rounded-lg shadow-lg group aspect-[4/3]">
             <div className="relative h-64">
               <Image
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-highlight-biz.webp"
+                src="/images/pages/comp-home-highlight-biz.webp"
                 alt="Students in training"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -35,7 +35,7 @@ export default function Highlights() {
           <div className="relative overflow-hidden rounded-lg shadow-lg group aspect-[4/3]">
             <div className="relative h-64">
               <Image
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-highlight-health.webp"
+                src="/images/pages/comp-home-highlight-health.webp"
                 alt="Training programs"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -59,7 +59,7 @@ export default function Highlights() {
           <div className="relative overflow-hidden rounded-lg shadow-lg group aspect-[4/3]">
             <div className="relative h-64">
               <Image
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-highlight-success.webp"
+                src="/images/pages/comp-home-highlight-success.webp"
                 alt="Career success"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"

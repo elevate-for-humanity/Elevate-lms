@@ -23,7 +23,7 @@ const TRUST_ITEMS = [
     href: '/federal-compliance',
   },
   {
-    img: '/images/pages/career-services-hero.webp',
+    img: '/images/hp/wioa.webp',
     label: 'WIOA Aligned',
     sub: 'Title I & II compliant',
     href: '/eligibility',
@@ -41,7 +41,7 @@ const TRUST_ITEMS = [
     href: '/partners/workforce',
   },
   {
-    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/jri-hero.webp',
+    img: '/images/pages/jri-hero.webp',
     label: 'JRI Approved',
     sub: 'Marion County free tuition',
     href: '/partners/jri',

@@ -39,7 +39,7 @@ export function ProgramHero({ program }: { program: Program }) {
           {hasVideo ? (
             <CanonicalVideo
               src="/videos/hero-home.mp4"
-              poster={program.heroImage || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-cohort.webp'}
+              poster={program.heroImage || '/images/pages/training-cohort.webp'}
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
@@ -76,7 +76,7 @@ export function ProgramHero({ program }: { program: Program }) {
                   >
                     Apply Now
                   </a>
-                  {program.ctaSecondary?.href && (
+                  {program.ctaSecondary && (
                     <a
                       href={program.ctaSecondary.href}
                       className="inline-flex items-center justify-center bg-white/10 backdrop-blur-sm text-slate-900 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold hover:bg-white/20 transition border-2 border-white/30 text-center whitespace-nowrap text-sm sm:text-base"

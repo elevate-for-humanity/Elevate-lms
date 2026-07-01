@@ -134,7 +134,7 @@ export async function HomeOutcomes() {
           Figures based on internal participant and credential records. Eligibility and outcomes
           vary by program and funding source.{' '}
           <Link
-            href="/about#methodology"
+            href="/impact/methodology"
             className="font-semibold text-sky-300 underline hover:text-white transition-colors"
           >
             See methodology

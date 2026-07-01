@@ -116,7 +116,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     id: 'modern',
     name: 'Modern',
     description: 'Clean lines, minimal design, perfect for tech-forward organizations',
-    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+    thumbnail: '/templates/modern-thumb.jpg',
     fonts: FONT_PAIRINGS.modern,
     colorSchemes: {
       default: {
@@ -162,7 +162,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     id: 'professional',
     name: 'Professional',
     description: 'Trustworthy and established, ideal for institutions and enterprises',
-    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+    thumbnail: '/templates/professional-thumb.jpg',
     fonts: FONT_PAIRINGS.professional,
     colorSchemes: {
       default: {
@@ -208,7 +208,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     id: 'bold',
     name: 'Bold',
     description: 'High-energy design with strong contrasts, great for youth programs',
-    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+    thumbnail: '/templates/bold-thumb.jpg',
     fonts: FONT_PAIRINGS.bold,
     colorSchemes: {
       default: {
@@ -254,7 +254,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     id: 'warm',
     name: 'Warm',
     description: 'Friendly and approachable, perfect for community organizations',
-    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+    thumbnail: '/templates/warm-thumb.jpg',
     fonts: FONT_PAIRINGS.warm,
     colorSchemes: {
       default: {
@@ -300,7 +300,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     id: 'academic',
     name: 'Academic',
     description: 'Traditional and scholarly, suited for educational institutions',
-    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+    thumbnail: '/templates/academic-thumb.jpg',
     fonts: FONT_PAIRINGS.academic,
     colorSchemes: {
       default: {
@@ -346,7 +346,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
     id: 'industrial',
     name: 'Industrial',
     description: 'Rugged and practical, built for trade and vocational training',
-    thumbnail: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+    thumbnail: '/templates/industrial-thumb.jpg',
     fonts: FONT_PAIRINGS.industrial,
     colorSchemes: {
       default: {

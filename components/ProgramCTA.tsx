@@ -28,7 +28,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
                 <div className="flex items-start gap-3">
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-cta-main.webp"
+                      src="/images/pages/comp-cta-main.webp"
                       alt="Funded training"
                       fill
                       className="object-cover"
@@ -46,7 +46,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
                 <div className="flex items-start gap-3">
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.webp"
+                      src="/images/pages/career-counseling.jpg"
                       alt="Job placement"
                       fill
                       className="object-cover"
@@ -62,7 +62,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
                 <div className="flex items-start gap-3">
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                     <Image
-                      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp"
+                      src="/images/pages/workforce-training.webp"
                       alt="Hands-on training"
                       fill
                       className="object-cover"
@@ -94,7 +94,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
 
             <div className="relative h-[400px] sm:h-[500px] rounded-lg overflow-hidden shadow-2xl">
               <Image
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp"
+                src="/images/pages/workforce-training.webp"
                 alt="Students in training"
                 fill
                 className="object-cover"
@@ -111,7 +111,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-[300px] sm:h-[400px] rounded-lg overflow-hidden shadow-2xl order-2 md:order-1">
               <Image
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-cohort.webp"
+                src="/images/pages/training-cohort.webp"
                 alt="Indiana Career Connect"
                 fill
                 className="object-cover"
@@ -185,7 +185,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
             <div className="bg-slate-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.webp"
+                  src="/images/pages/career-counseling.jpg"
                   alt="Career counseling"
                   fill
                   className="object-cover"
@@ -212,7 +212,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
             <div className="bg-slate-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-cohort.webp"
+                  src="/images/pages/training-cohort.webp"
                   alt="Job placement"
                   fill
                   className="object-cover"
@@ -226,7 +226,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
                   interview prep included.
                 </p>
                 <Link
-                  href="/admin/employers"
+                  href="/employer/dashboard"
                   aria-label="Link"
                   className="text-brand-orange-700 font-semibold hover:underline"
                 >
@@ -239,7 +239,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
             <div className="bg-slate-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workforce-training.webp"
+                  src="/images/pages/workforce-training.webp"
                   alt="Supportive services"
                   fill
                   className="object-cover"

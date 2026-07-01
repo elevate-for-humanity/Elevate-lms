@@ -152,19 +152,10 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
   }
 
   const adminClient = await getAdminClient();
-  
-  // Validate service role client is available
-  // Admin dashboard requires elevated privileges - fail fast if not configured
-  if (!adminClient) {
-    logger.error('[getAdminDashboardData] Service role client not available', {
-      hint: 'Ensure SUPABASE_SERVICE_ROLE_KEY is configured'
-    });
-    return getDegradedAdminDashboardData();
-  }
-  
-  // Use service role client directly - no fallback to anon client
-  // Anon client lacks elevated privileges and causes silent query failures
-  const db = adminClient;
+  // Fall back to the anon client if the service role key is absent.
+  // Queries that require elevated privileges will return empty results
+  // rather than crashing the entire dashboard.
+  const db = adminClient ?? supabase;
 
   const thisMonthStart  = monthStart();
   const lastMonthStartS = lastMonthStart();
@@ -173,36 +164,9 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
   // ── Auth first (fast — local JWT decode, no DB round-trip) ──────────────
   const authRes = await supabase.auth.getUser();
   const { data: { user }, error: authError } = authRes;
-  
-  // Differentiate between expected and unexpected auth errors
-  if (authError) {
-    // "Auth session missing!" is EXPECTED when user is not logged in
-    // This is not a warning - it's normal behavior for unauthenticated requests
-    const EXPECTED_AUTH_ERRORS = [
-      'Auth session missing!',
-      'No Auth session found',
-      'Session expired',
-    ];
-    const isExpectedAuthError = EXPECTED_AUTH_ERRORS.some(
-      expected => authError.message?.includes(expected)
-    );
-    
-    if (isExpectedAuthError) {
-      // Debug log only in dev - this is expected behavior
-      if (process.env.NODE_ENV === 'development') {
-        logger.debug('[dashboard] No authenticated user', { 
-          message: authError.message 
-        });
-      }
-      // else: silently continue with null user (expected for public dashboard)
-    } else {
-      // UNEXPECTED auth error - might indicate a real problem
-      logger.error('[dashboard] getUser failed (unexpected)', { 
-        message: authError.message,
-        code: authError.status,
-      });
-    }
-  }
+  // Log but never throw — page-level requireAdmin() already enforces auth.
+  // A transient getUser() failure should degrade gracefully, not crash the dashboard.
+  if (authError) logger.warn('[dashboard] getUser failed — continuing with null user', { message: authError.message });
 
   // ── All DB queries in a single Promise.all — one round-trip to Supabase ──
   const [

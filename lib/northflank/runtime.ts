@@ -60,11 +60,6 @@ function projectPath(projectId: string, suffix: string): string {
   return `/projects/${projectId}${suffix}`;
 }
 
-function secretPath(suffix: string): string {
-  // Secrets are project-level - just return the suffix, northflankFetch adds /projects/{projectId}
-  return suffix;
-}
-
 export async function northflankFetch<T = unknown>(
   projectId: string,
   suffix: string,
@@ -121,10 +116,10 @@ export async function upsertNorthflankSecretVariable(
   let variables: Record<string, string> = {};
 
   try {
-    const group = await northflankFetch<Record<string, unknown>>(projectId, secretPath(projectId, `/secrets/${groupId}`));
+    const group = await northflankFetch<Record<string, unknown>>(projectId, `/secrets/${groupId}`);
     variables = extractVariables(group);
   } catch {
-    await northflankFetch(projectId, secretPath(projectId, '/secrets'), {
+    await northflankFetch(projectId, '/secrets', {
       method: 'POST',
       body: JSON.stringify({
         name: groupId,
@@ -144,7 +139,7 @@ export async function upsertNorthflankSecretVariable(
 
   variables[key] = value;
 
-  await northflankFetch(projectId, secretPath(projectId, `/secrets/${groupId}`), {
+  await northflankFetch(projectId, `/secrets/${groupId}`, {
     method: 'POST',
     body: JSON.stringify({
       name: groupId,

@@ -19,7 +19,7 @@ export const ORG = {
   email: 'info@elevateforhumanity.org',
   phone: '(317) 555-0100',
   address: 'Indianapolis, IN',
-  logoUrl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/logo.png',
+  logoUrl: '/images/logo.png',
   // Absolute URL for emails (images must be absolute in email HTML)
   logoAbsoluteUrl: 'https://www.elevateforhumanity.org/images/logo.png',
   tagline: 'Workforce Development & Career Training',

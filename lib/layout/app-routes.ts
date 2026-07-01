@@ -18,8 +18,10 @@ export const APP_ROUTE_PREFIXES = [
   '/learner',
   '/admin',
   '/admin/instructor',
-  '/admin/staff-portal',
   '/employer',
+
+  '/partner',
+  '/admin/staff-portal',
   '/mentor',
   '/program-holder',
   '/provider',

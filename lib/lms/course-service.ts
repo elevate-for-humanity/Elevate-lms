@@ -231,7 +231,7 @@ export async function publishCourse(
       }
     }
   } catch (snapErr) {
-    logger.warn('[publishCourse] snapshot failed (non-fatal)', { err: snapErr });
+    logger.error('[publishCourse] snapshot failed (non-fatal):', snapErr);
   }
 
   await db.rpc('log_audit_event', {

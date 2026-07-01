@@ -208,7 +208,7 @@ export const PROGRAM_SOC_CODES: Record<string, string> = {
   'construction-trades-certification': '47-2061.00', // Construction Laborers
   forklift: '53-7051.00', // Industrial Truck and Tractor Operators
   bookkeeping: '43-3031.00', // Bookkeeping, Accounting, and Auditing Clerks
-   // Tax Preparers
+  'tax-preparation': '13-2082.00', // Tax Preparers
   'project-management': '11-9199.01', // Project Management Specialists
   entrepreneurship: '11-1021.00', // General and Operations Managers
   'barber-apprenticeship': '39-5011.00', // Barbers

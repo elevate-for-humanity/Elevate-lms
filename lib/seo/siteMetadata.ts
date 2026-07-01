@@ -5,7 +5,7 @@ export const SITE = {
   name: PLATFORM_DEFAULTS.orgName,
   domain: PLATFORM_DEFAULTS.canonicalDomain,
   url: PLATFORM_DEFAULTS.siteUrl,
-  ogImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-default.jpg',
+  ogImage: '/images/og-default.jpg',
 };
 
 type SiteMetadataInput = {

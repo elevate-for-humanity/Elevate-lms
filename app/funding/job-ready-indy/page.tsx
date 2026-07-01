@@ -19,7 +19,7 @@ export default function JobReadyIndyPage() {
     <div className="min-h-screen bg-white">
       <PageVideoHero
         videoSrc="/videos/training-providers-hero.mp4"
-        posterSrc="/images/pages/admin-wioa-hero.webp"
+        posterSrc="/images/pages/funding-page-4.jpg"
         posterAlt="Funding Job Ready Indy — {PLATFORM_DEFAULTS.orgName}"
         size="marketing"
       />
@@ -40,7 +40,7 @@ export default function JobReadyIndyPage() {
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw" 
         />
       </section>
       <div className="bg-white border-b border-slate-200 py-8 px-4">
@@ -80,11 +80,11 @@ export default function JobReadyIndyPage() {
             </div>
             <div className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/pages/student-portal-page-5.webp"
+                src="/images/pages/learner-page-1.webp"
                 alt="Job Ready Indy career training"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty"
+                sizes="(max-width: 768px) 100vw, 50vw" 
               />
             </div>
           </div>

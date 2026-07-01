@@ -26,13 +26,13 @@ export const metadata: Metadata = {
 
 const programs = [
   { title: 'IT Help Desk', duration: '8 weeks', salary: '$55,510', href: '/programs/it-help-desk', image: '/images/pages/it-help-desk.webp' },
-  { title: 'Cybersecurity Analyst', duration: '12 weeks', salary: '$112,000', href: '/programs/cybersecurity-analyst', image: '/images/pages/admin-network-hero.webp' },
-  { title: 'Web Development', duration: '10 weeks', salary: '$80,267', href: '/programs/technology/web-development', image: '/images/pages/admin-career-courses-create-hero.webp' },
+  { title: 'Cybersecurity Analyst', duration: '12 weeks', salary: '$112,000', href: '/programs/cybersecurity-analyst', image: '/images/pages/admin-business-hero.webp' },
+  { title: 'Web Development', duration: '10 weeks', salary: '$80,267', href: '/programs/technology/web-development', image: '/images/pages/admin-dashboard-hero.webp' },
   { title: 'Software Development', duration: '12 weeks', salary: '$104,000', href: '/programs/software-development', image: '/images/pages/admin-dev-hero.jpg' },
   { title: 'Network Administration', duration: '10 weeks', salary: '$80,600', href: '/programs/network-administration', image: '/images/pages/comp-layout-hero.webp' },
-  { title: 'CAD/Drafting', duration: '10 weeks', salary: '$63,419', href: '/programs/cad-drafting', image: '/images/pages/admin-media-studio-detail.webp' },
-  { title: 'Graphic Design', duration: '10 weeks', salary: '$58,910', href: '/programs/graphic-design', image: '/images/pages/admin-media-studio-detail.webp' },
-  { title: 'Project Management', duration: '8 weeks', salary: '$95,370', href: '/programs/project-management', image: '/images/pages/admin-automation-hero.webp' },
+  { title: 'CAD/Drafting', duration: '10 weeks', salary: '$63,419', href: '/programs/cad-drafting', image: '/images/pages/admin-ai-studio-hero.webp' },
+  { title: 'Graphic Design', duration: '10 weeks', salary: '$58,910', href: '/programs/graphic-design', image: '/images/pages/admin-ai-studio-hero.webp' },
+  { title: 'Project Management', duration: '8 weeks', salary: '$95,370', href: '/programs/project-management', image: '/images/pages/admin-automation-qa-hero.webp' },
   { title: 'Office Administration', duration: '6 weeks', salary: '$42,000', href: '/programs/office-administration', image: '/images/pages/technology-sector.webp' },
 ];
 

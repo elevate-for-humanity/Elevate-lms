@@ -146,7 +146,7 @@ export default async function HandbookPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/heroes/community.jpg"
+                  src="/images/pages/about-partners-hero.webp"
                   alt="Handbook"
                   fill
                   className="object-cover"

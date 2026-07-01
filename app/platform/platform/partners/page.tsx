@@ -143,7 +143,7 @@ export default async function PartnersPage() {
         <div className="mx-auto max-w-6xl px-6 py-14 grid gap-10 md:grid-cols-2">
           <div className="relative h-[340px] w-full overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
             <Image
-              src="/images/heroes/partner-hero.jpg"
+              src="/images/pages/admin-partners-hero.webp"
               alt="Employer and workforce partners"
               fill
               className="object-cover"

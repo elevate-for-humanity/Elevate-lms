@@ -117,7 +117,7 @@ export default function TrainingProvidersPage() {
               <div className="relative hidden lg:block">
                 <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/heroes/training-provider.jpg"
+                    src="/images/pages/training-providers-hero.webp"
                     alt="Training Provider Portal"
                     fill
                     className="object-cover"

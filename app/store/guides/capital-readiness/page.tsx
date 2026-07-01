@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: `${siteUrl}/images/og/capital-readiness-guide.jpg`,
+        url: `${siteUrl}/images/pages/store-digital-detail1.webp`,
         width: 1200,
         height: 630,
         alt: 'The Elevate Capital Readiness Guide',
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Capital Readiness Guide',
     description: 'Build institutional trust, pass audits, and scale responsibly.',
-    images: [`${siteUrl}/images/og/capital-readiness-guide.jpg`],
+    images: [`${siteUrl}/images/pages/store-digital-detail1.webp`],
   },
   alternates: {
     canonical: `${siteUrl}/store/guides/capital-readiness`,

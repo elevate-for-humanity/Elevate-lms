@@ -108,7 +108,7 @@ export default function EmployerPortalPage() {
               <div className="relative hidden lg:block">
                 <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/heroes/employer-dashboard.jpg"
+                    src="/images/pages/admin-employers-hero.webp"
                     alt="Employer Portal Dashboard"
                     fill
                     className="object-cover"

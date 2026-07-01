@@ -5,24 +5,26 @@ export const dynamic = 'force-dynamic';
 
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
+import dynamic from 'next/dynamic';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import PublicLayout from '@/components/layout/PublicLayout';
 import ToasterClient from '@/components/ui/ToasterClient';
 import { SkipToContent } from '@/components/ui/SkipToContent';
-import { DMCATrackingPixel } from '@/components/InvisibleWatermark';
-import { CopyrightProtection } from '@/components/CopyrightProtection';
-import { GoogleAnalytics } from '@/components/analytics/google-analytics';
-import { GoogleAds } from '@/components/analytics/google-ads';
 import RootWidgets from '@/components/layout/RootWidgets';
 import { generateChromeSuppressionScript } from '@/lib/layout/app-routes';
-
 import PWAManager from '@/components/PWAManager';
-import { InstallPromptBanner } from '@/components/pwa/InstallPromptBanner';
 import AuthRedirectHandler from '@/components/auth/AuthRedirectHandler';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import SupabaseConfigBootstrap from '@/components/supabase/SupabaseConfigBootstrap';
+
+// Lazy load analytics and tracking components - they don't need to block rendering
+const GoogleAnalytics = dynamic(() => import('@/components/analytics/google-analytics'), { ssr: false });
+const GoogleAds = dynamic(() => import('@/components/analytics/google-ads'), { ssr: false });
+const DMCATrackingPixel = dynamic(() => import('@/components/InvisibleWatermark'), { ssr: false });
+const CopyrightProtection = dynamic(() => import('@/components/CopyrightProtection'), { ssr: false });
+const InstallPromptBanner = dynamic(() => import('@/components/pwa/InstallPromptBanner'), { ssr: false });
 
 const inter = { variable: '' };
 

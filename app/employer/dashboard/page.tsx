@@ -1,117 +1,430 @@
-'use client';
+import { Metadata } from 'next';
 
-import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+export const metadata: Metadata = {
+  title: 'Employer Dashboard',
+  description: 'Elevate For Humanity - Career training and workforce development',
+};
+
+import { createClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/auth/require-role';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  Users, 
-  Briefcase, 
-  Building, 
-  FileText, 
-  TrendingUp,
-  Calendar,
-  CheckCircle,
-  Clock
-} from 'lucide-react';
+import { safeFormatDate } from '@/lib/format-utils';
+import { getEmployerState } from '@/lib/orchestration/state-machine';
+import { StateAwareDashboard, SectionCard } from '@/components/dashboards/StateAwareDashboard';
+import { Briefcase, Users, FileText, Shield, Building2, TrendingUp } from 'lucide-react';
+import WorkforceLiveWidget from '@/components/employer/WorkforceLiveWidget';
 
-export default function EmployerDashboard() {
-  const [user, setUser] = useState<{ id: string; email?: string; full_name?: string } | null>(null);
-  const [loading, setLoading] = useState(true);
+export const dynamic = 'force-dynamic';
 
-  useEffect(() => {
-    async function loadData() {
-      const supabase = createClient();
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      setUser(authUser);
-      setLoading(false);
-    }
-    loadData();
-  }, []);
+/**
+ * EMPLOYER PORTAL - PROGRESSION LOGIC
+ *
+ * This is not a feature list. This is an operator.
+ *
+ * Rules:
+ * - Verification gates everything
+ * - Hiring tools unlock progressively
+ * - Apprenticeship is optional but guided
+ * - Platform protects from compliance errors
+ */
 
-  if (loading) {
+export default async function EmployerDashboardOrchestrated() {
+  // requireRole handles auth + redirect; employer, sponsor, and admins allowed
+  const { user, effectiveRoles } = await requireRole(['employer', 'sponsor', 'admin']);
+  const supabase = await createClient();
+
+  // Get full employer profile (select * needed for company_name, verified, etc.)
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (!profile) redirect('/unauthorized');
+
+  // requireRole already enforced the role gate — this is just for behavior branching
+  const isEmployer = effectiveRoles.includes('employer') || effectiveRoles.includes('sponsor');
+  const isAdmin = effectiveRoles.includes('admin') || effectiveRoles.includes('admin');
+
+  // Employer account exists but not yet approved — show pending state
+  if (isEmployer && !isAdmin && !profile.verified) {
     return (
-      <div className="min-h-screen bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <Skeleton className="h-8 w-48 mb-4" />
-          <div className="grid md:grid-cols-4 gap-6">
-            {[1,2,3,4].map(i => <Skeleton key={i} className="h-32 rounded-xl" />)}
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
+          <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Building2 className="w-8 h-8 text-brand-blue-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Application Under Review</h1>
+          <p className="text-slate-600 mb-6">
+            Your employer application has been received. Our team will review it and activate your
+            account within 1–2 business days.
+          </p>
+          <p className="text-sm text-slate-500 mb-6">
+            You will receive an email at <strong>{profile?.email}</strong> when your account is
+            approved.
+          </p>
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/for-employers"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
+            >
+              Learn About Employer Partnership
+            </Link>
+            <a
+              href="tel:3173143757"
+              className="inline-flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-slate-50 transition"
+            >
+              Call (317) 314-3757
+            </a>
           </div>
         </div>
       </div>
     );
   }
 
-  const firstName = user?.full_name?.split(' ')[0] || 'Employer';
+  // Get job postings
+  const { data: postings } = await supabase
+    .from('job_postings')
+    .select('*')
+    .eq('employer_id', user.id)
+    .eq('status', 'active');
+
+  // Get pending applications
+  const { data: applications } = await supabase
+    .from('job_applications')
+    .select('*')
+    .eq('employer_id', user.id)
+    .eq('status', 'pending');
+
+  // Check apprenticeship program (maybeSingle — employer may not have one yet)
+  const { data: apprenticeshipProgram } = await supabase
+    .from('apprenticeships')
+    .select('id')
+    .eq('employer_id', user.id)
+    .maybeSingle();
+
+  // Calculate state
+  const stateData = getEmployerState({
+    isVerified: profile.verified || false,
+    activePostings: postings?.length || 0,
+    hasApprenticeshipProgram: !!apprenticeshipProgram,
+    pendingApplications: applications?.length || 0,
+  });
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <div className="mb-8 rounded-2xl overflow-hidden shadow-lg">
-          <div className="bg-gradient-to-br from-blue-800 via-blue-900 to-slate-900 py-8 px-8 md:px-12">
-            <h1 className="text-3xl md:text-4xl font-black text-white mb-2">
-              Employer Dashboard
-            </h1>
-            <p className="text-blue-200 mb-6">
-              Welcome back, {firstName}. Manage your workforce programs and apprentices.
-            </p>
-            
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Link href="/employer/apprentices" className="bg-white/10 backdrop-blur rounded-xl p-4 hover:bg-white/20 transition">
-                <Users className="w-6 h-6 text-white mb-2" />
-                <div className="text-2xl font-bold text-white">0</div>
-                <div className="text-sm text-blue-200">Apprentices</div>
-              </Link>
-              <Link href="/employers/post-job" className="bg-white/10 backdrop-blur rounded-xl p-4 hover:bg-white/20 transition">
-                <Briefcase className="w-6 h-6 text-white mb-2" />
-                <div className="text-2xl font-bold text-white">0</div>
-                <div className="text-sm text-blue-200">Open Jobs</div>
-              </Link>
-              <Link href="/admin/employers" className="bg-white/10 backdrop-blur rounded-xl p-4 hover:bg-white/20 transition">
-                <FileText className="w-6 h-6 text-white mb-2" />
-                <div className="text-2xl font-bold text-white">0</div>
-                <div className="text-sm text-blue-200">Applications</div>
-              </Link>
-              <Link href="/admin/grants" className="bg-white/10 backdrop-blur rounded-xl p-4 hover:bg-white/20 transition">
-                <TrendingUp className="w-6 h-6 text-white mb-2" />
-                <div className="text-2xl font-bold text-white">$0</div>
-                <div className="text-sm text-blue-200">Funding Available</div>
+    <StateAwareDashboard
+      dominantAction={stateData.dominantAction}
+      availableSections={stateData.availableSections}
+      lockedSections={stateData.lockedSections}
+      alerts={stateData.alerts}
+    >
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* Main Content - 2/3 width */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Metrics Dashboard */}
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+              <div className="flex items-center justify-between mb-2">
+                <Briefcase className="h-11 w-11 text-brand-blue-600" />
+                <span className="text-3xl font-bold text-black">{postings?.length || 0}</span>
+              </div>
+              <div className="text-sm text-black">Active Job Postings</div>
+            </div>
+
+            <div
+              className={`rounded-lg shadow-sm border p-6 ${
+                (applications?.length || 0) > 0
+                  ? 'bg-brand-green-50 border-brand-green-600'
+                  : 'bg-white border-slate-200'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <Users
+                  className={`h-11 w-11 ${
+                    (applications?.length || 0) > 0 ? 'text-brand-green-600' : 'text-slate-400'
+                  }`}
+                />
+                <span
+                  className={`text-3xl font-bold ${
+                    (applications?.length || 0) > 0 ? 'text-brand-green-900' : 'text-black'
+                  }`}
+                >
+                  {applications?.length || 0}
+                </span>
+              </div>
+              <div
+                className={`text-sm ${
+                  (applications?.length || 0) > 0 ? 'text-brand-green-900' : 'text-black'
+                }`}
+              >
+                Pending Applications
+              </div>
+            </div>
+
+            <div
+              className={`rounded-lg shadow-sm border p-6 ${
+                apprenticeshipProgram
+                  ? 'bg-brand-blue-50 border-brand-blue-600'
+                  : 'bg-white border-slate-200'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <TrendingUp
+                  className={`h-11 w-11 ${
+                    apprenticeshipProgram ? 'text-brand-blue-600' : 'text-slate-400'
+                  }`}
+                />
+                <span
+                  className={`text-3xl font-bold ${
+                    apprenticeshipProgram ? 'text-brand-blue-900' : 'text-black'
+                  }`}
+                >
+                  {apprenticeshipProgram ? '1' : '0'}
+                </span>
+              </div>
+              <div
+                className={`text-sm ${
+                  apprenticeshipProgram ? 'text-brand-blue-900' : 'text-black'
+                }`}
+              >
+                Apprenticeship Programs
+              </div>
+            </div>
+          </div>
+
+          {/* Available Sections */}
+          <div>
+            <h3 className="text-2xl font-bold text-black mb-6">Available Actions</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              {stateData.availableSections.includes('verification') && (
+                <SectionCard
+                  title="Complete Verification"
+                  description="Required before posting jobs"
+                  href="/employer/verification"
+                  icon={<Shield className="h-10 w-10" />}
+                  badge="Required"
+                />
+              )}
+
+              {stateData.availableSections.includes('postings') && (
+                <SectionCard
+                  title="Manage Job Postings"
+                  description={`${postings?.length || 0} active posting${(postings?.length || 0) !== 1 ? 's' : ''}`}
+                  href="/employer/jobs"
+                  icon={<Briefcase className="h-10 w-10" />}
+                />
+              )}
+
+              {stateData.availableSections.includes('candidates') && (
+                <SectionCard
+                  title="View Candidates"
+                  description="Browse trained workers"
+                  href="/employer/candidates"
+                  icon={<Users className="h-10 w-10" />}
+                  badge={
+                    (applications?.length || 0) > 0 ? `${applications?.length} New` : undefined
+                  }
+                />
+              )}
+
+              {stateData.availableSections.includes('apprenticeship') && (
+                <SectionCard
+                  title={
+                    apprenticeshipProgram ? 'Manage Apprenticeship' : 'Start Apprenticeship Program'
+                  }
+                  description={
+                    apprenticeshipProgram
+                      ? 'Track apprentices and compliance'
+                      : 'Build your talent pipeline'
+                  }
+                  href="/employer/apprenticeships"
+                  icon={<TrendingUp className="h-10 w-10" />}
+                  badge={apprenticeshipProgram ? 'Active' : undefined}
+                />
+              )}
+
+              {stateData.availableSections.includes('compliance') && (
+                <SectionCard
+                  title="Compliance Dashboard"
+                  description="Track apprenticeship requirements"
+                  href="/employer/compliance"
+                  icon={<Shield className="h-10 w-10" />}
+                />
+              )}
+
+              {stateData.availableSections.includes('reports') && (
+                <SectionCard
+                  title="Reports & Analytics"
+                  description="View hiring metrics"
+                  href="/employer/reports"
+                  icon={<FileText className="h-10 w-10" />}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Recent Postings */}
+          {(postings?.length || 0) > 0 && (
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+              <h3 className="text-xl font-bold text-black mb-4">Active Job Postings</h3>
+              <div className="space-y-3">
+                {postings?.slice(0, 5).map((posting) => (
+                  <div
+                    key={posting.id}
+                    className="flex items-center justify-between p-3 bg-white rounded-lg"
+                  >
+                    <div>
+                      <div className="font-semibold text-black">{posting.title}</div>
+                      <div className="text-sm text-black">
+                        Posted: {safeFormatDate(posting.created_at)}
+                      </div>
+                    </div>
+                    <a
+                      href={`/employer/postings/${posting.id}`}
+                      className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition text-sm"
+                    >
+                      View
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar - 1/3 width */}
+        <div className="space-y-6">
+          {/* Company Info */}
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Building2 className="h-11 w-11 text-brand-blue-600" />
+              <div>
+                <h3 className="font-bold text-black">{profile.company_name || 'Your Company'}</h3>
+                <div className="text-sm text-black">
+                  {profile.verified ? (
+                    <span className="text-brand-green-600 font-semibold">• Verified</span>
+                  ) : (
+                    <span className="text-yellow-600 font-semibold">Pending Verification</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <h3 className="text-lg font-bold text-black mb-4">Quick Actions</h3>
+            <div className="space-y-3">
+              {profile.verified && (
+                <Link
+                  href="/employer/post-job"
+                  className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
+                >
+                  Post New Job
+                </Link>
+              )}
+              <Link
+                href="/employer/candidates"
+                className="block w-full text-center px-4 py-3 bg-slate-200 text-black rounded-lg font-semibold hover:bg-slate-300 transition"
+              >
+                Browse Candidates
               </Link>
             </div>
           </div>
-        </div>
 
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Link href="/employers/post-job" className="bg-white rounded-xl p-6 hover:shadow-lg transition group">
-            <Briefcase className="w-10 h-10 text-blue-600 mb-4" />
-            <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600">Post a Job</h3>
-            <p className="text-slate-600 text-sm">Reach qualified candidates from our training programs</p>
-          </Link>
-          <Link href="/employer/apprentices" className="bg-white rounded-xl p-6 hover:shadow-lg transition group">
-            <Users className="w-10 h-10 text-blue-600 mb-4" />
-            <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600">Manage Apprentices</h3>
-            <p className="text-slate-600 text-sm">Track progress, provide feedback, and support your apprentices</p>
-          </Link>
-          <Link href="/admin/grants/opportunities" className="bg-white rounded-xl p-6 hover:shadow-lg transition group">
-            <Building className="w-10 h-10 text-blue-600 mb-4" />
-            <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600">Workforce Grants</h3>
-            <p className="text-slate-600 text-sm">Apply for wage reimbursement and training grants</p>
-          </Link>
-        </div>
+          {/* Apprenticeship CTA */}
+          {!apprenticeshipProgram && profile.verified && (
+            <div className="bg-brand-blue-50 rounded-lg border-2 border-brand-blue-600 p-6">
+              <h3 className="text-lg font-bold text-brand-blue-900 mb-3">
+                Build Your Talent Pipeline
+              </h3>
+              <p className="text-brand-blue-800 mb-4 text-sm">
+                Start an apprenticeship program and train workers specifically for your needs.
+              </p>
+              <Link
+                href="/employer/apprenticeships"
+                className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
+              >
+                View Apprenticeships
+              </Link>
+            </div>
+          )}
 
-        {/* Recent Activity */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Recent Activity</h2>
-          <div className="text-center py-12 text-slate-500">
-            <Clock className="w-12 h-12 mx-auto mb-4 text-slate-300" />
-            <p>No recent activity</p>
-            <p className="text-sm mt-1">Post a job or accept applications to get started</p>
+          {/* Support Card */}
+          <div className="bg-brand-blue-50 rounded-lg border-2 border-brand-blue-600 p-6">
+            <h3 className="text-lg font-bold text-brand-blue-900 mb-3">Need Help?</h3>
+            <p className="text-brand-blue-800 mb-4 text-sm">
+              Our team is here to help you find the right candidates.
+            </p>
+            <a
+              href="/support"
+              className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
+            >
+              Call (317) 314-3757
+            </a>
           </div>
+
+          {/* Employer Tools */}
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold text-black mb-4">Employer Tools</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Link
+                href="/employer/jobs"
+                aria-label="Link"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
+              >
+                My Jobs
+              </Link>
+              <Link
+                href="/employer/post-job"
+                aria-label="Link"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
+              >
+                Post Job
+              </Link>
+              <Link
+                href="/employer/candidates"
+                aria-label="Link"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
+              >
+                Candidates
+              </Link>
+              <Link
+                href="/employer/placements"
+                aria-label="Link"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
+              >
+                Placements
+              </Link>
+              <Link
+                href="/employer/opportunities"
+                aria-label="Link"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
+              >
+                Opportunities
+              </Link>
+              <Link
+                href="/employer/analytics"
+                aria-label="Link"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
+              >
+                Analytics
+              </Link>
+              <Link
+                href="/employer/settings"
+                aria-label="Link"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
+              >
+                Settings
+              </Link>
+            </div>
+          </div>
+
+          {/* Live Workforce Widget */}
+          {profile.verified && <WorkforceLiveWidget />}
         </div>
       </div>
-    </div>
+    </StateAwareDashboard>
   );
 }

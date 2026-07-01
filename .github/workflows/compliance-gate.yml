@@ -53,7 +53,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Build application
-        run: pnpm run build
+        run: pnpm run ci:build
         env:
           NODE_OPTIONS: '--max-old-space-size=6144'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -98,7 +98,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Build application
-        run: pnpm run build
+        run: pnpm run ci:build
         env:
           NODE_OPTIONS: '--max-old-space-size=6144'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}

@@ -241,7 +241,7 @@
     "archetype:check": "node scripts/archetype-mapper.mjs",
     "spot-check": "node scripts/spot-check.mjs",
     "ci:install": "pnpm install --frozen-lockfile",
-    "ci:build": "pnpm build",
+    "ci:build": "pnpm run build:lms:phased",
     "ci:check": "pnpm archetype:check && pnpm typecheck && pnpm lint && pnpm seo:check",
     "check:safety": "python3 scripts/audit-build-safety.py",
     "check:all": "pnpm check:safety && pnpm lint && pnpm typecheck",

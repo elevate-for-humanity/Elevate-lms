@@ -20,8 +20,11 @@ export async function POST(request: Request): Promise<Response> {
     headers.set(key, value);
   });
 
+  // Use public app URL to ensure HTTPS for internal fetch
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.elevateforhumanity.org';
+  
   const response = await fetch(
-    new URL('/api/donate/webhook', request.url).toString(),
+    `${baseUrl}/api/donate/webhook`,
     {
       method: 'POST',
       headers,

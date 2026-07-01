@@ -3,11 +3,13 @@
 //
 // config is defined here (not re-exported from proxy.ts) because Next.js
 // requires static analysis of the config export and cannot follow re-exports.
-//
-// Fixed: use experimental-edge for Next.js 15 compatibility
-export const runtime = 'experimental-edge';
 
-export { middleware as default } from './proxy';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function middleware(request: NextRequest) {
+  // Simple pass-through - avoid complex transformations that cause issues
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [

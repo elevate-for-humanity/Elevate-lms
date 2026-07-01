@@ -266,15 +266,15 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
 
                 <div className="mt-6 flex flex-col gap-2">
                   <Link
-                    href="/for-students"
+                    href="/apply"
                     prefetch={false}
                     onClick={closeMenu}
                     className="block w-full text-center py-3 bg-brand-red-600 text-white rounded-lg font-semibold"
                   >
-                    Get Started
+                    Apply Now
                   </Link>
                   <Link
-                    href="/portals"
+                    href="/admin/dashboard"
                     prefetch={false}
                     onClick={closeMenu}
                     className="block w-full text-center py-3 border border-slate-300 text-slate-800 rounded-lg font-semibold hover:bg-slate-50"
@@ -287,15 +287,15 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                     onClick={closeMenu}
                     className="block w-full text-center py-2.5 text-slate-600 font-medium text-sm hover:underline"
                   >
-                    Sign in (all roles)
+                    Sign in
                   </Link>
                   <Link
-                    href="/apply"
+                    href="/for-students"
                     prefetch={false}
                     onClick={closeMenu}
                     className="block w-full text-center py-2.5 text-brand-blue-600 font-medium text-sm hover:underline"
                   >
-                    Check eligibility
+                    For Students
                   </Link>
                 </div>
               </nav>

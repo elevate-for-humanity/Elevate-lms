@@ -63,7 +63,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       severity: rec.attendance_percentage < 60 ? 'critical' : 'warning',
       message: `Student ${rec.student_id} attendance at ${rec.attendance_percentage}% — below 80% compliance threshold`,
       metadata: { student_id: rec.student_id, program_id: rec.program_id, attendance_pct: rec.attendance_percentage },
-    }).onConflict('id').ignore().catch(() => {});
+    })
     flagged++;
   }
 

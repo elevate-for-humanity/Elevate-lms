@@ -41,7 +41,7 @@ async function notifyHourRejected(
       },
       idempotency_key: `hours-rejected-learner-${hourId}-${studentUserId}`,
     })
-    .catch(() => {});
+    
 
   const { data: admins } = await adminDb
     .from('profiles')
@@ -68,7 +68,7 @@ async function notifyHourRejected(
       },
       idempotency_key: `hours-rejected-admin-${hourId}-${admin.id}`,
     }));
-    await adminDb.from('notifications').insert(rows).catch(() => {});
+    await adminDb.from('notifications').insert(rows)
   }
 }
 

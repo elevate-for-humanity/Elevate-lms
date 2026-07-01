@@ -184,7 +184,7 @@ async function _POST(request: NextRequest) {
       metadata: {
         kind: 'program_enrollment',
         program_id: programId,
-        program_name: program.title ?? program.name,
+        program_name: program.title ?? program.title,
         program_slug: program.slug,
         payment_type: paymentType,
         user_id: user.id,
@@ -223,8 +223,8 @@ async function _POST(request: NextRequest) {
             price_data: {
               currency: 'usd',
               product_data: {
-                name: `${program.title ?? program.name} - Payment Plan`,
-                description: `4-month payment plan for ${program.title ?? program.name}. Total: $${price}`,
+                name: `${program.title ?? program.title} - Payment Plan`,
+                description: `4-month payment plan for ${program.title ?? program.title}. Total: $${price}`,
                 images: program.image_url ? [program.image_url] : undefined,
                 metadata: {
                   program_id: programId,
@@ -243,13 +243,13 @@ async function _POST(request: NextRequest) {
         subscription_data: {
           metadata: {
             program_id: programId,
-            program_name: program.title ?? program.name,
+            program_name: program.title ?? program.title,
             total_amount: price.toString(),
             installments: '4',
             installment_amount: monthlyAmount.toString(),
             payment_type: 'plan',
           },
-          description: `${program.title ?? program.name} - 4 Monthly Payments`,
+          description: `${program.title ?? program.title} - 4 Monthly Payments`,
           // Cancel automatically after 4 billing cycles so the subscription
           // does not continue charging after the student has paid in full.
           cancel_at: Math.floor(Date.now() / 1000) + 4 * 30 * 24 * 60 * 60,
@@ -265,8 +265,8 @@ async function _POST(request: NextRequest) {
             price_data: {
               currency: 'usd',
               product_data: {
-                name: program.title ?? program.name,
-                description: `Enrollment in ${program.title ?? program.name} training program`,
+                name: program.title ?? program.title,
+                description: `Enrollment in ${program.title ?? program.title} training program`,
                 images: program.image_url ? [program.image_url] : undefined,
                 metadata: {
                   program_id: programId,
@@ -281,11 +281,11 @@ async function _POST(request: NextRequest) {
         payment_intent_data: {
           metadata: {
             program_id: programId,
-            program_name: program.title ?? program.name,
+            program_name: program.title ?? program.title,
             user_id: user.id,
             payment_type: 'full',
           },
-          description: `${program.title ?? program.name} - Full Payment`,
+          description: `${program.title ?? program.title} - Full Payment`,
         },
       } as Stripe.Checkout.SessionCreateParams;
     }
@@ -316,7 +316,7 @@ async function _POST(request: NextRequest) {
         status: 'pending',
         stripe_customer_id: customerId,
         metadata: {
-          program_name: program.title ?? program.name,
+          program_name: program.title ?? program.title,
           program_slug: program.slug,
           preferred_method: preferredMethod,
         },

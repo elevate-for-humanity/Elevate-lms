@@ -57,7 +57,7 @@ async function _GET(request: NextRequest) {
 
         return {
           programId: program.id,
-          programName: program.name,
+          programName: program.title,
           credential: program.credential,
           accreditationStatus: program.accreditation_status || 'pending',
           accreditationBody: program.accreditation_body,

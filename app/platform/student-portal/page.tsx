@@ -266,7 +266,7 @@ export default function StudentPortalPage() {
               Ready to Start Learning?
             </h2>
             <p className="text-xl text-slate-300 mb-8">
-              Join thousands of students who are building their careers through our training programs.
+              Join our community of students who are building their careers through our training programs.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link

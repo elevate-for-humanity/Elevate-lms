@@ -349,7 +349,7 @@ export default async function ProgramHolderLicensePage() {
               </div>
               <div className="text-sm text-black mb-4">/month</div>
               <div className="text-sm text-black mb-4">
-                Up to 10,000 students
+                Up to 10,000+ career changers
               </div>
               <div className="text-xs text-slate-500">Setup: $35,000</div>
             </div>

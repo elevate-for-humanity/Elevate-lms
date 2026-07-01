@@ -194,9 +194,9 @@ export default function BarberApprenticeshipClient({ program: p, heroBanner: b, 
         <h2 className="text-xl font-bold text-slate-900 mb-6">Licensing and shop-readiness outcomes</h2>
         <div className="grid sm:grid-cols-2 gap-6">
           {[
-            { img: '/images/pages/barber-tools-closeup.webp', alt: 'Barber tools and clippers', cred: p.credentials[0] },
-            { img: '/images/pages/barber-client-consult.webp', alt: 'Barber consulting with client', cred: p.credentials[1] },
-            { img: '/images/pages/barber-station-mirror.webp', alt: 'Professional barbershop stations and mirrors', cred: p.credentials[2] },
+            { img: '/images/pages/barber-apprentice-learning.webp', alt: 'Barber tools and clippers', cred: p.credentials[0] },
+            { img: '/images/pages/barber-apprenticeship-hero.jpg', alt: 'Barber consulting with client', cred: p.credentials[1] },
+            { img: '/images/pages/barber-shop-interior.webp', alt: 'Professional barbershop stations and mirrors', cred: p.credentials[2] },
           ].filter(item => item.cred).map((item, i) => (
             <div key={i} className="border border-slate-200 rounded-xl overflow-hidden hover:border-brand-blue-300 transition-colors">
               <div className="relative h-44">

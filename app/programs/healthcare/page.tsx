@@ -105,7 +105,7 @@ const healthcarePrograms = [
     duration: '12–16 weeks',
     desc: 'Clinical and administrative medical assisting. CCMA certification included.',
     href: '/programs/medical-assistant',
-    image: '/images/pages/admin-health-hero.webp',
+    image: '/images/pages/career-services-hero.webp',
   },
   {
     title: 'Phlebotomy Technician',

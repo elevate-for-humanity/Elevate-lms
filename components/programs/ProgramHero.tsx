@@ -76,7 +76,7 @@ export function ProgramHero({ program }: { program: Program }) {
                   >
                     Apply Now
                   </a>
-                  {program.ctaSecondary && (
+                  {program.ctaSecondary?.href && (
                     <a
                       href={program.ctaSecondary.href}
                       className="inline-flex items-center justify-center bg-white/10 backdrop-blur-sm text-slate-900 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold hover:bg-white/20 transition border-2 border-white/30 text-center whitespace-nowrap text-sm sm:text-base"

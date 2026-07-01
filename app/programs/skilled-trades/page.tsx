@@ -30,7 +30,7 @@ const programs = [
   { title: 'Welding Technician', duration: '10 weeks', salary: '$47,540', href: '/programs/welding', image: '/images/pages/welding-sparks.webp' },
   { title: 'Plumbing Technician', duration: '10 weeks', salary: '$59,880', href: '/programs/plumbing', image: '/images/pages/programs-plumbing-apply-hero.jpg' },
   { title: 'CDL Class A Training', duration: '3–6 weeks', salary: '$62,000', href: '/programs/cdl-training', image: '/images/pages/comp-layout-hero.webp' },
-  { title: 'Diesel Mechanic', duration: '12 weeks', salary: '$55,000', href: '/programs/diesel-mechanic', image: '/images/pages/admin-construction-hero.webp' },
+  { title: 'Diesel Mechanic', duration: '12 weeks', salary: '$55,000', href: '/programs/diesel-mechanic', image: '/images/pages/career-services-hero.webp' },
 ];
 
 const config: ProgramPageConfig = {

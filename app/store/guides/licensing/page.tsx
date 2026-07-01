@@ -54,7 +54,7 @@ const STEPS = [
     num: '3',
     color: 'bg-brand-blue-600',
     title: 'Tenant Provisioning',
-    image: '/images/pages/admin-partners-hero.webp',
+    image: '/images/pages/admin-analytics-hero.webp',
     imageAlt: 'Admin dashboard showing tenant provisioning and organization setup',
     content: (
       <>

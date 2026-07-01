@@ -23,7 +23,7 @@ const TRUST_ITEMS = [
     href: '/federal-compliance',
   },
   {
-    img: '/images/hp/wioa.webp',
+    img: '/images/pages/career-services-hero.webp',
     label: 'WIOA Aligned',
     sub: 'Title I & II compliant',
     href: '/eligibility',

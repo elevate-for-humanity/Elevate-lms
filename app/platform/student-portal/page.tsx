@@ -93,11 +93,11 @@ export default function StudentPortalPage() {
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <Link
-                    href="/lms/dashboard"
+                    href="/lms/login"
                     className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-blue-50 transition shadow-lg"
                   >
                     <Play className="w-5 h-5" />
-                    Go to Dashboard
+                    Student Login
                   </Link>
                   <Link
                     href="/apply"
@@ -270,16 +270,16 @@ export default function StudentPortalPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
-                href="/apply"
+                href="/login"
                 className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-700 transition"
               >
-                Apply Now
+                Sign In
               </Link>
               <Link
-                href="/programs"
+                href="/apply"
                 className="inline-flex items-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-slate-100 transition"
               >
-                Browse Programs
+                Apply Now
               </Link>
             </div>
           </div>

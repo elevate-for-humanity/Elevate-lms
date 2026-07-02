@@ -1,11 +1,6 @@
-// Force all routes to render on-demand (SSR) — prevents Next from attempting
-// static generation of ~2,000 pages at build time, which causes OOM in constrained build environments.
-// Individual pages can override with their own `export const revalidate = N`.
-export const dynamic = 'force-dynamic';
-
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
-import dynamic from 'next/dynamic';
+import NextDynamic from 'next/dynamic';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import PublicLayout from '@/components/layout/PublicLayout';
@@ -19,12 +14,17 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import SupabaseConfigBootstrap from '@/components/supabase/SupabaseConfigBootstrap';
 
-// Lazy load analytics and tracking components - they don't need to block rendering
-const GoogleAnalytics = dynamic(() => import('@/components/analytics/google-analytics'), { ssr: false });
-const GoogleAds = dynamic(() => import('@/components/analytics/google-ads'), { ssr: false });
-const DMCATrackingPixel = dynamic(() => import('@/components/InvisibleWatermark'), { ssr: false });
-const CopyrightProtection = dynamic(() => import('@/components/CopyrightProtection'), { ssr: false });
-const InstallPromptBanner = dynamic(() => import('@/components/pwa/InstallPromptBanner'), { ssr: false });
+// Force all routes to render on-demand (SSR) — prevents Next from attempting
+// static generation of ~2,000 pages at build time, which causes OOM in constrained build environments.
+// Individual pages can override with their own `export const revalidate = N`.
+export const dynamic = 'force-dynamic';
+
+// Lazy load analytics and tracking components
+const GoogleAnalytics = NextDynamic(() => import('@/components/analytics/google-analytics'));
+const GoogleAds = NextDynamic(() => import('@/components/analytics/google-ads'));
+const DMCATrackingPixel = NextDynamic(() => import('@/components/InvisibleWatermark'));
+const CopyrightProtection = NextDynamic(() => import('@/components/CopyrightProtection'));
+const InstallPromptBanner = NextDynamic(() => import('@/components/pwa/InstallPromptBanner'));
 
 const inter = { variable: '' };
 

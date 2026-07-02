@@ -31,21 +31,6 @@ export const DynamicVideoPlayer = dynamic(
   }
 );
 
-// Rich text editor - very heavy
-// NOTE: components/RichTextEditor.tsx does not exist
-const NullComponent = () => null;
-export const DynamicRichTextEditor = dynamic(
-  () => Promise.resolve(NullComponent),
-  { ssr: false, loading: () => null }
-);
-
-// PDF viewer
-// NOTE: components/PDFViewer.tsx does not exist
-export const DynamicPDFViewer = dynamic(
-  () => Promise.resolve(NullComponent),
-  { ssr: false, loading: () => null }
-);
-
 // Calendar component - default export
 export const DynamicCalendar = dynamic(() => import('@/components/Calendar'), {
   ssr: false,
@@ -64,10 +49,3 @@ export const DynamicAIChat = dynamic(
 
 // Confetti - only for success pages - default export
 export const DynamicConfetti = dynamic(() => import('@/components/Confetti'), { ssr: false });
-
-// Map component
-// NOTE: components/Map.tsx does not exist
-export const DynamicMap = dynamic(
-  () => Promise.resolve(NullComponent),
-  { ssr: false, loading: () => null }
-);

@@ -8,12 +8,13 @@ import * as Sentry from '@sentry/nextjs';
 // Server Action ID mismatch — happens when ECS deploys a new build while
 // users still have the old page loaded. The old action IDs don't exist in
 // the new build. Hard reload fetches the new page with new action IDs.
-function isServerActionMismatch(error: Error): boolean {
+function isServerActionMismatch(error: Error & { digest?: string }): boolean {
+  const message = error.message ?? '';
+  const digest = error.digest ?? '';
   return (
-    error.message?.includes('Failed to find Server Action') ||
-    error.message?.includes('server-action') ||
-    error.digest?.includes('NEXT_NOT_FOUND') === false &&
-    error.message?.includes('This request might be from an older')
+    message.includes('Failed to find Server Action') ||
+    message.includes('server-action') ||
+    (!digest.includes('NEXT_NOT_FOUND') && message.includes('This request might be from an older'))
   );
 }
 
@@ -35,11 +36,11 @@ export default function GlobalError({
     Sentry.captureException(error);
 
     // Log error to console for debugging
-    console.error('=== GLOBAL ERROR CAUGHT ===');
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
-    console.error('Error digest:', error.digest);
-    console.error('========================');
+    // Error caught
+    // Error logged
+    // Stack logged
+    // Digest logged
+    // Separator
 
     // Send to Sentry if configured
     if (typeof window !== 'undefined' && window.Sentry) {

@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Dynamic imports for heavy components
  * Use these to lazy-load components that aren't needed on initial render

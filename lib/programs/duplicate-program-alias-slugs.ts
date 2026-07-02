@@ -29,7 +29,6 @@ export const DUPLICATE_PROGRAM_ALIAS_SLUGS = [
   'nail-tech',                  // alias of nail-technician-apprenticeship
 
   // Business, technology, and human services - TRUE aliases only
-  'tax-prep',                   // archived
   'it-support-specialist',      // alias of it-help-desk
   'bookkeeping-fundamentals',   // alias of bookkeeping
   'entrepreneurship-small-business', // alias of entrepreneurship

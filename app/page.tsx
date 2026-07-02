@@ -8,16 +8,47 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // Below-the-fold sections: lazy load to improve initial page render
-const HomeTrustBar = dynamic(() => import('@/components/home/HomeTrustBar'), { ssr: true });
-const HomeHowItWorks = dynamic(() => import('@/components/home/HomeHowItWorks'), { ssr: true });
-const HomeCareerPathways = dynamic(() => import('@/components/home/HomeCareerPathways'), { ssr: true });
-const HomeApprenticeshipInfra = dynamic(() => import('@/components/home/HomeApprenticeshipInfra'), { ssr: true });
-const HomeFunding = dynamic(() => import('@/components/home/HomeFunding'), { ssr: true });
-const HomeOutcomes = dynamic(() => import('@/components/home/HomeOutcomes'), { ssr: true });
-const HomePlatformPreview = dynamic(() => import('@/components/home/HomePlatformPreview'), { ssr: true });
-const HomeEmployerStrip = dynamic(() => import('@/components/home/HomeEmployerStrip'), { ssr: true });
-const HomeSegmentedCTA = dynamic(() => import('@/components/home/HomeSegmentedCTA'), { ssr: true });
-const HomeFinalCTA = dynamic(() => import('@/components/home/HomeFinalCTA'), { ssr: true });
+// FIX: All components below use named exports, so we must use .then() to extract them
+const HomeTrustBar = dynamic(
+  () => import('@/components/home/HomeTrustBar').then((m) => m.HomeTrustBar),
+  { ssr: true }
+);
+const HomeHowItWorks = dynamic(
+  () => import('@/components/home/HomeHowItWorks').then((m) => m.HomeHowItWorks),
+  { ssr: true }
+);
+const HomeCareerPathways = dynamic(
+  () => import('@/components/home/HomeCareerPathways').then((m) => m.HomeCareerPathways),
+  { ssr: true }
+);
+const HomeApprenticeshipInfra = dynamic(
+  () => import('@/components/home/HomeApprenticeshipInfra').then((m) => m.HomeApprenticeshipInfra),
+  { ssr: true }
+);
+const HomeFunding = dynamic(
+  () => import('@/components/home/HomeFunding').then((m) => m.HomeFunding),
+  { ssr: true }
+);
+const HomeOutcomes = dynamic(
+  () => import('@/components/home/HomeOutcomes').then((m) => m.HomeOutcomes),
+  { ssr: true }
+);
+const HomePlatformPreview = dynamic(
+  () => import('@/components/home/HomePlatformPreview').then((m) => m.HomePlatformPreview),
+  { ssr: true }
+);
+const HomeEmployerStrip = dynamic(
+  () => import('@/components/home/HomeEmployerStrip').then((m) => m.HomeEmployerStrip),
+  { ssr: true }
+);
+const HomeSegmentedCTA = dynamic(
+  () => import('@/components/home/HomeSegmentedCTA').then((m) => m.HomeSegmentedCTA),
+  { ssr: true }
+);
+const HomeFinalCTA = dynamic(
+  () => import('@/components/home/HomeFinalCTA').then((m) => m.HomeFinalCTA),
+  { ssr: true }
+);
 
 // Revalidate every 5 minutes — allows live enrollment stats to refresh
 // without a full rebuild.

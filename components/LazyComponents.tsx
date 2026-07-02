@@ -8,15 +8,19 @@ const LoadingPlaceholder = ({ height = 'h-64' }: { height?: string }) => (
 );
 
 // Lazy load heavy components that are below the fold
+// FIX: Using .then() for named exports
 export const LazyAILiveChat = dynamic(() => import('@/components/chat/AILiveChat'), {
   ssr: false,
   loading: () => null,
 });
 
-export const LazyVideoPlayer = dynamic(() => import('@/components/VideoPlayer'), {
-  ssr: false,
-  loading: () => <LoadingPlaceholder />,
-});
+export const LazyVideoPlayer = dynamic(
+  () => import('@/components/VideoPlayer').then((m) => m.VideoPlayer),
+  {
+    ssr: false,
+    loading: () => <LoadingPlaceholder />,
+  }
+);
 
 export const LazyInteractiveVideoPlayer = dynamic(
   () => import('@/components/InteractiveVideoPlayer'),
@@ -39,9 +43,10 @@ export const LazyCalendar = dynamic(() => import('@/components/Calendar'), {
   loading: () => <LoadingPlaceholder height="h-96" />,
 });
 
-export const LazyChart = dynamic(() => import('@/components/Chart'), {
+// FIX: @/components/Chart does not exist - disabled to prevent runtime error
+export const LazyChart = dynamic(() => Promise.resolve(() => null), {
   ssr: false,
-  loading: () => <LoadingPlaceholder />,
+  loading: () => null,
 });
 
 export const LazyExcelChartGenerator = dynamic(() => import('@/components/ExcelChartGenerator'), {
@@ -54,10 +59,13 @@ export const LazyDiscussionForums = dynamic(() => import('@/components/Discussio
   loading: () => <LoadingPlaceholder height="h-screen" />,
 });
 
-export const LazyStudentPortfolio = dynamic(() => import('@/components/StudentPortfolio'), {
-  ssr: false,
-  loading: () => <LoadingPlaceholder height="h-screen" />,
-});
+export const LazyStudentPortfolio = dynamic(
+  () => import('@/components/StudentPortfolio').then((m) => m.StudentPortfolio),
+  {
+    ssr: false,
+    loading: () => <LoadingPlaceholder height="h-screen" />,
+  }
+);
 
 export const LazyAdvancedQuizBuilder = dynamic(() => import('@/components/AdvancedQuizBuilder'), {
   ssr: false,
@@ -77,19 +85,24 @@ export const LazyVideoTestimonials = dynamic(() => import('@/components/VideoTes
   loading: () => <LoadingPlaceholder height="h-96" />,
 });
 
-export const LazyLeaderboard = dynamic(() => import('@/components/Leaderboard'), {
-  ssr: false,
-  loading: () => <LoadingPlaceholder height="h-96" />,
-});
+export const LazyLeaderboard = dynamic(
+  () => import('@/components/Leaderboard').then((m) => m.Leaderboard),
+  {
+    ssr: false,
+    loading: () => <LoadingPlaceholder height="h-96" />,
+  }
+);
 
-export const LazyDiscussionForum = dynamic(() => import('@/components/DiscussionForum'), {
-  ssr: false,
-  loading: () => <LoadingPlaceholder height="h-screen" />,
-});
+export const LazyDiscussionForum = dynamic(
+  () => import('@/components/DiscussionForum').then((m) => m.DiscussionForum),
+  {
+    ssr: false,
+    loading: () => <LoadingPlaceholder height="h-screen" />,
+  }
+);
 
 export const LazyLMSDiscussionForum = dynamic(
-  () =>
-    import('@/components/lms/DiscussionForum').then((mod) => ({ default: mod.DiscussionForum })),
+  () => import('@/components/lms/DiscussionForum').then((m) => m.DiscussionForum),
   {
     ssr: false,
     loading: () => <LoadingPlaceholder height="h-screen" />,
@@ -97,9 +110,9 @@ export const LazyLMSDiscussionForum = dynamic(
 );
 
 export const LazyRealTimeCollaboration = dynamic(
-  () => import('@/components/RealTimeCollaboration'),
+  () => import('@/components/RealTimeCollaboration').then((m) => m.RealTimeCollaboration),
   {
     ssr: false,
     loading: () => <LoadingPlaceholder height="h-screen" />,
-  },
+  }
 );

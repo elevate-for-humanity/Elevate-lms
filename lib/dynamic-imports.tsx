@@ -22,40 +22,51 @@ export const DynamicPieChart = dynamic(() => import('recharts').then((mod) => mo
 });
 
 // Video player - heavy component
-export const DynamicVideoPlayer = dynamic(() => import('@/components/VideoPlayer'), {
-  ssr: false,
-  loading: () => <div className="aspect-video bg-slate-900 animate-pulse rounded-lg" />,
-});
+// FIX: VideoPlayer uses named export
+export const DynamicVideoPlayer = dynamic(
+  () => import('@/components/VideoPlayer').then((m) => m.VideoPlayer),
+  {
+    ssr: false,
+    loading: () => <div className="aspect-video bg-slate-900 animate-pulse rounded-lg" />,
+  }
+);
 
 // Rich text editor - very heavy
-export const DynamicRichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
-  ssr: false,
-  loading: () => <div className="h-48 bg-slate-100 animate-pulse rounded-lg" />,
-});
+// NOTE: components/RichTextEditor.tsx does not exist
+export const DynamicRichTextEditor = dynamic(
+  () => Promise.resolve(() => null),
+  { ssr: false, loading: () => null }
+);
 
 // PDF viewer
-export const DynamicPDFViewer = dynamic(() => import('@/components/PDFViewer'), {
-  ssr: false,
-  loading: () => <div className="h-96 bg-slate-100 animate-pulse rounded-lg" />,
-});
+// NOTE: components/PDFViewer.tsx does not exist
+export const DynamicPDFViewer = dynamic(
+  () => Promise.resolve(() => null),
+  { ssr: false, loading: () => null }
+);
 
-// Calendar component
+// Calendar component - default export
 export const DynamicCalendar = dynamic(() => import('@/components/Calendar'), {
   ssr: false,
   loading: () => <div className="h-80 bg-slate-100 animate-pulse rounded-lg" />,
 });
 
 // AI Chat component
-export const DynamicAIChat = dynamic(() => import('@/components/AIInstructorPanel'), {
-  ssr: false,
-  loading: () => <div className="h-96 bg-slate-100 animate-pulse rounded-lg" />,
-});
+// FIX: AIInstructorPanel uses named export
+export const DynamicAIChat = dynamic(
+  () => import('@/components/AIInstructorPanel').then((m) => m.AIInstructorPanel),
+  {
+    ssr: false,
+    loading: () => <div className="h-96 bg-slate-100 animate-pulse rounded-lg" />,
+  }
+);
 
-// Confetti - only for success pages
+// Confetti - only for success pages - default export
 export const DynamicConfetti = dynamic(() => import('@/components/Confetti'), { ssr: false });
 
 // Map component
-export const DynamicMap = dynamic(() => import('@/components/Map'), {
-  ssr: false,
-  loading: () => <div className="h-64 bg-slate-100 animate-pulse rounded-lg" />,
-});
+// NOTE: components/Map.tsx does not exist
+export const DynamicMap = dynamic(
+  () => Promise.resolve(() => null),
+  { ssr: false, loading: () => null }
+);

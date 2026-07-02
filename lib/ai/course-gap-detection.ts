@@ -5,11 +5,11 @@
  * missing content that should be generated.
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { requireAdminClient } from '@/lib/supabase/admin';
 // Lazy initialization to prevent build-time execution
-let _supabase: ReturnType<typeof createClient> | null = null;
-export function getGapSupabase() {
+let _supabase: SupabaseClient | null = null;
+export function getGapSupabase(): SupabaseClient {
   if (!_supabase) {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       throw new Error('Missing Supabase environment variables');
@@ -21,6 +21,54 @@ export function getGapSupabase() {
     );
   }
   return _supabase;
+}
+
+// Database row types
+interface ProgramRow {
+  id: string;
+  title: string;
+  slug: string;
+  occupation: string | null;
+  soc_code: string | null;
+  credential_type: string | null;
+  category: string | null;
+  apprenticeship_hours_required: number | null;
+  program_type: string | null;
+  is_active: boolean;
+}
+
+interface CourseRow {
+  id: string;
+  title: string;
+  program_id: string | null;
+  status: string;
+  has_final_exam: boolean;
+  has_practical_assessment: boolean;
+  updated_at: string;
+}
+
+interface ModuleRow {
+  id: string;
+  title: string;
+  course_id: string;
+  is_draft: boolean;
+}
+
+interface LessonRow {
+  id: string;
+  title: string;
+  module_id: string;
+  has_quiz: boolean;
+}
+
+interface QuizRow {
+  id: string;
+  lesson_id: string;
+}
+
+interface CourseContentRow {
+  id: string;
+  program_id: string;
 }
 
 export interface CourseGap {
@@ -74,19 +122,19 @@ async function scanProgramsWithoutCourses(): Promise<CourseGap[]> {
     .select('id, title, program_id, status')
     .eq('status', 'published');
 
-  const courseProgramIds = new Set(courses?.map((c: any) => c.program_id) || []);
-  const programCourseMap = new Map(courses?.map((c: any) => [c.program_id, c]) || []);
+  const courseProgramIds = new Set((courses as ProgramRow[] | null)?.map((c) => c.program_id).filter(Boolean) || []);
+  const programCourseMap = new Map((courses as CourseRow[] | null)?.map((c) => [c.program_id, c]).filter(([k]) => k) || []) as Map<string, CourseRow>;
 
-  for (const program of programs || []) {
+  for (const program of (programs as ProgramRow[] | null) || []) {
     if (!courseProgramIds.has(program.id)) {
       gaps.push({
         gap_type: 'no_course',
         severity: 'critical',
         program_id: program.id,
         program_name: program.title,
-        occupation: program.occupation,
-        soc_code: program.soc_code,
-        credential_type: program.credential_type,
+        occupation: program.occupation ?? undefined,
+        soc_code: program.soc_code ?? undefined,
+        credential_type: program.credential_type ?? undefined,
         description: `Program "${program.title}" has no published course attached`,
         recommendation: 'Generate a new course based on program requirements',
         suggested_action: 'generate_course',
@@ -124,7 +172,7 @@ async function scanCoursesWithoutModules(): Promise<CourseGap[]> {
     .select('id, title, program_id, status')
     .eq('status', 'published');
 
-  for (const course of courses || []) {
+  for (const course of (courses as CourseRow[] | null) || []) {
     const { data: modules } = await getGapSupabase()
       .from('course_modules')
       .select('id, title')
@@ -158,7 +206,7 @@ async function scanModulesWithoutLessons(): Promise<CourseGap[]> {
     .select('id, title, course_id')
     .eq('is_draft', false);
 
-  for (const mod of modules || []) {
+  for (const mod of (modules as ModuleRow[] | null) || []) {
     const { data: lessons } = await getGapSupabase()
       .from('course_lessons')
       .select('id')
@@ -192,7 +240,7 @@ async function scanLessonsWithoutQuizzes(): Promise<CourseGap[]> {
     .select('id, title, module_id')
     .eq('has_quiz', false);
 
-  for (const lesson of lessons || []) {
+  for (const lesson of (lessons as LessonRow[] | null) || []) {
     const { data: quizzes } = await getGapSupabase()
       .from('course_quizzes')
       .select('id')
@@ -225,7 +273,7 @@ async function scanCoursesWithoutAssessments(): Promise<CourseGap[]> {
     .select('id, title, has_final_exam, has_practical_assessment')
     .eq('status', 'published');
 
-  for (const course of courses || []) {
+  for (const course of (courses as CourseRow[] | null) || []) {
     if (!course.has_final_exam || !course.has_practical_assessment) {
       gaps.push({
         gap_type: 'no_assessment',
@@ -255,7 +303,7 @@ async function scanApprenticeshipContentGaps(): Promise<CourseGap[]> {
     .eq('is_active', true)
     .eq('program_type', 'apprenticeship');
 
-  for (const program of programs || []) {
+  for (const program of (programs as ProgramRow[] | null) || []) {
     // Check if related instruction content exists
     const { data: content } = await getGapSupabase()
       .from('course_content')
@@ -290,7 +338,7 @@ async function scanMissingExternalData(): Promise<CourseGap[]> {
     .select('id, title, occupation, soc_code')
     .eq('is_active', true);
 
-  for (const program of programs || []) {
+  for (const program of (programs as ProgramRow[] | null) || []) {
     if (!program.soc_code || !program.occupation) {
       gaps.push({
         gap_type: 'no_onet_data',
@@ -323,7 +371,7 @@ async function scanInactiveDrafts(): Promise<CourseGap[]> {
     .eq('status', 'draft')
     .lt('updated_at', thirtyDaysAgo.toISOString());
 
-  for (const draft of drafts || []) {
+  for (const draft of (drafts as CourseRow[] | null) || []) {
     gaps.push({
       gap_type: 'inactive_draft',
       severity: 'low',

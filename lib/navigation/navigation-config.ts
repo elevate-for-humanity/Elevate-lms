@@ -425,7 +425,6 @@ export function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
 
 // Role display names
 export const ROLE_DISPLAY_NAMES: Record<UserRole, string> = {
-  admin: 'Admin',
   admin: 'Super Admin',
   student: 'Student',
   apprentice: 'Apprentice',
@@ -463,5 +462,4 @@ export const ROLE_DEFAULT_ACTIONS: Record<UserRole, ActionItem[]> = {
   sponsor: [],
   host_shop: [],
   workforce: [],
-  admin: [],
 };

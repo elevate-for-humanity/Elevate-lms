@@ -31,7 +31,7 @@
 // ─── Main API ─────────────────────────────────────────────────────────────────
 
 export { courseFactory, createCourse, factoryFromSlug } from './factory';
-export type { FactoryInput, FactoryOutput, FactoryStage, ProgressCallback } from './factory';
+export type { FactoryInput, FactoryOutput, FactoryStage, ProgressCallback } from './types';
 
 // ─── Blueprint API ─────────────────────────────────────────────────────────────
 

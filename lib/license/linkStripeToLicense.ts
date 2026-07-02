@@ -187,9 +187,10 @@ export async function handleInvoicePaid(
 ): Promise<LinkResult> {
   const customerId = invoice.customer as string;
   // Stripe SDK v19+ returns subscription as object or string
-  const subscriptionId = typeof invoice.subscription === 'object'
-    ? (invoice.subscription as { id?: string })?.id
-    : invoice.subscription;
+  const invoiceAny = invoice as unknown as { subscription?: { id?: string } | string };
+  const subscriptionId = typeof invoiceAny.subscription === 'object'
+    ? invoiceAny.subscription?.id
+    : invoiceAny.subscription;
 
   if (!subscriptionId) {
     return { success: false, error: 'No subscription on invoice' };
@@ -228,7 +229,10 @@ export async function handleSubscriptionUpdated(
 
   const customerId = subscription.customer as string;
   const subscriptionId = subscription.id;
-  const currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+  // Stripe SDK v19+ may return period_end as number or may be missing
+  const subAny = subscription as unknown as { current_period_end?: number };
+  const periodEnd = subAny.current_period_end ?? Date.now() / 1000;
+  const currentPeriodEnd = new Date(periodEnd * 1000).toISOString();
 
   const supabase = await requireAdminClient();
   await setAuditContext(supabase, {
@@ -323,9 +327,10 @@ export async function handlePaymentFailed(
   invoice: Stripe.Invoice,
 ): Promise<LinkResult> {
   // Stripe SDK v19+ returns subscription as object or string
-  const subscriptionId = typeof invoice.subscription === 'object'
-    ? (invoice.subscription as { id?: string })?.id
-    : invoice.subscription;
+  const invoiceAny = invoice as unknown as { subscription?: { id?: string } | string };
+  const subscriptionId = typeof invoiceAny.subscription === 'object'
+    ? invoiceAny.subscription?.id
+    : invoiceAny.subscription;
   if (!subscriptionId) {
     return { success: false, error: 'No subscription on invoice' };
   }

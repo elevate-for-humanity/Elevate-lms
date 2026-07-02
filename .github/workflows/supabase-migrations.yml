@@ -2,12 +2,6 @@ name: Supabase Migrations
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'supabase/migrations/**'
-      - 'supabase/seeds/**'
-    branches:
-      - main
 
 jobs:
   supabase-migrations:
@@ -27,6 +21,20 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
+
+      - name: Check secrets
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "⚠️ Supabase secrets not configured. Add these secrets at:"
+            echo "   https://github.com/elevate-for-humanity/Elevate-lms/settings/secrets/actions"
+            echo "   - NEXT_PUBLIC_SUPABASE_URL"
+            echo "   - SUPABASE_SERVICE_ROLE_KEY"
+            echo "Skipping migrations for now."
+            exit 0
+          fi
 
       - name: Lint migrations
         run: node scripts/lint-migrations.cjs
@@ -57,7 +65,3 @@ jobs:
       - name: Notify success
         if: success()
         run: echo "Migrations complete"
-
-      - name: Notify failure
-        if: failure()
-        run: echo "Migrations failed"

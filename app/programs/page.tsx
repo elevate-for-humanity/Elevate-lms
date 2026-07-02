@@ -98,15 +98,13 @@ const CATEGORY_META: Record<string,{label:string;color:string;order:number}> = {
 };
 
 const SUPPRESSED = new Set([
-  'cna-training','hvac','hvac-technician-program','hvac-2024','medical-assistant-program',
-  'phlebotomy-technician','phlebotomy-technician-program','barber','barber-program',
-  'cosmetology','nail-technician','cpr-cert','health-safety','forklift-operator','tax-prep',
-  'it-support','it-support-specialist','cybersecurity','bookkeeping-fundamentals',
-  'entrepreneurship-small-business','peer-recovery-specialist-jri',
-  'ai-advanced-project-management-1774494313718','ai-forklift-safety-certification-1774495387731',
-  'jri-badge-1-mindsets','jri-badge-2-self-management','jri-badge-3-learning-strategies',
-  'jri-badge-4-social-skills','jri-badge-5-workplace-skills','jri-badge-6-launch-a-career',
-  'jri-introduction','jri','micro-programs','emergency-health-safety','nha-medical-assistant',
+  // Only suppress truly duplicate or obsolete program slugs
+  'hvac-2024', // duplicate of hvac
+  'phlebotomy-technician-program', // duplicate of phlebotomy-technician
+  'barber-program', // duplicate of barber
+  'micro-programs', // obsolete umbrella
+  'jri-introduction', // intro to JRI badge system
+  'jri', // parent umbrella for badge system
 ]);
 
 type Prog = {slug:string;title:string;description:string|null;category:string;duration:string|null;credential:string|null;funding_eligible:boolean};

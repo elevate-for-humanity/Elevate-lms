@@ -33,15 +33,16 @@ export const DynamicVideoPlayer = dynamic(
 
 // Rich text editor - very heavy
 // NOTE: components/RichTextEditor.tsx does not exist
+const NullComponent = () => null;
 export const DynamicRichTextEditor = dynamic(
-  () => Promise.resolve(() => null),
+  () => Promise.resolve(NullComponent),
   { ssr: false, loading: () => null }
 );
 
 // PDF viewer
 // NOTE: components/PDFViewer.tsx does not exist
 export const DynamicPDFViewer = dynamic(
-  () => Promise.resolve(() => null),
+  () => Promise.resolve(NullComponent),
   { ssr: false, loading: () => null }
 );
 
@@ -67,6 +68,6 @@ export const DynamicConfetti = dynamic(() => import('@/components/Confetti'), { 
 // Map component
 // NOTE: components/Map.tsx does not exist
 export const DynamicMap = dynamic(
-  () => Promise.resolve(() => null),
+  () => Promise.resolve(NullComponent),
   { ssr: false, loading: () => null }
 );

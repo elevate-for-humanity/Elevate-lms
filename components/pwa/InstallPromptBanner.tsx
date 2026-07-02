@@ -24,3 +24,6 @@ export function InstallPromptBanner() {
     />
   );
 }
+
+// Default export for next/dynamic
+export default InstallPromptBanner;

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
+import dynamic from 'next/dynamic';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import PublicLayout from '@/components/layout/PublicLayout';
@@ -18,13 +19,12 @@ import SupabaseConfigBootstrap from '@/components/supabase/SupabaseConfigBootstr
 // Individual pages can override with their own `export const revalidate = N`.
 export const dynamic = 'force-dynamic';
 
-// TEMPORARILY DISABLED FOR DEBUGGING - Remove all dynamic imports to isolate error
-// Will restore ONE AT A TIME to find digest 544459545
-const GoogleAnalytics = null as any;
-const GoogleAds = null as any;
-const DMCATrackingPixel = null as any;
-const CopyrightProtection = null as any;
-const InstallPromptBanner = null as any;
+// Lazy load analytics and tracking components (client-only - no SSR)
+const GoogleAnalytics = dynamic(() => import('@/components/analytics/google-analytics'), { ssr: false });
+const GoogleAds = dynamic(() => import('@/components/analytics/google-ads'), { ssr: false });
+const DMCATrackingPixel = dynamic(() => import('@/components/InvisibleWatermark'), { ssr: false });
+const CopyrightProtection = dynamic(() => import('@/components/CopyrightProtection'), { ssr: false });
+const InstallPromptBanner = dynamic(() => import('@/components/pwa/InstallPromptBanner'), { ssr: false });
 
 const inter = { variable: '' };
 

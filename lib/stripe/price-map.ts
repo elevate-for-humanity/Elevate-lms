@@ -39,9 +39,6 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   'barber-license': PRICES.BARBER,
   'cosmetology-license': PRICES.COSMETOLOGY,
   
-  'tax-prep-financial-services': 'price_1TM739H4a2yrVOt5aGFKqYPH', // $0 WIOA
-  'tax-prep-financial-services-full': 'price_1TM739H4a2yrVOt5rAT6QPPF', // $4,950 self-pay
-
   // Technology Courses
   'it-support-specialist': PRICES.IT_SUPPORT,
   'cybersecurity-fundamentals': PRICES.CYBERSECURITY,
@@ -246,11 +243,6 @@ export const PAYMENT_LINKS = {
   // ============================================================================
   // WIOA PROGRAMS ($0 Free Enrollment)
   // ============================================================================
-
-  // Tax Preparation & Financial Services - FREE (WIOA)
-  taxPrep: {
-    free: 'https://buy.stripe.com/28EdRa7xwcPJdpsd0z8EN0N',
-  },
 
   // HVAC Technician - FREE (WIOA)
   hvac: {

@@ -87,47 +87,7 @@ export function setContentGroup(group: ContentGroup) {
 
 // ============================================
 // TAX PREPARATION FUNNEL (REQUIRED)
-// ============================================
-
-export const TaxFunnelEvents = {
-  // Tax funnel entry
-  startTaxPrep: (source?: string) => {
-    trackEvent({
-      action: 'start_tax_prep',
-      category: 'tax_funnel',
-      label: source || 'direct',
-      contentGroup: 'tax',
-    });
-  },
-
-  // Tax funnel completion
-  completeTaxPrep: (filingType?: string) => {
-    trackEvent({
-      action: 'complete_tax_prep',
-      category: 'tax_funnel',
-      label: filingType || 'standard',
-      contentGroup: 'tax',
-    });
-  },
-
-  // Refund advance viewed
-  refundAdvanceViewed: () => {
-    trackEvent({
-      action: 'refund_advance_viewed',
-      category: 'tax_funnel',
-      contentGroup: 'tax',
-    });
-  },
-
-  // Refund advance opt-in (risk monitoring)
-  refundAdvanceOptIn: () => {
-    trackEvent({
-      action: 'refund_advance_opt_in',
-      category: 'tax_funnel',
-      contentGroup: 'tax',
-    });
-  },
-};
+// Tax funnel events removed - program archived
 
 // ============================================
 // STORE / CHECKOUT FUNNEL (REQUIRED)

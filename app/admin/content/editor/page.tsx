@@ -21,7 +21,7 @@ export default function AdminContentEditorPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      console.log('Saving content:', { title, content });
+      console.debug('Saving content:', { title, content });
       setLastSaved(new Date());
     } catch (error) {
       console.error('Save failed:', error);

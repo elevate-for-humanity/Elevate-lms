@@ -115,13 +115,13 @@ function normalizeCategory(category?: string | null, sector?: string | null, pro
   const raw = (category ?? '').trim().toLowerCase();
   const normalizedSector = (sector ?? '').trim().toLowerCase();
 
-  if (raw.includes('health') || normalizedSector === 'healthcare') return 'healthcare';
-  if (raw.includes('trade') || normalizedSector === 'skilled-trades') return 'trades';
-  if (raw.includes('beauty') || raw.includes('cosmetology') || normalizedSector === 'personal-services') return 'beauty';
-  if (raw.includes('tech') || normalizedSector === 'technology') return 'technology';
-  if (raw.includes('business') || normalizedSector === 'business') return 'business';
-  if (raw.includes('hospitality')) return 'hospitality';
-  if (raw.includes('social')) return 'social services';
+  if (raw.includes('health') || raw.includes('medical') || raw.includes('care') || normalizedSector === 'healthcare') return 'healthcare';
+  if (raw.includes('trade') || raw.includes('welding') || raw.includes('electrical') || raw.includes('plumbing') || raw.includes('hvac') || raw.includes('construction') || raw.includes('cdl') || raw.includes('diesel') || raw.includes('fabrication') || normalizedSector === 'skilled-trades') return 'trades';
+  if (raw.includes('beauty') || raw.includes('cosmetology') || raw.includes('esthetic') || raw.includes('nail') || raw.includes('barber') || normalizedSector === 'personal-services') return 'beauty';
+  if (raw.includes('tech') || raw.includes('it ') || raw.includes('software') || raw.includes('cyber') || raw.includes('network') || raw.includes('web') || raw.includes('design') || raw.includes('data') || normalizedSector === 'technology') return 'technology';
+  if (raw.includes('business') || raw.includes('accounting') || raw.includes('project') || raw.includes('entrepreneur') || normalizedSector === 'business') return 'business';
+  if (raw.includes('hospitality') || raw.includes('culinary') || raw.includes('food') || raw.includes('tourism')) return 'hospitality';
+  if (raw.includes('social') || raw.includes('community') || raw.includes('peer') || raw.includes('support')) return 'social services';
   if (programType === 'apprenticeship') return 'apprenticeship';
   return raw || 'other';
 }

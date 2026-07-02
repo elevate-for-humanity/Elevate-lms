@@ -190,11 +190,13 @@ function ProgramPage({
   banner?: import('@/content/heroBanners').HeroBannerConfig | null;
   imageUrl?: string | null;
 }) {
-  const heroPosterSrc = resolveHeroPosterSrc(slug, {
-    banner,
-    dbImageUrl: imageUrl,
-    heroImage: getProgramOgImage(slug),
-  });
+  // Ensure imageUrl always resolves to a valid URL
+    const safeImageUrl = imageUrl || getProgramOgImage(slug) || '';
+    const heroPosterSrc = resolveHeroPosterSrc(slug, {
+      banner,
+      dbImageUrl: safeImageUrl,
+      heroImage: getProgramOgImage(slug),
+    });
   const learnItems = sections?.find(
     (s) => s.heading.toLowerCase().includes('learn') || s.heading.toLowerCase().includes('module'),
   );
@@ -601,7 +603,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
             durationWeeks={p.duration_weeks}
             slug={p.slug}
             banner={heroBanners[p.slug] ?? heroBanners[p.slug.replace(/-apprenticeship$/, '')] ?? null}
-            imageUrl={p.image_url}
+            imageUrl={p.image_url || getProgramOgImage(p.slug) || null}
             sections={
               p.description && p.description !== p.short_description
                 ? [{ heading: 'About This Program', body: p.description }]

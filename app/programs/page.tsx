@@ -37,7 +37,7 @@ const PROGRAM_IMAGES: Record<string, string> = {
   'dsp-training':'/images/pages/healthcare-classroom.webp',
   'peer-recovery-specialist':'/images/pages/peer-recovery.webp',
   'peer-support':'/images/pages/peer-recovery.webp',
-  'drug-alcohol-specimen-collector':'/images/healthcare/healthcare-professional-portrait-1.jpg',
+  'drug-alcohol-specimen-collector':'/images/healthcare/hero-program-phlebotomy.webp',
   'sanitation-infection-control':'/images/pages/healthcare-hero.webp',
   'hvac-technician':'/images/pages/hvac-technician.webp',
   electrical:'/images/pages/electrical.webp',

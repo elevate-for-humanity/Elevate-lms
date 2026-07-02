@@ -30,7 +30,7 @@ export default function DrugAlcoholSpecimenCollectorPage() {
   return (
     <main className="min-h-screen bg-white">
       <CleanPageHero
-        src="/images/healthcare/healthcare-professional-portrait-1.jpg"
+        src="/images/healthcare/hero-program-phlebotomy.webp"
         alt="Healthcare professional in specimen collection lab"
         title="Drug & Alcohol Specimen Collector"
         subtitle="DOT-certified training. High demand across transportation, healthcare, and corporate sectors."

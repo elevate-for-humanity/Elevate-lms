@@ -131,6 +131,9 @@ jobs:
             echo "Playwright not available - skipping E2E tests"
           fi
 
+      - name: Clear Next.js cache
+        run: rm -rf .next
+
       - name: Build
         env:
           # 6 GB heap - ubuntu-latest has 7 GB RAM; the LMS build peaks ~3 GB

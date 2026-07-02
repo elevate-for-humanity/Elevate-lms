@@ -142,7 +142,7 @@ async function _POST(req: NextRequest) {
   }
 
   if (!aiAvailable) {
-    const fallback = `The ${program.title ?? program.name} program is available at ${PLATFORM_DEFAULTS.orgName}. Apply at ${PLATFORM_DEFAULTS.canonicalDomain}${program.applyUrl} or contact us for details.`;
+    const fallback = `The ${program.name} program is available at ${PLATFORM_DEFAULTS.orgName}. Apply at ${PLATFORM_DEFAULTS.canonicalDomain}${program.applyUrl} or contact us for details.`;
     await logRequest(fallback.length, 'no_ai_provider');
     return NextResponse.json({ message: fallback, fallback: true }, { headers });
   }
@@ -162,7 +162,7 @@ async function _POST(req: NextRequest) {
 
     const answer =
       result.content ||
-      `I can help with ${program.title ?? program.name} questions. Please try rephrasing.`;
+      `I can help with ${program.name} questions. Please try rephrasing.`;
 
     await logRequest(answer.length, null);
     return NextResponse.json({ message: answer }, { headers });

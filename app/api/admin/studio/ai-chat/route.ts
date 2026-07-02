@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
         for await (const event of aiChatWithTools({
           model: 'gpt-4.1-mini',
           messages: [{ role: 'system', content: systemPrompt }, ...safeMessages],
-          tools: STUDIO_TOOLS as Parameters<typeof aiChatWithTools>[0]['tools'],
+          tools: [...STUDIO_TOOLS] as Parameters<typeof aiChatWithTools>[0]['tools'],
           temperature: 0.7,
           maxTokens: 1200,
         })) {

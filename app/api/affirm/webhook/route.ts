@@ -252,8 +252,8 @@ async function handleChargeCaptured(
         await logAuditEvent({
           action: 'ENROLLMENT_ACTIVATED_FROM_PAYMENT',
           userId: 'system:affirm_webhook',
-          target_type: 'barber_subscription',
-          target_id: existingSub.id,
+          resourceType: 'barber_subscription',
+          resourceId: existingSub.id,
           metadata: {
             payment_provider: 'affirm',
             payment_reference: chargeId,
@@ -307,8 +307,8 @@ async function handleChargeCaptured(
           await logAuditEvent({
             action: 'ENROLLMENT_CREATED_FROM_PAYMENT',
             userId: 'system:affirm_webhook',
-            target_type: 'barber_subscription',
-            target_id: newSub?.id,
+            resourceType: 'barber_subscription',
+            resourceId: newSub?.id,
             metadata: {
               payment_provider: 'affirm',
               payment_reference: chargeId,
@@ -441,8 +441,8 @@ async function deactivateEnrollmentForCharge(
       await logAuditEvent({
         action: `ENROLLMENT_DEACTIVATED_${reason.toUpperCase()}`,
         userId: 'system:affirm_webhook',
-        target_type: 'barber_subscription',
-        target_id: barberSub.id,
+        resourceType: 'barber_subscription',
+        resourceId: barberSub.id,
         metadata: {
           payment_provider: 'affirm',
           payment_reference: chargeId,
@@ -483,8 +483,8 @@ async function deactivateEnrollmentForCharge(
       await logAuditEvent({
         action: `ENROLLMENT_DEACTIVATED_${reason.toUpperCase()}`,
         userId: 'system:affirm_webhook',
-        target_type: 'program_enrollment',
-        target_id: enrollment.id,
+        resourceType: 'program_enrollment',
+        resourceId: enrollment.id,
         metadata: {
           payment_provider: 'affirm',
           payment_reference: chargeId,

@@ -10,7 +10,7 @@ interface Course {
   id: string;
   title: string;
   status: string;
-  modules_count: number;
+  modules_count?: number;
 }
 
 export default function StudioPage() {

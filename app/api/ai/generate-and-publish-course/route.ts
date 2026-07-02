@@ -84,11 +84,12 @@ export async function POST(request: NextRequest) {
   const genResult = await generateCourseOutlineFn(buildPrompt(body));
 
   if (!genResult.ok) {
+    const failure = genResult as { ok: false; attempts: number; errors_per_attempt: string[][] };
     return NextResponse.json(
       {
         ok: false,
-        error: `Generation failed after ${genResult.attempts} attempts`,
-        errors_per_attempt: genResult.errors_per_attempt,
+        error: `Generation failed after ${failure.attempts} attempts`,
+        errors_per_attempt: failure.errors_per_attempt,
       },
       { status: 422 },
     );

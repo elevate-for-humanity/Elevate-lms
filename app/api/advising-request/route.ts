@@ -42,7 +42,8 @@ async function _POST(request: Request) {
           created_at: new Date().toISOString(),
         })
         .select()
-        .maybeSingle(),
+        .maybeSingle()
+        .then(result => ({ data: result.data, error: result.error })),
       'Failed to save advising request',
     );
 

@@ -46,16 +46,6 @@ const COURSE_SCRIPTS: Record<string, string> = {
     Our program is eight weeks. You'll get real behind-the-wheel time and walk out with your commercial driver's license.
     Funding may be available. Apply today — your road to a great career starts right here!
   `,
-  'tax-preparation': `
-    What if you could earn thousands of dollars in just four months — and do it from home?
-    That's exactly what tax preparers do. Every single person and business in America has to file taxes. Every year. Without fail.
-    In this ten-week program, you'll learn to prepare federal and state returns, understand tax law, and use professional software.
-    Our graduates earn three to eight thousand dollars in a single tax season — working part time.
-    Want to work for a firm? You can. Want to run your own business from your kitchen table? You can do that too.
-    This is one of the most flexible, profitable skills you can learn.
-    Funding may be available. Let's get you started on your tax career today!
-  `,
-  'medical-assistant': `
     Welcome to Medical Assistant training! This is one of the most in-demand healthcare jobs in the country — and for good reason.
     Medical assistants do it all. Taking patient histories. Drawing blood. Giving injections. Handling scheduling. Supporting doctors.
     You are the person that keeps a clinic running smoothly every single day.

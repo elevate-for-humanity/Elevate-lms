@@ -78,13 +78,6 @@ const PROGRAM_HERO_MEDIA: Record<
     microLabel: 'CDL Class A',
     script: `CDL drivers are needed everywhere — and Indiana employers are hiring now. The Elevate CDL Class A program runs 4 weeks and prepares you for your commercial driver license skills test. Starting wages range from $22 to $38 per hour. Most students qualify for full funding through WIOA. Apply today.`,
   },
-  'tax-prep': {
-    video: '/videos/tax-career-paths.mp4',
-    audio: '/audio/heroes/tax.mp3',
-    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp',
-    microLabel: 'Tax Preparation',
-    script: `Tax preparation is a year-round career. The Elevate Tax Preparation program runs 8 weeks and prepares you for the IRS Annual Filing Season Program. Starting wages from $18 to $35 per hour. Funding available through WIOA. Apply today.`,
-  },
   'peer-recovery-specialist': {
     video: '/videos/healthcare-cna.mp4',
     audio: '/audio/heroes/healthcare.mp3',

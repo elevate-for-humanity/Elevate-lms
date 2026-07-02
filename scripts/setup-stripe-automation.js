@@ -34,12 +34,6 @@ const PROGRAMS = [
     courses: ['barber-apprentice-foundations'],
   },
   {
-    id: 'prog-tax-vita',
-    name: 'Tax Preparation (VITA)',
-    description: 'IRS VITA certification and tax preparation training',
-    price: 120000, // $1,200
-    courses: ['tax-vita-onramp'],
-  },
   {
     id: 'prog-hvac',
     name: 'HVAC Technician',

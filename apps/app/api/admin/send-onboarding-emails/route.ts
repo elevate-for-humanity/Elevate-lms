@@ -56,7 +56,6 @@ function formatProgramName(slug: string): string {
     electrical: 'Electrical Technician',
     'peer-recovery-specialist-jri': 'Peer Recovery Specialist',
     bookkeeping: 'Bookkeeping',
-    'tax-prep-financial-services': 'Tax Preparation & Financial Services',
     'beauty-career-educator': 'Beauty Career Educator',
     'Home Health Aide': 'Home Health Aide',
     'home-health-aide': 'Home Health Aide',

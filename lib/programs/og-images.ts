@@ -71,7 +71,6 @@ export const PROGRAM_OG_IMAGES: Record<string, string> = {
   'entrepreneurship':               'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-business-startup-marketing-hero.jpg',
   'graphic-design':                 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-business-startup-marketing-hero.jpg',
   
-  'tax-prep-financial-services':    'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp',
 
   // ── Hospitality / Other ───────────────────────────────────────────────────
   'hospitality':                    'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hvac-hero.webp',

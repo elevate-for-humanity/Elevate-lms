@@ -3,10 +3,6 @@
  *
  * CORE FUNNEL EVENTS (Required for institutional analytics):
  * - page_view: Baseline traffic
- * - start_tax_prep: Tax funnel entry
- * - complete_tax_prep: Tax funnel completion
- * - refund_advance_viewed: Advance visibility
- * - refund_advance_opt_in: Risk monitoring
  * - store_product_view: Store intent
  * - checkout_started: Revenue funnel
  * - purchase_completed: Conversion
@@ -16,7 +12,6 @@
  * DATA HYGIENE:
  * - IP anonymization ON (configured in gtag)
  * - No PII in event names or params
- * - No raw tax data tracked
  * - Respect cookie consent
  *
  * CONTENT GROUPINGS:
@@ -34,13 +29,13 @@ type EventCategory =
   | 'video'
   | 'download'
   | 'error'
-  | 'tax_funnel'
+  
   | 'demo_trial_funnel'
   | 'store'
   | 'lms'
   | 'enrollment';
 
-type ContentGroup = 'marketing' | 'resources' | 'lms_public' | 'store' | 'tax';
+type ContentGroup = 'marketing' | 'resources' | 'lms_public' | 'store' ;
 
 interface TrackEventParams {
   action: string;

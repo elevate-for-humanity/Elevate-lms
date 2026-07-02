@@ -356,7 +356,6 @@ export const siteMapSections: SiteMapSection[] = [
       { label: "Enrollment Success", href: "/programs/cdl-training/enrollment-success" },
       { label: "Enrollment Success", href: "/programs/cosmetology-apprenticeship/enrollment-success" },
       { label: "Enrollment Success", href: "/programs/esthetician-apprenticeship/enrollment-success" },
-      { label: "Enrollment Success", href: "/programs/tax-preparation/enrollment-success" },
       { label: "Esthetician Apprenticeship", href: "/programs/esthetician-apprenticeship" },
       { label: "Federal Funded", href: "/programs/federal-funded" },
       { label: "Finance Bookkeeping Accounting", href: "/programs/finance-bookkeeping-accounting" },

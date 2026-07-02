@@ -172,7 +172,6 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
 
   // ── Business / Finance ───────────────────────────────────────────────────
-  'tax-preparation': {
     card: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp',
     hero: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/professional-2.jpg',
     alt: 'Tax preparer working with a client on financial documents',

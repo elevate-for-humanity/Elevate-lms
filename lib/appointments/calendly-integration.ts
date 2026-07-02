@@ -57,8 +57,6 @@ export const CALENDLY_LINKS = {
   welding: CALENDLY_30MIN,
 
   // Tax services
-  taxVita: CALENDLY_30MIN,
-  taxPaid: CALENDLY_30MIN,
 
   // Support services
   caseManagement: CALENDLY_30MIN,
@@ -88,10 +86,6 @@ export function getCalendlyLink(appointmentType: string): string {
     medicalassistantconsultation: CALENDLY_LINKS.medicalAssistant,
     welding: CALENDLY_LINKS.welding,
     weldingconsultation: CALENDLY_LINKS.welding,
-    taxvita: CALENDLY_LINKS.taxVita,
-    freetaxprep: CALENDLY_LINKS.taxVita,
-    taxpaid: CALENDLY_LINKS.taxPaid,
-    paidtaxservices: CALENDLY_LINKS.taxPaid,
     casemanagement: CALENDLY_LINKS.caseManagement,
     financialaid: CALENDLY_LINKS.financialAid,
     workforceintake: CALENDLY_LINKS.workforceIntake,

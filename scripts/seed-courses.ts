@@ -659,80 +659,6 @@ const peerSupportTemplate: CourseTemplate = {
     },
   ],
 };
-
-// Tax Prep / Financial Services
-const taxPrepTemplate: CourseTemplate = {
-  code: "tax_financial",
-  modules: [
-    {
-      title: "Tax Preparation Fundamentals",
-      description:
-        "Introduction to tax preparation, IRS requirements, and professional standards.",
-      lessons: [
-        {
-          title: "Welcome to Tax Preparation Training",
-          description:
-            "Program overview, certification goals, and career opportunities.",
-        },
-        {
-          title: "IRS Requirements & Ethics",
-          description:
-            "Understanding IRS regulations, ethics, and professional conduct.",
-        },
-      ],
-    },
-    {
-      title: "Individual Tax Returns",
-      description:
-        "Preparing individual tax returns and understanding common forms.",
-      lessons: [
-        {
-          title: "Form 1040 Basics",
-          description:
-            "Understanding the 1040 form and common schedules.",
-        },
-        {
-          title: "Income, Deductions & Credits",
-          description:
-            "Identifying income sources, deductions, and tax credits.",
-        },
-      ],
-    },
-    {
-      title: "Tax Software & Client Service",
-      description:
-        "Using tax software and providing excellent client service.",
-      lessons: [
-        {
-          title: "Tax Software Navigation",
-          description:
-            "Learning to use professional tax preparation software.",
-        },
-        {
-          title: "Client Communication & Documentation",
-          description:
-            "Gathering information, explaining returns, and maintaining records.",
-        },
-      ],
-    },
-    {
-      title: "Certification & Career Launch",
-      description:
-        "Preparing for IRS certification and starting your tax preparation career.",
-      lessons: [
-        {
-          title: "IRS Certification Exam Prep",
-          description:
-            "Review of key concepts and exam strategies.",
-        },
-        {
-          title: "Building Your Tax Preparation Business",
-          description:
-            "Marketing, client acquisition, and seasonal business management.",
-        },
-      ],
-    },
-  ],
 };
 
 const templates: Record<string, CourseTemplate> = {
@@ -743,7 +669,6 @@ const templates: Record<string, CourseTemplate> = {
   business_admin: businessTemplate,
   emergency_safety: emergencyTemplate,
   peer_support: peerSupportTemplate,
-  tax_financial: taxPrepTemplate,
 };
 
 // ---------- MAP YOUR PROGRAM SLUGS TO TEMPLATES HERE ----------
@@ -797,9 +722,6 @@ const programToTemplate: Record<string, string> = {
   "peer-recovery-specialist-jri": "peer_support",
   "life-coach-certification-wioa": "peer_support",
 
-  // Tax/Financial programs
-  "tax-prep-financial-services": "tax_financial",
-  "rise-up-certificate": "business_admin",
 };
 
 // ---------- SEED LOGIC ----------

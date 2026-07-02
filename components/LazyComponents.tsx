@@ -43,14 +43,6 @@ export const LazyCalendar = dynamic(() => import('@/components/Calendar'), {
   loading: () => <LoadingPlaceholder height="h-96" />,
 });
 
-// FIX: @/components/Chart does not exist - disabled to prevent runtime error
-// Using null component wrapper to avoid "got: null" error
-const NullComponent = () => null;
-export const LazyChart = dynamic(() => Promise.resolve(NullComponent), {
-  ssr: false,
-  loading: () => null,
-});
-
 export const LazyExcelChartGenerator = dynamic(() => import('@/components/ExcelChartGenerator'), {
   ssr: false,
   loading: () => <LoadingPlaceholder height="h-96" />,

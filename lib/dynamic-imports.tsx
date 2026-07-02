@@ -37,6 +37,24 @@ export const DynamicCalendar = dynamic(() => import('@/components/Calendar'), {
   loading: () => <div className="h-80 bg-slate-100 animate-pulse rounded-lg" />,
 });
 
+// Rich text editor - for admin content editing
+export const DynamicRichTextEditor = dynamic(
+  () => import('@/components/RichTextEditor').then((m) => m.RichTextEditor),
+  {
+    ssr: false,
+    loading: () => <div className="h-48 bg-slate-100 animate-pulse rounded-lg" />,
+  }
+);
+
+// PDF viewer - for document viewing
+export const DynamicPDFViewer = dynamic(
+  () => import('@/components/PDFViewer').then((m) => m.PDFViewer),
+  {
+    ssr: false,
+    loading: () => <div className="h-96 bg-slate-100 animate-pulse rounded-lg" />,
+  }
+);
+
 // AI Chat component
 // FIX: AIInstructorPanel uses named export
 export const DynamicAIChat = dynamic(
@@ -49,3 +67,12 @@ export const DynamicAIChat = dynamic(
 
 // Confetti - only for success pages - default export
 export const DynamicConfetti = dynamic(() => import('@/components/Confetti'), { ssr: false });
+
+// Map component - for employer locations and workforce networks
+export const DynamicMap = dynamic(
+  () => import('@/components/DynamicMap').then((m) => m.DynamicMap),
+  {
+    ssr: false,
+    loading: () => <div className="h-96 bg-slate-100 animate-pulse rounded-lg" />,
+  }
+);

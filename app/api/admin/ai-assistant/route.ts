@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       reply: result.content,
       provider: result.provider,
-      fromCache: result.fromCache ?? false,
+      fromCache: (result as any).fromCache ?? false,
     });
   } catch (err) {
     logger.error('[ai-assistant] runAITask failed', undefined, { err });

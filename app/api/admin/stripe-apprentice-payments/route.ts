@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
             amountCents: c.amount,
             amountFormatted: formatCents(c.amount),
             status: c.status,
-            paid: c.paid,
+            paid: (c as any).paid ?? false,
             created: new Date(c.created * 1000).toISOString(),
             description: c.description,
             receiptUrl: c.receipt_url,
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
             amountDueCents: i.amount_due,
             amountPaidFormatted: formatCents(i.amount_paid),
             status: i.status,
-            paid: i.paid,
+            paid: i.status === 'paid',
             created: new Date(i.created * 1000).toISOString(),
             description: i.description,
             hostedInvoiceUrl: i.hosted_invoice_url,
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
   }
 
-  let body = { customerIds: [] as string[] | undefined, actions: [] as ApprenticeBillingAction[] | undefined };
+  let body: { customerIds?: string[]; actions?: ApprenticeBillingAction[] } = { customerIds: [], actions: [] };
   try {
     body = await request.json();
   } catch {

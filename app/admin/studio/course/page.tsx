@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { CourseProvider, useCourse } from '@/components/studio/CourseProvider';
-import StudioShell from '@/components/studio/StudioShell';
+import { StudioShell } from '@/components/studio/StudioShell';
 import { BlueprintPanel } from '@/components/studio/panels/BlueprintPanel';
 import { CurriculumPanel } from '@/components/studio/panels/CurriculumPanel';
 import { QuizPanel } from '@/components/studio/panels/QuizPanel';
@@ -60,7 +60,7 @@ export default function StudioCoursePage() {
   }
 
   return (
-    <CourseProvider>
+    <CourseProvider session={user}>
       <StudioShell>
         <PanelWorkspace />
       </StudioShell>

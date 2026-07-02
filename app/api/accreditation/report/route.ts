@@ -37,7 +37,7 @@ async function _GET(request: NextRequest) {
     const { data: programs } = await supabase
       .from('programs')
       .select(
-        'id, title, credential, accreditation_status, accreditation_body, accreditation_expires',
+        'id, title, name, credential, accreditation_status, accreditation_body, accreditation_expires',
       );
 
     const { data: enrollments } = await supabase

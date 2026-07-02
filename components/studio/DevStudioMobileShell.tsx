@@ -18,9 +18,10 @@ import {
   Server,
   Sparkles,
   X,
+  Zap,
 } from 'lucide-react';
 
-type MobileTab = 'ellie' | 'deploy' | 'health' | 'preview';
+type MobileTab = 'ellie' | 'deploy' | 'health' | 'preview' | 'autopilot';
 type MorePanel = 'files' | 'services' | 'environments' | 'secrets' | null;
 
 const DeployPanel = dynamic(() => import('@/components/studio/DeployPanel'), { ssr: false });
@@ -29,12 +30,14 @@ const SecretsPanel = dynamic(() => import('@/components/studio/SecretsPanel'), {
 const DevContainerPanel = dynamic(() => import('@/components/studio/DevContainerPanel'), { ssr: false });
 const UnifiedEllieChat = dynamic(() => import('@/components/studio/UnifiedEllieChat'), { ssr: false });
 const IframePreview = dynamic(() => import('@/components/studio/IframePreview'), { ssr: false });
+const AutopilotPanel = dynamic(() => import('@/components/studio/AutopilotPanel'), { ssr: false });
 
 const NAV: { id: MobileTab; label: string; Icon: ElementType<{ className?: string }> }[] = [
   { id: 'ellie', label: 'Ellie', Icon: Sparkles },
   { id: 'deploy', label: 'Deploy', Icon: Rocket },
   { id: 'preview', label: 'Preview', Icon: Globe },
   { id: 'health', label: 'Health', Icon: Activity },
+  { id: 'autopilot', label: 'Autopilot', Icon: Zap },
 ];
 
 interface DevStudioMobileShellProps {
@@ -63,6 +66,7 @@ export default function DevStudioMobileShell({
     if (t === 'deploy') return 'deploy';
     if (t === 'health') return 'health';
     if (t === 'preview') return 'preview';
+    if (t === 'autopilot') return 'autopilot';
     return 'ellie';
   });
   const [moreOpen, setMoreOpen] = useState<MorePanel>(null);
@@ -73,6 +77,7 @@ export default function DevStudioMobileShell({
     if (t === 'deploy') setTab('deploy');
     else if (t === 'health') setTab('health');
     else if (t === 'preview') setTab('preview');
+    else if (t === 'autopilot') setTab('autopilot');
     else if (t === 'ellie' || !t) setTab('ellie');
   }, [searchParams]);
 
@@ -208,6 +213,11 @@ export default function DevStudioMobileShell({
         {tab === 'health' && (
           <div className="h-full overflow-y-auto p-4">
             <HealthCards health={health} />
+          </div>
+        )}
+        {tab === 'autopilot' && (
+          <div className="h-full">
+            <AutopilotPanel />
           </div>
         )}
 

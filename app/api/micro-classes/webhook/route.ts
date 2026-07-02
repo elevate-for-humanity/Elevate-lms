@@ -1,3 +1,4 @@
+import type Stripe from 'stripe';
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 /**
  * POST /api/micro-classes/webhook

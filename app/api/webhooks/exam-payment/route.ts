@@ -1,3 +1,4 @@
+import type Stripe from 'stripe';
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 /**
  * Stripe webhook handler for exam fee payments.

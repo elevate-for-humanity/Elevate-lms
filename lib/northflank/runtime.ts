@@ -121,10 +121,10 @@ export async function upsertNorthflankSecretVariable(
   let variables: Record<string, string> = {};
 
   try {
-    const group = await northflankFetch<Record<string, unknown>>(projectId, secretPath(projectId, `/secrets/${groupId}`));
+    const group = await northflankFetch<Record<string, unknown>>(projectId, `/secrets/${groupId}`);
     variables = extractVariables(group);
   } catch {
-    await northflankFetch(projectId, secretPath(projectId, '/secrets'), {
+    await northflankFetch(projectId, '/secrets', {
       method: 'POST',
       body: JSON.stringify({
         name: groupId,
@@ -144,7 +144,7 @@ export async function upsertNorthflankSecretVariable(
 
   variables[key] = value;
 
-  await northflankFetch(projectId, secretPath(projectId, `/secrets/${groupId}`), {
+  await northflankFetch(projectId, `/secrets/${groupId}`, {
     method: 'POST',
     body: JSON.stringify({
       name: groupId,

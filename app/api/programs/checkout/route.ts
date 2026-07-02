@@ -1,4 +1,5 @@
 export const runtime = 'nodejs';
+import type Stripe from 'stripe';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 

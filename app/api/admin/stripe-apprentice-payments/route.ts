@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
 
   const body = { customerIds: [] as string[] | undefined, actions: [] as ApprenticeBillingAction[] | undefined };
   try {
-    _body = await request.json();
+    body = await request.json();
   } catch {
     _body = {};
   }

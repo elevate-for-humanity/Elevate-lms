@@ -152,6 +152,19 @@ jobs:
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
         run: npm run build:lms:phased
 
+      # Upload build artifacts for deploy workflows to use instead of rebuilding
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build-${{ github.sha }}
+          path: |
+            .next/
+            Dockerfile.northflank-lms
+            Dockerfile.northflank-admin
+            Dockerfile.marketing
+          retention-days: 1
+          compression-level: 9
+
   # Non-blocking legacy lint.
   # 896k lines, 2500+ files, pre-existing violations across the codebase.
   # This job NEVER blocks merge. Failure = lint found something, not build broken.

@@ -1,7 +1,8 @@
 /** Legacy URL alias — canonical handler: /api/partners/barber-host-shop/apply */
-export {
-  POST,
-  runtime,
-  maxDuration,
-  dynamic,
-} from '../../barber-host-shop/apply/route';
+
+export const runtime = 'edge';
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
+
+// Re-export only the POST handler
+export { POST } from '../../barber-host-shop/apply/route';

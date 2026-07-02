@@ -123,11 +123,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
   }
 
-  const body = { customerIds: [] as string[] | undefined, actions: [] as ApprenticeBillingAction[] | undefined };
+  let body = { customerIds: [] as string[] | undefined, actions: [] as ApprenticeBillingAction[] | undefined };
   try {
     body = await request.json();
   } catch {
-    _body = {};
+    body = {};
   }
 
   const customerIds = body.customerIds?.length ? body.customerIds : [...JORDAN_AND_NATALIA];

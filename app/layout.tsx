@@ -1,6 +1,5 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
-import NextDynamic from 'next/dynamic';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import PublicLayout from '@/components/layout/PublicLayout';
@@ -19,22 +18,13 @@ import SupabaseConfigBootstrap from '@/components/supabase/SupabaseConfigBootstr
 // Individual pages can override with their own `export const revalidate = N`.
 export const dynamic = 'force-dynamic';
 
-// Lazy load analytics and tracking components (using named exports)
-const GoogleAnalytics = NextDynamic(
-  () => import('@/components/analytics/google-analytics').then((m) => m.GoogleAnalytics)
-);
-const GoogleAds = NextDynamic(
-  () => import('@/components/analytics/google-ads').then((m) => m.GoogleAds)
-);
-const DMCATrackingPixel = NextDynamic(
-  () => import('@/components/InvisibleWatermark').then((m) => m.DMCATrackingPixel)
-);
-const CopyrightProtection = NextDynamic(
-  () => import('@/components/CopyrightProtection').then((m) => m.CopyrightProtection)
-);
-const InstallPromptBanner = NextDynamic(
-  () => import('@/components/pwa/InstallPromptBanner').then((m) => m.InstallPromptBanner)
-);
+// TEMPORARILY DISABLED FOR DEBUGGING - Remove all dynamic imports to isolate error
+// Will restore ONE AT A TIME to find digest 544459545
+const GoogleAnalytics = null as any;
+const GoogleAds = null as any;
+const DMCATrackingPixel = null as any;
+const CopyrightProtection = null as any;
+const InstallPromptBanner = null as any;
 
 const inter = { variable: '' };
 

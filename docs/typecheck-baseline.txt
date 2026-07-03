@@ -1,31 +1,34 @@
-app/admin/studio/course/page.tsx(63,21): error TS2740: Type '{ id: string; email?: string; full_name?: string; }' is missing the following properties from type 'CourseSession': course, modules, lessons, quizzes, and 6 more.
-app/api/advising-request/route.ts(33,7): error TS2345: Argument of type 'PromiseLike<{ data: never; error: unknown; } | { data: any; error: PostgrestError; }>' is not assignable to parameter of type 'Promise<{ data: any; error: unknown; }>'.
 app/api/applications/route.ts(105,43): error TS2367: This comparison appears to be unintentional because the types 'string' and 'number' have no overlap.
+app/api/applications/route.ts(105,62): error TS2367: This comparison appears to be unintentional because the types 'string' and 'boolean' have no overlap.
 app/api/auth/azure/callback/route.ts(112,55): error TS2339: Property 'email' does not exist on type 'never'.
 app/api/auth/saml/callback/route.ts(89,55): error TS2339: Property 'email' does not exist on type 'never'.
 app/api/auth/signup/route.ts(37,7): error TS2345: Argument of type 'ErrorCode.VAL_OUT_OF_RANGE' is not assignable to parameter of type 'ErrorCode'.
 app/api/barber/activate-subscription/route.ts(87,13): error TS2353: Object literal may only specify known properties, and 'product_data' does not exist in type 'PriceData'.
 app/api/billing/report-usage/route.ts(48,50): error TS2339: Property 'createUsageRecord' does not exist on type 'SubscriptionItemsResource'.
 app/api/booking/enrollment/route.ts(29,7): error TS2345: Argument of type 'PostgrestBuilder<any, any, false>' is not assignable to parameter of type 'Promise<{ data: unknown; error: unknown; }>'.
+  Type 'PostgrestBuilder<any, any, false>' is missing the following properties from type 'Promise<{ data: unknown; error: unknown; }>': catch, finally, [Symbol.toStringTag]
 app/api/booking/enrollment/route.ts(65,34): error TS2339: Property 'id' does not exist on type 'unknown'.
 app/api/checkout/phlebotomy/route.ts(10,5): error TS2322: Type '"2025-01-27.acacia"' is not assignable to type '"2025-10-29.clover"'.
-app/api/client-info/route.ts(23,13): error TS2339: Property 'ip' does not exist on type 'NextRequest'.
 app/api/compliance/automation/route.ts(122,34): error TS2345: Argument of type 'ReportingRequirement' is not assignable to parameter of type 'Date'.
-app/api/compliance/record/route.ts(119,64): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+  Type 'ReportingRequirement' is missing the following properties from type 'Date': toDateString, toTimeString, toLocaleDateString, toLocaleTimeString, and 37 more.
+app/api/compliance/record/route.ts(119,64): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/cosmetology/activate-subscription/route.ts(85,13): error TS2353: Object literal may only specify known properties, and 'product_data' does not exist in type 'PriceData'.
 app/api/cosmetology/webhook/route.ts(336,40): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
 app/api/cosmetology/webhook/route.ts(442,46): error TS2345: Argument of type '(request: NextRequest) => Promise<NextResponse<{ error: string; }> | NextResponse<{ received: boolean; }>>' is not assignable to parameter of type 'string'.
 app/api/course-generator/gap-scan/route.ts(57,13): error TS2554: Expected 2-3 arguments, but got 1.
 app/api/course-generator/gap-scan/route.ts(75,11): error TS2554: Expected 2-3 arguments, but got 1.
 app/api/course-generator/jobs/route.ts(81,11): error TS2554: Expected 2-3 arguments, but got 1.
-app/api/courses/[courseId]/announcements/route.ts(59,18): error TS2345: Argument of type 'PostgrestError' is not assignable to parameter of type 'string'.
-app/api/courses/[courseId]/check-completion/route.ts(39,18): error TS2345: Argument of type 'PostgrestError' is not assignable to parameter of type 'string'.
-app/api/courses/[courseId]/check-completion/route.ts(61,18): error TS2345: Argument of type 'PostgrestError' is not assignable to parameter of type 'string'.
-app/api/courses/[courseId]/check-completion/route.ts(96,18): error TS2345: Argument of type 'PostgrestError' is not assignable to parameter of type 'string'.
 app/api/courses/[courseId]/check-completion/route.ts(128,18): error TS2345: Argument of type 'PostgrestError' is not assignable to parameter of type 'string'.
 app/api/courses/[courseId]/lessons/public/route.ts(53,5): error TS1117: An object literal cannot have multiple properties with the same name.
 app/api/courses/metadata/route.ts(47,43): error TS2339: Property 'content' does not exist on type '{ type: "file"; encoding: string; size: number; name: string; path: string; content: string; sha: string; url: string; git_url: string; html_url: string; download_url: string; _links: { git: string; html: string; self: string; }; target?: string; submodule_git_url?: string; } | { ...; } | { ...; }'.
+  Property 'content' does not exist on type '{ type: "symlink"; target: string; size: number; name: string; path: string; sha: string; url: string; git_url: string; html_url: string; download_url: string; _links: { git: string; html: string; self: string; }; }'.
 app/api/cpr/checkout/embedded/route.ts(48,52): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(params?: SessionCreateParams, options?: RequestOptions): Promise<Response<Session>>', gave the following error.
+    Type '("card" | "bank_transfer")[]' is not assignable to type 'PaymentMethodType[]'.
+      Type '"card" | "bank_transfer"' is not assignable to type 'PaymentMethodType'.
+        Type '"bank_transfer"' is not assignable to type 'PaymentMethodType'.
+  Overload 2 of 2, '(options?: RequestOptions): Promise<Response<Session>>', gave the following error.
+    Object literal may only specify known properties, and 'ui_mode' does not exist in type 'RequestOptions'.
 app/api/credentials/issue/route.ts(29,15): error TS2554: Expected 2-3 arguments, but got 1.
 app/api/cron/embed-knowledge/route.ts(38,7): error TS2353: Object literal may only specify known properties, and 'document_id' does not exist in type 'EmitEventOptions'.
 app/api/cron/funding-followup/route.ts(53,33): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
@@ -37,22 +40,14 @@ app/api/cron/process-provisioning-jobs/route.ts(25,19): error TS2554: Expected 0
 app/api/cron/trial-lifecycle/route.ts(73,19): error TS2554: Expected 0-1 arguments, but got 2.
 app/api/documents/ai-prefill/route.ts(230,12): error TS2554: Expected 2-3 arguments, but got 0.
 app/api/documents/ai-prefill/route.ts(283,12): error TS2554: Expected 2-3 arguments, but got 0.
-app/api/documents/verify/bulk/route.ts(139,81): error TS2304: Cannot find name 'TransferSourceType'.
 app/api/documents/verify/route.ts(83,21): error TS2339: Property 'database' does not exist on type '{ unauthorized: (message?: string) => { error: string; code: ErrorCode; status: number; }; forbidden: (message?: string) => { error: string; code: ErrorCode; status: number; }; notFound: (message?: string) => { ...; }; ... 5 more ...; internal: (message?: string) => { ...; }; }'.
 app/api/ecosystem/content-automation/route.ts(24,24): error TS2673: Constructor of class 'ContentAutomation' is private and only accessible within the class declaration.
 app/api/ecosystem/url-health/route.ts(24,21): error TS2673: Constructor of class 'URLHealthMonitor' is private and only accessible within the class declaration.
 app/api/email/campaigns/send/route.ts(73,11): error TS2353: Object literal may only specify known properties, and 'reply_to' does not exist in type '{ from: string; to: string | string[]; subject: string; html?: string; text?: string; }'.
 app/api/email/send/route.ts(58,55): error TS2339: Property 'data' does not exist on type '{ success: boolean; error: string; from: string; data?: undefined; } | { success: boolean; data: { provider: string; }; error?: undefined; from?: undefined; } | { success: boolean; error: string; }'.
+  Property 'data' does not exist on type '{ success: boolean; error: string; }'.
 app/api/employer/hiring-trends/route.ts(14,61): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/employer/hiring-trends/route.ts(15,14): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/employer/hiring-trends/route.ts(15,33): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/employer/hiring-trends/route.ts(18,21): error TS2339: Property 'adminDb' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/employer/hiring-trends/route.ts(18,37): error TS2339: Property 'db' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
 app/api/employer/retention-stats/route.ts(14,61): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/employer/retention-stats/route.ts(15,14): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/employer/retention-stats/route.ts(15,33): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/employer/retention-stats/route.ts(18,21): error TS2339: Property 'adminDb' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/employer/retention-stats/route.ts(18,37): error TS2339: Property 'db' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
 app/api/enroll/approve/route.ts(208,32): error TS2339: Property 'name' does not exist on type '{ id: any; title: any; total_hours: any; }'.
 app/api/enroll/approve/route.ts(309,35): error TS2339: Property 'name' does not exist on type '{ title: any; }'.
 app/api/enroll/auto/route.ts(175,88): error TS2339: Property 'title' does not exist on type '{ id: any; name: any; slug: any; total_cost: any; }'.
@@ -60,13 +55,18 @@ app/api/enroll/checkout/route.ts(185,30): error TS2339: Property 'title' does no
 app/api/enroll/checkout/route.ts(186,27): error TS2339: Property 'title' does not exist on type '{ id: any; name: any; slug: any; total_cost: any; credentialing_cost: any; }'.
 app/api/enroll/checkout/route.ts(189,44): error TS2339: Property 'title' does not exist on type '{ id: any; name: any; slug: any; total_cost: any; credentialing_cost: any; }'.
 app/api/enroll/cna/route.ts(59,7): error TS2345: Argument of type 'PostgrestBuilder<any, any, false>' is not assignable to parameter of type 'Promise<{ data: unknown; error: unknown; }>'.
+  Type 'PostgrestBuilder<any, any, false>' is missing the following properties from type 'Promise<{ data: unknown; error: unknown; }>': catch, finally, [Symbol.toStringTag]
 app/api/enroll/cna/route.ts(111,154): error TS2339: Property 'id' does not exist on type 'unknown'.
 app/api/enroll/cna/route.ts(123,47): error TS2339: Property 'id' does not exist on type 'unknown'.
 app/api/enroll/complete/route.ts(243,18): error TS2339: Property 'name' does not exist on type 'ResolvedProgram'.
 app/api/enroll/complete/route.ts(246,18): error TS2339: Property 'name' does not exist on type 'ResolvedProgram'.
 app/api/enroll/payment/route.ts(97,52): error TS2769: No overload matches this call.
-app/api/enroll/payment/route.ts(109,20): error TS2367: This comparison appears to be unintentional because the types '"full" | "deposit" | "payment-plan"' and '"down-payment"' have no overlap.
-app/api/enrollment/upload-document/route.ts(158,41): error TS2304: Cannot find name 'urlData'.
+  Overload 1 of 2, '(params?: SessionCreateParams, options?: RequestOptions): Promise<Response<Session>>', gave the following error.
+    Type 'string[]' is not assignable to type 'PaymentMethodType[]'.
+      Type 'string' is not assignable to type 'PaymentMethodType'.
+  Overload 2 of 2, '(options?: RequestOptions): Promise<Response<Session>>', gave the following error.
+    Object literal may only specify known properties, and 'mode' does not exist in type 'RequestOptions'.
+app/api/enroll/payment/route.ts(109,20): error TS2367: This comparison appears to be unintentional because the types '"deposit" | "full" | "payment-plan"' and '"down-payment"' have no overlap.
 app/api/enrollments/checkout/route.ts(149,35): error TS2339: Property 'title' does not exist on type '{ id: any; course_name: any; retail_price_cents: any; stripe_price_id: any; }'.
 app/api/exams/start/route.ts(98,11): error TS2322: Type 'string' is not assignable to type 'ProctoringProvider'.
 app/api/franchise/api-franchise/ero/route.ts(108,56): error TS2559: Type 'string' has no properties in common with type 'Partial<EROConfig>'.
@@ -82,17 +82,10 @@ app/api/franchise/api-franchise/payouts/[payoutId]/approve/route.ts(52,40): erro
 app/api/franchise/api-franchise/payouts/[payoutId]/pay/route.ts(52,26): error TS2339: Property 'office_id' does not exist on type 'Payout'.
 app/api/franchise/api-franchise/payouts/[payoutId]/pay/route.ts(60,40): error TS2339: Property 'markPaid' does not exist on type '{ getPayout(id: string): Promise<Payout>; listPayouts(officeId: string): Promise<Payout[]>; }'.
 app/api/franchise/api-franchise/payouts/generate/route.ts(51,40): error TS2339: Property 'generateOfficePayouts' does not exist on type '{ getPayout(id: string): Promise<Payout>; listPayouts(officeId: string): Promise<Payout[]>; }'.
-app/api/franchise/api-franchise/preparers/[preparerId]/route.ts(24,56): error TS2554: Expected 0 arguments, but got 1.
-app/api/franchise/api-franchise/preparers/[preparerId]/route.ts(81,56): error TS2554: Expected 0 arguments, but got 1.
-app/api/franchise/api-franchise/preparers/[preparerId]/route.ts(126,45): error TS2339: Property 'updatePreparer' does not exist on type '{ getPreparer: () => Promise<any>; }'.
-app/api/franchise/api-franchise/preparers/[preparerId]/route.ts(130,43): error TS2339: Property 'updatePreparer' does not exist on type '{ getPreparer: () => Promise<any>; }'.
-app/api/franchise/api-franchise/preparers/[preparerId]/route.ts(157,56): error TS2554: Expected 0 arguments, but got 1.
-app/api/franchise/api-franchise/preparers/[preparerId]/route.ts(187,27): error TS2339: Property 'deactivatePreparer' does not exist on type '{ getPreparer: () => Promise<any>; }'.
-app/api/franchise/api-franchise/preparers/[preparerId]/stats/route.ts(24,56): error TS2554: Expected 0 arguments, but got 1.
-app/api/franchise/api-franchise/preparers/[preparerId]/stats/route.ts(60,41): error TS2551: Property 'getPreparerStats' does not exist on type '{ getPreparer: () => Promise<any>; }'. Did you mean 'getPreparer'?
+app/api/franchise/api-franchise/preparers/[preparerId]/stats/route.ts(60,41): error TS2551: Property 'getPreparerStats' does not exist on type '{ getPreparer: (preparerId: string) => Promise<any>; updatePreparer: (preparerId: string, updates: Record<string, unknown>, _userId: string) => Promise<any>; deactivatePreparer: (preparerId: string, _userId: string) => Promise<...>; }'. Did you mean 'getPreparer'?
 app/api/franchise/api-franchise/preparers/route.ts(6,10): error TS2305: Module '"@/lib/franchise/types"' has no exported member 'CreatePreparerInput'.
-app/api/franchise/api-franchise/preparers/route.ts(58,42): error TS2339: Property 'listPreparers' does not exist on type '{ getPreparer: () => Promise<any>; }'.
-app/api/franchise/api-franchise/preparers/route.ts(118,44): error TS2551: Property 'createPreparer' does not exist on type '{ getPreparer: () => Promise<any>; }'. Did you mean 'getPreparer'?
+app/api/franchise/api-franchise/preparers/route.ts(58,42): error TS2339: Property 'listPreparers' does not exist on type '{ getPreparer: (preparerId: string) => Promise<any>; updatePreparer: (preparerId: string, updates: Record<string, unknown>, _userId: string) => Promise<any>; deactivatePreparer: (preparerId: string, _userId: string) => Promise<...>; }'.
+app/api/franchise/api-franchise/preparers/route.ts(118,44): error TS2551: Property 'createPreparer' does not exist on type '{ getPreparer: (preparerId: string) => Promise<any>; updatePreparer: (preparerId: string, updates: Record<string, unknown>, _userId: string) => Promise<any>; deactivatePreparer: (preparerId: string, _userId: string) => Promise<...>; }'. Did you mean 'getPreparer'?
 app/api/franchise/api-franchise/returns/route.ts(50,44): error TS2339: Property 'getPreparerReturns' does not exist on type '{ submitReturn: () => Promise<any>; }'.
 app/api/franchise/api-franchise/returns/route.ts(104,42): error TS2339: Property 'getOfficeReturns' does not exist on type '{ submitReturn: () => Promise<any>; }'.
 app/api/franchise/api-franchise/returns/route.ts(114,42): error TS2339: Property 'getPreparerReturns' does not exist on type '{ submitReturn: () => Promise<any>; }'.
@@ -110,43 +103,29 @@ app/api/franchise/payouts/[payoutId]/approve/route.ts(52,40): error TS2339: Prop
 app/api/franchise/payouts/[payoutId]/pay/route.ts(52,26): error TS2339: Property 'office_id' does not exist on type 'Payout'.
 app/api/franchise/payouts/[payoutId]/pay/route.ts(60,40): error TS2339: Property 'markPaid' does not exist on type '{ getPayout(id: string): Promise<Payout>; listPayouts(officeId: string): Promise<Payout[]>; }'.
 app/api/franchise/payouts/generate/route.ts(51,40): error TS2339: Property 'generateOfficePayouts' does not exist on type '{ getPayout(id: string): Promise<Payout>; listPayouts(officeId: string): Promise<Payout[]>; }'.
-app/api/franchise/preparers/[preparerId]/route.ts(24,56): error TS2554: Expected 0 arguments, but got 1.
-app/api/franchise/preparers/[preparerId]/route.ts(81,56): error TS2554: Expected 0 arguments, but got 1.
-app/api/franchise/preparers/[preparerId]/route.ts(126,45): error TS2339: Property 'updatePreparer' does not exist on type '{ getPreparer: () => Promise<any>; }'.
-app/api/franchise/preparers/[preparerId]/route.ts(130,43): error TS2339: Property 'updatePreparer' does not exist on type '{ getPreparer: () => Promise<any>; }'.
-app/api/franchise/preparers/[preparerId]/route.ts(157,56): error TS2554: Expected 0 arguments, but got 1.
-app/api/franchise/preparers/[preparerId]/route.ts(187,27): error TS2339: Property 'deactivatePreparer' does not exist on type '{ getPreparer: () => Promise<any>; }'.
-app/api/franchise/preparers/[preparerId]/stats/route.ts(24,56): error TS2554: Expected 0 arguments, but got 1.
-app/api/franchise/preparers/[preparerId]/stats/route.ts(60,41): error TS2551: Property 'getPreparerStats' does not exist on type '{ getPreparer: () => Promise<any>; }'. Did you mean 'getPreparer'?
+app/api/franchise/preparers/[preparerId]/stats/route.ts(60,41): error TS2551: Property 'getPreparerStats' does not exist on type '{ getPreparer: (preparerId: string) => Promise<any>; updatePreparer: (preparerId: string, updates: Record<string, unknown>, _userId: string) => Promise<any>; deactivatePreparer: (preparerId: string, _userId: string) => Promise<...>; }'. Did you mean 'getPreparer'?
 app/api/franchise/preparers/route.ts(6,10): error TS2305: Module '"@/lib/franchise/types"' has no exported member 'CreatePreparerInput'.
-app/api/franchise/preparers/route.ts(58,42): error TS2339: Property 'listPreparers' does not exist on type '{ getPreparer: () => Promise<any>; }'.
-app/api/franchise/preparers/route.ts(118,44): error TS2551: Property 'createPreparer' does not exist on type '{ getPreparer: () => Promise<any>; }'. Did you mean 'getPreparer'?
+app/api/franchise/preparers/route.ts(58,42): error TS2339: Property 'listPreparers' does not exist on type '{ getPreparer: (preparerId: string) => Promise<any>; updatePreparer: (preparerId: string, updates: Record<string, unknown>, _userId: string) => Promise<any>; deactivatePreparer: (preparerId: string, _userId: string) => Promise<...>; }'.
+app/api/franchise/preparers/route.ts(118,44): error TS2551: Property 'createPreparer' does not exist on type '{ getPreparer: (preparerId: string) => Promise<any>; updatePreparer: (preparerId: string, updates: Record<string, unknown>, _userId: string) => Promise<any>; deactivatePreparer: (preparerId: string, _userId: string) => Promise<...>; }'. Did you mean 'getPreparer'?
 app/api/franchise/returns/route.ts(50,44): error TS2339: Property 'getPreparerReturns' does not exist on type '{ submitReturn: () => Promise<any>; }'.
 app/api/franchise/returns/route.ts(104,42): error TS2339: Property 'getOfficeReturns' does not exist on type '{ submitReturn: () => Promise<any>; }'.
 app/api/franchise/returns/route.ts(114,42): error TS2339: Property 'getPreparerReturns' does not exist on type '{ submitReturn: () => Promise<any>; }'.
 app/api/franchise/returns/route.ts(197,40): error TS2339: Property 'createReturn' does not exist on type '{ submitReturn: () => Promise<any>; }'.
-app/api/funding/create-checkout/route.ts(21,42): error TS2552: Cannot find name 'request'. Did you mean 'Request'?
 app/api/gdpr/export/route.ts(37,29): error TS2345: Argument of type 'string | { profile: any; enrollments: any[]; certificates: any[]; assignments: any[]; grades: any[]; notes: any[]; messages: any[]; exportDate: string; dataSubject: string; }' is not assignable to parameter of type 'BodyInit'.
+  Type '{ profile: any; enrollments: any[]; certificates: any[]; assignments: any[]; grades: any[]; notes: any[]; messages: any[]; exportDate: string; dataSubject: string; }' is not assignable to type 'BodyInit'.
 app/api/generate-video/route.ts(313,40): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 app/api/grade/upsert/route.ts(62,22): error TS2352: Conversion of type '{ instructor_id: any; }[]' to type 'string' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
 app/api/grade/upsert/route.ts(62,52): error TS2339: Property 'instructor_id' does not exist on type 'string'.
-app/api/grants/match/route.ts(65,20): error TS2345: Argument of type 'PostgrestError' is not assignable to parameter of type 'string'.
-app/api/grants/match/route.ts(75,20): error TS2345: Argument of type 'PostgrestError' is not assignable to parameter of type 'string'.
 app/api/grants/match/route.ts(105,76): error TS2554: Expected 1-3 arguments, but got 4.
-app/api/host-shop/subscription/webhook/route.ts(34,13): error TS2554: Expected 3 arguments, but got 2.
-app/api/host-shop/subscription/webhook/route.ts(68,62): error TS2339: Property 'current_period_start' does not exist on type 'Subscription'.
-app/api/host-shop/subscription/webhook/route.ts(69,57): error TS2339: Property 'current_period_end' does not exist on type 'Subscription'.
-app/api/host-shop/subscription/webhook/route.ts(99,47): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
-app/api/host-shop/subscription/webhook/route.ts(100,22): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
-app/api/host-shop/subscription/webhook/route.ts(101,21): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
-app/api/host-shop/subscription/webhook/route.ts(113,47): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
-app/api/host-shop/subscription/webhook/route.ts(114,22): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
-app/api/host-shop/subscription/webhook/route.ts(115,21): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
 app/api/host-shop/webhook/route.ts(85,14): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
-app/api/hr/emails/route.ts(72,45): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+app/api/hr/emails/route.ts(72,45): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
+app/api/hsi/create-checkout/route.ts(45,7): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(options?: RequestOptions): Promise<Response<Session>>', gave the following error.
+    Object literal may only specify known properties, and 'payment_method_types' does not exist in type 'RequestOptions'.
 app/api/intake/route.ts(48,24): error TS2339: Property 'trim' does not exist on type 'string | string[]'.
+  Property 'trim' does not exist on type 'string[]'.
 app/api/intake/route.ts(112,82): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any>'.
-app/api/intake/route.ts(370,7): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+app/api/intake/route.ts(370,7): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/internal/ai-operator/route.ts(32,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
 app/api/internal/ai-operator/route.ts(82,74): error TS2554: Expected 1 arguments, but got 2.
 app/api/internal/ai-operator/route.ts(126,8): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, "admin_alerts", unknown, "POST">'. Did you mean 'match'?
@@ -154,6 +133,7 @@ app/api/internal/ai-operator/route.ts(161,47): error TS2552: Cannot find name 't
 app/api/internal/ai-operator/route.ts(162,40): error TS2552: Cannot find name 'triaged'. Did you mean '_triaged'?
 app/api/internal/at-risk-detection/route.ts(33,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
 app/api/internal/cert-pdf/route.ts(122,25): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
+  Type 'Uint8Array<ArrayBufferLike>' is missing the following properties from type 'URLSearchParams': size, append, delete, get, and 2 more.
 app/api/internal/dropout-score/route.ts(24,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
 app/api/internal/dropout-score/route.ts(78,76): error TS2554: Expected 1 arguments, but got 2.
 app/api/internal/hours-pace-check/route.ts(44,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
@@ -168,37 +148,17 @@ app/api/leaderboard/route.ts(82,25): error TS2339: Property 'totalPoints' does n
 app/api/leaderboard/route.ts(82,41): error TS2339: Property 'totalPoints' does not exist on type 'unknown'.
 app/api/leaderboard/route.ts(85,9): error TS2698: Spread types may only be created from object types.
 app/api/learner/dashboard/route.ts(15,60): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/learner/dashboard/route.ts(16,14): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/learner/dashboard/route.ts(16,33): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/learner/dashboard/route.ts(18,13): error TS2339: Property 'user' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/learner/dashboard/route.ts(18,19): error TS2339: Property 'db' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
 app/api/learner/payments/route.ts(53,20): error TS2352: Conversion of type '{ id: any; title: any; }[]' to type '{ id: string; title: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-app/api/lessons/[lessonId]/audio/route.ts(11,5): error TS2304: Cannot find name 'readFileSync'.
+  Type '{ id: any; title: any; }[]' is missing the following properties from type '{ id: string; title: string; }': id, title
 app/api/license/checkout/route.ts(52,10): error TS2448: Block-scoped variable 'stripe' used before its declaration.
 app/api/lms/progress/complete/route.ts(34,60): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/lms/progress/complete/route.ts(35,14): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/progress/complete/route.ts(35,33): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/progress/complete/route.ts(37,13): error TS2339: Property 'user' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/progress/complete/route.ts(37,19): error TS2339: Property 'db' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
 app/api/lms/progress/start/route.ts(21,60): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/lms/progress/start/route.ts(22,14): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/progress/start/route.ts(22,33): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/progress/start/route.ts(24,13): error TS2339: Property 'user' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/progress/start/route.ts(24,19): error TS2339: Property 'db' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
 app/api/lms/quizzes/[quizId]/start/route.ts(11,58): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/lms/quizzes/[quizId]/start/route.ts(12,12): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/quizzes/[quizId]/start/route.ts(12,31): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/quizzes/[quizId]/start/route.ts(14,11): error TS2339: Property 'user' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/quizzes/[quizId]/start/route.ts(14,17): error TS2339: Property 'db' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/quizzes/[quizId]/start/route.ts(39,24): error TS2339: Property 'role' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/quizzes/[quizId]/start/route.ts(39,49): error TS2339: Property 'role' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
+app/api/lms/quizzes/[quizId]/start/route.ts(39,24): error TS2339: Property 'role' does not exist on type 'ApiAuthResult'.
+app/api/lms/quizzes/[quizId]/start/route.ts(39,49): error TS2339: Property 'role' does not exist on type 'ApiAuthResult'.
 app/api/lms/quizzes/[quizId]/submit/route.ts(17,58): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/lms/quizzes/[quizId]/submit/route.ts(18,12): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/quizzes/[quizId]/submit/route.ts(18,31): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/quizzes/[quizId]/submit/route.ts(20,11): error TS2339: Property 'user' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/lms/quizzes/[quizId]/submit/route.ts(20,17): error TS2339: Property 'db' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
 app/api/lms/recommendations/route.ts(68,69): error TS2345: Argument of type '{ id: string; interests: any; completedCourses: any[]; skillLevel: any; learningStyle: any; }' is not assignable to parameter of type 'UserProfile'.
-app/api/media/files/route.ts(20,35): error TS2304: Cannot find name 'db'.
+  Property 'goals' is missing in type '{ id: string; interests: any; completedCourses: any[]; skillLevel: any; learningStyle: any; }' but required in type 'UserProfile'.
 app/api/mentor/approvals/route.ts(38,9): error TS2367: This comparison appears to be unintentional because the types 'UserRole' and '"mentor"' have no overlap.
 app/api/mentor/approvals/route.ts(70,9): error TS2367: This comparison appears to be unintentional because the types 'UserRole' and '"mentor"' have no overlap.
 app/api/mentor/mentees/route.ts(41,9): error TS2367: This comparison appears to be unintentional because the types 'UserRole' and '"mentor"' have no overlap.
@@ -210,27 +170,39 @@ app/api/mobile/courses/route.ts(112,25): error TS2339: Property 'title' does not
 app/api/mobile/courses/route.ts(113,36): error TS2339: Property 'description' does not exist on type '{ id: any; title: any; description: any; thumbnail_url: any; }[]'.
 app/api/mobile/courses/route.ts(114,32): error TS2339: Property 'thumbnail_url' does not exist on type '{ id: any; title: any; description: any; thumbnail_url: any; }[]'.
 app/api/moderation/route.ts(152,52): error TS2345: Argument of type '(request: NextRequest) => Promise<NextResponse<unknown> | GuardedUser>' is not assignable to parameter of type '(req: Request, ...args: any[]) => Promise<Response>'.
+  Type 'Promise<NextResponse<unknown> | GuardedUser>' is not assignable to type 'Promise<Response>'.
+    Type 'NextResponse<unknown> | GuardedUser' is not assignable to type 'Response'.
+      Type 'GuardedUser' is missing the following properties from type 'Response': headers, ok, redirected, status, and 12 more.
 app/api/moderation/route.ts(153,53): error TS2345: Argument of type '(request: NextRequest) => Promise<NextResponse<unknown> | GuardedUser>' is not assignable to parameter of type '(req: Request, ...args: any[]) => Promise<Response>'.
+  Type 'Promise<NextResponse<unknown> | GuardedUser>' is not assignable to type 'Promise<Response>'.
+    Type 'NextResponse<unknown> | GuardedUser' is not assignable to type 'Response'.
+      Type 'GuardedUser' is missing the following properties from type 'Response': headers, ok, redirected, status, and 12 more.
 app/api/monitoring/bundle/route.ts(35,13): error TS2339: Property 'data' does not exist on type '{}'.
 app/api/monitoring/bundle/route.ts(35,19): error TS2339: Property 'error' does not exist on type '{}'.
 app/api/monitoring/bundle/route.ts(35,26): error TS2339: Property 'count' does not exist on type '{}'.
 app/api/monitoring/stats/route.ts(35,9): error TS2367: This comparison appears to be unintentional because the types '"admin" | "org_admin"' and '"super_admin"' have no overlap.
 app/api/mou/cdl/route.ts(68,27): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
+  Type 'Uint8Array<ArrayBufferLike>' is missing the following properties from type 'URLSearchParams': size, append, delete, get, and 2 more.
 app/api/mou/employer/route.ts(63,27): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
+  Type 'Uint8Array<ArrayBufferLike>' is missing the following properties from type 'URLSearchParams': size, append, delete, get, and 2 more.
 app/api/ocr/extract/route.ts(30,24): error TS2339: Property 'extractW2Data' does not exist on type 'typeof import("/workspace/project/Elevate-lms/lib/ocr/tesseract-ocr")'.
 app/api/ocr/extract/route.ts(31,26): error TS2339: Property 'extract1099Data' does not exist on type 'typeof import("/workspace/project/Elevate-lms/lib/ocr/tesseract-ocr")'.
 app/api/ocr/extract/route.ts(32,24): error TS2339: Property 'extractIDData' does not exist on type 'typeof import("/workspace/project/Elevate-lms/lib/ocr/tesseract-ocr")'.
 app/api/ocr/extract/route.ts(104,52): error TS2339: Property 'default' does not exist on type 'typeof import("/workspace/project/Elevate-lms/node_modules/.pnpm/pdf-parse@2.4.5/node_modules/pdf-parse/dist/pdf-parse/esm/index")'.
 app/api/ocr/extract/route.ts(110,7): error TS2322: Type 'OCRResult' is not assignable to type 'string'.
 app/api/onboarding/launch/route.ts(57,30): error TS2339: Property 'error' does not exist on type 'StartWorkspaceTrialResult'.
+  Property 'error' does not exist on type '{ ok: true; workspaceId: string; tenantId: string; organizationId: string; slug: string; workspaceUrl: string; publicPreviewUrl: string; dashboardUrl: string; trialEndsAt: string; status: string; }'.
 app/api/onboarding/launch/route.ts(57,37): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'number'.
+  Type 'string' is not assignable to type 'number'.
 app/api/onboarding/submit/route.ts(114,89): error TS2339: Property 'ip' does not exist on type 'NextRequest'.
 app/api/onboarding/validate-document/route.ts(71,52): error TS2554: Expected 1 arguments, but got 3.
-app/api/outcomes/route.ts(151,35): error TS2345: Argument of type '(req: NextRequest) => Promise<NextResponse<unknown>>' is not assignable to parameter of type 'string'.
-app/api/outcomes/route.ts(152,35): error TS2345: Argument of type '(req: NextRequest) => Promise<NextResponse<unknown>>' is not assignable to parameter of type 'string'.
-app/api/outcomes/route.ts(153,35): error TS2345: Argument of type '(req: NextRequest) => Promise<NextResponse<unknown>>' is not assignable to parameter of type 'string'.
+app/api/outcomes/route.ts(151,35): error TS2345: Argument of type '(req: NextRequest) => Promise<NextResponse<unknown> | (GuardedUser & NextResponse<any>)>' is not assignable to parameter of type 'string'.
+app/api/outcomes/route.ts(152,35): error TS2345: Argument of type '(req: NextRequest) => Promise<NextResponse<unknown> | (GuardedUser & NextResponse<any>)>' is not assignable to parameter of type 'string'.
+app/api/outcomes/route.ts(153,35): error TS2345: Argument of type '(req: NextRequest) => Promise<NextResponse<unknown> | (GuardedUser & NextResponse<any>)>' is not assignable to parameter of type 'string'.
 app/api/outreach/send/route.ts(249,24): error TS2339: Property 'filter' does not exist on type 'NextResponse<{ error: string; }> | { email: string; status: string; error?: string; }[]'.
+  Property 'filter' does not exist on type 'NextResponse<{ error: string; }>'.
 app/api/outreach/send/route.ts(250,26): error TS2339: Property 'filter' does not exist on type 'NextResponse<{ error: string; }> | { email: string; status: string; error?: string; }[]'.
+  Property 'filter' does not exist on type 'NextResponse<{ error: string; }>'.
 app/api/page-builder/pages/[id]/route.ts(14,37): error TS2353: Object literal may only specify known properties, and 'requireAuth' does not exist in type 'Request'.
 app/api/page-builder/pages/[id]/route.ts(46,37): error TS2353: Object literal may only specify known properties, and 'requireAuth' does not exist in type 'Request'.
 app/api/page-builder/pages/[id]/route.ts(75,37): error TS2353: Object literal may only specify known properties, and 'requireAuth' does not exist in type 'Request'.
@@ -239,7 +211,9 @@ app/api/page-builder/pages/route.ts(24,37): error TS2353: Object literal may onl
 app/api/partner/applications/[id]/approve/route.ts(124,16): error TS2339: Property 'email' does not exist on type 'never'.
 app/api/partner/applications/[id]/approve/route.ts(242,8): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, "notification_outbox", unknown, "POST">'. Did you mean 'match'?
 app/api/partner/apprentices/route.ts(92,25): error TS2352: Conversion of type '{ id: any; full_name: any; email: any; avatar_url: any; }[]' to type '{ id: string; full_name: string; email: string; avatar_url: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ id: any; full_name: any; email: any; avatar_url: any; }[]' is missing the following properties from type '{ id: string; full_name: string; email: string; avatar_url: string; }': id, full_name, email, avatar_url
 app/api/partner/documents/route.ts(39,27): error TS2352: Conversion of type '{ state: any; }[]' to type '{ state: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property 'state' is missing in type '{ state: any; }[]' but required in type '{ state: string; }'.
 app/api/payments/route.ts(97,45): error TS2353: Object literal may only specify known properties, and 'requireAuth' does not exist in type 'Request'.
 app/api/payments/route.ts(98,21): error TS2339: Property 'authorized' does not exist on type 'GuardedUser'.
 app/api/payments/route.ts(158,45): error TS2353: Object literal may only specify known properties, and 'requireAuth' does not exist in type 'Request'.
@@ -249,7 +223,7 @@ app/api/placements/[id]/route.ts(94,5): error TS2353: Object literal may only sp
 app/api/placements/[id]/route.ts(96,26): error TS2339: Property 'UPDATE' does not exist on type '{ readonly USER_CREATED: "user_created"; readonly USER_UPDATED: "user_updated"; readonly USER_DELETED: "user_deleted"; readonly USER_ROLE_CHANGED: "user_role_changed"; readonly USER_LOGIN: "user_login"; ... 86 more ...; readonly JOB_CREATED: "job_created"; }'.
 app/api/placements/route.ts(122,5): error TS2353: Object literal may only specify known properties, and 'actor_user_id' does not exist in type 'AuditEvent'.
 app/api/placements/route.ts(124,26): error TS2339: Property 'CREATE' does not exist on type '{ readonly USER_CREATED: "user_created"; readonly USER_UPDATED: "user_updated"; readonly USER_DELETED: "user_deleted"; readonly USER_ROLE_CHANGED: "user_role_changed"; readonly USER_LOGIN: "user_login"; ... 86 more ...; readonly JOB_CREATED: "job_created"; }'.
-app/api/proctor/sessions/[id]/route.ts(149,59): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+app/api/proctor/sessions/[id]/route.ts(149,59): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/proctor/sessions/[id]/route.ts(157,42): error TS2339: Property 'id_type' does not exist on type '{ id: any; status: any; result: any; id_verified: any; delivery_method: any; evidence_url: any; }'.
 app/api/proctor/sessions/[id]/route.ts(160,37): error TS2339: Property 'started_at' does not exist on type '{ id: any; status: any; result: any; id_verified: any; delivery_method: any; evidence_url: any; }'.
 app/api/proctor/sessions/[id]/route.ts(192,48): error TS2345: Argument of type '"certificate_issued"' is not assignable to parameter of type 'ExamEventType'.
@@ -257,7 +231,7 @@ app/api/proctor/sessions/route.ts(42,13): error TS2339: Property 'db' does not e
 app/api/proctor/sessions/route.ts(42,17): error TS2339: Property 'profile' does not exist on type 'NextResponse<{ error: string; }> | { supabase: SupabaseClient<any, "public", "public", any, any>; db: SupabaseClient<any, "public", "public", any, any>; user: User; profile: { ...; }; }'.
 app/api/proctor/sessions/route.ts(82,13): error TS2339: Property 'db' does not exist on type 'NextResponse<{ error: string; }> | { supabase: SupabaseClient<any, "public", "public", any, any>; db: SupabaseClient<any, "public", "public", any, any>; user: User; profile: { ...; }; }'.
 app/api/proctor/sessions/route.ts(82,17): error TS2339: Property 'profile' does not exist on type 'NextResponse<{ error: string; }> | { supabase: SupabaseClient<any, "public", "public", any, any>; db: SupabaseClient<any, "public", "public", any, any>; user: User; profile: { ...; }; }'.
-app/api/profile/update/route.ts(45,48): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+app/api/profile/update/route.ts(45,48): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/program-holder/call-log/route.ts(22,6): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
 app/api/program-holder/call-log/route.ts(29,6): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
 app/api/program-holder/call-log/route.ts(39,6): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
@@ -278,69 +252,40 @@ app/api/pwa/barber/log-hours/route.ts(78,43): error TS2339: Property 'notes' doe
 app/api/pwa/barber/log-hours/route.ts(78,99): error TS2339: Property 'notes' does not exist on type '{ id: any; hours_worked: any; }'.
 app/api/pwa/barber/profile/route.ts(75,52): error TS2339: Property 'created_at' does not exist on type '{ id: string; email?: string; }'.
 app/api/pwa/cosmetology/profile/route.ts(61,50): error TS2339: Property 'created_at' does not exist on type '{ id: string; email?: string; }'.
-app/api/recaps/[id]/route.ts(14,46): error TS2304: Cannot find name 'request'.
-app/api/recaps/action-items/[itemId]/toggle/route.ts(13,46): error TS2304: Cannot find name 'request'.
 app/api/recaps/generate/route.ts(124,28): error TS2339: Property 'label' does not exist on type 'It'.
 app/api/recaps/generate/route.ts(125,24): error TS2339: Property 'due_date' does not exist on type 'It'.
 app/api/recaps/generate/route.ts(125,45): error TS2339: Property 'due_date' does not exist on type 'It'.
-app/api/schedule-consultation/route.ts(100,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+app/api/schedule-consultation/route.ts(100,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/schedule-consultation/route.ts(111,74): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any>'.
 app/api/scorm/attempts/[attemptId]/data/route.ts(25,43): error TS2339: Property 'userId' does not exist on type 'string'.
 app/api/scorm/attempts/[attemptId]/data/route.ts(58,43): error TS2339: Property 'userId' does not exist on type 'string'.
-app/api/scorm/content/[packageId]/[...path]/route.ts(43,44): error TS2304: Cannot find name 'request'.
 app/api/security/log/route.ts(38,24): error TS2339: Property 'ip' does not exist on type 'NextRequest'.
-app/api/sezzle/webhook/route.ts(221,44): error TS2304: Cannot find name 'sezzleEventId'.
-app/api/simulations/[simKey]/attempts/[attemptId]/route.ts(78,23): error TS7030: Not all code paths return a value.
 app/api/soc/mark/route.ts(71,5): error TS2322: Type '"soc_controls"' is not assignable to type 'AuditEntity'.
-app/api/store/api-store/cart-checkout/route.ts(148,37): error TS2304: Cannot find name 'baseUrl'.
-app/api/store/api-store/clone/route.ts(52,14): error TS2304: Cannot find name 'NextResponse'.
 app/api/store/api-store/customer-portal/route.ts(23,45): error TS2554: Expected 0 arguments, but got 2.
 app/api/store/api-store/customer-portal/route.ts(49,8): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
-app/api/store/api-store/license/generate/route.ts(125,102): error TS2304: Cannot find name 'safeError'.
-app/api/store/api-store/license/generate/route.ts(127,11): error TS2304: Cannot find name 'authError'.
-app/api/store/api-store/license/generate/route.ts(167,14): error TS2304: Cannot find name 'NextResponse'.
-app/api/store/api-store/license/validate/route.ts(60,14): error TS2304: Cannot find name 'NextResponse'.
-app/api/store/api-store/licenses/webhook/route.ts(67,35): error TS2304: Cannot find name 'adminSupabase'.
-app/api/store/api-store/licenses/webhook/route.ts(84,49): error TS2304: Cannot find name 'adminSupabase'.
-app/api/store/api-store/licenses/webhook/route.ts(96,39): error TS2304: Cannot find name 'adminSupabase'.
-app/api/store/api-store/licenses/webhook/route.ts(146,41): error TS2304: Cannot find name 'adminSupabase'.
-app/api/store/api-store/licenses/webhook/route.ts(160,41): error TS2304: Cannot find name 'adminSupabase'.
-app/api/store/api-store/licenses/webhook/route.ts(209,19): error TS2304: Cannot find name 'adminSupabase'.
 app/api/store/api-store/products/[slug]/route.ts(36,13): error TS2339: Property 'getProductBySlug' does not exist on type 'typeof import("/workspace/project/Elevate-lms/app/data/store-products")'.
-app/api/store/api-store/subscribe/route.ts(24,45): error TS2554: Expected 0 arguments, but got 2.
-app/api/store/api-store/subscribe/route.ts(47,8): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
-app/api/store/api-store/subscribe/route.ts(62,8): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
-app/api/store/api-store/subscribe/route.ts(82,22): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
-app/api/store/api-store/subscribe/route.ts(94,8): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
 app/api/store/api-store/webhook/route.ts(150,49): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
 app/api/store/api-store/webhook/route.ts(162,67): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
-app/api/store/cart-checkout/route.ts(155,37): error TS2304: Cannot find name 'baseUrl'.
-app/api/store/clone/route.ts(53,14): error TS2304: Cannot find name 'NextResponse'.
-app/api/store/license/generate/route.ts(148,28): error TS2304: Cannot find name 'requireAdminClient'.
-app/api/store/license/generate/route.ts(151,14): error TS2304: Cannot find name 'NextResponse'.
-app/api/store/license/validate/route.ts(58,14): error TS2304: Cannot find name 'NextResponse'.
 app/api/store/platform-checkout/route.ts(115,52): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(params?: SessionCreateParams, options?: RequestOptions): Promise<Response<Session>>', gave the following error.
+    Type '{ price_data: { currency: string; unit_amount: number; recurring?: { interval: string; }; product_data: { name: string; description?: string; }; }; quantity: number; }[]' is not assignable to type 'LineItem[]'.
+      Type '{ price_data: { currency: string; unit_amount: number; recurring?: { interval: string; }; product_data: { name: string; description?: string; }; }; quantity: number; }' is not assignable to type 'LineItem'.
+        The types of 'price_data.recurring.interval' are incompatible between these types.
+          Type 'string' is not assignable to type 'Interval'.
+  Overload 2 of 2, '(options?: RequestOptions): Promise<Response<Session>>', gave the following error.
+    Object literal may only specify known properties, and 'customer' does not exist in type 'RequestOptions'.
 app/api/store/publish/route.ts(52,42): error TS2339: Property 'id' does not exist on type 'Response<Product> | NextResponse<{ error: string; }>'.
-app/api/stripe/invoice/create/route.ts(16,38): error TS2304: Cannot find name 'request'.
-app/api/student/acknowledge-handbook/route.ts(15,35): error TS2304: Cannot find name 'request'.
+  Property 'id' does not exist on type 'NextResponse<{ error: string; }>'.
 app/api/student/dashboard/route.ts(109,67): error TS2339: Property 'slug' does not exist on type '{ id: any; name: any; slug: any; category: any; duration_weeks: any; required_hours: any; total_hours: any; }[]'.
-app/api/student/hours/route.ts(118,45): error TS2339: Property 'name' does not exist on type '{ id: any; name: any; slug: any; title: any; total_hours: any; required_hours: any; }[]'.
-app/api/student/hours/route.ts(118,73): error TS2339: Property 'title' does not exist on type '{ id: any; name: any; slug: any; title: any; total_hours: any; required_hours: any; }[]'.
-app/api/student/hours/route.ts(119,72): error TS2339: Property 'slug' does not exist on type '{ id: any; name: any; slug: any; title: any; total_hours: any; required_hours: any; }[]'.
-app/api/student/hours/route.ts(121,33): error TS2339: Property 'required_hours' does not exist on type '{ id: any; name: any; slug: any; title: any; total_hours: any; required_hours: any; }[]'.
-app/api/student/hours/route.ts(121,71): error TS2339: Property 'total_hours' does not exist on type '{ id: any; name: any; slug: any; title: any; total_hours: any; required_hours: any; }[]'.
 app/api/tenants/provision/route.ts(21,28): error TS2339: Property 'isAdmin' does not exist on type 'string'.
 app/api/testing/booking-status/route.ts(92,14): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, "exam_bookings", unknown, "PATCH">'. Did you mean 'match'?
-app/api/testing/bookings/[id]/route.ts(81,57): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+app/api/testing/bookings/[id]/route.ts(81,57): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/testing/retake/route.ts(48,52): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-app/api/time/entries/route.ts(129,7): error TS2304: Cannot find name 'logger'.
-app/api/time/entries/route.ts(278,5): error TS2304: Cannot find name 'logger'.
-app/api/time/entries/route.ts(317,5): error TS2304: Cannot find name 'logger'.
 app/api/timeclock/context/route.ts(186,27): error TS2352: Conversion of type '{ id: any; name: any; }[]' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-app/api/trial/start-managed/route.ts(79,5): error TS2353: Object literal may only specify known properties, and 'headers' does not exist in type '{ from: string; to: string | string[]; subject: string; html?: string; text?: string; }'.
-app/api/trial/start-managed/route.ts(83,42): error TS2304: Cannot find name 'publicSiteUrl'.
-app/api/trial/start-managed/route.ts(83,65): error TS2304: Cannot find name 'publicSiteUrl'.
+  Property 'name' is missing in type '{ id: any; name: any; }[]' but required in type '{ name: string; }'.
+app/api/trial/start-managed/route.ts(80,5): error TS2353: Object literal may only specify known properties, and 'headers' does not exist in type '{ from: string; to: string | string[]; subject: string; html?: string; text?: string; }'.
 app/api/tts/route.ts(42,29): error TS2345: Argument of type 'Buffer<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
+  Type 'Buffer<ArrayBufferLike>' is missing the following properties from type 'URLSearchParams': size, append, delete, get, and 2 more.
 app/api/tutorials/route.ts(18,45): error TS2353: Object literal may only specify known properties, and 'requireAuth' does not exist in type 'Request'.
 app/api/tutorials/route.ts(19,21): error TS2339: Property 'authorized' does not exist on type 'GuardedUser'.
 app/api/tutorials/route.ts(62,45): error TS2353: Object literal may only specify known properties, and 'requireAuth' does not exist in type 'Request'.
@@ -348,21 +293,24 @@ app/api/tutorials/route.ts(63,21): error TS2339: Property 'authorized' does not 
 app/api/v1/tenant/branding/route.ts(90,19): error TS2339: Property 'features' does not exist on type '{ valid: boolean; tenantId?: string; error?: string; }'.
 app/api/v1/tenant/branding/route.ts(147,21): error TS2339: Property 'features' does not exist on type '{ valid: boolean; tenantId?: string; error?: string; }'.
 app/api/v1/tenant/branding/route.ts(185,19): error TS2339: Property 'features' does not exist on type '{ valid: boolean; tenantId?: string; error?: string; }'.
-app/api/webhooks/jotform/route.ts(106,81): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+app/api/webhooks/jotform/route.ts(106,81): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/webhooks/route.ts(142,50): error TS2345: Argument of type '(request: NextRequest) => Promise<NextResponse<unknown> | GuardedUser>' is not assignable to parameter of type '(req: Request, ...args: any[]) => Promise<Response>'.
+  Type 'Promise<NextResponse<unknown> | GuardedUser>' is not assignable to type 'Promise<Response>'.
+    Type 'NextResponse<unknown> | GuardedUser' is not assignable to type 'Response'.
+      Type 'GuardedUser' is missing the following properties from type 'Response': headers, ok, redirected, status, and 12 more.
 app/api/webhooks/route.ts(143,51): error TS2345: Argument of type '(request: NextRequest) => Promise<NextResponse<unknown> | GuardedUser>' is not assignable to parameter of type '(req: Request, ...args: any[]) => Promise<Response>'.
-app/api/webhooks/sendgrid-inbound/route.ts(74,58): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+  Type 'Promise<NextResponse<unknown> | GuardedUser>' is not assignable to type 'Promise<Response>'.
+    Type 'NextResponse<unknown> | GuardedUser' is not assignable to type 'Response'.
+      Type 'GuardedUser' is missing the following properties from type 'Response': headers, ok, redirected, status, and 12 more.
+app/api/webhooks/sendgrid-inbound/route.ts(74,58): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/webhooks/store/route.ts(266,45): error TS2339: Property 'current_period_end' does not exist on type 'Response<Subscription>'.
 app/api/webhooks/stripe/career-courses/route.ts(136,38): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any>'.
-app/api/webhooks/subscriptions/route.ts(97,47): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
-app/api/webhooks/subscriptions/route.ts(97,83): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
-app/api/webhooks/subscriptions/route.ts(97,110): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
-app/api/webhooks/subscriptions/route.ts(117,47): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
-app/api/webhooks/subscriptions/route.ts(117,83): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
-app/api/webhooks/subscriptions/route.ts(117,110): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
 app/api/websites/[websiteId]/config/route.ts(33,43): error TS2339: Property 'error' does not exist on type '{ ok: true; } | { ok: false; error: string; }'.
+  Property 'error' does not exist on type '{ ok: true; }'.
 app/api/websites/[websiteId]/publish/route.ts(44,27): error TS2339: Property 'error' does not exist on type '{ ok: true; publicUrl: string; } | { ok: false; error: string; }'.
+  Property 'error' does not exist on type '{ ok: true; publicUrl: string; }'.
 app/api/websites/[websiteId]/publish/route.ts(45,29): error TS2339: Property 'error' does not exist on type '{ ok: true; publicUrl: string; } | { ok: false; error: string; }'.
+  Property 'error' does not exist on type '{ ok: true; publicUrl: string; }'.
 app/api/wioa/case-management/[id]/route.ts(17,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
 app/api/wioa/case-management/[id]/route.ts(47,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
 app/api/wioa/case-management/route.ts(17,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
@@ -380,22 +328,24 @@ app/api/wioa/support-services/[id]/approve/route.ts(20,81): error TS2322: Type '
 app/api/wioa/support-services/route.ts(17,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
 app/api/wioa/support-services/route.ts(56,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
 app/api/workforce-board/performance-trends/route.ts(14,68): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/workforce-board/performance-trends/route.ts(15,14): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/workforce-board/performance-trends/route.ts(15,33): error TS2339: Property 'error' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
-app/api/workforce-board/performance-trends/route.ts(17,13): error TS2339: Property 'db' does not exist on type 'NextResponse<unknown> | ApiAuthResult'.
 app/api/workspaces/create/route.ts(65,31): error TS2339: Property 'error' does not exist on type 'StartWorkspaceTrialResult'.
+  Property 'error' does not exist on type '{ ok: true; workspaceId: string; tenantId: string; organizationId: string; slug: string; workspaceUrl: string; publicPreviewUrl: string; dashboardUrl: string; trialEndsAt: string; status: string; }'.
 app/api/workspaces/create/route.ts(65,38): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'number'.
-app/api/xapi/statement/route.ts(43,17): error TS2304: Cannot find name 'auth'.
-app/api/xapi/statement/route.ts(52,25): error TS2304: Cannot find name 'auth'.
+  Type 'string' is not assignable to type 'number'.
 app/apply/IntakeFormInner.tsx(220,9): error TS2304: Cannot find name 'setMirrorWarning'.
 app/apply/actions.ts(726,11): error TS2353: Object literal may only specify known properties, and 'status' does not exist in type '{ success: true; applicationId: string; referenceNumber: string; email?: string; }'.
 app/apply/employer/EmployerApplicationForm.tsx(54,26): error TS2339: Property 'redirectTo' does not exist on type '{ success: true; applicationId: string; referenceNumber: string; email?: string; } | { success: boolean; applicationId: string; referenceNumber: string; redirectTo: string; }'.
+  Property 'redirectTo' does not exist on type '{ success: true; applicationId: string; referenceNumber: string; email?: string; }'.
 app/apply/employer/EmployerApplicationForm.tsx(56,23): error TS2339: Property 'error' does not exist on type '{ success: true; applicationId: string; referenceNumber: string; email?: string; } | { success: false; error: string; } | { success: boolean; applicationId: string; referenceNumber: string; redirectTo: string; }'.
+  Property 'error' does not exist on type '{ success: true; applicationId: string; referenceNumber: string; email?: string; }'.
 app/apply/employer/success/page.tsx(22,6): error TS2339: Property 'catch' does not exist on type 'PromiseLike<any>'.
 app/apply/intake/page.tsx(7,3): error TS1117: An object literal cannot have multiple properties with the same name.
 app/apply/staff/StaffApplicationForm.tsx(37,26): error TS2339: Property 'redirectTo' does not exist on type '{ success: true; applicationId: string; referenceNumber: string; email?: string; } | { success: boolean; applicationId: string; referenceNumber: string; redirectTo: string; }'.
+  Property 'redirectTo' does not exist on type '{ success: true; applicationId: string; referenceNumber: string; email?: string; }'.
 app/apply/staff/StaffApplicationForm.tsx(39,23): error TS2339: Property 'error' does not exist on type '{ success: true; applicationId: string; referenceNumber: string; email?: string; } | { success: false; error: string; } | { success: boolean; applicationId: string; referenceNumber: string; redirectTo: string; }'.
+  Property 'error' does not exist on type '{ success: true; applicationId: string; referenceNumber: string; email?: string; }'.
 app/apply/student/StudentApplicationForm.tsx(471,20): error TS2339: Property 'status' does not exist on type '{ success: true; applicationId: string; referenceNumber: string; email?: string; } | { success: boolean; applicationId: string; referenceNumber: string; email: string; status: string; }'.
+  Property 'status' does not exist on type '{ success: true; applicationId: string; referenceNumber: string; email?: string; }'.
 app/apply/student/page.tsx(64,47): error TS2551: Property 'credentialIssued' does not exist on type 'ProgramSchema'. Did you mean 'credentials'?
 app/apply/waitlist/[program]/page.tsx(146,43): error TS2339: Property 'title' does not exist on type '{ name: string; description: string; estimatedWait: string; }'.
 app/apply/waitlist/[program]/page.tsx(197,22): error TS2339: Property 'title' does not exist on type '{ name: string; description: string; estimatedWait: string; }'.
@@ -406,7 +356,6 @@ app/apprentice/workbook/page.tsx(32,66): error TS2353: Object literal may only s
 app/apprentice/workbook/page.tsx(33,36): error TS2353: Object literal may only specify known properties, and 'className' does not exist in type 'BreadcrumbItem'.
 app/components/AIInstructor.tsx(31,26): error TS2448: Block-scoped variable 'speak' used before its declaration.
 app/components/AIInstructor.tsx(110,15): error TS17001: JSX elements cannot have multiple attributes with the same name.
-app/components/FeatureTour.tsx(12,13): error TS7030: Not all code paths return a value.
 app/data/curriculum-modules.ts(485,5): error TS1117: An object literal cannot have multiple properties with the same name.
 app/data/programs.ts(285,5): error TS2353: Object literal may only specify known properties, and 'downPayment' does not exist in type 'Program'.
 app/documents/page.tsx(27,11): error TS2339: Property 'user' does not exist on type 'AuthUser'.
@@ -415,42 +364,53 @@ app/employer/applications/page.tsx(71,11): error TS2304: Cannot find name 'profi
 app/employer/candidates/page.tsx(163,22): error TS2304: Cannot find name 'profile'.
 app/employer/reports/submit/page.tsx(28,28): error TS2339: Property 'company_name' does not exist on type '{ id: string; role: string; organization_id?: string; email?: string; first_name?: string; last_name?: string; full_name?: string; avatar_url?: string; onboarding_completed?: boolean; }'.
 app/employer/shop/create/page.tsx(26,5): error TS2304: Cannot find name 'redirect'.
-app/forgot-password/actions.ts(55,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-app/forgot-password/actions.ts(114,53): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-app/funding/confirm/page.tsx(37,45): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+app/forgot-password/actions.ts(55,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
+app/forgot-password/actions.ts(114,53): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
+app/funding/confirm/page.tsx(37,45): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/funding/wioa/page.tsx(27,10): error TS2339: Property 'from' does not exist on type 'Promise<any>'.
 app/host-shop/dashboard/schedule/page.tsx(37,105): error TS2554: Expected 2 arguments, but got 3.
-app/layout.tsx(3,10): error TS2395: Individual declarations in merged declaration 'dynamic' must be all exported or all local.
-app/layout.tsx(3,10): error TS2614: Module '"next/dynamic"' has no exported member 'dynamic'. Did you mean to use 'import dynamic from "next/dynamic"' instead?
-app/layout.tsx(20,14): error TS2395: Individual declarations in merged declaration 'dynamic' must be all exported or all local.
-app/layout.tsx(23,25): error TS2349: This expression is not callable.
-app/layout.tsx(24,19): error TS2349: This expression is not callable.
-app/layout.tsx(25,27): error TS2349: This expression is not callable.
-app/layout.tsx(26,29): error TS2349: This expression is not callable.
-app/layout.tsx(27,29): error TS2349: This expression is not callable.
 app/legal/[slug]/page.tsx(33,41): error TS2339: Property 'email' does not exist on type '{ name: string; url: string; description: string; ogImage: string; handoff: { apply: string; login: string; checkout: string; lms: string; studentPortal: string; }; social: { facebook: string; instagram: string; linkedin: string; }; }'.
 app/legal/[slug]/page.tsx(34,25): error TS2339: Property 'email' does not exist on type '{ name: string; url: string; description: string; ogImage: string; handoff: { apply: string; login: string; checkout: string; lms: string; studentPortal: string; }; social: { facebook: string; instagram: string; linkedin: string; }; }'.
 app/legal/[slug]/page.tsx(37,38): error TS2339: Property 'phone' does not exist on type '{ name: string; url: string; description: string; ogImage: string; handoff: { apply: string; login: string; checkout: string; lms: string; studentPortal: string; }; social: { facebook: string; instagram: string; linkedin: string; }; }'.
 app/legal/[slug]/page.tsx(38,25): error TS2339: Property 'phone' does not exist on type '{ name: string; url: string; description: string; ogImage: string; handoff: { apply: string; login: string; checkout: string; lms: string; studentPortal: string; }; social: { facebook: string; instagram: string; linkedin: string; }; }'.
 app/lms/dashboard/page.tsx(117,34): error TS2322: Type '{ count: number; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'count' does not exist on type 'IntrinsicAttributes'.
 app/manifest.ts(33,9): error TS2578: Unused '@ts-expect-error' directive.
 app/manifest.ts(41,9): error TS2578: Unused '@ts-expect-error' directive.
 app/page.tsx(7,26): error TS1261: Already included file name '/workspace/project/Elevate-lms/components/ui/skeleton.tsx' differs from file name '/workspace/project/Elevate-lms/components/ui/Skeleton.tsx' only in casing.
+  The file is in the program because:
+    Imported via '@/components/ui/skeleton' from file '/workspace/project/Elevate-lms/app/page.tsx'
+    Imported via '@/components/ui/skeleton' from file '/workspace/project/Elevate-lms/app/admin/dev-studio/page.tsx'
+    Imported via '@/components/ui/skeleton' from file '/workspace/project/Elevate-lms/app/admin/studio/page.tsx'
+    Imported via '@/components/ui/skeleton' from file '/workspace/project/Elevate-lms/app/lms/dashboard/page.tsx'
+    Imported via '@/components/ui/skeleton' from file '/workspace/project/Elevate-lms/app/partners/dashboard/page.tsx'
+    Matched by include pattern 'components/ui/**/*.tsx' in '/workspace/project/Elevate-lms/tsconfig.json'
+    Matched by include pattern 'components/ui/**/*.tsx' in '/workspace/project/Elevate-lms/tsconfig.json'
 app/partner/hours/page.tsx(79,38): error TS2365: Operator '+' cannot be applied to types '{ hours_claimed: any; }' and 'number'.
 app/partner/hours/page.tsx(79,76): error TS2345: Argument of type 'number' is not assignable to parameter of type '{ hours_claimed: any; }'.
 app/platform/licensing/page.tsx(171,26): error TS2367: This comparison appears to be unintentional because the types 'boolean' and 'string' have no overlap.
 app/programs/[program]/discussions/[threadId]/page.tsx(46,23): error TS2448: Block-scoped variable 'loadData' used before its declaration.
 app/programs/[program]/discussions/[threadId]/page.tsx(104,15): error TS2345: Argument of type '{ id: any; title: any; content: any; created_at: any; pinned: any; likes: any; author: { full_name: any; avatar_url: any; }[]; }' is not assignable to parameter of type 'SetStateAction<Thread>'.
+  Type '{ id: any; title: any; content: any; created_at: any; pinned: any; likes: any; author: { full_name: any; avatar_url: any; }[]; }' is not assignable to type 'Thread'.
+    Types of property 'author' are incompatible.
+      Property 'full_name' is missing in type '{ full_name: any; avatar_url: any; }[]' but required in type '{ full_name: string; avatar_url?: string; }'.
 app/programs/[program]/discussions/[threadId]/page.tsx(121,16): error TS2345: Argument of type '{ id: any; content: any; created_at: any; likes: any; author: { full_name: any; avatar_url: any; }[]; }[]' is not assignable to parameter of type 'SetStateAction<Reply[]>'.
+  Type '{ id: any; content: any; created_at: any; likes: any; author: { full_name: any; avatar_url: any; }[]; }[]' is not assignable to type 'Reply[]'.
+    Type '{ id: any; content: any; created_at: any; likes: any; author: { full_name: any; avatar_url: any; }[]; }' is not assignable to type 'Reply'.
+      Types of property 'author' are incompatible.
+        Property 'full_name' is missing in type '{ full_name: any; avatar_url: any; }[]' but required in type '{ full_name: string; avatar_url?: string; }'.
 app/programs/[program]/discussions/page.tsx(39,13): error TS2448: Block-scoped variable 'loadData' used before its declaration.
 app/programs/[program]/page.tsx(194,26): error TS2304: Cannot find name 'imageUrl'.
 app/programs/[program]/page.tsx(556,13): error TS2322: Type '{ programSlug: string; heading: string; limit: number; className: string; }' is not assignable to type 'IntrinsicAttributes & LiveJobPostingsProps'.
+  Property 'programSlug' does not exist on type 'IntrinsicAttributes & LiveJobPostingsProps'.
 app/programs/[program]/page.tsx(577,31): error TS2339: Property 'sections' does not exist on type 'CfProgram'.
 app/programs/barber-apprenticeship/TransferHoursCalculator.tsx(61,30): error TS2304: Cannot find name 'setTransferHours'.
 app/programs/barber-apprenticeship/apply/ApprenticeForm.tsx(224,11): error TS1117: An object literal cannot have multiple properties with the same name.
 app/programs/barber-apprenticeship/apply/apprentice/page.tsx(48,10): error TS2304: Cannot find name 'BarberApprenticeApplyForm'.
 app/programs/catalog/page.tsx(175,23): error TS2322: Type 'CatalogProgram' is not assignable to type 'ProgramRow'.
+  Property 'next_start_date' is optional in type 'CatalogProgram' but required in type 'ProgramRow'.
 app/programs/cosmetology-apprenticeship/eligibility/page.tsx(43,31): error TS2322: Type '{ programSlug: string; }' is not assignable to type 'IntrinsicAttributes & Props'.
+  Property 'programSlug' does not exist on type 'IntrinsicAttributes & Props'.
 app/programs/cosmetology-apprenticeship/enrollment-success/page.tsx(43,45): error TS2339: Property 'name' does not exist on type '{ name: any; slug: any; }[]'.
 app/programs/cosmetology-apprenticeship/enrollment-success/page.tsx(44,45): error TS2339: Property 'slug' does not exist on type '{ name: any; slug: any; }[]'.
 app/programs/federal-funded/page.tsx(46,6): error TS2339: Property 'from' does not exist on type 'Promise<any>'.
@@ -459,23 +419,22 @@ app/programs/hvac-technician/course/HvacCourseHome.tsx(393,80): error TS2322: Ty
 app/programs/micro-programs/page.tsx(38,6): error TS2339: Property 'from' does not exist on type 'Promise<any>'.
 app/store/apps/page.tsx(62,3): error TS1117: An object literal cannot have multiple properties with the same name.
 app/store/courses/page.tsx(88,31): error TS2339: Property 'format' does not exist on type 'Course'.
-components/AIAssistantBubble.tsx(24,52): error TS7030: Not all code paths return a value.
-components/AIAssistantBubble.tsx(56,18): error TS7030: Not all code paths return a value.
 components/AIAssistantBubble.tsx(127,28): error TS2503: Cannot find namespace 'JSX'.
 components/AvatarGuide.tsx(43,21): error TS7030: Not all code paths return a value.
 components/AvatarGuide.tsx(73,13): error TS7030: Not all code paths return a value.
 components/GlobalAvatar.tsx(107,39): error TS7030: Not all code paths return a value.
 components/PageAvatar.tsx(22,14): error TS7030: Not all code paths return a value.
 components/SearchDialog.tsx(15,23): error TS1261: Already included file name '/workspace/project/Elevate-lms/components/ui/Input.tsx' differs from file name '/workspace/project/Elevate-lms/components/ui/input.tsx' only in casing.
+  The file is in the program because:
+    Imported via '@/components/ui/Input' from file '/workspace/project/Elevate-lms/components/SearchDialog.tsx'
+    Matched by include pattern 'components/ui/**/*.tsx' in '/workspace/project/Elevate-lms/tsconfig.json'
+    Imported via './Input' from file '/workspace/project/Elevate-lms/components/ui/input.tsx'
+    Matched by include pattern 'components/ui/**/*.tsx' in '/workspace/project/Elevate-lms/tsconfig.json'
 components/SecurityMonitor.tsx(16,40): error TS7030: Not all code paths return a value.
 components/SecurityMonitor.tsx(101,11): error TS2322: Type 'Location' is not assignable to type 'string'.
 components/SignaturePad.tsx(20,13): error TS7030: Not all code paths return a value.
 components/Turnstile.tsx(85,7): error TS7030: Not all code paths return a value.
 components/VersionGuard.tsx(11,5): error TS2554: Expected 2 arguments, but got 0.
-components/admin/AdvancedVideoUploader.tsx(105,42): error TS2339: Property 'files' does not exist on type 'EventTarget & (HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement)'.
-components/admin/AdvancedVideoUploader.tsx(159,21): error TS2322: Type '{ value: string; onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, Element>) => void; Content: string; rows: number; className: string; }' is not assignable to type 'DetailedHTMLProps<TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>'.
-components/admin/AdvancedVideoUploader.tsx(198,52): error TS2339: Property 'files' does not exist on type 'EventTarget & (HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement)'.
-components/admin/AdvancedVideoUploader.tsx(220,42): error TS2339: Property 'files' does not exist on type 'EventTarget & (HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement)'.
 components/admin/dashboard/DashboardShell.tsx(597,82): error TS2339: Property 'slug' does not exist on type 'TopProgramPoint'.
 components/admin/dashboard/LivePreviewIframe.tsx(12,15): error TS7030: Not all code paths return a value.
 components/admin/dashboard/LizzyWorkspace.tsx(190,12): error TS2367: This comparison appears to be unintentional because the types 'ToolPanel' and '"workflows"' have no overlap.
@@ -493,9 +452,13 @@ components/documents/DocumentSignatureBlock.tsx(74,58): error TS7030: Not all co
 components/layout/RootWidgets.tsx(38,13): error TS7030: Not all code paths return a value.
 components/lms/AdvancedQuizBuilder.tsx(279,20): error TS2604: JSX element type 'Icon' does not have any construct or call signatures.
 components/lms/AdvancedQuizBuilder.tsx(279,20): error TS2786: 'Icon' cannot be used as a JSX component.
+  Its type 'ReactElement<unknown, string | JSXElementConstructor<any>> | ComponentType<any>' is not a valid JSX element type.
+    Type 'ReactElement<unknown, string | JSXElementConstructor<any>>' is not assignable to type 'ElementType'.
 components/lms/ContentLibrary.tsx(67,25): error TS2304: Cannot find name 'useCallback'.
-components/lms/ContentLibrary.tsx(185,31): error TS2339: Property 'files' does not exist on type 'EventTarget & (HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement)'.
-components/lms/ContentLibrary.tsx(185,62): error TS2339: Property 'files' does not exist on type 'EventTarget & (HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement)'.
+components/lms/ContentLibrary.tsx(185,31): error TS2339: Property 'files' does not exist on type 'EventTarget & (HTMLTextAreaElement | HTMLSelectElement | HTMLInputElement)'.
+  Property 'files' does not exist on type 'EventTarget & HTMLTextAreaElement'.
+components/lms/ContentLibrary.tsx(185,62): error TS2339: Property 'files' does not exist on type 'EventTarget & (HTMLTextAreaElement | HTMLSelectElement | HTMLInputElement)'.
+  Property 'files' does not exist on type 'EventTarget & HTMLTextAreaElement'.
 components/lms/CourseModuleAccordion.tsx(307,23): error TS2322: Type 'string' is not assignable to type 'never'.
 components/lms/HvacLessonVideo.tsx(123,15): error TS7030: Not all code paths return a value.
 components/lms/LessonActivityMenu.tsx(35,7): error TS2741: Property 'ask' is missing in type '{ video: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>; reading: React.ForwardRefExoticComponent<Omit<...> & React.RefAttributes<...>>; ... 6 more ...; resources: React.ForwardRefExoticComponent<...>; }' but required in type 'Record<ActivityId, ElementType<any, keyof IntrinsicElements>>'.
@@ -533,17 +496,13 @@ components/store/StoreGuideChat.tsx(94,7): error TS7030: Not all code paths retu
 components/store/StoreGuideChat.tsx(97,40): error TS7030: Not all code paths return a value.
 components/store/StoreGuideChat.tsx(98,24): error TS7030: Not all code paths return a value.
 components/store/StoreGuideChat.tsx(101,20): error TS7030: Not all code paths return a value.
-components/studio/CourseProvider.tsx(303,61): error TS7030: Not all code paths return a value.
 components/studio/DeployPanel.tsx(155,29): error TS7030: Not all code paths return a value.
 components/studio/IframePreview.tsx(10,15): error TS7030: Not all code paths return a value.
-components/studio/panels/CurriculumPanel.tsx(29,16): error TS2339: Property 'content' does not exist on type 'StudioLesson'.
-components/studio/panels/MediaPanel.tsx(17,3): error TS2345: Argument of type '() => Promise<{ default: typeof import("/workspace/project/Elevate-lms/components/admin/AdvancedVideoUploader") | (() => JSX.Element); }>' is not assignable to parameter of type 'DynamicOptions<{}> | Loader<{}>'.
-components/studio/panels/MediaPanel.tsx(42,9): error TS2769: No overload matches this call.
-components/studio/panels/QuizPanel.tsx(36,9): error TS2769: No overload matches this call.
 components/support/IntercomWidget.tsx(16,51): error TS7030: Not all code paths return a value.
 components/support/IntercomWidget.tsx(33,20): error TS2304: Cannot find name 'args'.
 components/support/ZendeskWidget.tsx(16,47): error TS7030: Not all code paths return a value.
 components/testing/ProviderExamList.tsx(47,19): error TS2322: Type '{ examType: string; examName: string; amountCents: number; active: true; }' is not assignable to type 'IntrinsicAttributes & { exam: any; className?: string; }'.
+  Property 'examType' does not exist on type 'IntrinsicAttributes & { exam: any; className?: string; }'.
 components/testing/TestingCart.tsx(15,11): error TS2339: Property 'addItem' does not exist on type '{ items: { id: string; name: string; price: number; quantity: number; }[]; total: number; removeItem: (productId: string) => void; updateQuantity: (productId: string, quantity: number) => void; clearCart: () => void; }'.
 components/tours/GuidedTour.tsx(64,34): error TS2448: Block-scoped variable 'handleComplete' used before its declaration.
 components/ui/AnimatedCounter.tsx(26,14): error TS7030: Not all code paths return a value.
@@ -563,12 +522,28 @@ components/ui/StaggerChildren.tsx(35,7): error TS7030: Not all code paths return
 components/ui/Tooltip.tsx(223,22): error TS2304: Cannot find name 'placeholder'.
 components/ui/animated-list.tsx(33,15): error TS7030: Not all code paths return a value.
 components/ui/badge.tsx(1,40): error TS1149: File name '/workspace/project/Elevate-lms/components/ui/badge.tsx' differs from already included file name '/workspace/project/Elevate-lms/components/ui/Badge.tsx' only in casing.
+  The file is in the program because:
+    Matched by include pattern 'components/ui/**/*.tsx' in '/workspace/project/Elevate-lms/tsconfig.json'
+    Imported via './Badge' from file '/workspace/project/Elevate-lms/components/ui/badge.tsx'
+    Matched by include pattern 'components/ui/**/*.tsx' in '/workspace/project/Elevate-lms/tsconfig.json'
 components/ui/bento-grid.tsx(5,24): error TS1149: File name '/workspace/project/Elevate-lms/components/ui/button.tsx' differs from already included file name '/workspace/project/Elevate-lms/components/ui/Button.tsx' only in casing.
+  The file is in the program because:
+    Imported via '@/components/ui/Button' from file '/workspace/project/Elevate-lms/components/SearchDialog.tsx'
+    Matched by include pattern 'components/ui/**/*.tsx' in '/workspace/project/Elevate-lms/tsconfig.json'
+    Imported via './Button' from file '/workspace/project/Elevate-lms/components/ui/button.tsx'
+    Imported via '@/components/ui/Button' from file '/workspace/project/Elevate-lms/components/FileUpload.tsx'
+    Imported via '@/components/ui/Button' from file '/workspace/project/Elevate-lms/components/lms/EnrollButton.tsx'
+    Imported via '@/components/ui/Button' from file '/workspace/project/Elevate-lms/components/SignaturePad.tsx'
+    Imported via '@/components/ui/button' from file '/workspace/project/Elevate-lms/components/ui/bento-grid.tsx'
 components/ui/bento-grid.tsx(55,15): error TS2322: Type 'string' is not assignable to type 'never'.
 components/ui/design-system/Button.tsx(67,43): error TS2352: Conversion of type '{ form?: string | undefined; formAction?: string | ((formData: FormData) => void | Promise<void>) | React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_FORM_ACTIONS[keyof React.DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_FORM_ACTIONS] | undefined; ... 284 more ...; className: string; }' to type 'string' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
 components/ui/input.tsx(1,22): error TS2305: Module '"./Input"' has no exported member 'InputProps'.
 components/ui/label.tsx(1,22): error TS2305: Module '"./Label"' has no exported member 'LabelProps'.
 components/ui/label.tsx(1,40): error TS1149: File name '/workspace/project/Elevate-lms/components/ui/label.tsx' differs from already included file name '/workspace/project/Elevate-lms/components/ui/Label.tsx' only in casing.
+  The file is in the program because:
+    Matched by include pattern 'components/ui/**/*.tsx' in '/workspace/project/Elevate-lms/tsconfig.json'
+    Imported via './Label' from file '/workspace/project/Elevate-lms/components/ui/label.tsx'
+    Matched by include pattern 'components/ui/**/*.tsx' in '/workspace/project/Elevate-lms/tsconfig.json'
 components/ui/number-ticker.tsx(33,13): error TS7030: Not all code paths return a value.
 components/ui/sheet.tsx(53,5): error TS2304: Cannot find name 'VariantProps'.
 components/ui/sheet.tsx(58,6): error TS2339: Property 'side' does not exist on type 'SheetContentProps'.
@@ -576,52 +551,67 @@ data/programs/cna.ts(33,3): error TS2353: Object literal may only specify known 
 data/programs/community-health-worker.ts(4,14): error TS2740: Type '{ slug: string; title: string; subtitle: string; sector: "healthcare"; category: string; programType: "workforce"; heroImage: string; heroImageAlt: string; deliveryMode: "hybrid"; deliveredBy: "Elevate"; ... 20 more ...; deliveryModel: "internal"; }' is missing the following properties from type 'ProgramSchema': curriculum, complianceAlignment, laborMarket, careers, and 2 more.
 data/programs/home-health-aide.ts(312,5): error TS2353: Object literal may only specify known properties, and 'isSelfPay' does not exist in type '{ fssa_eligible: boolean; snap_et_eligible?: boolean; wioa_eligible: boolean; etpl_approved?: boolean; wrg_eligible: boolean; jobReadyIndyEligible?: boolean; fundingNotes?: string; }'.
 data/programs/hospitality.ts(28,3): error TS2353: Object literal may only specify known properties, and 'coursePricing' does not exist in type 'ProgramSchema'.
-data/programs/medical-assistant.ts(25,3): error TS2353: Object literal may only specify known properties, and 'regularPrice' does not exist in type 'ProgramSchema'.
-data/programs/medical-assistant.ts(347,3): error TS1117: An object literal cannot have multiple properties with the same name.
-data/programs/medical-assistant.ts(348,3): error TS1117: An object literal cannot have multiple properties with the same name.
-data/programs/medical-assistant.ts(350,3): error TS1117: An object literal cannot have multiple properties with the same name.
-data/programs/medical-assistant.ts(351,3): error TS1117: An object literal cannot have multiple properties with the same name.
+data/programs/medical-assistant.ts(25,3): error TS2353: Object literal may only specify known properties, and 'salePrice' does not exist in type 'ProgramSchema'.
 lib/admin/bulk-import.ts(298,7): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
 lib/admin/course-admin-overview.ts(81,26): error TS2352: Conversion of type '{ slug: any; }[]' to type '{ slug: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property 'slug' is missing in type '{ slug: any; }[]' but required in type '{ slug: string; }'.
 lib/admin/document-access.ts(15,31): error TS2353: Object literal may only specify known properties, and 'actorUserId' does not exist in type 'AuditContext'.
 lib/admin/normalize-dashboard-data.ts(149,5): error TS2353: Object literal may only specify known properties, and 'role' does not exist in type '{ full_name: string; }'.
 lib/admin/normalize-dashboard-data.ts(149,26): error TS2339: Property 'role' does not exist on type '{ full_name: string; }'.
 lib/admin/normalize-dashboard-data.ts(149,54): error TS2339: Property 'role' does not exist on type '{ full_name: string; }'.
 lib/admin/normalize-dashboard-data.ts(355,83): error TS2339: Property 'role' does not exist on type '{ full_name: string; }'.
 lib/ai/anthropic-client.ts(42,3): error TS2322: Type 'unknown' is not assignable to type 'T'.
+  'T' could be instantiated with an arbitrary type which could be unrelated to 'unknown'.
 lib/ai/anthropic-client.ts(42,22): error TS2558: Expected 0 type arguments, but got 1.
 lib/ai/course-builder-cron.ts(298,10): error TS18047: 'data' is possibly 'null'.
 lib/ai/course-gap-detection.ts(125,37): error TS2352: Conversion of type '{ id: any; title: any; program_id: any; status: any; }[]' to type 'ProgramRow[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ id: any; title: any; program_id: any; status: any; }' is missing the following properties from type 'ProgramRow': slug, occupation, soc_code, credential_type, and 4 more.
 lib/ai/course-gap-detection.ts(125,83): error TS2339: Property 'program_id' does not exist on type 'ProgramRow'.
 lib/ai/course-gap-detection.ts(126,36): error TS2769: No overload matches this call.
-lib/ai/course-generation-worker.ts(311,27): error TS2339: Property 'subtitle' does not exist on type '{ title: string; modules: { title: string; description: string; lessons: number; }[]; }'.
-lib/ai/course-generation-worker.ts(312,30): error TS2339: Property 'description' does not exist on type '{ title: string; modules: { title: string; description: string; lessons: number; }[]; }'.
-lib/ai/course-generation-worker.ts(349,30): error TS2339: Property 'objectives' does not exist on type '{ title: string; description: string; lessons: number; }'.
-lib/ai/course-generation-worker.ts(385,46): error TS2339: Property 'reflectionPrompt' does not exist on type '{ content: string; summary: string; objectives: string[]; quizQuestions: { question: string; options: string[]; correctIndex: number; explanation: string; }[]; }'.
-lib/ai/course-generation-worker.ts(395,24): error TS2304: Cannot find name 'lessonRecord'.
+  Overload 1 of 4, '(iterable?: Iterable<readonly [string, CourseRow]>): Map<string, CourseRow>', gave the following error.
+    Argument of type '(string | CourseRow)[][]' is not assignable to parameter of type 'Iterable<readonly [string, CourseRow]>'.
+      The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+        Type 'IteratorResult<(string | CourseRow)[], any>' is not assignable to type 'IteratorResult<readonly [string, CourseRow], any>'.
+          Type 'IteratorYieldResult<(string | CourseRow)[]>' is not assignable to type 'IteratorResult<readonly [string, CourseRow], any>'.
+            Type 'IteratorYieldResult<(string | CourseRow)[]>' is not assignable to type 'IteratorYieldResult<readonly [string, CourseRow]>'.
+              Type '(string | CourseRow)[]' is not assignable to type 'readonly [string, CourseRow]'.
+                Target requires 2 element(s) but source may have fewer.
+  Overload 2 of 4, '(entries?: readonly (readonly [string, CourseRow])[]): Map<string, CourseRow>', gave the following error.
+    Argument of type '(string | CourseRow)[][]' is not assignable to parameter of type 'readonly (readonly [string, CourseRow])[]'.
+      Type '(string | CourseRow)[]' is not assignable to type 'readonly [string, CourseRow]'.
+        Target requires 2 element(s) but source may have fewer.
+lib/ai/course-generation-worker.ts(405,24): error TS2304: Cannot find name 'lessonRecord'.
 lib/ai/course-generator.ts(241,82): error TS2554: Expected 0-1 arguments, but got 2.
 lib/ai/course-generator.ts(268,75): error TS2554: Expected 0-1 arguments, but got 2.
 lib/ai/orchestrator.ts(414,48): error TS2304: Cannot find name 'isAiDegradedError'.
 lib/ai/orchestrator.ts(422,9): error TS2304: Cannot find name 'isAiDegradedError'.
 lib/ai/template-generator.ts(256,106): error TS2554: Expected 0-1 arguments, but got 2.
-lib/api/route.ts(40,58): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+lib/api/route.ts(40,58): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/api/validation-schemas.ts(272,9): error TS2554: Expected 0-1 arguments, but got 2.
-lib/api/with-error-handling.ts(77,31): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+lib/api/with-error-handling.ts(77,31): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/audit.ts(52,8): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
-lib/audit/ferpa.ts(91,52): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+lib/audit/ferpa.ts(91,52): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/auth.ts(47,61): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(supabaseUrl: string, supabaseKey: string, options: SupabaseClientOptions<"public"> & { cookieOptions?: CookieOptionsWithName; cookies: CookieMethodsServerDeprecated; cookieEncoding?: "base64url" | "raw"; }): SupabaseClient<...>', gave the following error.
+    Argument of type '{ auth: { persistSession: false; }; }' is not assignable to parameter of type 'SupabaseClientOptions<"public"> & { cookieOptions?: CookieOptionsWithName; cookies: CookieMethodsServerDeprecated; cookieEncoding?: "base64url" | "raw"; }'.
+      Property 'cookies' is missing in type '{ auth: { persistSession: false; }; }' but required in type '{ cookieOptions?: CookieOptionsWithName; cookies: CookieMethodsServerDeprecated; cookieEncoding?: "base64url" | "raw"; }'.
+  Overload 2 of 2, '(supabaseUrl: string, supabaseKey: string, options: SupabaseClientOptions<"public"> & { cookieOptions?: CookieOptionsWithName; cookies: CookieMethodsServer; cookieEncoding?: "base64url" | "raw"; }): SupabaseClient<...>', gave the following error.
+    Argument of type '{ auth: { persistSession: false; }; }' is not assignable to parameter of type 'SupabaseClientOptions<"public"> & { cookieOptions?: CookieOptionsWithName; cookies: CookieMethodsServer; cookieEncoding?: "base64url" | "raw"; }'.
+      Property 'cookies' is missing in type '{ auth: { persistSession: false; }; }' but required in type '{ cookieOptions?: CookieOptionsWithName; cookies: CookieMethodsServer; cookieEncoding?: "base64url" | "raw"; }'.
 lib/auth.ts(254,22): error TS2345: Argument of type 'readonly ["admin", "staff"]' is not assignable to parameter of type 'UserRole | UserRole[]'.
+  The type 'readonly ["admin", "staff"]' is 'readonly' and cannot be assigned to the mutable type 'UserRole[]'.
 lib/auth/idle-timeout.ts(19,53): error TS7030: Not all code paths return a value.
 lib/auth/require-org-admin.ts(30,10): error TS2304: Cannot find name 'createClient'.
 lib/auth/route-guards.ts(11,43): error TS2322: Type '"program_holder"' is not assignable to type 'UserRole'.
 lib/auth/route-guards.ts(22,26): error TS2322: Type '"provider"' is not assignable to type 'UserRole'.
 lib/auth/route-guards.ts(23,32): error TS2322: Type '"program_holder"' is not assignable to type 'UserRole'.
 lib/auth/route-guards.ts(24,24): error TS2322: Type '"mentor"' is not assignable to type 'UserRole'.
-lib/auth/route-guards.ts(55,3): error TS1117: An object literal cannot have multiple properties with the same name.
-lib/auth/route-guards.ts(134,5): error TS1117: An object literal cannot have multiple properties with the same name.
 lib/auth/student-access.ts(93,9): error TS2322: Type 'User' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'User'.
 lib/auth/student-access.ts(115,9): error TS2322: Type 'User' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'User'.
 lib/auth/student-access.ts(144,7): error TS2322: Type 'User' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'User'.
 lib/authGuards.ts(231,3): error TS1117: An object literal cannot have multiple properties with the same name.
 lib/authGuards.ts(232,3): error TS1117: An object literal cannot have multiple properties with the same name.
 lib/automation/evidence-processor.ts(280,37): error TS2339: Property 'data' does not exist on type 'OCRResult'.
@@ -636,25 +626,19 @@ lib/autopilot/formatter.ts(17,25): error TS2304: Cannot find name 'json'.
 lib/autopilot/lesson-to-scenes.ts(17,14): error TS2304: Cannot find name 'OpenAI'.
 lib/autopilot/lesson-to-scenes.ts(18,23): error TS2304: Cannot find name 'OpenAI'.
 lib/autopilot/test-enrollment-flow.ts(413,34): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any>'.
-lib/avatar/useAvatarOnLoad.ts(32,38): error TS2554: Expected 0 arguments, but got 1.
-lib/avatar/useAvatarOnLoad.ts(35,18): error TS2339: Property 'enabled' does not exist on type '{ size: number; shape: string; }'.
-lib/avatar/useAvatarOnLoad.ts(35,36): error TS2339: Property 'speakOnLoad' does not exist on type '{ size: number; shape: string; }'.
-lib/avatar/useAvatarOnLoad.ts(35,59): error TS2339: Property 'message' does not exist on type '{ size: number; shape: string; }'.
-lib/avatar/useAvatarOnLoad.ts(40,19): error TS2339: Property 'enabled' does not exist on type '{ size: number; shape: string; }'.
-lib/avatar/useAvatarOnLoad.ts(40,37): error TS2339: Property 'message' does not exist on type '{ size: number; shape: string; }'.
-lib/avatar/useAvatarOnLoad.ts(47,38): error TS2339: Property 'enabled' does not exist on type '{ size: number; shape: string; }'.
 lib/billing/enforceLimit.ts(11,23): error TS2339: Property 'license' does not exist on type 'OrgConfig'.
 lib/billing/enforceLimit.ts(29,23): error TS2339: Property 'license' does not exist on type 'OrgConfig'.
 lib/billing/licenseAllows.ts(9,16): error TS2339: Property 'license' does not exist on type 'OrgConfig'.
 lib/certificates/flag-on-refund.ts(124,9): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
 lib/certificates/generator.ts(179,20): error TS2322: Type 'Uint8Array<ArrayBufferLike>' is not assignable to type 'BlobPart'.
+  Type 'Uint8Array<ArrayBufferLike>' is not assignable to type 'ArrayBufferView<ArrayBuffer>'.
+    Types of property 'buffer' are incompatible.
+      Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+        Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+          Types of property '[Symbol.toStringTag]' are incompatible.
+            Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
 lib/communication/forums.ts(280,27): error TS2339: Property 'reply_count' does not exist on type '{ locked: any; }'.
 lib/compliance/alert-system.ts(829,18): error TS2367: This comparison appears to be unintentional because the types '"info"' and '"critical"' have no overlap.
-lib/compliance/index.ts(10,3): error TS2724: '"./enforcement"' has no exported member named 'checkComplianceStatusWithClient'. Did you mean 'checkComplianceStatus'?
-lib/compliance/index.ts(14,3): error TS2305: Module '"./enforcement"' has no exported member 'getUserAgreements'.
-lib/compliance/index.ts(16,3): error TS2305: Module '"./enforcement"' has no exported member 'logComplianceEvent'.
-lib/compliance/index.ts(17,3): error TS2305: Module '"./enforcement"' has no exported member 'REQUIRED_AGREEMENTS'.
-lib/compliance/index.ts(19,8): error TS2724: '"./enforcement"' has no exported member named 'AgreementAcceptance'. Did you mean 'recordAgreementAcceptance'?
 lib/compliance/rapids-export.ts(18,36): error TS1064: The return type of an async function or method must be the global Promise<T> type. Did you mean to write 'Promise<SupabaseClient<any, "public", "public", any, any>>'?
 lib/consent.ts(99,3): error TS2322: Type 'string' is not assignable to type 'boolean'.
 lib/contentModeration.ts(166,5): error TS2322: Type '"content_reported"' is not assignable to type 'AuditAction'.
@@ -664,20 +648,12 @@ lib/control-plane/index.ts(360,95): error TS2554: Expected 0-1 arguments, but go
 lib/control-plane/index.ts(387,109): error TS2554: Expected 0-1 arguments, but got 2.
 lib/control-plane/index.ts(416,98): error TS2554: Expected 0-1 arguments, but got 2.
 lib/course-builder/assessment-generator.ts(294,9): error TS2322: Type '{ id: string; question: string; options: string[]; correctAnswer: number; explanation: string; }[]' is not assignable to type 'QuizQuestion[]'.
+  Type '{ id: string; question: string; options: string[]; correctAnswer: number; explanation: string; }' is missing the following properties from type 'QuizQuestion': prompt, type
 lib/course-builder/lesson-content-generator.ts(1,10): error TS2305: Module '"@/lib/groq-client"' has no exported member 'groqJSON'.
 lib/course-builder/program-auto-course.ts(126,11): error TS2322: Type '{ question: string; options: string[]; correctAnswer: number; explanation: string; }[]' is not assignable to type 'BlueprintQuizQuestion[]'.
+  Property 'id' is missing in type '{ question: string; options: string[]; correctAnswer: number; explanation: string; }' but required in type 'BlueprintQuizQuestion'.
 lib/course-builder/versioning.ts(90,31): error TS2339: Property 'version' does not exist on type 'ParserError<`Expected identifier at \`${GenericStringError}\``>'.
 lib/course-completion.ts(243,37): error TS2353: Object literal may only specify known properties, and 'actorUserId' does not exist in type 'AuditContext'.
-lib/course-factory/integration/types.ts(515,20): error TS2339: Property 'matchingCount' does not exist on type 'InteractionSpecs'.
-lib/course-factory/integration/types.ts(524,20): error TS2339: Property 'matchingCount' does not exist on type 'InteractionSpecs'.
-lib/course-factory/integration/types.ts(533,20): error TS2339: Property 'caseStudyCount' does not exist on type 'InteractionSpecs'.
-lib/course-factory/integration/types.ts(542,20): error TS2339: Property 'simulationCount' does not exist on type 'InteractionSpecs'.
-lib/course-factory/publisher.ts(108,5): error TS2322: Type '{ lessonSlug: string; field: string; message: string; severity: "error" | "warning"; }[]' is not assignable to type 'ValidationError[]'.
-lib/course-factory/publisher.ts(109,5): error TS2322: Type '{ lessonSlug: string; field: string; message: string; severity: "error" | "warning"; }[]' is not assignable to type 'ValidationError[]'.
-lib/course-factory/publisher.ts(179,29): error TS2339: Property 'description' does not exist on type 'BlueprintModule'.
-lib/course-factory/publisher.ts(192,27): error TS2339: Property 'description' does not exist on type 'BlueprintModule'.
-lib/course-factory/publisher.ts(218,16): error TS2339: Property 'correct' does not exist on type 'BlueprintQuizQuestion'.
-lib/course-factory/publisher.ts(296,49): error TS2339: Property 'lessonSlug' does not exist on type 'ValidationError'.
 lib/course-factory/types.ts(15,15): error TS2304: Cannot find name 'CredentialBlueprint'.
 lib/credentials/credential-system.ts(86,5): error TS2820: Type '"Industry - Recognized Certification"' is not assignable to type 'CredentialType'. Did you mean '"Industry-Recognized Certification"'?
 lib/credentials/credential-system.ts(87,5): error TS2322: Type '"Internal Revenue Service"' is not assignable to type 'CredentialProvider'.
@@ -685,19 +661,9 @@ lib/credentials/credential-system.ts(237,5): error TS2322: Type '"National Regis
 lib/curriculum/audit-alignment.ts(382,24): error TS2339: Property 'competency_key' does not exist on type 'GenericStringError'.
 lib/curriculum/audit-alignment.ts(402,29): error TS2339: Property 'competency_name' does not exist on type 'GenericStringError'.
 lib/curriculum/audit-alignment.ts(403,56): error TS2345: Argument of type 'GenericStringError' is not assignable to parameter of type '{ required_phrases: string[]; distinction_side_a: string[]; distinction_side_b: string[]; distractor_phrases: string[]; requires_distinction: boolean; }'.
-lib/curriculum/blueprints/building-services.ts(106,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
-lib/curriculum/blueprints/building-services.ts(144,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
-lib/curriculum/blueprints/building-services.ts(183,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
-lib/curriculum/blueprints/building-services.ts(221,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
-lib/curriculum/blueprints/building-services.ts(258,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
-lib/curriculum/blueprints/building-services.ts(297,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
-lib/curriculum/blueprints/building-services.ts(335,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
-lib/curriculum/blueprints/culinary.ts(106,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
-lib/curriculum/blueprints/culinary.ts(145,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
-lib/curriculum/blueprints/culinary.ts(185,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
-lib/curriculum/blueprints/culinary.ts(225,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
-lib/curriculum/blueprints/culinary.ts(264,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
-lib/curriculum/blueprints/culinary.ts(303,9): error TS2353: Object literal may only specify known properties, and 'matchingCount' does not exist in type 'InteractionSpecs'.
+  Type '{ error: true; } & String' is missing the following properties from type '{ required_phrases: string[]; distinction_side_a: string[]; distinction_side_b: string[]; distractor_phrases: string[]; requires_distinction: boolean; }': required_phrases, distinction_side_a, distinction_side_b, distractor_phrases, requires_distinction
+lib/curriculum/blueprints/building-services.ts(27,3): error TS2353: Object literal may only specify known properties, and 'features' does not exist in type 'CredentialBlueprint'.
+lib/curriculum/blueprints/culinary.ts(27,3): error TS2353: Object literal may only specify known properties, and 'features' does not exist in type 'CredentialBlueprint'.
 lib/curriculum/blueprints/peer-recovery-specialist.ts(29,5): error TS2353: Object literal may only specify known properties, and 'minModules' does not exist in type 'BlueprintGenerationRules'.
 lib/curriculum/builders/buildCanonicalCourseFromBlueprint.ts(413,13): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
 lib/curriculum/builders/buildCanonicalCourseFromBlueprint.ts(586,69): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
@@ -706,16 +672,18 @@ lib/curriculum/builders/buildCanonicalCourseFromBlueprint.ts(705,76): error TS23
 lib/curriculum/builders/buildCourseFromBlueprint.ts(54,31): error TS2304: Cannot find name 'createClient'.
 lib/curriculum/load-blueprint.ts(19,55): error TS2339: Property 'default' does not exist on type 'typeof import("/workspace/project/Elevate-lms/lib/curriculum/blueprints/barber-apprenticeship")'.
 lib/curriculum/load-blueprint.ts(23,45): error TS2339: Property 'default' does not exist on type 'typeof import("/workspace/project/Elevate-lms/lib/curriculum/blueprints/crs-indiana")'.
-lib/data/events.ts(77,55): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/data/events.ts(102,51): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/data/events.ts(120,46): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/data/jobs.ts(80,49): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+lib/data/events.ts(77,55): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
+lib/data/events.ts(102,51): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
+lib/data/events.ts(120,46): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
+lib/data/jobs.ts(80,49): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/data/jobs.ts(83,10): error TS2352: Conversion of type 'GenericStringError[]' to type 'JobPosting[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-lib/data/jobs.ts(96,46): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+  Type '{ error: true; } & String' is missing the following properties from type 'JobPosting': id, title, description, requirements, and 14 more.
+lib/data/jobs.ts(96,46): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/data/jobs.ts(99,10): error TS2352: Conversion of type 'GenericStringError' to type 'JobPosting' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-lib/data/news.ts(54,53): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/data/news.ts(71,51): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/data/news.ts(87,49): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+  Type '{ error: true; } & String' is missing the following properties from type 'JobPosting': id, title, description, requirements, and 14 more.
+lib/data/news.ts(54,53): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
+lib/data/news.ts(71,51): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
+lib/data/news.ts(87,49): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/data/programs.ts(18,29): error TS2304: Cannot find name 'Program'.
 lib/data/programs.ts(43,57): error TS2304: Cannot find name 'Program'.
 lib/data/programs.ts(54,49): error TS2304: Cannot find name 'Program'.
@@ -723,6 +691,8 @@ lib/db/courses.ts(608,43): error TS2339: Property 'learning_objectives' does not
 lib/db/courses.ts(610,32): error TS2339: Property 'examples' does not exist on type '{ lesson_title: string; lesson_objectives: string[]; estimated_minutes: number; narration_script: string; slide_outline: { slide_number: number; title: string; bullets: string[]; speaker_notes: string; visual_suggestion?: string; }[]; practice_exercise: { ...; }; knowledge_check: { ...; }[]; instructor_notes: string...'.
 lib/db/courses.ts(611,38): error TS2339: Property 'quiz_questions' does not exist on type '{ lesson_title: string; lesson_objectives: string[]; estimated_minutes: number; narration_script: string; slide_outline: { slide_number: number; title: string; bullets: string[]; speaker_notes: string; visual_suggestion?: string; }[]; practice_exercise: { ...; }; knowledge_check: { ...; }[]; instructor_notes: string...'.
 lib/db/programs.ts(172,10): error TS2352: Conversion of type '{ id: any; slug: any; title: any; description: any; short_description: any; image_url: any; hero_image_url: any; estimated_weeks: any; credential_name: any; funding_tags: any; wioa_approved: any; ... 16 more ...; program_requirements: { ...; }[]; }' to type 'DbProgram' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'program_ctas' are incompatible.
+    Type '{ apply_href: any; enroll_href: any; request_info_href: any; career_connect_href: any; advisor_href: any; course_href: any; }[]' is missing the following properties from type 'ProgramCTAs': apply_href, enroll_href, request_info_href, career_connect_href, and 2 more.
 lib/db/save-blueprint-canonical.ts(92,42): error TS2339: Property 'quiz_questions' does not exist on type '{ lesson_title: string; lesson_objectives: string[]; estimated_minutes: number; narration_script: string; slide_outline: { slide_number: number; title: string; bullets: string[]; speaker_notes: string; visual_suggestion?: string; }[]; practice_exercise: { ...; }; knowledge_check: { ...; }[]; instructor_notes: string...'.
 lib/db/save-blueprint-canonical.ts(93,29): error TS2339: Property 'quiz_questions' does not exist on type '{ lesson_title: string; lesson_objectives: string[]; estimated_minutes: number; narration_script: string; slide_outline: { slide_number: number; title: string; bullets: string[]; speaker_notes: string; visual_suggestion?: string; }[]; practice_exercise: { ...; }; knowledge_check: { ...; }[]; instructor_notes: string...'.
 lib/db/save-blueprint-canonical.ts(100,52): error TS2339: Property 'learning_objectives' does not exist on type '{ lesson_title: string; lesson_objectives: string[]; estimated_minutes: number; narration_script: string; slide_outline: { slide_number: number; title: string; bullets: string[]; speaker_notes: string; visual_suggestion?: string; }[]; practice_exercise: { ...; }; knowledge_check: { ...; }[]; instructor_notes: string...'.
@@ -744,18 +714,14 @@ lib/email/automated-triggers.ts(218,46): error TS2339: Property 'appointmentConf
 lib/email/automated-triggers.ts(243,46): error TS2339: Property 'reminder24Hours' does not exist on type '{ studentAppointment: { from: string; subject: string; getHtml: (data: { firstName: string; date: string; time: string; format: "phone" | "zoom"; zoomLink?: string; rescheduleLink?: string; }) => string; getText: (data: { ...; }) => string; }; appointmentReminder24h: { ...; }; appointmentReminder1h: { ...; }; }'.
 lib/email/automated-triggers.ts(268,46): error TS2339: Property 'reminder1Hour' does not exist on type '{ studentAppointment: { from: string; subject: string; getHtml: (data: { firstName: string; date: string; time: string; format: "phone" | "zoom"; zoomLink?: string; rescheduleLink?: string; }) => string; getText: (data: { ...; }) => string; }; appointmentReminder24h: { ...; }; appointmentReminder1h: { ...; }; }'.
 lib/email/automated-triggers.ts(424,30): error TS2339: Property 'messageId' does not exist on type '{ success: boolean; error: string; from: string; data?: undefined; } | { success: boolean; data: { provider: string; }; error?: undefined; from?: undefined; } | { success: boolean; error: string; }'.
-lib/email/send-onboarding.ts(88,71): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/email/sendOrgInviteEmail.ts(35,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/enrollment-service.ts(144,59): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/enrollment-service.ts(172,60): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/enrollment-service.ts(214,82): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/enrollment-service.ts(255,75): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/enrollment-service.ts(292,74): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+  Property 'messageId' does not exist on type '{ success: boolean; error: string; from: string; data?: undefined; }'.
+lib/email/send-onboarding.ts(88,71): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
+lib/email/sendOrgInviteEmail.ts(35,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/enrollment/complete-enrollment.ts(92,8): error TS2339: Property 'catch' does not exist on type 'PostgrestBuilder<any, { id: any; }, false>'.
 lib/enrollment/complete-enrollment.ts(99,39): error TS2353: Object literal may only specify known properties, and 'actorUserId' does not exist in type 'AuditContext'.
 lib/enrollment/complete-enrollment.ts(138,8): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
 lib/enrollment/create-enrollment.ts(60,33): error TS2304: Cannot find name 'requireAdminClient'.
-lib/enrollment/create-enrollment.ts(230,9): error TS18004: No value exists in scope for the shorthand property 'tempPassword'. Either declare one or provide an initializer.
+lib/enrollment/create-enrollment.ts(230,9): error TS2552: Cannot find name 'tempPassword'. Did you mean '_tempPassword'?
 lib/enrollment/create-enrollment.ts(241,9): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
 lib/enrollment/orchestrate-enrollment.ts(132,67): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any>'.
 lib/enrollment/partner-routing.ts(146,89): error TS2554: Expected 0-1 arguments, but got 2.
@@ -775,16 +741,20 @@ lib/images/hero-banner-media.ts(15,3): error TS1117: An object literal cannot ha
 lib/insurance/ocr.ts(7,56): error TS2339: Property 'default' does not exist on type 'typeof Tesseract'.
 lib/insurance/scan-approve-strict.ts(39,50): error TS2339: Property 'default' does not exist on type 'typeof import("/workspace/project/Elevate-lms/node_modules/.pnpm/pdf-parse@2.4.5/node_modules/pdf-parse/dist/pdf-parse/esm/index")'.
 lib/insurance/scan-approve-strict.ts(103,38): error TS2345: Argument of type '{ extractedText: string; expectedBusinessName: string; expectedShopAddress: string; expectedCertificateHolder: string; minGlPerOccurrence: number; minGlAggregate: number; minProLiabilityPerClaim: number; ocrConfidence: number; workerRelationship: "w2_employees" | ... 2 more ... | "not_sure"; }' is not assignable to parameter of type '{ extractedText: string; minGlPerOccurrence: number; minGlAggregate: number; minProLiabilityPerClaim: number; minOcrConfidence: number; expectedBusinessName?: string; expectedShopAddress?: string; expectedCertificateHolder?: string; ocrConfidence?: number; workerRelationship?: "w2_employees" | ... 2 more ... | "not_...'.
-lib/integrations/grants-gov.ts(111,45): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/integrations/grants-gov.ts(197,45): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/integrations/salesforce.ts(86,48): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/integrations/salesforce.ts(112,50): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/integrations/salesforce.ts(134,50): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/integrations/salesforce.ts(175,60): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Error | Record<string, any>'.
-lib/integrations/sam-gov.ts(37,42): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Error | Record<string, any>'.
+  Property 'minOcrConfidence' is missing in type '{ extractedText: string; expectedBusinessName: string; expectedShopAddress: string; expectedCertificateHolder: string; minGlPerOccurrence: number; minGlAggregate: number; minProLiabilityPerClaim: number; ocrConfidence: number; workerRelationship: "w2_employees" | ... 2 more ... | "not_sure"; }' but required in type '{ extractedText: string; minGlPerOccurrence: number; minGlAggregate: number; minProLiabilityPerClaim: number; minOcrConfidence: number; expectedBusinessName?: string; expectedShopAddress?: string; expectedCertificateHolder?: string; ocrConfidence?: number; workerRelationship?: "w2_employees" | ... 2 more ... | "not_...'.
+lib/integrations/grants-gov.ts(111,45): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Record<string, any> | Error'.
+lib/integrations/grants-gov.ts(197,45): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Record<string, any> | Error'.
+lib/integrations/salesforce.ts(86,48): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Record<string, any> | Error'.
+lib/integrations/salesforce.ts(112,50): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Record<string, any> | Error'.
+lib/integrations/salesforce.ts(134,50): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Record<string, any> | Error'.
+lib/integrations/salesforce.ts(175,60): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Record<string, any> | Error'.
+lib/integrations/sam-gov.ts(37,42): error TS2345: Argument of type 'number' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/jobs/handlers/email-send.ts(34,19): error TS2352: Conversion of type 'Record<string, unknown>' to type 'EmailPayload' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Record<string, unknown>' is missing the following properties from type 'EmailPayload': emailType, to, templateData
 lib/jobs/handlers/workspace-provision.ts(61,34): error TS2339: Property 'error' does not exist on type 'ProvisionTrialWebsiteResult'.
+  Property 'error' does not exist on type '{ ok: true; websiteId: string; publicUrl: string; }'.
 lib/jobs/handlers/workspace-provision.ts(65,29): error TS2339: Property 'error' does not exist on type 'ProvisionTrialWebsiteResult'.
+  Property 'error' does not exist on type '{ ok: true; websiteId: string; publicUrl: string; }'.
 lib/legal/requiredAgreements.ts(99,3): error TS1117: An object literal cannot have multiple properties with the same name.
 lib/legal/requiredAgreements.ts(193,64): error TS2322: Type '"org_admin"' is not assignable to type 'UserRole'.
 lib/legal/requiredAgreements.ts(198,45): error TS2322: Type '"org_admin"' is not assignable to type 'UserRole'.
@@ -793,20 +763,12 @@ lib/license/linkStripeToLicense.ts(172,48): error TS2339: Property 'current_peri
 lib/license/requireActiveLicense.ts(37,22): error TS2304: Cannot find name 'BillingAuthority'.
 lib/license/requireActiveLicense.ts(43,29): error TS2304: Cannot find name 'BillingAuthority'.
 lib/license/requireActiveLicense.ts(49,24): error TS2304: Cannot find name 'BillingAuthority'.
-lib/licensing/enforcement.ts(188,5): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
-lib/licensing/enforcement.ts(232,5): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
-lib/licensing/enforcement.ts(259,5): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
-lib/licensing/enforcement.ts(289,5): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
 lib/licensing/middleware.ts(24,22): error TS2304: Cannot find name 'BillingAuthority'.
-lib/licensing/provisioning.ts(225,62): error TS2551: Property 'getUserByEmail' does not exist on type 'GoTrueAdminApi'. Did you mean 'getUserById'?
-lib/licensing/provisioning.ts(334,7): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
-lib/licensing/provisioning.ts(363,7): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
-lib/licensing/provisioning.ts(425,5): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
-lib/licensing/provisioning.ts(464,5): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
+lib/licensing/provisioning.ts(226,51): error TS2339: Property 'email' does not exist on type 'never'.
 lib/licensing/validate.ts(114,30): error TS2339: Property 'warnings' does not exist on type 'AccessResult & { hasAccess: boolean; }'.
 lib/licensing/validate.ts(128,30): error TS2339: Property 'warnings' does not exist on type 'AccessResult & { hasAccess: boolean; }'.
 lib/licensing/validate.ts(138,28): error TS2339: Property 'warnings' does not exist on type 'AccessResult & { hasAccess: boolean; }'.
-lib/lms/course-service.ts(207,70): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Error | Record<string, any>'.
+lib/lms/course-service.ts(207,70): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/lms/engine/completion.ts(86,31): error TS2353: Object literal may only specify known properties, and 'actorUserId' does not exist in type 'AuditContext'.
 lib/lms/engine/completion.ts(217,26): error TS2304: Cannot find name 'SupabaseClient'.
 lib/lms/get-lesson-render-mode.ts(14,8): error TS2459: Module '"@/lib/curriculum/normalize-lesson-content"' declares 'LessonContent' locally, but it is not exported.
@@ -815,11 +777,17 @@ lib/middleware/withLicense.ts(15,21): error TS2304: Cannot find name 'BillingAut
 lib/navigation/navigation-config.ts(372,3): error TS1117: An object literal cannot have multiple properties with the same name.
 lib/new-ecosystem-services/URLHealthMonitor.ts(349,7): error TS2353: Object literal may only specify known properties, and 'service' does not exist in type '{ type: string; severity: string; endpoint: string; message: string; timestamp: Date; error?: string; }'.
 lib/notifications/email.ts(66,27): error TS2339: Property 'messageId' does not exist on type '{ success: boolean; error: string; from: string; data?: undefined; } | { success: boolean; data: { provider: string; }; error?: undefined; from?: undefined; } | { success: boolean; error: string; }'.
+  Property 'messageId' does not exist on type '{ success: boolean; error: string; from: string; data?: undefined; }'.
 lib/notifications/processor.ts(19,17): error TS2304: Cannot find name 'TemplateKey'.
-lib/observability/correlation.ts(27,23): error TS2352: Conversion of type 'Charge | Subscription | Invoice | Price | Session | PaymentIntent | Customer | PaymentMethod | ... 69 more ... | ReceivedDebit' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+lib/observability/correlation.ts(27,23): error TS2352: Conversion of type 'Charge | Subscription | Invoice | Price | Session | Customer | Product | Coupon | PaymentIntent | ... 68 more ... | ReceivedDebit' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'ReceivedDebit' is not comparable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'ReceivedDebit'.
 lib/observability/correlation.ts(38,21): error TS2352: Conversion of type 'Record<string, unknown>' to type 'Session' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Record<string, unknown>' is missing the following properties from type 'Session': id, object, adaptive_pricing, after_expiration, and 51 more.
 lib/observability/correlation.ts(44,20): error TS2352: Conversion of type 'Record<string, unknown>' to type 'Charge' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Record<string, unknown>' is missing the following properties from type 'Charge': id, object, amount, amount_captured, and 38 more.
 lib/observability/correlation.ts(49,21): error TS2352: Conversion of type 'Record<string, unknown>' to type 'Invoice & { payment_intent?: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Record<string, unknown>' is missing the following properties from type 'Invoice': id, object, account_country, account_name, and 65 more.
 lib/ops/autonomous-ops-agent.ts(217,13): error TS2304: Cannot find name 'setAuditContext'.
 lib/ops/autonomous-ops-agent.ts(221,13): error TS2304: Cannot find name 'setAuditContext'.
 lib/ops/autonomous-ops-agent.ts(240,11): error TS2304: Cannot find name 'setAuditContext'.
@@ -827,28 +795,16 @@ lib/ops/autonomous-ops-agent.ts(242,11): error TS2304: Cannot find name 'setAudi
 lib/partners/hybrid-enrollment.ts(42,5): error TS2353: Object literal may only specify known properties, and 'actorUserId' does not exist in type 'AuditContext'.
 lib/partners/seed-partner-courses.ts(134,49): error TS2339: Property 'price' does not exist on type 'PartnerCourse'.
 lib/platform/organization-features.ts(91,17): error TS2352: Conversion of type '{ feature_codes: any; }[]' to type '{ feature_codes: string[]; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property 'feature_codes' is missing in type '{ feature_codes: any; }[]' but required in type '{ feature_codes: string[]; }'.
 lib/platform/require-feature-for-auth.ts(59,3): error TS2322: Type 'NextResponse<unknown> | { ok: true; }' is not assignable to type 'NextResponse<unknown> | { userId: string; tenantId: string; }'.
-lib/programs/program-at-a-glance.ts(90,23): error TS2339: Property 'regularPrice' does not exist on type 'ProgramSchema'.
-lib/programs/program-at-a-glance.ts(91,36): error TS2339: Property 'regularPrice' does not exist on type 'ProgramSchema'.
-lib/programs/program-at-a-glance.ts(91,59): error TS2339: Property 'salePrice' does not exist on type 'ProgramSchema'.
-lib/programs/program-at-a-glance.ts(91,90): error TS2339: Property 'salePrice' does not exist on type 'ProgramSchema'.
+  Type '{ ok: true; }' is not assignable to type 'NextResponse<unknown> | { userId: string; tenantId: string; }'.
+    Type '{ ok: true; }' is missing the following properties from type 'NextResponse<unknown>': cookies, [INTERNALS], headers, redirected, and 13 more.
 lib/programs/program-data.ts(334,3): error TS2739: Type '{ intrainingId: string; name: string; price: number; duration: string; durationDays: number; location: string; county: string; credentials: ({ name: string; type: "Certificate"; } | { name: string; type: "Industry-Recognized Certification"; })[]; ... 7 more ...; careerOutcomes: string[]; }' is missing the following properties from type 'Program': id, slug
 lib/rate-limit.ts(71,55): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Duration'.
 lib/rbac-guard.ts(70,7): error TS2741: Property 'super_admin' is missing in type '{ student: number; partner: number; program_holder: number; employer: number; workforce_board: number; advisor: number; admin: number; }' but required in type 'Record<UserRole, number>'.
 lib/services/credential-pipeline.ts(466,31): error TS2353: Object literal may only specify known properties, and 'actorUserId' does not exist in type 'AuditContext'.
 lib/storage/course-assets.ts(212,25): error TS2353: Object literal may only specify known properties, and 'prefix' does not exist in type 'SearchOptions'.
-lib/storage/index.ts(13,3): error TS2305: Module '"./course-assets"' has no exported member 'getCourseAssetSignedUrl'.
-lib/storage/index.ts(16,3): error TS2305: Module '"./course-assets"' has no exported member 'uploadCertificate'.
-lib/storage/index.ts(17,3): error TS2305: Module '"./course-assets"' has no exported member 'uploadToCertBucket'.
-lib/storage/index.ts(45,10): error TS2724: '"./getSignedDownload"' has no exported member named 'getSignedDownloadUrl'. Did you mean 'getSignedDownload'?
-lib/storage/index.ts(46,10): error TS2305: Module '"./signed-url"' has no exported member 'generateSignedUrl'.
 lib/store/launch-plans.ts(109,23): error TS2339: Property 'API_ACCESS' does not exist on type '{ readonly CRM: "crm"; readonly WEBSITE: "website"; readonly BOOKING: "booking"; readonly FORMS: "forms"; readonly EMAIL_MARKETING: "email_marketing"; readonly AI_BASIC: "ai_basic"; ... 18 more ...; readonly WHITE_LABEL_MOBILE: "white_label_mobile"; }'.
-lib/stripe/get-stripe-server.ts(13,15): error TS2614: Module '"stripe"' has no exported member 'StripeEvent'. Did you mean to use 'import StripeEvent from "stripe"' instead?
-lib/stripe/get-stripe-server.ts(13,28): error TS2614: Module '"stripe"' has no exported member 'StripeInvoice'. Did you mean to use 'import StripeInvoice from "stripe"' instead?
-lib/stripe/get-stripe-server.ts(13,43): error TS2614: Module '"stripe"' has no exported member 'StripeSubscription'. Did you mean to use 'import StripeSubscription from "stripe"' instead?
-lib/stripe/get-stripe-server.ts(13,63): error TS2614: Module '"stripe"' has no exported member 'StripeCheckoutSession'. Did you mean to use 'import StripeCheckoutSession from "stripe"' instead?
-lib/stripe/get-stripe-server.ts(13,86): error TS2614: Module '"stripe"' has no exported member 'StripePaymentIntent'. Did you mean to use 'import StripePaymentIntent from "stripe"' instead?
 lib/stripe/handlers/checkout-session-completed.ts(342,28): error TS2304: Cannot find name 'runBarberPostPayment'.
 lib/utils/siteUrl.ts(44,66): error TS2554: Expected 0-1 arguments, but got 2.
 lms-data/programs.ts(215,7): error TS2741: Property 'slug' is missing in type '{ id: string; title: string; subtitle: string; description: string; deliveryEngine: "NATIVE"; salePrice: number; stripeProductId: undefined; stripePriceId: undefined; stripePriceIdPlan: undefined; partnerRequirements: { ...; }[]; isStateTuitionFunded: false; earnWhileYouLearnNotes: string; visiblePublic: true; }' but required in type 'Program'.
-# Error count: 853

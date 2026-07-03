@@ -87,30 +87,31 @@ export default function GlobalError({
                 issue.
               </p>
 
-              {/* Always show error details - even if empty to confirm what's received */}
+              {/* ALWAYS show error details box - even if error is empty/undefined */}
               <div className="bg-brand-red-50 border-2 border-brand-red-200 rounded-lg p-4 mb-6 text-left">
-                <p className="text-xs font-semibold text-brand-red-800 mb-2">Error Info:</p>
-                <p className="text-sm text-brand-red-700 font-mono break-words">
-                  Message: {error.message || '(empty)'}
-                </p>
-                {error.name && (
-                  <p className="text-xs text-brand-red-600 mt-1">Name: {error.name}</p>
-                )}
-                {error.digest && (
-                  <p className="text-xs text-brand-red-600 mt-1">Digest: {error.digest}</p>
-                )}
-                {error.stack && (
+                <p className="text-xs font-semibold text-brand-red-800 mb-2">🔍 Error Info:</p>
+                <pre className="text-xs text-brand-red-700 font-mono whitespace-pre-wrap break-words max-h-60 overflow-auto">
+                  {JSON.stringify({
+                    message: error?.message ?? '(undefined)',
+                    name: error?.name ?? '(undefined)',
+                    digest: error?.digest ?? '(undefined)',
+                    stack: error?.stack ? '(present)' : '(none)',
+                    typeof: typeof error,
+                    keys: error ? Object.keys(error) : []
+                  }, null, 2)}
+                </pre>
+                {error?.stack && (
                   <details className="mt-2">
                     <summary className="text-xs text-brand-red-600 cursor-pointer">
                       Stack Trace
                     </summary>
-                    <pre className="text-xs text-brand-red-600 mt-2 overflow-auto max-h-40">
+                    <pre className="text-xs text-brand-red-600 mt-2 overflow-auto max-h-40 whitespace-pre-wrap">
                       {error.stack}
                     </pre>
                   </details>
                 )}
-                <p className="text-xs text-brand-red-500 mt-2">
-                  Timestamp: {new Date().toISOString()}
+                <p className="text-xs text-brand-red-500 mt-2 font-semibold">
+                  🕐 Timestamp: {new Date().toISOString()}
                 </p>
               </div>
             </div>

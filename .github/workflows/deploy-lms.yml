@@ -49,6 +49,8 @@ jobs:
   deploy-lms:
     name: Build and deploy LMS on Northflank
     runs-on: ubuntu-latest
+    # TEMPORARILY DISABLED - debugging runtime issues
+    if: false
     # Wait for CI/CD Pipeline to complete and upload artifacts first
     needs: []
     # Set to: needs: [ci-cd-pipeline-id] once CI/CD is fixed to upload artifacts

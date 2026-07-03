@@ -82,12 +82,15 @@ const nextConfig = {
   },
 
   generateBuildId: async () => {
-    if (process.env.COMMIT_REF) return process.env.COMMIT_REF;
-    if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA;
+    // Priority: explicit env vars > git commit > timestamp fallback
+    if (process.env.COMMIT_REF) return process.env.COMMIT_REF.slice(0, 7);
+    if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 7);
     try {
       const { execSync } = await import('child_process');
-      return execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
+      return execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim().slice(0, 7);
     } catch {
+      // CRITICAL: Always return a unique timestamp-based ID to ensure cache busting works
+      // 'dev' causes permanent cache issues because version check never detects changes
       return `build-${Date.now()}`;
     }
   },

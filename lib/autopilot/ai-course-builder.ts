@@ -55,7 +55,7 @@ Format output as JSON:
 }
 `;
 
-  const res = await (client as any).chat.completions.create({
+  const res = await client.chat.completions.create({
     model: 'gpt-4.1-mini',
     messages: [{ role: 'user', content: prompt }],
   });

@@ -121,7 +121,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
     // Check if user already exists
     const { data: existingUsers } = await supabase.auth.admin.listUsers();
     const existingUser = existingUsers?.users?.find(
-      (u) => (u as any).email?.toLowerCase() === partnerEmail.toLowerCase(),
+      (u) => u.email?.toLowerCase() === partnerEmail.toLowerCase(),
     );
 
     if (existingUser) {

@@ -6,6 +6,7 @@ import { probeSupabaseDatabase } from '@/lib/supabase/db-probe';
 import { toErrorMessage } from '@/lib/safe';
 import { getAppVersion } from '@/lib/version/getAppVersion';
 import { getAuditTelemetry } from '@/lib/audit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 import { withRuntime } from '@/lib/api/withRuntime';
 
@@ -13,7 +14,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-async function _GET() {
+async function _GET(request: Request) {
   // No rate limiting — platform health checks call this frequently.
   // Applying Redis rate limiting here burns ~1,440 Upstash requests/day per task.
   const checks: Record<string, any> = {
@@ -94,7 +95,7 @@ async function _GET() {
     checks.checks.stripe = { skipped: true, status: 'pass' };
   }
 
-  // Check 5: SendGrid email (optional)
+  // Check 5: Resend (optional)
   if (process.env.SENDGRID_API_KEY) {
     try {
       const response = await fetch('https://api.sendgrid.com/v3/scopes', {
@@ -112,7 +113,7 @@ async function _GET() {
       };
     }
   } else {
-    checks.checks.sendgrid = { skipped: true, status: 'pass' };
+    checks.checks.resend = { skipped: true, status: 'pass' };
   }
 
   // Check 6: Audit telemetry
@@ -174,9 +175,11 @@ async function _GET() {
   };
   checks.production_ready = checks.activation.ready_for_traffic;
 
-  // TEMP FIX: Always return 200 to prevent restart loop on non-critical failures.
-  // TODO: Re-enable 500 for critical failures once root cause identified.
-  const httpStatus = 200;
+  // Return 500 on hard failures so platform health checks kill bad containers.
+  // Warnings (degraded DB, missing optional keys) still return 200 — the app
+  // can serve traffic in a degraded state. Only missing critical env vars or
+  // disabled audit triggers are hard failures.
+  const httpStatus = hasCriticalFailure ? 500 : 200;
   return NextResponse.json(checks, {
     status: httpStatus,
     headers: {

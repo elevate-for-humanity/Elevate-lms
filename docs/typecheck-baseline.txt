@@ -40,8 +40,6 @@ app/api/ecosystem/content-automation/route.ts(24,24): error TS2673: Constructor 
 app/api/ecosystem/url-health/route.ts(24,21): error TS2673: Constructor of class 'URLHealthMonitor' is private and only accessible within the class declaration.
 app/api/email/campaigns/send/route.ts(73,11): error TS2353: Object literal may only specify known properties, and 'reply_to' does not exist in type '{ from: string; to: string | string[]; subject: string; html?: string; text?: string; }'.
 app/api/email/send/route.ts(58,55): error TS2339: Property 'data' does not exist on type '{ success: boolean; error: string; from: string; data?: undefined; } | { success: boolean; data: { provider: string; }; error?: undefined; from?: undefined; } | { success: boolean; error: string; }'.
-app/api/employer/hiring-trends/route.ts(14,61): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/employer/retention-stats/route.ts(14,61): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
 app/api/enroll/approve/route.ts(208,32): error TS2339: Property 'name' does not exist on type '{ id: any; title: any; total_hours: any; }'.
 app/api/enroll/approve/route.ts(309,35): error TS2339: Property 'name' does not exist on type '{ title: any; }'.
 app/api/enroll/auto/route.ts(175,88): error TS2339: Property 'title' does not exist on type '{ id: any; name: any; slug: any; total_cost: any; }'.
@@ -130,15 +128,10 @@ app/api/jobs/process/route.ts(68,7): error TS2322: Type 'NextResponse<{ error: s
 app/api/leaderboard/route.ts(82,25): error TS2339: Property 'totalPoints' does not exist on type 'unknown'.
 app/api/leaderboard/route.ts(82,41): error TS2339: Property 'totalPoints' does not exist on type 'unknown'.
 app/api/leaderboard/route.ts(85,9): error TS2698: Spread types may only be created from object types.
-app/api/learner/dashboard/route.ts(15,60): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
 app/api/learner/payments/route.ts(53,20): error TS2352: Conversion of type '{ id: any; title: any; }[]' to type '{ id: string; title: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
 app/api/license/checkout/route.ts(52,10): error TS2448: Block-scoped variable 'stripe' used before its declaration.
-app/api/lms/progress/complete/route.ts(34,60): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/lms/progress/start/route.ts(21,60): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/lms/quizzes/[quizId]/start/route.ts(11,58): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
 app/api/lms/quizzes/[quizId]/start/route.ts(39,24): error TS2339: Property 'role' does not exist on type 'ApiAuthResult'.
 app/api/lms/quizzes/[quizId]/start/route.ts(39,49): error TS2339: Property 'role' does not exist on type 'ApiAuthResult'.
-app/api/lms/quizzes/[quizId]/submit/route.ts(17,58): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
 app/api/lms/recommendations/route.ts(68,69): error TS2345: Argument of type '{ id: string; interests: any; completedCourses: any[]; skillLevel: any; learningStyle: any; }' is not assignable to parameter of type 'UserProfile'.
 app/api/mentor/approvals/route.ts(38,9): error TS2367: This comparison appears to be unintentional because the types 'UserRole' and '"mentor"' have no overlap.
 app/api/mentor/approvals/route.ts(70,9): error TS2367: This comparison appears to be unintentional because the types 'UserRole' and '"mentor"' have no overlap.
@@ -155,7 +148,6 @@ app/api/moderation/route.ts(153,53): error TS2345: Argument of type '(request: N
 app/api/monitoring/bundle/route.ts(35,13): error TS2339: Property 'data' does not exist on type '{}'.
 app/api/monitoring/bundle/route.ts(35,19): error TS2339: Property 'error' does not exist on type '{}'.
 app/api/monitoring/bundle/route.ts(35,26): error TS2339: Property 'count' does not exist on type '{}'.
-app/api/monitoring/stats/route.ts(35,9): error TS2367: This comparison appears to be unintentional because the types '"admin" | "org_admin"' and '"super_admin"' have no overlap.
 app/api/mou/cdl/route.ts(68,27): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
 app/api/mou/employer/route.ts(63,27): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
 app/api/ocr/extract/route.ts(104,52): error TS2339: Property 'default' does not exist on type 'typeof import("node_modules/.pnpm/pdf-parse@2.4.5/node_modules/pdf-parse/dist/pdf-parse/esm/index")'.
@@ -259,23 +251,6 @@ app/api/webhooks/stripe/career-courses/route.ts(136,38): error TS2345: Argument 
 app/api/websites/[websiteId]/config/route.ts(33,43): error TS2339: Property 'error' does not exist on type '{ ok: true; } | { ok: false; error: string; }'.
 app/api/websites/[websiteId]/publish/route.ts(44,27): error TS2339: Property 'error' does not exist on type '{ ok: true; publicUrl: string; } | { ok: false; error: string; }'.
 app/api/websites/[websiteId]/publish/route.ts(45,29): error TS2339: Property 'error' does not exist on type '{ ok: true; publicUrl: string; } | { ok: false; error: string; }'.
-app/api/wioa/case-management/[id]/route.ts(17,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/case-management/[id]/route.ts(47,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/case-management/route.ts(17,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/case-management/route.ts(59,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/eligibility/route.ts(17,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/eligibility/route.ts(57,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/employment/route.ts(17,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/employment/route.ts(54,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/iep/[id]/route.ts(19,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/iep/[id]/route.ts(49,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/iep/route.ts(17,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/iep/route.ts(54,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/reporting/route.ts(15,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/support-services/[id]/approve/route.ts(20,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/support-services/route.ts(17,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/wioa/support-services/route.ts(56,81): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
-app/api/workforce-board/performance-trends/route.ts(14,68): error TS2322: Type '"super_admin"' is not assignable to type 'UserRole'.
 app/api/workspaces/create/route.ts(65,31): error TS2339: Property 'error' does not exist on type 'StartWorkspaceTrialResult'.
 app/api/workspaces/create/route.ts(65,38): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'number'.
 app/apply/IntakeFormInner.tsx(220,9): error TS2304: Cannot find name 'setMirrorWarning'.
@@ -645,7 +620,6 @@ lib/platform/organization-features.ts(91,17): error TS2352: Conversion of type '
 lib/platform/require-feature-for-auth.ts(59,3): error TS2322: Type 'NextResponse<unknown> | { ok: true; }' is not assignable to type 'NextResponse<unknown> | { userId: string; tenantId: string; }'.
 lib/programs/program-data.ts(334,3): error TS2739: Type '{ intrainingId: string; name: string; price: number; duration: string; durationDays: number; location: string; county: string; credentials: ({ name: string; type: "Certificate"; } | { name: string; type: "Industry-Recognized Certification"; })[]; ... 7 more ...; careerOutcomes: string[]; }' is missing the following properties from type 'Program': id, slug
 lib/rate-limit.ts(71,55): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Duration'.
-lib/rbac-guard.ts(70,7): error TS2741: Property 'super_admin' is missing in type '{ student: number; partner: number; program_holder: number; employer: number; workforce_board: number; advisor: number; admin: number; }' but required in type 'Record<UserRole, number>'.
 lib/services/credential-pipeline.ts(466,31): error TS2353: Object literal may only specify known properties, and 'actorUserId' does not exist in type 'AuditContext'.
 lib/storage/course-assets.ts(212,25): error TS2353: Object literal may only specify known properties, and 'prefix' does not exist in type 'SearchOptions'.
 lib/store/launch-plans.ts(109,23): error TS2339: Property 'API_ACCESS' does not exist on type '{ readonly CRM: "crm"; readonly WEBSITE: "website"; readonly BOOKING: "booking"; readonly FORMS: "forms"; readonly EMAIL_MARKETING: "email_marketing"; readonly AI_BASIC: "ai_basic"; ... 18 more ...; readonly WHITE_LABEL_MOBILE: "white_label_mobile"; }'.

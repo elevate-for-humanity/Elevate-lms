@@ -26,6 +26,16 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
+    // Also listen for uncaught JS errors at window level
+    const handleError = (event: ErrorEvent) => {
+      console.error('[Window ErrorEvent]', event.message, event.error);
+    };
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('[Unhandled Promise Rejection]', event.reason);
+    };
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
     // Auto-reload on Server Action ID mismatch (deployment rollover)
     if (isServerActionMismatch(error)) {
       window.location.reload();
@@ -38,6 +48,7 @@ export default function GlobalError({
     console.error('Name:', error.name);
     console.error('Stack:', error.stack);
     console.error('Digest:', error.digest);
+    console.error('Full Error Object:', JSON.stringify(error, null, 2));
     console.error('===========================');
 
     // Capture error with Sentry
@@ -51,6 +62,11 @@ export default function GlobalError({
         },
       });
     }
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
   }, [error]);
 
   return (

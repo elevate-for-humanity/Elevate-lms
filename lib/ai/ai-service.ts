@@ -126,7 +126,22 @@ function shouldTryNextProvider(err: any): boolean {
  * Provider is selected via options.provider, then AI_PROVIDER env var (default: openai).
  * Falls back automatically if the preferred provider is unavailable.
  */
-export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
+
+// Overload for convenience: pass messages array + options separately
+export async function aiChat(
+  messages: ChatCompletionOptions['messages'],
+  options?: Partial<Omit<ChatCompletionOptions, 'messages'>>,
+): Promise<ChatCompletionResult>;
+// Full options object
+export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult>;
+// Implementation
+export async function aiChat(
+  optionsOrMessages: ChatCompletionOptions | ChatCompletionOptions['messages'],
+  maybeOptions?: Partial<Omit<ChatCompletionOptions, 'messages'>>,
+): Promise<ChatCompletionResult> {
+  const options: ChatCompletionOptions = Array.isArray(optionsOrMessages)
+    ? { messages: optionsOrMessages, ...maybeOptions }
+    : optionsOrMessages;
   const preferred =
     options.provider && options.provider !== 'none' ? options.provider : undefined;
   const chain = getChatProviderChain(preferred);

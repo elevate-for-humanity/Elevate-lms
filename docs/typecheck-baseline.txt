@@ -28,8 +28,6 @@ app/api/cron/embed-knowledge/route.ts(38,7): error TS2353: Object literal may on
 app/api/cron/funding-followup/route.ts(53,33): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
 app/api/cron/low-hours-pace/route.ts(141,8): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, "admin_alerts", unknown, "POST">'. Did you mean 'match'?
 app/api/cron/payment-monitoring/route.ts(48,49): error TS2345: Argument of type '"payments"' is not assignable to parameter of type 'EventCategory'.
-app/api/cron/process-provisioning-jobs/route.ts(25,19): error TS2554: Expected 0-1 arguments, but got 2.
-app/api/cron/trial-lifecycle/route.ts(73,19): error TS2554: Expected 0-1 arguments, but got 2.
 app/api/documents/ai-prefill/route.ts(230,12): error TS2554: Expected 2-3 arguments, but got 0.
 app/api/documents/ai-prefill/route.ts(283,12): error TS2554: Expected 2-3 arguments, but got 0.
 app/api/documents/verify/route.ts(83,21): error TS2339: Property 'database' does not exist on type '{ unauthorized: (message?: string) => { error: string; code: ErrorCode; status: number; }; forbidden: (message?: string) => { error: string; code: ErrorCode; status: number; }; notFound: (message?: string) => { ...; }; ... 5 more ...; internal: (message?: string) => { ...; }; }'.
@@ -175,11 +173,6 @@ app/api/proctor/sessions/route.ts(42,13): error TS2339: Property 'db' does not e
 app/api/proctor/sessions/route.ts(42,17): error TS2339: Property 'profile' does not exist on type 'NextResponse<{ error: string; }> | { supabase: SupabaseClient<any, "public", "public", any, any>; db: SupabaseClient<any, "public", "public", any, any>; user: User; profile: { ...; }; }'.
 app/api/proctor/sessions/route.ts(82,13): error TS2339: Property 'db' does not exist on type 'NextResponse<{ error: string; }> | { supabase: SupabaseClient<any, "public", "public", any, any>; db: SupabaseClient<any, "public", "public", any, any>; user: User; profile: { ...; }; }'.
 app/api/proctor/sessions/route.ts(82,17): error TS2339: Property 'profile' does not exist on type 'NextResponse<{ error: string; }> | { supabase: SupabaseClient<any, "public", "public", any, any>; db: SupabaseClient<any, "public", "public", any, any>; user: User; profile: { ...; }; }'.
-app/api/program-holder/call-log/route.ts(22,6): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
-app/api/program-holder/call-log/route.ts(29,6): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
-app/api/program-holder/call-log/route.ts(39,6): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
-app/api/program-holder/call-log/route.ts(56,12): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
-app/api/program-holder/call-log/route.ts(79,6): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
 app/api/program-holder/hours/approve/route.ts(143,27): error TS2551: Property 'ENROLLMENT_UPDATED' does not exist on type '{ readonly USER_LOGIN: "USER_LOGIN"; readonly USER_LOGOUT: "USER_LOGOUT"; readonly USER_CREATED: "USER_CREATED"; readonly USER_UPDATED: "USER_UPDATED"; readonly USER_DELETED: "USER_DELETED"; ... 49 more ...; readonly DATA_DELETED: "DATA_DELETED"; }'. Did you mean 'ENROLLMENT_CREATED'?
 app/api/programs/[program]/courses/route.ts(19,13): error TS2339: Property 'program' does not exist on type '{ slug: string; }'.
 app/api/programs/checkout/route.ts(100,24): error TS2503: Cannot find namespace 'Stripe'.
@@ -204,10 +197,7 @@ app/api/scorm/attempts/[attemptId]/data/route.ts(58,43): error TS2339: Property 
 app/api/security/log/route.ts(38,24): error TS2339: Property 'ip' does not exist on type 'NextRequest'.
 app/api/soc/mark/route.ts(71,5): error TS2322: Type '"soc_controls"' is not assignable to type 'AuditEntity'.
 app/api/store/api-store/customer-portal/route.ts(23,45): error TS2554: Expected 0 arguments, but got 2.
-app/api/store/api-store/customer-portal/route.ts(49,8): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
 app/api/store/api-store/products/[slug]/route.ts(36,13): error TS2339: Property 'getProductBySlug' does not exist on type 'typeof import("app/data/store-products")'.
-app/api/store/api-store/webhook/route.ts(150,49): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
-app/api/store/api-store/webhook/route.ts(162,67): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
 app/api/store/platform-checkout/route.ts(115,52): error TS2769: No overload matches this call.
 app/api/store/publish/route.ts(52,42): error TS2339: Property 'id' does not exist on type 'Response<Product> | NextResponse<{ error: string; }>'.
 app/api/student/dashboard/route.ts(109,67): error TS2339: Property 'slug' does not exist on type '{ id: any; name: any; slug: any; category: any; duration_weeks: any; required_hours: any; total_hours: any; }[]'.
@@ -260,7 +250,6 @@ app/employer/applications/page.tsx(71,11): error TS2304: Cannot find name 'profi
 app/employer/candidates/page.tsx(163,22): error TS2304: Cannot find name 'profile'.
 app/employer/reports/submit/page.tsx(28,28): error TS2339: Property 'company_name' does not exist on type '{ id: string; role: string; organization_id?: string; email?: string; first_name?: string; last_name?: string; full_name?: string; avatar_url?: string; onboarding_completed?: boolean; }'.
 app/employer/shop/create/page.tsx(26,5): error TS2304: Cannot find name 'redirect'.
-app/funding/wioa/page.tsx(27,10): error TS2339: Property 'from' does not exist on type 'Promise<any>'.
 app/host-shop/dashboard/schedule/page.tsx(37,105): error TS2554: Expected 2 arguments, but got 3.
 app/legal/[slug]/page.tsx(33,41): error TS2339: Property 'email' does not exist on type '{ name: string; url: string; description: string; ogImage: string; handoff: { apply: string; login: string; checkout: string; lms: string; studentPortal: string; }; social: { facebook: string; instagram: string; linkedin: string; }; }'.
 app/legal/[slug]/page.tsx(34,25): error TS2339: Property 'email' does not exist on type '{ name: string; url: string; description: string; ogImage: string; handoff: { apply: string; login: string; checkout: string; lms: string; studentPortal: string; }; social: { facebook: string; instagram: string; linkedin: string; }; }'.
@@ -287,10 +276,8 @@ app/programs/catalog/page.tsx(175,23): error TS2322: Type 'CatalogProgram' is no
 app/programs/cosmetology-apprenticeship/eligibility/page.tsx(43,31): error TS2322: Type '{ programSlug: string; }' is not assignable to type 'IntrinsicAttributes & Props'.
 app/programs/cosmetology-apprenticeship/enrollment-success/page.tsx(43,45): error TS2339: Property 'name' does not exist on type '{ name: any; slug: any; }[]'.
 app/programs/cosmetology-apprenticeship/enrollment-success/page.tsx(44,45): error TS2339: Property 'slug' does not exist on type '{ name: any; slug: any; }[]'.
-app/programs/federal-funded/page.tsx(46,6): error TS2339: Property 'from' does not exist on type 'Promise<any>'.
 app/programs/hvac-technician/course/HvacCourseHome.tsx(221,25): error TS2322: Type 'string' is not assignable to type 'never'.
 app/programs/hvac-technician/course/HvacCourseHome.tsx(393,80): error TS2322: Type 'string' is not assignable to type 'never'.
-app/programs/micro-programs/page.tsx(38,6): error TS2339: Property 'from' does not exist on type 'Promise<any>'.
 app/store/apps/page.tsx(62,3): error TS1117: An object literal cannot have multiple properties with the same name.
 app/store/courses/page.tsx(88,31): error TS2339: Property 'format' does not exist on type 'Course'.
 components/AIAssistantBubble.tsx(127,28): error TS2503: Cannot find namespace 'JSX'.
@@ -309,7 +296,6 @@ components/admin/dashboard/LivePreviewIframe.tsx(12,15): error TS7030: Not all c
 components/admin/dashboard/LizzyWorkspace.tsx(190,12): error TS2367: This comparison appears to be unintentional because the types 'ToolPanel' and '"workflows"' have no overlap.
 components/admin/dashboard/RealtimeKpiGrid.tsx(33,23): error TS7030: Not all code paths return a value.
 components/admin/dashboard/RealtimeKpiGrid.tsx(77,7): error TS7030: Not all code paths return a value.
-components/admin/dashboard/SystemHealthPanel.tsx(154,30): error TS2322: Type 'string' is not assignable to type 'never'.
 components/auth/AuthRedirectHandler.tsx(33,73): error TS7030: Not all code paths return a value.
 components/auth/AuthRedirectHandler.tsx(40,7): error TS7030: Not all code paths return a value.
 components/dashboard/CourseCardGrid.tsx(50,25): error TS2339: Property 'course_name' does not exist on type 'Course'.
@@ -413,12 +399,8 @@ lib/ai/course-gap-detection.ts(125,37): error TS2352: Conversion of type '{ id: 
 lib/ai/course-gap-detection.ts(125,83): error TS2339: Property 'program_id' does not exist on type 'ProgramRow'.
 lib/ai/course-gap-detection.ts(126,36): error TS2769: No overload matches this call.
 lib/ai/course-generation-worker.ts(405,24): error TS2304: Cannot find name 'lessonRecord'.
-lib/ai/course-generator.ts(241,82): error TS2554: Expected 0-1 arguments, but got 2.
-lib/ai/course-generator.ts(268,75): error TS2554: Expected 0-1 arguments, but got 2.
 lib/ai/orchestrator.ts(414,48): error TS2304: Cannot find name 'isAiDegradedError'.
 lib/ai/orchestrator.ts(422,9): error TS2304: Cannot find name 'isAiDegradedError'.
-lib/ai/template-generator.ts(256,106): error TS2554: Expected 0-1 arguments, but got 2.
-lib/api/validation-schemas.ts(272,9): error TS2554: Expected 0-1 arguments, but got 2.
 lib/audit.ts(52,8): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
 lib/auth.ts(254,22): error TS2345: Argument of type 'readonly ["admin", "staff"]' is not assignable to parameter of type 'UserRole | UserRole[]'.
 lib/auth.ts(47,61): error TS2769: No overload matches this call.
@@ -455,10 +437,6 @@ lib/compliance/rapids-export.ts(18,36): error TS1064: The return type of an asyn
 lib/consent.ts(99,3): error TS2322: Type 'string' is not assignable to type 'boolean'.
 lib/contentModeration.ts(166,5): error TS2322: Type '"content_reported"' is not assignable to type 'AuditAction'.
 lib/contentModeration.ts(277,5): error TS2322: Type '"content_moderated"' is not assignable to type 'AuditAction'.
-lib/control-plane/index.ts(350,94): error TS2554: Expected 0-1 arguments, but got 2.
-lib/control-plane/index.ts(360,95): error TS2554: Expected 0-1 arguments, but got 2.
-lib/control-plane/index.ts(387,109): error TS2554: Expected 0-1 arguments, but got 2.
-lib/control-plane/index.ts(416,98): error TS2554: Expected 0-1 arguments, but got 2.
 lib/course-builder/assessment-generator.ts(294,9): error TS2322: Type '{ id: string; question: string; options: string[]; correctAnswer: number; explanation: string; }[]' is not assignable to type 'QuizQuestion[]'.
 lib/course-builder/lesson-content-generator.ts(1,10): error TS2305: Module '"@/lib/groq-client"' has no exported member 'groqJSON'.
 lib/course-builder/program-auto-course.ts(126,11): error TS2322: Type '{ question: string; options: string[]; correctAnswer: number; explanation: string; }[]' is not assignable to type 'BlueprintQuizQuestion[]'.
@@ -501,8 +479,6 @@ lib/demo/requireDemo.ts(48,37): error TS2304: Cannot find name 'DemoRole'.
 lib/demo/requireDemo.ts(92,39): error TS2304: Cannot find name 'DemoRole'.
 lib/devstudio/env.ts(1,28): error TS2307: Cannot find module './webcontainer/runtime' or its corresponding type declarations.
 lib/devstudio/fs/index.ts(1,28): error TS2307: Cannot find module '../webcontainer/runtime' or its corresponding type declarations.
-lib/ellie/executor.ts(61,19): error TS2554: Expected 0-1 arguments, but got 2.
-lib/ellie/executor.ts(75,19): error TS2554: Expected 0-1 arguments, but got 2.
 lib/email/automated-triggers.ts(218,46): error TS2339: Property 'appointmentConfirmation' does not exist on type '{ studentAppointment: { from: string; subject: string; getHtml: (data: { firstName: string; date: string; time: string; format: "phone" | "zoom"; zoomLink?: string; rescheduleLink?: string; }) => string; getText: (data: { ...; }) => string; }; appointmentReminder24h: { ...; }; appointmentReminder1h: { ...; }; }'.
 lib/email/automated-triggers.ts(243,46): error TS2339: Property 'reminder24Hours' does not exist on type '{ studentAppointment: { from: string; subject: string; getHtml: (data: { firstName: string; date: string; time: string; format: "phone" | "zoom"; zoomLink?: string; rescheduleLink?: string; }) => string; getText: (data: { ...; }) => string; }; appointmentReminder24h: { ...; }; appointmentReminder1h: { ...; }; }'.
 lib/email/automated-triggers.ts(268,46): error TS2339: Property 'reminder1Hour' does not exist on type '{ studentAppointment: { from: string; subject: string; getHtml: (data: { firstName: string; date: string; time: string; format: "phone" | "zoom"; zoomLink?: string; rescheduleLink?: string; }) => string; getText: (data: { ...; }) => string; }; appointmentReminder24h: { ...; }; appointmentReminder1h: { ...; }; }'.
@@ -513,10 +489,6 @@ lib/enrollment/create-enrollment.ts(230,9): error TS2552: Cannot find name 'temp
 lib/enrollment/create-enrollment.ts(241,9): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
 lib/enrollment/create-enrollment.ts(60,33): error TS2304: Cannot find name 'requireAdminClient'.
 lib/enrollment/orchestrate-enrollment.ts(132,67): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any>'.
-lib/enrollment/partner-routing.ts(146,89): error TS2554: Expected 0-1 arguments, but got 2.
-lib/enrollment/partner-routing.ts(158,75): error TS2554: Expected 0-1 arguments, but got 2.
-lib/enrollment/partner-routing.ts(208,82): error TS2554: Expected 0-1 arguments, but got 2.
-lib/enrollment/partner-routing.ts(218,68): error TS2554: Expected 0-1 arguments, but got 2.
 lib/experiments/ab-testing.ts(282,5): error TS2687: All declarations of 'gtag' must have identical modifiers.
 lib/experiments/ab-testing.ts(282,5): error TS2717: Subsequent property declarations must have the same type.  Property 'gtag' must be of type '(command: "event" | "config" | "consent", targetId: string, config?: Record<string, unknown>) => void', but here has type '(...args: unknown[]) => void'.
 lib/gdpr.ts(179,7): error TS2353: Object literal may only specify known properties, and 'target_type' does not exist in type 'AuditEvent'.
@@ -573,6 +545,5 @@ lib/rate-limit.ts(71,55): error TS2345: Argument of type 'string' is not assigna
 lib/storage/course-assets.ts(212,25): error TS2353: Object literal may only specify known properties, and 'prefix' does not exist in type 'SearchOptions'.
 lib/store/launch-plans.ts(109,23): error TS2339: Property 'API_ACCESS' does not exist on type '{ readonly CRM: "crm"; readonly WEBSITE: "website"; readonly BOOKING: "booking"; readonly FORMS: "forms"; readonly EMAIL_MARKETING: "email_marketing"; readonly AI_BASIC: "ai_basic"; ... 18 more ...; readonly WHITE_LABEL_MOBILE: "white_label_mobile"; }'.
 lib/stripe/handlers/checkout-session-completed.ts(342,28): error TS2304: Cannot find name 'runBarberPostPayment'.
-lib/utils/siteUrl.ts(44,66): error TS2554: Expected 0-1 arguments, but got 2.
 lms-data/programs.ts(215,7): error TS2741: Property 'slug' is missing in type '{ id: string; title: string; subtitle: string; description: string; deliveryEngine: "NATIVE"; salePrice: number; stripeProductId: undefined; stripePriceId: undefined; stripePriceIdPlan: undefined; partnerRequirements: { ...; }[]; isStateTuitionFunded: false; earnWhileYouLearnNotes: string; visiblePublic: true; }' but required in type 'Program'.
 # TypeScript baseline - Fixed bearer/x-header errors

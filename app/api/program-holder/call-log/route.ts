@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   const { program_holder_student_id, outcome, notes, next_follow_up, work_start_date, work_site } = body;
   if (!program_holder_student_id) return NextResponse.json({ error: 'Missing student id' }, { status: 400 });
 
-  const db = requireAdminClient();
+  const db = await requireAdminClient();
 
   // Verify caller owns this student record
   const { data: student } = await db
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
   const studentId = request.nextUrl.searchParams.get('student_id');
   if (!studentId) return NextResponse.json({ error: 'Missing student_id' }, { status: 400 });
 
-  const db = requireAdminClient();
+  const db = await requireAdminClient();
   const { data, error } = await db
     .from('program_holder_call_log')
     .select('*')

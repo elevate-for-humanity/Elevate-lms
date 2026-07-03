@@ -143,15 +143,16 @@ export function SystemHealthPanel({ health }: Props) {
         {alerts.length > 0 && (
           <div className="space-y-2">
             {alerts.map((alert, i) => {
-              const styles = SEVERITY_STYLES[alert.severity] ?? SEVERITY_STYLES.info;
+              const severity = alert.severity as keyof typeof SEVERITY_STYLES;
+              const styles = SEVERITY_STYLES[severity] ?? SEVERITY_STYLES.info;
               const code = typeof alert.code === 'string' ? alert.code : 'unknown';
-              const AlertIcon = CODE_ICONS[code] ?? styles.Icon;
+              const IconComponent: React.ElementType = CODE_ICONS[code] ?? styles.Icon;
               return (
                 <div
                   key={i}
                   className={`flex items-start gap-3 px-4 py-3 rounded-xl border ${styles.row}`}
                 >
-                  <AlertIcon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${styles.icon}`} />
+                  <IconComponent className={`w-4 h-4 mt-0.5 flex-shrink-0 ${styles.icon}`} />
                   <div className="min-w-0">
                     <p className={`text-xs font-semibold ${styles.text}`}>
                       {code.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}

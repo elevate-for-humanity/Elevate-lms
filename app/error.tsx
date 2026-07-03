@@ -15,6 +15,13 @@ export default function Error({
   useEffect(() => {
     // Log error to console in development, send to monitoring in production
     logger.error('Application error:', error);
+    // Always log to console for debugging
+    console.error('=== CRITICAL APP ERROR ===');
+    console.error('Message:', error.message);
+    console.error('Name:', error.name);
+    console.error('Stack:', error.stack);
+    console.error('Digest:', error.digest);
+    console.error('===========================');
   }, [error]);
 
   return (
@@ -28,9 +35,12 @@ export default function Error({
           <p className="text-lg text-slate-700 mb-6">
             We encountered an unexpected error. Our team has been notified.
           </p>
-          {error.message && process.env.NODE_ENV === 'development' && (
+          {error.message && (
             <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6">
               <p className="text-sm text-brand-red-800 font-mono">{error.message}</p>
+              {error.stack && (
+                <pre className="text-xs text-brand-red-700 mt-2 overflow-auto">{error.stack}</pre>
+              )}
             </div>
           )}
         </div>

@@ -14,7 +14,7 @@ export function DynamicPDFViewer(props: { url: string; title: string; showDownlo
 }
 
 export function DynamicRichTextEditor(props: { 
-  content?: string; 
+  value?: string; content?: string; 
   onChange?: (content: string) => void; 
   placeholder?: string;
   className?: string;

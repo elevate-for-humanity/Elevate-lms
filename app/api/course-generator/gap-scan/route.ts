@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'No gaps provided' }, { status: 400 });
       }
 
-      const jobIds = await createDraftJobsFromGaps(gaps);
+      const jobIds = await createDraftJobsFromGaps(gaps as any);
 
       await withApiAudit({
         userId: user.id,

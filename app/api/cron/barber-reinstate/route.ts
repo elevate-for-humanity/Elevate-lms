@@ -57,7 +57,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       .update({ status: 'active', updated_at: new Date().toISOString() })
       .eq('user_id', sub.student_id)
       .eq('status', 'suspended')
-      .catch((e: unknown) => logger.warn('[cron/barber-reinstate] Enrollment restore failed', { error: String(e) }));
+      .then(() => {}, (e: unknown) => logger.warn('[cron/barber-reinstate] Enrollment restore failed', { error: String(e) }));
 
     if (profile?.email) {
       await sendEmail({

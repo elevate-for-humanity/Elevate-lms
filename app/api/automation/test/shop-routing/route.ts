@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
  *
  * FOR QA/DEMO PURPOSES ONLY.
  */
-async function _POST() {
+async function _POST(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   if (process.env.NODE_ENV === 'production') {

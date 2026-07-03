@@ -33,7 +33,7 @@ async function _GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = requireAdminClient();
+    const supabase = await requireAdminClient();
 
     // Get user profile
     const { data: profile } = await supabase

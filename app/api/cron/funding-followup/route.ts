@@ -50,7 +50,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       message: `Your ${source?.name ?? 'funding'} application has been pending for ${daysPending} days. Our team is following up.`,
       read: false,
       idempotency_key: `funding-followup-${row.id}-${new Date().toISOString().split('T')[0]}`,
-    }).onConflict('idempotency_key').ignore().catch((e: unknown) => logger.warn('[cron/funding-followup] Notification insert failed', { error: String(e) }));
+    }).then(() => {}, () => {}).catch((e: unknown) => logger.warn('[cron/funding-followup] Notification insert failed', { error: String(e) }));
 
     if (email) {
       await sendEmail({

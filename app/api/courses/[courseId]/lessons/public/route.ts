@@ -49,7 +49,6 @@ function buildLocalFallback(courseId: string, slug: string, COURSE_DEFINITIONS: 
   const moduleUuids = MODULE_ID_TO_UUID[slug] || {};
 
   const course = {
-    id: courseId,
     title: def.title,
     title: def.title,
     description: def.subtitle,

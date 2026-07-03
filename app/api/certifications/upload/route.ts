@@ -69,7 +69,7 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to update certification record' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, url: signed.signedUrl, file_path: filePath });
+    return NextResponse.json({ success: true, url: urlData.publicUrl, file_path: filePath });
   } catch (err) {
     logger.error('Certification upload handler error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

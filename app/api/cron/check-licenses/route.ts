@@ -39,7 +39,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       severity: 'warning',
       message: `License ${lic.id} (${lic.license_type ?? 'unknown type'}) missing required fields: ${missing}`,
       metadata: { license_id: lic.id, holder_id: lic.holder_id, missing_fields: missing },
-    }).onConflict('id').ignore();
+    }).then(() => {}, () => {});
 
     flagged++;
   }

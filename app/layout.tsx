@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
-import dynamic from 'next/dynamic';
+import { dynamic } from 'next/dynamic';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import PublicLayout from '@/components/layout/PublicLayout';

@@ -18,7 +18,7 @@ async function _GET(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const auth = await requireAuth(req);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const { searchParams } = new URL(req.url);
     const repo = searchParams.get('repo') || 'elevateforhumanity/fix2';

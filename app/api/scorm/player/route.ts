@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   const packageId = request.nextUrl.searchParams.get('packageId') ?? request.nextUrl.searchParams.get('package_id');
   if (!packageId) return safeError('packageId is required', 400);
   try {

@@ -62,6 +62,7 @@ async function sendTrialWelcomeEmail(
   orgName: string,
   subdomain: string,
   dashboardUrl: string,
+  publicSiteUrl: string,
   correlationId: string,
 ) {
   const sendgridKey = process.env.SENDGRID_API_KEY;
@@ -298,7 +299,7 @@ async function _POST(request: NextRequest) {
 
     // Send welcome email
     try {
-      await sendTrialWelcomeEmail(email, orgName.trim(), subdomain, dashboardUrl, correlationId);
+      await sendTrialWelcomeEmail(email, orgName.trim(), subdomain, dashboardUrl, publicPreviewUrl, correlationId);
     } catch (emailError) {
       logger.error('[trial] ' + correlationId + ' - Failed to send welcome email:', emailError);
       // Don't fail - trial is created

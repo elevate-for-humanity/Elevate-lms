@@ -155,7 +155,7 @@ async function _POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      document: document || { file_url: urlData.publicUrl },
+      document,
       path: fileName,
     });
   } catch (error) {

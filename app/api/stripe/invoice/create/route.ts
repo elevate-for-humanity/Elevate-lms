@@ -13,8 +13,8 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
-  const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  const auth = await apiRequireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
 
   try {
 
@@ -90,7 +90,7 @@ async function _POST(req: Request) {
 
 async function _GET(request: Request) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   try {
 

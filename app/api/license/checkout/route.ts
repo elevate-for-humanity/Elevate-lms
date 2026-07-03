@@ -19,7 +19,7 @@ import { withRuntime } from '@/lib/api/withRuntime';
 async function _POST(request: NextRequest) {
   try {
     const auth = await requireAuth(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const body = await request.json();
     const {

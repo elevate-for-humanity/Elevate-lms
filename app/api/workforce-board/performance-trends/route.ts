@@ -12,7 +12,7 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const auth = await requireApiRole(['workforce_board', 'admin', 'super_admin', 'org_admin']);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const { db } = auth;
 

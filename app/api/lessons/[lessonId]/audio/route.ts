@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { mkdir, writeFile, readFile } from 'fs/promises';
 import path from 'path';
 import { logger } from '@/lib/logger';

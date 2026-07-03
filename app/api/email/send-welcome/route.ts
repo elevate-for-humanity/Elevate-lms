@@ -13,7 +13,7 @@ async function _POST(request: NextRequest) {
   try {
 
     const auth = await requireAuth(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const { to, name, userId } = await request.json();
 

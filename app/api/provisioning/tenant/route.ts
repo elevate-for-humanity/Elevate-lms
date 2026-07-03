@@ -67,7 +67,7 @@ async function _POST(request: NextRequest) {
 
     if (!isWebhook) {
       const auth = await apiRequireAdmin(request);
-      if (auth.error) return auth.error;
+      if (auth instanceof NextResponse) return auth;
     }
 
     const body = await request.json();

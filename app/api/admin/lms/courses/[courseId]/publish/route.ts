@@ -1,4 +1,5 @@
 import { type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { createClient } from '@/lib/supabase/server';
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ co
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   
   const { courseId } = await context.params;
   const supabase = await createClient();

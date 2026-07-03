@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
   if (limited) return limited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   let body: { message?: string; sessionId?: string; provider?: string };
   try {
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   let body: { sessionId?: string };
   try {

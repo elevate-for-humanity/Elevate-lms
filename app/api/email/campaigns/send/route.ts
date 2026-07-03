@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 
 async function _POST(req: NextRequest) {
   const auth = await apiRequireAdmin(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   try {
     await hydrateProcessEnv();

@@ -17,7 +17,7 @@ async function _GET(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const { data: files } = await db.storage.from('media').list('', {
+    const { data: files } = await supabase.storage.from('media').list('', {
       limit: 100,
       sortBy: { column: 'created_at', order: 'desc' },
     });

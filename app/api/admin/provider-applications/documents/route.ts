@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const applicationId = request.nextUrl.searchParams.get('applicationId');
   if (!applicationId) return safeError('applicationId required', 400);

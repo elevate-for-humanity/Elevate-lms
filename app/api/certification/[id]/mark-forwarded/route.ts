@@ -17,7 +17,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const result = await markForwarded(params.id, auth.id);

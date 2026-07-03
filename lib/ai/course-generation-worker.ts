@@ -131,7 +131,17 @@ async function generateCourseOutline(
   onetData: unknown,
   blsData: unknown,
   cosData: unknown
-): Promise<{ title: string; modules: Array<{ title: string; description: string; lessons: number }> }> {
+): Promise<{ 
+  title: string; 
+  subtitle?: string; 
+  description?: string; 
+  modules: Array<{ 
+    title: string; 
+    description: string; 
+    lessons: number;
+    objectives?: string[];
+  }> 
+}> {
   const model = modelRouter.selectModel('course_generation');
   
   const systemPrompt = `You are an expert instructional designer for workforce development programs.
@@ -382,7 +392,7 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
             content: lessonContent.content,
             summary: lessonContent.summary,
             objectives: lessonContent.objectives,
-            reflection_prompt: lessonContent.reflectionPrompt,
+            // reflectionPrompt not available
             duration_minutes: 30,
             order_index: lessonNum,
           });

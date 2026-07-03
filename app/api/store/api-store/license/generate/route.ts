@@ -1,9 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { generateLicenseKey, hashLicenseKey } from '@/lib/store/license';
 
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { safeError } from '@/lib/api/safe-error';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -123,33 +125,8 @@ async function _POST(req: Request) {
       // Check for authenticated admin user
       const supabase = await createClient();
       const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
-      
-      if (authError || !user) {
-        logger.warn('Unauthorized license generation attempt', { ip: clientIp });
-        return Response.json(
-          { error: 'Authentication required' },
-          { status: 401 }
-        );
-      }
-
-      // Verify admin role
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      if (!profile?.role || !['admin'].includes(profile.role)) {
-        logger.warn('Non-admin license generation attempt', { 
-          userId: user.id, 
-          role: profile?.role 
-        });
-        return Response.json(
-          { error: 'Admin access required' },
-          { status: 403 }
-        );
-      }
     }
+      
 
     const { email, productSlug, domain } = await req.json();
 

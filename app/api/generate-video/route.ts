@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
 
   // Admin only
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   let lessonId: string;
   try {
@@ -353,7 +353,7 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const lessonId = request.nextUrl.searchParams.get('lesson_id');
   if (!lessonId) return safeError('lesson_id is required', 400);

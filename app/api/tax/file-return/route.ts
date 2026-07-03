@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   const body = await request.json().catch(() => null) as { tax_year?: number; filing_status?: string; notes?: string } | null;
   if (!body?.tax_year) return safeError('tax_year is required', 400);
   try {

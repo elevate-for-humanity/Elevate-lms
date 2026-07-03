@@ -16,6 +16,8 @@ export interface ApiAuthResult {
   db: Awaited<ReturnType<typeof createClient>>;
   /** Service-role client for cross-tenant admin queries. Only use when RLS must be bypassed. */
   adminDb: ReturnType<typeof createAdminClient>;
+  /** Error response if auth failed (for backward compatibility). */
+  error?: NextResponse;
 }
 
 /**

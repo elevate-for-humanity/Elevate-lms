@@ -21,7 +21,7 @@ export function AIAssistantBubble() {
 
   useEffect(() => {
     // Only show the welcome bubble once per session
-    if (sessionStorage.getItem('ai-bubble-shown')) return;
+    if (sessionStorage.getItem('ai-bubble-shown')) return undefined;
     const timer = setTimeout(() => {
       setShowWelcome(true);
       sessionStorage.setItem('ai-bubble-shown', '1');
@@ -53,7 +53,7 @@ export function AIAssistantBubble() {
   };
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) return undefined;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setIsOpen(false);
     };

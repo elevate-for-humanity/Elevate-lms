@@ -10,7 +10,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
     const auth = await apiRequireAdmin(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
   const { id } = await params;
   try {
     const supabase = await requireAdminClient();
@@ -37,7 +37,7 @@ export async function DELETE(
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
     const auth = await apiRequireAdmin(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
   const { id } = await params;
   try {
     const supabase = await requireAdminClient();

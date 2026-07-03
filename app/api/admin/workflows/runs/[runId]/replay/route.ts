@@ -20,7 +20,7 @@ export async function POST(
   { params }: { params: Promise<{ runId: string }> },
 ) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { runId } = await params;
   const traceId = request.headers.get('x-trace-id') ?? 'no-trace';

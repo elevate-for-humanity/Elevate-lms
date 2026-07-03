@@ -12,7 +12,7 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const auth = await requireApiRole(['employer', 'admin', 'super_admin']);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     // Employer needs cross-user apprentice data; role gate is the auth boundary
     const db = auth.adminDb || auth.db;

@@ -20,7 +20,6 @@ async function _GET(request: NextRequest) {
     headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
     headersList.get('x-real-ip') ||
     headersList.get('cf-connecting-ip') ||
-    request.ip ||
     '0.0.0.0';
 
   return NextResponse.json({

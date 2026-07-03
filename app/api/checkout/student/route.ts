@@ -19,7 +19,7 @@ async function _POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await requireAuth(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   logger.warn('Deprecated checkout endpoint called', {
     path: '/api/checkout/student',
     redirect: '/api/checkout/learner',

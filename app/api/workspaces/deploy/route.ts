@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { safeError, safeInternalError, safeOk } from '@/lib/api/safe-error';
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -14,7 +14,7 @@ import { enqueueJob } from '@/lib/jobs/queue';
  */
 async function _POST(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const body = await request.json();

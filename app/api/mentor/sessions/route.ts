@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
   const auth = await apiAuthGuard(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   if (!ALLOWED_ROLES.includes(auth.role ?? '')) return safeError('Forbidden', 403);
 
   const { searchParams } = req.nextUrl;
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
   const auth = await apiAuthGuard(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   if (!ALLOWED_ROLES.includes(auth.role ?? '')) return safeError('Forbidden', 403);
 
   try {

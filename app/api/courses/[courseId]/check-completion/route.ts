@@ -36,7 +36,7 @@ async function _POST(req: NextRequest, { params }: Params) {
     .maybeSingle();
 
   if (enrollError || !enrollment) {
-    logger.error(enrollError);
+    logger.error('Enroll error', enrollError);
     return NextResponse.json({ error: 'Enrollment not found for this course' }, { status: 404 });
   }
 
@@ -58,7 +58,7 @@ async function _POST(req: NextRequest, { params }: Params) {
   });
 
   if (extError) {
-    logger.error(extError);
+    logger.error('Extraction error', extError);
     return NextResponse.json({ error: 'Error checking external modules' }, { status: 500 });
   }
 
@@ -93,7 +93,7 @@ async function _POST(req: NextRequest, { params }: Params) {
     .eq('id', enrollment.id);
 
   if (updateError) {
-    logger.error(updateError);
+    logger.error('Update error', updateError);
     return NextResponse.json({ error: 'Failed to set course as completed' }, { status: 500 });
   }
 

@@ -29,7 +29,7 @@ async function _POST(request: Request) {
     const supabase = await createClient();
 
     // DB write is required — no fallthrough on failure
-    const record = await requireDbWrite(
+    const record = await requireDbWrite<Record<string, unknown>>(
       supabase
         .from('advising_requests')
         .insert({
@@ -42,8 +42,7 @@ async function _POST(request: Request) {
           created_at: new Date().toISOString(),
         })
         .select()
-        .maybeSingle()
-        .then(result => ({ data: result.data, error: result.error })),
+        .maybeSingle() as unknown as Promise<{ data: Record<string, unknown> | null; error: unknown }>,
       'Failed to save advising request',
     );
 

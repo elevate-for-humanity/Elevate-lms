@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
   const isCron = cronSecret && cronSecret === process.env.CRON_SECRET;
   if (!isCron) {
     const auth = await apiRequireAdmin(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
   }
 
   const db = await requireAdminClient();

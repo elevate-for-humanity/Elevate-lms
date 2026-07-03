@@ -143,6 +143,7 @@ export type BlueprintModule = {
    */
   slug: string;
   title: string;
+  description?: string;
   /** 1-based position within the program */
   orderIndex: number;
 
@@ -154,7 +155,7 @@ export type BlueprintModule = {
   quizRequired: boolean;
   practicalRequired: boolean;
   isCritical: boolean;
-  requiredLessonTypes: BlueprintLessonTypeRule[];
+  requiredLessonTypes?: BlueprintLessonTypeRule[];
 
   // ── Competency coverage requirements (enforced by auditor) ──
   competencies: BlueprintCompetency[];
@@ -464,6 +465,10 @@ export interface InteractionSpecs {
   knowledgeCheckCount: number;
   scenarioCount: number;
   flashcardCount: number;
+  matchingCount?: number;
+  caseStudyCount?: number;
+  simulationCount?: number;
+  decisionTreeCount?: number;
 }
 
 // ─── Enrollment-Based Features ────────────────────────────────────────────────

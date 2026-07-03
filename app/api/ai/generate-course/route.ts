@@ -16,7 +16,7 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const auth = await requireAuth(req);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const { mode, prompt } = await req.json();
     if (!mode || !prompt) return NextResponse.json({ error: 'Missing mode or prompt' }, { status: 400 });

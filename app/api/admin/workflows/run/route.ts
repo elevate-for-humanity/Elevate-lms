@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   if (limited) return limited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const body = await request.json();
   const { workflow_id, payload } = body;

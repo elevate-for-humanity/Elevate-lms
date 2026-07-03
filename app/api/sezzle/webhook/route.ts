@@ -129,6 +129,7 @@ async function _POST(request: NextRequest) {
   }
 
   // After signature verification, always return 200 to prevent retries
+  let sezzleEventId = 'unknown';
   try {
     const event: SezzleWebhookEvent = JSON.parse(payload);
 
@@ -140,7 +141,7 @@ async function _POST(request: NextRequest) {
     });
 
     // Event-level deduplication via webhook_events_processed
-    const sezzleEventId = event.event_id || `${event.event_type}:${event.data.order_uuid}`;
+    sezzleEventId = event.event_id || `${event.event_type}:${event.data.order_uuid}`;
     const { shouldProcess, confident } = await claimWebhookEvent(
       'sezzle',
       sezzleEventId,

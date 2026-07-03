@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
-import { verifyDocument, rejectDocument, canEvaluateTransfer } from '@/lib/documents';
+import { verifyDocument, rejectDocument, canEvaluateTransfer, TransferSourceType } from '@/lib/documents';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';

@@ -23,7 +23,7 @@ async function _GET(request: Request) {
     }
 
     const auth = await apiAuthGuard(request as any);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
     const email = auth.email;
 
     if (!email) {

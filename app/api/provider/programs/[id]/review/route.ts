@@ -19,7 +19,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const approvalId = params.id;
   if (!approvalId) return safeError('approval id is required', 400);

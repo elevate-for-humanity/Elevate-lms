@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   if (!auth.role || !LIST_ROLES.has(auth.role)) return safeError('Forbidden', 403);
 
   const db = await requireAdminClient();

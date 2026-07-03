@@ -181,7 +181,7 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { enrollment_id, amount, program_holder_name, program_holder_email, memo } =
     await request.json() as {

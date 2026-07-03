@@ -17,7 +17,7 @@ async function _GET(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const db = await requireAdminClient();
   if (!db) return safeError('Service unavailable', 503);
@@ -51,7 +51,7 @@ async function _POST(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   let body: Record<string, string | number>;
   try {
@@ -116,7 +116,7 @@ async function _PATCH(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   let body: Record<string, string | number>;
   try {

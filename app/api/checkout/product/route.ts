@@ -12,7 +12,7 @@ export const maxDuration = 60;
 
 async function _POST(req: Request) {
   const auth = await requireAuth(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });

@@ -112,13 +112,13 @@ async function _GET(request: Request) {
         const pending_total = entries
           .filter((e) => !e.verified)
           .reduce((sum, e) => sum + Number(e.hours), 0);
+        const program = Array.isArray(enrollment.program) ? enrollment.program[0] : enrollment.program;
 
         return {
           enrollment_id: enrollment.id,
-          program_name: enrollment.program?.name || enrollment.program?.title || 'Unknown Program',
-          program_slug: enrollment.program_slug || enrollment.program?.slug || '',
-          required_hours:
-            enrollment.program?.required_hours || enrollment.program?.total_hours || null,
+          program_name: program?.name || program?.title || 'Unknown Program',
+          program_slug: enrollment.program_slug || program?.slug || '',
+          required_hours: program?.required_hours || program?.total_hours || null,
           entries,
           verified_total,
           pending_total,

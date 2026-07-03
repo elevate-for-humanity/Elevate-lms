@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from 'next/server';
 // PUBLIC ROUTE: store clone — internal tool
 import { cloneRepoForCustomer } from '@/lib/store/github-clone';
 import { hashLicenseKey } from '@/lib/store/license';

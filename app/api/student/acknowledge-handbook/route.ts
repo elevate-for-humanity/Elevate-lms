@@ -12,8 +12,8 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
-  const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  const auth = await apiAuthGuard(req);
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const rateLimited = await applyRateLimit(req, 'api');

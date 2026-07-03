@@ -37,7 +37,7 @@ async function _POST(request: NextRequest) {
       const { apiRequireAdmin } = await import('@/lib/admin/guards');
       try {
         const auth = await apiRequireAdmin(request);
-        if (auth.error) return auth.error;
+        if (auth instanceof NextResponse) return auth;
       } catch (e) {
         return e instanceof Response
           ? e

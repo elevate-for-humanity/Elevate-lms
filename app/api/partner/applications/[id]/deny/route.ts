@@ -17,7 +17,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
     if (rateLimited) return rateLimited;
 
     const auth = await apiRequireAdmin(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const { id } = await params;
     const { reason } = await request.json();

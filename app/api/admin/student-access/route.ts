@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   let body: { email?: string; repair?: boolean };
   try {

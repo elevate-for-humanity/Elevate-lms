@@ -2,7 +2,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
@@ -17,11 +17,7 @@ const stripe = stripeKey
       apiVersion: '2025-10-29.clover',
     })
   : null;
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase =
-  supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+const supabase = createAdminClient();
 
 export async function POST(request: NextRequest) {
   if (!stripe || !supabase) {

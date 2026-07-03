@@ -17,6 +17,7 @@ export default function FeatureTour() {
       const timer = setTimeout(() => setShowTour(true), 2000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, []);
 
   const features = [

@@ -12,7 +12,7 @@ async function _POST(req: NextRequest) {
   try {
 
     const auth = await requireAuth(req);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const body = await req.json();
     const { courseSlug, message } = body as {

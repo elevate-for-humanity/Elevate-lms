@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 // GET /api/admin/workflows/[id] — workflow detail with triggers, steps, recent runs
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { id } = await params;
   const db = await requireAdminClient();
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 // PATCH /api/admin/workflows/[id] — update status / name / metadata
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { id } = await params;
   const body = await request.json();
@@ -57,7 +57,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 // DELETE /api/admin/workflows/[id]
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { id } = await params;
   const db = await requireAdminClient();

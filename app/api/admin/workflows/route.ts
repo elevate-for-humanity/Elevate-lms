@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 // GET /api/admin/workflows — list workflows with trigger + step counts and recent run
 export async function GET(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const db = await requireAdminClient();
 
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 // POST /api/admin/workflows — create a new workflow
 export async function POST(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const body = await request.json();
   const { name, category, metadata } = body;

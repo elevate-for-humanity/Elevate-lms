@@ -56,7 +56,7 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ courseId:
     .maybeSingle();
 
   if (courseError || !course) {
-    logger.error(courseError);
+    logger.error('Course error', courseError);
     return NextResponse.json({ error: 'Course not found' }, { status: 404 });
   }
 

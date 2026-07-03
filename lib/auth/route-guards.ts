@@ -52,7 +52,6 @@ const ROUTE_REDIRECTS: Record<string, string> = {
 // Unauthorized redirect per role
 const UNAUTHORIZED_REDIRECTS: Record<string, string> = {
   admin: '/admin/dashboard',
-  admin: '/admin/dashboard',
   student: '/lms/dashboard',
   apprentice: '/apprentice',
   instructor: '/instructor/dashboard',
@@ -131,7 +130,6 @@ export function canAccessPortal(role: string | null | undefined, pathname: strin
 export function normalizeRole(role: string): string {
   const roleMap: Record<string, string> = {
     admin: 'admin',
-    admin: 'admin',
     student: 'student',
     apprentice: 'apprentice',
     instructor: 'instructor',
@@ -147,6 +145,7 @@ export function normalizeRole(role: string): string {
     program_holder_staff: 'partner',
     provider: 'provider',
     mentor: 'mentor',
+    super_admin: 'super_admin',
   };
   
   return roleMap[role] || role;

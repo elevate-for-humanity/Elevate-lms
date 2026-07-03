@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { hashLicenseKey, isValidLicenseKeyFormat } from '@/lib/store/license';
 

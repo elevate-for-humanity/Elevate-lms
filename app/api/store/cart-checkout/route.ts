@@ -12,12 +12,12 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
-  try {
+  // Use the public-facing host for redirects so they work behind proxies/Gitpod tunnels
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || new URL(process.env.NEXT_PUBLIC_SITE_URL!).host;
+  const proto = req.headers.get('x-forwarded-proto') || 'https';
+  const baseUrl = `${proto}://${host}`;
 
-    // Use the public-facing host for redirects so they work behind proxies/Gitpod tunnels
-    const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || new URL(process.env.NEXT_PUBLIC_SITE_URL!).host;
-    const proto = req.headers.get('x-forwarded-proto') || 'https';
-    const baseUrl = `${proto}://${host}`;
+  try {
 
     const injected = injectFailureRedirect(req, `${baseUrl}/store/cart?error=checkout-failed`);
     if (injected) return injected;

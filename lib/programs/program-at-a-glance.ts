@@ -87,8 +87,8 @@ export function buildProgramAtAGlance(program: ProgramSchema): ProgramAtAGlanceR
     {
       question: 'What does it cost?',
       answer: program.selfPayCost,
-      detail: program.regularPrice
-        ? `Regular price ${program.regularPrice}${program.salePrice ? ` · Sale ${program.salePrice}` : ''}`
+      detail: program.selfPayCost
+        ? `Regular price ${program.selfPayCost}${program.selfPayCost ? ` · Sale ${program.selfPayCost}` : ''}`
         : undefined,
     },
     {

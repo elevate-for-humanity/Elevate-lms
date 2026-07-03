@@ -64,27 +64,27 @@ function inferStepType(slug: string): string {
 }
 
 function validateBlueprint(blueprint: BlueprintModule[]): ValidationResult {
-  const errors: Array<{ lessonSlug: string; field: string; message: string; severity: 'error' | 'warning' }> = [];
-  const warnings: Array<{ lessonSlug: string; field: string; message: string; severity: 'error' | 'warning' }> = [];
+  const errors: Array<{ type: 'error' | 'warning'; module?: string; lesson?: string; field: string; message: string }> = [];
+  const warnings: Array<{ type: 'error' | 'warning'; module?: string; lesson?: string; field: string; message: string }> = [];
 
   for (const mod of blueprint) {
     if (!mod.slug) {
-      errors.push({ lessonSlug: '', field: 'module.slug', message: 'Module slug is required', severity: 'error' });
+      errors.push({ type: 'error', module: mod.title, field: 'slug', message: 'Module slug is required' });
       continue;
     }
 
     if (!validateLessonSlug(mod.slug)) {
-      errors.push({ lessonSlug: mod.slug, field: 'module.slug', message: 'Invalid slug format', severity: 'error' });
+      errors.push({ type: 'error', module: mod.title, field: 'slug', message: 'Invalid slug format' });
     }
 
     for (const lesson of mod.lessons ?? []) {
       if (!lesson.slug) {
-        errors.push({ lessonSlug: '', field: 'lesson.slug', message: 'Lesson slug is required', severity: 'error' });
+        errors.push({ type: 'error', module: mod.title, field: 'slug', message: 'Lesson slug is required' });
         continue;
       }
 
       if (!validateLessonSlug(lesson.slug)) {
-        errors.push({ lessonSlug: lesson.slug, field: 'lesson.slug', message: 'Invalid slug format', severity: 'error' });
+        errors.push({ type: 'error', module: mod.title, lesson: lesson.slug, field: 'slug', message: 'Invalid slug format' });
       }
 
       const stepType = inferStepType(lesson.slug);
@@ -93,10 +93,11 @@ function validateBlueprint(blueprint: BlueprintModule[]): ValidationResult {
       if (stepType !== 'exam') {
         if (!lesson.content || lesson.content.trim().length < 100) {
           warnings.push({ 
-            lessonSlug: lesson.slug, 
+            type: 'warning',
+            module: mod.title,
+            lesson: lesson.slug, 
             field: 'content', 
-            message: 'Content may be too short (< 100 chars)', 
-            severity: 'warning' 
+            message: 'Content may be too short (< 100 chars)'
           });
         }
       }
@@ -104,6 +105,7 @@ function validateBlueprint(blueprint: BlueprintModule[]): ValidationResult {
   }
 
   return {
+    ok: errors.length === 0,
     valid: errors.length === 0,
     errors,
     warnings,
@@ -215,7 +217,7 @@ async function upsertLesson(
   const quizQuestions = lesson.quizQuestions?.map((q) => ({
     question: q.question,
     options: q.options,
-    correct: q.correct,
+    correct: q.correctAnswer,
     explanation: q.explanation,
   })) ?? null;
 
@@ -293,12 +295,12 @@ export async function publishCourse(input: PublishInput): Promise<PublishResult>
       lessonCount: 0,
       skippedCount: 0,
       warnings,
-      errors: validation.errors.map((e) => `${e.lessonSlug || 'module'}: ${e.message}`),
+      errors: validation.errors.map((e) => `${e.lesson || e.module || 'module'}: ${e.message}`),
       validation,
     };
   }
 
-  warnings.push(...validation.warnings.map((w) => `Warning: ${w.message}`));
+  warnings.push(...validation.warnings.map((w) => `Warning: ${w.lesson || w.module || 'module'}: ${w.message}`));
 
   // 2. Upsert course
   let courseId: string;

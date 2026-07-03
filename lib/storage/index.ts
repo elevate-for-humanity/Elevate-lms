@@ -10,11 +10,10 @@ export {
   BUCKETS,
   uploadCourseAsset,
   deleteCourseAsset,
-  getCourseAssetSignedUrl,
+  getSignedCourseAssetUrl as getCourseAssetSignedUrl,
   getPublicCourseAssetUrl,
   uploadStudentSubmission,
-  uploadCertificate,
-  uploadToCertBucket,
+  uploadCertificateTemplate as uploadCertificate,
   listCourseAssets,
 } from './course-assets';
 
@@ -42,8 +41,7 @@ export {
 } from '@/lib/cloudflare-r2';
 
 // Signed URL utilities
-export { getSignedDownloadUrl } from './getSignedDownload';
-export { generateSignedUrl } from './signed-url';
+export { getSignedDocumentUrl as getSignedDownloadUrl } from './signed-url';
 
 // Compliance Evidence
 export { uploadComplianceEvidenceFile } from './complianceEvidence';

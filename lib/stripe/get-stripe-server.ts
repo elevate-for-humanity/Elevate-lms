@@ -10,7 +10,13 @@ import type StripeModule from 'stripe';
  * prevents it from being traced into the Lambda bundle.
  */
 export type Stripe = StripeModule;
-export type { StripeEvent, StripeInvoice, StripeSubscription, StripeCheckoutSession, StripePaymentIntent } from 'stripe';
+
+// Re-export commonly used types from Stripe namespace
+export type StripeEvent = StripeModule.Event;
+export type StripeInvoice = StripeModule.Invoice;
+export type StripeSubscription = StripeModule.Subscription;
+export type StripeCheckoutSession = StripeModule.Checkout.Session;
+export type StripePaymentIntent = StripeModule.PaymentIntent;
 
 export async function getStripeServer(): Promise<StripeModule> {
   const Stripe = (await import('stripe')).default;

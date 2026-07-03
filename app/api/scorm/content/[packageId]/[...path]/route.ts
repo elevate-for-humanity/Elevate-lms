@@ -37,7 +37,7 @@ function contentTypeFor(filePath: string): string {
 }
 
 async function _GET(
-  _req: NextRequest,
+  request: NextRequest,
   ctx: { params: Promise<{ packageId: string; path: string[] }> },
 ) {
   const rateLimited = await applyRateLimit(request, 'api');

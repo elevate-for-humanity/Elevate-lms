@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   return NextResponse.json({ ok: true, namespace: 'admin', user: { id: auth.id, role: auth.role }, endpoints: ['/api/admin/users', '/api/admin/reports/generate', '/api/admin/impersonate'] });
 }
 

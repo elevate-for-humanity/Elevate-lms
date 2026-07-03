@@ -70,7 +70,7 @@ async function _POST(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await requireAuth(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const { programId, lessonId, context = 'welcome' } = await req.json();

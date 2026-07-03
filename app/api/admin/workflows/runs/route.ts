@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 // GET /api/admin/workflows/runs — recent runs across all workflows
 export async function GET(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const db = await requireAdminClient();
   const url = new URL(request.url);

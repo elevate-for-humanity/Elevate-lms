@@ -27,7 +27,7 @@ async function _POST(request: NextRequest) {
 
     const { apiRequireAdmin } = await import('@/lib/admin/guards');
     const auth = await apiRequireAdmin(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     // Hydrate process.env from app_secrets before reading env vars
     try {

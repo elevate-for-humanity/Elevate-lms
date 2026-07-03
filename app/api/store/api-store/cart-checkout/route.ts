@@ -12,14 +12,14 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
+  // Use the public-facing host for redirects so they work behind proxies/Gitpod tunnels
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || process.env.NEXT_PUBLIC_SITE_URL?.replace(/^https?:\/\//, '') || 'localhost:3000';
+  const proto = req.headers.get('x-forwarded-proto') || 'https';
+  const baseUrl = `${proto}://${host}`;
+
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
-
-    // Use the public-facing host for redirects so they work behind proxies/Gitpod tunnels
-    const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || process.env.NEXT_PUBLIC_SITE_URL?.replace(/^https?:\/\//, '') || 'localhost:3000';
-    const proto = req.headers.get('x-forwarded-proto') || 'https';
-    const baseUrl = `${proto}://${host}`;
 
     const injected = injectFailureRedirect(req, `${baseUrl}/store/cart?error=checkout-failed`);
     if (injected) return injected;

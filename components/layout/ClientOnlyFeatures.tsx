@@ -10,11 +10,20 @@
 
 import dynamic from 'next/dynamic';
 
-const GlobalAvatar = dynamic(() => import('@/components/GlobalAvatar'), { ssr: false });
-const FacebookPixel = dynamic(() => import('@/components/FacebookPixel'), { ssr: false });
+// Loading placeholder to prevent null component errors
+const LoadingDiv = () => <div className="hidden" />;
+
+const GlobalAvatar = dynamic(
+  () => import('@/components/GlobalAvatar').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
+const FacebookPixel = dynamic(
+  () => import('@/components/FacebookPixel').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
 const AIAssistantBubble = dynamic(
-  () => import('@/components/AIAssistantBubble').then((m) => ({ default: m.AIAssistantBubble })),
-  { ssr: false },
+  () => import('@/components/AIAssistantBubble').then((m) => m.AIAssistantBubble || m.default || (() => null)),
+  { ssr: false, loading: LoadingDiv }
 );
 
 export default function ClientOnlyFeatures() {

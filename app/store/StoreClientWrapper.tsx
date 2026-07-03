@@ -4,12 +4,14 @@ import { useState, useEffect, useCallback, ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 
 // Lazy-load chat and tour — they aren't needed for initial render
-const StoreGuideChat = dynamic(() => import('@/components/store/StoreGuideChat'), {
-  ssr: false,
-});
-const GuidedTour = dynamic(() => import('@/components/store/GuidedTour'), {
-  ssr: false,
-});
+const StoreGuideChat = dynamic(
+  () => import('@/components/store/StoreGuideChat').then((m) => m.default || m),
+  { ssr: false }
+);
+const GuidedTour = dynamic(
+  () => import('@/components/store/GuidedTour').then((m) => m.default || m),
+  { ssr: false }
+);
 
 interface StoreClientWrapperProps {
   children: ReactNode;

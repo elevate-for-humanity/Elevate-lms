@@ -44,3 +44,5 @@ export const STATES: Record<string, StateConfig> = {
         'Job placement assistance',
       ],
     },
+  },
+};

@@ -13,7 +13,6 @@ app/api/booking/enrollment/route.ts(29,7): error TS2345: Argument of type 'Postg
 app/api/booking/enrollment/route.ts(65,34): error TS2339: Property 'id' does not exist on type 'unknown'.
 app/api/checkout/phlebotomy/route.ts(10,5): error TS2322: Type '"2025-01-27.acacia"' is not assignable to type '"2025-10-29.clover"'.
 app/api/compliance/automation/route.ts(122,34): error TS2345: Argument of type 'ReportingRequirement' is not assignable to parameter of type 'Date'.
-app/api/compliance/record/route.ts(119,64): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/cosmetology/activate-subscription/route.ts(85,13): error TS2353: Object literal may only specify known properties, and 'product_data' does not exist in type 'PriceData'.
 app/api/cosmetology/webhook/route.ts(336,40): error TS2339: Property 'subscription' does not exist on type 'Invoice'.
 app/api/cosmetology/webhook/route.ts(442,46): error TS2345: Argument of type '(request: NextRequest) => Promise<NextResponse<{ error: string; }> | NextResponse<{ received: boolean; }>>' is not assignable to parameter of type 'string'.
@@ -101,10 +100,8 @@ app/api/grade/upsert/route.ts(62,22): error TS2352: Conversion of type '{ instru
 app/api/grade/upsert/route.ts(62,52): error TS2339: Property 'instructor_id' does not exist on type 'string'.
 app/api/grants/match/route.ts(105,76): error TS2554: Expected 1-3 arguments, but got 4.
 app/api/host-shop/webhook/route.ts(85,14): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
-app/api/hr/emails/route.ts(72,45): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/hsi/create-checkout/route.ts(45,7): error TS2769: No overload matches this call.
 app/api/intake/route.ts(112,82): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any>'.
-app/api/intake/route.ts(370,7): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/intake/route.ts(48,24): error TS2339: Property 'trim' does not exist on type 'string | string[]'.
 app/api/internal/ai-operator/route.ts(126,8): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, "admin_alerts", unknown, "POST">'. Did you mean 'match'?
 app/api/internal/ai-operator/route.ts(161,47): error TS2552: Cannot find name 'triaged'. Did you mean '_triaged'?
@@ -171,7 +168,6 @@ app/api/placements/[id]/route.ts(94,5): error TS2353: Object literal may only sp
 app/api/placements/[id]/route.ts(96,26): error TS2339: Property 'UPDATE' does not exist on type '{ readonly USER_CREATED: "user_created"; readonly USER_UPDATED: "user_updated"; readonly USER_DELETED: "user_deleted"; readonly USER_ROLE_CHANGED: "user_role_changed"; readonly USER_LOGIN: "user_login"; ... 86 more ...; readonly JOB_CREATED: "job_created"; }'.
 app/api/placements/route.ts(122,5): error TS2353: Object literal may only specify known properties, and 'actor_user_id' does not exist in type 'AuditEvent'.
 app/api/placements/route.ts(124,26): error TS2339: Property 'CREATE' does not exist on type '{ readonly USER_CREATED: "user_created"; readonly USER_UPDATED: "user_updated"; readonly USER_DELETED: "user_deleted"; readonly USER_ROLE_CHANGED: "user_role_changed"; readonly USER_LOGIN: "user_login"; ... 86 more ...; readonly JOB_CREATED: "job_created"; }'.
-app/api/proctor/sessions/[id]/route.ts(149,59): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/proctor/sessions/[id]/route.ts(157,42): error TS2339: Property 'id_type' does not exist on type '{ id: any; status: any; result: any; id_verified: any; delivery_method: any; evidence_url: any; }'.
 app/api/proctor/sessions/[id]/route.ts(160,37): error TS2339: Property 'started_at' does not exist on type '{ id: any; status: any; result: any; id_verified: any; delivery_method: any; evidence_url: any; }'.
 app/api/proctor/sessions/[id]/route.ts(192,48): error TS2345: Argument of type '"certificate_issued"' is not assignable to parameter of type 'ExamEventType'.
@@ -179,7 +175,6 @@ app/api/proctor/sessions/route.ts(42,13): error TS2339: Property 'db' does not e
 app/api/proctor/sessions/route.ts(42,17): error TS2339: Property 'profile' does not exist on type 'NextResponse<{ error: string; }> | { supabase: SupabaseClient<any, "public", "public", any, any>; db: SupabaseClient<any, "public", "public", any, any>; user: User; profile: { ...; }; }'.
 app/api/proctor/sessions/route.ts(82,13): error TS2339: Property 'db' does not exist on type 'NextResponse<{ error: string; }> | { supabase: SupabaseClient<any, "public", "public", any, any>; db: SupabaseClient<any, "public", "public", any, any>; user: User; profile: { ...; }; }'.
 app/api/proctor/sessions/route.ts(82,17): error TS2339: Property 'profile' does not exist on type 'NextResponse<{ error: string; }> | { supabase: SupabaseClient<any, "public", "public", any, any>; db: SupabaseClient<any, "public", "public", any, any>; user: User; profile: { ...; }; }'.
-app/api/profile/update/route.ts(45,48): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/program-holder/call-log/route.ts(22,6): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
 app/api/program-holder/call-log/route.ts(29,6): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
 app/api/program-holder/call-log/route.ts(39,6): error TS2339: Property 'from' does not exist on type 'Promise<SupabaseClient<any, "public", "public", any, any>>'.
@@ -203,7 +198,6 @@ app/api/pwa/cosmetology/profile/route.ts(61,50): error TS2339: Property 'created
 app/api/recaps/generate/route.ts(124,28): error TS2339: Property 'label' does not exist on type 'It'.
 app/api/recaps/generate/route.ts(125,24): error TS2339: Property 'due_date' does not exist on type 'It'.
 app/api/recaps/generate/route.ts(125,45): error TS2339: Property 'due_date' does not exist on type 'It'.
-app/api/schedule-consultation/route.ts(100,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/schedule-consultation/route.ts(111,74): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any>'.
 app/api/scorm/attempts/[attemptId]/data/route.ts(25,43): error TS2339: Property 'userId' does not exist on type 'string'.
 app/api/scorm/attempts/[attemptId]/data/route.ts(58,43): error TS2339: Property 'userId' does not exist on type 'string'.
@@ -219,7 +213,6 @@ app/api/store/publish/route.ts(52,42): error TS2339: Property 'id' does not exis
 app/api/student/dashboard/route.ts(109,67): error TS2339: Property 'slug' does not exist on type '{ id: any; name: any; slug: any; category: any; duration_weeks: any; required_hours: any; total_hours: any; }[]'.
 app/api/tenants/provision/route.ts(21,28): error TS2339: Property 'isAdmin' does not exist on type 'string'.
 app/api/testing/booking-status/route.ts(92,14): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, "exam_bookings", unknown, "PATCH">'. Did you mean 'match'?
-app/api/testing/bookings/[id]/route.ts(81,57): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/testing/retake/route.ts(48,52): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
 app/api/timeclock/context/route.ts(186,27): error TS2352: Conversion of type '{ id: any; name: any; }[]' to type '{ name: string; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
 app/api/trial/start-managed/route.ts(80,5): error TS2353: Object literal may only specify known properties, and 'headers' does not exist in type '{ from: string; to: string | string[]; subject: string; html?: string; text?: string; }'.
@@ -231,10 +224,8 @@ app/api/tutorials/route.ts(63,21): error TS2339: Property 'authorized' does not 
 app/api/v1/tenant/branding/route.ts(147,21): error TS2339: Property 'features' does not exist on type '{ valid: boolean; tenantId?: string; error?: string; }'.
 app/api/v1/tenant/branding/route.ts(185,19): error TS2339: Property 'features' does not exist on type '{ valid: boolean; tenantId?: string; error?: string; }'.
 app/api/v1/tenant/branding/route.ts(90,19): error TS2339: Property 'features' does not exist on type '{ valid: boolean; tenantId?: string; error?: string; }'.
-app/api/webhooks/jotform/route.ts(106,81): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/webhooks/route.ts(142,50): error TS2345: Argument of type '(request: NextRequest) => Promise<NextResponse<unknown> | GuardedUser>' is not assignable to parameter of type '(req: Request, ...args: any[]) => Promise<Response>'.
 app/api/webhooks/route.ts(143,51): error TS2345: Argument of type '(request: NextRequest) => Promise<NextResponse<unknown> | GuardedUser>' is not assignable to parameter of type '(req: Request, ...args: any[]) => Promise<Response>'.
-app/api/webhooks/sendgrid-inbound/route.ts(74,58): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/api/webhooks/store/route.ts(266,45): error TS2339: Property 'current_period_end' does not exist on type 'Response<Subscription>'.
 app/api/webhooks/stripe/career-courses/route.ts(136,38): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any>'.
 app/api/websites/[websiteId]/config/route.ts(33,43): error TS2339: Property 'error' does not exist on type '{ ok: true; } | { ok: false; error: string; }'.
@@ -269,9 +260,6 @@ app/employer/applications/page.tsx(71,11): error TS2304: Cannot find name 'profi
 app/employer/candidates/page.tsx(163,22): error TS2304: Cannot find name 'profile'.
 app/employer/reports/submit/page.tsx(28,28): error TS2339: Property 'company_name' does not exist on type '{ id: string; role: string; organization_id?: string; email?: string; first_name?: string; last_name?: string; full_name?: string; avatar_url?: string; onboarding_completed?: boolean; }'.
 app/employer/shop/create/page.tsx(26,5): error TS2304: Cannot find name 'redirect'.
-app/forgot-password/actions.ts(114,53): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
-app/forgot-password/actions.ts(55,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
-app/funding/confirm/page.tsx(37,45): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 app/funding/wioa/page.tsx(27,10): error TS2339: Property 'from' does not exist on type 'Promise<any>'.
 app/host-shop/dashboard/schedule/page.tsx(37,105): error TS2554: Expected 2 arguments, but got 3.
 app/legal/[slug]/page.tsx(33,41): error TS2339: Property 'email' does not exist on type '{ name: string; url: string; description: string; ogImage: string; handoff: { apply: string; login: string; checkout: string; lms: string; studentPortal: string; }; social: { facebook: string; instagram: string; linkedin: string; }; }'.
@@ -430,11 +418,8 @@ lib/ai/course-generator.ts(268,75): error TS2554: Expected 0-1 arguments, but go
 lib/ai/orchestrator.ts(414,48): error TS2304: Cannot find name 'isAiDegradedError'.
 lib/ai/orchestrator.ts(422,9): error TS2304: Cannot find name 'isAiDegradedError'.
 lib/ai/template-generator.ts(256,106): error TS2554: Expected 0-1 arguments, but got 2.
-lib/api/route.ts(40,58): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/api/validation-schemas.ts(272,9): error TS2554: Expected 0-1 arguments, but got 2.
-lib/api/with-error-handling.ts(77,31): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/audit.ts(52,8): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
-lib/audit/ferpa.ts(91,52): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/auth.ts(254,22): error TS2345: Argument of type 'readonly ["admin", "staff"]' is not assignable to parameter of type 'UserRole | UserRole[]'.
 lib/auth.ts(47,61): error TS2769: No overload matches this call.
 lib/auth/idle-timeout.ts(19,53): error TS7030: Not all code paths return a value.
@@ -495,16 +480,8 @@ lib/curriculum/builders/buildCanonicalCourseFromBlueprint.ts(705,76): error TS23
 lib/curriculum/builders/buildCourseFromBlueprint.ts(54,31): error TS2304: Cannot find name 'createClient'.
 lib/curriculum/load-blueprint.ts(19,55): error TS2339: Property 'default' does not exist on type 'typeof import("lib/curriculum/blueprints/barber-apprenticeship")'.
 lib/curriculum/load-blueprint.ts(23,45): error TS2339: Property 'default' does not exist on type 'typeof import("lib/curriculum/blueprints/crs-indiana")'.
-lib/data/events.ts(102,51): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
-lib/data/events.ts(120,46): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
-lib/data/events.ts(77,55): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
-lib/data/jobs.ts(80,49): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/data/jobs.ts(83,10): error TS2352: Conversion of type 'GenericStringError[]' to type 'JobPosting[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-lib/data/jobs.ts(96,46): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/data/jobs.ts(99,10): error TS2352: Conversion of type 'GenericStringError' to type 'JobPosting' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-lib/data/news.ts(54,53): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
-lib/data/news.ts(71,51): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
-lib/data/news.ts(87,49): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/data/programs.ts(18,29): error TS2304: Cannot find name 'Program'.
 lib/data/programs.ts(43,57): error TS2304: Cannot find name 'Program'.
 lib/data/programs.ts(54,49): error TS2304: Cannot find name 'Program'.
@@ -530,8 +507,6 @@ lib/email/automated-triggers.ts(218,46): error TS2339: Property 'appointmentConf
 lib/email/automated-triggers.ts(243,46): error TS2339: Property 'reminder24Hours' does not exist on type '{ studentAppointment: { from: string; subject: string; getHtml: (data: { firstName: string; date: string; time: string; format: "phone" | "zoom"; zoomLink?: string; rescheduleLink?: string; }) => string; getText: (data: { ...; }) => string; }; appointmentReminder24h: { ...; }; appointmentReminder1h: { ...; }; }'.
 lib/email/automated-triggers.ts(268,46): error TS2339: Property 'reminder1Hour' does not exist on type '{ studentAppointment: { from: string; subject: string; getHtml: (data: { firstName: string; date: string; time: string; format: "phone" | "zoom"; zoomLink?: string; rescheduleLink?: string; }) => string; getText: (data: { ...; }) => string; }; appointmentReminder24h: { ...; }; appointmentReminder1h: { ...; }; }'.
 lib/email/automated-triggers.ts(424,30): error TS2339: Property 'messageId' does not exist on type '{ success: boolean; error: string; from: string; data?: undefined; } | { success: boolean; data: { provider: string; }; error?: undefined; from?: undefined; } | { success: boolean; error: string; }'.
-lib/email/send-onboarding.ts(88,71): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
-lib/email/sendOrgInviteEmail.ts(35,54): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/enrollment/complete-enrollment.ts(138,8): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
 lib/enrollment/complete-enrollment.ts(92,8): error TS2339: Property 'catch' does not exist on type 'PostgrestBuilder<any, { id: any; }, false>'.
 lib/enrollment/create-enrollment.ts(230,9): error TS2552: Cannot find name 'tempPassword'. Did you mean '_tempPassword'?
@@ -578,7 +553,6 @@ lib/licensing/provisioning.ts(226,51): error TS2339: Property 'email' does not e
 lib/licensing/validate.ts(114,30): error TS2339: Property 'warnings' does not exist on type 'AccessResult & { hasAccess: boolean; }'.
 lib/licensing/validate.ts(128,30): error TS2339: Property 'warnings' does not exist on type 'AccessResult & { hasAccess: boolean; }'.
 lib/licensing/validate.ts(138,28): error TS2339: Property 'warnings' does not exist on type 'AccessResult & { hasAccess: boolean; }'.
-lib/lms/course-service.ts(207,70): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Record<string, any> | Error'.
 lib/lms/engine/completion.ts(217,26): error TS2304: Cannot find name 'SupabaseClient'.
 lib/lms/get-lesson-render-mode.ts(14,8): error TS2459: Module '"@/lib/curriculum/normalize-lesson-content"' declares 'LessonContent' locally, but it is not exported.
 lib/lms/hvac-simulations.ts(3,3): error TS2322: Type '"hvac-01-01"' is not assignable to type '"hvac-module-1"'.

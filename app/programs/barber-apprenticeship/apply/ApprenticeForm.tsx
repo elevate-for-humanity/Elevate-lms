@@ -220,8 +220,6 @@ export default function ApprenticeForm({
           paymentOption: isSelfPay ? paymentOption : undefined,
           turnstileToken: isSelfPay ? turnstileToken : undefined,
           transfer_hours_claimed: transferHours > 0 ? transferHours : undefined,
-          transferHours,
-          transfer_hours_claimed: transferHours,
           support_notes: [
             formData.hasHostShop ? `Host shop: ${formData.hasHostShop}` : '',
             formData.hostShopName ? `Shop name: ${formData.hostShopName}` : '',

@@ -149,12 +149,15 @@ class Logger {
     this.log('warn', message, context);
   }
 
-  error(message: string, context?: Record<string, any> | Error, extra?: Record<string, any>) {
+  error(message: string, context?: Record<string, any> | Error | string, extra?: Record<string, any>) {
     // Handle both signatures:
     // - error(message, context) where context is Record
     // - error(message, error, extra) where error is Error
+    // - error(message, contextString) where context is a simple string message
     if (context instanceof Error) {
       this.log('error', message, extra, context);
+    } else if (typeof context === 'string') {
+      this.log('error', message, { message: context });
     } else {
       this.log('error', message, context);
     }

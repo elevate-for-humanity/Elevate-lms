@@ -8,6 +8,7 @@
  * Cost per lesson: ~$0.20 (4 DALL-E images × $0.04 + GPT-4o ~$0.04)
  */
 
+import OpenAI from 'openai';
 import { getOpenAIClient } from '@/lib/ai/openai-client';
 import { logger } from '@/lib/logger';
 import fs from 'fs/promises';

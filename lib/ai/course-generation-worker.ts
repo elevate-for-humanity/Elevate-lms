@@ -380,7 +380,7 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
         );
 
         // Save lesson
-        const { error: lessonError } = await supabase
+        const { data: lessonRecord, error: lessonError } = await supabase
           .from('generated_lessons')
           .insert({
             module_id: moduleRecord.id,
@@ -395,14 +395,16 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
             // reflectionPrompt not available
             duration_minutes: 30,
             order_index: lessonNum,
-          });
+          })
+          .select('id')
+          .single();
 
         if (lessonError) throw lessonError;
 
         // Save quiz if questions generated
         if (lessonContent.quizQuestions?.length > 0) {
           await supabase.from('generated_quizzes').insert({
-            lesson_id: lessonRecord?.id, // This would need the lesson ID
+            lesson_id: lessonRecord?.id,
             course_id: course.id,
             job_id: jobId,
             title: `${lessonTitle} Quiz`,

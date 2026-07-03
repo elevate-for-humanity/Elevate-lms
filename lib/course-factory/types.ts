@@ -3,6 +3,7 @@
  * Unified type definitions for the Course Factory.
  */
 import type { SupabaseClient } from '@/lib/supabase';
+import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 export type { BlueprintLessonRef, BlueprintModule, BlueprintQuizQuestion, CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 export type BuildMode = 'replace' | 'missing-only';
 export type VideoMode = 'queue' | 'off';

@@ -28,6 +28,7 @@
  */
 
 import { aiChat, aiReason, isReasoningAvailable } from '@/lib/ai/ai-service';
+import { isAiDegradedError } from '@/lib/ai/degraded';
 import { logger } from '@/lib/logger';
 import type { ChatMessage } from '@/lib/ai/types';
 import { getRAGContext } from '@/lib/platform/rag';

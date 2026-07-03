@@ -244,3 +244,6 @@ export function SecurityBadge() {
   // Removed from homepage to avoid "internal system" feel
   return null;
 }
+
+// Default export for next/dynamic
+export default SecurityMonitor;

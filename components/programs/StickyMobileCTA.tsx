@@ -61,3 +61,6 @@ export function StickyMobileCTA({
     </div>
   );
 }
+
+// Default export for next/dynamic
+export default StickyMobileCTA;

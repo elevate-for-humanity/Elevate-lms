@@ -13,3 +13,6 @@ export function VersionGuard() {
 
   return null;
 }
+
+// Default export for next/dynamic
+export default VersionGuard;

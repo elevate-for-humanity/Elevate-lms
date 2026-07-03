@@ -12,3 +12,6 @@ export function SentryInit() {
 
   return null;
 }
+
+// Default export for next/dynamic
+export default SentryInit;

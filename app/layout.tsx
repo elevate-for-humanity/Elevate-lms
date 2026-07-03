@@ -1,12 +1,12 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
-import nextDynamic from 'next/dynamic';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import PublicLayout from '@/components/layout/PublicLayout';
 import ToasterClient from '@/components/ui/ToasterClient';
 import { SkipToContent } from '@/components/ui/SkipToContent';
 import RootWidgets from '@/components/layout/RootWidgets';
+import ClientOnlyFeatures from '@/components/layout/ClientOnlyFeatures';
 import { generateChromeSuppressionScript } from '@/lib/layout/app-routes';
 import PWAManager from '@/components/PWAManager';
 import AuthRedirectHandler from '@/components/auth/AuthRedirectHandler';
@@ -18,13 +18,6 @@ import SupabaseConfigBootstrap from '@/components/supabase/SupabaseConfigBootstr
 // static generation of ~2,000 pages at build time, which causes OOM in constrained build environments.
 // Individual pages can override with their own `export const revalidate = N`.
 export const dynamic = 'force-dynamic';
-
-// Lazy load analytics and tracking components (client-only - no SSR)
-const GoogleAnalytics = nextDynamic(() => import('@/components/analytics/google-analytics').then(m => m.default || m), { ssr: false });
-const GoogleAdsConversion = nextDynamic(() => import('@/components/analytics/google-ads').then(m => m.default || m), { ssr: false });
-const DMCATrackingPixel = nextDynamic(() => import('@/components/InvisibleWatermark').then(m => m.default || m), { ssr: false });
-const CopyrightProtection = nextDynamic(() => import('@/components/CopyrightProtection').then(m => m.default || m), { ssr: false });
-const InstallPromptBanner = nextDynamic(() => import('@/components/pwa/InstallPromptBanner').then(m => m.default || m), { ssr: false });
 
 const inter = { variable: '' };
 
@@ -245,14 +238,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <SkipToContent />
-        <GoogleAnalytics />
-        <GoogleAdsConversion />
+        <ClientOnlyFeatures />
         <PWAManager />
-        <InstallPromptBanner />
         <AuthRedirectHandler />
         <PublicLayout>{children}</PublicLayout>
-        <DMCATrackingPixel />
-        <CopyrightProtection />
         <RootWidgets />
         <ToasterClient />
       </body>

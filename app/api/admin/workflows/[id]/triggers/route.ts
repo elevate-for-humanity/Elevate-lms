@@ -23,7 +23,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  logAdminAudit({ action: AdminAction.WORKFLOW_TRIGGER_ADDED, actorId: auth.id, entityType: 'workflow_triggers', entityId: data.id, metadata: { workflow_id: id, trigger_type, cron_expr }, req: request }).catch(() => {});
+  logAdminAudit({ action: AdminAction.WORKFLOW_TRIGGER_ADDED, actorId: auth.id, entityType: 'workflow_triggers', entityId: data.id, metadata: { workflow_id: id, trigger_type, cron_expr }, req: request }).then(() => {}, () => {});
 
   return NextResponse.json({ trigger: data }, { status: 201 });
 }

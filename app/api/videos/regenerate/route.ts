@@ -139,7 +139,7 @@ async function runRender(opts: {
       if (!uploadErr) {
         const { data: urlData } = adminDb.storage.from('course-videos').getPublicUrl(storagePath);
         storageUrl = urlData.publicUrl;
-        await unlink(localPath).catch(() => {});
+        await unlink(localPath).then(() => {}, () => {});
       }
     } catch {
       /* keep local URL */

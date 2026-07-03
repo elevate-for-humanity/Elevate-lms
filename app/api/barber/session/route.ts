@@ -124,7 +124,7 @@ export async function PATCH(request: NextRequest) {
       await db
         .rpc('increment_session_video', { p_session_id: session_id, p_seconds: video_seconds })
         .then(() => {})
-        .catch(() => {}); // non-critical
+        .then(() => {}, () => {}); // non-critical
     }
 
     return NextResponse.json({ ok: true, idle_gap: additionalIdle });

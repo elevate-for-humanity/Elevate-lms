@@ -209,7 +209,7 @@ async function _POST(request: NextRequest) {
           });
 
           if (enrollResult.error) {
-            logger.error('[cosmetology/webhook] program_enrollments write failed:', enrollResult.error);
+            logger.error('[cosmetology/webhook] program_enrollments write failed', { error: enrollResult.error });
           } else {
             logger.info(`[cosmetology/webhook] program_enrollments ${enrollResult.action}: ${enrollResult.id}`);
           }

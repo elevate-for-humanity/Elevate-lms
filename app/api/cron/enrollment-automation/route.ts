@@ -77,7 +77,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       subject_type: 'student',
       payload: { application_id: app.id, program_id: app.program_id },
       message: `Auto-enrolled ${app.applicant_name ?? app.user_id} into ${app.program_name}`,
-    }).catch(() => {});
+    }).then(() => {}, () => {});
 
     enrolled++;
   }

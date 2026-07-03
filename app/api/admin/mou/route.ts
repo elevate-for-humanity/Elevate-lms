@@ -65,11 +65,11 @@ export async function POST(request: NextRequest) {
       if (existing) {
         partnerId = existing.id;
       } else {
-        const { data: newPartner } = await supabase
+        const { data: newPartner, error: _insertErr } = await supabase
           .from('partners')
           .insert({ name: partner_name, email: partner_email ?? null, status: 'pending', created_at: new Date().toISOString() })
           .select('id')
-          .maybeSingle();
+          .single();
         partnerId = newPartner?.id ?? null;
       }
     }

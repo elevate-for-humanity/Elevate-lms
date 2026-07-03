@@ -68,7 +68,15 @@ async function _POST(request: NextRequest) {
       await supabase.from('profiles').update({ stripe_customer_id: customerId }).eq('id', user.id);
     }
 
-    const lineItems: { price_data: object; quantity: number }[] = [
+    const lineItems: {
+      price_data: {
+        currency: string;
+        unit_amount: number;
+        recurring?: { interval: string };
+        product_data: { name: string; description?: string };
+      };
+      quantity: number;
+    }[] = [
       {
         price_data: {
           currency: 'usd',

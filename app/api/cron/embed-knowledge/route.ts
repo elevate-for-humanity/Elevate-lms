@@ -34,7 +34,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   let queued = 0;
 
   for (const doc of rows) {
-    await emitEvent('knowledge.embed_requested', {
+    await emitEvent('knowledge.embed_requested', 'knowledge', {
       document_id: doc.id,
       content_hash: doc.content_hash,
     }).catch((err) =>

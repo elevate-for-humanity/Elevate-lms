@@ -109,7 +109,7 @@ async function _GET(request: NextRequest) {
 
         return {
           id: course.id,
-          title: course.course_name,
+          title: course.title,
           shortDescription: course.description?.substring(0, 100) || 'No description available',
           thumbnailUrl: course.thumbnail_url,
           progressPercent,

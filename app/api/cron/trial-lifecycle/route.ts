@@ -39,7 +39,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
         html: `<p>Hi,</p><p>Your trial for <strong>${org.name}</strong> expires in 7 days. Upgrade now to keep access to all features.</p><p><a href="https://www.elevateforhumanity.org/billing/upgrade">Upgrade →</a></p><p>— Elevate for Humanity</p>`,
       }).catch((e: unknown) => logger.warn('[cron/trial-lifecycle] Warn email failed', { org_id: org.id, error: String(e) }));
     }
-    await db.from('organizations').update({ trial_warned_at: now.toISOString() }).eq('id', org.id).catch(() => {});
+    await db.from('organizations').update({ trial_warned_at: now.toISOString() }).eq('id', org.id);
     warned++;
   }
 

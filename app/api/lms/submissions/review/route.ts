@@ -108,7 +108,7 @@ export async function PATCH(request: NextRequest) {
     })
     .then(({ error }) => {
       if (error)
-        logger.warn('[submissions/review] audit log insert failed (non-fatal):', error.message);
+        logger.warn('[submissions/review] audit log insert failed', { error: error.message });
     });
 
   // If approved, check whether all required competency checks for this lesson are now approved.

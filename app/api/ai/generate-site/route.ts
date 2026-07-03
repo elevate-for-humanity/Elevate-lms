@@ -88,7 +88,7 @@ Return ONLY valid JSON, no markdown.`;
       const jsonStr = responseText.replace(/```json\n?|\n?```/g, '').trim();
       siteConfig = JSON.parse(jsonStr);
     } catch (parseError) {
-      logger.error('Failed to parse AI response:', responseText);
+      logger.error('Failed to parse AI response', { responseText });
       // Return default config if parsing fails
       siteConfig = getDefaultConfig(organizationName, organizationType);
     }

@@ -101,7 +101,7 @@ export async function autoGenerateCourseForProgram(args: {
   };
 
   const expectedLessonCount = blueprint.modules.reduce(
-    (acc, module) => acc + (blueprintMod.lessons?.length ?? 0),
+    (acc, module) => acc + (module.lessons?.length ?? 0),
     0,
   );
   const generationFailures: Array<{ slug: string; reason: string }> = [];
@@ -218,7 +218,7 @@ export async function autoGenerateCourseForProgram(args: {
           lessonSlug: lesson.slug,
           moduleTitle:
             enrichedBlueprint.modules.find((module) =>
-              blueprintMod.lessons?.some((entry) => entry.slug === lesson.slug),
+              module.lessons?.some((entry) => entry.slug === lesson.slug),
             )?.title ?? blueprint.credentialTitle,
           questionCount: 8,
           passingScore: 70,

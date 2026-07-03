@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
   const result = await executeWorkflow(workflow_id, 'manual', payload ?? {});
 
-  logAdminAudit({ action: AdminAction.WORKFLOW_RUN, actorId: auth.id, entityType: 'workflows', entityId: workflow_id, metadata: { run_id: result.runId, status: result.status, steps_run: result.stepsRun }, req: request }).catch(() => {});
+  logAdminAudit({ action: AdminAction.WORKFLOW_RUN, actorId: auth.id, entityType: 'workflows', entityId: workflow_id, metadata: { run_id: result.runId, status: result.status, steps_run: result.stepsRun }, req: request }).then(() => {}, () => {});
 
   return NextResponse.json(result, { status: result.status === 'failed' ? 500 : 200 });
 }

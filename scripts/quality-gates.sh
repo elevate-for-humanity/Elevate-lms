@@ -103,7 +103,7 @@ echo ""
 # =============================================================================
 echo "Checking for malformed import lines..."
 
-MALFORMED_IMPORTS=$(grep -rn "^import {.*from.*import\|^import.*};.*} from" --include="*.ts" --include="*.tsx" app/ lib/ 2>/dev/null || true)
+MALFORMED_IMPORTS=$(grep -rn "^import {[^}]*from[^}]*import\|^import.*};.*} from" --include="*.ts" --include="*.tsx" app/ lib/ 2>/dev/null || true)
 
 if [ -n "$MALFORMED_IMPORTS" ]; then
   echo -e "${RED}❌ FAIL:${NC} Malformed import lines found (likely bad merge/codegen):"

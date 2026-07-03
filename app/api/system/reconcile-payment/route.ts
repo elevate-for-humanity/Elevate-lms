@@ -191,7 +191,7 @@ async function reconcileApplication(db: SupabaseClient, applicationId: string, a
         metadata: { application_id: applicationId, rpc_error: rpcErr.message },
       })
       .then(() => {})
-      .catch(() => {});
+      .then(() => {}, () => {});
 
     return safeInternalError(rpcErr, 'Enrollment reconciliation failed');
   }

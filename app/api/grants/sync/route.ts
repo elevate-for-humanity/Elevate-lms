@@ -101,7 +101,7 @@ async function _POST(request: Request) {
       );
 
       if (error) {
-        logger.error('Error upserting grant:', grant.id, error);
+        logger.error('Error upserting grant', { grantId: grant.id, error });
         errors++;
       } else {
         imported++;

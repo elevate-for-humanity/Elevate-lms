@@ -51,8 +51,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const result = await aiChat({
-      messages: [{ role: 'user', content: prompt }],
-      system: 'You are a career matching assistant. Return only valid JSON — no markdown, no explanation.',
+      messages: [
+        { role: 'system', content: 'You are a career matching assistant. Return only valid JSON — no markdown, no explanation.' },
+        { role: 'user', content: prompt },
+      ],
       temperature: 0.3,
     });
 

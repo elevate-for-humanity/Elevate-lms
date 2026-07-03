@@ -111,9 +111,9 @@ async function _POST(request: NextRequest) {
     } else {
       // Log email for development
       logger.info('=== WELCOME EMAIL ===');
-      logger.info('To:', to);
-      logger.info('Subject: Welcome! Your LMS Access is Ready');
-      logger.info('Content:', emailHTML);
+      logger.info('Email sent to', { to });
+      logger.info('Email subject', { subject: 'Welcome! Your LMS Access is Ready' });
+      logger.info('Email content length', { length: emailHTML.length });
       logger.info('====================');
 
       return NextResponse.json({

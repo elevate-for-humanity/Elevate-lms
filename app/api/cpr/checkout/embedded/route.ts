@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     const siteUrl =
       (process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl;
-    const paymentMethods = getStripeMethodsForAmount(CPR_PRICE_CENTS / 100);
+    const paymentMethods = getStripeMethodsForAmount(CPR_PRICE_CENTS / 100) as ('card' | 'bank_transfer')[];
 
     const customers = await stripe.customers.list({ email: customer_email, limit: 1 });
     const customerId =

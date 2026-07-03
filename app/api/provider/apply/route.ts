@@ -166,7 +166,10 @@ export async function POST(request: NextRequest) {
           legal_name: orgName || null,
           submitted_at: new Date().toISOString(),
         })
-        .catch((err) => logger.warn('[provider/apply] w9_submissions insert failed', err));
+        .then(
+          () => {},
+          (err) => logger.warn('[provider/apply] w9_submissions insert failed', err)
+        );
     }
 
     // Save document metadata to admin dashboard (ocr_extractions audit log)
@@ -191,7 +194,10 @@ export async function POST(request: NextRequest) {
             uploaded_at: new Date().toISOString(),
           })),
         )
-        .catch((err) => logger.warn('[provider/apply] doc metadata save failed', err));
+        .then(
+          () => {},
+          (err) => logger.warn('[provider/apply] doc metadata save failed', err)
+        );
     }
 
     // Confirmation email to applicant

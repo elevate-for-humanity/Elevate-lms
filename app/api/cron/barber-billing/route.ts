@@ -73,7 +73,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       subject_type: 'student',
       payload: { subscription_id: sub.id, amount_cents: sub.amount_cents, next_billing_date: nextDate.toISOString().split('T')[0] },
       message: `Barber billing cycle processed for ${profile?.full_name ?? sub.student_id}`,
-    }).catch(() => {});
+    }).then(() => {}, () => {});
 
     processed++;
   }

@@ -50,7 +50,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       actor_type: 'cron',
       payload: { unresolved_failures: failureCount, overdue_payouts: overdueCount },
       message: `Payment monitoring: ${failureCount} unresolved failures, ${overdueCount} overdue payouts`,
-    }).catch(() => {});
+    }).then(() => {}, () => {});
 
     if (failureCount > 0) {
       await sendEmail({

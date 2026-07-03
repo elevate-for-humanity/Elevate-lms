@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
         status: 'pending',
       })
       .then(() => {})
-      .catch(() => {}); // non-fatal — storage upload already succeeded
+      .then(() => {}, () => {}); // non-fatal — storage upload already succeeded
 
     return NextResponse.json({ success: true, path: storagePath });
   } catch (err) {

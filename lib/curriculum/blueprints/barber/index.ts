@@ -35,6 +35,8 @@ const BARBER_VIDEO_CONFIG: BlueprintVideoConfig = {
   segments: ['intro', 'concept', 'visual', 'application', 'wrapup'],
   generateDalleImage: true,
   dalleImageStyle: 'natural',
+  width: 1920,
+  height: 1080,
 };
 
 export const barberApprenticeshipBlueprint: CredentialBlueprint = {

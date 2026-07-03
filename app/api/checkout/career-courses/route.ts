@@ -43,7 +43,7 @@ async function _POST(req: Request) {
       // Create Stripe products/prices on the fly
       for (const course of missingStripe) {
         const product = await stripe.products.create({
-          name: course.course_name,
+          name: course.title,
           metadata: {
             course_id: course.id,
             course_slug: course.slug,

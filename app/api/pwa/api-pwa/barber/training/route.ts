@@ -98,7 +98,7 @@ async function _GET(request: Request) {
 
     return NextResponse.json({
       course: {
-        title: course.course_name,
+        title: course.title,
         subtitle: course.subtitle,
         partner: course.partner,
         estimatedWeeks: course.estimatedDurationWeeks,

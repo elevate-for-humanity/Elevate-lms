@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
       line_items: lineItems as any,
       subscription_data: {
         billing_cycle_anchor: billingAnchor,
-        prorate: false,
+        
         metadata: {
           discipline,
           renter_name: `${firstName} ${lastName}`,

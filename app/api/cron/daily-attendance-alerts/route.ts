@@ -42,7 +42,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     severity: absences.length > 5 ? 'warning' : 'info',
     message: `${absences.length} student${absences.length !== 1 ? 's' : ''} absent today (${today})`,
     metadata: { date: today, count: absences.length, student_ids: absences.map(a => a.student_id) },
-  }).catch(() => {});
+  }).then(() => {}, () => {});
 
   await sendEmail({
     to: ADMIN_EMAIL,

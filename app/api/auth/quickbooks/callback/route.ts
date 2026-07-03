@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 
     if (!tokenRes.ok) {
       const err = await tokenRes.text();
-      logger.error('[QB callback] token exchange failed:', err);
+      logger.error('[QB callback] token exchange failed', { error: err });
       return redirect('error=token_failed');
     }
 

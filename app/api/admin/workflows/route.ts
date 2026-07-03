@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  logAdminAudit({ action: AdminAction.WORKFLOW_CREATED, actorId: auth.id, entityType: 'workflows', entityId: data.id, metadata: { name, category }, req: request }).catch(() => {});
+  logAdminAudit({ action: AdminAction.WORKFLOW_CREATED, actorId: auth.id, entityType: 'workflows', entityId: data.id, metadata: { name, category }, req: request }).then(() => {}, () => {});
 
   return NextResponse.json({ workflow: data }, { status: 201 });
 }

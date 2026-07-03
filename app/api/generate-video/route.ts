@@ -326,8 +326,8 @@ export async function POST(request: NextRequest) {
 
     // Clean up temp files
     await Promise.all([
-      unlink(videoPath).catch(() => {}),
-      ...scenes.filter((s) => s.audioSrc).map((s) => unlink(s.audioSrc!).catch(() => {})),
+      unlink(videoPath).then(() => {}, () => {}),
+      ...scenes.filter((s) => s.audioSrc).map((s) => unlink(s.audioSrc!).then(() => {}, () => {})),
     ]);
 
     logger.info(`[GenerateVideo] Complete: ${lessonId} → ${videoUrl}`);

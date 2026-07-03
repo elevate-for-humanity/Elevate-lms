@@ -61,7 +61,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       link: `/lms/courses/${row.course_id}`,
       read: false,
       idempotency_key: `morning-reminder-${row.user_id}-${row.course_id}-${today}`,
-    }).onConflict('idempotency_key').ignore().catch(() => {});
+    })
     reminded++;
   }
 

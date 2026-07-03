@@ -55,7 +55,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       link: `/lms/courses/${row.course_id}`,
       read: false,
       idempotency_key: `inactivity-${row.user_id}-${row.course_id}-${today}`,
-    }).onConflict('idempotency_key').ignore().catch(() => {});
+    })
 
     await sendEmail({
       to: profile.email,

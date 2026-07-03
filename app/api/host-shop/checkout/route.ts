@@ -94,7 +94,6 @@ export async function POST(request: NextRequest) {
       },
       success_url: successUrl || `${siteUrl}/host-shop/apply/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl || `${siteUrl}/host-shop/apply?cancelled=true`,
-      description: 'Elevate Host Shop Application Fee - Non-Refundable',
       billing_address_collection: 'required',
       automatic_tax: { enabled: false },
     });

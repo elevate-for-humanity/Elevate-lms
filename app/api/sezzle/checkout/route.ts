@@ -123,7 +123,8 @@ async function _POST(request: NextRequest) {
     );
 
     if (!resolution.ok) {
-      return NextResponse.json({ error: resolution.error }, { status: resolution.status });
+      const errorResult = resolution as { ok: false; error: string; status: number };
+      return NextResponse.json({ error: errorResult.error }, { status: errorResult.status });
     }
 
     const supabase = await createClient();

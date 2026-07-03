@@ -47,6 +47,7 @@ export const nailTechnicianBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'Jennifer Park',
     instructorTitle: 'Licensed Nail Technician & Salon Owner',
+    instructorImagePath: 'https://example.com/default-instructor.jpg',
     topBarColor: '#f43f5e',
     accentColor: '#fb7185',
     backgroundColor: '#1e1b4b',

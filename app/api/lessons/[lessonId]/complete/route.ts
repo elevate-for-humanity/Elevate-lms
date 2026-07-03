@@ -426,7 +426,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
             result: { completion: true, success: true },
             timestamp: completedAt,
           }),
-        }).catch(() => {}); // fire-and-forget
+        }).then(() => {}, () => {}); // fire-and-forget
       }
     } catch {
       // xAPI is optional — never block lesson completion

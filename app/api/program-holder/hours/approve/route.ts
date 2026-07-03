@@ -152,7 +152,7 @@ async function _POST(request: Request) {
         source_type: hourEntry.source_type,
         rejection_reason: action === 'reject' ? rejection_reason : undefined,
       },
-    }).catch(() => {});
+    }).then(() => {}, () => {});
 
     return NextResponse.json({ ok: true, action, hour_id });
   } catch (err) {

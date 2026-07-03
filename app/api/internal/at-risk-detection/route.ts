@@ -72,7 +72,7 @@ export const POST = withRuntime({ cron: true }, async () => {
         to: ADMIN_EMAIL,
         subject: `[L2 Escalation] At-Risk Student — ${alertAgeHours.toFixed(0)}h unresolved`,
         html: `<p>An at-risk student alert has been unresolved for ${alertAgeHours.toFixed(0)} hours.</p><p>${alert.message}</p><p><a href="https://www.elevateforhumanity.org/admin/students?filter=at-risk">Review in admin dashboard</a></p>`,
-      }).catch(() => {});
+      }).then(() => {}, () => {});
 
       escalated++;
     } else if (alert.escalation_level === 2 && alert.created_at <= l3Cutoff) {
@@ -85,7 +85,7 @@ export const POST = withRuntime({ cron: true }, async () => {
         to: ADMIN_EMAIL,
         subject: `[L3 CRITICAL] At-Risk Student — ${alertAgeHours.toFixed(0)}h unresolved`,
         html: `<p><strong>CRITICAL:</strong> An at-risk student alert has been unresolved for ${alertAgeHours.toFixed(0)} hours with no supervisor action.</p><p>${alert.message}</p><p>Immediate intervention required.</p><p><a href="https://www.elevateforhumanity.org/admin/students?filter=at-risk">Review now</a></p>`,
-      }).catch(() => {});
+      }).then(() => {}, () => {});
 
       await emitEvent('student.at_risk_critical', 'compliance', {
         severity: 'critical',
@@ -149,7 +149,7 @@ export const POST = withRuntime({ cron: true }, async () => {
         program_id: row.program_id,
       },
       metadata: { user_id: row.user_id, program_id: row.program_id },
-    }).catch(() => {});
+    }).then(() => {}, () => {});
 
     // In-app notification to student
     await db.from('notifications').insert({
@@ -162,7 +162,7 @@ export const POST = withRuntime({ cron: true }, async () => {
       link: '/lms/courses',
       read: false,
       idempotency_key: `at-risk-${row.user_id}-${new Date().toISOString().split('T')[0]}`,
-    }).catch(() => {});
+    }).then(() => {}, () => {});
 
     // Email student
     if (email) {
@@ -170,7 +170,7 @@ export const POST = withRuntime({ cron: true }, async () => {
         to: email,
         subject: 'Action Required: You may be falling behind in your program',
         html: `<p>Hi ${name},</p><p>Our records show you have <strong>${overdue} overdue item${overdue !== 1 ? 's' : ''}</strong> and haven't logged activity in <strong>${daysInactive} day${daysInactive !== 1 ? 's' : ''}</strong>.</p><p>Please log in and contact your instructor as soon as possible to get back on track.</p><p><a href="https://www.elevateforhumanity.org/lms/courses">View your courses</a></p><p>— Elevate for Humanity</p>`,
-      }).catch(() => {});
+      }).then(() => {}, () => {});
     }
 
     // Platform event

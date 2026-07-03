@@ -54,7 +54,7 @@ export async function createCourse(input: CourseCreate) {
   return data;
 }
 
-export async function listCourses() {
+export async function listCourses(options?: { status?: string; programId?: string }) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
     .from('lms_courses')

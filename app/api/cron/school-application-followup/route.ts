@@ -49,7 +49,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
         severity: 'warning',
         message: `Application from ${app.applicant_name ?? 'unknown'} for ${app.program_name ?? 'unknown program'} has been pending ${hoursWaiting}h with no action`,
         metadata: { application_id: app.id },
-      }).onConflict('id').ignore().catch(() => {});
+      })
     }
 
     followed_up++;

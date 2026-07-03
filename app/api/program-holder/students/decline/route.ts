@@ -120,7 +120,7 @@ async function _POST(request: NextRequest) {
         studentProfile.full_name || 'Student',
         phProfile?.full_name || 'Program Holder',
         reason,
-      ).catch(() => {});
+      ).then(() => {}, () => {});
     }
 
     return NextResponse.json(

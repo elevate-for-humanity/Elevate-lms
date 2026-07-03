@@ -40,7 +40,7 @@ async function _POST(request: NextRequest) {
         user_agent: request.headers.get('user-agent') || 'unknown',
       });
       if (error) {
-        logger.error('[Compliance] Handbook acknowledgment failed:', error.message);
+        logger.error('[Compliance] Handbook acknowledgment failed', { error: error.message });
         return NextResponse.json(
           { success: false, error: 'Failed to record acknowledgment' },
           { status: 500 },
@@ -88,7 +88,7 @@ async function _POST(request: NextRequest) {
         .single();
 
       if (error) {
-        logger.error('[Compliance] Agreement acceptance failed:', error.message, error.code);
+        logger.error('[Compliance] Agreement acceptance failed', { message: error.message, code: error.code });
         // Race condition — another request inserted between our check and insert
         if (error.code === '23505') {
           const { data: race } = await db

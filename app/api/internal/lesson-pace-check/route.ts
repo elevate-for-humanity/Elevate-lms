@@ -168,7 +168,7 @@ export const POST = withRuntime({ cron: true }, async () => {
       })
       .onConflict('idempotency_key')
       .ignore()
-      .catch(() => {});
+      .then(() => {}, () => {});
 
     // Upsert student_risk_status — escalate status if already watch
     const { data: existingRisk } = await db
@@ -191,7 +191,7 @@ export const POST = withRuntime({ cron: true }, async () => {
           updated_at: new Date().toISOString(),
         })
         .eq('id', existingRisk.id)
-        .catch(() => {});
+        .then(() => {}, () => {});
     } else {
       await db
         .from('student_risk_status')
@@ -205,7 +205,7 @@ export const POST = withRuntime({ cron: true }, async () => {
             ? new Date(enrollment.last_activity_at).toISOString().split('T')[0]
             : null,
         })
-        .catch(() => {});
+        .then(() => {}, () => {});
     }
 
     // Platform event
@@ -223,7 +223,7 @@ export const POST = withRuntime({ cron: true }, async () => {
         days_elapsed: daysElapsed,
       },
       message: `Learner is ${Math.round(deficit)} lessons behind pace in ${course?.title ?? courseId}`,
-    }).catch(() => {});
+    }).then(() => {}, () => {});
 
     flagged++;
   }

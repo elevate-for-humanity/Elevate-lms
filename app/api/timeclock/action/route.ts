@@ -271,7 +271,7 @@ async function notifyClockIn(
       },
       idempotency_key: `timeclock-clock-in-learner-${entryId}-${apprenticeUserId}`,
     })
-    .catch(() => {});
+    .then(() => {}, () => {});
 
   const { data: admins } = await supabase
     .from('profiles')
@@ -297,7 +297,7 @@ async function notifyClockIn(
       },
       idempotency_key: `timeclock-clock-in-admin-${entryId}-${admin.id}`,
     }));
-    await supabase.from('notifications').insert(adminRows).catch(() => {});
+    await supabase.from('notifications').insert(adminRows).then(() => {}, () => {});
   }
 }
 
@@ -457,7 +457,7 @@ async function _POST(request: NextRequest) {
 <p><a href="https://www.elevateforhumanity.org/admin/apprentices">Review in admin dashboard</a></p>
         `.trim(),
         text: `Geofence violation at ${site.name ?? site_id}: ${Math.round(distance)}m from site (allowed ${site.radius_meters}m) during ${action}. Clock-in blocked.`,
-      }).catch(() => {});
+      }).then(() => {}, () => {});
 
       // Platform event for audit trail and AI review
       emitEvent('timeclock.geofence_violation', 'compliance', {
@@ -468,7 +468,7 @@ async function _POST(request: NextRequest) {
         subject_type: 'apprentice_site',
         payload: violationDetails,
         message: `Geofence violation: ${Math.round(distance)}m from ${site.name ?? 'site'} during ${action}`,
-      }).catch(() => {});
+      }).then(() => {}, () => {});
 
       return NextResponse.json(
         {

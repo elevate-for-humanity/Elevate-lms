@@ -146,7 +146,7 @@ async function _POST(request: NextRequest) {
             currency: 'usd',
             unit_amount: partnerCourse.retail_price_cents,
             product_data: {
-              name: partnerCourse.course_name,
+              name: partnerCourse.title,
               description: 'Partner course enrollment',
             },
           },

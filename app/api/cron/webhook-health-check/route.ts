@@ -50,14 +50,14 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       severity: 'critical',
       message: `${failed.length} internal endpoint${failed.length !== 1 ? 's' : ''} failing health check: ${failed.map(f => f.name).join(', ')}`,
       metadata: { results },
-    }).catch(() => {});
+    }).then(() => {}, () => {});
 
     await emitEvent('system.webhook_health_failure', 'system', {
       severity: 'error',
       actor_type: 'cron',
       payload: { failed: failed.map(f => f.name), results },
       message: `Webhook health check failed: ${failed.map(f => f.name).join(', ')}`,
-    }).catch(() => {});
+    }).then(() => {}, () => {});
   }
 
   logger.info('[cron/webhook-health-check] Done', { total: results.length, failed: failed.length, results });

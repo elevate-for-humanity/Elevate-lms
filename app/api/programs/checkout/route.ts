@@ -1,5 +1,4 @@
 export const runtime = 'nodejs';
-import type Stripe from 'stripe';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -109,7 +108,7 @@ export async function POST(request: NextRequest) {
         payment_type: paymentType === 'plan' ? 'program_subscription' : 'program_enrollment',
         funding_source: 'self_pay',
         program_id: programId,
-        program_name: program.name,
+        program_name: program.title,
         program_slug: program.slug,
         user_id: user?.id || 'guest',
       },
@@ -132,8 +131,8 @@ export async function POST(request: NextRequest) {
             price_data: {
               currency: 'usd',
               product_data: {
-                name: `${program.name} - Payment Plan`,
-                description: `4-month payment plan for ${program.name} program`,
+                name: `${program.title} - Payment Plan`,
+                description: `4-month payment plan for ${program.title} program`,
                 images: program.image_url ? [program.image_url] : undefined,
               },
               unit_amount: monthlyAmount * 100,
@@ -148,7 +147,7 @@ export async function POST(request: NextRequest) {
         subscription_data: {
           metadata: {
             program_id: programId,
-            program_name: program.name,
+            program_name: program.title,
             total_amount: price,
             installments: 4,
             installment_amount: monthlyAmount,
@@ -166,8 +165,8 @@ export async function POST(request: NextRequest) {
             price_data: {
               currency: 'usd',
               product_data: {
-                name: program.name,
-                description: `Enrollment in ${program.name} training program`,
+                name: program.title,
+                description: `Enrollment in ${program.title} training program`,
                 images: program.image_url ? [program.image_url] : undefined,
               },
               unit_amount: price * 100,
@@ -178,7 +177,7 @@ export async function POST(request: NextRequest) {
         payment_intent_data: {
           metadata: {
             program_id: programId,
-            program_name: program.name,
+            program_name: program.title,
           },
         },
       };

@@ -261,7 +261,7 @@ export async function POST(request: NextRequest) {
 
     const event: CalendlyEvent = JSON.parse(rawBody);
 
-    logger.info('[Calendly Webhook] Received event:', event.event);
+    logger.info('[Calendly Webhook] Received event', { event: event.event });
 
     if (!process.env.RESEND_API_KEY) {
       logger.warn('[Calendly Webhook] RESEND_API_KEY not configured');
@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
           },
           { onConflict: 'invitee_email,start_time', ignoreDuplicates: false },
         )
-        .catch((err) => {
+        .then(() => {}, (err) => {
           logger.error('[Calendly Webhook] DB upsert failed', err);
         });
     }
@@ -311,18 +311,15 @@ export async function POST(request: NextRequest) {
           notifyInternal(event.payload),
           sendReminder(event.payload.invitee, event.payload.scheduled_event.start_time),
         ]);
-        logger.info(
-          '[Calendly Webhook] Booking confirmation sent to:',
-          event.payload.invitee.email,
-        );
+        logger.info('[Calendly Webhook] Booking confirmation sent', { email: event.payload.invitee.email });
         break;
 
       case 'invitee.canceled':
-        logger.info('[Calendly Webhook] Booking canceled:', event.payload.invitee.email);
+        logger.info('[Calendly Webhook] Booking canceled', { email: event.payload.invitee.email });
         break;
 
       default:
-        logger.info('[Calendly Webhook] Unhandled event type:', event.event);
+        logger.info('[Calendly Webhook] Unhandled event type', { eventType: event.event });
     }
 
     return NextResponse.json({ success: true });

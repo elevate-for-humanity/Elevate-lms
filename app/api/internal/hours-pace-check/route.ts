@@ -211,7 +211,7 @@ export const POST = withRuntime({ cron: true }, async () => {
           },
           idempotency_key: `pace-warning-${enrollment.id}-${new Date().toISOString().slice(0, 10)}`,
         })
-        .catch(() => {});
+        .then(() => {}, () => {});
 
       // 3. Email apprentice
       if (apprenticeEmail) {
@@ -249,7 +249,7 @@ export const POST = withRuntime({ cron: true }, async () => {
 <p>— Elevate for Humanity</p>
           `.trim(),
           text: `Hi ${apprenticeName}, you are ${Math.round(deficit)}h behind your OJL pace for ${programName}. You need ${requiredPacePerWeek.toFixed(1)}h/week to finish on time. Contact your supervisor.`,
-        }).catch(() => {});
+        }).then(() => {}, () => {});
       }
 
       // 4. Email admin
@@ -268,7 +268,7 @@ export const POST = withRuntime({ cron: true }, async () => {
 <p><a href="https://www.elevateforhumanity.org/admin/apprentices">Review in admin dashboard</a></p>
         `.trim(),
         text: `${apprenticeName} is ${Math.round(deficit)}h behind OJL pace for ${programName}. Needs ${requiredPacePerWeek.toFixed(1)}h/week.`,
-      }).catch(() => {});
+      }).then(() => {}, () => {});
 
       // 5. Platform event
       await emitEvent('apprentice.low_hours_pace', 'compliance', {

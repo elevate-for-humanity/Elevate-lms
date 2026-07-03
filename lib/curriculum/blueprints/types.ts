@@ -96,14 +96,19 @@ export type BlueprintLessonRef = {
    * Instructor-facing notes for practical evaluation.
    * Not shown to learners. Used by instructor sign-off UI.
    */
-  instructorNotes?: string[];
+  instructorNotes?: string | string[];
+
+  /**
+   * Learning objectives - what learners will know/be able to do.
+   */
+  learningObjectives?: string[];
 
   /**
    * Observable competency checks for practical sign-off.
    * Each string is a discrete behavior the instructor verifies.
    * Required for lab and skill lessons.
    */
-  competencyChecks?: string[];
+  competencyChecks?: Array<string | { key: string; label: string; description: string; isCritical?: boolean; requiresInstructorSignoff?: boolean }>;
 };
 
 // ─── Competency requirement (consumed by auditor) ─────────────────────────────
@@ -452,6 +457,10 @@ export interface InteractionSpecs {
   includeFlashcards: boolean;
   includeClickToReveal: boolean;
   includeDragDrop: boolean;
+  includeMatching?: boolean;
+  includeCaseStudies?: boolean;
+  includeSimulations?: boolean;
+  includeDecisionTrees?: boolean;
   knowledgeCheckCount: number;
   scenarioCount: number;
   flashcardCount: number;

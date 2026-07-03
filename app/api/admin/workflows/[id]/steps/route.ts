@@ -23,7 +23,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  logAdminAudit({ action: AdminAction.WORKFLOW_STEP_ADDED, actorId: auth.id, entityType: 'workflow_steps', entityId: data.id, metadata: { workflow_id: id, action_type, step_order }, req: request }).catch(() => {});
+  logAdminAudit({ action: AdminAction.WORKFLOW_STEP_ADDED, actorId: auth.id, entityType: 'workflow_steps', entityId: data.id, metadata: { workflow_id: id, action_type, step_order }, req: request }).then(() => {}, () => {});
 
   return NextResponse.json({ step: data }, { status: 201 });
 }

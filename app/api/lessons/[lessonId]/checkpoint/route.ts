@@ -124,7 +124,7 @@ export async function POST(
           Score: `${score}% (passing: ${passingScore}%)`,
           Attempt: String(result.attemptNumber),
         },
-      ).catch(() => {});
+      ).then(() => {}, () => {});
     }
 
     return NextResponse.json(result);

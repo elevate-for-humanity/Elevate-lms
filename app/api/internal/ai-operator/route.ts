@@ -134,7 +134,7 @@ Respond with ONLY valid JSON, no markdown.`;
         .from('platform_events')
         .update({ resolved: true })
         .in('id', ids)
-        .catch(() => {});
+        .then(() => {}, () => {});
       autoResolved = ids.length;
     }
 
@@ -152,9 +152,9 @@ Respond with ONLY valid JSON, no markdown.`;
         recommendation,
       },
       message: `AI operator triaged ${events.length} event${events.length !== 1 ? 's' : ''}: ${summary.slice(0, 100)}`,
-    }).catch(() => {});
+    }).then(() => {}, () => {});
   } catch (err) {
-    logger.error('[ai-operator] AI triage failed', err instanceof Error ? err.message : String(err));
+    logger.error('[ai-operator] AI triage failed', { error: err instanceof Error ? err.message : String(err) });
     return NextResponse.json({ error: 'AI triage failed' }, { status: 500 });
   }
 

@@ -112,7 +112,7 @@ async function _POST(req: NextRequest) {
       course_id,
       serial,
       student_name: learner?.email?.split('@')[0] || 'Learner',
-      course_name: course.course_name,
+      course_name: course.title,
       completion_date: new Date().toISOString().split('T')[0],
       issued_at: new Date().toISOString(),
       expires_at: expires_at_calc,

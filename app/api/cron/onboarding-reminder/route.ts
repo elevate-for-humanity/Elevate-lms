@@ -55,7 +55,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       link: '/onboarding',
       read: false,
       idempotency_key: `onboarding-reminder-${user.id}-${today}`,
-    }).onConflict('idempotency_key').ignore().catch(() => {});
+    }).onConflict('idempotency_key').ignore().then(() => {}, () => {});
 
     await sendEmail({
       to: user.email,

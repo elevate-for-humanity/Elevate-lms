@@ -71,28 +71,32 @@ export default function GlobalError({
                 issue.
               </p>
 
-              {/* Always show error details for debugging - this is a temporary debug change */}
-              {error.message && (
-                <div className="bg-brand-red-50 border-2 border-brand-red-200 rounded-lg p-4 mb-6 text-left">
-                  <p className="text-xs font-semibold text-brand-red-800 mb-2">Error Details:</p>
-                  <p className="text-sm text-brand-red-700 font-mono break-words">
-                    {error.message}
-                  </p>
-                  {error.digest && (
-                    <p className="text-xs text-brand-red-600 mt-2">Error ID: {error.digest}</p>
-                  )}
-                  {error.stack && (
-                    <details className="mt-2">
-                      <summary className="text-xs text-brand-red-600 cursor-pointer">
-                        Stack Trace
-                      </summary>
-                      <pre className="text-xs text-brand-red-600 mt-2 overflow-auto max-h-40">
-                        {error.stack}
-                      </pre>
-                    </details>
-                  )}
-                </div>
-              )}
+              {/* Always show error details - even if empty to confirm what's received */}
+              <div className="bg-brand-red-50 border-2 border-brand-red-200 rounded-lg p-4 mb-6 text-left">
+                <p className="text-xs font-semibold text-brand-red-800 mb-2">Error Info:</p>
+                <p className="text-sm text-brand-red-700 font-mono break-words">
+                  Message: {error.message || '(empty)'}
+                </p>
+                {error.name && (
+                  <p className="text-xs text-brand-red-600 mt-1">Name: {error.name}</p>
+                )}
+                {error.digest && (
+                  <p className="text-xs text-brand-red-600 mt-1">Digest: {error.digest}</p>
+                )}
+                {error.stack && (
+                  <details className="mt-2">
+                    <summary className="text-xs text-brand-red-600 cursor-pointer">
+                      Stack Trace
+                    </summary>
+                    <pre className="text-xs text-brand-red-600 mt-2 overflow-auto max-h-40">
+                      {error.stack}
+                    </pre>
+                  </details>
+                )}
+                <p className="text-xs text-brand-red-500 mt-2">
+                  Timestamp: {new Date().toISOString()}
+                </p>
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">

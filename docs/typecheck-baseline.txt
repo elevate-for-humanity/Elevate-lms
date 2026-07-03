@@ -310,7 +310,6 @@ components/lms/AdvancedQuizBuilder.tsx(279,20): error TS2786: 'Icon' cannot be u
 components/lms/ContentLibrary.tsx(185,31): error TS2339: Property 'files' does not exist on type 'EventTarget & (HTMLTextAreaElement | HTMLSelectElement | HTMLInputElement)'.
 components/lms/ContentLibrary.tsx(185,62): error TS2339: Property 'files' does not exist on type 'EventTarget & (HTMLTextAreaElement | HTMLSelectElement | HTMLInputElement)'.
 components/lms/ContentLibrary.tsx(67,25): error TS2304: Cannot find name 'useCallback'.
-components/lms/CourseModuleAccordion.tsx(307,23): error TS2322: Type 'string' is not assignable to type 'never'.
 components/lms/HvacLessonVideo.tsx(123,15): error TS7030: Not all code paths return a value.
 components/lms/LessonActivityMenu.tsx(163,17): error TS2322: Type 'string' is not assignable to type 'never'.
 components/lms/LessonActivityMenu.tsx(35,7): error TS2741: Property 'ask' is missing in type '{ video: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>; reading: React.ForwardRefExoticComponent<Omit<...> & React.RefAttributes<...>>; ... 6 more ...; resources: React.ForwardRefExoticComponent<...>; }' but required in type 'Record<ActivityId, ElementType<any, keyof IntrinsicElements>>'.

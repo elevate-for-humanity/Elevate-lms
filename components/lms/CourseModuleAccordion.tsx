@@ -273,8 +273,9 @@ function LessonRow({
       {expanded && (
         <div className="bg-slate-50 border-t border-slate-100 px-5 py-3 space-y-1">
           {activities.map((activity, actIdx) => {
-            const Icon = ACTIVITY_ICON[activity.type] ?? Play;
-            const color = ACTIVITY_COLOR[activity.type] ?? 'text-slate-500';
+            const activityType = activity.type as ActivityType;
+            const Icon = ACTIVITY_ICON[activityType] ?? Play;
+            const color = ACTIVITY_COLOR[activityType] ?? 'text-slate-500';
             // Gate the checkpoint activity on prior required activities being
             // done — NOT on isCompleted. Gating on isCompleted is circular:
             // the lesson can't be completed without passing the checkpoint, but

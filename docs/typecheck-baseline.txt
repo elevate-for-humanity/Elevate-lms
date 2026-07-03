@@ -1,7 +1,6 @@
 app/admin/studio/course/page.tsx(63,21): error TS2740: Type '{ id: string; email?: string; full_name?: string; }' is missing the following properties from type 'CourseSession': course, modules, lessons, quizzes, and 6 more.
 app/api/advising-request/route.ts(33,7): error TS2345: Argument of type 'PromiseLike<{ data: never; error: unknown; } | { data: any; error: PostgrestError; }>' is not assignable to parameter of type 'Promise<{ data: any; error: unknown; }>'.
 app/api/applications/route.ts(105,43): error TS2367: This comparison appears to be unintentional because the types 'string' and 'number' have no overlap.
-app/api/applications/route.ts(105,62): error TS2367: This comparison appears to be unintentional because the types 'string' and 'boolean' have no overlap.
 app/api/auth/azure/callback/route.ts(112,55): error TS2339: Property 'email' does not exist on type 'never'.
 app/api/auth/saml/callback/route.ts(89,55): error TS2339: Property 'email' does not exist on type 'never'.
 app/api/auth/signup/route.ts(37,7): error TS2345: Argument of type 'ErrorCode.VAL_OUT_OF_RANGE' is not assignable to parameter of type 'ErrorCode'.
@@ -852,4 +851,4 @@ lib/stripe/get-stripe-server.ts(13,86): error TS2614: Module '"stripe"' has no e
 lib/stripe/handlers/checkout-session-completed.ts(342,28): error TS2304: Cannot find name 'runBarberPostPayment'.
 lib/utils/siteUrl.ts(44,66): error TS2554: Expected 0-1 arguments, but got 2.
 lms-data/programs.ts(215,7): error TS2741: Property 'slug' is missing in type '{ id: string; title: string; subtitle: string; description: string; deliveryEngine: "NATIVE"; salePrice: number; stripeProductId: undefined; stripePriceId: undefined; stripePriceIdPlan: undefined; partnerRequirements: { ...; }[]; isStateTuitionFunded: false; earnWhileYouLearnNotes: string; visiblePublic: true; }' but required in type 'Program'.
-# Error count: 854
+# Error count: 853

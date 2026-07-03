@@ -12,7 +12,7 @@ import { promisify } from 'util';
 const execAsync = promisify(exec);
 
 // Lazy-initialized Supabase client - initialized on first use, not at module load
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 let _supabase: any = null;
 
 async function getSupabaseClient(): Promise<any> {

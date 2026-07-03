@@ -156,7 +156,7 @@ async function _PATCH(request: NextRequest) {
   }
 
   // Process step update
-  let updateData: Record<string, any>; // eslint-disable-line @typescript-eslint/no-unused-vars
+  let updateData: Record<string, any>;  
   let newStatus: IntakeStatus = intake.status;
 
   switch (step) {

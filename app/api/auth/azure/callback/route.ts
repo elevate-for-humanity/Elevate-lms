@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
     // Upsert user and generate a Supabase magic link to establish session
     const admin = await getAdminClient();
     const { data: existing } = await admin.auth.admin.listUsers();
-    const existingUser = existing?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase());
+    const existingUser = existing?.users?.find(u => (u as any).email?.toLowerCase() === email.toLowerCase());
 
     if (!existingUser) {
       await admin.auth.admin.createUser({

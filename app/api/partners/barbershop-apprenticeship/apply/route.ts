@@ -1,6 +1,6 @@
 /** Legacy URL alias — canonical handler: /api/partners/barber-host-shop/apply */
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 

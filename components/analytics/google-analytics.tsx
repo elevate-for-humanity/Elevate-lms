@@ -13,7 +13,7 @@ import { useEffect } from 'react';
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || 'AW-16712632425';
 
-function GoogleAnalyticsComponent() {
+export function GoogleAnalytics() {
   useEffect(() => {
     // GA_MEASUREMENT_ID check is silent in production — operators
     // should verify runtime env vars, not browser console.
@@ -99,4 +99,4 @@ export function updateConsent(analyticsAllowed: boolean, adsAllowed: boolean = f
 }
 
 // Default export for next/dynamic
-export default GoogleAnalyticsComponent;
+export default GoogleAnalytics;

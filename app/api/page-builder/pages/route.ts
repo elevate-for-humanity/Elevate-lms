@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { apiAuthGuard } from '@/lib/admin/guards';
+import { apiAuthGuard } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { getAllPages, upsertPage, upsertSections } from '@/lib/data/pages';

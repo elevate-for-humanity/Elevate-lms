@@ -232,10 +232,17 @@ for (const file of projectFiles) {
 console.log(`Found ${referencedPaths.size} referenced paths`);
 
 // Remove only route entry points that are excluded
+// BUT respect SCOPE_ROUTES - never delete directories that are in scope
 console.log('\nRemoving excluded routes...');
 for (const target of toRemove) {
   const fullPath = path.join(appDir, target);
   if (fs.existsSync(fullPath)) {
+    // NEVER delete if it's a scope-specific route
+    if (SCOPE_ROUTES[scope]?.has(target)) {
+      console.log(`✓ PRESERVE ${target} (${scope} scope route)`);
+      continue;
+    }
+    
     let isReferenced = referencedPaths.has(fullPath);
     if (!isReferenced) {
       const filesInDir = getAllSourceFiles(fullPath);

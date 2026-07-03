@@ -28,8 +28,6 @@ app/api/credentials/issue/route.ts(29,15): error TS2554: Expected 2-3 arguments,
 app/api/cron/embed-knowledge/route.ts(38,7): error TS2353: Object literal may only specify known properties, and 'document_id' does not exist in type 'EmitEventOptions'.
 app/api/cron/funding-followup/route.ts(53,33): error TS2339: Property 'catch' does not exist on type 'PromiseLike<void>'.
 app/api/cron/low-hours-pace/route.ts(141,8): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, "admin_alerts", unknown, "POST">'. Did you mean 'match'?
-app/api/cron/low-hours-pace/route.ts(44,34): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
-app/api/cron/missed-checkins/route.ts(28,34): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
 app/api/cron/payment-monitoring/route.ts(48,49): error TS2345: Argument of type '"payments"' is not assignable to parameter of type 'EventCategory'.
 app/api/cron/process-provisioning-jobs/route.ts(25,19): error TS2554: Expected 0-1 arguments, but got 2.
 app/api/cron/trial-lifecycle/route.ts(73,19): error TS2554: Expected 0-1 arguments, but got 2.
@@ -111,19 +109,10 @@ app/api/intake/route.ts(48,24): error TS2339: Property 'trim' does not exist on 
 app/api/internal/ai-operator/route.ts(126,8): error TS2551: Property 'catch' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, "admin_alerts", unknown, "POST">'. Did you mean 'match'?
 app/api/internal/ai-operator/route.ts(161,47): error TS2552: Cannot find name 'triaged'. Did you mean '_triaged'?
 app/api/internal/ai-operator/route.ts(162,40): error TS2552: Cannot find name 'triaged'. Did you mean '_triaged'?
-app/api/internal/ai-operator/route.ts(32,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
 app/api/internal/ai-operator/route.ts(82,74): error TS2554: Expected 1 arguments, but got 2.
-app/api/internal/at-risk-detection/route.ts(33,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
 app/api/internal/cert-pdf/route.ts(122,25): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BodyInit'.
-app/api/internal/dropout-score/route.ts(24,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
 app/api/internal/dropout-score/route.ts(78,76): error TS2554: Expected 1 arguments, but got 2.
-app/api/internal/hours-pace-check/route.ts(44,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
 app/api/internal/lesson-pace-check/route.ts(169,8): error TS2339: Property 'onConflict' does not exist on type 'PostgrestFilterBuilder<any, any, any, null, "notifications", unknown, "POST">'.
-app/api/internal/lesson-pace-check/route.ts(35,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
-app/api/internal/missed-clockout/route.ts(38,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
-app/api/internal/testing-reminders/route.ts(26,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
-app/api/internal/workflow-event-processor/route.ts(44,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
-app/api/internal/workflow-schedule-processor/route.ts(80,35): error TS2322: Type 'true' is not assignable to type '"bearer" | "x-header"'.
 app/api/jobs/process/route.ts(68,7): error TS2322: Type 'NextResponse<{ error: string; }>' is not assignable to type 'void'.
 app/api/leaderboard/route.ts(82,25): error TS2339: Property 'totalPoints' does not exist on type 'unknown'.
 app/api/leaderboard/route.ts(82,41): error TS2339: Property 'totalPoints' does not exist on type 'unknown'.
@@ -612,3 +601,4 @@ lib/store/launch-plans.ts(109,23): error TS2339: Property 'API_ACCESS' does not 
 lib/stripe/handlers/checkout-session-completed.ts(342,28): error TS2304: Cannot find name 'runBarberPostPayment'.
 lib/utils/siteUrl.ts(44,66): error TS2554: Expected 0-1 arguments, but got 2.
 lms-data/programs.ts(215,7): error TS2741: Property 'slug' is missing in type '{ id: string; title: string; subtitle: string; description: string; deliveryEngine: "NATIVE"; salePrice: number; stripeProductId: undefined; stripePriceId: undefined; stripePriceIdPlan: undefined; partnerRequirements: { ...; }[]; isStateTuitionFunded: false; earnWhileYouLearnNotes: string; visiblePublic: true; }' but required in type 'Program'.
+# TypeScript baseline - Fixed bearer/x-header errors

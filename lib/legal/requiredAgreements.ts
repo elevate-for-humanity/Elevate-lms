@@ -96,16 +96,6 @@ export const REQUIRED_AGREEMENTS: Record<UserRole, RequiredAgreement[]> = {
     },
   ],
 
-  admin: [
-    {
-      type: 'staff_agreement',
-      version: '1.0',
-      title: 'Staff Agreement',
-      description: 'Terms of employment and confidentiality obligations',
-      documentUrl: '/legal/staff-agreement',
-    },
-  ],
-
   partner: [
     {
       type: 'program_holder_mou',

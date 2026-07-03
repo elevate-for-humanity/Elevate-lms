@@ -50,7 +50,6 @@ function buildLocalFallback(courseId: string, slug: string, COURSE_DEFINITIONS: 
 
   const course = {
     title: def.title,
-    title: def.title,
     description: def.subtitle,
     is_active: true,
   };

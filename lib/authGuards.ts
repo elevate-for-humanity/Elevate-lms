@@ -228,8 +228,6 @@ export async function getUserRole(): Promise<UserRole | null> {
 
 const PERMISSIONS: Record<UserRole, string[]> = {
   admin: ['*'], // All permissions
-  admin: ['*'],
-  admin: ['*'],
   staff: ['view_students', 'view_programs', 'view_analytics', 'manage_enrollments'],
   instructor: [
     'view_students',

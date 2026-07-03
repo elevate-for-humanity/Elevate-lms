@@ -2,7 +2,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-import { createAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
@@ -17,9 +17,10 @@ const stripe = stripeKey
       apiVersion: '2025-10-29.clover',
     })
   : null;
-const supabase = createAdminClient();
 
 export async function POST(request: NextRequest) {
+  const supabase = await getAdminClient();
+  
   if (!stripe || !supabase) {
     return NextResponse.json(
       { error: 'Stripe or Supabase not configured' },

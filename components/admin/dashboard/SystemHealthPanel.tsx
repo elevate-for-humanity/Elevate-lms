@@ -146,7 +146,8 @@ export function SystemHealthPanel({ health }: Props) {
               const severity = alert.severity as keyof typeof SEVERITY_STYLES;
               const styles = SEVERITY_STYLES[severity] ?? SEVERITY_STYLES.info;
               const code = typeof alert.code === 'string' ? alert.code : 'unknown';
-              const IconComponent: React.ElementType = CODE_ICONS[code] ?? styles.Icon;
+              const IconComponent = CODE_ICONS[code] ?? styles.Icon;
+              if (!IconComponent) return null;
               return (
                 <div
                   key={i}

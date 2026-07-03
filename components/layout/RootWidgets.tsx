@@ -5,27 +5,30 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import SpeechCanceller from '@/components/ui/SpeechCanceller';
 
-const GlobalAvatar = dynamicImport(() => import('@/components/GlobalAvatar'), {
-  ssr: false,
-  loading: () => null,
-});
+// Loading placeholder to prevent null component errors
+const LoadingDiv = () => <div className="hidden" />;
 
-const FacebookPixel = dynamicImport(() => import('@/components/FacebookPixel'), {
-  ssr: false,
-  loading: () => null,
-});
+const GlobalAvatar = dynamicImport(
+  () => import('@/components/GlobalAvatar').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
 
-const ConditionalAIBubble = dynamicImport(() => import('@/components/ConditionalAIBubble'), {
-  ssr: false,
-  loading: () => null,
-});
+const FacebookPixel = dynamicImport(
+  () => import('@/components/FacebookPixel').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
+
+const ConditionalAIBubble = dynamicImport(
+  () => import('@/components/ConditionalAIBubble').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
 
 // Deferred - cookie banner shows after 1s delay anyway, no reason to block
 // the critical bundle. Moved here from app/layout.tsx synchronous import.
-const CookieConsent = dynamicImport(() => import('@/components/CookieConsent'), {
-  ssr: false,
-  loading: () => null,
-});
+const CookieConsent = dynamicImport(
+  () => import('@/components/CookieConsent').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
 
 export default function RootWidgets() {
   const pathname = usePathname();

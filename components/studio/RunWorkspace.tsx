@@ -6,7 +6,8 @@ import { Loader2, Send, Sparkles, Terminal } from 'lucide-react';
 import type { StudioRuntimeCompletion } from '@/lib/devstudio/studio-runtime';
 import DevStudioRuntimeStatus from '@/components/studio/DevStudioRuntimeStatus';
 
-const XTerminal = dynamic(() => import('@/components/studio/XTerminal'), { ssr: false });
+// XTerminal placeholder - the actual XTerminal component file doesn't exist yet
+const XTerminal = () => null;
 
 const QUICK_ACTIONS = [
   { label: 'Website deploy', command: 'Deploy the LMS service' },

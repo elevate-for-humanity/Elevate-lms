@@ -8,76 +8,61 @@ const LoadingPlaceholder = ({ height = 'h-64' }: { height?: string }) => (
 );
 
 // Lazy load heavy components that are below the fold
-// FIX: Using .then() for named exports
-export const LazyAILiveChat = dynamic(() => import('@/components/chat/AILiveChat'), {
-  ssr: false,
-  loading: () => null,
-});
+// FIX: Using .then(m => m.default || m) to handle both default and named exports
+export const LazyAILiveChat = dynamic(
+  () => import('@/components/chat/AILiveChat').then(m => m.default || m),
+  { ssr: false, loading: () => null }
+);
 
 export const LazyVideoPlayer = dynamic(
   () => import('@/components/VideoPlayer').then((m) => m.VideoPlayer),
-  {
-    ssr: false,
-    loading: () => <LoadingPlaceholder />,
-  }
+  { ssr: false, loading: () => <LoadingPlaceholder /> }
 );
 
 export const LazyInteractiveVideoPlayer = dynamic(
-  () => import('@/components/InteractiveVideoPlayer'),
-  {
-    ssr: false,
-    loading: () => <LoadingPlaceholder />,
-  },
+  () => import('@/components/InteractiveVideoPlayer').then(m => m.default || m),
+  { ssr: false, loading: () => <LoadingPlaceholder /> }
 );
 
 export const LazyTikTokStyleVideoPlayer = dynamic(
-  () => import('@/components/TikTokStyleVideoPlayer'),
-  {
-    ssr: false,
-    loading: () => <LoadingPlaceholder />,
-  },
+  () => import('@/components/TikTokStyleVideoPlayer').then(m => m.default || m),
+  { ssr: false, loading: () => <LoadingPlaceholder /> }
 );
 
-export const LazyCalendar = dynamic(() => import('@/components/Calendar'), {
-  ssr: false,
-  loading: () => <LoadingPlaceholder height="h-96" />,
-});
+export const LazyCalendar = dynamic(
+  () => import('@/components/Calendar').then(m => m.default || m),
+  { ssr: false, loading: () => <LoadingPlaceholder height="h-96" /> }
+);
 
-export const LazyExcelChartGenerator = dynamic(() => import('@/components/ExcelChartGenerator'), {
-  ssr: false,
-  loading: () => <LoadingPlaceholder height="h-96" />,
-});
+export const LazyExcelChartGenerator = dynamic(
+  () => import('@/components/ExcelChartGenerator').then(m => m.default || m),
+  { ssr: false, loading: () => <LoadingPlaceholder height="h-96" /> }
+);
 
-export const LazyDiscussionForums = dynamic(() => import('@/components/DiscussionForums'), {
-  ssr: false,
-  loading: () => <LoadingPlaceholder height="h-screen" />,
-});
+export const LazyDiscussionForums = dynamic(
+  () => import('@/components/DiscussionForums').then(m => m.default || m),
+  { ssr: false, loading: () => <LoadingPlaceholder height="h-screen" /> }
+);
 
 export const LazyStudentPortfolio = dynamic(
   () => import('@/components/StudentPortfolio').then((m) => m.StudentPortfolio),
-  {
-    ssr: false,
-    loading: () => <LoadingPlaceholder height="h-screen" />,
-  }
+  { ssr: false, loading: () => <LoadingPlaceholder height="h-screen" /> }
 );
 
-export const LazyAdvancedQuizBuilder = dynamic(() => import('@/components/AdvancedQuizBuilder'), {
-  ssr: false,
-  loading: () => <LoadingPlaceholder height="h-screen" />,
-});
+export const LazyAdvancedQuizBuilder = dynamic(
+  () => import('@/components/AdvancedQuizBuilder').then(m => m.default || m),
+  { ssr: false, loading: () => <LoadingPlaceholder height="h-screen" /> }
+);
 
 export const LazyComprehensiveEnrollmentWizard = dynamic(
-  () => import('@/components/ComprehensiveEnrollmentWizard'),
-  {
-    ssr: false,
-    loading: () => <LoadingPlaceholder height="h-screen" />,
-  },
+  () => import('@/components/ComprehensiveEnrollmentWizard').then(m => m.default || m),
+  { ssr: false, loading: () => <LoadingPlaceholder height="h-screen" /> }
 );
 
-export const LazyVideoTestimonials = dynamic(() => import('@/components/VideoTestimonials'), {
-  ssr: false,
-  loading: () => <LoadingPlaceholder height="h-96" />,
-});
+export const LazyVideoTestimonials = dynamic(
+  () => import('@/components/VideoTestimonials').then(m => m.default || m),
+  { ssr: false, loading: () => <LoadingPlaceholder height="h-96" /> }
+);
 
 export const LazyLeaderboard = dynamic(
   () => import('@/components/Leaderboard').then((m) => m.Leaderboard),

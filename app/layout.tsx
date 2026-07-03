@@ -20,11 +20,11 @@ import SupabaseConfigBootstrap from '@/components/supabase/SupabaseConfigBootstr
 export const dynamic = 'force-dynamic';
 
 // Lazy load analytics and tracking components (client-only - no SSR)
-const GoogleAnalytics = nextDynamic(() => import('@/components/analytics/google-analytics'), { ssr: false });
-const GoogleAds = nextDynamic(() => import('@/components/analytics/google-ads'), { ssr: false });
-const DMCATrackingPixel = nextDynamic(() => import('@/components/InvisibleWatermark'), { ssr: false });
-const CopyrightProtection = nextDynamic(() => import('@/components/CopyrightProtection'), { ssr: false });
-const InstallPromptBanner = nextDynamic(() => import('@/components/pwa/InstallPromptBanner'), { ssr: false });
+const GoogleAnalytics = nextDynamic(() => import('@/components/analytics/google-analytics').then(m => m.default || m), { ssr: false });
+const GoogleAdsConversion = nextDynamic(() => import('@/components/analytics/google-ads').then(m => m.default || m), { ssr: false });
+const DMCATrackingPixel = nextDynamic(() => import('@/components/InvisibleWatermark').then(m => m.default || m), { ssr: false });
+const CopyrightProtection = nextDynamic(() => import('@/components/CopyrightProtection').then(m => m.default || m), { ssr: false });
+const InstallPromptBanner = nextDynamic(() => import('@/components/pwa/InstallPromptBanner').then(m => m.default || m), { ssr: false });
 
 const inter = { variable: '' };
 
@@ -246,7 +246,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <SkipToContent />
         <GoogleAnalytics />
-        <GoogleAds />
+        <GoogleAdsConversion />
         <PWAManager />
         <InstallPromptBanner />
         <AuthRedirectHandler />

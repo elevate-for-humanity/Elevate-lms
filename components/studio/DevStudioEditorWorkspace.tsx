@@ -4,8 +4,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { FolderOpen, GitBranch, Loader2, Save, Upload } from 'lucide-react';
 
-const CodeEditor = dynamic(() => import('@/components/studio/CodeEditor'), { ssr: false });
-const GitPanel = dynamic(() => import('@/components/studio/GitPanel'), { ssr: false });
+const CodeEditor = dynamic(
+  () => import('@/components/studio/CodeEditor').then((m) => m.default || m),
+  { ssr: false }
+);
+const GitPanel = dynamic(
+  () => import('@/components/studio/GitPanel').then((m) => m.default || m),
+  { ssr: false }
+);
 
 type TreeNode = { type: string; path: string; name: string; children?: TreeNode[] };
 

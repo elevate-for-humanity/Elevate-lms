@@ -7,65 +7,62 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
+// Loading placeholder - simple div to prevent null component errors
+const LoadingDiv = () => <div className="hidden" />;
+
 // Lazy load sticky mobile CTA - shows on program pages
 const StickyMobileCTA = dynamic(
-  () =>
-    import('@/components/programs/StickyMobileCTA').then((mod) => ({
-      default: mod.StickyMobileCTA,
-    })),
-  { ssr: false, loading: () => null },
+  () => import('@/components/programs/StickyMobileCTA').then((mod) => mod.default || mod),
+  { ssr: false, loading: LoadingDiv }
 );
 
 // Mobile bottom navigation for authenticated users
 const BottomNav = dynamic(
-  () => import('@/components/BottomNav').then((mod) => ({ default: mod.BottomNav })),
-  { ssr: false, loading: () => null },
+  () => import('@/components/BottomNav').then((mod) => mod.default || mod),
+  { ssr: false, loading: LoadingDiv }
 );
 
 // Scroll unlock failsafe on route changes
-const ScrollUnlocker = dynamic(() => import('@/components/ScrollUnlocker'), {
-  ssr: false,
-  loading: () => null,
-});
+const ScrollUnlocker = dynamic(
+  () => import('@/components/ScrollUnlocker').then((mod) => mod.default || mod),
+  { ssr: false, loading: LoadingDiv }
+);
 
 // Version guard - auto-refresh on stale deployments
 const VersionGuard = dynamic(
-  () => import('@/components/VersionGuard').then((mod) => ({ default: mod.VersionGuard })),
-  { ssr: false, loading: () => null },
+  () => import('@/components/VersionGuard').then((mod) => mod.default || mod),
+  { ssr: false, loading: LoadingDiv }
 );
 
 // Security monitor - tracks suspicious client-side activity
 const SecurityMonitor = dynamic(
-  () => import('@/components/SecurityMonitor').then((mod) => ({ default: mod.SecurityMonitor })),
-  { ssr: false, loading: () => null },
+  () => import('@/components/SecurityMonitor').then((mod) => mod.default || mod),
+  { ssr: false, loading: LoadingDiv }
 );
 
 // Offline indicator - shows when user loses connectivity
 const OfflineIndicator = dynamic(
-  () => import('@/components/offline-indicator').then((mod) => ({ default: mod.OfflineIndicator })),
-  { ssr: false, loading: () => null },
+  () => import('@/components/offline-indicator').then((mod) => mod.default || mod),
+  { ssr: false, loading: LoadingDiv }
 );
 
 // Sentry error monitoring init
 const SentryInit = dynamic(
-  () => import('@/components/sentry-init').then((mod) => ({ default: mod.SentryInit })),
-  { ssr: false, loading: () => null },
+  () => import('@/components/sentry-init').then((mod) => mod.default || mod),
+  { ssr: false, loading: LoadingDiv }
 );
 
 // GlobalAvatar removed — inline video section was appearing unexpectedly on portal pages
 
 // Toast notifications — use a client wrapper to avoid SSR issues with react-hot-toast
 const Toaster = dynamic(
-  () => import('@/components/ToasterWrapper').then((m) => m.default),
-  {
-    ssr: false,
-    loading: () => null,
-  }
+  () => import('@/components/ToasterWrapper').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
 );
 
 const SearchDialog = dynamic(
-  () => import('@/components/SearchDialog').then((mod) => ({ default: mod.SearchDialog })),
-  { ssr: false, loading: () => null },
+  () => import('@/components/SearchDialog').then((mod) => mod.default || mod),
+  { ssr: false, loading: LoadingDiv }
 );
 
 // Avatar is now added to each page individually via PageAvatar component

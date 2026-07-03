@@ -24,13 +24,37 @@ import {
 type MobileTab = 'ellie' | 'deploy' | 'health' | 'preview' | 'autopilot';
 type MorePanel = 'files' | 'services' | 'environments' | 'secrets' | null;
 
-const DeployPanel = dynamic(() => import('@/components/studio/DeployPanel'), { ssr: false });
-const ServicesPanel = dynamic(() => import('@/components/studio/ServicesPanel'), { ssr: false });
-const SecretsPanel = dynamic(() => import('@/components/studio/SecretsPanel'), { ssr: false });
-const DevContainerPanel = dynamic(() => import('@/components/studio/DevContainerPanel'), { ssr: false });
-const UnifiedEllieChat = dynamic(() => import('@/components/studio/UnifiedEllieChat'), { ssr: false });
-const IframePreview = dynamic(() => import('@/components/studio/IframePreview'), { ssr: false });
-const AutopilotPanel = dynamic(() => import('@/components/studio/AutopilotPanel'), { ssr: false });
+// Loading placeholder to prevent null component errors
+const LoadingDiv = () => <div className="hidden" />;
+
+const DeployPanel = dynamic(
+  () => import('@/components/studio/DeployPanel').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
+const ServicesPanel = dynamic(
+  () => import('@/components/studio/ServicesPanel').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
+const SecretsPanel = dynamic(
+  () => import('@/components/studio/SecretsPanel').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
+const DevContainerPanel = dynamic(
+  () => import('@/components/studio/DevContainerPanel').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
+const UnifiedEllieChat = dynamic(
+  () => import('@/components/studio/UnifiedEllieChat').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
+const IframePreview = dynamic(
+  () => import('@/components/studio/IframePreview').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
+const AutopilotPanel = dynamic(
+  () => import('@/components/studio/AutopilotPanel').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
 
 const NAV: { id: MobileTab; label: string; Icon: ElementType<{ className?: string }> }[] = [
   { id: 'ellie', label: 'Ellie', Icon: Sparkles },

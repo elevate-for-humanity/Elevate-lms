@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { Users } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
-const SocialLinksModal = dynamic(() => import('@/components/social/SocialLinksModal'), {
-  ssr: false,
-});
+const SocialLinksModal = dynamic(
+  () => import('@/components/social/SocialLinksModal').then((m) => m.default || m),
+  { ssr: false }
+);
 
 export default function SocialMediaHighlight() {
   const [open, setOpen] = useState(false);

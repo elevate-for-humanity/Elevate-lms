@@ -33,8 +33,9 @@ const ALWAYS_KEEP_DIRS = new Set([
   'content'
 ]);
 
-// Only actually delete in CI/Docker builds (not locally)
-const DRY_RUN = process.env.CI !== 'true' && process.env.DOCKER !== 'true';
+// SAFETY: Always use DRY_RUN in CI to prevent accidental deletions
+// Only run LIVE mode when explicitly enabled via SPLIT_LIVE_MODE=true
+const DRY_RUN = process.env.SPLIT_LIVE_MODE !== 'true';
 console.log(`Mode: ${DRY_RUN ? 'DRY RUN (no deletions)' : 'LIVE (will delete files)'}`);
 
 // Route prefixes to exclude for each scope

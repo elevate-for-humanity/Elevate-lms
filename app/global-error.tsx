@@ -32,15 +32,16 @@ export default function GlobalError({
       return;
     }
 
+    // Log error details to console for debugging - THIS IS CRITICAL
+    console.error('=== GLOBAL ERROR CAUGHT ===');
+    console.error('Message:', error.message);
+    console.error('Name:', error.name);
+    console.error('Stack:', error.stack);
+    console.error('Digest:', error.digest);
+    console.error('===========================');
+
     // Capture error with Sentry
     Sentry.captureException(error);
-
-    // Log error to console for debugging
-    // Error caught
-    // Error logged
-    // Stack logged
-    // Digest logged
-    // Separator
 
     // Send to Sentry if configured
     if (typeof window !== 'undefined' && window.Sentry) {
@@ -70,7 +71,8 @@ export default function GlobalError({
                 issue.
               </p>
 
-              {error.message && process.env.NODE_ENV === 'development' && (
+              {/* Always show error details for debugging - this is a temporary debug change */}
+              {error.message && (
                 <div className="bg-brand-red-50 border-2 border-brand-red-200 rounded-lg p-4 mb-6 text-left">
                   <p className="text-xs font-semibold text-brand-red-800 mb-2">Error Details:</p>
                   <p className="text-sm text-brand-red-700 font-mono break-words">

@@ -20,7 +20,7 @@ export const CONVERSION_ACTIONS = {
   CONTACT: `${GOOGLE_ADS_ID}/contact_form`,
 } as const;
 
-function GoogleAdsComponent() {
+export function GoogleAds() {
   // Canonical gtag injection/config happens in components/analytics/google-analytics.tsx.
   // Keep this component as a harmless compatibility mount point.
   return null;
@@ -50,4 +50,4 @@ export function trackAdsConversion(
 }
 
 // Default export for next/dynamic
-export default GoogleAdsComponent;
+export default GoogleAds;

@@ -5,6 +5,7 @@
 
 interface AuditContext {
   actorId?: string;
+  actorUserId?: string;
   systemActor?: string;
   requestId?: string;
   metadata?: Record<string, unknown>;
@@ -17,6 +18,7 @@ export async function setAuditContext(
   context: AuditContext
 ): Promise<void> {
   contextHolder.actorId = context.actorId;
+  contextHolder.actorUserId = context.actorUserId;
   contextHolder.systemActor = context.systemActor;
   contextHolder.requestId = context.requestId;
   contextHolder.metadata = context.metadata;
@@ -28,6 +30,7 @@ export function getAuditContext(): AuditContext {
 
 export function clearAuditContext(): void {
   contextHolder.actorId = undefined;
+  contextHolder.actorUserId = undefined;
   contextHolder.systemActor = undefined;
   contextHolder.requestId = undefined;
   contextHolder.metadata = undefined;

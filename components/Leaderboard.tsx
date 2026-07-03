@@ -87,3 +87,6 @@ export function Leaderboard({ entries, timeframe = 'week' }: LeaderboardProps) {
     </Card>
   );
 }
+
+// Default export for next/dynamic
+export default Leaderboard;

@@ -107,3 +107,6 @@ export function VideoPlayer({ src, title, onProgress, onComplete }: VideoPlayerP
     </div>
   );
 }
+
+// Default export for next/dynamic
+export default VideoPlayer;

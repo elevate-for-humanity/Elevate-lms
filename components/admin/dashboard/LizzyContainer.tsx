@@ -102,3 +102,6 @@ export function LizzyContainer({
     />
   );
 }
+
+// Default export for next/dynamic
+export default LizzyContainer;

@@ -716,3 +716,6 @@ export function StudentPortfolio() {
     </div>
   );
 }
+
+// Default export for next/dynamic
+export default StudentPortfolio;

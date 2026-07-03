@@ -130,3 +130,6 @@ export function WorkflowsOpsPanel() {
     </div>
   );
 }
+
+// Default export for next/dynamic
+export default WorkflowsOpsPanel;

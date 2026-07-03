@@ -254,3 +254,6 @@ export function DiscussionForum({ lessonId, initialComments = [] }: DiscussionFo
     </div>
   );
 }
+
+// Default export for next/dynamic
+export default DiscussionForum;

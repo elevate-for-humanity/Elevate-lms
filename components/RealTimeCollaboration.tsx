@@ -237,3 +237,6 @@ export function RealTimeCollaboration({ roomId, currentUser }: RealTimeCollabora
     </div>
   );
 }
+
+// Default export for next/dynamic
+export default RealTimeCollaboration;

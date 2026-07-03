@@ -28,9 +28,14 @@ export default function Error({
           <p className="text-lg text-slate-700 mb-6">
             We encountered an unexpected error. Our team has been notified.
           </p>
-          {error.message && process.env.NODE_ENV === 'development' && (
+          {/* Always show error details for debugging */}
+          {error.message && (
             <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-brand-red-800 font-mono">{error.message}</p>
+              <p className="text-xs font-semibold text-brand-red-800 mb-1">Error:</p>
+              <p className="text-sm text-brand-red-800 font-mono break-words">{error.message}</p>
+              {error.digest && (
+                <p className="text-xs text-brand-red-600 mt-1">Error ID: {error.digest}</p>
+              )}
             </div>
           )}
         </div>

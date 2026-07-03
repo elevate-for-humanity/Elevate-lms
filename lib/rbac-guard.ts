@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import { logger } from '@/lib/logger';
 
 export type UserRole =
-  | 'super_admin'
+  | 'admin'
   | 'student'
   | 'advisor'
   | 'admin'

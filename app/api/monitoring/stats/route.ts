@@ -32,7 +32,7 @@ async function _GET(req: Request) {
 
     const { role } = await requireOrgAdmin(req, orgId);
 
-    if (role !== 'super_admin') {
+    if (role !== 'admin') {
       return NextResponse.json({ error: 'Super admin access required' }, { status: 403 });
     }
 

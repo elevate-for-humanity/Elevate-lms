@@ -199,7 +199,7 @@ const nextConfig = {
 
   // Include lib/supabase in standalone builds to fix runtime errors
   outputFileTracingIncludes: {
-    '/**': ['lib/supabase/**', 'lib/logger.ts'],
+    '/**': ['lib/supabase/**', 'lib/logger.ts', 'content/**', 'lib/data/**', 'public/data/**'],
   },
 
   async redirects() {

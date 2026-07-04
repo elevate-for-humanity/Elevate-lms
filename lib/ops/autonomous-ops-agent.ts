@@ -1,15 +1,14 @@
 /**
  * Autonomous Platform Operations Agent
- * 
+ *
  * Scans, detects, reports, and safely fixes problems across:
  * marketing site, LMS, enrollment, onboarding, payments,
-import { setAuditContext } from '@/lib/audit-context';
  * documents, dashboards, email, login, payroll, Cloudflare, Supabase.
  */
 
+import { setAuditContext } from '@/lib/audit-context';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
-
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!

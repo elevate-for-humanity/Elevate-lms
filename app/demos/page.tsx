@@ -4,6 +4,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = {
   title: `Demos | ${PLATFORM_DEFAULTS.orgName}`,
   description: `Demos page.`,
+  robots: { index: false, follow: false },
 };
 
 export default function DemosPage() {

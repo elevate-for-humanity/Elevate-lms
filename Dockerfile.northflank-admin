@@ -31,6 +31,7 @@ COPY . .
 # 3. SPLIT optimization
 ENV BUILD_SCOPE=ADMIN
 ENV CI=true
+ENV SPLIT_LIVE_MODE=true
 RUN node scripts/split-app.mjs
 
 # 4. Build Admin with 6GB heap safety

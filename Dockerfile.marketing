@@ -23,6 +23,7 @@ COPY . .
 # Run the splitter
 ENV BUILD_SCOPE=MARKETING
 ENV CI=true
+ENV SPLIT_LIVE_MODE=true
 RUN node scripts/split-app.mjs
 
 # Stable PNPM (matching lockfileVersion 9.0)

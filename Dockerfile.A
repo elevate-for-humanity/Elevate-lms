@@ -28,7 +28,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # 8GB heap limit
 ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV NEXT_STANDALONE_OUTPUT=1
-ENV BUILD_SCOPE=1
+ENV BUILD_SCOPE=A
+ENV SPLIT_LIVE_MODE=true
 ENV CI=true
 
 # Re-enable Webpack cache for 8GB stability

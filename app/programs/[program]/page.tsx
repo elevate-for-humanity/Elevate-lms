@@ -536,6 +536,11 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
       }
     }
     const banner = heroBanners[mergedProgram.slug] ?? null;
+    const heroPosterSrc = resolveHeroPosterSrc(program, {
+      banner,
+      dbImageUrl: mergedProgram.heroImage,
+      heroImage: mergedProgram.heroImage,
+    });
     return (
       <>
         <ProgramStructuredData

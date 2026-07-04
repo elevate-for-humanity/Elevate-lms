@@ -27,6 +27,7 @@ import {
   Bell,
   ChevronRight,
   ScissorsIcon,
+  Globe,
   Hammer,
   Sparkles,
   User,

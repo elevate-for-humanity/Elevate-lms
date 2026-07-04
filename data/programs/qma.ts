@@ -258,6 +258,7 @@ export const QMA: ProgramSchema = {
     'Indiana state QMA certification in 4 weeks. Administer medications under nurse supervision. WIOA and WRG funding available for eligible participants. Self-pay: $1,200. Indianapolis.',
 
   funding: {
+    fssa_eligible: false,
     wioa_eligible: true,
     wrg_eligible: true,
     etpl_approved: true,

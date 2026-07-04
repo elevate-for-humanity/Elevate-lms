@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkLicenseAccess } from './billing-authority';
+import { checkLicenseAccess, type BillingAuthority } from './billing-authority';
 
 /**
  * License validation for API routes

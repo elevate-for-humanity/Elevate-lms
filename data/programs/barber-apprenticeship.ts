@@ -273,6 +273,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     wioa_eligible: true,
     etpl_approved: true,
     wrg_eligible: false,
+    fssa_eligible: false,
     fundingNotes:
       'DOL Registered Apprenticeship (RAPIDS). WIOA Title I eligible for dislocated workers and adults. Employer sponsorship available for eligible participants.',
   },

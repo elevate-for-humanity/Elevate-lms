@@ -279,6 +279,7 @@ export const CNA: ProgramSchema = {
   funding: {
     wioa_eligible: true,
     wrg_eligible: true,
+    fssa_eligible: false,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I Adult/Dislocated Worker funding available for eligible participants.',
   },

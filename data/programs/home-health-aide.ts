@@ -309,7 +309,10 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
 
 
   funding: {
-    isSelfPay: true,
+    fssa_eligible: false,
+    wioa_eligible: false,
+    wrg_eligible: false,
+    jobReadyIndyEligible: false,
     fundingNotes: 'Self-pay and payment plans available. BNPL options accepted at checkout.',
   },
 };

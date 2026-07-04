@@ -282,6 +282,7 @@ export const COSMETOLOGY: ProgramSchema = {
     wioa_eligible: false,   // NOT on Indiana ETPL — tuition not covered by WIOA
     etpl_approved: false,
     wrg_eligible: false,
+    fssa_eligible: false,
   },
   enrollmentType: 'internal',
   partnerCourses: [

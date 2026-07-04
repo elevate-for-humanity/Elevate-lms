@@ -247,6 +247,7 @@ export const WEB_DEVELOPMENT: ProgramSchema = {
 
 
   funding: {
+    fssa_eligible: false,
     wioa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,

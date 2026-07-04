@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { createAdminClient, requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { TenantContext } from './withTenant';
-import { checkLicenseAccess } from '@/lib/licensing/billing-authority';
+import { checkLicenseAccess, type BillingAuthority } from '@/lib/licensing/billing-authority';
 import { setAuditContext } from '@/lib/audit-context';
 
 export interface LicenseContext extends TenantContext {

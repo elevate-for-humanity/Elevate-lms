@@ -240,10 +240,10 @@ async function _POST(req: Request) {
         programSlug === 'barber-apprenticeship' ||
         program.title ||
         program?.title ||
-        program?.name.toLowerCase().includes('barber') ||
+        program?.title.toLowerCase().includes('barber') ||
         program.title ||
         program?.title ||
-        program?.name.toLowerCase().includes('apprentice');
+        program?.title.toLowerCase().includes('apprentice');
 
       await sendWelcomeEmail({
         email: emailLower,

@@ -258,6 +258,7 @@ export const CAD_DRAFTING: ProgramSchema = {
   funding: {
     wioa_eligible: true,
     wrg_eligible: true,
+    fssa_eligible: false,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',
   },

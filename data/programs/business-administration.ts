@@ -231,7 +231,7 @@ export const BUSINESS_ADMIN: ProgramSchema = {
   deliveryModel: 'partner',
   deliveryModelDetail: 'hybrid',
   partnerProvider: 'employindy',
-  fundingOptions: ['wioa', 'impact', 'self_pay'],
+  fundingOptions: ['wioa', 'wioa', 'self_pay'],
   enrollmentType: 'internal',
   partnerCourses: [
     {
@@ -293,7 +293,6 @@ export const BUSINESS_ADMIN: ProgramSchema = {
 
   funding: {
     wioa_eligible: true,
-    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',

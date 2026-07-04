@@ -20,7 +20,7 @@ export const GRAPHIC_DESIGN: ProgramSchema = {
   fundingStatement:
     'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$4,000',
-  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
+  fundingOptions: ['wioa', 'wrg', 'wioa', 'self_pay'],
   badge: 'Funding Available',
   badgeColor: 'green',
   credentials: [
@@ -242,7 +242,6 @@ export const GRAPHIC_DESIGN: ProgramSchema = {
 
   funding: {
     wioa_eligible: true,
-    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',

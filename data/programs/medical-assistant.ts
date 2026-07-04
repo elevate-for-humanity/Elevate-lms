@@ -27,7 +27,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   badgeColor: 'green',
   deliveryModel: 'hybrid',
   deliveryModelDetail: 'hybrid',
-  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
+  fundingOptions: ['wioa', 'wrg', 'wioa', 'self_pay'],
   enrollmentType: 'internal',
   credentials: [
     {
@@ -417,7 +417,6 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
 
   funding: {
     wioa_eligible: true,
-    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. FSSA Gov Portal and WIOA Title I funding available for eligible Indiana residents.',

@@ -269,12 +269,11 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   enrollmentType: 'internal',
   deliveryModel: 'internal',
   lmsCourseSlug: 'hvac-technician',
-  fundingOptions: ['wioa', 'wrg', 'impact'],
+  fundingOptions: ['wioa', 'wrg', 'wioa'],
 
 
   funding: {
     wioa_eligible: true,
-    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA, WRG, and FSSA Gov Portal funding available. NHA EPA 608 certification program.',

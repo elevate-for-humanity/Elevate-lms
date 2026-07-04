@@ -27,7 +27,7 @@ export const COMMUNITY_HEALTH_WORKER: ProgramSchema = {
   fundingStatement:
     'WIOA and Workforce Ready Grant funding available for eligible Indiana residents. Self-pay available.',
   selfPayCost: '$3,800',
-  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
+  fundingOptions: ['wioa', 'wrg', 'wioa', 'self_pay'],
   badge: 'ETPL Listed',
   badgeColor: 'green',
   credentials: [
@@ -77,7 +77,6 @@ export const COMMUNITY_HEALTH_WORKER: ProgramSchema = {
   funding: {
     wioa_eligible: true,
     wrg_eligible: true,
-    fssa_eligible: true,
     etpl_approved: true,
     fundingNotes: 'Indiana ETPL-listed community health worker pathway.',
   },

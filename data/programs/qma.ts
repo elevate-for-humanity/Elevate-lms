@@ -262,7 +262,6 @@ export const QMA: ProgramSchema = {
     wrg_eligible: true,
     etpl_approved: true,
     snap_et_eligible: false,
-    fssa_eligible: false,
   },
 
   enrollmentType: 'internal',

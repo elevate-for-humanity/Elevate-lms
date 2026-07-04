@@ -4,7 +4,7 @@ export const CNA: ProgramSchema = {
   slug: 'cna',
   title: 'Certified Nursing Assistant (CNA)',
   subtitle:
-    'Indiana state CNA certification in 6 weeks. Clinical rotations at licensed healthcare facilities. State exam proctored on-site. FSSA Gov Portal funding available for eligible participants. Self-pay: $2,500 (Sale: $1,850).',
+    'Indiana state CNA certification in 6 weeks. Clinical rotations at licensed healthcare facilities. State exam proctored on-site. WIOA funding available for eligible participants. Self-pay: $2,500.',
   sector: 'healthcare',
   category: 'Healthcare',
   programType: 'workforce',
@@ -16,7 +16,7 @@ export const CNA: ProgramSchema = {
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
   durationWeeks: 6,
-  enrollmentStartLabel: 'Waitlist open — next cohort date confirmed at intake',
+  enrollmentStartLabel: 'Cohorts forming now — apply today',
   hoursPerWeekMin: 30,
   hoursPerWeekMax: 40,
   hoursBreakdown: {
@@ -28,11 +28,10 @@ export const CNA: ProgramSchema = {
   schedule: 'Mon–Fri, 30–40 hours per week',
   cohortSize: '8–12 participants per cohort',
   fundingStatement:
-    'FSSA Gov Portal funding available for eligible participants (SNAP/TANF recipients). Covers tuition, books, and state exam fees when approved. Eligibility is not guaranteed. Self-pay: $2,500 (Sale: $1,850). BNPL available.',
-  selfPayCost: '$1,850',
+    'WIOA funding available for eligible participants. Covers tuition, books, and exam fees when approved. Self-pay: $2,500. BNPL available.',
+  selfPayCost: '$2,500',
   regularPrice: '$2,500',
-  salePrice: '$1,850',
-  badge: 'FSSA Eligible',
+  badge: 'Funding Available',
   badgeColor: 'blue',
 
   credentials: [
@@ -201,9 +200,9 @@ export const CNA: ProgramSchema = {
         'Federal law establishing minimum training and competency standards for nursing assistants in Medicare/Medicaid facilities.',
     },
     {
-      standard: 'FSSA Gov Portal Program',
+      standard: 'WIOA Funded Training',
       description:
-        'Eligible training provider under the Indiana FSSA Gov Portal program for SNAP and TANF recipients pursuing healthcare careers.',
+        'Indiana ETPL-listed training provider. WIOA funding available for eligible participants.',
     },
   ],
 
@@ -243,7 +242,7 @@ export const CNA: ProgramSchema = {
     {
       question: 'What funding is available?',
       answer:
-        'CNA is funded through the FSSA Gov Portal program for eligible SNAP and TANF recipients. Many students pay $0. Eligibility is determined through FSSA intake. Self-pay tuition is $2,500 (currently on sale for $1,850). BNPL financing available through Affirm, Sezzle, Klarna, and more.',
+        'CNA is funded through WIOA Title I for eligible adults and dislocated workers. Many students pay $0. Eligibility is determined through WIOA intake. Self-pay tuition is $2,500. BNPL financing available through Affirm, Sezzle, Klarna, and more.',
     },
     {
       question: 'Where are the clinical rotations?',
@@ -270,18 +269,17 @@ export const CNA: ProgramSchema = {
 
   metaTitle: 'CNA Program — Indiana State Certification in 4 Weeks | Elevate for Humanity',
   metaDescription:
-    'Indiana state CNA certification in 4 weeks. Clinical rotations at licensed facilities. State exam proctored on-site. FSSA Gov Portal funding available for eligible participants. Self-pay: $2,500 (Sale: $1,850). Indianapolis.',
+    'Indiana state CNA certification in 4 weeks. Clinical rotations at licensed facilities. State exam proctored on-site. WIOA funding available for eligible participants. Self-pay: $2,500. Indianapolis.',
 
   enrollmentType: 'internal',
   deliveryModel: 'internal',
-  fundingOptions: ['impact', 'self_pay'],
+  fundingOptions: ['wioa', 'self_pay'],
 
 
   funding: {
     wioa_eligible: true,
-    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. FSSA Gov Portal covers eligible SNAP/TANF recipients. WIOA Title I Adult/Dislocated Worker funding available.',
+    fundingNotes: 'Indiana ETPL-listed. WIOA Title I Adult/Dislocated Worker funding available for eligible participants.',
   },
 };

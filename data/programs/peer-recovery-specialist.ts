@@ -28,7 +28,7 @@ export const PEER_RECOVERY: ProgramSchema = {
   metaDescription:
     'Earn your Indiana Certified Peer Recovery Specialist (CPRS) credential in 8 weeks. WIOA funding available. Help others overcome addiction and mental health challenges.',
   fundingStatement: 'WIOA and FSSA Gov Portal funding available for eligible Indiana residents.',
-  fundingOptions: ['wioa', 'impact', 'self_pay'],
+  fundingOptions: ['wioa', 'wioa', 'self_pay'],
   badge: 'ETPL Approved',
   badgeColor: 'green',
 
@@ -279,7 +279,6 @@ export const PEER_RECOVERY: ProgramSchema = {
 
   funding: {
     wioa_eligible: true,
-    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA and FSSA Gov Portal funding available. DMHA-recognized credential pathway.',

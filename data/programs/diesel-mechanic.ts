@@ -23,7 +23,7 @@ export const DIESEL_MECHANIC: ProgramSchema = {
   fundingStatement:
     'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$5,500',
-  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
+  fundingOptions: ['wioa', 'wrg', 'wioa', 'self_pay'],
   badge: 'Accepting Interest',
   badgeColor: 'orange',
 
@@ -364,7 +364,6 @@ export const DIESEL_MECHANIC: ProgramSchema = {
 
   funding: {
     wioa_eligible: true,
-    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',

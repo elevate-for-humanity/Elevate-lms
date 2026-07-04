@@ -49,7 +49,7 @@ import { QMA } from './qma';
 import { BEAUTY_CAREER_EDUCATOR } from './beauty-career-educator';
 import { COMMUNITY_HEALTH_WORKER } from './community-health-worker';
 
-const STATIC_PROGRAMS: ProgramSchema[] = [
+export const STATIC_PROGRAMS: ProgramSchema[] = [
   // Programs with dedicated page.tsx - registered here for [slug] fallback and sitemap
   BARBER_APPRENTICESHIP,
   HVAC_TECHNICIAN,

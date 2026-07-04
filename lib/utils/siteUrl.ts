@@ -13,7 +13,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 const DEFAULT_ADMIN_URL = '';
 
-function resolveUrl(name: string, fallback: string): string {
+function resolveEnvUrl(name: string, fallback: string): string {
   const val = (process.env[name] || '').trim() || fallback;
   return val.replace(/\/$/, '');
 }
@@ -27,12 +27,12 @@ export function getPublicSiteUrl(): string {
 
 /** LMS app base URL — canonical public site (www), not the admin subdomain */
 export function getSiteUrl(): string {
-  return resolveUrl('NEXT_PUBLIC_SITE_URL', PLATFORM_DEFAULTS.siteUrl);
+  return resolveEnvUrl('NEXT_PUBLIC_SITE_URL', PLATFORM_DEFAULTS.siteUrl);
 }
 
 /** Admin app base URL —  */
 export function getAdminUrl(): string {
-  const url = resolveUrl('NEXT_PUBLIC_ADMIN_URL', DEFAULT_ADMIN_URL);
+  const url = resolveEnvUrl('NEXT_PUBLIC_ADMIN_URL', DEFAULT_ADMIN_URL);
   try {
     const parsed = new URL(url);
     if (!parsed.hostname.includes('.')) {
@@ -47,7 +47,7 @@ export function getAdminUrl(): string {
 
 /** WebSocket URL for Yjs collaboration */
 export function getCollaborationWsUrl(): string {
-  return resolveUrl(
+  return resolveEnvUrl(
     'NEXT_PUBLIC_COLLABORATION_WS_URL',
     'wss://collab.elevateforhumanity.org',
   );

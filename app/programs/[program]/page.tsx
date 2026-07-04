@@ -179,6 +179,7 @@ function ProgramPage({
   slug,
   sections,
   banner,
+  imageUrl,
 }: {
   title: string;
   summary: string;
@@ -191,12 +192,12 @@ function ProgramPage({
   imageUrl?: string | null;
 }) {
   // Ensure imageUrl always resolves to a valid URL
-    const safeImageUrl = imageUrl || getProgramOgImage(slug) || '';
-    const heroPosterSrc = resolveHeroPosterSrc(slug, {
-      banner,
-      dbImageUrl: safeImageUrl,
-      heroImage: getProgramOgImage(slug),
-    });
+  const safeImageUrl = imageUrl || getProgramOgImage(slug) || '';
+  const heroPosterSrc = resolveHeroPosterSrc(slug, {
+    banner,
+    dbImageUrl: safeImageUrl,
+    heroImage: getProgramOgImage(slug),
+  });
   const learnItems = sections?.find(
     (s) => s.heading.toLowerCase().includes('learn') || s.heading.toLowerCase().includes('module'),
   );

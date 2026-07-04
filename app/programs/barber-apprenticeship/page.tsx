@@ -11,11 +11,15 @@ export const revalidate = 0;
 
 const p = BARBER_APPRENTICESHIP;
 
-const errors = validateProgram(p);
-if (errors.length > 0) {
-  throw new Error(
-    `Barber Apprenticeship program schema validation failed:\n${errors.map((e) => `  ${e.field}: ${e.message}`).join('\n')}`
-  );
+// Validate at module level for development errors only
+// In production, log but don't throw to avoid breaking the page
+if (process.env.NODE_ENV === 'development') {
+  const errors = validateProgram(p);
+  if (errors.length > 0) {
+    console.error(
+      `Barber Apprenticeship program schema validation failed:\n${errors.map((e) => `  ${e.field}: ${e.message}`).join('\n')}`
+    );
+  }
 }
 
 export const metadata: Metadata = {

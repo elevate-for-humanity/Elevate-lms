@@ -2,6 +2,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+// pre-auth-registry: exempt — uses getAdminClient() with authenticated session, user_id is always present
+
 import { getAdminClient } from '@/lib/supabase/admin';
 
 import { NextResponse } from 'next/server';

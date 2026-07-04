@@ -333,7 +333,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
 
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
-        const subscriptionId = invoice.subscription as string;
+        const subscriptionId = (invoice as any).subscription as string;
         if (!subscriptionId) break;
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         if (subscription.metadata?.program !== 'cosmetology-apprenticeship') break;
@@ -439,4 +439,4 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
   return NextResponse.json({ received: true });
 }
 
-export const POST = withRuntime(withApiAudit(_POST, 'cosmetology_webhook'));
+export const POST = withRuntime(withApiAudit('/api/cosmetology/webhook', _POST, { actor_type: 'webhook', actor_id: 'stripe' }));

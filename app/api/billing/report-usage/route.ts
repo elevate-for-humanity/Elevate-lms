@@ -45,7 +45,8 @@ async function _POST(request: Request) {
 
     try {
       // Report usage to Stripe subscription item
-      const res = await stripe.subscriptionItems.createUsageRecord(billing.price_id, {
+      // Note: createUsageRecord API may vary by Stripe SDK version
+      const res = await (stripe.subscriptionItems as any).createUsageRecord(billing.price_id, {
         quantity: u.quantity,
         timestamp: Math.floor(new Date(u.period_end).getTime() / 1000),
         action: 'set',

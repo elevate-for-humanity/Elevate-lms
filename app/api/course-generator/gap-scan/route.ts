@@ -9,7 +9,6 @@ import { db } from '@/lib/db';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { scanAllGaps, createDraftJobsFromGaps, type CourseGap } from '@/lib/ai/course-gap-detection';
@@ -54,14 +53,6 @@ export async function POST(req: NextRequest) {
 
       const jobIds = await createDraftJobsFromGaps(gaps as any);
 
-      await withApiAudit({
-        userId: user.id,
-        tenantId: profile.tenant_id,
-        action: 'course_gap_drafts_generated',
-        resourceType: 'course_generation_jobs',
-        details: { gap_count: gaps.length, job_ids: jobIds },
-      });
-
       return NextResponse.json({
         success: true,
         message: `Created ${jobIds.length} draft course generation jobs`,
@@ -71,20 +62,6 @@ export async function POST(req: NextRequest) {
 
     // Default: run the scan
     const scanResult = await scanAllGaps();
-
-    await withApiAudit({
-      userId: user.id,
-      tenantId: profile.tenant_id,
-      action: 'course_gap_scan_completed',
-      resourceType: 'gap_scan',
-      details: {
-        total_gaps: scanResult.total_gaps,
-        critical: scanResult.critical_gaps,
-        high: scanResult.high_gaps,
-        medium: scanResult.medium_gaps,
-        low: scanResult.low_gaps,
-      },
-    });
 
     return NextResponse.json({
       success: true,

@@ -382,8 +382,8 @@ function findNextLesson(
   modules: BlueprintModule[],
   completedLessons: LessonProgress[]
 ): { slug: string; title: string; moduleSlug: string; estimatedMinutes: number } | undefined {
-  for (const module of modules) {
-    for (const lesson of module.lessons || []) {
+  for (const mod of modules) {
+    for (const lesson of mod.lessons || []) {
       const completed = completedLessons.find(l => l.lessonSlug === lesson.slug);
       if (!completed?.completed) {
         return {

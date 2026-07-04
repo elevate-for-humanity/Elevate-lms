@@ -342,10 +342,10 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
     let currentStep = 0;
 
     // Generate modules and lessons
-    for (const module of outline.modules || []) {
+    for (const mod of outline.modules || []) {
       currentStep++;
       const progress = 10 + Math.floor((currentStep / totalSteps) * 80);
-      await updateJobProgress(jobId, 'generating', `Generating module: ${module.title}`, progress);
+      await updateJobProgress(jobId, 'generating', `Generating module: ${mod.title}`, progress);
 
       // Create module record
       const { data: moduleRecord, error: moduleError } = await supabase
@@ -353,10 +353,10 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
         .insert({
           course_id: course.id,
           job_id: jobId,
-          sort_order: outline.modules.indexOf(module) + 1,
-          title: module.title,
+          sort_order: outline.modules.indexOf(mod) + 1,
+          title: mod.title,
           description: module.description,
-          objectives: module.objectives || [],
+          objectives: mod.objectives || [],
           estimated_hours: Math.ceil((job.target_hours || 40) / totalModules),
         })
         .select()
@@ -365,10 +365,10 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
       if (moduleError) throw moduleError;
 
       // Generate lessons for this module
-      for (let lessonNum = 1; lessonNum <= (module.lessons || lessonsPerModule); lessonNum++) {
+      for (let lessonNum = 1; lessonNum <= (mod.lessons || lessonsPerModule); lessonNum++) {
         currentStep++;
         const progress = 10 + Math.floor((currentStep / totalSteps) * 80);
-        const lessonTitle = `Lesson ${lessonNum}: ${module.title} - Part ${lessonNum}`;
+        const lessonTitle = `Lesson ${lessonNum}: ${mod.title} - Part ${lessonNum}`;
         await updateJobProgress(jobId, 'generating', `Generating lesson: ${lessonTitle}`, progress);
 
         // Generate lesson content
@@ -376,7 +376,7 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
           job,
           lessonTitle,
           lessonNum,
-          module.title
+          mod.title
         );
 
         // Save lesson

@@ -117,7 +117,7 @@ function buildCompetencyTree(
     progressData.map(p => [p.competency_key as string, p])
   );
   
-  for (const module of blueprint.modules) {
+  for (const mod of blueprint.modules) {
     for (const comp of module.competencies || []) {
       if (!competencyMap.has(comp.competencyKey)) {
         const stored = progressMap.get(comp.competencyKey);

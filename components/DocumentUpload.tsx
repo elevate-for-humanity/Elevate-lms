@@ -50,7 +50,7 @@ export default function DocumentUpload({
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const validateFile = (file: File): string | null => {
+  const validateFile = useCallback((file: File): string | null => {
     // Check file size
     const fileSizeMB = file.size / (1024 * 1024);
     if (fileSizeMB > maxSize) {
@@ -69,7 +69,7 @@ export default function DocumentUpload({
     }
 
     return null;
-  };
+  }, [maxSize, acceptedTypes, maxFiles, files.length]);
 
   const simulateUpload = (fileId: string) => {
     let progress = 0;
@@ -124,9 +124,9 @@ export default function DocumentUpload({
         setFiles((prev) => [...prev, uploadedFile]);
         simulateUpload(uploadedFile.id);
       });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [files.length, maxFiles, maxSize, acceptedTypes],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [files.length, maxFiles, maxSize, acceptedTypes, validateFile],
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {

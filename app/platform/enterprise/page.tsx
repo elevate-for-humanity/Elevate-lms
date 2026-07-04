@@ -60,7 +60,7 @@ export default async function EnterprisePage() {
     <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: 'Platform', href: '/platform' }, { label: 'Enterprise Access' }]} />
       <div className="max-w-7xl mx-auto px-4 pb-2">
-        <p className="text-sm text-slate-600 font-medium">Part of the <a href="/platform" className="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p>
+        <p className="text-sm text-slate-600 font-medium">Part of the <Link href="/platform" className="text-brand-red-600 hover:underline">Elevate Workforce Operating System</Link></p>
       </div>
 
       {/* Hero */}

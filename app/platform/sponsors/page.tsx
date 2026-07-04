@@ -51,7 +51,7 @@ export default async function SponsorLicensingPage() {
     <div className="bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Platform", href: "/platform" }, { label: "Sponsors" }]} />
-        <p className="text-sm text-slate-600 mt-1">Part of the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>. <a href="/store/licensing" className="hover:underline">View pricing →</a></p>
+        <p className="text-sm text-slate-600 mt-1">Part of the <Link href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</Link>. <Link href="/store/licensing" className="hover:underline">View pricing →</Link></p>
       </div>
 {/* Hero Banner */}
       <ModernLandingHero

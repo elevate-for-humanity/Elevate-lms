@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { TrendingUp, ArrowRight } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -40,9 +41,9 @@ export default function PathwaysPage() {
           </div>
           
           <div className="mt-12 text-center">
-            <a href="/programs" className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-medium hover:bg-blue-700">
+            <Link href="/programs" className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-medium hover:bg-blue-700">
               Explore Programs <ArrowRight className="w-4 h-4" />
-            </a>
+            </Link>
           </div>
         </div>
       </section>

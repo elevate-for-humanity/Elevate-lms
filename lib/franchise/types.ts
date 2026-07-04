@@ -15,3 +15,13 @@ export interface CreateOfficeInput {
   address?: string;
   owner_id?: string;
 }
+
+export interface CreatePreparerInput {
+  name: string;
+  email: string;
+}
+
+export interface EROConfig {
+  ero_preparer_id?: string;
+  [key: string]: unknown;
+}

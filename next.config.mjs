@@ -139,15 +139,16 @@ const nextConfig = {
 
   allowedDevOrigins: ['localhost'],
 
+  modularizeImports: {
+    // Split lucide icons into individual imports for better tree-shaking
+    '^lucide-react$': {
+      transform: 'lucide-react/dist/esm/icons/{{member}}',
+      skipDefaultConversion: true,
+    },
+  },
+
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', '@radix-ui/react-'],
-    modularizeImports: {
-      // Split lucide icons into individual imports for better tree-shaking
-      '^lucide-react$': {
-        transform: 'lucide-react/dist/esm/icons/{{member}}',
-        skipDefaultConversion: true,
-      },
-    },
     serverActions: {
       allowedOrigins: [
         'www.elevateforhumanity.org',

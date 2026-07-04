@@ -576,12 +576,12 @@ export const NAV_ITEMS: NavItem[] = [
 export function collectNavHrefOwners(items: NavItem[] = NAV_ITEMS): Map<string, string> {
   const owners = new Map<string, string>();
   for (const item of items) {
-    if (item.href) {
+    if (item && item.href) {
       const key = item.href.split('?')[0];
       if (!owners.has(key)) owners.set(key, item.name);
     }
-    for (const sub of item.subItems ?? []) {
-      if (sub.isHeader) continue;
+    for (const sub of item?.subItems ?? []) {
+      if (!sub || sub.isHeader || !sub.href) continue;
       const key = sub.href.split('?')[0];
       const existing = owners.get(key);
       if (existing && existing !== item.name) {
@@ -619,14 +619,16 @@ export function getNavCategoryLabel(column: NavSubItem[]): string {
 export function findDuplicateNavHrefs(items: NavItem[] = NAV_ITEMS): { href: string; owners: string }[] {
   const count = new Map<string, Set<string>>();
   for (const item of items) {
+    if (!item) continue;
     const add = (href: string) => {
+      if (!href) return;
       const key = href.split('?')[0];
       if (!count.has(key)) count.set(key, new Set());
       count.get(key)!.add(item.name);
     };
     if (item.href) add(item.href);
     for (const sub of item.subItems ?? []) {
-      if (!sub.isHeader) add(sub.href);
+      if (sub && !sub.isHeader && sub.href) add(sub.href);
     }
   }
   return [...count.entries()]

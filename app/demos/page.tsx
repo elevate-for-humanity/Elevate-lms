@@ -1,17 +1,24 @@
 import { Metadata } from 'next';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Demos | Elevate for Humanity',
-  robots: { index: false, follow: false },
+  title: `Demos | ${PLATFORM_DEFAULTS.orgName}`,
+  description: `Demos page.`,
 };
 
 export default function DemosPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Demos</h1>
-        <p className="text-gray-600">This page is under construction.</p>
-      </div>
+    <div className="min-h-screen bg-slate-50">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Demos</h1>
+        </div>
+      </section>
+      <section className="py-16 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-slate-600">This page is under development.</p>
+        </div>
+      </section>
     </div>
   );
 }

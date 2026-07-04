@@ -1,4 +1,6 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -10,11 +12,6 @@ const AIChat = dynamic(() => import('@/components/studio/AIChat').then(m => ({ d
     </div>
   ),
 });
-
-export const metadata: Metadata = {
-  title: `AI Career Assistant | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Get personalized career guidance from our AI assistant.',
-};
 
 export default function AIChatPage() {
   return (

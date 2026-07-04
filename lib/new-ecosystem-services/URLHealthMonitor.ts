@@ -508,6 +508,13 @@ export class URLHealthMonitor {
       });
     }
   }
+
+  async run(urls?: string[]): Promise<any> {
+    if (urls && urls.length > 0) {
+      return await this.checkMultipleURLs(urls);
+    }
+    return { success: true, checked: 0 };
+  }
 }
 
 export default URLHealthMonitor;

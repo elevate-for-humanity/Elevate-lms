@@ -21,7 +21,7 @@ async function _POST(request: NextRequest) {
     if (adminCheck) return adminCheck;
 
     const body = await request.json();
-    const monitor = new URLHealthMonitor();
+    const monitor = URLHealthMonitor.getInstance();
     const result = await monitor.run(body);
     return NextResponse.json({ success: true, result });
   } catch (error) {

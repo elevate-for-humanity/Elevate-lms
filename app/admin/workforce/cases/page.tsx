@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { Case, Search, Plus, Filter, AlertCircle } from 'lucide-react';
+import { Briefcase, Search, Plus, Filter, AlertCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Cases | Workforce | Admin | Elevate For Humanity',

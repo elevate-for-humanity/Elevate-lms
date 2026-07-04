@@ -210,7 +210,7 @@ export default async function OperationsPage() {
               status: alertHealth,
               value: `${openAlertsCount} open · ${criticalCount} critical/high`,
             },
-          ].map((s) => (
+          ].map((s: { label: string; status: 'ok' | 'warn' | 'fail'; value: string }) => (
             <div key={s.label} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="mb-2 flex items-center gap-2">
                 <StatusDot status={s.status} />

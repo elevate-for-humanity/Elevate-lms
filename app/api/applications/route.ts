@@ -102,7 +102,7 @@ async function claimIdempotencyKey(
 
   try {
     const setResult = await redis.set(key, value, { nx: true, ex: ttlSeconds });
-    const claimed = setResult === 'OK' || setResult === 1 || setResult === true;
+    const claimed = String(setResult) === 'OK' || setResult === 1 || setResult === true;
     if (claimed) {
       return { duplicate: false, samePayload: false };
     }

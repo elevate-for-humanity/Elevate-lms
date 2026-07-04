@@ -17,8 +17,12 @@ export interface CreateOfficeInput {
 }
 
 export interface CreatePreparerInput {
-  name: string;
-  email: string;
+  name?: string;
+  email?: string;
+  office_id?: string;
+  ptin?: string;
+  first_name?: string;
+  last_name?: string;
 }
 
 export interface EROConfig {

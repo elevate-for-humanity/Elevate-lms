@@ -61,7 +61,7 @@ export const preparerService = {
     if (error) throw error;
     return data;
   },
-  getPreparerStats: async (preparerId: string): Promise<PreparerStats> => {
+  getPreparerStats: async (preparerId: string, _taxYear?: number): Promise<PreparerStats> => {
     return { total_returns: 0, completed_returns: 0, pending_returns: 0 };
   },
 };

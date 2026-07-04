@@ -48,8 +48,7 @@ async function _GET(request: NextRequest) {
 
       if (preparer) {
         const result = await returnService.getPreparerReturns(preparer.id, {
-          taxYear,
-          status,
+          taxYear: taxYear?.toString(),
           limit,
           offset
         });
@@ -102,7 +101,7 @@ async function _GET(request: NextRequest) {
 
     if (officeId) {
       const result = await returnService.getOfficeReturns(officeId, {
-        taxYear,
+        taxYear: taxYear?.toString(),
         status,
         limit,
         offset
@@ -112,8 +111,7 @@ async function _GET(request: NextRequest) {
 
     if (preparerId) {
       const result = await returnService.getPreparerReturns(preparerId, {
-        taxYear,
-        status,
+        taxYear: taxYear?.toString(),
         limit,
         offset
       });
@@ -195,11 +193,10 @@ async function _POST(request: NextRequest) {
     }
 
     const result = await returnService.createReturn({
-      officeId: body.officeId,
-      preparerId: body.preparerId,
-      clientId: body.clientId,
-      taxReturn: body.taxReturn,
-      clientFee: body.clientFee
+      office_id: body.officeId,
+      preparer_id: body.preparerId,
+      taxYear: body.taxYear,
+      status: 'pending'
     });
 
     return NextResponse.json(result, { status: 201 });

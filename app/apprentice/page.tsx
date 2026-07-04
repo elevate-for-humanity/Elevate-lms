@@ -191,6 +191,10 @@ export default async function ApprenticePortalPage() {
     description: 'Finish your apprenticeship orientation module'
   };
 
+  const programName = 'Indiana Barber Apprenticeship';
+  const programLevel = 'Year 1 Apprentice';
+  const instructorName = 'Assigned Mentor';
+
   const upcomingTasks = [
     { id: 1, title: 'Watch RTI Module 5', due: 'Today', type: 'video' },
     { id: 2, title: 'Log 4 hours at shop', due: 'Tomorrow', type: 'hours' },

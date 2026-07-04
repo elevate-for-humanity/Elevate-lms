@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
-import BillingCard, { type BillingSummary } from '@/components/learner/BillingCard';
+import BillingCard, { type BillingSummary, BillingFallback } from '@/components/learner/BillingCard';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 import { APPRENTICE_PORTAL_CONFIGS } from '@/components/portal/ApprenticePortalShell';
 import { AlertTriangle, ArrowLeft, CreditCard, DollarSign, ChevronRight } from 'lucide-react';

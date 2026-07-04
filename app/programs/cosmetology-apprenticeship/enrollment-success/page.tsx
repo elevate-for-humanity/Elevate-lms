@@ -27,7 +27,7 @@ export default async function EnrollmentSuccessPage() {
     .select('id, enrolled_at, status, program_id, user_id, programs(name, slug)')
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false })
-    .maybeSingle();
+    .maybeSingle() as { data: { programs: { name: string; slug: string } | null } | null };
 
   // Fall back to checking by email for public-checkout users
   if (!enrollment) {
@@ -37,7 +37,7 @@ export default async function EnrollmentSuccessPage() {
       .eq('email', user.email || '')
       .order('enrolled_at', { ascending: false })
       .maybeSingle();
-    enrollment = byEmail;
+    enrollment = byEmail as typeof enrollment;
   }
 
   const programName = enrollment?.programs?.name || 'Cosmetology Apprenticeship';

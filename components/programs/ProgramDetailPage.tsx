@@ -1,4 +1,4 @@
-'use client';
+
 
 /**
  * ProgramDetailPage — Institutional Program Detail Template v1

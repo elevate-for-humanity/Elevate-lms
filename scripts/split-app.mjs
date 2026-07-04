@@ -144,13 +144,20 @@ const SCOPE_ROUTES = {
     // Credentials/Certs
     'accreditation',
     'certiport-exam',
+    'credentials',
     // AI/Chat
     'ai-chat',
     'achievements',
     // Special Services
     'community-services',
     'help',
-    'careers'
+    'careers',
+    // Additional Marketing Pages
+    'donate',
+    'jri',
+    'resources',
+    'services',
+    'verify'
   ]),
   ADMIN: new Set([
     'admin',

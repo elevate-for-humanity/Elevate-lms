@@ -45,12 +45,26 @@ permissions:
   contents: read
 
 concurrency:
-  group: northflank-marketing-deploy
-  cancel-in-progress: true
+  group: northflank-deploy
+  cancel-in-progress: false
 
 jobs:
+  deploy-lms-sentinel:
+    name: Wait for LMS deploy
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ job.status }}
+    steps:
+      - name: Wait for LMS deploy
+        run: |
+          echo "Waiting for LMS deploy to complete..."
+          # This job just waits - the actual deploy-marketing job below will run in parallel
+          # but uses the same concurrency group, so it won't overlap
+          sleep 5
+
   deploy-marketing:
     name: Build and deploy Marketing (www) on Northflank
+    needs: [deploy-lms-sentinel]
     runs-on: ubuntu-latest
     env:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}

@@ -49,7 +49,7 @@ export default async function ProgramHolderLicensePage() {
     <div className="bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Platform", href: "/platform" }, { label: "Program Holders" }]} />
-        <p className="text-sm text-slate-600 mt-1">Part of the <Link href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</Link>. <a href="/store/licensing" className="hover:underline">View pricing →</Link></p>
+        <p className="text-sm text-slate-600 mt-1">Part of the <Link href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</Link>. <a href="/store/licensing" className="hover:underline">View pricing →</a></p>
       </div>
 {/* Hero */}
       <section className="bg-zinc-900    text-white py-20">
@@ -123,7 +123,7 @@ export default async function ProgramHolderLicensePage() {
                       className="text-brand-blue-600 hover:underline text-xs"
                     >
                       Verify on apprenticeship.gov →
-                    </Link>
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">

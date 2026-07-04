@@ -13,6 +13,7 @@ import EnrollmentPipeline from '@/components/programs/EnrollmentPipeline';
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import ProgramApplyForm from '@/components/programs/ProgramApplyForm';
@@ -143,6 +144,7 @@ export default function ProgramDetailPage({
   ];
 
   return (
+    <ErrorBoundary title="Program Content Error" backHref={`/programs/${p.slug}`}>
     <div className="min-h-screen bg-white">
       {/* A. HERO */}
       <section>
@@ -1098,6 +1100,7 @@ export default function ProgramDetailPage({
 
       <CredentialAuthorityFootnote />
     </div>
+    </ErrorBoundary>
   );
 }
 

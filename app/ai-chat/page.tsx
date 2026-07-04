@@ -1,16 +1,25 @@
 import { Metadata } from 'next';
+import dynamic from 'next/dynamic';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+const AIChat = dynamic(() => import('@/components/studio/AIChat').then(m => ({ default: m.AIChat })), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="text-white">Loading AI Assistant...</div>
+    </div>
+  ),
+});
 
 export const metadata: Metadata = {
-  title: 'Ai Chat | Elevate for Humanity',
+  title: `AI Career Assistant | ${PLATFORM_DEFAULTS.orgName}`,
+  description: 'Get personalized career guidance from our AI assistant.',
 };
 
-export default function Page() {
+export default function AIChatPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Ai Chat</h1>
-        <p className="text-gray-600">This page is under construction.</p>
-      </div>
+    <div className="min-h-screen bg-slate-900">
+      <AIChat />
     </div>
   );
 }

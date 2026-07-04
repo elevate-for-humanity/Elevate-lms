@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const DevStudioMobileShell = dynamic(
   () => import('@/components/studio/DevStudioMobileShell'),
-  { ssr: false, loading: () => <DevStudioLoading /> }
+  { ssr: false }
 );
 
 function DevStudioLoading() {
@@ -33,7 +33,6 @@ export default function DevStudioPage() {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       setUser(authUser);
 
-      // Fetch system health
       try {
         const res = await fetch('/api/health');
         if (res.ok) {
@@ -42,29 +41,31 @@ export default function DevStudioPage() {
       } catch (err) {
         console.error('Health check failed:', err);
       }
-      
+
       setLoading(false);
     }
     loadData();
   }, []);
 
-  if (loading) {
-    return <DevStudioLoading />;
-  }
-
   return (
-    <DevStudioMobileShell
-      isSuperAdmin={true}
-      health={health}
-      previewUrl={previewUrl}
-      livePreviewUrl={previewUrl}
-      onPreviewUrlChange={setPreviewUrl}
-      onPreviewGo={() => window.open(previewUrl, '_blank')}
-      workflowButtons={[
-        { key: 'build', label: 'Build', description: 'Run production build' },
-        { key: 'deploy', label: 'Deploy', description: 'Deploy to staging' },
-        { key: 'test', label: 'Test', description: 'Run test suite' },
-      ]}
-    />
+    <Suspense fallback={<DevStudioLoading />}>
+      {loading ? (
+        <DevStudioLoading />
+      ) : (
+        <DevStudioMobileShell
+          isSuperAdmin={true}
+          health={health}
+          previewUrl={previewUrl}
+          livePreviewUrl={previewUrl}
+          onPreviewUrlChange={setPreviewUrl}
+          onPreviewGo={() => window.open(previewUrl, '_blank')}
+          workflowButtons={[
+            { key: 'build', label: 'Build', description: 'Run production build' },
+            { key: 'deploy', label: 'Deploy', description: 'Deploy to staging' },
+            { key: 'test', label: 'Test', description: 'Run test suite' },
+          ]}
+        />
+      )}
+    </Suspense>
   );
 }

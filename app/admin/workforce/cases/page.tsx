@@ -110,7 +110,7 @@ export default async function CasesPage() {
             ) : (
               <tr>
                 <td colSpan={6} className="px-4 py-12 text-center text-gray-500">
-                  <Case className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                   <p>No cases found</p>
                 </td>
               </tr>

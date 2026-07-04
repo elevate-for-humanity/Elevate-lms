@@ -42,7 +42,7 @@ function formatRelative(iso: string) {
 
 // ─── Service card ─────────────────────────────────────────────────────────────
 
-const SERVICE_ICONS: Record<string, React.ElementType> = {
+const SERVICE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Database: Database,
   Redis:    Zap,
   Stripe:   Shield,

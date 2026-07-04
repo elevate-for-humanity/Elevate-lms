@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
             recurring: { interval: 'week', interval_count: 1 },
           },
         },
-      ],
+      ] as unknown as Parameters<typeof stripe.subscriptions.create>[0]['items'],
       metadata: {
         user_id: user.id,
         program: 'barber-apprenticeship',

@@ -6,10 +6,10 @@ import { safeInternalError } from '@/lib/api/safe-error';
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { withErrorHandling, APIErrors, ErrorCode } from '@/lib/api';
+import { withErrorHandling, APIErrors } from '@/lib/api';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { APIError } from '@/lib/api/api-error';
+import { APIError, ErrorCode } from '@/lib/api/api-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { validatePassword } from '@/lib/auth/password-validation';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

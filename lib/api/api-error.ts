@@ -1,5 +1,8 @@
 import { ErrorCode, getErrorMessage } from './error-codes';
 
+// Re-export ErrorCode for convenience
+export { ErrorCode };
+
 /**
  * Custom API Error class with error codes
  */

@@ -542,12 +542,12 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
             id: mergedProgram.slug,
             name: mergedProgram.title,
             slug: mergedProgram.slug,
-            description: mergedProgram.subtitle,
+            description: mergedProgram.subtitle ?? '',
             duration_weeks: mergedProgram.durationWeeks,
-            price: parseInt(mergedProgram.selfPayCost.replace(/[^0-9]/g, ''), 10),
+            price: parseInt((mergedProgram.selfPayCost ?? '$0').replace(/[^0-9]/g, ''), 10),
             image_url: mergedProgram.heroImage,
             category: mergedProgram.category,
-            outcomes: mergedProgram.outcomes.map((o) => o.statement),
+            outcomes: (mergedProgram.outcomes ?? []).map((o) => o.statement),
           }}
         />
         <ProgramDetailPageComponent program={mergedProgram} banner={banner} heroPosterSrc={heroPosterSrc} />

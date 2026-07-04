@@ -18,7 +18,7 @@ export function CourseStructuredData({ course }: CourseStructuredDataProps) {
     '@context': 'https://schema.org',
     '@type': 'Course',
     '@id': `${siteConfig.url}/courses/${course.id}`,
-    name: course.course_name,
+    name: course.title,
     description: course.description,
     provider: {
       '@type': 'Organization',

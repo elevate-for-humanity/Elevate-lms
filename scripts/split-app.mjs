@@ -107,7 +107,50 @@ const SCOPE_ROUTES = {
     'health',
     'testing',
     'certificates',
-    'videos'
+    'videos',
+    // Public Marketing
+    'blog',
+    'press',
+    'site-map',
+    'faq',
+    'funding',
+    'accessibility',
+    // Lead Gen Pages
+    'career-training',
+    'success-stories',
+    'cna-waitlist',
+    'hire-graduates',
+    'start',
+    'check-eligibility',
+    'partnerships',
+    'how-it-works',
+    'pathways',
+    // Core Pages
+    'booking',
+    'jobs',
+    'search',
+    'calendar',
+    'schedule',
+    'pay',
+    // Special Programs
+    'workforce-board',
+    'find-workone',
+    'barber-and-beauty-apprenticeships',
+    'education',
+    // Store/Products
+    'for-students',
+    'for-employers',
+    'for-providers',
+    // Credentials/Certs
+    'accreditation',
+    'certiport-exam',
+    // AI/Chat
+    'ai-chat',
+    'achievements',
+    // Special Services
+    'community-services',
+    'help',
+    'careers'
   ]),
   ADMIN: new Set([
     'admin',

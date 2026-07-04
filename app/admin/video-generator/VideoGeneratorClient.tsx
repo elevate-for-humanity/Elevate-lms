@@ -7,6 +7,10 @@ import { Video, Play, Loader2, XCircle, RefreshCw } from 'lucide-react';
 interface GenerationStatus {
   total: number;
   withVideos: number;
+  // Legacy/compatibility fields from older API responses:
+  // - withoutVideos: prior single pending-count field
+  // - withoutMedia + withMp3Only: split pending counts
+  // Canonical field is `needsGeneration`.
   withoutVideos?: number;
   withoutMedia?: number;
   withMp3Only?: number;
@@ -27,6 +31,9 @@ export default function VideoGeneratorPage() {
   const [results, setResults] = useState<GenerationResult[]>([]);
   const [batchSize, setBatchSize] = useState(5);
   const [error, setError] = useState<string | null>(null);
+  // Compatibility fallback order: newest canonical `needsGeneration` →
+  // legacy `withoutVideos` → derived sum from split legacy counters.
+  // `0` is valid, so we intentionally use `??` (not `||`).
   const pendingLessons =
     status?.needsGeneration ??
     status?.withoutVideos ??
@@ -37,7 +44,7 @@ export default function VideoGeneratorPage() {
       const res = await fetch('/api/admin/generate-lesson-videos');
       const data = await res.json();
       setStatus(data);
-    } catch {
+    } catch (err) {
       setError('Failed to fetch status');
     }
   };
@@ -65,8 +72,8 @@ export default function VideoGeneratorPage() {
       }
 
       setResults(data.results || []);
-      fetchStatus();
-    } catch {
+      fetchStatus(); // Refresh status
+    } catch (err) {
       setError('An error occurred');
     } finally {
       setGenerating(false);
@@ -77,10 +84,12 @@ export default function VideoGeneratorPage() {
     setGenerating(true);
     setError(null);
 
+    // Generate in batches until done
     let totalGenerated = 0;
     let hasMore = true;
 
     while (hasMore && totalGenerated < 100) {
+      // Safety limit
       try {
         const res = await fetch('/api/admin/generate-lesson-videos', {
           method: 'POST',
@@ -97,7 +106,7 @@ export default function VideoGeneratorPage() {
 
         fetchStatus();
         await new Promise((r) => setTimeout(r, 1000));
-      } catch {
+      } catch (err) {
         setError('Batch generation failed');
         hasMore = false;
       }
@@ -108,6 +117,7 @@ export default function VideoGeneratorPage() {
 
   return (
     <div className="min-h-screen bg-white p-8">
+      {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Video Generator' }]} />
       </div>
@@ -118,6 +128,7 @@ export default function VideoGeneratorPage() {
             <h1 className="text-2xl font-bold">Lesson Video Generator</h1>
           </div>
 
+          {/* Status */}
           {status && (
             <div className="grid grid-cols-4 gap-4 mb-6">
               <div className="bg-slate-50 rounded-lg p-4 text-center">
@@ -141,6 +152,7 @@ export default function VideoGeneratorPage() {
             </div>
           )}
 
+          {/* Progress Bar */}
           {status && (
             <div className="mb-6">
               <div className="h-4 bg-slate-200 rounded-full overflow-hidden">
@@ -152,6 +164,7 @@ export default function VideoGeneratorPage() {
             </div>
           )}
 
+          {/* Controls */}
           <div className="flex items-center gap-4 mb-6">
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium">Batch Size:</label>
@@ -204,12 +217,14 @@ export default function VideoGeneratorPage() {
             </button>
           </div>
 
+          {/* Error */}
           {error && (
             <div className="bg-brand-red-50 border border-brand-red-200 text-brand-red-700 px-4 py-3 rounded-lg mb-6">
               {error}
             </div>
           )}
 
+          {/* Results */}
           {results.length > 0 && (
             <div className="border rounded-lg overflow-hidden">
               <div className="bg-slate-50 px-4 py-2 font-medium border-b">Generation Results</div>
@@ -243,6 +258,7 @@ export default function VideoGeneratorPage() {
           )}
         </div>
 
+        {/* Instructions */}
         <div className="bg-white rounded-xl shadow-sm border p-6">
           <h2 className="text-lg font-bold mb-4">How It Works</h2>
           <ol className="list-decimal list-inside space-y-2 text-slate-700">

@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 const WARN_DAYS = 14;
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export const GET = withRuntime({ cron: 'bearer' }, async () => {
+export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
   const db = await requireAdminClient();
   const now = new Date();
   const warnCutoff = new Date(now.getTime() + WARN_DAYS * 86400000).toISOString();

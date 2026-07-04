@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 
 const BATCH_SIZE = 20;
 
-export const GET = withRuntime({ cron: 'bearer' }, async () => {
+export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
   const db = await requireAdminClient();
 
   // Find published knowledge docs that have no embedding yet

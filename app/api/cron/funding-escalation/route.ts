@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 const ESCALATE_DAYS = 7;
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export const GET = withRuntime({ cron: 'bearer' }, async () => {
+export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
   const db = await requireAdminClient();
   const cutoff = new Date(Date.now() - ESCALATE_DAYS * 86400000).toISOString();
 

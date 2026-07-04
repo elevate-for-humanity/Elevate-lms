@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 const PENDING_DAYS_THRESHOLD = 3;
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export const GET = withRuntime({ cron: 'bearer' }, async () => {
+export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
   const db = await requireAdminClient();
   const cutoff = new Date(Date.now() - PENDING_DAYS_THRESHOLD * 24 * 60 * 60 * 1000).toISOString();
 
@@ -43,14 +43,14 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     const email = profile?.email;
     const daysPending = Math.floor((Date.now() - new Date(row.created_at).getTime()) / 86400000);
 
-    await db.from('notifications').insert({
+    db.from('notifications').insert({
       user_id: row.student_id,
       type: 'system',
       title: 'Funding approval pending',
       message: `Your ${source?.name ?? 'funding'} application has been pending for ${daysPending} days. Our team is following up.`,
       read: false,
       idempotency_key: `funding-followup-${row.id}-${new Date().toISOString().split('T')[0]}`,
-    }).then(() => {}, () => {}).catch((e: unknown) => logger.warn('[cron/funding-followup] Notification insert failed', { error: String(e) }));
+    }).then(() => {}, () => {});
 
     if (email) {
       await sendEmail({

@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 
 const VIOLATION_ALERT_THRESHOLD = 5;
 
-export const GET = withRuntime({ cron: 'bearer' }, async () => {
+export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
   const db = await requireAdminClient();
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 

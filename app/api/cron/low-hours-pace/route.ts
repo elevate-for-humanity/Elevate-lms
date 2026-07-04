@@ -138,7 +138,7 @@ export const GET = withRuntime({ cron: true }, async () => {
         weekly_hours_needed: weeklyNeeded,
       },
       created_at: new Date().toISOString(),
-    }).catch((err: any) => logger.warn('[low-hours-pace] alert insert failed', { err }));
+    }).then(() => {}, () => {});
 
     // Email student
     if (profile?.email) {

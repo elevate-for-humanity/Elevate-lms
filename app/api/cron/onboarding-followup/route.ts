@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 const STALE_HOURS = 48;
 
-export const GET = withRuntime({ cron: 'bearer' }, async () => {
+export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
   const db = await requireAdminClient();
   const cutoff = new Date(Date.now() - STALE_HOURS * 3600000).toISOString();
   const today = new Date().toISOString().split('T')[0];

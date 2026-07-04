@@ -6,11 +6,14 @@ export interface TaxReturn {
   officeId?: string;
   preparerId?: string;
   taxYear?: string;
+  taxReturn?: Partial<TaxReturn>;
+  clientFee?: number;
+  [key: string]: unknown;
 }
 
 export const returnService = {
   submitReturn: async () => null,
-  getPreparerReturns: async (preparerId: string, _options?: { limit?: number; taxYear?: string }) => [] as TaxReturn[],
-  getOfficeReturns: async (officeId: string, _options?: { status?: string; taxYear?: string }) => [] as TaxReturn[],
+  getPreparerReturns: async (preparerId: string, options?: { taxYear?: string; status?: string; limit?: number; offset?: number }) => [] as TaxReturn[],
+  getOfficeReturns: async (officeId: string, options?: { status?: string; taxYear?: string; limit?: number; offset?: number }) => [] as TaxReturn[],
   createReturn: async (data: Partial<TaxReturn>) => null as TaxReturn | null,
 };

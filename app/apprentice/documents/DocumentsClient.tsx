@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import {
   FileText,
@@ -82,7 +82,7 @@ export default function DocumentsClient() {
   // Delete state
   const [deleting, setDeleting] = useState<Record<string, boolean>>({});
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -107,11 +107,11 @@ export default function DocumentsClient() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [programSlug, setLoading, setError, setDocTypes, setUploaded, setProgramSlug]);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   // Map uploaded docs by document_type for quick lookup
   const uploadedByType: Record<string, UploadedDoc> = {};

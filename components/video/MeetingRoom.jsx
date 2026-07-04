@@ -117,6 +117,7 @@ export function MeetingRoom({ meetingCode, userName, isModerator = false, onLeav
         api.dispose();
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [meetingCode, userName, onLeave]);
   const handleStartRecording = () => {
     if (api && isModerator) {

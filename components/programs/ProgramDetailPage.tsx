@@ -42,7 +42,7 @@ import { DeliveryBadge, FundingSection } from './ProgramTruthBadges';
 import ProgramFundingProcessSection from './ProgramFundingProcessSection';
 import { resolveProgramFundingStatus } from '@/lib/programs/funding-visibility';
 import { ICC_URL, ICC_INSTRUCTION, hero as heroTokens } from '@/lib/page-design-tokens';
-import { DEFAULT_HERO_VIDEO, resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
+import { DEFAULT_HERO_VIDEO } from '@/lib/images/hero-banner-media';
 import { formatDeliveryDisclosure } from '@/lib/programs/program-schema';
 import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
 import ProgramAtAGlance from '@/components/programs/ProgramAtAGlance';
@@ -69,6 +69,8 @@ interface Props {
   program: ProgramSchema;
   /** Banner data passed from the server page — bypasses client-side JSON cache limitation. */
   banner?: HeroBannerConfig | null;
+  /** Pre-resolved hero poster image URL from server -- do NOT call resolveSiteImagePath here (uses 'fs'). */
+  heroPosterSrc?: string;
   /** Replaces the default video/image hero entirely. */
   heroOverride?: React.ReactNode;
   /** Optional alert strip below the hero (e.g. enrollment open banner). */
@@ -81,6 +83,7 @@ interface Props {
 export default function ProgramDetailPage({
   program: p,
   banner: bannerProp,
+  heroPosterSrc: heroPosterSrcProp,
   heroOverride,
   announcement,
   processSlot,
@@ -149,10 +152,6 @@ export default function ProgramDetailPage({
             // heroBanners Proxy returns {} on the client (loadJsonOnce is server-only).
             // Check pageKey to distinguish a real banner from the empty fallback object.
             const banner = bannerProp;
-            const heroPosterSrc = resolveHeroPosterSrc(p.slug, {
-              banner,
-              heroImage: p.heroImage,
-            });
             // Render the video hero only when a real video source is configured.
             // Programs without a dedicated video (e.g. beauty/culinary, which have
             // no beauty video assets) fall through to the still-image hero so they
@@ -178,9 +177,10 @@ export default function ProgramDetailPage({
               );
             }
             // Fallback: picture hero when hero-banners.json has no entry
+            // heroPosterSrcProp is pre-resolved by the server page.tsx
             return (
               <HeroPicture
-                src={heroPosterSrc}
+                src={heroPosterSrcProp ?? ''}
                 alt={p.heroImageAlt ?? p.title}
                 heightStyle={heroTokens.imageWrap}
                 microLabel={p.badge ?? p.category}

@@ -550,7 +550,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
             outcomes: mergedProgram.outcomes.map((o) => o.statement),
           }}
         />
-        <ProgramDetailPageComponent program={mergedProgram} banner={banner} />
+        <ProgramDetailPageComponent program={mergedProgram} banner={banner} heroPosterSrc={heroPosterSrc} />
         {LIVE_JOBS_PROGRAM_SLUGS.has(program) ? (
           <LiveJobPostings
             programSlug={program}

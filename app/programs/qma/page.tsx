@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { QMA } from '@/data/programs/qma';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
 
 export const metadata: Metadata = {
   title: QMA.metaTitle ?? `${QMA.title} | ${PLATFORM_DEFAULTS.orgName}`,
@@ -11,5 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default function QMAPage() {
-  return <ProgramDetailPage program={QMA} />;
+  const heroPosterSrc = resolveHeroPosterSrc(QMA.slug, {
+    heroImage: QMA.heroImage,
+  });
+  return <ProgramDetailPage program={QMA} heroPosterSrc={heroPosterSrc} />;
 }

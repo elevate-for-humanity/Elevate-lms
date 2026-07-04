@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import heroBanners from '@/content/heroBanners';
+import { resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
 
 export function buildProgramMetadata(program: ProgramSchema): Metadata {
   return {
@@ -22,7 +23,16 @@ export function ProgramMarketingPage({
   announcement?: ReactNode;
 }) {
   const banner = heroBanners[program.slug] ?? null;
+  const heroPosterSrc = resolveHeroPosterSrc(program.slug, {
+    banner,
+    heroImage: program.heroImage,
+  });
   return (
-    <ProgramDetailPage program={program} banner={banner} announcement={announcement} />
+    <ProgramDetailPage 
+      program={program} 
+      banner={banner} 
+      heroPosterSrc={heroPosterSrc}
+      announcement={announcement} 
+    />
   );
 }

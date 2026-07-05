@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 import { Metadata } from 'next';
 import { Users, Building, ArrowRight, CheckCircle } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -49,3 +51,4 @@ export default function HireGraduatesPage() {
     </div>
   );
 }
+

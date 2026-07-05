@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 import { Metadata } from 'next';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { TrendingUp, ArrowRight } from 'lucide-react';
@@ -50,3 +51,4 @@ export default function PathwaysPage() {
     </div>
   );
 }
+

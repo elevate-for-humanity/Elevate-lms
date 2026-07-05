@@ -6,7 +6,6 @@ export const metadata: Metadata = {
   description: 'Get in touch with our team',
 };
 
-export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20">
@@ -26,4 +25,8 @@ export default function Page() {
       </section>
     </div>
   );
+}
+
+export default function ContactPage() {
+  return (<ContactPageInner />);
 }

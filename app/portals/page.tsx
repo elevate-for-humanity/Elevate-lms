@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -22,3 +24,4 @@ export default function PortalsPage() {
     </div>
   );
 }
+

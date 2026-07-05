@@ -9,7 +9,7 @@ export const PLUMBING: ProgramSchema = {
   category: 'Plumbing',
   programType: 'workforce',
 
-  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/plumbing-pipes.webp',
+  heroImage: '/images/pages/plumbing-pipes.webp',
   heroImageAlt: 'Plumbing student working on pipe installation',
   videoSrc: '/videos/welding-trades.mp4',
 

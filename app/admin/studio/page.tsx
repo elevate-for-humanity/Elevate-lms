@@ -1,10 +1,9 @@
-'use client';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import type { Metadata } from 'next';
+import StudioClientWrapper from './StudioClientWrapper';
 
-import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import Link from 'next/link';
-import { Skeleton } from '@/components/ui/skeleton';
-import { BookOpen, Plus, Users, FileText } from 'lucide-react';
+export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 interface Course {
   id: string;

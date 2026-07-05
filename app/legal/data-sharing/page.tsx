@@ -20,7 +20,7 @@ export default function DataSharingPage() {
       <DocumentPage
         documentType="Data Sharing Consent"
         title="Data Sharing Consent Form"
-        subtitle="{PLATFORM_DEFAULTS.orgName} Career & Technical Institute"
+        subtitle={`${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`}
         date="2025-01-01"
         version="1.0"
       >
@@ -119,7 +119,7 @@ export default function DataSharingPage() {
           agreementType="data_sharing"
           agreementVersion="1.0"
           buttonLabel="Sign Data Sharing Consent"
-          nextUrl="/student-portal/onboarding"
+          nextUrl="/onboarding/learner"
         />
       </DocumentPage>
     </>

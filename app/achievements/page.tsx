@@ -354,3 +354,4 @@ export default async function AchievementsPage() {
     </div>
   );
 }
+

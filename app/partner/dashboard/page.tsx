@@ -113,3 +113,4 @@ export default async function PartnerDashboardPage() {
   // so partners do not get stuck in a loop with no dashboard context.
   redirect(onboardingPaths.dashboard);
 }
+

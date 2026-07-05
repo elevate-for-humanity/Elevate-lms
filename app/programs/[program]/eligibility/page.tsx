@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!cfg) return { robots: { index: false, follow: false } };
   return {
     title: `Funding & Enrollment | ${cfg.title} | ${PLATFORM_DEFAULTS.orgName}`,
-    description: `Explore funding options for the ${cfg.title} — FSSA IMPACT for SNAP/TANF recipients, employer sponsorship, or self-pay with flexible payments.`,
+    description: `Explore funding options for the ${cfg.title} —  for SNAP/TANF recipients, employer sponsorship, or self-pay with flexible payments.`,
   };
 }
 
@@ -43,7 +43,7 @@ export default async function BeautyEligibilityPage({ params }: Props) {
         microLabel={cfg.title}
         analyticsName={`${cfg.slug}-eligibility`}
         belowHeroHeadline="Funding & Enrollment"
-        belowHeroSubheadline={`The ${cfg.title} is not on Indiana's ETPL and does not qualify for WIOA or Workforce Ready Grant. FSSA IMPACT (SNAP/TANF), employer sponsorship, and self-pay are all available.`}
+        belowHeroSubheadline={`The ${cfg.title} is not on Indiana's ETPL and does not qualify for WIOA or Workforce Ready Grant.  (SNAP/TANF), employer sponsorship, and self-pay are all available.`}
         ctas={[
           {
             label: '← Back to Program',

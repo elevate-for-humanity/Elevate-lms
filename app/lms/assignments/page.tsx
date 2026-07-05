@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Metadata } from 'next';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 

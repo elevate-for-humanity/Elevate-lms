@@ -18,7 +18,7 @@ export default function StudentHandbookPage() {
       <DocumentPage
         documentType="Student Handbook Acknowledgment"
         title="Student Handbook"
-        subtitle="{PLATFORM_DEFAULTS.orgName} Career & Technical Institute"
+        subtitle={`${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`}
         date="2025-01-01"
         version="2.0"
       >
@@ -276,7 +276,7 @@ export default function StudentHandbookPage() {
           agreementType="handbook"
           agreementVersion="2.0"
           buttonLabel="Acknowledge Student Handbook"
-          nextUrl="/student-portal/onboarding"
+          nextUrl="/onboarding/learner"
         />
       </DocumentPage>
     </>

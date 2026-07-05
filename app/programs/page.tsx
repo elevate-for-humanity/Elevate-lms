@@ -1,21 +1,25 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/public';
 import { Clock, Award, DollarSign, ChevronRight } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
+import {
+  buildProgramsListingMetadata,
+  formatPublicProgramsDisplay,
+  getPublicProgramsPageData,
+} from '@/lib/programs/public-programs-page';
+import { PUBLIC_PROGRAM_DURATION_RANGE } from '@/lib/programs/marketing-duration';
 import { getProgramCardImage } from '@/lib/images/programImages';
 import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
+import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
+import { card } from '@/lib/page-design-tokens';
+import { HomePlatformPreview } from '@/components/home/HomePlatformPreview';
 
 export const revalidate = 0; // always fresh - catalog should prefer DB state when available
 
-export const metadata: Metadata = {
-  title: `Programs | ${PLATFORM_DEFAULTS.orgName}`,
-  description:
-    'Credential-bearing programs in healthcare, skilled trades, technology, beauty, and business. WIOA and Workforce Ready Grant funding available.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/programs' },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildProgramsListingMetadata();
+}
 
 const PROGRAM_IMAGES: Record<string, string> = {
   cna:'/images/pages/cna-nursing-real.webp',qma:'/images/pages/programs-cna-hero.webp',
@@ -83,6 +87,7 @@ const PROGRAM_IMAGES: Record<string, string> = {
   'guest-service-gold':'/images/pages/healthcare-classroom.webp',
   servsuccess:'/images/pages/healthcare-classroom.webp',
   'start-hospitality':'/images/pages/healthcare-classroom.webp',
+  'emergency-health-safety':'/images/pages/cpr-aed.webp',
 };
 
 const CATEGORY_META: Record<string,{label:string;color:string;order:number}> = {
@@ -97,74 +102,11 @@ const CATEGORY_META: Record<string,{label:string;color:string;order:number}> = {
   special:          {label:'Workforce Readiness',  color:'bg-slate-600',   order:9},
 };
 
-const SUPPRESSED = new Set([
-  'cna-training','hvac','hvac-technician-program','hvac-2024','medical-assistant-program',
-  'phlebotomy-technician','phlebotomy-technician-program','barber','barber-program',
-  'cosmetology','nail-technician','cpr-cert','health-safety','forklift-operator','tax-prep',
-  'it-support','it-support-specialist','cybersecurity','bookkeeping-fundamentals',
-  'entrepreneurship-small-business','peer-recovery-specialist-jri',
-  'ai-advanced-project-management-1774494313718','ai-forklift-safety-certification-1774495387731',
-  'jri-badge-1-mindsets','jri-badge-2-self-management','jri-badge-3-learning-strategies',
-  'jri-badge-4-social-skills','jri-badge-5-workplace-skills','jri-badge-6-launch-a-career',
-  'jri-introduction','jri','micro-programs','emergency-health-safety','nha-medical-assistant',
-]);
-
 type Prog = {slug:string;title:string;description:string|null;category:string;duration:string|null;credential:string|null;funding_eligible:boolean};
 
-function normalizeCategory(category?: string | null, sector?: string | null, programType?: string | null): string {
-  const raw = (category ?? '').trim().toLowerCase();
-  const normalizedSector = (sector ?? '').trim().toLowerCase();
-
-  if (raw.includes('health') || normalizedSector === 'healthcare') return 'healthcare';
-  if (raw.includes('trade') || normalizedSector === 'skilled-trades') return 'trades';
-  if (raw.includes('beauty') || raw.includes('cosmetology') || normalizedSector === 'personal-services') return 'beauty';
-  if (raw.includes('tech') || normalizedSector === 'technology') return 'technology';
-  if (raw.includes('business') || normalizedSector === 'business') return 'business';
-  if (raw.includes('hospitality')) return 'hospitality';
-  if (raw.includes('social')) return 'social services';
-  if (programType === 'apprenticeship') return 'apprenticeship';
-  return raw || 'other';
-}
-
-const staticProgramFallback: Prog[] = Array.from(STATIC_PROGRAM_MAP.values())
-  .filter((program) => !SUPPRESSED.has(program.slug) && program.public_visible !== false && program.active !== false)
-  .map((program) => {
-    const hasFunding = Boolean(
-      program.funding?.wioa_eligible ||
-      program.funding?.wrg_eligible ||
-      program.funding?.fssa_eligible ||
-      program.fundingOptions?.some((option) => option === 'wioa' || option === 'wrg' || option === 'impact'),
-    );
-    return {
-      slug: program.slug,
-      title: program.title,
-      description: program.subtitle || program.metaDescription || null,
-      category: normalizeCategory(program.category, program.sector, program.programType),
-      duration: program.durationWeeks ? `${program.durationWeeks} week${program.durationWeeks === 1 ? '' : 's'}` : null,
-      credential: program.credentials?.[0]?.name ?? null,
-      funding_eligible: hasFunding,
-    };
-  })
-  .sort((a, b) => a.title.localeCompare(b.title));
-
 export default async function ProgramsPage() {
-  let programs: Prog[] = staticProgramFallback;
-
-  try {
-    const db = createPublicClient();
-    const {data} = await db.from('programs')
-      .select('slug,title,short_description,description,category,duration,credential_type,wioa_eligible')
-      .eq('is_active',true).eq('published',true).neq('status','archived').order('title');
-    if (data?.length) {
-      programs = data.filter(p=>!SUPPRESSED.has(p.slug)).map(p=>{
-        let desc:string|null = p.short_description||p.description||null;
-        if(desc&&!/[.!?]$/.test(desc.trim())){const l=Math.max(desc.lastIndexOf('.'),desc.lastIndexOf('!'),desc.lastIndexOf('?'));desc=l>20?desc.slice(0,l+1):null;}
-        return {slug:p.slug,title:p.title,description:desc,category:normalizeCategory(p.category),duration:p.duration??null,credential:p.credential_type??null,funding_eligible:p.wioa_eligible??false};
-      });
-    }
-  } catch {
-    programs = staticProgramFallback;
-  }
+  const { programs: catalogPrograms } = await getPublicProgramsPageData();
+  const programs: Prog[] = catalogPrograms;
 
   const grouped:Record<string,Prog[]>={};
   programs.forEach(p=>{if(!grouped[p.category])grouped[p.category]=[];grouped[p.category].push(p);});
@@ -176,16 +118,16 @@ export default async function ProgramsPage() {
       {/* Hero */}
       <section className="relative h-64 sm:h-80 w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image sizes="(max-width: 768px) 100vw, 1200px" src="/images/programs-hero-vibrant.webp" alt={`${PLATFORM_DEFAULTS.orgName} programs`} fill className="object-cover object-center" priority placeholder="empty" />
+        <Image sizes="(max-width: 768px) 100vw, 1200px" src="/images/programs-hero-vibrant.webp" alt={`${PLATFORM_DEFAULTS.orgName} programs`} fill className="object-cover object-center" priority  />
         <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/85 to-brand-blue-900/30" />
         <div className="relative z-10 flex h-full flex-col justify-center px-6 sm:px-12 max-w-6xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-2">{PLATFORM_DEFAULTS.orgName}</p>
           <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight">Career Training Programs</h1>
           <p className="mt-3 text-slate-200 text-sm sm:text-base max-w-xl">
-            {programs.length} credential-bearing programs · 4-12 weeks · WIOA &amp; WRG funding available
+            {formatPublicProgramsDisplay(programs.length)} credential-bearing programs · {PUBLIC_PROGRAM_DURATION_RANGE} · WIOA &amp; WRG funding available
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/programs/cosmetology-apprenticeship/orientation" className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-red-700 transition-colors">
+            <Link href="/orientation/schedule" className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-red-700 transition-colors">
               Schedule Free Orientation
             </Link>
             <Link href="/programs/catalog" className="inline-flex items-center gap-2 rounded-lg bg-white/10 border border-white/30 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/20 transition-colors">
@@ -240,10 +182,10 @@ export default async function ProgramsPage() {
                 {list.map(p=>(
                   <Link key={p.slug} href={`/programs/${p.slug}`}
                     className="group flex flex-col rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-slate-300 transition-all duration-200 bg-white">
-                    <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100 flex-shrink-0">
+                    <div className={card.programImage}>
                       <Image src={resolveSiteImagePath(PROGRAM_IMAGES[p.slug] ?? getProgramCardImage(p.slug))} alt={p.title} fill
-                        className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                        sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" placeholder="empty" />
+                        className={card.programImageFill}
+                        sizes={IMAGE_SIZES.programCard}  />
                       {p.funding_eligible&&(
                         <span className="absolute top-2 left-2 bg-brand-green-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">WIOA Eligible</span>
                       )}
@@ -292,6 +234,8 @@ export default async function ProgramsPage() {
         </div>
       </section>
 
+      <HomePlatformPreview />
+
       {/* CTA */}
       <section className="bg-slate-900 text-white py-16">
         <div className="max-w-3xl mx-auto px-4 text-center">
@@ -300,7 +244,7 @@ export default async function ProgramsPage() {
             Schedule a free orientation. We&apos;ll match you to the right program, check your funding eligibility, and get you enrolled.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link href="/programs/cosmetology-apprenticeship/orientation" className="rounded-lg bg-brand-red-600 px-8 py-3 font-semibold text-white hover:bg-brand-red-700 transition-colors">
+            <Link href="/orientation/schedule" className="rounded-lg bg-brand-red-600 px-8 py-3 font-semibold text-white hover:bg-brand-red-700 transition-colors">
               Schedule Free Orientation
             </Link>
             <Link href="/contact" className="rounded-lg border border-white/30 px-8 py-3 font-semibold text-white hover:bg-white/10 transition-colors">

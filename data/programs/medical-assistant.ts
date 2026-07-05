@@ -8,7 +8,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   sector: 'healthcare',
   category: 'Medical Assisting',
   programType: 'workforce',
-  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant-lab.webp',
+  heroImage: '/images/pages/medical-assistant-lab.webp',
   heroImageAlt: 'Medical assistant student in clinical training',
   videoSrc: '/videos/healthcare-cna.mp4',
   deliveryMode: 'hybrid',
@@ -22,14 +22,8 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   cohortSize: '10–15 participants per cohort',
   fundingStatement: '$0 with WIOA or Next Level Jobs funding. Self-pay: $5,000. BNPL financing available through Affirm and Sezzle.',
   selfPayCost: '$5,000',
-  regularPrice: '$5,000',
-  salePrice: '$5,000',
   badge: 'Funding Available',
   badgeColor: 'green',
-  deliveryModel: 'hybrid',
-  deliveryModelDetail: 'hybrid',
-  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
-  enrollmentType: 'internal',
   credentials: [
     {
       name: 'Certified Clinical Medical Assistant (CCMA)',

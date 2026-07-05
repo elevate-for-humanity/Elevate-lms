@@ -9,7 +9,7 @@ export const QMA: ProgramSchema = {
   category: 'Healthcare',
   programType: 'workforce',
 
-  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-hero.webp',
+  heroImage: '/images/pages/healthcare-hero.webp',
   heroImageAlt: 'Qualified Medication Aide student preparing medications in a residential care facility',
 
   deliveryMode: 'hybrid',

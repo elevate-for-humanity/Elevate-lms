@@ -7,7 +7,7 @@ export const PROJECT_MANAGEMENT: ProgramSchema = {
   sector: 'business',
   category: 'Project Management',
   programType: 'workforce',
-  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/project-management.webp',
+  heroImage: '/images/pages/project-management.webp',
   heroImageAlt: 'Project manager leading a team meeting',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

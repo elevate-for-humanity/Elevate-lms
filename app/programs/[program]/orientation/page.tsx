@@ -148,7 +148,7 @@ export default function BeautyOrientationPage() {
                   <span className={`w-6 h-6 ${c.bg} text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5`}>2</span>
                   <div>
                     <p className="font-bold text-slate-900 text-sm">Funding may be available</p>
-                    <p className="text-slate-600 text-sm">FSSA IMPACT (SNAP/TANF recipients) and employer sponsorship can cover part or all of your cost.</p>
+                    <p className="text-slate-600 text-sm"> (SNAP/TANF recipients) and employer sponsorship can cover part or all of your cost.</p>
                   </div>
                 </div>
               </>

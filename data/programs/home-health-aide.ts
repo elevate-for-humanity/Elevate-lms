@@ -8,7 +8,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
   sector: 'healthcare',
   category: 'Home & Community Health',
   programType: 'workforce',
-  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
+  heroImage: '/images/pages/healthcare-classroom.webp',
   heroImageAlt: 'Home health aide assisting elderly client',
   videoSrc: '/videos/cna-hero.mp4',
   deliveryMode: 'hybrid',
@@ -20,11 +20,11 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
   schedule: 'Day or evening options — monthly cohort start dates',
   cohortSize: '10–15 participants per cohort',
   fundingStatement:
-    'Self-pay available. Payment plans and BNPL options accepted.',
+    'WIOA and Workforce Ready Grant funding available for eligible Indiana residents. Self-pay available.',
   selfPayCost: '$3,500',
-  fundingOptions: ['self_pay'],
-  badge: 'Self-Pay',
-  badgeColor: 'blue',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
+  badge: 'ETPL Approved',
+  badgeColor: 'green',
 
   credentials: [
     {
@@ -179,13 +179,17 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
 
   complianceAlignment: [
     {
+      standard: 'ETPL Program ID #10004626',
+      description: 'Approved on Indiana ETPL for WIOA Individual Training Account funding.',
+    },
+    {
       standard: 'Indiana HHA Certification Standards',
       description:
         'Curriculum meets Indiana State Department of Health HHA competency requirements.',
     },
     {
-      standard: 'CCHW Certification Standards',
-      description: 'Aligned with Indiana Community Health Worker certification requirements.',
+      standard: 'WIOA Title I',
+      description: 'Program meets WIOA eligibility requirements for workforce funding.',
     },
   ],
 
@@ -278,7 +282,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
     'Career placement support',
   ],
   paymentTerms:
-    'Self-pay: $3,500. Payment plans and BNPL options available.',
+    'WIOA and Workforce Ready Grant accepted. Self-pay: $4,700 with payment plans available.',
 
   faqs: [
     {
@@ -287,9 +291,9 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
         "HHAs provide personal care in clients' homes. CNAs work in facilities (hospitals, nursing homes). HHA training is shorter and leads directly to home care employment. Many HHAs later complete CNA training to expand their options.",
     },
     {
-      question: 'Is funding available for this program?',
+      question: 'Is this program WIOA-funded?',
       answer:
-        'This program is self-pay only. Payment plans, BNPL (Klarna, Afterpay, Zip), and income-share options are available to make training more affordable.',
+        'Yes. This program is ETPL-approved (Program ID #10004626) and eligible for WIOA Individual Training Accounts in certain areas. Contact your local WorkOne office to verify eligibility.',
     },
     {
       question: 'How quickly can I find work after completing this program?',
@@ -305,11 +309,14 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
   ],
   metaTitle: 'Home Health Aide Certification | HHA + CCHW | Indianapolis',
   metaDescription:
-    'Earn your HHA and CCHW certifications in 4 weeks. Self-pay Home Health Aide program in Indianapolis with payment plans and direct employer placement.',
+    'Earn your HHA and CCHW certifications in 4 weeks. WIOA-funded Home Health Aide program in Indianapolis with direct employer placement.',
 
 
   funding: {
-    isSelfPay: true,
-    fundingNotes: 'Self-pay and payment plans available. BNPL options accepted at checkout.',
+    wioa_eligible: true,
+    fssa_eligible: true,
+    wrg_eligible: true,
+    jobReadyIndyEligible: true,
+    fundingNotes: 'Indiana ETPL-listed. FSSA Gov Portal and WIOA Title I funding available. WRG eligibility determined by Indiana DWD.',
   },
 };

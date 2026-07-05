@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `Enrolled | ${cfg.title} | ${PLATFORM_DEFAULTS.orgName}`,
     description: `Your enrollment in the ${cfg.title} is confirmed.`,
-    robots: { index: false, follow: false },
+    robots: { index: true, follow: true },
   };
 }
 

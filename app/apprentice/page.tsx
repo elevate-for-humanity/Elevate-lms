@@ -30,6 +30,7 @@ import {
   Hammer,
   Sparkles,
   User,
+  Globe,
 } from 'lucide-react';
 
 export const metadata: Metadata = {

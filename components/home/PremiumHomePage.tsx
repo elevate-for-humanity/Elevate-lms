@@ -17,6 +17,8 @@ import { TrustBar } from './TrustBar';
 import { EmployerPartnerWall } from './EmployerPartnerWall';
 import { FundingExperience } from './FundingExperience';
 import { VisitorQuestions } from './VisitorQuestions';
+import { HeroVideo } from './HeroVideo';
+import { PremiumPrograms } from './PremiumPrograms';
 import { useScrollAnimation } from '@/hooks/useAnimatedCounter';
 
 // Statistics for animated counter
@@ -240,7 +242,7 @@ function HowItWorksPreview() {
 }
 
 // Programs Preview
-function ProgramsPreview() {
+function PremiumPrograms() {
   const { ref, isVisible } = useScrollAnimation(0);
   
   const programs = [
@@ -611,8 +613,8 @@ function FinalCTA() {
 export function PremiumHomePage() {
   return (
     <div className="min-h-screen">
-      {/* 1. Hero */}
-      <HeroSection />
+      {/* 1. Hero - Premium Video Experience */}
+      <HeroVideo />
 
       {/* 2. Trust Badges Strip */}
       <div className="bg-slate-50 border-y border-slate-200 py-4">
@@ -622,10 +624,10 @@ export function PremiumHomePage() {
       {/* 3. How It Works */}
       <HowItWorksPreview />
 
-      {/* 3b. Career Pathways */}
+      {/* 4. Career Pathways */}
       <CareerPathways />
 
-      {/* 4. Animated Stats */}
+      {/* 5. Animated Stats */}
       <AnimatedStats
         stats={OUTCOME_STATS}
         title="Proven Results"
@@ -633,14 +635,14 @@ export function PremiumHomePage() {
         dark={false}
       />
 
-      {/* 5. Trust Bar - Comprehensive */}
+      {/* 6. Trust Bar - Comprehensive */}
       <TrustBar variant="full" />
 
-      {/* 6. Program Discovery Quiz */}
+      {/* 7. Program Discovery Quiz */}
       <ProgramDiscovery />
 
-      {/* 7. Programs Preview */}
-      <ProgramsPreview />
+      {/* 8. Premium Programs */}
+      <PremiumPrograms />
 
       {/* 8. Salary Calculator */}
       <SalaryCalculator />

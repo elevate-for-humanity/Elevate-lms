@@ -21,6 +21,10 @@ const HomeCareerPathways = dynamic(
   () => import('@/components/home/HomeCareerPathways').then((m) => m.HomeCareerPathways),
   { ssr: true }
 );
+const HomeFeaturedPrograms = dynamic(
+  () => import('@/components/home/HomeFeaturedPrograms').then((m) => m.default),
+  { ssr: true }
+);
 const HomeApprenticeshipInfra = dynamic(
   () => import('@/components/home/HomeApprenticeshipInfra').then((m) => m.HomeApprenticeshipInfra),
   { ssr: true }
@@ -148,6 +152,10 @@ export default async function HomePage() {
       {/* 6-step operational pipeline: Apply → Funding → Training →
           Apprenticeship → Credential → Employment */}
       <HomeHowItWorks />
+
+      {/* ── 3. FEATURED PROGRAMS ───────────────────────────────────────── */}
+      {/* HVAC, CDL, and Apprenticeships highlighted with premium cards */}
+      <HomeFeaturedPrograms />
 
       {/* ── 4. CAREER PATHWAYS ──────────────────────────────────────────── */}
       {/* 8 featured program cards with credential, funding, and

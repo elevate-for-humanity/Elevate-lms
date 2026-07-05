@@ -328,7 +328,36 @@
     ],
     "transcript": "Train for EPA 608 Universal certification in 6 weeks at Elevate for Humanity, working on real HVAC systems with hands-on instruction. Graduates also earn OSHA 10, CPR, and Rise Up credentials. HVAC technicians in Indiana commonly earn $38,000 to $55,000. Total program cost is $5,000 — most students pay $0 through the Workforce Ready Grant.",
     "analyticsName": "hvac-technician",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
+    "storySections": [
+      {
+        "icon": "🔧",
+        "title": "Master HVAC Systems",
+        "description": "Learn installation, repair, and maintenance of heating, ventilation, and air conditioning systems. Get hands-on experience with real equipment.",
+        "stat": {
+          "value": "6 weeks",
+          "label": "full training"
+        }
+      },
+      {
+        "icon": "📜",
+        "title": "Earn EPA 608 Certification",
+        "description": "Pass the EPA Section 608 Universal certification exam - proctored on-site. This industry-standard credential opens doors to refrigeration and HVAC careers.",
+        "stat": {
+          "value": "100%",
+          "label": "certification rate"
+        }
+      },
+      {
+        "icon": "💼",
+        "title": "Start Your Career",
+        "description": "Our career services team helps with resume, interview prep, and job placements. Many students have job offers before they complete training.",
+        "stat": {
+          "value": "35K+",
+          "label": "starting wages"
+        }
+      }
+    ]
   },
   "cdl-training": {
     "pageKey": "cdl-training",
@@ -358,7 +387,36 @@
     "transcript": "Train for CDL Class A licensure in 3 to 6 weeks at Elevate for Humanity in Indianapolis, with behind-the-wheel instruction, pre-trip inspection, and on-site skills testing. CDL drivers commonly earn $50,000 to $65,000. WIOA covers tuition, DOT physical, drug screen, and exam fees for eligible Indiana residents.",
     "analyticsName": "cdl-training",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cdl-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
+    "storySections": [
+      {
+        "icon": "📝",
+        "title": "Apply & Get CDL Permit",
+        "description": "Complete application and get your learner permit. We guide you through the process and help with funding options.",
+        "stat": {
+          "value": "1-2 weeks",
+          "label": "to start training"
+        }
+      },
+      {
+        "icon": "🚛",
+        "title": "Complete CDL Training",
+        "description": "4-8 weeks of behind-the-wheel training. Learn pre-trip inspections, backing maneuvers, and highway driving.",
+        "stat": {
+          "value": "160 hours",
+          "label": "minimum training"
+        }
+      },
+      {
+        "icon": "🎯",
+        "title": "Pass CDL Exam & Get Hired",
+        "description": "Take your CDL Class A road test. Our job placement team connects you with trucking companies.",
+        "stat": {
+          "value": "95%",
+          "label": "pass rate"
+        }
+      }
+    ]
   },
   "electrical": {
     "pageKey": "electrical",
@@ -566,7 +624,36 @@
       "ETPL approved"
     ],
     "transcript": "Prepare for Indiana CNA certification in 6 weeks, completing clinical rotations at licensed healthcare facilities with the state exam proctored on-site. CNAs in Indiana commonly earn $30,000 to $40,000. WIOA and Workforce Ready Grant funding available for eligible Indiana residents. Join the waitlist for the next cohort.",
-    "analyticsName": "cna"
+    "analyticsName": "cna",
+    "storySections": [
+      {
+        "icon": "📋",
+        "title": "Apply & Enroll",
+        "description": "Complete a simple application. Our advisors help you understand funding options including WIOA and Workforce Ready Grant. Most students pay nothing upfront.",
+        "stat": {
+          "value": "< 1 week",
+          "label": "to get funded"
+        }
+      },
+      {
+        "icon": "📚",
+        "title": "Complete Training",
+        "description": "6 weeks of hands-on training including classroom instruction and clinical rotations at licensed healthcare facilities. Learn from experienced RNs and CNAs.",
+        "stat": {
+          "value": "120 hours",
+          "label": "total training"
+        }
+      },
+      {
+        "icon": "🏆",
+        "title": "Get Certified",
+        "description": "Take your Indiana state CNA certification exam - proctored right here. Walk out certified and ready to work in hospitals, nursing homes, and home health.",
+        "stat": {
+          "value": "94%",
+          "label": "pass rate"
+        }
+      }
+    ]
   },
   "medical-assistant": {
     "pageKey": "medical-assistant",
@@ -808,7 +895,36 @@
     ],
     "transcript": "Earn your Indiana Barber License through a DOL Registered Apprenticeship — 2,000 hours of training, 1,500 of which are paid on-the-job at a licensed barbershop. Barbers commonly earn $28,000 to $52,000 depending on clientele and setting. Wages begin on day one.",
     "analyticsName": "barber-apprenticeship",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4"
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4",
+    "storySections": [
+      {
+        "icon": "💈",
+        "title": "Apply & Match with Shop",
+        "description": "Apply to the program and get matched with a licensed barbershop. Your employer sponsors your apprenticeship.",
+        "stat": {
+          "value": "< 1 week",
+          "label": "to get matched"
+        }
+      },
+      {
+        "icon": "✂️",
+        "title": "Earn While You Learn",
+        "description": "Work in a real barbershop from day one. Get paid for your hours while learning from experienced barbers.",
+        "stat": {
+          "value": "2,000",
+          "label": "OJT hours"
+        }
+      },
+      {
+        "icon": "🏆",
+        "title": "Get Your License",
+        "description": "Complete 1,500 hours of training plus classroom instruction. Pass the Indiana barber exam and get your license.",
+        "stat": {
+          "value": "100%",
+          "label": "licensure rate"
+        }
+      }
+    ]
   },
   "cosmetology-apprenticeship": {
     "pageKey": "cosmetology-apprenticeship",

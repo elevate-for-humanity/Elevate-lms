@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { CheckCircle, DollarSign, Users, ArrowRight } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import FundingEligibilityQuiz from '@/components/eligibility/FundingEligibilityQuiz';
 
 export const metadata: Metadata = {
   title: `Check Eligibility | ${PLATFORM_DEFAULTS.orgName}`,
@@ -25,7 +26,7 @@ export default function CheckEligibilityPage() {
       
       <section className="py-16 px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
             {ELIGIBILITY_TYPES.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="bg-white p-8 rounded-xl border border-slate-200">
                 <Icon className="w-12 h-12 text-blue-600 mb-4" />
@@ -35,7 +36,16 @@ export default function CheckEligibilityPage() {
             ))}
           </div>
           
-          <div className="mt-12 text-center">
+          {/* Eligibility Quiz - Integrate existing component */}
+          <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
+            <h2 className="text-2xl font-bold mb-6 text-center">Take the Quick Eligibility Quiz</h2>
+            <p className="text-slate-600 text-center mb-8">
+              Answer a few questions to see what funding you may qualify for.
+            </p>
+            <FundingEligibilityQuiz />
+          </div>
+          
+          <div className="text-center">
             <a href="/contact" className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-medium hover:bg-blue-700">
               Get Started <ArrowRight className="w-4 h-4" />
             </a>

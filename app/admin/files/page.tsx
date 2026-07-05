@@ -1,0 +1,77 @@
+import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
+import { createClient } from '@/lib/supabase/server';
+import Link from 'next/link';
+import AdvancedVideoUploader from '@/components/admin/AdvancedVideoUploader';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 60;
+
+export const metadata: Metadata = {
+  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/files' },
+  title: 'File Manager | Elevate For Humanity',
+  description: 'Manage uploaded files and media.',
+};
+
+export default async function FilesPage() {
+  await requireRole(['admin', 'super_admin']);
+  const supabase = await createClient();
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Hero Image */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <nav className="text-sm mb-4">
+            <ol className="flex items-center space-x-2 text-slate-700">
+              <li>
+                <Link href="/admin" className="hover:text-primary">
+                  Admin
+                </Link>
+              </li>
+              <li>/</li>
+              <li className="text-slate-900 font-medium">Files</li>
+            </ol>
+          </nav>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900">File Manager</h1>
+              <p className="text-slate-700 mt-2">Manage uploaded files and media</p>
+            </div>
+            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
+              Upload Files
+            </button>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-sm font-medium text-slate-700">Total Files</h3>
+            <p className="text-3xl font-bold text-slate-900 mt-2">0</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-sm font-medium text-slate-700">Images</h3>
+            <p className="text-3xl font-bold text-brand-blue-600 mt-2">0</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-sm font-medium text-slate-700">Documents</h3>
+            <p className="text-3xl font-bold text-brand-green-600 mt-2">0</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-sm font-medium text-slate-700">Storage Used</h3>
+            <p className="text-3xl font-bold text-brand-blue-600 mt-2">0 MB</p>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <h2 className="text-lg font-semibold mb-4">Recent Files</h2>
+          <p className="text-slate-700 text-center py-4">No files uploaded yet</p>
+        </div>
+
+        {/* Advanced Video Uploader */}
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-4">Video Upload</h2>
+          <AdvancedVideoUploader />
+        </div>
+      </div>
+    </div>
+  );
+}

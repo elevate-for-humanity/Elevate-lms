@@ -1,16 +1,21 @@
 import { Metadata } from 'next';
+import { getAdminDashboardData } from '@/lib/admin/get-admin-dashboard-data';
+import { normalizeAdminDashboardData } from '@/lib/admin/normalize-dashboard-data';
+import { AdminDashboardContent } from '@/components/admin/dashboard/DashboardShell';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Dashboard | Admin',
+  title: 'Admin Dashboard | Elevate For Humanity',
 };
 
-export default function AdminPage() {
+// Auth and role enforcement is handled by apps/admin/app/admin/layout.tsx.
+export default async function AdminDashboardPage() {
+  const data = normalizeAdminDashboardData(await getAdminDashboardData());
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Dashboard</h1>
-        <p className="text-gray-600">Admin page under construction.</p>
-      </div>
-    </div>
+    <>
+      <AdminDashboardContent data={data} />
+    </>
   );
 }

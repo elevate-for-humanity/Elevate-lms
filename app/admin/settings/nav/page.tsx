@@ -1,16 +1,16 @@
 import { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
+import NavEditorClient from './NavEditorClient';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Nav | Admin',
+  title: 'Navigation Settings | Admin | Elevate For Humanity',
+  description: 'Edit the admin navigation structure.',
 };
 
-export default function AdminPage() {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Nav</h1>
-        <p className="text-gray-600">Admin page under construction.</p>
-      </div>
-    </div>
-  );
+export default async function NavSettingsPage() {
+  await requireRole(['super_admin']);
+  return <NavEditorClient />;
 }

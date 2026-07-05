@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, Cloud, Shield, Zap, HeadphonesIcon, Globe, Palette } from 'lucide-react';
+import { Check, Cloud, Shield, Zap, Headphones, Globe, Palette } from 'lucide-react';
 
 const FEATURES = [
   {
@@ -31,7 +31,7 @@ const FEATURES = [
     description: 'Get new features automatically. No manual upgrades needed.',
   },
   {
-    icon: HeadphonesIcon,
+    icon: Headphones,
     title: 'Priority Support',
     description: 'Dedicated support team with 4-hour response time.',
   },

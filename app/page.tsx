@@ -65,6 +65,10 @@ const FundingQuickCheck = dynamic(
   () => import('@/components/home/FundingQuickCheck').then((m) => m.FundingQuickCheck),
   { ssr: true }
 );
+const GraduateTestimonials = dynamic(
+  () => import('@/components/home/GraduateTestimonials').then((m) => m.GraduateTestimonials),
+  { ssr: true }
+);
 
 // Revalidate every 5 minutes — allows live enrollment stats to refresh
 // without a full rebuild.
@@ -203,6 +207,10 @@ export default async function HomePage() {
       <Suspense fallback={<OutcomesSkeleton />}>
         <HomeOutcomes />
       </Suspense>
+
+      {/* ── 7b. GRADUATE TESTIMONIALS ───────────────────────────────────── */}
+      {/* Real student success stories with salary comparisons */}
+      <GraduateTestimonials />
 
       {/* ── 8. PLATFORM PREVIEW ─────────────────────────────────────────── */}
       {/* Learner portal, employer dashboard, workforce analytics screenshots.

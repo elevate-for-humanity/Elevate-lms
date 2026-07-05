@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Contact | Elevate for Humanity',
-  description: 'Get in touch with our team',
+  title: 'Beauty Educator | Elevate for Humanity',
+  description: 'Beauty career educator program',
 };
 
 export default function Page() {
@@ -11,7 +11,7 @@ export default function Page() {
     <div className="min-h-screen bg-white">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Beauty Educator</h1>
           <p className="text-xl text-blue-100">{subtitle}</p>
         </div>
       </section>

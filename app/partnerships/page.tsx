@@ -1,70 +1,33 @@
 import { Metadata } from 'next';
-import { Users, Handshake, Building, ArrowRight } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: `Partnerships | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Partner with Elevate for Humanity to train your workforce or host apprentices.',
+  title: 'Partnerships | Elevate for Humanity',
+  description: 'Learn more about Elevate for Humanity.',
 };
-
-const PARTNER_TYPES = [
-  {
-    icon: Building,
-    title: 'Employer Partners',
-    description: 'Hire trained graduates or sponsor apprenticeships for your workforce.',
-  },
-  {
-    icon: Users,
-    title: 'Training Partners',
-    description: 'Join our network of training providers across Indiana.',
-  },
-  {
-    icon: Handshake,
-    title: 'Workforce Partners',
-    description: 'Collaborate with workforce boards and career centers.',
-  },
-];
 
 export default function PartnershipsPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
+    <div className="min-h-screen bg-white">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Partnerships</h1>
-          <p className="text-xl text-blue-100">
-            Work with us to build a stronger workforce in Indiana.
-          </p>
+          <p className="text-xl text-blue-100">Connecting you to workforce opportunities.</p>
         </div>
       </section>
-      
-      {/* Partner Types */}
-      <section className="py-16 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Partner With Us</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {PARTNER_TYPES.map(({ icon: Icon, title, description }) => (
-              <div key={title} className="bg-white p-8 rounded-xl border border-slate-200 text-center hover:shadow-lg transition">
-                <Icon className="w-16 h-16 text-blue-600 mx-auto mb-6" />
-                <h3 className="text-xl font-bold mb-3">{title}</h3>
-                <p className="text-slate-600 mb-6">{description}</p>
-                <a href="/contact" className="inline-flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700">
-                  Learn More <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
-            ))}
+
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p className="text-gray-600 mb-8">This page is under construction. Please check back soon.</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/contact" className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700">
+              Contact Us
+            </Link>
+            <Link href="/" className="px-6 py-3 border-2 border-brand-blue-600 text-brand-blue-600 font-semibold rounded-lg hover:bg-brand-blue-50">
+              Return Home
+            </Link>
           </div>
-        </div>
-      </section>
-      
-      {/* CTA */}
-      <section className="py-16 px-6 bg-slate-900 text-white">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Partner?</h2>
-          <p className="text-slate-300 mb-8">Contact us to discuss partnership opportunities.</p>
-          <a href="/contact" className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition">
-            Get Started <ArrowRight className="w-5 h-5" />
-          </a>
         </div>
       </section>
     </div>

@@ -1,45 +1,49 @@
 import { Metadata } from 'next';
-import { Heart, Users, Globe, ArrowRight } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import Link from 'next/link';
+import { Heart, Users, Globe } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: `Community Services | ${PLATFORM_DEFAULTS.orgName}`,
+  title: 'Community Services | Elevate for Humanity',
   description: 'Elevate for Humanity serves the community through workforce development and training.',
 };
 
-const SERVICES = [
-  { icon: Users, title: 'Workforce Development', desc: 'Training programs for community members seeking employment.' },
-  { icon: Heart, title: 'Support Services', desc: 'Career coaching and job placement assistance.' },
-  { icon: Globe, title: 'Community Partnerships', desc: 'Collaborating with local organizations to serve better.' },
-];
-
 export default function CommunityServicesPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
+    <div className="min-h-screen bg-white">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Community Services</h1>
           <p className="text-xl text-blue-100">Serving our community through workforce development.</p>
         </div>
       </section>
-      
-      <section className="py-16 px-6">
-        <div className="max-w-5xl mx-auto">
+
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
-            {SERVICES.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="bg-white p-8 rounded-xl border border-slate-200 text-center">
-                <Icon className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-2">{title}</h3>
-                <p className="text-slate-600">{desc}</p>
-              </div>
-            ))}
+            <div className="text-center">
+              <Heart className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Workforce Development</h3>
+              <p className="text-gray-600">Free and low-cost training programs for community members.</p>
+            </div>
+            <div className="text-center">
+              <Users className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Job Placement</h3>
+              <p className="text-gray-600">Connecting graduates with local employers.</p>
+            </div>
+            <div className="text-center">
+              <Globe className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Community Partners</h3>
+              <p className="text-gray-600">Working with local organizations to serve our community.</p>
+            </div>
           </div>
-          
-          <div className="mt-12 text-center">
-            <a href="/contact" className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-medium hover:bg-blue-700">
-              Get Involved <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-slate-50 text-center">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Get Involved</h2>
+          <p className="text-gray-600 mb-8">Partner with us to serve our community.</p>
+          <Link href="/contact" className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg">Contact Us</Link>
         </div>
       </section>
     </div>

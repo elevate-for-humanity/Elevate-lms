@@ -1,55 +1,33 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { Heart, Users, GraduationCap, Building } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: `Donate | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Support workforce development. Your donation helps remove barriers to career training for those who need it most.',
+  title: 'Donate | Elevate for Humanity',
+  description: 'Learn more about Elevate for Humanity.',
 };
 
 export default function DonatePage() {
   return (
     <div className="min-h-screen bg-white">
-      <section className="bg-slate-900 py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <Heart className="w-16 h-16 text-brand-red-500 mx-auto mb-6" />
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Make a Difference</h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Your support helps remove barriers to career training
-          </p>
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Donate</h1>
+          <p className="text-xl text-blue-100">Connecting you to workforce opportunities.</p>
         </div>
       </section>
 
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center mb-12">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Why Donate?</h2>
-          <p className="text-slate-600">
-            Every dollar helps someone access workforce training who otherwise couldn't afford it.
-          </p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { icon: GraduationCap, title: 'Support Students', desc: 'Help cover costs for students without funding' },
-            { icon: Building, title: 'Expand Programs', desc: 'Fund new training programs in high-demand fields' },
-            { icon: Users, title: 'Build Community', desc: 'Strengthen the workforce in our community' },
-          ].map((item) => (
-            <div key={item.title} className="text-center p-8 bg-slate-50 rounded-xl">
-              <item.icon className="w-10 h-10 text-brand-red-600 mx-auto mb-4" />
-              <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-              <p className="text-slate-600 text-sm">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="py-16 bg-slate-50 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Contact Us to Donate</h2>
-          <p className="text-slate-600 mb-8">We'd love to discuss partnership opportunities with you.</p>
-          <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold rounded-xl transition-colors">
-            Get in Touch
-          </Link>
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p className="text-gray-600 mb-8">This page is under construction. Please check back soon.</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/contact" className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700">
+              Contact Us
+            </Link>
+            <Link href="/" className="px-6 py-3 border-2 border-brand-blue-600 text-brand-blue-600 font-semibold rounded-lg hover:bg-brand-blue-50">
+              Return Home
+            </Link>
+          </div>
         </div>
       </section>
     </div>

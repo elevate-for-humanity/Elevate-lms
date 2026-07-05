@@ -9,6 +9,10 @@ import { TrustBadges } from './TrustBadges';
 import { AnimatedLogoStrip, PartnerLogoStrip } from './AnimatedLogoStrip';
 import { AIAdvisorWidget } from './AIAdvisorWidget';
 import { ProgramDiscovery } from './ProgramDiscovery';
+import { ROICalculator } from './ROICalculator';
+import { SalaryCalculator } from './SalaryCalculator';
+import { SuccessStoriesGallery } from './SuccessStoriesGallery';
+import { CareerPathways } from './CareerPathways';
 import { useScrollAnimation } from '@/hooks/useAnimatedCounter';
 
 // Statistics for animated counter
@@ -614,6 +618,9 @@ export function PremiumHomePage() {
       {/* 3. How It Works */}
       <HowItWorksPreview />
 
+      {/* 3b. Career Pathways - NEW */}
+      <CareerPathways />
+
       {/* 4. Animated Stats */}
       <AnimatedStats
         stats={OUTCOME_STATS}
@@ -628,20 +635,26 @@ export function PremiumHomePage() {
       {/* 5. Programs Preview */}
       <ProgramsPreview />
 
-      {/* 6. Funding Section */}
+      {/* 6. Salary Calculator - NEW */}
+      <SalaryCalculator />
+
+      {/* 7. ROI Calculator - NEW */}
+      <ROICalculator />
+
+      {/* 8. Funding Section */}
       <FundingSection />
 
-      {/* 7. Employer Partners */}
+      {/* 9. Success Stories Gallery - NEW */}
+      <SuccessStoriesGallery />
+
+      {/* 10. Employer Partners */}
       <AnimatedLogoStrip />
       <PartnerLogoStrip variant="dark" />
 
-      {/* 8. Success Stories */}
-      <SuccessStories />
-
-      {/* 9. Final CTA */}
+      {/* 11. Final CTA */}
       <FinalCTA />
 
-      {/* 10. AI Advisor Floating Widget */}
+      {/* 12. AI Advisor Floating Widget */}
       <AIAdvisorWidget variant="floating" />
     </div>
   );

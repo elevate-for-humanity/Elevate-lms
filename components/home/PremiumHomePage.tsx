@@ -13,6 +13,10 @@ import { ROICalculator } from './ROICalculator';
 import { SalaryCalculator } from './SalaryCalculator';
 import { SuccessStoriesGallery } from './SuccessStoriesGallery';
 import { CareerPathways } from './CareerPathways';
+import { TrustBar } from './TrustBar';
+import { EmployerPartnerWall } from './EmployerPartnerWall';
+import { FundingExperience } from './FundingExperience';
+import { VisitorQuestions } from './VisitorQuestions';
 import { useScrollAnimation } from '@/hooks/useAnimatedCounter';
 
 // Statistics for animated counter
@@ -618,7 +622,7 @@ export function PremiumHomePage() {
       {/* 3. How It Works */}
       <HowItWorksPreview />
 
-      {/* 3b. Career Pathways - NEW */}
+      {/* 3b. Career Pathways */}
       <CareerPathways />
 
       {/* 4. Animated Stats */}
@@ -629,32 +633,41 @@ export function PremiumHomePage() {
         dark={false}
       />
 
-      {/* 4b. Program Discovery Quiz */}
+      {/* 5. Trust Bar - Comprehensive */}
+      <TrustBar variant="full" />
+
+      {/* 6. Program Discovery Quiz */}
       <ProgramDiscovery />
 
-      {/* 5. Programs Preview */}
+      {/* 7. Programs Preview */}
       <ProgramsPreview />
 
-      {/* 6. Salary Calculator - NEW */}
+      {/* 8. Salary Calculator */}
       <SalaryCalculator />
 
-      {/* 7. ROI Calculator - NEW */}
+      {/* 9. ROI Calculator */}
       <ROICalculator />
 
-      {/* 8. Funding Section */}
-      <FundingSection />
+      {/* 10. Funding Experience */}
+      <FundingExperience />
 
-      {/* 9. Success Stories Gallery - NEW */}
+      {/* 11. Success Stories Gallery */}
       <SuccessStoriesGallery />
 
-      {/* 10. Employer Partners */}
+      {/* 12. Employer & Partner Wall */}
+      <EmployerPartnerWall />
+
+      {/* 13. Visitor Questions - Answer Before They Ask */}
+      <VisitorQuestions />
+
+      {/* 14. Employer Partners - Logo Strip */}
       <AnimatedLogoStrip />
       <PartnerLogoStrip variant="dark" />
 
-      {/* 11. Final CTA */}
+      {/* 15. Final CTA */}
       <FinalCTA />
 
-      {/* 12. AI Advisor Floating Widget */}
+      {/* 16. AI Advisor Floating Widget */}
       <AIAdvisorWidget variant="floating" />
     </div>
   );

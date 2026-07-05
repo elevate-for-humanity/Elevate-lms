@@ -30,6 +30,11 @@ const CookieConsent = dynamicImport(
   { ssr: false, loading: LoadingDiv }
 );
 
+const StickyMobileCTA = dynamicImport(
+  () => import('@/components/ui/StickyMobileCTA').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
+
 export default function RootWidgets() {
   const pathname = usePathname();
   const isStoreRoute = pathname?.startsWith('/store') ?? false;
@@ -56,6 +61,7 @@ export default function RootWidgets() {
       <FacebookPixel />
       {!isStoreRoute && <ConditionalAIBubble />}
       <CookieConsent />
+      {!isStoreRoute && <StickyMobileCTA />}
     </>
   );
 }

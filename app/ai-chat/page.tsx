@@ -1,22 +1,29 @@
-'use client';
+import { Metadata } from 'next';
+import Link from 'next/link';
 
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+export const metadata: Metadata = {
+  title: 'AI Chat | Elevate for Humanity',
+  description: 'Chat with our AI assistant',
+};
 
-const AIChat = dynamic(() => import('@/components/studio/AIChat'), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-      <div className="text-white">Loading AI Assistant...</div>
-    </div>
-  ),
-});
-
-export default function AIChatPage() {
+export default function Page() {
   return (
-    <div className="min-h-screen bg-slate-900">
-      <AIChat />
+    <div className="min-h-screen bg-white">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">AI Chat</h1>
+          <p className="text-xl text-blue-100">{subtitle}</p>
+        </div>
+      </section>
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p className="text-gray-600 mb-8">This page is under construction. Please check back soon.</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/contact" className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700">Contact Us</Link>
+            <Link href="/" className="px-6 py-3 border-2 border-brand-blue-600 text-brand-blue-600 font-semibold rounded-lg hover:bg-brand-blue-50">Return Home</Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

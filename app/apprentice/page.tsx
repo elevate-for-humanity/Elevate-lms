@@ -26,7 +26,6 @@ import {
   Settings,
   Bell,
   ChevronRight,
-  Scissors,
   Hammer,
   Sparkles,
   User,

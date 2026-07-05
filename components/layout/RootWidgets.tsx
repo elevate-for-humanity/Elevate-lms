@@ -35,6 +35,11 @@ const StickyMobileCTA = dynamicImport(
   { ssr: false, loading: LoadingDiv }
 );
 
+const AIAdvisorWidget = dynamicImport(
+  () => import('@/components/ai/AIAdvisor').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
+
 export default function RootWidgets() {
   const pathname = usePathname();
   const isStoreRoute = pathname?.startsWith('/store') ?? false;
@@ -62,6 +67,7 @@ export default function RootWidgets() {
       {!isStoreRoute && <ConditionalAIBubble />}
       <CookieConsent />
       {!isStoreRoute && <StickyMobileCTA />}
+      {!isStoreRoute && <AIAdvisorWidget />}
     </>
   );
 }

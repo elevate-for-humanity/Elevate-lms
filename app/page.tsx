@@ -69,6 +69,10 @@ const GraduateTestimonials = dynamic(
   () => import('@/components/home/GraduateTestimonials').then((m) => m.GraduateTestimonials),
   { ssr: true }
 );
+const TourBookingWidget = dynamic(
+  () => import('@/components/forms/TourBookingWidget').then((m) => m.TourBookingWidget),
+  { ssr: true }
+);
 
 // Revalidate every 5 minutes — allows live enrollment stats to refresh
 // without a full rebuild.
@@ -232,6 +236,14 @@ export default async function HomePage() {
       {/* "From where you are to where you want to be."
           Apply Now + Check Eligibility + phone number. */}
       <HomeFinalCTA />
+
+      {/* ── 10b. TOUR BOOKING ─────────────────────────────────────────── */}
+      {/* Schedule a campus tour widget */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-md mx-auto px-4">
+          <TourBookingWidget />
+        </div>
+      </section>
     </>
   );
 }

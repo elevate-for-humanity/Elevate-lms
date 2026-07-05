@@ -15,3 +15,10 @@ export interface CreateOfficeInput {
   address?: string;
   owner_id?: string;
 }
+
+export interface CreatePreparerInput {
+  name: string;
+  email: string;
+  efin: string;
+  office_id: string;
+}

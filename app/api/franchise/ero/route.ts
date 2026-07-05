@@ -105,7 +105,7 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    const config = await eroService.setEROConfig(body, user.id);
+    const config = await eroService.setEROConfig(body);
 
     return NextResponse.json(config, { status: 201 });
   } catch (error) {

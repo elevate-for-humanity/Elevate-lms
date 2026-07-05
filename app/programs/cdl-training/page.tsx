@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'CDL Training | Elevate for Humanity',
-  description: 'Commercial driver's license training',
+  description: "Commercial driver's license training",
 };
 
 export default function Page() {

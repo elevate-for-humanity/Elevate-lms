@@ -58,7 +58,7 @@ export async function GET(
     let foundModule: BlueprintModule | undefined;
     let foundLesson: { slug: string; title: string } | undefined;
     
-    for (const mod of blueprint.modules) {
+    for (const module of blueprint.modules) {
       const lesson = module.lessons?.find(l => l.slug === lessonSlug);
       if (lesson) {
         foundModule = module;

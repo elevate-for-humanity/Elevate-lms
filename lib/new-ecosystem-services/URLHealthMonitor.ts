@@ -508,14 +508,6 @@ export class URLHealthMonitor {
       });
     }
   }
-
-  async run(urls?: string[]): Promise<any> {
-    if (urls && urls.length > 0) {
-      const checks = await Promise.all(urls.map(url => this.checkURL(url)));
-      return { success: true, checked: checks.length, results: checks };
-    }
-    return { success: true, checked: 0 };
-  }
 }
 
 export default URLHealthMonitor;

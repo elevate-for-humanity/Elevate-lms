@@ -7,8 +7,6 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { isDemoTenant, getDemoTenantSlug } from './context';
 
-type DemoRole = 'demo_admin' | 'demo_staff' | 'demo_partner' | 'demo_learner';
-
 const ALLOWED_DEMO_ROLES: DemoRole[] = [
   'demo_admin',
   'demo_staff',

@@ -278,7 +278,6 @@ export const PEER_RECOVERY: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,

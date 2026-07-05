@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use, useCallback } from 'react';
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
@@ -46,7 +46,9 @@ export default function SOPDetailPage({ params }: { params: Promise<{ id: string
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [dueDate, setDueDate] = useState('');
 
-  const fetchSOP = useCallback(async () => {
+  useEffect(() => { fetchSOP(); fetchEmployees(); fetchAssignments(); }, [id]);
+
+  async function fetchSOP() {
     try {
       const supabase = createClient();
       const { data } = await supabase.from('sop_templates').select('*').eq('id', id).single();
@@ -57,25 +59,23 @@ export default function SOPDetailPage({ params }: { params: Promise<{ id: string
       }
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  }, [id]);
+  }
 
-  const fetchEmployees = useCallback(async () => {
+  async function fetchEmployees() {
     try {
       const supabase = createClient();
       const { data } = await supabase.from('employees').select('*').eq('status', 'active');
       setEmployees(data || []);
     } catch (err) { console.error(err); }
-  }, []);
+  }
 
-  const fetchAssignments = useCallback(async () => {
+  async function fetchAssignments() {
     try {
       const supabase = createClient();
       const { data } = await supabase.from('sop_assignments').select('*, assigned_user:assigned_to(first_name, last_name, email)').eq('sop_id', id);
       setAssignments(data || []);
     } catch (err) { console.error(err); }
-  }, [id]);
-
-  useEffect(() => { fetchSOP(); fetchEmployees(); fetchAssignments(); }, [fetchSOP, fetchEmployees, fetchAssignments]);
+  }
 
   async function saveSOP() {
     setSaving(true);

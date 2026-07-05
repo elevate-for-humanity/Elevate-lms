@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 const MEMORY_TTL_DAYS = 90;
 const EMBEDDING_TTL_DAYS = 180;
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const db = await requireAdminClient();
   const memoryCutoff = new Date(Date.now() - MEMORY_TTL_DAYS * 24 * 60 * 60 * 1000).toISOString();
   const embeddingCutoff = new Date(Date.now() - EMBEDDING_TTL_DAYS * 24 * 60 * 60 * 1000).toISOString();

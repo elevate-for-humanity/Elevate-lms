@@ -241,25 +241,3 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
     </div>
   );
 }
-
-interface BillingFallbackProps {
-  portalPath?: string;
-  message?: string;
-}
-
-export function BillingFallback({ portalPath, message }: BillingFallbackProps) {
-  return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="bg-slate-100 rounded-full p-4 mb-4">
-        <AlertCircle className="w-8 h-8 text-slate-400" />
-      </div>
-      <p className="text-slate-600 mb-4">{message || 'No billing information available.'}</p>
-      <a
-        href={portalPath || '/apprentice'}
-        className="text-brand-blue-600 hover:underline font-medium"
-      >
-        Return to Portal
-      </a>
-    </div>
-  );
-}

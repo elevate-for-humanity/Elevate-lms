@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 const INACTIVE_DAYS = 7;
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const db = await requireAdminClient();
   const cutoff = new Date(Date.now() - INACTIVE_DAYS * 24 * 60 * 60 * 1000).toISOString();
   const today = new Date().toISOString().split('T')[0];

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getTenantContext, TenantContextError } from '@/lib/tenant';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
-import { checkLicenseAccess, type BillingAuthority } from '@/lib/licensing/billing-authority';
+import { checkLicenseAccess } from '@/lib/licensing/billing-authority';
 
 /**
  * STEP 5B: License Enforcement Middleware

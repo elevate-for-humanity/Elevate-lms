@@ -96,7 +96,7 @@ export interface RuntimeContext {
   user?: { id: string; email: string };
 }
 
-type Handler = (req: NextRequest, ctx?: RuntimeContext) => Promise<NextResponse>;
+type Handler = (req: NextRequest, ctx: RuntimeContext) => Promise<NextResponse>;
 // Also accept plain Next.js handlers (no RuntimeContext) so routes that call
 // withRuntime(withApiAudit(...)) without an options object compile and run.
 type AnyHandler = (req: NextRequest, ...args: any[]) => Promise<Response>;
@@ -115,7 +115,7 @@ export function withRuntime(optionsOrHandler: RuntimeOptions | AnyHandler, handl
     const fn = optionsOrHandler;
     return async function wrappedHandler(req: NextRequest, ...args: any[]): Promise<Response> {
       await hydrateProcessEnv();
-      return fn(req, ...args) as Promise<Response>;
+      return fn(req, ...args);
     };
   }
   const options = optionsOrHandler;

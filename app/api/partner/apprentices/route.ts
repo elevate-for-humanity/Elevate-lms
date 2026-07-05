@@ -89,7 +89,12 @@ async function _GET(request: NextRequest) {
           .eq('partner_id', partnerUser.partner_id);
 
         const totalHours = (progressSum || []).reduce((sum, p) => sum + (p.hours_worked || 0), 0);
-        const profile = a.profiles?.[0] as { id: string; full_name: string; email: string; avatar_url: string | null } | null;
+        const profile = a.profiles as {
+          id: string;
+          full_name: string;
+          email: string;
+          avatar_url: string | null;
+        } | null;
 
         return {
           id: profile?.id || a.apprentice_id,

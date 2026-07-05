@@ -42,7 +42,7 @@ async function _POST(req: Request) {
           source: 'website',
         })
         .select()
-        .single() as any,
+        .maybeSingle(),
       'Failed to create booking',
     );
 

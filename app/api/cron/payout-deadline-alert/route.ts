@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const db = await requireAdminClient();
   const in48h = new Date(Date.now() + 48 * 3600000).toISOString().split('T')[0];
   const today = new Date().toISOString().split('T')[0];

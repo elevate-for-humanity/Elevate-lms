@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 const STALE_HOURS = 48;
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const db = await requireAdminClient();
   const cutoff = new Date(Date.now() - STALE_HOURS * 60 * 60 * 1000).toISOString();
 

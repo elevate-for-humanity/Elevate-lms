@@ -27,7 +27,6 @@ import {
   Bell,
   ChevronRight,
   ScissorsIcon,
-  Globe,
   Hammer,
   Sparkles,
   User,
@@ -190,10 +189,6 @@ export default async function ApprenticePortalPage() {
     time: 'Today',
     description: 'Finish your apprenticeship orientation module'
   };
-
-  const programName = 'Indiana Barber Apprenticeship';
-  const programLevel = 'Year 1 Apprentice';
-  const instructorName = 'Assigned Mentor';
 
   const upcomingTasks = [
     { id: 1, title: 'Watch RTI Module 5', due: 'Today', type: 'video' },

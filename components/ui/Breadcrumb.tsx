@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
 export interface BreadcrumbItem {
-  className?: string;
   label: string;
   href?: string;
 }

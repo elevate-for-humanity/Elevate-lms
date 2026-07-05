@@ -289,7 +289,6 @@ export const BEAUTY_CAREER_EDUCATOR: ProgramSchema = {
   funding: {
     wioa_eligible: true,
     wrg_eligible: true,
-    fssa_eligible: false,
     jobReadyIndyEligible: false,
     fundingNotes:
       'ETPL-approved program. WIOA, Workforce Ready Grant, and FSSA Gov Portal eligibility determined by your case manager or WorkOne office.',

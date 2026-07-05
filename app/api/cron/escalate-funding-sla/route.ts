@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 const SLA_DAYS = 5;
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const db = await requireAdminClient();
   const slaCutoff = new Date(Date.now() - SLA_DAYS * 86400000).toISOString();
 

@@ -11,7 +11,7 @@ import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const db = await requireAdminClient();
   const now = new Date();
 
@@ -65,12 +65,12 @@ export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
   }
 
   // Archive expired orgs at day 30
-  const { count: archived } = (await db
+  const { count: archived } = await db
     .from('organizations')
     .update({ status: 'archived', updated_at: now.toISOString() })
     .eq('status', 'trial_expired')
     .lt('updated_at', day30)
-    .select('*', { count: 'exact', head: true } as any)) as any;
+    .select('id', { count: 'exact', head: true });
 
   logger.info('[cron/trial-lifecycle] Done', { warned, expired: expired?.length ?? 0, archived: archived ?? 0 });
   return NextResponse.json({ ok: true, warned, expired: expired?.length ?? 0, archived: archived ?? 0 });

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-const AIChat = dynamic(() => import('@/components/studio/AIChat'), {
+const AIChat = dynamic(() => import('@/components/studio/AIChat').then(m => ({ default: m.AIChat })), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center">

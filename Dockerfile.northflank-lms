@@ -33,7 +33,6 @@ COPY . .
 # 3. SPLIT optimization: Quarantine non-LMS routes to stay under 8GB
 ENV BUILD_SCOPE=LMS
 ENV CI=true
-ENV SPLIT_LIVE_MODE=true
 RUN node scripts/split-app.mjs
 
 # 4. Build with 6GB heap for safety

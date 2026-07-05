@@ -210,7 +210,6 @@ export const ESTHETICIAN_APPRENTICESHIP: ProgramSchema = {
   metaDescription:
     'Earn your Indiana esthetician license through a paid apprenticeship. 700 hours of supervised training. Earn while you learn. Indianapolis.',
   funding: {
-    fssa_eligible: false,
     wioa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,

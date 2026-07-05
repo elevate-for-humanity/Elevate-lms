@@ -237,7 +237,6 @@ export const CULINARY: ProgramSchema = {
 
   fundingOptions: ['wioa', 'employer_paid', 'self_pay'],
   funding: {
-    fssa_eligible: false,
     wioa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,

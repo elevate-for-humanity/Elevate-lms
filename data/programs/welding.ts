@@ -347,7 +347,6 @@ export const WELDING: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,

@@ -28,7 +28,7 @@ interface Anomaly {
   threshold: number;
 }
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const db = await requireAdminClient();
   const now = new Date();
   const since1h  = new Date(now.getTime() - 60 * 60 * 1000).toISOString();

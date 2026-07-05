@@ -48,10 +48,11 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    const result = await payoutService.generateOfficePayouts(body.officeId, {
-      startDate: body.periodStart,
-      endDate: body.periodEnd
-    });
+    const result = await payoutService.generateOfficePayouts(
+      body.officeId,
+      body.periodStart,
+      body.periodEnd
+    );
 
     return NextResponse.json(result);
   } catch (error) {

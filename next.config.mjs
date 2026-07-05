@@ -199,7 +199,7 @@ const nextConfig = {
 
   // Include lib/supabase in standalone builds to fix runtime errors
   outputFileTracingIncludes: {
-    '/**': ['lib/supabase/**', 'lib/logger.ts', 'content/**', 'lib/data/**', 'public/data/**'],
+    '/**': ['lib/supabase/**', 'lib/logger.ts'],
   },
 
   async redirects() {
@@ -757,7 +757,7 @@ const sentryWebpackPluginOptions = {
   widenClientFileUpload: false,
 };
 
-const skipSentry = process.env.SKIP_SENTRY === 'true' || process.env.BUILD_SCOPE === '1';
+const skipSentry = process.env.BUILD_SCOPE === '1';
 
 export default skipSentry
   ? nextConfig

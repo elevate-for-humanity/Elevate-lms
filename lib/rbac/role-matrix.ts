@@ -17,8 +17,7 @@ export type UserRole =
   | 'provider_admin'
   | 'partner'
   | 'delegate'
-  | 'student'
-  | 'mentor';
+  | 'student';
 
 // ── Role sets ─────────────────────────────────────────────────────────────────
 export const ADMIN_ROLES = ['admin', 'staff'] as const;

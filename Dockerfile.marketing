@@ -1,18 +1,16 @@
 # Dockerfile.marketing
 # Specialized for Public Pages / (marketing) / store
+# REVERTED TO GREEN BUILD LOGIC (115c099)
 
 FROM node:22-bookworm AS builder
 
 # Cache invalidation
-RUN echo "nf-cache-invalidate-20260704-marketing-v5"
+RUN echo "nf-cache-invalidate-20260629-marketing-v4"
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 build-essential ca-certificates libcairo2-dev libpango1.0-dev \
     libjpeg-dev libgif-dev librsvg2-dev && rm -rf /var/lib/apt/lists/*
-
-# Stable PNPM (matching lockfileVersion 9.0) - MUST be before split
-RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -22,16 +20,18 @@ COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 COPY . .
 
-# 1. Install ALL dependencies FIRST
-RUN pnpm install --no-frozen-lockfile
-
-# 2. Run the splitter AFTER dependencies are installed
+# Run the splitter
 ENV BUILD_SCOPE=MARKETING
 ENV CI=true
-ENV SPLIT_LIVE_MODE=true
 RUN node scripts/split-app.mjs
 
-# 3. Build with 6GB Limit (MARKETING scope)
+# Stable PNPM (matching lockfileVersion 9.0)
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+
+# 1. Install ALL dependencies
+RUN pnpm install --no-frozen-lockfile
+
+# 2. Build with 6GB Limit (MARKETING scope)
 ENV NODE_OPTIONS=--max-old-space-size=6144
 ENV NEXT_STANDALONE_OUTPUT=1
 RUN pnpm exec cross-env BUILD_SCOPE=MARKETING NODE_OPTIONS='--max-old-space-size=6144' next build

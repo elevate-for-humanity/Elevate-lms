@@ -157,7 +157,7 @@ export default async function AdminStripeIntegrationPage() {
   ]);
 
   const flags: PaymentFlag[] = flagsResult.data ?? [];
-  const enrollments = enrollmentsResult.data ?? [];
+  const enrollments: Enrollment[] = enrollmentsResult.data ?? [];
   const enrollmentPaymentRows: PaymentRow[] = (enrollmentsResult.data ?? []).map((e: any) => ({
     id: e.id,
     full_name: e.full_name ?? null,

@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 const WARN_DAYS_BEFORE = 30;
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const db = await requireAdminClient();
   const now = new Date();
   const warnCutoff = new Date(now.getTime() + WARN_DAYS_BEFORE * 86400000).toISOString();

@@ -86,7 +86,7 @@ async function _POST(request: NextRequest) {
     // 3. Load partner course pricing via course_id
     const { data: partnerCourse, error: courseError } = await supabase
       .from('partner_lms_courses')
-      .select('id, title, retail_price_cents, stripe_price_id')
+      .select('id, course_name, retail_price_cents, stripe_price_id')
       .eq('id', enrollment.course_id)
       .maybeSingle();
 

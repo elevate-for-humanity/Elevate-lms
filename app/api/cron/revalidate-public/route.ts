@@ -29,7 +29,7 @@ export const PUBLIC_REVALIDATE_PATHS = [
   '/contact',
 ] as const;
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   for (const path of PUBLIC_REVALIDATE_PATHS) {
     revalidatePath(path);
   }

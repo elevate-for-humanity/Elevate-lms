@@ -21,10 +21,6 @@ const HomeCareerPathways = dynamic(
   () => import('@/components/home/HomeCareerPathways').then((m) => m.HomeCareerPathways),
   { ssr: true }
 );
-const HomeFeaturedPrograms = dynamic(
-  () => import('@/components/home/HomeFeaturedPrograms').then((m) => m.default),
-  { ssr: true }
-);
 const HomeApprenticeshipInfra = dynamic(
   () => import('@/components/home/HomeApprenticeshipInfra').then((m) => m.HomeApprenticeshipInfra),
   { ssr: true }
@@ -51,26 +47,6 @@ const HomeSegmentedCTA = dynamic(
 );
 const HomeFinalCTA = dynamic(
   () => import('@/components/home/HomeFinalCTA').then((m) => m.HomeFinalCTA),
-  { ssr: true }
-);
-const JourneySelector = dynamic(
-  () => import('@/components/home/JourneySelector').then((m) => m.JourneySelector),
-  { ssr: true }
-);
-const ApprenticeshipSpotlight = dynamic(
-  () => import('@/components/home/ApprenticeshipSpotlight').then((m) => m.ApprenticeshipSpotlight),
-  { ssr: true }
-);
-const FundingQuickCheck = dynamic(
-  () => import('@/components/home/FundingQuickCheck').then((m) => m.FundingQuickCheck),
-  { ssr: true }
-);
-const GraduateTestimonials = dynamic(
-  () => import('@/components/home/GraduateTestimonials').then((m) => m.GraduateTestimonials),
-  { ssr: true }
-);
-const TourBookingWidget = dynamic(
-  () => import('@/components/forms/TourBookingWidget').then((m) => m.TourBookingWidget),
   { ssr: true }
 );
 
@@ -168,26 +144,10 @@ export default async function HomePage() {
       {/* ── 1b. ROTATING MARQUEE BANNER ─────────────────────────────────── */}
       <MarqueeBanner />
 
-      {/* ── 1c. JOURNEY SELECTOR ────────────────────────────────────────── */}
-      {/* User journey selector: Student, Funding, Employer, Agency */}
-      <JourneySelector />
-
-      {/* ── 1d. APPRENTICESHIP SPOTLIGHT ─────────────────────────────── */}
-      {/* Barbering apprenticeship highlight with wage progression calculator */}
-      <ApprenticeshipSpotlight />
-
-      {/* ── 1e. FUNDING QUICK CHECK ───────────────────────────────────── */}
-      {/* Inline eligibility checker for WIOA/funding */}
-      <FundingQuickCheck />
-
       {/* ── 2. HOW ELEVATE WORKS ────────────────────────────────────────── */}
       {/* 6-step operational pipeline: Apply → Funding → Training →
           Apprenticeship → Credential → Employment */}
       <HomeHowItWorks />
-
-      {/* ── 3. FEATURED PROGRAMS ───────────────────────────────────────── */}
-      {/* HVAC, CDL, and Apprenticeships highlighted with premium cards */}
-      <HomeFeaturedPrograms />
 
       {/* ── 4. CAREER PATHWAYS ──────────────────────────────────────────── */}
       {/* 8 featured program cards with credential, funding, and
@@ -212,10 +172,6 @@ export default async function HomePage() {
         <HomeOutcomes />
       </Suspense>
 
-      {/* ── 7b. GRADUATE TESTIMONIALS ───────────────────────────────────── */}
-      {/* Real student success stories with salary comparisons */}
-      <GraduateTestimonials />
-
       {/* ── 8. PLATFORM PREVIEW ─────────────────────────────────────────── */}
       {/* Learner portal, employer dashboard, workforce analytics screenshots.
           System capabilities listed — framed as "supporting student success." */}
@@ -236,14 +192,6 @@ export default async function HomePage() {
       {/* "From where you are to where you want to be."
           Apply Now + Check Eligibility + phone number. */}
       <HomeFinalCTA />
-
-      {/* ── 10b. TOUR BOOKING ─────────────────────────────────────────── */}
-      {/* Schedule a campus tour widget */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-md mx-auto px-4">
-          <TourBookingWidget />
-        </div>
-      </section>
     </>
   );
 }

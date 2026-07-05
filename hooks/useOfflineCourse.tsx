@@ -29,7 +29,6 @@ export function useOfflineCourse(courseId: string) {
   // Check if course is already cached
   useEffect(() => {
     checkOfflineStatus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
 
   const checkOfflineStatus = useCallback(async () => {

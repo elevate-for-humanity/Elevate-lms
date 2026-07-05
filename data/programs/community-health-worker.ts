@@ -77,7 +77,6 @@ export const COMMUNITY_HEALTH_WORKER: ProgramSchema = {
   funding: {
     wioa_eligible: true,
     wrg_eligible: true,
-    fssa_eligible: false,
     etpl_approved: true,
     fundingNotes: 'Indiana ETPL-listed community health worker pathway.',
   },

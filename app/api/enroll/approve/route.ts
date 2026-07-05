@@ -205,7 +205,7 @@ async function _POST(req: NextRequest) {
         user_id: enrollment.user_id,
         application_id: null, // Link if came from application flow
         program_id: enrollment.program_id,
-        program_name: program?.title || 'Barber Apprenticeship',
+        program_name: program?.name || 'Barber Apprenticeship',
         status: 'active',
         total_hours_required: program?.total_hours || 2000,
         hours_completed: 0,
@@ -306,7 +306,7 @@ async function _POST(req: NextRequest) {
           await sendWelcomeEmail({
             email: studentProfile.email,
             name: studentProfile.full_name || 'Student',
-            programName: program?.title || 'Your Program',
+            programName: program?.name || 'Your Program',
             dashboardUrl: `${siteUrl}/learner/dashboard`,
           });
           logger.info('Student approval email sent directly via SendGrid', {

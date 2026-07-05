@@ -19,7 +19,7 @@ const INTERNAL_CHECKS = [
   { name: 'at-risk-detection', path: '/api/internal/at-risk-detection' },
 ];
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const db = await requireAdminClient();
   const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL ?? process.env.DEPLOY_URL ?? '';
   const cronSecret = process.env.CRON_SECRET ?? '';

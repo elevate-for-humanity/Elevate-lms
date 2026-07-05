@@ -260,7 +260,6 @@ export const FORKLIFT: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,

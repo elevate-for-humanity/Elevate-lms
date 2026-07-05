@@ -255,7 +255,6 @@ export const NAIL_TECH: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,

@@ -327,7 +327,6 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
 
   fundingOptions: ['wioa', 'wrg', 'self_pay', 'employer_paid'],
   funding: {
-    fssa_eligible: false,
     wioa_eligible: true,
     wrg_eligible: true,
     etpl_approved: true,

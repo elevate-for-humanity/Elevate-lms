@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const STUCK_MINUTES = 30;
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const db = await requireAdminClient();
   const stuckCutoff = new Date(Date.now() - STUCK_MINUTES * 60000).toISOString();
 

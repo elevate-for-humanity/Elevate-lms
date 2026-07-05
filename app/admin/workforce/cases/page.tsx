@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { Briefcase, Search, Plus, Filter, AlertCircle } from 'lucide-react';
+import { Case, Search, Plus, Filter, AlertCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Cases | Workforce | Admin | Elevate For Humanity',
@@ -110,7 +110,7 @@ export default async function CasesPage() {
             ) : (
               <tr>
                 <td colSpan={6} className="px-4 py-12 text-center text-gray-500">
-                  <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <Case className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                   <p>No cases found</p>
                 </td>
               </tr>

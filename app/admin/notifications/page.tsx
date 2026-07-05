@@ -16,7 +16,7 @@ const STATUS_STYLES: Record<string, string> = {
   failed: 'bg-red-100 text-red-800',
   pending: 'bg-amber-100 text-amber-800',
 };
-const STATUS_ICON: Record<string, React.ComponentType<{ className?: string }>> = {
+const STATUS_ICON: Record<string, React.ElementType> = {
   sent: CheckCircle,
   failed: XCircle,
   pending: Clock,

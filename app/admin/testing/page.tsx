@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 const VENDORS = [
@@ -19,7 +19,9 @@ export default function TestingPage() {
   const [form, setForm] = useState({ student_name: '', vendor: 'certiport', exam_name: '', scheduled_at: '', notes: '' });
   const [filter, setFilter] = useState('upcoming');
 
-  const fetchSessions = useCallback(async () => {
+  useEffect(() => { fetchSessions(); }, []);
+
+  async function fetchSessions() {
     setLoading(true);
     try {
       const supabase = createClient();
@@ -30,9 +32,7 @@ export default function TestingPage() {
       setSessions(data || []);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  }, [filter]);
-
-  useEffect(() => { fetchSessions(); }, [fetchSessions]);
+  }
 
   async function createSession() {
     if (!form.student_name || !form.exam_name || !form.scheduled_at) return;

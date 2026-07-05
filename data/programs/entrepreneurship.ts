@@ -221,7 +221,6 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
 
   fundingOptions: ['wioa', 'self_pay'],
   funding: {
-    fssa_eligible: false,
     wioa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,

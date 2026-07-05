@@ -58,7 +58,7 @@ async function _POST(req: Request) {
     // STEP 1: Get program details
     const { data: program, error: programError } = await db
       .from('programs')
-      .select('id, title, slug, total_cost')
+      .select('id, name, slug, total_cost')
       .eq('slug', programSlug)
       .maybeSingle();
 

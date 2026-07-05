@@ -119,7 +119,7 @@ async function _GET(request: NextRequest) {
     criticalRequirements: critical.length,
     requirements: requirements.map((r) => ({
       ...r,
-      status: getReportingStatus(r.due_date, r.submitted_date),
+      status: getReportingStatus(r, new Date()),
     })),
   });
 }

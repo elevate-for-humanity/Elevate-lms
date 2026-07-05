@@ -486,11 +486,6 @@ export class ContentAutomation {
   /**
    * Schedule automatic updates
    */
-  async run(body?: any): Promise<any> {
-    await this.updateAllFeeds();
-    return { success: true, updated: this.cache.size };
-  }
-
   scheduleAutomaticUpdates(): void {
     this.dataFeeds.forEach((feed) => {
       setInterval(() => {

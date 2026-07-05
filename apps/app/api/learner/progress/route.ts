@@ -255,7 +255,7 @@ function buildLessonProgress(
   const dataMap = new Map(data.map(d => [d.lesson_slug, d]));
   const progress: LessonProgress[] = [];
   
-  for (const mod of blueprint.modules) {
+  for (const module of blueprint.modules) {
     for (const lesson of module.lessons || []) {
       const stored = dataMap.get(lesson.slug);
       progress.push({
@@ -284,7 +284,7 @@ function buildCompetencyProgress(
   const competencyMap = new Map<string, CompetencyProgress>();
   
   // Initialize from blueprint
-  for (const mod of blueprint.modules) {
+  for (const module of blueprint.modules) {
     for (const comp of module.competencies || []) {
       if (!competencyMap.has(comp.competencyKey)) {
         competencyMap.set(comp.competencyKey, {

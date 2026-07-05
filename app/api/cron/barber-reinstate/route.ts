@@ -11,7 +11,7 @@ import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const db = await requireAdminClient();
 
   // Suspended subscriptions with a resolved payment (reinstate_after date passed)

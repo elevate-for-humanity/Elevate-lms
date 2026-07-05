@@ -12,17 +12,17 @@ export const dynamic = 'force-dynamic';
 
 const STALE_MINUTES = 30;
 
-export const GET = withRuntime({ cron: 'bearer' }, async (_req) => {
+export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const db = await requireAdminClient();
   const staleCutoff = new Date(Date.now() - STALE_MINUTES * 60 * 1000).toISOString();
 
   // Timeout stale in-progress jobs
-  const { count: timedOut } = (await db
+  const { count: timedOut } = await db
     .from('provisioning_jobs')
     .update({ status: 'failed', error: 'Timed out after 30 minutes', updated_at: new Date().toISOString() })
     .eq('status', 'in_progress')
     .lt('updated_at', staleCutoff)
-    .select('*', { count: 'exact', head: true } as any)) as any;
+    .select('id', { count: 'exact', head: true });
 
   if (timedOut) logger.warn('[cron/process-provisioning-jobs] Timed out stale jobs', { count: timedOut });
 

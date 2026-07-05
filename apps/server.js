@@ -115,6 +115,7 @@ function attemptRecovery(reason, errorId) {
   const now = Date.now();
   
   if (now - rejectionMetrics.lastRecoveryAttempt < 30_000) {
+    // eslint-disable-next-line no-console
     console.warn(`[admin] recovery: rate limited (last_attempt=${Math.round((now - rejectionMetrics.lastRecoveryAttempt)/1000)}s ago)`);
     return true;
   }
@@ -129,8 +130,10 @@ function attemptRecovery(reason, errorId) {
         try { reason[key] = null; } catch { /* non-writable */ }
       });
     }
+    // eslint-disable-next-line no-console
     console.info(`[admin] recovery: cleared rejection references (error_id=${errorId})`);
   } catch (clearErr) {
+    // eslint-disable-next-line no-console
     console.warn(`[admin] recovery: failed to clear references: ${clearErr.message}`);
   }
 
@@ -138,11 +141,14 @@ function attemptRecovery(reason, errorId) {
   if (typeof global.gc === 'function') {
     try {
       global.gc();
+      // eslint-disable-next-line no-console
       console.info(`[admin] recovery: garbage collection forced (error_id=${errorId})`);
     } catch (gcErr) {
+      // eslint-disable-next-line no-console
       console.warn(`[admin] recovery: GC failed: ${gcErr.message}`);
     }
   } else {
+    // eslint-disable-next-line no-console
     console.info(`[admin] recovery: GC not exposed (start with --expose-gc for best recovery)`);
   }
 
@@ -151,6 +157,7 @@ function attemptRecovery(reason, errorId) {
     try {
       if (require.cache[require.resolve(modName)]) {
         delete require.cache[require.resolve(modName)];
+        // eslint-disable-next-line no-console
         console.info(`[admin] recovery: cleared cache for ${modName}`);
       }
     } catch { /* not loaded */ }
@@ -159,13 +166,16 @@ function attemptRecovery(reason, errorId) {
   // 4. Capture heap snapshot
   try {
     const heapSnapshot = v8.writeHeapSnapshot();
+    // eslint-disable-next-line no-console
     console.info(`[admin] recovery: heap snapshot saved (file=${path.basename(heapSnapshot)}, error_id=${errorId})`);
   } catch (snapshotErr) {
+    // eslint-disable-next-line no-console
     console.warn(`[admin] recovery: heap snapshot failed: ${snapshotErr.message}`);
   }
 
   // 5. Log memory usage
   const memUsage = process.memoryUsage();
+  // eslint-disable-next-line no-console
   console.info(`[admin] recovery: memory (heapUsed=${Math.round(memUsage.heapUsed/1024/1024)}MB, heapTotal=${Math.round(memUsage.heapTotal/1024/1024)}MB, rss=${Math.round(memUsage.rss/1024/1024)}MB)`);
 
   // 6. Emit warning for external monitoring
@@ -175,10 +185,13 @@ function attemptRecovery(reason, errorId) {
       'UnhandledRejection', 'ELMS001', { errorId, recoveryCount: rejectionMetrics.recoveryCount }
     );
   }
+
+  // eslint-disable-next-line no-console
   console.info(`[admin] recovery: attempted (count=${rejectionMetrics.recoveryCount}, error_id=${errorId})`);
 
   // 7. Return false if exceeded recovery limits
   if (rejectionMetrics.recoveryCount > 20) {
+    // eslint-disable-next-line no-console
     console.error(`[admin] recovery: FAILED - exceeded recovery limit (count=${rejectionMetrics.recoveryCount})`);
     return false;
   }

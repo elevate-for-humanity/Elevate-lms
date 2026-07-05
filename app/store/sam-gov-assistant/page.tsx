@@ -16,6 +16,7 @@ import {
   RotateCcw,
   ChevronDown,
 } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import { SAM_GOV_WALKTHROUGH_STEPS } from '@/lib/store/digital-products';
 
 interface Message {
@@ -140,6 +141,21 @@ export default function SamGovAssistantPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Sanitize content to prevent XSS
+  const sanitizeContent = (content: string): string => {
+    // First apply markdown-like transformations
+    const transformed = content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n- /g, '</p><ul><li>')
+      .replace(/\n(\d+)\. /g, '</p><ol><li>')
+      .replace(/\n/g, '<br />')
+      .replace(/<\/li><br \/>/g, '</li><li>')
+      .replace(/<li>([^<]+)$/gm, '<li>$1</li></ul>');
+    // Then sanitize with DOMPurify to prevent XSS
+    return DOMPurify.sanitize(transformed, { ALLOWED_TAGS: ['p', 'strong', 'br', 'ul', 'ol', 'li', 'a', 'b', 'i'] });
+  };
 
   const handleOptionClick = (option: string) => {
     // Add user message
@@ -379,14 +395,7 @@ Come back anytime if you need help!`,
                         color: message.type === 'user' ? 'white' : 'inherit',
                       }}
                       dangerouslySetInnerHTML={{
-                        __html: message.content
-                          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                          .replace(/\n\n/g, '</p><p>')
-                          .replace(/\n- /g, '</p><ul><li>')
-                          .replace(/\n(\d+)\. /g, '</p><ol><li>')
-                          .replace(/\n/g, '<br />')
-                          .replace(/<\/li><br \/>/g, '</li><li>')
-                          .replace(/<li>([^<]+)$/gm, '<li>$1</li></ul>')
+                        __html: sanitizeContent(message.content)
                       }}
                     />
                     {message.options && message.options.length > 0 && (

@@ -1,16 +1,43 @@
-import { Metadata } from 'next';
+export const dynamic = 'force-dynamic';
+/**
+ * Server component — loads all HVAC static data from JSON files
+ * and passes to the client component. Keeps static data arrays
+ * out of the webpack module graph entirely.
+ */
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import HVACClassroomPreview from './CoursePreviewClient';
+import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Hvac Technician | Elevate for Humanity',
-};
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default function Page() {
+
+function loadJson(filename: string) {
+  return JSON.parse(readFileSync(join(process.cwd(), 'public/data', filename), 'utf8'));
+}
+
+export default function HVACCoursePreviewPage() {
+  const quizBanks = loadJson('hvac-quiz-banks.json');
+  const visualLibraryData = loadJson('hvac-visual-library.json');
+  const equipmentModels = loadJson('hvac-equipment-models.json');
+  const serviceScenarios = loadJson('hvac-service-scenarios.json');
+  const condenserScenarios = loadJson('condenser-scenarios.json');
+  const courseDefinitions = loadJson('course-definitions.json');
+  const epa608Data = loadJson('hvac-epa608-prep.json');
+
+  const course = courseDefinitions.find((c: any) => c.slug === 'hvac-technician');
+
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Hvac Technician</h1>
-        <p className="text-gray-600">This page is under construction.</p>
-      </div>
-    </div>
+    <HVACClassroomPreview
+      course={course}
+      quizBanks={quizBanks}
+      visualLibrary={visualLibraryData.HVAC_VISUAL_LIBRARY ?? []}
+      equipmentModels={equipmentModels}
+      serviceScenarios={serviceScenarios}
+      condenserScenarios={condenserScenarios}
+      epa608Questions={epa608Data.EPA608_QUESTIONS ?? []}
+      epa608Sections={epa608Data.EPA608_SECTIONS ?? []}
+    />
   );
 }
+

@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, CheckCircle, ChevronRight, Clock, Phone, Star, Users } from 'lucide-react';
@@ -7,6 +8,7 @@ import { AnimatedStats } from './AnimatedStats';
 import { TrustBadges } from './TrustBadges';
 import { AnimatedLogoStrip, PartnerLogoStrip } from './AnimatedLogoStrip';
 import { AIAdvisorWidget } from './AIAdvisorWidget';
+import { ProgramDiscovery } from './ProgramDiscovery';
 import { useScrollAnimation } from '@/hooks/useAnimatedCounter';
 
 // Statistics for animated counter
@@ -619,6 +621,9 @@ export function PremiumHomePage() {
         subtitle="Our graduates succeed because we invest in their futures"
         dark={false}
       />
+
+      {/* 4b. Program Discovery Quiz */}
+      <ProgramDiscovery />
 
       {/* 5. Programs Preview */}
       <ProgramsPreview />

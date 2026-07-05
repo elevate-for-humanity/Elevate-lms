@@ -53,6 +53,14 @@ const HomeFinalCTA = dynamic(
   () => import('@/components/home/HomeFinalCTA').then((m) => m.HomeFinalCTA),
   { ssr: true }
 );
+const JourneySelector = dynamic(
+  () => import('@/components/home/JourneySelector').then((m) => m.JourneySelector),
+  { ssr: true }
+);
+const ApprenticeshipSpotlight = dynamic(
+  () => import('@/components/home/ApprenticeshipSpotlight').then((m) => m.ApprenticeshipSpotlight),
+  { ssr: true }
+);
 
 // Revalidate every 5 minutes — allows live enrollment stats to refresh
 // without a full rebuild.
@@ -147,6 +155,14 @@ export default async function HomePage() {
 
       {/* ── 1b. ROTATING MARQUEE BANNER ─────────────────────────────────── */}
       <MarqueeBanner />
+
+      {/* ── 1c. JOURNEY SELECTOR ────────────────────────────────────────── */}
+      {/* User journey selector: Student, Funding, Employer, Agency */}
+      <JourneySelector />
+
+      {/* ── 1d. APPRENTICESHIP SPOTLIGHT ─────────────────────────────── */}
+      {/* Barbering apprenticeship highlight with wage progression calculator */}
+      <ApprenticeshipSpotlight />
 
       {/* ── 2. HOW ELEVATE WORKS ────────────────────────────────────────── */}
       {/* 6-step operational pipeline: Apply → Funding → Training →

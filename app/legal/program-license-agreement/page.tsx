@@ -20,7 +20,7 @@ export default function ProgramLicenseAgreementPage() {
       <DocumentPage
         documentType="Program Licensing Agreement"
         title="Inter-Entity Program Licensing Agreement"
-        subtitle="{PLATFORM_DEFAULTS.orgName} (Nonprofit) and 2Exclusive LLC-S (Operating Company)"
+        subtitle={`${PLATFORM_DEFAULTS.orgName} (Nonprofit) and 2Exclusive LLC-S (Operating Company)`}
         date="2025-01-01"
         version="1.0"
         confidential

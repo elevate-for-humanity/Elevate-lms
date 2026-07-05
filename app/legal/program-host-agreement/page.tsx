@@ -20,7 +20,7 @@ export default function ProgramHostAgreementPage() {
       <DocumentPage
         documentType="Master Program Host Agreement"
         title="Master Program Host Agreement"
-        subtitle="{PLATFORM_DEFAULTS.orgName} Training Network — Authorized Delivery Site Agreement"
+        subtitle={`${PLATFORM_DEFAULTS.orgName} Training Network — Authorized Delivery Site Agreement`}
         date="2025-01-01"
         version="1.0"
         confidential

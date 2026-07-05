@@ -135,7 +135,7 @@ export default function FerpaConsentPage() {
           agreementType="ferpa"
           agreementVersion="1.0"
           buttonLabel="Sign FERPA Consent"
-          nextUrl="/student-portal/onboarding"
+          nextUrl="/onboarding/learner"
         />
       </DocumentPage>
     </>

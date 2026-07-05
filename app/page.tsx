@@ -61,6 +61,10 @@ const ApprenticeshipSpotlight = dynamic(
   () => import('@/components/home/ApprenticeshipSpotlight').then((m) => m.ApprenticeshipSpotlight),
   { ssr: true }
 );
+const FundingQuickCheck = dynamic(
+  () => import('@/components/home/FundingQuickCheck').then((m) => m.FundingQuickCheck),
+  { ssr: true }
+);
 
 // Revalidate every 5 minutes — allows live enrollment stats to refresh
 // without a full rebuild.
@@ -163,6 +167,10 @@ export default async function HomePage() {
       {/* ── 1d. APPRENTICESHIP SPOTLIGHT ─────────────────────────────── */}
       {/* Barbering apprenticeship highlight with wage progression calculator */}
       <ApprenticeshipSpotlight />
+
+      {/* ── 1e. FUNDING QUICK CHECK ───────────────────────────────────── */}
+      {/* Inline eligibility checker for WIOA/funding */}
+      <FundingQuickCheck />
 
       {/* ── 2. HOW ELEVATE WORKS ────────────────────────────────────────── */}
       {/* 6-step operational pipeline: Apply → Funding → Training →

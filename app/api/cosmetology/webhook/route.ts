@@ -333,7 +333,11 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
 
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
-        const subscriptionId = invoice.subscription as string;
+        // Access subscription - newer Stripe types use subscription_details.subscription
+        const invoiceAny = invoice as any;
+        const subscriptionId = typeof invoiceAny.subscription_details?.subscription === 'string' 
+          ? invoiceAny.subscription_details.subscription 
+          : (typeof invoiceAny.subscription === 'string' ? invoiceAny.subscription : null);
         if (!subscriptionId) break;
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         if (subscription.metadata?.program !== 'cosmetology-apprenticeship') break;
@@ -439,4 +443,4 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
   return NextResponse.json({ received: true });
 }
 
-export const POST = withRuntime(withApiAudit(_POST, 'cosmetology_webhook'));
+export const POST = withRuntime(withApiAudit('/api/cosmetology/webhook', _POST, { actor_type: 'webhook' }));

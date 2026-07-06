@@ -1,28 +1,52 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { Building2, Users, FileCheck, Shield, BarChart3 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Government Partners | Elevate for Humanity',
-  description: 'Government workforce partnerships',
+  description: 'Workforce development solutions for government agencies, workforce boards, and WIOA programs.',
 };
 
-export default function Page() {
+export default function GovernmentPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-50">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Government Partners</h1>
-          <p className="text-xl text-blue-100">Elevate your career with our workforce development programs</p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Government & Workforce Partners</h1>
+          <p className="text-xl text-blue-100">Serving workforce boards, WIOA programs, and government agencies across Indiana.</p>
         </div>
       </section>
       <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-gray-600 mb-8">This page is under construction. Please check back soon.</p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/contact" className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700">Contact Us</Link>
-            <Link href="/" className="px-6 py-3 border-2 border-brand-blue-600 text-brand-blue-600 font-semibold rounded-lg hover:bg-brand-blue-50">Return Home</Link>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Our Government Services</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl p-6 shadow-lg">
+              <Building2 className="w-10 h-10 text-brand-blue-600 mb-4" />
+              <h3 className="text-xl font-bold mb-2">WIOA Title I Services</h3>
+              <p className="text-slate-600 text-sm">ETPL-approved training provider delivering WIOA-funded programs with full compliance and reporting.</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-lg">
+              <BarChart3 className="w-10 h-10 text-brand-blue-600 mb-4" />
+              <h3 className="text-xl font-bold mb-2">Reporting & Analytics</h3>
+              <p className="text-slate-600 text-sm">Real-time dashboards for enrollment, completion, placement rates, and performance metrics.</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-lg">
+              <FileCheck className="w-10 h-10 text-brand-blue-600 mb-4" />
+              <h3 className="text-xl font-bold mb-2">Compliance & Auditing</h3>
+              <p className="text-slate-600 text-sm">DOL-registered apprenticeship sponsor with full federal and state compliance documentation.</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-lg">
+              <Users className="w-10 h-10 text-brand-blue-600 mb-4" />
+              <h3 className="text-xl font-bold mb-2">Participant Tracking</h3>
+              <p className="text-slate-600 text-sm">End-to-end tracking from enrollment through employment with measurable outcomes.</p>
+            </div>
           </div>
         </div>
+      </section>
+      <section className="py-16 bg-white text-center">
+        <h2 className="text-2xl font-bold mb-4">Ready to Partner?</h2>
+        <p className="text-slate-600 mb-6">Contact us to discuss your workforce development needs.</p>
+        <Link href="/contact" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Contact Our Team</Link>
       </section>
     </div>
   );

@@ -10,6 +10,7 @@ import type { User } from '@supabase/supabase-js';
 export type UserRole =
   | 'student'
   | 'admin'
+  | 'advisor'
   | 'staff'
   | 'employer'
   | 'workforce_board'

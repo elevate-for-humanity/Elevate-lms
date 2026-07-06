@@ -9,6 +9,7 @@
 export type UserRole =
   | 'student'
   | 'admin'
+  | 'advisor'
   | 'staff'
   | 'employer'
   | 'workforce_board'

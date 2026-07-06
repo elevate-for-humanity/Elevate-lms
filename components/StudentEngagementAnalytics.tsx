@@ -165,7 +165,7 @@ export default function StudentEngagementAnalytics() {
           </Card>
 
           <Card className="p-6   ">
-            <h3 className="font-bold mb-2">💡 Insight</h3>
+            <h3 className="font-bold mb-2">Insight</h3>
             <p className="text-sm text-black">
               Peak activity hours are 7-9 PM. Schedule live sessions during this window.
             </p>

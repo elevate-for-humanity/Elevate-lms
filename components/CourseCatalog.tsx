@@ -53,7 +53,7 @@ export function CourseCatalog() {
       rating: 4.9,
       students: 892,
       instructor: 'Nurse Maria Rodriguez',
-      thumbnail: '🏥',
+      thumbnail: 'Heart',
       description: 'Comprehensive CNA training with clinical practice',
       skills: ['Patient Care', 'Vital Signs', 'Medical Records'],
     },

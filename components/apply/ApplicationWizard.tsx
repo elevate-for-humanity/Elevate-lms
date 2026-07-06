@@ -46,7 +46,7 @@ const PROGRAMS = [
 const FUNDING_OPTIONS = [
   { id: 'wioa', name: 'WIOA Funding', desc: 'Workforce Innovation & Opportunity Act', icon: '💼' },
   { id: 'wrg', name: 'Workforce Ready Grant', desc: 'Indiana free training program', icon: '🎓' },
-  { id: 'fssa', name: 'FSSA IMPACT', desc: 'Health & Human Services programs', icon: '🏥' },
+  { id: 'fssa', name: 'FSSA IMPACT', desc: 'Health and Human Services programs' },
   { id: 'vr', name: 'Vocational Rehabilitation', desc: 'Individualized support', icon: '♿' },
   { id: 'self', name: 'Self-Pay', desc: 'Payment plan available', icon: '💳' },
 ];

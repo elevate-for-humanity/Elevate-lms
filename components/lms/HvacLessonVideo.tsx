@@ -1,5 +1,6 @@
 'use client';
 
+import { CheckCircle2 } from 'lucide-react';
 import CourseYouTubeEmbed from '@/components/CourseYouTubeEmbed';
 
 /**
@@ -409,7 +410,7 @@ export default function HvacLessonVideo({
       {ended && (
         <div className="bg-slate-900 px-4 pb-3">
           <div className="flex items-center gap-2 rounded-lg bg-brand-green-600/20 px-3 py-2 text-sm text-brand-green-400">
-            ✅ Lesson complete
+            <CheckCircle2 className="w-4 h-4" /> Lesson complete
           </div>
         </div>
       )}

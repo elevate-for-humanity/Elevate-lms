@@ -26,9 +26,9 @@ interface Campus {
 
 const PROGRAMS: Program[] = [
   { slug: 'barber-apprenticeship', title: 'Barbering', description: 'Launch your career in professional barbering', icon: '✂️', color: 'from-amber-500 to-orange-600' },
-  { slug: 'cosmetology-apprenticeship', title: 'Cosmetology', description: 'Master beauty techniques and styles', icon: '💇', color: 'from-pink-500 to-rose-600' },
-  { slug: 'hvac-technician', title: 'HVAC/Refrigeration', description: 'Earn while you learn refrigeration', icon: '❄️', color: 'from-cyan-500 to-blue-600' },
-  { slug: 'cna-medication-aide', title: 'Healthcare', description: 'Start your healthcare career', icon: '🏥', color: 'from-emerald-500 to-teal-600' },
+  { slug: 'cosmetology-apprenticeship', title: 'Cosmetology', description: 'Master beauty techniques and styles', color: 'from-pink-500 to-rose-600' },
+  { slug: 'hvac-technician', title: 'HVAC/Refrigeration', description: 'Earn while you learn refrigeration', color: 'from-cyan-500 to-blue-600' },
+  { slug: 'cna-medication-aide', title: 'Healthcare', description: 'Start your healthcare career', color: 'from-emerald-500 to-teal-600' },
 ];
 
 const STATS: Stat[] = [

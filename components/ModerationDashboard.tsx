@@ -124,7 +124,7 @@ export default function ModerationDashboard() {
       case 'comment':
         return '💭';
       case 'review':
-        return '⭐';
+        return 'Star';
       case 'message':
         return '✉️';
       default:

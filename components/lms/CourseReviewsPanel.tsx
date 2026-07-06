@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Star, ThumbsUp, Loader2 } from 'lucide-react';
+import { Star, ThumbsUp, Loader2, CheckCircle2 } from 'lucide-react';
 
 interface Review {
   id: string;
@@ -164,7 +164,7 @@ export function CourseReviewsPanel({ courseId, courseName }: CourseReviewsPanelP
 
       {submitted && (
         <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-4 mb-6 text-sm text-brand-green-700 font-medium">
-          ✅ Review submitted — thank you!
+<CheckCircle2 className="w-4 h-4 mr-1" /> Review submitted — thank you!
         </div>
       )}
 

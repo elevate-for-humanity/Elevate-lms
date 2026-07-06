@@ -18,6 +18,7 @@ import {
   RotateCcw,
   ChevronRight,
   Flag,
+  BadgeCheck,
 } from 'lucide-react';
 
 export interface ExamQuestion {
@@ -206,7 +207,7 @@ export default function TimedPracticeExam({
             {pct}%
           </p>
           <p className={`text-lg font-bold ${passed ? 'text-brand-green-800' : 'text-red-800'}`}>
-            {passed ? '✅ PASS' : '❌ NOT PASSING'}
+            {passed ? <><BadgeCheck className="w-4 h-4 mr-1" /> PASS</> : <><XCircle className="w-4 h-4 mr-1" /> NOT PASSING</>}
           </p>
           <p className="text-sm text-slate-600 mt-1">
             {score}/{exam.length} correct · Time: {formatTime(timeTaken)}

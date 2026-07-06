@@ -44,7 +44,7 @@ export default function VirtualCareerFair() {
     {
       id: '2',
       name: 'Healthcare Solutions',
-      logo: '🏥',
+      logo: 'Heart',
       industry: 'Healthcare',
       booth: 'Virtual Booth B2',
       openPositions: 8,

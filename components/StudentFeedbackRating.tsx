@@ -220,7 +220,7 @@ export function StudentFeedbackRating({ courseId }: { courseId?: string }) {
             </Card>
 
             <Card className="p-6   ">
-              <h3 className="font-bold mb-2">💡 Review Guidelines</h3>
+              <h3 className="font-bold mb-2">Review Guidelines</h3>
               <ul className="text-sm text-black space-y-2">
                 <li>• Be specific and constructive</li>
                 <li>• Focus on course content and delivery</li>

@@ -289,7 +289,7 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
               </a>
             </div>
             <div className="bg-white rounded-lg p-6">
-              <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">📍</div>
+              <MapPin className="w-8 h-8 mb-3 text-brand-red-500"/>
               <h3 className="font-bold mb-2 text-white">Visit Us</h3>
               <p className="text-white/90 text-sm">
                 8888 Keystone Crossing

@@ -139,7 +139,7 @@ export function AIInstructorWidget({
                 onClick={() => fetchMessage()}
                 className="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-lg text-sm font-medium text-black transition-colors"
               >
-                💡 Give me a tip
+                Give me a tip
               </button>
               <button
                 onClick={() =>

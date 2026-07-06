@@ -20,7 +20,7 @@ export default function FeedbackWidget({ userId }: FeedbackWidgetProps) {
 
   const feedbackTypes = [
     { value: 'bug', label: '🐛 Bug Report', color: 'red' },
-    { value: 'feature', label: '💡 Feature Request', color: 'blue' },
+    { value: 'feature', label: 'Lightbulb Feature Request', color: 'blue' },
     { value: 'improvement', label: '⚡ Improvement', color: 'yellow' },
     { value: 'complaint', label: '😞 Complaint', color: 'orange' },
     { value: 'praise', label: '🎉 Praise', color: 'green' },

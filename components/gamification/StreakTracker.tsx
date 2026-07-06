@@ -133,7 +133,7 @@ export function StreakTracker({
         <p className="text-sm text-brand-orange-400">
           {streakActive
             ? currentStreak >= 7
-              ? '🔥 Amazing! Keep the momentum going!'
+              ? 'Excellent! Keep the momentum going!'
               : 'Great start! Keep learning daily to build your streak.'
             : 'Your streak ended. Start learning today to begin a new one!'}
         </p>

@@ -243,7 +243,7 @@ Apply today and start your journey.`;
               </>
             )}
             <p className="mt-2 text-xs text-slate-500">
-              💡 Tip: Keep music volume low (20-40%) so voiceover is clear
+              <span className="text-yellow-500">*</span> Tip: Keep music volume low (20-40%) so voiceover is clear
             </p>
           </div>
 

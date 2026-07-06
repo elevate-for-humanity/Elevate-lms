@@ -46,7 +46,7 @@ export function ARTrainingModules() {
       duration: '30 minutes',
       difficulty: 'beginner',
       completionRate: 0,
-      thumbnail: '🏥',
+      thumbnail: 'Heart',
       features: [
         'Interactive equipment models',
         'Patient care simulations',
@@ -94,7 +94,7 @@ export function ARTrainingModules() {
       duration: '50 minutes',
       difficulty: 'intermediate',
       completionRate: 0,
-      thumbnail: '🔥',
+      thumbnail: 'Flame',
       features: [
         'Angle and distance guidance',
         'Bead pattern practice',
@@ -319,7 +319,7 @@ export function ARTrainingModules() {
                   </Card>
 
                   <Card className="p-6   ">
-                    <h3 className="font-bold mb-2">💡 Pro Tip</h3>
+                    <h3 className="font-bold mb-2">Pro Tip</h3>
                     <p className="text-sm text-black">
                       Use headphones for the best experience. Audio cues will guide you through each
                       step.

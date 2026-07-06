@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight } Flame, & from 'lucide-react';
 
 export type AutoPolishedPageProps = {
   route: string; // e.g. "/learner/dashboard"
@@ -443,7 +443,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="inline-flex items-center rounded-full bg-white/20 px-3 py-2 text-xs font-bold text-slate-900 animate-pulse">
-                🔥 NOW ENROLLING
+                <Flame className="w-4 h-4 mr-1"/> NOW ENROLLING
               </span>
               <p className="text-white font-semibold text-sm sm:text-base">
                 Free Career Training - 100% Government Funded • Start in 2 Weeks

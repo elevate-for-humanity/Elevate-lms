@@ -30,7 +30,7 @@ const SERVICE_TYPES = [
   { key: 'shaves', label: 'Straight Razor Shaves', icon: '🪒' },
   { key: 'color_services', label: 'Color Services', icon: '🎨' },
   { key: 'chemical_services', label: 'Chemical Services', icon: '⚗️' },
-  { key: 'styling', label: 'Styling Services', icon: '💇' },
+  { key: 'styling', label: 'Styling Services' },
   { key: 'consultations', label: 'Client Consultations', icon: '💬' },
   { key: 'sanitation', label: 'Sanitation Tasks', icon: '🧼' },
   { key: 'other', label: 'Other Services', icon: '📋' },

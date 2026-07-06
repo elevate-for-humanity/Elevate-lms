@@ -143,7 +143,7 @@ export function EnhancedVideoPlayer(props: EnhancedVideoPlayerProps) {
 
       {/* Video Controls Info */}
       <div className="text-xs text-slate-500 space-y-1">
-        <p>💡 Tip: Use keyboard shortcuts - Space to play/pause, ← → to skip</p>
+        <p><span className="text-yellow-500">*</span> Tip: Use keyboard shortcuts - Space to play/pause, ← → to skip</p>
         {props.provider === 'vimeo' && (
           <p>🎬 Powered by Vimeo - Professional video hosting with analytics</p>
         )}

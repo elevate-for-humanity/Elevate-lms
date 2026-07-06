@@ -123,7 +123,7 @@ export function ProgressTrackingDashboard() {
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Current Streak</h3>
             <p className="text-3xl font-bold text-brand-green-600">{overallProgress.streak} days</p>
-            <p className="text-sm text-black mt-2">🔥 Keep it going!</p>
+            <p className="text-sm text-black mt-2">Keep it going!</p>
           </Card>
 
           <Card className="p-6">
@@ -258,7 +258,7 @@ export function ProgressTrackingDashboard() {
           </Card>
 
           <Card className="p-6   ">
-            <h3 className="font-bold mb-2">💡 Tip</h3>
+            <h3 className="font-bold mb-2">Tip</h3>
             <p className="text-sm text-black">
               Your best learning time is 9-11 AM. Schedule difficult topics during this window.
             </p>

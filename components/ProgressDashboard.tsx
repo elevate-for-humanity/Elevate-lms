@@ -192,7 +192,7 @@ export function ProgressDashboard({ userId }: { userId: string }) {
         <div className="   rounded-lg p-6 text-white">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-              <span className="text-3xl">🔥</span>
+              <Flame className="w-8 h-8 text-orange-500"/>
             </div>
             <div>
               <p className="text-3xl font-bold">{data.streak_days} Days</p>

@@ -151,7 +151,7 @@ export default function ProgramSpecSheet({ spec }: { spec: LOCProgramSpec }) {
             <DataRow label="Modality" value={spec.modality} />
             <DataRow
               label="Next Level Jobs Eligible"
-              value={spec.nextLevelJobsEligible ? '✅ Yes' : 'No'}
+              value={spec.nextLevelJobsEligible ? 'Yes - Eligible for advancement' : 'No'}
               highlight={spec.nextLevelJobsEligible}
             />
           </Section>
@@ -221,12 +221,12 @@ export default function ProgramSpecSheet({ spec }: { spec: LOCProgramSpec }) {
           <Section icon={HelpCircle} title="Student Support Services" id="spec-support">
             <DataRow
               label="Bilingual Support (Spanish)"
-              value={spec.bilingualSupport ? '✅ Available' : 'Not available'}
+              value={spec.bilingualSupport ? 'Available' : 'Not available'}
               highlight={spec.bilingualSupport}
             />
             <DataRow
               label="Tutoring / Academic Support"
-              value={spec.tutoringAvailable ? '✅ Available' : 'Not available'}
+              value={spec.tutoringAvailable ? 'Available' : 'Not available'}
               highlight={spec.tutoringAvailable}
             />
             <DataRow label="Attendance Tracking" value={spec.attendanceTracking} />

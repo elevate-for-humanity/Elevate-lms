@@ -283,7 +283,7 @@ export default function ProgramPageLayout({
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {[
                 { label: 'Duration', value: c.duration, icon: '⏱' },
-                { label: 'Format', value: c.format, icon: '📍' },
+                { label: 'Format', value: c.format },
                 { label: 'Cost', value: c.cost, icon: '💰' },
                 { label: 'Credentials', value: c.credential, icon: '🏆' },
               ].map((f) => (

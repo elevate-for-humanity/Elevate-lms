@@ -168,7 +168,7 @@ export function QuickTips({ tips }: { tips: string[] }) {
   return (
     <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
       <div className="flex items-start gap-2 mb-2">
-        <span className="text-lg">💡</span>
+        <Lightbulb className="w-5 h-5 text-yellow-500"/>
         <h4 className="font-semibold text-amber-900">Quick Tips</h4>
       </div>
       <ul className="space-y-2 ml-7">

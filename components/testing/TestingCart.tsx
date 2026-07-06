@@ -5,15 +5,10 @@ import { ShoppingCart, X, Plus, Minus, Loader2, CreditCard } from 'lucide-react'
 import { useCart } from '@/lib/store/use-cart';
 import { handleTestingCheckout } from '@/lib/store/actions';
 
-<<<<<<< HEAD
 export default function TestingCart() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-=======
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { ShoppingCart, X, Trash2, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
->>>>>>> origin/main
 
   const handleCheckout = async () => {
     setLoading(true);
@@ -102,11 +97,7 @@ import { ShoppingCart, X, Trash2, Loader2, ChevronDown, ChevronUp } from 'lucide
         </button>
 
         {error && (
-<<<<<<< HEAD
           <p className="mt-3 text-xs text-red-400 text-center font-medium">{error}</p>
-=======
-          <div className="bg-red-900/80 px-4 py-2 text-red-200 text-xs text-center">{error}</div>
->>>>>>> origin/main
         )}
       </div>
     </div>

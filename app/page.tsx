@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import heroBanners from '@/content/heroBanners';
 import MarqueeBanner from '@/components/MarqueeBanner';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // Below-the-fold sections: lazy load to improve initial page render

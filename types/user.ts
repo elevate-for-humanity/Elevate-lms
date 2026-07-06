@@ -13,7 +13,16 @@ export type UserRole =
   | 'creator'
   | 'instructor'
   | 'case_manager'
-  | 'provider_admin';
+  | 'provider_admin'
+  | 'super_admin'
+  | 'grant_client'
+  | 'partner_admin'
+  | 'host_shop'
+  | 'government'
+  | 'testing_center'
+  | 'financial_aid'
+  | 'compliance'
+  | 'dev_studio';
 
 export interface User {
   id: string;

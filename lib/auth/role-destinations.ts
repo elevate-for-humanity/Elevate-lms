@@ -19,25 +19,29 @@
 
 export type UserRole =
   | 'student'
-  | 'instructor'
   | 'admin'
-  | 'admin'
-  | 'org_admin'
   | 'staff'
-  | 'program_holder'
-  | 'delegate'
+  | 'employer'
+  | 'workforce_board'
   | 'partner'
   | 'sponsor'
-  | 'employer'
-  | 'host_shop'
   | 'mentor'
+  | 'org_admin'
+  | 'program_holder'
+  | 'delegate'
   | 'creator'
-  | 'workforce_board'
+  | 'instructor'
   | 'case_manager'
   | 'provider_admin'
+  | 'super_admin'
   | 'grant_client'
   | 'partner_admin'
-  | 'admin';
+  | 'host_shop'
+  | 'government'
+  | 'testing_center'
+  | 'financial_aid'
+  | 'compliance'
+  | 'dev_studio';
 
 /**
  * Maps every role to its canonical post-auth landing page.

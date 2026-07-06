@@ -5,6 +5,7 @@ import type { UserRole } from '@/types/database';
 
 export interface ApiAuthResult {
   user: { id: string; email: string };
+  role: UserRole;
   profile: {
     id: string;
     role: UserRole;
@@ -81,6 +82,7 @@ export async function requireApiRole(
 
   return {
     user: { id: user.id, email: user.email || '' },
+    role: profile.role as UserRole,
     profile: profile as ApiAuthResult['profile'],
     db: supabase,
     adminDb: admin,

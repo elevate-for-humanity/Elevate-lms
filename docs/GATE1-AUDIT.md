@@ -7,6 +7,20 @@
 
 ---
 
+## ⚠️ IMPORTANT: OVERLAPPING CATEGORIZATION
+
+**The category counts in this report OVERLAP and DO NOT SUM to 556.**
+
+Individual errors may be counted in multiple categories based on their business impact. For example:
+- An auth error in an enrollment API is counted in both Authentication AND Enrollment
+- A payment error in a credential workflow is counted in both Payments AND Credentials
+
+**The 556 total represents the unique error count after deduplication.**
+
+When reviewing by category, consider each category independently rather than summing them.
+
+---
+
 ## EXECUTIVE SUMMARY
 
 | Metric | Count | % of Total |
@@ -18,6 +32,21 @@
 | Low/Cosmetic | ~364 | 65.5% |
 
 **Assessment:** Majority of errors are type system refinements. Critical payment and authentication errors are isolated and being addressed.
+
+---
+
+## CRITICAL BUSINESS BLOCKERS (Priority 1)
+
+These errors MUST be fixed before merge:
+
+| Category | Unique Files | Error Count | Files with Errors | Priority |
+|----------|-------------|-------------|-------------------|----------|
+| **Payments** | ~15 | 24 | barber, cosmetology, billing, checkout | **CRITICAL** |
+| **Authentication** | ~25 | 52 | auth/*, lib/rbac/* | **CRITICAL** |
+| **Enrollment** | ~40 | 163 | enrollment/*, applications/* | **HIGH** |
+| **Credentials** | ~20 | 41 | certificates/*, exams/*, testing/* | **HIGH** |
+
+**Combined Priority-1 errors: ~280 unique errors across ~50 files**
 
 ---
 

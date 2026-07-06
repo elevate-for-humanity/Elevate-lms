@@ -4,7 +4,7 @@ import { Heart, Users, Calendar } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Volunteer | Elevate for Humanity',
-  description: 'Volunteer opportunities to support workforce development.',
+  keywords: ["volunteer", "mentor", "workforce training", "Indiana"], description: 'Volunteer opportunities to support workforce development.',
 };
 
 export default function VolunteerPage() {

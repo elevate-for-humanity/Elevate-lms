@@ -20,7 +20,7 @@ import {
 const LICENSE_DATA = {
   name: 'Elevate LMS Starter License',
   price: 299,
-  description: 'Single site license with 1 year updates and email support.',
+  keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Single site license with 1 year updates and email support.',
   longDescription:
     'Get the complete Elevate LMS codebase for a single site deployment. Perfect for individual developers, small training providers, or proof of concept projects. Includes 1 year of updates and email support.',
   features: [
@@ -41,20 +41,20 @@ const LICENSE_DATA = {
     'Startups testing the market',
   ],
   appsIncluded: [
-    { name: 'Learning Management System', icon: BookOpen, description: 'Courses, SCORM, certifications' },
-    { name: 'Enrollment & Intake', icon: Users, description: 'Applications and student onboarding' },
-    { name: 'Admin Dashboard', icon: Settings, description: 'User management and reporting' },
-    { name: 'Mobile PWA', icon: Smartphone, description: 'iOS and Android support' },
+    { name: 'Learning Management System', icon: BookOpen, keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Courses, SCORM, certifications' },
+    { name: 'Enrollment & Intake', icon: Users, keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Applications and student onboarding' },
+    { name: 'Admin Dashboard', icon: Settings, keywords: ["get started", "apply", "enroll", "workforce training"], description: 'User management and reporting' },
+    { name: 'Mobile PWA', icon: Smartphone, keywords: ["get started", "apply", "enroll", "workforce training"], description: 'iOS and Android support' },
   ],
 };
 
 const DEMO_PAGES = [
-  { name: 'Homepage', path: '/', description: 'Main landing page' },
-  { name: 'Programs', path: '/programs', description: 'Training programs catalog' },
-  { name: 'Courses', path: '/courses', description: 'Course listings' },
-  { name: 'Apply', path: '/apply', description: 'Student application' },
-  { name: 'LMS Dashboard', path: '/lms/dashboard', description: 'Student portal' },
-  { name: 'Admin', path: '/admin', description: 'Admin dashboard' },
+  { name: 'Homepage', path: '/', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Main landing page' },
+  { name: 'Programs', path: '/programs', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Training programs catalog' },
+  { name: 'Courses', path: '/courses', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Course listings' },
+  { name: 'Apply', path: '/apply', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Student application' },
+  { name: 'LMS Dashboard', path: '/lms/dashboard', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Student portal' },
+  { name: 'Admin', path: '/admin', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Admin dashboard' },
 ];
 
 export default function StarterLicensePage() {

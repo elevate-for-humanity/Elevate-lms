@@ -6,15 +6,15 @@ import { GraduationCap, ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react
 
 export const metadata: Metadata = {
   title: 'Instructor Demo | Elevate LMS Platform',
-  description: 'Explore the instructor experience in the Elevate LMS platform.',
+  keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Explore the instructor experience in the Elevate LMS platform.',
 };
 
 const DEMO_SECTIONS = [
-  { title: 'Course Builder', description: 'Create and organize course content, lessons, and modules.', demoUrl: '/instructor/courses' },
-  { title: 'Assessment Tools', description: 'Build quizzes, assignments, and practical assessments.', demoUrl: '/instructor/assessments' },
-  { title: 'Gradebook', description: 'Track student progress, grades, and completion status.', demoUrl: '/instructor/gradebook' },
-  { title: 'Certificate Templates', description: 'Design and issue certificates upon course completion.', demoUrl: '/instructor/certificates' },
-  { title: 'Student Communication', description: 'Send announcements and messages to enrolled students.', demoUrl: '/instructor/messages' },
+  { title: 'Course Builder', keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Create and organize course content, lessons, and modules.', demoUrl: '/instructor/courses' },
+  { title: 'Assessment Tools', keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Build quizzes, assignments, and practical assessments.', demoUrl: '/instructor/assessments' },
+  { title: 'Gradebook', keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Track student progress, grades, and completion status.', demoUrl: '/instructor/gradebook' },
+  { title: 'Certificate Templates', keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Design and issue certificates upon course completion.', demoUrl: '/instructor/certificates' },
+  { title: 'Student Communication', keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Send announcements and messages to enrolled students.', demoUrl: '/instructor/messages' },
 ];
 
 export default function InstructorDemoPage() {

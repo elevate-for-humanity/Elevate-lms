@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Subscription | Elevate for Humanity',
-  description: 'Subscription page content.',
+  keywords: ["subscription", "platform access", "workforce LMS"], description: 'Subscription page content.',
 };
 
 export default function Page() {

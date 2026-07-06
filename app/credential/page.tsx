@@ -4,7 +4,7 @@ import { Award, CheckCircle, Search } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Verify Credential | Elevate for Humanity',
-  description: 'Verify credentials issued by Elevate for Humanity.',
+  keywords: ["credential", "certification", "verify certificate", "graduates"], description: 'Verify credentials issued by Elevate for Humanity.',
 };
 
 export default function CredentialPage() {

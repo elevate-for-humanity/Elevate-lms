@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Ai Team | Elevate for Humanity',
-  description: 'Ai Team page content.',
+  keywords: ["team", "staff", "workforce development", "Elevate staff"], description: 'Ai Team page content.',
 };
 
 export default function Page() {

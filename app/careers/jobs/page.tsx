@@ -4,7 +4,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Careers & Job Openings | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'View current career opportunities and job openings at Elevate for Humanity.',
+  keywords: ["career training", "workforce development", "job training", "WIOA"], description: 'View current career opportunities and job openings at Elevate for Humanity.',
 };
 
 const JOB_OPENINGS = [
@@ -12,19 +12,19 @@ const JOB_OPENINGS = [
     title: 'Workforce Development Coach',
     type: 'Full-time',
     location: 'Indianapolis, IN',
-    description: 'Help participants navigate workforce training programs and career pathways.',
+    keywords: ["career training", "workforce development", "job training", "WIOA"], description: 'Help participants navigate workforce training programs and career pathways.',
   },
   {
     title: 'Program Coordinator',
     type: 'Full-time',
     location: 'Indianapolis, IN',
-    description: 'Coordinate program scheduling, enrollment, and participant support.',
+    keywords: ["career training", "workforce development", "job training", "WIOA"], description: 'Coordinate program scheduling, enrollment, and participant support.',
   },
   {
     title: 'Employer Relations Specialist',
     type: 'Full-time',
     location: 'Remote',
-    description: 'Build partnerships with employers for job placement and apprenticeships.',
+    keywords: ["career training", "workforce development", "job training", "WIOA"], description: 'Build partnerships with employers for job placement and apprenticeships.',
   },
 ];
 

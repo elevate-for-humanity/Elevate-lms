@@ -4,7 +4,7 @@ import { Users, Heart } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Our Team | Elevate for Humanity',
-  description: 'Meet the dedicated team at Elevate for Humanity working to empower individuals through workforce training.',
+  keywords: ["team", "staff", "workforce development", "Elevate staff"], description: 'Meet the dedicated team at Elevate for Humanity working to empower individuals through workforce training.',
 };
 
 export default function TeamPage() {

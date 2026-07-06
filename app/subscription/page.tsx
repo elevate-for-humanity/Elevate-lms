@@ -4,7 +4,7 @@ import { CreditCard, Check } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Subscription | Elevate for Humanity',
-  description: 'Manage your Elevate platform subscription.',
+  keywords: ["subscription", "platform access", "workforce LMS"], description: 'Manage your Elevate platform subscription.',
 };
 
 export default function SubscriptionPage() {

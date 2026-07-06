@@ -4,7 +4,7 @@ import { User } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Founder | Elevate for Humanity',
-  description: 'Meet the founder of Elevate for Humanity.',
+  keywords: ["founder", "leadership", "Elevate for Humanity"], description: 'Meet the founder of Elevate for Humanity.',
 };
 
 export default function FounderPage() {

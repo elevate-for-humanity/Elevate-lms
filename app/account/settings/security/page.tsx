@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Security Settings',
-  description: 'Manage your account security settings.',
+  keywords: ["security", "data protection", "privacy", "FERPA"], description: 'Manage your account security settings.',
 };
 
 export default async function SecuritySettingsPage() {

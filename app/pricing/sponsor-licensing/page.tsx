@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Sponsor Licensing | Elevate for Humanity',
-  description: 'Sponsor Licensing page content.',
+  keywords: ["tuition", "pricing", "WIOA funding", "financial aid", "Indiana"], description: 'Sponsor Licensing page content.',
 };
 
 export default function Page() {

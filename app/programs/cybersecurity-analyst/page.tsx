@@ -4,7 +4,7 @@ import { Clock, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Workforce Training | Elevate for Humanity',
-  description: 'Workforce training programs with WIOA funding available.',
+  keywords: ["security", "data protection", "privacy", "FERPA"], description: 'Workforce training programs with WIOA funding available.',
 };
 
 export default function ProgramPage() {

@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Interview Prep | Elevate for Humanity',
-  description: 'Interview Prep page content.',
+  keywords: ["services", "workforce development", "training programs"], description: 'Interview Prep page content.',
 };
 
 export default function Page() {

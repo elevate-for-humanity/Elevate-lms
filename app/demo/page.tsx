@@ -4,7 +4,7 @@ import { Play, Monitor, Users, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Request a Demo | Elevate for Humanity',
-  description: 'Schedule a demo of the Elevate workforce development platform.',
+  keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Schedule a demo of the Elevate workforce development platform.',
 };
 
 export default function DemoPage() {

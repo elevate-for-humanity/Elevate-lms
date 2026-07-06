@@ -4,7 +4,7 @@ import { Shield, Lock, Eye } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Security | Elevate for Humanity',
-  description: 'Platform security and data protection policies.',
+  keywords: ["security", "data protection", "privacy", "FERPA"], description: 'Platform security and data protection policies.',
 };
 
 export default function SecurityPage() {

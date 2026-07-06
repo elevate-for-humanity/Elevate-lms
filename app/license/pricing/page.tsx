@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Pricing | Elevate for Humanity',
-  description: 'Pricing page content.',
+  keywords: ["tuition", "pricing", "WIOA funding", "financial aid", "Indiana"], description: 'Pricing page content.',
 };
 
 export default function Page() {

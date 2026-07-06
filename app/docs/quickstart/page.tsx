@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Quickstart | Elevate for Humanity',
-  description: 'Quickstart page content.',
+  keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Quickstart page content.',
 };
 
 export default function Page() {

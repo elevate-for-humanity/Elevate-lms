@@ -1,22 +1,18 @@
 import { Metadata } from 'next';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-
-export const metadata: Metadata = {
-  title: `Services | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Services page.`,
-};
-
-export default function ServicesPage() {
+import Link from 'next/link';
+export const metadata: Metadata = { title: 'Services | Elevate', keywords: ["services", "workforce development", "training programs"], description: 'Our services.' };
+export default function Page() {
   return (
     <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Services</h1>
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold">Our Services</h1>
+          <p className="text-blue-200">Workforce development solutions.</p>
         </div>
       </section>
-      <section className="py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-slate-600">This page is under development.</p>
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <Link href="/programs" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">View Programs</Link>
         </div>
       </section>
     </div>

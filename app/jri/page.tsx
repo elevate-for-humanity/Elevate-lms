@@ -1,22 +1,18 @@
 import { Metadata } from 'next';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-
-export const metadata: Metadata = {
-  title: `Jri | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Jri page.`,
-};
-
-export default function JriPage() {
+import Link from 'next/link';
+export const metadata: Metadata = { title: 'Job Ready Indy | Elevate', description: 'Job Ready Indy page.' };
+export default function Page() {
   return (
     <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Jri</h1>
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold">Job Ready Indy</h1>
+          <p className="text-blue-200">Workforce development.</p>
         </div>
       </section>
-      <section className="py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-slate-600">This page is under development.</p>
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <Link href="/contact" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Contact Us</Link>
         </div>
       </section>
     </div>

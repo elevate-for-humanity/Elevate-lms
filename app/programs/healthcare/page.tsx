@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import ProgramPageTemplate from '@/components/content/ProgramPageTemplate';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 
 export const metadata: Metadata = {
   title: 'Healthcare Training Programs | Elevate for Humanity',
@@ -8,23 +9,33 @@ export const metadata: Metadata = {
 };
 
 export default function HealthcarePage() {
+  const heroBanner = heroBanners['healthcare'];
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-teal-700 to-teal-900 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-teal-200 font-semibold mb-3 uppercase text-sm tracking-wide">Healthcare Programs</p>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">Start Your Healthcare Career</h1>
-          <p className="text-xl text-teal-100 max-w-2xl">
-            Train for in-demand healthcare careers in weeks, not years. Many programs are fully funded through WIOA.
-          </p>
-        </div>
-      </section>
+    <div className="min-h-screen">
+      {/* Hero with Video from your hero-banners.json */}
+      <HeroVideo
+        videoSrcDesktop={heroBanner?.videoSrcDesktop || 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-healthcare.mp4'}
+        videoSrcMobile={heroBanner?.videoSrcMobile}
+        voiceoverSrc={heroBanner?.voiceoverSrc}
+        microLabel={heroBanner?.microLabel || 'Healthcare Programs'}
+        belowHeroHeadline={heroBanner?.belowHeroHeadline || 'Healthcare training that leads to certification.'}
+        belowHeroSubheadline={heroBanner?.belowHeroSubheadline || 'CNA, Medical Assistant, Pharmacy Technician, Phlebotomy, CPR, and more.'}
+        ctas={[
+          { label: 'Enroll Now', href: '/apply?program=healthcare', variant: 'primary' },
+          { label: 'Request Information', href: '/programs/healthcare/request-info', variant: 'secondary' },
+        ]}
+        trustIndicators={heroBanner?.trustIndicators || ['Free with WIOA funding', 'State-approved curricula', 'Clinical rotations included', 'Job placement assistance']}
+        transcript={heroBanner?.transcript}
+        eagerVideoLoad
+        compactBelowHero
+      />
 
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 mb-8">Explore Healthcare Programs</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+            <Link href="/programs/cna" className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow block">
               <h3 className="text-xl font-bold text-slate-900 mb-2">CNA / Nursing Assistant</h3>
               <p className="text-slate-600 text-sm mb-4">Start in healthcare in 4-8 weeks. Work in hospitals, nursing homes, and home health.</p>
               <div className="flex gap-4 text-sm text-slate-500 mb-4">
@@ -32,9 +43,9 @@ export default function HealthcarePage() {
                 <span>•</span>
                 <span>WIOA Eligible</span>
               </div>
-              <Link href="/programs/cna" className="text-teal-600 font-semibold hover:underline">Learn More →</Link>
-            </div>
-            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <span className="text-teal-600 font-semibold">Learn More →</span>
+            </Link>
+            <Link href="/programs/medical-assistant" className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow block">
               <h3 className="text-xl font-bold text-slate-900 mb-2">Medical Assistant</h3>
               <p className="text-slate-600 text-sm mb-4">Clinical and administrative skills for physician offices and clinics.</p>
               <div className="flex gap-4 text-sm text-slate-500 mb-4">
@@ -42,9 +53,9 @@ export default function HealthcarePage() {
                 <span>•</span>
                 <span>WIOA Eligible</span>
               </div>
-              <Link href="/programs/medical-assistant" className="text-teal-600 font-semibold hover:underline">Learn More →</Link>
-            </div>
-            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <span className="text-teal-600 font-semibold">Learn More →</span>
+            </Link>
+            <Link href="/programs/pharmacy-technician" className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow block">
               <h3 className="text-xl font-bold text-slate-900 mb-2">Pharmacy Technician</h3>
               <p className="text-slate-600 text-sm mb-4">Prepare prescriptions and assist pharmacists in retail and hospital settings.</p>
               <div className="flex gap-4 text-sm text-slate-500 mb-4">
@@ -52,9 +63,9 @@ export default function HealthcarePage() {
                 <span>•</span>
                 <span>Certification Prep</span>
               </div>
-              <Link href="/programs/pharmacy-technician" className="text-teal-600 font-semibold hover:underline">Learn More →</Link>
-            </div>
-            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <span className="text-teal-600 font-semibold">Learn More →</span>
+            </Link>
+            <Link href="/programs/phlebotomy" className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow block">
               <h3 className="text-xl font-bold text-slate-900 mb-2">Phlebotomy Technician</h3>
               <p className="text-slate-600 text-sm mb-4">Draw blood for tests, donations, and research. High demand in hospitals and labs.</p>
               <div className="flex gap-4 text-sm text-slate-500 mb-4">
@@ -62,9 +73,9 @@ export default function HealthcarePage() {
                 <span>•</span>
                 <span>Certification Prep</span>
               </div>
-              <Link href="/programs/phlebotomy" className="text-teal-600 font-semibold hover:underline">Learn More →</Link>
-            </div>
-            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <span className="text-teal-600 font-semibold">Learn More →</span>
+            </Link>
+            <Link href="/programs/qma" className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow block">
               <h3 className="text-xl font-bold text-slate-900 mb-2">QMA / Medication Aide</h3>
               <p className="text-slate-600 text-sm mb-4">Administer medications in nursing homes under RN supervision.</p>
               <div className="flex gap-4 text-sm text-slate-500 mb-4">
@@ -72,9 +83,9 @@ export default function HealthcarePage() {
                 <span>•</span>
                 <span>CNA Required</span>
               </div>
-              <Link href="/programs/qma" className="text-teal-600 font-semibold hover:underline">Learn More →</Link>
-            </div>
-            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <span className="text-teal-600 font-semibold">Learn More →</span>
+            </Link>
+            <Link href="/programs/home-health-aide" className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow block">
               <h3 className="text-xl font-bold text-slate-900 mb-2">Home Health Aide</h3>
               <p className="text-slate-600 text-sm mb-4">Care for patients in their homes, helping with daily activities.</p>
               <div className="flex gap-4 text-sm text-slate-500 mb-4">
@@ -82,8 +93,8 @@ export default function HealthcarePage() {
                 <span>•</span>
                 <span>High Demand</span>
               </div>
-              <Link href="/programs/home-health-aide" className="text-teal-600 font-semibold hover:underline">Learn More →</Link>
-            </div>
+              <span className="text-teal-600 font-semibold">Learn More →</span>
+            </Link>
           </div>
         </div>
       </section>

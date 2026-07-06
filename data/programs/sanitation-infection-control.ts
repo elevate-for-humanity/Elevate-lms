@@ -209,6 +209,7 @@ export const SANITATION: ProgramSchema = {
 
   fundingOptions: ['wioa', 'wioa', 'self_pay'],
   funding: {
+    fssa_eligible: false,
     wioa_eligible: true,
     wrg_eligible: false,
     jobReadyIndyEligible: false,

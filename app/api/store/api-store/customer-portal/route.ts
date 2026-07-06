@@ -1,4 +1,5 @@
-import { createClient, safeGetUser } from '@/lib/supabase/server';
+import { safeGetUser } from '@/lib/supabase/server';
+import { getAdminClient } from '@/lib/supabase/admin';
 // PUBLIC ROUTE: Stripe customer portal redirect
 
 import { stripe } from '@/lib/stripe/client';
@@ -15,20 +16,21 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase =
-  supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
-
 async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-  if (!stripe || !supabase) {
+  if (!stripe) {
     return NextResponse.json(
-      { error: 'Stripe or Supabase not configured' },
+      { error: 'Stripe not configured' },
+      { status: 503 }
+    );
+  }
+
+  const supabase = await getAdminClient();
+  if (!supabase) {
+    return NextResponse.json(
+      { error: 'Supabase not configured' },
       { status: 503 }
     );
   }

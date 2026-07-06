@@ -6,6 +6,7 @@ import { CPR_PRICE_CENTS, CPR_PROGRAM_SLUG } from '@/lib/cpr/pricing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getStripeMethodsForAmount } from '@/lib/bnpl-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import type Stripe from 'stripe';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     const siteUrl =
       (process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl;
-    const paymentMethods = getStripeMethodsForAmount(CPR_PRICE_CENTS / 100) as ('card' | 'bank_transfer')[];
+    const paymentMethods = getStripeMethodsForAmount(CPR_PRICE_CENTS / 100);
 
     const customers = await stripe.customers.list({ email: customer_email, limit: 1 });
     const customerId =
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
       ui_mode: 'embedded',
       redirect_on_completion: 'never',
       customer: customerId,
-      payment_method_types: paymentMethods,
+      payment_method_types: paymentMethods as Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
       line_items: [
         {
           price_data: {

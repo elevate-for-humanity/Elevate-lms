@@ -11,7 +11,7 @@ import { logSecurityEventAction } from '@/lib/actions/security';
  * Monitors and logs security events in real-time
  */
 export function SecurityMonitor() {
-  useEffect(() => {
+  useEffect((): void => {
     // Safety check - only run in browser
     if (typeof window === 'undefined') return;
 

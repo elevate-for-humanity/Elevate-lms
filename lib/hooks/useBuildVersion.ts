@@ -32,7 +32,7 @@ let checkIntervalId: ReturnType<typeof setInterval> | null = null;
 export function useBuildVersion() {
   const initialized = useRef(false);
 
-  const checkForBuildMismatch = useCallback(async () => {
+  const checkForBuildMismatch = useCallback(async (): Promise<boolean> => {
     try {
       // Fetch current build version from server
       const response = await fetch('/api/health/build-version', {
@@ -40,7 +40,7 @@ export function useBuildVersion() {
         headers: { 'Cache-Control': 'no-cache' },
       });
       
-      if (!response.ok) return;
+      if (!response.ok) return false;
       
       const { buildVersion: serverVersion } = await response.json();
       const storedVersion = sessionStorage.getItem(BUILD_VERSION_KEY);
@@ -61,7 +61,7 @@ export function useBuildVersion() {
     return false;
   }, []);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (initialized.current) return;
     initialized.current = true;
 

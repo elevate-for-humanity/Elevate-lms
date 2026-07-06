@@ -53,12 +53,12 @@ export function NotificationBell() {
     }
   }, []);
 
-  useEffect(() => {
+  useEffect((): void => {
     void fetchNotifications();
 
     // Subscribe to realtime notifications
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user } }): void => {
       if (!user) return;
       const unsubscribe = subscribeToNotifications(user.id, (payload) => {
         const newNotif = payload as any;

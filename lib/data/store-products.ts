@@ -343,3 +343,8 @@ export const ALL_PRODUCTS: StoreProduct[] = [
   ...CLONE_LICENSES,
 ];
 export const STORE_PRODUCTS = [...WORKFORCE_PLATFORM_PLANS];
+
+// Lookup helper
+export function getProductBySlug(slug: string): StoreProduct | undefined {
+  return ALL_PRODUCTS.find((p) => p.slug === slug);
+}

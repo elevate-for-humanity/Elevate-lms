@@ -1,4 +1,4 @@
-import { STATIC_PROGRAMS } from '@/data/programs/index';
+import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
 
 /**
  * One Canonical Program Registry
@@ -11,7 +11,7 @@ import { STATIC_PROGRAMS } from '@/data/programs/index';
  * - Checkout flows
  */
 
-export const PROGRAM_REGISTRY = STATIC_PROGRAMS;
+export const PROGRAM_REGISTRY = STATIC_PROGRAM_MAP;
 
 /** 
  * Returns the registry filtered by category for dynamic navigation.

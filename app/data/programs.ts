@@ -39,6 +39,18 @@ export type Program = {
   ctaPrimary: { label: string; href: string };
   ctaSecondary?: { label: string; href: string };
   price?: number;
+  downPayment?: number;
+  weeklyPayment?: number;
+  paymentWeeks?: number;
+  fundingType?: string;
+  paymentPlan?: {
+    totalPrice: number;
+    downPayment: number;
+    remainingBalance: number;
+    weeklyPayment: number;
+    numberOfWeeks: number;
+    description: string;
+  };
   etplProgramId?: string;
   partnerUrl?: string;
   partners?: string[];

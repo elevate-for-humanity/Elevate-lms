@@ -59,7 +59,7 @@ async function _POST(req: Request) {
     .eq('id', gradeItemId)
     .maybeSingle();
 
-  if (!gradeItem || (gradeItem.courses as string)?.instructor_id !== user.id) {
+  if (!gradeItem || (gradeItem.courses as { instructor_id?: string } | null)?.instructor_id !== user.id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

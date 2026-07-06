@@ -9,7 +9,7 @@ import { db } from '@/lib/db';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { writeApiAuditEvent } from '@/lib/audit/api-audit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
@@ -78,13 +78,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to create job' }, { status: 500 });
     }
 
-    await withApiAudit({
-      userId: user.id,
-      tenantId: profile.tenant_id,
-      action: 'course_generation_job_created',
-      resourceType: 'course_generation_job',
-      resourceId: job.id,
-      details: { title, occupation, soc_code },
+    await writeApiAuditEvent({
+      endpoint: '/api/course-generator/jobs',
+      method: 'POST',
+      actor_type: 'admin',
+      actor_id: user.id,
+      params: { title, occupation, soc_code },
+      result: 'success',
     });
 
     return NextResponse.json({

@@ -61,19 +61,19 @@ const SecretsPanel = dynamic(
   { ssr: false }
 );
 const LizzyFilesPanel = dynamic(
-  () => import('./LizzyFilesPanel').then((m) => m.default || m),
+  () => import('./LizzyFilesPanel').then((m) => m.LizzyFilesPanel),
   { ssr: false }
 );
 const LizzyUploadPanel = dynamic(
-  () => import('./LizzyUploadPanel').then((m) => m.default || m),
+  () => import('./LizzyUploadPanel').then((m) => m.LizzyUploadPanel),
   { ssr: false }
 );
 const LizzyErrorsPanel = dynamic(
-  () => import('./LizzyErrorsPanel').then((m) => m.default || m),
+  () => import('./LizzyErrorsPanel').then((m) => m.LizzyErrorsPanel),
   { ssr: false }
 );
 const LizzyVideoPanel = dynamic(
-  () => import('./LizzyVideoPanel').then((m) => m.default || m),
+  () => import('./LizzyVideoPanel').then((m) => m.LizzyVideoPanel),
   { ssr: false }
 );
 const LizzyOperationsPanel = dynamic(

@@ -287,6 +287,7 @@ export const BEAUTY_CAREER_EDUCATOR: ProgramSchema = {
 
   fundingOptions: ['wioa', 'employer_paid', 'self_pay'],
   funding: {
+    fssa_eligible: false,
     wioa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: false,

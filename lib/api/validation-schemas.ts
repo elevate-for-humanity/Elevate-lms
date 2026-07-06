@@ -267,10 +267,10 @@ export async function validateRequestBody<T>(request: Request, schema: z.ZodSche
     return schema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      throw new Error(
-        `Validation failed: ${error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`,
-        { cause: error },
-      );
+      const message = `Validation failed: ${error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`;
+      const err = new Error(message);
+      (err as { cause?: unknown }).cause = error;
+      throw err;
     }
     throw error;
   }

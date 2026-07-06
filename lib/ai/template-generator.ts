@@ -253,7 +253,9 @@ export async function generateTemplate(
       },
     };
   } catch (error) {
-    throw new Error(`Template generation failed: ${error instanceof Error ? error.message : 'Unknown'}`, { cause: error });
+    const e = new Error(`Template generation failed: ${error instanceof Error ? error.message : 'Unknown'}`);
+    (e as { cause?: unknown }).cause = error;
+    throw e;
   }
 }
 

@@ -75,6 +75,7 @@ export const COMMUNITY_HEALTH_WORKER: ProgramSchema = {
   metaDescription:
     'Earn Indiana CHW certification in 8–10 weeks. WIOA and WRG funding available for eligible residents.',
   funding: {
+    fssa_eligible: false,
     wioa_eligible: true,
     wrg_eligible: true,
     etpl_approved: true,

@@ -27,7 +27,7 @@ function patchKpi(cards: KPICard[], labelFragment: string, updater: (v: number) 
 export function RealtimeKpiGrid({ kpis: initialKpis }: Props) {
   const [kpis, setKpis] = useState<KPICard[]>(initialKpis);
 
-  useEffect(() => {
+  useEffect((): void => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     if (!url || !key) return;

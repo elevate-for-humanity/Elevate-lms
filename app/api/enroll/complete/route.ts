@@ -238,12 +238,8 @@ async function _POST(req: Request) {
       const { sendWelcomeEmail } = await import('@/lib/email/sendgrid');
       const isBarberProgram =
         programSlug === 'barber-apprenticeship' ||
-        program.title ||
-        program?.title ||
-        program?.name.toLowerCase().includes('barber') ||
-        program.title ||
-        program?.title ||
-        program?.name.toLowerCase().includes('apprentice');
+        program?.title?.toLowerCase().includes('barber') ||
+        program?.title?.toLowerCase().includes('apprentice');
 
       await sendWelcomeEmail({
         email: emailLower,

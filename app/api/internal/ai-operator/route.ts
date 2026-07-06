@@ -50,7 +50,7 @@ export const POST = withRuntime({ cron: true }, async () => {
   }
 
   if (!events?.length) {
-    return NextResponse.json({ ok: true, triaged: 0 });
+    return NextResponse.json({ ok: true, __triaged: 0 });
   }
 
   // Build a compact event summary for the AI prompt
@@ -75,7 +75,7 @@ Respond with a JSON object:
 
 Respond with ONLY valid JSON, no markdown.`;
 
-  let _triaged = 0;
+  let __triaged = 0;
   let autoResolved = 0;
 
   try {
@@ -107,25 +107,27 @@ Respond with ONLY valid JSON, no markdown.`;
     const autoResolvable = parsed.auto_resolvable === true;
 
     // Write admin alert with AI recommendation
-    await db.from('admin_alerts').insert({
-      alert_type: 'ai_operator_triage',
-      severity: priority === 'critical' ? 'critical' : priority === 'high' ? 'high' : 'warning',
-      message: summary,
-      details: {
-        recommended_action: recommendation,
-        event_count: events.length,
-        event_ids: events.map((e) => e.id),
-        auto_resolvable: autoResolvable,
-        triaged_at: new Date().toISOString(),
-      },
-      metadata: {
-        source: 'ai_operator',
-        priority,
-        event_types: [...new Set(events.map((e) => e.event_type))],
-      },
-    }).catch((err: unknown) => {
+    try {
+      await db.from('admin_alerts').insert({
+        alert_type: 'ai_operator_triage',
+        severity: priority === 'critical' ? 'critical' : priority === 'high' ? 'high' : 'warning',
+        message: summary,
+        details: {
+          recommended_action: recommendation,
+          event_count: events.length,
+          event_ids: events.map((e) => e.id),
+          auto_resolvable: autoResolvable,
+          __triaged_at: new Date().toISOString(),
+        },
+        metadata: {
+          source: 'ai_operator',
+          priority,
+          event_types: [...new Set(events.map((e) => e.event_type))],
+        },
+      });
+    } catch (err) {
       logger.warn('[ai-operator] Failed to write admin_alert', err);
-    });
+    }
 
     // Mark events resolved if AI says they're auto-resolvable
     if (autoResolvable) {
@@ -138,7 +140,7 @@ Respond with ONLY valid JSON, no markdown.`;
       autoResolved = ids.length;
     }
 
-    _triaged = events.length;
+    __triaged = events.length;
 
     // Emit summary event
     await emitEvent('ai.operator_triage', 'ai', {
@@ -151,13 +153,13 @@ Respond with ONLY valid JSON, no markdown.`;
         summary,
         recommendation,
       },
-      message: `AI operator triaged ${events.length} event${events.length !== 1 ? 's' : ''}: ${summary.slice(0, 100)}`,
+      message: `AI operator __triaged ${events.length} event${events.length !== 1 ? 's' : ''}: ${summary.slice(0, 100)}`,
     }).then(() => {}, () => {});
   } catch (err) {
     logger.error('[ai-operator] AI triage failed', { error: err instanceof Error ? err.message : String(err) });
     return NextResponse.json({ error: 'AI triage failed' }, { status: 500 });
   }
 
-  logger.info('[ai-operator] Run complete', { triaged, autoResolved });
-  return NextResponse.json({ ok: true, triaged, autoResolved });
+  logger.info('[ai-operator] Run complete', { __triaged, autoResolved });
+  return NextResponse.json({ ok: true, __triaged, autoResolved });
 });

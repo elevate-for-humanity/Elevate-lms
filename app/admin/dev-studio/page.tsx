@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 const DevStudioMobileShell = dynamic(
   () => import('@/components/studio/DevStudioMobileShell'),

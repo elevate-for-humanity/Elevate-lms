@@ -55,7 +55,7 @@ async function _POST(request: NextRequest) {
       .maybeSingle();
 
     // DB write is required — no fallthrough on failure
-    const enrollment = await requireDbWrite(
+    const enrollment = await requireDbWrite<{ id: string; email: string }>(
       supabase
         .from('program_enrollments')
         .insert({
@@ -86,7 +86,7 @@ async function _POST(request: NextRequest) {
           }),
         })
         .select()
-        .maybeSingle(),
+        .maybeSingle() as unknown as Promise<{ data: { id: string; email: string } | null; error: unknown }>,
       'Failed to create enrollment record. Please try again or call ' + PLATFORM_DEFAULTS.supportPhone + '.',
     );
 

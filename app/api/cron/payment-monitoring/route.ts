@@ -45,7 +45,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const overdueCount = overduePayouts?.length ?? 0;
 
   if (failureCount > 0 || overdueCount > 0) {
-    await emitEvent('payment.monitoring_alert', 'payments', {
+    await emitEvent('payment.monitoring_alert', 'payment', {
       severity: failureCount > 5 ? 'error' : 'warning',
       actor_type: 'cron',
       payload: { unresolved_failures: failureCount, overdue_payouts: overdueCount },

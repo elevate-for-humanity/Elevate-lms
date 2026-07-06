@@ -23,7 +23,7 @@ export function useAnimatedCounter({
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLElement>(null);
 
-  useEffect(() => {
+  useEffect((): void => {
     const el = ref.current;
     if (!el) return;
 
@@ -40,7 +40,7 @@ export function useAnimatedCounter({
     return () => observer.disconnect();
   }, [isVisible]);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (!isVisible) return;
 
     let startTime: number;
@@ -88,7 +88,7 @@ export function useScrollAnimation(delay = 0) {
   const ref = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
+  useEffect((): void => {
     const el = ref.current;
     if (!el) return;
 

@@ -247,6 +247,7 @@ export const CPR_FIRST_AID: ProgramSchema = {
 
 
   funding: {
+    fssa_eligible: false,
     wioa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,

@@ -102,7 +102,7 @@ async function _POST(request: Request) {
         );
 
         if (error) {
-          logger.error('Error upserting grant_match', grant.id, entity.id, error);
+          logger.error('Error upserting grant_match', { grantId: grant.id, entityId: entity.id }, error as Error);
         }
       }
     }

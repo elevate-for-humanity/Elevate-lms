@@ -172,7 +172,7 @@ async function _POST(req: Request) {
           user_id: admin.id,
           type: 'system',
           title: 'New Enrollment Pending Approval',
-          message: `${firstName} ${lastName} (${emailLower}) has enrolled in ${program.title}. Enrollment ID: ${enrollmentId}`,
+          message: `${firstName} ${lastName} (${emailLower}) has enrolled in ${program.name}. Enrollment ID: ${enrollmentId}`,
         }));
 
         await db.from('notifications').insert(notifications);

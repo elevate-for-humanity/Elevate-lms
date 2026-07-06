@@ -342,7 +342,7 @@ export default function AutomatedEnrollmentWorkflow({
     }
   };
 
-  useEffect(() => {
+  useEffect((): void => {
     const loadData = async () => {
       setLoading(true);
       await Promise.all([fetchEnrollmentData(), fetchStats()]);
@@ -351,7 +351,7 @@ export default function AutomatedEnrollmentWorkflow({
     loadData();
   }, [fetchEnrollmentData, fetchStats]);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (!enrollmentId) return;
 
     const channel = supabase

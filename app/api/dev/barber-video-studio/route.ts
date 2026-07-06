@@ -16,7 +16,7 @@ export async function GET() {
 
   // Require admin authentication
   const auth = await apiRequireAdmin();
-  if (!auth.authorized) {
+  if (auth.error) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

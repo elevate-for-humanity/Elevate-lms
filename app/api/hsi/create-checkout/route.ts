@@ -1,12 +1,14 @@
 // PUBLIC ROUTE: HSI program checkout
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getStripe, stripe } from '@/lib/stripe/client';
+import { getStripe } from '@/lib/stripe/client';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import type Stripe from 'stripe';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -17,11 +19,12 @@ async function _POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await requireAdminClient();
+  const stripeClient = getStripe();
 
   if (!supabase) {
     return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
   }
-  if (!stripe) {
+  if (!stripeClient) {
     return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
   }
 
@@ -41,8 +44,8 @@ async function _POST(request: NextRequest) {
     }
 
     // Create Stripe checkout session with Buy Now Pay Later options
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card', 'afterpay_clearpay', 'klarna', 'us_bank_account'],
+    const session = await stripeClient.checkout.sessions.create({
+      payment_method_types: ['card', 'afterpay_clearpay', 'klarna', 'us_bank_account'] as Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
       line_items: [
         {
           price_data: {

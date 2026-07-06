@@ -104,7 +104,7 @@ export function RightSidebar() {
         title: a.title,
         type: 'assignment' as const,
         dueDate: new Date(a.due_date),
-        courseTitle: (a.courses as string)?.title || 'Unknown Course',
+        courseTitle: (a.courses as { title?: string } | null)?.title || 'Unknown Course',
         courseId: a.course_id,
       }));
       setDeadlines(formattedDeadlines);

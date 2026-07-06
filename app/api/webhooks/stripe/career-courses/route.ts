@@ -133,7 +133,7 @@ async function _POST(req: Request) {
 
     case 'payment_intent.payment_failed': {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
-      logger.info('Payment failed:', paymentIntent.id);
+      logger.info('Payment failed', { paymentIntentId: paymentIntent.id });
       break;
     }
   }

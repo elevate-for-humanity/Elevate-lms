@@ -10,5 +10,5 @@ export function licenseAllows(config: OrgConfig, feature: string): boolean {
     return true;
   }
 
-  return (config as any).license.features[feature] !== false;
+  return config.license.features[feature] !== false;
 }

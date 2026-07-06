@@ -66,7 +66,7 @@ export default function HvacLessonVideo({
   const [audioReady, setAudioReady] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
 
-  useEffect(() => {
+  useEffect((): void => {
     // Priority 1: YouTube URL — render embed directly, no HEAD check needed
     if (dbVideoUrl && /youtube\.com|youtu\.be/.test(dbVideoUrl)) {
       setMode('youtube' as MediaMode);
@@ -116,13 +116,13 @@ export default function HvacLessonVideo({
         const audioPath = `/hvac/audio/lesson-${resolvedUuid}.mp3`;
 
         fetch(audioPath, { method: 'HEAD' })
-          .then((r) => {
+          .then((r): void | Promise<void> => {
             if (r.ok) {
               setMp3Url(audioPath);
               setMode('mp3+avatar');
               return;
             }
-            return Promise.resolve()
+            Promise.resolve()
               .then(() => {
                 setMode('broll');
               })

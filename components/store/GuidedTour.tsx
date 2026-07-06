@@ -28,7 +28,7 @@ export default function GuidedTour({
   const currentStepData = steps[currentStep];
 
   // Check if tour was already completed
-  useEffect(() => {
+  useEffect((): void => {
     if (typeof window === 'undefined') return;
 
     const completed = localStorage.getItem(GUIDE_STORAGE_KEYS.TOUR_COMPLETED(tourId));
@@ -40,7 +40,7 @@ export default function GuidedTour({
   }, [tourId, autoStart, startTour]);
 
   // Update target element position
-  useEffect(() => {
+  useEffect((): void => {
     if (!isActive || !currentStepData) return;
 
     const updatePosition = () => {
@@ -140,7 +140,7 @@ export default function GuidedTour({
   }, []);
 
   // Handle keyboard navigation
-  useEffect(() => {
+  useEffect((): void => {
     if (!isActive) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {

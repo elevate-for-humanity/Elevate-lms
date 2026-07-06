@@ -17,7 +17,7 @@ export default function SignaturePad({ onSave, width = 500, height = 200 }: Sign
   const [signaturePad, setSignaturePad] = useState<SignatureCanvas | null>(null);
   const [isEmpty, setIsEmpty] = useState(true);
 
-  useEffect(() => {
+  useEffect((): void | (() => void) => {
     if (canvasRef.current) {
       const pad = new SignatureCanvas(canvasRef.current, {
         backgroundColor: 'rgb(255, 255, 255)',

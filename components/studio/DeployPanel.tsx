@@ -151,7 +151,7 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
     }
   }
 
-  useEffect(() => {
+  useEffect((): void => {
     if (!lastResult?.runId) return;
     refreshRun();
     const timer = window.setInterval(refreshRun, 5000);

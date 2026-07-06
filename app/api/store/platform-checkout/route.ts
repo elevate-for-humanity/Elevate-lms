@@ -14,6 +14,7 @@ import {
   type BasePlanId,
   type BillingInterval,
 } from '@/lib/store/platform-pricing';
+import type Stripe from 'stripe';
 
 async function _POST(request: NextRequest) {
   try {
@@ -114,7 +115,7 @@ async function _POST(request: NextRequest) {
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      payment_method_types: ['card'],
+      payment_method_types: ['card'] as Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
       line_items: lineItems,
       mode: 'subscription',
       success_url: `${siteUrl}/store/plans?success=1`,

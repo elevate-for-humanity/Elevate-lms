@@ -8,7 +8,7 @@ export type PreviewDevice = 'desktop' | 'tablet' | 'mobile';
 function useEmbedCheck(url: string) {
   const [state, setState] = useState<{ embeddable: boolean | null; reason?: string }>({ embeddable: null });
 
-  useEffect(() => {
+  useEffect((): void => {
     if (!url) return;
     setState({ embeddable: null });
     const controller = new AbortController();
@@ -37,7 +37,7 @@ export function LivePreviewIframe({
   const { embeddable, reason } = useEmbedCheck(url);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  useEffect((): void => {
     setLoading(true);
   }, [url, refreshKey]);
 

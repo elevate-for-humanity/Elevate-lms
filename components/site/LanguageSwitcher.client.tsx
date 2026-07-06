@@ -22,12 +22,12 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
   const router = useRouter();
 
   // Read current locale from cookie on mount
-  useEffect(() => {
+  useEffect((): void => {
     setCurrent(getCurrentLocale());
   }, []);
 
   // Close on outside click
-  useEffect(() => {
+  useEffect((): void => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -39,7 +39,7 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
   }, [open]);
 
   // Close on Escape
-  useEffect(() => {
+  useEffect((): void => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);

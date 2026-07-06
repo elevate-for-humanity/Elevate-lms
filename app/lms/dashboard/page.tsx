@@ -7,7 +7,7 @@ import { EnrolledProgramsList } from '@/components/lms/dashboard/EnrolledProgram
 import { EmptyEnrollmentState } from '@/components/lms/dashboard/EmptyEnrollmentState';
 import { PendingApprovalNotice } from '@/components/lms/dashboard/PendingApprovalNotice';
 import { StudentToolsStrip } from '@/components/lms/dashboard/StudentToolsStrip';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/ui/Skeleton';
 import Link from 'next/link';
 import { BookOpen, Award, Calendar, MessageSquare } from 'lucide-react';
 

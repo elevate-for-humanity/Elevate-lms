@@ -1,3 +1,4 @@
+import React from 'react';
 'use client';
 
 /**
@@ -82,7 +83,7 @@ export default function PremiumImage({
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   // Reset on src change
-  useEffect(() => {
+  useEffect((): void => {
     setLoaded(false);
     setError(false);
   }, [src]);
@@ -210,7 +211,7 @@ export function PremiumIcon({
   className?: string;
 }) {
   // Pre-built premium SVG icons
-  const icons: Record<string, JSX.Element> = {
+  const icons: Record<string, React.ReactElement> = {
     check: (
       <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -300,7 +301,7 @@ export function AnimatedCounter({
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true });
 
-  useEffect(() => {
+  useEffect((): void => {
     if (!isInView) return;
 
     let startTime: number;

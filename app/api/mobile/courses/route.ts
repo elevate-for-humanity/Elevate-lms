@@ -62,7 +62,7 @@ async function _GET(request: NextRequest) {
     const coursesWithProgress = await Promise.all(
       enrollments.map(async (enrollment) => {
         const courseId = enrollment.course_id;
-        const course = enrollment.courses;
+        const course = enrollment.courses as { id: string; title: string; description: string; thumbnail_url: string } | null;
 
         if (!course) return null;
 

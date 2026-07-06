@@ -273,6 +273,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
 
 
   funding: {
+    fssa_eligible: false,
     wioa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,

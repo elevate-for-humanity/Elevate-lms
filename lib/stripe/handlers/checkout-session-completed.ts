@@ -14,9 +14,12 @@
 import type Stripe from 'stripe';
 import type { StripeEventHandler } from './types';
 import {
-  createOrUpdateEnrollment,
+  runBarberPostPayment,
+} from '@/lib/enrollment/barber-post-payment';
+import {
   linkOrphanedEnrollments,
   normalizeFundingSource,
+  createOrUpdateEnrollment,
 } from '@/lib/enrollment-service';
 import { handleTestingCheckoutSession } from '@/lib/stripe/handlers/testing-checkout-completed';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';

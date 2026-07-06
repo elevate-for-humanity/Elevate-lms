@@ -38,7 +38,7 @@ export default function RootWidgets() {
   // This keeps the main thread free during first paint and hydration.
   const [idle, setIdle] = useState(false);
 
-  useEffect(() => {
+  useEffect((): void => {
     if ('requestIdleCallback' in window) {
       (window as any).requestIdleCallback(() => setIdle(true), { timeout: 4000 });
     } else {

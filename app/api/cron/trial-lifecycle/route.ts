@@ -65,13 +65,13 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   }
 
   // Archive expired orgs at day 30
-  const { count: archived } = await db
+  const resultArchived = await (db as any)
     .from('organizations')
     .update({ status: 'archived', updated_at: now.toISOString() })
     .eq('status', 'trial_expired')
     .lt('updated_at', day30)
     .select('id', { count: 'exact', head: true });
-
+  const archived = resultArchived.count;
   logger.info('[cron/trial-lifecycle] Done', { warned, expired: expired?.length ?? 0, archived: archived ?? 0 });
   return NextResponse.json({ ok: true, warned, expired: expired?.length ?? 0, archived: archived ?? 0 });
 });

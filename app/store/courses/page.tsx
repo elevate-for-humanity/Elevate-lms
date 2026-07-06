@@ -85,7 +85,7 @@ export default function StoreCoursesPage() {
                     </div>
                     <div className="flex items-center gap-1">
                       <BookOpen className="w-4 h-4" />
-                      {course.format}
+                      {course.duration}
                     </div>
                   </div>
 

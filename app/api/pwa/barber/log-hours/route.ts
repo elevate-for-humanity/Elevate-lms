@@ -75,7 +75,7 @@ async function _POST(request: NextRequest) {
         .from('progress_entries')
         .update({
           hours_worked: existingEntry.hours_worked + parseFloat(hours),
-          notes: notes ? `${existingEntry.notes || ''}\n${date}: ${notes}`.trim() : existingEntry.notes,
+          notes: notes ? `${existingEntry.notes || ''}\n${date}: ${notes}`.trim() : (existingEntry as { notes?: string }).notes,
           updated_at: new Date().toISOString(),
         })
         .eq('id', existingEntry.id);

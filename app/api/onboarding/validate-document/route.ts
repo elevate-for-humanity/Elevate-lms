@@ -68,7 +68,7 @@ async function _POST(request: NextRequest) {
         passed: false,
         detail: 'File could not be retrieved from storage',
       });
-      return NextResponse.json(buildResult(checks, documentId, db));
+      return NextResponse.json(buildResult(checks));
     }
     checks.push({ name: 'File accessible', passed: true, detail: 'File retrieved successfully' });
 

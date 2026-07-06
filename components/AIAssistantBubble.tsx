@@ -1,3 +1,4 @@
+import React from 'react';
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -124,7 +125,7 @@ export function AIAssistantBubble() {
   const renderMessage = (content: string | undefined | null) => {
     if (!content) return null;
     const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    const parts: (string | JSX.Element)[] = [];
+    const parts: (string | React.ReactElement)[] = [];
     let lastIndex = 0;
     let match;
     while ((match = linkRegex.exec(content)) !== null) {

@@ -347,7 +347,7 @@ async function runQAScan(): Promise<Record<string, unknown>> {
     
     return { scan_id: scan?.id, status: 'completed' };
   } catch (error) {
-    throw new Error(`QA scan failed: ${error instanceof Error ? error.message : 'Unknown'}`, { cause: error });
+    const e = new Error(`QA scan failed: ${error instanceof Error ? error.message : 'Unknown'}`); (e as { cause?: unknown }).cause = error; throw e;
   }
 }
 
@@ -357,7 +357,7 @@ async function runGapScan(): Promise<Record<string, unknown>> {
     const result = await scanAllGaps();
     return { total_gaps: result.total_gaps, critical: result.critical_gaps };
   } catch (error) {
-    throw new Error(`Gap scan failed: ${error instanceof Error ? error.message : 'Unknown'}`, { cause: error });
+    const e = new Error(`Gap scan failed: ${error instanceof Error ? error.message : 'Unknown'}`); (e as { cause?: unknown }).cause = error; throw e;
   }
 }
 
@@ -384,7 +384,7 @@ async function clearCloudflareCache(): Promise<Record<string, unknown>> {
 
     return { status: 'success', message: 'Cache cleared' };
   } catch (error) {
-    throw new Error(`Cloudflare cache clear failed: ${error instanceof Error ? error.message : 'Unknown'}`, { cause: error });
+    const e = new Error(`Cloudflare cache clear failed: ${error instanceof Error ? error.message : 'Unknown'}`); (e as { cause?: unknown }).cause = error; throw e;
   }
 }
 
@@ -413,7 +413,7 @@ async function createGitHubPR(parameters: Record<string, unknown>): Promise<Reco
 
     return { branch: sanitizedBranch, pr_url: stdout, status: 'created' };
   } catch (error) {
-    throw new Error(`PR creation failed: ${error instanceof Error ? error.message : 'Unknown'}`, { cause: error });
+    const e = new Error(`PR creation failed: ${error instanceof Error ? error.message : 'Unknown'}`); (e as { cause?: unknown }).cause = error; throw e;
   }
 }
 

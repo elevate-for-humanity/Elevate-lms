@@ -100,7 +100,7 @@ async function _GET(request: Request) {
       recentActivity:
         recentActivity?.map((activity) => ({
           timestamp: activity.created_at,
-          courseTitle: activity.courses?.title || 'Course',
+          courseTitle: (activity.courses as { title?: string } | null)?.title || 'Course',
           type: 'enrollment',
         })) || [],
       dataSource: 'live_database',

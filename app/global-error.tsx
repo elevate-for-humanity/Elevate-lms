@@ -25,7 +25,7 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
+  useEffect((): void => {
     // Also listen for uncaught JS errors at window level
     const handleError = (event: ErrorEvent) => {
       console.error('[Window ErrorEvent]', event.message, event.error);

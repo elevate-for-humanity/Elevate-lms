@@ -91,7 +91,7 @@ export default function LessonPlayer({
   }, [mediaKind]);
 
   // Reset state when URL changes
-  React.useEffect(() => {
+  React.useEffect((): void => {
     setIsPlaying(false);
     setHasStarted(false);
     setCurrentTime(0);
@@ -103,7 +103,7 @@ export default function LessonPlayer({
   }, [videoUrl]);
 
   // Media event listeners
-  React.useEffect(() => {
+  React.useEffect((): void => {
     const v = getMedia();
     if (!v) return;
 
@@ -171,7 +171,7 @@ export default function LessonPlayer({
   }, [onComplete, onProgress, getMedia, videoUrl, mediaKind]);
 
   // Fullscreen listener
-  React.useEffect(() => {
+  React.useEffect((): void => {
     const onChange = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', onChange);
     return () => document.removeEventListener('fullscreenchange', onChange);
@@ -186,7 +186,7 @@ export default function LessonPlayer({
     }
   }, [isPlaying]);
 
-  React.useEffect(() => {
+  React.useEffect((): void => {
     if (!isPlaying) setShowControls(true);
     else resetControlsTimer();
     return () => {
@@ -280,7 +280,7 @@ export default function LessonPlayer({
   const progressPct = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   // Keyboard shortcuts
-  React.useEffect(() => {
+  React.useEffect((): void => {
     const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       switch (e.key) {

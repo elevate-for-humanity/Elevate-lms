@@ -27,7 +27,7 @@ import { readRedirectParam, validateRedirect } from '@/lib/auth/validate-redirec
 export default function AuthRedirectHandler() {
   const router = useRouter();
 
-  useEffect(() => {
+  useEffect((): void => {
     // Only act when the URL contains a Supabase auth hash fragment
     const hash = window.location.hash;
     if (!hash.includes('access_token') && !hash.includes('error_code')) return;

@@ -41,15 +41,15 @@ async function onAuditFailure(context: string, error: unknown, event: Record<str
     const fallbackClient = await getAdminClient();
     if (!fallbackClient) return;
     // Fire-and-forget: don't await, don't let this throw
-    fallbackClient
-      .from('audit_failures')
-      .insert({
-        context,
-        error_message: errorMessage,
-        original_event: event,
-      })
-      .then(() => {})
-      .catch(() => {});
+    try {
+      await fallbackClient
+        .from('audit_failures')
+        .insert({
+          context,
+          error_message: errorMessage,
+          original_event: event,
+        });
+    } catch { /* silently ignore audit failures */ }
   } catch {
     // If even creating the client fails, fall through to file
   }

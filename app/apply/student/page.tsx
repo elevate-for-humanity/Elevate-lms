@@ -61,7 +61,7 @@ const PROGRAMS = FEATURED_SLUGS.flatMap((slug) => {
   return [{
     title: p.title,
     duration: p.durationWeeks ? `${p.durationWeeks} weeks` : 'Varies',
-    credential: p.credentials?.[0]?.name ?? p.credentialIssued ?? '',
+    credential: p.credentials?.[0]?.name ?? '',
     href: `/programs/${p.slug}`,
     image: p.heroImage,
   }];

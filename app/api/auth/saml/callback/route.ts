@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     // Upsert user in Supabase Auth
     const admin = await getAdminClient();
-    const { data: existing } = await admin.auth.admin.listUsers();
+    const { data: existing } = await admin.auth.admin.listUsers() as { data: { users?: Array<{ id: string; email?: string }> } | null };
     const existingUser = existing?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase());
 
     let userId: string;

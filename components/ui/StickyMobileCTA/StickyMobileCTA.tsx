@@ -24,7 +24,7 @@ export function StickyMobileCTA({
   const [isHidden, setIsHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-  useEffect(() => {
+  useEffect((): void => {
     // Check if we should hide based on current path
     const shouldHide = hideOnPaths.some(path => window.location.pathname.startsWith(path));
     if (shouldHide) {

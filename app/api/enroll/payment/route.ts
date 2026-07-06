@@ -7,13 +7,14 @@ import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import type Stripe from 'stripe';
 
 import { withRuntime } from '@/lib/api/withRuntime';
 
 const enrollPaymentSchema = z.object({
   amount: z.number().positive(),
   program: z.string().min(1).max(100),
-  paymentType: z.enum(['full', 'deposit', 'payment-plan']).optional(),
+  paymentType: z.enum(['full', 'deposit', 'payment-plan', 'down-payment']).optional(),
   description: z.string().max(500).optional(),
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),
@@ -96,7 +97,7 @@ async function _POST(req: Request) {
     // Create Stripe Checkout session (includes BNPL methods from bnpl-config)
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      payment_method_types: paymentMethodTypes,
+      payment_method_types: paymentMethodTypes as Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
       customer_email: user?.email || undefined,
       line_items: [
         {

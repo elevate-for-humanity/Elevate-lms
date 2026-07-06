@@ -34,7 +34,7 @@ export default function SchedulePage() {
   const getFirstDayOfMonth = (month: number, year: number) => new Date(year, month, 1).getDay();
 
   const daysInMonth = getDaysInMonth(currentMonth, currentYear);
-  const firstDay = getFirstDayOfMonth(currentMonth, currentMonth === 0 ? currentYear - 1 : currentYear, currentMonth);
+  const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
 
   const prevMonth = () => {
     if (currentMonth === 0) {

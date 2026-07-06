@@ -72,7 +72,7 @@ async function _GET(request: Request) {
         shopName: partner?.name || 'Not assigned',
         shopCity: partner?.city,
         shopState: partner?.state,
-        startDate: partnerUser?.created_at || user.created_at,
+        startDate: partnerUser?.created_at || (user as { created_at?: string }).created_at,
         totalHours,
         targetHours: 2000,
         milestonesAchieved: achievedMilestones.length,

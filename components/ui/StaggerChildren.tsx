@@ -26,7 +26,7 @@ export function StaggerChildren({
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
+  useEffect((): void => {
     const el = ref.current;
     if (!el) return;
 

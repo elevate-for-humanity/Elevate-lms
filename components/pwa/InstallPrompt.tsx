@@ -20,7 +20,7 @@ function InstallPrompt({ appName, appDescription, themeColor = '#7c3aed' }: Inst
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
-  useEffect(() => {
+  useEffect((): void => {
     // Check if already installed
     const standalone = window.matchMedia('(display-mode: standalone)').matches;
     setIsStandalone(standalone);

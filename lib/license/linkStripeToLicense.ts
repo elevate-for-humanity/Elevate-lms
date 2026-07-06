@@ -162,14 +162,15 @@ export async function handleCheckoutCompleted(
   const customerId = session.customer as string;
   const subscriptionId = session.subscription as string | null;
 
-  // Get current_period_end from subscription
+  // Get billing_cycle_anchor from subscription (replaces deprecated current_period_end)
   let currentPeriodEnd: string | undefined;
   if (subscriptionId) {
     try {
       const stripe = getStripe();
       if (!stripe) throw new Error('Stripe not configured');
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-      currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId) as Stripe.Subscription;
+      // Use billing_cycle_anchor as the reference date for the current period
+      currentPeriodEnd = new Date(subscription.billing_cycle_anchor * 1000).toISOString();
     } catch (e) {
       logger.warn('Could not retrieve subscription:', e);
     }

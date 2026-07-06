@@ -24,7 +24,7 @@ export interface CorrelationContext {
  * Extract correlation ID from Stripe event
  */
 export function getCorrelationFromStripeEvent(event: Stripe.Event): CorrelationContext {
-  const eventObject = event.data.object as Record<string, unknown>;
+  const eventObject = event.data.object as unknown as Record<string, unknown>;
 
   // Try to extract payment_intent_id from various event types
   let paymentIntentId: string | undefined;
@@ -35,18 +35,18 @@ export function getCorrelationFromStripeEvent(event: Stripe.Event): CorrelationC
   }
 
   if (event.type === 'checkout.session.completed') {
-    const session = eventObject as Stripe.Checkout.Session;
+    const session = eventObject as unknown as Stripe.Checkout.Session;
     paymentIntentId = session.payment_intent as string;
     checkoutSessionId = session.id;
   }
 
   if (event.type.startsWith('charge.')) {
-    const charge = eventObject as Stripe.Charge;
+    const charge = eventObject as unknown as Stripe.Charge;
     paymentIntentId = charge.payment_intent as string;
   }
 
   if (event.type.startsWith('invoice.')) {
-    const invoice = eventObject as Stripe.Invoice & { payment_intent?: string | null };
+    const invoice = eventObject as unknown as Stripe.Invoice & { payment_intent?: string | null };
     paymentIntentId = (invoice.payment_intent as string) ?? '';
   }
 

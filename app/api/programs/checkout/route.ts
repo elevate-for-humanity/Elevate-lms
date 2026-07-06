@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import type Stripe from 'stripe';
 
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'payment');

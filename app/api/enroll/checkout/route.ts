@@ -182,11 +182,11 @@ async function _POST(req: Request) {
             currency: 'usd',
             product_data: {
               name: isFunded
-                ? `${program.title} — Credential Fees (OSHA 10 + CPR/First Aid)`
-                : program.title,
+                ? `${program.name} — Credential Fees (OSHA 10 + CPR/First Aid)`
+                : program.name,
               description: isFunded
                 ? `CareerSafe OSHA 10-Hour Construction + CPR/AED/First Aid credentials. Program tuition covered by ${(fundingSource || '').toUpperCase()} funding.`
-                : `Enrollment in ${program.title} — self-pay. Includes EPA 608 prep, OSHA 10-Hour, and ACT WorkKeys.`,
+                : `Enrollment in ${program.name} — self-pay. Includes EPA 608 prep, OSHA 10-Hour, and ACT WorkKeys.`,
             },
             unit_amount: amount,
           },

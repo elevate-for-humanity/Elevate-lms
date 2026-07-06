@@ -73,24 +73,28 @@ export async function POST(request: NextRequest) {
     nextFriday.setUTCHours(15, 0, 0, 0); // 10:00 AM ET = 15:00 UTC
 
     const weeklyAmountCents = sub.weekly_payment_cents;
+    
+    // First, create the product
+    const product = await stripe.products.create({
+      name: 'Cosmetology Apprenticeship — Weekly Tuition',
+      metadata: { program: 'cosmetology-apprenticeship' },
+    });
+    
+    // Then create the price
+    const price = await stripe.prices.create({
+      product: product.id,
+      unit_amount: weeklyAmountCents,
+      currency: 'usd',
+      recurring: { interval: 'week', interval_count: 1 },
+    });
+    
+    // Now create subscription with the price ID
     const stripeSubscription = await stripe.subscriptions.create({
       customer: sub.stripe_customer_id,
       default_payment_method: paymentMethodId,
       billing_cycle_anchor: Math.floor(nextFriday.getTime() / 1000),
       proration_behavior: 'none',
-      items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'Cosmetology Apprenticeship — Weekly Tuition',
-              metadata: { program: 'cosmetology-apprenticeship', user_id: user.id },
-            },
-            unit_amount: weeklyAmountCents,
-            recurring: { interval: 'week', interval_count: 1 },
-          },
-        },
-      ],
+      items: [{ price: price.id }],
       metadata: {
         user_id: user.id,
         program: 'cosmetology-apprenticeship',

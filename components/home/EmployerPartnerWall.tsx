@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Building2, Users, Truck, Heart, Wrench, Scissors, Stethoscope, GraduationCap, Award } from 'lucide-react';
 import { useScrollAnimation } from '@/hooks/useAnimatedCounter';

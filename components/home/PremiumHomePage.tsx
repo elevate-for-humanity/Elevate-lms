@@ -18,7 +18,6 @@ import { EmployerPartnerWall } from './EmployerPartnerWall';
 import { FundingExperience } from './FundingExperience';
 import { VisitorQuestions } from './VisitorQuestions';
 import { HeroVideo } from './HeroVideo';
-import { PremiumPrograms } from './PremiumPrograms';
 import { useScrollAnimation } from '@/hooks/useAnimatedCounter';
 
 // Statistics for animated counter

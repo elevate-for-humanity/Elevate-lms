@@ -13,6 +13,7 @@ import {
   Calendar,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   HelpCircle,
   FileText,
   Phone,

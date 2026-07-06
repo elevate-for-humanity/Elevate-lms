@@ -44,8 +44,19 @@ async function _POST(request: Request) {
     if (!billing?.stripe_subscription_id || !billing.price_id) continue;
 
     try {
-      // Report usage to Stripe subscription item
-      const res = await stripe.subscriptionItems.createUsageRecord(billing.price_id, {
+      // Get the subscription to find the subscription item ID
+      const subscription = await stripe.subscriptions.retrieve(billing.stripe_subscription_id);
+      const subscriptionItemId = subscription.items.data[0]?.id;
+      
+      if (!subscriptionItemId) {
+        logger.error('No subscription item found for tenant', u.tenant_id);
+        continue;
+      }
+
+      // Report usage to Stripe subscription item using the subscription item ID
+      // Note: createUsageRecord may need different API in Stripe 19.x - cast to any for now
+      const stripeWithUsage = stripe.subscriptionItems as any;
+      const res = await stripeWithUsage.createUsageRecord(subscriptionItemId, {
         quantity: u.quantity,
         timestamp: Math.floor(new Date(u.period_end).getTime() / 1000),
         action: 'set',

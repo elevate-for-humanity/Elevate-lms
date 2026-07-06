@@ -1,7 +1,6 @@
-import React from 'react';
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, MessageSquare, X, Send, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';

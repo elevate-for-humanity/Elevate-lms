@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Briefcase, DollarSign, GraduationCap, MapPin, Truck, Heart, Scissors, Wrench, User, CheckCircle } from 'lucide-react';
 import { useScrollAnimation } from '@/hooks/useAnimatedCounter';
@@ -239,7 +240,7 @@ function PathwayDetail({ pathway }: { pathway: Pathway }) {
       </div>
 
       {/* CTA */}
-      <a
+                <Link
         href={pathway.href}
         className={`block w-full text-center px-6 py-4 font-bold rounded-xl transition-colors ${
           pathway.color === 'amber' ? 'bg-amber-500 hover:bg-amber-600 text-white' :
@@ -249,7 +250,7 @@ function PathwayDetail({ pathway }: { pathway: Pathway }) {
       >
         Start Your {pathway.title} Journey
         <ArrowRight className="w-5 h-5 inline ml-2" />
-      </a>
+                </Link>
     </motion.div>
   );
 }
@@ -315,13 +316,13 @@ export function CareerPathways({ className = '' }: CareerPathwaysProps) {
           transition={{ delay: 0.4 }}
           className="text-center mt-12"
         >
-          <a
+                    <Link
             href="/programs"
             className="inline-flex items-center gap-2 text-brand-red-600 font-semibold hover:text-brand-red-700"
           >
             View All Career Pathways
             <ArrowRight className="w-5 h-5" />
-          </a>
+                    </Link>
         </motion.div>
       </div>
     </section>

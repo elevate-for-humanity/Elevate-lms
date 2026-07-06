@@ -127,38 +127,43 @@ interface SuccessMetricsProps {
   className?: string;
 }
 
+// Helper component to call hook for each metric
+function MetricCard({ metric, index }: { metric: SuccessMetric; index: number }) {
+  const { ref, displayValue } = useAnimatedCounter({
+    end: metric.value,
+    duration: 2000,
+    suffix: metric.suffix || '%',
+  });
+
+  return (
+    <motion.div
+      key={metric.label}
+      ref={ref as React.RefObject<HTMLDivElement>}
+      initial={{ opacity: 0, scale: 0.9 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 text-center hover:shadow-xl transition-shadow"
+    >
+      <div className="w-14 h-14 bg-brand-red-100 rounded-xl flex items-center justify-center mx-auto mb-4 text-brand-red-600">
+        {metric.icon}
+      </div>
+      <div className="text-3xl font-extrabold text-slate-900 mb-2">
+        {displayValue}
+      </div>
+      <div className="text-slate-600 font-medium">{metric.label}</div>
+    </motion.div>
+  );
+}
+
 export function SuccessMetrics({ metrics, className = '' }: SuccessMetricsProps) {
   return (
     <section className={`py-16 sm:py-20 ${className}`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {metrics.map((metric, index) => {
-            const { ref, displayValue } = useAnimatedCounter({
-              end: metric.value,
-              duration: 2000,
-              suffix: metric.suffix || '%',
-            });
-
-            return (
-              <motion.div
-                key={metric.label}
-                ref={ref as React.RefObject<HTMLDivElement>}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 text-center hover:shadow-xl transition-shadow"
-              >
-                <div className="w-14 h-14 bg-brand-red-100 rounded-xl flex items-center justify-center mx-auto mb-4 text-brand-red-600">
-                  {metric.icon}
-                </div>
-                <div className="text-3xl font-extrabold text-slate-900 mb-2">
-                  {displayValue}
-                </div>
-                <div className="text-slate-600 font-medium">{metric.label}</div>
-              </motion.div>
-            );
-          })}
+          {metrics.map((metric, index) => (
+            <MetricCard key={metric.label} metric={metric} index={index} />
+          ))}
         </div>
       </div>
     </section>

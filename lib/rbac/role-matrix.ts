@@ -7,17 +7,30 @@
  */
 
 export type UserRole =
+  | 'student'
   | 'admin'
   | 'staff'
+  | 'employer'
+  | 'workforce_board'
+  | 'partner'
+  | 'sponsor'
+  | 'mentor'
   | 'org_admin'
+  | 'program_holder'
+  | 'delegate'
+  | 'creator'
   | 'instructor'
   | 'case_manager'
-  | 'employer'
-  | 'program_holder'
   | 'provider_admin'
-  | 'partner'
-  | 'delegate'
-  | 'student';
+  | 'super_admin'
+  | 'grant_client'
+  | 'partner_admin'
+  | 'host_shop'
+  | 'government'
+  | 'testing_center'
+  | 'financial_aid'
+  | 'compliance'
+  | 'dev_studio';
 
 // ── Role sets ─────────────────────────────────────────────────────────────────
 export const ADMIN_ROLES = ['admin', 'staff'] as const;

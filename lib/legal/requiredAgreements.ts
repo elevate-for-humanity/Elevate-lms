@@ -19,14 +19,29 @@ export interface RequiredAgreement {
 
 export type UserRole =
   | 'student'
-  | 'program_holder'
-  | 'employer'
+  | 'admin'
   | 'staff'
-  | 'admin'
-  | 'admin'
+  | 'employer'
+  | 'workforce_board'
   | 'partner'
+  | 'sponsor'
+  | 'mentor'
+  | 'org_admin'
+  | 'program_holder'
+  | 'delegate'
+  | 'creator'
   | 'instructor'
-  | 'mentor';
+  | 'case_manager'
+  | 'provider_admin'
+  | 'super_admin'
+  | 'grant_client'
+  | 'partner_admin'
+  | 'host_shop'
+  | 'government'
+  | 'testing_center'
+  | 'financial_aid'
+  | 'compliance'
+  | 'dev_studio';
 
 /**
  * Required agreements by role.

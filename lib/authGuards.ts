@@ -9,17 +9,29 @@ import { NextResponse } from 'next/server';
 
 export type UserRole =
   | 'student'
-  | 'instructor'
-  | 'admin'
-  | 'admin'
   | 'admin'
   | 'staff'
-  | 'program_holder'
-  | 'provider_admin'
-  | 'case_manager'
   | 'employer'
+  | 'workforce_board'
   | 'partner'
-  | 'delegate';
+  | 'sponsor'
+  | 'mentor'
+  | 'org_admin'
+  | 'program_holder'
+  | 'delegate'
+  | 'creator'
+  | 'instructor'
+  | 'case_manager'
+  | 'provider_admin'
+  | 'super_admin'
+  | 'grant_client'
+  | 'partner_admin'
+  | 'host_shop'
+  | 'government'
+  | 'testing_center'
+  | 'financial_aid'
+  | 'compliance'
+  | 'dev_studio';
 
 export interface AuthGuardOptions {
   requireAuth?: boolean;

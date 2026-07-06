@@ -53,20 +53,32 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
-// Role type
+// Role type - canonical UserRole definition
 export type UserRole =
-  | 'admin'
-  | 'admin'
   | 'student'
-  | 'apprentice'
-  | 'instructor'
-  | 'employer'
-  | 'partner'
+  | 'admin'
   | 'staff'
-  | 'case_manager'
+  | 'employer'
+  | 'workforce_board'
+  | 'partner'
   | 'sponsor'
+  | 'mentor'
+  | 'org_admin'
+  | 'program_holder'
+  | 'delegate'
+  | 'creator'
+  | 'instructor'
+  | 'case_manager'
+  | 'provider_admin'
+  | 'super_admin'
+  | 'grant_client'
+  | 'partner_admin'
   | 'host_shop'
-  | 'workforce';
+  | 'government'
+  | 'testing_center'
+  | 'financial_aid'
+  | 'compliance'
+  | 'dev_studio';
 
 // Navigation item interface
 export interface NavItem {

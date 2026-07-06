@@ -4,15 +4,24 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { ArrowRight, Clock, DollarSign, Award, Users, CheckCircle, Play } from 'lucide-react';
 
-// Load REAL content from your data files
+// Video hero banner
+const HOME_HERO = {
+  video: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4',
+  microLabel: 'DOL Registered Apprenticeship Sponsor',
+  headline: 'Start Your Career Today',
+  subheadline: 'Earn while you learn with paid apprenticeships in healthcare, trades, and beauty industries.',
+  cta: { label: 'Apply Now', href: '/apply' },
+  secondaryCta: { label: 'View Programs', href: '/programs' },
+};
+
 const PROGRAMS = [
   { 
     slug: 'barber-apprenticeship', 
     title: 'Barbering', 
     desc: 'Launch your career in professional barbering', 
     image: '/images/beauty/hero-program-barber.webp',
-    icon: '💇',
     price: 4980 
   },
   { 
@@ -20,7 +29,6 @@ const PROGRAMS = [
     title: 'Cosmetology', 
     desc: 'Master beauty techniques and styles', 
     image: '/images/beauty/esthetician.webp',
-    icon: '💄',
     price: 4980 
   },
   { 
@@ -28,7 +36,6 @@ const PROGRAMS = [
     title: 'HVAC/Refrigeration', 
     desc: 'Earn while you learn refrigeration', 
     image: '/images/pages/hvac-technician.webp',
-    icon: '❄️',
     price: 4980 
   },
   { 
@@ -36,7 +43,6 @@ const PROGRAMS = [
     title: 'Healthcare', 
     desc: 'Start your healthcare career', 
     image: '/images/pages/cna-nursing-real.webp',
-    icon: '🏥',
     price: 2500 
   },
 ];
@@ -196,46 +202,79 @@ export default function ElevateAnimatedHome() {
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="relative min-h-screen flex items-center bg-[#0f172a] overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden">
-          {[200, 350, 500, 650, 800].map((size, i) => (
-            <motion.div
-              key={i}
-              className="absolute border border-[#dc2626]/20 rounded-full"
-              style={{ width: size, height: size, left: '50%', top: '50%', marginLeft: -size / 2, marginTop: -size / 2 }}
-              animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
-              transition={{ duration: 30 + i * 10, repeat: Infinity, ease: 'linear' }}
-            />
-          ))}
-        </div>
+      {/* Hero with Video */}
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        {/* Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src={HOME_HERO.video} type="video/mp4" />
+        </video>
+        
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a]/90 via-[#0f172a]/80 to-[#0f172a]/70" />
 
+        {/* Content */}
         <div className="relative z-10 max-w-5xl mx-auto text-center px-6 py-32">
-          <motion.span className="inline-block px-5 py-2 bg-[#dc2626]/20 border border-[#dc2626]/40 rounded-full text-[#dc2626] text-sm font-medium mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            DOL Registered Apprenticeship Sponsor
+          <motion.span 
+            className="inline-block px-5 py-2 bg-[#dc2626]/20 border border-[#dc2626]/40 rounded-full text-[#dc2626] text-sm font-medium mb-8" 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {HOME_HERO.microLabel}
           </motion.span>
 
-          <motion.h1 className="text-5xl md:text-7xl font-bold text-white mb-6" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            Start Your Career
+          <motion.h1 
+            className="text-5xl md:text-7xl font-bold text-white mb-6" 
+            initial={{ opacity: 0, y: 30 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: 0.2 }}
+          >
+            {HOME_HERO.headline}
             <span className="block text-[#dc2626]">Today</span>
           </motion.h1>
 
-          <motion.p className="text-xl text-white/70 mb-10 max-w-2xl mx-auto" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-            Earn while you learn with paid apprenticeships in healthcare, trades, and beauty industries.
+          <motion.p 
+            className="text-xl text-white/80 mb-10 max-w-2xl mx-auto" 
+            initial={{ opacity: 0, y: 30 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: 0.4 }}
+          >
+            {HOME_HERO.subheadline}
           </motion.p>
 
-          <motion.div className="flex flex-col sm:flex-row gap-4 justify-center" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
-            <Link href="/programs/barber-apprenticeship/apply" className="px-10 py-4 bg-[#dc2626] text-white rounded-lg font-bold hover:bg-[#b91c1c] transition shadow-xl">
-              Apply Now →
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-4 justify-center" 
+            initial={{ opacity: 0, y: 30 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: 0.6 }}
+          >
+            <Link href={HOME_HERO.cta.href} className="px-10 py-4 bg-[#dc2626] text-white rounded-lg font-bold hover:bg-[#b91c1c] transition shadow-xl flex items-center justify-center gap-2">
+              {HOME_HERO.cta.label} <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/programs" className="px-10 py-4 bg-white/10 text-white rounded-lg font-bold hover:bg-white/20 transition border border-white/20">
-              View Programs
+            <Link href={HOME_HERO.secondaryCta.href} className="px-10 py-4 bg-white/10 text-white rounded-lg font-bold hover:bg-white/20 transition border border-white/20 flex items-center justify-center gap-2">
+              {HOME_HERO.secondaryCta.label}
             </Link>
           </motion.div>
         </div>
 
-        <motion.div className="absolute bottom-10 left-1/2 -translate-x-1/2" animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }}>
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full pt-2"><motion.div className="w-1.5 h-3 bg-[#dc2626] rounded-full mx-auto" animate={{ y: [0, 15, 0], opacity: [1, 0, 1] }} transition={{ duration: 2, repeat: Infinity }} /></div>
+        {/* Scroll Indicator */}
+        <motion.div 
+          className="absolute bottom-10 left-1/2 -translate-x-1/2" 
+          animate={{ y: [0, 10, 0] }} 
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full pt-2">
+            <motion.div 
+              className="w-1.5 h-3 bg-[#dc2626] rounded-full mx-auto" 
+              animate={{ y: [0, 15, 0], opacity: [1, 0, 1] }} 
+              transition={{ duration: 2, repeat: Infinity }} 
+            />
+          </div>
         </motion.div>
       </section>
 

@@ -248,12 +248,12 @@ export default function ContactPage() {
                   <li>
                     <a href="https://www.indianacareerconnect.com/" target="_blank" rel="noopener noreferrer" className="text-brand-blue-700 hover:underline">
                       → Indiana Career Connect (State Portal)
-                    </Link>
+                    </a>
                   </li>
                   <li>
                     <a href="https://www.in.gov/dwd/workone-centers/" target="_blank" rel="noopener noreferrer" className="text-brand-blue-700 hover:underline">
                       → Find your local WorkOne Center
-                    </Link>
+                    </a>
                   </li>
                 </ul>
               </div>

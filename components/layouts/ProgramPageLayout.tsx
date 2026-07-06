@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Flame } from 'lucide-react';
 
 type ProgramPageLayoutProps = {
   title: string;
@@ -44,8 +44,8 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <span className="inline-flex items-center rounded-full bg-white/20 px-3 py-2 text-xs font-bold text-slate-900 animate-pulse">
-                🔥 NOW ENROLLING
+              <span className="inline-flex items-center gap-1 rounded-full bg-brand-orange-500 px-3 py-2 text-xs font-bold text-white animate-pulse">
+                <Flame className="w-4 h-4" /> NOW ENROLLING
               </span>
               <p className="text-white font-semibold text-sm sm:text-base">
                 Free Career Training - 100% Government Funded • Start in 2 Weeks

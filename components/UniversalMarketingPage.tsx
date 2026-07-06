@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { sanitizeHtml } from '@/lib/sanitize';
 import Link from 'next/link';
-import { ArrowRight } Flame, & from 'lucide-react';
+import { ArrowRight, Flame } from 'lucide-react';
 
 interface UniversalMarketingPageProps {
   title: string;

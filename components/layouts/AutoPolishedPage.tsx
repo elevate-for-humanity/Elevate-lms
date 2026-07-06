@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight } Flame, & from 'lucide-react';
+import { ArrowRight, Flame } from 'lucide-react';
 
 export type AutoPolishedPageProps = {
   route: string; // e.g. "/learner/dashboard"

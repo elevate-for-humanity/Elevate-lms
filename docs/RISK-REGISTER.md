@@ -48,7 +48,11 @@ This document tracks all production risks identified during RC-1 stabilization. 
 | PAY-001 | app/api/barber/activate-subscription | price_data API | ✅ Fixed | Subscription creation | Fixed | P0 |
 | PAY-002 | app/api/cosmetology/activate-subscription | price_data API | ✅ Fixed | Subscription creation | Fixed | P0 |
 | PAY-003 | app/api/billing/report-usage | createUsageRecord | ✅ Fixed | Usage tracking | Fixed | P0 |
-| PAY-004 | app/api/stripe/webhook | Webhook handling | ⬜ Review | Payment processing | Pending | RC-1 |
+| PAY-004 | app/api/cosmetology/webhook | Stripe.Invoice subscription access | ✅ Fixed | Invoice processing | Fixed | RC-1 |
+| PAY-004 | app/api/cosmetology/webhook | withApiAudit signature | ✅ Fixed | Webhook handler | Fixed | RC-1 |
+| PAY-004 | app/api/host-shop/webhook | Promise.catch issue | ✅ Fixed | Supabase client | Fixed | RC-1 |
+| PAY-004 | app/api/webhooks/route | Duplicate auth check | ✅ Fixed | Admin API | Fixed | RC-1 |
+| PAY-004 | app/api/store/api-store/webhook | Missing db variable | ✅ Fixed | License storage | Fixed | RC-1 |
 | PAY-005 | app/api/checkout/* | Checkout flow | ⬜ Review | Payment completion | Pending | RC-1 |
 
 ### 🔴 AUTHENTICATION (Login, Sessions, RBAC)
@@ -119,11 +123,21 @@ This document tracks all production risks identified during RC-1 stabilization. 
 
 | Status | Count | Description |
 |--------|-------|-------------|
-| ✅ Fixed | 10 | Resolved in P0-P3 |
-| ⬜ Pending Review | 563 | Identified, needs resolution |
+| ✅ Fixed | 18 | Resolved in P0-RC-1 |
+| ⬜ Pending Review | 556 | Identified, needs resolution |
 | 🔄 In Progress | 0 | Currently being fixed |
 | ⏸️ Deferred | TBD | Accepted debt, scheduled fix |
 | ❌ Won't Fix | TBD | Not applicable |
+
+## RC-1 PROGRESS SUMMARY
+
+| Metric | Before | After | Change |
+|--------|--------|-------|--------|
+| TypeScript Errors | 585 | 556 | -29 |
+| Payment Errors | 31 | ~22 | -9 |
+| Auth Errors | 74 | 74 | 0 |
+| Enrollment Errors | 163 | 163 | 0 |
+| Quality Gates | ✅ | ✅ | Pass |
 
 ---
 

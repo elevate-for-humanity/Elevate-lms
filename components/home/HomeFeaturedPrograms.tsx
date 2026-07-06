@@ -5,21 +5,21 @@
  * 
  * Features:
  * - Animated card carousel/grid
- * - Premium visual design
+ * - Premium visual design with REAL images
  * - Dynamic animations with framer-motion
  * - Story-driven content
- * - No gradient overlays
  */
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, Clock, DollarSign, Award, Users, Play } from 'lucide-react';
+import { ArrowRight, Clock, DollarSign, Award } from 'lucide-react';
 
 interface FeaturedProgram {
   slug: string;
   title: string;
   subtitle: string;
-  icon: string;
+  image: string;
   color: string;
   bgColor: string;
   duration: string;
@@ -29,8 +29,6 @@ interface FeaturedProgram {
   secondaryCta: { label: string; href: string };
   features: string[];
   stats: { value: string; label: string }[];
-  videoSrc?: string;
-  posterImage?: string;
 }
 
 const FEATURED_PROGRAMS: FeaturedProgram[] = [
@@ -38,7 +36,7 @@ const FEATURED_PROGRAMS: FeaturedProgram[] = [
     slug: 'hvac-technician',
     title: 'HVAC Technician',
     subtitle: 'Master heating, cooling, and refrigeration systems. EPA 608 certification included.',
-    icon: '❄️',
+    image: '/images/pages/hvac-technician.webp',
     color: 'text-amber-600',
     bgColor: 'bg-amber-50',
     duration: '6 Weeks',
@@ -62,7 +60,7 @@ const FEATURED_PROGRAMS: FeaturedProgram[] = [
     slug: 'cdl-training',
     title: 'CDL Class A Training',
     subtitle: 'Get your commercial driver\'s license and hit the road. Job placement guaranteed.',
-    icon: '🚛',
+    image: '/images/pages/cdl-hero.webp',
     color: 'text-emerald-600',
     bgColor: 'bg-emerald-50',
     duration: '4-8 Weeks',
@@ -86,7 +84,7 @@ const FEATURED_PROGRAMS: FeaturedProgram[] = [
     slug: 'barber-apprenticeship',
     title: 'Barber Apprenticeship',
     subtitle: 'Earn while you learn. DOL-registered apprenticeship with 2,000 hours of training.',
-    icon: '💈',
+    image: '/images/beauty/barber-hero-new.webp',
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
     duration: '12-18 Months',
@@ -184,16 +182,17 @@ function FeaturedProgramCard({ program, index }: { program: FeaturedProgram; ind
       {/* Header with gradient accent */}
       <div className={`h-3 ${program.bgColor.replace('50', '500')}`} />
       
-      {/* Icon and Title */}
-      <div className="p-6 pb-4">
-        <div className="flex items-start gap-4">
-          <div className={`w-16 h-16 ${program.bgColor} rounded-2xl flex items-center justify-center text-3xl shrink-0`}>
-            {program.icon}
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-slate-900 mb-1">{program.title}</h3>
-            <p className="text-sm text-slate-500">{program.subtitle}</p>
-          </div>
+      {/* Image */}
+      <div className="relative h-40 overflow-hidden">
+        <Image 
+          src={program.image} 
+          alt={program.title} 
+          fill 
+          className="object-cover" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-4 left-4 right-4">
+          <h3 className="text-xl font-bold text-white mb-1">{program.title}</h3>
         </div>
       </div>
 

@@ -142,6 +142,9 @@ export async function POST(req: Request) {
       // Fallback: process synchronously if queue fails
       logger.warn('Queue unavailable, processing synchronously', { eventId: event.id });
 
+      // Get admin client for database operations
+      const db = await getAdminClient();
+
       // Generate license key
       const licenseKey = generateLicenseKey();
       const licenseHash = hashLicenseKey(licenseKey);

@@ -24,10 +24,6 @@ async function _GET(request: NextRequest) {
     const authResult = await apiRequireAdmin(request);
     if (authResult.error) return authResult.error;
 
-    if (authResult.error) {
-      return authResult;
-    }
-
     const { searchParams } = new URL(request.url);
     const action = searchParams.get('action');
     const webhookId = searchParams.get('webhookId');
@@ -70,10 +66,6 @@ async function _POST(request: NextRequest) {
   try {
     const authResult = await apiRequireAdmin(request);
     if (authResult.error) return authResult.error;
-
-    if (authResult.error) {
-      return authResult;
-    }
 
     const userId = authResult.id;
     const body = await parseBody<Record<string, any>>(request);

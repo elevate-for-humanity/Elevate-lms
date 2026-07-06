@@ -48,3 +48,6 @@ export function trackAdsConversion(
     ...(value !== undefined && { value, currency }),
   });
 }
+
+// Default export for next/dynamic
+export default GoogleAds;

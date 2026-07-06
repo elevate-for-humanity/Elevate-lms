@@ -27,7 +27,7 @@ async function requireAdminAccess() {
   }
 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!profile?.role || !['admin', 'staff'].includes(profile.role)) {
+  if (!profile?.role || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
     return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
   }
 
@@ -39,7 +39,7 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
     const auth = await requireAdminAccess();
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const body = await req.json();
     const { apprentice_id, employer_id, wage_rate, reimbursement_rate, hours_worked, status } =
@@ -77,7 +77,7 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
     const auth = await requireAdminAccess();
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
     const { supabase } = auth;
 
     const { data, error }: any = await supabase
@@ -100,7 +100,7 @@ async function _PATCH(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
     const auth = await requireAdminAccess();
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const body = await req.json();
     const { id, status } = body;

@@ -29,13 +29,13 @@ const LEVEL_COLORS: Record<string, string> = {
 
 // Hero images per provider key
 const PROVIDER_HERO: Record<string, string> = {
-  esco: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
-  certiport: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-it-hero.webp',
-  nha: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant.webp',
-  nrf: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-employer-hero.webp',
-  workkeys: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-4.webp',
-  careersafe: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeships-hero.webp',
-  midland: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
+  esco: '/images/pages/hvac-technician.webp',
+  certiport: '/images/pages/programs-it-hero.webp',
+  nha: '/images/pages/medical-assistant.webp',
+  nrf: '/images/pages/apply-employer-hero.webp',
+  workkeys: '/images/pages/career-services-page-4.webp',
+  careersafe: '/images/pages/apprenticeships-hero.webp',
+  midland: '/images/pages/hvac-technician.webp',
 };
 
 const PROVIDER_ACCENT: Record<string, string> = {
@@ -103,7 +103,7 @@ export default async function ProviderPage({ params }: Props) {
     if (dbOverride.website_url) (provider as any).verifyUrl = dbOverride.website_url;
   }
 
-  const heroImg = PROVIDER_HERO[key] ?? 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-hero.webp';
+  const heroImg = PROVIDER_HERO[key] ?? '/images/pages/career-services-hero.webp';
   const accent = PROVIDER_ACCENT[key] ?? 'from-brand-blue-900';
   const capInfo = CAPABILITY_LABEL[provider.capability];
   const CapIcon = capInfo?.icon ?? MapPin;
@@ -123,7 +123,7 @@ export default async function ProviderPage({ params }: Props) {
           alt={provider.name}
           fill
           className="object-cover object-center"
-          priority
+          priority placeholder="empty"
         />
         {/* gradient overlay — bottom only, no text on video rule doesn't apply to static images */}
         <div
@@ -240,7 +240,7 @@ export default async function ProviderPage({ params }: Props) {
                 you test helps you prepare to the right standard.
               </p>
               <div className="space-y-4">
-                {((provider as any).ncrcJobProfiles as any[])?.map((tier: any) => (
+                {((provider as any).ncrcJobProfiles as any[]).map((tier: any) => (
                   <div
                     key={tier.level}
                     className={`rounded-xl border p-5 ${LEVEL_COLORS[tier.color] ?? LEVEL_COLORS.slate}`}
@@ -250,7 +250,7 @@ export default async function ProviderPage({ params }: Props) {
                       <span className="text-xs font-medium opacity-70">{tier.score}</span>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-2">
-                      {(tier.jobs ?? []).map((job: any) => (
+                      {tier.jobs.map((job: any) => (
                         <div key={job.title} className="flex items-start gap-2">
                           <span className="text-slate-300 flex-shrink-0 select-none mt-0.5">—</span>
                           <div>

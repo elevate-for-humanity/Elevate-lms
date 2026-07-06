@@ -51,39 +51,39 @@ export async function generateMetadata({
 // Maps course category keywords → a real image from public/images/pages/
 
 const COVER_MAP: Record<string, string> = {
-  hvac: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-hvac-activation-hero.webp',
-  heating: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-hvac-activation-hero.webp',
-  cooling: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-hvac-activation-hero.webp',
-  cdl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-training.webp',
-  truck: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-truck-highway.webp',
-  driving: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-driver-seat.webp',
-  cna: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-patient-care.jpg',
-  nursing: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-nursing-real.webp',
-  clinical: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-clinical.jpg',
-  healthcare: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-vitals.webp',
-  medical: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-nursing.webp',
-  phlebotomy: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-clinical.jpg',
-  cyber: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity.webp',
-  security: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity-screen.jpg',
-  'it ': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity-code.jpg',
-  network: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity-code.jpg',
-  electrical: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/electrical-panel.webp',
-  wiring: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/electrical-conduit.webp',
-  welding: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-highlights-welding.webp',
-  fabrication: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-highlights-welding.webp',
-  tax: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-business-hero.webp',
-  accounting: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-business-hero.webp',
-  barber: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/barber-hero.webp',
-  cosmetology: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/barber-hero.webp',
-  business: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp',
-  management: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp',
-  construction: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/construction-trades.webp',
-  trades: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/skilled-trades-sector.webp',
-  plumbing: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/construction-trades.webp',
-  carpentry: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/construction-trades.webp',
+  hvac: '/images/pages/admin-hvac-activation-hero.webp',
+  heating: '/images/pages/admin-hvac-activation-hero.webp',
+  cooling: '/images/pages/admin-hvac-activation-hero.webp',
+  cdl: '/images/pages/cdl-training.webp',
+  truck: '/images/pages/cdl-truck-highway.webp',
+  driving: '/images/pages/cdl-driver-seat.webp',
+  cna: '/images/pages/cna-patient-care.jpg',
+  nursing: '/images/pages/cna-nursing-real.webp',
+  clinical: '/images/pages/cna-clinical.jpg',
+  healthcare: '/images/pages/cna-vitals.webp',
+  medical: '/images/pages/cna-nursing.webp',
+  phlebotomy: '/images/pages/cna-clinical.jpg',
+  cyber: '/images/pages/cybersecurity.webp',
+  security: '/images/pages/cybersecurity-screen.jpg',
+  'it ': '/images/pages/cybersecurity-code.jpg',
+  network: '/images/pages/cybersecurity-code.jpg',
+  electrical: '/images/pages/electrical-panel.webp',
+  wiring: '/images/pages/electrical-conduit.webp',
+  welding: '/images/pages/comp-highlights-welding.webp',
+  fabrication: '/images/pages/comp-highlights-welding.webp',
+  tax: '/images/pages/admin-business-hero.webp',
+  accounting: '/images/pages/admin-business-hero.webp',
+  barber: '/images/barber-hero.jpg',
+  cosmetology: '/images/barber-hero.jpg',
+  business: '/images/pages/about-career-training.webp',
+  management: '/images/pages/about-career-training.webp',
+  construction: '/images/pages/construction-trades.webp',
+  trades: '/images/pages/skilled-trades-sector.webp',
+  plumbing: '/images/pages/construction-trades.webp',
+  carpentry: '/images/pages/construction-trades.webp',
 };
 
-const DEFAULT_COVER = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-career-training.webp';
+const DEFAULT_COVER = '/images/pages/about-career-training.webp';
 
 function getCoverImage(category: string | null, title: string | null): string {
   const text = `${category ?? ''} ${title ?? ''}`.toLowerCase();
@@ -376,7 +376,7 @@ function InternalCard({ item, index }: { item: InternalItem; index: number }) {
           alt={label}
           fill
           className="object-cover"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
         />
         {/* Step badge */}
         <div className="absolute top-3 left-3 w-7 h-7 rounded-full bg-white/90 text-slate-700 text-xs font-bold flex items-center justify-center shadow">
@@ -453,7 +453,7 @@ function ExternalCard({ item, index }: { item: ExternalItem; index: number }) {
           alt={item.title}
           fill
           className="object-cover"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
         />
         <div className="absolute top-3 left-3 w-7 h-7 rounded-full bg-white/90 text-slate-700 text-xs font-bold flex items-center justify-center shadow">
           {index + 1}

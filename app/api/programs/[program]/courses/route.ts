@@ -30,8 +30,6 @@ async function _GET(request: Request, { params }: { params: Params }) {
       cna: 'Healthcare',
       'hvac-technician': 'Skilled Trades',
       'barber-apprenticeship': 'Skilled Trades',
-      
-      'tax-entrepreneurship': 'Business',
       'direct-support-professional': 'Healthcare',
       'drug-collector': 'Healthcare',
       'drug-alcohol-specimen-collector': 'Healthcare',
@@ -60,7 +58,7 @@ async function _GET(request: Request, { params }: { params: Params }) {
     // Transform courses to match expected format
     const transformedCourses = (courses || []).map((course) => ({
       id: course.id,
-      title: course.course_name,
+      title: course.title,
       description: course.description || '',
       duration: course.duration_hours ? `${course.duration_hours} hours` : '8 weeks',
       lessons: course.duration_hours || 24,
@@ -69,7 +67,7 @@ async function _GET(request: Request, { params }: { params: Params }) {
       enrolled: course.enrolled_count || 0,
       certification: course.certification || false,
       funding: course.funding_source,
-      image: course.cover_image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp',
+      image: course.cover_image_url || '/images/pages/course-create-hero.webp',
     }));
 
     return NextResponse.json({

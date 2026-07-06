@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 /**
  * Trigger a Northflank combined-service build from the current git branch.
+ * Skips build if the same SHA is already building or recently completed.
  *
  *   npx tsx scripts/northflank/trigger-build.ts elevate-lms
  *   npx tsx scripts/northflank/trigger-build.ts elevate-admin
@@ -8,6 +9,22 @@
 
 import fs from 'node:fs';
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
+
+async function getRecentBuilds(projectId: string, serviceId: string, sha: string) {
+  try {
+    const builds = await nfFetch<{
+      builds: Array<{
+        id: string;
+        sha?: string;
+        status?: string;
+        concluded?: boolean;
+      }>;
+    }>(projectApiPath(projectId, `/services/${serviceId}/builds?limit=5`));
+    return builds.builds || [];
+  } catch {
+    return [];
+  }
+}
 
 async function main() {
   const serviceId = process.argv[2];
@@ -20,6 +37,27 @@ async function main() {
     console.error('Set NORTHFLANK_PROJECT_ID');
     process.exit(1);
   }
+
+  // Get current SHA
+  const currentSha = process.env.GITHUB_SHA || process.env.VERCEL_GIT_COMMIT_SHA || '';
+  
+  // Check for existing build with same SHA
+  if (currentSha) {
+    const recentBuilds = await getRecentBuilds(projectId, serviceId, currentSha);
+    const existingBuild = recentBuilds.find(
+      (b) => b.sha === currentSha && (!b.concluded || b.status === 'running' || b.status === 'pending')
+    );
+    
+    if (existingBuild) {
+      console.log(`Skipping build for ${serviceId} - SHA ${currentSha} already has build ${existingBuild.id} (status: ${existingBuild.status})`);
+      if (process.env.GITHUB_OUTPUT) {
+        fs.appendFileSync(process.env.GITHUB_OUTPUT, `build_id=${existingBuild.id}\n`, 'utf8');
+        fs.appendFileSync(process.env.GITHUB_OUTPUT, `skipped=true\n`, 'utf8');
+      }
+      return;
+    }
+  }
+
   const build = await nfFetch<{
     id: string;
     branch?: string;

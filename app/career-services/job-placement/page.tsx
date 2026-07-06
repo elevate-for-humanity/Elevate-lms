@@ -1,65 +1,25 @@
-import { buildMetadata } from '@/lib/cf-seo';
-import { siteConfig } from '@/content/cf-site';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { Metadata } from 'next';
+import Link from 'next/link';
 
-export const metadata = buildMetadata({
-  title: 'Job Placement',
-  description: '{PLATFORM_DEFAULTS.orgName} career services — Job Placement.',
-  path: '/career-services/job-placement',
-});
+export const metadata: Metadata = {
+  title: 'Job Placement | Elevate for Humanity',
+  keywords: ["services", "workforce development", "training programs"], description: 'Job Placement page content.',
+};
 
 export default function Page() {
   return (
-    <PublicLandingPage
-      config={{
-        breadcrumbs: [{ label: 'Career Services', href: '/career-services' }, { label: 'Job Placement' }],
-        hero: {
-          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-3.webp',
-          tag: 'Job Placement',
-          tagColor: 'text-brand-blue-600',
-          title: 'From Credential to Career',
-          subtitle: 'Direct employer connections, job leads, and placement support for Elevate graduates in healthcare, skilled trades, technology, and business.',
-        },
-        intro: {
-          heading: 'We Do Not Just Train — We Place',
-          paragraphs: [
-            'Job placement is built into every Elevate program. We maintain active relationships with employers across Indiana who hire our graduates — and we make direct introductions when you are ready.',
-            'Our placement team tracks every graduate for 90 days post-completion and works with you until you are employed in your field.',
-          ],
-          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-4.webp',
-        },
-        features: {
-          heading: 'Placement Services',
-          items: [
-            'Direct employer introductions to hiring partners in your field',
-            'Job lead notifications matched to your credential and location',
-            'Interview scheduling and preparation support',
-            'Offer negotiation coaching',
-            'Apprenticeship placement for DOL Registered programs',
-            'Healthcare facility connections for CNA, MA, and phlebotomy graduates',
-            'Employer job fair access — exclusive to Elevate graduates',
-            '90-day follow-up to confirm placement and address barriers',
-          ],
-        },
-        steps: {
-          heading: 'The Placement Process',
-          items: [
-            { title: 'Complete Your Program', desc: 'Placement services activate when you are within 4 weeks of credential completion.' },
-            { title: 'Meet With Placement Staff', desc: 'We review your resume, target employers, and geographic preferences.' },
-            { title: 'Get Introduced', desc: 'We make direct introductions to employers who are actively hiring in your field.' },
-            { title: 'Land the Job', desc: 'We support you through interviews and offer negotiation, then check in at 30 and 90 days.' },
-          ],
-        },
-        cta: {
-          heading: 'Ready to Work?',
-          subtitle: `Job placement support is free for all Elevate graduates. Call ${PLATFORM_DEFAULTS.supportPhone}.`,
-          primaryLabel: 'Contact Career Services',
-          primaryHref: '/contact',
-          secondaryLabel: 'Hire Our Graduates',
-          secondaryHref: '/hire-graduates',
-          bgColor: 'bg-brand-blue-700',
-        },
-      }}
-    />
+    <div className="min-h-screen bg-slate-50">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold">Job Placement</h1>
+          <p className="text-blue-200">Workforce development resources.</p>
+        </div>
+      </section>
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
+        </div>
+      </section>
+    </div>
   );
 }

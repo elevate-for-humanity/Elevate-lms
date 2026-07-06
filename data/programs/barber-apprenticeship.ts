@@ -33,7 +33,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   },
   schedule: 'Flexible — 15–20 hrs/week (OJT at host shop + RTI online)',
   cohortSize: '8–12 apprentices per cohort',
-  fundingStatement: 'FSSA/Gov Portal (IMPACT) eligible. Self-pay: $4,980 — $600 down, then weekly payments or BNPL.',
+  fundingStatement: 'Self-pay: $4,980 — $600 down, then weekly payments or BNPL. WIOA funding may be available.',
   selfPayCost: '$4,980',
   badge: 'DOL Registered',
   badgeColor: 'blue',
@@ -266,15 +266,16 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   deliveryModel: 'partner',
   deliveryModelDetail: 'hybrid',
   partnerProvider: 'elevate-lms',
-  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
+  fundingOptions: ['wioa', 'employer_paid', 'self_pay'],
   funding: {
-    fssa_eligible: true,
+    fssa_eligible: false,
+    
     snap_et_eligible: true,
     wioa_eligible: true,
     etpl_approved: true,
     wrg_eligible: false,
     fundingNotes:
-      'DOL Registered Apprenticeship (RAPIDS). WIOA Title I eligible for dislocated workers and adults. IMPACT/Gov Portal for eligible participants.',
+      'DOL Registered Apprenticeship (RAPIDS). WIOA Title I eligible for dislocated workers and adults. Employer sponsorship available for eligible participants.',
   },
   enrollmentType: 'internal',
   partnerCourses: [

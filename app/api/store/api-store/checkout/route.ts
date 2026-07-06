@@ -1,6 +1,6 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 // PUBLIC ROUTE: public store checkout
 import { createCheckoutSession } from '@/lib/store/stripe';
-import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { validateCheckoutAuthorization } from '@/lib/store/licensing-mode';
@@ -62,3 +62,4 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/store/checkout', _POST);
+

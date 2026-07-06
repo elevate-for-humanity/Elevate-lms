@@ -15,7 +15,7 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const auth = await requireAuth(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const { text, voiceId = 'EXAVITQu4vr4xnSDxMaL' } = await request.json(); // Default: Bella voice
 

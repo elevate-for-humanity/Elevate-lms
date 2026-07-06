@@ -82,9 +82,15 @@ async function hydrateAndSendWithAttachment(opts: {
   pdfB64: string;
   filename: string;
 }) {
-  const { hydrateProcessEnv } = await import('@/lib/secrets');
-  await hydrateProcessEnv();
-  const apiKey = process.env.SENDGRID_API_KEY;
+  let apiKey = process.env.SENDGRID_API_KEY;
+  // Try to hydrate from DB-backed secrets (5-min cache)
+  try {
+    const { hydrateProcessEnv } = await import('@/lib/secrets');
+    await hydrateProcessEnv();
+    apiKey = process.env.SENDGRID_API_KEY;
+  } catch (err) {
+    logger.warn('[notifyElevateHostMouSigned] Failed to hydrate secrets, using env fallback', { err });
+  }
   if (!apiKey) {
     logger.warn('[notifyElevateHostMouSigned] SENDGRID_API_KEY missing');
     return;

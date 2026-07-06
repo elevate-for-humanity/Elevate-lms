@@ -82,10 +82,11 @@ export interface RuntimeOptions {
   /**
    * Cron route — validates cron secret header against CRON_SECRET env var.
    * Automatically adds 'CRON_SECRET' to required secrets.
+   *   true        — defaults to 'x-header' for backwards compatibility
    *   'x-header'  — checks x-cron-secret header
    *   'bearer'    — checks Authorization: Bearer <secret> header (manual / external cron)
    */
-  cron?: 'x-header' | 'bearer';
+  cron?: 'x-header' | 'bearer' | true;
 }
 
 export interface RuntimeContext {
@@ -151,14 +152,15 @@ export function withRuntime(optionsOrHandler: RuntimeOptions | AnyHandler, handl
     // 3. Cron secret validation
     if (options.cron) {
       const cronSecret = env['CRON_SECRET'];
+      const cronMode = options.cron === true ? 'x-header' : options.cron;
       const provided =
-        options.cron === 'bearer'
+        cronMode === 'bearer'
           ? req.headers.get('authorization')?.replace(/^Bearer\s+/, '')
           : req.headers.get('x-cron-secret');
       if (provided !== cronSecret) {
         logger.warn('[withRuntime] Cron secret mismatch', {
           route: req.nextUrl.pathname,
-          mode: options.cron,
+          mode: cronMode,
           ip: req.headers.get('x-forwarded-for') ?? 'unknown',
         });
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -9,7 +9,7 @@
  */
 
 export type IndexingWave = 'wave1' | 'wave2' | 'noindex';
-export type PageCategory = 'core' | 'tax' | 'lms' | 'resources' | 'store';
+export type PageCategory = 'core'  | 'lms' | 'resources' | 'store';
 
 /**
  * Indexing gates - ALL must pass for a page to be indexed
@@ -76,8 +76,6 @@ export const WAVE2_APPROVED_TYPES = {
       '800+ words',
     ],
     examples: [
-      '/resources/how-tax-filing-works',
-      '/resources/tax-refund-timeline-explained',
       '/resources/workforce-training-vs-traditional-education',
       '/resources/how-program-funding-works',
     ],
@@ -104,7 +102,6 @@ export const WAVE2_APPROVED_TYPES = {
     ],
     examples: [
       '/resources/how-refund-advances-work',
-      '/resources/understanding-tax-prep-fees',
       '/resources/data-protection-overview',
     ],
   },

@@ -5,7 +5,6 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { provisionPartnerFromBarberApplication } from '@/lib/partners/provision-barber-partner';
-import { notifyElevateHostMouSigned } from '@/lib/email/notify-host-mou-signed';
 
 export const dynamic = 'force-dynamic';
 
@@ -123,21 +122,6 @@ export async function POST(req: NextRequest) {
     })
     .eq('contact_email', email)
     .eq('status', 'approved');
-
-  void notifyElevateHostMouSigned({
-    program: 'barber',
-    organizationName: shop_name,
-    signerName: signer_name,
-    signerTitle: signer_title,
-    contactEmail: user.email ?? email,
-    supervisorName: supervisor_name,
-    supervisorLicense: supervisor_license,
-    compensationModel: compensation_model,
-    compensationRate: compensation_rate,
-    signatureData: signature_data,
-    signedAt,
-    mouVersion: mou_version,
-  });
 
   logger.info(`Barbershop MOU signed: partner ${partner.id} — ${shop_name}`);
   return NextResponse.json({ success: true }, { status: 200 });

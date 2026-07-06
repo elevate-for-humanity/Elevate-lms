@@ -31,7 +31,7 @@ function useSpeech() {
   const [isMuted, setIsMuted] = useState(false);
   const synthRef = useRef<SpeechSynthesis | null>(null);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       synthRef.current = window.speechSynthesis;
     }
@@ -88,7 +88,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
   const { speak, stop, isSpeaking, isMuted, toggleMute } = useSpeech();
 
   // Auto-open and greet on first visit (or every visit if not dismissed)
-  useEffect(() => {
+  useEffect((): void => {
     if (forceOpen) {
       setIsOpen(true);
       return;

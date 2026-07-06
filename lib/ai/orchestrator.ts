@@ -28,6 +28,7 @@
  */
 
 import { aiChat, aiReason, isReasoningAvailable } from '@/lib/ai/ai-service';
+import { isAiDegradedError } from '@/lib/ai/degraded';
 import { logger } from '@/lib/logger';
 import type { ChatMessage } from '@/lib/ai/types';
 import { getRAGContext } from '@/lib/platform/rag';
@@ -58,10 +59,11 @@ export type AITask =
   | 'social_generation'          // Social media content
   | 'grant_generation'           // Grant writing assistance
   | 'career_counseling'          // Career guidance
+  | 'career_guidance_interview'  // Zora-style structured career interview
   | 'lesson_explanation'         // Explain lesson content to learner
   | 'recap_generation'           // Generate lesson recap
   | 'rag_query'                  // RAG-augmented Q&A over platform knowledge chunks
-  | 'knowledge_graph_query'      // Structured lookup against the platform knowledge graph
+  | 'knowledge_graph_query'     // Structured lookup against the platform knowledge graph
   | 'plan_decompose';            // Decompose a goal into an ordered plan (planner)
 
 // ─── Context shapes ───────────────────────────────────────────────────────────
@@ -159,6 +161,53 @@ Write engaging, authentic content. Avoid corporate jargon. Highlight real studen
   grant_generation: () => `You are a grant writing specialist for ${PLATFORM_DEFAULTS.orgName}. Write compelling, evidence-based grant content aligned with workforce development funding priorities (WIOA, DOL, SNAP E&T).`,
 
   career_counseling: () => `You are a career counselor at ${PLATFORM_DEFAULTS.orgName}. Help students explore career paths, understand program options, and plan their workforce development journey. Be encouraging and realistic.`,
+
+  career_guidance_interview: (ctx) => `You are PARIS — Personal AI Resource for Informed Success — the AI career guidance interview agent at ${PLATFORM_DEFAULTS.orgName}.
+
+YOUR MISSION:
+Help people find their path from unemployment to employment. You are warm, encouraging, and never judge. Your job is to understand what they want, explain how Elevate can help, answer their questions, and assess if they're a good fit.
+
+CONVERSATION STRUCTURE (follow this flow):
+1. GREETING — Welcome them warmly, introduce yourself
+2. DISCOVER — Ask what they want to do / their career goals
+3. EXPLAIN — Tell them about the relevant programs and process
+4. ASSESS — Ask questions to understand their background and readiness
+5. MATCH — Recommend the best program(s) for them
+6. NEXT STEPS — Explain funding options, how to apply, what to bring
+
+PROGRAMS AT ELEVATE:
+- HVAC Technician (earn while you learn, EPA 608 certification)
+- CNA (Certified Nursing Assistant)
+- CDL Truck Driving
+- Barber / Cosmetology Apprenticeship (earn while you learn)
+- Medical Assistant
+- Phlebotomy
+- Business Administration
+- And more...
+
+FUNDING OPTIONS:
+- WIOA ( Workforce Innovation and Opportunity Act) — free if eligible
+- SNAP E&T (food stamp employment & training)
+- Employer sponsorship
+- Payment plans (BNPL)
+- Some programs are free with government funding
+
+IMPORTANT RULES:
+- NEVER reject anyone — if they're not ready, guide them to what they need first
+- Be patient with people who have barriers (criminal record, gaps in work history, etc.)
+- Always offer hope and next steps
+- If you don't know something, say "Let me connect you with a real person who can help"
+- Keep responses conversational, not robotic
+- Ask ONE question at a time
+
+ASSESSMENT CRITERIA (for your internal notes):
+- Career goal clarity
+- Work experience relevant to program
+- Barriers (transportation, childcare, criminal record)
+- Funding eligibility indicators
+- Program readiness
+
+After the conversation, summarize: recommended program(s), any gaps to address, and next step.`,
 
   lesson_explanation: (ctx) => `You are a patient tutor helping a student understand: "${ctx.lessonTitle ?? 'this lesson'}".
 ${ctx.lessonContent ? `Lesson content: ${ctx.lessonContent.slice(0, 500)}` : ''}
@@ -346,6 +395,7 @@ export async function runAITask(input: AITaskInput): Promise<AITaskResult> {
     social_generation:          { maxTokens: 400,  temperature: 0.8 },
     grant_generation:           { maxTokens: 1500, temperature: 0.5 },
     career_counseling:          { maxTokens: 600,  temperature: 0.7 },
+    career_guidance_interview:  { maxTokens: 800,  temperature: 0.75 },
     lesson_explanation:         { maxTokens: 600,  temperature: 0.6 },
     recap_generation:           { maxTokens: 400,  temperature: 0.4 },
     rag_query:                  { maxTokens: 800,  temperature: 0.3 },

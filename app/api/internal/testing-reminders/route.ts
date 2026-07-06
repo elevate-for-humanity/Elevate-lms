@@ -23,7 +23,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export const POST = withRuntime({ cron: "x-header" }, async () => {
+export const POST = withRuntime({ cron: true }, async () => {
   const db = await requireAdminClient();
 
   // Fetch all unsent reminders due now or overdue

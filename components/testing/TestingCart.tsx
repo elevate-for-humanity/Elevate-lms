@@ -1,9 +1,27 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, createContext, useContext, ReactNode } from 'react';
 import { ShoppingCart, X, Plus, Minus, Loader2, CreditCard } from 'lucide-react';
 import { useCart } from '@/lib/store/use-cart';
 import { handleTestingCheckout } from '@/lib/store/actions';
+
+// Provider implementation
+export const TestingCartProvider = ({ children }: { children: ReactNode }) => {
+  return <>{children}</>;
+};
+
+// Add to cart button
+export const AddExamToCartButton = ({ exam, className }: { exam: any, className?: string }) => {
+  const { addItem } = useCart();
+  return (
+    <button
+      onClick={() => addItem(exam)}
+      className={className}
+    >
+      Add Exam
+    </button>
+  );
+};
 
 export default function TestingCart() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart();
@@ -91,7 +109,7 @@ export default function TestingCart() {
           ) : (
             <>
               <CreditCard className="w-5 h-5" />
-              Pay & Initialize
+              Pay & Checkout
             </>
           )}
         </button>

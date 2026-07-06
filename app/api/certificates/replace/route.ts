@@ -37,6 +37,9 @@ async function _POST(req: NextRequest) {
   if (!adminDb) {
     return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
   }
+  if (!adminDb) {
+    return new Response('Server configuration error', { status: 500 });
+  }
 
   const { old_serial, reason } = await req.json();
   if (!old_serial) return new Response('Missing serial', { status: 400 });

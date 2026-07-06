@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
         status: 'pending',
       })
       .then(() => {})
-      .catch(() => {}); // non-fatal if table doesn't exist yet
+      .then(() => {}, () => {}); // non-fatal if table doesn't exist yet
 
     return NextResponse.json({ success: true, path });
   } catch (err) {

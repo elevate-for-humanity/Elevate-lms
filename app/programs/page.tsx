@@ -1,93 +1,87 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
+import { createPublicClient } from '@/lib/supabase/public';
 import { Clock, Award, DollarSign, ChevronRight } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import {
-  buildProgramsListingMetadata,
-  formatPublicProgramsDisplay,
-  getPublicProgramsPageData,
-} from '@/lib/programs/public-programs-page';
-import { PUBLIC_PROGRAM_DURATION_RANGE } from '@/lib/programs/marketing-duration';
+import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
 import { getProgramCardImage } from '@/lib/images/programImages';
 import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
-import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
-import { card } from '@/lib/page-design-tokens';
-import { HomePlatformPreview } from '@/components/home/HomePlatformPreview';
 
 export const revalidate = 0; // always fresh - catalog should prefer DB state when available
 
-export async function generateMetadata(): Promise<Metadata> {
-  return buildProgramsListingMetadata();
-}
+export const metadata: Metadata = {
+  title: `Programs | ${PLATFORM_DEFAULTS.orgName}`,
+  description:
+    'Credential-bearing programs in healthcare, skilled trades, technology, beauty, and business. WIOA and Workforce Ready Grant funding available.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/programs' },
+};
 
 const PROGRAM_IMAGES: Record<string, string> = {
-  cna:'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-nursing-real.webp',qma:'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-cna-hero.webp',
-  'medical-assistant':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant-real.webp',
+  cna:'/images/pages/cna-nursing-real.webp',qma:'/images/pages/programs-cna-hero.webp',
+  'medical-assistant':'/images/pages/medical-assistant-real.webp',
   'nha-phlebotomy':'/images/healthcare/hero-program-phlebotomy.jpg',
   phlebotomy:'/images/healthcare/hero-program-phlebotomy.jpg',
   'nha-patient-care-technician':'/images/healthcare/hero-program-patient-care.webp',
-  'nha-billing-coding':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant-desk.webp',
-  'nha-pharmacy-technician':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pharmacy-technician.webp',
-  'pharmacy-technician':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/pharmacy-tech.webp',
+  'nha-billing-coding':'/images/pages/medical-assistant-desk.webp',
+  'nha-pharmacy-technician':'/images/pages/pharmacy-technician.webp',
+  'pharmacy-technician':'/images/pages/pharmacy-tech.webp',
   'nha-ekg-technician':'/images/healthcare/healthcare-professional-portrait-2.webp',
-  'nha-ehr':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant-lab.webp',
-  'nha-medical-admin-assistant':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/medical-assistant-desk.webp',
+  'nha-ehr':'/images/pages/medical-assistant-lab.webp',
+  'nha-medical-admin-assistant':'/images/pages/medical-assistant-desk.webp',
   'dental-assistant':'/images/healthcare/video-thumbnail-dental-assistant.webp',
   'cpr-first-aid':'/images/healthcare/cpr-certification-group.webp',
-  'chw-cert':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/peer-recovery.webp',
+  'chw-cert':'/images/pages/peer-recovery.webp',
   'home-health-aide':'/images/healthcare/program-cna-training.webp',
-  'direct-support-professional':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
-  'dsp-training':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
-  'peer-recovery-specialist':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/peer-recovery.webp',
-  'peer-support':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/peer-recovery.webp',
-  'drug-alcohol-specimen-collector':'/images/healthcare/healthcare-professional-portrait-1.jpg',
-  'sanitation-infection-control':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-hero.webp',
-  'hvac-technician':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
-  electrical:'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/electrical.webp',
-  plumbing:'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/plumbing-pipes.webp',
-  'cdl-training':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-hero.webp',
-  welding:'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/welding-sparks.webp',
-  'building-services-technician':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-building-tech-card.jpg',
-  'building-maintenance-wrg':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/building-maintenance.webp',
-  'construction-trades-certification':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/construction-trades.webp',
-  'automotive-technician':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/skilled-trades-hero.webp',
-  'diesel-mechanic':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/trades-classroom.webp',
-  'solar-panel-installation':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/skilled-trades-sector.webp',
-  'manufacturing-technician':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/trades-classroom.webp',
-  forklift:'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/trades-classroom.webp',
-  'barber-apprenticeship':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/hero-program-barber.webp',
-  'cosmetology-apprenticeship':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-apprenticeship-hero.webp',
-  'esthetician-apprenticeship':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/esthetician.webp',
-  'nail-technician-apprenticeship':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-tech-hero.webp',
-  'beauty-career-educator':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/beauty/program-beauty-training.webp',
-  'culinary-apprenticeship':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
-  'youth-culinary-apprenticeship':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
-  'emt-apprenticeship':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-hero.webp',
-  'it-help-desk':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/tech-classroom.webp',
-  'cybersecurity-analyst':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/technology-sector.webp',
-  'data-analytics':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/tech-classroom.webp',
-  'graphic-design':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/tech-classroom.webp',
-  'cad-drafting':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/tech-classroom.webp',
-  'web-development':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-tech-webdev-hero.webp',
-  
-  bookkeeping:'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp',
-  'finance-bookkeeping-accounting':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp',
-  'business-startup':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-business-startup-marketing-hero.jpg',
-  'business-administration':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/professional-2.jpg',
-  'administrative-assistant':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp',
-  entrepreneurship:'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/partnership-1.webp',
-  'real-estate-agent':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/collaboration-1.webp',
-  'insurance-agent':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/team-3.webp',
-  'customer-service-representative':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/team-4.webp',
-  'office-administration':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/office-admin.webp',
-  'project-management':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/collaboration-1.webp',
-  'servsafe-food-handler':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
-  'servsafe-manager':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
-  'guest-service-gold':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
-  servsuccess:'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
-  'start-hospitality':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-classroom.webp',
-  'emergency-health-safety':'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cpr-aed.webp',
+  'direct-support-professional':'/images/pages/healthcare-classroom.webp',
+  'dsp-training':'/images/pages/healthcare-classroom.webp',
+  'peer-recovery-specialist':'/images/pages/peer-recovery.webp',
+  'peer-support':'/images/pages/peer-recovery.webp',
+  'drug-alcohol-specimen-collector':'/images/healthcare/hero-program-phlebotomy.webp',
+  'sanitation-infection-control':'/images/pages/healthcare-hero.webp',
+  'hvac-technician':'/images/pages/hvac-technician.webp',
+  electrical:'/images/pages/electrical.webp',
+  plumbing:'/images/pages/plumbing-pipes.webp',
+  'cdl-training':'/images/pages/cdl-hero.webp',
+  welding:'/images/pages/welding-sparks.webp',
+  'building-services-technician':'/images/programs/efh-building-tech-card.jpg',
+  'building-maintenance-wrg':'/images/building-maintenance.webp',
+  'construction-trades-certification':'/images/pages/construction-trades.webp',
+  'automotive-technician':'/images/pages/skilled-trades-hero.webp',
+  'diesel-mechanic':'/images/pages/trades-classroom.webp',
+  'solar-panel-installation':'/images/pages/skilled-trades-sector.webp',
+  'manufacturing-technician':'/images/pages/trades-classroom.webp',
+  forklift:'/images/pages/trades-classroom.webp',
+  'barber-apprenticeship':'/images/beauty/hero-program-barber.webp',
+  'cosmetology-apprenticeship':'/images/pages/cosmetology-apprenticeship-hero.webp',
+  'esthetician-apprenticeship':'/images/beauty/esthetician.webp',
+  'nail-technician-apprenticeship':'/images/pages/nail-tech-hero.webp',
+  'beauty-career-educator':'/images/beauty/program-beauty-training.webp',
+  'culinary-apprenticeship':'/images/pages/healthcare-classroom.webp',
+  'youth-culinary-apprenticeship':'/images/pages/healthcare-classroom.webp',
+  'emt-apprenticeship':'/images/pages/healthcare-hero.webp',
+  'it-help-desk':'/images/pages/tech-classroom.webp',
+  'cybersecurity-analyst':'/images/pages/technology-sector.webp',
+  'data-analytics':'/images/pages/tech-classroom.webp',
+  'graphic-design':'/images/pages/tech-classroom.webp',
+  'cad-drafting':'/images/pages/tech-classroom.webp',
+  'web-development':'/images/pages/programs-tech-webdev-hero.webp',
+  bookkeeping:'/images/business/office-admin.webp',
+  'finance-bookkeeping-accounting':'/images/business/office-admin.webp',
+  'business-startup':'/images/programs/efh-business-startup-marketing-hero.jpg',
+  'business-administration':'/images/business/professional-2.jpg',
+  'administrative-assistant':'/images/business/office-admin.webp',
+  entrepreneurship:'/images/business/partnership-1.webp',
+  'real-estate-agent':'/images/business/collaboration-1.webp',
+  'insurance-agent':'/images/business/team-3.webp',
+  'customer-service-representative':'/images/business/team-4.webp',
+  'office-administration':'/images/business/office-admin.webp',
+  'project-management':'/images/business/collaboration-1.webp',
+  'servsafe-food-handler':'/images/pages/healthcare-classroom.webp',
+  'servsafe-manager':'/images/pages/healthcare-classroom.webp',
+  'guest-service-gold':'/images/pages/healthcare-classroom.webp',
+  servsuccess:'/images/pages/healthcare-classroom.webp',
+  'start-hospitality':'/images/pages/healthcare-classroom.webp',
 };
 
 const CATEGORY_META: Record<string,{label:string;color:string;order:number}> = {
@@ -102,11 +96,72 @@ const CATEGORY_META: Record<string,{label:string;color:string;order:number}> = {
   special:          {label:'Workforce Readiness',  color:'bg-slate-600',   order:9},
 };
 
+const SUPPRESSED = new Set([
+  // Only suppress truly duplicate or obsolete program slugs
+  'hvac-2024', // duplicate of hvac
+  'phlebotomy-technician-program', // duplicate of phlebotomy-technician
+  'barber-program', // duplicate of barber
+  'micro-programs', // obsolete umbrella
+  'jri-introduction', // intro to JRI badge system
+  'jri', // parent umbrella for badge system
+]);
+
 type Prog = {slug:string;title:string;description:string|null;category:string;duration:string|null;credential:string|null;funding_eligible:boolean};
 
+function normalizeCategory(category?: string | null, sector?: string | null, programType?: string | null): string {
+  const raw = (category ?? '').trim().toLowerCase();
+  const normalizedSector = (sector ?? '').trim().toLowerCase();
+
+  if (raw.includes('health') || raw.includes('medical') || raw.includes('care') || normalizedSector === 'healthcare') return 'healthcare';
+  if (raw.includes('trade') || raw.includes('welding') || raw.includes('electrical') || raw.includes('plumbing') || raw.includes('hvac') || raw.includes('construction') || raw.includes('cdl') || raw.includes('diesel') || raw.includes('fabrication') || normalizedSector === 'skilled-trades') return 'trades';
+  if (raw.includes('beauty') || raw.includes('cosmetology') || raw.includes('esthetic') || raw.includes('nail') || raw.includes('barber') || normalizedSector === 'personal-services') return 'beauty';
+  if (raw.includes('tech') || raw.includes('it ') || raw.includes('software') || raw.includes('cyber') || raw.includes('network') || raw.includes('web') || raw.includes('design') || raw.includes('data') || normalizedSector === 'technology') return 'technology';
+  if (raw.includes('business') || raw.includes('accounting') || raw.includes('project') || raw.includes('entrepreneur') || normalizedSector === 'business') return 'business';
+  if (raw.includes('hospitality') || raw.includes('culinary') || raw.includes('food') || raw.includes('tourism')) return 'hospitality';
+  if (raw.includes('social') || raw.includes('community') || raw.includes('peer') || raw.includes('support')) return 'social services';
+  if (programType === 'apprenticeship') return 'apprenticeship';
+  return raw || 'other';
+}
+
+const staticProgramFallback: Prog[] = Array.from(STATIC_PROGRAM_MAP.values())
+  .filter((program) => !SUPPRESSED.has(program.slug) && program.public_visible !== false && program.active !== false)
+  .map((program) => {
+    const hasFunding = Boolean(
+      program.funding?.wioa_eligible ||
+      program.funding?.wrg_eligible ||
+      program.funding?.fssa_eligible ||
+      program.fundingOptions?.some((option) => option === 'wioa' || option === 'wrg' || option === 'impact'),
+    );
+    return {
+      slug: program.slug,
+      title: program.title,
+      description: program.subtitle || program.metaDescription || null,
+      category: normalizeCategory(program.category, program.sector, program.programType),
+      duration: program.durationWeeks ? `${program.durationWeeks} week${program.durationWeeks === 1 ? '' : 's'}` : null,
+      credential: program.credentials?.[0]?.name ?? null,
+      funding_eligible: hasFunding,
+    };
+  })
+  .sort((a, b) => a.title.localeCompare(b.title));
+
 export default async function ProgramsPage() {
-  const { programs: catalogPrograms } = await getPublicProgramsPageData();
-  const programs: Prog[] = catalogPrograms;
+  let programs: Prog[] = staticProgramFallback;
+
+  try {
+    const db = createPublicClient();
+    const {data} = await db.from('programs')
+      .select('slug,title,short_description,description,category,duration,credential_type,wioa_eligible')
+      .eq('is_active',true).eq('published',true).neq('status','archived').order('title');
+    if (data?.length) {
+      programs = data.filter(p=>!SUPPRESSED.has(p.slug)).map(p=>{
+        let desc:string|null = p.short_description||p.description||null;
+        if(desc&&!/[.!?]$/.test(desc.trim())){const l=Math.max(desc.lastIndexOf('.'),desc.lastIndexOf('!'),desc.lastIndexOf('?'));desc=l>20?desc.slice(0,l+1):null;}
+        return {slug:p.slug,title:p.title,description:desc,category:normalizeCategory(p.category),duration:p.duration??null,credential:p.credential_type??null,funding_eligible:p.wioa_eligible??false};
+      });
+    }
+  } catch {
+    programs = staticProgramFallback;
+  }
 
   const grouped:Record<string,Prog[]>={};
   programs.forEach(p=>{if(!grouped[p.category])grouped[p.category]=[];grouped[p.category].push(p);});
@@ -118,16 +173,16 @@ export default async function ProgramsPage() {
       {/* Hero */}
       <section className="relative h-64 sm:h-80 w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image sizes="(max-width: 768px) 100vw, 1200px" src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs-hero-vibrant.webp" alt={`${PLATFORM_DEFAULTS.orgName} programs`} fill className="object-cover object-center" priority  />
+        <Image sizes="(max-width: 768px) 100vw, 1200px" src="/images/programs-hero-vibrant.webp" alt={`${PLATFORM_DEFAULTS.orgName} programs`} fill className="object-cover object-center" priority placeholder="empty" />
         <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/85 to-brand-blue-900/30" />
         <div className="relative z-10 flex h-full flex-col justify-center px-6 sm:px-12 max-w-6xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-2">{PLATFORM_DEFAULTS.orgName}</p>
           <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight">Career Training Programs</h1>
           <p className="mt-3 text-slate-200 text-sm sm:text-base max-w-xl">
-            {formatPublicProgramsDisplay(programs.length)} credential-bearing programs · {PUBLIC_PROGRAM_DURATION_RANGE} · WIOA &amp; WRG funding available
+            {programs.length} credential-bearing programs · 4-12 weeks · WIOA &amp; WRG funding available
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/orientation/schedule" className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-red-700 transition-colors">
+            <Link href="/programs/cosmetology-apprenticeship/orientation" className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-red-700 transition-colors">
               Schedule Free Orientation
             </Link>
             <Link href="/programs/catalog" className="inline-flex items-center gap-2 rounded-lg bg-white/10 border border-white/30 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/20 transition-colors">
@@ -182,10 +237,10 @@ export default async function ProgramsPage() {
                 {list.map(p=>(
                   <Link key={p.slug} href={`/programs/${p.slug}`}
                     className="group flex flex-col rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-slate-300 transition-all duration-200 bg-white">
-                    <div className={card.programImage}>
+                    <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100 flex-shrink-0">
                       <Image src={resolveSiteImagePath(PROGRAM_IMAGES[p.slug] ?? getProgramCardImage(p.slug))} alt={p.title} fill
-                        className={card.programImageFill}
-                        sizes={IMAGE_SIZES.programCard}  />
+                        className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" placeholder="empty" />
                       {p.funding_eligible&&(
                         <span className="absolute top-2 left-2 bg-brand-green-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">WIOA Eligible</span>
                       )}
@@ -234,8 +289,6 @@ export default async function ProgramsPage() {
         </div>
       </section>
 
-      <HomePlatformPreview />
-
       {/* CTA */}
       <section className="bg-slate-900 text-white py-16">
         <div className="max-w-3xl mx-auto px-4 text-center">
@@ -244,7 +297,7 @@ export default async function ProgramsPage() {
             Schedule a free orientation. We&apos;ll match you to the right program, check your funding eligibility, and get you enrolled.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link href="/orientation/schedule" className="rounded-lg bg-brand-red-600 px-8 py-3 font-semibold text-white hover:bg-brand-red-700 transition-colors">
+            <Link href="/programs/cosmetology-apprenticeship/orientation" className="rounded-lg bg-brand-red-600 px-8 py-3 font-semibold text-white hover:bg-brand-red-700 transition-colors">
               Schedule Free Orientation
             </Link>
             <Link href="/contact" className="rounded-lg border border-white/30 px-8 py-3 font-semibold text-white hover:bg-white/10 transition-colors">

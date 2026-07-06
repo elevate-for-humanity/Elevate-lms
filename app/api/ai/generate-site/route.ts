@@ -4,24 +4,23 @@ import { aiChat } from '@/lib/ai/ai-service';
 import { getRecommendedTemplate } from '@/lib/templates/designs';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { requireFeatureForAuth } from '@/lib/platform/require-feature-for-auth';
-import { FEATURES } from '@/lib/platform/feature-catalog';
+import { apiAuthGuard } from '@/lib/admin/guards';
 import { saveWebsiteConfig } from '@/lib/websites/save-site-config';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 
 /**
  * POST /api/ai/generate-site
  *
- * Auth: requireFeatureForAuth(FEATURES.AI_BASIC) — not a public route.
  * AI generates a complete site configuration based on user input.
+ * Returns preview config that can be used to render a preview site.
  */
 async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const auth = await requireFeatureForAuth(request, FEATURES.AI_BASIC);
-    if (auth instanceof Response) return auth;
+    const auth = await apiAuthGuard(request);
+    if (auth instanceof NextResponse) return auth;
 
     const body = await request.json();
     const {
@@ -89,7 +88,7 @@ Return ONLY valid JSON, no markdown.`;
       const jsonStr = responseText.replace(/```json\n?|\n?```/g, '').trim();
       siteConfig = JSON.parse(jsonStr);
     } catch (parseError) {
-      logger.error('Failed to parse AI response: ' + responseText);
+      logger.error('Failed to parse AI response', { responseText });
       // Return default config if parsing fails
       siteConfig = getDefaultConfig(organizationName, organizationType);
     }

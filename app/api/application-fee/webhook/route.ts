@@ -1,3 +1,4 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 /**
  * Application Fee Webhook Handler
  *
@@ -16,7 +17,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { constructWebhookEvent } from '@/lib/stripe/construct-webhook-event';

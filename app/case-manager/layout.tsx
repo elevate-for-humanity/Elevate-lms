@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 export default async function CaseManagerLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const user = safeGetUser(await supabase.auth.getUser());
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/case-manager/dashboard');

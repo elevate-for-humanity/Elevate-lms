@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { safeInternalError, safeOk } from '@/lib/api/safe-error';
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -9,7 +10,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
  */
 async function _GET(request: NextRequest) {
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const workspaceId = new URL(request.url).searchParams.get('workspaceId');
@@ -35,3 +36,4 @@ async function _GET(request: NextRequest) {
 }
 
 export const GET = withRuntime(_GET);
+

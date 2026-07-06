@@ -1,1 +1,12 @@
-export const securityUtils = { sanitize: (s: string) => s };
+export const CRITICAL_EVENTS = new Set(['AUTOMATION_DETECTED', 'IFRAME_EMBEDDING_DETECTED']);
+
+export function getSeverity(eventType: string): string {
+  if (CRITICAL_EVENTS.has(eventType)) return 'critical';
+  if (['RAPID_NAVIGATION', 'CONSOLE_ACCESS'].includes(eventType)) return 'high';
+  return 'medium';
+}
+
+export const securityUtils = {
+  sanitize: (s: string) => s.replace(/[<>]/g, ''),
+  getSeverity
+};

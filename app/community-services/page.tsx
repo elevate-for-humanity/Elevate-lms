@@ -1,68 +1,47 @@
-import type { Metadata } from 'next';
-import PublicLandingPage from '@/components/marketing/PublicLandingPage';
+import { Metadata } from 'next';
+import { Heart, Users, Globe, ArrowRight } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = {
-  title: 'Community Services',
-  description:
-    'Free community services for Indiana residents: VITA tax preparation, financial literacy, consumer education, reentry support, and workforce navigation.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/community-services' },
+  title: `Community Services | ${PLATFORM_DEFAULTS.orgName}`,
+  keywords: ["services", "workforce development", "training programs"], description: 'Elevate for Humanity serves the community through workforce development and training.',
 };
+
+const SERVICES = [
+  { icon: Users, title: 'Workforce Development', desc: 'Training programs for community members seeking employment.' },
+  { icon: Heart, title: 'Support Services', desc: 'Career coaching and job placement assistance.' },
+  { icon: Globe, title: 'Community Partnerships', desc: 'Collaborating with local organizations to serve better.' },
+];
 
 export default function CommunityServicesPage() {
   return (
-    <PublicLandingPage
-      config={{
-        breadcrumbs: [{ label: 'Community Services' }],
-        hero: {
-          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/community-page-1.webp',
-          tag: 'Community Services',
-          tagColor: 'text-brand-blue-600',
-          title: 'Free Services for Indiana Residents',
-          subtitle: 'VITA tax preparation, financial literacy, consumer education, reentry support, and workforce navigation — all free for qualifying residents.',
-        },
-        intro: {
-          heading: 'Beyond Training',
-          paragraphs: [
-            `${PLATFORM_DEFAULTS.orgName} provides free community services that address the barriers keeping Indiana residents from economic stability. Training is one piece — but stable housing, accurate tax filing, and financial literacy are equally critical.`,
-            'Our community services are available to all Indiana residents, not just enrolled students. No referral required.',
-          ],
-          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/community-page-2.webp',
-        },
-        features: {
-          heading: 'Available Services',
-          items: [
-            'VITA free tax preparation for households earning under $67,000',
-            'Financial literacy workshops: budgeting, credit, and savings',
-            'Benefits screening: SNAP, Medicaid, childcare, utility assistance',
-            'Consumer education: debt, predatory lending, tenant rights',
-            'Reentry support: employment barriers, expungement referrals',
-            'Workforce navigation: WIOA eligibility, WorkOne referrals',
-            'FAFSA and financial aid assistance',
-            'Emergency resource referrals: food, housing, transportation',
-          ],
-        },
-        steps: {
-          heading: 'How to Access Services',
-          items: [
-            { title: 'Contact Us', desc: 'Call or email to describe what you need. No appointment required for most services.' },
-            { title: 'Meet With a Navigator', desc: 'A community navigator will assess your situation and connect you to the right services.' },
-            { title: 'Get Connected', desc: 'We provide direct referrals, warm handoffs, and follow-up to make sure you get what you need.' },
-            { title: 'No Cost, No Judgment', desc: 'All community services are free and confidential.' },
-          ],
-        },
-        cta: {
-          heading: 'Get Help Today',
-          subtitle: `Free community services for all Indiana residents. No referral required. Call ${PLATFORM_DEFAULTS.supportPhone}.`,
-          primaryLabel: 'Contact Us',
-          primaryHref: '/contact',
-          secondaryLabel: 'Consumer Education',
-          secondaryHref: '/consumer-education',
-          bgColor: 'bg-brand-blue-700',
-        },
-      }}
-    />
+    <div className="min-h-screen bg-slate-50">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Community Services</h1>
+          <p className="text-xl text-blue-100">Serving our community through workforce development.</p>
+        </div>
+      </section>
+      
+      <section className="py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8">
+            {SERVICES.map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="bg-white p-8 rounded-xl border border-slate-200 text-center">
+                <Icon className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold mb-2">{title}</h3>
+                <p className="text-slate-600">{desc}</p>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-12 text-center">
+            <a href="/contact" className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-medium hover:bg-blue-700">
+              Get Involved <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

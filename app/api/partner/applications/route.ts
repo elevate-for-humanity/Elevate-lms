@@ -159,7 +159,7 @@ async function _POST(request: NextRequest) {
         }),
       });
     } catch (emailError) {
-      logger.warn('Failed to send confirmation email:', emailError);
+      logger.warn(`Failed to send confirmation email: ${emailError}`);
     }
 
     // Send notification to admin
@@ -244,7 +244,7 @@ async function _GET(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

@@ -193,7 +193,7 @@ export default function PartnerOnboardingPage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/partner-page-9.jpg"
+          src="/images/pages/partner-page-9.jpg"
           alt="Partner onboarding"
           fill
           sizes="100vw"

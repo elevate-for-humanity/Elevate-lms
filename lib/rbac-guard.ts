@@ -8,12 +8,30 @@ import { logger } from '@/lib/logger';
 
 export type UserRole =
   | 'student'
-  | 'advisor'
   | 'admin'
-  | 'partner'
-  | 'program_holder'
+  | 'advisor'
+  | 'staff'
   | 'employer'
-  | 'workforce_board';
+  | 'workforce_board'
+  | 'partner'
+  | 'sponsor'
+  | 'mentor'
+  | 'org_admin'
+  | 'program_holder'
+  | 'delegate'
+  | 'creator'
+  | 'instructor'
+  | 'case_manager'
+  | 'provider_admin'
+  | 'super_admin'
+  | 'grant_client'
+  | 'partner_admin'
+  | 'host_shop'
+  | 'government'
+  | 'testing_center'
+  | 'financial_aid'
+  | 'compliance'
+  | 'dev_studio';
 
 /**
  * Require specific role(s) for access

@@ -91,7 +91,7 @@ const FALLBACK_RESPONSES: Record<string, string> = {
 function getFallbackResponse(message: string): string {
   const lowerMsg = message.toLowerCase();
   if (
-    lowerMsg.includes('program') ||
+    lowerMsg.includes("program'") ||
     lowerMsg.includes('course') ||
     lowerMsg.includes('training') ||
     lowerMsg.includes('offer')

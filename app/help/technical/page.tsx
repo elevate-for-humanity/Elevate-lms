@@ -1,32 +1,25 @@
-import type { Metadata } from 'next';
-import { Settings } from 'lucide-react';
-import { HelpCategoryPage } from '@/components/help/HelpCategoryPage';
-
-export const dynamic = 'force-dynamic';
+import { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Technical Support | Help Center',
-  description:
-    'Troubleshoot login issues, browser compatibility, video playback, and other technical problems.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/help/technical' },
-  robots: { index: true, follow: true },
+  title: 'Technical | Elevate for Humanity',
+  description: 'Technical page content.',
 };
 
-export default function HelpTechnicalPage() {
+export default function Page() {
   return (
-    <HelpCategoryPage
-      config={{
-        categorySlug: 'technical-support',
-        title: 'Technical Support',
-        description:
-          'Troubleshoot login issues, browser compatibility, video playback, and platform errors.',
-        icon: <Settings className="w-6 h-6" />,
-        relatedCategories: [
-          { label: 'Getting Started', href: '/help/getting-started' },
-          { label: 'Courses & Learning', href: '/help/courses' },
-          { label: 'Account & Billing', href: '/help/account' },
-        ],
-      }}
-    />
+    <div className="min-h-screen bg-slate-50">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold">Technical</h1>
+          <p className="text-blue-200">Workforce development resources.</p>
+        </div>
+      </section>
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
+        </div>
+      </section>
+    </div>
   );
 }

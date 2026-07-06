@@ -19,17 +19,6 @@ import { DUPLICATE_PROGRAM_ALIAS_SLUGS } from '@/lib/programs/duplicate-program-
 export const PROGRAMS_PAGE_SUPPRESSED_SLUGS = new Set([
   ...DUPLICATE_PROGRAM_ALIAS_SLUGS,
   ...ARCHIVED_PROGRAM_SLUGS,
-  'ai-advanced-project-management-1774494313718',
-  'ai-forklift-safety-certification-1774495387731',
-  'jri-badge-1-mindsets',
-  'jri-badge-2-self-management',
-  'jri-badge-3-learning-strategies',
-  'jri-badge-4-social-skills',
-  'jri-badge-5-workplace-skills',
-  'jri-badge-6-launch-a-career',
-  'jri-introduction',
-  'jri',
-  'micro-programs',
 ]);
 
 export type ProgramsPageRow = {

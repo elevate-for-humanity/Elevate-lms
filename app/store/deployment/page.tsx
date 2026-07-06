@@ -54,7 +54,7 @@ export default async function DeploymentPage() {
               <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
                 <Zap className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">Northflank Managed (Recommended)</h3>
+              <h3 className="text-2xl font-bold mb-4">Vercel (Recommended)</h3>
               <div className="flex items-center gap-2 mb-4">
                 <Clock className="w-5 h-5 text-brand-green-600" />
                 <span className="font-semibold text-brand-green-600">5 minutes</span>
@@ -239,8 +239,8 @@ export default async function DeploymentPage() {
                 },
                 {
                   step: 4,
-                  title: 'Deploy with Docker',
-                  description: 'Build Dockerfile.northflank-lms and Dockerfile.northflank-admin on your Northflank project (or any container host)',
+                  title: 'Deploy to Vercel',
+                  description: 'Connect repository to Vercel and deploy with one click',
                   time: '5 minutes',
                 },
                 {

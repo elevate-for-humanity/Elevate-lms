@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -78,7 +80,7 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   if (!auth.role || !EXPORT_ROLES.has(auth.role)) return safeError('Forbidden', 403);
 
   const body = (await request.json().catch(() => null)) as { export_type?: ExportType; tenant_id?: string } | null;
@@ -135,3 +137,4 @@ export async function POST(request: NextRequest) {
     return safeInternalError(error, 'Provider export failed');
   }
 }
+

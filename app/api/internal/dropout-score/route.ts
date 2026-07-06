@@ -7,7 +7,7 @@
  * persists both back to student_risk_status.risk_score and risk_factors.
  *
  * Processes up to 50 students per run to stay within AI rate limits.
- * Gated by CRON_SECRET via withRuntime({ cron: "x-header" }).
+ * Gated by CRON_SECRET via withRuntime({ cron: true }).
  */
 
 import { NextResponse } from 'next/server';
@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic';
 
 const BATCH_SIZE = 50;
 
-export const POST = withRuntime({ cron: "x-header" }, async () => {
+export const POST = withRuntime({ cron: true }, async () => {
   const db = await requireAdminClient();
 
   // Load students that need scoring — prioritise those with no score or stale score (>24h)
@@ -135,7 +135,7 @@ Respond with ONLY valid JSON, no markdown, no explanation. Example: {"score":72,
     } catch (err) {
       logger.warn('[dropout-score] AI scoring failed for student', {
         user_id: row.user_id,
-        error: 'Internal server error',
+        error: err instanceof Error ? err.message : String(err),
       });
       failed++;
     }

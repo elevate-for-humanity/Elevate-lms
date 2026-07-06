@@ -26,7 +26,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/enrollment-automation] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   let enrolled = 0;
@@ -77,7 +77,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       subject_type: 'student',
       payload: { application_id: app.id, program_id: app.program_id },
       message: `Auto-enrolled ${app.applicant_name ?? app.user_id} into ${app.program_name}`,
-    }).catch(() => {});
+    }).then(() => {}, () => {});
 
     enrolled++;
   }

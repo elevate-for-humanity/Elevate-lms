@@ -30,7 +30,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/payment-monitoring] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   // Payout schedules past due
@@ -45,12 +45,12 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const overdueCount = overduePayouts?.length ?? 0;
 
   if (failureCount > 0 || overdueCount > 0) {
-    await emitEvent('payment.monitoring_alert', 'payments', {
+    await emitEvent('payment.monitoring_alert', 'payment', {
       severity: failureCount > 5 ? 'error' : 'warning',
       actor_type: 'cron',
       payload: { unresolved_failures: failureCount, overdue_payouts: overdueCount },
       message: `Payment monitoring: ${failureCount} unresolved failures, ${overdueCount} overdue payouts`,
-    }).catch(() => {});
+    }).then(() => {}, () => {});
 
     if (failureCount > 0) {
       await sendEmail({

@@ -29,7 +29,7 @@ async function _GET(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -37,7 +37,7 @@ async function _GET(request: NextRequest) {
     const { data: programs } = await supabase
       .from('programs')
       .select(
-        'id, name, title, credential, accreditation_status, accreditation_body, accreditation_expires',
+        'id, title, credential, accreditation_status, accreditation_body, accreditation_expires',
       );
 
     const { data: enrollments } = await supabase
@@ -57,7 +57,7 @@ async function _GET(request: NextRequest) {
 
         return {
           programId: program.id,
-          programName: program.name || program.title,
+          programName: program.title,
           credential: program.credential,
           accreditationStatus: program.accreditation_status || 'pending',
           accreditationBody: program.accreditation_body,
@@ -124,7 +124,7 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

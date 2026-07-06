@@ -185,8 +185,8 @@ export async function handleRefund(paymentIntentId: string): Promise<void> {
   await logAuditEvent({
     action: 'LICENSE_REFUND_PROCESSED',
     actor_id: 'system:stripe_refund_handler',
-    target_type: 'license_purchase',
-    target_id: purchase.license_id || paymentIntentId,
+    resourceType: 'license_purchase',
+    resourceId: purchase.license_id || paymentIntentId,
     metadata: { payment_intent_id: paymentIntentId, tenant_id: purchase.tenant_id },
   });
 
@@ -229,8 +229,8 @@ export async function handleDispute(paymentIntentId: string): Promise<void> {
   await logAuditEvent({
     action: 'LICENSE_DISPUTE_OPENED',
     actor_id: 'system:stripe_dispute_handler',
-    target_type: 'license_purchase',
-    target_id: purchase.license_id || paymentIntentId,
+    resourceType: 'license_purchase',
+    resourceId: purchase.license_id || paymentIntentId,
     metadata: { payment_intent_id: paymentIntentId, tenant_id: purchase.tenant_id },
   });
 
@@ -256,8 +256,8 @@ export async function revokeLicense(tenantId: string, reason: string): Promise<v
   await logAuditEvent({
     action: 'LICENSE_REVOKED',
     actor_id: 'system:license_enforcement',
-    target_type: 'tenant',
-    target_id: tenantId,
+    resourceType: 'tenant',
+    resourceId: tenantId,
     metadata: { reason, correlation_id: requestId },
   });
 
@@ -286,8 +286,8 @@ export async function extendLicense(tenantId: string, newExpirationDate: Date): 
   await logAuditEvent({
     action: 'LICENSE_EXTENDED',
     actor_id: 'system:license_enforcement',
-    target_type: 'tenant',
-    target_id: tenantId,
+    resourceType: 'tenant',
+    resourceId: tenantId,
     metadata: { new_expiration: newExpirationDate.toISOString(), correlation_id: requestId },
   });
 

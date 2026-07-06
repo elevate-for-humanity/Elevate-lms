@@ -4,9 +4,9 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { headers } from 'next/headers';
+import crypto from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { hashIp } from '@/lib/api/get-client-ip';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,6 +24,10 @@ const ratelimit =
         prefix: 'chat_session',
       })
     : null;
+
+function hashIp(ip: string): string {
+  return crypto.createHash('sha256').update(ip).digest('hex').slice(0, 16);
+}
 
 // POST /api/chat/session — create a new chat session (works for anon + auth)
 async function _POST(request: Request) {

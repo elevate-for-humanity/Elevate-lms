@@ -52,6 +52,21 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
       NEXT_PUBLIC_LMS_URL: 'https://www.elevateforhumanity.org/lms',
     },
   },
+  {
+    id: process.env.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-lms-build',
+    dockerfile: '/Dockerfile.marketing',
+    runtimeEnvironment: {
+      SERVICE_ROLE: 'marketing',
+      PORT: '8080',
+      HOSTNAME: '0.0.0.0',
+      NODE_ENV: 'production',
+      NEXT_TELEMETRY_DISABLED: '1',
+      NEXT_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
+      NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
+      NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
+      NEXT_PUBLIC_LMS_URL: 'https://www.elevateforhumanity.org/lms',
+    },
+  },
 ];
 
 /** Northflank only accepts these MB values for build ephemeral storage. */

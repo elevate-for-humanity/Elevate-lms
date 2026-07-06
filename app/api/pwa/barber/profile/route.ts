@@ -1,7 +1,7 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { getAchievedMilestones, BARBER_MILESTONES } from '@/lib/pwa/milestones';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -72,7 +72,7 @@ async function _GET(request: Request) {
         shopName: partner?.name || 'Not assigned',
         shopCity: partner?.city,
         shopState: partner?.state,
-        startDate: partnerUser?.created_at || user.created_at,
+        startDate: partnerUser?.created_at || (user as { created_at?: string }).created_at,
         totalHours,
         targetHours: 2000,
         milestonesAchieved: achievedMilestones.length,
@@ -85,3 +85,5 @@ async function _GET(request: Request) {
   }
 }
 export const GET = withApiAudit('/api/pwa/barber/profile', _GET);
+
+

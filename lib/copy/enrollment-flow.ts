@@ -143,11 +143,6 @@ export const PROGRAM_COPY: Record<string, Partial<Record<keyof typeof COPY.progr
     heroSubtext:
       'Learn to install, maintain, and repair heating and cooling systems. High-demand career with excellent earning potential.',
   },
-  'tax-prep': {
-    heroHeadline: 'Tax Preparation Certification',
-    heroSubtext:
-      'Become a certified tax preparer and start your own practice or work for an established firm. Flexible schedule, seasonal or year-round.',
-  },
   cna: {
     heroHeadline: 'Certified Nursing Assistant Training',
     heroSubtext:

@@ -1,4 +1,4 @@
-// PUBLIC ROUTE: health check — no auth, no rate limiting (Northflank probes every 30s)
+// PUBLIC ROUTE: health check — no auth, no rate limiting (ECS calls this every 30s)
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { probeSupabaseDatabase } from '@/lib/supabase/db-probe';
@@ -25,22 +25,20 @@ async function _GET(request: Request) {
     checks: {},
   };
 
-  // Check 1: Environment Variables — missing critical vars = warn (not fail) for better UX
+  // Check 1: Environment Variables — missing critical vars = hard fail → 500
   const criticalEnv = [
     'NEXT_PUBLIC_SUPABASE_URL',
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     'SUPABASE_SERVICE_ROLE_KEY',
   ];
   const missingEnv = criticalEnv.filter((k) => !process.env[k]);
-  const hasSupabaseUrl = !!(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || process.env.DATABASE_URL);
-  
   checks.checks.environment = {
-    supabase_url: !!(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL),
+    supabase_url: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
     supabase_anon_key: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     service_role_key: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
     service_role_key_length: process.env.SUPABASE_SERVICE_ROLE_KEY?.length ?? 0,
     missing: missingEnv,
-    status: missingEnv.length === 0 ? 'pass' : 'warn', // Changed from 'fail' to 'warn'
+    status: missingEnv.length === 0 ? 'pass' : 'fail',
   };
 
   // Check 2: Database Connection (direct REST probe — not subject to circuit breaker)
@@ -139,9 +137,9 @@ async function _GET(request: Request) {
       // disabled_triggers > 0 = hard fail (active tampering risk)
       // missing_immutability > 0 = warn only (RLS still enforced; trigger is
       //   defense-in-depth — apply migration 20260424000004 to resolve)
-      // TODO(security): missing immutability triggers are a hardening gap, not
-      //   a healthy final state. Apply 20260424000004_audit_ddl_events_immutability_trigger.sql
-      //   in Supabase Dashboard to promote this from warn → pass.
+      // NOTE: Missing immutability triggers show as "warn" status. Apply
+      // migration 20260424000004_audit_ddl_events_immutability_trigger.sql
+      // in Supabase Dashboard to promote from warn → pass.
       const integrityStatus =
         disabledCount > 0 ? 'fail' : missingTables.length > 0 ? 'warn' : 'pass';
       checks.checks.audit_integrity = {

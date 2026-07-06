@@ -35,7 +35,7 @@ const MAX_AUTO_CLOSE_HOURS = 8;
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export const POST = withRuntime({ cron: "x-header" }, async () => {
+export const POST = withRuntime({ cron: true }, async () => {
   const db = await requireAdminClient();
 
   const cutoff = new Date(Date.now() - AUTO_CLOSE_HOURS * 60 * 60 * 1000).toISOString();
@@ -167,22 +167,21 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
 
       // 4. In-app notification to apprentice
       if (userId) {
-        await Promise.resolve(
-          db
-            .from('notifications')
-            .insert({
-              user_id: userId,
-              type: 'timeclock',
-              title: 'Shift auto-closed',
-              message: `Your shift on ${shift.work_date} at ${siteName} was automatically closed after ${MAX_AUTO_CLOSE_HOURS} hours. Hours are pending supervisor approval. Please contact your supervisor.`,
-              action_label: 'View timeclock',
-              action_url: '/apprentice/timeclock',
-              link: '/apprentice/timeclock',
-              read: false,
-              metadata: { progress_entry_id: shift.id, auto_closed: true },
-              idempotency_key: `missed-clockout-${shift.id}`,
-            })
-        ).catch(() => {});
+        await db
+          .from('notifications')
+          .insert({
+            user_id: userId,
+            type: 'timeclock',
+            title: 'Shift auto-closed',
+            message: `Your shift on ${shift.work_date} at ${siteName} was automatically closed after ${MAX_AUTO_CLOSE_HOURS} hours. Hours are pending supervisor approval. Please contact your supervisor.`,
+            action_label: 'View timeclock',
+            action_url: '/apprentice/timeclock',
+            link: '/apprentice/timeclock',
+            read: false,
+            metadata: { progress_entry_id: shift.id, auto_closed: true },
+            idempotency_key: `missed-clockout-${shift.id}`,
+          })
+          .then(() => {}, () => {});
       }
 
       // 5. Email apprentice
@@ -200,7 +199,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
 <p>— Elevate for Humanity</p>
           `.trim(),
           text: `Hi ${apprenticeName}, your shift on ${shift.work_date} at ${siteName} was auto-closed after ${AUTO_CLOSE_HOURS}h. ${MAX_AUTO_CLOSE_HOURS} hours recorded pending supervisor review. Contact your supervisor if incorrect.`,
-        }).catch(() => {});
+        }).then(() => {}, () => {});
       }
 
       // 6. Email admin
@@ -219,7 +218,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
 <p><a href="https://www.elevateforhumanity.org/admin/apprentices">Review in admin dashboard</a></p>
         `.trim(),
         text: `Missed clock-out auto-closed for ${apprenticeName} at ${siteName} on ${shift.work_date}. Open ${Math.round(openHours)}h. ${MAX_AUTO_CLOSE_HOURS}h recorded pending approval.`,
-      }).catch(() => {});
+      }).then(() => {}, () => {});
 
       // 7. Platform event for audit trail
       await emitEvent('timeclock.missed_clock_out', 'compliance', {

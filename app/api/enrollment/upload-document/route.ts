@@ -92,6 +92,7 @@ async function _POST(req: Request) {
       .insert({
         user_id: user.id,
         enrollment_id: enrollmentId,
+        digital_binder_id: binderId,
         file_name: file.name,
         document_type: documentType,
         file_url: signed.signedUrl,
@@ -99,7 +100,6 @@ async function _POST(req: Request) {
         file_size: file.size,
         mime_type: file.type,
         status: 'pending_review',
-        metadata: { digital_binder_id: binderId },
       })
       .select()
       .maybeSingle();
@@ -155,7 +155,7 @@ async function _POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      document: document || { file_url: signed.signedUrl, file_path: fileName },
+      document,
       path: fileName,
     });
   } catch (error) {

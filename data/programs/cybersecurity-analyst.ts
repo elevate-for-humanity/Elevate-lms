@@ -30,7 +30,7 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
   fundingStatement:
     'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$4,200',
-  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
+  fundingOptions: ['wioa', 'wrg', 'wioa', 'self_pay'],
   badge: '5-Star Top Job — DWD',
   badgeColor: 'purple',
 
@@ -429,8 +429,8 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
 
 
   funding: {
+    fssa_eligible: false,
     wioa_eligible: true,
-    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available. CompTIA/ISC2 certification pathway.',

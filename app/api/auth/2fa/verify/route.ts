@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const authRes = await supabase.auth.getUser(); const { data: { user }, error } = authRes;
+  const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) return safeError('Not authenticated', 401);
 
   const { token, isBackupCode } = await req.json().catch(() => ({}));

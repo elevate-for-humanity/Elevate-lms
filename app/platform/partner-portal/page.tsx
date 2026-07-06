@@ -46,7 +46,7 @@ export default async function PartnerPortalPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/pages/about-supportive-services.jpg"
+          src="/images/pages/about-supportive-services.webp"
           alt="Partner Portal"
           fill
           className="object-cover"
@@ -143,7 +143,7 @@ export default async function PartnerPortalPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/about-employer-partners.jpg"
+                  src="/images/pages/about-employer-partners.webp"
                   alt="Partner Portal"
                   fill
                   className="object-cover"
@@ -229,7 +229,7 @@ export default async function PartnerPortalPage() {
               Ready to Get Started?
             </h2>
             <p className="text-base md:text-lg text-blue-100 mb-8">
-              Join thousands who have launched successful careers through our
+              Join our community who have launched successful careers through our
               programs.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">

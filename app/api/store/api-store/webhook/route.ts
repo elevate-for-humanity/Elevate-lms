@@ -1,10 +1,12 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+import { db } from '@/lib/db';
+
 import { verifyWebhookSignature } from '@/lib/store/stripe';
 import { generateLicenseKey, hashLicenseKey } from '@/lib/store/license';
-import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -140,6 +142,9 @@ export async function POST(req: Request) {
       // Fallback: process synchronously if queue fails
       logger.warn('Queue unavailable, processing synchronously', { eventId: event.id });
 
+      // Get admin client for database operations
+      const db = await getAdminClient();
+
       // Generate license key
       const licenseKey = generateLicenseKey();
       const licenseHash = hashLicenseKey(licenseKey);
@@ -232,3 +237,4 @@ export async function POST(req: Request) {
     return Response.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }
+

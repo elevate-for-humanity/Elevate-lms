@@ -1,5 +1,3 @@
-'use client';
-
 import { Calendar, Clock, Award, Briefcase, DollarSign, Landmark } from 'lucide-react';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { buildProgramAtAGlance } from '@/lib/programs/program-at-a-glance';

@@ -79,12 +79,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(`${loginUrl}?error=azure_not_configured`);
   }
 
-  let idToken: string | null;
-  let state: string | null;
+  let idToken: string | null = null;  
+  let state: string | null = null;  
   try {
     const formData = await req.formData();
     idToken = formData.get('id_token') as string | null;
-    state   = formData.get('state') as string | null;
+    state = formData.get('state') as string | null;
   } catch {
     return NextResponse.redirect(`${loginUrl}?error=azure_parse_failed`);
   }
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
 
     // Upsert user and generate a Supabase magic link to establish session
     const admin = await getAdminClient();
-    const { data: existing } = await admin.auth.admin.listUsers();
+    const { data: existing } = await admin.auth.admin.listUsers() as { data: { users?: Array<{ email?: string }> } | null };
     const existingUser = existing?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase());
 
     if (!existingUser) {

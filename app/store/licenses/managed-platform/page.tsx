@@ -128,11 +128,11 @@ export default function ManagedPlatformPage() {
               <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden shadow-2xl border border-slate-200">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
                 <Image
-                  src="/images/demos/admin-dashboard-thumb.jpg"
+                  src="/images/demos/admin-analytics-hero.webp"
                   alt="Elevate managed platform dashboard"
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 80vw" 
+                  sizes="(max-width: 768px) 100vw, 80vw" placeholder="empty"
                 />
               </div>
             </div>

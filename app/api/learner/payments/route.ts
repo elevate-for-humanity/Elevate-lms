@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'payment');
   if (rateLimited) return rateLimited;
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   const userId = auth.id;
 
   const supabase = await createClient();
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
   const enrollmentPayments = (enrollments ?? [])
     .filter((e) => (e.amount_paid_cents ?? 0) > 0)
     .map((e) => {
-      const prog = e.programs as { id: string; title: string } | null;
+      const prog = (e.programs ?? null) as unknown as { id: string; title: string } | null;
       return {
         id: e.id,
         source: 'enrollment' as const,

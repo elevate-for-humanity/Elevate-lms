@@ -16,10 +16,11 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function handler(req: Request) {
-  try {
+  // Define URLs outside try block so they're accessible in catch
+  const siteUrl = ((process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl);
+  const storeUrl = `${siteUrl}/store`;
 
-    const siteUrl = ((process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl);
-    const storeUrl = `${siteUrl}/store`;
+  try {
 
     const injected = injectFailureRedirect(req, `${storeUrl}?error=checkout-failed`);
     if (injected) return injected;
@@ -122,7 +123,7 @@ async function handler(req: Request) {
           quantity: 1,
         },
       ],
-      success_url: `${siteUrl}/onboarding/learner?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${siteUrl}/dashboard/onboarding?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/platform/${product.slug}`,
       metadata: {
         // Standardized metadata for grant/license compliance
@@ -148,7 +149,8 @@ async function handler(req: Request) {
     // Redirect to Stripe Checkout
     return NextResponse.redirect(session.url, 303);
   } catch (err: unknown) {
-    return NextResponse.redirect(new URL(`${storeUrl}?error=checkout-failed`, req.url), 303);
+    const fallbackUrl = `${siteUrl || PLATFORM_DEFAULTS.siteUrl}/store`;
+    return NextResponse.redirect(new URL(`${fallbackUrl}?error=checkout-failed`, req.url), 303);
   }
 }
 export const POST = withRuntime(withApiAudit('/api/stripe/checkout', handler));

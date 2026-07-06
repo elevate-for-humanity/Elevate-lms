@@ -25,7 +25,7 @@ export const dynamic = 'force-dynamic';
 const AUTO_CLOSE_HOURS = 10;
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export const GET = withRuntime({ cron: "x-header" }, async () => {
+export const GET = withRuntime({ cron: true }, async () => {
   const db = await requireAdminClient();
   const cutoff = new Date(Date.now() - AUTO_CLOSE_HOURS * 3600 * 1000).toISOString();
 

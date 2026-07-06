@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 
 import { Metadata } from 'next';
@@ -10,7 +10,7 @@ import DemoTabs from './DemoTabs';
 
 export const metadata: Metadata = {
   title: 'Platform Demos',
-  description: 'Watch guided video walkthroughs of the Elevate platform - admin dashboard, student portal, and employer tools. No signup required.',
+  keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Watch guided video walkthroughs of the Elevate platform - admin dashboard, student portal, and employer tools. No signup required.',
   robots: { index: false, follow: false },
 };
 
@@ -19,40 +19,40 @@ const demos = [
     id: 'admin',
     title: 'Admin Dashboard',
     icon: Shield,
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.jpg',
+    image: '/images/pages/career-counseling.webp',
     alt: 'Training program administrator reviewing enrollment data',
     href: '/store/demo/admin',
-    description: 'This is what your staff sees every day. Watch how enrollment tracking, compliance reporting, and application management work inside the admin portal.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'This is what your staff sees every day. Watch how enrollment tracking, compliance reporting, and application management work inside the admin portal.',
     highlights: ['Enrollment and completion tracking', 'Compliance reporting for workforce boards', 'Application and intake pipeline management', 'WIOA documentation and audit tools'],
   },
   {
     id: 'employer',
     title: 'Employer Portal',
     icon: Briefcase,
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-handshake.webp',
+    image: '/images/pages/employer-handshake.webp',
     alt: 'Employer reviewing candidate profiles from training programs',
     href: '/store/demo/employer',
-    description: 'See what your employer partners see - how they track apprentices, view hiring incentives, and manage OJT contracts inside their portal.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'See what your employer partners see - how they track apprentices, view hiring incentives, and manage OJT contracts inside their portal.',
     highlights: ['Apprenticeship hour and wage progression tracking', 'OJT contract and incentive management', 'MOU and compliance document signing', 'WOTC credit visibility'],
   },
   {
     id: 'learner',
     title: 'Student Experience',
     icon: GraduationCap,
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
+    image: '/images/pages/wioa-meeting.webp',
     alt: 'Students in a training classroom working on coursework',
     href: '/store/demo/student',
-    description: 'What your students see when they log in. Their courses, progress bars, apprenticeship hours logged, and certificates earned. This is the experience that keeps them showing up.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'What your students see when they log in. Their courses, progress bars, apprenticeship hours logged, and certificates earned. This is the experience that keeps them showing up.',
     highlights: ['Course modules with progress tracking', 'Log apprenticeship hours from their phone', 'View earned certificates and credentials', 'Access career services and job placement tools'],
   },
   {
     id: 'workforce',
     title: 'Workforce Board View',
     icon: BarChart3,
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
+    image: '/images/pages/wioa-meeting.webp',
     alt: 'Workforce board staff reviewing program outcomes and funding data',
     href: '/store/demo/admin',
-    description: 'Built for workforce boards and state agencies. WIOA eligibility, ITA tracking, PIRL reporting, and partner network management. The same admin dashboard, filtered for what matters to you.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Built for workforce boards and state agencies. WIOA eligibility, ITA tracking, PIRL reporting, and partner network management. The same admin dashboard, filtered for what matters to you.',
     highlights: ['WIOA eligibility screening with document verification', 'Track WIOA, state, employer, and grant funding together', 'Automated PIRL reporting and quarterly performance', 'Manage your network of training providers and employers'],
   },
 ];
@@ -98,7 +98,7 @@ export default function StoreDemosPage() {
                 {/* Image */}
                 <div className="w-full md:w-1/2 relative rounded-2xl overflow-hidden shadow-lg aspect-video">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                  <Image src={demo.image} alt={demo.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" quality={90}  />
+                  <Image src={demo.image} alt={demo.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" quality={90} placeholder="empty" />
                   <Link href={demo.href} className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
                     <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
                       <Play className="w-7 h-7 text-brand-red-600 ml-1" />

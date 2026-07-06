@@ -96,14 +96,19 @@ export type BlueprintLessonRef = {
    * Instructor-facing notes for practical evaluation.
    * Not shown to learners. Used by instructor sign-off UI.
    */
-  instructorNotes?: string[];
+  instructorNotes?: string | string[];
+
+  /**
+   * Learning objectives - what learners will know/be able to do.
+   */
+  learningObjectives?: string[];
 
   /**
    * Observable competency checks for practical sign-off.
    * Each string is a discrete behavior the instructor verifies.
    * Required for lab and skill lessons.
    */
-  competencyChecks?: string[];
+  competencyChecks?: Array<string | { key: string; label: string; description: string; isCritical?: boolean; requiresInstructorSignoff?: boolean }>;
 };
 
 // ─── Competency requirement (consumed by auditor) ─────────────────────────────
@@ -138,6 +143,7 @@ export type BlueprintModule = {
    */
   slug: string;
   title: string;
+  description?: string;
   /** 1-based position within the program */
   orderIndex: number;
 
@@ -149,7 +155,7 @@ export type BlueprintModule = {
   quizRequired: boolean;
   practicalRequired: boolean;
   isCritical: boolean;
-  requiredLessonTypes: BlueprintLessonTypeRule[];
+  requiredLessonTypes?: BlueprintLessonTypeRule[];
 
   // ── Competency coverage requirements (enforced by auditor) ──
   competencies: BlueprintCompetency[];
@@ -452,9 +458,17 @@ export interface InteractionSpecs {
   includeFlashcards: boolean;
   includeClickToReveal: boolean;
   includeDragDrop: boolean;
+  includeMatching?: boolean;
+  includeCaseStudies?: boolean;
+  includeSimulations?: boolean;
+  includeDecisionTrees?: boolean;
   knowledgeCheckCount: number;
   scenarioCount: number;
   flashcardCount: number;
+  matchingCount?: number;
+  caseStudyCount?: number;
+  simulationCount?: number;
+  decisionTreeCount?: number;
 }
 
 // ─── Enrollment-Based Features ────────────────────────────────────────────────

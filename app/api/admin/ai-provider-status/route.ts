@@ -20,7 +20,7 @@ const PROVIDER_ENV_KEYS: Record<string, string> = {
 
 export async function GET(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const keys: Record<string, { set: boolean }> = {};
   let activeProvider: string | null = null;

@@ -2,10 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-const HVACSimulation = dynamic(() => import('@/components/lms/HVACSimulation'), {
-  ssr: false,
-  loading: () => null,
-});
+
+// Loading placeholder to prevent null component errors
+const LoadingDiv = () => <div className="hidden" />;
+
+const HVACSimulation = dynamic(
+  () => import('@/components/lms/HVACSimulation').then((m) => m.default || m),
+  { ssr: false, loading: LoadingDiv }
+);
 import { hvacLessonSimulations } from '@/lib/lms/hvac-simulations';
 
 type LessonVideoWithSimulationProps = {
@@ -34,14 +38,14 @@ export default function LessonVideoWithSimulation({
   const teaching = simulation.teaching;
   const minimumReached = watchedSeconds >= minimumTimeSeconds;
 
-  useEffect(() => {
+  useEffect((): void => {
     if (minimumReached && !minimumReported) {
       setMinimumReported(true);
       onMinimumTimeReached?.();
     }
   }, [minimumReached, minimumReported, onMinimumTimeReached]);
 
-  useEffect(() => {
+  useEffect((): void => {
     const video = videoRef.current;
     if (!video) return;
 

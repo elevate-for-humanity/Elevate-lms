@@ -3,8 +3,6 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
-import { normalizePostAuthDestination } from '@/lib/auth/role-redirects';
-import { validateRedirect } from '@/lib/auth/validate-redirect';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // PUBLIC ROUTE: unauthenticated users need this to sign in
@@ -23,10 +21,7 @@ export async function POST(req: Request) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   // Always route through /auth/callback so the session is established correctly
   // and role-based destination routing runs. Never redirect directly to a page.
-  const destination = normalizePostAuthDestination(
-    validateRedirect(redirectTo, getRoleDestination('student')),
-    'student',
-  );
+  const destination = redirectTo || getRoleDestination('student');
   const finalRedirect = `${siteUrl}/auth/callback?redirect=${encodeURIComponent(destination)}`;
 
   // generateLink fails with "User not found" for unknown emails — use that as

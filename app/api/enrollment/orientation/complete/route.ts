@@ -3,11 +3,6 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import {
-  canCompleteOrientation,
-  hasLmsAccess,
-  normalizeEnrollmentState,
-} from '@/lib/enrollment/enrollment-flow';
 
 async function _POST(req: Request) {
   try {
@@ -30,6 +25,7 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Missing enrollment_id' }, { status: 400 });
     }
 
+    // Verify ownership and current state
     const { data: enrollment, error: fetchError } = await supabase
       .from('program_enrollments')
       .select('id, user_id, enrollment_state')
@@ -44,17 +40,19 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const state = normalizeEnrollmentState(enrollment.enrollment_state);
-
-    if (state === 'enrolled' || hasLmsAccess(state)) {
-      return NextResponse.json({
-        success: true,
-        message: 'Orientation already completed',
-        redirect: hasLmsAccess(state) ? '/learner/dashboard' : '/enrollment/documents',
-      });
-    }
-
-    if (!canCompleteOrientation(state)) {
+    // Check state allows transition
+    if (enrollment.enrollment_state !== 'confirmed') {
+      if (
+        enrollment.enrollment_state === 'orientation_complete' ||
+        enrollment.enrollment_state === 'documents_complete' ||
+        enrollment.enrollment_state === 'active'
+      ) {
+        return NextResponse.json({
+          success: true,
+          message: 'Orientation already completed',
+          redirect: '/enrollment/documents',
+        });
+      }
       return NextResponse.json(
         {
           error: 'Cannot complete orientation from current state',
@@ -64,10 +62,11 @@ async function _POST(req: Request) {
       );
     }
 
+    // Advance state
     const { error: updateError } = await supabase
       .from('program_enrollments')
       .update({
-        enrollment_state: 'enrolled',
+        enrollment_state: 'orientation_complete',
         orientation_completed_at: new Date().toISOString(),
         next_required_action: 'DOCUMENTS',
       })

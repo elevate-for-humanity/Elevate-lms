@@ -130,7 +130,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
       if (e.code === 'CHECKPOINT_NOT_PASSED') {
         return NextResponse.json(
           {
-            error: 'Internal server error',
+            error: e.message,
             code: 'CHECKPOINT_NOT_PASSED',
             checkpointLessonId: e.checkpointLessonId,
             requiredScore: e.requiredScore,
@@ -426,7 +426,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
             result: { completion: true, success: true },
             timestamp: completedAt,
           }),
-        }).catch(() => {}); // fire-and-forget
+        }).then(() => {}, () => {}); // fire-and-forget
       }
     } catch {
       // xAPI is optional — never block lesson completion

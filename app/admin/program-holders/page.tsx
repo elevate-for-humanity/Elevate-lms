@@ -22,7 +22,7 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export default async function AdminProgramHoldersPage() {
-  await requireRole(['admin', 'staff']);
+  await requireRole(['admin', 'super_admin', 'staff']);
   const supabase = await requireAdminClient();
 
   // Fetch all program holders

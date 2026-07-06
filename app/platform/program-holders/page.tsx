@@ -49,7 +49,7 @@ export default async function ProgramHolderLicensePage() {
     <div className="bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Platform", href: "/platform" }, { label: "Program Holders" }]} />
-        <p className="text-sm text-slate-600 mt-1">Part of the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>. <a href="/store/licensing" className="hover:underline">View pricing →</a></p>
+        <p className="text-sm text-slate-600 mt-1">Part of the <Link href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</Link>. <a href="/store/licensing" className="hover:underline">View pricing →</a></p>
       </div>
 {/* Hero */}
       <section className="bg-zinc-900    text-white py-20">
@@ -194,7 +194,7 @@ export default async function ProgramHolderLicensePage() {
                 </div>
                 <div className="flex items-start gap-2">
                   <Check className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
-                  <div className="font-semibold">Workforce Development Partner</div>
+                  <div className="font-semibold">SNAP E&T Partner</div>
                 </div>
               </div>
             </div>
@@ -349,7 +349,7 @@ export default async function ProgramHolderLicensePage() {
               </div>
               <div className="text-sm text-black mb-4">/month</div>
               <div className="text-sm text-black mb-4">
-                Up to 10,000 students
+                Up to 10,000+ career changers
               </div>
               <div className="text-xs text-slate-500">Setup: $35,000</div>
             </div>

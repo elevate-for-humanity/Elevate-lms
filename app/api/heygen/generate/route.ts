@@ -20,7 +20,7 @@ async function _POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await requireAuth(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   if (!HEYGEN_API_KEY) {
     return NextResponse.json({ error: 'HeyGen API key not configured' }, { status: 500 });
@@ -76,7 +76,7 @@ async function _POST(request: NextRequest) {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: 'Request failed' },
+        { error: data.message || 'Failed to generate video' },
         { status: response.status },
       );
     }

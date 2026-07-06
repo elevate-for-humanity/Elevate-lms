@@ -93,11 +93,11 @@ export default function StudentPortalPage() {
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <Link
-                    href="/lms/dashboard"
+                    href="/lms/login"
                     className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-blue-50 transition shadow-lg"
                   >
                     <Play className="w-5 h-5" />
-                    Go to Dashboard
+                    Student Login
                   </Link>
                   <Link
                     href="/apply"
@@ -110,7 +110,7 @@ export default function StudentPortalPage() {
               <div className="relative hidden lg:block">
                 <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/student-catalog.webp"
+                    src="/images/pages/admin-dashboard-hero.webp"
                     alt="Student Portal Dashboard"
                     fill
                     className="object-cover"
@@ -193,7 +193,7 @@ export default function StudentPortalPage() {
               </div>
               <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/student-catalog.webp"
+                  src="/images/pages/admin-dashboard-hero.webp"
                   alt="Student Dashboard"
                   fill
                   className="object-cover"
@@ -245,7 +245,7 @@ export default function StudentPortalPage() {
                     <div className="absolute inset-0 bg-white/10 rounded-[3rem] backdrop-blur" />
                     <div className="absolute inset-4 bg-slate-900 rounded-[2.5rem] overflow-hidden">
                       <Image
-                        src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/student-catalog.webp"
+                        src="/images/pages/admin-dashboard-hero.webp"
                         alt="Mobile App"
                         fill
                         className="object-cover"
@@ -266,20 +266,20 @@ export default function StudentPortalPage() {
               Ready to Start Learning?
             </h2>
             <p className="text-xl text-slate-300 mb-8">
-              Join thousands of students who are building their careers through our training programs.
+              Join our community of students who are building their careers through our training programs.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
-                href="/apply"
+                href="/login"
                 className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-700 transition"
               >
-                Apply Now
+                Sign In
               </Link>
               <Link
-                href="/programs"
+                href="/apply"
                 className="inline-flex items-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-slate-100 transition"
               >
-                Browse Programs
+                Apply Now
               </Link>
             </div>
           </div>

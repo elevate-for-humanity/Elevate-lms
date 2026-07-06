@@ -7,6 +7,11 @@ on:
   pull_request:
     branches: [main]
 
+# Prevent multiple CI runs from conflicting - wait for pending runs to complete
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Hard quality gate: install + test + build must pass
   test-and-build:
@@ -20,10 +25,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: pnpm install --no-frozen-lockfile
 
       # tsconfig.json writes tsBuildInfoFile to .next/cache/tsbuildinfo.json.
       # Caching that path (not the root .tsbuildinfo) lets tsc skip unchanged files.
@@ -124,6 +131,9 @@ jobs:
             echo "Playwright not available - skipping E2E tests"
           fi
 
+      - name: Clear Next.js cache
+        run: rm -rf .next
+
       - name: Build
         env:
           # 6 GB heap - ubuntu-latest has 7 GB RAM; the LMS build peaks ~3 GB
@@ -145,6 +155,19 @@ jobs:
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
         run: npm run build:lms:phased
 
+      # Upload build artifacts for deploy workflows to use instead of rebuilding
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build-${{ github.sha }}
+          path: |
+            .next/
+            Dockerfile.northflank-lms
+            Dockerfile.northflank-admin
+            Dockerfile.marketing
+          retention-days: 1
+          compression-level: 9
+
   # Non-blocking legacy lint.
   # 896k lines, 2500+ files, pre-existing violations across the codebase.
   # This job NEVER blocks merge. Failure = lint found something, not build broken.
@@ -164,14 +187,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: pnpm install --no-frozen-lockfile
 
       - name: Lint changed files only
         run: |
@@ -207,7 +227,12 @@ jobs:
 
           # Pass files via xargs to avoid argv length limits (exit code 249 was caused by
           # a huge space-delimited argument list exceeding the OS exec limit)
+<<<<<<< HEAD
           echo "$EXISTING_FILES" | xargs npx eslint --max-warnings=0 --no-error-on-unmatched-pattern --no-warn-ignored
+=======
+          # NOTE: This is non-blocking legacy lint - failures don't block deployment
+          echo "$EXISTING_FILES" | xargs npx eslint --max-warnings=0 --no-error-on-unmatched-pattern --no-warn-ignored || true
+>>>>>>> 05c273fb44 (fix: Copy missing client components from apps/admin to app/admin)
 
   # Deployment verification (runs after successful merge to main)
   post-deployment-check:

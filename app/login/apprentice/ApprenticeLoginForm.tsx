@@ -4,10 +4,8 @@ import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
-import { mapAuthError } from '@/lib/auth/map-auth-error';
-import { hydrateBrowserSupabaseConfig } from '@/lib/supabase/public-config';
 
-export default function ApprenticeLoginForm({ redirectTo }: { redirectTo?: string }) {
+export default function ApprenticeLoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,12 +17,6 @@ export default function ApprenticeLoginForm({ redirectTo }: { redirectTo?: strin
     setLoading(true);
 
     try {
-      const hydrated = await hydrateBrowserSupabaseConfig();
-      if (!hydrated) {
-        setError(mapAuthError('site configuration'));
-        return;
-      }
-
       const supabase = createClient();
 
       const { data, error: authError } = await supabase.auth.signInWithPassword({
@@ -33,7 +25,7 @@ export default function ApprenticeLoginForm({ redirectTo }: { redirectTo?: strin
       });
 
       if (authError) {
-        setError(mapAuthError(authError.message));
+        setError(authError.message || 'Invalid credentials');
         return;
       }
 
@@ -48,15 +40,16 @@ export default function ApprenticeLoginForm({ redirectTo }: { redirectTo?: strin
         .eq('id', data.user.id)
         .maybeSingle();
 
-      const resolved = redirectTo
-        ? redirectTo
-        : await resolveStudentHomePath(supabase, data.user.id, profile?.portal_type);
+      const dest = await resolveStudentHomePath(
+        supabase,
+        data.user.id,
+        profile?.portal_type,
+      );
 
-      // Apprentice login page: never fall through to generic learner dashboard
-      window.location.href = resolved === '/learner/dashboard' ? '/apprentice' : resolved;
+      window.location.href = dest;
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Login failed';
-      setError(mapAuthError(msg));
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -65,16 +58,13 @@ export default function ApprenticeLoginForm({ redirectTo }: { redirectTo?: strin
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div
-          className="bg-brand-red-50 border border-brand-red-200 rounded-lg px-4 py-3 text-sm text-brand-red-800"
-          role="alert"
-        >
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-sm text-red-300">
           {error}
         </div>
       )}
 
       <div>
-        <label htmlFor="apprentice-email" className="block text-sm font-medium text-slate-800 mb-1">
+        <label htmlFor="apprentice-email" className="block text-sm font-medium text-slate-200 mb-1">
           Email
         </label>
         <input
@@ -84,13 +74,13 @@ export default function ApprenticeLoginForm({ redirectTo }: { redirectTo?: strin
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
           placeholder="you@example.com"
         />
       </div>
 
       <div>
-        <label htmlFor="apprentice-password" className="block text-sm font-medium text-slate-800 mb-1">
+        <label htmlFor="apprentice-password" className="block text-sm font-medium text-slate-200 mb-1">
           Password
         </label>
         <input
@@ -100,14 +90,14 @@ export default function ApprenticeLoginForm({ redirectTo }: { redirectTo?: strin
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
         />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold transition disabled:opacity-60 flex items-center justify-center gap-2"
+        className="w-full py-3 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold transition disabled:opacity-60 flex items-center justify-center gap-2"
       >
         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
         Sign In

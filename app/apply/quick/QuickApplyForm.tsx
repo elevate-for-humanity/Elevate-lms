@@ -1,6 +1,5 @@
 'use client';
 
-import Turnstile from '@/components/Turnstile';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getActivePrograms } from '@/lib/program-registry';
@@ -10,15 +9,10 @@ export default function QuickApplyForm() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [turnstileToken, setTurnstileToken] = useState('');
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    if (!turnstileToken) {
-      setError('Please complete the security check before submitting.');
-      return;
-    }
     setSubmitting(true);
 
     const fd = new FormData(e.currentTarget);
@@ -34,7 +28,6 @@ export default function QuickApplyForm() {
           phone: fd.get('phone') as string,
           program: fd.get('programInterest') as string,
           source: 'quick_apply',
-          turnstileToken,
         }),
       });
 
@@ -144,15 +137,9 @@ export default function QuickApplyForm() {
         </p>
       )}
 
-      <Turnstile
-        onVerify={setTurnstileToken}
-        onExpire={() => setTurnstileToken('')}
-        formId="quick-apply"
-      />
-
       <button
         type="submit"
-        disabled={submitting || !turnstileToken}
+        disabled={submitting}
         className="w-full py-3 px-6 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {submitting ? 'Submitting…' : 'Submit Application'}

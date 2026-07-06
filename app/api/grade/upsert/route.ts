@@ -31,7 +31,7 @@ async function _POST(req: Request) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const gradingRoles = ['instructor', 'admin', 'staff'];
+  const gradingRoles = ['instructor', 'admin', 'super_admin', 'staff'];
   if (!profile?.role || !gradingRoles.includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -59,7 +59,7 @@ async function _POST(req: Request) {
     .eq('id', gradeItemId)
     .maybeSingle();
 
-  if (!gradeItem || (gradeItem.courses as string)?.instructor_id !== user.id) {
+  if (!gradeItem || (gradeItem.courses as { instructor_id?: string } | null)?.instructor_id !== user.id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

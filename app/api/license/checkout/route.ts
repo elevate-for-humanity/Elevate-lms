@@ -19,7 +19,7 @@ import { withRuntime } from '@/lib/api/withRuntime';
 async function _POST(request: NextRequest) {
   try {
     const auth = await requireAuth(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const body = await request.json();
     const {
@@ -49,6 +49,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Check Stripe is configured
+    const stripe = getStripe();
     if (!stripe) {
       logger.error('Stripe not configured: STRIPE_SECRET_KEY missing');
       return NextResponse.json(
@@ -98,9 +99,6 @@ async function _POST(request: NextRequest) {
         { status: 400 },
       );
     }
-
-    const stripe = getStripe();
-    if (!stripe) return NextResponse.json({ error: 'Payment processing not configured' }, { status: 503 });
 
     // Create or retrieve Stripe customer
     const customers = await stripe.customers.list({

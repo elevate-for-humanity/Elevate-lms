@@ -22,7 +22,7 @@ export const HOSPITALITY: ProgramSchema = {
   fundingStatement:
     'WIOA and Workforce Ready Grant funding available for eligible Indiana residents.',
   selfPayCost: 'See individual courses',
-  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
+  fundingOptions: ['wioa', 'wrg', 'wioa', 'self_pay'],
 
   // Individual course pricing
   coursePricing: [
@@ -267,8 +267,8 @@ export const HOSPITALITY: ProgramSchema = {
 
 
   funding: {
+    fssa_eligible: false,
     wioa_eligible: true,
-    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',

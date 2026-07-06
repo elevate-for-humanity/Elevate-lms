@@ -11,7 +11,7 @@
  *   3. Emits a single ai.operator_triage event summarising the batch
  *
  * Processes up to 20 events per run to stay within AI token limits.
- * Gated by CRON_SECRET via withRuntime({ cron: "x-header" }).
+ * Gated by CRON_SECRET via withRuntime({ cron: true }).
  */
 
 import { NextResponse } from 'next/server';
@@ -29,7 +29,7 @@ const BATCH_SIZE = 20;
 // Only triage events that are at least 2 minutes old (avoid racing with the emitter)
 const MIN_AGE_MINUTES = 2;
 
-export const POST = withRuntime({ cron: "x-header" }, async () => {
+export const POST = withRuntime({ cron: true }, async () => {
   const db = await requireAdminClient();
 
   const ageCutoff = new Date(Date.now() - MIN_AGE_MINUTES * 60 * 1000).toISOString();
@@ -50,7 +50,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
   }
 
   if (!events?.length) {
-    return NextResponse.json({ ok: true, triaged: 0 });
+    return NextResponse.json({ ok: true, __triaged: 0 });
   }
 
   // Build a compact event summary for the AI prompt
@@ -75,7 +75,7 @@ Respond with a JSON object:
 
 Respond with ONLY valid JSON, no markdown.`;
 
-  let triaged;
+  let __triaged = 0;
   let autoResolved = 0;
 
   try {
@@ -107,8 +107,8 @@ Respond with ONLY valid JSON, no markdown.`;
     const autoResolvable = parsed.auto_resolvable === true;
 
     // Write admin alert with AI recommendation
-    await Promise.resolve(
-      db.from('admin_alerts').insert({
+    try {
+      await db.from('admin_alerts').insert({
         alert_type: 'ai_operator_triage',
         severity: priority === 'critical' ? 'critical' : priority === 'high' ? 'high' : 'warning',
         message: summary,
@@ -117,31 +117,30 @@ Respond with ONLY valid JSON, no markdown.`;
           event_count: events.length,
           event_ids: events.map((e) => e.id),
           auto_resolvable: autoResolvable,
-          triaged_at: new Date().toISOString(),
+          __triaged_at: new Date().toISOString(),
         },
         metadata: {
           source: 'ai_operator',
           priority,
           event_types: [...new Set(events.map((e) => e.event_type))],
         },
-      })
-    ).catch((err: unknown) => {
+      });
+    } catch (err) {
       logger.warn('[ai-operator] Failed to write admin_alert', err);
-    });
+    }
 
     // Mark events resolved if AI says they're auto-resolvable
     if (autoResolvable) {
       const ids = events.map((e) => e.id);
-      await Promise.resolve(
-        db
-          .from('platform_events')
-          .update({ resolved: true })
-          .in('id', ids)
-      ).catch(() => {});
+      await db
+        .from('platform_events')
+        .update({ resolved: true })
+        .in('id', ids)
+        .then(() => {}, () => {});
       autoResolved = ids.length;
     }
 
-    triaged = events.length;
+    __triaged = events.length;
 
     // Emit summary event
     await emitEvent('ai.operator_triage', 'ai', {
@@ -154,13 +153,13 @@ Respond with ONLY valid JSON, no markdown.`;
         summary,
         recommendation,
       },
-      message: `AI operator triaged ${events.length} event${events.length !== 1 ? 's' : ''}: ${summary.slice(0, 100)}`,
-    }).catch(() => {});
+      message: `AI operator __triaged ${events.length} event${events.length !== 1 ? 's' : ''}: ${summary.slice(0, 100)}`,
+    }).then(() => {}, () => {});
   } catch (err) {
     logger.error('[ai-operator] AI triage failed', { error: err instanceof Error ? err.message : String(err) });
     return NextResponse.json({ error: 'AI triage failed' }, { status: 500 });
   }
 
-  logger.info('[ai-operator] Run complete', { triaged, autoResolved });
-  return NextResponse.json({ ok: true, triaged, autoResolved });
+  logger.info('[ai-operator] Run complete', { __triaged, autoResolved });
+  return NextResponse.json({ ok: true, __triaged, autoResolved });
 });

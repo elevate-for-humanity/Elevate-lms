@@ -27,7 +27,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/check-stuck-approvals] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   if (!stuck?.length) return NextResponse.json({ ok: true, stuck: 0 });
@@ -40,7 +40,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       severity: hoursStuck > 96 ? 'critical' : 'warning',
       message: `Approval chain '${instance.chain_type}' for ${instance.subject_type}/${instance.subject_id} stuck at step ${instance.current_step} for ${hoursStuck}h`,
       metadata: { instance_id: instance.id, chain_type: instance.chain_type, hours_stuck: hoursStuck },
-    })
+    });
   }
 
   await sendEmail({

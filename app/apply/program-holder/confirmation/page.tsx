@@ -19,7 +19,7 @@ export default function ProgramHolderConfirmationPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Image sizes="100vw"
-            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
+            src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
             alt={PLATFORM_DEFAULTS.orgName}
             width={140}
             height={48}

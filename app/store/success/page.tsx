@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -12,7 +11,7 @@ import {
 CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Order Successful | {PLATFORM_DEFAULTS.orgName}',
+  title: 'Order Successful',
   description: 'Your order has been completed successfully.',
   robots: { index: false, follow: false },
 };
@@ -27,7 +26,7 @@ export default async function StoreSuccessPage({
   const { order_id } = await searchParams;
   const supabase = await createClient();
 
-  const user = safeGetUser(await supabase.auth.getUser());
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/store');
@@ -78,7 +77,8 @@ export default async function StoreSuccessPage({
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-success-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
+        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
+        <Image src="/images/pages/store-success-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority placeholder="empty" />
       </section>
       <div className="max-w-3xl mx-auto px-4 py-16">
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
@@ -169,8 +169,8 @@ export default async function StoreSuccessPage({
               Continue Shopping
             </Link>
             <Link
-              href="/shop/orders"
-              className="inline-flex items-center justify-center gap-2 border border-gray-300 px-6 py-3 rounded-lg font-semibold hover:bg-white"
+              href="/store"
+              className="inline-flex items-center justify-center gap-2 border border-slate-300 px-6 py-3 rounded-lg font-semibold hover:bg-white"
             >
               View All Orders <ArrowRight className="w-4 h-4" />
             </Link>

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminEmployersPage() {
-  await requireRole(['admin', 'staff']);
+  await requireRole(['admin', 'super_admin', 'staff']);
   const db = await requireAdminClient();
 
   const [employersRes] = await Promise.all([

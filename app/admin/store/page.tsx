@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminStorePage() {
-  await requireRole(['admin']);
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
   const [

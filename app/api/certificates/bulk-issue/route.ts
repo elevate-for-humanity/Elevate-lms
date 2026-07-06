@@ -46,6 +46,9 @@ async function _POST(req: NextRequest) {
   if (!adminDb) {
     return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
   }
+  if (!adminDb) {
+    return new Response('Server configuration error', { status: 500 });
+  }
 
   const raw = await req.text();
   const rows = parseCSV(raw);
@@ -140,7 +143,7 @@ async function _POST(req: NextRequest) {
           course_id: course.id,
           serial: s,
           student_name: u.email ? u.email.split('@')[0] : 'Unknown',
-          course_name: course.course_name,
+          course_name: course.title,
           completion_date: new Date(issued_at).toISOString().split('T')[0],
           issued_at,
           expires_at,

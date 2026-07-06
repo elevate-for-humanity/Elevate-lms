@@ -1,329 +1,85 @@
-export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import Image from 'next/image';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import {
-  GraduationCap,
-  Building2,
-  Users,
-  TrendingUp,
-  Shield,
-  Zap,
-  ArrowRight,
-  Phone,
-  CheckCircle,
-} from 'lucide-react';
+import { Building2, Users, GraduationCap, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Solutions | Elevate For Humanity LMS',
-  description:
-    'Workforce training solutions for organizations, government agencies, and training providers. White-label LMS with integrated content partners.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/solutions',
-  },
+  title: 'Workforce Solutions | Elevate for Humanity',
+  description: 'Workforce development solutions for employers, agencies, training providers, and educational institutions.',
 };
 
 const solutions = [
   {
-    title: 'Workforce Development Agencies',
     icon: Building2,
-    description: 'Complete platform for WIOA, WRG, and grant-funded training programs',
-    features: [
-      'ETPL compliance tracking',
-      'Grant management & reporting',
-      'Multi-program administration',
-      'Student outcome tracking',
-    ],
-    cta: 'See Details',
-    href: '/solutions/workforce',
+    title: 'For Employers',
+    desc: 'Access trained graduates, apprenticeship programs, and WOTC tax credits.',
+    href: '/for-employers',
+    color: 'bg-brand-blue-100 text-brand-blue-600'
   },
   {
-    title: 'Training Providers',
-    icon: GraduationCap,
-    description: 'White-label LMS for delivering your training programs at scale',
-    features: [
-      'Custom branding & domain',
-      'Integrated content library',
-      'Certificate management',
-      'Payment processing',
-    ],
-    cta: 'Get Demo',
-    href: '/demo/admin',
-  },
-  {
-    title: 'Employers & HR Teams',
     icon: Users,
-    description: 'Upskill your workforce with industry-recognized certifications',
-    features: [
-      'Employee training tracking',
-      'Compliance certifications',
-      'Skills gap analysis',
-      'ROI reporting',
-    ],
-    cta: 'Schedule a Demo',
-    href: '/contact?topic=enterprise',
+    title: 'For Agencies',
+    desc: 'WIOA-approved training provider with compliance reporting.',
+    href: '/for-agencies',
+    color: 'bg-green-100 text-green-600'
   },
   {
-    title: 'Distance Learning',
     icon: GraduationCap,
-    description: 'Fully online delivery for remote learners and distributed cohorts',
-    features: [
-      'Async & live session support',
-      'Virtual proctoring',
-      'Progress tracking',
-      'Mobile-friendly interface',
-    ],
-    cta: 'See Details',
-    href: '/solutions/distance-learning',
-  },
-  {
-    title: 'Higher Education',
-    icon: Building2,
-    description: 'Credential and continuing education programs for colleges and universities',
-    features: [
-      'Credit hour tracking',
-      'Accreditation reporting',
-      'Student information integration',
-      'Workforce alignment',
-    ],
-    cta: 'See Details',
-    href: '/solutions/higher-ed',
-  },
-  {
-    title: 'K-12 Career Pathways',
-    icon: Users,
-    description: 'Career and technical education pathways for high school students',
-    features: [
-      'CTE program management',
-      'Dual enrollment support',
-      'Industry credential prep',
-      'Parent & counselor portals',
-    ],
-    cta: 'See Details',
+    title: 'For Schools',
+    desc: 'Partner with us for CTE programs and workforce pathways.',
     href: '/solutions/k12',
-  },
-];
-
-const products = [
-  {
-    name: 'CareerSafe OSHA Training',
-    description: 'OSHA 10 & 30-hour safety certifications',
-    logo: '🛡️',
-    href: '/partners/careersafe',
+    color: 'bg-purple-100 text-purple-600'
   },
   {
-    name: 'HSI Health & Safety',
-    description: 'CPR, AED, First Aid certifications',
-    logo: '❤️',
-    href: '/partners/hsi',
-  },
-  {
-    name: 'NRF Foundation RISE Up',
-    description: 'Retail industry credentials',
-    logo: '🏪',
-    href: '/partners/nrf',
-  },
-  {
-    name: 'Elevate LMS',
-    description: 'Cosmetology & barber training',
-    logo: '✂️',
-    href: '/programs/barber-apprenticeship',
+    icon: Award,
+    title: 'For Colleges',
+    desc: 'Credit articulation and degree completion pathways.',
+    href: '/solutions/higher-ed',
+    color: 'bg-amber-100 text-amber-600'
   },
 ];
 
 export default function SolutionsPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Solutions' }]} />
-      </div>
-      {/* Hero Section */}
-      <section className="relative bg-brand-blue-700 text-white py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-block px-4 py-2 bg-white/20 rounded-full text-sm font-semibold mb-6">
-                Trusted by 100+ Organizations
-              </div>
-              <h1 className="text-5xl md:text-6xl font-bold mb-6">
-                Workforce Training for Agencies, Providers & Employers
-              </h1>
-              <p className="text-base md:text-lg mb-8 text-brand-blue-50">
-                We partner with workforce boards, training providers, and employers to deliver
-                WIOA-compliant programs. Our platform handles enrollment, tracking, and reporting so
-                you can focus on outcomes.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/schedule"
-                  className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition shadow-xl"
-                >
-                  Get Interactive Demo
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-                <Link
-                  href="https://calendly.com/elevate4humanityedu"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center border-2 border-white text-slate-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition"
-                >
-                  Schedule a Demo
-                </Link>
-              </div>
-            </div>
-            <div className="relative h-96 bg-white/10 rounded-2xl backdrop-blur-sm p-8 overflow-hidden">
-              <div className="text-center">
-                <div className="text-6xl mb-4">
-                  <GraduationCap aria-label="graduationcap" className="w-5 h-5 inline-block" />
-                </div>
-                <div className="text-2xl font-bold mb-2">30+ Programs</div>
-                <div className="text-white mb-6">Healthcare • Trades • Technology</div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="bg-white/20 rounded-lg p-4">
-                    <div className="text-3xl font-bold">Many</div>
-                    <div className="text-white">Students Trained</div>
-                  </div>
-                  <div className="bg-white/20 rounded-lg p-4">
-                    <div className="text-3xl font-bold">95%</div>
-                    <div className="text-white">Completion Rate</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Workforce Solutions</h1>
+          <p className="text-xl text-blue-100">
+            Partner with Elevate for customized workforce development solutions.
+          </p>
         </div>
       </section>
 
-      {/* Solutions Grid */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-black mb-4">
-              Solutions for Every Organization
-            </h2>
-            <p className="text-base md:text-lg text-black max-w-3xl mx-auto">
-              Whether you're a workforce agency, training provider, or employer, we have a solution
-              that fits your needs.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {solutions.map((solution) => {
-              const Icon = solution.icon;
-              return (
-                <div
-                  key={solution.title}
-                  className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition"
-                >
-                  <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-6">
-                    <Icon className="w-8 h-8 text-brand-blue-600" />
-                  </div>
-                  <h3 className="text-lg md:text-lg font-bold text-black mb-4">{solution.title}</h3>
-                  <p className="text-black mb-6">{solution.description}</p>
-                  <ul className="space-y-3 mb-8">
-                    {solution.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2">
-                        <span className="text-slate-500 flex-shrink-0">•</span>
-                        <span className="text-sm text-black">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href={solution.href}
-                    className="inline-flex items-center text-brand-blue-600 font-semibold hover:text-brand-blue-700"
-                  >
-                    {solution.cta}
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Link>
+      <section className="py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Who We Serve</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {solutions.map((s) => (
+              <Link key={s.title} href={s.href} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow border border-gray-100">
+                <div className={`w-14 h-14 ${s.color} rounded-xl flex items-center justify-center mb-4`}>
+                  <s.icon className="w-7 h-7" />
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Integrated Content Partners */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-black mb-4">
-              Integrated Content Partners
-            </h2>
-            <p className="text-base md:text-lg text-black max-w-3xl mx-auto">
-              Access industry-leading training content through our platform. No separate logins or
-              integrations needed.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <Link
-                key={product.name}
-                href={product.href}
-                className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition text-center group"
-              >
-                <div className="text-5xl mb-4">{product.logo}</div>
-                <h3 className="text-lg font-bold text-black mb-2 group-hover:text-brand-blue-600 transition">
-                  {product.name}
-                </h3>
-                <p className="text-sm text-black">{product.description}</p>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{s.title}</h3>
+                <p className="text-gray-600 text-sm">{s.desc}</p>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-brand-blue-700 text-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-2xl md:text-2xl md:text-3xl font-bold mb-6">
-            Questions About Our Programs?
-          </h2>
-          <p className="text-base md:text-lg text-slate-600 mb-8">
-            Contact us at {PLATFORM_DEFAULTS.supportPhone} or schedule a walkthrough of our platform. We'll show you
-            exactly how enrollment, tracking, and reporting works.
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Enterprise Solutions</h2>
+          <p className="text-gray-600 text-center mb-8">
+            Looking for enterprise-level workforce development? Our platform licensing and white-label solutions help organizations build their own workforce ecosystems.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/schedule"
-              className="inline-flex items-center justify-center bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition shadow-xl"
-            >
-              Try Interactive Demo
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/white-label" className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 text-center">
+              White Label Platform
             </Link>
-            <Link
-              href="https://calendly.com/elevate4humanityedu"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center bg-white text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition"
-            >
-              Schedule a Demo
+            <Link href="/contact" className="px-6 py-3 border-2 border-brand-blue-600 text-brand-blue-600 font-semibold rounded-lg hover:bg-brand-blue-50 text-center">
+              Contact Sales
             </Link>
-          </div>
-        </div>
-      </section>
-      {/* CTA Section */}
-      <section className="bg-brand-blue-700 text-white py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-white mb-6">
-            Check your eligibility for funded career training programs.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/start"
-              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
-            >
-              Apply Now
-            </Link>
-            <a
-              href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
-            >
-              <Phone className="w-4 h-4" />
-              {PLATFORM_DEFAULTS.supportPhone}
-            </a>
           </div>
         </div>
       </section>

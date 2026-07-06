@@ -1,4 +1,4 @@
-'use client';
+
 
 /**
  * ProgramDetailPage — Institutional Program Detail Template v1
@@ -42,7 +42,7 @@ import { DeliveryBadge, FundingSection } from './ProgramTruthBadges';
 import ProgramFundingProcessSection from './ProgramFundingProcessSection';
 import { resolveProgramFundingStatus } from '@/lib/programs/funding-visibility';
 import { ICC_URL, ICC_INSTRUCTION, hero as heroTokens } from '@/lib/page-design-tokens';
-import { DEFAULT_HERO_VIDEO, resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
+import { DEFAULT_HERO_VIDEO } from '@/lib/images/hero-banner-media';
 import { formatDeliveryDisclosure } from '@/lib/programs/program-schema';
 import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
 import ProgramAtAGlance from '@/components/programs/ProgramAtAGlance';
@@ -69,6 +69,8 @@ interface Props {
   program: ProgramSchema;
   /** Banner data passed from the server page — bypasses client-side JSON cache limitation. */
   banner?: HeroBannerConfig | null;
+  /** Pre-resolved hero poster image URL from server -- do NOT call resolveSiteImagePath here (uses 'fs'). */
+  heroPosterSrc?: string;
   /** Replaces the default video/image hero entirely. */
   heroOverride?: React.ReactNode;
   /** Optional alert strip below the hero (e.g. enrollment open banner). */
@@ -81,6 +83,7 @@ interface Props {
 export default function ProgramDetailPage({
   program: p,
   banner: bannerProp,
+  heroPosterSrc: heroPosterSrcProp,
   heroOverride,
   announcement,
   processSlot,
@@ -149,10 +152,6 @@ export default function ProgramDetailPage({
             // heroBanners Proxy returns {} on the client (loadJsonOnce is server-only).
             // Check pageKey to distinguish a real banner from the empty fallback object.
             const banner = bannerProp;
-            const heroPosterSrc = resolveHeroPosterSrc(p.slug, {
-              banner,
-              heroImage: p.heroImage,
-            });
             // Render the video hero only when a real video source is configured.
             // Programs without a dedicated video (e.g. beauty/culinary, which have
             // no beauty video assets) fall through to the still-image hero so they
@@ -178,15 +177,16 @@ export default function ProgramDetailPage({
               );
             }
             // Fallback: picture hero when hero-banners.json has no entry
+            // heroPosterSrcProp is pre-resolved by the server page.tsx
             return (
               <HeroPicture
-                src={heroPosterSrc}
+                src={heroPosterSrcProp ?? ''}
                 alt={p.heroImageAlt ?? p.title}
                 heightStyle={heroTokens.imageWrap}
                 microLabel={p.badge ?? p.category}
                 belowHeroHeadline={p.title}
                 belowHeroSubheadline={p.subtitle}
-                ctas={primaryCTA ? [{ label: primaryCTA.label, href: primaryCTA.href }] : undefined}
+                ctas={primaryCTA?.href ? [{ label: primaryCTA.label, href: primaryCTA.href }] : undefined}
               />
             );
           })()}
@@ -292,7 +292,7 @@ export default function ProgramDetailPage({
                     </div>
                   )}
 
-                  {primaryCTA && (
+                  {primaryCTA && primaryCTA.href && (
                     <>
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
                         {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
@@ -876,9 +876,9 @@ export default function ProgramDetailPage({
           <div className="mt-8 rounded-xl border border-slate-200 bg-white p-5">
             <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4">Next Step</p>
             <div className="flex flex-col sm:flex-row gap-3">
-              {primaryCTA && (
+              {primaryCTA && primaryCTA.href && (
                 <Link
-                  href={primaryCTA.external ? primaryCTA.href : '#apply'}
+                  href={primaryCTA.href}
                   target={primaryCTA.external ? '_blank' : '_self'}
                   rel={primaryCTA.external ? 'noopener noreferrer' : undefined}
                   className="inline-flex items-center justify-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-5 py-3 rounded-lg transition-colors text-sm"
@@ -1017,7 +1017,7 @@ export default function ProgramDetailPage({
           {/* Two distinct paths — applicant vs enrolled */}
           <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">
             {/* Primary CTA — driven by enrollmentType */}
-            {primaryCTA && (
+            {primaryCTA && primaryCTA.href && (
               <div className="flex flex-col items-center gap-1.5">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   {primaryCTA.external ? 'Enrollment' : 'New Applicant'}

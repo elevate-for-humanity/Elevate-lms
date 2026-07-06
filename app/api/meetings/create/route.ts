@@ -43,7 +43,7 @@ async function _POST(req: Request) {
   }
 
   try {
-    let joinUrl: string;
+    let joinUrl = '';
 
     if (provider === 'zoom') {
       const zoom = await createZoomMeeting({

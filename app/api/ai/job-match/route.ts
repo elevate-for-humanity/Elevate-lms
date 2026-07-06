@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   if (limited) return limited;
 
   const supabase = await createClient();
-  const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -51,8 +51,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const result = await aiChat({
-      messages: [{ role: 'user', content: prompt }],
-      system: 'You are a career matching assistant. Return only valid JSON — no markdown, no explanation.',
+      messages: [
+        { role: 'system', content: 'You are a career matching assistant. Return only valid JSON — no markdown, no explanation.' },
+        { role: 'user', content: prompt },
+      ],
       temperature: 0.3,
     });
 

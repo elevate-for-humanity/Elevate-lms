@@ -175,11 +175,11 @@ export const STRIPE_BNPL_PAYMENT_METHODS: string[] = [
  * Stripe payment_method_types for providers valid for a given dollar amount.
  * Always includes 'card'.
  */
-export function getStripeMethodsForAmount(amountDollars: number): string[] {
+export function getStripeMethodsForAmount(amountDollars: number): ('card' | 'us_bank_account' | string)[] {
   return [
     'card',
     ...getProvidersForAmount(amountDollars)
       .filter((p) => p.stripeMethodId !== null)
-      .map((p) => p.stripeMethodId as string),
+      .map((p) => p.stripeMethodId as 'us_bank_account'),
   ];
 }

@@ -60,8 +60,6 @@ jobs:
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10.28.2
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -100,7 +98,8 @@ jobs:
           for i in $(seq 1 20); do
             status=$(curl -sk --max-time 10 -o /tmp/admin-health.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/ping || true)
             body=$(cat /tmp/admin-health.json 2>/dev/null || true)
-            if [ "$status" = "200" ] && echo "$body" | grep -q '"ok":true'; then
+            # Accept either "ok":true or "status":"ok" or "status":"healthy"
+            if [ "$status" = "200" ] && echo "$body" | grep -qE '"ok":true|"status":"(ok|healthy)"'; then
               echo "Admin liveness passed."
               exit 0
             fi

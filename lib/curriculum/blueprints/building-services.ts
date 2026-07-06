@@ -60,6 +60,7 @@ export const buildingServicesBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'Marcus Johnson',
     instructorTitle: 'Building Services Supervisor',
+    instructorImagePath: 'https://example.com/default-instructor.jpg',
     topBarColor: '#0891b2',
     accentColor: '#06b6d4',
     backgroundColor: '#0f172a',
@@ -69,6 +70,8 @@ export const buildingServicesBlueprint: CredentialBlueprint = {
     segments: ['intro', 'concept', 'visual', 'application', 'wrapup'],
     generateDalleImage: true,
     dalleImageStyle: 'natural',
+    width: 1920,
+    height: 1080,
   },
 
   assessmentRules: [

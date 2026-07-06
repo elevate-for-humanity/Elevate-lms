@@ -11,7 +11,7 @@
  *   L3 (72h+)     — admin notified, platform event severity=critical
  *
  * Idempotent: uses idempotency_key on notifications to avoid duplicate sends.
- * Gated by CRON_SECRET header via withRuntime({ cron: "x-header" }).
+ * Gated by CRON_SECRET header via withRuntime({ cron: true }).
  */
 
 import { NextResponse } from 'next/server';
@@ -30,7 +30,7 @@ const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const L2_HOURS = 24;
 const L3_HOURS = 72;
 
-export const POST = withRuntime({ cron: "x-header" }, async () => {
+export const POST = withRuntime({ cron: true }, async () => {
   const db = await requireAdminClient();
 
   // ── Load at-risk students from the view ───────────────────────────────────
@@ -72,7 +72,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
         to: ADMIN_EMAIL,
         subject: `[L2 Escalation] At-Risk Student — ${alertAgeHours.toFixed(0)}h unresolved`,
         html: `<p>An at-risk student alert has been unresolved for ${alertAgeHours.toFixed(0)} hours.</p><p>${alert.message}</p><p><a href="https://www.elevateforhumanity.org/admin/students?filter=at-risk">Review in admin dashboard</a></p>`,
-      }).catch(() => {});
+      }).then(() => {}, () => {});
 
       escalated++;
     } else if (alert.escalation_level === 2 && alert.created_at <= l3Cutoff) {
@@ -85,7 +85,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
         to: ADMIN_EMAIL,
         subject: `[L3 CRITICAL] At-Risk Student — ${alertAgeHours.toFixed(0)}h unresolved`,
         html: `<p><strong>CRITICAL:</strong> An at-risk student alert has been unresolved for ${alertAgeHours.toFixed(0)} hours with no supervisor action.</p><p>${alert.message}</p><p>Immediate intervention required.</p><p><a href="https://www.elevateforhumanity.org/admin/students?filter=at-risk">Review now</a></p>`,
-      }).catch(() => {});
+      }).then(() => {}, () => {});
 
       await emitEvent('student.at_risk_critical', 'compliance', {
         severity: 'critical',
@@ -135,38 +135,34 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
     const message = `${name} is at risk: ${daysInactive} days inactive, ${overdue} overdue items, ${progress}% progress`;
 
     // Write admin alert
-    await Promise.resolve(
-      db.from('admin_alerts').insert({
-        alert_type: 'at_risk_student',
-        severity: overdue > 3 ? 'high' : 'warning',
-        apprentice_id: row.user_id,
-        message,
-        escalation_level: 1,
-        details: {
-          days_since_activity: daysInactive,
-          overdue_count: overdue,
-          progress_percentage: progress,
-          last_activity_date: row.last_activity_date,
-          program_id: row.program_id,
-        },
-        metadata: { user_id: row.user_id, program_id: row.program_id },
-      })
-    ).catch(() => {});
+    await db.from('admin_alerts').insert({
+      alert_type: 'at_risk_student',
+      severity: overdue > 3 ? 'high' : 'warning',
+      apprentice_id: row.user_id,
+      message,
+      escalation_level: 1,
+      details: {
+        days_since_activity: daysInactive,
+        overdue_count: overdue,
+        progress_percentage: progress,
+        last_activity_date: row.last_activity_date,
+        program_id: row.program_id,
+      },
+      metadata: { user_id: row.user_id, program_id: row.program_id },
+    }).then(() => {}, () => {});
 
     // In-app notification to student
-    await Promise.resolve(
-      db.from('notifications').insert({
-        user_id: row.user_id,
-        type: 'at_risk',
-        title: 'Action required: You may be falling behind',
-        message: `You have ${overdue} overdue item${overdue !== 1 ? 's' : ''} and haven't logged activity in ${daysInactive} day${daysInactive !== 1 ? 's' : ''}. Please contact your instructor.`,
-        action_label: 'View progress',
-        action_url: '/lms/courses',
-        link: '/lms/courses',
-        read: false,
-        idempotency_key: `at-risk-${row.user_id}-${new Date().toISOString().split('T')[0]}`,
-      })
-    ).catch(() => {});
+    await db.from('notifications').insert({
+      user_id: row.user_id,
+      type: 'at_risk',
+      title: 'Action required: You may be falling behind',
+      message: `You have ${overdue} overdue item${overdue !== 1 ? 's' : ''} and haven't logged activity in ${daysInactive} day${daysInactive !== 1 ? 's' : ''}. Please contact your instructor.`,
+      action_label: 'View progress',
+      action_url: '/lms/courses',
+      link: '/lms/courses',
+      read: false,
+      idempotency_key: `at-risk-${row.user_id}-${new Date().toISOString().split('T')[0]}`,
+    }).then(() => {}, () => {});
 
     // Email student
     if (email) {
@@ -174,7 +170,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
         to: email,
         subject: 'Action Required: You may be falling behind in your program',
         html: `<p>Hi ${name},</p><p>Our records show you have <strong>${overdue} overdue item${overdue !== 1 ? 's' : ''}</strong> and haven't logged activity in <strong>${daysInactive} day${daysInactive !== 1 ? 's' : ''}</strong>.</p><p>Please log in and contact your instructor as soon as possible to get back on track.</p><p><a href="https://www.elevateforhumanity.org/lms/courses">View your courses</a></p><p>— Elevate for Humanity</p>`,
-      }).catch(() => {});
+      }).then(() => {}, () => {});
     }
 
     // Platform event

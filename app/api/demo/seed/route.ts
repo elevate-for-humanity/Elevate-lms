@@ -8,3 +8,4 @@ async function _POST() {
   return NextResponse.json({ ok: true, message: 'Demo environment ready' });
 }
 export const POST = withApiAudit('/api/demo/seed', _POST);
+

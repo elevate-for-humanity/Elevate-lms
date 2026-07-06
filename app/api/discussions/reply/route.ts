@@ -10,7 +10,7 @@ async function _POST(req: Request) {
   if (rateLimited) return rateLimited;
   try {
     const supabase = await createClient();
-    const authRes = await supabase.auth.getUser(); if (authRes.error || !authRes.data.user) return safeError('Unauthorized', 401); const user = authRes.data.user;
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }

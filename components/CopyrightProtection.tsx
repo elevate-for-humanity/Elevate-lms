@@ -123,3 +123,6 @@ export function CopyrightFooter() {
     </div>
   );
 }
+
+// Default export for next/dynamic
+export default CopyrightProtection;

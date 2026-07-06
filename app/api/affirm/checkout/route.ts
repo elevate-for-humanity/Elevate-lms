@@ -90,7 +90,7 @@ async function _POST(request: NextRequest) {
     );
 
     if (!resolution.ok) {
-      return NextResponse.json({ error: resolution.error }, { status: resolution.status });
+      return NextResponse.json({ error: (resolution as {error: string}).error }, { status: (resolution as {status: number}).status });
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;

@@ -11,7 +11,7 @@ import { HelpCircle } from 'lucide-react';
 import { PanelHeader, PanelSkeleton } from './BlueprintPanel';
 
 const QuizManagerClient = dynamic(
-  () => import('../../../apps/admin/app/admin/studio/courses/[courseId]/quizzes/QuizManagerClient'),
+  () => import('@/apps/admin/app/admin/studio/courses/[courseId]/quizzes/QuizManagerClient').then((m) => m.default || m),
   { ssr: false, loading: () => <PanelSkeleton label="Quizzes" /> }
 );
 

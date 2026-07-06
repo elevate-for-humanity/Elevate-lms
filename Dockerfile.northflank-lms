@@ -1,96 +1,64 @@
 # Dockerfile.northflank-lms
-# Fresh rewrite for Elevate LMS (root Next.js app)
+# Optimized for 8GB Heap / LMS routes ONLY
+# REVERTED TO GREEN BUILD LOGIC (115c099) with SPLIT optimization
 
 FROM node:22-bookworm AS builder
 
-# Cache invalidation marker
-# Fixed: pnpm 9.12.3 (matches lockfile), inline logger/memory-monitor
-RUN echo "nf-cache-invalidate-20260626-fixes"
+# Cache invalidation
+RUN echo "nf-cache-invalidate-20260629-lms-v7"
 
-# Install system deps for native modules (sharp, canvas, pdf)
+# System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    build-essential \
-    ca-certificates \
-    libcairo2-dev \
-    libpango1.0-dev \
-    libjpeg-dev \
-    libgif-dev \
-    librsvg2-dev \
-    && rm -rf /var/lib/apt/lists/*
+    python3 build-essential ca-certificates libcairo2-dev libpango1.0-dev \
+    libjpeg-dev libgif-dev librsvg2-dev && rm -rf /var/lib/apt/lists/*
 
-ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN corepack enable && corepack prepare pnpm@9.12.3 --activate
+# Stable PNPM (matching lockfileVersion 9.0)
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
-ENV PNPM_HOME="/app/.pnpm-home"
-ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /app
 
-# Copy manifests and source
+# Copy dependency files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json apps/admin/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
-COPY . .
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-
-# Build memory: 8GB heap for builds
-ENV NODE_OPTIONS=--max-old-space-size=8192
-ENV BUILD_SCOPE=1
-ENV NEXT_STANDALONE_OUTPUT=1
-ENV CI=true
-# Webpack cache enabled for faster incremental builds
-
-# Install dependencies
-# Using --no-frozen-lockfile because lockfile may not match overrides in CI
+# 1. Install ALL dependencies
 RUN pnpm install --no-frozen-lockfile
 
-# Build Next.js
-ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
-ARG NEXT_PUBLIC_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
-ARG NEXT_PUBLIC_SUPABASE_URL
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
-ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
-ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+# 2. Copy source code
+COPY . .
 
-# Build: 8GB memory for large app builds
-RUN pnpm build:lms:compile
+# 3. SPLIT optimization: Quarantine non-LMS routes to stay under 8GB
+ENV BUILD_SCOPE=LMS
+ENV CI=true
+RUN node scripts/split-app.mjs
 
-# --- runtime stage ---
-FROM node:22-bookworm-slim
+# 4. Build with 6GB heap for safety
+ARG COMMIT_SHA=unknown
+ARG BUILD_TIME=unknown
+ENV NEXT_PUBLIC_COMMIT_SHA=$COMMIT_SHA
+ENV NEXT_PUBLIC_BUILD_TIME=$BUILD_TIME
+ENV NODE_OPTIONS=--max-old-space-size=6144
+ENV NEXT_STANDALONE_OUTPUT=1
+RUN pnpm run build:lms:compile
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    fonts-liberation \
-    && rm -rf /var/lib/apt/lists/*
-
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV HOSTNAME=0.0.0.0
+# --- Runner ---
+FROM node:22-bookworm-slim AS runner
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl fonts-liberation && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 ENV PORT=8080
-# Runtime memory limit (4GB - leaving room for OS/native modules)
+ENV HOSTNAME=0.0.0.0
+ENV NODE_ENV=production
 ENV NODE_OPTIONS=--max-old-space-size=4096
 
-WORKDIR /app
-
-# Copy standalone build
+# Standalone output artifacts
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/.next/server ./.next/server
 COPY --from=builder /app/public ./public
-
-# Copy full node_modules from builder (preserves pnpm symlinks)
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 8080
-
-HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
-
-CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "server.js"]
+CMD ["node", "server.js"]

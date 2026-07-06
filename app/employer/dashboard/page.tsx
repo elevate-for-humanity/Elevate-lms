@@ -45,7 +45,7 @@ export default async function EmployerDashboardOrchestrated() {
 
   // requireRole already enforced the role gate — this is just for behavior branching
   const isEmployer = effectiveRoles.includes('employer') || effectiveRoles.includes('sponsor');
-  const isAdmin = effectiveRoles.includes('admin') || effectiveRoles.includes('org_admin') || user.email === 'curvaturebodysculpting@gmail.com';
+  const isAdmin = effectiveRoles.includes('admin') || effectiveRoles.includes('admin');
 
   // Employer account exists but not yet approved — show pending state
   if (isEmployer && !isAdmin && !profile.verified) {

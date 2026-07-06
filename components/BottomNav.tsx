@@ -43,3 +43,6 @@ export function BottomNav() {
     </nav>
   );
 }
+
+// Default export for next/dynamic
+export default BottomNav;

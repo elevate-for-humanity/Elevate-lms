@@ -1,3 +1,4 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 /**
  * GET /api/pwa/cosmetology/hours-history
  *
@@ -6,7 +7,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
@@ -53,3 +53,5 @@ export async function GET(request: NextRequest) {
     return safeInternalError(err, 'Failed to load hours history');
   }
 }
+
+

@@ -45,7 +45,7 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const auth = await requireAuth(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const {
       prompt,
@@ -170,7 +170,7 @@ async function generateWithDID(
   const DID_API_KEY = process.env.DID_API_KEY;
 
   if (!DID_API_KEY) {
-    throw new Error('API key not configured');
+    throw new Error('D-ID API key not configured');
   }
 
   // Create talk
@@ -216,7 +216,7 @@ async function generateWithDID(
       videoUrl = status.result_url;
       break;
     } else if (status.status === 'error') {
-      throw new Error('Internal server error');
+      throw new Error('D-ID talk failed');
     }
   }
 

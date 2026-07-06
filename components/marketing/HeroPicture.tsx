@@ -11,6 +11,10 @@
  *
  * Use this when a high-quality still image is available and video is not
  * required. Accepts the same prop shape as HeroVideo for easy swapping.
+ *
+ * ⚠️ IMPORTANT: This is a Client Component. Do NOT call resolveSiteImagePath()
+ * here - that function uses 'fs' which is server-only. Pass pre-resolved paths
+ * from the parent Server Component.
  */
 
 import Image from 'next/image';
@@ -18,7 +22,6 @@ import { useId, useState } from 'react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
 import { hero as heroTokens } from '@/lib/page-design-tokens';
-import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
 
 export interface HeroPictureCta {
   label: string;
@@ -82,8 +85,10 @@ export default function HeroPicture({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
 
-  const imageSrcDesktop = resolveSiteImagePath(src);
-  const imageSrcMobile = resolveSiteImagePath(srcMobile ?? src);
+  // NOTE: src is expected to be pre-resolved by the Server Component parent.
+  // resolveSiteImagePath() uses 'fs' which is server-only and cannot be called here.
+  const imageSrcDesktop = src;
+  const imageSrcMobile = srcMobile ?? src;
   const wrapClass = heightStyle ?? heroTokens.homepageWrap;
 
   return (

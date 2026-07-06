@@ -262,8 +262,8 @@ async function _POST(req: NextRequest) {
         let currentPeriodEnd: string | undefined;
         if (typeof session.subscription === 'string' && stripe) {
           try {
-            const sub = await stripe.subscriptions.retrieve(session.subscription);
-            currentPeriodEnd = new Date(sub.current_period_end * 1000).toISOString();
+            const sub = await stripe.subscriptions.retrieve(session.subscription) as Stripe.Subscription;
+            currentPeriodEnd = new Date(sub.billing_cycle_anchor * 1000).toISOString();
           } catch (e) {
             logger.warn('platform_saas: could not load subscription period', e as Error);
           }

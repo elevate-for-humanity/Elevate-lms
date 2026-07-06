@@ -1,0 +1,131 @@
+name: Deploy Marketing (www)
+
+on:
+  push:
+    branches:
+      - main
+      - 'fix/**'
+      - 'chore/**'
+    paths:
+      - 'app/**'
+      - '!app/admin/**'
+      - '!app/apprentice/**'
+      - '!app/instructor/**'
+      - '!app/partner/**'
+      - '!app/student-portal/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'public/**'
+      - 'packages/**'
+      - 'styles/**'
+      - 'data/**'
+      - 'types/**'
+      - 'hooks/**'
+      - 'contexts/**'
+      - 'config/**'
+      - 'content/**'
+      - 'utils/**'
+      - 'proxy.ts'
+      - 'next.config.mjs'
+      - 'tailwind.config.js'
+      - 'tsconfig.json'
+      - 'Dockerfile.marketing'
+      - 'scripts/northflank/**'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
+      - '.github/workflows/deploy-marketing.yml'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy (defaults to main)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: northflank-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy-lms-sentinel:
+    name: Wait for LMS deploy
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ job.status }}
+    steps:
+      - name: Wait for LMS deploy
+        run: |
+          echo "Waiting for LMS deploy to complete..."
+          # This job just waits - the actual deploy-marketing job below will run in parallel
+          # but uses the same concurrency group, so it won't overlap
+          sleep 5
+
+  deploy-marketing:
+    name: Build and deploy Marketing (www) on Northflank
+    needs: [deploy-lms-sentinel]
+    runs-on: ubuntu-latest
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_MARKETING_SERVICE_ID: ${{ secrets.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-lms-build' }}
+      DEPLOY_BRANCH: main
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      # Note: Ensure elevate-lms-build service is set to "external-git" build mode
+      # with Dockerfile path /Dockerfile.marketing in Northflank dashboard before running
+
+      - name: Point Marketing service at main
+        run: pnpm tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_MARKETING_SERVICE_ID" "$DEPLOY_BRANCH"
+
+      - name: Trigger Marketing build
+        id: trigger_build
+        run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_MARKETING_SERVICE_ID"
+
+      - name: Wait for Marketing build to complete
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --build-id "${{ steps.trigger_build.outputs.build_id }}" --timeout-ms 3600000
+
+      - name: Roll out latest Marketing image
+        run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_MARKETING_SERVICE_ID"
+
+      - name: Wait for Marketing deployment
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 600000
+
+      - name: Smoke Marketing (www)
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 20); do
+            status=$(curl -sk --max-time 10 -o /tmp/www-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/ping || true)
+            body=$(cat /tmp/www-health.json 2>/dev/null || true)
+            if [ "$status" = "200" ] && echo "$body" | grep -q '"ok":true'; then
+              echo "Marketing (www) liveness passed."
+              exit 0
+            fi
+            echo "Marketing (www) liveness not ready yet: HTTP ${status}. Retry ${i}/20."
+            sleep 15
+          done
+          echo "Marketing (www) liveness failed after deploy."
+          cat /tmp/www-health.json 2>/dev/null || true
+          exit 1

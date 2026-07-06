@@ -26,7 +26,7 @@ const IssueSchema = z.object({
   courseId: z.string().uuid().optional(),
   issuerOrgId: z.string().uuid().optional(),
   expiresInDays: z.number().min(1).max(3650).optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 });
 
 async function _POST(req: NextRequest) {
@@ -39,7 +39,7 @@ async function _POST(req: NextRequest) {
     if (session instanceof Response) return session;
 
     // Role check
-    const roleCheck = requireRoleAPI(session, ['admin', 'advisor']);
+    const roleCheck = requireRoleAPI(session, ['admin', 'super_admin', 'advisor']);
     if (roleCheck instanceof Response) return roleCheck;
 
     // Parse body

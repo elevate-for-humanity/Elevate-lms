@@ -21,8 +21,9 @@ async function _POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const { apiAuthGuard } = await import('@/lib/admin/guards');
+  let auth: Awaited<ReturnType<typeof apiAuthGuard>>;
   try {
-    await apiAuthGuard(request);
+    auth = await apiAuthGuard(request);
   } catch (e) {
     return e instanceof Response
       ? e
@@ -36,8 +37,7 @@ async function _POST(request: NextRequest) {
     const statements = Array.isArray(body) ? body : [body];
 
     // Resolve tenant from the authenticated user's profile
-    const db = await requireAdminClient();
-    const { data: actorProfile } = await db
+    const { data: actorProfile } = await supabase
       .from('profiles')
       .select('tenant_id')
       .eq('id', auth.id)

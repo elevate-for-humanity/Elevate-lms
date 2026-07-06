@@ -13,7 +13,7 @@ async function _POST(request: Request) {
   if (rateLimited) return rateLimited;
 
   const auth = await requireAuth(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const result = await prepareDeploy();
   return NextResponse.json(result);
@@ -23,7 +23,7 @@ async function _GET(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   const auth = await requireAuth(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const result = await prepareDeploy();
   return NextResponse.json(result);

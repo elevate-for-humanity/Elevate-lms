@@ -1,4 +1,6 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 // AUTH: Enforced inside handler (createClient + getUser check)
+
 import { NextRequest } from 'next/server';
 import { handleLogHours } from '@/lib/api/apprentice-hours-handler';
 
@@ -7,3 +9,4 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
   return handleLogHours(request, 'esthetician');
 }
+

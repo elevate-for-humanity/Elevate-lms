@@ -39,7 +39,7 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const auth = await apiRequireAdmin(req);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const supabase = await createClient();
 
@@ -197,7 +197,7 @@ async function _POST(req: NextRequest) {
       // Get program info
       const { data: program } = await supabase
         .from('programs')
-        .select('id, title, total_hours')
+        .select('id, name, total_hours')
         .eq('id', enrollment.program_id)
         .maybeSingle();
 
@@ -299,7 +299,7 @@ async function _POST(req: NextRequest) {
           // Get program name for the email
           const { data: program } = await supabase
             .from('programs')
-            .select('title')
+            .select('name')
             .eq('id', enrollment.program_id)
             .maybeSingle();
 

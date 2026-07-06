@@ -1,0 +1,16 @@
+{
+  "serviceType": "combined",
+  "name": "Elevate-lms build",
+  "billing": {
+    "deploymentPlan": "nf-compute-400"
+  },
+  "buildEngineConfiguration": {
+    "buildEngine": "buildkit"
+  },
+  "vcsData": {
+    "projectUrl": "https://github.com/elevate-for-humanity/Elevate-lms",
+    "projectBranch": "main",
+    "dockerFilePath": "/Dockerfile.northflank-lms",
+    "dockerWorkDir": "/"
+  }
+}

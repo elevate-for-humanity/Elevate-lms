@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import { legalDocs } from '@/content/cf-legal';
-import { findBySlug, staticParamsFromSlugs } from '@/lib/cf-content-helpers';
+import { findBySlug, staticParamsFromSlugs } from '@/lib/content-helpers';
 import { buildMetadata } from '@/lib/cf-seo';
-import { siteConfig } from '@/content/cf-site';
+import { siteConfig } from '@/lib/config/site';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,13 +30,14 @@ export default async function LegalDocPage({ params }: { params: Promise<{ slug:
       <div className="mt-8 rounded border bg-slate-50 p-6">
         <p className="text-sm text-slate-700">
           For the full text of this document, contact us at{' '}
-          <a href={`mailto:${siteConfig.email}`} className="underline">
-            {siteConfig.email}
+          <a href={`mailto:${siteConfig.email.general}`} className="underline">
+            {siteConfig.email.general}
           </a>{' '}
           or call{' '}
-          <a href={`tel:${siteConfig.phone}`} className="underline">
-            {siteConfig.phone}
-          </a>.
+          <a href={siteConfig.phone.href} className="underline">
+            {siteConfig.phone.display}
+          </a>
+          .
         </p>
       </div>
     </section>

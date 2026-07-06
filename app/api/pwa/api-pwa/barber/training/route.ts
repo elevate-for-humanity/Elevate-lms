@@ -1,7 +1,7 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { getCourseBySlug } from '@/lib/courses/definitions';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -98,7 +98,7 @@ async function _GET(request: Request) {
 
     return NextResponse.json({
       course: {
-        title: course.course_name,
+        title: course.title,
         subtitle: course.subtitle,
         partner: course.partner,
         estimatedWeeks: course.estimatedDurationWeeks,
@@ -162,3 +162,5 @@ async function _POST(request: Request) {
 }
 export const GET = withApiAudit('/api/pwa/barber/training', _GET);
 export const POST = withApiAudit('/api/pwa/barber/training', _POST);
+
+

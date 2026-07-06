@@ -81,7 +81,7 @@ async function _POST(request: NextRequest) {
     if (error) {
       logger.error('Error creating trial:', error);
       return NextResponse.json(
-        { error: 'Failed to create trial', detail: 'Unknown error' },
+        { error: 'Failed to create trial', detail: error.message },
         { status: 500 },
       );
     }

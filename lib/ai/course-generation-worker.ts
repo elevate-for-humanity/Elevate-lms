@@ -131,7 +131,17 @@ async function generateCourseOutline(
   onetData: unknown,
   blsData: unknown,
   cosData: unknown
-): Promise<{ title: string; modules: Array<{ title: string; description: string; lessons: number }> }> {
+): Promise<{ 
+  title: string; 
+  subtitle?: string; 
+  description?: string; 
+  modules: Array<{ 
+    title: string; 
+    description: string; 
+    lessons: number;
+    objectives?: string[];
+  }> 
+}> {
   const model = modelRouter.selectModel('course_generation');
   
   const systemPrompt = `You are an expert instructional designer for workforce development programs.
@@ -370,7 +380,7 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
         );
 
         // Save lesson
-        const { error: lessonError } = await supabase
+        const { data: lessonRecord, error: lessonError } = await supabase
           .from('generated_lessons')
           .insert({
             module_id: moduleRecord.id,
@@ -382,17 +392,19 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
             content: lessonContent.content,
             summary: lessonContent.summary,
             objectives: lessonContent.objectives,
-            reflection_prompt: lessonContent.reflectionPrompt,
+            // reflectionPrompt not available
             duration_minutes: 30,
             order_index: lessonNum,
-          });
+          })
+          .select('id')
+          .single();
 
         if (lessonError) throw lessonError;
 
         // Save quiz if questions generated
         if (lessonContent.quizQuestions?.length > 0) {
           await supabase.from('generated_quizzes').insert({
-            lesson_id: lessonRecord?.id, // This would need the lesson ID
+            lesson_id: lessonRecord?.id,
             course_id: course.id,
             job_id: jobId,
             title: `${lessonTitle} Quiz`,

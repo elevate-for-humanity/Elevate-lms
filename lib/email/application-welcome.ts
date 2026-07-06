@@ -151,16 +151,6 @@ const PROGRAMS: Record<string, ProgramInfo> = {
     funding: ['wioa', 'wrg'],
     etplApproved: true,
   },
-  'tax-prep': {
-    name: 'Tax Preparation Program',
-    description:
-      'Prepare individual and business tax returns using professional software. Work for a firm or start your own business.',
-    credentials: 'IRS PTIN, VITA Certification, QuickBooks Pro Advisor',
-    careerOutlook: 'Firms: $15-$25/hour. Self-employed: $50-$200+ per return.',
-    duration: '10 Weeks (150 Hours)',
-    funding: ['wioa', 'wrg'],
-    etplApproved: true,
-  },
   'peer-recovery-specialist-jri': {
     name: 'Certified Peer Recovery Coach',
     description:

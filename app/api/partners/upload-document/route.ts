@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const supabase = await createClient();
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return safeError('Unauthorized', 401);
 
     const supabaseAdmin = await requireAdminClient();
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
         status: 'pending',
       })
       .then(() => {})
-      .catch(() => {}); // non-fatal — storage upload already succeeded
+      .then(() => {}, () => {}); // non-fatal — storage upload already succeeded
 
     return NextResponse.json({ success: true, path: storagePath });
   } catch (err) {

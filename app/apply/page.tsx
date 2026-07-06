@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Apply | Check Eligibility for Funded Training',
   description:
-    'Check eligibility for WIOA, WRG, and -funded training in healthcare, trades, technology, and business. Many programs are no cost to eligible Indiana residents.',
+    'Check eligibility for WIOA, WRG, and FSSA IMPACT-funded training in healthcare, trades, technology, and business. Many programs are no cost to eligible Indiana residents.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/apply',
   },
@@ -54,23 +54,19 @@ export default async function ApplyPage({
   // Use admin client to bypass RLS when available. CI and local preview jobs often
   // do not have SUPABASE_SERVICE_ROLE_KEY, so fall back to the static catalog
   // instead of crashing the entire intake page.
-  try {
-    const db = await getAdminClient();
-    if (db) {
-      const { data, error } = await db
-        .from('programs')
-        .select('id, title, slug')
-        .eq('published', true)
-        .eq('is_active', true)
-        .neq('status', 'archived')
-        .order('title');
+  const db = await getAdminClient();
+  if (db) {
+    const { data, error } = await db
+      .from('programs')
+      .select('id, title, slug')
+      .eq('published', true)
+      .eq('is_active', true)
+      .neq('status', 'archived')
+      .order('title');
 
-      if (!error && data?.length) {
-        programs = data;
-      }
+    if (!error && data?.length) {
+      programs = data;
     }
-  } catch (err) {
-    console.error('ApplyPage: Failed to load programs from DB, using static fallback', err);
   }
 
   return (
@@ -83,7 +79,7 @@ export default async function ApplyPage({
           <span className="text-slate-300">|</span>
           <Link href="/apply/employer" className="text-slate-500 hover:text-slate-800 transition-colors">Employer</Link>
           <Link href="/apply/program-holder" className="text-slate-500 hover:text-slate-800 transition-colors">Training Provider</Link>
-          <Link href="/partners/apply" className="text-slate-500 hover:text-slate-800 transition-colors">Agency / Partner</Link>
+          <Link href="/apply" className="text-slate-500 hover:text-slate-800 transition-colors">Agency / Partner</Link>
         </div>
       </div>
 
@@ -91,13 +87,13 @@ export default async function ApplyPage({
       <section className="relative w-full">
         <div className={`${heroTokens.imageWrap} w-full overflow-hidden`}>
           <Image
-            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-hero.webp"
+            src="/images/pages/apply-hero.webp"
             alt="Students exploring career training programs at Elevate for Humanity"
             fill
             className="object-cover object-center"
             priority
             sizes="100vw"
-            
+            placeholder="empty"
           />
         </div>
         <div className="bg-white border-b border-slate-200 py-10">
@@ -116,7 +112,7 @@ export default async function ApplyPage({
               </h1>
             )}
             <p className="text-slate-700 text-base max-w-xl">
-              Takes 3–5 minutes. We screen for WIOA, Workforce Ready Grant, , and Job Ready
+              Takes 3–5 minutes. We screen for WIOA, Workforce Ready Grant, FSSA IMPACT, and Job Ready
               Indy funding — most eligible Indiana residents pay $0.
             </p>
             <p className="mt-3 text-sm text-slate-600">

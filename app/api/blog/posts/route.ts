@@ -75,7 +75,7 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin', 'staff'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -106,7 +106,7 @@ async function _POST(request: NextRequest) {
         content,
         excerpt: excerpt || content.substring(0, 200) + '...',
         category: category || 'News',
-        image: image || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/social-media-1.webp',
+        image: image || '/images/pages/social-media-1.webp',
         tags: tags || [],
         status: status || 'draft',
         author_id: user.id,

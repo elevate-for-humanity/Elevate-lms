@@ -17,12 +17,13 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   const staleCutoff = new Date(Date.now() - STALE_MINUTES * 60 * 1000).toISOString();
 
   // Timeout stale in-progress jobs
-  const { count: timedOut } = await db
+  const resultTimedOut = await (db as any)
     .from('provisioning_jobs')
     .update({ status: 'failed', error: 'Timed out after 30 minutes', updated_at: new Date().toISOString() })
     .eq('status', 'in_progress')
     .lt('updated_at', staleCutoff)
     .select('id', { count: 'exact', head: true });
+  const timedOut = resultTimedOut.count;
 
   if (timedOut) logger.warn('[cron/process-provisioning-jobs] Timed out stale jobs', { count: timedOut });
 

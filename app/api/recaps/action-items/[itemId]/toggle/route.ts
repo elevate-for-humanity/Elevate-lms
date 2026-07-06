@@ -8,7 +8,7 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-async function _POST(_: Request, { params }: { params: Promise<{ itemId: string }> }) {
+async function _POST(request: Request, { params }: { params: Promise<{ itemId: string }> }) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;

@@ -1,5 +1,5 @@
-export const dynamic = 'force-dynamic';
-export const revalidate = 3600;
+// useHeroVideo
+export const dynamic = 'force-static';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -92,7 +92,7 @@ export default function HvacCourseLicensePage() {
                 className="w-full h-full object-contain"
                 controls
                 preload="metadata"
-                poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp"
+                poster="/images/pages/hvac-technician.webp"
               >
                 <source src={VIDEO_URL} type="video/mp4" />
               </video>
@@ -201,24 +201,25 @@ export default function HvacCourseLicensePage() {
                 credential: 'EPA Section 608 Universal',
                 issuer: 'ESCO Institute / Mainstream Engineering (EPA-approved)',
                 desc: 'Required by federal law to purchase and handle refrigerants. Covers all four sections: Core, Type I, Type II, Type III.',
-                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
+                img: '/images/pages/hvac-technician.webp',
               },
               {
                 credential: 'OSHA 10-Hour',
                 issuer: 'CareerSafe / OSHA-authorized trainer',
                 desc: 'Workplace safety fundamentals recognized by employers nationwide. DOL card issued upon completion.',
-                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/trades-classroom.webp',
+                img: '/images/pages/trades-classroom.webp',
               },
               {
                 credential: 'CPR/AED',
                 issuer: 'American Heart Association or Red Cross',
                 desc: 'Hands-on CPR and AED certification. Required by many HVAC employers and apprenticeship programs.',
-                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cpr-mannequin.webp',
+                img: '/images/pages/cpr-mannequin.webp',
               },
             ].map((c) => (
               <div key={c.credential} className="rounded-xl overflow-hidden border border-slate-200">
                 <div className="relative h-36">
-                  <Image src={c.img} alt={c.credential} fill className="object-cover" sizes="(max-width: 640px) 100vw, 33vw" />
+        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
+                  <Image src={c.img} alt={c.credential} fill className="object-cover" sizes="(max-width: 640px) 100vw, 33vw" placeholder="empty" />
                 </div>
                 <div className="p-4">
                   <p className="font-bold text-slate-900 text-sm">{c.credential}</p>

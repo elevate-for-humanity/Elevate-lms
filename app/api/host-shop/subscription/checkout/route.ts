@@ -87,7 +87,6 @@ export async function POST(request: NextRequest) {
       },
       success_url: successUrl || `${siteUrl}/host-shop/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl || `${siteUrl}/host-shop/partnership?cancelled=true`,
-      description: `Elevate Host Shop Partnership - ${TIER_NAMES[tier]}`,
       billing_address_collection: 'required',
       automatic_tax: { enabled: false },
     });

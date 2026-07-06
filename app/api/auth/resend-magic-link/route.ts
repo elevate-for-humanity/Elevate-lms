@@ -19,7 +19,6 @@ import { sendEmail } from '@/lib/email';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { validateRedirect } from '@/lib/auth/validate-redirect';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
 const LOGO_URL = `${SITE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
@@ -37,13 +36,18 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     email = (body.email ?? '').trim().toLowerCase();
-    redirectPath = validateRedirect(body.redirect ?? body.next, '/learner/dashboard');
+    redirectPath = (body.redirect ?? body.next ?? '/learner/dashboard').trim();
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
+  }
+
+  // Sanitize redirect path — must be a relative path on this domain.
+  if (!redirectPath.startsWith('/') || redirectPath.includes('//') || redirectPath.length > 200) {
+    redirectPath = '/learner/dashboard';
   }
 
   try {

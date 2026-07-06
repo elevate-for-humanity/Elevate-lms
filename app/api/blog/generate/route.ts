@@ -37,7 +37,7 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!profile || !['admin'].includes(profile.role)) {
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -56,7 +56,7 @@ async function _POST(request: NextRequest) {
         .maybeSingle();
 
       if (program) {
-        context = `Program: ${program.title ?? program.name}\nDescription: ${program.description}\nOutcomes: ${program.outcomes?.join(', ')}\n`;
+        context = `Program: ${program.title}\nDescription: ${program.description}\nOutcomes: ${program.outcomes?.join(', ')}\n`;
       }
     }
 

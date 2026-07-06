@@ -12,14 +12,14 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError, safeDbError } from '@/lib/api/safe-error';
 import { emitEvent } from '@/lib/platform/events';
 
-const ALLOWED_ROLES = ['mentor', 'admin'];
+const ALLOWED_ROLES = ['mentor', 'admin', 'super_admin'];
 
 export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   if (!ALLOWED_ROLES.includes(auth.role ?? '')) return safeError('Forbidden', 403);
 
   try {
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   if (!ALLOWED_ROLES.includes(auth.role ?? '')) return safeError('Forbidden', 403);
 
   try {

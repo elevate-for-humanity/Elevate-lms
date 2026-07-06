@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    const blockedRoles = ['program_holder', 'employer', 'partner', 'admin', 'staff'];
+    const blockedRoles = ['program_holder', 'employer', 'partner', 'admin', 'super_admin', 'staff'];
     if (profile?.role && blockedRoles.includes(profile.role)) {
       return NextResponse.json(
         { error: 'This onboarding flow is for learners only.' },
@@ -72,15 +72,17 @@ export async function POST(req: Request) {
     if (step === 'orientation') {
       profileUpdates.orientation_completed = true;
       profileUpdates.orientation_completed_at = now;
+      // Canonical gate: advance enrollment_state so document gate reads one source of truth.
+      // Only advance if currently in 'confirmed' state — do not overwrite later states.
       await supabase
         .from('program_enrollments')
         .update({
-          enrollment_state: 'enrolled',
+          enrollment_state: 'orientation_complete',
           orientation_completed_at: now,
           next_required_action: 'DOCUMENTS',
         })
         .eq('user_id', user.id)
-        .in('enrollment_state', ['orientation', 'onboarding']);
+        .eq('enrollment_state', 'confirmed');
     }
     if (step === 'handbook') {
       profileUpdates.handbook_acknowledged_at = now;

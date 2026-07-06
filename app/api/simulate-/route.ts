@@ -7,3 +7,4 @@ export async function GET() {
 export async function POST() {
   return NextResponse.json({ error: 'Legacy dev/test endpoint is disabled in production.' }, { status: 410 });
 }
+

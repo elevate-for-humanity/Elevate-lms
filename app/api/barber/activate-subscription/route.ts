@@ -75,20 +75,22 @@ export async function POST(request: NextRequest) {
     // Create Stripe subscription with weekly interval
     // Use price_data for dynamic weekly amount
     const weeklyAmountCents = sub.weekly_payment_cents;
-
-    // Create or get product for this program
+    
+    // First, create or get the product
     const product = await stripe.products.create({
       name: 'Barber Apprenticeship — Weekly Tuition',
       metadata: { program: 'barber-apprenticeship' },
     });
-
+    
+    // Then create the price
     const price = await stripe.prices.create({
       product: product.id,
       unit_amount: weeklyAmountCents,
       currency: 'usd',
       recurring: { interval: 'week', interval_count: 1 },
     });
-
+    
+    // Now create subscription with the price ID
     const stripeSubscription = await stripe.subscriptions.create({
       customer: sub.stripe_customer_id,
       default_payment_method: paymentMethodId,

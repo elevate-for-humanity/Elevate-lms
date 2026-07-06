@@ -11,7 +11,7 @@ export const maxDuration = 60;
 
 async function _POST(request: NextRequest) {
   const auth = await requireAuth(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   // Log for debugging (remove in production)
 

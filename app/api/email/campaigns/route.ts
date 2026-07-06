@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 
 async function _GET(req: NextRequest) {
   const auth = await apiRequireAdmin(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const rateLimited = await applyRateLimit(req, 'api');

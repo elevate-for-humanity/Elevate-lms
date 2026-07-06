@@ -5,6 +5,7 @@ import type { UserRole } from '@/types/database';
 
 export interface ApiAuthResult {
   user: { id: string; email: string };
+  role: UserRole;
   profile: {
     id: string;
     role: UserRole;
@@ -16,6 +17,8 @@ export interface ApiAuthResult {
   db: Awaited<ReturnType<typeof createClient>>;
   /** Service-role client for cross-tenant admin queries. Only use when RLS must be bypassed. */
   adminDb: ReturnType<typeof createAdminClient>;
+  /** Error response if auth failed (for backward compatibility). */
+  error?: NextResponse;
 }
 
 /**
@@ -79,6 +82,7 @@ export async function requireApiRole(
 
   return {
     user: { id: user.id, email: user.email || '' },
+    role: profile.role as UserRole,
     profile: profile as ApiAuthResult['profile'],
     db: supabase,
     adminDb: admin,

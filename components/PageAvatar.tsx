@@ -17,7 +17,7 @@ export default function PageAvatar({ videoSrc, title, position = 'default' }: Pa
   const [isMuted, setIsMuted] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  useEffect(() => {
+  useEffect((): void => {
     const el = containerRef.current;
     if (!el) return;
 
@@ -54,7 +54,7 @@ export default function PageAvatar({ videoSrc, title, position = 'default' }: Pa
   }, [hasPlayed]);
 
   // Auto-play when visible, pause when not. Unmute on visibility since user scrolled.
-  useEffect(() => {
+  useEffect((): void => {
     const video = videoRef.current;
     if (!video) return;
     if (isVisible) {

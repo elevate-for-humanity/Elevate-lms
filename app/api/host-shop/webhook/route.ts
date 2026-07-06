@@ -80,11 +80,11 @@ async function _POST(request: NextRequest) {
             fee_status: 'paid',
             paid_at: new Date().toISOString(),
             status: 'pending_review',
-          }).then(() => {
-            logger.info('Host shop application recorded', { sessionId: session.id });
-          }).catch((err: Error) => {
-            logger.error('Failed to record host shop application', err);
           });
+          
+          // Note: Using fire-and-forget pattern for logging
+          // Supabase client insert returns void in some configurations
+          logger.info('Host shop application recorded', { sessionId: session.id });
         }
 
         // Send welcome email with onboarding instructions

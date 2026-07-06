@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { CheckCircle2, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 const FUNDING_OPTIONS = [
@@ -15,12 +15,14 @@ const FUNDING_OPTIONS = [
   {
     id: 'wioa',
     label: 'WIOA / WorkOne',
-    description: 'I have been approved for Workforce Innovation and Opportunity Act funding through WorkOne.',
+    description:
+      'I have been approved for Workforce Innovation and Opportunity Act funding through WorkOne.',
   },
   {
     id: 'wrg',
     label: 'Workforce Ready Grant',
-    description: 'I am applying for the Indiana Workforce Ready Grant (free tuition for eligible residents).',
+    description:
+      'I am applying for the Indiana Workforce Ready Grant (free tuition for eligible residents).',
   },
   {
     id: 'employer',
@@ -58,8 +60,13 @@ export default function FundingConfirmClient({ currentFundingSource, alreadyConf
     setSaving(true);
     setError('');
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push('/login?redirect=/funding/confirm'); return; }
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      router.push('/login?redirect=/funding/confirm');
+      return;
+    }
 
     const { error: updateError } = await supabase
       .from('profiles')
@@ -83,13 +90,18 @@ export default function FundingConfirmClient({ currentFundingSource, alreadyConf
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center">
-          <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+          <span className="w-16 h-16 rounded-full bg-brand-green-500 inline-block flex-shrink-0 mx-auto mb-4" aria-hidden="true" />
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Funding Confirmed</h1>
           <p className="text-slate-600 mb-6">
-            Your funding source is set to <strong>{FUNDING_OPTIONS.find(o => o.id === currentFundingSource)?.label ?? currentFundingSource}</strong>.
+            Your funding source is set to{' '}
+            <strong>
+              {FUNDING_OPTIONS.find((o) => o.id === currentFundingSource)?.label ??
+                currentFundingSource}
+            </strong>
+            .
           </p>
           <Link
-            href="/onboarding/learner"
+            href="/funding/confirm"
             className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition"
           >
             Back to Onboarding <ArrowRight className="w-4 h-4" />
@@ -103,7 +115,7 @@ export default function FundingConfirmClient({ currentFundingSource, alreadyConf
     <div className="min-h-screen bg-white">
       <div className="max-w-2xl mx-auto px-4 py-10">
         <Link
-          href="/onboarding/learner"
+          href="/funding/confirm"
           className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900 mb-6"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Onboarding
@@ -111,7 +123,8 @@ export default function FundingConfirmClient({ currentFundingSource, alreadyConf
 
         <h1 className="text-3xl font-bold text-slate-900 mb-2">Confirm Your Funding Source</h1>
         <p className="text-slate-600 mb-8">
-          Select how your training will be funded. This helps us connect you with the right support services.
+          Select how your training will be funded. This helps us connect you with the right support
+          services.
         </p>
 
         <div className="space-y-3 mb-8">
@@ -127,9 +140,13 @@ export default function FundingConfirmClient({ currentFundingSource, alreadyConf
               }`}
             >
               <div className="flex items-start gap-3">
-                <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center ${
-                  selected === opt.id ? 'border-brand-blue-600 bg-brand-blue-600' : 'border-slate-300'
-                }`}>
+                <div
+                  className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center ${
+                    selected === opt.id
+                      ? 'border-brand-blue-600 bg-brand-blue-600'
+                      : 'border-slate-300'
+                  }`}
+                >
                   {selected === opt.id && <div className="w-2 h-2 rounded-full bg-white" />}
                 </div>
                 <div>
@@ -141,9 +158,7 @@ export default function FundingConfirmClient({ currentFundingSource, alreadyConf
           ))}
         </div>
 
-        {error && (
-          <p className="text-red-600 text-sm mb-4">{error}</p>
-        )}
+        {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
 
         <button
           onClick={handleConfirm}

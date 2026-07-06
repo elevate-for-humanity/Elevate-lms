@@ -83,7 +83,7 @@ export function HomeEmployerStrip() {
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/employer/dashboard"
+                href="/admin/employers"
                 className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors"
               >
                 Employer Portal <ArrowRight className="w-4 h-4" />

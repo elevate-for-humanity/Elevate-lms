@@ -1,94 +1,98 @@
+import { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { buildMetadata } from '@/lib/cf-seo';
-import { siteConfig } from '@/content/cf-site';
+import { ArrowRight, Briefcase, FileText, Users, Target, Clock, CheckCircle, Phone } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const metadata = buildMetadata({
-  title: 'Career Services',
-  description: 'Resume building, interview prep, job placement, and ongoing career support from {PLATFORM_DEFAULTS.orgName}.',
-  path: '/career-services',
-});
+export const metadata: Metadata = {
+  title: `Career Services | ${PLATFORM_DEFAULTS.orgName}`,
+  description: 'Career coaching, job placement, resume building, and interview prep services to help you launch your career after training.',
+  keywords: ['career services', 'job placement', 'resume help', 'interview prep', 'career coaching'],
+};
 
-const services = [
-  { slug: 'resume-building', title: 'Resume Building', summary: 'Professional resume review and writing support for program graduates.' },
-  { slug: 'interview-prep', title: 'Interview Prep', summary: 'Mock interviews, coaching, and employer-readiness workshops.' },
-  { slug: 'job-placement', title: 'Job Placement', summary: 'Direct employer connections and hiring pipeline access for graduates.' },
-  { slug: 'career-counseling', title: 'Career Counseling', summary: 'One-on-one advising to map your career pathway and next steps.' },
+const SERVICES = [
+  {
+    icon: Briefcase,
+    title: 'Job Placement Assistance',
+    desc: 'We connect graduates with employers actively hiring. Our employer partnerships mean direct pathways to employment.',
+    image: '/images/pages/career-coaching.webp',
+  },
+  {
+    icon: FileText,
+    title: 'Resume & Portfolio Building',
+    desc: 'Professional resume reviews, cover letter assistance, and portfolio development to make you stand out.',
+    image: '/images/pages/resume-work.webp',
+  },
+  {
+    icon: Target,
+    title: 'Interview Preparation',
+    desc: 'Mock interviews, feedback sessions, and tips to help you confidently land the job.',
+    image: '/images/pages/interview-prep.webp',
+  },
+  {
+    icon: Users,
+    title: 'Career Coaching',
+    desc: 'One-on-one guidance to help you navigate your career path, set goals, and overcome challenges.',
+    image: '/images/pages/counselor-session.webp',
+  },
+];
+
+const EMPLOYER_BENEFITS = [
+  'Pre-screened candidates with verified skills',
+  'Industry-recognized certifications',
+  'Ongoing retention support',
+  'Customized hiring events',
+  'Apprenticeship pipeline access',
 ];
 
 export default function CareerServicesPage() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16">
-      <h1 className="text-3xl font-bold">Career Services</h1>
-      <p className="mt-4 text-slate-700">
-        Elevate graduates receive career support beyond the classroom — from resume help to direct employer connections.
-      </p>
-      <div className="mt-10 grid gap-6 md:grid-cols-2">
-        {services.map((s) => (
-          <article key={s.slug} className="rounded border p-6 hover:bg-slate-50">
-            <h2 className="text-xl font-semibold">{s.title}</h2>
-            <p className="mt-2 text-sm text-slate-700">{s.summary}</p>
-            <Link href={`/career-services/${s.slug}`} className="mt-4 inline-block text-sm underline">Learn more</Link>
-          </article>
-        ))}
-      </div>
+    <div className="min-h-screen bg-white">
+      {/* Hero */}
+      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-24 overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <Image src="/images/pages/career-coaching.webp" alt="" fill className="object-cover" />
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <p className="text-blue-300 font-semibold mb-4 uppercase tracking-wide text-sm">Career Services</p>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+              From Training to Career — We Stay With You
+            </h1>
+            <p className="text-xl text-blue-100 leading-relaxed mb-8">
+              Our career services don't end when your program does. We provide ongoing support to help you 
+              land a job, advance in your career, and achieve your professional goals.
+            </p>
+            <Link href="/contact" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              Schedule a Consultation <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
 
-      <HeroVideo
-        videoSrcDesktop="/videos/career-services-hero.mp4"
-        posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-hero.webp"
-        voiceoverSrc="/audio/heroes/career-services.mp3"
-        microLabel={`Career Services — Supporting ${jobSeekerCount || 0} Job Seekers`}
-        analyticsName="career-services"
-      />
-
-      {/* What We Offer — stacked on mobile */}
-      <section className="py-8 sm:py-14">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">
-            What You Get
-          </h2>
-          <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-5">
-            {[
-              {
-                title: 'Resume Building',
-                desc: 'Work one-on-one with a career advisor to build a professional resume tailored to your industry. We format, proofread, and optimize for applicant tracking systems.',
-                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/resume-building-hero.webp',
-              },
-              {
-                title: 'Interview Preparation',
-                desc: 'Practice with mock interviews, get feedback on your answers, and learn how to present yourself confidently. We cover behavioral, technical, and situational questions.',
-                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/networking-hero.webp',
-              },
-              {
-                title: 'Job Fairs & Hiring Events',
-                desc: 'Attend exclusive hiring events where our employer partners interview and hire on the spot. We host events monthly across Indiana.',
-                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/job-placement.webp',
-              },
-              {
-                title: 'Direct Employer Connections',
-                desc: 'We match you with employers in your field who are actively hiring. Many of our graduates receive job offers before they finish training.',
-                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-hero.webp',
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="flex gap-4 sm:flex-col rounded-xl overflow-hidden border border-slate-200 bg-white"
-              >
-                <div className="relative w-28 h-28 sm:w-full sm:h-[180px] flex-shrink-0 sm:flex-shrink overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    sizes="100vw"
-                    className="object-cover" 
-                  />
+      {/* Services Grid */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Career Services</h2>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              Comprehensive support at every stage of your career journey.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8">
+            {SERVICES.map((service) => (
+              <div key={service.title} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                <div className="relative h-48 bg-slate-200">
+                  <Image src={service.image} alt={service.title} fill className="object-cover" />
                 </div>
-                <div className="py-3 pr-3 sm:p-5 flex-1">
-                  <h3 className="font-bold text-slate-900 text-sm sm:text-base mb-1">
-                    {item.title}
-                  </h3>
-                  <p className="text-black text-xs sm:text-sm leading-relaxed">{item.desc}</p>
+                <div className="p-8">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                      <service.icon className="w-6 h-6 text-brand-blue-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900">{service.title}</h3>
+                  </div>
+                  <p className="text-slate-600">{service.desc}</p>
                 </div>
               </div>
             ))}
@@ -96,94 +100,78 @@ export default function CareerServicesPage() {
         </div>
       </section>
 
-      {/* Your Journey — step by step */}
-      <section className="py-8 sm:py-14">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">
-            Your Path to Employment
-          </h2>
-          <div className="space-y-3">
+      {/* Success Timeline */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Your Path to Employment</h2>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              We guide you every step of the way from enrollment to your first day on the job.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-5 gap-4">
             {[
-              {
-                step: '1',
-                title: 'Complete Your Training',
-                desc: 'Finish your certification program and earn your credential.',
-              },
-              {
-                step: '2',
-                title: 'Build Your Resume',
-                desc: 'Meet with a career advisor to create a professional resume.',
-              },
-              {
-                step: '3',
-                title: 'Practice Interviewing',
-                desc: 'Do mock interviews and get feedback from hiring professionals.',
-              },
-              {
-                step: '4',
-                title: 'Connect With Employers',
-                desc: 'We introduce you to employers hiring in your field.',
-              },
-              {
-                step: '5',
-                title: 'Get Hired',
-                desc: 'Interview, receive an offer, and start your new career.',
-              },
+              { step: 1, title: 'Enroll', desc: 'Start your training program' },
+              { step: 2, title: 'Learn', desc: 'Develop your skills' },
+              { step: 3, title: 'Certify', desc: 'Earn your credentials' },
+              { step: 4, title: 'Prepare', desc: 'Build resume & practice interviews' },
+              { step: 5, title: 'Hired', desc: 'Start your new career' },
             ].map((item) => (
-              <div
-                key={item.step}
-                className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-4"
-              >
-                <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+              <div key={item.step} className="text-center">
+                <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                   {item.step}
                 </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
-                  <p className="text-black text-sm">{item.desc}</p>
-                </div>
+                <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
+                <p className="text-sm text-slate-600">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <LiveJobPostings heading="Employer Job Openings" limit={8} />
-
-      {/* WorkOne Locator */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <WorkOneLocator />
+      {/* For Employers */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">For Employers</h2>
+              <p className="text-lg text-slate-700 mb-8">
+                Partner with us to access a pipeline of skilled, certified workers ready to contribute 
+                to your team from day one.
+              </p>
+              <ul className="space-y-4 mb-8">
+                {EMPLOYER_BENEFITS.map((benefit) => (
+                  <li key={benefit} className="flex items-start gap-3">
+                    <CheckCircle className="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-700">{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/for-employers" className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+                Learn About Hiring <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            </div>
+            <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl">
+              <Image src="/images/pages/team-collaboration.webp" alt="Employer partnership" fill className="object-cover" />
+            </div>
+          </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-8 sm:py-14">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">
-            Ready to Start Your Career?
-          </h2>
-          <p className="text-white mb-6 text-sm">
-            Apply for training and career services are included at no extra cost.
+      <section className="py-20 bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Start Your Career Journey?</h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Whether you're finishing a program or looking for your next opportunity, we're here to help.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/start"
-              className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center"
-            >
-              Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/contact" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              Contact Us <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
-            <Link
-              href="/career-services/ongoing-support"
-              className="bg-white/10 text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/20 transition-colors text-center"
-            >
-              Ongoing Support
-            </Link>
-            <Link
-              href="/programs"
-              className="border-2 border-white text-slate-900 font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center"
-            >
-              View Programs
-            </Link>
+            <a href="tel:+13175551234" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Phone className="mr-2 w-5 h-5" /> Call (317) 555-1234
+            </a>
           </div>
         </div>
       </section>

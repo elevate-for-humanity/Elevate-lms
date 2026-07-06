@@ -30,12 +30,12 @@ export default async function EmployerApplicationPage() {
       <div className="relative h-[200px] sm:h-[260px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-employer-hero.webp"
+          src="/images/pages/apply-employer-hero.webp"
           alt="Employer partnership"
           fill
           sizes="100vw"
           className="object-cover"
-          priority 
+          priority placeholder="empty"
         />
         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
           <span className="text-sm font-bold text-slate-900">{PLATFORM_DEFAULTS.orgName}</span>

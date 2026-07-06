@@ -165,7 +165,7 @@ async function _POST(req: Request) {
       last_name: lastName,
       full_name: fullName,
       email: clean(body.email as string) ?? '',
-      phone: clean(body.phone as string) ?? null,  // null allowed after migration
+      phone: clean(body.phone as string) ?? '',
       city: clean(body.city as string) ?? '',
       zip: zipCode,
       program_interest: clean(programInterest) ?? 'not-specified',
@@ -268,7 +268,7 @@ async function _POST(req: Request) {
     });
     if (refErr) {
       logger.warn('[Intake API] workforce_referrals insert failed', {
-        error: 'Internal server error', code: refErr.code, email: intakeEmail,
+        error: refErr.message, code: refErr.code, email: intakeEmail,
       });
     }
   }
@@ -284,7 +284,7 @@ async function _POST(req: Request) {
     );
     if (inviteError) {
       logger.warn('[Intake API] Auth invite failed', {
-        email: intakeEmail, error: 'Internal server error',
+        email: intakeEmail, error: inviteError.message,
       });
       return;
     }
@@ -300,7 +300,7 @@ async function _POST(req: Request) {
     );
     if (profileErr) {
       logger.warn('[Intake API] Profile upsert failed', {
-        email: intakeEmail, error: 'Internal server error', code: profileErr.code,
+        email: intakeEmail, error: profileErr.message, code: profileErr.code,
       });
     }
   }
@@ -313,7 +313,7 @@ async function _POST(req: Request) {
       results.forEach((r) => {
         if (r.status === 'rejected') {
           logger.error('[Intake API] Side-effect threw unexpectedly', {
-            error: 'Internal server error',
+            error: r.reason instanceof Error ? r.reason.message : String(r.reason),
           });
         }
       });

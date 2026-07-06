@@ -23,7 +23,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/check-licenses] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   let flagged = 0;
@@ -39,7 +39,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       severity: 'warning',
       message: `License ${lic.id} (${lic.license_type ?? 'unknown type'}) missing required fields: ${missing}`,
       metadata: { license_id: lic.id, holder_id: lic.holder_id, missing_fields: missing },
-    })
+    }).then(() => {}, () => {});
 
     flagged++;
   }

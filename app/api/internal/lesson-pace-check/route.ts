@@ -14,7 +14,7 @@
  *   2. student_risk_status updated (status escalated if already watch/at_risk)
  *   3. Platform event emitted
  *
- * Gated by CRON_SECRET via withRuntime({ cron: "x-header" }).
+ * Gated by CRON_SECRET via withRuntime({ cron: true }).
  */
 
 import { NextResponse } from 'next/server';
@@ -32,7 +32,7 @@ const LESSON_DEFICIT_THRESHOLD = 2;
 // Default program duration when not set on the program row.
 const DEFAULT_PROGRAM_DAYS = 180; // 6-month program
 
-export const POST = withRuntime({ cron: "x-header" }, async () => {
+export const POST = withRuntime({ cron: true }, async () => {
   const db = await requireAdminClient();
 
   // Load active enrollments with program info and lesson counts
@@ -168,7 +168,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
       })
       .onConflict('idempotency_key')
       .ignore()
-      .catch(() => {});
+      .then(() => {}, () => {});
 
     // Upsert student_risk_status — escalate status if already watch
     const { data: existingRisk } = await db
@@ -184,30 +184,28 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
       currentStatus; // don't downgrade at_risk/critical
 
     if (existingRisk?.id) {
-      await Promise.resolve(
-        db
-          .from('student_risk_status')
-          .update({
-            status: newStatus,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', existingRisk.id)
-      ).catch(() => {});
+      await db
+        .from('student_risk_status')
+        .update({
+          status: newStatus,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existingRisk.id)
+        .then(() => {}, () => {});
     } else {
-      await Promise.resolve(
-        db
-          .from('student_risk_status')
-          .insert({
-            user_id: userId,
-            status: 'watch',
-            days_since_activity: 0,
-            overdue_count: Math.round(deficit),
-            progress_percentage: enrollment.progress_percent ?? 0,
-            last_activity_date: enrollment.last_activity_at
-              ? new Date(enrollment.last_activity_at).toISOString().split('T')[0]
-              : null,
-          })
-      ).catch(() => {});
+      await db
+        .from('student_risk_status')
+        .insert({
+          user_id: userId,
+          status: 'watch',
+          days_since_activity: 0,
+          overdue_count: Math.round(deficit),
+          progress_percentage: enrollment.progress_percent ?? 0,
+          last_activity_date: enrollment.last_activity_at
+            ? new Date(enrollment.last_activity_at).toISOString().split('T')[0]
+            : null,
+        })
+        .then(() => {}, () => {});
     }
 
     // Platform event
@@ -225,7 +223,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
         days_elapsed: daysElapsed,
       },
       message: `Learner is ${Math.round(deficit)} lessons behind pace in ${course?.title ?? courseId}`,
-    }).catch(() => {});
+    }).then(() => {}, () => {});
 
     flagged++;
   }

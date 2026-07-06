@@ -42,6 +42,9 @@ async function _POST(req: NextRequest) {
   if (!adminDb) {
     return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
   }
+  if (!adminDb) {
+    return new Response('Server configuration error', { status: 500 });
+  }
 
   const { user_id, course_id, expires_at } = await req.json();
 

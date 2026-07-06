@@ -40,7 +40,7 @@ export function DocumentSignatureBlock({
   const [signerEmail, setSignerEmail] = useState('');
 
   // Pre-fill name and check if already signed
-  useEffect(() => {
+  useEffect((): void => {
     import('@/lib/supabase/client').then(({ createClient }) => {
       const supabase = createClient();
       supabase?.auth.getUser().then(async ({ data }) => {
@@ -70,7 +70,7 @@ export function DocumentSignatureBlock({
   }, [agreementType, agreementVersion]);
 
   // Init signature pad
-  useEffect(() => {
+  useEffect((): void => {
     if (method !== 'drawn' || !canvasRef.current || pad) return;
     const instance = new SignatureCanvas(canvasRef.current, {
       backgroundColor: 'rgb(255,255,255)',

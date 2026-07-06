@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
   const { data: bpa } = await db
     .from('barbershop_partner_applications')
     .select(
-      'id, shop_legal_name, shop_dba_name, owner_name, contact_name, contact_email, contact_phone, shop_address_line1, shop_city, shop_state, shop_zip, indiana_shop_license_number, supervisor_name, supervisor_license_number, compensation_model, status, mou_signed_at',
+      'id, shop_legal_name, shop_dba_name, owner_name, contact_name, contact_email, contact_phone, shop_address_line1, shop_city, shop_state, shop_zip, indiana_shop_license_number, supervisor_name, supervisor_license_number, status, mou_signed_at',
     )
     .eq('contact_email', user.email ?? '')
     .order('created_at', { ascending: false })
@@ -58,11 +58,8 @@ export async function GET(req: NextRequest) {
     name: bpa.shop_dba_name || bpa.shop_legal_name,
     shop_name: bpa.shop_dba_name || bpa.shop_legal_name,
     shopName: bpa.shop_dba_name || bpa.shop_legal_name,
-    owner_name: bpa.owner_name,
     contact_name: bpa.contact_name,
     contact_email: bpa.contact_email,
-    supervisor_name: bpa.supervisor_name,
-    supervisor_license_number: bpa.supervisor_license_number,
     status: bpa.status,
     mou_signed: !!bpa.mou_signed_at,
   });

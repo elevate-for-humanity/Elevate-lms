@@ -1,3 +1,4 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 
 import { processFulfillmentQueue, getQueueStats } from '@/lib/store/fulfillment-queue';
 import { logger } from '@/lib/logger';
@@ -82,3 +83,5 @@ async function _GET(request: Request) {
 }
 export const GET = withRuntime(withApiAudit('/api/store/process-queue', _GET));
 export const POST = withRuntime(withApiAudit('/api/store/process-queue', _POST));
+
+

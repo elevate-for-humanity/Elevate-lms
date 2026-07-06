@@ -11,11 +11,11 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
 
 export async function GET(req: NextRequest) {
-  const rateLimited = await applyRateLimit(req, 'api');
+  const rateLimited = await applyRateLimit(req, 'auth');
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const authRes = await supabase.auth.getUser(); const { data: { user }, error } = authRes;
+  const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) return safeError('Not authenticated', 401);
 
   const { data } = await supabase

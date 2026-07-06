@@ -39,10 +39,10 @@ const adminConfig = {
   webpack(config, { isServer }) {
     config.resolve.alias['@'] = ROOT;
     // For standalone server.js, resolve @/lib/* to TypeScript files for bundling
-    // This ensures lib/logger.ts and lib/memory-monitor.ts are included in standalone output
+    // This ensures lib/logger.ts is included in standalone output
     if (isServer) {
       config.resolve.alias['@/lib/logger'] = path.join(ROOT, 'lib/logger.ts');
-      config.resolve.alias['@/lib/memory-monitor'] = path.join(ROOT, 'lib/memory-monitor.ts');
+      config.resolve.alias['@/lib/supabase'] = path.join(ROOT, 'lib/supabase');
     }
     // Keep peak memory stable during admin builds on low-RAM runners.
     config.parallelism = 1;

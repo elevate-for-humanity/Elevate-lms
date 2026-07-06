@@ -227,7 +227,7 @@ Valid field keys: ${Object.keys(FIELD_LABELS).join(', ')}`;
     return NextResponse.json({ fields: enrichedFields });
   } catch (err) {
     logger.error('[api/documents/ai-prefill] error', err);
-    return safeInternalError();
+    return safeInternalError(err as Error, 'Failed to generate AI prefill');
   }
 }
 
@@ -280,6 +280,6 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ success: true, saved: Object.keys(profileUpdate) });
   } catch (err) {
     logger.error('[api/documents/ai-prefill PATCH] error', err);
-    return safeInternalError();
+    return safeInternalError(err as Error, 'Failed to generate AI prefill');
   }
 }

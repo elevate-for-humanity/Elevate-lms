@@ -26,16 +26,17 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .limit(BATCH_SIZE);
 
   if (error) {
-    logger.error('[cron/embed-knowledge] DB error', { error: 'Internal server error' });
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    logger.error('[cron/embed-knowledge] DB error', { error: error.message });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   const rows = docs ?? [];
   let queued = 0;
 
   for (const doc of rows) {
-    await emitEvent('knowledge.embed_requested', 'ai', {
-      payload: { document_id: doc.id, content_hash: doc.content_hash },
+    await emitEvent('knowledge.embed_requested', 'knowledge', {
+      document_id: doc.id,
+      content_hash: doc.content_hash,
     }).catch((err) =>
       logger.error('[cron/embed-knowledge] Failed to emit embed event', { docId: doc.id, error: String(err) }),
     );

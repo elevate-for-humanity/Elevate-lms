@@ -34,7 +34,7 @@ export async function generateMetadata({
       title: video.title,
       description: video.description,
       url: `${PLATFORM_DEFAULTS.siteUrl}/videos/${video.id}`,
-      type: 'video.other',
+      type: `video.other`,
       images: [
         {
           url: video.thumbnailUrl,

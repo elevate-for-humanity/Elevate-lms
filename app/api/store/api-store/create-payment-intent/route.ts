@@ -13,7 +13,7 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'contact');
     if (rateLimited) return rateLimited;
     const auth = await requireAuth(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
 
     if (!stripe) {
@@ -62,3 +62,4 @@ async function _POST(request: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/store/create-payment-intent', _POST);
+

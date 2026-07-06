@@ -8,7 +8,7 @@
  *   - Tenant settings
  *
  * The clone gets a fresh subdomain, empty user base, and no active runs.
- * Auth: admin only.
+ * Auth: super_admin only.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
@@ -23,7 +23,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { id: sourceId } = await params;
   const traceId = request.headers.get('x-trace-id') ?? 'no-trace';

@@ -115,7 +115,7 @@ async function _POST(request: NextRequest) {
         // Get program details
         const { data: program } = await supabase
           .from('programs')
-          .select('id, title, name, slug, total_cost')
+          .select('id, title, slug, total_cost')
           .eq('id', programId)
           .maybeSingle();
 
@@ -137,8 +137,8 @@ async function _POST(request: NextRequest) {
               price_data: {
                 currency: 'usd',
                 product_data: {
-                  name: program.title ?? program.name,
-                  description: `Enrollment in ${program.title ?? program.name}`,
+                  name: program.title,
+                  description: `Enrollment in ${program.title}`,
                 },
                 unit_amount: programAmount,
               },

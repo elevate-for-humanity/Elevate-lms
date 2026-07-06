@@ -105,7 +105,7 @@ export default async function PartnerHoursPage() {
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden rounded-xl mb-6 -mx-4 sm:-mx-6 lg:-mx-8">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/partner-page-6.jpg"
+          src="/images/pages/partner-page-6.jpg"
           alt="Training hours"
           fill
           sizes="100vw"

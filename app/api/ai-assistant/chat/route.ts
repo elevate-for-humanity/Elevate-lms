@@ -10,7 +10,6 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { isAiDegradedError } from '@/lib/ai/degraded';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
@@ -25,8 +24,24 @@ function buildAssistantFallback(message: string): string {
   const normalized = message.toLowerCase();
   const supportLine = `You can also call ${PLATFORM_DEFAULTS.supportPhone} or use the [Contact Page](/contact).`;
 
+  if (/\b(take me to|go to|open|show me|navigate)\b/.test(normalized)) {
+    if (/\b(barber|barbering|barbershop)\b/.test(normalized)) {
+      return `Our DOL Registered Barber Apprenticeship is earn-while-you-learn training toward an Indiana barber license. Details: [Barber Apprenticeship](/programs/barber-apprenticeship). Ready to apply? [Apply for Barber Apprenticeship](/apply?program=barber-apprenticeship). ${supportLine}`;
+    }
+    if (/\b(cna|nursing assistant|nurse aide)\b/.test(normalized)) {
+      return `Start here: [CNA Program](/programs/cna) or [Apply for CNA](/apply?program=cna). ${supportLine}`;
+    }
+    if (/\b(hvac)\b/.test(normalized)) {
+      return `Start here: [HVAC Program](/programs/hvac-technician) or [Apply](/apply?program=hvac-technician). ${supportLine}`;
+    }
+  }
+
+  if (/\b(barber|barbering|barbershop|barber apprenticeship)\b/.test(normalized)) {
+    return `The Barber Apprenticeship is a DOL-registered earn-while-you-learn program (about 2,000 hours) toward an Indiana barber license. Most eligible learners qualify for workforce funding. Explore: [Barber Apprenticeship](/programs/barber-apprenticeship). Apply: [Apply Now](/apply?program=barber-apprenticeship). ${supportLine}`;
+  }
+
   if (/\b(cna|nursing assistant|nurse aide)\b/.test(normalized)) {
-    return `The CNA program is 4 weeks and prepares students for the Indiana CNA written and skills exam. Self-pay is currently listed at $1,850, regular price $2,500, and  funding may cover eligible SNAP/TANF participants. BNPL/self-pay options are available. Start here: [Apply for CNA](/apply?program=cna). ${supportLine}`;
+    return `The CNA program is 4 weeks and prepares students for the Indiana CNA written and skills exam. Self-pay is currently listed at $1,850, regular price $2,500, and FSSA IMPACT funding may cover eligible SNAP/TANF participants. BNPL/self-pay options are available. Start here: [Apply for CNA](/apply?program=cna). ${supportLine}`;
   }
 
   if (/\b(qma|medication aide)\b/.test(normalized)) {
@@ -34,7 +49,7 @@ function buildAssistantFallback(message: string): string {
   }
 
   if (/\b(cost|price|tuition|payment|pay|bnpl|finance|financing|installment|self-pay|self pay)\b/.test(normalized)) {
-    return `Program pages should show the current training cost, funding options, and self-pay/BNPL availability. Eligible students may qualify for WIOA, , Workforce Ready Grant, employer sponsorship, or payment options depending on the program. Start here: [Payment Options](/funding/payment-options) or [Check Eligibility](/apply). ${supportLine}`;
+    return `Program pages should show the current training cost, funding options, and self-pay/BNPL availability. Eligible students may qualify for WIOA, FSSA IMPACT, Workforce Ready Grant, employer sponsorship, or payment options depending on the program. Start here: [Payment Options](/funding/payment-options) or [Check Eligibility](/apply). ${supportLine}`;
   }
 
   if (/\b(apply|application|enroll|start|sign up|signup)\b/.test(normalized)) {
@@ -83,7 +98,7 @@ export async function POST(req: NextRequest) {
 
         if (conversationError) {
           logger.warn('AI Assistant conversation create failed', {
-            error: 'Internal server error',
+            error: conversationError.message,
           });
         }
         convId = newConv?.id ?? null;
@@ -113,7 +128,7 @@ export async function POST(req: NextRequest) {
       logger.warn('AI Assistant database unavailable; continuing without history', { databaseError });
     }
 
-    let assistantMessage: string;
+    let assistantMessage = '';
 
     try {
       const { runAITask } = await import('@/lib/ai/orchestrator');
@@ -127,13 +142,7 @@ export async function POST(req: NextRequest) {
       assistantMessage =
         aiResult.content || buildAssistantFallback(message);
     } catch (aiError) {
-      if (isAiDegradedError(aiError)) {
-        logger.warn('AI Assistant degraded; using guided fallback', {
-          error: 'Internal server error',
-        });
-      } else {
-        logger.error('AI Assistant model unavailable; using guided fallback:', aiError);
-      }
+      logger.error('AI Assistant model unavailable; using guided fallback:', aiError);
       assistantMessage = buildAssistantFallback(message);
     }
 

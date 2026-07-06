@@ -41,7 +41,7 @@ const FALLBACK_REQUIRED_OJL_HOURS = 2000; // Indiana barber DOL baseline
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
-export const POST = withRuntime({ cron: "x-header" }, async () => {
+export const POST = withRuntime({ cron: true }, async () => {
   const db = await requireAdminClient();
 
   // Load all active apprenticeship enrollments with start date and required hours.
@@ -193,26 +193,25 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
       });
 
       // 2. In-app notification
-      await Promise.resolve(
-        db
-          .from('notifications')
-          .insert({
-            user_id: enrollment.student_id,
-            type: 'compliance',
-            title: 'Hours pace warning',
-            message: `You are ${Math.round(deficit)} hours behind your required OJL pace. You need to log ${requiredPacePerWeek.toFixed(1)} hours per week to complete on time.`,
-            action_label: 'View hours',
-            action_url: '/apprentice/hours',
-            link: '/apprentice/hours',
-            read: false,
-            metadata: {
-              enrollment_id: enrollment.id,
-              deficit_hours: Math.round(deficit),
-              required_pace_per_week: requiredPacePerWeek.toFixed(1),
-            },
-            idempotency_key: `pace-warning-${enrollment.id}-${new Date().toISOString().slice(0, 10)}`,
-          })
-      ).catch(() => {});
+      await db
+        .from('notifications')
+        .insert({
+          user_id: enrollment.student_id,
+          type: 'compliance',
+          title: 'Hours pace warning',
+          message: `You are ${Math.round(deficit)} hours behind your required OJL pace. You need to log ${requiredPacePerWeek.toFixed(1)} hours per week to complete on time.`,
+          action_label: 'View hours',
+          action_url: '/apprentice/hours',
+          link: '/apprentice/hours',
+          read: false,
+          metadata: {
+            enrollment_id: enrollment.id,
+            deficit_hours: Math.round(deficit),
+            required_pace_per_week: requiredPacePerWeek.toFixed(1),
+          },
+          idempotency_key: `pace-warning-${enrollment.id}-${new Date().toISOString().slice(0, 10)}`,
+        })
+        .then(() => {}, () => {});
 
       // 3. Email apprentice
       if (apprenticeEmail) {
@@ -250,7 +249,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
 <p>— Elevate for Humanity</p>
           `.trim(),
           text: `Hi ${apprenticeName}, you are ${Math.round(deficit)}h behind your OJL pace for ${programName}. You need ${requiredPacePerWeek.toFixed(1)}h/week to finish on time. Contact your supervisor.`,
-        }).catch(() => {});
+        }).then(() => {}, () => {});
       }
 
       // 4. Email admin
@@ -269,7 +268,7 @@ export const POST = withRuntime({ cron: "x-header" }, async () => {
 <p><a href="https://www.elevateforhumanity.org/admin/apprentices">Review in admin dashboard</a></p>
         `.trim(),
         text: `${apprenticeName} is ${Math.round(deficit)}h behind OJL pace for ${programName}. Needs ${requiredPacePerWeek.toFixed(1)}h/week.`,
-      }).catch(() => {});
+      }).then(() => {}, () => {});
 
       // 5. Platform event
       await emitEvent('apprentice.low_hours_pace', 'compliance', {

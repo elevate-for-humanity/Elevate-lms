@@ -26,10 +26,10 @@ import {
   Settings,
   Bell,
   ChevronRight,
-  ScissorsIcon,
   Hammer,
-  Sparkles, Globe,
+  Sparkles,
   User,
+  Globe,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -197,8 +197,8 @@ export default async function ApprenticePortalPage() {
   ];
 
   const skills = [
-    { name: 'Haircutting', icon: ScissorsIcon, percent: 80, color: 'bg-blue-100 text-blue-600' },
-    { name: 'Color Theory', icon: Globe, percent: 60, color: 'bg-purple-100 text-purple-600' },
+    { name: 'Haircutting', icon: Scissors, percent: 80, color: 'bg-blue-100 text-blue-600' },
+    { name: 'Color Theory', icon: Sparkles, percent: 60, color: 'bg-purple-100 text-purple-600' },
     { name: 'Sanitation', icon: CheckCircle, percent: 100, color: 'bg-green-100 text-green-600' },
     { name: 'Shaving', icon: Hammer, percent: 45, color: 'bg-amber-100 text-amber-600' },
   ];

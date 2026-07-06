@@ -32,7 +32,6 @@ export async function updateEnrollment(
     status?: string;
     progress?: number;
     at_risk?: boolean;
-    host_shop_id?: string | null;
     completed_at?: string | null;
   },
 ) {
@@ -59,7 +58,6 @@ export async function createEnrollment(data: {
   user_id: string;
   course_id: string;
   program_id?: string | null;
-  host_shop_id?: string | null;
   status?: string;
   progress?: number;
 }) {
@@ -79,7 +77,6 @@ export async function createEnrollment(data: {
       user_id: data.user_id,
       course_id: data.course_id,
       program_id: data.program_id ?? null,
-      host_shop_id: data.host_shop_id ?? null,
       status: data.status ?? 'active',
       enrollment_state: data.status ?? 'active',
       progress: data.progress ?? 0,

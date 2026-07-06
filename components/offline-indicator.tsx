@@ -78,3 +78,6 @@ export function OfflineIndicator() {
     </div>
   );
 }
+
+// Default export for next/dynamic
+export default OfflineIndicator;

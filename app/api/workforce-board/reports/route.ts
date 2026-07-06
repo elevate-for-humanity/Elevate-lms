@@ -12,14 +12,14 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 
-const ALLOWED_ROLES = ['workforce_board', 'admin', 'staff'];
+const ALLOWED_ROLES = ['workforce_board', 'admin', 'super_admin', 'staff'];
 
 export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   if (!ALLOWED_ROLES.includes(auth.role ?? '')) return safeError('Forbidden', 403);
 
   try {

@@ -356,7 +356,7 @@ export const CDL_TRAINING: ProgramSchema = {
   // ─── Content model ──────────────────────────────────────────────
   deliveryModel: 'internal',
   deliveryModelDetail: 'internal_lms',
-  fundingOptions: ['wioa', 'impact', 'self_pay'],
+  fundingOptions: ['wioa', 'wioa', 'self_pay'],
   enrollmentType: 'internal',
 
   faqs: [
@@ -393,8 +393,8 @@ export const CDL_TRAINING: ProgramSchema = {
 
 
   funding: {
+    fssa_eligible: false,
     wioa_eligible: true,
-    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available. CDL-A/B certification program.',

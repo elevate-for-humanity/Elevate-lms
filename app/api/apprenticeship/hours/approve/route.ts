@@ -42,12 +42,12 @@ async function notifyHourDecision(
       },
       idempotency_key: `hours-${action}-learner-${hourId}-${studentUserId}`,
     })
-    .catch(() => {});
+    
 
   const { data: admins } = await adminDb
     .from('profiles')
     .select('id')
-    .in('role', ['admin', 'staff'])
+    .in('role', ['admin', 'super_admin', 'staff'])
     .limit(200);
 
   if (admins?.length) {
@@ -68,7 +68,7 @@ async function notifyHourDecision(
       },
       idempotency_key: `hours-${action}-admin-${hourId}-${admin.id}`,
     }));
-    await adminDb.from('notifications').insert(adminRows).catch(() => {});
+    await adminDb.from('notifications').insert(adminRows);
   }
 }
 

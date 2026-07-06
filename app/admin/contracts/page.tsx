@@ -11,6 +11,6 @@ export const metadata: Metadata = {
 };
 
 export default async function ContractsPage() {
-  await requireRole(['admin', 'staff']);
+  await requireRole(['admin', 'super_admin', 'staff']);
   return <ContractsClient />;
 }

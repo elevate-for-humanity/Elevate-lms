@@ -1,1 +1,1 @@
-export const storeProducts = [];
+export * from '@/lib/data/store-products';

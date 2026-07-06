@@ -29,7 +29,7 @@ export default async function CheckoutPage() {
       </div>
     );
   }
-  const user = safeGetUser(await supabase.auth.getUser());
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/store/checkout');

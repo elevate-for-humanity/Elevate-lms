@@ -77,8 +77,8 @@ async function _POST(req: Request) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `${fundingSource} - ${program.title ?? program.name}`,
-              description: `Student: ${profile.full_name || profile.email} | Program: ${program.title ?? program.name}`,
+              name: `${fundingSource} - ${program.title}`,
+              description: `Student: ${profile.full_name || profile.email} | Program: ${program.title}`,
             },
             unit_amount: amount,
           },
@@ -88,7 +88,6 @@ async function _POST(req: Request) {
       success_url: `${siteUrl}/funding/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/funding/canceled`,
       metadata: {
-        kind: 'funded_enrollment',
         // Standardized metadata for grant/license compliance
         payment_type: 'funded_enrollment',
         funding_source: fundingSource,

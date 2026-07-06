@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   }
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   const userId = auth.id;
 
   let body: {
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
   }
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   const userId = auth.id;
 
   const { searchParams } = new URL(request.url);

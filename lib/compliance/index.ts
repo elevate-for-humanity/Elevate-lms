@@ -7,14 +7,11 @@
 
 export {
   checkComplianceStatus,
-  checkComplianceStatusWithClient,
   recordAgreementAcceptance,
   recordHandbookAcknowledgment,
   updateOnboardingProgress,
-  getUserAgreements,
   getCurrentAgreementVersions,
-  logComplianceEvent,
-  REQUIRED_AGREEMENTS,
   type ComplianceStatus,
-  type AgreementAcceptance,
 } from './enforcement';
+
+export { REQUIRED_AGREEMENTS } from '@/lib/legal/requiredAgreements';

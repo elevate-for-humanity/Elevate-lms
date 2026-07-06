@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-async function _GET() {
+async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   try {
@@ -17,7 +17,7 @@ async function _GET() {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const { data: files } = await db.storage.from('media').list('', {
+    const { data: files } = await supabase.storage.from('media').list('', {
       limit: 100,
       sortBy: { column: 'created_at', order: 'desc' },
     });

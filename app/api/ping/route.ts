@@ -1,8 +1,9 @@
 /**
  * GET /api/ping
  *
- * // PUBLIC ROUTE: Northflank liveness probe — no auth, no DB.
+ * Unauthenticated liveness probe used by Northflank health checks.
  * Returns 200 as soon as the Next.js runtime is accepting requests.
+ * No auth, no DB - intentionally minimal.
  */
 
 import { NextResponse } from 'next/server';

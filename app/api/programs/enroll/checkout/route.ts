@@ -1,4 +1,5 @@
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
+import type Stripe from 'stripe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 /**
  * CANONICAL PROGRAM ENROLLMENT CHECKOUT

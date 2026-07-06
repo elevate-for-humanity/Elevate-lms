@@ -95,8 +95,8 @@ async function _POST(request: NextRequest) {
     const notificationPayload = JSON.stringify({
       title: payload.title,
       body: payload.body,
-      icon: payload.icon || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
-      badge: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
+      icon: payload.icon || '/icon-192.png',
+      badge: '/icon-192.png',
       url: payload.url || '/',
       tag: payload.tag || 'default',
       timestamp: Date.now(),

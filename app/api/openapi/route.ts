@@ -6,3 +6,4 @@ export async function GET() {
     info: { title: 'Elevate LMS API', version: '1.0.0' }
   });
 }
+

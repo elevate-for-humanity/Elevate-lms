@@ -66,7 +66,7 @@ async function _POST(request: NextRequest) {
   const signature = request.headers.get('stripe-signature');
 
   if (!signature) {
-    return NextResponse.json({ received: true, warning: 'no_signature' }, { status: 200 });
+    return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
   }
 
   const stripe = getStripe();
@@ -82,8 +82,8 @@ async function _POST(request: NextRequest) {
   try {
     event = constructStripeEventWithAnySecret(stripe, body, signature, webhookSecrets);
   } catch (err) {
-    logger.error("[cosmetology/webhook] Signature verification failed: " + String(err));
-    return NextResponse.json({ received: true, warning: 'invalid_signature' }, { status: 200 });
+    logger.error('[cosmetology/webhook] Signature verification failed:', err);
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
   const supabase = await getAdminClient();
@@ -137,7 +137,7 @@ async function _POST(request: NextRequest) {
             created_at: new Date().toISOString(),
           });
           if (subRecordError) {
-            logger.error("[cosmetology/webhook] cosmetology_subscriptions insert error: " + String(subRecordError));
+            logger.error('[cosmetology/webhook] cosmetology_subscriptions insert error:', subRecordError);
           }
 
           if (!fullyPaidEnrollment && weeklyPaymentCents > 0 && weeksRemaining > 0) {
@@ -209,7 +209,7 @@ async function _POST(request: NextRequest) {
           });
 
           if (enrollResult.error) {
-            logger.error("[cosmetology/webhook] program_enrollments write failed: " + String(enrollResult.error));
+            logger.error('[cosmetology/webhook] program_enrollments write failed', { error: enrollResult.error });
           } else {
             logger.info(`[cosmetology/webhook] program_enrollments ${enrollResult.action}: ${enrollResult.id}`);
           }
@@ -333,10 +333,11 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
 
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
-        // Stripe SDK v19+ returns subscription as object or string
-        const subscriptionId = typeof invoice.subscription === 'object'
-          ? (invoice.subscription as { id?: string })?.id
-          : invoice.subscription;
+        // Access subscription - newer Stripe types use subscription_details.subscription
+        const invoiceAny = invoice as any;
+        const subscriptionId = typeof invoiceAny.subscription_details?.subscription === 'string' 
+          ? invoiceAny.subscription_details.subscription 
+          : (typeof invoiceAny.subscription === 'string' ? invoiceAny.subscription : null);
         if (!subscriptionId) break;
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         if (subscription.metadata?.program !== 'cosmetology-apprenticeship') break;

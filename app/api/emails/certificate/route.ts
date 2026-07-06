@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 
 async function _POST(request: NextRequest) {
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const rateLimited = await applyRateLimit(request, 'contact');

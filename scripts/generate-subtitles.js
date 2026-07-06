@@ -17,7 +17,6 @@ const videos = [
   { file: 'beauty-career-educator-10002424.mp4', title: 'Beauty Career Educator' },
   { file: 'esthetician-client-services-10002415.mp4', title: 'Esthetician Client Services' },
   { file: 'business-startup-marketing-10002422.mp4', title: 'Business Startup Marketing' },
-  { file: 'tax-preparation-financial-service-10002414.mp4', title: 'Tax Preparation' },
   { file: 'public-safety-reentry-specialist-10002439.mp4', title: 'Public Safety Reentry' },
 ];
 

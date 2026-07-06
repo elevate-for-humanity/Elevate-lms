@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const db = await requireAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
     if (!job_id) return NextResponse.json({ error: 'job_id required' }, { status: 400 });
 
     // Only admins/staff/employers can query candidates
-    if (!['admin', 'staff', 'employer'].includes(auth.role ?? '')) {
+    if (!['admin', 'super_admin', 'staff', 'employer'].includes(auth.role ?? '')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

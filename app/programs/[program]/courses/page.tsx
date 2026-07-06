@@ -22,12 +22,11 @@ export async function generateMetadata({
 }
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  healthcare: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-patient-care.jpg',
-  'skilled-trades': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-unit.webp',
-  technology: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/it-helpdesk-desk.webp',
-  business: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/office-admin-desk.jpg',
-  transportation: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-truck-highway.webp',
-  barber: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-fade.webp',
+  healthcare: '/images/pages/cna-patient-care.jpg',
+  'skilled-trades': '/images/pages/hvac-unit.webp',
+  technology: '/images/pages/it-helpdesk-desk.webp',
+  transportation: '/images/pages/cdl-truck-highway.webp',
+  barber: '/images/pages/barber-fade.webp',
 };
 
 function getCategory(slug: string): string {
@@ -44,7 +43,7 @@ export default async function ProgramCoursesPage({ params }: { params: { program
     'student',
     'learner',
     'admin',
-    'admin',
+    'super_admin',
     'staff',
     'instructor',
     'program_holder',

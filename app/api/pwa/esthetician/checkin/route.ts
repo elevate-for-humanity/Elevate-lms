@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { apiAuthGuard } from '@/lib/admin/guards';
@@ -15,7 +17,7 @@ export async function POST(request: NextRequest) {
   }
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const body = await request.json().catch(() => null);
 
@@ -36,3 +38,4 @@ export async function POST(request: NextRequest) {
   if (error) return safeDbError(error, 'Failed to record check-in');
   return NextResponse.json({ success: true });
 }
+

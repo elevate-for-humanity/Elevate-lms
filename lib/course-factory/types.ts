@@ -3,6 +3,7 @@
  * Unified type definitions for the Course Factory.
  */
 import type { SupabaseClient } from '@/lib/supabase';
+import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 export type { BlueprintLessonRef, BlueprintModule, BlueprintQuizQuestion, CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 export type BuildMode = 'replace' | 'missing-only';
 export type VideoMode = 'queue' | 'off';
@@ -75,4 +76,64 @@ export interface QuizQuestion {
   options: string[];
   correct: number;
   explanation: string;
+}
+
+// Missing types that were referenced but not exported
+export type CredentialLevel = 'certificate' | 'diploma' | 'degree' | 'certification' | 'license';
+
+export interface BlueprintVideoConfig {
+  provider: 'local' | 'mux' | 'youtube' | 'vimeo';
+  autoGenerate?: boolean;
+  thumbnail?: boolean;
+}
+
+export interface CourseOutline {
+  title: string;
+  description: string;
+  modules: CourseModuleOutline[];
+}
+
+export interface CourseModuleOutline {
+  title: string;
+  description?: string;
+  lessons: CourseLessonOutline[];
+}
+
+export interface CourseLessonOutline {
+  title: string;
+  type: LessonType;
+  duration?: number;
+  description?: string;
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  description?: string;
+  status: PublishStatus;
+  modules?: CourseModule[];
+}
+
+export interface CourseModule {
+  id: string;
+  title: string;
+  courseId: string;
+  order: number;
+  lessons?: CourseLesson[];
+}
+
+export interface CourseLesson {
+  id: string;
+  title: string;
+  moduleId: string;
+  type: LessonType;
+  order: number;
+  content?: string;
+}
+
+export interface AssessmentConfig {
+  type: 'quiz' | 'exam' | 'practical';
+  passingScore: number;
+  timeLimit?: number;
+  questions: QuizQuestion[];
 }

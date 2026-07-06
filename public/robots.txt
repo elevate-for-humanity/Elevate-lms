@@ -1,0 +1,19 @@
+# robots.txt for elevateforhumanity.org
+User-agent: *
+Allow: /
+
+# Block admin routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /dev/
+
+# Block staging/preview routes
+Disallow: /staging/
+Disallow: /preview/
+
+# Sitemap location
+Sitemap: https://www.elevateforhumanity.org/sitemap.xml
+
+# Crawl delay for polite bots
+Crawl-delay: 1

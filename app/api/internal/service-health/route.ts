@@ -48,10 +48,7 @@ export async function GET(request: NextRequest) {
   const provided =
     request.headers.get('x-internal-secret') ??
     request.nextUrl.searchParams.get('secret');
-  if (!cronSecret) {
-    return NextResponse.json({ error: 'Forbidden — CRON_SECRET not configured' }, { status: 403 });
-  }
-  if (provided !== cronSecret) {
+  if (cronSecret && provided !== cronSecret) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

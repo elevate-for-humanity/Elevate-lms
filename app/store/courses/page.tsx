@@ -1,5 +1,4 @@
-export const dynamic = 'force-dynamic';
-export const revalidate = 3600;
+export const dynamic = 'force-static';
 
 
 import { Metadata } from 'next';
@@ -38,8 +37,9 @@ export default function StoreCoursesPage() {
 {/* Hero */}
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
-          <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-courses-hero.jpg" alt="Certification courses" fill sizes="100vw" className="object-cover" priority quality={85} />
+        <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
+        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
+          <Image src="/images/pages/admin-courses-partners-hero.webp" alt="Certification courses" fill sizes="100vw" className="object-cover" priority quality={85} placeholder="empty" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -60,11 +60,11 @@ export default function StoreCoursesPage() {
               >
                 <div className="relative h-48 overflow-hidden">
                   <Image
-                    src={course.image || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/course-create-hero.webp'}
+                    src={course.image || '/images/pages/course-create-hero.webp'}
                     alt={course.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty" />
                   <div className="absolute top-4 left-4 px-3 py-1 bg-brand-blue-600 text-white text-xs font-bold rounded-full">
                     {course.provider}
                   </div>
@@ -85,11 +85,11 @@ export default function StoreCoursesPage() {
                     </div>
                     <div className="flex items-center gap-1">
                       <BookOpen className="w-4 h-4" />
-                      {course.format}
+                      {course.duration}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                     <div>
                       <span className="text-2xl font-black text-slate-900">
                         ${course.price}
@@ -122,7 +122,7 @@ export default function StoreCoursesPage() {
               </p>
             </div>
             <div>
-              <Award className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
+              <Award aria-label="award" className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-slate-900 mb-2">Exam Voucher Included</h3>
               <p className="text-slate-700">
                 Every course includes the certification exam voucher - no hidden costs.

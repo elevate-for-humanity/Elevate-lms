@@ -20,7 +20,7 @@ async function _POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
     const auth = await apiRequireAdmin(req);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const body = await req.json();
     const { action, entityId, grantId } = body;

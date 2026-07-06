@@ -215,3 +215,6 @@ export function DMCATrackingPixel() {
   }, []);
   return null;
 }
+
+// Default export for next/dynamic
+export default InvisibleWatermark;

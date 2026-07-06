@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -14,7 +16,7 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   if (!auth.role || !LIST_ROLES.has(auth.role)) return safeError('Forbidden', 403);
 
   const db = await requireAdminClient();
@@ -63,3 +65,4 @@ export async function GET(request: NextRequest) {
     return safeInternalError(error, 'Provider program list failed');
   }
 }
+

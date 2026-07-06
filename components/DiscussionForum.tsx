@@ -162,3 +162,6 @@ export function DiscussionForum({ courseId, posts = [] }: DiscussionForumProps) 
     </div>
   );
 }
+
+// Default export for next/dynamic
+export default DiscussionForum;

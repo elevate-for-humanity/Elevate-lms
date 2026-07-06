@@ -1,11 +1,13 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe/client';
-import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { headers } from 'next/headers';
 import { generateLicenseWelcomeEmail } from '@/lib/email-templates/license-welcome';
@@ -62,7 +64,7 @@ export async function POST(request: NextRequest) {
         const correlationId = paymentIntent.id;
 
         // Log payment received
-        await logProvisioningStep(adminSupabase, {
+        await logProvisioningStep(db, {
           paymentIntentId: correlationId,
           correlationId,
           step: 'payment_received',
@@ -79,7 +81,7 @@ export async function POST(request: NextRequest) {
 
         if (purchase) {
           // SECTION 3: Use transactional provisioning - all or nothing
-          const result = await provisionLicense(adminSupabase, {
+          const result = await provisionLicense(db, {
             purchaseId: purchase.id,
             paymentIntentId: paymentIntent.id,
             organizationName: purchase.organization_name,
@@ -91,7 +93,7 @@ export async function POST(request: NextRequest) {
 
           if (result.success && result.licenseKey && result.tenantId) {
             // SECTION 4: Send welcome email with admin access
-            await logProvisioningStep(adminSupabase, {
+            await logProvisioningStep(db, {
               tenantId: result.tenantId,
               correlationId,
               paymentIntentId: paymentIntent.id,
@@ -141,7 +143,7 @@ export async function POST(request: NextRequest) {
                 text,
               });
 
-              await logProvisioningStep(adminSupabase, {
+              await logProvisioningStep(db, {
                 tenantId: result.tenantId,
                 correlationId,
                 paymentIntentId: paymentIntent.id,
@@ -155,7 +157,7 @@ export async function POST(request: NextRequest) {
                 tenantId: result.tenantId,
               });
             } catch (emailError) {
-              await logProvisioningStep(adminSupabase, {
+              await logProvisioningStep(db, {
                 tenantId: result.tenantId,
                 correlationId,
                 paymentIntentId: paymentIntent.id,
@@ -204,7 +206,7 @@ export async function POST(request: NextRequest) {
             .single();
 
           if (purchase?.tenant_id) {
-            await adminSupabase
+            await db
               .from('licenses')
               .update({ status: 'suspended' })
               .eq('tenant_id', purchase.tenant_id);
@@ -287,3 +289,4 @@ function getRepoUrl(licenseType: string): string {
   };
   return repos[licenseType] || repos.single;
 }
+

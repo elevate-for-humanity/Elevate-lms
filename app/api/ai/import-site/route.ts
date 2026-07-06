@@ -3,14 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
 import * as cheerio from 'cheerio';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { requireFeatureForAuth } from '@/lib/platform/require-feature-for-auth';
-import { FEATURES } from '@/lib/platform/feature-catalog';
 
 /**
  * POST /api/ai/import-site
  *
- * Auth: requireFeatureForAuth(FEATURES.AI_BASIC) — not a public route.
  * Imports an existing website and recreates it on Elevate LMS platform.
  *
  * Flow:
@@ -24,8 +22,8 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const auth = await requireFeatureForAuth(request, FEATURES.WEBSITE);
-    if (auth instanceof Response) return auth;
+    const auth = await requireAuth(request);
+    if (auth instanceof NextResponse) return auth;
 
     const body = await request.json();
     const { url, includePages = ['/', '/about', '/programs', '/contact'] } = body;
@@ -289,15 +287,7 @@ Return ONLY valid JSON.`;
 
     const responseText = completion.content || '';
     const jsonStr = responseText.replace(/```json\n?|\n?```/g, '').trim();
-    try {
-      return JSON.parse(jsonStr);
-    } catch (parseError) {
-      logger.error('[import-site] JSON parse error', {
-        raw: jsonStr.slice(0, 200),
-        error: 'Import failed'
-      });
-      throw new Error(`Failed to parse AI response as JSON`), { cause: parseError };
-    }
+    return JSON.parse(jsonStr);
   } catch (error) {
     // Return default config based on scraped data
     return {

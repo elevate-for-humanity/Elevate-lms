@@ -60,6 +60,11 @@ function projectPath(projectId: string, suffix: string): string {
   return `/projects/${projectId}${suffix}`;
 }
 
+function secretPath(suffix: string): string {
+  // Secrets are project-level - just return the suffix, northflankFetch adds /projects/{projectId}
+  return suffix;
+}
+
 export async function northflankFetch<T = unknown>(
   projectId: string,
   suffix: string,

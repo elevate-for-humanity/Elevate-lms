@@ -28,7 +28,7 @@ async function _POST(req: Request) {
     const { apiRequireAdmin } = await import('@/lib/admin/guards');
     try {
       const auth = await apiRequireAdmin(req);
-      if (auth.error) return auth.error;
+      if (auth instanceof NextResponse) return auth;
     } catch (e) {
       return e instanceof Response
         ? e
@@ -74,8 +74,8 @@ async function _POST(req: Request) {
             const payload = JSON.stringify({
               title,
               body,
-              icon: icon || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192x192.png',
-              badge: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192x192.png',
+              icon: icon || '/icon-192x192.png',
+              badge: '/icon-192x192.png',
               url: url || '/',
               timestamp: Date.now(),
             });

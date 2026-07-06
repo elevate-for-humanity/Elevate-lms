@@ -10,7 +10,7 @@ type RouteContext = { params: Promise<{ websiteId: string }> };
 
 async function _PATCH(request: NextRequest, context: RouteContext) {
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { websiteId } = await context.params;
   const body = await request.json();

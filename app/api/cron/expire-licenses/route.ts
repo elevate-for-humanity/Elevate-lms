@@ -28,7 +28,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (expErr) {
     logger.error('[cron/expire-licenses] Expire failed', expErr);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: expErr.message }, { status: 500 });
   }
 
   // Warn expiring soon
@@ -52,9 +52,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
         html: `<p>Hi ${profile.full_name ?? 'there'},</p><p>Your <strong>${lic.license_type ?? 'license'}</strong> (${lic.license_number ?? 'N/A'}) expires in <strong>${daysLeft} days</strong>. Please begin the renewal process immediately.</p><p>— Elevate for Humanity</p>`,
       }).catch((e: unknown) => logger.warn('[cron/expire-licenses] Warn email failed', { lic_id: lic.id, error: String(e) }));
     }
-    await Promise.resolve(
-      db.from('licenses').update({ expiry_warned_at: now.toISOString() }).eq('id', lic.id)
-    ).catch(() => {});
+    await db.from('licenses').update({ expiry_warned_at: now.toISOString() }).eq('id', lic.id)
     warned++;
   }
 

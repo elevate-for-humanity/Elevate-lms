@@ -25,7 +25,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/stale-applications] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   if (!stale?.length) {
@@ -40,7 +40,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (archiveErr) {
     logger.error('[cron/stale-applications] Archive failed', archiveErr);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: archiveErr.message }, { status: 500 });
   }
 
   logger.info('[cron/stale-applications] Archived stale applications', { archived: archived ?? ids.length });

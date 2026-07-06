@@ -3,7 +3,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getStripe, stripe } from '@/lib/stripe/client';
-import { CERTIPORT_EXAMS, CertiportExamCode } from '@/lib/partners/certiport';
+import { CERTIPORT_EXAMS, type CertiportExamCode } from '@/lib/partners/certiport';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';

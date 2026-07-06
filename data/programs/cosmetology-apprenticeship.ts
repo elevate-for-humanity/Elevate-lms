@@ -276,9 +276,9 @@ export const COSMETOLOGY: ProgramSchema = {
   deliveryModel: 'partner',
   deliveryModelDetail: 'hybrid',
   partnerProvider: 'milady',
-  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
+  fundingOptions: ['wioa', 'employer_paid', 'self_pay'],
   funding: {
-    fssa_eligible: true,
+    fssa_eligible: false,
     snap_et_eligible: true,
     wioa_eligible: false,   // NOT on Indiana ETPL — tuition not covered by WIOA
     etpl_approved: false,

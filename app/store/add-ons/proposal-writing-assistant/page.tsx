@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Sparkles, ArrowRight, AlertTriangle } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'Proposal Writing Assistant | Elevate Store',
   description: 'AI-assisted grant narrative writing grounded in your org data — no hallucinations, no fluff.',

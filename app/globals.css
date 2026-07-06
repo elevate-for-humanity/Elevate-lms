@@ -1512,18 +1512,10 @@ img:not([data-nimg]) {
 main .container,
 main .wrapper,
 .main-content {
-  max-width: 1400px;
+  max-width: 90vw;
   width: 100%;
   margin: 0 auto;
-  padding-inline: 1.5rem;
-}
-
-@media (min-width: 640px) {
-  main .container,
-  main .wrapper,
-  .main-content {
-    padding-inline: 2rem;
-  }
+  padding-inline: 3vw;
 }
 
 /* 2️⃣ Improve readability - font size only, color in @layer base */
@@ -1588,7 +1580,7 @@ footer {
   main .wrapper,
   .main-content {
     max-width: 100%;
-    padding-inline: 1rem;
+    padding-inline: 5vw;
   }
   body {
     font-size: 15px;
@@ -1735,12 +1727,10 @@ header[role='banner'] nav[aria-label='Main navigation'] {
   align-items: center !important;
   justify-content: center !important;
   min-width: 0 !important;
-  /* Must stay visible on both axes so the hover mega-menu (absolutely
-     positioned below the nav) is not clipped. Note: overflow-x:auto would
-     force overflow-y to compute to auto per spec and clip the dropdown.
-     This nav only renders at lg+, where the items fit. */
-  overflow: visible !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 
 header[role='banner'] nav[aria-label='Main navigation'] > div {

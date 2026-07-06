@@ -15,7 +15,7 @@ async function _POST(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   if (!isAIAvailable()) {
     return NextResponse.json({ error: 'AI features not configured' }, { status: 503 });

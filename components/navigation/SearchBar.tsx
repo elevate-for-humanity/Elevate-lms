@@ -292,8 +292,8 @@ export function SearchBar({
                 Results for "{query}"
               </div>
               {results.map((result, index) => {
-                const Icon = TYPE_ICONS[result.type];
-                const colorClass = TYPE_COLORS[result.type];
+                const Icon = TYPE_ICONS[result.type] ?? FileText;
+                const colorClass = TYPE_COLORS[result.type] ?? 'text-slate-600 bg-slate-100';
                 const isSelected = index === selectedIndex;
 
                 // Defensive: skip results without href

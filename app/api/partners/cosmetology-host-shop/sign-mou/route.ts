@@ -6,7 +6,6 @@ import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { autoEnroll } from '@/lib/enrollment/auto-enroll';
 import { COSMETOLOGY_PROGRAM_ID, COSMETOLOGY_COURSE_ID } from '@/lib/cosmetology/pricing';
-import { notifyElevateHostMouSigned } from '@/lib/email/notify-host-mou-signed';
 
 export const dynamic = 'force-dynamic';
 
@@ -109,22 +108,6 @@ export async function POST(req: NextRequest) {
   } else {
     logger.info(`Cosmetology partner enrolled: partner ${partner.id} — enrollment ${enrollResult.enrollmentId}`);
   }
-
-  const signedAtIso = signed_at ?? new Date().toISOString();
-  void notifyElevateHostMouSigned({
-    program: 'cosmetology',
-    organizationName: salon_name,
-    signerName: signer_name,
-    signerTitle: signer_title,
-    contactEmail: user.email ?? '',
-    supervisorName: supervisor_name,
-    supervisorLicense: supervisor_license,
-    compensationModel: compensation_model,
-    compensationRate: compensation_rate,
-    signatureData: signature_data,
-    signedAt: signedAtIso,
-    mouVersion: mou_version,
-  });
 
   logger.info(`Cosmetology MOU signed: partner ${partner.id} — ${salon_name}`);
   return NextResponse.json({ success: true, enrollmentId: enrollResult.enrollmentId ?? null }, { status: 200 });

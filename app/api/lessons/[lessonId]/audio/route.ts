@@ -290,6 +290,7 @@ type Params = Promise<{ lessonId: string }>;
 async function _GET(request: NextRequest, { params }: { params: Params }) {
   const { lessonId } = await params;
 
+
   const auth = await apiAuthGuard(request);
 
   const ctx = findLesson(lessonId);

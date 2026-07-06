@@ -1,18 +1,10 @@
 import { Metadata } from 'next';
 import StoreClientWrapper from './StoreClientWrapper';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { GuidedDemoChat } from '@/components/store/GuidedDemoChat';
 
 export const metadata: Metadata = {
   title: 'Store — License the Elevate Workforce Platform',
   description: 'Deploy a proven eligibility-to-placement workforce system. Self-serve plans from $99/month or enterprise licenses from $35,000. Built for workforce boards, training providers, and public-private partnerships.',
-  icons: {
-    icon: [
-      { url: '/favicon.ico', type: 'image/x-icon', sizes: '32x32' },
-      { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/favicon.png', type: 'image/png', sizes: '192x192' },
-    ],
-    apple: [{ url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
-  },
   keywords: [
     'workforce platform license',
     'LMS licensing',
@@ -59,7 +51,6 @@ export default function StoreLayout({
   return (
     <StoreClientWrapper>
       {children}
-      <GuidedDemoChat />
     </StoreClientWrapper>
   );
 }

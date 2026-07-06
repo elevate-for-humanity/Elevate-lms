@@ -79,7 +79,7 @@ function LoginForm() {
     // Check if already logged in and redirect away
     async function checkSession() {
       const supabase = createClient();
-      const user = safeGetUser(await supabase.auth.getUser());
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -337,7 +337,7 @@ function LoginForm() {
       <section className="relative h-[200px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/login-page-1.webp"
+          src="/images/pages/login-page-1.webp"
           alt={`${PLATFORM_DEFAULTS.orgName} login`}
           fill
           className="object-cover"

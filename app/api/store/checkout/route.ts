@@ -72,7 +72,7 @@ async function _POST(req: Request) {
       stripePriceId: resolvedStripePriceId,
       email,
       successUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/store/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/store/checkout/cancel`,
+      cancelUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/store/cancel`,
     });
 
     return Response.json({ sessionId: session.id, url: session.url });

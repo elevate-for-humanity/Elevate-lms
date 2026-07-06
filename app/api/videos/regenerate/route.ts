@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   let lessonId: string;
   try {
@@ -139,7 +139,7 @@ async function runRender(opts: {
       if (!uploadErr) {
         const { data: urlData } = adminDb.storage.from('course-videos').getPublicUrl(storagePath);
         storageUrl = urlData.publicUrl;
-        await unlink(localPath).catch(() => {});
+        await unlink(localPath).then(() => {}, () => {});
       }
     } catch {
       /* keep local URL */

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   const userId = auth.id;
 
   const { searchParams } = new URL(request.url);
@@ -46,7 +46,7 @@ export async function PATCH(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   let body: Record<string, any>;
   try {

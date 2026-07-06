@@ -54,7 +54,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
     const auth = await apiRequireAdmin(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
     const supabaseAdmin = await requireAdminClient();
 
     const { data: entities, error: entitiesError } = await supabaseAdmin
@@ -62,7 +62,7 @@ async function _POST(request: Request) {
       .select('*');
 
     if (entitiesError || !entities) {
-      logger.error(entitiesError);
+      logger.error('Entities error', entitiesError);
       return NextResponse.json({ error: 'Failed to fetch entities' }, { status: 500 });
     }
 
@@ -72,7 +72,7 @@ async function _POST(request: Request) {
       .gte('due_date', new Date().toISOString().slice(0, 10));
 
     if (grantsError || !grants) {
-      logger.error(grantsError);
+      logger.error('Grants error', grantsError);
       return NextResponse.json({ error: 'Failed to fetch grants' }, { status: 500 });
     }
 
@@ -102,7 +102,7 @@ async function _POST(request: Request) {
         );
 
         if (error) {
-          logger.error('Error upserting grant_match', grant.id, entity.id, error);
+          logger.error('Error upserting grant_match', { grantId: grant.id, entityId: entity.id }, error as Error);
         }
       }
     }

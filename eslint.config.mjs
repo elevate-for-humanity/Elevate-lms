@@ -59,6 +59,7 @@ export default tseslint.config(
       // react-refresh/only-export-components: Disabled - only affects HMR during development, not production
       'react-refresh/only-export-components': 'off',
       'no-undef': 'off',
+      'no-useless-assignment': 'off',
       'no-case-declarations': 'off',
       // Enforce structured logging via lib/logger.ts — console.log is banned in
       // application code. console.warn and console.error are allowed as fallbacks

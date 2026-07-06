@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Briefcase, Search, ArrowRight, BarChart3, ShieldCheck, FileText, Users } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'Workforce Grant Operations Hub | Elevate Store',
   description: 'Full grant operations platform — opportunity search, application pipeline, org profile, facts vault, and submission tracking.',

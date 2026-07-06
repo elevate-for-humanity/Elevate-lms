@@ -68,7 +68,7 @@ async function _GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
-    const user = safeGetUser(await supabase.auth.getUser());
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return redirect('error=unauthorized');
 
     const { error: saveError } = await supabase.from('social_media_settings').upsert({

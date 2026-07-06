@@ -4,7 +4,8 @@
  * Accepts a lesson_id from the admin course builder, creates a video_jobs row,
  * then fires the render pipeline asynchronously (non-blocking response).
  *
- * The render runs in the background on the container (Remotion + ffmpeg).
+ * The render runs in the background on the container which has
+ * ffmpeg, chromium, and Remotion's native binaries available.
  *
  * Flow:
  *   Admin POST lesson_id
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   let lessonId: string;
   try {

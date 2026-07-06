@@ -1,8 +1,8 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { z } from 'zod';
 import { createStoreProduct } from '@/lib/store/stripe-products';
-import { createClient } from '@/lib/supabase/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
@@ -102,3 +102,4 @@ async function _POST(req: NextRequest) {
   }
 }
 export const POST = withApiAudit('/api/store/create-product', _POST);
+

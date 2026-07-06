@@ -30,8 +30,7 @@ export default function BeautyDocumentsPage() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then((authRes) => {
-      const user = authRes.data?.user;
+    supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return;
       supabase
         .from('program_enrollments')
@@ -145,7 +144,7 @@ export default function BeautyDocumentsPage() {
                   <Loader2 className={`w-4 h-4 animate-spin ${c.spinner}`} />
                 )}
                 {governmentId.status === 'error' && (
-                  <span className="text-xs text-red-600">Upload failed — try again</span>
+                  <span className="text-xs text-red-600">Upload failed - try again</span>
                 )}
                 {governmentId.status === 'complete' && (
                   <button onClick={() => setGovernmentId(null)} className="text-slate-400 hover:text-red-500">
@@ -166,7 +165,7 @@ export default function BeautyDocumentsPage() {
         {/* Optional */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
           <div className="bg-slate-50 px-6 py-3 border-b border-slate-200">
-            <h2 className="text-sm font-bold text-slate-700">Optional — can submit later</h2>
+            <h2 className="text-sm font-bold text-slate-700">Optional - can submit later</h2>
           </div>
           <div className="p-6 space-y-4">
             {[

@@ -29,7 +29,7 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-  const user = safeGetUser(await supabase.auth.getUser());
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return safeError('Unauthenticated', 401);
 
   const { courseId } = await params;

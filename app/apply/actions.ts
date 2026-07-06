@@ -9,7 +9,7 @@ import { logger } from '@/lib/logger';
 import { sendWorkOneHoldEmail } from '@/lib/email/workone-hold';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-// info@elevateforhumanity.org removed — domain MX points to Resend/SES inbound
+// info@elevateforhumanity.org removed - domain MX points to Resend/SES inbound
 // but no mailbox exists there, so emails bounce and get re-suppressed in a loop.
 // Use only the Gmail address until MX records are updated or Resend forwarding is configured.
 const ADMIN_EMAILS = ['elevate4humanityedu@gmail.com'];
@@ -64,7 +64,7 @@ async function resolveCourseId(supabase: any, programInterest: string): Promise<
  * onboarding. Application stays 'pending' until onboarding is complete and
  * documents are verified, then auto-enrolls.
  *
- * Flow: pending → onboarding → docs verified → approved → enrolled
+ * Flow: pending -> onboarding -> docs verified -> approved -> enrolled
  */
 async function createStudentAccount(
   supabase: any,
@@ -88,7 +88,7 @@ async function createStudentAccount(
 
     // Use the password the student provided on the application form.
     // Fall back to a generated password only if none was provided (e.g. admin-initiated enrollment).
-    // Math.random() is predictable — use randomBytes for the fallback password.
+    // Math.random() is predictable - use randomBytes for the fallback password.
     const password = userPassword || (() => `EFH-${randomBytes(8).toString('hex')}-Temp!`)();
 
     // Check profiles first
@@ -132,7 +132,7 @@ async function createStudentAccount(
           { onConflict: 'id' },
         );
       } else if (createError) {
-        // User exists in auth but not profiles — look up directly by email
+        // User exists in auth but not profiles - look up directly by email
         const { data: authLookup } = await supabase
           .rpc('get_user_id_by_email', { user_email: normalizedEmail })
           .maybeSingle();
@@ -164,7 +164,7 @@ async function createStudentAccount(
     }
 
     if (!userId) {
-      logger.error('Account creation failed — could not create user', { email: normalizedEmail });
+      logger.error('Account creation failed - could not create user', { email: normalizedEmail });
       return { accountCreated: false };
     }
 
@@ -197,7 +197,7 @@ async function createStudentAccount(
       .update({ user_id: userId, program_id: programId })
       .eq('id', applicationId);
 
-    logger.info('Student account created — awaiting onboarding completion for enrollment', {
+    logger.info('Student account created - awaiting onboarding completion for enrollment', {
       applicationId,
       userId,
       email: normalizedEmail,
@@ -212,7 +212,7 @@ async function createStudentAccount(
 
 /**
  * Application submission.
- * On submit: save application (pending) → create auth user → send onboarding email.
+ * On submit: save application (pending) -> create auth user -> send onboarding email.
  * Enrollment is automatic after onboarding + document verification.
  * All inserts use admin client (service role) to bypass RLS.
  */
@@ -240,7 +240,7 @@ export interface StudentApplicationData extends BaseApplicationData {
   educationLevel?: string;
   goals?: string;
   /** 'inquiry' = information request only, no enrollment created.
-   *  'enrollment' = intent to enroll — requires payment or verified funding. */
+   *  'enrollment' = intent to enroll - requires payment or verified funding. */
   applicationType?: 'inquiry' | 'enrollment' | string;
   /** Override the default source tag written to the applications table. */
   source?: string;
@@ -350,7 +350,7 @@ async function insertApplication(payload: {
   source: string;
   fundingType?: string | null;
 }): Promise<
-  | { success: true; status?: 'submitted'; applicationId: string; referenceNumber: string; email?: string }
+  | { success: true; applicationId: string; referenceNumber: string; email?: string }
   | { success: false; error: string }
 > {
   let supabase: Awaited<ReturnType<typeof requireAdminClient>> | null = null;
@@ -384,7 +384,7 @@ async function insertApplication(payload: {
     const ctaLink = magicLink || `${siteUrl}/login`;
     const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
 
-    // ── Shared email chrome — clean white layout, single accent ──
+    // ---- Shared email chrome - clean white layout, single accent ----
     const emailHeader = [
       `<div style="max-width:600px;margin:0 auto;font-family:Georgia,serif;color:#1a1a1a;background:#ffffff">`,
       `<div style="text-align:center;padding:32px 24px 24px">`,
@@ -392,7 +392,7 @@ async function insertApplication(payload: {
       `<img src="${logoUrl}" alt="${PLATFORM_DEFAULTS.orgName}" width="160" style="max-width:160px;height:auto" />`,
       `</div>`,
       `<div style="padding:0 32px 32px">`,
-    ].join('');
+    ].join(``);
     const emailFooter = [
       `<div style="border-top:1px solid #e0e0e0;margin-top:32px;padding-top:20px;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#999">`,
       `<p style="margin:0 0 4px">${PLATFORM_DEFAULTS.orgName} Career & Technical Institute</p>`,
@@ -402,7 +402,7 @@ async function insertApplication(payload: {
       `</div></div>`,
     ].join('');
 
-    // ── ETPL program lists ──
+    // ---- ETPL program lists ----
     const etplPrograms = [
       'Building Maintenance',
       'Building Maintenance Technician',
@@ -433,12 +433,12 @@ async function insertApplication(payload: {
       'Tax Preparation',
     ];
 
-    const etplList = etplPrograms.map((p) => `<li style="padding:1px 0">${p}</li>`).join('');
+    const etplList = etplPrograms.map((p) => "<li style=\"padding:1px 0\">" + p + "</li>").join("");
     const waitlistList = waitlistPrograms
-      .map((p) => `<li style="padding:1px 0">${p}</li>`)
-      .join('');
+      .map((p) => "<li style=\"padding:1px 0\">" + p + "</li>")
+      .join("");
 
-    // Login reminder — no password in email, student set it on the form
+    // Login reminder - no password in email, student set it on the form
     const credentialsBlock = [
       `<table style="width:100%;border-collapse:collapse;margin:20px 0;border:1px solid #e0e0e0">`,
       `<tr style="background:#f9f9f9"><td colspan="2" style="padding:12px 16px;font-weight:bold;font-size:14px;border-bottom:1px solid #e0e0e0">Your Login</td></tr>`,
@@ -446,15 +446,15 @@ async function insertApplication(payload: {
       `<tr><td style="padding:10px 16px;color:#666">Password</td><td style="padding:10px 16px">The password you created on the application form</td></tr>`,
       `</table>`,
       `<p style="margin:0 0 20px;font-size:13px;color:#888;font-family:Arial,sans-serif">Forgot your password? Reset it anytime at <a href="${siteUrl}/reset-password" style="color:#888">${siteUrl}/reset-password</a></p>`,
-    ].join('');
+    ].join("");
 
-    // Admin notification FIRST — send before student email so serverless
+    // Admin notification FIRST - send before student email so serverless
     // timeout doesn't prevent admin from being notified about new applications.
-    const adminSubject = `[NEW APPLICATION] ${payload.firstName} ${payload.lastName} — ${programLabel} [${referenceNumber}]`;
+    const adminSubject = `[NEW APPLICATION] ${payload.firstName} ${payload.lastName} - ${programLabel} [${referenceNumber}]`;
     const adminHtml = [
       emailHeader,
       `<h3>New ${payload.source.replace(/-/g, ' ')}</h3>`,
-      `<p style="color:#1d4ed8"><strong>Status: SUBMITTED — applicant account created, pending admin review</strong></p>`,
+      `<p style="color:#16a34a"><strong>Status: APPROVED - applicant account created and enrolled automatically</strong></p>`,
       `<table style="border-collapse:collapse;width:100%;max-width:500px">`,
       `<tr><td style="padding:6px;font-weight:bold">Name</td><td style="padding:6px">${payload.firstName} ${payload.lastName}</td></tr>`,
       `<tr><td style="padding:6px;font-weight:bold">Email</td><td style="padding:6px"><a href="mailto:${payload.email}">${payload.email}</a></td></tr>`,
@@ -470,7 +470,7 @@ async function insertApplication(payload: {
       emailFooter,
     ]
       .filter(Boolean)
-      .join('');
+      .join("");
 
     await Promise.allSettled(
       ADMIN_EMAILS.map((addr) => sendEmailDirect(addr, adminSubject, adminHtml)),
@@ -482,14 +482,22 @@ async function insertApplication(payload: {
       });
     });
 
-    // Always send the applicant confirmation immediately after persistence.
-    // Payment-gated programs may send additional checkout/onboarding emails later,
-    // but the applicant still needs a reference number and login instructions now.
+    // Barber Apprenticeship requires payment before onboarding.
+    // Student welcome email is sent by the Stripe webhook after checkout.session.completed.
+    // Only the admin notification fires here.
+    const isPaymentGated = payload.programInterest.toLowerCase().includes('barber');
+    if (isPaymentGated) {
+      logger.info(
+        '[Apply] Skipping student welcome email - payment-gated program, webhook will send after payment',
+        { email: payload.email },
+      );
+      return;
+    }
 
     // Send student confirmation email
     await sendEmailDirect(
       payload.email,
-      `Welcome to ${PLATFORM_DEFAULTS.orgName} — ${programLabel} [${referenceNumber}]`,
+      `Welcome to ${PLATFORM_DEFAULTS.orgName} - ${programLabel} [${referenceNumber}]`,
       [
         emailHeader,
 
@@ -499,7 +507,7 @@ async function insertApplication(payload: {
 
         `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">We've created your account. You can log in using the email and password you provided on the application form.</p>`,
 
-        // Onboarding — first thing after greeting
+        // Onboarding - first thing after greeting
         `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Your Next Steps</h3>`,
         `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">Log in and complete your onboarding to secure your spot:</p>`,
         `<ol style="margin:0 0 20px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
@@ -521,11 +529,11 @@ async function insertApplication(payload: {
         // Credentials
         credentialsBlock,
 
-        // CTA — schedule meeting
+        // CTA - schedule meeting
         `<div style="text-align:center;margin:28px 0">`,
         `<a href="${siteUrl}/schedule-consultation" style="display:inline-block;padding:14px 40px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:6px;font-family:Arial,sans-serif;font-weight:bold;font-size:15px">Schedule a Meeting with an Advisor</a>`,
         `</div>`,
-        `<p style="text-align:center;font-size:13px;color:#888;font-family:Arial,sans-serif;margin:-12px 0 24px">We'll walk you through your options — no commitment required.</p>`,
+        `<p style="text-align:center;font-size:13px;color:#888;font-family:Arial,sans-serif;margin:-12px 0 24px">We'll walk you through your options - no commitment required.</p>`,
 
         // Divider
         `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
@@ -533,7 +541,7 @@ async function insertApplication(payload: {
         // Funding section
         `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">How Funding Works</h3>`,
 
-        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">Many of our programs are listed on Indiana's <strong>Eligible Training Provider List (ETPL)</strong>, which means they can be fully funded through WIOA or other workforce grants — at no cost to you.</p>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">Many of our programs are listed on Indiana's <strong>Eligible Training Provider List (ETPL)</strong>, which means they can be fully funded through WIOA or other workforce grants - at no cost to you.</p>`,
 
         // ETPL programs
         `<p style="font-size:14px;font-weight:bold;margin:20px 0 8px">Programs eligible for federal funding:</p>`,
@@ -547,7 +555,7 @@ async function insertApplication(payload: {
         `<li>Visit <a href="https://www.indianacareerconnect.com" style="color:#1a1a1a;font-weight:bold">www.indianacareerconnect.com</a> and create an account</li>`,
         `<li>Schedule an appointment with your local WorkOne office</li>`,
         `<li>Let them know you'd like to enroll in <strong>${programLabel}</strong> at ${PLATFORM_DEFAULTS.orgName}</li>`,
-        `<li>They'll confirm your eligibility and issue a training voucher</li>`,
+        `<li> They'll confirm your eligibility and issue a training voucher</li>`,
         `</ol>`,
 
         // Divider
@@ -565,11 +573,11 @@ async function insertApplication(payload: {
 
         // Self-pay
         `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Don't Want to Wait? Start Now</h3>`,
-        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">If you'd rather not wait for funding approval — or if your program isn't on the ETPL yet — you can begin classes right away with one of these options:</p>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">If you'd rather not wait for funding approval - or if your program isn't on the ETPL yet - you can begin classes right away with one of these options:</p>`,
         `<ul style="margin:0 0 16px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
-        `<li><strong>Self-Pay</strong> — pay tuition upfront and start immediately</li>`,
-        `<li><strong>Buy Now, Pay Later</strong> — split your tuition into monthly payments</li>`,
-        `<li><strong>Deposit + Payment Plan</strong> — put down a deposit and pay the balance over time</li>`,
+        `<li><strong>Self-Pay</strong> - pay tuition upfront and start immediately</li>`,
+        `<li><strong>Buy Now, Pay Later</strong> - split your tuition into monthly payments</li>`,
+        `<li><strong>Deposit + Payment Plan</strong> - put down a deposit and pay the balance over time</li>`,
         `</ul>`,
         `<p style="font-size:14px;line-height:1.7;margin:0 0 16px">To discuss which option works best for you, <a href="${siteUrl}/schedule-consultation" style="color:#1a1a1a;font-weight:bold">schedule a Zoom meeting</a> with our enrollment team or call us at <strong>${PLATFORM_DEFAULTS.supportPhone}</strong>.</p>`,
 
@@ -581,7 +589,7 @@ async function insertApplication(payload: {
         `<p style="font-size:12px;color:#999;font-family:Arial,sans-serif;margin:16px 0 0">Ref: ${referenceNumber}</p>`,
 
         emailFooter,
-      ].join(''),
+      ].join(""),
     ).catch((err) => {
       logger.error(
         '[Apply] Student confirmation email failed:',
@@ -590,7 +598,7 @@ async function insertApplication(payload: {
     });
   }
 
-  // Path A: DB available — insert application, admin enrolls later
+  // Path A: DB available - insert application, admin enrolls later
   if (supabase) {
     try {
       // Resolve program_id from slug so admin dashboard can approve without guessing
@@ -659,7 +667,7 @@ async function insertApplication(payload: {
       } else {
         // Derive the profile role and onboarding destination from the application source.
         // These are passed into createStudentAccount so the profile is written correctly
-        // on first creation — no post-hoc correction needed.
+        // on first creation - no post-hoc correction needed.
         const roleBySource: Record<string, string> = {
           'student-application': 'student',
           'employer-application': 'employer',
@@ -688,7 +696,7 @@ async function insertApplication(payload: {
           onboardingPath,
         );
 
-        // Audit log — non-blocking
+        // Audit log - non-blocking
         Promise.resolve(
           supabase.from('audit_logs').insert({
             event_type: 'application_submitted',
@@ -704,7 +712,7 @@ async function insertApplication(payload: {
           })
         ).catch((err: unknown) => logger.warn('[Apply] Audit log failed (non-fatal)', err));
 
-        // Application lands in admin queue as 'submitted' — admin reviews and approves.
+        // Application lands in admin queue as 'submitted' - admin reviews and approves.
         // Approval requires funding verification or a paid Stripe session before enrollment.
         logger.info('[Apply] Application submitted, pending admin review', {
           applicationId: data.id,
@@ -737,7 +745,7 @@ async function insertApplication(payload: {
     }
   }
 
-  // Path B: hard failure — never report success when no DB record exists.
+  // Path B: hard failure - never report success when no DB record exists.
   logger.error(
     `[Application] Submission failed before persistence [ref=${referenceNumber}] [source=${payload.source}] [email=${payload.email}] [reason=${persistenceFailureReason}]`,
     new Error(persistenceFailureReason),
@@ -811,7 +819,7 @@ export async function submitStudentApplication(data: StudentApplicationData) {
     supabase = await requireAdminClient();
   } catch (err) {
     logger.error(
-      '[Apply] getAdminClient failed in submitStudentApplication — eligibility fields not persisted',
+      '[Apply] getAdminClient failed in submitStudentApplication - eligibility fields not persisted',
       err,
     );
   }
@@ -821,7 +829,7 @@ export async function submitStudentApplication(data: StudentApplicationData) {
       ['workone', 'workforce_ready_grant'].includes(requestedSource) && !data.hasWorkOneApproval;
 
     const elig = data.eligibilityData;
-    // 'incomplete' is not a valid eligibility_status value — use 'pending' as the default
+    // 'incomplete' is not a valid eligibility_status value - use 'pending' as the default
     const eligStatus = elig?.eligibilityStatus ?? 'pending';
     const fundingStatus =
       elig?.hasSnap || elig?.hasTanf || elig?.hasReferral
@@ -907,7 +915,7 @@ export async function submitStudentApplication(data: StudentApplicationData) {
       logger.error('[Apply] Failed to persist funding eligibility fields', updateErr);
     }
 
-    // Send WorkOne hold email — non-blocking, failure does not abort the submission
+    // Send WorkOne hold email - non-blocking, failure does not abort the submission
     if (needsWorkOne && !updateErr) {
       sendWorkOneHoldEmail({
         firstName: data.firstName,
@@ -938,7 +946,7 @@ export async function submitStudentApplication(data: StudentApplicationData) {
 }
 
 export async function submitProgramHolderApplication(data: ProgramHolderApplicationData) {
-  // Server-side validation — browser required attrs are not enforcement
+  // Server-side validation - browser required attrs are not enforcement
   const firstName = data.firstName?.trim();
   const lastName = data.lastName?.trim();
   const email = data.email?.trim().toLowerCase();
@@ -979,7 +987,7 @@ export async function submitProgramHolderApplication(data: ProgramHolderApplicat
   });
 
   if (result.success) {
-    // Create program_holders row and set role immediately — no admin approval needed.
+    // Create program_holders row and set role immediately - no admin approval needed.
     // Entire provisioning block is wrapped in try/catch so a failure here
     // never blocks the user from reaching the confirmation page.
     try {
@@ -1087,7 +1095,7 @@ async function ensureProgramHolderAccount(
   }
 
   if (!userId) {
-    logger.error('[Apply] Unable to provision program holder auth account', undefined, {
+    logger.error('[Apply] Unable to provision program holder auth account', {
       email: normalizedEmail,
       organizationName,
     });
@@ -1144,13 +1152,13 @@ async function sendProgramHolderWelcomeEmail(
 ) {
   const sgKey = process.env.SENDGRID_API_KEY;
   if (!sgKey) {
-    logger.warn('[Apply] SENDGRID_API_KEY not set — skipping program holder password setup email');
+    logger.warn('[Apply] SENDGRID_API_KEY not set - skipping program holder password setup email');
     return;
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
 
-  // Generate a password setup link — recovery links work for both new and existing accounts
+  // Generate a password setup link - recovery links work for both new and existing accounts
   // without requiring an invite-specific flow, while still forcing a password reset.
   // The full welcome email fires separately after all onboarding steps are complete.
   let setupLink = `${siteUrl}/login`;
@@ -1192,16 +1200,16 @@ async function sendProgramHolderWelcomeEmail(
           <img src="${logoUrl}" alt="${PLATFORM_DEFAULTS.orgName}" width="140" style="max-width:140px;height:auto" />
         </td></tr>
         <tr><td style="padding:32px">
-          <h2 style="color:#1a1a1a;font-size:20px;margin:0 0 16px">Hi ${opts.firstName} — set your password to begin onboarding</h2>
+          <h2 style="color:#1a1a1a;font-size:20px;margin:0 0 16px">Hi ${opts.firstName} - set your password to begin onboarding</h2>
           <p style="color:#334155;font-size:15px;line-height:1.7;margin:0 0 16px">
             Your Program Holder account for <strong>${opts.organizationName}</strong> has been created with
-            <strong>${PLATFORM_DEFAULTS.orgName}</strong>. Click below to set your password — you will need it to
+            <strong>${PLATFORM_DEFAULTS.orgName}</strong>. Click below to set your password - you will need it to
             log in and complete your onboarding steps.
           </p>
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr><td align="center" style="padding:8px 0 28px">
               <a href="${setupLink}" style="display:inline-block;background:#1d4ed8;color:#fff;text-decoration:none;padding:14px 36px;border-radius:6px;font-weight:bold;font-size:16px">
-                Set My Password →
+                Set My Password ->
               </a>
             </td></tr>
           </table>
@@ -1241,7 +1249,7 @@ async function sendProgramHolderWelcomeEmail(
         from: { email: PLATFORM_DEFAULTS.emailFromAddress, name: PLATFORM_DEFAULTS.orgName },
         reply_to: { email: 'elevate4humanityedu@gmail.com', name: PLATFORM_DEFAULTS.orgName },
         personalizations: [{ to: [{ email: opts.email, name: opts.firstName }] }],
-        subject: `Welcome — Complete Your Program Holder Onboarding [${opts.referenceNumber}]`,
+        subject: `Welcome - Complete Your Program Holder Onboarding [${opts.referenceNumber}]`,
         content: [{ type: 'text/html', value: html }],
       }),
     });

@@ -164,3 +164,6 @@ export function SearchDialog() {
     </Dialog>
   );
 }
+
+// Default export for next/dynamic
+export default SearchDialog;

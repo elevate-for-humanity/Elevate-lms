@@ -19,7 +19,7 @@ async function _POST(req: Request) {
   try {
 
     const auth = await apiRequireAdmin(req);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const body = await req.json();
     const parsed = connectCreateSchema.safeParse(body);

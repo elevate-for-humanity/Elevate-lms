@@ -23,10 +23,6 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
-
 async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'contact');
@@ -127,7 +123,8 @@ async function _POST(request: NextRequest) {
     );
 
     if (!resolution.ok) {
-      return NextResponse.json({ error: resolution.error }, { status: resolution.status });
+      const errorResult = resolution as { ok: false; error: string; status: number };
+      return NextResponse.json({ error: errorResult.error }, { status: errorResult.status });
     }
 
     const supabase = await createClient();

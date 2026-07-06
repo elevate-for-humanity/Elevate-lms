@@ -5,7 +5,7 @@ import { ArrowRight, ArrowLeft, Play, Building2, DollarSign, Briefcase, FileSear
 
 export const metadata: Metadata = {
   title: 'Enterprise Infrastructure Demo',
-  description: 'See how workforce boards and regional systems govern programs without direct operational involvement.',
+  keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'See how workforce boards and regional systems govern programs without direct operational involvement.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/demo/enterprise',
   },
@@ -15,14 +15,14 @@ const demoSteps = [
   {
     step: 1,
     title: 'Multi-Tenant Overview',
-    description: 'Multiple organizations with regional rollups visible from single dashboard.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Multiple organizations with regional rollups visible from single dashboard.',
     icon: Building2,
     detail: 'Workforce boards see all providers. Regional operators see their territory. Each tenant isolated but aggregated for oversight.',
   },
   {
     step: 2,
     title: 'Funding Oversight',
-    description: 'WIOA / WRG / JRI views with outcome tracking across all programs.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'WIOA / WRG / JRI views with outcome tracking across all programs.',
     icon: DollarSign,
     detail: 'Track funding utilization by source. See outcomes by funding type. Compliance data aggregated automatically.',
   },
@@ -36,21 +36,21 @@ const demoSteps = [
   {
     step: 4,
     title: 'Audit Trail',
-    description: 'Event logs showing every action, status change, and decision point.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Event logs showing every action, status change, and decision point.',
     icon: FileSearch,
     detail: 'Full audit history. Who did what, when, and why. Exportable for compliance reviews and external audits.',
   },
   {
     step: 5,
     title: 'AI Avatar Support',
-    description: 'Learner guidance without staff intervention.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Learner guidance without staff intervention.',
     icon: Bot,
     detail: 'Avatar answers eligibility questions, explains requirements, guides applications. Staff freed from repetitive inquiries.',
   },
   {
     step: 6,
     title: 'Export & Reporting',
-    description: 'Downloadable reports for any time period, funding source, or program.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Downloadable reports for any time period, funding source, or program.',
     icon: Download,
     detail: 'Generate compliance reports on demand. Export to CSV, PDF. Data formatted for federal and state reporting requirements.',
   },

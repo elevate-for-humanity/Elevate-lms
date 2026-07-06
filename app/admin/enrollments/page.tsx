@@ -19,7 +19,7 @@ export default async function AdminEnrollmentsPage({
 }: {
   searchParams: Promise<{ program?: string; status?: string }>;
 }) {
-  await requireRole(['admin', 'staff']);
+  await requireRole(['admin', 'super_admin', 'staff']);
   const params = await searchParams;
   const programFilter = params.program || '';
   const statusFilter = params.status || '';
@@ -81,11 +81,6 @@ export default async function AdminEnrollmentsPage({
     .from('cohorts')
     .select('id, name, code, status')
     .eq('status', 'active')
-    .order('name');
-  const { data: hostShops } = await db
-    .from('organizations')
-    .select('id, name')
-    .eq('is_active', true)
     .order('name');
 
   const allEnrollments = enrollments;
@@ -184,7 +179,6 @@ export default async function AdminEnrollmentsPage({
         users={users || []}
         courses={(coursesRaw || []).map((c: any) => ({ id: c.id, title: c.title }))}
         cohorts={cohortsRaw || []}
-        hostShops={(hostShops || []).map((s: any) => ({ id: s.id, name: s.name }))}
         stats={stats}
       />
     </AdminPageShell>

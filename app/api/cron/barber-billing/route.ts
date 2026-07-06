@@ -28,7 +28,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/barber-billing] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   if (!due?.length) return NextResponse.json({ ok: true, processed: 0 });
@@ -67,13 +67,13 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       }).catch((e: unknown) => logger.warn('[cron/barber-billing] Email failed', { sub_id: sub.id, error: String(e) }));
     }
 
-    await emitEvent('payment.barber_cycle_processed', 'payment', {
+    await emitEvent('billing.barber_cycle_processed', 'billing', {
       actor_type: 'cron',
       subject_id: sub.student_id,
       subject_type: 'student',
       payload: { subscription_id: sub.id, amount_cents: sub.amount_cents, next_billing_date: nextDate.toISOString().split('T')[0] },
       message: `Barber billing cycle processed for ${profile?.full_name ?? sub.student_id}`,
-    }).catch(() => {});
+    }).then(() => {}, () => {});
 
     processed++;
   }

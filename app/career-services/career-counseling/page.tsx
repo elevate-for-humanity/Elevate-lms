@@ -1,65 +1,25 @@
-import { buildMetadata } from '@/lib/cf-seo';
-import { siteConfig } from '@/content/cf-site';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { Metadata } from 'next';
+import Link from 'next/link';
 
-export const metadata = buildMetadata({
-  title: 'Career Counseling',
-  description: '{PLATFORM_DEFAULTS.orgName} career services — Career Counseling.',
-  path: '/career-services/career-counseling',
-});
+export const metadata: Metadata = {
+  title: 'Career Counseling | Elevate for Humanity',
+  keywords: ["services", "workforce development", "training programs"], description: 'Career Counseling page content.',
+};
 
 export default function Page() {
   return (
-    <PublicLandingPage
-      config={{
-        breadcrumbs: [{ label: 'Career Services', href: '/career-services' }, { label: 'Career Counseling' }],
-        hero: {
-          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp',
-          tag: 'Career Counseling',
-          tagColor: 'text-brand-blue-600',
-          title: 'Plan Your Career Path',
-          subtitle: 'One-on-one sessions with a career counselor to map your credential pathway, set salary targets, and build a job search strategy.',
-        },
-        intro: {
-          heading: 'Career Counseling for Real Outcomes',
-          paragraphs: [
-            'Career counseling at Elevate is not generic advice. Sessions are focused on your specific program, your local job market, and the employers who hire our graduates. We help you understand what credentials to pursue, what wages to expect, and how to position yourself for the jobs you want.',
-            'Available to all enrolled students and graduates at no additional cost.',
-          ],
-          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
-        },
-        features: {
-          heading: 'What We Cover',
-          items: [
-            'Career pathway mapping: which credentials lead where',
-            'Local labor market data: wages, demand, and top employers',
-            'Resume and LinkedIn profile review',
-            'Interview preparation and salary negotiation coaching',
-            'Job search strategy and employer targeting',
-            'Credential renewal and continuing education planning',
-            'Career change planning for mid-career adults',
-            'Referrals to employer partners actively hiring graduates',
-          ],
-        },
-        steps: {
-          heading: 'How to Schedule',
-          items: [
-            { title: 'Contact Career Services', desc: 'Email or call to request a counseling appointment.' },
-            { title: 'Complete a Brief Intake', desc: 'Tell us your program, goals, and timeline so we can prepare.' },
-            { title: 'Meet With Your Counselor', desc: 'In-person or virtual sessions, typically 45–60 minutes.' },
-            { title: 'Follow Up', desc: 'We check in at 30 and 90 days to track your progress and adjust the plan.' },
-          ],
-        },
-        cta: {
-          heading: 'Schedule a Session',
-          subtitle: `Free for all enrolled students and graduates. Call ${PLATFORM_DEFAULTS.supportPhone} to schedule.`,
-          primaryLabel: 'Contact Career Services',
-          primaryHref: '/contact',
-          secondaryLabel: 'All Career Services',
-          secondaryHref: '/career-services',
-          bgColor: 'bg-brand-blue-700',
-        },
-      }}
-    />
+    <div className="min-h-screen bg-slate-50">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold">Career Counseling</h1>
+          <p className="text-blue-200">Workforce development resources.</p>
+        </div>
+      </section>
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
+        </div>
+      </section>
+    </div>
   );
 }

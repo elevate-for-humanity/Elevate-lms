@@ -1,65 +1,25 @@
-import { buildMetadata } from '@/lib/cf-seo';
-import { siteConfig } from '@/content/cf-site';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { Metadata } from 'next';
+import Link from 'next/link';
 
-export const metadata = buildMetadata({
-  title: 'Interview Prep',
-  description: '{PLATFORM_DEFAULTS.orgName} career services — Interview Prep.',
-  path: '/career-services/interview-prep',
-});
+export const metadata: Metadata = {
+  title: 'Interview Prep | Elevate for Humanity',
+  keywords: ["services", "workforce development", "training programs"], description: 'Interview Prep page content.',
+};
 
 export default function Page() {
   return (
-    <PublicLandingPage
-      config={{
-        breadcrumbs: [{ label: 'Career Services', href: '/career-services' }, { label: 'Interview Prep' }],
-        hero: {
-          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-2.jpg',
-          tag: 'Interview Preparation',
-          tagColor: 'text-brand-blue-600',
-          title: 'Walk In Confident',
-          subtitle: 'Mock interviews, industry-specific coaching, and salary negotiation guidance — so you are ready when the opportunity comes.',
-        },
-        intro: {
-          heading: 'Industry-Specific Interview Coaching',
-          paragraphs: [
-            'Generic interview advice does not work for skilled trades, healthcare, or technical roles. Our coaching is specific to your field — the questions employers actually ask, the certifications they verify, and the red flags they watch for.',
-            'Available to all enrolled students and graduates at no cost.',
-          ],
-          image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-services-page-1.webp',
-        },
-        features: {
-          heading: 'What We Cover',
-          items: [
-            'Mock interviews with field-specific questions',
-            'STAR method coaching for behavioral questions',
-            'Technical question preparation by credential type',
-            'Professional appearance and presentation guidance',
-            'Salary research and negotiation strategy',
-            'Background check and reference preparation',
-            'Video interview practice for remote positions',
-            'Follow-up email and thank-you note templates',
-          ],
-        },
-        steps: {
-          heading: 'How It Works',
-          items: [
-            { title: 'Schedule a Session', desc: 'Contact career services to book a 45-minute interview prep session.' },
-            { title: 'Share Your Target Role', desc: 'Tell us the job title and employer so we can tailor the coaching.' },
-            { title: 'Run the Mock Interview', desc: 'We conduct a realistic interview and give detailed feedback.' },
-            { title: 'Refine and Repeat', desc: 'Most students do 2–3 sessions before their first real interview.' },
-          ],
-        },
-        cta: {
-          heading: 'Book Interview Prep',
-          subtitle: `Free for all enrolled students and graduates. Call ${PLATFORM_DEFAULTS.supportPhone} to book.`,
-          primaryLabel: 'Contact Career Services',
-          primaryHref: '/contact',
-          secondaryLabel: 'All Career Services',
-          secondaryHref: '/career-services',
-          bgColor: 'bg-brand-blue-700',
-        },
-      }}
-    />
+    <div className="min-h-screen bg-slate-50">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold">Interview Prep</h1>
+          <p className="text-blue-200">Workforce development resources.</p>
+        </div>
+      </section>
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
+        </div>
+      </section>
+    </div>
   );
 }

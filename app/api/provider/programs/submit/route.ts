@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -70,7 +72,7 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   if (!auth.role || !SUBMIT_ROLES.has(auth.role)) {
     return safeError('Forbidden', 403);
   }
@@ -142,3 +144,4 @@ export async function POST(request: NextRequest) {
     return safeInternalError(error, 'Provider program submission failed');
   }
 }
+

@@ -12,7 +12,7 @@ declare global {
 }
 
 export function ZendeskWidget({ user }: { user?: { id: string; email: string; name?: string } }) {
-  useEffect(() => {
+  useEffect((): void => {
     if (!process.env.NEXT_PUBLIC_ZENDESK_KEY) return;
 
     const script = document.createElement('script');

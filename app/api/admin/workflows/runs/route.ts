@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 // GET /api/admin/workflows/runs — recent runs across all workflows
 export async function GET(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const db = await requireAdminClient();
   const url = new URL(request.url);
@@ -23,6 +23,6 @@ export async function GET(request: NextRequest) {
   if (workflowId) q = q.eq('workflow_id', workflowId) as typeof q;
 
   const { data, error } = await q;
-  if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ runs: data ?? [] });
 }

@@ -11,7 +11,7 @@ async function _GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const auth = await requireAuth(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const cards = await getStoreCards();
     return NextResponse.json(cards);

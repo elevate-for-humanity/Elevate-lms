@@ -1,5 +1,3 @@
-'use client';
-
 import { Award, ExternalLink } from 'lucide-react';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { formatCredentialAuthorityLine } from '@/lib/programs/format-credential';

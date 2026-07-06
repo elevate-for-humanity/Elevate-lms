@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function LmsIntegrationsPage() {
-  await requireRole(['admin']);
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
   // Fetch relevant data
@@ -37,7 +37,7 @@ export default async function LmsIntegrationsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-partners-lms-detail.webp"
+          src="/images/pages/admin-partners-lms-detail.webp"
           alt="Lms Integrations"
           fill
           className="object-cover"

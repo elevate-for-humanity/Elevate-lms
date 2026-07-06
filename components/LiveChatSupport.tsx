@@ -23,7 +23,6 @@ const INITIAL_MESSAGES: Message[] = [
 export function LiveChatSupport() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
-  // eslint-disable-next-line no-useless-assignment -- used in JSX render below
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [sessionId, setSessionId] = useState<string | null>(null);
 

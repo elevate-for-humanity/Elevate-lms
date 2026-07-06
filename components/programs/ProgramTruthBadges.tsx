@@ -36,9 +36,9 @@ interface DeliveryBadgeProps {
 }
 
 export function DeliveryBadge({ model }: DeliveryBadgeProps) {
-  const Icon = DELIVERY_ICONS[model];
-  const label = DELIVERY_LABELS[model];
-  const color = DELIVERY_COLORS[model];
+  const Icon = DELIVERY_ICONS[model] ?? Monitor;
+  const label = DELIVERY_LABELS[model] ?? model;
+  const color = DELIVERY_COLORS[model] ?? 'bg-slate-100 text-slate-600 border-slate-200';
 
   return (
     <span

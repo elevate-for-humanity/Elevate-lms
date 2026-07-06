@@ -6,6 +6,7 @@ import { CPR_PRICE_CENTS, CPR_PROGRAM_SLUG } from '@/lib/cpr/pricing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getStripeMethodsForAmount } from '@/lib/bnpl-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import type Stripe from 'stripe';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
       ui_mode: 'embedded',
       redirect_on_completion: 'never',
       customer: customerId,
-      payment_method_types: paymentMethods,
+      payment_method_types: paymentMethods as Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
       line_items: [
         {
           price_data: {

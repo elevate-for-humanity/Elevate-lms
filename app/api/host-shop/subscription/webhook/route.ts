@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { constructWebhookEvent } from '@/lib/stripe/construct-webhook-event';
+import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 import type Stripe from 'stripe';
 
 export const runtime = 'nodejs';
@@ -31,7 +32,8 @@ async function _POST(request: NextRequest) {
 
   let event: Stripe.Event;
   try {
-    event = constructWebhookEvent(payload, sig);
+    const stripe = await getStripeServer();
+    event = constructWebhookEvent(stripe, payload, sig);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     logger.error('Host shop subscription webhook: signature verification failed', undefined, { error: msg });
@@ -47,29 +49,37 @@ async function _POST(request: NextRequest) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription;
+        const subData = subscription as unknown as {
+          id: string;
+          customer: string;
+          status: string;
+          items: { data: Array<{ price: { product: string } }> };
+          billing_cycle_anchor: number;
+          current_period_end?: number;
+        };
         
         logger.info('Subscription update', {
-          subscriptionId: subscription.id,
-          customerId: subscription.customer,
-          status: subscription.status,
-          tier: subscription.items.data[0]?.price?.product,
+          subscriptionId: subData.id,
+          customerId: subData.customer,
+          status: subData.status,
+          tier: subData.items.data[0]?.price?.product,
         });
 
-        const productId = subscription.items.data[0]?.price?.product as string;
+        const productId = subData.items.data[0]?.price?.product as string;
         const tier = TIER_PRICES[productId] || 'free';
 
         if (adminDb) {
           await adminDb
             .from('host_shop_partnerships')
             .update({
-              stripe_subscription_id: subscription.id,
+              stripe_subscription_id: subData.id,
               partner_tier: tier,
-              subscription_status: subscription.status,
-              subscription_start_date: new Date(subscription.current_period_start * 1000).toISOString(),
-              current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-              status: subscription.status === 'active' ? 'active' : 'suspended',
+              subscription_status: subData.status,
+              subscription_start_date: new Date(subData.billing_cycle_anchor * 1000).toISOString(),
+              current_period_end: subData.current_period_end ? new Date(subData.current_period_end * 1000).toISOString() : null,
+              status: subData.status === 'active' ? 'active' : 'suspended',
             })
-            .eq('stripe_subscription_id', subscription.id);
+            .eq('stripe_subscription_id', subData.id);
         }
         break;
       }
@@ -95,13 +105,14 @@ async function _POST(request: NextRequest) {
 
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice;
+        const invoiceData = invoice as unknown as { id: string; subscription?: string | { id?: string } };
         // Stripe SDK v19+ returns subscription as object or string
-        const subscriptionId = typeof invoice.subscription === 'object' 
-          ? (invoice.subscription as { id?: string })?.id 
-          : invoice.subscription;
+        const subscriptionId = typeof invoiceData.subscription === 'object' 
+          ? (invoiceData.subscription as { id?: string })?.id 
+          : invoiceData.subscription;
         
         logger.info('Subscription payment succeeded', {
-          invoiceId: invoice.id,
+          invoiceId: invoiceData.id,
           subscriptionId,
         });
         break;
@@ -109,13 +120,14 @@ async function _POST(request: NextRequest) {
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
+        const invoiceData = invoice as unknown as { id: string; subscription?: string | { id?: string } };
         // Stripe SDK v19+ returns subscription as object or string
-        const subscriptionId = typeof invoice.subscription === 'object' 
-          ? (invoice.subscription as { id?: string })?.id 
-          : invoice.subscription;
+        const subscriptionId = typeof invoiceData.subscription === 'object' 
+          ? (invoiceData.subscription as { id?: string })?.id 
+          : invoiceData.subscription;
         
         logger.warn('Subscription payment failed', {
-          invoiceId: invoice.id,
+          invoiceId: invoiceData.id,
           subscriptionId,
         });
 

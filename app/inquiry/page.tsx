@@ -1,224 +1,25 @@
-'use client';
+import { Metadata } from 'next';
+import Link from 'next/link';
 
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { useState, useEffect } from 'react';
-import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
-import ModernLandingHero from '@/components/landing/ModernLandingHero';
-import Turnstile from '@/components/Turnstile';
-import { resolveProgram, getActiveProgramsByCategory } from '@/lib/program-registry';
+export const metadata: Metadata = {
+  title: 'Inquiry | Elevate for Humanity',
+  description: 'Inquiry page content.',
+};
 
-const programGroups = getActiveProgramsByCategory();
-
-function InquiryForm() {
-  const searchParams = useSafeSearchParams();
-  const [selectedProgram, setSelectedProgram] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-
-  // Preselect program from URL param using canonical registry
-  useEffect(() => {
-    const programParam = searchParams.get('program');
-    if (programParam) {
-      const entry = resolveProgram(programParam);
-      if (entry) {
-        setSelectedProgram(entry.slug);
-      }
-    }
-  }, [searchParams]);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!turnstileToken) {
-      setError('Please complete the verification');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData);
-
-    try {
-      const response = await fetch('/api/inquiry', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ...data, turnstileToken }),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        setSuccess(true);
-        setTimeout(() => {
-          window.location.href = '/inquiry/success';
-        }, 1000);
-      } else {
-        setError(result.error || 'Application failed. Please try again.');
-        setLoading(false);
-      }
-    } catch (error) {
-      setError('An error occurred. Please try again or submit your question at /contact.');
-      setLoading(false);
-    }
-  };
-
+export default function Page() {
   return (
-    <>
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Inquiry' }]} />
-      </div>
-      <ModernLandingHero
-        badge="Limited Seats Available"
-        headline="Start Your Career"
-        accentText="In 10 Minutes"
-        subheadline="Quick application. Fast response. Real results."
-        description="Last year, 753 students were accepted and 89% got jobs after graduation. Average time from application to first paycheck: 67 days."
-        imageSrc="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/hero-images/apply-hero.webp"
-        imageAlt="Apply Now"
-        primaryCTA={{ text: 'Start Application', href: '#application' }}
-        secondaryCTA={{ text: 'Questions? Visit FAQ', href: '/faq' }}
-        features={[
-          '10-minute application with 2-3 day response',
-          'Workforce funding available for eligible Indiana residents',
-          'Job placement support and career counseling included',
-        ]}
-        imageOnRight={true}
-      />
-      <section id="application" className="max-w-3xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold text-black mb-4">Start Your Application</h1>
-        <p className="my-4 text-black">10–15 minutes. Response within 2–3 business days.</p>
-
-        {error && (
-          <div className="mb-6 p-4 bg-brand-red-50 border-2 border-brand-red-200 rounded-lg">
-            <p className="text-brand-red-800 font-semibold">{error}</p>
-          </div>
-        )}
-
-        {success && (
-          <div className="mb-6 p-4 bg-brand-green-50 border-2 border-brand-green-200 rounded-lg">
-            <p className="text-brand-green-800 font-semibold">
-              • Application submitted successfully! Redirecting...
-            </p>
-          </div>
-        )}
-
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 bg-white border border-slate-200 rounded-lg p-6"
-        >
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-black mb-2">
-              Full Name <span className="text-brand-red-600">*</span>
-            </label>
-            <input
-              required
-              id="name"
-              name="name"
-              placeholder="Full name"
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
-              Email <span className="text-brand-red-600">*</span>
-            </label>
-            <input
-              required
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Email"
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-black mb-2">
-              Phone <span className="text-brand-red-600">*</span>
-            </label>
-            <input
-              required
-              id="phone"
-              name="phone"
-              placeholder="Phone"
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="program" className="block text-sm font-medium text-black mb-2">
-              Program <span className="text-brand-red-600">*</span>
-            </label>
-            <select
-              required
-              id="program"
-              name="program"
-              value={selectedProgram}
-              onChange={(e) => setSelectedProgram(e.target.value)}
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-            >
-              <option value="">Select program...</option>
-              {programGroups.map((group) => (
-                <optgroup key={group.category} label={group.category}>
-                  {group.programs.map((p) => (
-                    <option key={p.slug} value={p.slug}>
-                      {p.name}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-              <option value="not-sure">Not Sure - Help Me Choose</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="funding" className="block text-sm font-medium text-black mb-2">
-              Funding <span className="text-brand-red-600">*</span>
-            </label>
-            <select
-              required
-              id="funding"
-              name="funding"
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-            >
-              <option value="">Select funding...</option>
-              <option value="WIOA / Next Level Jobs">WIOA / Next Level Jobs</option>
-              <option value="FSSA">FSSA (Family &amp; Social Services Administration)</option>
-              <option value="Employer Sponsored">Employer Sponsored</option>
-              <option value="Self Pay">Self Pay</option>
-              <option value="Not Sure">Not Sure</option>
-            </select>
-          </div>
-
-          <label className="text-sm flex gap-2 items-center">
-            <input type="checkbox" required className="w-4 h-4" />
-            <span>Consent to contact</span>
-          </label>
-
-          <Turnstile onVerify={setTurnstileToken} />
-
-          <button
-            type="submit"
-            disabled={loading || !turnstileToken}
-            className="w-full min-h-[44px] bg-slate-900 text-white px-6 py-3 rounded-lg hover:bg-slate-800 transition-colors font-semibold disabled:bg-slate-400 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Submitting...' : 'Submit Application'}
-          </button>
-        </form>
+    <div className="min-h-screen bg-slate-50">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold">Inquiry</h1>
+          <p className="text-blue-200">Workforce development resources.</p>
+        </div>
       </section>
-    </>
-  );
-}
-
-export default function Inquiry() {
-  return (
-          <InquiryForm />
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
+        </div>
+      </section>
+    </div>
   );
 }

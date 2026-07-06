@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, MessageSquare, X, Send, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -21,7 +21,7 @@ export function AIAssistantBubble() {
 
   useEffect(() => {
     // Only show the welcome bubble once per session
-    if (sessionStorage.getItem('ai-bubble-shown')) return;
+    if (sessionStorage.getItem('ai-bubble-shown')) return undefined;
     const timer = setTimeout(() => {
       setShowWelcome(true);
       sessionStorage.setItem('ai-bubble-shown', '1');
@@ -53,7 +53,7 @@ export function AIAssistantBubble() {
   };
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) return undefined;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setIsOpen(false);
     };
@@ -124,7 +124,7 @@ export function AIAssistantBubble() {
   const renderMessage = (content: string | undefined | null) => {
     if (!content) return null;
     const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    const parts: (string | JSX.Element)[] = [];
+    const parts: (string | React.ReactElement)[] = [];
     let lastIndex = 0;
     let match;
     while ((match = linkRegex.exec(content)) !== null) {

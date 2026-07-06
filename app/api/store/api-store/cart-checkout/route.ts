@@ -1,5 +1,5 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -12,14 +12,14 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
+  // Use the public-facing host for redirects so they work behind proxies/Gitpod tunnels
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || process.env.NEXT_PUBLIC_SITE_URL?.replace(/^https?:\/\//, '') || 'localhost:3000';
+  const proto = req.headers.get('x-forwarded-proto') || 'https';
+  const baseUrl = `${proto}://${host}`;
+
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
-
-    // Use the public-facing host for redirects so they work behind proxies/Gitpod tunnels
-    const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'localhost:3000';
-    const proto = req.headers.get('x-forwarded-proto') || 'https';
-    const baseUrl = `${proto}://${host}`;
 
     const injected = injectFailureRedirect(req, `${baseUrl}/store/cart?error=checkout-failed`);
     if (injected) return injected;
@@ -110,7 +110,7 @@ async function _POST(req: Request) {
       };
     });
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
     // Build metadata — include LMS fields so webhook can fulfill enrollment
     const sessionMetadata: Record<string, string> = {
@@ -149,3 +149,5 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withRuntime(withApiAudit('/api/store/cart-checkout', _POST));
+
+

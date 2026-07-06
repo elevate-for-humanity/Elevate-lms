@@ -39,7 +39,7 @@ export default function AvatarGuide({
   const totalSteps = steps.length;
 
   // Typing effect
-  useEffect(() => {
+  useEffect((): void => {
     if (!isVisible) return;
 
     setDisplayedText('');
@@ -70,7 +70,7 @@ export default function AvatarGuide({
   }, [currentStep, currentMessage, isVisible]);
 
   // Highlight element when step changes
-  useEffect(() => {
+  useEffect((): void | (() => void) => {
     if (currentStep >= 0 && steps[currentStep]?.highlight) {
       const element = document.querySelector(steps[currentStep].highlight!);
       if (element) {

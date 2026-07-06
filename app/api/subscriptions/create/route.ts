@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -10,7 +10,7 @@ import { withRuntime } from '@/lib/api/withRuntime';
  */
 async function _POST(request: NextRequest) {
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   try {
     const body = await request.json();
@@ -35,3 +35,4 @@ async function _POST(request: NextRequest) {
 }
 
 export const POST = withRuntime(_POST);
+

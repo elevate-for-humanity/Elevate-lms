@@ -79,7 +79,6 @@ export const HERO_IMAGES = {
 
   // Business family
   business: {
-    taxPrep: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/professional-2.jpg',
     entrepreneurship: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/business-sector.webp',
     businessAdmin: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-business-hero.webp',
   },

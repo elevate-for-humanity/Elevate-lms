@@ -1,3 +1,5 @@
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { getCurrentUser } from '@/lib/auth';
@@ -148,3 +150,4 @@ export async function GET(request: NextRequest) {
     return safeInternalError(err, 'Failed to load pending reps');
   }
 }
+

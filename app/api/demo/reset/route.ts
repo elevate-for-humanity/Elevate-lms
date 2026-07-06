@@ -95,7 +95,7 @@ async function _POST(request: Request) {
     deletedCounts.profiles = profileCount || 0;
 
     // 6. Now re-seed by calling the seed endpoint
-    const seedUrl = new URL('/api/demo/seed', process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000');
+    const seedUrl = new URL('/api/demo/seed', process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org');
     const seedResponse = await fetch(seedUrl.toString(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -119,3 +119,4 @@ async function _POST(request: Request) {
   }
 }
 export const POST = withApiAudit('/api/demo/reset', _POST);
+

@@ -1,10 +1,11 @@
+export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DocumentPage, DocumentSection, DocumentSignatureBlock } from '@/components/documents';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Participation Agreement | {PLATFORM_DEFAULTS.orgName}',
+  title: 'Participation Agreement',
   robots: { index: false, follow: false },
 };
 
@@ -12,7 +13,9 @@ export default function ParticipationAgreementPage() {
   return (
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Legal', href: '/legal' }, { label: 'Participation Agreement' }]} />
+        <Breadcrumbs
+          items={[{ label: 'Legal', href: '/legal' }, { label: 'Participation Agreement' }]}
+        />
       </div>
       <DocumentPage
         documentType="Participation Agreement"
@@ -23,7 +26,9 @@ export default function ParticipationAgreementPage() {
       >
         <DocumentSection heading="Purpose" number={1}>
           <p>
-            This Participation Agreement outlines the expectations and requirements for active participation in {PLATFORM_DEFAULTS.orgName} career pathway programs. By signing, the Student agrees to meet these standards for the duration of their enrollment.
+            This Participation Agreement outlines the expectations and requirements for active
+            participation in {PLATFORM_DEFAULTS.orgName} career pathway programs. By signing, the Student
+            agrees to meet these standards for the duration of their enrollment.
           </p>
         </DocumentSection>
 
@@ -82,19 +87,27 @@ export default function ParticipationAgreementPage() {
             <li>Suspension from employer site days</li>
             <li>Dismissal from the program</li>
           </ul>
-          <p>Serious violations (violence, weapons, drug use) result in immediate dismissal without warning.</p>
+          <p>
+            Serious violations (violence, weapons, drug use) result in immediate dismissal without
+            warning.
+          </p>
         </DocumentSection>
 
         <DocumentSection heading="Grievance Procedure" number={8}>
           <p>
-            Students who have a complaint should first speak with their program coordinator. If unresolved, submit a written grievance to the Program Director at <strong>info@elevateforhumanity.org</strong>. Elevate will respond within 10 business days.
+            Students who have a complaint should first speak with their program coordinator. If
+            unresolved, submit a written grievance to the Program Director at{' '}
+            <strong>info@elevateforhumanity.org</strong>. Elevate will respond within 10 business
+            days.
           </p>
         </DocumentSection>
 
         <DocumentSection heading="Contact" number={9}>
           <p>
-            {PLATFORM_DEFAULTS.orgName} — Program Director<br />
-            8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240<br />
+            {PLATFORM_DEFAULTS.orgName} — Program Director
+            <br />
+            8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
+            <br />
             Email: info@elevateforhumanity.org · Phone: {PLATFORM_DEFAULTS.supportPhone}
           </p>
         </DocumentSection>

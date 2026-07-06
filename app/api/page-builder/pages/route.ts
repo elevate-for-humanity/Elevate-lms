@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { apiAuthGuard } from '@/lib/admin/guards';
+import { apiAuthGuard } from '@/lib/authGuards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { getAllPages, upsertPage, upsertSections } from '@/lib/data/pages';
 
 // GET /api/page-builder/pages — list all pages
 export async function GET(request: NextRequest) {
-  const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ['admin'] });
+  const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ['admin', 'super_admin'] });
 
   try {
     const pages = await getAllPages();
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ['admin'] });
+  const auth = await apiAuthGuard({ requireAuth: true, allowedRoles: ['admin', 'super_admin'] });
 
   try {
     const body = await request.json();

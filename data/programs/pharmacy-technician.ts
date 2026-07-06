@@ -34,7 +34,7 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
   cohortSize: '12–16 participants per cohort',
   fundingStatement: '$0 with WIOA funding. Next Level Jobs accepted.',
   selfPayCost: '$4,200 (payment plans available)',
-  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
+  fundingOptions: ['wioa', 'wrg', 'wioa', 'self_pay'],
   badge: 'Funding Available',
   badgeColor: 'green',
 
@@ -452,8 +452,8 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
 
 
   funding: {
+    fssa_eligible: false,
     wioa_eligible: true,
-    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. FSSA Gov Portal and WIOA Title I funding available for eligible Indiana residents.',

@@ -131,3 +131,6 @@ function QueueCard({
     </Link>
   );
 }
+
+// Default export for next/dynamic
+export default LizzyOperationsPanel;

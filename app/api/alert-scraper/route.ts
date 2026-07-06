@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
           userAgent,
           timestamp: timestamp || new Date().toISOString(),
           ...additionalData,
-        }).catch(() => {});
+        }).then(() => {}, () => {});
 
         if (process.env.SLACK_WEBHOOK_URL) {
           sendSlackAlert({
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
             url,
             ip,
             timestamp: timestamp || new Date().toISOString(),
-          }).catch(() => {});
+          }).then(() => {}, () => {});
         }
       } catch (error) {
         logger.error('Background alert processing failed:', error);
@@ -123,7 +123,7 @@ View full details: ${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteU
 This is an automated alert from ${PLATFORM_DEFAULTS.orgName} Security System.
   `;
 
-  logger.info('[EMAIL ALERT]: ' + emailContent);
+  logger.info('[EMAIL ALERT]', { emailContent });
 
   // Email sending via SendGrid when configured
   // Set SENDGRID_API_KEY and ALERT_EMAIL in environment variables

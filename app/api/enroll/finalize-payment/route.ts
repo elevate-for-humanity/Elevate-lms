@@ -121,11 +121,11 @@ async function _POST(req: Request) {
     if (paymentMode === 'sponsored') {
       // Elevate pays wholesale cost to partner
       amountCents = enrollment.course.wholesale_cost_cents || 0;
-      description = `Sponsored seat: ${enrollment.course.course_name}`;
+      description = `Sponsored seat: ${enrollment.course.title}`;
     } else if (paymentMode === 'self_pay') {
       // Student pays retail price
       amountCents = enrollment.course.retail_price_cents || 0;
-      description = `Enrollment: ${enrollment.course.course_name}`;
+      description = `Enrollment: ${enrollment.course.title}`;
     } else if (paymentMode === 'scholarship') {
       // No charge - mark as paid immediately
       const { error: updateError } = await supabase
@@ -150,89 +150,56 @@ async function _POST(req: Request) {
         enrollmentId: enrollment.id,
         message: 'Scholarship enrollment activated',
       });
-    } else if (paymentMode === 'employer') {
-      const { data: sponsorship } = await supabase
-        .from('employer_sponsorships')
-        .select('employer_contact_email, employer_name, total_tuition')
-        .eq('enrollment_id', enrollmentId)
-        .order('created_at', { ascending: false })
-        .limit(1)
+    } else {
+      // employer mode - create invoice for employer
+      const { data: enrollment } = await supabase
+        .from('program_enrollments')
+        .select('*, programs(*), users(*)')
+        .eq('id', enrollmentId)
         .maybeSingle();
 
-      const employerEmail = sponsorship?.employer_contact_email?.trim();
-      if (!employerEmail) {
-        return NextResponse.json(
-          {
-            error:
-              'Employer sponsorship with a contact email is required before employer-paid checkout',
-          },
-          { status: 400 },
-        );
+      if (!enrollment) {
+        return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 });
       }
 
-      amountCents = sponsorship?.total_tuition
-        ? Math.round(Number(sponsorship.total_tuition) * 100)
-        : enrollment.course?.retail_price_cents || 0;
-      description = `Employer-sponsored training: ${enrollment.course?.course_name ?? 'Program'}`;
-
-      const { error: employerLockError } = await supabase.rpc('initiate_enrollment_payment', {
-        p_enrollment_id: enrollmentId,
-        p_payment_mode: paymentMode,
-        p_amount_cents: amountCents,
-      });
-
-      if (employerLockError) {
-        logger.error('Error locking employer enrollment for payment:', employerLockError);
-        return NextResponse.json({ error: 'Failed to initiate payment' }, { status: 500 });
-      }
-
-      const siteUrl = ((process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl);
-
-      const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
-        customer_email: employerEmail,
-        line_items: [
-          {
-            price_data: {
-              currency: 'usd',
-              product_data: {
-                name: description,
-                description: sponsorship?.employer_name
-                  ? `Employer: ${sponsorship.employer_name}`
-                  : undefined,
-              },
-              unit_amount: amountCents,
-            },
-            quantity: 1,
-          },
-        ],
-        success_url: `${siteUrl}/enroll/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${siteUrl}/dashboard?enrollment_id=${enrollmentId}`,
+      // Create Stripe invoice for employer
+      const invoice = await stripe.invoices.create({
+        customer: enrollment.employer_stripe_customer_id,
+        collection_method: 'send_invoice',
+        days_until_due: 30,
         metadata: {
-          kind: 'program_enrollment',
-          payment_mode: 'employer',
-          funding_source: 'employer_paid',
           enrollment_id: enrollmentId,
-          user_id: enrollment.user_id,
-          student_id: enrollment.user_id,
+          payment_mode: 'employer',
           program_id: enrollment.program_id,
+          student_id: enrollment.user_id,
         },
       });
 
+      // Add invoice item
+      await stripe.invoiceItems.create({
+        customer: enrollment.employer_stripe_customer_id,
+        invoice: invoice.id,
+        amount: Math.round((enrollment.programs?.price || 0) * 100),
+        currency: 'usd',
+        description: `Training: ${enrollment.programs?.title || 'Program'}`,
+      });
+
+      // Finalize and send invoice
+      await stripe.invoices.finalizeInvoice(invoice.id);
+
+      // Update enrollment with invoice ID
       await supabase
         .from('program_enrollments')
         .update({
-          stripe_checkout_session_id: session.id,
+          stripe_invoice_id: invoice.id,
           payment_status: 'pending',
-          payment_mode: 'employer',
         })
         .eq('id', enrollmentId);
 
       return NextResponse.json({
-        ok: true,
-        paymentMode: 'employer',
-        checkoutUrl: session.url,
-        sessionId: session.id,
+        success: true,
+        invoice_id: invoice.id,
+        invoice_url: invoice.hosted_invoice_url,
       });
     }
 
@@ -259,7 +226,7 @@ async function _POST(req: Request) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: enrollment.course.course_name,
+              name: enrollment.course.title,
               description: description,
             },
             unit_amount: amountCents,

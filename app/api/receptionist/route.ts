@@ -43,7 +43,7 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const auth = await requireAuth(req);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
 
     const { message, history } = await req.json();
 

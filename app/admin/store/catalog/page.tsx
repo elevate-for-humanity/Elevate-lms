@@ -35,7 +35,7 @@ function StatusBadge({ ok }: { ok: boolean }) {
 }
 
 export default async function CatalogSanityPage() {
-  await requireRole(['admin']);
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
   const dbProducts = await getCatalogProducts();

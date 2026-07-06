@@ -25,11 +25,11 @@ export default function SchoolLicensePage() {
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image sizes="100vw"
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp"
+          src="/images/pages/about-hero.webp"
           alt="School License Platform"
           fill
           className="object-cover"
-          priority 
+          priority placeholder="empty"
         />
       </section>
 
@@ -253,37 +253,37 @@ export default function SchoolLicensePage() {
               {
                 title: 'Self-Service Enrollment',
                 desc: 'Students apply online, upload documents, and get instant eligibility decisions. No staff time required.',
-                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hero.webp'
+                img: '/images/pages/programs-hero.webp'
               },
               {
                 title: 'Complete LMS',
                 desc: 'Courses, quizzes, certificates, progress tracking. Students learn on any device. Instructors see everything.',
-                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp'
+                img: '/images/pages/about-hero.webp'
               },
               {
                 title: 'Automated Compliance',
                 desc: 'WIOA fields enforced at enrollment. Reports generate automatically. Audit trail for everything.',
-                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp'
+                img: '/images/pages/about-hero.webp'
               },
               {
                 title: 'Case Management',
                 desc: 'Track barriers, interventions, and outcomes. Flag at-risk students. Coordinate services.',
-                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hero.webp'
+                img: '/images/pages/programs-hero.webp'
               },
               {
                 title: 'Employer Portal',
                 desc: 'Employers post jobs, view candidates, verify credentials. Placement tracking built in.',
-                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hero.webp'
+                img: '/images/pages/programs-hero.webp'
               },
               {
                 title: 'Your Brand',
                 desc: 'Your logo, your colors, your domain. Students see your organization, not ours.',
-                img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp'
+                img: '/images/pages/about-hero.webp'
               },
             ].map((item, i) => (
               <div key={i} className="bg-slate-50 rounded-xl overflow-hidden">
                 <div className="relative h-40">
-                  <Image sizes="100vw" src={item.img} alt={item.title} fill className="object-cover"  />
+                  <Image sizes="100vw" src={item.img} alt={item.title} fill className="object-cover" placeholder="empty" />
                 </div>
                 <div className="p-6">
                   <h3 className="font-bold text-lg mb-2">{item.title}</h3>

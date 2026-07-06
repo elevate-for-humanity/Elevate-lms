@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SystemHealthPage() {
-  await requireRole(['admin']);
+  await requireRole(['admin', 'super_admin']);
   const snapshot = await getPlatformHealth();
 
   return (

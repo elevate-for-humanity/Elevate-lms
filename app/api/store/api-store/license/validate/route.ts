@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from 'next/server';
 // PUBLIC ROUTE: license key validation
 import { hashLicenseKey, isValidLicenseKeyFormat } from '@/lib/store/license';
 
@@ -145,3 +146,4 @@ async function _POST(req: Request) {
   }
 }
 export const POST = withApiAudit('/api/store/license/validate', _POST);
+

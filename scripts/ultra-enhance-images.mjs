@@ -21,7 +21,6 @@ const imagesToEnhance = [
   'images/trades/program-electrical-training.jpg',
 
   // Business images
-  'images/business/tax-prep-certification.jpg',
   'images/business/professional-1.jpg',
   'images/business/team-1.jpg',
 ];

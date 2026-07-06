@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: BEAUTY_DASHBOARD_CLONE_META.title,
     description: BEAUTY_DASHBOARD_CLONE_META.description,
-    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-gallery-1.webp'],
+    images: ['/images/pages/barber-gallery-1.webp'],
   },
 };
 
@@ -65,7 +65,7 @@ export default function BeautyProgramsStorePage() {
           </div>
           <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border border-slate-200">
             <Image
-              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-gallery-1.webp"
+              src="/images/pages/barber-gallery-1.webp"
               alt="Beauty school training environment"
               fill
               className="object-cover"

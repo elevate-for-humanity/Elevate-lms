@@ -32,7 +32,7 @@ async function _POST(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
     const auth = await apiRequireAdmin(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
     const supabaseAdmin = await requireAdminClient();
 
     // Ensure grant source exists
@@ -101,7 +101,7 @@ async function _POST(request: Request) {
       );
 
       if (error) {
-        logger.error('Error upserting grant:', grant.id, error);
+        logger.error('Error upserting grant', { grantId: grant.id, error });
         errors++;
       } else {
         imported++;

@@ -5,7 +5,7 @@ import { ArrowRight, ArrowLeft, Play, LayoutGrid, Users, FileBarChart, Eye, Awar
 
 export const metadata: Metadata = {
   title: 'Institutional Operator Demo',
-  description: 'See how institutions operate multiple programs while maintaining clean, auditable records.',
+  keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'See how institutions operate multiple programs while maintaining clean, auditable records.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/demo/institutional',
   },
@@ -15,35 +15,35 @@ const demoSteps = [
   {
     step: 1,
     title: 'Program Manager View',
-    description: 'Multiple programs listed with different funding paths per program.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Multiple programs listed with different funding paths per program.',
     icon: LayoutGrid,
     detail: 'See all active programs at a glance. Each program has its own funding configuration, eligibility rules, and credential types.',
   },
   {
     step: 2,
     title: 'Roster & Progress',
-    description: 'Multiple cohorts with attendance and progress views.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Multiple cohorts with attendance and progress views.',
     icon: Users,
     detail: 'Track learners across cohorts. Attendance logged automatically. Progress percentages updated in real-time.',
   },
   {
     step: 3,
     title: 'Compliance Dashboard',
-    description: 'Report filters by funding source, dates, and program.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Report filters by funding source, dates, and program.',
     icon: FileBarChart,
     detail: 'Generate compliance reports without manual data entry. Filter by WIOA, WRG, JRI, or self-pay. Export for audits.',
   },
   {
     step: 4,
     title: 'Partner Visibility',
-    description: 'Employer and partner read-only access to relevant data.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Employer and partner read-only access to relevant data.',
     icon: Eye,
     detail: 'Partners see only what they need. No full admin access required. Controlled visibility maintains data integrity.',
   },
   {
     step: 5,
     title: 'Credential Management',
-    description: 'Rules per credential type with automated issuance.',
+    keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Rules per credential type with automated issuance.',
     icon: Award,
     detail: 'Different credentials for different programs. Completion requirements enforced automatically. Verification links generated.',
   },

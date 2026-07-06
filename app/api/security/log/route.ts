@@ -72,7 +72,7 @@ async function _POST(request: NextRequest) {
 
         // Send alerts for critical events (non-blocking)
         if (isCriticalEvent(body.type as string)) {
-          sendSecurityAlert(body).catch(() => {});
+          sendSecurityAlert(body).then(() => {}, () => {});
         }
       } catch (error) {
         // Silent fail - logging should never break the app

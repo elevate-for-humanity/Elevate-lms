@@ -41,7 +41,7 @@ export default function HeroSlideshow() {
         autoPlay
         playsInline
         preload="none"
-        poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-federal-funding.webp"
+        poster="/images/heroes/hero-federal-funding.webp"
         className="absolute inset-0 w-full h-full object-cover"
         style={{
           objectFit: 'cover',

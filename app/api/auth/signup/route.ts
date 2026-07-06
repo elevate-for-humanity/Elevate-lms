@@ -7,10 +7,10 @@ import { safeInternalError } from '@/lib/api/safe-error';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling, APIErrors } from '@/lib/api';
-import { ErrorCode } from '@/lib/api/error-codes';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { APIError } from '@/lib/api/api-error';
+import { ErrorCode } from '@/lib/api/error-codes';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { validatePassword } from '@/lib/auth/password-validation';
 import { withApiAudit } from '@/lib/audit/withApiAudit';

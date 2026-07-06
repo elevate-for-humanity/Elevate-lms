@@ -29,7 +29,6 @@ import { pharmacyTechCourse } from './program-pharmacy-tech';
 import { phlebotomyCourse } from './program-phlebotomy';
 import { plumbingCourse } from './program-plumbing';
 import { securityOfficerCourse } from './program-security-officer';
-import { taxPrepCourse } from './program-tax-prep';
 import { warehouseLogisticsCourse } from './program-warehouse-logistics';
 import { weldingCourse } from './program-welding';
 
@@ -63,7 +62,6 @@ export const allCourses: Course[] = [
   phlebotomyCourse,
   plumbingCourse,
   securityOfficerCourse,
-  taxPrepCourse,
   warehouseLogisticsCourse,
   weldingCourse,
 ];

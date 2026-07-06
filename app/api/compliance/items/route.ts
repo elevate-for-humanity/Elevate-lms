@@ -15,7 +15,7 @@ async function _GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   // Use service-role client — compliance_items RLS may block user-session reads
   const supabase = await requireAdminClient();
@@ -38,7 +38,7 @@ async function _PATCH(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const supabase = await requireAdminClient();
 

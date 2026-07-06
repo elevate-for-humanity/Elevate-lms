@@ -22,7 +22,7 @@ async function _GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    // Require admin for monitoring access — no environment bypass
+    // Require super_admin for monitoring access — no environment bypass
     const url = new URL(req.url);
     const orgId = url.searchParams.get('orgId');
 

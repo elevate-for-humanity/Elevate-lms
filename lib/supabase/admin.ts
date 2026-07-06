@@ -113,6 +113,14 @@ export async function requireAdminClient(): Promise<SupabaseClient<any>> {
 }
 
 /**
+ * @deprecated Use requireAdminClient() instead. This alias exists for
+ * backwards compatibility with older code that expects a sync function.
+ */
+export async function getSupabaseAdmin(): Promise<SupabaseClient<any>> {
+  return requireAdminClient();
+}
+
+/**
  * Create an admin client with audit context pre-set.
  * The audit trigger will read these session variables to attribute the write.
  *

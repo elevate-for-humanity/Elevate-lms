@@ -27,8 +27,8 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .limit(300);
 
   if (error) {
-    logger.error('[cron/weekly-reminders] DB error', { error: 'Internal server error' });
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    logger.error('[cron/weekly-reminders] DB error', { error: error.message });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   let sent = 0;

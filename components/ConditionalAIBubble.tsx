@@ -3,9 +3,12 @@
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 
+// Loading placeholder to prevent null component errors
+const LoadingDiv = () => <div className="hidden" />;
+
 const AIAssistantBubble = dynamic(
-  () => import('@/components/AIAssistantBubble').then((m) => m.AIAssistantBubble),
-  { ssr: false, loading: () => null },
+  () => import('@/components/AIAssistantBubble').then((m) => m.AIAssistantBubble || m.default || (() => null)),
+  { ssr: false, loading: LoadingDiv }
 );
 
 const APP_ROUTE_PREFIXES = [

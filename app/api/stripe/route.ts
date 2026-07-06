@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
@@ -10,7 +11,7 @@ async function _POST(req: Request) {
   if (rateLimited) return rateLimited;
 
   const auth = await requireAuth(req);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const stripe = getStripe();
   if (!stripe) throw new Error('Stripe not configured');

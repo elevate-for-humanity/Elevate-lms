@@ -8,7 +8,7 @@ import { checkCompetencyGate } from '@/lib/lms/competency-gate';
 
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_ROLES = ['instructor', 'admin', 'staff'];
+const ALLOWED_ROLES = ['instructor', 'admin', 'super_admin', 'staff'];
 const VALID_STATUSES = ['under_review', 'approved', 'rejected', 'revision_requested'] as const;
 type ReviewStatus = (typeof VALID_STATUSES)[number];
 
@@ -25,7 +25,7 @@ export async function PATCH(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   const userId = auth.id;
 
   // Require instructor or admin role
@@ -108,7 +108,7 @@ export async function PATCH(request: NextRequest) {
     })
     .then(({ error }) => {
       if (error)
-        logger.warn('[submissions/review] audit log insert failed (non-fatal):', error.message);
+        logger.warn('[submissions/review] audit log insert failed', { error: error.message });
     });
 
   // If approved, check whether all required competency checks for this lesson are now approved.

@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { cloneRepoForCustomer } from '@/lib/store/github-clone';
 import { hashLicenseKey } from '@/lib/store/license';

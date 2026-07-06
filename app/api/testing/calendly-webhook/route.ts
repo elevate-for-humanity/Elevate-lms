@@ -4,16 +4,16 @@
  * Receives Calendly webhook events for the Testing Appointment event type.
  *
  * Events handled:
- *   invitee.created  — booking confirmed: send confirmation email + SMS,
+ *   invitee.created  - booking confirmed: send confirmation email + SMS,
  *                      store appointment in testing_appointments, alert staff
- *   invitee.canceled — booking canceled: send cancellation email + SMS,
+ *   invitee.canceled - booking canceled: send cancellation email + SMS,
  *                      update appointment record
  *
  * Reminders (24hr + 1hr) are scheduled via rows in testing_appointment_reminders
  * and fired by the daily cron at /api/internal/testing-reminders.
  *
  * Webhook signature verified using CALENDLY_WEBHOOK_SECRET (Signing Key from
- * Calendly → Integrations → Webhooks).
+ * Calendly -> Integrations -> Webhooks).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -30,12 +30,12 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// ─── Signature verification ───────────────────────────────────────────────────
+// ------ Signature verification ------------------------------------------------------------------------------------------------------
 
 function verifyCalendlySignature(payload: string, signature: string | null): boolean {
   const secret = process.env.CALENDLY_WEBHOOK_SECRET;
   if (!secret) {
-    logger.warn('CALENDLY_WEBHOOK_SECRET not set — skipping signature verification');
+    logger.warn('CALENDLY_WEBHOOK_SECRET not set - skipping signature verification');
     return true; // allow in dev; enforce in prod by setting the secret
   }
   if (!signature) return false;
@@ -43,7 +43,7 @@ function verifyCalendlySignature(payload: string, signature: string | null): boo
   return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
 }
 
-// ─── Email templates ──────────────────────────────────────────────────────────
+// ------ Email templates --------------------------------------------------------------------------------------------------------------------
 
 function confirmationEmailHtml(name: string, startTime: string, examQuestion: string): string {
   const date = new Date(startTime);
@@ -133,20 +133,20 @@ function cancellationEmailHtml(name: string, startTime: string): string {
 </html>`;
 }
 
-// ─── Handler ──────────────────────────────────────────────────────────────────
+// ------ Handler ------------------------------------------------------------------------------------------------------------------------------------
 
 export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }, async (req) => {
   const rawBody = await req.text();
   const signature = req.headers.get('calendly-webhook-signature');
 
   if (!verifyCalendlySignature(rawBody, signature)) {
-    // Log enough to detect probing — timestamp is implicit in the log entry
+    // Log enough to detect probing - timestamp is implicit in the log entry
     logger.warn('[calendly-webhook] Signature rejected', {
       ip: req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'unknown',
       signaturePresent: signature !== null,
       secretConfigured: !!process.env.CALENDLY_WEBHOOK_SECRET,
       payloadBytes: rawBody.length,
-      // Parse event type without trusting the payload — best-effort only
+      // Parse event type without trusting the payload - best-effort only
       eventType: (() => {
         try {
           return JSON.parse(rawBody)?.event ?? 'unknown';
@@ -194,7 +194,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
   const cancelUrl: string = payload?.invitee?.cancel_url ?? '';
   const rescheduleUrl: string = payload?.invitee?.reschedule_url ?? '';
 
-  // ── invitee.created ────────────────────────────────────────────────────────
+  // ---- invitee.created ----------------------------------------------------------------------------------------------------------------
   if (eventType === 'invitee.created') {
     // 1. Store appointment
     const { data: appt, error: apptError } = await db
@@ -221,7 +221,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
 
     if (apptError) {
       logger.error('Failed to store testing appointment', apptError);
-      // Non-fatal — continue with notifications
+      // Non-fatal - continue with notifications
     }
 
     // 2. Schedule reminders (24hr + 1hr)
@@ -242,7 +242,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
         .send({
           from: `Elevate Testing Center <${TESTING_CENTER.email}>`,
           to: inviteeEmail,
-          subject: `Your Testing Appointment is Confirmed — ${PLATFORM_DEFAULTS.orgName}`,
+          subject: `Your Testing Appointment is Confirmed - ${PLATFORM_DEFAULTS.orgName}`,
           html: confirmationEmailHtml(inviteeName, startTime, examAnswer),
         })
         .catch((err) => logger.error('Confirmation email failed', err));
@@ -273,7 +273,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
       .send({
         from: `Elevate Testing Center <${TESTING_CENTER.email}>`,
         to: TESTING_CENTER.email,
-        subject: `New Testing Appointment: ${inviteeName} — ${examAnswer || 'Exam TBD'}`,
+        subject: `New Testing Appointment: ${inviteeName} - ${examAnswer || 'Exam TBD'}`,
         html: `
         <p><strong>New booking received.</strong></p>
         <ul>
@@ -292,7 +292,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
     return NextResponse.json({ ok: true, event: 'invitee.created' });
   }
 
-  // ── invitee.canceled ───────────────────────────────────────────────────────
+  // ---- invitee.canceled --------------------------------------------------------------------------------------------------------------
   if (eventType === 'invitee.canceled') {
     // Update appointment status
     await db
@@ -321,7 +321,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
         .send({
           from: `Elevate Testing Center <${TESTING_CENTER.email}>`,
           to: inviteeEmail,
-          subject: `Testing Appointment Canceled — ${PLATFORM_DEFAULTS.orgName}`,
+          subject: `Testing Appointment Canceled - ${PLATFORM_DEFAULTS.orgName}`,
           html: cancellationEmailHtml(inviteeName, startTime),
         })
         .catch((err) => logger.error('Cancellation email failed', err));

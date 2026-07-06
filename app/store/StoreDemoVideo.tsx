@@ -40,7 +40,7 @@ export default function StoreDemoVideo() {
       {!started && (
         <>
           <Image
-            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-activity-hero.webp"
+            src="/images/pages/admin-activity-hero.webp"
             alt="HVAC Technician course — Module 1 preview"
             fill
             className="object-cover"

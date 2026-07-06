@@ -14,26 +14,26 @@ const panelSkeleton = (
 );
 
 export const PublishWebsitePanelLazy = dynamic(
-  () => import('./PublishWebsitePanel').then((m) => m.PublishWebsitePanel),
+  () => import('./PublishWebsitePanel').then((m) => m.default || m),
   { loading: () => panelSkeleton, ssr: false },
 );
 
 export const ProgramIntegrityPanelLazy = dynamic(
-  () => import('./ProgramIntegrityPanel').then((m) => m.ProgramIntegrityPanel),
+  () => import('./ProgramIntegrityPanel').then((m) => m.default || m),
   { loading: () => panelSkeleton, ssr: false },
 );
 
 export const JobBoardPanelLazy = dynamic(
-  () => import('./JobBoardPanel').then((m) => m.JobBoardPanel),
+  () => import('./JobBoardPanel').then((m) => m.default || m),
   { loading: () => panelSkeleton, ssr: false },
 );
 
 export const SitePreviewPanelWrapperLazy = dynamic(
-  () => import('./SitePreviewPanelWrapper'),
+  () => import('./SitePreviewPanelWrapper').then((m) => m.default || m),
   { loading: () => panelSkeleton, ssr: false },
 );
 
-export const LizzyContainerWrapperLazy = dynamic(() => import('./LizzyContainerWrapper'), {
-  loading: () => panelSkeleton,
-  ssr: false,
-});
+export const LizzyContainerWrapperLazy = dynamic(
+  () => import('./LizzyContainerWrapper').then((m) => m.default || m),
+  { loading: () => panelSkeleton, ssr: false },
+);

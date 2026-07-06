@@ -8,8 +8,7 @@
 export type UserRole =
   | 'student'
   | 'admin'
-  | 'admin'
-  | 'admin'
+  | 'advisor'
   | 'staff'
   | 'employer'
   | 'workforce_board'
@@ -20,7 +19,18 @@ export type UserRole =
   | 'program_holder'
   | 'delegate'
   | 'creator'
-  | 'instructor';
+  | 'instructor'
+  | 'case_manager'
+  | 'provider_admin'
+  | 'super_admin'
+  | 'grant_client'
+  | 'partner_admin'
+  | 'host_shop'
+  | 'government'
+  | 'testing_center'
+  | 'financial_aid'
+  | 'compliance'
+  | 'dev_studio';
 export type EnrollmentStatus = 'pending' | 'active' | 'completed' | 'withdrawn' | 'suspended';
 export type FundingType = 'wrg' | 'wioa' | 'jri' | 'employindy' | 'self_pay' | 'employer_sponsored';
 export type ProgramHolderStatus = 'pending' | 'approved' | 'inactive';

@@ -1,241 +1,149 @@
+import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Metadata } from 'next';
-import { Building2, Briefcase, GraduationCap, Handshake, Award } from 'lucide-react';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createPublicClient } from '@/lib/supabase/server';
+import { ArrowRight, Building2, Users, Handshake, Award, Globe } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const revalidate = 600;
-
 export const metadata: Metadata = {
-  title: 'Our Partners',
-  description:
-    `${PLATFORM_DEFAULTS.orgName} partners with workforce boards, employers, credential providers, and government agencies to deliver funded credential pathway programs in Indianapolis.`,
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/about/partners',
-  },
+  title: `Our Partners | ${PLATFORM_DEFAULTS.orgName}`,
+  description: 'Discover the employers, workforce agencies, and organizations that partner with Elevate for Humanity to create career pathways.',
+  keywords: ['partners', 'employers', 'workforce agencies', 'WorkOne', 'collaborations'],
 };
 
-export default async function PartnersPage() {
-  const supabase = createPublicClient();
+const PARTNER_TYPES = [
+  {
+    icon: Building2,
+    title: 'Employer Partners',
+    desc: 'Local businesses across healthcare, trades, beauty, and technology who hire our graduates.',
+    examples: ['Hospitals & Healthcare Facilities', 'Salon & Spa Networks', 'Manufacturing Companies', 'Tech Firms'],
+  },
+  {
+    icon: Users,
+    title: 'Workforce Agencies',
+    desc: 'Indiana workforce development organizations including WorkOne centers across the state.',
+    examples: ['WorkOne Indianapolis', 'Region 6 Workforce Board', 'WorkOne Northeast Indiana', 'Indiana Department of Workforce Development'],
+  },
+  {
+    icon: Handshake,
+    title: 'Training Partners',
+    desc: 'Educational institutions and training organizations we collaborate with to expand opportunities.',
+    examples: ['Community Colleges', 'Vocational Schools', 'Industry Associations', 'Certification Bodies'],
+  },
+];
 
-  // Fetch partners by type
-  const { data: allPartners } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('is_active', true)
-    .order('display_order');
-
-  const partners = allPartners || [];
-
-  const governmentPartners = partners.filter((p) => p.partner_type === 'government');
-  const certificationPartners = partners.filter((p) => p.partner_type === 'certification');
-  const trainingPartners = partners.filter((p) => p.partner_type === 'training');
-  const employerPartners = partners.filter((p) => p.partner_type === 'employer');
-  const workforcePartners = partners.filter((p) => p.partner_type === 'workforce');
-
+export default function PartnersPage() {
   return (
     <div className="min-h-screen bg-white">
-      {' '}
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'About', href: '/about' }, { label: 'Partners' }]} />
-        </div>
-      </div>
-      {/* Hero Section */}
       {/* Hero */}
-      <section className="relative w-full">
-        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image
-            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-partners-hero.webp"
-            alt="Partners background"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw" 
-          />
+      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-24 overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <Image src="/images/pages/workone-partners.webp" alt="" fill className="object-cover" />
         </div>
-        <div className="bg-white py-10">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Our Partners</h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-              We collaborate with government agencies, employers, and credential providers to
-              deliver funded credential pathway programs.
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <p className="text-blue-300 font-semibold mb-4 uppercase tracking-wide text-sm">Our Network</p>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+              Partners in Workforce Excellence
+            </h1>
+            <p className="text-xl text-blue-100 leading-relaxed">
+              We work alongside employers, workforce agencies, and training organizations to create 
+              meaningful career pathways for Hoosiers across Indiana.
             </p>
           </div>
         </div>
       </section>
-      {/* Government Partners */}
-      {(governmentPartners.length > 0 || workforcePartners.length > 0) && (
-        <section className="py-16">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-center gap-3 mb-8">
-              <Building2 className="w-8 h-8 text-brand-blue-600" />
-              <h2 className="text-3xl font-bold text-slate-900">Government & Workforce Partners</h2>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...governmentPartners, ...workforcePartners].map((partner: any) => (
-                <div
-                  key={partner.id}
-                  className="bg-white border rounded-xl p-6 shadow-sm hover:shadow-md transition"
-                >
-                  {partner.logo_url && (
-                    <div className="h-16 flex items-center justify-center mb-4">
-                      <Image
-                        src={partner.logo_url}
-                        alt={partner.name}
-                        width={120}
-                        height={60}
-                        className="object-contain"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                        
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                      />
-                    </div>
-                  )}
-                  <h3 className="font-semibold text-slate-900 mb-2">{partner.name}</h3>
-                  {partner.description && (
-                    <p className="text-sm text-black">{partner.description}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-      {/* Certification Partners */}
-      {certificationPartners.length > 0 && (
-        <section className="py-16">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-center gap-3 mb-8">
-              <Award aria-label="award" className="w-8 h-8 text-brand-green-600" />
-              <h2 className="text-3xl font-bold text-slate-900">Certification Partners</h2>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {certificationPartners.map((partner: any) => (
-                <div key={partner.id} className="bg-white border rounded-xl p-6 shadow-sm">
-                  {partner.logo_url && (
-                    <div className="h-16 flex items-center justify-center mb-4">
-                      <Image
-                        src={partner.logo_url}
-                        alt={partner.name}
-                        width={120}
-                        height={60}
-                        className="object-contain"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                        
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                      />
-                    </div>
-                  )}
-                  <h3 className="font-semibold text-slate-900 mb-2">{partner.name}</h3>
-                  {partner.description && (
-                    <p className="text-sm text-black">{partner.description}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-      {/* Training Partners */}
-      {trainingPartners.length > 0 && (
-        <section className="py-16">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-center gap-3 mb-8">
-              <GraduationCap aria-label="graduationcap" className="w-8 h-8 text-brand-blue-600" />
-              <h2 className="text-3xl font-bold text-slate-900">Training Partners</h2>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {trainingPartners.map((partner: any) => {
-                // Validate website_url — must start with http to avoid bad redirects
-                const safeUrl =
-                  partner.website_url &&
-                  (partner.website_url.startsWith('http://') ||
-                    partner.website_url.startsWith('https://'))
-                    ? partner.website_url
-                    : null;
-                return (
-                  <div key={partner.id} className="bg-white border rounded-xl p-6 shadow-sm hover:shadow-md transition">
-                    {/* Logo — shown if logo_url is present */}
-                    {partner.logo_url ? (
-                      <div className="h-16 flex items-center justify-center mb-4">
-                        <Image
-                          src={partner.logo_url}
-                          alt={partner.name}
-                          width={120}
-                          height={60}
-                          className="object-contain"
-                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                        
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        />
-                      </div>
-                    ) : (
-                      <div className="h-16 flex items-center justify-center mb-4 bg-slate-50 rounded-lg">
-                        <GraduationCap aria-label="graduationcap" className="w-8 h-8 text-slate-300" />
-                      </div>
-                    )}
-                    <h3 className="font-semibold text-slate-900 mb-2">{partner.name}</h3>
-                    {partner.description && (
-                      <p className="text-sm text-slate-600 mb-3">{partner.description}</p>
-                    )}
-                    {safeUrl && (
-                      <a
-                        href={safeUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-brand-blue-600 text-sm hover:underline"
-                      >
-                        Visit Website →
-                      </a>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-      {/* Employer Partners */}
-      {employerPartners.length > 0 && (
-        <section className="py-16">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-center gap-3 mb-8">
-              <Briefcase className="w-8 h-8 text-brand-orange-600" />
-              <h2 className="text-3xl font-bold text-slate-900">Employer Partners</h2>
-            </div>
-            <p className="text-black mb-8">
-              Our graduates are hired by leading employers across healthcare, skilled trades, and
-              professional services.
+
+      {/* Partner Types */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Partner Network</h2>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              Together with our partners, we're building a workforce ecosystem that benefits everyone.
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {employerPartners.map((partner: any) => (
-                <div key={partner.id} className="bg-white border rounded-lg p-4 text-center">
-                  <p className="font-medium text-slate-700 text-sm">{partner.name}</p>
+          </div>
+          <div className="grid lg:grid-cols-3 gap-8">
+            {PARTNER_TYPES.map((type) => (
+              <div key={type.title} className="bg-white rounded-2xl p-8 shadow-lg border border-slate-100">
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-2xl flex items-center justify-center mb-6">
+                  <type.icon className="w-8 h-8 text-brand-blue-600" />
                 </div>
-              ))}
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{type.title}</h3>
+                <p className="text-slate-600 mb-6">{type.desc}</p>
+                <ul className="space-y-2">
+                  {type.examples.map((ex) => (
+                    <li key={ex} className="flex items-center gap-2 text-slate-700">
+                      <div className="w-1.5 h-1.5 bg-brand-blue-500 rounded-full" />
+                      {ex}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Partner With Us */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">Why Partner With Us?</h2>
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Award className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-1">Pre-Screened Candidates</h4>
+                    <p className="text-slate-600">Our students complete background checks, drug screenings, and skills assessments before placement.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Globe className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-1">Industry-Recognized Credentials</h4>
+                    <p className="text-slate-600">Graduates earn certifications that meet employer standards across healthcare, trades, and technology.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Handshake className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-1">Ongoing Support</h4>
+                    <p className="text-slate-600">We provide retention support to help ensure long-term success for both employers and employees.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl">
+              <Image src="/images/pages/business-meeting.webp" alt="Business partnership" fill className="object-cover" />
             </div>
           </div>
-        </section>
-      )}
-      {/* CTA */}
-      <section className="py-16 bg-brand-blue-700 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Handshake className="w-12 h-12 mx-auto mb-4 opacity-80" />
-          <h2 className="text-3xl font-bold mb-4">Become a Partner</h2>
-          <p className="text-xl text-white mb-8">
-            Join our network of employers, credential partners, and workforce organizations.
+        </div>
+      </section>
+
+      {/* Become a Partner CTA */}
+      <section className="py-20 bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Handshake className="w-16 h-16 mx-auto mb-6 opacity-80" />
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Become a Partner</h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Whether you're an employer seeking talent, a workforce agency, or a training organization — 
+            we'd love to explore how we can work together.
           </p>
-          <Link
-            href="/contact?subject=Partnership%20Inquiry"
-            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-50 transition"
-          >
-            Contact Us
-          </Link>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/contact" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              Contact Us <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
+            <Link href="/for-employers" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              Employer Info
+            </Link>
+          </div>
         </div>
       </section>
     </div>

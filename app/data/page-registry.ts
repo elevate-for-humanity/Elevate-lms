@@ -63,13 +63,13 @@ export const NAV_REGISTRY: NavCategory[] = [
       { label: 'How It Works', href: '/how-it-works', description: 'Our enrollment process' },
       {
         label: 'Student Dashboard',
-        href: '/learner/dashboard',
+        href: '/dashboard',
         public: false,
         description: 'Access your dashboard',
       },
       {
         label: 'Next Steps Checklist',
-        href: '/next-steps',
+        href: '/dashboard/next-steps',
         public: false,
         description: 'Track your progress',
       },

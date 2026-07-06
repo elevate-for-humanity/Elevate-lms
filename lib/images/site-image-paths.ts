@@ -1,6 +1,9 @@
 /**
  * Image path resolution - fallback only for truly dynamic paths.
  * Use resolveSiteImagePath() before passing src to next/image.
+ * 
+ * ⚠️ SERVER-ONLY: This module imports 'fs' which is not available in browsers.
+ * Only import this in Server Components or pass pre-resolved paths to Client Components.
  */
 import { existsSync } from 'fs';
 import { join } from 'path';

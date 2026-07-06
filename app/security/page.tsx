@@ -1,262 +1,48 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import {
-  Shield,
-  Lock,
-  Eye,
-  FileCheck,
-  AlertTriangle,
-  Mail,
-  Server,
-  Key,
-  Phone,
-  CheckCircle,
-} from 'lucide-react';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { Shield, Lock, Eye } from 'lucide-react';
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/security',
-  },
-  title: 'Security & Data Protection',
-  description:
-    'Your information is protected. Your trust matters. Learn about our security measures and data protection practices.',
+  title: 'Security | Elevate for Humanity',
+  keywords: ["security", "data protection", "privacy", "FERPA"], description: 'Platform security and data protection policies.',
 };
 
-export const dynamic = 'force-dynamic';
-
 export default function SecurityPage() {
-  const certifications = null;
-  const auditInfo = null;
-
-  const securityMeasures = [
-    {
-      icon: Lock,
-      title: 'Encryption',
-      description: 'All data is encrypted in transit (TLS 1.3) and at rest (AES-256)',
-    },
-    {
-      icon: Key,
-      title: 'Access Control',
-      description: 'Role-based access control with multi-factor authentication',
-    },
-    {
-      icon: Server,
-      title: 'Secure Infrastructure',
-      description: 'Hosted on SOC 2 compliant cloud infrastructure',
-    },
-    {
-      icon: Eye,
-      title: 'Monitoring',
-      description: '24/7 security monitoring and intrusion detection',
-    },
-    {
-      icon: FileCheck,
-      title: 'Compliance',
-      description: 'FERPA compliant for educational records protection',
-    },
-    {
-      icon: Shield,
-      title: 'Regular Audits',
-      description: 'Annual third-party security assessments and penetration testing',
-    },
-  ];
-
-  const dataProtection = [
-    'We collect only information necessary for program coordination and compliance',
-    'Personal data is never sold to third parties',
-    'You can request access to or deletion of your data at any time',
-    'Data retention follows federal and state requirements',
-    'Staff access is limited to job-related needs',
-  ];
-
   return (
-    <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Security' }]} />
+    <div className="min-h-screen bg-slate-50">
+      <section className="bg-gradient-to-br from-green-700 to-green-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold">Security</h1>
+          <p className="text-green-200">Your data security is our priority.</p>
         </div>
-      </div>
-
-      <div className="py-16">
+      </section>
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="flex items-center gap-3 mb-8">
-            <Shield className="w-10 h-10 text-brand-blue-600" />
-            <h1 className="text-4xl font-bold text-black">Security & Data Protection</h1>
-          </div>
-
-          <div className="bg-brand-blue-50 border-l-4 border-brand-blue-600 p-6 mb-8">
-            <p className="text-xl font-semibold text-black">
-              Your information is protected. Your trust matters.
-            </p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
-            <p className="text-lg text-black leading-relaxed mb-6">
-              {PLATFORM_DEFAULTS.orgName} takes data security and privacy seriously. Our platform is
-              designed to protect personal, educational, and workforce-related information using
-              industry-standard safeguards and access controls.
-            </p>
-
-            <p className="text-lg text-black leading-relaxed">
-              We collect only the information necessary to support program coordination, advising,
-              reporting, and compliance.
-            </p>
-          </div>
-
-          {/* Security Measures */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">Security Measures</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {securityMeasures.map((measure, index) => {
-                const Icon = measure.icon;
-                return (
-                  <div key={index} className="bg-white rounded-lg shadow-sm p-6">
-                    <Icon className="w-8 h-8 text-brand-blue-600 mb-3" />
-                    <h3 className="font-bold text-lg mb-2">{measure.title}</h3>
-                    <p className="text-slate-600">{measure.description}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
-          {/* Data Protection */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">Data Protection Practices</h2>
-            <div className="bg-white rounded-lg shadow-sm p-8">
-              <ul className="space-y-4">
-                {dataProtection.map((item, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-slate-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-
-          {/* Security Certifications from DB */}
-          {certifications && certifications.length > 0 && (
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold mb-6">Security Certifications & Compliance</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {certifications.map((cert: any) => (
-                  <div
-                    key={cert.id}
-                    className="bg-white rounded-lg shadow-sm p-6 border-2 border-slate-100"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <Shield className="w-8 h-8 text-brand-blue-600" />
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium ${
-                          cert.status === 'active' || cert.is_active
-                            ? 'bg-brand-green-100 text-brand-green-700'
-                            : 'bg-brand-blue-100 text-brand-blue-700'
-                        }`}
-                      >
-                        {cert.status === 'active' || cert.is_active
-                          ? 'Compliant'
-                          : cert.status || 'Pending'}
-                      </span>
-                    </div>
-                    <h3 className="font-bold text-lg mb-1">{cert.name}</h3>
-                    {cert.description && (
-                      <p className="text-sm text-slate-600 mb-2">{cert.description}</p>
-                    )}
-                    {cert.valid_until && (
-                      <p className="text-xs text-slate-500">
-                        Valid until {new Date(cert.valid_until).toLocaleDateString()}
-                      </p>
-                    )}
-                  </div>
-                ))}
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl p-6 shadow">
+              <div className="flex items-start gap-4">
+                <Shield className="w-10 h-10 text-green-600 flex-shrink-0" />
+                <div>
+                  <h3 className="font-bold text-lg mb-2">Data Protection</h3>
+                  <p className="text-slate-600">All student data is encrypted and protected in compliance with FERPA.</p>
+                </div>
               </div>
-            </section>
-          )}
-
-          {/* Report a Concern */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <AlertTriangle className="w-6 h-6 text-yellow-500" />
-              Report a Security Concern
-            </h2>
-            <div className="bg-white rounded-lg shadow-sm p-8">
-              <p className="text-slate-700 mb-4">
-                If you believe you've discovered a security vulnerability or have concerns about
-                data protection, please contact us immediately:
-              </p>
-              <a
-                href="/contact"
-                className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:underline"
-              >
-                <Mail className="w-5 h-5" />
-                our contact form
-              </a>
             </div>
-          </section>
-
-          {/* Related Policies */}
-          <section>
-            <h2 className="text-2xl font-bold mb-6">Related Policies</h2>
-            <div className="grid md:grid-cols-3 gap-4">
-              <Link
-                href="/legal/privacy"
-                className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition"
-              >
-                <h3 className="font-semibold">Privacy Policy</h3>
-                <p className="text-sm text-slate-600">How we collect and use data</p>
-              </Link>
-              <Link
-                href="/legal"
-                className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition"
-              >
-                <h3 className="font-semibold">Terms of Service</h3>
-                <p className="text-sm text-slate-600">Platform usage terms</p>
-              </Link>
-              <Link
-                href="/cookies"
-                className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition"
-              >
-                <h3 className="font-semibold">Cookie Policy</h3>
-                <p className="text-sm text-slate-600">How we use cookies</p>
-              </Link>
+            <div className="bg-white rounded-xl p-6 shadow">
+              <div className="flex items-start gap-4">
+                <Lock className="w-10 h-10 text-green-600 flex-shrink-0" />
+                <div>
+                  <h3 className="font-bold text-lg mb-2">Secure Authentication</h3>
+                  <p className="text-slate-600">Multi-factor authentication and secure session management.</p>
+                </div>
+              </div>
             </div>
-          </section>
-
-          {/* Last Updated */}
-          <div className="mt-12 text-center text-sm text-slate-500">
-            <p>Last security audit: {auditInfo?.value || 'January 2025'}</p>
-            <p>This page was last updated: January 2025</p>
+          </div>
+          <div className="mt-8 text-center">
+            <Link href="/privacy" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Privacy Policy</Link>
           </div>
         </div>
-        {/* CTA Section */}
-        <section className="bg-brand-blue-700 text-white py-12">
-          <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-            <p className="text-white mb-6">
-              Check your eligibility for funded career training programs.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/start"
-                className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
-              >
-                Apply Now
-              </Link>
-              <a
-                href="/support"
-                className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
-              >
-                <Phone className="w-4 h-4" />
-                Visit Support Center
-              </a>
-            </div>
-          </div>
-        </section>
-      </div>
+      </section>
     </div>
   );
 }

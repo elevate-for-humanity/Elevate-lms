@@ -33,7 +33,7 @@ async function _GET(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile?.role || !['admin'].includes(profile.role)) {
+  if (!profile?.role || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
 
@@ -82,7 +82,7 @@ async function _POST(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile?.role || !['admin'].includes(profile.role)) {
+  if (!profile?.role || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
 
@@ -246,7 +246,7 @@ async function _PATCH(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile?.role || !['admin'].includes(profile.role)) {
+  if (!profile?.role || !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
   }
 
@@ -257,7 +257,7 @@ async function _PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'auditId and action required' }, { status: 400 });
   }
 
-  let updateData: Record<string, any>;
+  let updateData: Record<string, any>;  
 
   switch (action) {
     case 'update_manual_entries':

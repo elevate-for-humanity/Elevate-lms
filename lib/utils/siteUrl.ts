@@ -41,7 +41,9 @@ export function getAdminUrl(): string {
     return `${parsed.protocol}//${parsed.host}`;
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    throw new Error(`Invalid NEXT_PUBLIC_ADMIN_URL: ${message}`, { cause: e });
+    const err = new Error(`Invalid NEXT_PUBLIC_ADMIN_URL: ${message}`);
+    (err as { cause?: unknown }).cause = e;
+    throw err;
   }
 }
 

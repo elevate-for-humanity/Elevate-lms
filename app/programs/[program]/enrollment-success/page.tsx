@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `Enrolled | ${cfg.title} | ${PLATFORM_DEFAULTS.orgName}`,
     description: `Your enrollment in the ${cfg.title} is confirmed.`,
-    robots: { index: true, follow: true },
+    robots: { index: false, follow: false },
   };
 }
 
@@ -29,7 +29,7 @@ export default async function BeautyEnrollmentSuccessPage({ params }: Props) {
   if (!cfg) return notFound();
 
   const supabase = await createClient();
-  const user = safeGetUser(await supabase.auth.getUser());
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?redirect=/programs/${cfg.slug}/enrollment-success`);
 
   // Find enrollment — try by user_id first, then by email for pre-auth enrollments

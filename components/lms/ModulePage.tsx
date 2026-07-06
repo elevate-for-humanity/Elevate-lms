@@ -5,14 +5,17 @@ import Link from 'next/link';
 import { useState } from 'react';
 import type { ModuleDef } from '@/courses/hvac/modules';
 
-const HVACLab = dynamic(() => import('@/components/HVACLab'), {
-  ssr: false,
-  loading: () => (
-    <div className="h-[500px] bg-slate-100 rounded-xl flex items-center justify-center text-slate-500">
-      Loading 3D equipment lab...
-    </div>
-  ),
-});
+const HVACLab = dynamic(
+  () => import('@/components/HVACLab').then((m) => m.default || m),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[500px] bg-slate-100 rounded-xl flex items-center justify-center text-slate-500">
+        Loading 3D equipment lab...
+      </div>
+    ),
+  }
+);
 
 interface QuizQuestion {
   question: string;

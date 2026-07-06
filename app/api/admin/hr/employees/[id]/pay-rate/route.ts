@@ -19,7 +19,7 @@ export async function PATCH(request: NextRequest, { params }: Props) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { id: employeeId } = await params;
 
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest, { params }: Props) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { id: employeeId } = await params;
   const supabase = await getAdminClient();

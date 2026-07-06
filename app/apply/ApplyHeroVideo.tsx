@@ -21,7 +21,7 @@ export default function ApplyHeroVideo() {
     <div ref={wrapperRef} className="absolute inset-0 w-full h-full">
       <CanonicalVideo
         src={VIDEO_HEROES.homepage}
-        poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apply-hero.webp"
+        poster="/images/pages/apply-hero.webp"
         className="absolute inset-0 w-full h-full object-cover"
         autoPlayOnMount
         threshold={0.2}

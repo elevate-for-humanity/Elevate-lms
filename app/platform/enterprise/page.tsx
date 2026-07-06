@@ -11,7 +11,9 @@ import {
   Scale,
   ClipboardCheck,
   ArrowRight,
-CheckCircle, } from 'lucide-react';
+  CheckCircle,
+  Server,
+} from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { createClient } from '@/lib/supabase/server';
@@ -58,12 +60,14 @@ export default async function EnterprisePage() {
     <div className="min-h-screen bg-white">
       <Breadcrumbs items={[{ label: 'Platform', href: '/platform' }, { label: 'Enterprise Access' }]} />
       <div className="max-w-7xl mx-auto px-4 pb-2">
-        <p className="text-sm text-slate-600 font-medium">Part of the <a href="/platform" className="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p>
+        <p className="text-sm text-slate-600 font-medium">Part of the <Link href="/platform" className="text-brand-red-600 hover:underline">Elevate Workforce Operating System</Link></p>
       </div>
 
       {/* Hero */}
-      <section className="bg-slate-900 text-white py-16 sm:py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="bg-slate-900 text-white py-16 sm:py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 opacity-90" />
+        <div className="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-brand-red-900/30 to-transparent" />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <div className="inline-flex items-center gap-2 bg-amber-500/20 text-amber-400 px-4 py-2 rounded-full text-sm font-bold mb-6">
             <Building2 className="w-4 h-4" /> Enterprise License
           </div>
@@ -173,13 +177,5 @@ export default async function EnterprisePage() {
         </div>
       </section>
     </div>
-  );
-}
-
-function Server(props: any) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/>
-    </svg>
   );
 }

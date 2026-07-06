@@ -12,7 +12,7 @@ export default async function DocumentsLayout({
 }) {
   const { program } = await params;
   const supabase = await createClient();
-  const user = safeGetUser(await supabase.auth.getUser());
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect(`/login?redirect=/programs/${program}/documents`);
 

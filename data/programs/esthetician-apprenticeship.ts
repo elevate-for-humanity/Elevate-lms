@@ -22,7 +22,7 @@ export const ESTHETICIAN_APPRENTICESHIP: ProgramSchema = {
   fundingStatement:
     'Paid apprenticeship track available. For self-pay enrollment, BNPL starts at a $600 deposit with weekly payment options.',
   selfPayCost: '$4,980',
-  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
+  fundingOptions: ['wioa', 'employer_paid', 'self_pay'],
   badge: 'Earn & Learn',
   badgeColor: 'purple',
   credentials: [
@@ -210,8 +210,8 @@ export const ESTHETICIAN_APPRENTICESHIP: ProgramSchema = {
   metaDescription:
     'Earn your Indiana esthetician license through a paid apprenticeship. 700 hours of supervised training. Earn while you learn. Indianapolis.',
   funding: {
+    fssa_eligible: false,
     wioa_eligible: false,
-    fssa_eligible: true,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
     fundingNotes:

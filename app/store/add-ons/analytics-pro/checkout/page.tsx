@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 import AddOnCheckout from '@/components/store/AddOnCheckout';
 import type { Metadata } from 'next';
@@ -11,7 +11,7 @@ export default function AnalyticsProCheckoutPage() {
     <AddOnCheckout
       productId="analytics-pro"
       productName="Analytics Pro"
-      productImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-analytics-hero.webp"
+      productImage="/images/pages/admin-analytics-hero.webp"
       backHref="/store/add-ons/analytics-pro"
       oneTimePrice={1497}
       monthlyPrice={424}

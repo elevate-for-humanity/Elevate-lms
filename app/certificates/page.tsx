@@ -34,13 +34,13 @@ export default function CertificatesPage() {
       <section className="relative h-48 md:h-64 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/certificates-page-1.webp"
+          src="/images/pages/certificates-page-1.webp"
           alt="Certificates & Credentials"
           fill
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" 
+          sizes="100vw" placeholder="empty"
         />
       </section>
       {/* Verify Certificate */}

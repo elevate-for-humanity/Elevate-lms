@@ -149,14 +149,14 @@ async function _PATCH(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const isStaff = profile?.role && ['admin', 'advisor', 'admin'].includes(profile.role);
+  const isStaff = profile?.role && ['admin', 'advisor', 'super_admin'].includes(profile.role);
 
   if (intake.user_id !== user.id && !isStaff) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 
   // Process step update
-  let updateData;
+  let updateData: Record<string, any>;  
   let newStatus: IntakeStatus = intake.status;
 
   switch (step) {

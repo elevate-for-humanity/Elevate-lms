@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 async function _GET(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;

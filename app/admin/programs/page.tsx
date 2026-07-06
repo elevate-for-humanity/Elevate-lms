@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProgramsPage() {
-  await requireRole(['admin']);
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
 
   const [

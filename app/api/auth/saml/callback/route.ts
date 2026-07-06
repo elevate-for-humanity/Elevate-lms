@@ -45,12 +45,12 @@ export async function POST(req: NextRequest) {
   }
 
   // Parse the multipart/form-data body to get SAMLResponse
-  let samlResponse: string | null;
-  let relayState: string | null;
+  let samlResponse: string | null = null;  
+  let relayState: string | null = null;  
   try {
     const formData = await req.formData();
     samlResponse = formData.get('SAMLResponse') as string | null;
-    relayState   = formData.get('RelayState') as string | null;
+    relayState = formData.get('RelayState') as string | null;
   } catch {
     return NextResponse.redirect(`${loginUrl}?error=saml_parse_failed`);
   }
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     // Upsert user in Supabase Auth
     const admin = await getAdminClient();
-    const { data: existing } = await admin.auth.admin.listUsers();
+    const { data: existing } = await admin.auth.admin.listUsers() as { data: { users?: Array<{ id: string; email?: string }> } | null };
     const existingUser = existing?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase());
 
     let userId: string;

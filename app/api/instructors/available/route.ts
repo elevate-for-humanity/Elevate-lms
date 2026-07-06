@@ -71,7 +71,7 @@ async function _GET(request: Request) {
       id: instructor.id,
       name: instructor.full_name || 'Instructor',
       title: 'Senior Instructor',
-      avatar: instructor.avatar_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/avatar-default.svg',
+      avatar: instructor.avatar_url || '/images/avatar-default.svg',
       specialties: ['Career Training', 'Professional Development'],
       rating: 4.8,
       totalSessions: 50,

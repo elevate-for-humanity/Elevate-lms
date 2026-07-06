@@ -30,8 +30,8 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .lte('scheduled_at', yesterdayEnd.toISOString());
 
   if (error) {
-    logger.error('[cron/testing-no-show] DB error', { error: 'Internal server error' });
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    logger.error('[cron/testing-no-show] DB error', { error: error.message });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   const rows = noShows ?? [];

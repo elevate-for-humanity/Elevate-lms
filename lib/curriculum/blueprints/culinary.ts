@@ -59,7 +59,8 @@ export const culinaryBlueprint: CredentialBlueprint = {
     videoGenerator: 'runway',
     template: 'elevate-slide',
     instructorName: 'Chef Angela Rodriguez',
-    instructorTitle: 'Executive Chef & Culinary Instructor',
+    instructorTitle: 'Instructor',
+    instructorImagePath: 'https://example.com/default-instructor.jpg',
     topBarColor: '#ea580c',
     accentColor: '#fb923c',
     backgroundColor: '#1c1917',
@@ -68,7 +69,9 @@ export const culinaryBlueprint: CredentialBlueprint = {
     slideCount: 5,
     segments: ['intro', 'concept', 'visual', 'application', 'wrapup'],
     generateDalleImage: true,
-    dalleImageStyle: 'food-photography',
+    dalleImageStyle: 'natural',
+    width: 1920,
+    height: 1080,
   },
 
   assessmentRules: [

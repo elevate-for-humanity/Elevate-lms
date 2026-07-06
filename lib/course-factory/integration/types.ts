@@ -4,8 +4,8 @@
  * Bridges blueprints to learner experience.
  * Blueprint → API → Components → Learner Dashboard
  */
-import type { CredentialBlueprint, BlueprintModule, InteractionSpecs } from '../blueprints/types';
-import type { EnrollmentType } from '../blueprints/types';
+import type { CredentialBlueprint, BlueprintModule, InteractionSpecs } from '../../curriculum/blueprints/types';
+import type { EnrollmentType } from '../../curriculum/blueprints/types';
 
 // ─── Learner Context ────────────────────────────────────────────────────────────
 

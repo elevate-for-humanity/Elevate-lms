@@ -32,7 +32,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/funding-followup] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   let notified = 0;
@@ -43,28 +43,29 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     const email = profile?.email;
     const daysPending = Math.floor((Date.now() - new Date(row.created_at).getTime()) / 86400000);
 
-    const insertNotification = async () => {
-      try {
-        await db.from('notifications').insert({
-          user_id: row.student_id,
-          type: 'system',
-          title: 'Funding approval pending',
-          message: `Your ${source?.name ?? 'funding'} application has been pending for ${daysPending} days. Our team is following up.`,
-          read: false,
-          idempotency_key: `funding-followup-${row.id}-${new Date().toISOString().split('T')[0]}`,
-        });
-      } catch (e: unknown) {
-        logger.warn('[cron/funding-followup] Notification insert failed', { error: String(e) });
-      }
-    };
-    await insertNotification();
+    try {
+      await db.from('notifications').insert({
+        user_id: row.student_id,
+        type: 'system',
+        title: 'Funding approval pending',
+        message: `Your ${source?.name ?? 'funding'} application has been pending for ${daysPending} days. Our team is following up.`,
+        read: false,
+        idempotency_key: `funding-followup-${row.id}-${new Date().toISOString().split('T')[0]}`,
+      });
+    } catch (e) {
+      logger.warn('[cron/funding-followup] Notification insert failed', { error: String(e) });
+    }
 
     if (email) {
-      await sendEmail({
-        to: email,
-        subject: 'Update on your funding application',
-        html: `<p>Hi ${name},</p><p>Your funding application (${source?.name ?? source?.code ?? 'funding source'}) has been pending for ${daysPending} days. Our team is actively following up. We will contact you within 1 business day.</p><p>— Elevate for Humanity</p>`,
-      }).catch((e: unknown) => logger.warn('[cron/funding-followup] Email failed', { student_id: row.student_id, error: String(e) }));
+      try {
+        await sendEmail({
+          to: email,
+          subject: 'Update on your funding application',
+          html: `<p>Hi ${name},</p><p>Your funding application (${source?.name ?? source?.code ?? 'funding source'}) has been pending for ${daysPending} days. Our team is actively following up. We will contact you within 1 business day.</p><p>— Elevate for Humanity</p>`,
+        });
+      } catch (e) {
+        logger.warn('[cron/funding-followup] Email failed', { student_id: row.student_id, error: String(e) });
+      }
     }
 
     notified++;

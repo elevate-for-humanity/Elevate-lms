@@ -38,7 +38,7 @@ async function _GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await requireAuth(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
   const searchParams = request.nextUrl.searchParams;
   const licenseSlug = searchParams.get('license');
   const email = searchParams.get('email');

@@ -41,7 +41,7 @@ const PROGRAM_REQUIREMENTS: Record<string, { ojl: number; rti: number; totalWeek
   'hvac-technician':                { ojl: 2000, rti: 500,  totalWeeks: 104 },
 };
 
-export const GET = withRuntime({ cron: "x-header" }, async () => {
+export const GET = withRuntime({ cron: true }, async () => {
   const db = await requireAdminClient();
 
   // Load all active enrollments with start date
@@ -89,7 +89,7 @@ export const GET = withRuntime({ cron: "x-header" }, async () => {
     if (weeksElapsed < 2 || weeksRemaining <= 0) continue;
 
     // Get actual approved OJL hours
-    let actualOjl: number;
+    let actualOjl = 0;
     try {
       const hours = await getApprovedHoursByType(db as any, enroll.user_id);
       actualOjl = hours.ojl;
@@ -123,8 +123,8 @@ export const GET = withRuntime({ cron: "x-header" }, async () => {
     });
 
     // Raise admin alert
-    await Promise.resolve(
-      db.from('admin_alerts').insert({
+    try {
+      await db.from('admin_alerts').insert({
         alert_type: 'low_hours_pace',
         severity: deficitPct > 0.25 ? 'critical' : 'warning',
         resolved: false,
@@ -139,8 +139,10 @@ export const GET = withRuntime({ cron: "x-header" }, async () => {
           weekly_hours_needed: weeklyNeeded,
         },
         created_at: new Date().toISOString(),
-      })
-    ).catch((err: any) => logger.warn('[low-hours-pace] alert insert failed', { err }));
+      });
+    } catch (err) {
+      logger.warn('[low-hours-pace] alert insert failed', { err });
+    }
 
     // Email student
     if (profile?.email) {

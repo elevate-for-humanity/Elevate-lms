@@ -1,32 +1,25 @@
-import type { Metadata } from 'next';
-import { CreditCard } from 'lucide-react';
-import { HelpCategoryPage } from '@/components/help/HelpCategoryPage';
-
-export const dynamic = 'force-dynamic';
+import { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Account & Billing | Help Center',
-  description:
-    'Help articles for managing your Elevate account, billing, payments, and WIOA funding.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/help/account' },
-  robots: { index: true, follow: true },
+  title: 'Account | Elevate for Humanity',
+  description: 'Account page content.',
 };
 
-export default function HelpAccountPage() {
+export default function Page() {
   return (
-    <HelpCategoryPage
-      config={{
-        categorySlug: 'account-billing',
-        title: 'Account & Billing',
-        description:
-          'Manage your account settings, payment methods, WIOA funding, and billing questions.',
-        icon: <CreditCard className="w-6 h-6" />,
-        relatedCategories: [
-          { label: 'Getting Started', href: '/help/getting-started' },
-          { label: 'Courses & Learning', href: '/help/courses' },
-          { label: 'Technical Support', href: '/help/technical' },
-        ],
-      }}
-    />
+    <div className="min-h-screen bg-slate-50">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold">Account</h1>
+          <p className="text-blue-200">Workforce development resources.</p>
+        </div>
+      </section>
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
+        </div>
+      </section>
+    </div>
   );
 }

@@ -65,7 +65,6 @@ export const programCategories: ProgramCategory[] = [
     programs: [
       'business',
       'entrepreneurship',
-      
       'finance-bookkeeping-accounting',
       'bookkeeping',
       'office-administration',

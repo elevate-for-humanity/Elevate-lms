@@ -49,7 +49,7 @@ export default async function HandbookPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/success-stories-hero.webp"
+          src="/images/pages/about-team-hero.webp"
           alt="Handbook"
           fill
           className="object-cover"
@@ -146,7 +146,7 @@ export default async function HandbookPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp"
+                  src="/images/pages/about-partners-hero.webp"
                   alt="Handbook"
                   fill
                   className="object-cover"
@@ -232,7 +232,7 @@ export default async function HandbookPage() {
               Ready to Get Started?
             </h2>
             <p className="text-base md:text-lg text-blue-100 mb-8">
-              Join thousands who have launched successful careers through our
+              Join our community who have launched successful careers through our
               programs.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">

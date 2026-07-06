@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ShieldCheck, Zap, FileText, ArrowRight } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'Agency Template Autofill | Elevate Store',
   description: 'Instantly prefill any state or federal agency form from your verified organization profile.',

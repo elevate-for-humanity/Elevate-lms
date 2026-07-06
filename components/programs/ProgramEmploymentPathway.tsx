@@ -1,5 +1,3 @@
-'use client';
-
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 
 /** Training → Credential → Employer → Job → Wage — workforce board mental model. */

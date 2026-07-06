@@ -144,7 +144,7 @@ export const PHLEBOTOMY: ProgramSchema = {
   // ─── Content model ──────────────────────────────────────────────
   deliveryModel: 'internal',
   deliveryModelDetail: 'internal_lms',
-  fundingOptions: ['impact', 'self_pay'],
+  fundingOptions: ['wioa', 'self_pay'],
   enrollmentType: 'internal',
 
   careerPathway: [

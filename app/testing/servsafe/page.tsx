@@ -1,68 +1,65 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { CalendarDays, Award } from 'lucide-react';
+import { Utensils, Award, CheckCircle, Phone } from 'lucide-react';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'ServSafe Food Safety Certifications | Elevate Testing Center',
-  description: 'ServSafe food handler and manager certifications tested at Elevate Testing Center.',
+  title: `ServSafe Food Handler Certification | ${PLATFORM_DEFAULTS.orgName}`,
+  description: 'Get your ServSafe food handler and manager certification at our testing center.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/testing/servsafe' },
 };
 
-const exams = [
-  { name: 'ServSafe Manager', code: 'SSM', price: '$135' },
-  { name: 'ServSafe Food Handler', code: 'SSF', price: '$55' },
+const certs = [
+  'ServSafe Food Handler',
+  'ServSafe Manager',
+  'ServSafe Allergen',
+  'Texas Food Handler',
 ];
 
 export default function ServSafePage() {
   return (
-    <main className="min-h-screen">
-      <section className="relative bg-brand-blue-900 text-white py-20">
-        <div className="absolute inset-0 opacity-20">
-          <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/certifications-page-1.webp" alt="ServSafe food handler certification" fill className="object-cover" sizes="100vw" />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4">
-          <Breadcrumbs items={[{ label: 'Testing', href: '/testing' }, { label: 'ServSafe' }]} />
-          <div className="mt-8">
-            <div className="inline-flex items-center gap-2 bg-brand-red-600 text-white text-sm font-bold px-4 py-1 rounded-full mb-4">
-              <Award className="w-4 h-4" /> ServSafe
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black mb-4">ServSafe Food Safety Certifications</h1>
-            <p className="text-xl text-blue-200 max-w-2xl">
-              Food safety certifications required for food service professionals.
-            </p>
+    <div className="min-h-screen bg-white">
+      <section className="bg-gradient-to-br from-slate-900 via-brand-blue-900 to-slate-900 text-white py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAgTCAwIDIwIEwgMTAgMjAgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmZmYwMDIiIHN0cm9rZS1vcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30" />
+        <div className="max-w-5xl mx-auto px-4 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 bg-brand-red-600/20 text-brand-red-400 px-4 py-2 rounded-full text-sm font-bold mb-6">
+            <Utensils className="w-4 h-4" /> ServSafe Certifications
           </div>
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tight mb-6">ServSafe Food Safety Certification</h1>
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-10">
+            Get certified in food safety through ServSafe at our testing center.
+          </p>
+          <Link href="/testing/book" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-colors text-lg">
+            Book Your Test
+          </Link>
         </div>
       </section>
 
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold mb-8">Available ServSafe Exams</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            {exams.map((exam) => (
-              <div key={exam.code} className="bg-white rounded-xl border p-6 shadow-sm">
-                <div className="text-xs text-slate-500 font-mono mb-2">{exam.code}</div>
-                <h3 className="font-bold text-lg mb-2">{exam.name}</h3>
-                <div className="flex items-center justify-between mt-4">
-                  <span className="text-2xl font-black text-brand-red-600">{exam.price}</span>
-                  <Link href="/testing/book" className="bg-brand-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-red-700 transition">
-                    Book Now
-                  </Link>
-                </div>
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-3xl font-black text-slate-900 text-center mb-12">Available ServSafe Certifications</h2>
+          <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+            {certs.map((cert) => (
+              <div key={cert} className="bg-white rounded-lg p-5 border border-slate-200 flex items-center gap-3">
+                <CheckCircle className="w-6 h-6 text-brand-red-600 flex-shrink-0" />
+                <span className="font-medium text-slate-700">{cert}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 px-4 text-center bg-slate-50">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl font-black mb-4">Get Food Safety Certified</h2>
-          <Link href="/testing/book?type=servsafe" className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-brand-red-700 transition">
-            <CalendarDays className="w-5 h-5" /> Book Your Exam
+      <section className="py-16 bg-white text-center">
+        <h2 className="text-3xl font-black text-slate-900 mb-8">Ready to Get Certified?</h2>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/testing/book" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-colors text-lg">
+            Book Now
           </Link>
+          <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`} className="border-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-bold px-8 py-4 rounded-xl transition-colors text-lg inline-flex items-center justify-center gap-2">
+            <Phone className="w-5 h-5" /> Call for Info
+          </a>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
     const auth = await apiRequireAdmin(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
   try {
     const supabase = await requireAdminClient();
     const { data, error } = await supabase
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
     const auth = await apiRequireAdmin(request);
-    if (auth.error) return auth.error;
+    if (auth instanceof NextResponse) return auth;
   try {
     const body = await request.json();
     const { name, description, repoUrl } = body;

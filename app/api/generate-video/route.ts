@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
 
   // Admin only
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   let lessonId: string;
   try {
@@ -326,8 +326,8 @@ export async function POST(request: NextRequest) {
 
     // Clean up temp files
     await Promise.all([
-      unlink(videoPath).catch(() => {}),
-      ...scenes.filter((s) => s.audioSrc).map((s) => unlink(s.audioSrc!).catch(() => {})),
+      unlink(videoPath).then(() => {}, () => {}),
+      ...scenes.filter((s) => s.audioSrc).map((s) => unlink(s.audioSrc!).then(() => {}, () => {})),
     ]);
 
     logger.info(`[GenerateVideo] Complete: ${lessonId} → ${videoUrl}`);
@@ -353,7 +353,7 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const lessonId = request.nextUrl.searchParams.get('lesson_id');
   if (!lessonId) return safeError('lesson_id is required', 400);

@@ -487,7 +487,7 @@ export default async function StaffDashboard() {
 
               {/* Onboarding */}
               <Link
-                href="/onboarding/staff"
+                href="/admin/staff-portal"
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">

@@ -1,8 +1,17 @@
 'use client';
 
+/**
+ * LazyImage — client-safe lazy loading image component.
+ * 
+ * NOTE: This component does NOT call resolveSiteImagePath() because it uses 'fs'
+ * which is server-only. Pass pre-resolved paths from Server Components when possible.
+ * For direct usage, provide full URLs (not local paths that need resolution).
+ */
+
 import Image, { ImageProps } from 'next/image';
 import { useState, useEffect, useRef } from 'react';
-import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
+
+const DEFAULT_FALLBACK = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/prog-hero-main-2.webp';
 
 interface LazyImageProps extends Omit<ImageProps, 'onLoad'> {
   fallback?: string;
@@ -11,12 +20,12 @@ interface LazyImageProps extends Omit<ImageProps, 'onLoad'> {
 export function LazyImage({
   src,
   alt,
-  fallback = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/prog-hero-main-2.webp',
+  fallback = DEFAULT_FALLBACK,
   className = '',
   ...props
 }: LazyImageProps) {
-  const resolvedSrc = resolveSiteImagePath(src);
-  const resolvedFallback = resolveSiteImagePath(fallback);
+  // Client-safe: just use the src directly
+  // If you need server-side path resolution, resolve in the parent Server Component
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [error, setError] = useState(false);
@@ -47,7 +56,7 @@ export function LazyImage({
 
       {isInView && (
         <Image
-          src={error ? resolvedFallback : resolvedSrc}
+          src={error ? fallback : src}
           alt={alt}
           className={`transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setIsLoaded(true)}

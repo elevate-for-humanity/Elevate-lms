@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { searchParams } = new URL(request.url);
   const lessonId = searchParams.get('lesson_id');

@@ -9,11 +9,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string; triggerId: string }> },
 ) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { triggerId } = await params;
   const db = await requireAdminClient();
   const { error } = await db.from('workflow_triggers').delete().eq('id', triggerId);
-  if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ deleted: true });
 }

@@ -5,7 +5,7 @@
  * with the original payload. Marks the dead-letter row as 'replayed'
  * so it no longer appears in the active dead-letter queue.
  *
- * Auth: admin / admin only.
+ * Auth: admin / super_admin only.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
@@ -21,7 +21,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { id } = await params;
   const traceId = request.headers.get('x-trace-id') ?? 'no-trace';

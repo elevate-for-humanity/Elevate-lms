@@ -22,7 +22,7 @@ export const FORKLIFT: ProgramSchema = {
   fundingStatement:
     'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
   selfPayCost: '$500',
-  fundingOptions: ['wioa', 'impact', 'self_pay'],
+  fundingOptions: ['wioa', 'wioa', 'self_pay'],
   badge: 'Quick Cert',
   badgeColor: 'green',
   credentials: [
@@ -260,8 +260,8 @@ export const FORKLIFT: ProgramSchema = {
 
 
   funding: {
-    wioa_eligible: false,
     fssa_eligible: false,
+    wioa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
     fundingNotes: 'Short certification. Eligibility for standalone WIOA/FSSA funding determined by the applicable workforce agency.',

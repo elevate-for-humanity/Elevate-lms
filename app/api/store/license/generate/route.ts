@@ -1,6 +1,7 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { generateLicenseKey, hashLicenseKey } from '@/lib/store/license';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { generateLicenseKey, hashLicenseKey } from '@/lib/store/license';
 
 import { logger } from '@/lib/logger';
 import { safeInternalError } from '@/lib/api/safe-error';
@@ -130,7 +131,7 @@ async function _POST(req: Request) {
         .eq('id', user.id)
         .maybeSingle();
 
-      if (!profile?.role || !['admin'].includes(profile.role)) {
+      if (!profile?.role || !['admin', 'super_admin'].includes(profile.role)) {
         logger.warn('Non-admin license generation attempt', {
           userId: user.id,
           role: profile?.role,

@@ -1,8 +1,3 @@
-// Force all routes to render on-demand (SSR) — prevents Next from attempting
-// static generation of ~2,000 pages at build time, which causes OOM in constrained build environments.
-// Individual pages can override with their own `export const revalidate = N`.
-export const dynamic = 'force-dynamic';
-
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
@@ -10,20 +5,19 @@ import StructuredData from '@/components/StructuredData';
 import PublicLayout from '@/components/layout/PublicLayout';
 import ToasterClient from '@/components/ui/ToasterClient';
 import { SkipToContent } from '@/components/ui/SkipToContent';
-import { DMCATrackingPixel } from '@/components/InvisibleWatermark';
-import { CopyrightProtection } from '@/components/CopyrightProtection';
-import { GoogleAnalytics } from '@/components/analytics/google-analytics';
-import { GoogleAds } from '@/components/analytics/google-ads';
 import RootWidgets from '@/components/layout/RootWidgets';
-import BuildVersionSync from '@/components/BuildVersionSync';
+import ClientOnlyFeatures from '@/components/layout/ClientOnlyFeatures';
 import { generateChromeSuppressionScript } from '@/lib/layout/app-routes';
-
 import PWAManager from '@/components/PWAManager';
-import { InstallPromptBanner } from '@/components/pwa/InstallPromptBanner';
 import AuthRedirectHandler from '@/components/auth/AuthRedirectHandler';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import SupabaseConfigBootstrap from '@/components/supabase/SupabaseConfigBootstrap';
+
+// Force all routes to render on-demand (SSR) — prevents Next from attempting
+// static generation of ~2,000 pages at build time, which causes OOM in constrained build environments.
+// Individual pages can override with their own `export const revalidate = N`.
+export const dynamic = 'force-dynamic';
 
 const inter = { variable: '' };
 
@@ -43,12 +37,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default: `${PLATFORM_DEFAULTS.orgName} | The AI-Powered Workforce Operating System`,
+    default: `${PLATFORM_DEFAULTS.orgName} | Career Training at No Cost for Eligible Participants`,
     template: `%s | ${PLATFORM_DEFAULTS.orgName}`,
   },
 
   description:
-    'The unified operating system for workforce development, apprenticeship tracking, and verified credentialing. Empowering employers, agencies, and learners through AI-driven career navigation.',
+    'Nonprofit workforce development institute in Indianapolis. Career training in healthcare, skilled trades, CDL, technology, and business at no cost to eligible Indiana residents through WIOA and state funding. Enroll today.',
 
   // Homepage canonical - child pages should override with their own
   alternates: {
@@ -56,20 +50,28 @@ export const metadata: Metadata = {
   },
 
   keywords: [
-    'AI workforce development',
-    'Elizabeth Greene',
-    'Workforce Operating System',
-    'DOL Registered Apprenticeship',
-    'WIOA training platform',
-    'VR workforce simulation',
-    'Career training infrastructure',
-    'National Talent Strategy',
-    PLATFORM_DEFAULTS.orgName,
+    'funded career training Indianapolis',
+    'WIOA programs Indiana',
+    'free job training Marion County',
+    'HVAC training Indianapolis',
+    'barber school Indianapolis',
+    'healthcare training Indiana',
+    'free trade school Indianapolis',
+    'workforce development Indianapolis',
+    'apprenticeship programs Indiana',
+    'CNA training Indianapolis',
+    'free medical assistant training Indianapolis',
+    'free CDL training Indiana',
+    'job placement Indianapolis',
+    'career change Indianapolis',
+    'second chance jobs Indiana',
+    'reentry programs Indianapolis',
+    'free esthetician school Indianapolis',
+    'WIOA eligible programs',
+    'WorkOne Indianapolis',
+    'free vocational training Indiana',
+    'paid training programs Indianapolis',
   ],
-  authors: [{ name: 'Elizabeth Greene', url: 'https://www.elevateforhumanity.org/about' }],
-  creator: 'Elizabeth Greene',
-  publisher: PLATFORM_DEFAULTS.orgName,
-
 
   authors: [{ name: PLATFORM_DEFAULTS.orgName }],
 
@@ -82,7 +84,7 @@ export const metadata: Metadata = {
       'Learn job-ready skills through career training programs in healthcare, skilled trades, CDL, and technology. Training at no cost to eligible Indiana residents through WIOA and state funding.',
     images: [
       {
-        url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-image.jpg',
+        url: '/images/og-image.jpg',
         width: 1200,
         height: 630,
         alt: `${PLATFORM_DEFAULTS.orgName} — workforce training programs in Indianapolis`,
@@ -95,7 +97,7 @@ export const metadata: Metadata = {
     title: `${PLATFORM_DEFAULTS.orgName} | Career Training at No Cost for Eligible Participants`,
     description:
       'Learn job-ready skills through career training programs in healthcare, skilled trades, CDL, and technology. Training at no cost to eligible Indiana residents through WIOA and state funding.',
-    images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-image.jpg'],
+    images: ['/images/og-image.jpg'],
   },
 
   robots: {
@@ -126,13 +128,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.ico', type: 'image/x-icon', sizes: '32x32' },
-      { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/favicon.png', type: 'image/png', sizes: '192x192' },
-      { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png', type: 'image/png', sizes: '192x192' },
-      { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-512.png', type: 'image/png', sizes: '512x512' },
+      { url: '/favicon.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
     ],
-    apple: [{ url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
-    shortcut: '/favicon.ico',
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    shortcut: '/favicon.png',
   },
 };
 
@@ -150,8 +151,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
 
-        <link rel="icon" href="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/favicon.png" type="image/png" sizes="192x192" />
-        <link rel="apple-touch-icon" href="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/apple-touch-icon.png" sizes="180x180" />
+        <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <meta name="theme-color" content="#dc2626" />
         {/* Organization structured data — tells Google Knowledge Panel the correct logo */}
         <script
@@ -237,15 +238,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <SkipToContent />
-        <GoogleAnalytics />
-        <BuildVersionSync />
-        <GoogleAds />
+        <ClientOnlyFeatures />
         <PWAManager />
-        <InstallPromptBanner />
         <AuthRedirectHandler />
         <PublicLayout>{children}</PublicLayout>
-        <DMCATrackingPixel />
-        <CopyrightProtection />
         <RootWidgets />
         <ToasterClient />
       </body>

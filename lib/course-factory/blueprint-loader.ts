@@ -133,7 +133,7 @@ export async function loadBlueprintWithProgram(
   identifier: { programId?: string; programSlug?: string },
 ): Promise<BlueprintWithProgram | null> {
   // Load program
-  const program = await resolveProgram(db, identifier);
+  const program = await resolveProgram(db, { id: identifier.programId, slug: identifier.programSlug });
   if (!program) {
     logger.warn('[blueprint-loader] Program not found', identifier);
     return null;

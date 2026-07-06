@@ -6,35 +6,33 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-// Program-specific pricing (amounts in cents)
-const PROGRAM_PRICING: Record<string, { full: number; deposit: number }> = {
-  'barber-apprenticeship': {
-    full: 498000,    // $4,980.00
-    deposit: 99900,  // $999.00
+// Barber Apprenticeship pricing (configured in Stripe Dashboard)
+const PRICING = {
+  full: {
+    amount: 498000, // $4,980.00 in cents
+    description: 'Barber Apprenticeship - Full Payment',
   },
-  'esthetician-apprenticeship': {
-    full: 550000,    // $5,500.00
-    deposit: 60000,  // $600.00 BNPL start
+  deposit: {
+    amount: 99900, // $999.00 deposit
+    description: 'Barber Apprenticeship - Deposit',
   },
-  'cosmetology-apprenticeship': {
-    full: 550000,    // $5,500.00
-    deposit: 60000,  // $600.00 BNPL start
-  },
-  'nail-technician-apprenticeship': {
-    full: 350000,    // $3,500.00
-    deposit: 35000, // $350.00 BNPL start
+  installment: {
+    amount: 498000, // Full amount, Stripe handles installments
+    description: 'Barber Apprenticeship - Payment Plan',
   },
 };
 
 type PaymentOption = 'full' | 'deposit' | 'installment';
 
-function getProgramPricing(programSlug: string): { full: number; deposit: number } {
-  return PROGRAM_PRICING[programSlug] || PROGRAM_PRICING['barber-apprenticeship'];
-}
-
 async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'contact');
   if (rateLimited) return rateLimited;
+
+  // Get Stripe instance at the start
+  const stripe = getStripe();
+  if (!stripe) {
+    return NextResponse.json({ error: 'Payment system not configured' }, { status: 503 });
+  }
 
   try {
     const supabase = await createClient();
@@ -124,16 +122,7 @@ async function _POST(request: NextRequest) {
       .maybeSingle();
 
     const customerEmail = profile?.email || user.email;
-    
-    // Get program-specific pricing
-    const programSlug = application.program_slug || 'barber-apprenticeship';
-    const programPricing = getProgramPricing(programSlug);
-    const programLabel = programSlug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    
-    const pricingConfig = {
-      amount: payment_option === 'deposit' ? programPricing.deposit : programPricing.full,
-      description: `${programLabel} - ${payment_option === 'deposit' ? 'BNPL Deposit' : payment_option === 'full' ? 'Full Payment' : 'Payment Plan'}`,
-    };
+    const pricing = PRICING[payment_option];
 
     // Build Stripe Checkout Session
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
@@ -144,11 +133,11 @@ async function _POST(request: NextRequest) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: pricingConfig.description,
+              name: pricing.description,
               description:
                 'Payment secures your enrollment. Training access unlocks after approval and shop assignment.',
             },
-            unit_amount: pricingConfig.amount,
+            unit_amount: pricing.amount,
           },
           quantity: 1,
         },
@@ -156,22 +145,21 @@ async function _POST(request: NextRequest) {
       // CRITICAL: Metadata for webhook processing
       metadata: {
         kind: 'apprenticeship_enrollment',
-        program: programSlug,
+        program: 'barber_apprenticeship',
         student_id: user.id,
         application_id: application_id,
         payment_option: payment_option,
         enrollment_flow: 'self_pay',
       },
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/enroll/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/enroll/payment?application_id=${application_id}&program=${programSlug}&canceled=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/enroll/payment?application_id=${application_id}&canceled=true`,
       // Enable installments/BNPL for installment option
       ...(payment_option === 'installment' && {
         payment_method_types: ['card', 'klarna', 'afterpay_clearpay'],
       }),
     };
 
-    const stripe = getStripe();
-    if (!stripe) return NextResponse.json({ error: 'Payment processing not configured' }, { status: 503 });
+    // Create checkout session (stripe is already validated at function start)
     const session = await stripe.checkout.sessions.create(sessionConfig);
 
     // Log the checkout attempt
@@ -180,7 +168,7 @@ async function _POST(request: NextRequest) {
       application_id: application_id,
       stripe_session_id: session.id,
       payment_option: payment_option,
-      amount: pricingConfig.amount,
+      amount: pricing.amount,
       status: 'checkout_started',
       metadata: sessionConfig.metadata,
     });

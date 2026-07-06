@@ -116,7 +116,7 @@ export default function UniversalPracticeExam() {
     [timeLeft],
   );
 
-  useEffect(() => {
+  useEffect((): void => {
     if (state !== 'active') return;
     timerRef.current = setInterval(() => {
       setTimeLeft((t) => {
@@ -133,7 +133,7 @@ export default function UniversalPracticeExam() {
   }, [state, finish]);
 
   // Save missed questions on results
-  useEffect(() => {
+  useEffect((): void => {
     if (state !== 'results') return;
     const missed = EXAM_QUESTIONS.filter((q) => answers[q.globalIndex] !== q.answer);
     if (!missed.length) return;

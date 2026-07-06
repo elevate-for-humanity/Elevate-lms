@@ -94,9 +94,12 @@ async function getUserStripeCustomerId(userId: string): Promise<string | null> {
 async function _GET(request: NextRequest) {
   try {
 
-    const authResult = await apiAuthGuard({ requireAuth: true });
-    if (!authResult.authorized) {
-      return NextResponse.json({ error: authResult.error }, { status: 401 });
+    const authResult = await apiAuthGuard(request);
+    if (authResult.error) {
+      return authResult.error;
+    }
+    if (!authResult.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const userId = authResult.id;
@@ -155,9 +158,12 @@ async function _POST(request: NextRequest) {
     }
 
     // All other actions require auth
-    const authResult = await apiAuthGuard({ requireAuth: true });
-    if (!authResult.authorized) {
-      return NextResponse.json({ error: authResult.error }, { status: 401 });
+    const authResult = await apiAuthGuard(request);
+    if (authResult.error) {
+      return authResult.error;
+    }
+    if (!authResult.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const userId = authResult.id;

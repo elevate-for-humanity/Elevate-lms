@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 // GET /api/admin/workflows — list workflows with trigger + step counts and recent run
 export async function GET(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const db = await requireAdminClient();
 
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     .select('*')
     .order('updated_at', { ascending: false });
 
-  if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Enrich with trigger + step counts
   const ids = (workflows ?? []).map((w: any) => w.id);
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 // POST /api/admin/workflows — create a new workflow
 export async function POST(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const body = await request.json();
   const { name, category, metadata } = body;
@@ -66,9 +66,9 @@ export async function POST(request: NextRequest) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  logAdminAudit({ action: AdminAction.WORKFLOW_CREATED, actorId: auth.id, entityType: 'workflows', entityId: data.id, metadata: { name, category }, req: request }).catch(() => {});
+  logAdminAudit({ action: AdminAction.WORKFLOW_CREATED, actorId: auth.id, entityType: 'workflows', entityId: data.id, metadata: { name, category }, req: request }).then(() => {}, () => {});
 
   return NextResponse.json({ workflow: data }, { status: 201 });
 }

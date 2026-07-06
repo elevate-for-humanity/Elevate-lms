@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const isAdmin = ['admin', 'staff'].includes(profile?.role ?? '');
+  const isAdmin = ['admin', 'super_admin', 'staff'].includes(profile?.role ?? '');
 
   if (!isAdmin) {
     const { data: app } = await db
@@ -191,7 +191,7 @@ async function reconcileApplication(db: SupabaseClient, applicationId: string, a
         metadata: { application_id: applicationId, rpc_error: rpcErr.message },
       })
       .then(() => {})
-      .catch(() => {});
+      .then(() => {}, () => {});
 
     return safeInternalError(rpcErr, 'Enrollment reconciliation failed');
   }

@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
       });
     } catch (err: unknown) {
       logger.error(`[orphan-check] unexpected error for ${config.table}`, undefined, {
-        error: 'Internal server error',
+        error: err instanceof Error ? err.message : String(err),
       });
       results.push({ table: config.table, orphaned_rows: -1, linkable_rows: -1, status: 'REVIEW' });
     }

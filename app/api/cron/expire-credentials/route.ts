@@ -28,7 +28,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (expErr) {
     logger.error('[cron/expire-credentials] Expire update failed', expErr);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: expErr.message }, { status: 500 });
   }
 
   // Warn about credentials expiring within 30 days
@@ -52,9 +52,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
         html: `<p>Hi ${profile.full_name ?? 'there'},</p><p>Your <strong>${cred.credential_type ?? 'credential'}</strong> expires in <strong>${daysLeft} days</strong>. Please contact your program coordinator to begin the renewal process.</p><p>— Elevate for Humanity</p>`,
       }).catch((e: unknown) => logger.warn('[cron/expire-credentials] Warn email failed', { cred_id: cred.id, error: String(e) }));
     }
-    await Promise.resolve(
-      db.from('credentials').update({ expiry_warned_at: now.toISOString() }).eq('id', cred.id)
-    ).catch(() => {});
+    await db.from('credentials').update({ expiry_warned_at: now.toISOString() }).eq('id', cred.id);
     warned++;
   }
 

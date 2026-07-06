@@ -20,7 +20,7 @@ export default async function PartnerApplicationDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireRole(['admin', 'staff']);
+  await requireRole(['admin', 'super_admin', 'staff']);
   const { id } = await params;
   const db = await requireAdminClient();
 

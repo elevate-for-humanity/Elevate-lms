@@ -95,7 +95,7 @@ async function _POST(request: Request) {
   const proctoringUrl =
     exam.proctoring_required && exam.proctoring_provider
       ? getProctoringLaunchUrl({
-          provider: exam.proctoring_provider as string,
+          provider: exam.proctoring_provider as 'proctorio' | 'respondus' | 'honorlock',
           examId: exam.id,
           attemptId: attempt.id,
           studentId,

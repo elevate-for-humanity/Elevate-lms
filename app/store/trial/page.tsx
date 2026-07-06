@@ -56,11 +56,6 @@ function TrialPageContent() {
     if (searchParams.get('vertical') === 'beauty') {
       setPrograms((prev) => (prev.trim() ? prev : BEAUTY_TRIAL_PROGRAMS_PREFILL));
     }
-
-    const mode = searchParams.get('mode');
-    if (mode === 'existing' || mode === 'new') {
-      setWebsiteMode(mode);
-    }
   }, [searchParams]);
   const [error, setError] = useState<string | null>(null);
   const [correlationId, setCorrelationId] = useState<string | null>(null);
@@ -121,7 +116,7 @@ function TrialPageContent() {
       <div className="min-h-screen bg-white">
         <section className="relative h-[160px] sm:h-[220px] overflow-hidden">
           {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-trial-hero.jpg" alt="Elevate platform" fill sizes="100vw" className="object-cover" priority  />
+          <Image src="/images/pages/store-trial-hero.webp" alt="Elevate platform" fill sizes="100vw" className="object-cover" priority placeholder="empty" />
         </section>
 
         <div className="bg-white border-b">
@@ -218,7 +213,7 @@ function TrialPageContent() {
     );
   }
 
-  // ── Form state ────────────────────────────────────────────────────────────
+  // ── Form state ─────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
@@ -234,7 +229,7 @@ function TrialPageContent() {
             {/* Left: value prop */}
             <div className="hidden lg:block">
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl border border-slate-200 mb-6">
-                <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-trial-detail.jpg" alt="Admin dashboard preview" fill sizes="50vw" className="object-cover"  />
+                <Image src="/images/pages/store-trial-detail.webp" alt="Admin dashboard preview" fill sizes="50vw" className="object-cover" placeholder="empty" />
               </div>
               <p className="text-sm text-slate-500 text-center mb-6">Your branded training website + LMS — ready in under 60 seconds</p>
               <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 space-y-3">

@@ -44,7 +44,6 @@ export const siteMapSections: SiteMapSection[] = [
       { label: 'HVAC Technician', href: '/programs/hvac-technician' },
       { label: 'Building Maintenance Tech', href: '/programs/building-maintenance-tech' },
       { label: 'CDL / Truck Driving', href: '/programs/cdl' },
-      { label: 'Tax Prep (VITA)', href: '/programs/tax-prep-vita' },
       { label: 'Workforce Readiness', href: '/programs/workforce-readiness' },
       { label: 'Micro Classes', href: '/programs/micro-classes' },
     ],
@@ -211,7 +210,6 @@ export const siteMapSections: SiteMapSection[] = [
     id: 'special-programs',
     title: 'Special Programs',
     items: [
-      { label: 'VITA Tax Program', href: '/programs/vita-tax' },
       { label: 'Selfish Inc', href: '/programs/selfish-inc' },
     ],
   },

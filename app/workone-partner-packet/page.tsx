@@ -163,12 +163,12 @@ export default function WorkOnePartnerPacketPage() {
               <div className="relative h-64 rounded-2xl overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workone-partner-packet-page-1.webp"
+                  src="/images/pages/workone-partner-packet-page-1.webp"
                   alt="Workforce partnership"
                   fill
                   quality={85}
                   className="object-cover"
-                  sizes="100vw" 
+                  sizes="100vw" placeholder="empty"
                 />
               </div>
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
@@ -239,12 +239,12 @@ export default function WorkOnePartnerPacketPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/partner-page-1.jpg"
+                  src="/images/pages/partner-page-1.jpg"
                   alt="Referral"
                   fill
                   sizes="100vw"
                   quality={85}
-                  className="object-cover" 
+                  className="object-cover" placeholder="empty"
                 />
               </div>
               <div className="p-6">
@@ -262,12 +262,12 @@ export default function WorkOnePartnerPacketPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/partner-page-14.webp"
+                  src="/images/pages/partner-page-14.webp"
                   alt="Enrollment"
                   fill
                   sizes="100vw"
                   quality={85}
-                  className="object-cover" 
+                  className="object-cover" placeholder="empty"
                 />
               </div>
               <div className="p-6">
@@ -285,12 +285,12 @@ export default function WorkOnePartnerPacketPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workone-packet-1.webp"
+                  src="/images/pages/workone-packet-1.webp"
                   alt="Training"
                   fill
                   sizes="100vw"
                   quality={85}
-                  className="object-cover" 
+                  className="object-cover" placeholder="empty"
                 />
               </div>
               <div className="p-6">
@@ -308,12 +308,12 @@ export default function WorkOnePartnerPacketPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workone-packet-2.webp"
+                  src="/images/pages/workone-packet-2.webp"
                   alt="Placement"
                   fill
                   sizes="100vw"
                   quality={85}
-                  className="object-cover" 
+                  className="object-cover" placeholder="empty"
                 />
               </div>
               <div className="p-6">
@@ -357,42 +357,42 @@ export default function WorkOnePartnerPacketPage() {
                 duration: '18 months',
                 credential: 'Indiana Barber License',
                 funding: 'WIOA, WRG, Apprenticeship',
-                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-gallery-1.webp',
+                image: '/images/pages/barber-gallery-1.webp',
               },
               {
                 title: 'Healthcare Certifications',
                 duration: '4-12 weeks',
                 credential: 'CNA, Medical Assistant, Home Health Aide',
                 funding: 'WIOA, WRG',
-                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-pathway-healthcare.webp',
+                image: '/images/pages/comp-pathway-healthcare.webp',
               },
               {
                 title: 'IT & Cybersecurity',
                 duration: '8-12 weeks',
                 credential: 'Certiport IT Specialist, Cisco CCST',
                 funding: 'WIOA, WRG',
-                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workone-partner-packet-page-1.webp',
+                image: '/images/pages/workone-partner-packet-page-1.webp',
               },
               {
                 title: 'CDL Training',
                 duration: '4-6 weeks',
                 credential: 'Class A CDL',
                 funding: 'WIOA, WRG',
-                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workone-partner-packet-page-1.webp',
+                image: '/images/pages/workone-partner-packet-page-1.webp',
               },
               {
                 title: 'Skilled Trades',
                 duration: '8-24 weeks',
                 credential: 'OSHA, NCCER, Industry Certs',
                 funding: 'WIOA, WRG, Apprenticeship',
-                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
+                image: '/images/pages/hvac-technician.webp',
               },
               {
                 title: 'Business & Office',
                 duration: '4-8 weeks',
                 credential: 'Microsoft Office, QuickBooks',
                 funding: 'WIOA, WRG',
-                image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/workone-partner-packet-page-1.webp',
+                image: '/images/pages/workone-partner-packet-page-1.webp',
               },
             ].map((program, index) => (
               <div
@@ -406,7 +406,7 @@ export default function WorkOnePartnerPacketPage() {
                     fill
                     sizes="100vw"
                     quality={85}
-                    className="object-cover" 
+                    className="object-cover" placeholder="empty"
                   />
                 </div>
                 <div className="p-6">
@@ -473,7 +473,7 @@ export default function WorkOnePartnerPacketPage() {
                     'WIOA Title I (DW)',
                     'WIOA Title I (Youth)',
                     'WRG (Workforce Ready Grant)',
-                    '',
+                    'SNAP E&T',
                     'TANF',
                     'TAA',
                     'Veterans Benefits',

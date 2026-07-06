@@ -222,11 +222,12 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
     );
 
     await logProvisioningEvent(correlationId, 'admin_created', 'started', tenantId);
-    const { data: existingUser } = await supabase.auth.admin.getUserByEmail(email);
+    const { data: users } = await supabase.auth.admin.listUsers();
+    const existingUser = users?.users.find(u => u.email === email);
     let temporaryPassword: string | undefined;
 
-    if (existingUser?.user) {
-      adminUserId = existingUser.user.id;
+    if (existingUser) {
+      adminUserId = existingUser.id;
       await supabase
         .from('profiles')
         .update({ tenant_id: tenantId, role: 'admin' })
@@ -331,8 +332,8 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
     await logAuditEvent({
       action: 'LICENSE_PROVISIONED',
       actor_id: adminUserId || 'system:license_provisioning',
-      target_type: 'license',
-      target_id: licenseId,
+      resourceType: 'license',
+      resourceId: licenseId,
       metadata: {
         correlation_id: correlationId,
         tenant_id: tenantId,
@@ -360,8 +361,8 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
     await logAuditEvent({
       action: 'LICENSE_PROVISIONING_FAILED',
       actor_id: 'system:license_provisioning',
-      target_type: 'license',
-      target_id: correlationId,
+      resourceType: 'license',
+      resourceId: correlationId,
       metadata: {
         correlation_id: correlationId,
         tenant_id: tenantId,
@@ -422,8 +423,8 @@ export async function suspendLicense(tenantId: string, reason: string): Promise<
   await logAuditEvent({
     action: 'LICENSE_SUSPENDED',
     actor_id: 'system:license_enforcement',
-    target_type: 'tenant',
-    target_id: tenantId,
+    resourceType: 'tenant',
+    resourceId: tenantId,
     metadata: { reason, correlation_id: correlationId },
   });
 
@@ -461,8 +462,8 @@ export async function reactivateLicense(tenantId: string): Promise<void> {
   await logAuditEvent({
     action: 'LICENSE_REACTIVATED',
     actor_id: 'system:license_enforcement',
-    target_type: 'tenant',
-    target_id: tenantId,
+    resourceType: 'tenant',
+    resourceId: tenantId,
     metadata: { correlation_id: correlationId },
   });
 

@@ -64,7 +64,6 @@ export const PROGRAM_SOC_MAP: Record<string, string> = {
   'entrepreneurship': '11-1011.00',      // Chief Executives
   'graphic-design': '27-1024.00',        // Graphic Designers
          // Tax Preparers
-  'tax-prep-financial-services': '13-2082.00',
 
   // ── Hospitality / Other ───────────────────────────────────────────────────
   'hospitality': '35-1012.00',           // First-Line Supervisors of Food Preparation and Serving Workers

@@ -98,7 +98,7 @@ export default function HeroVideo({
   const [videoSrc, setVideoSrc] = useState(videoSrcDesktop);
   const [ttsSupported, setTtsSupported] = useState(false);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (videoSrcMobile && window.innerWidth < 768) {
       setVideoSrc(videoSrcMobile);
     }
@@ -153,7 +153,7 @@ export default function HeroVideo({
 
   // src is resolved synchronously in useState initializer above — no swap needed.
 
-  useEffect(() => {
+  useEffect((): void => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
     // Voices may not be loaded yet on first render (Chrome async loads them).

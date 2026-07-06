@@ -48,7 +48,7 @@ export default function StoreHeroVideo() {
             muted
             playsInline
             preload="metadata"
-            poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-licensing-hero.jpg"
+            poster="/images/pages/store-licensing-hero.webp"
             onLoadedData={() => setIsLoaded(true)}
             onEnded={() => setHasEnded(true)}
             onError={() => setHasError(true)}
@@ -69,7 +69,7 @@ export default function StoreHeroVideo() {
         {hasError && (
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: 'url(/images/pages/store-licensing-hero.jpg)' }}
+            style={{ backgroundImage: 'url(/images/pages/store-licensing-hero.webp)' }}
           />
         )}
 

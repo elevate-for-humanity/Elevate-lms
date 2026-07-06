@@ -14,55 +14,10 @@ import {
   Award,
   Shield,
 } from 'lucide-react';
-import {
-  STORE_PRODUCTS,
-  CLONE_LICENSES,
-  type StoreProduct,
-} from '@/lib/data/store-products';
-import { getCatalogProducts, type CatalogProduct } from '@/lib/store/db';
+import { STORE_PRODUCTS, CLONE_LICENSES } from '@/lib/data/store-products';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
-
-type LicenseDisplayProduct = {
-  id: string;
-  slug: string;
-  name: string;
-  description: string;
-  price: number;
-  billingType: 'one_time' | 'subscription';
-  licenseType?: 'single' | 'school' | 'enterprise';
-  features: string[];
-  idealFor: string[];
-};
-
-function fromCatalogProduct(product: CatalogProduct): LicenseDisplayProduct {
-  return {
-    id: product.id,
-    slug: product.slug,
-    name: product.name,
-    description: product.description,
-    price: product.price / 100,
-    billingType: product.billingType,
-    licenseType: product.licenseType,
-    features: product.features,
-    idealFor: product.idealFor ? [product.idealFor] : [],
-  };
-}
-
-function fromStoreProduct(product: StoreProduct): LicenseDisplayProduct {
-  return {
-    id: product.id,
-    slug: product.slug,
-    name: product.name,
-    description: product.description,
-    price: product.price,
-    billingType: product.billingType,
-    licenseType: product.licenseType,
-    features: product.features,
-    idealFor: product.idealFor,
-  };
-}
 
 export const metadata: Metadata = {
   title: `Platform Licenses | ${PLATFORM_DEFAULTS.orgName} Store`,
@@ -74,23 +29,10 @@ export const metadata: Metadata = {
 };
 
 export default async function LicensesPage() {
-  const [dbStoreProducts, dbCloneProducts] = await Promise.all([
-    getCatalogProducts('store'),
-    getCatalogProducts('clone'),
-  ]);
-
-  // DB catalog is canonical; hardcoded list is dev/offline fallback only.
-  const licenseProducts: LicenseDisplayProduct[] =
-    dbStoreProducts.length > 0
-      ? dbStoreProducts.map(fromCatalogProduct)
-      : STORE_PRODUCTS.filter(
-          (p) => p.id.startsWith('efh-') && !p.id.includes('community'),
-        ).map(fromStoreProduct);
-
-  const cloneLicenses: LicenseDisplayProduct[] =
-    dbCloneProducts.length > 0
-      ? dbCloneProducts.map(fromCatalogProduct)
-      : CLONE_LICENSES.map(fromStoreProduct);
+  // Filter to only show main license products (not community add-ons)
+  const licenseProducts = STORE_PRODUCTS.filter(
+    (p) => p.id.startsWith('efh-') && !p.id.includes('community')
+  );
 
   return (
     <div className="bg-white">
@@ -103,19 +45,19 @@ export default async function LicensesPage() {
           loop
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          poster="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-licensing-enterprise-hero.webp"
+          poster="/images/pages/store-licensing-enterprise-hero.webp"
         >
           <source src="/videos/training-providers-video-with-narration.mp4" type="video/mp4" />
         </video>
         {/* Fallback Image */}
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image sizes="100vw"
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-licensing-enterprise-hero.webp"
+          src="/images/pages/store-licensing-enterprise-hero.webp"
           alt="Workforce training platform"
           fill
           className="object-cover -z-10"
           priority
-          quality={90} 
+          quality={90} placeholder="empty"
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-zinc-900/95 via-zinc-900/80 to-zinc-900/60" />
@@ -304,7 +246,7 @@ export default async function LicensesPage() {
       </section>
 
       {/* Clone Licenses Section */}
-      {cloneLicenses.length > 0 && (
+      {CLONE_LICENSES && CLONE_LICENSES.length > 0 && (
         <section className="px-4 sm:px-6 lg:px-8 py-20 bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
@@ -322,7 +264,7 @@ export default async function LicensesPage() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
-              {cloneLicenses.map((license) => (
+              {CLONE_LICENSES.map((license) => (
                 <div
                   key={license.id}
                   className="bg-slate-50 rounded-2xl p-8 border border-slate-200 hover:border-purple-300 hover:shadow-lg transition-all"
@@ -408,7 +350,7 @@ export default async function LicensesPage() {
               </div>
               <h3 className="text-xl font-bold mb-3">Deploy Anywhere</h3>
               <p className="text-zinc-400">
-                Northflank, Docker on any cloud, or self-hosted. Managed trial at /store/trial
+                Vercel, AWS, Azure, GCP, or self-hosted. One-click deployment
                 templates included.
               </p>
             </div>
@@ -474,10 +416,10 @@ export default async function LicensesPage() {
       {/* CTA */}
       <section className="relative px-4 sm:px-6 lg:px-8 py-20 overflow-hidden">
         <Image sizes="100vw"
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/team-4.webp"
+          src="/images/business/team-4.webp"
           alt="Get started"
           fill
-          className="object-cover" 
+          className="object-cover" placeholder="empty"
         />
         <div className="absolute inset-0 bg-zinc-900/90" />
 

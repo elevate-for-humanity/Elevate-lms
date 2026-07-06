@@ -11,7 +11,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { getStripe } from '@/lib/stripe/client';
-import { createPaymentMethodUpdatePortalSession } from '@/lib/stripe/payment-method-portal';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
@@ -40,8 +39,7 @@ export async function POST(request: NextRequest) {
   if (!db) return safeError('Service unavailable', 503);
 
   const stripe = getStripe();
-  if (!stripe)
-    return NextResponse.json({ error: 'Payment processing not configured' }, { status: 503 });
+  if (!stripe) return NextResponse.json({ error: 'Payment processing not configured' }, { status: 503 });
 
   try {
     // Get the user's barber subscription
@@ -61,15 +59,11 @@ export async function POST(request: NextRequest) {
       return safeError('No Stripe customer on record', 404);
     }
 
-    const returnUrl = request.headers.get('referer')?.includes('/apprentice/billing')
-      ? `${SITE_URL}/apprentice?billing=updated`
-      : `${SITE_URL}/billing-required?updated=1`;
-
-    const session = await createPaymentMethodUpdatePortalSession(
-      stripe,
-      sub.stripe_customer_id,
-      returnUrl,
-    );
+    // Create Stripe Billing Portal session
+    const session = await stripe.billingPortal.sessions.create({
+      customer: sub.stripe_customer_id,
+      return_url: `${SITE_URL}/billing-required?updated=1`,
+    });
 
     logger.info('[update-payment] Portal session created', { userId: user.id, subId: sub.id });
 

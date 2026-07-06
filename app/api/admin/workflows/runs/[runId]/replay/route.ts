@@ -4,7 +4,7 @@
  * Re-executes a failed or cancelled workflow run using the original trigger payload.
  * Guards against double-fire: returns 409 if the workflow already has a 'running' run.
  *
- * Auth: admin / admin only.
+ * Auth: admin / super_admin only.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
@@ -20,7 +20,7 @@ export async function POST(
   { params }: { params: Promise<{ runId: string }> },
 ) {
   const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+  if (auth instanceof NextResponse) return auth;
 
   const { runId } = await params;
   const traceId = request.headers.get('x-trace-id') ?? 'no-trace';

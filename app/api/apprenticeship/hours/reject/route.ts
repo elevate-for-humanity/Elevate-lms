@@ -41,12 +41,12 @@ async function notifyHourRejected(
       },
       idempotency_key: `hours-rejected-learner-${hourId}-${studentUserId}`,
     })
-    .catch(() => {});
+    
 
   const { data: admins } = await adminDb
     .from('profiles')
     .select('id')
-    .in('role', ['admin', 'staff'])
+    .in('role', ['admin', 'super_admin', 'staff'])
     .limit(200);
 
   if (admins?.length) {
@@ -68,7 +68,7 @@ async function notifyHourRejected(
       },
       idempotency_key: `hours-rejected-admin-${hourId}-${admin.id}`,
     }));
-    await adminDb.from('notifications').insert(rows).catch(() => {});
+    await adminDb.from('notifications').insert(rows);
   }
 }
 
@@ -105,7 +105,7 @@ async function _POST(req: Request) {
       .eq('user_id', user.id)
       .maybeSingle();
 
-    const isAdmin = profile?.role && ['admin'].includes(profile.role);
+    const isAdmin = profile?.role && ['admin', 'super_admin'].includes(profile.role);
     const isPartner = !!partnerUser;
 
     if (!isAdmin && !isPartner) {

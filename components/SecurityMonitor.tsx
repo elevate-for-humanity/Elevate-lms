@@ -11,7 +11,7 @@ import { logSecurityEventAction } from '@/lib/actions/security';
  * Monitors and logs security events in real-time
  */
 export function SecurityMonitor() {
-  useEffect(() => {
+  useEffect((): void => {
     // Safety check - only run in browser
     if (typeof window === 'undefined') return;
 
@@ -244,3 +244,6 @@ export function SecurityBadge() {
   // Removed from homepage to avoid "internal system" feel
   return null;
 }
+
+// Default export for next/dynamic
+export default SecurityMonitor;

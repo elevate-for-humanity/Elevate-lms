@@ -341,9 +341,10 @@ export const CLONE_LICENSES: StoreProduct[] = [
 export const ALL_PRODUCTS: StoreProduct[] = [
   ...WORKFORCE_PLATFORM_PLANS,
   ...CLONE_LICENSES,
-  ...COMMUNITY_ADDONS,
-  ...GRANT_CONTRACT_ADDONS,
 ];
-// Aliases for backwards compatibility
-export const ALL_PRODUCTS = [...PLATFORM_APPS];
 export const STORE_PRODUCTS = [...WORKFORCE_PLATFORM_PLANS];
+
+// Lookup helper
+export function getProductBySlug(slug: string): StoreProduct | undefined {
+  return ALL_PRODUCTS.find((p) => p.slug === slug);
+}

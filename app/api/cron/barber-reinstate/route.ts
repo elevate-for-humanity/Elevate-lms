@@ -25,7 +25,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 
   if (error) {
     logger.error('[cron/barber-reinstate] DB error', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
   if (!toReinstate?.length) return NextResponse.json({ ok: true, reinstated: 0 });
@@ -52,13 +52,12 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     }
 
     // Restore program enrollment
-    await Promise.resolve(
-      db
-        .from('program_enrollments')
-        .update({ status: 'active', updated_at: new Date().toISOString() })
-        .eq('user_id', sub.student_id)
-        .eq('status', 'suspended')
-    ).catch((e: unknown) => logger.warn('[cron/barber-reinstate] Enrollment restore failed', { error: String(e) }));
+    await db
+      .from('program_enrollments')
+      .update({ status: 'active', updated_at: new Date().toISOString() })
+      .eq('user_id', sub.student_id)
+      .eq('status', 'suspended')
+      .then(() => {}, (e: unknown) => logger.warn('[cron/barber-reinstate] Enrollment restore failed', { error: String(e) }));
 
     if (profile?.email) {
       await sendEmail({

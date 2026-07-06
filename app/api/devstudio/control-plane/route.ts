@@ -1,3 +1,5 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 /**
  * Control Plane API Routes
  * GET /api/devstudio/control-plane/map - Get platform map
@@ -6,6 +8,9 @@
  * GET /api/devstudio/control-plane/logs - Get platform logs
  * GET /api/devstudio/control-plane/integrations - Get integrations
  */
+
+import { db } from '@/lib/db';
+
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -20,7 +25,7 @@ export async function GET(req: NextRequest) {
   const endpoint = url.pathname.split('/').pop();
 
   try {
-    const { createClient } = await import('@/lib/supabase/server');
+    const { createClient, safeGetUser } = await import('@/lib/supabase/server');
     const { requireAdminClient } = await import('@/lib/supabase/admin');
     const { getPlatformMap, checkAllHealth, getPlatformLogs, getIntegrations } = await import('@/lib/control-plane');
     const { logger } = await import('@/lib/logger');
@@ -80,7 +85,7 @@ export async function GET(req: NextRequest) {
 // POST /api/devstudio/control-plane/action
 export async function POST(req: NextRequest) {
   try {
-    const { createClient } = await import('@/lib/supabase/server');
+    const { createClient, safeGetUser } = await import('@/lib/supabase/server');
     const { requireAdminClient } = await import('@/lib/supabase/admin');
     const { executeControlAction, approveAction } = await import('@/lib/control-plane');
     const { logger } = await import('@/lib/logger');
@@ -127,3 +132,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+

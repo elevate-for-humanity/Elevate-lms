@@ -118,3 +118,6 @@ export function WorkOneIndianaMap({ region, showAllRegionsLink = true }: WorkOne
     </section>
   );
 }
+
+// Default export for next/dynamic
+export default WorkOneIndianaMap;

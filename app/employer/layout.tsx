@@ -15,7 +15,7 @@ export const metadata = {
 
 export default async function EmployerLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
-  const user = safeGetUser(await supabase.auth.getUser());
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     const { headers: headersList } = await import('next/headers');

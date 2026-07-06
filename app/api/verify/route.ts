@@ -1,17 +1,28 @@
 // PUBLIC ROUTE: public verification endpoint
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+import crypto from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { getClientIp, hashIp } from '@/lib/api/get-client-ip';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
+
+function getClientIp(headers: Headers): string {
+  const xff = headers.get('x-forwarded-for');
+  if (xff) return xff.split(',')[0].trim();
+  return headers.get('x-real-ip')?.trim() || '0.0.0.0';
+}
+
+function hashIp(ip: string): string {
+  const salt = process.env.VERIFY_RATE_LIMIT_SALT || 'elevate-verify-default';
+  return crypto.createHash('sha256').update(`${ip}:${salt}`).digest('hex');
+}
 
 function normalizeCredentialId(input: string): string {
   return input.trim().toUpperCase().replace(/\s+/g, '');
@@ -38,8 +49,8 @@ async function logAudit(
  */
 async function _POST(req: NextRequest) {
   const supabase = await requireAdminClient();
-  const ip = getClientIp(req);
-  const ipHash = hashIp(ip, process.env.VERIFY_RATE_LIMIT_SALT || 'elevate-verify-default', 64);
+  const ip = getClientIp(req.headers);
+  const ipHash = hashIp(ip);
 
   try {
     const rateLimited = await applyRateLimit(req, 'contact');

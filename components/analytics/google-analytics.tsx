@@ -97,3 +97,6 @@ export function updateConsent(analyticsAllowed: boolean, adsAllowed: boolean = f
     });
   }
 }
+
+// Default export for next/dynamic
+export default GoogleAnalytics;

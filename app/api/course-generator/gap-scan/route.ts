@@ -1,13 +1,15 @@
+import { createClient, safeGetUser } from '@/lib/supabase/server';
 /**
  * Course Gap Scanner API
  * POST /api/course-generator/gap-scan - Scan for missing content
  * POST /api/course-generator/gap-scan/generate-drafts - Create draft jobs from gaps
  */
 
+import { db } from '@/lib/db';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { writeApiAuditEvent } from '@/lib/audit/api-audit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { scanAllGaps, createDraftJobsFromGaps, type CourseGap } from '@/lib/ai/course-gap-detection';
@@ -50,14 +52,14 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'No gaps provided' }, { status: 400 });
       }
 
-      const jobIds = await createDraftJobsFromGaps(gaps);
+      const jobIds = await createDraftJobsFromGaps(gaps as any);
 
-      await withApiAudit({
-        userId: user.id,
-        tenantId: profile.tenant_id,
-        action: 'course_gap_drafts_generated',
-        resourceType: 'course_generation_jobs',
-        details: { gap_count: gaps.length, job_ids: jobIds },
+      await writeApiAuditEvent({
+        endpoint: '/api/course-generator/gap-scan',
+        method: 'POST',
+        actor_type: 'admin',
+        actor_id: user.id,
+        result: 'success',
       });
 
       return NextResponse.json({
@@ -70,18 +72,20 @@ export async function POST(req: NextRequest) {
     // Default: run the scan
     const scanResult = await scanAllGaps();
 
-    await withApiAudit({
-      userId: user.id,
-      tenantId: profile.tenant_id,
-      action: 'course_gap_scan_completed',
-      resourceType: 'gap_scan',
-      details: {
+    await writeApiAuditEvent({
+      endpoint: '/api/course-generator/gap-scan',
+      method: 'POST',
+      actor_type: 'admin',
+      actor_id: user.id,
+      params: {
+        action: 'scan',
         total_gaps: scanResult.total_gaps,
         critical: scanResult.critical_gaps,
         high: scanResult.high_gaps,
         medium: scanResult.medium_gaps,
         low: scanResult.low_gaps,
       },
+      result: 'success',
     });
 
     return NextResponse.json({
@@ -136,3 +140,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+

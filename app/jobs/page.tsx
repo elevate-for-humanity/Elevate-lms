@@ -1,345 +1,230 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
-import { createPublicClient } from '@/lib/supabase/public';
-import { Briefcase, MapPin, Clock, ExternalLink, BadgeCheck, Zap, Building2, ChevronRight } from 'lucide-react';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-
-export const revalidate = 900; // 15 min
+import { Briefcase, GraduationCap, DollarSign, Clock, ArrowRight, CheckCircle2, Users, Building2 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: `Job Board | ${PLATFORM_DEFAULTS.orgName}`,
-  description:
-    'Browse job openings from Elevate employer partners, OJT opportunities, apprenticeship positions, and WIOA-approved placements in Indiana.',
-  openGraph: {
-    title: `Job Board | ${PLATFORM_DEFAULTS.orgName}`,
-    description: 'Workforce-aligned job openings — OJT, apprenticeships, and WIOA-approved positions.',
+  title: 'Career Programs & Training | Elevate for Humanity',
+  description: 'Explore workforce training programs and apprenticeship opportunities. Earn while you learn with WIOA funding and employer partnerships in healthcare, skilled trades, and technology.',
+};
+
+const programs = [
+  {
+    category: 'Healthcare',
+    slug: 'healthcare',
+    title: 'Healthcare Programs',
+    jobs: ['Certified Nursing Assistant (CNA)', 'Medical Assistant', 'Pharmacy Technician', 'Phlebotomy Technician'],
+    salary: '$28,000 - $45,000',
+    timeframe: '4-12 weeks',
+    funding: 'WIOA & Next Level Jobs eligible',
   },
-};
+  {
+    category: 'Skilled Trades',
+    slug: 'skilled-trades',
+    title: 'Skilled Trades',
+    jobs: ['HVAC Technician', 'Electrical', 'Plumbing', 'Welding', 'Diesel Mechanic', 'CDL Truck Driver'],
+    salary: '$35,000 - $65,000',
+    timeframe: '8-52 weeks',
+    funding: 'High employer demand',
+  },
+  {
+    category: 'Technology',
+    slug: 'technology',
+    title: 'Technology Programs',
+    jobs: ['IT Help Desk', 'Network Administration', 'Cybersecurity', 'Software Development', 'Web Development'],
+    salary: '$40,000 - $80,000',
+    timeframe: '12-24 weeks',
+    funding: 'Growing field',
+  },
+  {
+    category: 'Personal Services',
+    slug: 'personal-services',
+    title: 'Personal Services (Apprenticeships)',
+    jobs: ['Barber', 'Cosmetologist', 'Esthetician', 'Nail Technician'],
+    salary: '$30,000 - $55,000+',
+    timeframe: '1-2 years (earn while you learn)',
+    funding: 'DOL Registered Apprenticeship',
+  },
+  {
+    category: 'Business & Admin',
+    slug: 'business',
+    title: 'Business & Administrative',
+    jobs: ['Office Administration', 'Bookkeeping', 'Project Management', 'Business Administration'],
+    salary: '$32,000 - $50,000',
+    timeframe: '8-16 weeks',
+    funding: 'WIOA eligible',
+  },
+];
 
-async function getJobs() {
-  const db = createPublicClient();
-
-  // Internal employer-posted jobs
-  const { data: internalJobs } = await db
-    .from('public_job_board')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(60);
-
-  // Government feed jobs (most recent 40)
-  const { data: govJobs } = await db
-    .from('government_job_feed')
-    .select('id,source,title,organization,location,salary_range,job_type,remote_type,application_url,posted_at,closes_at')
-    .order('imported_at', { ascending: false })
-    .limit(40);
-
-  return {
-    internal: internalJobs ?? [],
-    government: govJobs ?? [],
-  };
-}
-
-const SOURCE_LABEL: Record<string, string> = {
-  usajobs: 'USAJobs.gov',
-  careeronestop: 'CareerOneStop',
-  indiana_career_connect: 'Indiana Career Connect',
-};
-
-const SOURCE_COLOR: Record<string, string> = {
-  usajobs: 'bg-blue-50 text-blue-700 border-blue-200',
-  careeronestop: 'bg-brand-green-50 text-brand-green-700 border-brand-green-200',
-  indiana_career_connect: 'bg-amber-50 text-amber-700 border-amber-200',
-};
-
-export default async function JobBoardPage() {
-  const { internal, government } = await getJobs();
-  const totalJobs = internal.length + government.length;
-
+export default function JobsPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Hero */}
-      <div className="bg-brand-blue-900 text-white py-14 px-4">
-        <div className="max-w-5xl mx-auto">
-          <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Jobs' }]} />
-          <h1 className="text-3xl md:text-4xl font-extrabold mt-4 mb-3">
-            Workforce Job Board
-          </h1>
-          <p className="text-brand-blue-200 text-lg max-w-2xl">
-            Job openings from Elevate employer partners, federal and state government sources,
-            OJT opportunities, and WIOA-approved positions — all in one place.
-          </p>
-          <div className="flex flex-wrap gap-3 mt-6">
-            <span className="bg-brand-blue-800/40 text-white text-sm font-semibold px-3 py-1.5 rounded-full">
-              {totalJobs} open positions
-            </span>
-            <span className="bg-brand-blue-800/40 text-white text-sm font-semibold px-3 py-1.5 rounded-full">
-              USAJobs · CareerOneStop · Indiana Career Connect
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-4 py-10 space-y-10">
-
-        {/* Employer CTA */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <p className="font-bold text-slate-900">Are you an employer?</p>
-            <p className="text-sm text-slate-500 mt-0.5">
-              Post a job, OJT position, or apprenticeship opening — reach Elevate graduates directly.
+      <section className="bg-gradient-to-br from-brand-blue-700 via-brand-blue-800 to-brand-blue-900 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <p className="text-blue-200 font-semibold mb-3 tracking-wide uppercase text-sm">Career Training</p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              Launch Your Career With Funded Training
+            </h1>
+            <p className="text-xl text-blue-100 leading-relaxed">
+              From healthcare to skilled trades to technology — we help you get trained, certified, and hired. 
+              Many programs are free or low-cost with WIOA funding, apprenticeships, and employer sponsorships.
             </p>
           </div>
-          <div className="flex gap-3 flex-shrink-0">
-            <Link
-              href="/apply/employer"
-              className="text-sm font-semibold text-brand-blue-700 border border-brand-blue-300 hover:bg-brand-blue-50 px-4 py-2 rounded-lg transition-colors"
-            >
-              Employer Application
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="py-12 bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-3xl md:text-4xl font-bold text-brand-orange-600">40+</div>
+              <div className="text-slate-600 text-sm">Training Programs</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-bold text-brand-orange-600">DOL</div>
+              <div className="text-slate-600 text-sm">Registered Apprenticeships</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-bold text-brand-orange-600">WIOA</div>
+              <div className="text-slate-600 text-sm">Approved Provider</div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-bold text-brand-orange-600">Free</div>
+              <div className="text-slate-600 text-sm">Eligibility Screening</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Programs Grid */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8 text-center">
+            Explore Career Paths
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {programs.map((program) => (
+              <div key={program.category} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div className="bg-gradient-to-r from-brand-blue-600 to-brand-blue-700 text-white p-4">
+                  <h3 className="text-lg font-bold">{program.title}</h3>
+                </div>
+                <div className="p-6">
+                  <div className="mb-4">
+                    <p className="text-sm font-semibold text-slate-700 mb-2">Career Paths:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {program.jobs.slice(0, 3).map((job) => (
+                        <span key={job} className="inline-block bg-slate-100 text-slate-700 text-xs px-2 py-1 rounded">
+                          {job}
+                        </span>
+                      ))}
+                      {program.jobs.length > 3 && (
+                        <span className="inline-block bg-slate-100 text-slate-500 text-xs px-2 py-1 rounded">
+                          +{program.jobs.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-sm mb-4">
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <DollarSign className="w-4 h-4 text-green-600" />
+                      <span>Avg. Start: {program.salary}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <Clock className="w-4 h-4 text-brand-blue-600" />
+                      <span>{program.timeframe}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <GraduationCap className="w-4 h-4 text-brand-orange-600" />
+                      <span>{program.funding}</span>
+                    </div>
+                  </div>
+                  <Link
+                    href={`/programs/${program.slug}`}
+                    className="block w-full text-center bg-brand-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-brand-blue-700 transition-colors"
+                  >
+                    View Programs →
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-16 bg-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8 text-center">
+            How Funded Training Works
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-brand-orange-600">1</span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Check Eligibility</h3>
+              <p className="text-slate-600 text-sm">
+                Take our 2-minute quiz or meet with an advisor to see what funding you qualify for — WIOA, grants, or employer sponsorship.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-brand-orange-600">2</span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Choose Your Path</h3>
+              <p className="text-slate-600 text-sm">
+                Select from 40+ programs in healthcare, trades, technology, and more. We&apos;ll help you find the right fit for your goals.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-brand-orange-600">3</span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Get Trained & Hired</h3>
+              <p className="text-slate-600 text-sm">
+                Complete your training, earn industry credentials, and connect with employers who are hiring.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* For Employers */}
+      <section className="py-16 bg-gradient-to-br from-purple-900 to-purple-800 text-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Building2 className="w-12 h-12 mx-auto mb-4 text-purple-300" />
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">Are You an Employer?</h2>
+          <p className="text-purple-200 text-lg mb-8 max-w-2xl mx-auto">
+            Build your talent pipeline with pre-screened candidates, apprenticeship programs, and tax credits for hiring.
+          </p>
+          <Link
+            href="/for-employers"
+            className="inline-flex items-center gap-2 bg-white text-purple-900 font-bold py-3 px-8 rounded-lg hover:bg-purple-100 transition-colors"
+          >
+            Partner With Us <ArrowRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16 bg-brand-orange-600 text-white">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4">Ready to Start Your New Career?</h2>
+          <p className="text-xl text-orange-100 mb-8">
+            Get free guidance on funding options and the right program for your goals.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/check-eligibility" className="bg-white text-brand-orange-600 font-bold py-4 px-8 rounded-lg hover:bg-orange-50">
+              Check My Eligibility
             </Link>
-            <Link
-              href="/employer/post-job"
-              className="text-sm font-semibold text-white bg-brand-blue-700 hover:bg-brand-blue-800 px-4 py-2 rounded-lg transition-colors"
-            >
-              Post a Job →
+            <Link href="/contact" className="bg-transparent border-2 border-white text-white font-bold py-4 px-8 rounded-lg hover:bg-white/10">
+              Talk to an Advisor
             </Link>
           </div>
         </div>
-
-        {/* Internal jobs — employer partners */}
-        {internal.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                <BadgeCheck className="w-5 h-5 text-brand-green-600" />
-                Elevate Employer Partners
-              </h2>
-              <Link href="/employers" className="text-sm font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
-                View all employers <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="space-y-3">
-              {internal.map((job: any) => (
-                <JobCard key={job.id} job={job} isInternal />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Government feed */}
-        {government.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                <Zap className="w-5 h-5 text-amber-500" />
-                Government Job Feed
-              </h2>
-              {/* CareerOneStop logo — required by API terms */}
-              <a
-                href="https://www.careeronestop.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700"
-                title="Powered by CareerOneStop"
-              >
-                <span className="font-semibold">Powered by</span>
-                <span className="font-bold text-brand-green-700 bg-brand-green-50 border border-brand-green-200 px-2 py-0.5 rounded">
-                  CareerOneStop
-                </span>
-              </a>
-            </div>
-            <div className="space-y-3">
-              {government.map((job: any) => (
-                <GovJobCard key={job.id} job={job} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {totalJobs === 0 && (
-          <div className="text-center py-20">
-            <Briefcase className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-500 font-semibold">No jobs posted yet.</p>
-            <p className="text-slate-400 text-sm mt-1">
-              Check back soon — or{' '}
-              <Link href="/apply/employer" className="text-brand-blue-600 hover:underline">
-                become an employer partner
-              </Link>
-              .
-            </p>
-          </div>
-        )}
-
-        {/* Indiana Career Connect link-out */}
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
-          <h3 className="font-bold text-amber-900 mb-1">Indiana Career Connect</h3>
-          <p className="text-sm text-amber-800 mb-4">
-            Browse thousands of additional jobs on Indiana&apos;s official workforce portal,
-            powered by the Indiana Department of Workforce Development.
-          </p>
-          <a
-            href="https://www.indianacareerconnect.com/jobs/search"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-amber-900 bg-amber-100 hover:bg-amber-200 px-4 py-2 rounded-lg transition-colors"
-          >
-            <ExternalLink className="w-4 h-4" />
-            Search Indiana Career Connect →
-          </a>
-        </div>
-
-        {/* USAJobs link-out */}
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
-          <h3 className="font-bold text-blue-900 mb-1">Federal Jobs — USAJobs.gov</h3>
-          <p className="text-sm text-blue-800 mb-4">
-            Search federal government job openings across all agencies. Many positions qualify
-            for WIOA-funded training and OJT reimbursement.
-          </p>
-          <a
-            href="https://www.usajobs.gov/Search/Results?l=Indiana"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-blue-900 bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg transition-colors"
-          >
-            <ExternalLink className="w-4 h-4" />
-            Search USAJobs.gov →
-          </a>
-        </div>
-
-        {/* CareerOneStop required attribution */}
-        <div className="border-t border-slate-200 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <p className="text-xs text-slate-400 max-w-lg">
-            Some job listings are sourced from{' '}
-            <a
-              href="https://www.careeronestop.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-slate-500 hover:underline"
-            >
-              CareerOneStop
-            </a>
-            , sponsored by the U.S. Department of Labor, Employment and Training Administration.
-            CareerOneStop is an equal opportunity employer/program. Auxiliary aids and services
-            are available upon request to individuals with disabilities.
-          </p>
-          <a
-            href="https://www.careeronestop.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-shrink-0 flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 hover:border-slate-300 transition-colors"
-            title="CareerOneStop — Sponsored by the U.S. Department of Labor"
-          >
-            <Image
-              src="https://www.careeronestop.org/images/careeronestop-logo.png"
-              alt="CareerOneStop"
-              width={140}
-              height={32}
-              sizes="140px"
-              
-              className="h-8 w-auto"
-              unoptimized
-            />
-          </a>
-        </div>
-
-      </div>
-    </div>
-  );
-}
-
-function JobCard({ job, isInternal }: { job: any; isInternal?: boolean }) {
-  return (
-    <div className="bg-white border border-slate-200 rounded-xl p-5 hover:border-brand-blue-300 transition-colors">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-1">
-            <h3 className="font-bold text-slate-900 text-sm">{job.title}</h3>
-            {isInternal && (
-              <span className="text-xs font-semibold text-brand-green-700 bg-brand-green-50 border border-brand-green-200 px-2 py-0.5 rounded-full flex items-center gap-1">
-                <BadgeCheck className="w-3 h-3" /> Partner
-              </span>
-            )}
-            {job.is_ojt && (
-              <span className="text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full">OJT</span>
-            )}
-            {job.is_apprenticeship && (
-              <span className="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">Apprenticeship</span>
-            )}
-            {job.wotc_eligible && (
-              <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">WOTC</span>
-            )}
-            {job.wioa_approved && (
-              <span className="text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full">WIOA</span>
-            )}
-          </div>
-          <p className="text-sm text-slate-600 font-medium">{job.employer_name}</p>
-          <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-400 flex-wrap">
-            {job.location && (
-              <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{job.location}</span>
-            )}
-            {job.salary_range && (
-              <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" />{job.salary_range}</span>
-            )}
-            {job.remote_type && job.remote_type !== 'onsite' && (
-              <span className="capitalize">{job.remote_type}</span>
-            )}
-          </div>
-        </div>
-        <a
-          href={job.application_url ?? `/careers/${job.id}`}
-          target={job.application_url ? '_blank' : undefined}
-          rel={job.application_url ? 'noopener noreferrer' : undefined}
-          className="flex-shrink-0 text-xs font-bold text-white bg-brand-blue-700 hover:bg-brand-blue-800 px-4 py-2 rounded-lg transition-colors"
-        >
-          Apply →
-        </a>
-      </div>
-    </div>
-  );
-}
-
-function GovJobCard({ job }: { job: any }) {
-  const sourceLabel = SOURCE_LABEL[job.source] ?? job.source;
-  const sourceColor = SOURCE_COLOR[job.source] ?? 'bg-slate-50 text-slate-600 border-slate-200';
-
-  return (
-    <div className="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 transition-colors">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-1">
-            <h3 className="font-bold text-slate-900 text-sm">{job.title}</h3>
-            <span className={`text-xs font-semibold border px-2 py-0.5 rounded-full ${sourceColor}`}>
-              {sourceLabel}
-            </span>
-          </div>
-          {job.organization && (
-            <p className="text-sm text-slate-600 font-medium">{job.organization}</p>
-          )}
-          <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-400 flex-wrap">
-            {job.location && (
-              <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{job.location}</span>
-            )}
-            {job.salary_range && (
-              <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" />{job.salary_range}</span>
-            )}
-            {job.posted_at && (
-              <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {new Date(job.posted_at).toLocaleDateString()}
-              </span>
-            )}
-          </div>
-        </div>
-        <a
-          href={job.application_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-shrink-0 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg transition-colors flex items-center gap-1"
-        >
-          Apply <ExternalLink className="w-3 h-3" />
-        </a>
-      </div>
+      </section>
     </div>
   );
 }

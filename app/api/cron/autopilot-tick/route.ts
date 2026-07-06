@@ -26,3 +26,4 @@ async function _GET(request: Request) {
 }
 
 export const GET = withRuntime(_GET);
+

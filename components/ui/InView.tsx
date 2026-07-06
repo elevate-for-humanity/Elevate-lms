@@ -72,7 +72,7 @@ export function InView({
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
+  useEffect((): void => {
     setMounted(true);
     const el = ref.current;
     if (!el) return;

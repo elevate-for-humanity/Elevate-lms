@@ -25,7 +25,7 @@ async function _POST(req: Request) {
     const supabase = await createClient();
 
     // DB write is required — no fallthrough on failure
-    const booking = await requireDbWrite(
+    const booking = await requireDbWrite<{ id: string }>(
       supabase
         .from('appointments')
         .insert({
@@ -42,7 +42,7 @@ async function _POST(req: Request) {
           source: 'website',
         })
         .select()
-        .maybeSingle(),
+        .maybeSingle() as unknown as Promise<{ data: { id: string } | null; error: unknown }>,
       'Failed to create booking',
     );
 

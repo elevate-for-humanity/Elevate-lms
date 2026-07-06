@@ -35,7 +35,6 @@ const courses = [
     title: 'Peer Recovery Specialist',
     color: '#10b981',
   },
-  { slug: 'tax-prep', title: 'Tax Preparation Professional', color: '#2563eb' },
   {
     slug: 'medical-assistant',
     title: 'Medical Assistant Training',

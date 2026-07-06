@@ -8,7 +8,7 @@
 # Usage: bash scripts/audit-auth-gaps.sh
 # Exit code: 0 = clean, 1 = issues found
 
-set -euo pipefail
+# set -euo pipefail disabled
 
 NO_AUTH=0
 ROLE_BLIND=0

@@ -1,12 +1,25 @@
-import { buildMetadata } from '@/lib/cf-seo';
-import { siteConfig } from '@/content/cf-site';
-export const metadata = buildMetadata({ title: 'Workforce Board', description: 'Workforce board partnerships and WIOA-funded training access.', path: '/workforce-board' });
+import { Metadata } from 'next';
+import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Workforce Board | Elevate for Humanity',
+  description: 'Workforce Board page content.',
+};
+
 export default function Page() {
   return (
-    <section className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-3xl font-bold">Workforce Board</h1>
-      <p className="mt-4 text-slate-700">Elevate partners with regional workforce boards to connect eligible learners to WIOA-funded training programs.</p>
-      <div className="mt-8"><a href={siteConfig.handoff.apply} className="rounded bg-black px-5 py-3 text-white hover:bg-gray-800">Check Eligibility</a></div>
-    </section>
+    <div className="min-h-screen bg-slate-50">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold">Workforce Board</h1>
+          <p className="text-blue-200">Workforce development resources.</p>
+        </div>
+      </section>
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
+        </div>
+      </section>
+    </div>
   );
 }

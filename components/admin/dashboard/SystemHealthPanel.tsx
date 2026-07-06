@@ -143,20 +143,24 @@ export function SystemHealthPanel({ health }: Props) {
         {alerts.length > 0 && (
           <div className="space-y-2">
             {alerts.map((alert, i) => {
-              const styles = SEVERITY_STYLES[alert.severity] ?? SEVERITY_STYLES.info;
+              const severity = alert.severity as string;
+              const defaultStyles = SEVERITY_STYLES.info;
+              const styles = SEVERITY_STYLES[severity as keyof typeof SEVERITY_STYLES] ?? defaultStyles;
               const code = typeof alert.code === 'string' ? alert.code : 'unknown';
-              const AlertIcon = CODE_ICONS[code] ?? styles.Icon;
+              const defaultIcon = styles?.Icon ?? Info;
+              const IconComponent: React.ElementType = CODE_ICONS[code] ?? defaultIcon;
+              if (!IconComponent) return null;
               return (
                 <div
                   key={i}
-                  className={`flex items-start gap-3 px-4 py-3 rounded-xl border ${styles.row}`}
+                  className={`flex items-start gap-3 px-4 py-3 rounded-xl border ${styles?.row ?? defaultStyles.row}`}
                 >
-                  <AlertIcon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${styles.icon}`} />
+                  <IconComponent className={`w-4 h-4 mt-0.5 flex-shrink-0 ${styles?.icon ?? defaultStyles.icon}`} />
                   <div className="min-w-0">
-                    <p className={`text-xs font-semibold ${styles.text}`}>
+                    <p className={`text-xs font-semibold ${styles?.text ?? defaultStyles.text}`}>
                       {code.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
                     </p>
-                    <p className={`text-xs mt-0.5 ${styles.sub}`}>{alert.message}</p>
+                    <p className={`text-xs mt-0.5 ${styles?.sub ?? defaultStyles.sub}`}>{alert.message}</p>
                   </div>
                 </div>
               );

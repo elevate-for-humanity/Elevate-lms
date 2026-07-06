@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, Clock, DollarSign, GraduationCap, Briefcase, Award, CheckCircle } from 'lucide-react';
+import { ArrowRight, Clock, DollarSign, GraduationCap, Briefcase, Award, CheckCircle, Star } from 'lucide-react';
 
 interface PremiumProgramCardProps {
   title: string;
@@ -67,8 +67,8 @@ export function PremiumProgramCard({
 
         {/* Featured Badge */}
         {featured && (
-          <div className="absolute top-3 right-3 px-3 py-1 bg-white rounded-full text-xs font-bold text-brand-red-600">
-            ⭐ Featured
+          <div className="absolute top-3 right-3 px-3 py-1 bg-white rounded-full text-xs font-bold text-brand-red-600 flex items-center gap-1">
+            <Star className="w-3 h-3 fill-current" /> Featured
           </div>
         )}
       </div>

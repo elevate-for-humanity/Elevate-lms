@@ -12,6 +12,7 @@ const PROGRAMS = [
     title: 'Barbering', 
     desc: 'Launch your career in professional barbering', 
     image: '/images/beauty/hero-program-barber.webp',
+    icon: '💇',
     price: 4980 
   },
   { 
@@ -19,6 +20,7 @@ const PROGRAMS = [
     title: 'Cosmetology', 
     desc: 'Master beauty techniques and styles', 
     image: '/images/beauty/esthetician.webp',
+    icon: '💄',
     price: 4980 
   },
   { 
@@ -26,6 +28,7 @@ const PROGRAMS = [
     title: 'HVAC/Refrigeration', 
     desc: 'Earn while you learn refrigeration', 
     image: '/images/pages/hvac-technician.webp',
+    icon: '❄️',
     price: 4980 
   },
   { 
@@ -33,6 +36,7 @@ const PROGRAMS = [
     title: 'Healthcare', 
     desc: 'Start your healthcare career', 
     image: '/images/pages/cna-nursing-real.webp',
+    icon: '🏥',
     price: 2500 
   },
 ];
@@ -258,12 +262,21 @@ export default function ElevateAnimatedHome() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {PROGRAMS.map((p, i) => (
               <motion.div key={p.slug} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-                <button onClick={() => setSelectedProgram(p)} className={`w-full text-left bg-white rounded-2xl p-6 border-2 transition-all ${selectedProgram.slug === p.slug ? 'border-[#dc2626] shadow-xl' : 'border-slate-200 hover:border-[#dc2626]/50'}`}>
-                  <div className="text-4xl mb-4">{p.icon}</div>
-                  <h3 className="text-xl font-bold text-[#0f172a] mb-2">{p.title}</h3>
-                  <p className="text-slate-600 text-sm mb-4">{p.desc}</p>
-                  <div className="text-2xl font-bold text-[#dc2626]">${p.price.toLocaleString()}</div>
-                  <div className="text-xs text-slate-500">Total Tuition</div>
+                <button onClick={() => setSelectedProgram(p)} className={`w-full text-left bg-white rounded-2xl overflow-hidden border-2 transition-all ${selectedProgram.slug === p.slug ? 'border-[#dc2626] shadow-xl' : 'border-slate-200 hover:border-[#dc2626]/50'}`}>
+                  <div className="relative h-40 overflow-hidden">
+                    <Image src={p.image} alt={p.title} fill className="object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-3 left-3">
+                      <span className="text-white font-bold text-lg">{p.title}</span>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-slate-600 text-sm mb-3">{p.desc}</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold text-[#dc2626]">${p.price.toLocaleString()}</span>
+                      <span className="text-xs text-slate-500">tuition</span>
+                    </div>
+                  </div>
                 </button>
               </motion.div>
             ))}
@@ -275,14 +288,19 @@ export default function ElevateAnimatedHome() {
       <section className="py-24 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-[#0f172a] text-center mb-4">How It Works</h2>
-          <p className="text-slate-600 text-center mb-12">Your path to a new career in 3 simple steps</p>
+          <p className="text-slate-600 text-center mb-12">Your path to a new career in 6 simple steps</p>
           <div className="grid md:grid-cols-3 gap-8">
-            {STEPS.map((step, i) => (
-              <motion.div key={i} className="text-center relative" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}>
-                <div className="w-20 h-20 bg-[#dc2626] rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6 shadow-lg">{step.num}</div>
-                <h3 className="text-xl font-bold text-[#0f172a] mb-3">{step.title}</h3>
-                <p className="text-slate-600">{step.desc}</p>
-                {i < 2 && <div className="hidden md:block absolute top-10 -right-4 text-3xl text-slate-300">→</div>}
+            {STEPS.slice(0, 6).map((step, i) => (
+              <motion.div key={i} className="relative" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+                <div className="relative h-48 rounded-2xl overflow-hidden mb-4">
+                  <Image src={step.image} alt={step.title} fill className="object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <span className="w-10 h-10 bg-[#dc2626] rounded-full flex items-center justify-center text-white font-bold">{step.num}</span>
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-[#0f172a] mb-2">{step.title}</h3>
+                <p className="text-slate-600 text-sm">{step.desc}</p>
               </motion.div>
             ))}
           </div>

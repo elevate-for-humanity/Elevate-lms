@@ -695,7 +695,7 @@ export default function ProgramDetailPage({
             <div className="bg-white rounded-2xl border-2 border-brand-green-500 shadow-sm p-7 flex flex-col">
               <div className="flex items-center gap-2 mb-4">
                 <span className="bg-brand-green-100 text-brand-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                  Lowest Cost Path
+                  Workforce Funded
                 </span>
               </div>
               <h3 className="text-lg font-extrabold text-slate-900 mb-1">

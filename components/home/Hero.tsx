@@ -1,13 +1,13 @@
 // components/home/Hero.tsx
 import Image from 'next/image';
 import Link from 'next/link';
+import { MapPin, Lightbulb, CheckCircle2, Calendar, FileText, TrendingUp } from 'lucide-react';
 
 export function Hero() {
   return (
     <>
       {/* FULL-WIDTH HERO BANNER AT TOP */}
-      <div className="relative w-full h-[250px] sm:h-[350px] lg:h-[450px]">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
+      <div className="relative w-full h-[350px] sm:h-[450px] lg:h-[500px]">
         <Image
           src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp"
           alt="Elevate For Humanity - Career Training and Partnerships"
@@ -80,7 +80,6 @@ export function Hero() {
               </a>
             </div>
 
-            {/* Fallback text for Indiana Career Connect */}
             <p className="text-[11px] text-slate-500 max-w-sm leading-relaxed">
               If IndianaCareerConnect.com doesn&apos;t load, call your local WorkOne office and ask
               for a WIOA/WRG appointment. Tell them Elevate For Humanity is your training provider.
@@ -122,7 +121,10 @@ export function Hero() {
         {/* How to Get Started Section */}
         <div className="bg-slate-50 border-t border-slate-200">
           <div className="max-w-6xl mx-auto px-4 py-8">
-            <h2 className="text-lg font-bold text-black mb-4">📍 How to Get Started:</h2>
+            <h2 className="text-lg font-bold text-black mb-4 flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-brand-orange-600" />
+              How to Get Started:
+            </h2>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="bg-white rounded-lg p-4 shadow-sm">
                 <div className="flex items-center gap-2 mb-2">
@@ -147,9 +149,9 @@ export function Hero() {
                   <strong>Option 2:</strong> Call your local WorkOne office directly to schedule an
                   appointment with a career counselor.
                 </p>
-                <p className="text-xs text-slate-500 italic">
-                  💡 Tip: Have your ID, proof of income, and employment history ready for your
-                  appointment.
+                <p className="text-xs text-slate-500 italic flex items-start gap-1">
+                  <Lightbulb className="w-3 h-3 shrink-0 mt-0.5" />
+                  <span>Tip: Have your ID, proof of income, and employment history ready for your appointment.</span>
                 </p>
               </div>
               <div className="bg-white rounded-lg p-4 shadow-sm">
@@ -161,13 +163,14 @@ export function Hero() {
                 </div>
                 <p className="text-sm text-black mb-2">Your WorkOne counselor will:</p>
                 <ul className="text-sm text-black space-y-1 ml-4 mb-2">
-                  <li>• Complete your intake and eligibility assessment</li>
-                  <li>• Process all funding paperwork (WIOA, WRG, or JRI)</li>
-                  <li>• Check your eligibility for no-cost training</li>
-                  <li>• Enroll you in your chosen program</li>
+                  <li className="flex items-start gap-1"><CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-0.5" /> Complete your intake and eligibility assessment</li>
+                  <li className="flex items-start gap-1"><CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-0.5" /> Process all funding paperwork (WIOA, WRG, or JRI)</li>
+                  <li className="flex items-start gap-1"><CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-0.5" /> Check your eligibility for no-cost training</li>
+                  <li className="flex items-start gap-1"><CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-0.5" /> Enroll you in your chosen program</li>
                 </ul>
-                <p className="text-xs text-slate-500 italic">
-                  💡 Most appointments take 30-60 minutes. Same-day approval is common!
+                <p className="text-xs text-slate-500 italic flex items-start gap-1">
+                  <Lightbulb className="w-3 h-3 shrink-0 mt-0.5" />
+                  <span>Most appointments take 30-60 minutes. Same-day approval is common!</span>
                 </p>
               </div>
               <div className="bg-white rounded-lg p-4 shadow-sm">
@@ -179,15 +182,15 @@ export function Hero() {
                 </div>
                 <p className="text-sm text-black mb-2">Once approved, you'll:</p>
                 <ul className="text-sm text-black space-y-1 ml-4 mb-2">
-                  <li>• Begin training immediately (most programs start within 1-2 weeks)</li>
-                  <li>• Get connected to real shops, clinics, and job sites</li>
-                  <li>• Receive hands-on training from industry professionals</li>
-                  <li>• Earn certifications and credentials</li>
-                  <li>• Get job placement assistance upon completion</li>
+                  <li className="flex items-start gap-1"><TrendingUp className="w-4 h-4 text-green-500 shrink-0 mt-0.5" /> Begin training immediately (most programs start within 1-2 weeks)</li>
+                  <li className="flex items-start gap-1"><TrendingUp className="w-4 h-4 text-green-500 shrink-0 mt-0.5" /> Get connected to real shops, clinics, and job sites</li>
+                  <li className="flex items-start gap-1"><TrendingUp className="w-4 h-4 text-green-500 shrink-0 mt-0.5" /> Receive hands-on training from industry professionals</li>
+                  <li className="flex items-start gap-1"><TrendingUp className="w-4 h-4 text-green-500 shrink-0 mt-0.5" /> Earn certifications and credentials</li>
+                  <li className="flex items-start gap-1"><TrendingUp className="w-4 h-4 text-green-500 shrink-0 mt-0.5" /> Get job placement assistance upon completion</li>
                 </ul>
-                <p className="text-xs text-slate-500 italic">
-                  💡 No tuition for eligible participants through WIOA, WRG, or JRI funding.
-                  Eligibility determined by your WorkOne counselor.
+                <p className="text-xs text-slate-500 italic flex items-start gap-1">
+                  <Lightbulb className="w-3 h-3 shrink-0 mt-0.5" />
+                  <span>No tuition for eligible participants through WIOA, WRG, or JRI funding.</span>
                 </p>
               </div>
             </div>

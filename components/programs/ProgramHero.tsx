@@ -4,6 +4,10 @@ import React from 'react';
 import Image from 'next/image';
 import type { Program } from '@/lib/types/program';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
+import { 
+  Scissors, Heart, Stethoscope, Wrench, Truck, 
+  Briefcase, Sparkles, Building, GraduationCap 
+} from 'lucide-react';
 
 export function ProgramHero({ program }: { program: Program }) {
   const isBarberProgram = program.slug === 'barber-apprenticeship';
@@ -21,15 +25,15 @@ export function ProgramHero({ program }: { program: Program }) {
     isMedicalAssistant;
 
   const getIcon = () => {
-    if (program.slug.includes('barber')) return '✂️';
-    if (program.slug.includes('cna') || program.slug.includes('health')) return '🏥';
-    if (program.slug.includes('medical')) return '🩺';
-    if (program.slug.includes('hvac')) return '🛠️';
-    if (program.slug.includes('cdl')) return '🚚';
-    if (program.slug.includes('tax') || program.slug.includes('business')) return '💼';
-    if (program.slug.includes('beauty') || program.slug.includes('esthetician')) return '💅';
-    if (program.slug.includes('building')) return '🏗️';
-    return '📚';
+    if (program.slug.includes('barber')) return <Scissors className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />;
+    if (program.slug.includes('cna') || program.slug.includes('health')) return <Heart className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />;
+    if (program.slug.includes('medical')) return <Stethoscope className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />;
+    if (program.slug.includes('hvac')) return <Wrench className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />;
+    if (program.slug.includes('cdl')) return <Truck className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />;
+    if (program.slug.includes('tax') || program.slug.includes('business')) return <Briefcase className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />;
+    if (program.slug.includes('beauty') || program.slug.includes('esthetician')) return <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />;
+    if (program.slug.includes('building')) return <Building className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />;
+    return <GraduationCap className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />;
   };
 
   return (
@@ -58,7 +62,7 @@ export function ProgramHero({ program }: { program: Program }) {
             <div className="container mx-auto px-4 sm:px-6 pb-8 sm:pb-12">
               <div className="max-w-4xl">
                 <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                  <span className="text-3xl sm:text-4xl md:text-5xl">{getIcon()}</span>
+                  {getIcon()}
                   <p className="text-xs sm:text-sm uppercase tracking-wide text-brand-orange-400 font-semibold">
                     Elevate Workforce Pathway
                   </p>

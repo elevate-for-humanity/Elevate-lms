@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-export const metadata: Metadata = { title: 'Demos | Elevate', description: 'Demos page.' };
+export const metadata: Metadata = {
+  robots: { index: false, follow: false }, title: 'Demos | Elevate', description: 'Demos page.' };
 export default function Page() {
   return (
     <div className="min-h-screen bg-slate-50">

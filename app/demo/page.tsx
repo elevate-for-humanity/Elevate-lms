@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Play, Monitor, Users, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: false },
   title: 'Request a Demo | Elevate for Humanity',
   keywords: ["demo", "platform demo", "workforce software", "LMS demo"], description: 'Schedule a demo of the Elevate workforce development platform.',
 };

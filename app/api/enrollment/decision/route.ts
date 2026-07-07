@@ -102,7 +102,8 @@ async function checkDocumentsApproved(
  * Check 3: PARiS Interview Completion
  * Returns true if PARiS interview is complete
  * 
- * Note: PARiS is the AI career guidance interview
+ * Note: PARiS uses ai_interview_sessions table
+ * Table: public.ai_interview_sessions
  */
 async function checkPARISComplete(
   db: any,
@@ -118,24 +119,25 @@ async function checkPARISComplete(
     };
   }
 
-  // Check for PARiS session completion
+  // Check for PARiS/AI Interview session completion
+  // Table: ai_interview_sessions (from 20260705000001_paris_career_guidance.sql)
   const { data: parisSession } = await db
-    .from('paris_sessions')
+    .from('ai_interview_sessions')
     .select('id, status, completed_at')
     .eq('user_id', userId)
     .eq('status', 'completed')
     .maybeSingle();
 
-  // Alternative: check for any career_interview completion record
+  // Alternative: check for career_counseling_conversations
   if (!parisSession) {
-    const { data: careerInterview } = await db
-      .from('career_interviews')
+    const { data: careerConv } = await db
+      .from('career_counseling_conversations')
       .select('id, status')
       .eq('user_id', userId)
       .eq('status', 'completed')
       .maybeSingle();
 
-    if (!careerInterview) {
+    if (!careerConv) {
       return {
         name: 'paris_completed',
         passed: false,

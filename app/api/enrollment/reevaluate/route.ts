@@ -246,10 +246,10 @@ async function checkEligibility(db: any, app: any): Promise<{
   const docsApproved = true; // Assume OK if no docs required
   if (docsApproved) passed++; else { failed++; reasons.push('Documents not approved'); }
 
-  // Check 5: PARiS (check for session)
+  // Check 5: PARiS (check for ai_interview_sessions)
   if (app.user_id) {
     const { data: paris } = await db
-      .from('paris_sessions')
+      .from('ai_interview_sessions')
       .select('id')
       .eq('user_id', app.user_id)
       .eq('status', 'completed')

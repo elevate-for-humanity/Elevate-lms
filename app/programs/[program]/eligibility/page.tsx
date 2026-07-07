@@ -37,7 +37,7 @@ export default async function BeautyEligibilityPage({ params }: Props) {
       <HeroVideo
         videoSrcDesktop={
           (b as any)?.videoSrcDesktop ??
-          'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero.mp4'
+          'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/barber-hero.mp4'
         }
         posterImage={(b as any)?.posterImage ?? '/images/pages/programs-hero.webp'}
         microLabel={cfg.title}

@@ -31,7 +31,7 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
       {/* Hero */}
       <section className="relative w-full h-[clamp(220px,34vw,390px)] flex items-center overflow-hidden bg-slate-900">
         <CanonicalVideo
-          src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hvac-hero-final.mp4"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/hvac-hero-final.mp4"
           className="absolute inset-0 w-full h-full object-cover brightness-110"
           autoPlayOnMount
           playThrough={false}

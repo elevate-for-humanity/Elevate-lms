@@ -47,7 +47,7 @@ export const VIDEO_REGISTRY: Record<string, VideoRecord> = {
     title: 'Elevate for Humanity - Free Career Training Programs',
     description:
       'Discover 100% free, funded workforce training programs in Indianapolis. WIOA-funded programs in healthcare, skilled trades, technology, and business.',
-    video_url: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4',
+    video_url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/hero-home-fast.mp4',
     thumbnail_url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-grad.jpg',
     duration: 'PT1M30S',
     upload_date: '2025-01-01',
@@ -65,7 +65,7 @@ export const VIDEO_REGISTRY: Record<string, VideoRecord> = {
     title: 'CNA Training Program - Certified Nursing Assistant',
     description:
       'Free CNA training in Indianapolis. State-approved program, 6-8 weeks, job placement assistance.',
-    video_url: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4',
+    video_url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/cna-hero.mp4',
     thumbnail_url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-pathway-healthcare.webp',
     duration: 'PT45S',
     upload_date: '2025-01-01',

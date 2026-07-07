@@ -57,7 +57,7 @@ export default function HomeHero() {
         >
           <video
             ref={videoRef}
-            src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero.mp4"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/barber-hero.mp4"
             muted
             loop
             playsInline

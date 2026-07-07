@@ -520,7 +520,7 @@ export default function ApprenticeForm({
       <section className="relative w-full">
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
           <LazyVideo
-            src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4"
+            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/barber-hero-final.mp4"
             poster="/images/pages/barber-hero-new.webp"
             className="absolute inset-0 w-full h-full object-cover"
           />

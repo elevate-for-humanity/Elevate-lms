@@ -13,30 +13,30 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // Video hero sources - used across the site
 // Rules: No gradient overlays, text in solid container, calm motion only
-// All URLs point to R2 CDN — confirmed 206 on all files listed below.
-const R2 = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos';
+// All URLs point to Supabase CDN — must create 'videos' bucket and upload files
+const SUPABASE = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos';
 export const VIDEO_HEROES = {
   // Main/Marketing
-  homepage: `${R2}/hero-home-fast.mp4`,
-  careerServices: `${R2}/career-services-hero.mp4`,
+  homepage: `${SUPABASE}/hero-home-fast.mp4`,
+  careerServices: `${SUPABASE}/career-services-hero.mp4`,
 
   // Program Categories
-  barber: `${R2}/barber-hero-final.mp4`,
-  barberApprenticeship: `${R2}/barber-hero-final.mp4`,
-  healthcare: `${R2}/cna-hero.mp4`,
-  skilledTrades: `${R2}/hvac-hero-final.mp4`,
-  technology: `${R2}/hero-home-fast.mp4`,
+  barber: `${SUPABASE}/barber-hero-final.mp4`,
+  barberApprenticeship: `${SUPABASE}/barber-hero-final.mp4`,
+  healthcare: `${SUPABASE}/cna-hero.mp4`,
+  skilledTrades: `${SUPABASE}/hvac-hero-final.mp4`,
+  technology: `${SUPABASE}/hero-home-fast.mp4`,
 
   // Government/Enterprise
-  government: `${R2}/hero-home-fast.mp4`,
-  workforceBoard: `${R2}/hero-home-fast.mp4`,
+  government: `${SUPABASE}/hero-home-fast.mp4`,
+  workforceBoard: `${SUPABASE}/hero-home-fast.mp4`,
 
   // Store
-  storeCourses: `${R2}/hero-home-fast.mp4`,
-  storeDigital: `${R2}/hero-home-fast.mp4`,
+  storeCourses: `${SUPABASE}/hero-home-fast.mp4`,
+  storeDigital: `${SUPABASE}/hero-home-fast.mp4`,
 
   // LMS
-  lmsCourses: `${R2}/hero-home-fast.mp4`,
+  lmsCourses: `${SUPABASE}/hero-home-fast.mp4`,
 } as const;
 
 // Category-based hero image assignments

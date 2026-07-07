@@ -2,8 +2,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/public';
-import { programs as staticPrograms } from '@/content/cf-programs';
 import { getStaticProgram } from '@/data/programs/index';
+import { resolveSlug } from '@/lib/program-registry';
 import ProgramDetailPageComponent from '@/components/programs/ProgramDetailPage';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import { OnetLaborData } from '@/components/programs/onet/OnetLaborData';
@@ -57,7 +57,8 @@ export async function generateMetadata({
   };
 
   // Static ProgramSchema — preferred source for metadata
-  const sp = getStaticProgram(program);
+  const canonicalSlug = resolveSlug(program) || program;
+  const sp = getStaticProgram(canonicalSlug);
   if (sp) {
     const title = sp.metaTitle || `${sp.title} | ${PLATFORM_DEFAULTS.orgName}`;
     const description = sp.metaDescription || sp.subtitle || '';
@@ -71,19 +72,6 @@ export async function generateMetadata({
     };
   }
 
-  // cf-programs fallback
-  const cfp = staticPrograms.find((p) => p.slug === program);
-  if (cfp) {
-    const title = `${cfp.title} | ${PLATFORM_DEFAULTS.orgName}`;
-    const description = cfp.summary;
-    return {
-      title,
-      description,
-      alternates: { canonical: `${SITE_URL}/programs/${program}` },
-      openGraph: { ...ogBase, title, description, images: [{ url: ogImage, width: 1200, height: 630, alt: cfp.title }] },
-      twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
-    };
-  }
 
   // DB fallback — programs with no static definition
   const db = createPublicClient();
@@ -91,7 +79,7 @@ export async function generateMetadata({
     const { data } = await db
       .from('programs')
       .select('title, description, short_description')
-      .eq('slug', program)
+      .eq('slug', canonicalSlug)
       .maybeSingle();
     if (data) {
       const title = `${data.title} | ${PLATFORM_DEFAULTS.orgName}`;
@@ -517,7 +505,8 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
   // Static ProgramSchema — richest renderer, always preferred when available.
   // Overlay DB title/description if the program also exists in the DB.
-  const sp = getStaticProgram(program);
+  const canonicalSlug = resolveSlug(program) || program;
+  const sp = getStaticProgram(canonicalSlug);
   if (sp) {
     const db = createPublicClient();
     let mergedProgram = sp;
@@ -525,7 +514,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
       const { data: dbRow } = await db
         .from('programs')
         .select('title, description, short_description, credential, duration_weeks')
-        .eq('slug', program)
+        .eq('slug', canonicalSlug)
         .maybeSingle();
       if (dbRow) {
         mergedProgram = {
@@ -570,24 +559,6 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
     );
   }
 
-  // cf-programs fallback (legacy marketing data)
-  const cfProgram = staticPrograms.find((p) => p.slug === program);
-  if (cfProgram) {
-    return (
-      <>
-        <ProgramPage
-          title={cfProgram.title}
-          summary={cfProgram.summary}
-          description={cfProgram.description}
-          slug={cfProgram.slug}
-          sections={cfProgram.sections}
-          banner={heroBanners[cfProgram.slug] ?? null}
-          imageUrl={getProgramOgImage(cfProgram.slug)}
-        />
-        <OnetLaborData slug={cfProgram.slug} />
-      </>
-    );
-  }
 
   // DB fallback — programs that exist only in the database with no static definition
   const db = createPublicClient();
@@ -595,7 +566,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
     const { data: p } = await db
       .from('programs')
       .select('slug, title, description, short_description, credential, duration_weeks, image_url')
-      .eq('slug', program)
+      .eq('slug', canonicalSlug)
       .maybeSingle();
 
     if (p) {

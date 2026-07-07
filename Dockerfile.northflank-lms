@@ -4,7 +4,7 @@
 FROM node:22-bookworm AS builder
 
 # Cache invalidation marker
-RUN echo "nf-cache-invalidate-42c4964"
+RUN echo "nf-cache-invalidate-ae9cfbf"
 
 # Install system deps for native modules (sharp, canvas, pdf)
 RUN apt-get update && apt-get install -y --no-install-recommends \

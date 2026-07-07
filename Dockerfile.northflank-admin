@@ -39,21 +39,22 @@ COPY . .
 # Critical ENV variables (must be set before install)
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=ADMIN
 ENV CI=true
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
+ENV NEXT_SWC_DUP_DISABLE=1
+ENV TURBOPACK_DISABLED=1
 
 # Install dependencies
 RUN pnpm install --no-frozen-lockfile
 
-# Build Admin with 8GB heap
+# Build Admin with memory-optimized settings
 ARG COMMIT_SHA=unknown
 ARG BUILD_TIME=unknown
 ENV NEXT_PUBLIC_COMMIT_SHA=$COMMIT_SHA
 ENV NEXT_PUBLIC_BUILD_TIME=$BUILD_TIME
-RUN pnpm --filter @elevate/admin build
+RUN NODE_OPTIONS='--max-old-space-size=7168 --gc-interval=100' pnpm --filter @elevate/admin build --no-lint
 
 # --- runtime stage ---
 FROM node:22-bookworm-slim

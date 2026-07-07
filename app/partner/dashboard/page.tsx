@@ -20,6 +20,11 @@ import type { Metadata } from 'next';
  * Must never redirect to /program-holder/dashboard —
  * that guard rejects role='partner' and sends them to /unauthorized.
  */
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
 export default async function PartnerDashboardPage() {
   const supabase = await createClient();
   const {

@@ -44,7 +44,7 @@ export default function AboutTeamPage() {
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-24 overflow-hidden">
         <div className="absolute inset-0 opacity-20">
-          <Image src="/images/pages/team-collaboration.webp" alt="" fill className="object-cover" />
+          <Image src="/images/pages/team-collaboration.webp" alt="Elevate for Humanity leadership team" fill className="object-cover" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">

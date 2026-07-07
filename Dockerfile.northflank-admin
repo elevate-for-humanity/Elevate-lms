@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg-dev libgif-dev librsvg2-dev && rm -rf /var/lib/apt/lists/*
 
 # Stable PNPM (matching lockfileVersion 9.0)
-RUN corepack enable && corepack prepare pnpm@9.16.0 --activate
+RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
 
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./

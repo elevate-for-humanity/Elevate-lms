@@ -2,16 +2,8 @@
 -- DELETE LEGACY TABLES (Not used, deprecated, or going to other repos)
 -- Created: July 7, 2026
 -- Purpose: Clean up tables not used in Elevate LMS
+-- NOTE: CMI tables are KEEP - they are referenced in code
 -- ============================================================================
-
--- ============================================================================
--- DELETE: CMI (Clinical Management) - Not built
--- ============================================================================
-DROP TABLE IF EXISTS cmi_attendance;
-DROP TABLE IF EXISTS cmi_certificates;
-DROP TABLE IF EXISTS cmi_clinicals;
-DROP TABLE IF EXISTS cmi_competencies;
-DROP TABLE IF EXISTS cmi_students;
 
 -- ============================================================================
 -- DELETE: Milady RISE - Not used

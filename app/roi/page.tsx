@@ -111,7 +111,7 @@ export default function ROIPage() {
               in efficiency, outcomes, and return on investment. Here's what our partners achieve.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/demo" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Link href="/demos" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
                 See It In Action <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
               <Link href="/contact" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
@@ -581,7 +581,7 @@ export default function ROIPage() {
             Schedule a personalized demo and get a custom ROI analysis for your organization.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/demo" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link href="/demos" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
               Schedule Demo <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link href="/contact" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">

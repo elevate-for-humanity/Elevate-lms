@@ -27,7 +27,7 @@ export const PUBLIC_REVALIDATE_PATHS = [
   '/careers',
   '/workforce-training-indianapolis',
   '/healthcare-training-indianapolis',
-  '/skilled-trades-training-indiana',
+  '/programs/skilled-trades',
   '/cna-training-indianapolis',
   '/hvac-training-indianapolis',
   '/cdl-training-indianapolis',

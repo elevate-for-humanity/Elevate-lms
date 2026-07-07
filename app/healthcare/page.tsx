@@ -1,6 +1,7 @@
-export const metadata = { robots: { index: false, follow: false } };
 import { redirect } from 'next/navigation';
 
-export default function HealthcareRedirect() {
+export const metadata = { robots: { index: false, follow: false } };
+
+export default function HealthcarePage() {
   redirect('/programs/healthcare');
 }

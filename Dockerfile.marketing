@@ -26,7 +26,7 @@ ENV CI=true
 RUN node scripts/split-app.mjs
 
 # Stable PNPM (matching lockfileVersion 9.0)
-RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+RUN corepack enable && corepack prepare pnpm@9.16.0 --activate
 
 # 1. Install ALL dependencies
 RUN pnpm install --no-frozen-lockfile

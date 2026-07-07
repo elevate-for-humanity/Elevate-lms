@@ -57,7 +57,7 @@ const footerLinks = {
   // Platform / Resources (footer-only)
   platform: [
     { name: 'Platform Overview', href: '/platform' },
-    { name: 'Microclasses', href: '/microclasses' },
+    { name: 'Microclasses', href: '/programs' },
     { name: 'Downloads & Resources', href: '/downloads' },
     { name: 'Credential Verification', href: '/verify-credentials' },
   ],

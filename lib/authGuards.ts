@@ -120,7 +120,7 @@ export async function authGuard(options: AuthGuardOptions = {}): Promise<AuthGua
 
   // Check email verification
   if (requireEmailVerified && !user.email_confirmed_at) {
-    redirect('/verify-email');
+    redirect('/verify');
   }
 
   // Check role authorization

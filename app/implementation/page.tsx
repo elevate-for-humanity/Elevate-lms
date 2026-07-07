@@ -183,7 +183,7 @@ export default function ImplementationPage() {
               <Link href="/contact" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
                 Start Implementation <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
-              <Link href="/demo" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Link href="/demos" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
                 See Platform Demo
               </Link>
             </div>
@@ -516,7 +516,7 @@ export default function ImplementationPage() {
             <Link href="/contact" className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
               Schedule Implementation Call <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
-            <Link href="/demo" className="inline-flex items-center border-2 border-slate-300 hover:border-slate-400 text-slate-700 font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link href="/demos" className="inline-flex items-center border-2 border-slate-300 hover:border-slate-400 text-slate-700 font-bold py-4 px-8 rounded-lg transition-colors">
               View Demo First
             </Link>
           </div>

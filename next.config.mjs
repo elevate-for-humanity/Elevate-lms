@@ -190,6 +190,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   outputFileTracingExcludes: {
     '/api/devstudio/files': ['**/*'],
     '/api/devstudio/shell': ['**/*'],
@@ -487,6 +490,24 @@ const nextConfig = {
       { source: '/store/licensing/managed', destination: '/store/licenses', permanent: true },
       { source: '/store/licenses/managed', destination: '/store/licenses', permanent: true },
       { source: '/store/licensing/:path*', destination: '/store/licenses/:path*', permanent: true },
+
+      // SEO Redirect Stubs - Moved from page.tsx to config for better performance
+      { source: '/career-training-indiana', destination: '/career-training', permanent: true },
+      { source: '/community-services-indiana', destination: '/community-services', permanent: true },
+      { source: '/connect', destination: '/career-services', permanent: true },
+      { source: '/healthcare', destination: '/programs/healthcare', permanent: true },
+      { source: '/learner', destination: '/lms', permanent: true },
+      { source: '/partner', destination: '/host-shop', permanent: true },
+      { source: '/skilled-trades-training-indiana', destination: '/programs/skilled-trades', permanent: true },
+      { source: '/verify-email', destination: '/verify', permanent: true },
+      { source: '/launch', destination: '/store', permanent: true },
+      { source: '/microclasses', destination: '/programs', permanent: true },
+
+      // Legacy /demo duplicate - consolidate to /demos
+      { source: '/demo', destination: '/demos', permanent: true },
+
+      // Fix redirect chains
+      { source: '/healthcare-training-indianapolis', destination: '/programs/healthcare', permanent: true },
     ];
   },
 

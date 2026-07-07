@@ -383,14 +383,9 @@ export const headerNavigation: NavGroup[] = [
     items: [
       { label: 'All Services', href: '/services', description: 'Our service offerings' },
       {
-        label: 'Career Training Indiana',
-        href: '/career-training-indiana',
+        label: 'Career Training',
+        href: '/career-training',
         description: 'Indiana workforce programs',
-      },
-      {
-        label: 'Community Services Indiana',
-        href: '/community-services-indiana',
-        description: 'IN community services',
       },
       {
         label: 'Community Services',
@@ -563,7 +558,7 @@ export const footerNavigation = {
       { label: 'Analytics', href: '/analytics' },
       { label: 'Approvals', href: '/approvals' },
       { label: 'Call Now', href: '/call-now' },
-      { label: 'Connect', href: '/connect' },
+      { label: 'Connect', href: '/career-services' },
       { label: 'Donations', href: '/donate' },
       { label: 'Ecosystem', href: '/ecosystem' },
       { label: 'Email', href: '/email' },
@@ -579,7 +574,7 @@ export const footerNavigation = {
       { label: 'Share', href: '/share' },
       { label: 'Social', href: '/social' },
       { label: 'Community Tax Support', href: '/tax' },
-      { label: 'Microclasses', href: '/microclasses' },
+      { label: 'Microclasses', href: '/programs' },
       { label: 'Educator Hub', href: '/educatorhub' },
       { label: 'Hub About', href: '/hub/about' },
       { label: 'Funding Impact', href: '/fundingimpact' },
@@ -651,7 +646,7 @@ export const footerNavigation = {
       { label: 'Access Paused', href: '/access-paused' },
       { label: 'License Suspended', href: '/license-suspended' },
       { label: 'Reset Password', href: '/auth/reset-password' },
-      { label: 'Verify Email', href: '/verify-email' },
+      { label: 'Verify Email', href: '/verify' },
       { label: 'Enterprise', href: '/enterprise' },
       { label: 'Licensing', href: '/licensing' },
       { label: 'Payment Cancel', href: '/payment/cancel' },

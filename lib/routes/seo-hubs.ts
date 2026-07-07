@@ -72,7 +72,7 @@ export const SEO_HUBS: SeoHubConfig[] = [
     internalLinks: [
       { label: 'WIOA & Funded Training', href: '/wioa-funded-training-indiana' },
       { label: 'Healthcare Programs', href: '/healthcare-training-indianapolis' },
-      { label: 'Skilled Trades Programs', href: '/skilled-trades-training-indiana' },
+      { label: 'Skilled Trades Programs', href: '/programs/skilled-trades' },
       { label: 'IT & Digital Skills', href: '/it-certification-training-indianapolis' },
       { label: 'Employer Partnerships', href: '/employer-workforce-partnerships-indiana' },
       { label: 'Agency Referrals', href: '/agency-referral-workforce-training-indiana' },
@@ -111,7 +111,7 @@ export const SEO_HUBS: SeoHubConfig[] = [
     internalLinks: [
       { label: 'Main Training Hub', href: '/workforce-training-indianapolis' },
       { label: 'Healthcare Programs', href: '/healthcare-training-indianapolis' },
-      { label: 'Skilled Trades Programs', href: '/skilled-trades-training-indiana' },
+      { label: 'Skilled Trades Programs', href: '/programs/skilled-trades' },
       { label: 'IT & Digital Skills', href: '/it-certification-training-indianapolis' },
       { label: 'Agency Referrals', href: '/agency-referral-workforce-training-indiana' },
       { label: 'How Funding Works', href: '/funding/how-it-works' },
@@ -166,7 +166,7 @@ export const SEO_HUBS: SeoHubConfig[] = [
   // 4. Skilled Trades Hub
   // ──────────────────────────────────────────────────────────────────────
   {
-    slug: '/skilled-trades-training-indiana',
+    slug: '/programs/skilled-trades',
     title: 'Skilled Trades Training Indiana | HVAC, Electrical & Apprenticeships | Elevate for Humanity',
     description:
       'HVAC, electrical, construction, OSHA, and EPA 608 training in Indiana. DOL-registered apprenticeship sponsor. Employer OJT and work-based learning pathway available.',
@@ -262,7 +262,7 @@ export const SEO_HUBS: SeoHubConfig[] = [
       { label: 'Main Training Hub', href: '/workforce-training-indianapolis' },
       { label: 'Agency Referrals', href: '/agency-referral-workforce-training-indiana' },
       { label: 'Healthcare Programs', href: '/healthcare-training-indianapolis' },
-      { label: 'Skilled Trades Programs', href: '/skilled-trades-training-indiana' },
+      { label: 'Skilled Trades Programs', href: '/programs/skilled-trades' },
       { label: 'IT Programs', href: '/it-certification-training-indianapolis' },
       { label: 'All Programs', href: '/programs' },
       { label: 'Contact Us', href: '/contact' },
@@ -301,7 +301,7 @@ export const SEO_HUBS: SeoHubConfig[] = [
       { label: 'WIOA & Funded Training', href: '/wioa-funded-training-indiana' },
       { label: 'Employer Partnerships', href: '/employer-workforce-partnerships-indiana' },
       { label: 'Healthcare Programs', href: '/healthcare-training-indianapolis' },
-      { label: 'Skilled Trades Programs', href: '/skilled-trades-training-indiana' },
+      { label: 'Skilled Trades Programs', href: '/programs/skilled-trades' },
       { label: 'All Programs', href: '/programs' },
       { label: 'Contact Us', href: '/contact' },
     ],

@@ -1,0 +1,138 @@
+name: Multi-Container Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '22'
+  PNPM_VERSION: '9.16.0'
+
+jobs:
+  # ============================================
+  # BUILD: LMS (Root Next.js App)
+  # ============================================
+  build-lms:
+    name: Build LMS
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build LMS
+        run: pnpm run build:lms:phased
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+          BUILD_SCOPE: LMS
+
+  # ============================================
+  # BUILD: Admin Dashboard
+  # ============================================
+  build-admin:
+    name: Build Admin
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build Admin
+        run: pnpm run build:admin
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+
+  # ============================================
+  # BUILD: Marketing (Public Pages)
+  # ============================================
+  build-marketing:
+    name: Build Marketing
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build Marketing
+        run: pnpm exec cross-env BUILD_SCOPE=MARKETING next build
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+          BUILD_SCOPE: MARKETING
+
+  # ============================================
+  # INTEGRITY CHECK
+  # ============================================
+  integrity:
+    name: Integrity Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Run integrity checks
+        run: |
+          pnpm run integrity:links
+          pnpm run integrity:media

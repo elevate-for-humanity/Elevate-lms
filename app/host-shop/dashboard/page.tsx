@@ -19,6 +19,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Host Shop Dashboard | Elevate for Humanity',
   description: 'Manage your host shop, apprentices, and training programs.',
+  robots: { index: false, follow: false },
 };
 
 export default async function HostShopDashboardPage() {

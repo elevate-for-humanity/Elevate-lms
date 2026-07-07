@@ -1,3 +1,6 @@
+export const dynamic = 'force-static';
+
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Monitor, User, Building2, GraduationCap, Users, Play, Shield, Clock, CheckCircle, ArrowRight } from 'lucide-react';

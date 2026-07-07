@@ -183,3 +183,4 @@ export default async function ApprenticeSkillsPage() {
     </div>
   );
 }
+

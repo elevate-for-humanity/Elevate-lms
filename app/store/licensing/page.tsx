@@ -6,7 +6,12 @@ export const metadata: Metadata = {
   description: 'Licensing page content.',
 };
 
-export default function Page() {
+import Link from 'next/link';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export const revalidate = 3600; // 1 hour ISR cache
+
+export default function LicensingPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">

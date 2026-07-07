@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -6,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Docs page content.',
 };
 
-export default function Page() {
+export default async function DocsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
@@ -23,3 +24,4 @@ export default function Page() {
     </div>
   );
 }
+

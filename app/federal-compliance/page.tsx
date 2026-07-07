@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -6,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Federal Compliance page content.',
 };
 
-export default function Page() {
+export default function FederalCompliancePage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
@@ -23,3 +25,4 @@ export default function Page() {
     </div>
   );
 }
+

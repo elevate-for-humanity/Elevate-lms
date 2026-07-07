@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Turnstile from '@/components/Turnstile';
 import FundingEligibilityFlow, {
   type EligibilityStatus,
 } from '@/components/programs/FundingEligibilityFlow';
@@ -26,15 +27,8 @@ export default function BeautyApplyPage() {
   const params = useParams<{ program: string }>();
   const router = useRouter();
 
-  // Redirect programs that have their own dedicated enrollment flow.
-  useEffect(() => {
-    const dedicated = DEDICATED_FLOWS[params.program];
-    if (dedicated) {
-      router.replace(dedicated);
-    }
-  }, [params.program, router]);
-
   const cfg = getBeautyProgram(params.program);
+  const dedicatedFlow = DEDICATED_FLOWS[params.program];
   const c = colorClasses(cfg?.color ?? 'blue');
 
   const [loading, setLoading] = useState(false);
@@ -42,12 +36,25 @@ export default function BeautyApplyPage() {
   const [fundingType, setFundingType] = useState<FundingType>('wioa');
   const [eligibilityStatus, setEligibilityStatus] = useState<EligibilityStatus | null>(null);
   const [paymentPlan, setPaymentPlan] = useState<'full' | 'deposit'>('deposit');
+  const [turnstileToken, setTurnstileToken] = useState('');
 
-  if (!cfg) {
-    // Non-beauty slug hit the shared beauty apply page — redirect to the
-    // generic intake so the user lands on the correct flow.
-    router.replace(`/apply?program=${params.program}`);
-    return null;
+  // Redirects must run in useEffect — router.replace during render throws on SSR (location is not defined).
+  useEffect(() => {
+    if (dedicatedFlow) {
+      router.replace(dedicatedFlow);
+      return;
+    }
+    if (!cfg) {
+      router.replace(`/apply?program=${params.program}`);
+    }
+  }, [cfg, dedicatedFlow, params.program, router]);
+
+  if (dedicatedFlow || !cfg) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <Loader2 className="w-8 h-8 animate-spin text-slate-400" aria-label="Redirecting" />
+      </div>
+    );
   }
 
   const depositDollars = (cfg.depositCents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
@@ -82,6 +89,12 @@ export default function BeautyApplyPage() {
     setLoading(true);
     setError('');
 
+    if (!turnstileToken) {
+      setError('Please complete the security check before submitting.');
+      setLoading(false);
+      return;
+    }
+
     const form = e.currentTarget;
     const email = (form.elements.namedItem('email') as HTMLInputElement).value;
 
@@ -96,6 +109,7 @@ export default function BeautyApplyPage() {
       programName: cfg.title,
       fundingType,
       source: 'program-page',
+      turnstileToken,
     };
 
     try {
@@ -112,9 +126,7 @@ export default function BeautyApplyPage() {
 
       if (fundingType === 'self_pay') {
         const link = paymentPlan === 'full' ? links.full : links.deposit;
-        if (typeof window !== 'undefined') {
-          window.location.href = `${link}?prefilled_email=${encodeURIComponent(email)}`;
-        }
+        window.location.href = `${link}?prefilled_email=${encodeURIComponent(email)}`;
         return;
       }
 
@@ -289,9 +301,15 @@ export default function BeautyApplyPage() {
               </div>
             )}
 
+            <Turnstile
+              onVerify={setTurnstileToken}
+              onExpire={() => setTurnstileToken('')}
+              formId={`beauty-apply-${cfg.slug}`}
+            />
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !turnstileToken}
               className={`w-full ${c.bg} ${c.hover} disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 mt-2`}
             >
               {loading ? (

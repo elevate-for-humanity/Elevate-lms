@@ -9,7 +9,7 @@ export const FORKLIFT: ProgramSchema = {
   sector: 'skilled-trades',
   category: 'Warehouse & Logistics',
   programType: 'workforce',
-  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/forklift.webp',
+  heroImage: '/images/pages/forklift.webp',
   heroImageAlt: 'Forklift operator training in a warehouse setting',
   deliveryMode: 'hybrid',
   deliveredBy: 'Partner',

@@ -6,7 +6,49 @@ export const metadata: Metadata = {
   keywords: ["calendar", "class schedule", "program dates", "Indiana"], description: 'Calendar page content.',
 };
 
-export default function Page() {
+export const dynamic = 'force-dynamic';
+
+export default async function CalendarPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let enrollments = null;
+  let assignments = null;
+
+  if (user) {
+    const { data: enrollmentData } = await supabase
+      .from('program_enrollments')
+      .select(
+        `
+        id,
+        course:courses(id, title, schedule, start_date, end_date)
+      `,
+      )
+      .eq('user_id', user.id)
+      .eq('status', 'active');
+    enrollments = enrollmentData;
+
+    const courseIds = enrollments?.map((e: any) => e.course?.id).filter(Boolean) || [];
+    if (courseIds.length > 0) {
+      const { data: assignmentData } = await supabase
+        .from('assignments')
+        .select('*')
+        .in('course_id', courseIds)
+        .gte('due_date', new Date().toISOString())
+        .order('due_date', { ascending: true })
+        .limit(10);
+      assignments = assignmentData;
+    }
+  }
+
+  const { data: programs } = await supabase
+    .from('programs')
+    .select('id, title, start_date, schedule')
+    .eq('is_active', true)
+    .limit(10);
+
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">

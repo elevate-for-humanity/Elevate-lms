@@ -6,7 +6,19 @@ export const metadata: Metadata = {
   description: 'Reports page content.',
 };
 
-export default function Page() {
+export default async function ReportsPage() {
+  const supabase = await createClient();
+
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/reports');
+
+  const { data: reports } = await supabase
+    .from('reports')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(20);
+
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
@@ -23,3 +35,4 @@ export default function Page() {
     </div>
   );
 }
+

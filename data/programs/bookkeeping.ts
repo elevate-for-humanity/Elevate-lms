@@ -10,7 +10,7 @@ export const BOOKKEEPING: ProgramSchema = {
   category: 'Accounting & Finance',
   programType: 'workforce',
 
-  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/bookkeeping-ledger.webp',
+  heroImage: '/images/pages/bookkeeping-ledger.webp',
   heroImageAlt: 'Bookkeeping and accounting training program',
   videoSrc: '/videos/business-finance.mp4',
 

@@ -6,7 +6,28 @@ export const metadata: Metadata = {
   description: 'Press page content.',
 };
 
-export default function Page() {
+export default async function PressPage() {
+  const db = await requireAdminClient();
+
+  // Press-specific posts (category = 'press' or 'media')
+  const { data: pressItems } = await db
+    .from('blog_posts')
+    .select('id, title, slug, excerpt, featured_image, published_at, category')
+    .eq('published', true)
+    .in('category', ['press', 'media', 'Press', 'Media'])
+    .order('published_at', { ascending: false })
+    .limit(12);
+
+  // Recent news as fallback if no press-tagged posts
+  const { data: recentNews } = await db
+    .from('blog_posts')
+    .select('id, title, slug, excerpt, featured_image, published_at, category')
+    .eq('published', true)
+    .order('published_at', { ascending: false })
+    .limit(6);
+
+  const posts = pressItems && pressItems.length > 0 ? pressItems : (recentNews ?? []);
+
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">

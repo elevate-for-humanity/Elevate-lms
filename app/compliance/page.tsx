@@ -1,12 +1,21 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
+import { createClient } from '@/lib/supabase/server';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export const revalidate = 3600;
 export const metadata: Metadata = {
   title: 'Compliance | Elevate for Humanity',
   description: 'Compliance page content.',
 };
 
-export default function Page() {
+export default async function CompliancePage() {
+  const supabase = await createClient();
+  const { data: dbRows } = await supabase.from('compliance_audits').select('*').limit(50);
+
+  const programCredentials = (dbRows as any[]) || [];
+
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">

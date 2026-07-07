@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 export const metadata: Metadata = { title: 'Portals | Elevate', description: 'Portals page.' };
@@ -18,3 +20,4 @@ export default function Page() {
     </div>
   );
 }
+

@@ -23,7 +23,7 @@ export default function PartnerMOUPage() {
       <DocumentPage
         documentType="Memorandum of Understanding"
         title="Training Network Partner Agreement"
-        subtitle="{PLATFORM_DEFAULTS.orgName} Career & Technical Institute — Indiana Workforce Training Network"
+        subtitle={`${PLATFORM_DEFAULTS.orgName} Career & Technical Institute — Indiana Workforce Training Network`}
         date="2025-01-01"
         version="3.0"
         confidential

@@ -1,46 +1,21 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import type { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/public';
 import { getStaticProgram } from '@/data/programs/index';
 import { resolveSlug } from '@/lib/program-registry';
 import ProgramDetailPageComponent from '@/components/programs/ProgramDetailPage';
+import CdlEnrollmentOpenBanner from '@/components/programs/CdlEnrollmentOpenBanner';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import { OnetLaborData } from '@/components/programs/onet/OnetLaborData';
 import { getProgramOgImageUrl } from '@/lib/programs/og-images';
 import heroBanners from '@/content/heroBanners';
-import HeroVideo from '@/components/marketing/HeroVideo';
-import HeroPicture from '@/components/marketing/HeroPicture';
-import { DEFAULT_HERO_VIDEO, resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
-import { hero as heroTokens } from '@/lib/page-design-tokens';
-import { getProgramOgImage } from '@/lib/programs/og-images';
-import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import LiveJobPostings from '@/components/careers/LiveJobPostings';
+import { loadProgramForPage, loadProgramMetadataSource } from '@/lib/programs/load-program-page';
 
+// On-demand rendering only - prevents memory spikes on 1,000+ variants
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = PLATFORM_DEFAULTS.siteUrl;
-
-// Programs that show live job postings on their detail page
-const LIVE_JOBS_PROGRAM_SLUGS = new Set(['barber-apprenticeship', 'cosmetology-apprenticeship']);
-
-// Slugs that have a dedicated /programs/{slug}/apply page.
-// All others fall back to /apply?program={slug} (generic intake).
-// Only slugs with a real /programs/{slug}/apply page.tsx go here.
-// Everything else falls back to /apply?program={slug}.
-const DEDICATED_APPLY_SLUGS = new Set([
-  'barber-apprenticeship',
-  'cosmetology-apprenticeship',
-  'hvac-technician',
-  'peer-recovery-specialist',
-]);
-
-function getApplyHref(program: string): string {
-  return DEDICATED_APPLY_SLUGS.has(program)
-    ? `/programs/${program}/apply`
-    : `/apply?program=${program}`;
-}
 
 export async function generateMetadata({
   params,
@@ -48,12 +23,32 @@ export async function generateMetadata({
   params: Promise<{ program: string }>;
 }): Promise<Metadata> {
   const { program } = await params;
-  const ogImage = getProgramOgImageUrl(program, SITE_URL);
+  const meta = await loadProgramMetadataSource(program);
+  if (!meta) return {};
 
-  const ogBase = {
-    images: [{ url: ogImage, width: 1200, height: 630, alt: `${program.replace(/-/g, ' ')} training program at ${PLATFORM_DEFAULTS.orgName}` }],
-    siteName: PLATFORM_DEFAULTS.orgName,
-    type: 'website' as const,
+  const ogImage = getProgramOgImageUrl(program, SITE_URL);
+  const img =
+    meta.image?.startsWith('http') ? meta.image
+    : meta.image ? `${SITE_URL}${meta.image}`
+    : ogImage;
+
+  return {
+    title: meta.title,
+    description: meta.description,
+    alternates: { canonical: `${SITE_URL}/programs/${program}` },
+    openGraph: {
+      title: meta.title,
+      description: meta.description,
+      siteName: PLATFORM_DEFAULTS.orgName,
+      type: 'website',
+      images: [{ url: img, width: 1200, height: 630, alt: meta.title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: meta.title,
+      description: meta.description,
+      images: [img],
+    },
   };
 
   // Static ProgramSchema — preferred source for metadata
@@ -500,6 +495,7 @@ function ProgramPage({
 
 export default async function ProgramDetailPage({ params }: { params: Promise<{ program: string }> }) {
   const { program } = await params;
+  const loaded = await loadProgramForPage(program);
 
   // Static ProgramSchema — richest renderer, always preferred when available.
   // Overlay DB title/description if the program also exists in the DB.

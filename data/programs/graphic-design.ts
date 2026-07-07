@@ -7,7 +7,7 @@ export const GRAPHIC_DESIGN: ProgramSchema = {
   sector: 'technology',
   category: 'Graphic Design',
   programType: 'workforce',
-  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/graphic-design.webp',
+  heroImage: '/images/pages/graphic-design.webp',
   heroImageAlt: 'Graphic design student working in Adobe Creative Suite',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

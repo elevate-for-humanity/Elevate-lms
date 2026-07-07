@@ -20,7 +20,7 @@ export default function EmployerAgreementPage() {
       <DocumentPage
         documentType="Employer Partnership Agreement"
         title="Employer Partnership Agreement"
-        subtitle="{PLATFORM_DEFAULTS.orgName} — Workforce & Apprenticeship Programs"
+        subtitle={`${PLATFORM_DEFAULTS.orgName} — Workforce & Apprenticeship Programs`}
         date="2025-01-01"
         version="1.0"
         confidential

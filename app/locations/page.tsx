@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { MapPin } from 'lucide-react';
@@ -21,3 +23,4 @@ export default function Page() {
     </div>
   );
 }
+

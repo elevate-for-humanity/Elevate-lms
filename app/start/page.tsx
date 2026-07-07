@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import Link from 'next/link';
 export const metadata: Metadata = { title: 'Get Started | Elevate', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Start your journey.' };
@@ -18,3 +19,4 @@ export default function Page() {
     </div>
   );
 }
+

@@ -35,3 +35,16 @@ export default function EmployerApprenticesPage() {
     </div>
   );
 }
+
+function StatCard({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
+  return (
+    <div className="bg-white border border-slate-200 rounded-xl p-4">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm text-slate-600">{label}</span>
+        {icon}
+      </div>
+      <p className="text-2xl font-extrabold text-slate-900">{value}</p>
+    </div>
+  );
+}
+

@@ -1,0 +1,137 @@
+import { requireRole } from '@/lib/auth/require-role';
+import { Metadata } from 'next';
+import { createClient } from '@/lib/supabase/server';
+import Link from 'next/link';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { FileText, Users, Award, DollarSign, ArrowLeft, Download, BarChart3, GraduationCap } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: 'Sample Reports | Admin',
+  description: 'Generate sample reports from live platform data.',
+};
+
+export default async function SampleReportsPage() {
+  await requireRole(['admin', 'super_admin', 'staff']);
+  const supabase = await createClient();
+
+  const [students, enrollments, certificates, completions, programs, courses] = await Promise.all([
+    supabase.from('profiles').select('id, full_name, email, role, enrollment_status, created_at').eq('role', 'student').order('created_at', { ascending: false }).limit(20),
+    supabase.from('program_enrollments').select('id, status, created_at, program_id').order('created_at', { ascending: false }).limit(20),
+    supabase.from('certificates').select('id, status, created_at').order('created_at', { ascending: false }).limit(20),
+    supabase.from('completions').select('id, created_at').order('created_at', { ascending: false }).limit(20),
+    supabase.from('programs').select('id, title, status', { count: 'exact' }),
+    supabase.from('courses').select('id, title, is_active', { count: 'exact' }),
+  ]);
+
+  const reportSections = [
+    {
+      title: 'Student Roster',
+      icon: Users,
+      count: students.data?.length ?? 0,
+      color: 'brand-blue',
+      rows: (students.data ?? []).map((s: any) => ({
+        cols: [s.full_name || s.email || 'Unknown', s.role, s.enrollment_status || 'pending', s.created_at ? new Date(s.created_at).toLocaleDateString() : '—'],
+      })),
+      headers: ['Name', 'Role', 'Status', 'Registered'],
+    },
+    {
+      title: 'Enrollment Report',
+      icon: GraduationCap,
+      count: enrollments.data?.length ?? 0,
+      color: 'emerald',
+      rows: (enrollments.data ?? []).map((e: any) => ({
+        cols: [e.id.slice(0, 8), e.status || 'active', e.program_id?.slice(0, 8) || '—', e.created_at ? new Date(e.created_at).toLocaleDateString() : '—'],
+      })),
+      headers: ['ID', 'Status', 'Program', 'Date'],
+    },
+    {
+      title: 'Certificates Issued',
+      icon: Award,
+      count: certificates.data?.length ?? 0,
+      color: 'purple',
+      rows: (certificates.data ?? []).map((c: any) => ({
+        cols: [c.id.slice(0, 8), c.status || 'issued', c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'],
+      })),
+      headers: ['ID', 'Status', 'Issued'],
+    },
+    {
+      title: 'Program Summary',
+      icon: BarChart3,
+      count: programs.count ?? 0,
+      color: 'amber',
+      rows: (programs.data ?? []).map((p: any) => ({
+        cols: [p.title || p.name || 'Unnamed', p.status || '—'],
+      })),
+      headers: ['Program', 'Status'],
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-white p-6">
+
+      {/* Hero Image */}
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-4">
+          <Breadcrumbs items={[
+            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Reports', href: '/admin/reports' },
+            { label: 'Sample Reports' },
+          ]} />
+        </div>
+
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <Link href="/admin/reports" className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-2">
+              <ArrowLeft className="w-4 h-4" /> Back to Reports
+            </Link>
+            <h1 className="text-2xl font-bold text-slate-900">Sample Reports</h1>
+            <p className="text-sm text-slate-700 mt-1">Live data snapshots from the platform (most recent 20 records per section)</p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          {reportSections.map((section) => (
+            <div key={section.title} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <section.icon className="w-5 h-5 text-slate-700" />
+                  <div>
+                    <h2 className="font-semibold text-slate-900">{section.title}</h2>
+                    <p className="text-xs text-slate-700">{section.count} records</p>
+                  </div>
+                </div>
+              </div>
+              {section.rows.length === 0 ? (
+                <div className="px-6 py-8 text-center text-sm text-slate-700">No data available.</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-slate-50">
+                      <tr>
+                        {section.headers.map((h) => (
+                          <th key={h} className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {section.rows.map((row: any, i: number) => (
+                        <tr key={i} className="hover:bg-slate-50">
+                          {row.cols.map((col: string, j: number) => (
+                            <td key={j} className="px-6 py-3 text-sm text-slate-900">{col}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

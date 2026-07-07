@@ -6,7 +6,45 @@ export const metadata: Metadata = {
   keywords: ["tuition", "pricing", "WIOA funding", "financial aid", "Indiana"], description: 'Pricing page content.',
 };
 
-export default function Page() {
+export const revalidate = 3600;
+export default async function PricingPage() {
+  const supabase = await createClient();
+
+  // Get license tiers from database
+  const { data: dbTiers } = await supabase
+    .from('license_tiers')
+    .select('*')
+    .eq('is_active', true)
+    .order('price', { ascending: true });
+
+  // Get FAQs
+  const { data: faqs } = await supabase
+    .from('faqs')
+    .select('*')
+    .eq('category', 'licensing')
+    .eq('is_active', true)
+    .order('order', { ascending: true });
+
+  const displayTiers = dbTiers && dbTiers.length > 0 ? dbTiers : LICENSE_TIERS.slice(0, 3);
+
+  const defaultFaqs = [
+    {
+      question: "What's included in the license?",
+      answer:
+        'All licenses include the core platform, training, and support. Higher tiers include additional features and customization.',
+    },
+    {
+      question: 'Can I upgrade later?',
+      answer: "Yes, you can upgrade your license at any time. We'll prorate the difference.",
+    },
+    {
+      question: 'Is there a monthly option?',
+      answer: 'Yes, we offer monthly billing at a slightly higher rate. Contact us for details.',
+    },
+  ];
+
+  const displayFaqs = faqs && faqs.length > 0 ? faqs : defaultFaqs;
+
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
@@ -23,3 +61,4 @@ export default function Page() {
     </div>
   );
 }
+

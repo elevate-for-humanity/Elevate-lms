@@ -6,7 +6,53 @@ export const metadata: Metadata = {
   description: 'Apply page content.',
 };
 
-export default function Page() {
+const staticProgramOptions = Array.from(STATIC_PROGRAM_MAP.values())
+  .map((program) => ({
+    id: program.slug,
+    title: program.title,
+    slug: program.slug,
+  }))
+  .sort((a, b) => a.title.localeCompare(b.title));
+
+export default async function ApplyPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ program?: string; payment?: string }>;
+}) {
+  const params = await searchParams;
+
+  // Note: ?program=barber-apprenticeship is 301'd to /programs/barber-apprenticeship/apply
+  // by next.config.mjs before this page renders. No barber-specific branch needed here.
+  const programSlug = normalizeProgramInterest(params?.program) ?? '';
+
+  // Resolve a human-readable program name for the hero: try static catalog first,
+  // then fall back to slug-to-title formatting so the hero is never blank.
+  const staticProg = programSlug ? getStaticProgram(programSlug) : null;
+  const programTitle = staticProg?.title
+    ?? (programSlug
+      ? programSlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+      : '');
+
+  let programs = staticProgramOptions;
+
+  // Use admin client to bypass RLS when available. CI and local preview jobs often
+  // do not have SUPABASE_SERVICE_ROLE_KEY, so fall back to the static catalog
+  // instead of crashing the entire intake page.
+  const db = await getAdminClient();
+  if (db) {
+    const { data, error } = await db
+      .from('programs')
+      .select('id, title, slug')
+      .eq('published', true)
+      .eq('is_active', true)
+      .neq('status', 'archived')
+      .order('title');
+
+    if (!error && data?.length) {
+      programs = data;
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">

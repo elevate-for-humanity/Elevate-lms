@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Check, X, ArrowRight, DollarSign, Building2, Users, GraduationCap } from 'lucide-react';

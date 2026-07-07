@@ -8,7 +8,7 @@ export const NAIL_TECH: ProgramSchema = {
   sector: 'personal-services',
   category: 'Nail Technology',
   programType: 'apprenticeship',
-  heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-technician.webp',
+  heroImage: '/images/pages/nail-technician.webp',
   heroImageAlt: 'Nail technician apprentice performing a manicure',
   deliveryMode: 'in-person',
   deliveredBy: 'Partner',

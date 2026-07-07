@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { DollarSign, CheckCircle, ArrowRight } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -49,3 +50,4 @@ export default function GrantsPage() {
     </div>
   );
 }
+

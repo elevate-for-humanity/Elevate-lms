@@ -178,9 +178,17 @@ const nextConfig = {
       };
     }
 
-    config.parallelism = 1;
-
+    // Webpack cache configuration for consistent builds
+    // - Enable filesystem cache when NEXT_BUILD_CACHE is set (Northflank persistent /cache/.next)
+    // - This ensures consistent Server Action IDs across builds
+    // - Only disable if DISABLE_WEBPACK_FILESYSTEM_CACHE='1'
     if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') {
+      config.cache = false;
+    } else if (process.env.NEXT_BUILD_CACHE) {
+      // Next.js auto-detects NEXT_BUILD_CACHE and enables filesystem cache
+      // No explicit config needed - ensures stable Server Action IDs
+    } else if (process.env.CI === 'true') {
+      // CI without persistent cache - disable to avoid stale cache
       config.cache = false;
     }
 

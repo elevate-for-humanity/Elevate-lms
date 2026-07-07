@@ -4,7 +4,7 @@
 FROM node:22-bookworm AS builder
 
 # Cache invalidation marker
-RUN echo "nf-cache-invalidate-20260707-admin-v1"
+RUN echo "nf-cache-invalidate-ae9cfbf-admin"
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -18,43 +18,45 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     librsvg2-dev \
     && rm -rf /var/lib/apt/lists/*
 
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+
+ENV PNPM_HOME="/app/.pnpm-home"
+ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /app
 
-# Copy manifests first (for better caching)
+# Copy manifests and source
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json apps/admin/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
-
-# Install pnpm directly via npm
-RUN npm install -g pnpm@9.15.9
-
-ENV PNPM_HOME="/app/.pnpm-home"
-ENV PATH="$PNPM_HOME:$PATH"
-
-# Copy source
 COPY . .
 
-# Critical ENV variables (must be set before install)
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=ADMIN
 ENV CI=true
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
-ENV NEXT_SWC_DUP_DISABLE=1
-ENV TURBOPACK_DISABLED=1
 
 # Install dependencies
 RUN pnpm install --no-frozen-lockfile
 
-# Build Admin with memory-optimized settings
-ARG COMMIT_SHA=unknown
-ARG BUILD_TIME=unknown
-ENV NEXT_PUBLIC_COMMIT_SHA=$COMMIT_SHA
-ENV NEXT_PUBLIC_BUILD_TIME=$BUILD_TIME
-RUN NODE_OPTIONS="--max-old-space-size=7168" pnpm --filter @elevate/admin build --no-lint
+# Build Admin
+ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
+ARG NEXT_PUBLIC_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG GITHUB_SHA=unknown
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV GITHUB_SHA=$GITHUB_SHA
+
+RUN pnpm --filter @elevate/admin build --no-lint
 
 # --- runtime stage ---
 FROM node:22-bookworm-slim

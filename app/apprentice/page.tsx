@@ -486,31 +486,3 @@ export default async function ApprenticePortalPage() {
   );
 }
 
-// Skill progress card
-function SkillProgress({ name, icon: Icon, percent, color }: {
-  name: string;
-  icon: React.ElementType;
-  percent: number;
-  color: string;
-}) {
-  return (
-    <div className="bg-white rounded-xl p-4 border border-slate-100">
-      <div className="flex items-center gap-3 mb-3">
-        <div className={`w-10 h-10 rounded-lg ${color} flex items-center justify-center`}>
-          <Icon className="w-5 h-5" />
-        </div>
-        <div className="flex-1">
-          <p className="font-medium text-slate-900 text-sm">{name}</p>
-          <p className="text-xs text-slate-500">{percent}% complete</p>
-        </div>
-      </div>
-      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-        <div 
-          className="h-full bg-gradient-to-r from-brand-blue-500 to-brand-blue-600 rounded-full transition-all"
-          style={{ width: `${percent}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-

@@ -6,36 +6,37 @@
 
 ---
 
-## DESTINATIONS
+## DESTINATIONS - UPDATED
 
-| Code | Destination |
-|------|-------------|
-| **DELETE** | Delete (not used) |
-| **APPRENTICE** | Apprenticeship system (APPP) |
-| **ADMIN** | Admin dashboard |
-| **STORE** | Store/e-commerce |
-| **AI** | AI/Course generation |
-| **PROGRAM** | Program builder |
-| **CREDENTIAL** | Credentialing system |
-| **ENROLL** | Enrollment system |
-| **STUDENT** | Student portal |
-| **STUDENT/QUICKBOOKS** | Student container + QuickBooks payroll |
-| **PARTNER** | Partner/Host Shop |
-| **STAFF** | Staff portal |
-| **TESTING** | Testing center |
-| **COMPLIANCE** | Compliance/Legal |
-| **LMS** | Learning system |
-| **LMS/GAMIFICATION** | Gamification features |
-| **FINANCE** | Finance/Payments |
-| **HR** | HR/Payroll |
-| **REPORTS** | Analytics/Reports |
-| **NOTIFY** | Notifications |
-| **DOCS** | Document management |
-| **AUTO** | Automation/Workflow |
-| **FSSA** | Archive for FSSA (Indiana) |
-| **JTI** | JTI (Job Ready Indy) - SCORM |
-| **APPP** | APPP - Apprenticeship for grants (SAMs) |
-| **STARTER REPO** | Starter repository (VITA, Volunteer, Supersonic) |
+| Code | Destination | Status |
+|------|-------------|--------|
+| **DELETE** | Delete (not used) | Pending |
+| **APPRENTICE** | Apprenticeship Dashboard | ✅ To be activated |
+| **ADMIN** | Admin Dashboard | ✅ To be activated |
+| **STORE** | Store/E-commerce | ✅ To be activated |
+| **AI** | AI/Course generation | ✅ To be activated |
+| **STUDIO** | Studio Container (Course Builder) | ✅ To be activated |
+| **CHECK** | Check Credentials (Credentialing) | ✅ To be activated |
+| **APPLICATIONS** | Applications (Enrollment) | ✅ To be activated |
+| **LEARNER** | Learner Dashboard (Student) | ✅ To be activated |
+| **STUDENT/QUICKBOOKS** | Student container + QuickBooks payroll | ✅ To be activated |
+| **HOST SHOP** | Host Shop Dashboard | ✅ To be activated |
+| **PARTNER** | Partner Dashboard | ✅ To be activated |
+| **STAFF** | Staff Dashboard | ✅ To be activated |
+| **TESTING** | Testing Center | ✅ To be activated |
+| **COMPLIANCE** | Compliance/Legal | ✅ To be activated |
+| **LMS** | LMS Dashboard | ✅ To be activated |
+| **LMS/GAMIFICATION** | LMS Gamification | ✅ To be activated |
+| **PAYROLL/STRIPE** | Payroll or Stripe (Payments) | ✅ To be activated |
+| **REPORTS** | Reports Dashboard | ✅ To be activated |
+| **NOTIFY** | Notifications | ✅ To be activated |
+| **DOCS** | Document Management | ✅ To be activated |
+| **WORKFLOW** | Workflow (Studio Deviation) | ✅ To be activated |
+| **TRAINING** | Training (Any Training) | ✅ To be activated |
+| **FSSA** | Archive for FSSA (Indiana) | Archive |
+| **JTI** | JTI (Job Ready Indy) - SCORM | Export to JTI repo |
+| **APPP** | APPP - Apprenticeship for grants (SAMs) | Export to APPP repo |
+| **STARTER REPO** | Starter repository (VITA, Volunteer, Supersonic) | Export to Starter repo |
 
 ---
 
@@ -52,7 +53,7 @@
 | 5 | accreditation_reviews | **DELETE** | Accreditation not built |
 | 6 | accreditation_standards | **DELETE** | Accreditation not built |
 | 7 | accreditations | **DELETE** | Accreditation not built |
-| 8 | activity_feed | **STUDENT** → student_activity_log | Already exists |
+| 8 | activity_feed | **LEARNER** → student_activity_log | Already exists |
 | 9 | activity_progress | **LMS** → progress_entries | Learning progress |
 | 10 | adaptive_learning_paths | **LMS** → learning_paths | AI-powered paths |
 | 11 | addon_subscriptions | **STORE** → subscription_plans | Add-on features |
@@ -63,7 +64,7 @@
 | 16 | affiliate_applications | **DELETE** | Affiliates not built |
 | 17 | affiliate_payouts | **DELETE** | Affiliates not built |
 | 18 | affiliates | **DELETE** | Affiliates not built |
-| 19 | agency_referral_confirmations | **ENROLL** → referrals | Agency referrals |
+| 19 | agency_referral_confirmations | **APPLICATIONS** → referrals | Agency referrals |
 | 20 | agreement_signatures | **COMPLIANCE** → agreement_acceptances | Already renamed |
 | 21 | ai_chat_history | **AI** → ai_conversation_memory | Already renamed |
 | 22 | ai_course_generation_log | **AI** → course_generation_jobs | Already renamed |
@@ -71,12 +72,12 @@
 | 24 | ai_generations | **AI** | AI generation jobs |
 | 25 | ai_instructor_assignments | **AI** → instructor_attestations | Already renamed |
 | 26 | ai_instructors | **AI** | AI instructor records |
-| 27 | ai_interview_assessments | **ENROLL** → interview_assessments | Interview data |
+| 27 | ai_interview_assessments | **APPLICATIONS** → interview_assessments | Interview data |
 | 28 | ai_job_matches | **AI** | Job matching AI |
 | 29 | ai_messages | **AI** | AI chat messages |
 | 30 | ai_operator_memory | **ADMIN** → operator_memory | Operator memory |
-| 31 | ai_plan_executions | **AUTO** | AI workflow execution |
-| 32 | ai_planner_tasks | **AUTO** → workflow_steps | Already renamed |
+| 31 | ai_plan_executions | **WORKFLOW** | AI workflow execution |
+| 32 | ai_planner_tasks | **WORKFLOW** → workflow_steps | Already renamed |
 | 33 | ai_tutor_interactions | **LMS** → public_ai_tutor_logs | Already renamed |
 | 34 | alert_notifications | **NOTIFY** → notifications | Already renamed |
 | 35 | ambient_music_log | **DELETE** | Not used |
@@ -84,13 +85,13 @@
 | 37 | api_keys | **ADMIN** | API key management |
 | 38 | api_request_logs | **ADMIN** | API logging |
 | 39 | app_screenshot_views | **DELETE** | Not used |
-| 40 | application_checklist | **ENROLL** → enrollment_steps | Enrollment checklist |
-| 41 | application_claim_log | **ENROLL** → application_events | Application tracking |
+| 40 | application_checklist | **APPLICATIONS** → enrollment_steps | Enrollment checklist |
+| 41 | application_claim_log | **APPLICATIONS** → application_events | Application tracking |
 | 42 | application_compliance_checks | **COMPLIANCE** | Compliance checks |
-| 43 | application_financials | **FINANCE** → applications | Application finances |
-| 44 | application_followups | **ENROLL** → follow_ups | Follow-ups |
-| 45 | application_intake | **ENROLL** → intakes | Intake forms |
-| 46 | application_submissions | **ENROLL** → applications | Applications |
+| 43 | application_financials | **PAYROLL/STRIPE** → applications | Application finances |
+| 44 | application_followups | **APPLICATIONS** → follow_ups | Follow-ups |
+| 45 | application_intake | **APPLICATIONS** → intakes | Intake forms |
+| 46 | application_submissions | **APPLICATIONS** → applications | Applications |
 | 47 | appointment_types | **NOTIFY** → calendar_events | Appointment types |
 | 48 | apprentice_agreements | **APPRENTICE** → agreements | Apprentice agreements |
 | 49 | apprentice_assignments | **APPRENTICE** | Apprentice assignments |
@@ -108,14 +109,14 @@
 | 56 | apprentice_payroll | **STUDENT/QUICKBOOKS** | ✅ Apprentice payroll (QuickBooks sync) |
 | 57 | apprentice_service_logs | **APPRENTICE** | Service logs |
 | 58 | apprentice_uploads | **APPRENTICE** → documents | Apprentice docs |
-| 59 | apprentice_wage_updates | **HR** → payroll | Wage tracking |
+| 59 | apprentice_wage_updates | **STAFF** → payroll | Wage tracking |
 | 60 | apprenticeship_hours_summary | **APPRENTICE** | Hours summary |
 | 61 | apprenticeship_portfolio | **APPRENTICE** | Apprentice portfolio |
 | 62 | apprenticeship_shop_drafts | **APPRENTICE** → host_shop_applications | Drafts |
 | 63 | apprenticeship_shops | **APPRENTICE** → apprentice_sites | Already renamed |
-| 64 | approval_chain_definitions | **AUTO** → workflow_definitions | Workflow defs |
-| 65 | approval_chain_steps | **AUTO** → workflow_steps | Already renamed |
-| 66 | approval_tokens | **AUTO** | Approval tokens |
+| 64 | approval_chain_definitions | **WORKFLOW** → workflow_definitions | Workflow defs |
+| 65 | approval_chain_steps | **WORKFLOW** → workflow_steps | Already renamed |
+| 66 | approval_tokens | **WORKFLOW** | Approval tokens |
 | 67 | assessment_attempts | **TESTING** → credential_attempts | Already renamed |
 | 68 | assessment_questions | **TESTING** → quiz_questions | Questions |
 | 69 | assessments | **TESTING** | Assessment definitions |
@@ -126,29 +127,29 @@
 | 74 | audit_ddl_events | **ADMIN** → audit_logs | DDL events |
 | 75 | audit_export_log | **ADMIN** → audit_logs | Export logs |
 | 76 | audit_failures | **ADMIN** → audit_logs | Failure logs |
-| 77 | automation_action_queue | **AUTO** | Action queue |
-| 78 | automation_execution_log | **AUTO** → workflow_runs | Already renamed |
-| 79 | automation_rules | **AUTO** → automated_decisions | Already renamed |
-| 80 | automation_triggers | **AUTO** → workflow_triggers | Already renamed |
-| 81 | autopilot_logs | **AUTO** | Autopilot logs |
-| 82 | autopilot_settings | **AUTO** → workflow_settings | Settings |
+| 77 | automation_action_queue | **WORKFLOW** | Action queue |
+| 78 | automation_execution_log | **WORKFLOW** → workflow_runs | Already renamed |
+| 79 | automation_rules | **WORKFLOW** → automated_decisions | Already renamed |
+| 80 | automation_triggers | **WORKFLOW** → workflow_triggers | Already renamed |
+| 81 | autopilot_logs | **WORKFLOW** | Autopilot logs |
+| 82 | autopilot_settings | **WORKFLOW** → workflow_settings | Settings |
 | 83 | avatars | **USER** → profiles | User avatars |
 | 84 | backups | **ADMIN** | Backup management |
 | 85 | badge_definitions | **LMS** → badges | Badge system |
-| 86 | bank_accounts | **FINANCE** → billing_accounts | Banking |
-| 87 | banking_services | **FINANCE** | Banking services |
+| 86 | bank_accounts | **PAYROLL/STRIPE** → billing_accounts | Banking |
+| 87 | banking_services | **PAYROLL/STRIPE** | Banking services |
 | 88 | barber_competency_mappings | **APPRENTICE** → competencies | Barber comps |
 | 89 | barber_completions | **APPRENTICE** → program_completion | Barber completion |
 | 90 | barber_instructor_signoffs | **APPRENTICE** → competency_signoffs | Sign-offs |
 | 91 | barber_lesson_progress | **APPRENTICE** → lesson_completions | Lesson progress |
 | 92 | barber_module_hour_config | **APPRENTICE** → program_modules | Module config |
 | 93 | barber_shops | **PARTNER** → host_shops | Already renamed |
-| 94 | benefits_enrollments | **HR** → benefits_enrollments | Benefits |
-| 95 | benefits_plans | **HR** → benefits_plans | Benefits plans |
-| 96 | billing_cycles | **FINANCE** → billing_cycles | Billing |
+| 94 | benefits_enrollments | **STAFF** → benefits_enrollments | Benefits |
+| 95 | benefits_plans | **STAFF** → benefits_plans | Benefits plans |
+| 96 | billing_cycles | **PAYROLL/STRIPE** → billing_cycles | Billing |
 | 97 | bookings | **NOTIFY** → appointments | Bookings |
 | 98 | captcha_attempts | **DELETE** | Use Cloudflare |
-| 99 | career_applications | **ENROLL** → job_applications | Career apps |
+| 99 | career_applications | **APPLICATIONS** → job_applications | Career apps |
 | 100 | case_events | **ADMIN** → events | Already renamed |
 
 ### 101-150
@@ -159,14 +160,14 @@
 | 102 | case_notes | **ADMIN** → case_manager_notes | Case notes |
 | 103 | case_studies | **LMS** → resources | Case studies |
 | 104 | cases | **ADMIN** → workforce_cases | Already renamed |
-| 105 | cash_advance_applications | **FINANCE** → advances | Cash advances |
-| 106 | cash_advances | **FINANCE** → advances | Advances |
-| 107 | certificate_funding_status_log | **CREDENTIAL** | Funding status |
-| 108 | certification_audit_log | **CREDENTIAL** → cert_revocation_log | Already renamed |
-| 109 | certification_bodies | **CREDENTIAL** → certifications | Already renamed |
+| 105 | cash_advance_applications | **PAYROLL/STRIPE** → advances | Cash advances |
+| 106 | cash_advances | **PAYROLL/STRIPE** → advances | Advances |
+| 107 | certificate_funding_status_log | **CHECK** | Funding status |
+| 108 | certification_audit_log | **CHECK** → cert_revocation_log | Already renamed |
+| 109 | certification_bodies | **CHECK** → certifications | Already renamed |
 | 110 | chat_conversations | **NOTIFY** → conversations | Already renamed |
 | 111 | client_consents | **COMPLIANCE** → consent_records | Consents |
-| 112 | clients | **ENROLL** → students | Students as clients |
+| 112 | clients | **APPLICATIONS** → students | Students as clients |
 | 113 | clinical_hours_logs | **APPRENTICE** → hour_entries | Clinical hours |
 | 114 | clinical_placements | **APPRENTICE** → apprentice_placements | Placements |
 | 115 | clinical_sites | **APPRENTICE** → apprentice_sites | Sites |
@@ -181,8 +182,8 @@
 | 124 | collaboration_presence | **NOTIFY** | Online status |
 | 125 | collection_sites | **PARTNER** → host_shops | Collection sites |
 | 126 | community_event_rsvps | **NOTIFY** → event_registrations | RSVPs |
-| 127 | community_group_members | **ENROLL** → study_groups | Group members |
-| 128 | community_groups | **ENROLL** → study_groups | Groups |
+| 127 | community_group_members | **APPLICATIONS** → study_groups | Group members |
+| 128 | community_groups | **APPLICATIONS** → study_groups | Groups |
 | 129 | competency_evidence | **APPRENTICE** → apprentice_skills | Already renamed |
 | 130 | competency_results | **APPRENTICE** → apprentice_skills | Already renamed |
 | 131 | competency_signoffs | **APPRENTICE** → apprentice_skills | Signoffs |
@@ -197,12 +198,12 @@
 | 140 | consent_preferences | **COMPLIANCE** → consent_records | Consents |
 | 141 | consent_records | **COMPLIANCE** | Consent records |
 | 142 | contact_hours | **ADMIN** → business_hours | Business hours |
-| 143 | contact_submissions | **ENROLL** → inquiries | Inquiries |
-| 144 | content_approvals | **PROGRAM** → approvals | Content approvals |
-| 145 | content_blocks | **PROGRAM** → lesson_content | Lesson content |
-| 146 | content_library | **PROGRAM** → resources | Resource library |
-| 147 | content_pages | **PROGRAM** → pages | Static pages |
-| 148 | content_sync_log | **PROGRAM** | Sync logs |
+| 143 | contact_submissions | **APPLICATIONS** → inquiries | Inquiries |
+| 144 | content_approvals | **STUDIO** → approvals | Content approvals |
+| 145 | content_blocks | **STUDIO** → lesson_content | Lesson content |
+| 146 | content_library | **STUDIO** → resources | Resource library |
+| 147 | content_pages | **STUDIO** → pages | Static pages |
+| 148 | content_sync_log | **STUDIO** | Sync logs |
 | 149 | contract_audit_logs | **COMPLIANCE** | Contract audits |
 | 150 | contract_exports | **COMPLIANCE** → documents | Contract exports |
 
@@ -216,49 +217,49 @@
 | 154 | cookie_consent_log | **COMPLIANCE** | Cookie consent |
 | 155 | copilot_usage_log | **AI** | AI usage logs |
 | 156 | course_access | **LMS** → course_enrollments | Access control |
-| 157 | course_accreditation_metadata | **CREDENTIAL** | Accreditation data |
-| 158 | course_categories | **PROGRAM** → program_categories | Categories |
-| 159 | course_competencies | **CREDENTIAL** → competencies | Course comps |
-| 160 | course_credentials | **CREDENTIAL** → program_credentials | Already renamed |
+| 157 | course_accreditation_metadata | **CHECK** | Accreditation data |
+| 158 | course_categories | **STUDIO** → program_categories | Categories |
+| 159 | course_competencies | **CHECK** → competencies | Course comps |
+| 160 | course_credentials | **CHECK** → program_credentials | Already renamed |
 | 161 | course_discussions | **LMS** → discussion_threads | Discussions |
 | 162 | course_embeddings | **AI** → knowledge_embeddings | Already renamed |
 | 163 | course_lesson_versions | **LMS** → curriculum_lessons | Already renamed |
 | 164 | course_metrics | **REPORTS** → course_metrics | Analytics |
-| 165 | course_module_settings | **PROGRAM** → course_settings | Settings |
-| 166 | course_objectives | **PROGRAM** → learning_goals | Objectives |
+| 165 | course_module_settings | **STUDIO** → course_settings | Settings |
+| 166 | course_objectives | **STUDIO** → learning_goals | Objectives |
 | 167 | course_progress | **LMS** → progress | Progress tracking |
-| 168 | course_publish_audits | **PROGRAM** | Publish audits |
+| 168 | course_publish_audits | **STUDIO** | Publish audits |
 | 169 | course_recommendations | **LMS** → recommendations | Recommendations |
-| 170 | course_syllabi | **PROGRAM** → syllabi | Syllabi |
+| 170 | course_syllabi | **STUDIO** → syllabi | Syllabi |
 | 171 | course_tasks | **LMS** → tasks | Course tasks |
-| 172 | course_templates | **PROGRAM** → templates | Templates |
-| 173 | course_vendor_links | **PROGRAM** → vendor_links | Vendor links |
-| 174 | course_version_lessons | **PROGRAM** → versions | Version lessons |
-| 175 | course_version_modules | **PROGRAM** → versions | Version modules |
+| 172 | course_templates | **STUDIO** → templates | Templates |
+| 173 | course_vendor_links | **STUDIO** → vendor_links | Vendor links |
+| 174 | course_version_lessons | **STUDIO** → versions | Version lessons |
+| 175 | course_version_modules | **STUDIO** → versions | Version modules |
 | 176 | course_videos | **LMS** | Course videos |
-| 177 | creator_courses | **PROGRAM** → courses | Creator courses |
-| 178 | credential_blueprint_competencies | **CREDENTIAL** | Blueprint comps |
-| 179 | credential_blueprint_domains | **CREDENTIAL** | Blueprint domains |
-| 180 | credential_blueprints | **CREDENTIAL** → credentials | Already renamed |
-| 181 | credential_domains | **CREDENTIAL** | Credential domains |
-| 182 | credential_exam_domains | **CREDENTIAL** → exam_domains | Exam domains |
-| 183 | credential_generation_rules | **CREDENTIAL** | Generation rules |
-| 184 | credential_providers | **CREDENTIAL** | Providers |
-| 185 | credential_submissions | **CREDENTIAL** → certification_submissions | Already renamed |
-| 186 | credential_validation_rules | **CREDENTIAL** | Validation rules |
-| 187 | credentialing_partners | **CREDENTIAL** | Credentialing partners |
+| 177 | creator_courses | **STUDIO** → courses | Creator courses |
+| 178 | credential_blueprint_competencies | **CHECK** | Blueprint comps |
+| 179 | credential_blueprint_domains | **CHECK** | Blueprint domains |
+| 180 | credential_blueprints | **CHECK** → credentials | Already renamed |
+| 181 | credential_domains | **CHECK** | Credential domains |
+| 182 | credential_exam_domains | **CHECK** → exam_domains | Exam domains |
+| 183 | credential_generation_rules | **CHECK** | Generation rules |
+| 184 | credential_providers | **CHECK** | Providers |
+| 185 | credential_submissions | **CHECK** → certification_submissions | Already renamed |
+| 186 | credential_validation_rules | **CHECK** | Validation rules |
+| 187 | credentialing_partners | **CHECK** | Credentialing partners |
 | 188 | critical_audit_logs | **ADMIN** → audit_logs | Critical logs |
-| 189 | crm_interactions | **ENROLL** → communications | CRM interactions |
-| 190 | crm_leads | **ENROLL** → leads | Already renamed |
+| 189 | crm_interactions | **APPLICATIONS** → communications | CRM interactions |
+| 190 | crm_leads | **APPLICATIONS** → leads | Already renamed |
 | 191 | cross_tenant_access | **DELETE** | Multi-tenant not built |
 | 192 | cta_clicks | **REPORTS** → analytics | CTA analytics |
-| 193 | curriculum_alignment_audits | **PROGRAM** | Alignment audits |
-| 194 | curriculum_compiler_jobs | **PROGRAM** | Compiler jobs |
-| 195 | curriculum_generation_lessons | **PROGRAM** | Generated lessons |
-| 196 | curriculum_generation_runs | **PROGRAM** | Generation runs |
-| 197 | curriculum_lesson_competencies | **PROGRAM** | Lesson comps |
-| 198 | curriculum_publish_log | **PROGRAM** | Publish logs |
-| 199 | curriculum_validation_results | **PROGRAM** | Validation results |
+| 193 | curriculum_alignment_audits | **STUDIO** | Alignment audits |
+| 194 | curriculum_compiler_jobs | **STUDIO** | Compiler jobs |
+| 195 | curriculum_generation_lessons | **STUDIO** | Generated lessons |
+| 196 | curriculum_generation_runs | **STUDIO** | Generation runs |
+| 197 | curriculum_lesson_competencies | **STUDIO** | Lesson comps |
+| 198 | curriculum_publish_log | **STUDIO** | Publish logs |
+| 199 | curriculum_validation_results | **STUDIO** | Validation results |
 | 200 | curvature_reviews | **DELETE** | Not used |
 
 ### 201-250
@@ -266,23 +267,23 @@
 | # | Table | Destination | Notes |
 |---|-------|------------|-------|
 | 201 | customer_service_protocols | **ADMIN** → help_articles | Help articles |
-| 202 | daily_activities | **STUDENT** → activity_log | Activity log |
+| 202 | daily_activities | **LEARNER** → activity_log | Activity log |
 | 203 | dashboards | **ADMIN** | Admin dashboards |
 | 204 | data_deletion_requests | **COMPLIANCE** → gdpr_requests | GDPR requests |
-| 205 | data_processing_jobs | **AUTO** → jobs | Processing jobs |
+| 205 | data_processing_jobs | **WORKFLOW** → jobs | Processing jobs |
 | 206 | data_retention_policies | **ADMIN** | Retention policies |
 | 207 | data_sharing_agreements | **COMPLIANCE** | Sharing agreements |
 | 208 | delegate_assignments | **ADMIN** → delegates | Delegation |
 | 209 | delivery_logs | **NOTIFY** → notification_logs | Delivery logs |
 | 210 | demo_analytics | **REPORTS** | Demo analytics |
 | 211 | departments | **ADMIN** → organizations | Departments |
-| 212 | dependents | **HR** → profiles | Dependent info |
+| 212 | dependents | **STAFF** → profiles | Dependent info |
 | 213 | devstudio_chat_log | **ADMIN** → studio_logs | Admin logs |
 | 214 | devstudio_documents | **ADMIN** → documents | Admin docs |
 | 215 | devstudio_jobs | **ADMIN** → studio_jobs | Admin jobs |
 | 216 | digital_binders | **DOCS** → binders | Digital binders |
 | 217 | digital_purchases | **STORE** → purchases | Digital purchases |
-| 218 | direct_deposit_accounts | **FINANCE** → bank_accounts | Direct deposit |
+| 218 | direct_deposit_accounts | **PAYROLL/STRIPE** → bank_accounts | Direct deposit |
 | 219 | direct_messages | **NOTIFY** → messages | Direct messages |
 | 220 | discussion_forums | **LMS** → forums | Forums |
 | 221 | discussion_replies | **LMS** → forum_posts | Forum replies |
@@ -301,42 +302,42 @@
 | 234 | ecr_snapshots | **DELETE** | ECR not built |
 | 235 | ecr_sync_logs | **DELETE** | ECR not built |
 | 236 | efh_migrations | **ADMIN** | Migration tracking |
-| 237 | email_automations | **AUTO** | Email automation |
+| 237 | email_automations | **WORKFLOW** | Email automation |
 | 238 | email_events | **NOTIFY** → email_logs | Email events |
 | 239 | email_notifications | **NOTIFY** | Email notifications |
-| 240 | employee_documents | **HR** → staff_documents | Already renamed |
-| 241 | employee_goals | **HR** → goals | Goals |
+| 240 | employee_documents | **STAFF** → staff_documents | Already renamed |
+| 241 | employee_goals | **STAFF** → goals | Goals |
 | 242 | employer_agreements | **PARTNER** → agreements | Employer agreements |
 | 243 | employer_applications | **PARTNER** → applications | Employer apps |
 | 244 | employer_incentives | **PARTNER** → incentives | Employer incentives |
 | 245 | employer_sponsors | **PARTNER** → sponsors | Sponsors |
-| 246 | employment_tracking | **HR** | Employment tracking |
-| 247 | enrollment_acknowledgments | **ENROLL** → acknowledgments | Acknowledgments |
-| 248 | enrollment_agreements | **ENROLL** → agreements | Enrollment agreements |
-| 249 | enrollment_bypass_allowlist | **ENROLL** → bypass_list | Bypass list |
-| 250 | enrollment_funding_records | **FINANCE** → funding_records | Funding records |
+| 246 | employment_tracking | **STAFF** | Employment tracking |
+| 247 | enrollment_acknowledgments | **APPLICATIONS** → acknowledgments | Acknowledgments |
+| 248 | enrollment_agreements | **APPLICATIONS** → agreements | Enrollment agreements |
+| 249 | enrollment_bypass_allowlist | **APPLICATIONS** → bypass_list | Bypass list |
+| 250 | enrollment_funding_records | **PAYROLL/STRIPE** → funding_records | Funding records |
 
 ### 251-300
 
 | # | Table | Destination | Notes |
 |---|-------|------------|-------|
-| 251 | enrollment_funding_status_log | **FINANCE** → funding_status | Funding status |
-| 252 | enrollment_insert_audit | **ENROLL** → audit_log | Insert audit |
-| 253 | enrollment_jobs | **AUTO** → job_queue | Already renamed |
+| 251 | enrollment_funding_status_log | **PAYROLL/STRIPE** → funding_status | Funding status |
+| 252 | enrollment_insert_audit | **APPLICATIONS** → audit_log | Insert audit |
+| 253 | enrollment_jobs | **WORKFLOW** → job_queue | Already renamed |
 | 254 | enrollment_module_progress | **LMS** → module_progress | Module progress |
-| 255 | enrollment_payments | **FINANCE** → application_payments | Already renamed |
-| 256 | enrollment_status_history | **ENROLL** → status_history | Status history |
-| 257 | enrollment_transitions | **ENROLL** → transitions | Transitions |
-| 258 | enrollment_voucher_audit | **FINANCE** → voucher_audit | Voucher audit |
-| 259 | entitlements | **HR** → entitlements | Entitlements |
-| 260 | entity_eligibility_checks | **ENROLL** → eligibility | Eligibility checks |
-| 261 | evaluations | **HR** → performance_reviews | Evaluations |
+| 255 | enrollment_payments | **PAYROLL/STRIPE** → application_payments | Already renamed |
+| 256 | enrollment_status_history | **APPLICATIONS** → status_history | Status history |
+| 257 | enrollment_transitions | **APPLICATIONS** → transitions | Transitions |
+| 258 | enrollment_voucher_audit | **PAYROLL/STRIPE** → voucher_audit | Voucher audit |
+| 259 | entitlements | **STAFF** → entitlements | Entitlements |
+| 260 | entity_eligibility_checks | **APPLICATIONS** → eligibility | Eligibility checks |
+| 261 | evaluations | **STAFF** → performance_reviews | Evaluations |
 | 262 | exam_authorization_queue | **TESTING** → exam_authorizations | Already renamed |
 | 263 | exam_outcome_tracking | **TESTING** → exam_events | Already renamed |
 | 264 | exam_ready_status | **TESTING** | Ready status |
 | 265 | exam_session_events | **TESTING** → exam_events | Already renamed |
 | 266 | external_course_access | **LMS** → external_credentials | Already renamed |
-| 267 | external_lms_enrollments | **ENROLL** → external_course_completions | Already renamed |
+| 267 | external_lms_enrollments | **APPLICATIONS** → external_course_completions | Already renamed |
 | 268 | external_module_progress | **LMS** → program_external_completions | Already renamed |
 | 269 | external_modules | **LMS** → program_external_courses | Already renamed |
 | 270 | external_partner_modules | **PARTNER** → modules | Partner modules |
@@ -357,14 +358,14 @@
 | 285 | ferpa_training | **LMS** → training | FERPA training |
 | 286 | ferpa_violation_reports | **COMPLIANCE** | Violation reports |
 | 287 | field_hours_logs | **APPRENTICE** → hour_entries | Field hours |
-| 288 | financial_assurance_records | **FINANCE** | Financial records |
-| 289 | financial_assurances | **FINANCE** | Assurances |
+| 288 | financial_assurance_records | **PAYROLL/STRIPE** | Financial records |
+| 289 | financial_assurances | **PAYROLL/STRIPE** | Assurances |
 | 290 | flashcard_progress | **LMS** → flashcard_progress | Flashcard progress |
 | 291 | flashcard_sets | **LMS** → flashcard_sets | Flashcard sets |
 | 292 | flashcards | **LMS** → flashcards | Flashcards |
 | 293 | focused_reviews | **LMS** | Focused reviews |
-| 294 | follow_up_reminders | **ENROLL** → follow_ups | Follow-ups |
-| 295 | followup_schedule | **ENROLL** → schedules | Followup schedules |
+| 294 | follow_up_reminders | **APPLICATIONS** → follow_ups | Follow-ups |
+| 295 | followup_schedule | **APPLICATIONS** → schedules | Followup schedules |
 | 296 | forum_comments | **LMS** → forum_posts | Forum comments |
 | 297 | forum_members | **LMS** → forum_members | Forum members |
 | 298 | forum_reactions | **LMS** → reactions | Forum reactions |
@@ -382,26 +383,26 @@
 | 305 | fssa_budget | **FSSA** | FSSA budget |
 | 306 | fssa_participants | **FSSA** | FSSA participants |
 | 307 | fssa_program_components | **FSSA** | FSSA programs |
-| 308 | funding_applications | **FINANCE** → grant_applications | Funding apps |
-| 309 | funding_cases | **FINANCE** → funding_cases | Funding cases |
-| 310 | funding_change_audit | **FINANCE** | Change audit |
-| 311 | funding_programs | **FINANCE** → funding_programs | Funding programs |
-| 312 | funding_records | **FINANCE** → workforce_funding | Already renamed |
-| 313 | funding_tracking | **FINANCE** | Funding tracking |
-| 314 | funding_verification_escalations | **FINANCE** | Escalations |
+| 308 | funding_applications | **PAYROLL/STRIPE** → grant_applications | Funding apps |
+| 309 | funding_cases | **PAYROLL/STRIPE** → funding_cases | Funding cases |
+| 310 | funding_change_audit | **PAYROLL/STRIPE** | Change audit |
+| 311 | funding_programs | **PAYROLL/STRIPE** → funding_programs | Funding programs |
+| 312 | funding_records | **PAYROLL/STRIPE** → workforce_funding | Already renamed |
+| 313 | funding_tracking | **PAYROLL/STRIPE** | Funding tracking |
+| 314 | funding_verification_escalations | **PAYROLL/STRIPE** | Escalations |
 | 315 | gamification_events | **LMS/GAMIFICATION** | ✅ KEEP - Gamification events |
 | 317 | gdpr_requests | **COMPLIANCE** | GDPR requests |
-| 318 | generated_assets | **PROGRAM** → assets | Generated assets |
+| 318 | generated_assets | **STUDIO** → assets | Generated assets |
 | 319 | generated_images | **AI** → images | AI images |
 | 320 | grade_records | **LMS** → grades | Already renamed |
-| 321 | grant_disbursements | **FINANCE** → disbursements | Disbursements |
-| 322 | grant_eligibility_results | **FINANCE** → eligibility | Eligibility |
-| 323 | grant_entities | **FINANCE** → entities | Grant entities |
-| 324 | grant_federal_forms | **FINANCE** → forms | Federal forms |
-| 325 | grant_notification_log | **FINANCE** → notifications | Grant notifications |
-| 326 | grant_packages | **FINANCE** → packages | Grant packages |
-| 327 | grant_programs | **FINANCE** → programs | Grant programs |
-| 328 | grant_submissions | **FINANCE** → submissions | Grant submissions |
+| 321 | grant_disbursements | **PAYROLL/STRIPE** → disbursements | Disbursements |
+| 322 | grant_eligibility_results | **PAYROLL/STRIPE** → eligibility | Eligibility |
+| 323 | grant_entities | **PAYROLL/STRIPE** → entities | Grant entities |
+| 324 | grant_federal_forms | **PAYROLL/STRIPE** → forms | Federal forms |
+| 325 | grant_notification_log | **PAYROLL/STRIPE** → notifications | Grant notifications |
+| 326 | grant_packages | **PAYROLL/STRIPE** → packages | Grant packages |
+| 327 | grant_programs | **PAYROLL/STRIPE** → programs | Grant programs |
+| 328 | grant_submissions | **PAYROLL/STRIPE** → submissions | Grant submissions |
 | 329 | group_messages | **NOTIFY** → messages | Group messages |
 | 330 | handbook_policies | **COMPLIANCE** → handbooks | Handbooks |
 | 331 | health_check_log | **ADMIN** | Health checks |
@@ -418,12 +419,12 @@
 | 342 | hour_tracking | **APPRENTICE** → hour_entries | Hour tracking |
 | 343 | hours_log | **APPRENTICE** → hour_entries | Already renamed |
 | 344 | hours_logs | **APPRENTICE** → hour_entries | Already renamed |
-| 345 | hsi_enrollment_queue | **ENROLL** → enrollment_queue | HSI queue |
+| 345 | hsi_enrollment_queue | **APPLICATIONS** → enrollment_queue | HSI queue |
 | 346 | impact_metrics | **REPORTS** → metrics | Impact metrics |
 | 347 | impact_statistics | **REPORTS** → statistics | Impact stats |
 | 348 | impact_stats | **REPORTS** → stats | Impact stats |
 | 349 | incentives | **PARTNER** → incentives | Partner incentives |
-| 350 | income_sources | **FINANCE** → income_sources | Income sources |
+| 350 | income_sources | **PAYROLL/STRIPE** → income_sources | Income sources |
 
 ### 351-400
 
@@ -443,9 +444,9 @@
 | 362 | interactive_elements | **LMS** → interactive_quizzes | Interactive elements |
 | 363 | interview_schedules | **NOTIFY** → interviews | Interview schedules |
 | 364 | ip_access_control | **ADMIN** → access_control | IP control |
-| 365 | job_categories | **ENROLL** → categories | Job categories |
-| 366 | job_listings | **ENROLL** → job_postings | Job listings |
-| 367 | job_skills | **ENROLL** → required_skills | Required skills |
+| 365 | job_categories | **APPLICATIONS** → categories | Job categories |
+| 366 | job_listings | **APPLICATIONS** → job_postings | Job listings |
+| 367 | job_skills | **APPLICATIONS** → required_skills | Required skills |
 | 368 | jri_participants | **DELETE** | JRI not built |
 | 369 | leaderboard_entries | **LMS** → leaderboard | Leaderboard |
 | 370 | leaderboard_scores | **LMS** → scores | Scores |
@@ -454,14 +455,14 @@
 | 373 | learner_documents | **DOCS** → student_documents | Already renamed |
 | 374 | learner_goals | **LMS** → goals | Learner goals |
 | 375 | learner_module_gate_state | **LMS** → module_gates | Module gates |
-| 376 | learner_onboarding | **ENROLL** → onboarding | Learner onboarding |
+| 376 | learner_onboarding | **APPLICATIONS** → onboarding | Learner onboarding |
 | 377 | learning_activity_streaks | **LMS** → streaks | Learning streaks |
 | 378 | learning_analytics | **REPORTS** → analytics | Analytics |
 | 379 | learning_resources | **LMS** → resources | Resources |
 | 380 | learning_streaks | **LMS** → streaks | Streaks |
-| 381 | leave_balances | **HR** → leave_balances | Leave balances |
-| 382 | leave_policies | **HR** → leave_policies | Leave policies |
-| 383 | leave_requests | **HR** → leave_requests | Leave requests |
+| 381 | leave_balances | **STAFF** → leave_balances | Leave balances |
+| 382 | leave_policies | **STAFF** → leave_policies | Leave policies |
+| 383 | leave_requests | **STAFF** → leave_requests | Leave requests |
 | 384 | legal_actions | **COMPLIANCE** → legal_actions | Legal actions |
 | 385 | lesson_bookmarks | **LMS** → bookmarks | Bookmarks |
 | 386 | lesson_comments | **LMS** → comments | Lesson comments |
@@ -470,15 +471,15 @@
 | 389 | lesson_objectives | **LMS** → objectives | Lesson objectives |
 | 390 | lesson_resources | **LMS** → resources | Resources |
 | 391 | library_resources | **LMS** → resources | Library |
-| 392 | license_audit_log | **CREDENTIAL** → license_events | Already renamed |
-| 393 | license_keys | **CREDENTIAL** → licenses | Already renamed |
-| 394 | license_tiers | **CREDENTIAL** → license_tiers | License tiers |
-| 395 | license_usage | **CREDENTIAL** → usage | License usage |
-| 396 | license_usage_log | **CREDENTIAL** → license_validations | Already renamed |
-| 397 | license_violations | **CREDENTIAL** → violations | Violations |
+| 392 | license_audit_log | **CHECK** → license_events | Already renamed |
+| 393 | license_keys | **CHECK** → licenses | Already renamed |
+| 394 | license_tiers | **CHECK** → license_tiers | License tiers |
+| 395 | license_usage | **CHECK** → usage | License usage |
+| 396 | license_usage_log | **CHECK** → license_validations | Already renamed |
+| 397 | license_violations | **CHECK** → violations | Violations |
 | 398 | live_class_attendance | **LMS** → live_class_attendance | Live class |
 | 399 | lms_organizations | **LMS** → organizations | LMS orgs |
-| 400 | makeup_work_requests | **ENROLL** → requests | Makeup requests |
+| 400 | makeup_work_requests | **APPLICATIONS** → requests | Makeup requests |
 
 ### 401-450
 
@@ -504,36 +505,36 @@
 | 418 | moderation_queue | **ADMIN** → review_queue | Already renamed |
 | 419 | moderation_reports | **ADMIN** → reports | Moderation reports |
 | 420 | moderation_rules | **ADMIN** → rules | Moderation rules |
-| 421 | module_competencies | **PROGRAM** → competencies | Module comps |
-| 422 | module_objectives | **PROGRAM** → objectives | Module objectives |
+| 421 | module_competencies | **STUDIO** → competencies | Module comps |
+| 422 | module_objectives | **STUDIO** → objectives | Module objectives |
 | 423 | module_progress | **LMS** → progress_entries | Already renamed |
 | 424 | mou_documents | **PARTNER** → partner_mous | Already renamed |
 | 425 | navigation_categories | **ADMIN** → navigation | Navigation |
 | 426 | navigation_items | **ADMIN** → navigation | Navigation items |
-| 427 | nds_course_catalog | **PROGRAM** → catalog | NDS catalog |
+| 427 | nds_course_catalog | **STUDIO** → catalog | NDS catalog |
 | 428 | news_articles | **ADMIN** → blog_posts | Already renamed |
 | 429 | news_categories | **ADMIN** → categories | News categories |
 | 430 | nonprofit_services | **ADMIN** → services | Nonprofit services |
-| 431 | occupation_standards | **PROGRAM** → standards | Occupation standards |
-| 432 | offerings | **PROGRAM** → offerings | Program offerings |
+| 431 | occupation_standards | **STUDIO** → standards | Occupation standards |
+| 432 | offerings | **STUDIO** → offerings | Program offerings |
 | 433 | ojt_logs | **APPRENTICE** → hour_entries | OJT logs |
 | 434 | ojt_notes | **APPRENTICE** → notes | OJT notes |
 | 435 | ojt_placements | **APPRENTICE** → apprentice_placements | Already renamed |
 | 436 | ojt_student_summary | **APPRENTICE** → summaries | Student summary |
-| 437 | onboarding_checklist | **ENROLL** → checklist | Onboarding checklist |
-| 438 | onboarding_events | **ENROLL** → events | Onboarding events |
-| 439 | onboarding_resources | **ENROLL** → resources | Onboarding resources |
-| 440 | onboarding_steps | **ENROLL** → steps | Onboarding steps |
-| 441 | open_timeclock_shifts | **HR** → shifts | Open shifts |
+| 437 | onboarding_checklist | **APPLICATIONS** → checklist | Onboarding checklist |
+| 438 | onboarding_events | **APPLICATIONS** → events | Onboarding events |
+| 439 | onboarding_resources | **APPLICATIONS** → resources | Onboarding resources |
+| 440 | onboarding_steps | **APPLICATIONS** → steps | Onboarding steps |
+| 441 | open_timeclock_shifts | **STAFF** → shifts | Open shifts |
 | 442 | operator_memory | **AI** → ai_memory | AI memory |
 | 443 | org_invitations | **ADMIN** → invitations | Org invitations |
 | 444 | org_role_normalization_log | **ADMIN** → audit_log | Role normalization |
 | 445 | org_settings | **ADMIN** → site_settings | Already renamed |
 | 446 | organization_addons | **ADMIN** → addons | Organization addons |
-| 447 | parent_student_links | **ENROLL** → family_links | Family links |
-| 448 | participant_barriers | **ENROLL** → barriers | Participant barriers |
-| 449 | participant_demographics | **ENROLL** → demographics | Demographics |
-| 450 | participants | **ENROLL** → workforce_participants | Already renamed |
+| 447 | parent_student_links | **APPLICATIONS** → family_links | Family links |
+| 448 | participant_barriers | **APPLICATIONS** → barriers | Participant barriers |
+| 449 | participant_demographics | **APPLICATIONS** → demographics | Demographics |
+| 450 | participants | **APPLICATIONS** → workforce_participants | Already renamed |
 
 ### 451-500
 
@@ -544,7 +545,7 @@
 | 453 | partner_course_enrollments | **PARTNER** → program_enrollments | Already renamed |
 | 454 | partner_course_payments | **PARTNER** → payments | Partner payments |
 | 455 | partner_courses_catalog | **PARTNER** → catalog | Partner catalog |
-| 456 | partner_credentials | **CREDENTIAL** | Partner credentials |
+| 456 | partner_credentials | **CHECK** | Partner credentials |
 | 457 | partner_lms_enrollment_failures | **PARTNER** → failures | LMS failures |
 | 458 | partner_organizations | **PARTNER** → partners | Already renamed |
 | 459 | partner_profiles | **PARTNER** → profiles | Partner profiles |
@@ -557,27 +558,27 @@
 | 466 | partner_types | **PARTNER** → types | Partner types |
 | 467 | password_history | **ADMIN** → security_logs | Password history |
 | 468 | pathways | **LMS** → learning_paths | Learning pathways |
-| 469 | payment_methods | **FINANCE** → payment_methods | Payment methods |
-| 470 | payment_options | **FINANCE** → options | Payment options |
-| 471 | payment_plan_selections | **FINANCE** → plan_selections | Plan selections |
-| 472 | payment_plans | **FINANCE** → bridge_payment_plans | Payment plans |
-| 473 | payment_sessions | **FINANCE** → sessions | Payment sessions |
-| 474 | payment_transactions | **FINANCE** → payments | Already renamed |
-| 475 | payout_queue | **FINANCE** → payout_queue | Payout queue |
-| 476 | payout_rate_configs | **FINANCE** → rate_configs | Rate configs |
+| 469 | payment_methods | **PAYROLL/STRIPE** → payment_methods | Payment methods |
+| 470 | payment_options | **PAYROLL/STRIPE** → options | Payment options |
+| 471 | payment_plan_selections | **PAYROLL/STRIPE** → plan_selections | Plan selections |
+| 472 | payment_plans | **PAYROLL/STRIPE** → bridge_payment_plans | Payment plans |
+| 473 | payment_sessions | **PAYROLL/STRIPE** → sessions | Payment sessions |
+| 474 | payment_transactions | **PAYROLL/STRIPE** → payments | Already renamed |
+| 475 | payout_queue | **PAYROLL/STRIPE** → payout_queue | Payout queue |
+| 476 | payout_rate_configs | **PAYROLL/STRIPE** → rate_configs | Rate configs |
 | 477 | payroll | **STUDENT/QUICKBOOKS** | ✅ Payroll (QuickBooks integration) |
 | 478 | payroll_records | **STUDENT/QUICKBOOKS** | ✅ Payroll records |
 | 479 | peer_review_assignments | **LMS** → peer_reviews | Peer reviews |
 | 480 | peer_reviews | **LMS** → peer_reviews | Peer reviews |
-| 481 | performance_alerts | **HR** → alerts | Performance alerts |
-| 482 | performance_metrics | **HR** → metrics | Performance metrics |
-| 483 | performance_reviews | **HR** → reviews | Performance reviews |
+| 481 | performance_alerts | **STAFF** → alerts | Performance alerts |
+| 482 | performance_metrics | **STAFF** → metrics | Performance metrics |
+| 483 | performance_reviews | **STAFF** → reviews | Performance reviews |
 | 484 | permission_audit_log | **ADMIN** → audit_log | Permission audit |
 | 485 | permission_group_members | **ADMIN** → permission_groups | Group members |
 | 486 | permission_groups | **ADMIN** → groups | Permission groups |
 | 487 | permissions | **ADMIN** → permissions | Permissions |
-| 488 | placement_outcomes | **ENROLL** → outcomes | Placement outcomes |
-| 489 | placements | **ENROLL** → job_placements | Placements |
+| 488 | placement_outcomes | **APPLICATIONS** → outcomes | Placement outcomes |
+| 489 | placements | **APPLICATIONS** → job_placements | Placements |
 | 490 | plan_features | **STORE** → plan_features | Plan features |
 | 491 | plans | **STORE** → plans | Subscription plans |
 | 492 | platform_knowledge_chunks | **AI** → knowledge_documents | Already renamed |
@@ -588,7 +589,7 @@
 | 497 | platform_stats | **REPORTS** → platform_stats | Platform stats |
 | 498 | policies | **COMPLIANCE** → policies | Policies |
 | 499 | portfolio_projects | **LMS** → portfolios | Portfolio projects |
-| 500 | positions | **HR** → positions | Job positions |
+| 500 | positions | **STAFF** → positions | Job positions |
 
 ### 501-550
 
@@ -598,50 +599,50 @@
 | 502 | practice_attempts | **TESTING** → sim_attempts | Already renamed |
 | 503 | practice_exam_blueprints | **TESTING** → blueprints | Practice blueprints |
 | 504 | priority_scores | **ADMIN** → scores | Priority scores |
-| 505 | process_steps | **AUTO** → workflow_steps | Already renamed |
-| 506 | processed_stripe_events | **FINANCE** → processed_webhook_events | Already renamed |
-| 507 | processes | **AUTO** | Workflow processes |
+| 505 | process_steps | **WORKFLOW** → workflow_steps | Already renamed |
+| 506 | processed_stripe_events | **PAYROLL/STRIPE** → processed_webhook_events | Already renamed |
+| 507 | processes | **WORKFLOW** | Workflow processes |
 | 508 | proctored_exams | **TESTING** → exams | Proctored exams |
 | 509 | proctoring_sessions | **TESTING** → sessions | Proctoring sessions |
 | 510 | product_images | **STORE** → images | Product images |
 | 511 | product_page_views | **REPORTS** → analytics | Page views |
 | 512 | product_reports | **REPORTS** → product_reports | Product reports |
 | 513 | product_variants | **STORE** → variants | Product variants |
-| 514 | program_announcements | **PROGRAM** → announcements | Already renamed |
+| 514 | program_announcements | **STUDIO** → announcements | Already renamed |
 | 515 | program_banner_views | **REPORTS** | Banner views |
-| 516 | program_catalog | **PROGRAM** → catalog | Program catalog |
-| 517 | program_cohorts | **ENROLL** → cohort_sessions | Already renamed |
-| 518 | program_completion_candidates | **PROGRAM** → program_completion | Already renamed |
-| 519 | program_course_activity | **PROGRAM** → activity | Course activity |
-| 520 | program_course_links | **PROGRAM** → program_courses | Already renamed |
-| 521 | program_course_map | **PROGRAM** → course_map | Course map |
-| 522 | program_course_versions | **PROGRAM** → versions | Course versions |
-| 523 | program_ctas | **PROGRAM** → ctas | CTAs |
-| 524 | program_curriculum_modules | **PROGRAM** → modules | Curriculum modules |
-| 525 | program_enrollment_tracks | **ENROLL** → partner_program_access | Already renamed |
-| 526 | program_funding | **FINANCE** → funding | Program funding |
-| 527 | program_funding_links | **FINANCE** → funding_links | Funding links |
-| 528 | program_funding_options | **FINANCE** → funding_options | Funding options |
-| 529 | program_holder_applications | **PROGRAM** → holder_applications | Holder apps |
-| 530 | program_holder_banking | **FINANCE** → banking | Holder banking |
-| 531 | program_holder_payouts | **FINANCE** → payouts | Holder payouts |
+| 516 | program_catalog | **STUDIO** → catalog | Program catalog |
+| 517 | program_cohorts | **APPLICATIONS** → cohort_sessions | Already renamed |
+| 518 | program_completion_candidates | **STUDIO** → program_completion | Already renamed |
+| 519 | program_course_activity | **STUDIO** → activity | Course activity |
+| 520 | program_course_links | **STUDIO** → program_courses | Already renamed |
+| 521 | program_course_map | **STUDIO** → course_map | Course map |
+| 522 | program_course_versions | **STUDIO** → versions | Course versions |
+| 523 | program_ctas | **STUDIO** → ctas | CTAs |
+| 524 | program_curriculum_modules | **STUDIO** → modules | Curriculum modules |
+| 525 | program_enrollment_tracks | **APPLICATIONS** → partner_program_access | Already renamed |
+| 526 | program_funding | **PAYROLL/STRIPE** → funding | Program funding |
+| 527 | program_funding_links | **PAYROLL/STRIPE** → funding_links | Funding links |
+| 528 | program_funding_options | **PAYROLL/STRIPE** → funding_options | Funding options |
+| 529 | program_holder_applications | **STUDIO** → holder_applications | Holder apps |
+| 530 | program_holder_banking | **PAYROLL/STRIPE** → banking | Holder banking |
+| 531 | program_holder_payouts | **PAYROLL/STRIPE** → payouts | Holder payouts |
 | 532 | program_holder_reports | **REPORTS** → holder_reports | Holder reports |
-| 533 | program_lessons | **PROGRAM** → lessons | Program lessons |
-| 534 | program_media | **PROGRAM** → media | Program media |
-| 535 | program_modules | **PROGRAM** → modules | Program modules |
-| 536 | program_organizations | **PROGRAM** → organizations | Program orgs |
-| 537 | program_partner_lms | **PROGRAM** → partner_lms | Partner LMS |
-| 538 | program_phases | **PROGRAM** → phases | Program phases |
-| 539 | program_required_courses | **PROGRAM** → program_requirements | Already renamed |
-| 540 | program_requirement_rules | **PROGRAM** → requirement_rules | Requirement rules |
+| 533 | program_lessons | **STUDIO** → lessons | Program lessons |
+| 534 | program_media | **STUDIO** → media | Program media |
+| 535 | program_modules | **STUDIO** → modules | Program modules |
+| 536 | program_organizations | **STUDIO** → organizations | Program orgs |
+| 537 | program_partner_lms | **STUDIO** → partner_lms | Partner LMS |
+| 538 | program_phases | **STUDIO** → phases | Program phases |
+| 539 | program_required_courses | **STUDIO** → program_requirements | Already renamed |
+| 540 | program_requirement_rules | **STUDIO** → requirement_rules | Requirement rules |
 | 541 | program_revenue | **REPORTS** → revenue | Revenue reports |
-| 542 | program_review_log | **PROGRAM** → review_log | Review log |
-| 543 | program_reviews | **PROGRAM** → program_outcomes | Already renamed |
-| 544 | program_sponsorships | **PROGRAM** → sponsorships | Sponsorships |
-| 545 | program_tracks | **PROGRAM** → tracks | Program tracks |
-| 546 | program_versions | **PROGRAM** → versions | Program versions |
+| 542 | program_review_log | **STUDIO** → review_log | Review log |
+| 543 | program_reviews | **STUDIO** → program_outcomes | Already renamed |
+| 544 | program_sponsorships | **STUDIO** → sponsorships | Sponsorships |
+| 545 | program_tracks | **STUDIO** → tracks | Program tracks |
+| 546 | program_versions | **STUDIO** → versions | Program versions |
 | 547 | program_wioa_compliance_forms | **COMPLIANCE** → wioa_forms | WIOA forms |
-| 548 | programs_for_holder | **PROGRAM** → programs | Programs for holder |
+| 548 | programs_for_holder | **STUDIO** → programs | Programs for holder |
 | 549 | provisioning_events | **ADMIN** → provisioning | Provisioning |
 | 550 | push_notification_tokens | **NOTIFY** → tokens | Push tokens |
 
@@ -663,10 +664,10 @@
 | 562 | rapids_apprentice_data | **APPRENTICE** → apprentices | Already renamed |
 | 563 | readiness_reports | **REPORTS** → readiness | Readiness reports |
 | 564 | recap_generation_log | **AI** | AI recap generation |
-| 565 | referral_codes | **ENROLL** → referral_codes | Referral codes |
-| 566 | refund_advance_applications | **FINANCE** → refund_advances | Refund advances |
-| 567 | refund_tracking | **FINANCE** → refunds | Refund tracking |
-| 568 | refunds | **FINANCE** → refunds | Refunds |
+| 565 | referral_codes | **APPLICATIONS** → referral_codes | Referral codes |
+| 566 | refund_advance_applications | **PAYROLL/STRIPE** → refund_advances | Refund advances |
+| 567 | refund_tracking | **PAYROLL/STRIPE** → refunds | Refund tracking |
+| 568 | refunds | **PAYROLL/STRIPE** → refunds | Refunds |
 | 569 | reporting_completions | **REPORTS** → completions | Completion reports |
 | 570 | reporting_enrollments | **REPORTS** → enrollments | Enrollment reports |
 | 571 | reporting_funding | **REPORTS** → funding | Funding reports |
@@ -678,7 +679,7 @@
 | 577 | resource_downloads | **LMS** → downloads | Resource downloads |
 | 578 | resource_library | **LMS** → library | Resource library |
 | 579 | resources | **LMS** → resources | Learning resources |
-| 580 | resume_profiles | **ENROLL** → resumes | Resume profiles |
+| 580 | resume_profiles | **APPLICATIONS** → resumes | Resume profiles |
 | 581 | resumes | **DOCS** → resumes | Resumes |
 | 582 | rise_participants | **DELETE** | RISE not built |
 | 583 | rise_programs | **DELETE** | RISE not built |
@@ -686,13 +687,13 @@
 | 585 | role_templates | **ADMIN** → role_templates | Role templates |
 | 586 | roles | **ADMIN** → roles | Roles |
 | 587 | rubrics | **LMS** → rubrics | Grading rubrics |
-| 588 | salary_history | **HR** → salary_history | Salary history |
+| 588 | salary_history | **STAFF** → salary_history | Salary history |
 | 589 | sam_alerts | **APPP** → sam_alerts | ✅ SAMs for APPP (grants) |
 | 590 | sam_documents | **APPP** → documents | ✅ SAMs documents |
 | 591 | sam_entities | **APPP** → entities | ✅ SAMs entities |
 | 592 | sap_records | **DELETE** | SAP not built |
-| 593 | scholarship_applications | **FINANCE** → scholarships | Scholarship apps |
-| 594 | school_application_followups | **ENROLL** → followups | School followups |
+| 593 | scholarship_applications | **PAYROLL/STRIPE** → scholarships | Scholarship apps |
+| 594 | school_application_followups | **APPLICATIONS** → followups | School followups |
 | 595 | scorm_completion_summary | **JTI** → scorm_progress | ✅ SCORM for JTI (Job Ready Indy) |
 | 596 | scorm_progress | **JTI** → progress | ✅ SCORM progress |
 | 597 | scorm_registrations | **JTI** → registrations | ✅ SCORM registrations |
@@ -722,7 +723,7 @@
 | 616 | sfc_tax_returns | **DELETE** | SFC not built |
 | 617 | sfc_tax_returns_public_lookup | **DELETE** | SFC not built |
 | 618 | shared_documents | **DOCS** → shared | Shared documents |
-| 619 | shift_schedules | **HR** → schedules | Shift schedules |
+| 619 | shift_schedules | **STAFF** → schedules | Shift schedules |
 | 620 | shop_applications | **PARTNER** → provider_applications | Already renamed |
 | 621 | shop_categories | **STORE** → categories | Shop categories |
 | 622 | shop_document_requirements | **DOCS** → partner_document_requirements | Already renamed |
@@ -775,32 +776,32 @@
 | 664 | sso_login_attempts | **ADMIN** → login_attempts | SSO login attempts |
 | 665 | sso_providers | **ADMIN** → providers | SSO providers |
 | 666 | sso_sessions | **ADMIN** → sessions | SSO sessions |
-| 667 | staff_applications | **HR** → staffs | Already renamed |
+| 667 | staff_applications | **STAFF** → staffs | Already renamed |
 | 668 | staff_notifications | **STAFF** → notifications | Staff notifications |
-| 669 | staff_processes | **AUTO** → workflows | Staff workflows |
+| 669 | staff_processes | **WORKFLOW** → workflows | Staff workflows |
 | 670 | staff_training_modules | **STAFF** → training_modules | Staff training |
 | 671 | staff_training_progress | **STAFF** → progress | Staff progress |
 | 672 | state_compliance | **COMPLIANCE** | State compliance |
-| 673 | state_licensing | **CREDENTIAL** → licensing | State licensing |
+| 673 | state_licensing | **CHECK** → licensing | State licensing |
 | 674 | state_rules | **COMPLIANCE** → rules | State rules |
 | 675 | statistics | **REPORTS** → statistics | Statistics |
 | 676 | store_branding | **STORE** → branding | Store branding |
 | 677 | store_instances | **STORE** → instances | Store instances |
 | 678 | store_orders | **STORE** → orders | Store orders |
-| 679 | student_activity_log | **STUDENT** | Student activity |
+| 679 | student_activity_log | **LEARNER** | Student activity |
 | 680 | student_ai_instructors | **LMS** → ai_instructors | AI instructors |
-| 681 | student_applications | **ENROLL** → applications | Student apps |
+| 681 | student_applications | **APPLICATIONS** → applications | Student apps |
 | 682 | student_badges | **LMS** → badges | Student badges |
-| 683 | student_credential_uploads | **CREDENTIAL** → uploads | Credential uploads |
-| 684 | student_credentials | **CREDENTIAL** → learner_credentials | Already renamed |
-| 685 | student_interventions | **ENROLL** → interventions | Interventions |
+| 683 | student_credential_uploads | **CHECK** → uploads | Credential uploads |
+| 684 | student_credentials | **CHECK** → learner_credentials | Already renamed |
+| 685 | student_interventions | **APPLICATIONS** → interventions | Interventions |
 | 686 | student_milestones | **LMS** → milestones | Student milestones |
 | 687 | student_module_progress | **LMS** → module_progress | Module progress |
-| 688 | student_payments | **FINANCE** → payments | Student payments |
+| 688 | student_payments | **PAYROLL/STRIPE** → payments | Student payments |
 | 689 | student_points | **LMS** → points | Student points |
 | 690 | student_progress | **LMS** → progress_entries | Already renamed |
-| 691 | student_records | **STUDENT** → records | Student records |
-| 692 | student_requirements | **ENROLL** → requirements | Requirements |
+| 691 | student_records | **LEARNER** → records | Student records |
+| 692 | student_requirements | **APPLICATIONS** → requirements | Requirements |
 | 693 | student_resources | **LMS** → resources | Student resources |
 | 694 | student_skill_signoffs | **APPRENTICE** → skill_signoffs | Already renamed |
 | 695 | student_subscriptions | **STORE** → subscriptions | Student subs |
@@ -835,35 +836,35 @@
 | 719 | system_configuration | **ADMIN** → config | System config |
 | 720 | system_errors | **ADMIN** → errors | System errors |
 | 721 | tasks | **LMS** → student_tasks | Already renamed |
-| 722 | tax_applications | **FINANCE** → tax_applications | Tax applications |
-| 723 | tax_calculations | **FINANCE** → calculations | Tax calculations |
+| 722 | tax_applications | **PAYROLL/STRIPE** → tax_applications | Tax applications |
+| 723 | tax_calculations | **PAYROLL/STRIPE** → calculations | Tax calculations |
 | 724 | tax_document_uploads | **DOCS** → tax_documents | Tax documents |
 | 725 | tax_documents | **DOCS** → documents | Tax documents |
-| 726 | tax_filing_applications | **FINANCE** → filings | Tax filings |
-| 727 | tax_filings | **FINANCE** → filings | Tax filings |
-| 728 | tax_firms | **FINANCE** → firms | Tax firms |
-| 729 | tax_information | **FINANCE** → information | Tax info |
-| 730 | tax_intake | **FINANCE** → intake | Tax intake |
-| 731 | tax_interview_questions | **FINANCE** → questions | Tax questions |
-| 732 | tax_payments | **FINANCE** → payments | Tax payments |
-| 733 | tax_return_drafts | **FINANCE** → drafts | Tax drafts |
-| 734 | tax_return_events | **FINANCE** → events | Tax events |
-| 735 | tax_services | **FINANCE** → services | Tax services |
-| 736 | tax_tools | **FINANCE** → tools | Tax tools |
-| 737 | tax_withholdings | **FINANCE** → withholdings | Withholdings |
+| 726 | tax_filing_applications | **PAYROLL/STRIPE** → filings | Tax filings |
+| 727 | tax_filings | **PAYROLL/STRIPE** → filings | Tax filings |
+| 728 | tax_firms | **PAYROLL/STRIPE** → firms | Tax firms |
+| 729 | tax_information | **PAYROLL/STRIPE** → information | Tax info |
+| 730 | tax_intake | **PAYROLL/STRIPE** → intake | Tax intake |
+| 731 | tax_interview_questions | **PAYROLL/STRIPE** → questions | Tax questions |
+| 732 | tax_payments | **PAYROLL/STRIPE** → payments | Tax payments |
+| 733 | tax_return_drafts | **PAYROLL/STRIPE** → drafts | Tax drafts |
+| 734 | tax_return_events | **PAYROLL/STRIPE** → events | Tax events |
+| 735 | tax_services | **PAYROLL/STRIPE** → services | Tax services |
+| 736 | tax_tools | **PAYROLL/STRIPE** → tools | Tax tools |
+| 737 | tax_withholdings | **PAYROLL/STRIPE** → withholdings | Withholdings |
 | 738 | team_members | **ADMIN** → team | Team members |
 | 739 | tenant_compliance_records | **COMPLIANCE** → tenant_records | Tenant compliance |
 | 740 | tenant_configurations | **ADMIN** → configs | Tenant configs |
 | 741 | tenant_invitations | **ADMIN** → invitations | Tenant invites |
 | 742 | tenant_licenses | **ADMIN** → licenses | Tenant licenses |
 | 743 | tenant_members | **ADMIN** → members | Tenant members |
-| 744 | tenant_stripe_customers | **FINANCE** → stripe_customers | Stripe customers |
+| 744 | tenant_stripe_customers | **PAYROLL/STRIPE** → stripe_customers | Stripe customers |
 | 745 | tenant_subscriptions | **STORE** → subscriptions | Tenant subs |
 | 746 | tenant_usage_daily | **REPORTS** → usage | Daily usage |
 | 747 | terminal_command_log | **ADMIN** → terminal_log | Terminal log |
-| 748 | timeclock_cron_runs | **AUTO** → cron_job_runs | Already renamed |
-| 749 | timeclock_ui_state | **HR** → ui_state | Timeclock UI |
-| 750 | timesheets | **HR** → timesheets | Timesheets |
+| 748 | timeclock_cron_runs | **WORKFLOW** → cron_job_runs | Already renamed |
+| 749 | timeclock_ui_state | **STAFF** → ui_state | Timeclock UI |
+| 750 | timesheets | **STAFF** → timesheets | Timesheets |
 
 ### 751-800
 
@@ -882,12 +883,12 @@
 | 761 | training_videos | **LMS** → course_videos | Training videos |
 | 762 | transcript_search_log | **LMS** → search_log | Transcript search |
 | 763 | transmission_statuses | **NOTIFY** → statuses | Transmission statuses |
-| 764 | trial_signups | **ENROLL** → signups | Trial signups |
+| 764 | trial_signups | **APPLICATIONS** → signups | Trial signups |
 | 765 | tts_audio_files | **AI** → audio_files | TTS audio files |
 | 766 | tts_usage_log | **AI** → usage_log | TTS usage log |
-| 767 | tuition_options | **FINANCE** → options | Tuition options |
-| 768 | tuition_payments | **FINANCE** → payments | Tuition payments |
-| 769 | tuition_subscriptions | **FINANCE** → subscriptions | Tuition subs |
+| 767 | tuition_options | **PAYROLL/STRIPE** → options | Tuition options |
+| 768 | tuition_payments | **PAYROLL/STRIPE** → payments | Tuition payments |
+| 769 | tuition_subscriptions | **PAYROLL/STRIPE** → subscriptions | Tuition subs |
 | 770 | tutorials | **LMS** → tutorials | Tutorials |
 | 771 | two_factor_attempts | **ADMIN** → two_factor | 2FA attempts |
 | 772 | updates | **ADMIN** → announcements | Updates |
@@ -900,14 +901,14 @@
 | 779 | user_consents | **COMPLIANCE** → consents | User consents |
 | 780 | user_documents | **DOCS** → student_documents | Already renamed |
 | 781 | user_files | **DOCS** → files | User files |
-| 782 | user_onboarding | **ENROLL** → onboarding | User onboarding |
-| 783 | user_onboarding_status | **ENROLL** → status | Onboarding status |
+| 782 | user_onboarding | **APPLICATIONS** → onboarding | User onboarding |
+| 783 | user_onboarding_status | **APPLICATIONS** → status | Onboarding status |
 | 784 | user_permissions | **ADMIN** → permissions | User permissions |
 | 785 | user_preferences | **USER** → preferences | User preferences |
 | 786 | user_progress | **LMS** → progress | User progress |
 | 787 | user_resumes | **DOCS** → resumes | User resumes |
 | 788 | user_roles | **ADMIN** → roles | User roles |
-| 789 | user_saved_grants | **FINANCE** → saved_grants | Saved grants |
+| 789 | user_saved_grants | **PAYROLL/STRIPE** → saved_grants | Saved grants |
 | 790 | user_sessions | **ADMIN** → sessions | User sessions |
 | 791 | v_active_programs | **REPORTS** → active_programs | Active programs view |
 | 792 | v_app_slow_queries | **ADMIN** → slow_queries | Slow queries view |
@@ -918,13 +919,13 @@
 | 797 | v_payment_integrity_dashboard | **REPORTS** → integrity_dashboard | Payment integrity |
 | 798 | v_published_programs | **REPORTS** → published_programs | Published programs |
 | 799 | vendor_accounts | **STORE** → vendor_accounts | Vendor accounts |
-| 800 | vendor_payments | **FINANCE** → vendor_payments | Vendor payments |
+| 800 | vendor_payments | **PAYROLL/STRIPE** → vendor_payments | Vendor payments |
 
 ### 801-835
 
 | # | Table | Destination | Notes |
 |---|-------|------------|-------|
-| 801 | vendor_payout_tasks | **FINANCE** → payout_tasks | Payout tasks |
+| 801 | vendor_payout_tasks | **PAYROLL/STRIPE** → payout_tasks | Payout tasks |
 | 802 | verification_actions | **COMPLIANCE** → verify_audit | Already renamed |
 | 803 | video_captions | **LMS** → captions | Video captions |
 | 804 | video_chapters | **LMS** → chapters | Video chapters |
@@ -936,23 +937,23 @@
 | 810 | vita_appointments | **STARTER REPO** | ✅ VITA - Volunteer Income Tax Assistance |
 | 811 | volunteer_opportunities | **STARTER REPO** | ✅ Volunteer opportunities |
 | 812 | volunteers | **STARTER REPO** | ✅ Volunteer management |
-| 813 | waitlist_entries | **ENROLL** → waitlist | Already renamed |
+| 813 | waitlist_entries | **APPLICATIONS** → waitlist | Already renamed |
 | 814 | web_vitals | **REPORTS** → vitals | Web vitals |
-| 815 | webhook_deliveries | **AUTO** → webhook_logs | Already renamed |
+| 815 | webhook_deliveries | **WORKFLOW** → webhook_logs | Already renamed |
 | 816 | webhook_health_log | **ADMIN** → health_log | Health log |
-| 817 | webhook_logs | **AUTO** → processed_webhook_events | Already renamed |
-| 818 | webhooks | **AUTO** → webhooks | Webhooks |
+| 817 | webhook_logs | **WORKFLOW** → processed_webhook_events | Already renamed |
+| 818 | webhooks | **WORKFLOW** → webhooks | Webhooks |
 | 819 | webinar_registrations | **LMS** → registrations | Webinar reg |
 | 820 | webinars | **LMS** → webinars | Webinars |
-| 821 | website_pages | **PROGRAM** → pages | Website pages |
-| 822 | welcome_packet_items | **ENROLL** → packets | Welcome items |
-| 823 | welcome_packets | **ENROLL** → packets | Welcome packets |
+| 821 | website_pages | **STUDIO** → pages | Website pages |
+| 822 | welcome_packet_items | **APPLICATIONS** → packets | Welcome items |
+| 823 | welcome_packets | **APPLICATIONS** → packets | Welcome packets |
 | 824 | wioa_applications | **COMPLIANCE** → wioa_participant_records | Already renamed |
 | 825 | wioa_documents | **COMPLIANCE** → wioa_compliance_reports | Already renamed |
 | 826 | wioa_exports | **COMPLIANCE** → exports | WIOA exports |
 | 827 | wioa_report_runs | **REPORTS** → wioa_runs | WIOA report runs |
 | 828 | wioa_services | **COMPLIANCE** → services | WIOA services |
-| 829 | withdrawals | **ENROLL** → withdrawals | Withdrawals |
+| 829 | withdrawals | **APPLICATIONS** → withdrawals | Withdrawals |
 | 830 | workforce_board_cases | **ADMIN** → board_cases | Board cases |
 | 831 | workforce_board_notes | **ADMIN** → board_notes | Board notes |
 | 832 | workforce_board_participants | **ADMIN** → board_participants | Board participants |
@@ -962,37 +963,37 @@
 
 ---
 
-## SUMMARY BY DESTINATION
+## SUMMARY BY DESTINATION - FINAL
 
-| Destination | Count | Tables |
-|-------------|-------|--------|
-| **DELETE** | ~50 | Not used, deprecated, external |
-| **ADMIN** | ~120 | Admin dashboard |
-| **APPRENTICE** | ~35 | Apprenticeship system (APPP) |
-| **LMS** | ~80 | Learning management |
-| **LMS/GAMIFICATION** | ~20 | Gamification features |
-| **PROGRAM** | ~50 | Program builder |
-| **ENROLL** | ~50 | Enrollment system |
-| **FINANCE** | ~45 | Finance/Payments |
-| **CREDENTIAL** | ~25 | Credentialing |
-| **PARTNER** | ~30 | Partner/Host Shop |
-| **NOTIFY** | ~20 | Notifications |
-| **DOCS** | ~15 | Documents |
-| **AUTO** | ~20 | Automation |
-| **STORE** | ~20 | E-commerce |
-| **HR** | ~15 | HR/Payroll |
-| **REPORTS** | ~35 | Analytics |
-| **AI** | ~15 | AI features |
-| **COMPLIANCE** | ~30 | Legal/Compliance |
-| **TESTING** | ~15 | Testing center |
-| **USER** | ~5 | User preferences |
-| **STAFF** | ~5 | Staff portal |
-| **STUDENT** | ~10 | Student portal |
-| **STUDENT/QUICKBOOKS** | ~3 | QuickBooks payroll |
-| **FSSA** | ~6 | Archive for FSSA (Indiana) |
-| **JTI** | ~5 | JTI (Job Ready Indy) - SCORM |
-| **APPP** | ~3 | APPP - Apprenticeship for grants |
-| **STARTER REPO** | ~10 | Starter repository |
+| Destination | Count | Tables | Status |
+|-------------|-------|--------|--------|
+| **DELETE** | ~50 | Not used | Pending |
+| **APPRENTICE** | ~35 | Apprenticeship Dashboard | ✅ Activate |
+| **ADMIN** | ~120 | Admin Dashboard | ✅ Activate |
+| **STORE** | ~20 | Store/E-commerce | ✅ Activate |
+| **AI** | ~15 | AI features | ✅ Activate |
+| **STUDIO** | ~50 | Course Builder | ✅ Activate |
+| **CHECK** | ~25 | Credentials | ✅ Activate |
+| **APPLICATIONS** | ~50 | Enrollment/Apps | ✅ Activate |
+| **LEARNER** | ~40 | Learner Dashboard | ✅ Activate |
+| **HOST SHOP** | ~30 | Host Shop Dashboard | ✅ Activate |
+| **PARTNER** | ~30 | Partner Dashboard | ✅ Activate |
+| **STAFF** | ~20 | Staff Dashboard | ✅ Activate |
+| **TESTING** | ~15 | Testing Center | ✅ Activate |
+| **COMPLIANCE** | ~30 | Legal/Compliance | ✅ Activate |
+| **LMS** | ~80 | LMS Dashboard | ✅ Activate |
+| **LMS/GAMIFICATION** | ~20 | Gamification | ✅ Activate |
+| **PAYROLL/STRIPE** | ~45 | Payments | ✅ Activate |
+| **REPORTS** | ~35 | Reports | ✅ Activate |
+| **NOTIFY** | ~20 | Notifications | ✅ Activate |
+| **DOCS** | ~15 | Documents | ✅ Activate |
+| **WORKFLOW** | ~20 | Workflow | ✅ Activate |
+| **TRAINING** | ~25 | Training | ✅ Activate |
+| **FSSA** | ~6 | Archive | Archive |
+| **JTI** | ~5 | JTI Repo | Export |
+| **APPP** | ~3 | APPP Repo | Export |
+| **STARTER REPO** | ~10 | Starter Repo | Export |
+| **STUDENT/QUICKBOOKS** | ~3 | QuickBooks | ✅ Activate |
 
 ---
 

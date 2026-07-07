@@ -1,4 +1,5 @@
 {
+  "legacyAliases": [],
   "canonicalRoutes": {
     "programs": {
       "certifiedNursingAssistant": "/programs/cna",

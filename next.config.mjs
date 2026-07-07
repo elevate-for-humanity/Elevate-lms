@@ -362,8 +362,6 @@ const nextConfig = {
       { source: '/partner-courses/:path*', destination: '/partners/:path*', permanent: true },
       { source: '/partner-playbook/:path*', destination: '/partners/:path*', permanent: true },
       { source: '/credentials/checksheets', destination: '/programs', permanent: false },
-      {
-      },
       { source: '/credentials/:path+', destination: '/programs', permanent: false },
       { source: '/mission', destination: '/about', permanent: false },
       { source: '/financial-support', destination: '/funding', permanent: true },

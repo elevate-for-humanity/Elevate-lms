@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { HiringTrendsChart, RetentionByRoleChart } from './EmployerCharts';
+import { HiringTrendsChart, RetentionByRoleChart } from '@/app/employer/analytics/EmployerCharts';
 
 export const dynamic = 'force-dynamic';
 

@@ -46,7 +46,7 @@ ENV CI=true
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 
 # Install dependencies
-RUN pnpm install --no-frozen-lockfile --audit-level=low
+RUN pnpm install --no-frozen-lockfile
 
 # Build Next.js (MARKETING scope) - preserve BUILD_SCOPE
 RUN pnpm exec cross-env BUILD_SCOPE=MARKETING NODE_OPTIONS='--max-old-space-size=8192' next build

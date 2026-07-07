@@ -46,7 +46,7 @@ ENV CI=true
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 
 # Install dependencies
-RUN pnpm install --no-frozen-lockfile --audit-level=low
+RUN pnpm install --no-frozen-lockfile
 
 # Build Admin with 8GB heap
 ARG COMMIT_SHA=unknown

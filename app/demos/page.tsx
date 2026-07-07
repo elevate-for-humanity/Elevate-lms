@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Request a Demo | Elevate for Humanity',
   description: 'See Elevate workforce development platform in action. Demo admin, student, employer, and host shop dashboards with sandbox data.',
   keywords: ['workforce demo', 'LMS demo', 'apprenticeship platform demo', 'training management system'],
-  robots: { index: true, follow: false },
+  robots: { index: false, follow: false },
 };
 
 const DEMO_TYPES = [

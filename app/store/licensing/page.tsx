@@ -6,10 +6,7 @@ export const metadata: Metadata = {
   description: 'Licensing page content.',
 };
 
-import Link from 'next/link';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-
-export const revalidate = 3600; // 1 hour ISR cache
+export const revalidate = 3600;
 
 export default function LicensingPage() {
   return (

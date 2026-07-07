@@ -302,7 +302,3 @@ export default function ContactPage() {
     </div>
   );
 }
-
-export default function ContactPage() {
-  return (<ContactPageInner />);
-}

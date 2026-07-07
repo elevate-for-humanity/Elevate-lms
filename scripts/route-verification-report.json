@@ -1,0 +1,305 @@
+{
+  "timestamp": "2026-07-07T08:16:19.890Z",
+  "baseUrl": "https://www.elevateforhumanity.org",
+  "summary": {
+    "passed": 41,
+    "failed": 1,
+    "total": 42
+  },
+  "routes": [
+    {
+      "url": "https://www.elevateforhumanity.org/",
+      "status": 200,
+      "duration": 171,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/about",
+      "status": 200,
+      "duration": 150,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/programs",
+      "status": 200,
+      "duration": 136,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/apply",
+      "status": 200,
+      "duration": 170,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/store",
+      "status": 200,
+      "duration": 155,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/login",
+      "status": 200,
+      "duration": 139,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/admin-login",
+      "status": 200,
+      "duration": 144,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/host-shop",
+      "status": 200,
+      "duration": 180,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/partner",
+      "status": 200,
+      "duration": 122,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/employer",
+      "status": 200,
+      "duration": 121,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/funding",
+      "status": 200,
+      "duration": 135,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/testing",
+      "status": 200,
+      "duration": 152,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/contact",
+      "status": 200,
+      "duration": 128,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/blog",
+      "status": 200,
+      "duration": 133,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/faq",
+      "status": 200,
+      "duration": 127,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/legal",
+      "status": 200,
+      "duration": 138,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/privacy",
+      "status": 308,
+      "duration": 87,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/terms",
+      "status": 308,
+      "duration": 85,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/verify",
+      "status": 200,
+      "duration": 145,
+      "ok": true,
+      "build": "MARKETING"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/admin",
+      "status": 200,
+      "duration": 126,
+      "ok": true,
+      "build": "ADMIN"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/admin/dashboard",
+      "status": 200,
+      "duration": 252,
+      "ok": true,
+      "build": "ADMIN"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/admin/students",
+      "status": 200,
+      "duration": 139,
+      "ok": true,
+      "build": "ADMIN"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/admin/enrollments",
+      "status": 200,
+      "duration": 415,
+      "ok": true,
+      "build": "ADMIN"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/admin/courses",
+      "status": 200,
+      "duration": 144,
+      "ok": true,
+      "build": "ADMIN"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/admin/reports",
+      "status": 200,
+      "duration": 138,
+      "ok": true,
+      "build": "ADMIN"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/admin/analytics",
+      "status": 200,
+      "duration": 132,
+      "ok": true,
+      "build": "ADMIN"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/admin/partners",
+      "status": 200,
+      "duration": 158,
+      "ok": true,
+      "build": "ADMIN"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/admin/employers",
+      "status": 200,
+      "duration": 133,
+      "ok": true,
+      "build": "ADMIN"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/admin/settings",
+      "status": 200,
+      "duration": 134,
+      "ok": true,
+      "build": "ADMIN"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/lms",
+      "status": 200,
+      "duration": 122,
+      "ok": true,
+      "build": "LMS"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/lms/courses",
+      "status": 200,
+      "duration": 123,
+      "ok": true,
+      "build": "LMS"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/learner/dashboard",
+      "status": 200,
+      "duration": 127,
+      "ok": true,
+      "build": "LMS"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/profile",
+      "status": 200,
+      "duration": 135,
+      "ok": true,
+      "build": "LMS"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/account",
+      "status": 200,
+      "duration": 125,
+      "ok": true,
+      "build": "LMS"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/achievements",
+      "status": 200,
+      "duration": 133,
+      "ok": true,
+      "build": "LMS"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/messages",
+      "status": 200,
+      "duration": 131,
+      "ok": true,
+      "build": "LMS"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/schedule",
+      "status": 404,
+      "duration": 134,
+      "ok": false,
+      "build": "LMS"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/student-support",
+      "status": 200,
+      "duration": 126,
+      "ok": true,
+      "build": "LMS"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/api/health",
+      "status": 200,
+      "duration": 258,
+      "ok": true,
+      "build": "SHARED"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/certificates",
+      "status": 200,
+      "duration": 138,
+      "ok": true,
+      "build": "SHARED"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/credentials",
+      "status": 200,
+      "duration": 122,
+      "ok": true,
+      "build": "SHARED"
+    },
+    {
+      "url": "https://www.elevateforhumanity.org/verify",
+      "status": 200,
+      "duration": 119,
+      "ok": true,
+      "build": "SHARED"
+    }
+  ]
+}

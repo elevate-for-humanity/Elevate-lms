@@ -38,34 +38,127 @@ const ALWAYS_KEEP_DIRS = new Set([
 const DRY_RUN = process.env.SPLIT_LIVE_MODE !== 'true';
 console.log(`Mode: ${DRY_RUN ? 'DRY RUN (no deletions)' : 'LIVE (will delete files)'}`);
 
+/**
+ * ROUTE EXCLUSIONS BY BUILD
+ * 
+ * Each build EXCLUDES routes owned by other builds to prevent:
+ * - 404 errors (page excluded but URL still exists)
+ * - Code bloat (unused routes in wrong builds)
+ * - Route conflicts
+ * 
+ * MARKETING = Public website, marketing pages, store, apply, ALL portals
+ * ADMIN = Admin dashboard and management pages (/admin/*)
+ * LMS = Student learning, apprentice, profile pages (/lms/*, /learner/*)
+ */
+
+// Routes OWNED by MARKETING (kept in Marketing build)
+const MARKETING_OWNED = new Set([
+  // Core
+  'about', 'contact', 'team', 'careers', 'press', 'news', 'site-map',
+  // Programs
+  'programs', 'barber-and-beauty-apprenticeships',
+  'barber-host-shop', 'cosmetology-host-shop', 'esthetician-host-shop', 'nail-host-shop',
+  // Apply
+  'apply', 'eligibility', 'check-eligibility', 'next-steps', 'onboarding', 'orientation', 'enrollment',
+  // Store
+  'store', 'shop', 'licensing', 'licenses', 'checkout', 'compare', 'demo', 'demos', 'white-label',
+  // Funding
+  'funding', 'financing', 'wioa-eligibility', 'wioa-participant', 'donate', 'scholarships', 'tuition', 'pricing',
+  // Testing
+  'testing', 'certiport-exam', 'certificates', 'credentials', 'credential', 'verify',
+  // Career
+  'career-training', 'career-training-indiana', 'healthcare-training-indianapolis',
+  'skilled-trades-training-indiana', 'workforce-board', 'workforce-partners',
+  'career-services', 'career-assessment', 'career-counseling',
+  'find-workone', 'workone-partner-packet', 'employment-support', 'hire-graduates',
+  // For pages
+  'for-employers', 'for-partners', 'for-agencies', 'for-providers', 'for-students',
+  // Marketing
+  'solutions', 'how-it-works', 'pathways', 'success-stories', 'testimonials', 'start', 'booking',
+  // Education
+  'education', 'training', 'launch', 'schools', 'grants', 'government', 'industries',
+  'microclasses', 'syllabi', 'webinars', 'ebooks', 'reels',
+  // Resources
+  'resources', 'documents', 'docs', 'forms', 'workbooks', 'data',
+  // Community
+  'community-services', 'community-services-indiana', 'agencies', 'volunteer',
+  'impact', 'metrics', 'outcomes',
+  // Legal
+  'legal', 'compliance', 'ferpa', 'equal-opportunity', 'federal-compliance',
+  'grievance', 'transparency', 'disaster-recovery', 'cookies', 'privacy', 'terms', 'dmca', 'accessibility',
+  // Services
+  'services', 'healthcare', 'locations', 'academic-calendar', 'events', 'updates',
+  'jri', 'fssa', 'snap', 'ojt-and-funding',
+  // Special
+  'cna-waitlist', 'mobile-app', 'mobile', 'connect', 'inquiry', 'directory', 'search',
+  'calendar', 'pay', 'booth-rental', 'instructional-framework',
+  'satisfactory-academic-progress', 'writing-center', 'educatorhub',
+  'founder', 'roi', 'implementation', 'trust', 'suboffice-onboarding', 'alumni', 'platform',
+  // Portals (Landing pages in Marketing)
+  'host-shop', 'employer', 'employers', 'partner', 'partner-directory',
+  'program-holder', 'case-manager', 'apprentice', 'apprenticeship-sponsor',
+  'dashboards', 'portals', 'license', 'ai-chat',
+  // Blog
+  'blog',
+  // AI
+  'ai', 'ai-tutor',
+  // Public
+  'login', 'signup', 'forgot-password', 'reset-password', 'verify-email', 'verify-credentials', 'admin-login'
+]);
+
+// Routes OWNED by ADMIN (kept in Admin build)
+const ADMIN_OWNED = new Set([
+  'admin', 'admin-login',
+  // Admin sub-routes
+  'admin-login',
+  // Auth
+  '(auth)/admin'
+]);
+
+// Routes OWNED by LMS (kept in LMS build)
+const LMS_OWNED = new Set([
+  'lms',
+  'learner',
+  'student',
+  'students',
+  'profile',
+  'account',
+  'achievements',
+  'messages',
+  'notifications',
+  'reports',
+  'import',
+  'advising',
+  'attendance',
+  'learning',
+  'courses',
+  'course-preview',
+  'schedule',
+  'schedule-consultation',
+  'student-support',
+  'actions',
+  'subscription'
+]);
+
 // Route prefixes to exclude for each scope
 const ROUTE_EXCLUSIONS = {
   MARKETING: [
-    'admin',
-    'mission-control',
-    'intelligence',
-    'case-manager',
-    'lms'
+    // Remove ADMIN routes from Marketing
+    ...Array.from(ADMIN_OWNED),
+    // Remove LMS routes from Marketing
+    ...Array.from(LMS_OWNED)
   ],
   ADMIN: [
-    '(marketing)',
-    '(public)',
-    'programs',
-    'lms',
-    'store',
-    'apply'
+    // Remove MARKETING routes from Admin
+    ...Array.from(MARKETING_OWNED).filter(r => r !== 'admin-login'),
+    // Remove LMS routes from Admin
+    ...Array.from(LMS_OWNED)
   ],
   LMS: [
-    'admin',
-    'mission-control',
-    'intelligence',
-    'partner',
-    'case-manager',
-    '(marketing)',
-    'blog',
-    'store',
-    'apply',
-    'about'
+    // Remove ADMIN routes from LMS
+    ...Array.from(ADMIN_OWNED),
+    // Remove MARKETING routes from LMS
+    ...Array.from(MARKETING_OWNED).filter(r => !['verify', 'certificates', 'credentials'].includes(r))
   ]
 };
 
@@ -74,164 +167,27 @@ const SHARED_ROUTES = new Set([
   'api',
   'auth',
   '(auth)',
-  'legal',
-  'health',
-  'data',
-  'funding',
-  'testing',
-  'certificates',
   'videos',
-  'login',
-  'signup',
-  'forgot-password',
-  'verify-credentials',
-  'barber-and-beauty-apprenticeships',
-  'programs',
-  'lms',
-  'store',
-  'apply',
-  'contact'
+  'health',
+  // Credentials (public verification)
+  'certificates',
+  'credentials',
+  'verify',
+  // Legal (required by all)
+  'legal',
+  'privacy',
+  'terms',
+  'cookies',
+  'accessibility',
+  // Public
+  'data'
 ]);
 
 // Scope-specific routes that should be kept
 const SCOPE_ROUTES = {
-  MARKETING: new Set([
-    '(marketing)',
-    '(public)',
-    'about',
-    'apply',
-    'admin',
-    'student',
-    'portals',
-    'store',
-    'programs',
-    'contact',
-    'login',
-    'signup',
-    'legal',
-    'health',
-    'testing',
-    'certificates',
-    'videos',
-    // Public Marketing
-    'blog',
-    'press',
-    'site-map',
-    'faq',
-    'funding',
-    'accessibility',
-    // Lead Gen Pages
-    'career-training',
-    'success-stories',
-    'cna-waitlist',
-    'hire-graduates',
-    'start',
-    'check-eligibility',
-    'partnerships',
-    'how-it-works',
-    'pathways',
-    // Core Pages
-    'booking',
-    'jobs',
-    'search',
-    'calendar',
-    'schedule',
-    'pay',
-    // Special Programs
-    'workforce-board',
-    'find-workone',
-    'barber-and-beauty-apprenticeships',
-    'education',
-    // Store/Products
-    'for-students',
-    'for-employers',
-    'for-providers',
-    // Credentials/Certs
-    'accreditation',
-    'certiport-exam',
-    'credentials',
-    // AI/Chat
-    'ai-chat',
-    'achievements',
-    // Special Services
-    'community-services',
-    'help',
-    'careers',
-    // Additional Marketing Pages
-    'donate',
-    'jri',
-    'resources',
-    'services',
-    'verify',
-    // All portal pages
-    'partner',
-    'case-manager',
-    'mission-control',
-    'intelligence',
-    'employer',
-    'apprentice',
-    'program-holder',
-    'host-shop',
-    'barber-host-shop',
-    'license',
-    'ebook',
-    'dashboards',
-    'wioa-eligibility',
-    'career-services',
-    'support',
-    'apprenticeship-sponsor',
-    'equal-opportunity',
-    'cookies',
-    'dmca',
-    'forgot-password',
-    'reset-password',
-    'testimonials',
-    'messages',
-    'notifications',
-    'security',
-    'settings',
-    'profile',
-    'reports',
-    'import',
-    'advising',
-    'docs',
-    'compliance',
-    'lms'
-  ]),
-  ADMIN: new Set([
-    'admin',
-    'api',
-    'auth',
-    '(auth)',
-    'legal',
-    'health',
-    'data',
-    'funding',
-    'testing',
-    'certificates',
-    'videos',
-    'login',
-    'signup',
-    'forgot-password'
-  ]),
-  LMS: new Set([
-    'lms',
-    'api',
-    'auth',
-    '(auth)',
-    'legal',
-    'health',
-    'data',
-    'funding',
-    'testing',
-    'certificates',
-    'videos',
-    'login',
-    'signup',
-    'forgot-password',
-    'barber-and-beauty-apprenticeships',
-    'programs'
-  ])
+  MARKETING: MARKETING_OWNED,
+  ADMIN: ADMIN_OWNED,
+  LMS: LMS_OWNED
 };
 
 const toRemove = ROUTE_EXCLUSIONS[scope];

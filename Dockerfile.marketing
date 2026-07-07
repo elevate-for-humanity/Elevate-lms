@@ -28,8 +28,8 @@ RUN node scripts/split-app.mjs
 # Install pnpm directly via npm
 RUN npm install -g pnpm@9.15.9
 
-# 1. Install ALL dependencies
-RUN pnpm install --no-frozen-lockfile
+# 1. Install ALL dependencies (suppress peer warnings)
+RUN pnpm install --no-frozen-lockfile --audit-level=low
 
 # 2. Build with 6GB Limit (MARKETING scope)
 ENV NODE_OPTIONS=--max-old-space-size=6144

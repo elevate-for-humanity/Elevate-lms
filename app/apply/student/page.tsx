@@ -34,12 +34,6 @@ export const metadata: Metadata = {
     ],
     type: 'website',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Apply for Career Training',
-    description: 'Apply for workforce training programs. Most students begin within 2–4 weeks.',
-    images: ['/images/pages/comp-home-highlight-health.webp'],
-  },
 };
 
 // Featured program slugs — order controls display sequence.

@@ -43,15 +43,6 @@ export function generateMetadata(params: SEOParams): Metadata {
       type: params.type || 'website',
       locale: 'en_US',
     };
-
-    metadata.twitter = {
-      card: 'summary_large_image',
-      title: fullTitle,
-      description: params.description,
-      images: [image],
-      creator: '@ElevateForHuman',
-      site: '@ElevateForHuman',
-    };
   }
 
   if (params.noindex) {

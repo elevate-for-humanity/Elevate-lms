@@ -68,7 +68,6 @@ export async function generateMetadata({
       description,
       alternates: { canonical: `${SITE_URL}/programs/${program}` },
       openGraph: { ...ogBase, title, description, images: [{ url: img.startsWith('http') ? img : `${SITE_URL}${img}`, width: 1200, height: 630, alt: sp.title }] },
-      twitter: { card: 'summary_large_image', title, description, images: [img.startsWith('http') ? img : `${SITE_URL}${img}`] },
     };
   }
 
@@ -89,7 +88,6 @@ export async function generateMetadata({
         description,
         alternates: { canonical: `${SITE_URL}/programs/${program}` },
         openGraph: { ...ogBase, title, description, images: [{ url: ogImage, width: 1200, height: 630, alt: data.title }] },
-        twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
       };
     }
   }

@@ -29,12 +29,6 @@ export function indianapolisHubMetadata(config: IndianapolisProgramHubConfig): M
       ],
       type: 'website',
     },
-    twitter: {
-      card: 'summary_large_image',
-      title: config.metadata.ogTitle ?? config.metadata.title,
-      description: config.metadata.twitterDescription ?? config.metadata.description,
-      images: ['https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp'],
-    },
   };
 }
 

@@ -29,11 +29,6 @@ export const metadata: Metadata = {
       },
     ],
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'License the Elevate Workforce Platform',
-    description: 'Deploy a proven eligibility-to-placement workforce system. Self-serve from $99/mo.',
-  },
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store',
   },

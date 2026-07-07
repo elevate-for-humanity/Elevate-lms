@@ -42,13 +42,6 @@ export const metadata: Metadata = {
     ],
     type: 'website',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training & Apprenticeships`,
-    description:
-      'Funded training, DOL-registered apprenticeships, and job placement — often at no cost.',
-    images: ['/images/pages/comp-home-hero.webp'],
-  },
 };
 
 export default function HomePage() {

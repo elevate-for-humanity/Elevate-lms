@@ -29,11 +29,6 @@ export const metadata: Metadata = {
     siteName: 'Elevate for Humanity',
     type: 'website',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Beauty Apprenticeships | DOL Registered',
-    description: 'Start your beauty career. 2,000 hours, $4,980. Funding available.',
-  },
   robots: {
     index: true,
     follow: true,

@@ -225,9 +225,6 @@ const nextConfig = {
         destination: '/hero-images/how-it-works-hero.webp',
         permanent: true,
       },
-      {
-        permanent: true,
-      },
     );
 
     return [

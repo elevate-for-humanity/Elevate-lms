@@ -215,8 +215,6 @@ export default function ElevateAnimatedHome() {
           <source src={HOME_HERO.video} type="video/mp4" />
         </video>
         
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a]/90 via-[#0f172a]/80 to-[#0f172a]/70" />
 
         {/* Content */}
         <div className="relative z-10 max-w-5xl mx-auto text-center px-6 py-32">

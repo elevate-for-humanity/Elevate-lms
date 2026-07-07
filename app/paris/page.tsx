@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import ParisChat from '@/components/paris/ParisChat';
 import { GraduationCap, Clock, Shield, Heart } from 'lucide-react';
 
@@ -24,11 +25,11 @@ export default function ParisPage() {
               </div>
             </div>
             <nav className="flex items-center gap-4 text-sm">
-              <a href="/programs" className="text-slate-600 hover:text-purple-600 transition">Programs</a>
-              <a href="/about" className="text-slate-600 hover:text-purple-600 transition">About</a>
-              <a href="/apply" className="px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition">
+              <Link href="/programs" className="text-slate-600 hover:text-purple-600 transition">Programs</Link>
+              <Link href="/about" className="text-slate-600 hover:text-purple-600 transition">About</Link>
+              <Link href="/apply" className="px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition">
                 Apply Now
-              </a>
+              </Link>
             </nav>
           </div>
         </div>

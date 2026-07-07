@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -28,11 +28,7 @@ export default function SOPsPage() {
   const [newSOP, setNewSOP] = useState({ title: '', category: 'admissions', description: '' });
   const router = useRouter();
 
-  useEffect(() => {
-    fetchSOPs();
-  }, [filterCategory, filterStatus]);
-
-  async function fetchSOPs() {
+  const fetchSOPs = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -57,7 +53,11 @@ export default function SOPsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [filterCategory, filterStatus]);
+
+  useEffect(() => {
+    fetchSOPs();
+  }, [fetchSOPs]);
 
   async function createSOP() {
     if (!newSOP.title.trim()) return;

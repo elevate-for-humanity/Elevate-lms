@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import {
   Users,
@@ -66,12 +66,7 @@ export default function PartnerProgramClient({ slug, programName }: Props) {
     notes: '',
   });
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    fetchData();
-  }, [slug]);
-
-  async function fetchData() {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const onboardingRes = await fetch('/api/partner/onboarding-status');
@@ -95,7 +90,11 @@ export default function PartnerProgramClient({ slug, programName }: Props) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [slug]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   async function handleSubmitProgress(e: React.FormEvent) {
     e.preventDefault();

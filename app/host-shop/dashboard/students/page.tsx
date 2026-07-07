@@ -95,7 +95,7 @@ export default async function PartnerStudentsPage() {
             <p className="text-slate-600">Students enrolled through your organization</p>
           </div>
           <Link
-            href="/partner/programs"
+            href="/host-shop/dashboard/programs"
             className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
           >
             Refer New Student

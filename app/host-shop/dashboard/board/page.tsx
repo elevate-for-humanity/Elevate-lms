@@ -53,7 +53,7 @@ export default async function PartnerBoardPage() {
           <p className="text-2xl font-bold">{board.pendingHoursCount}</p>
           <p className="text-sm text-slate-600">Hours Pending Review</p>
           {board.pendingHoursCount > 0 && (
-            <Link href="/partner/hours/pending" className="text-xs text-orange-600 hover:underline mt-1 block">Review now →</Link>
+            <Link href="/host-shop/dashboard/hours/pending" className="text-xs text-orange-600 hover:underline mt-1 block">Review now →</Link>
           )}
         </div>
         <div className="bg-white rounded-xl border p-5">
@@ -161,7 +161,7 @@ export default async function PartnerBoardPage() {
       <div className="bg-white rounded-xl border overflow-hidden">
         <div className="px-6 py-4 border-b flex items-center justify-between">
           <h2 className="font-semibold text-slate-900">Apprentice OJT Progress</h2>
-          <Link href="/partner/hours" className="text-sm text-blue-600 hover:underline">Manage Hours →</Link>
+          <Link href="/host-shop/dashboard/hours" className="text-sm text-blue-600 hover:underline">Manage Hours →</Link>
         </div>
         {board.apprentices.length === 0 ? (
           <div className="px-6 py-10 text-center text-slate-500">
@@ -197,15 +197,15 @@ export default async function PartnerBoardPage() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Link href="/partner/attendance/record" className="bg-white rounded-xl border p-5 hover:border-blue-300 hover:shadow-sm transition block">
+        <Link href="/host-shop/dashboard/attendance/record" className="bg-white rounded-xl border p-5 hover:border-blue-300 hover:shadow-sm transition block">
           <h3 className="font-semibold text-slate-900">Record Attendance</h3>
           <p className="text-sm text-slate-600 mt-1">Log a training session</p>
         </Link>
-        <Link href="/partner/hours/pending" className="bg-white rounded-xl border p-5 hover:border-orange-300 hover:shadow-sm transition block">
+        <Link href="/host-shop/dashboard/hours/pending" className="bg-white rounded-xl border p-5 hover:border-orange-300 hover:shadow-sm transition block">
           <h3 className="font-semibold text-slate-900">Verify Hours</h3>
           <p className="text-sm text-slate-600 mt-1">{board.pendingHoursCount} pending</p>
         </Link>
-        <Link href="/partner/competencies" className="bg-white rounded-xl border p-5 hover:border-purple-300 hover:shadow-sm transition block">
+        <Link href="/host-shop/dashboard/competencies" className="bg-white rounded-xl border p-5 hover:border-purple-300 hover:shadow-sm transition block">
           <h3 className="font-semibold text-slate-900">Competency Reviews</h3>
           <p className="text-sm text-slate-600 mt-1">Approve skill reps</p>
         </Link>

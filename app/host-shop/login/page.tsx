@@ -255,7 +255,7 @@ function PartnerLoginPageInner() {
             <p className="text-slate-700">
               Not a partner yet?{' '}
               <Link
-                href="/partner/onboarding"
+                href="/host-shop/onboarding"
                 className="text-brand-blue-600 font-medium hover:text-brand-blue-700"
               >
                 Apply here

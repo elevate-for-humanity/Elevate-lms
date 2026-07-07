@@ -145,7 +145,7 @@ export default function PartnerProgramClient({ slug, programName }: Props) {
             Complete your partner onboarding before managing apprentices.
           </p>
           <Link
-            href="/partner/onboarding"
+            href="/host-shop/onboarding"
             className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
           >
             Complete Onboarding
@@ -172,7 +172,7 @@ export default function PartnerProgramClient({ slug, programName }: Props) {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Link href="/partner/dashboard" className="p-2 hover:bg-slate-100 rounded-lg">
+            <Link href="/host-shop/dashboard" className="p-2 hover:bg-slate-100 rounded-lg">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>

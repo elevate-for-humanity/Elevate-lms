@@ -110,7 +110,7 @@ export default function PartnerApplyPage() {
           </p>
           <div className="space-y-3">
             <Link
-              href="/partner/onboarding"
+              href="/host-shop/onboarding"
               className="block w-full bg-brand-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition text-center"
             >
               Continue to Full Onboarding
@@ -164,7 +164,7 @@ export default function PartnerApplyPage() {
           <h2 className="text-xl font-bold text-slate-900 mb-1">Partner Application</h2>
           <p className="text-slate-500 text-sm mb-6">
             All fields marked * are required. For the full onboarding with document uploads,{' '}
-            <Link href="/partner/onboarding" className="text-brand-blue-600 hover:underline">
+            <Link href="/host-shop/onboarding" className="text-brand-blue-600 hover:underline">
               start here instead
             </Link>
             .

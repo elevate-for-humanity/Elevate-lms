@@ -123,7 +123,7 @@ export default async function PartnerAttendancePage() {
         </div>
         <div className="flex gap-3">
           <Link
-            href="/partner/attendance/record"
+            href="/host-shop/dashboard/attendance/record"
             className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium"
           >
             <Plus className="w-4 h-4" /> Record Attendance
@@ -240,7 +240,7 @@ export default async function PartnerAttendancePage() {
             <Calendar className="w-12 h-12 text-slate-700 mx-auto mb-3" />
             <p className="text-slate-700 mb-4">No attendance sessions recorded yet.</p>
             <Link
-              href="/partner/attendance/record"
+              href="/host-shop/dashboard/attendance/record"
               className="text-brand-blue-600 font-medium hover:underline"
             >
               Record your first session

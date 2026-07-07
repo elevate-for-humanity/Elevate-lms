@@ -192,6 +192,11 @@ const nextConfig = {
       config.cache = false;
     }
 
+    // Use Next.js default splitChunks  the custom config above was creating
+    // one chunk per npm package (name() function), generating thousands of
+    // chunks and holding the entire module graph in memory simultaneously.
+    // On a 2,500+ page app this caused OOM on every cold build.
+    // Let Next.js manage chunking; it's tuned for this scale.
     return config;
   },
 

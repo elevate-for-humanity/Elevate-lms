@@ -2,11 +2,7 @@ import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
-// MUST be first - breaks circular dependency with MarketingChromeGuard
-// PublicLayout imports MarketingChromeGuardLoader which imports MarketingChromeGuard
-// which imports shouldHideMarketingHeader from app-routes. Importing app-routes
-// first ensures the module is fully evaluated before the circular chain.
-import { generateChromeSuppressionScript, shouldHideMarketingHeader } from '@/lib/layout/app-routes';
+import { generateChromeSuppressionScript } from '@/lib/layout/app-routes';
 import PublicLayout from '@/components/layout/PublicLayout';
 import ToasterClient from '@/components/ui/ToasterClient';
 import { SkipToContent } from '@/components/ui/SkipToContent';
@@ -23,8 +19,6 @@ import SupabaseConfigBootstrap from '@/components/supabase/SupabaseConfigBootstr
 // Individual pages can override with their own `export const revalidate = N`.
 export const dynamic = 'force-dynamic';
 
-const inter = { variable: '' };
-
 // Viewport configuration (separate from metadata in Next.js 14+)
 export const viewport: Viewport = {
   width: 'device-width',
@@ -35,7 +29,6 @@ export const viewport: Viewport = {
 
 // Global SEO configuration - canonical domain is ${PLATFORM_DEFAULTS.canonicalDomain}
 const SITE_URL = PLATFORM_DEFAULTS.siteUrl;
-const isProduction = process.env.NODE_ENV === 'production';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -97,12 +90,12 @@ export const metadata: Metadata = {
   },
 
   robots: {
-    index: isProduction,
-    follow: isProduction,
-    nocache: !isProduction,
+    index: process.env.NODE_ENV === 'production',
+    follow: process.env.NODE_ENV === 'production',
+    nocache: process.env.NODE_ENV !== 'production',
     googleBot: {
-      index: isProduction,
-      follow: isProduction,
+      index: process.env.NODE_ENV === 'production',
+      follow: process.env.NODE_ENV === 'production',
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
@@ -134,14 +127,10 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // Simplified: Always allow indexing on production, always set canonical
-  // No async header checks that could cause SSR issues
-  const isProduction = process.env.NODE_ENV === 'production';
-
   return (
-    <html lang="en" className={`light ${inter.variable}`}>
+    <html lang="en" className="light">
       <head>
-        {!isProduction && <meta name="robots" content="noindex,nofollow" />}
+        {process.env.NODE_ENV !== 'production' && <meta name="robots" content="noindex,nofollow" />}
 
         {/* DNS prefetch for external resources */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
@@ -170,11 +159,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         {/* Prevent iOS Safari from auto-linking phone numbers/dates — causes hydration mismatches */}
         <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
-        {/* LCP preload is set per-page in each page's metadata/head, not globally */}
-        {!isProduction && (
-          <>
-          </>
-        )}
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 
         {/* Critical CSS to prevent FOUC on mobile */}
@@ -244,7 +228,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-// Cache bust: 2026-01-09T13:15:00Z
-// FORCE DEPLOYMENT: Trigger new build to replace stale production
-// All fixes applied: no black text, proper headers, hashed CSS only
-// Build timestamp: 2026-01-09T13:15:00Z
+// Build timestamp: 2026-07-08T14:50:00Z
+// Fixes: Removed unused shouldHideMarketingHeader import, empty fragment, duplicate isProduction

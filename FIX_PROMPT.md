@@ -222,6 +222,41 @@ Verify page renders without errors
 
 ## CURRENT KNOWN ISSUES
 
+### VersionGuard getAppVersion Import Error (July 8, 2026)
+
+**Error**: `getAppVersion is not a function` or similar import error
+
+**Root Cause**: `components/VersionGuard.tsx` imports `getAppVersion` from `@/lib/version-check` but this function is NOT exported from that module - it exists in `@/lib/version/getAppVersion.ts`. Additionally, `checkVersionMismatch()` takes 0 parameters but is called with 2.
+
+**Affected File**: `components/VersionGuard.tsx`
+
+**Line 3**: `import { checkVersionMismatch, getAppVersion } from '@/lib/version-check';`
+
+**Fix Options**:
+
+**Option 1 - Fix imports (Recommended)**:
+```tsx
+// Line 3 - Change TO:
+import { checkVersionMismatch } from '@/lib/version-check';
+import { getAppVersion } from '@/lib/version/getAppVersion';
+
+// Lines 11-12 - Change TO:
+const version = getAppVersion();
+checkVersionMismatch();
+```
+
+**Option 2 - Use APP_VERSION from version-check**:
+```tsx
+// Line 3 - Change TO:
+import { checkVersionMismatch, APP_VERSION } from '@/lib/version-check';
+
+// Lines 11-12 - Change TO:
+const version = APP_VERSION;
+checkVersionMismatch();
+```
+
+---
+
 ### shouldHideMarketingHeader Runtime Error
 
 **Error**: `(0, r.shouldHideMarketingHeader) is not a function`
@@ -249,6 +284,8 @@ export function shouldHideMarketingHeader(pathname: string): boolean {
   );
 }
 ```
+
+---
 
 ### dynamic-imports.tsx ssr:false Error
 

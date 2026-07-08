@@ -21,7 +21,6 @@ const PORTAL_ROLE_MAP: Record<string, UserRole[]> = {
   '/workforce-board': ['admin', 'employer'],
   '/provider': ['admin', 'provider'],
   '/program-holder': ['admin', 'program_holder', 'partner'],
-  '/mentor': ['admin', 'mentor'],
   '/student-portal': ['admin', 'student'],
   '/student': ['admin', 'student'],
   '/learner': ['admin', 'student'],
@@ -43,7 +42,6 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/workforce-board': '/workforce-board/dashboard',
   '/provider': '/provider/dashboard',
   '/program-holder': '/program-holder/dashboard',
-  '/mentor': '/mentor/dashboard',
   '/student-portal': '/student-portal/dashboard',
   '/student': '/learner/dashboard',
   '/learner': '/learner/dashboard',
@@ -65,7 +63,6 @@ const UNAUTHORIZED_REDIRECTS: Record<string, string> = {
   workforce_board: '/workforce-board/dashboard',
   provider: '/provider/dashboard',
   program_holder: '/program-holder/dashboard',
-  mentor: '/mentor/dashboard',
 };
 
 // Billing-exempt routes (don't redirect if subscription is suspended)
@@ -144,7 +141,6 @@ export function normalizeRole(role: string): string {
     program_holder: 'program_holder',
     program_holder_staff: 'partner',
     provider: 'provider',
-    mentor: 'mentor',
     super_admin: 'super_admin',
   };
   

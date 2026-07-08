@@ -13,7 +13,6 @@ import {
   Home,
   Palette,
   Scissors,
-  HeartPulse,
   Wrench,
   Heart,
 } from 'lucide-react';
@@ -102,13 +101,6 @@ const portals = [
     icon: Heart,
     desc: 'Track student progress and communications',
     color: 'bg-pink-600',
-  },
-  {
-    title: 'Mentor Portal',
-    href: '/mentor/dashboard',
-    icon: HeartPulse,
-    desc: 'Mentorship programs and mentee tracking',
-    color: 'bg-violet-600',
   },
   {
     title: 'Case Manager Portal',

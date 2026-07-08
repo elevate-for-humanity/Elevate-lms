@@ -263,19 +263,6 @@ export const SYSTEMS: SystemNode[] = [
     status: 'partial',
   },
   {
-    id: 'mentor-portal',
-    name: 'Mentor Portal',
-    description: 'Mentorship matching, session tracking',
-    routes: [
-      '/mentor',
-      '/mentor/dashboard',
-      '/mentor/students',
-    ],
-    apis: [],
-    tables: ['mentor_assignments', 'mentor_sessions'],
-    status: 'stub',
-  },
-  {
     id: 'program-holder',
     name: 'Program Holder / Partner Portal',
     description: 'Partner salon/barbershop management, apprentice oversight, MOU signing',
@@ -416,13 +403,6 @@ export const PLATFORM_DEBT = [
     description: 'Workforce board portal has 5 pages but 0 API routes. Pages are stubs.',
     affectedRoutes: ['/workforce-board', '/workforce-board/cases', '/workforce-board/reports'],
     resolution: 'Build /api/workforce-board/* routes',
-  },
-  {
-    id: 'mentor-portal-no-api',
-    severity: 'medium',
-    description: 'Mentor portal has 3 pages but 0 API routes.',
-    affectedRoutes: ['/mentor', '/mentor/dashboard', '/mentor/students'],
-    resolution: 'Build /api/mentor/* routes',
   },
   {
     id: 'lab-assignment-signoff-ui',

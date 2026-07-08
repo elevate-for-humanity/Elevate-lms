@@ -105,7 +105,6 @@ export async function GET(request: Request) {
             'partner',
             'sponsor',
             'employer',
-            'mentor',
             'creator',
             'workforce_board',
             'case_manager',

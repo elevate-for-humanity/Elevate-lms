@@ -28,7 +28,6 @@ const ROLE_PORTAL: Record<string, { label: string; href: string }> = {
   org_admin:       { label: 'Admin Dashboard',        href: '/admin/dashboard' },
   staff:           { label: 'Staff Portal',           href: '/admin/staff-portal/dashboard' },
   instructor:      { label: 'Instructor Portal',      href: '/instructor' },
-  mentor:          { label: 'Mentor Portal',          href: '/mentor/dashboard' },
   creator:         { label: 'Creator Portal',         href: '/creator/products' },
   case_manager:    { label: 'Case Manager Portal',    href: '/case-manager/dashboard' },
   workforce_board: { label: 'Workforce Board',        href: '/workforce-board/dashboard' },

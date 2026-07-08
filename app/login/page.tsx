@@ -534,7 +534,6 @@ function LoginForm() {
                   { label: 'Employer', dest: '/employer/dashboard' },
                   { label: 'Partner Portal', dest: '/partner/dashboard' },
                   { label: 'Staff Portal', dest: '/admin/staff-portal/dashboard' },
-                  { label: 'Mentor', dest: '/mentor/dashboard' },
                   { label: 'Case Manager', dest: '/case-manager/dashboard' },
                   { label: 'Workforce Board', dest: '/workforce-board/dashboard' },
                   { label: 'Provider Admin', dest: '/provider/dashboard' },

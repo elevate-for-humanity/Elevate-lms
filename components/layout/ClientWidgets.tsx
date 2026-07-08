@@ -97,8 +97,7 @@ export default function ClientWidgets() {
     pathname?.startsWith('/employer') ||
     pathname?.startsWith('/partner') ||
     pathname?.startsWith('/program-holder') ||
-    pathname?.startsWith('/staff-portal') ||
-    pathname?.startsWith('/mentor');
+    pathname?.startsWith('/staff-portal');
 
   useEffect(() => {
     // Load deferred widgets after 4 seconds — keeps initial paint fast

@@ -37,7 +37,6 @@ export default function robots(): MetadataRoute.Robots {
           '/instructor/',
           '/creator/',
           '/learner/',
-          '/mentor/',
           '/portal/',
           '/program-holder/dashboard',
           '/workforce-board/dashboard',

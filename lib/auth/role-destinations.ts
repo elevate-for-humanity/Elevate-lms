@@ -29,7 +29,6 @@ export type UserRole =
   | 'partner'
   | 'sponsor'
   | 'employer'
-  | 'mentor'
   | 'creator'
   | 'workforce_board'
   | 'case_manager'
@@ -56,7 +55,6 @@ export const ROLE_DESTINATIONS: Record<string, string> = {
 
   // ── Education staff ───────────────────────────────────────────────
   instructor: 'https://admin.elevateforhumanity.org/admin/instructor/dashboard',
-  mentor: '/mentor/dashboard',
   creator: '/creator/products',
 
   // ── Workforce / case management ───────────────────────────────────

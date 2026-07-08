@@ -188,8 +188,6 @@ async function main() {
     checkUrl(roles, '/instructor/dashboard', `${BASE}/instructor/dashboard`),
     checkUrl(roles, '/instructor/students', `${BASE}/instructor/students`),
     checkUrl(roles, '/instructor/gradebook', `${BASE}/instructor/gradebook`),
-    checkUrl(roles, '/mentor/dashboard', `${BASE}/mentor/dashboard`),
-    checkUrl(roles, '/mentor/sessions', `${BASE}/mentor/sessions`),
     checkUrl(roles, '/admin/staff-portal/dashboard', `${BASE}/admin/staff-portal/dashboard`),
     checkUrl(roles, '/admin/staff-portal/students', `${BASE}/admin/staff-portal/students`),
     checkUrl(roles, '/partner/dashboard', `${BASE}/partner/dashboard`),

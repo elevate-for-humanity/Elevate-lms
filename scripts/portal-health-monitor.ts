@@ -29,7 +29,6 @@ const PORTAL_ROUTES = [
   '/partner/dashboard',
   '/program-holder/dashboard',
   '/case-manager/dashboard',
-  '/mentor/dashboard',
   '/support',
 ];
 

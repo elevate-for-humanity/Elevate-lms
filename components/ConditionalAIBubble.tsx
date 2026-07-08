@@ -19,7 +19,6 @@ const APP_ROUTE_PREFIXES = [
   '/employer',
   '/partner',
   '/admin/staff-portal',
-  '/mentor',
   '/program-holder',
 ];
 

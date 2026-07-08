@@ -112,16 +112,6 @@ const DEFAULT_DASHBOARDS: Dashboard[] = [
     order_index: 3,
   },
   {
-    id: '4',
-    name: 'Mentor Portal',
-    href: '/mentor/dashboard',
-    icon: 'Users',
-    description: 'Mentees and sessions',
-    color: 'text-brand-green-600',
-    roles: ['mentor', 'admin'],
-    order_index: 4,
-  },
-  {
     id: '5',
     name: 'Creator Studio',
     href: '/creator/products',

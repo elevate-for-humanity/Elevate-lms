@@ -591,7 +591,6 @@ export const footerNavigation = {
       { label: 'Hub About', href: '/hub/about' },
       { label: 'Funding Impact', href: '/fundingimpact' },
       { label: 'Compliance Report', href: '/compliance/report' },
-      { label: 'Mentor Approvals', href: '/mentor/approvals' },
       { label: 'Messages', href: '/messages/new' },
       { label: 'Archived Messages', href: '/messages/archived' },
       { label: 'Training Center', href: '/training/learning-center' },

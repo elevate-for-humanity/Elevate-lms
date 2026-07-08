@@ -65,3 +65,38 @@ export async function getAdminDocumentUrl(params: {
 
   return data.signedUrl;
 }
+
+/**
+ * Get signed URLs for multiple file paths.
+ * Uses the same signed URL mechanism as getAdminDocumentUrl.
+ */
+export async function getAdminDocumentUrlByPath(params: {
+  adminId: string;
+  filePaths: string[];
+  context?: string;
+}): Promise<Record<string, string | null>> {
+  const { adminId, filePaths, context } = params;
+  const result: Record<string, string | null> = {};
+
+  if (!filePaths?.length) return result;
+
+  const db = await requireAdminClient();
+  if (!db) return result;
+  await setAuditContext(db, { actorUserId: adminId, systemActor: 'admin_document_access' });
+
+  const urlPromises = filePaths.map(async (filePath) => {
+    try {
+      const { data, error } = await db.storage.from(DOCUMENT_BUCKET).createSignedUrl(filePath, 60);
+      return { filePath, url: error || !data?.signedUrl ? null : data.signedUrl };
+    } catch {
+      return { filePath, url: null };
+    }
+  });
+
+  const urls = await Promise.all(urlPromises);
+  for (const { filePath, url } of urls) {
+    result[filePath] = url;
+  }
+
+  return result;
+}

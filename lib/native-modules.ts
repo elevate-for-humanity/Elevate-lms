@@ -5,7 +5,8 @@
  * with error handling and graceful fallbacks to prevent segfaults.
  */
 
-import type { PDFDocument as PDFKitDocument } from 'pdfkit';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type PDFDocumentType = any;
 
 // Track initialization state
 let sharpInstance: typeof import('sharp') | null = null;
@@ -57,9 +58,11 @@ export async function withSegfaultProtection<T>(
  * Execute PDFKit operations with segfault protection
  */
 export async function withPDFKit<T>(
-  setup: (doc: import('pdfkit').PDFDocument) => void,
-  finish: (doc: import('pdfkit').PDFDocument) => Promise<T>,
-  options?: Parameters<typeof import('pdfkit')>[0]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setup: (doc: any) => void,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  finish: (doc: any) => Promise<T>,
+  options?: Record<string, unknown>
 ): Promise<{ result: T | null; error?: string }> {
   const { PDFDocument, available } = await getPDFKit();
   
@@ -116,7 +119,6 @@ export async function initializeNativeModules(): Promise<{
   // Try sharp
   try {
     sharpInstance = await import('sharp');
-    sharpInstance.cache(false); // Disable caching to reduce memory
     result.modules.sharp = true;
   } catch (e) {
     console.warn('[NativeModules] sharp initialization failed:', e);
@@ -140,8 +142,7 @@ export async function initializeNativeModules(): Promise<{
 
   if (!result.modules.sharp && !result.modules.canvas && !result.modules.pdfkit) {
     result.success = false;
-    result.error = 'All native modules failed to initialize';
-    initializationError = result.error;
+    initializationError = 'All native modules failed to initialize';
   }
 
   return result;
@@ -159,10 +160,9 @@ export async function getSharp(): Promise<{
   }
 
   try {
-    const sharp = await import('sharp');
-    sharp.cache(false);
-    sharpInstance = sharp;
-    return { sharp, available: true };
+    const sharpModule = await import('sharp');
+    sharpInstance = sharpModule;
+    return { sharp: sharpModule, available: true };
   } catch (e) {
     console.error('[NativeModules] sharp not available:', e);
     return {
@@ -222,7 +222,8 @@ export async function getPDFKit(): Promise<{
  */
 export async function processImageWithSharp(
   input: Buffer | string,
-  operations: (sharp: import('sharp').Sharp) => import('sharp').Sharp,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  operations: (pipeline: any) => any,
   fallback?: () => Promise<Buffer>
 ): Promise<{ result: Buffer | null; error?: string }> {
   try {
@@ -235,7 +236,10 @@ export async function processImageWithSharp(
       return { result: null, error: 'sharp not available' };
     }
 
-    let pipeline = sharp(input);
+    // sharp(input) creates a pipeline - use default import
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sharpFn = (sharp as any).default || (sharp as any);
+    let pipeline = sharpFn(input);
     pipeline = operations(pipeline);
     const result = await pipeline.toBuffer();
     return { result };
@@ -259,7 +263,8 @@ export async function processImageWithSharp(
 export async function withCanvas(
   width: number,
   height: number,
-  operation: (canvas: import('@napi-rs/canvas').Canvas) => void,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  operation: (canvas: any) => void,
   fallback?: () => Promise<void>
 ): Promise<{ success: boolean; error?: string }> {
   try {
@@ -293,10 +298,11 @@ export async function withCanvas(
  * Safe PDF document creation with fallback
  */
 export async function createPDFDocument(
-  options?: Parameters<typeof import('pdfkit')>[0],
+  options?: Record<string, unknown>,
   fallback?: () => Promise<Buffer>
 ): Promise<{
-  doc: import('pdfkit').PDFDocument | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  doc: any;
   available: boolean;
   error?: string;
 }> {

@@ -20,8 +20,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-# Use pnpm@10.7.0 to match lockfileVersion 6.0 (pnpm 9.x format)
-RUN corepack enable && corepack prepare pnpm@10.7.0 --activate
+# Use pnpm@10.28.2 to match lockfileVersion 9.0 (pnpm 10.x format)
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
 ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"

@@ -313,3 +313,34 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
 ];
+
+export function findDuplicateNavHrefs(navItems: NavItem[]): Array<{ href: string; items: NavItem[] }> {
+  const hrefMap = new Map<string, NavItem[]>();
+  for (const item of navItems) {
+    if (!item.href) continue;
+    const existing = hrefMap.get(item.href) || [];
+    hrefMap.set(item.href, [...existing, item]);
+  }
+  return Array.from(hrefMap.entries())
+    .filter(([, items]) => items.length > 1)
+    .map(([href, items]) => ({ href, items }));
+}
+
+export function groupNavSubItemsByHeader(navItems: NavItem[]): Record<string, NavItem[]> {
+  const groups: Record<string, NavItem[]> = {};
+  for (const item of navItems) {
+    const header = item.isHeader ? item.name : 'Default';
+    if (!groups[header]) groups[header] = [];
+    groups[header].push(item);
+  }
+  return groups;
+}
+
+export function getNavCategoryLabel(item: NavItem): string {
+  if (item.isHeader) return item.name;
+  if (item.isSectionLink) return 'Section Links';
+  if (item.isExternal) return 'External';
+  if (item.href?.startsWith('https://') || item.href?.startsWith('http://')) return 'External';
+  if (item.href?.startsWith('/admin')) return 'Admin';
+  return 'Navigation';
+}

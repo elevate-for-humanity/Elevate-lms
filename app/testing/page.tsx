@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 
 import { Metadata } from 'next';
-import { PremiumTestingCenter } from '@/components/testing/PremiumTestingCenter';
+import { TestingCenter } from '@/components/testing/TestingCenter';
 
 export const metadata: Metadata = {
   title: 'Testing & Credential Exams',
@@ -13,5 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function TestingPage() {
-  return <PremiumTestingCenter />;
+  return <TestingCenter />;
 }

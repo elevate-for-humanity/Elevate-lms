@@ -15,7 +15,7 @@ import HeroPicture from '@/components/marketing/HeroPicture';
 import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import LiveJobPostings from '@/components/careers/LiveJobPostings';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { BeautyApprenticeshipPage } from '@/components/programs/BeautyApprenticeshipPage';
+import { BeautyApprenticeship } from '@/components/programs/BeautyApprenticeship';
 
 // Premium beauty apprenticeship programs
 const BEAUTY_APPRENTICESHIP_SLUGS = new Set([
@@ -519,7 +519,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
   // Use Premium Beauty Apprenticeship Page for beauty programs
   if (BEAUTY_APPRENTICESHIP_SLUGS.has(program)) {
     const programType = program.replace('-apprenticeship', '') as 'barber' | 'cosmetology' | 'esthetics' | 'manicurist';
-    return <BeautyApprenticeshipPage program={programType} />;
+    return <BeautyApprenticeship program={programType} />;
   }
 
   // Static ProgramSchema — richest renderer, always preferred when available.

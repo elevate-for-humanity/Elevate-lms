@@ -12,7 +12,7 @@ const LoadingDiv = () => <div className="hidden" />;
 
 // Lazy load sticky mobile CTA - shows on program pages
 const StickyMobileCTA = dynamic(
-  () => import('@/components/programs/StickyMobileCTA').then((mod) => mod.StickyMobileCTA || mod),
+  () => import('@/components/programs/StickyMobileCTA').then((mod) => mod.default || mod.StickyMobileCTA || mod),
   { ssr: false, loading: LoadingDiv }
 );
 

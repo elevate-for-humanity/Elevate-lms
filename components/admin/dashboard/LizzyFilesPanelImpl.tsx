@@ -231,3 +231,6 @@ export function LizzyFilesPanel() {
   );
 }
 
+// Default export for next/dynamic
+export default LizzyFilesPanel;
+

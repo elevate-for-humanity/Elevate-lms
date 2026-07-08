@@ -61,27 +61,27 @@ const SecretsPanel = dynamic(
   { ssr: false }
 );
 const LizzyFilesPanel = dynamic(
-  () => import('./LizzyFilesPanel').then((m) => m.LizzyFilesPanel),
+  () => import('./LizzyFilesPanel').then((m) => m.default || m),
   { ssr: false }
 );
 const LizzyUploadPanel = dynamic(
-  () => import('./LizzyUploadPanel').then((m) => m.LizzyUploadPanel),
+  () => import('./LizzyUploadPanel').then((m) => m.default || m),
   { ssr: false }
 );
 const LizzyErrorsPanel = dynamic(
-  () => import('./LizzyErrorsPanel').then((m) => m.LizzyErrorsPanel),
+  () => import('./LizzyErrorsPanel').then((m) => m.default || m),
   { ssr: false }
 );
 const LizzyVideoPanel = dynamic(
-  () => import('./LizzyVideoPanel').then((m) => m.LizzyVideoPanel),
+  () => import('./LizzyVideoPanel').then((m) => m.default || m),
   { ssr: false }
 );
 const LizzyOperationsPanel = dynamic(
-  () => import('./LizzyOperationsPanel').then((m) => m.LizzyOperationsPanel),
+  () => import('./LizzyOperationsPanel').then((m) => m.default || m),
   { ssr: false },
 );
 const WorkflowsOpsPanel = dynamic(
-  () => import('./WorkflowsOpsPanel').then((m) => m.WorkflowsOpsPanel),
+  () => import('./WorkflowsOpsPanel').then((m) => m.default || m),
   { ssr: false },
 );
 

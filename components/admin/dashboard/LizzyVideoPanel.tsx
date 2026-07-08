@@ -36,3 +36,6 @@ export function LizzyVideoPanel() {
     </div>
   );
 }
+
+// Default export for next/dynamic
+export default LizzyVideoPanel;

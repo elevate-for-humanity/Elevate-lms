@@ -1,21 +1,55 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/public';
 import { getStaticProgram } from '@/data/programs/index';
-import { resolveSlug } from '@/lib/program-registry';
 import ProgramDetailPageComponent from '@/components/programs/ProgramDetailPage';
-import CdlEnrollmentOpenBanner from '@/components/programs/CdlEnrollmentOpenBanner';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import { OnetLaborData } from '@/components/programs/onet/OnetLaborData';
 import { getProgramOgImageUrl } from '@/lib/programs/og-images';
 import heroBanners from '@/content/heroBanners';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import HeroPicture from '@/components/marketing/HeroPicture';
+import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { loadProgramForPage, loadProgramMetadataSource } from '@/lib/programs/load-program-page';
-
-// On-demand rendering only - prevents memory spikes on 1,000+ variants
+import { resolveSlug } from '@/lib/program-registry';
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = PLATFORM_DEFAULTS.siteUrl;
+
+// Default hero video fallback
+const DEFAULT_HERO_VIDEO = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/hero-home-fast.mp4';
+
+// Slugs that have a dedicated /programs/{slug}/apply page
+const DEDICATED_APPLY_SLUGS = new Set([
+  'barber-apprenticeship',
+  'cosmetology-apprenticeship',
+  'hvac-technician',
+  'peer-recovery-specialist',
+]);
+
+function getApplyHref(program: string): string {
+  return DEDICATED_APPLY_SLUGS.has(program)
+    ? `/programs/${program}/apply`
+    : `/apply?program=${program}`;
+}
+
+// Resolve hero poster source with fallback logic
+function resolveHeroPosterSrc(slug: string, opts: {
+  banner?: import('@/content/heroBanners').HeroBannerConfig | null;
+  dbImageUrl?: string;
+  heroImage?: string;
+}): string {
+  if (opts.banner?.posterImage) return opts.banner.posterImage;
+  if (opts.dbImageUrl) return opts.dbImageUrl;
+  if (opts.heroImage) return opts.heroImage;
+  return `/images/pages/${slug.replace(/-/g, '-')}.webp`;
+}
+
+// Get program OG image fallback
+function getProgramOgImage(slug: string): string | undefined {
+  return `/images/pages/${slug}.webp`;
+}
 
 export async function generateMetadata({
   params,
@@ -23,32 +57,12 @@ export async function generateMetadata({
   params: Promise<{ program: string }>;
 }): Promise<Metadata> {
   const { program } = await params;
-  const meta = await loadProgramMetadataSource(program);
-  if (!meta) return {};
-
   const ogImage = getProgramOgImageUrl(program, SITE_URL);
-  const img =
-    meta.image?.startsWith('http') ? meta.image
-    : meta.image ? `${SITE_URL}${meta.image}`
-    : ogImage;
 
-  return {
-    title: meta.title,
-    description: meta.description,
-    alternates: { canonical: `${SITE_URL}/programs/${program}` },
-    openGraph: {
-      title: meta.title,
-      description: meta.description,
-      siteName: PLATFORM_DEFAULTS.orgName,
-      type: 'website',
-      images: [{ url: img, width: 1200, height: 630, alt: meta.title }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: meta.title,
-      description: meta.description,
-      images: [img],
-    },
+  const ogBase = {
+    images: [{ url: ogImage, width: 1200, height: 630, alt: `${program.replace(/-/g, ' ')} training program at ${PLATFORM_DEFAULTS.orgName}` }],
+    siteName: PLATFORM_DEFAULTS.orgName,
+    type: 'website' as const,
   };
 
   // Static ProgramSchema — preferred source for metadata
@@ -63,9 +77,9 @@ export async function generateMetadata({
       description,
       alternates: { canonical: `${SITE_URL}/programs/${program}` },
       openGraph: { ...ogBase, title, description, images: [{ url: img.startsWith('http') ? img : `${SITE_URL}${img}`, width: 1200, height: 630, alt: sp.title }] },
+      twitter: { card: 'summary_large_image', title, description, images: [img.startsWith('http') ? img : `${SITE_URL}${img}`] },
     };
   }
-
 
   // DB fallback — programs with no static definition
   const db = createPublicClient();
@@ -83,11 +97,16 @@ export async function generateMetadata({
         description,
         alternates: { canonical: `${SITE_URL}/programs/${program}` },
         openGraph: { ...ogBase, title, description, images: [{ url: ogImage, width: 1200, height: 630, alt: data.title }] },
+        twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
       };
     }
   }
 
-  return {};
+  return {
+    title: program.replace(/-/g, ' '),
+    description: '',
+    alternates: { canonical: `${SITE_URL}/programs/${program}` },
+  };
 }
 
 // Funding sources shown on every program page
@@ -203,7 +222,7 @@ function ProgramPage({
         <HeroPicture
           src={heroPosterSrc}
           alt={banner?.microLabel ?? title}
-          heightStyle={heroTokens.imageWrap}
+          heightStyle="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden"
           microLabel={banner?.microLabel}
           analyticsName={banner?.analyticsName ?? slug}
           belowHeroHeadline={banner?.belowHeroHeadline ?? title}

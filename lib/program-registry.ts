@@ -42,6 +42,13 @@ export const PROGRAMS: ProgramEntry[] = [
     active: true,
   },
   {
+    slug: 'home-health-aide',
+    name: 'Home Health Aide',
+    category: 'Healthcare',
+    formType: 'apply',
+    active: true,
+  },
+  {
     slug: 'emergency-health-safety',
     name: 'Emergency Health & Safety Technician',
     category: 'Healthcare',
@@ -87,6 +94,13 @@ export const PROGRAMS: ProgramEntry[] = [
     formType: 'apply',
     active: true,
     dedicatedApplyPage: '/programs/barber-apprenticeship/apply',
+  },
+  {
+    slug: 'esthetician',
+    name: 'Esthetician & Skincare Specialist',
+    category: 'Barber & Beauty',
+    formType: 'apply',
+    active: true,
   },
 
   // Business & Financial
@@ -167,8 +181,29 @@ export const PROGRAMS: ProgramEntry[] = [
     active: true,
   },
   {
+    slug: 'plumbing',
+    name: 'Plumbing Apprenticeship',
+    category: 'Skilled Trades',
+    formType: 'apply',
+    active: true,
+  },
+  {
     slug: 'forklift-operator',
     name: 'Forklift Operator Certification',
+    category: 'Skilled Trades',
+    formType: 'apply',
+    active: true,
+  },
+  {
+    slug: 'welding',
+    name: 'Welding Certification',
+    category: 'Skilled Trades',
+    formType: 'apply',
+    active: true,
+  },
+  {
+    slug: 'diesel-mechanic',
+    name: 'Diesel Mechanic',
     category: 'Skilled Trades',
     formType: 'apply',
     active: true,
@@ -189,7 +224,6 @@ export const PROGRAMS: ProgramEntry[] = [
     category: 'Barber & Beauty',
     formType: 'apply',
     active: true,
-    dedicatedApplyPage: '/programs/nail-technician-apprenticeship/apply',
   },
 
   // Additional Programs
@@ -206,6 +240,13 @@ export const PROGRAMS: ProgramEntry[] = [
     slug: 'business-administration',
     name: 'Business Administration',
     category: 'Business & Financial',
+    formType: 'apply',
+    active: true,
+  },
+  {
+    slug: 'cad-drafting',
+    name: 'CAD / Drafting',
+    category: 'Technology',
     formType: 'apply',
     active: true,
   },
@@ -259,6 +300,20 @@ export const PROGRAMS: ProgramEntry[] = [
     active: true,
   },
   {
+    slug: 'home-health-aide',
+    name: 'Home Health Aide',
+    category: 'Healthcare',
+    formType: 'apply',
+    active: true,
+  },
+  {
+    slug: 'hospitality',
+    name: 'Hospitality & Customer Service',
+    category: 'Business & Financial',
+    formType: 'apply',
+    active: true,
+  },
+  {
     slug: 'it-help-desk',
     name: 'IT Help Desk',
     category: 'Technology',
@@ -269,6 +324,20 @@ export const PROGRAMS: ProgramEntry[] = [
     slug: 'medical-assistant',
     name: 'Medical Assistant',
     category: 'Healthcare',
+    formType: 'apply',
+    active: true,
+  },
+  {
+    slug: 'network-administration',
+    name: 'Network Administration',
+    category: 'Technology',
+    formType: 'apply',
+    active: true,
+  },
+  {
+    slug: 'network-support-technician',
+    name: 'Network Support Technician',
+    category: 'Technology',
     formType: 'apply',
     active: true,
   },
@@ -477,7 +546,6 @@ const SLUG_ALIASES: Record<string, string> = {
   cdl: 'cdl-training',
   'esthetician-apprenticeship': 'esthetician',
   'professional-esthetician': 'esthetician',
-  'nha-phlebotomy': 'phlebotomy',
   'phlebotomy-technician': 'phlebotomy',
   'building-maintenance': 'building-maintenance-wrg',
   'building-maintenance-tech': 'building-maintenance-wrg',
@@ -523,22 +591,6 @@ const SLUG_ALIASES: Record<string, string> = {
   'health-safety': 'emergency-health-safety',
   'emergency-health': 'emergency-health-safety',
   cosmetology: 'cosmetology-apprenticeship',
-  // Legacy marketing / partner micro-course slugs → canonical program pages
-  'beauty-educator': 'beauty-career-educator',
-  'bloodborne-pathogens': 'cpr-first-aid',
-  'business-financial': 'bookkeeping',
-  careersafe: 'emergency-health-safety',
-  'cpr-aed': 'cpr-first-aid',
-  'food-handler': 'culinary-apprenticeship',
-  'servsafe-food-handler': 'culinary-apprenticeship',
-  hsi: 'cpr-first-aid',
-  'medical-billing': 'office-administration',
-  nrf: 'technology',
-  'osha-30': 'emergency-health-safety',
-  'osha-safety': 'emergency-health-safety',
-  'tax-entrepreneurship': 'entrepreneurship',
-  'workforce-readiness': 'reentry-specialist',
-  'it-certifications': 'technology',
 };
 
 /**

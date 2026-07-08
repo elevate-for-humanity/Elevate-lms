@@ -274,3 +274,6 @@ export function PublishWebsitePanel() {
     </section>
   );
 }
+
+// Default export for next/dynamic
+export default PublishWebsitePanel;

@@ -13,27 +13,30 @@ const panelSkeleton = (
   </div>
 );
 
+// Handle both default and named exports
+const withFallback = (m: any) => m.default || m;
+
 export const PublishWebsitePanelLazy = dynamic(
-  () => import('./PublishWebsitePanel').then((m) => m.default || m),
+  () => import('./PublishWebsitePanel').then(withFallback),
   { loading: () => panelSkeleton, ssr: false },
 );
 
 export const ProgramIntegrityPanelLazy = dynamic(
-  () => import('./ProgramIntegrityPanel').then((m) => m.default || m),
+  () => import('./ProgramIntegrityPanel').then(withFallback),
   { loading: () => panelSkeleton, ssr: false },
 );
 
 export const JobBoardPanelLazy = dynamic(
-  () => import('./JobBoardPanel').then((m) => m.default || m),
+  () => import('./JobBoardPanel').then(withFallback),
   { loading: () => panelSkeleton, ssr: false },
 );
 
 export const SitePreviewPanelWrapperLazy = dynamic(
-  () => import('./SitePreviewPanelWrapper').then((m) => m.default || m),
+  () => import('./SitePreviewPanelWrapper').then(withFallback),
   { loading: () => panelSkeleton, ssr: false },
 );
 
 export const LizzyContainerWrapperLazy = dynamic(
-  () => import('./LizzyContainerWrapper').then((m) => m.default || m),
+  () => import('./LizzyContainerWrapper').then(withFallback),
   { loading: () => panelSkeleton, ssr: false },
 );

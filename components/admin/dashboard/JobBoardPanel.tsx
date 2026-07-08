@@ -165,3 +165,6 @@ export function JobBoardPanel() {
     </div>
   );
 }
+
+// Default export for next/dynamic
+export default JobBoardPanel;

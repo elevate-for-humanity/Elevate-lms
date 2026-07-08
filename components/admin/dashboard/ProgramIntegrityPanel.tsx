@@ -205,3 +205,6 @@ export function ProgramIntegrityPanel() {
     </div>
   );
 }
+
+// Default export for next/dynamic
+export default ProgramIntegrityPanel;

@@ -45,6 +45,29 @@ export function isAdminRoute(pathname: string): boolean {
 }
 
 /**
+ * Determines if the marketing header/footer should be hidden for a given pathname.
+ * Custom header routes are non-app routes that use a different header style.
+ */
+export function shouldHideMarketingHeader(pathname: string): boolean {
+  // Custom header routes use a different header but still show footer
+  const customHeaderPrefixes = [
+    '/contact',
+    '/about',
+    '/blog',
+    '/faq',
+    '/privacy',
+    '/terms',
+    '/accessibility',
+    '/support',
+    '/careers',
+  ] as const;
+
+  return customHeaderPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(prefix + '/'),
+  );
+}
+
+/**
  * Generates the inline script string for app/layout.tsx.
  * Keeps the hard-nav suppression in sync with APP_ROUTE_PREFIXES automatically.
  */

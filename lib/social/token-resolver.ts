@@ -56,9 +56,6 @@ function getEnvFallback(platform: string): SocialTokens | null {
     case 'youtube':
       if (!process.env.YOUTUBE_API_KEY) return null;
       return { access_token: process.env.YOUTUBE_API_KEY, organization_id: process.env.YOUTUBE_CHANNEL_ID };
-    case 'twitter':
-      if (!process.env.TWITTER_ACCESS_TOKEN) return null;
-      return { access_token: process.env.TWITTER_ACCESS_TOKEN };
     case 'linkedin':
       if (!process.env.LINKEDIN_ACCESS_TOKEN) return null;
       return { access_token: process.env.LINKEDIN_ACCESS_TOKEN };
@@ -95,18 +92,6 @@ async function tryRefresh(platform: string, refreshToken: string | null): Promis
           client_id: process.env.LINKEDIN_CLIENT_ID!,
           client_secret: process.env.LINKEDIN_CLIENT_SECRET!,
         }),
-      });
-      if (res.ok) tokenData = await res.json();
-    } else if (platform === 'twitter') {
-      const clientId = process.env.TWITTER_CLIENT_ID || process.env.TWITTER_API_KEY!;
-      const clientSecret = process.env.TWITTER_CLIENT_SECRET || process.env.TWITTER_API_SECRET!;
-      const res = await fetch('https://api.twitter.com/2/oauth2/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
-        },
-        body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refreshToken }),
       });
       if (res.ok) tokenData = await res.json();
     }

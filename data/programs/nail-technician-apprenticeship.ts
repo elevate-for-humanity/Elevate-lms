@@ -205,7 +205,6 @@ export const NAIL_TECH: ProgramSchema = {
   },
   careers: [
     { title: 'Nail Technician', salary: '$25,000–$40,000' },
-  videoSrc: '/videos/nail-tech-hero.mp4',
     { title: 'Senior Nail Tech', salary: '$35,000–$55,000' },
     { title: 'Salon Owner', salary: '$45,000–$80,000+' },
   ],

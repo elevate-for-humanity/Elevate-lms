@@ -75,7 +75,6 @@ export const DIESEL_MECHANIC: ProgramSchema = {
     },
     {
       title: 'Diesel Mechanic',
-  videoSrc: '/videos/hvac-hero-final.mp4',
       timeframe: '1–3 years',
       requirements: 'ASE T-series certification',
       salaryRange: '$45,000–$65,000',
@@ -298,7 +297,6 @@ export const DIESEL_MECHANIC: ProgramSchema = {
   },
   careers: [
     { title: 'Diesel Mechanic', salary: '$45,000–$65,000' },
-  videoSrc: '/videos/hvac-hero-final.mp4',
     { title: 'Heavy Equipment Mechanic', salary: '$48,000–$68,000' },
     { title: 'Fleet Maintenance Technician', salary: '$42,000–$60,000' },
     { title: 'Mobile Diesel Technician', salary: '$50,000–$70,000' },

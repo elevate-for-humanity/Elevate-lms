@@ -8,7 +8,7 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
   sector: 'healthcare',
   category: 'Emergency Response',
   programType: 'certification',
-  heroImage: '/images/pages/cpr-aed.webp',
+  heroImage: '/images/pexels/cna.webp',
   heroImageAlt: 'Emergency medical responder providing care',
   videoSrc: '/videos/healthcare-cna.mp4',
   deliveryMode: 'hybrid',

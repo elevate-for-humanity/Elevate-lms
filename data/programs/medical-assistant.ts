@@ -8,7 +8,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   sector: 'healthcare',
   category: 'Medical Assisting',
   programType: 'workforce',
-  heroImage: '/images/pages/medical-assistant-lab.webp',
+  heroImage: '/images/pexels/medical-assistant.webp',
   heroImageAlt: 'Medical assistant student in clinical training',
   videoSrc: '/videos/healthcare-cna.mp4',
   deliveryMode: 'hybrid',

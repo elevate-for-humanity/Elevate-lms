@@ -15,7 +15,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   category: 'Personal Services',
   programType: 'apprenticeship',
 
-  heroImage: '/images/pages/barber-apprenticeship-hero.jpg',
+  heroImage: '/images/pexels/barber-hero.webp',
   heroImageAlt: 'Barber apprentice training at a licensed barbershop',
   videoSrc: '/videos/barber-hero-final.mp4',
 

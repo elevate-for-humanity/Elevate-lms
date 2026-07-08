@@ -7,7 +7,7 @@ export const NETWORK_SUPPORT: ProgramSchema = {
   sector: 'technology',
   category: 'IT Support',
   programType: 'workforce',
-  heroImage: '/images/pages/networking-hero.webp',
+  heroImage: '/images/pexels/network.webp',
   heroImageAlt: 'Network support technician troubleshooting a connection',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

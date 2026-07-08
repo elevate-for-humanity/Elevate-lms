@@ -9,7 +9,7 @@ export const WELDING: ProgramSchema = {
   category: 'Welding & Fabrication',
   programType: 'workforce',
 
-  heroImage: '/images/pages/welding-sparks.webp',
+  heroImage: '/images/pexels/welding.webp',
   heroImageAlt: 'Welding student practicing MIG welding in a training lab',
   videoSrc: '/videos/welding-trades.mp4',
 

@@ -7,7 +7,7 @@ export const CAD_DRAFTING: ProgramSchema = {
   sector: 'technology',
   category: 'Design & Drafting',
   programType: 'workforce',
-  heroImage: '/images/pages/graphic-design.webp',
+  heroImage: '/images/pexels/webdev.webp',
   heroImageAlt: 'CAD drafting student working on technical drawings',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

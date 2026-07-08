@@ -7,7 +7,7 @@ export const CPR_FIRST_AID: ProgramSchema = {
   sector: 'healthcare',
   category: 'Emergency Response',
   programType: 'certification',
-  heroImage: '/images/pages/cpr-mannequin.webp',
+  heroImage: '/images/pexels/cna.webp',
   heroImageAlt: 'CPR training mannequin for at-home certification',
   videoSrc: '',
   deliveryMode: 'online',

@@ -8,7 +8,7 @@ export const ESTHETICIAN_APPRENTICESHIP: ProgramSchema = {
   sector: 'personal-services',
   category: 'Esthetics',
   programType: 'apprenticeship',
-  heroImage: '/images/beauty/esthetician.webp',
+  heroImage: '/images/pexels/esthetician.webp',
   heroImageAlt: 'Esthetician apprentice performing a professional facial treatment',
   videoSrc: '/videos/esthetician-spa.mp4',
   deliveryMode: 'in-person',

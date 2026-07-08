@@ -9,7 +9,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
   category: 'Certifications',
   programType: 'certification',
 
-  heroImage: '/images/pages/hvac-unit.webp',
+  heroImage: '/images/pexels/hvac.webp',
   heroImageAlt: 'HVAC technician servicing a rooftop unit in Indianapolis',
   videoSrc: '/videos/hvac-hero.mp4',
 

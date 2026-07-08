@@ -7,7 +7,7 @@ export const BUSINESS_ADMIN: ProgramSchema = {
   sector: 'business',
   category: 'Business Administration',
   programType: 'workforce',
-  heroImage: '/images/pages/business-sector.webp',
+  heroImage: '/images/pexels/business.webp',
   heroImageAlt: 'Business administration student working on a computer',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

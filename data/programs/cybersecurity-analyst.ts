@@ -9,7 +9,7 @@ export const CYBERSECURITY_ANALYST: ProgramSchema = {
   category: 'Cybersecurity',
   programType: 'workforce',
 
-  heroImage: '/images/pages/cybersecurity-screen.jpg',
+  heroImage: '/images/pexels/cybersecurity.webp',
   heroImageAlt: 'Cybersecurity student analyzing network security',
   videoSrc: '/videos/it-technology.mp4',
 

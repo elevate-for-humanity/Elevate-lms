@@ -206,7 +206,7 @@ export const courses: Course[] = [
             title: 'Connecting Tax Experience to Career Paths',
             type: 'video',
             durationMinutes: 12,
-            videoUrl: '/videos/tax-career-paths.mp4',
+            videoUrl: '/videos/hero-home-fast.mp4',
           },
           {
             id: 'tax-lesson-1-3',

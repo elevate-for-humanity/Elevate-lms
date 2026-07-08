@@ -7,7 +7,7 @@ export const CULINARY: ProgramSchema = {
   sector: 'personal-services',
   category: 'Culinary Arts',
   programType: 'apprenticeship',
-  heroImage: '/images/pages/culinary.webp',
+  heroImage: '/images/pexels/culinary.webp',
   heroImageAlt: 'Culinary apprentice preparing food in a professional kitchen',
   deliveryMode: 'in-person',
   deliveredBy: 'Partner',

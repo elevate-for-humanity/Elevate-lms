@@ -1252,7 +1252,7 @@
     ],
     "transcript": "Train for IRS PTIN and AFSP credentials in 8 weeks, building skills in individual and small business tax preparation using real tax software. Tax preparers commonly earn $35,000 to $55,000. Enrolled Agent exam preparation included. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "tax-preparation",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/tax-career-paths.mp4",
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
   },
   "bookkeeping": {
@@ -2142,7 +2142,7 @@
     ],
     "transcript": "Tax Operations software is built for speed, volume, and compliance. Designed for Enrolled Agents and EROs who need fast refunds and secure filing.",
     "analyticsName": "supersonic",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/tax-career-paths.mp4",
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
   },
   "services": {
@@ -3410,8 +3410,8 @@
   },
   "tax-prep": {
     "pageKey": "tax-prep",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/tax-career-paths.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/tax-career-paths.mp4",
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "headline": "Tax Preparation",
     "subheadline": "Become a certified tax preparer.",
     "microLabel": "Tax Preparation",

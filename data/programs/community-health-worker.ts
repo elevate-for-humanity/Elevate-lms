@@ -9,7 +9,7 @@ export const COMMUNITY_HEALTH_WORKER: ProgramSchema = {
   sector: 'healthcare',
   category: 'Healthcare & Human Services',
   programType: 'workforce',
-  heroImage: '/images/pages/healthcare-classroom.webp',
+  heroImage: '/images/pexels/medical-assistant.webp',
   heroImageAlt: 'Community health worker supporting a patient in the community',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

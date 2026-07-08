@@ -14,6 +14,7 @@ import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
 import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
 import { card } from '@/lib/page-design-tokens';
 import { HomePlatformPreview } from '@/components/home/HomePlatformPreview';
+import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
 
 export const revalidate = 0; // always fresh - catalog should prefer DB state when available
 

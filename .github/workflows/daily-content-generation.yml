@@ -20,10 +20,14 @@ jobs:
       - run: pnpm install --no-frozen-lockfile
       - name: Run available content generation checks
         run: |
-          if [ -f scripts/generate-daily-content.mjs ]; then
+          if [ -f scripts/generate-daily-blog.mjs ]; then
+            node scripts/generate-daily-blog.mjs
+          elif [ -f scripts/generate-daily-content.mjs ]; then
             node scripts/generate-daily-content.mjs
           elif [ -f scripts/activate-all-autopilots.sh ]; then
             bash scripts/activate-all-autopilots.sh --content-only || true
           else
             echo "No content generation script is currently present; workflow remains as the documented scheduler hook."
           fi
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

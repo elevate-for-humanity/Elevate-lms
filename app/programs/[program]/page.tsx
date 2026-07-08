@@ -15,6 +15,15 @@ import HeroPicture from '@/components/marketing/HeroPicture';
 import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import LiveJobPostings from '@/components/careers/LiveJobPostings';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { BeautyApprenticeshipPage } from '@/components/programs/BeautyApprenticeshipPage';
+
+// Premium beauty apprenticeship programs
+const BEAUTY_APPRENTICESHIP_SLUGS = new Set([
+  'barber-apprenticeship',
+  'cosmetology-apprenticeship',
+  'esthetician-apprenticeship',
+  'nail-technician-apprenticeship',
+]);
 
 export const dynamic = 'force-dynamic';
 
@@ -506,6 +515,12 @@ function ProgramPage({
 
 export default async function ProgramDetailPage({ params }: { params: Promise<{ program: string }> }) {
   const { program } = await params;
+
+  // Use Premium Beauty Apprenticeship Page for beauty programs
+  if (BEAUTY_APPRENTICESHIP_SLUGS.has(program)) {
+    const programType = program.replace('-apprenticeship', '') as 'barber' | 'cosmetology' | 'esthetics' | 'manicurist';
+    return <BeautyApprenticeshipPage program={programType} />;
+  }
 
   // Static ProgramSchema — richest renderer, always preferred when available.
   // Overlay DB title/description if the program also exists in the DB.

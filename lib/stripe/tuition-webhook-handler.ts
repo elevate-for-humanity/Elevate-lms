@@ -76,7 +76,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <img src="${PLATFORM_DEFAULTS.siteUrl}/logo.png" alt="${PLATFORM_DEFAULTS.orgName}" style="max-width: 200px;">
+            <img src="${PLATFORM_DEFAULTS.siteUrl}/logo.png" alt={PLATFORM_DEFAULTS.orgName} style="max-width: 200px;">
           </div>
           
           <div style="background-color: #10b981; color: white; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
@@ -121,7 +121,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
     // EMAIL 2: WELCOME LETTER - Complete Enrollment
     // ============================================
     await resend.emails.send({
-      from: `${PLATFORM_DEFAULTS.orgName} <admissions@${PLATFORM_DEFAULTS.canonicalDomain}>`,
+      from: '${PLATFORM_DEFAULTS.orgName} <admissions@${PLATFORM_DEFAULTS.canonicalDomain}>',
       to: student.email,
       subject: `ACTION REQUIRED: Complete Your Enrollment - ${programName}`,
       html: `
@@ -133,7 +133,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <img src="${PLATFORM_DEFAULTS.siteUrl}/logo.png" alt="${PLATFORM_DEFAULTS.orgName}" style="max-width: 200px;">
+            <img src="${PLATFORM_DEFAULTS.siteUrl}/logo.png" alt={PLATFORM_DEFAULTS.orgName} style="max-width: 200px;">
           </div>
           
           <h1 style="color: #1e40af; text-align: center;">Welcome to ${PLATFORM_DEFAULTS.orgName}!</h1>
@@ -272,7 +272,7 @@ async function sendAdminEnrollmentNotification(
 
   try {
     await resend.emails.send({
-      from: `${PLATFORM_DEFAULTS.orgName} <system@${PLATFORM_DEFAULTS.canonicalDomain}>`,
+      from: '${PLATFORM_DEFAULTS.orgName} <system@${PLATFORM_DEFAULTS.canonicalDomain}>',
       to: adminEmail,
       subject: `🎉 New Enrollment: ${studentName} - ${programName}`,
       html: `
@@ -393,7 +393,7 @@ async function sendPaymentFailedEmail(studentId: string, programId: string): Pro
   if (!student?.email) return;
 
   await resend.emails.send({
-    from: `Elevate LMS <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
+    from: 'Elevate LMS <billing@${PLATFORM_DEFAULTS.canonicalDomain}>',
     to: student.email,
     subject: 'Payment Failed - Action Required',
     html: `
@@ -695,7 +695,7 @@ async function sendPaymentConfirmationEmail(
 
   await resend.emails
     .send({
-      from: `${PLATFORM_DEFAULTS.orgName} <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
+      from: '${PLATFORM_DEFAULTS.orgName} <billing@${PLATFORM_DEFAULTS.canonicalDomain}>',
       to: student.email,
       subject: `Payment Received - ${paymentNumber} of ${totalPayments}`,
       html: `
@@ -708,7 +708,7 @@ async function sendPaymentConfirmationEmail(
       <p>- ${PLATFORM_DEFAULTS.orgName}</p>
     `,
     })
-    .catch((err) => logger.warn('Failed to send payment confirmation (non-fatal)', { err }));
+    .catch((err) => logger.error('Failed to send payment confirmation:', err));
 }
 
 /**
@@ -735,7 +735,7 @@ async function sendPaymentCompletionEmail(studentId: string, programId: string):
 
   await resend.emails
     .send({
-      from: `${PLATFORM_DEFAULTS.orgName} <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
+      from: '${PLATFORM_DEFAULTS.orgName} <billing@${PLATFORM_DEFAULTS.canonicalDomain}>',
       to: student.email,
       subject: 'Congratulations! Tuition Paid in Full',
       html: `
@@ -747,7 +747,7 @@ async function sendPaymentCompletionEmail(studentId: string, programId: string):
       <p>- ${PLATFORM_DEFAULTS.orgName}</p>
     `,
     })
-    .catch((err) => logger.warn('Failed to send completion email (non-fatal)', { err }));
+    .catch((err) => logger.error('Failed to send completion email:', err));
 }
 
 /**
@@ -815,15 +815,17 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
   const supabase = await getSupabaseAdmin();
   if (subscription.metadata.payment_type !== 'tuition_installment') return;
 
+  const studentId = subscription.metadata.student_id;
+  const programId = subscription.metadata.program_id;
+
+  const supabase = await getSupabaseAdmin();
   const { data: sub } = await supabase
     .from('tuition_subscriptions')
-    .select('installments_paid, total_installments, status, student_id, program_id')
+    .select('installments_paid, total_installments, status')
     .eq('stripe_subscription_id', subscription.id)
     .maybeSingle();
 
   if (sub) {
-    const studentId = sub.student_id;
-    const programId = sub.program_id;
     const isComplete = sub.installments_paid >= sub.total_installments;
 
     if (isComplete) {

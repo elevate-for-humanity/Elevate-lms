@@ -1,5 +1,4 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { isValidEmail } from '@/lib/validate';
 /**
  * Bulk User Import System
  * CSV/Excel upload with role assignment and validation
@@ -377,6 +376,11 @@ export async function exportUsersToCSV(filters?: {
   }
 
   return rows.join('\n');
+}
+
+// Helper functions
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 function isValidDate(date: string): boolean {

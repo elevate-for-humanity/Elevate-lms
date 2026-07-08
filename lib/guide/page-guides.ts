@@ -32,7 +32,7 @@ export const STORE_GUIDES: Record<string, PageGuide> = {
     pageId: 'store-landing',
     pageName: 'Store',
     avatarName: 'Maya',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp',
+    avatarImage: '/images/pages/store-recommendations.webp',
     messages: [
       {
         id: 'welcome',
@@ -65,7 +65,7 @@ export const STORE_GUIDES: Record<string, PageGuide> = {
     pageId: 'licenses',
     pageName: 'Platform Licenses',
     avatarName: 'Maya',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp',
+    avatarImage: '/images/pages/store-recommendations.webp',
     messages: [
       {
         id: 'welcome',
@@ -119,7 +119,7 @@ export const STORE_GUIDES: Record<string, PageGuide> = {
     pageId: 'compliance-wioa',
     pageName: 'WIOA Compliance',
     avatarName: 'James',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-guide-1.webp',
+    avatarImage: '/images/pages/store-guide-1.webp',
     messages: [
       {
         id: 'welcome',
@@ -171,7 +171,7 @@ export const PROGRAM_GUIDES: Record<string, PageGuide> = {
     pageId: 'programs-landing',
     pageName: 'Training Programs',
     avatarName: 'Marcus',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-guide-2.jpg',
+    avatarImage: '/images/pages/store-guide-2.jpg',
     messages: [
       {
         id: 'welcome',
@@ -204,7 +204,7 @@ export const PROGRAM_GUIDES: Record<string, PageGuide> = {
     pageId: 'barber-apprenticeship',
     pageName: 'Barber Apprenticeship',
     avatarName: 'Marcus',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-guide-2.jpg',
+    avatarImage: '/images/pages/store-guide-2.jpg',
     messages: [
       {
         id: 'welcome',
@@ -244,7 +244,7 @@ export const PROGRAM_GUIDES: Record<string, PageGuide> = {
     pageId: 'cna-training',
     pageName: 'CNA Training',
     avatarName: 'Sarah',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp',
+    avatarImage: '/images/pages/store-recommendations.webp',
     messages: [
       {
         id: 'welcome',
@@ -290,77 +290,79 @@ export const TAX_OFFICE_GUIDES: Record<string, PageGuide> = {
     pageId: 'tax-office-landing',
     pageName: 'Tax Office',
     avatarName: 'David',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-guide-1.webp',
+    avatarImage: '/images/pages/store-guide-1.webp',
     messages: [
       {
         id: 'welcome',
         type: 'welcome',
         message:
-          "Welcome! I'm David. If you're exploring bookkeeping or finance credentials, I can point you to our active business programs.",
+          "Welcome to the Elevate Tax Office! I'm David. Whether you need your taxes done or want to become a tax preparer yourself, I'll guide you through.",
       },
       {
         id: 'explain',
         type: 'explain',
         message:
-          'Our finance pathway covers bookkeeping, QuickBooks certification, and office administration — stackable credentials for accounting support roles.',
+          'We offer two things: Tax preparation services (we do your taxes), and Tax Preparer Training (become a certified tax professional yourself).',
       },
       {
         id: 'tip',
         type: 'tip',
         message:
-          'Bookkeeping is a strong entry point: QuickBooks certification, WIOA funding for eligible participants, and a clear path into office and accounting roles.',
-        action: { label: 'See Bookkeeping Program', href: '/programs/bookkeeping' },
+          "Thinking about a career in tax preparation? It's great side income - preparers earn $50-150 per return during tax season. Our training gets you certified in 8 weeks.",
+        action: { label: 'See Tax Training', href: '/programs/tax-preparation' },
       },
     ],
     quickTips: [
-      'Bookkeeping & QuickBooks certification',
-      'Finance pathway includes multiple tiers',
-      'WIOA funding for eligible participants',
+      'Tax prep services available year-round',
+      'Become a certified preparer in 8 weeks',
+      'Earn $50-150 per return',
     ],
   },
-  'finance-bookkeeping': {
-    pageName: 'Finance & Bookkeeping Training',
+
+  'tax-preparation-training': {
+    pageId: 'tax-preparation-training',
+    pageName: 'Tax Preparer Training',
     avatarName: 'David',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-guide-1.webp',
+    avatarImage: '/images/pages/store-guide-1.webp',
     messages: [
       {
         id: 'welcome',
         type: 'welcome',
         message:
-          'Exploring a career in bookkeeping or office finance? Our active programs prepare you for QuickBooks certification and accounting support roles.',
+          'Want to become a tax preparer? This is one of the best side hustles out there. 8 weeks of training, then you can earn $50-150 per return during tax season.',
       },
       {
         id: 'explain',
         type: 'explain',
         message:
-          "You'll learn bookkeeping fundamentals, payroll basics, and QuickBooks — the skills employers expect for entry-level accounting and office roles.",
+          "You'll learn federal and state tax law, how to use professional tax software, and how to handle different return types - W-2s, 1099s, self-employment, deductions.",
       },
       {
         id: 'how-to',
         type: 'how-to',
         message:
-          'Programs run 6–16 weeks depending on track. Training blends online coursework with instructor support and certification exam prep.',
+          "The training is 8 weeks, mostly online with some in-person sessions. You'll practice on real scenarios. After passing the exam, you get your PTIN and can start preparing returns.",
       },
       {
         id: 'tip',
         type: 'tip',
         message:
-          'Start with Bookkeeping for the fastest path to a credential, or explore the full Finance & Accounting pathway for stacked certifications.',
-        action: { label: 'View Finance Pathway', href: '/programs/finance-bookkeeping-accounting' },
+          "Many of our graduates do 100+ returns per season. At $75 average per return, that's $7,500+ in extra income. Some go full-time and open their own tax offices.",
+        action: { label: 'Enroll Now', href: '/programs/tax-preparation/enroll' },
       },
       {
         id: 'upsell',
         type: 'upsell',
         message:
-          'Ready to apply? Bookkeeping cohorts enroll through our standard application — an advisor will review funding options with you.',
-        action: { label: 'Apply for Bookkeeping', href: '/apply?program=bookkeeping' },
+          'Want to open your own tax office? We have a Tax Business Toolkit that includes everything - software, marketing materials, client management system.',
+        action: { label: 'See Tax Business Toolkit', href: '/store/digital/tax-business-toolkit' },
       },
     ],
     quickTips: [
-      'QuickBooks certification prep',
-      'Stackable finance credentials',
-      'WIOA funding for eligible participants',
-      'Career placement support',
+      '8 weeks to certification',
+      'Earn $50-150 per return',
+      'Work from home or office',
+      'Great seasonal income',
     ],
   },
 };
@@ -374,7 +376,7 @@ export const DASHBOARD_GUIDES: Record<string, PageGuide> = {
     pageId: 'student-dashboard',
     pageName: 'Student Dashboard',
     avatarName: 'Maya',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp',
+    avatarImage: '/images/pages/store-recommendations.webp',
     messages: [
       {
         id: 'welcome',
@@ -414,7 +416,7 @@ export const DASHBOARD_GUIDES: Record<string, PageGuide> = {
     pageId: 'instructor-dashboard',
     pageName: 'Instructor Dashboard',
     avatarName: 'James',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-guide-1.webp',
+    avatarImage: '/images/pages/store-guide-1.webp',
     messages: [
       {
         id: 'welcome',
@@ -439,7 +441,7 @@ export const DASHBOARD_GUIDES: Record<string, PageGuide> = {
         type: 'tip',
         message:
           "The 'At Risk' section shows students who might be struggling. Reaching out early makes a big difference in completion rates.",
-        action: { label: 'View At-Risk Students', href: '/admin/instructor/at-risk' },
+        action: { label: 'View At-Risk Students', href: 'https://admin.elevateforhumanity.org/admin/instructor/at-risk' },
       },
     ],
     quickTips: [
@@ -454,7 +456,7 @@ export const DASHBOARD_GUIDES: Record<string, PageGuide> = {
     pageId: 'admin-dashboard',
     pageName: 'Admin Dashboard',
     avatarName: 'Sarah',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp',
+    avatarImage: '/images/pages/store-recommendations.webp',
     messages: [
       {
         id: 'welcome',
@@ -494,7 +496,7 @@ export const DASHBOARD_GUIDES: Record<string, PageGuide> = {
     pageId: 'partner-dashboard',
     pageName: 'Partner Dashboard',
     avatarName: 'Marcus',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-guide-2.jpg',
+    avatarImage: '/images/pages/store-guide-2.jpg',
     messages: [
       {
         id: 'welcome',
@@ -534,7 +536,7 @@ export const DASHBOARD_GUIDES: Record<string, PageGuide> = {
     pageId: 'employer-dashboard',
     pageName: 'Employer Dashboard',
     avatarName: 'David',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-guide-1.webp',
+    avatarImage: '/images/pages/store-guide-1.webp',
     messages: [
       {
         id: 'welcome',
@@ -580,7 +582,7 @@ export const LMS_GUIDES: Record<string, PageGuide> = {
     pageId: 'course-viewer',
     pageName: 'Course Viewer',
     avatarName: 'Maya',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp',
+    avatarImage: '/images/pages/store-recommendations.webp',
     messages: [
       {
         id: 'welcome',
@@ -620,7 +622,7 @@ export const LMS_GUIDES: Record<string, PageGuide> = {
     pageId: 'assignment-submission',
     pageName: 'Submit Assignment',
     avatarName: 'Maya',
-    avatarImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp',
+    avatarImage: '/images/pages/store-recommendations.webp',
     messages: [
       {
         id: 'welcome',

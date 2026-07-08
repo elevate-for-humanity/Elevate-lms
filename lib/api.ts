@@ -47,10 +47,6 @@ export enum ErrorCode {
   VALIDATION_ERROR = 'VALIDATION_ERROR',
   INTERNAL_ERROR = 'INTERNAL_ERROR',
   BAD_REQUEST = 'BAD_REQUEST',
-  // Additional codes
-  CONFLICT = 'CONFLICT',
-  EXTERNAL = 'EXTERNAL',
-  VAL_OUT_OF_RANGE = 'VAL_OUT_OF_RANGE',
 }
 
 // Standard API error responses
@@ -80,22 +76,6 @@ export const APIErrors = {
     code: ErrorCode.VALIDATION_ERROR,
     status: 400,
     details,
-  }),
-  validation: (field: string, message?: string) => ({
-    error: message || `Invalid ${field}`,
-    code: ErrorCode.VALIDATION_ERROR,
-    status: 400,
-    details: { field },
-  }),
-  conflict: (message = 'Resource already exists') => ({
-    error: message,
-    code: ErrorCode.CONFLICT,
-    status: 409,
-  }),
-  external: (service: string, message?: string) => ({
-    error: message || `${service} is unavailable`,
-    code: ErrorCode.EXTERNAL,
-    status: 503,
   }),
   internal: (message = 'Internal server error') => ({
     error: message,

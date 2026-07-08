@@ -42,8 +42,6 @@ export interface CreateCourseInput {
   shortDescription?: string;
   description?: string;
   modules: GeneratedModule[];
-  /** Optional tenant/org scoping for multi-tenant isolation */
-  orgId?: string;
 }
 
 /**
@@ -102,7 +100,6 @@ export async function createDraftCourse(db: SupabaseClient, input: CreateCourseI
       description: input.description ?? null,
       status: 'draft',
       is_active: true,
-      ...(input.orgId ? { org_id: input.orgId } : {}),
     })
     .select('*')
     .maybeSingle();
@@ -231,7 +228,7 @@ export async function publishCourse(
       }
     }
   } catch (snapErr) {
-    logger.warn('[publishCourse] snapshot failed (non-fatal)', { err: snapErr });
+    logger.error('[publishCourse] snapshot failed (non-fatal):', snapErr);
   }
 
   await db.rpc('log_audit_event', {

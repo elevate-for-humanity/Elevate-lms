@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { createPublicClient } from '@/lib/supabase/public';
 import { logAuthFailure, logAdminAction } from '@/lib/monitoring';
 
 /**
@@ -35,11 +35,11 @@ function createAuthSupabaseFromRequest(req: Request) {
 
 export interface OrgAdminResult {
   userId: string;
-  role: 'org_admin' | 'admin' | 'admin' | 'admin';
+  role: 'org_admin' | 'super_admin';
 }
 
 /**
- * Require that the request is from an org_admin, admin, admin, or admin
+ * Require that the request is from an org_admin or super_admin
  *
  * @param req - Request object
  * @param orgId - Organization ID to check membership
@@ -74,7 +74,7 @@ export async function requireOrgAdmin(req: Request, orgId: string): Promise<OrgA
     throw new Error('Unauthorized');
   }
 
-  // Check if user is org_admin, admin, admin, or admin for this organization
+  // Check if user is org_admin or super_admin for this organization
   const admin = await requireAdminClient();
   const { data, error } = await admin
     .from('organization_users')
@@ -93,7 +93,7 @@ export async function requireOrgAdmin(req: Request, orgId: string): Promise<OrgA
     throw new Error('Forbidden');
   }
 
-  if (!['org_admin', 'admin'].includes(data.role)) {
+  if (!['org_admin', 'super_admin'].includes(data.role)) {
     logAuthFailure(endpoint, 403, ip, userRes.user.id, `Insufficient role: ${data.role}`);
     throw new Error('Forbidden');
   }
@@ -106,17 +106,17 @@ export async function requireOrgAdmin(req: Request, orgId: string): Promise<OrgA
 
   return {
     userId: userRes.user.id,
-    role: data.role as 'org_admin' | 'admin' | 'admin' | 'admin',
+    role: data.role as 'org_admin' | 'super_admin',
   };
 }
 
 /**
- * Require admin role specifically
+ * Require super_admin role specifically
  */
 export async function requireSuperAdmin(req: Request, orgId: string): Promise<OrgAdminResult> {
   const result = await requireOrgAdmin(req, orgId);
 
-  if (!['admin'].includes(result.role)) {
+  if (result.role !== 'super_admin') {
     throw new Error('Forbidden');
   }
 

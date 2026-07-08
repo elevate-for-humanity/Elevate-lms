@@ -1,31 +1,24 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Program } from '@/lib/programs/programs.data';
-import { getProgramCardImage } from '@/lib/images/programImages';
-import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
-import { card } from '@/lib/page-design-tokens';
-import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
 
 /**
  * Standard program card — system-locked structure.
- * Top image (4:3, 1200×900 WebP) → program name → short description → metadata chips → CTA.
+ * Top image (16:9, flush) → program name → short description → metadata chips → CTA.
  * Do not add icons, checkmarks, or colored badges here.
  */
 export default function ProgramCard({ program }: { program: Program }) {
   return (
     <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
-      {/* Flush top image — 4:3 (see lib/images/media-dimensions.ts) */}
-      <div className={card.programImage}>
+      {/* Flush top image — 16:9 */}
+      <div className="relative aspect-[16/9] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src={resolveSiteImagePath(
-            program.cardImage || program.heroImage || getProgramCardImage(program.slug),
-          )}
+          src={program.cardImage || program.heroImage || '/images/pages/training-cohort.webp'}
           alt={program.title}
           fill
-          sizes={IMAGE_SIZES.programCard}
-          className={card.programImageFill}
-          placeholder="empty"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className="object-cover" placeholder="empty"
         />
       </div>
 

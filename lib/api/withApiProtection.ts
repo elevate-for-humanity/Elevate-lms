@@ -14,9 +14,9 @@
  * Auth levels:
  *   'public'  — no auth required. Must be explicitly declared.
  *   'user'    — any authenticated user
- *   'admin'   — admin | admin | staff | org_admin
- *   'staff'   — staff | admin | admin
- *   'instructor' — instructor | admin | admin | staff
+ *   'admin'   — admin | super_admin | staff | org_admin
+ *   'staff'   — staff | admin | super_admin
+ *   'instructor' — instructor | admin | super_admin | staff
  *   'system'  — cron/webhook — validated via CRON_SECRET or JOB_PROCESSOR_TOKEN header
  *
  * Rate limit tiers map to lib/api/withRateLimit.ts tiers.
@@ -44,9 +44,9 @@ export type ApiHandler = (
   context: { params: Record<string, string>; userId?: string; userRole?: string },
 ) => Promise<NextResponse> | NextResponse;
 
-const ADMIN_ROLES = new Set(['admin', 'staff', 'org_admin']);
-const STAFF_ROLES = new Set(['staff', 'admin']);
-const INSTRUCTOR_ROLES = new Set(['instructor', 'admin', 'staff']);
+const ADMIN_ROLES = new Set(['admin', 'super_admin', 'staff', 'org_admin']);
+const STAFF_ROLES = new Set(['staff', 'admin', 'super_admin']);
+const INSTRUCTOR_ROLES = new Set(['instructor', 'admin', 'super_admin', 'staff']);
 
 function defaultRateLimit(auth: AuthLevel): RateLimitTier {
   if (auth === 'public') return 'public';
@@ -58,12 +58,7 @@ async function resolveUser(request: NextRequest): Promise<{ userId: string; role
   try {
     const { createServerClient } = await import('@supabase/ssr');
     const { cookies } = await import('next/headers');
-    let cookieStore;
-    try {
-      cookieStore = await cookies();
-    } catch {
-      return null; // cookies() called outside request context
-    }
+    const cookieStore = await cookies();
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -101,13 +96,8 @@ function validateSystemToken(request: NextRequest): boolean {
   if (cronSecret && (authHeader === `Bearer ${cronSecret}` || cronHeader === cronSecret)) return true;
   if (jobToken && authHeader === `Bearer ${jobToken}`) return true;
 
-  // Legacy scheduled-task header (Northflank/cron); same secret as CRON_SECRET.
-  if (
-    cronSecret &&
-    request.headers.get('x-ecs-scheduled-task-secret') === cronSecret
-  ) {
-    return true;
-  }
+  // ECS scheduled task header (EventBridge → ECS cron)
+  if (request.headers.get('x-ecs-scheduled-task-secret') === process.env.CRON_SECRET) return true;
 
   return false;
 }

@@ -247,8 +247,8 @@ export const CPR_FIRST_AID: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: false,
+    fssa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
     fundingNotes: 'Short certification. Not typically funded through WIOA or FSSA as a standalone credential. May be bundled with a funded program.',

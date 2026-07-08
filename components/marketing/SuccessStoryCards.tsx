@@ -6,7 +6,7 @@ const stories = [
   {
     name: 'Graduate',
     program: 'Public Safety & Reentry Specialist',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/job-placement.webp',
+    image: '/images/pages/job-placement.webp',
     beforeJob: 'Unemployed after incarceration',
     afterJob: 'Reentry Specialist',
     salary: '$45,000/year',
@@ -15,7 +15,7 @@ const stories = [
   {
     name: 'Sarah Martinez',
     program: 'Medical Assistant',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-grad.jpg',
+    image: '/images/pages/healthcare-grad.jpg',
     beforeJob: 'Retail cashier, $12/hour',
     afterJob: 'Medical Assistant',
     salary: '$38,000/year',
@@ -24,7 +24,7 @@ const stories = [
   {
     name: 'James Wilson',
     program: 'HVAC Technician',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-home-highlight-health.webp',
+    image: '/images/pages/comp-home-highlight-health.webp',
     beforeJob: 'Fast food worker',
     afterJob: 'HVAC Technician',
     salary: '$52,000/year',

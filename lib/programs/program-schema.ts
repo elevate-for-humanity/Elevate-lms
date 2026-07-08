@@ -18,9 +18,6 @@
  *   J. Institutional footer + disclaimers
  */
 
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { sanitizePlatformValue } from '@/lib/config/sanitize-platform-value';
-
 // ─── Credential ──────────────────────────────────────────────────────
 export interface ProgramCredential {
   /** Credential name as it appears on the certificate/card */
@@ -220,8 +217,6 @@ export interface ProgramSchema {
   schedule: string;
   eveningSchedule?: string;
   cohortSize: string;
-  /** Optional override for "When do I start?" on program pages */
-  enrollmentStartLabel?: string;
   fundingStatement: string;
   selfPayCost: string;
   /** Upfront deposit amount for BNPL enrollment (e.g., "$600"). Defaults to $600 for apprenticeship programs when omitted. */
@@ -242,16 +237,6 @@ export interface ProgramSchema {
   };
   badge?: string;
   badgeColor?: 'red' | 'green' | 'blue' | 'orange' | 'purple';
-
-  // ─── ETPL / Technology Program Fields ──────────────────────────
-  /** Indiana ETPL Program ID for compliance disclosure */
-  etplProgramId?: string;
-  /** Technology career pathways for ETPL-aligned programs */
-  technologyCareerPathways?: string[];
-  /** Additional certifications supported beyond primary credentials */
-  additionalCertifications?: string[];
-  /** Technology-specific skills covered in the curriculum */
-  technologySkills?: string[];
 
   // ─── Enrollment Tracks ───────────────────────────────────────────
   /** Two-track enrollment: funded (Indiana) vs self-pay (national) */
@@ -595,17 +580,6 @@ export function getPrimaryCTA(p: ProgramSchema): PrimaryCTA | null {
 // ═══════════════════════════════════════════════════════════════════════
 //  HELPERS
 // ═══════════════════════════════════════════════════════════════════════
-
-/** Resolved delivery disclosure — never emit raw template placeholders. */
-export function formatDeliveryDisclosure(
-  deliveredBy?: ProgramSchema['deliveredBy'],
-): string | null {
-  if (!deliveredBy) return null;
-  const org = sanitizePlatformValue(PLATFORM_DEFAULTS.orgName, 'Elevate for Humanity');
-  if (deliveredBy === 'Elevate') return `Delivered directly by ${org}.`;
-  if (deliveredBy === 'Partner') return 'Delivered by an approved training partner.';
-  return `Delivered by ${org} or an approved training partner.`;
-}
 
 /**
  * Derive enrollment tracks for a program.

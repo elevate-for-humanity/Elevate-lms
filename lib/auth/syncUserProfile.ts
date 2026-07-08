@@ -43,7 +43,7 @@ export async function syncUserProfile(input: SyncUserInput) {
 
   if (!email) return;
 
-  const supabase = await getSupabaseAdmin();
+  const supabase = getSupabaseAdmin();
 
   // Set audit context so DB triggers attribute this service-role write
   await setAuditContext(supabase, { systemActor: 'sso_profile_sync' });

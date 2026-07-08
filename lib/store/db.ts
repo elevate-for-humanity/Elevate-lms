@@ -314,10 +314,15 @@ export async function getProduct(slug: string): Promise<Product | null> {
   const supabase = await createClient();
   if (!supabase) return null;
 
-  // Fetch product without implicit joins to avoid FK relationship errors
   const { data, error } = await supabase
     .from('products')
-    .select('*')
+    .select(
+      `
+      *,
+      product_images (*),
+      product_variants (*)
+    `,
+    )
     .eq('slug', slug)
     .eq('is_active', true)
     .maybeSingle();
@@ -327,19 +332,7 @@ export async function getProduct(slug: string): Promise<Product | null> {
     return null;
   }
 
-  if (!data) return null;
-
-  // Manually fetch related data
-  const [imagesResult, variantsResult] = await Promise.all([
-    supabase.from('product_images').select('*').eq('product_id', data.id).order('position', { ascending: true }),
-    supabase.from('product_variants').select('*').eq('product_id', data.id).order('price', { ascending: true }),
-  ]);
-
-  return {
-    ...data,
-    product_images: imagesResult.data || [],
-    product_variants: variantsResult.data || [],
-  };
+  return data;
 }
 
 /**
@@ -367,34 +360,11 @@ export async function getCatalogProducts(
     .eq('is_active', true)
     .order('sort_order', { ascending: true });
 
-  if (group === 'store') {
-    query = query.eq('catalog_group', 'store').in('category', ['platform', 'infrastructure']);
-  } else if (group) {
+  if (group) {
     query = query.eq('catalog_group', group);
   }
 
-  let { data, error } = await query;
-
-  // Pre-catalog_group schema: filter by type/category until migration is applied.
-  if (error?.message?.includes('catalog_group')) {
-    let fallback = supabase
-      .from('products')
-      .select('*')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true });
-
-    if (group === 'store') {
-      fallback = fallback.eq('type', 'license').in('category', ['platform', 'infrastructure']);
-    } else if (group === 'clone') {
-      fallback = fallback.eq('type', 'license').eq('category', 'clone');
-    } else if (group === 'addon') {
-      fallback = fallback.in('type', ['addon', 'digital']);
-    }
-
-    const result = await fallback;
-    data = result.data;
-    error = result.error;
-  }
+  const { data, error } = await query;
 
   if (error) {
     logger.error('Error fetching catalog products:', error);

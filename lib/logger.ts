@@ -149,18 +149,8 @@ class Logger {
     this.log('warn', message, context);
   }
 
-  error(message: string, context?: Record<string, any> | Error | string, extra?: Record<string, any>) {
-    // Handle both signatures:
-    // - error(message, context) where context is Record
-    // - error(message, error, extra) where error is Error
-    // - error(message, contextString) where context is a simple string message
-    if (context instanceof Error) {
-      this.log('error', message, extra, context);
-    } else if (typeof context === 'string') {
-      this.log('error', message, { message: context });
-    } else {
-      this.log('error', message, context);
-    }
+  error(message: string, error?: Error, context?: Record<string, any>) {
+    this.log('error', message, context, error);
   }
 }
 
@@ -172,14 +162,6 @@ export const log = {
   debug: (message: string, context?: Record<string, any>) => logger.debug(message, context),
   info: (message: string, context?: Record<string, any>) => logger.info(message, context),
   warn: (message: string, context?: Record<string, any>) => logger.warn(message, context),
-  error: (message: string, context?: Record<string, any> | Error | string, extra?: Record<string, any>) => {
-    if (context instanceof Error) {
-      logger.error(message, context, extra);
-    } else if (typeof context === 'string') {
-      // String context is treated as a message annotation
-      logger.error(message, { message: context }, extra);
-    } else {
-      logger.error(message, context);
-    }
-  },
+  error: (message: string, error?: Error, context?: Record<string, any>) =>
+    logger.error(message, error, context),
 };

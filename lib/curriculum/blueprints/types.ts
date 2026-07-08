@@ -96,19 +96,14 @@ export type BlueprintLessonRef = {
    * Instructor-facing notes for practical evaluation.
    * Not shown to learners. Used by instructor sign-off UI.
    */
-  instructorNotes?: string | string[];
-
-  /**
-   * Learning objectives - what learners will know/be able to do.
-   */
-  learningObjectives?: string[];
+  instructorNotes?: string[];
 
   /**
    * Observable competency checks for practical sign-off.
    * Each string is a discrete behavior the instructor verifies.
    * Required for lab and skill lessons.
    */
-  competencyChecks?: Array<string | { key: string; label: string; description: string; isCritical?: boolean; requiresInstructorSignoff?: boolean }>;
+  competencyChecks?: string[];
 };
 
 // ─── Competency requirement (consumed by auditor) ─────────────────────────────
@@ -143,7 +138,6 @@ export type BlueprintModule = {
    */
   slug: string;
   title: string;
-  description?: string;
   /** 1-based position within the program */
   orderIndex: number;
 
@@ -155,13 +149,10 @@ export type BlueprintModule = {
   quizRequired: boolean;
   practicalRequired: boolean;
   isCritical: boolean;
-  requiredLessonTypes?: BlueprintLessonTypeRule[];
+  requiredLessonTypes: BlueprintLessonTypeRule[];
 
   // ── Competency coverage requirements (enforced by auditor) ──
   competencies: BlueprintCompetency[];
-
-  // NHA-Style Interaction Specs
-  interactionSpecs?: InteractionSpecs;
 
   /**
    * Suggested lesson titles for the AI generator.
@@ -449,48 +440,3 @@ export type BlueprintAuditResult = {
   violations: BlueprintAuditViolation[];
   warnings: BlueprintAuditViolation[];
 };
-
-
-// ─── NHA-Style Interaction Specs ──────────────────────────────────────────────
-export interface InteractionSpecs {
-  includeKnowledgeChecks: boolean;
-  includeScenarios: boolean;
-  includeFlashcards: boolean;
-  includeClickToReveal: boolean;
-  includeDragDrop: boolean;
-  includeMatching?: boolean;
-  includeCaseStudies?: boolean;
-  includeSimulations?: boolean;
-  includeDecisionTrees?: boolean;
-  knowledgeCheckCount: number;
-  scenarioCount: number;
-  flashcardCount: number;
-  matchingCount?: number;
-  caseStudyCount?: number;
-  simulationCount?: number;
-  decisionTreeCount?: number;
-}
-
-// ─── Enrollment-Based Features ────────────────────────────────────────────────
-export type EnrollmentType = "standard" | "apprentice" | "enterprise";
-
-export interface ApprenticeshipFeatures {
-  enabled: boolean;
-  rtiHoursRequired: number;
-  ojlHoursRequired: number;
-  competencyTracking: boolean;
-  employerEvaluations: boolean;
-  skillSignoffs: boolean;
-  rapidsReporting: boolean;
-}
-
-export interface CourseFeatures {
-  enrollmentTypes: EnrollmentType[];
-  apprenticeship?: ApprenticeshipFeatures;
-  certificationPrep: boolean;
-  practiceExams: boolean;
-  discussionBoards: boolean;
-  studyGroups: boolean;
-  careerPathways: boolean;
-  mobileOffline: boolean;
-}

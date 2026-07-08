@@ -28,15 +28,9 @@ const REQUIRED_ENV = [
 
 // In-process cache for the Stripe Issuing check — avoids a live outbound HTTP
 // call on every dashboard render. TTL: 5 minutes.
-let _stripeIssuingCache: {
-  result: { enabled: boolean; reason: string | null };
-  expiresAt: number;
-} | null = null;
+let _stripeIssuingCache: { result: { enabled: boolean; reason: string | null }; expiresAt: number } | null = null;
 
-async function getCachedStripeIssuingStatus(): Promise<{
-  enabled: boolean;
-  reason: string | null;
-}> {
+async function getCachedStripeIssuingStatus(): Promise<{ enabled: boolean; reason: string | null }> {
   const now = Date.now();
   if (_stripeIssuingCache && now < _stripeIssuingCache.expiresAt) {
     return _stripeIssuingCache.result;
@@ -50,14 +44,11 @@ async function getCachedStripeIssuingStatus(): Promise<{
   try {
     const res = await fetch('https://api.stripe.com/v1/issuing/cardholders?limit=1', {
       headers: { Authorization: `Bearer ${key}` },
-      signal: AbortSignal.timeout(1500),
     });
     const result =
-      res.status === 200
-        ? { enabled: true, reason: null }
-        : res.status === 403
-          ? { enabled: false, reason: 'not_approved' }
-          : { enabled: false, reason: `stripe_${res.status}` };
+      res.status === 200 ? { enabled: true, reason: null } :
+      res.status === 403 ? { enabled: false, reason: 'not_approved' } :
+      { enabled: false, reason: `stripe_${res.status}` };
     _stripeIssuingCache = { result, expiresAt: now + 5 * 60 * 1000 };
     return result;
   } catch {
@@ -82,52 +73,34 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
     });
   }
 
-  const [stripeWebhook, stripeIssuing, staleJobs, missingDocs, unresolvedFlags] = await Promise.all(
-    [
-      // Check Stripe webhook status via app_secrets or a known sentinel
-      Promise.resolve(
-        db.from('app_secrets').select('value').eq('key', 'STRIPE_WEBHOOK_SECRET').maybeSingle(),
-      ).catch(() => ({ data: null, error: null })),
+  const [stripeWebhook, stripeIssuing, staleJobs, missingDocs, unresolvedFlags] = await Promise.all([
+    // Check Stripe webhook status via app_secrets or a known sentinel
+    db.from('app_secrets').select('value').eq('key', 'STRIPE_WEBHOOK_SECRET').maybeSingle(),
 
-      // Check Stripe Issuing — cached for 5 minutes to avoid blocking every dashboard load.
-      // A live outbound fetch on every render adds 200-800ms of latency.
-      getCachedStripeIssuingStatus(),
+    // Check Stripe Issuing — cached for 5 minutes to avoid blocking every dashboard load.
+    // A live outbound fetch on every render adds 200-800ms of latency.
+    getCachedStripeIssuingStatus(),
 
-      // Stale jobs stuck in processing > 30 min
-      Promise.resolve(
-        db
-          .from('job_queue')
-          .select('id', { count: 'exact', head: true })
-          .eq('status', 'processing')
-          .lt('updated_at', new Date(Date.now() - 30 * 60 * 1000).toISOString()),
-      )
-        .then((r) => (r.error ? { count: 0, error: null } : r))
-        .catch(() => ({ count: 0, error: null })),
+    // Stale jobs stuck in processing > 30 min
+    db
+      .from('job_queue')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'processing')
+      .lt('updated_at', new Date(Date.now() - 30 * 60 * 1000).toISOString()),
 
-      // Enrollments missing required documents
-      Promise.resolve(
-        db
-          .from('program_enrollments')
-          .select('id', { count: 'exact', head: true })
-          .eq('enrollment_state', 'active')
-          .eq('docs_verified', false),
-      )
-        .then((r) => (r.error ? { count: 0, error: null } : r))
-        .catch(() => ({ count: 0, error: null })),
+    // Enrollments missing required documents
+    db
+      .from('program_enrollments')
+      .select('id', { count: 'exact', head: true })
+      .eq('enrollment_state', 'active')
+      .eq('docs_verified', false),
 
-      // Unresolved compliance flags (table may not exist — degrade gracefully)
-      Promise.resolve(
-        db
-          .from('compliance_flags')
-          .select('id', { count: 'exact', head: true })
-          .eq('resolved', false),
-      )
-        .then((r) => (r.error ? { count: 0, error: null } : r))
-        .catch(() => ({ count: 0, error: null })),
-    ],
-  );
+    // Unresolved compliance flags (table may not exist — degrade gracefully)
+    db.from('compliance_flags').select('id', { count: 'exact', head: true }).eq('resolved', false)
+      .then(r => r.error ? { count: 0, error: null } : r),
+  ]);
 
-  // Check env var first, then fall back to app_secrets table.
+  // Check env var first (ECS injects it via SSM), then fall back to app_secrets table
   const stripeWebhookOk = !!process.env.STRIPE_WEBHOOK_SECRET || !!stripeWebhook.data?.value;
   if (!stripeWebhookOk) {
     alerts.push({
@@ -143,8 +116,8 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
       stripeIssuing.reason === 'not_approved'
         ? 'Stripe Issuing not yet approved for this account. Apply at dashboard.stripe.com/issuing.'
         : stripeIssuing.reason === 'no_key'
-          ? 'STRIPE_SECRET_KEY missing — Stripe Issuing status unknown.'
-          : `Stripe Issuing unavailable (${stripeIssuing.reason}).`;
+        ? 'STRIPE_SECRET_KEY missing — Stripe Issuing status unknown.'
+        : `Stripe Issuing unavailable (${stripeIssuing.reason}).`;
     alerts.push({
       code: 'stripe_issuing_not_enabled',
       severity: stripeIssuing.reason === 'not_approved' ? 'warning' : 'info',

@@ -121,8 +121,8 @@ export async function seedCourseToCurriculumLessons(
     const moduleOrder = mod?.order_index ?? 0;
 
     // Parse content JSON (stored as stringified JSON from generator)
-    let keyTerms: string[];
-    let scriptText: string;
+    let scriptText = '';
+    let keyTerms: string[] = [];
     try {
       const content =
         typeof lesson.content === 'string' ? JSON.parse(lesson.content) : (lesson.content ?? {});

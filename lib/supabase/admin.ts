@@ -1,7 +1,6 @@
 import { timedFetch } from '@/lib/supabase/timed-fetch';
 import { logger } from '@/lib/logger';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { normalizeSupabaseProjectUrl } from '@/lib/supabase/normalize-url';
 
 /**
  * @deprecated Use `getAdminClient()` instead in all request-time code
@@ -42,7 +41,7 @@ export function createAdminClient(): SupabaseClient<any> {
   }
   // ────────────────────────────────────────────────────────────────────────
 
-  const url = normalizeSupabaseProjectUrl(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url) {
@@ -110,14 +109,6 @@ export async function requireAdminClient(): Promise<SupabaseClient<any>> {
     );
   }
   return client;
-}
-
-/**
- * @deprecated Use requireAdminClient() instead. This alias exists for
- * backwards compatibility with older code that expects a sync function.
- */
-export async function getSupabaseAdmin(): Promise<SupabaseClient<any>> {
-  return requireAdminClient();
 }
 
 /**

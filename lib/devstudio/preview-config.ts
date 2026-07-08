@@ -1,7 +1,7 @@
 /**
  * Dev Studio live-preview URL resolution.
  *
- * The admin container sets NEXT_PUBLIC_SITE_URL to the admin hostname; the public
+ * The admin ECS task sets NEXT_PUBLIC_SITE_URL to the admin hostname; the public
  * marketing site must come from NEXT_PUBLIC_PUBLIC_SITE_URL (or LMS URL), not SITE_URL.
  */
 
@@ -20,7 +20,7 @@ function trimUrl(url: string | undefined | null): string {
 
 function hostnameIsAdmin(host: string): boolean {
   const h = host.toLowerCase();
-  return h === '' || h.startsWith('admin.');
+  return h === 'admin.elevateforhumanity.org' || h.startsWith('admin.');
 }
 
 /** Canonical public (www / LMS) origin for marketing pages. */
@@ -52,7 +52,7 @@ export function resolvePublicSiteUrl(): string {
 
 /** Canonical admin app origin. */
 export function resolveAdminSiteUrl(): string {
-  return trimUrl(process.env.NEXT_PUBLIC_ADMIN_URL) || '';
+  return trimUrl(process.env.NEXT_PUBLIC_ADMIN_URL) || 'https://admin.elevateforhumanity.org';
 }
 
 /** Default iframe URL when Dev Studio opens (overridable via env / platform_settings). */

@@ -1,6 +1,5 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { prestigeElevationBarberCoursePath } from '@/lib/barber/branding';
 
 /**
  * Barber Apprenticeship — Program Detail Template v1
@@ -16,7 +15,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   category: 'Personal Services',
   programType: 'apprenticeship',
 
-  heroImage: '/images/pages/barber-hero-main.webp',
+  heroImage: '/images/pages/barber-hero-main.jpg',
   heroImageAlt: 'Barber apprentice training at a licensed barbershop',
   videoSrc: '/videos/barber-hero-final.mp4',
 
@@ -26,14 +25,14 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   hoursPerWeekMin: 15,
   hoursPerWeekMax: 20,
   hoursBreakdown: {
-    onlineInstruction: 400,
+    onlineInstruction: 300,
     handsOnLab: 500,
     examPrep: 50,
     careerPlacement: 50,
   },
   schedule: 'Flexible — 15–20 hrs/week (OJT at host shop + RTI online)',
   cohortSize: '8–12 apprentices per cohort',
-  fundingStatement: 'Self-pay: $4,980 — $600 down, then weekly payments or BNPL. WIOA funding may be available.',
+  fundingStatement: 'FSSA/SNAP E&T (IMPACT) eligible. Self-pay: $4,980 — $600 down, then weekly payments or BNPL.',
   selfPayCost: '$4,980',
   badge: 'DOL Registered',
   badgeColor: 'blue',
@@ -247,8 +246,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   facilityInfo: 'Host barbershops across Indianapolis metro area',
   bilingualSupport: 'Bilingual (English/Spanish) instruction available.',
   employerPartners: [
-    'Elevate Prestige Barber and Beauty Institute',
-    'Kountry Kutz Barbershop',
+    'Partner barbershops in Indianapolis (host shops)',
     'Indiana Barber Association',
   ],
   pricingIncludes: [
@@ -258,24 +256,19 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     'LMS access for full program duration',
     'Career placement and shop matching',
   ],
-  depositAmount: '$600',
-  paymentTerms:
-    '$4,980 total tuition. $600 minimum down payment, then 29 weekly installments (~$152/wk) or BNPL at checkout.',
+  paymentTerms: '$4,980. Payment plans available.',
 
   // ─── Content model ──────────────────────────────────────────────
   deliveryModel: 'partner',
   deliveryModelDetail: 'hybrid',
-  partnerProvider: 'elevate-lms',
-  fundingOptions: ['wioa', 'employer_paid', 'self_pay'],
+  partnerProvider: 'milady',
+  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
   funding: {
-    fssa_eligible: false,
-    
+    fssa_eligible: true,
     snap_et_eligible: true,
-    wioa_eligible: true,
-    etpl_approved: true,
+    wioa_eligible: false,   // DOL apprenticeship — not on Indiana ETPL
+    etpl_approved: false,
     wrg_eligible: false,
-    fundingNotes:
-      'DOL Registered Apprenticeship (RAPIDS). WIOA Title I eligible for dislocated workers and adults. Employer sponsorship available for eligible participants.',
   },
   enrollmentType: 'internal',
   partnerCourses: [
@@ -286,7 +279,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       credentialIssued: 'RTI completion (500 hours)',
       duration: '500 hours RTI',
       required: true,
-      enrollmentUrl: prestigeElevationBarberCoursePath,
+      enrollmentUrl: '/lms/courses/3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
     },
   ],
   microCourses: [
@@ -302,11 +295,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   faqs: [
-    {
-      question: 'How much does the program cost?',
-      answer:
-        'Tuition is $4,980 when workforce funding does not apply. Pay $600 down and spread the balance over 29 weekly payments (~$152/week), pay in full, or use BNPL at checkout.',
-    },
+    { question: 'How much does the program cost?', answer: 'Tuition is $4,980. Payment plans are available — contact us to discuss options.' },
     { question: 'How long is the program?', answer: '12 months (52 weeks). Indiana requires 2,000 total hours: 1,500 hours of on-the-job training at a licensed shop and 500 hours of Related Technical Instruction delivered online.' },
     { question: 'Do I need my own barbershop?', answer: 'No. We match you with a licensed host barbershop in the Indianapolis area. The host shop provides your on-the-job training environment.' },
     { question: 'What license do I earn?', answer: 'The Indiana Barber License, issued by the Indiana State Board of Cosmetology and Barber Examiners. You also earn a DOL Registered Apprenticeship certificate, which is recognized in all 50 states.' },

@@ -1,7 +1,7 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 /**
  * TUITION FINANCING POLICY
- * Elevate for Humanity Career & Technical Institute
+ * Elevate for Humanity Career and Training Institute
  *
  * This policy governs all non-funded (non-WIOA, non-Pell) tuition payments.
  * Staff must follow this policy exactly. No verbal negotiations. No exceptions
@@ -19,7 +19,7 @@ export const TUITION_FINANCING_POLICY = {
    * POLICY STATEMENT
    */
   policyStatement: `
-${PLATFORM_DEFAULTS.orgName} Career & Technical Institute offers multiple pathways for students 
+${PLATFORM_DEFAULTS.orgName} Career and Training Institute offers multiple pathways for students 
 to pay tuition for non-funded programs. This policy establishes clear, consistent rules 
 for tuition collection that protect both students and the institution.
 

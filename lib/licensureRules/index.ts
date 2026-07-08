@@ -134,7 +134,7 @@ export function evaluateTransfer(params: {
   }
 
   // Build explanation
-  let explanation: string;
+  let explanation = '';
   if (decision === 'accepted') {
     explanation = `All ${acceptedHours} hours accepted under ${rules.rule_set_id}.`;
   } else if (decision === 'partially_accepted') {

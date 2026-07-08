@@ -36,9 +36,9 @@ interface DeliveryBadgeProps {
 }
 
 export function DeliveryBadge({ model }: DeliveryBadgeProps) {
-  const Icon = DELIVERY_ICONS[model] ?? Monitor;
-  const label = DELIVERY_LABELS[model] ?? model;
-  const color = DELIVERY_COLORS[model] ?? 'bg-slate-100 text-slate-600 border-slate-200';
+  const Icon = DELIVERY_ICONS[model];
+  const label = DELIVERY_LABELS[model];
+  const color = DELIVERY_COLORS[model];
 
   return (
     <span
@@ -64,7 +64,7 @@ const FUNDING_COPY: Record<FundingType, { label: string; detail: string }> = {
       'Indiana state grant covering tuition for high-demand programs. Eligibility determined through WorkOne.',
   },
   impact: {
-    label: '',
+    label: 'FSSA IMPACT',
     detail:
       'Indiana Manpower Placement and Comprehensive Training — pays for training at no cost to current SNAP or TANF recipients. Contact FSSA at 800-403-0864 (press 3) or ask your DFR eligibility worker for a referral.',
   },

@@ -17,7 +17,7 @@ export async function getSessionUser() {
 }
 
 // Roles allowed to access the partner portal
-const PARTNER_ROLES = new Set(['partner', 'admin']);
+const PARTNER_ROLES = new Set(['partner', 'admin', 'super_admin']);
 
 export async function getMyPartnerContext() {
   const supabase = await createClient();
@@ -36,7 +36,7 @@ export async function getMyPartnerContext() {
 
   // Shops the user belongs to — only active shops
   // Try with shop_staff.active filter first; fall back if column doesn't exist yet
-  let shops: any[] | null;
+  let shops: any[] | null = null;
   const { data: s1, error: e1 } = await supabase
     .from('shop_staff')
     .select('shop_id, role, active, shops:shops!inner(id, name, active)')

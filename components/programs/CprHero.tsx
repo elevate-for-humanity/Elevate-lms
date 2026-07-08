@@ -61,12 +61,12 @@ export default function CprHero() {
       {/* IMAGE FRAME — no text on it */}
       <section
         className="relative w-full overflow-hidden bg-slate-900"
-        style={{ height: 'clamp(220px, 34vw, 390px)' }}
+        style={{ height: 'clamp(400px, 56vw, 780px)' }}
         aria-label="CPR & First Aid hero"
       >
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cpr-training-real.webp"
+          src="/images/pages/cpr-training-real.webp"
           alt="CPR training session"
           fill
           priority

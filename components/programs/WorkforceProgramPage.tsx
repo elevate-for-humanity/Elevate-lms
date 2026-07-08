@@ -55,7 +55,7 @@ export interface WorkforceProgramData {
   slug: string;
   programId: string; // INTraining ID e.g. "#10004322"
   providerName: string; // "2Exclusive LLC-S" on INTraining
-  locationName: string; // e.g. org training center display name
+  locationName: string; // "{PLATFORM_DEFAULTS.orgName} Training Center"
   category: string;
   categoryHref: string;
   heroImage: string;

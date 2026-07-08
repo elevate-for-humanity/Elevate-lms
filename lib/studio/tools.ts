@@ -136,22 +136,6 @@ export const STUDIO_TOOLS = [
   {
     type: 'function' as const,
     function: {
-      name: 'createCourse',
-      description: 'Create a brand-new empty course (draft). Use when the user asks to start a new course from scratch. Returns the new courseId so subsequent tools can add modules and lessons.',
-      parameters: {
-        type: 'object',
-        properties: {
-          title: { type: 'string', description: 'Course title' },
-          description: { type: 'string', description: 'Course description' },
-          short_description: { type: 'string', description: 'Short summary (1-2 sentences)' },
-        },
-        required: ['title'],
-      },
-    },
-  },
-  {
-    type: 'function' as const,
-    function: {
       name: 'buildCourseFromBlueprint',
       description: 'Build a complete course from a known blueprint — generates all modules and lessons automatically. Use when the user asks to build, generate, or create a full course (e.g. "Build HVAC certification course", "Generate EPA 608 course").',
       parameters: {
@@ -221,8 +205,6 @@ export async function executeStudioTool(
       return executeUpdateCourseTitle(args, courseId, db);
     case 'createModule':
       return executeCreateModule(args, courseId, db);
-    case 'createCourse':
-      return executeCreateCourse(args, userId, db);
     case 'buildCourseFromBlueprint':
       return executeBuildCourseFromBlueprint(args, courseId, db);
     default:
@@ -445,40 +427,6 @@ async function executeBuildCourseFromBlueprint(
     ok: true,
     message: `Built course from blueprint "${blueprintId}": ${modulesCreated} modules, ${lessonsCreated} lessons created`,
     data: { blueprintId, modulesCreated, lessonsCreated, mode },
-  };
-}
-
-async function executeCreateCourse(
-  args: Record<string, unknown>,
-  userId: string,
-  db: SupabaseClient,
-): Promise<ToolResult> {
-  const title = String(args.title ?? 'New Course');
-  const slug = title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 80) + '-' + Date.now().toString(36);
-
-  const { data, error } = await db
-    .from('courses')
-    .insert({
-      title,
-      slug,
-      description: args.description ?? null,
-      short_description: args.short_description ?? null,
-      status: 'draft',
-      is_active: true,
-      created_by: userId,
-    })
-    .select('id, title, slug, status')
-    .single();
-
-  if (error) return { ok: false, message: `Failed to create course: ${error.message}` };
-  return {
-    ok: true,
-    message: `Created new course "${data.title}" (draft)`,
-    data: { courseId: data.id, title: data.title, slug: data.slug },
   };
 }
 

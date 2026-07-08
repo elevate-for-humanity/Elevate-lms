@@ -44,7 +44,7 @@ export const azureADConfig = {
   scope: ['profile', 'email', 'openid'],
 };
 
-// LDAP Configuration — only active when LDAP_ENABLED=true and LDAP_URL is configured.
+// LDAP Configuration — only active when LDAP_ENABLED=true and LDAP_URL is set in SSM
 export const ldapConfig = process.env.LDAP_ENABLED === 'true' && process.env.LDAP_URL
   ? {
       url: process.env.LDAP_URL,

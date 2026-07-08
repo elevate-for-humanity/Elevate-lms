@@ -132,7 +132,7 @@ export async function completeProgramEnrollment(
   // 2. Fetch learner profile and program details
   const [{ data: profile }, { data: program }] = await Promise.all([
     db.from('profiles').select('full_name, email').eq('id', userId).maybeSingle(),
-    db.from('programs').select('name, required_hours').eq('id', programId).maybeSingle(),
+    db.from('training_programs').select('name, required_hours').eq('id', programId).maybeSingle(),
   ]);
 
   const studentName = profile?.full_name ?? 'Learner';
@@ -166,7 +166,7 @@ export async function completeProgramEnrollment(
     .maybeSingle();
 
   // 5. Generate certificate PDF and upload to storage
-  let pdfUrl: string | null;
+  let pdfUrl: string | null = null;
   try {
     const { generateCertificatePDF, generateCertificateNumber } =
       await import('@/lib/certificates/generator');
@@ -206,7 +206,7 @@ export async function completeProgramEnrollment(
       }
     }
   } catch (pdfErr) {
-    logger.warn('[completion] PDF generation failed (non-fatal)', { err: pdfErr });
+    logger.error('[completion] PDF generation failed (non-fatal):', pdfErr);
   }
 
   // 6. Issue certificate record via canonical issuer

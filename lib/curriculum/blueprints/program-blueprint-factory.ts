@@ -1,6 +1,5 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { getSocCode } from '@/lib/onet/soc-map';
-import { slugify } from '@/lib/validate';
 import type {
   BlueprintAssessmentRule,
   BlueprintCompetency,
@@ -16,31 +15,31 @@ const SECTOR_VIDEO_CONFIG: Record<ProgramSchema['sector'], Partial<BlueprintVide
     topBarColor: '#f97316',
     accentColor: '#fb7185',
     instructorTitle: 'Lead Trades Instructor',
-    instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg',
+    instructorImagePath: '/images/instructors/marcus-johnson.jpg',
   },
   healthcare: {
     topBarColor: '#0ea5e9',
     accentColor: '#22c55e',
     instructorTitle: 'Clinical Program Lead',
-    instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg',
+    instructorImagePath: '/images/instructors/marcus-johnson.jpg',
   },
   'personal-services': {
     topBarColor: '#ec4899',
     accentColor: '#f97316',
     instructorTitle: 'Program Instructor',
-    instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg',
+    instructorImagePath: '/images/instructors/marcus-johnson.jpg',
   },
   technology: {
     topBarColor: '#8b5cf6',
     accentColor: '#38bdf8',
     instructorTitle: 'Technology Lead Instructor',
-    instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg',
+    instructorImagePath: '/images/instructors/marcus-johnson.jpg',
   },
   business: {
     topBarColor: '#2563eb',
     accentColor: '#14b8a6',
     instructorTitle: 'Business Program Instructor',
-    instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg',
+    instructorImagePath: '/images/instructors/marcus-johnson.jpg',
   },
 };
 
@@ -49,7 +48,7 @@ const DEFAULT_VIDEO_CONFIG: BlueprintVideoConfig = {
   template: 'elevate-slide',
   instructorName: 'Marcus Johnson',
   instructorTitle: 'Lead Instructor',
-  instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg',
+  instructorImagePath: '/images/instructors/marcus-johnson.jpg',
   topBarColor: '#f97316',
   accentColor: '#3b82f6',
   backgroundColor: '#0f172a',
@@ -62,6 +61,13 @@ const DEFAULT_VIDEO_CONFIG: BlueprintVideoConfig = {
   width: 1920,
   height: 1080,
 };
+
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
 
 function titleCase(input: string): string {
   return input

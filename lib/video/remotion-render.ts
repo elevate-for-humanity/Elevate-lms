@@ -11,7 +11,8 @@
 
 import path from 'path';
 import os from 'os';
-import { mkdir, readFile, rm, writeFile, unlink } from 'fs/promises';
+import { mkdir, writeFile, unlink } from 'fs/promises';
+import { bundle } from '@remotion/bundler';
 import { renderMedia, selectComposition } from '@remotion/renderer';
 import { registerUsageEvent } from '@remotion/licensing';
 import { generateEdgeTTS, buildLessonScript, EDGE_TTS_VOICES, type EdgeTTSVoice } from './edge-tts';
@@ -20,17 +21,6 @@ import { logger } from '@/lib/logger';
 // Type-only import — never bundled, only used for type checking
 import type { ElevateLessonProps } from '@/remotion-src/compositions/ElevateLesson';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import {
-  getRemotionBundleUrl,
-  releaseRemotionBundle,
-  retainRemotionBundle,
-  shouldReleaseRemotionBundleAfterJob,
-} from './remotion-bundle-cache';
-import {
-  lessonRenderTempPaths,
-  uploadLessonFileFromDisk,
-  uploadLessonMediaBuffer,
-} from './upload-lesson-media';
 
 // Remotion's inputProps requires Record<string, unknown> — this cast is safe
 // because ElevateLessonProps is a plain serialisable object.
@@ -54,8 +44,8 @@ export interface RemotionLessonInput {
 
 export interface RemotionRenderResult {
   success: boolean;
-  videoUrl?: string; // Supabase course-videos public URL
-  audioUrl?: string; // Supabase course-videos public URL (MP3)
+  videoUrl?: string; // public path, e.g. /generated/lessons/lesson-<id>.mp4
+  audioUrl?: string; // public path to the MP3 (kept for reuse)
   duration?: number; // seconds
   method: 'remotion-free';
   error?: string;
@@ -77,7 +67,7 @@ const INSTRUCTOR_CONFIGS: Record<string, InstructorConfig> = {
     name: 'Marcus Johnson',
     title: 'Workforce Development Specialist',
     voice: EDGE_TTS_VOICES.marcus,
-    imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg',
+    imageSrc: '/images/instructors/marcus-johnson.jpg',
     topBarColor: '#f97316',
     accentColor: '#3b82f6',
   },
@@ -85,7 +75,7 @@ const INSTRUCTOR_CONFIGS: Record<string, InstructorConfig> = {
     name: 'Dr. Sarah Chen',
     title: 'Healthcare Training Specialist',
     voice: EDGE_TTS_VOICES.female,
-    imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/sarah-chen.jpg',
+    imageSrc: '/images/instructors/sarah-chen.jpg',
     topBarColor: '#10b981',
     accentColor: '#6366f1',
   },
@@ -93,7 +83,7 @@ const INSTRUCTOR_CONFIGS: Record<string, InstructorConfig> = {
     name: 'James Williams',
     title: 'Master Barber & Instructor',
     voice: EDGE_TTS_VOICES.warm,
-    imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/james-williams.jpg',
+    imageSrc: '/images/instructors/james-williams.jpg',
     topBarColor: '#8b5cf6',
     accentColor: '#f59e0b',
   },
@@ -101,7 +91,7 @@ const INSTRUCTOR_CONFIGS: Record<string, InstructorConfig> = {
     name: 'Lisa Martinez',
     title: 'IT & Cybersecurity Instructor',
     voice: EDGE_TTS_VOICES.female,
-    imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/lisa-martinez.webp',
+    imageSrc: '/images/instructors/lisa-martinez.jpg',
     topBarColor: '#06b6d4',
     accentColor: '#8b5cf6',
   },
@@ -109,7 +99,7 @@ const INSTRUCTOR_CONFIGS: Record<string, InstructorConfig> = {
     name: 'Robert Davis',
     title: 'CDL & Transportation Instructor',
     voice: EDGE_TTS_VOICES.british,
-    imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/robert-davis.jpg',
+    imageSrc: '/images/instructors/robert-davis.jpg',
     topBarColor: '#ef4444',
     accentColor: '#f97316',
   },
@@ -117,7 +107,7 @@ const INSTRUCTOR_CONFIGS: Record<string, InstructorConfig> = {
     name: 'Angela Thompson',
     title: 'Business & Career Coach',
     voice: EDGE_TTS_VOICES.neutral,
-    imageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/angela-thompson.webp',
+    imageSrc: '/images/instructors/angela-thompson.jpg',
     topBarColor: '#ec4899',
     accentColor: '#14b8a6',
   },
@@ -167,36 +157,62 @@ function estimateDuration(script: string): number {
   return Math.ceil((words / 140) * 60);
 }
 
-// ── Main render function ──────────────────────────────────────────────────────
+// ── Output paths ──────────────────────────────────────────────────────────────
 
-export interface RenderLessonVideoOptions {
-  /** Batch already called retainRemotionBundle — skip per-lesson retain/release. */
-  sharedBundleSession?: boolean;
+function getOutputPaths(lessonId: string) {
+  const outputDir = path.join(process.cwd(), 'public', 'generated', 'lessons');
+  return {
+    outputDir,
+    audioPath: path.join(outputDir, `lesson-${lessonId}.mp3`),
+    videoPath: path.join(outputDir, `lesson-${lessonId}.mp4`),
+    audioUrl: `/generated/lessons/lesson-${lessonId}.mp3`,
+    videoUrl: `/generated/lessons/lesson-${lessonId}.mp4`,
+  };
 }
+
+// ── Remotion bundle cache ─────────────────────────────────────────────────────
+
+let _bundleUrl: string | null = null;
+
+async function getBundleUrl(): Promise<string> {
+  if (_bundleUrl) return _bundleUrl;
+
+  logger.info('[RemotionRender] Bundling Remotion composition...');
+  const entryPoint = path.join(process.cwd(), 'remotion-src', 'index.ts');
+
+  _bundleUrl = await bundle({
+    entryPoint,
+    // Webpack override: mark Node-only modules as external so they don't
+    // get bundled into the browser-side Remotion bundle.
+    webpackOverride: (config) => ({
+      ...config,
+      externals: [
+        ...(Array.isArray(config.externals) ? config.externals : []),
+        'edge-tts',
+      ],
+    }),
+  });
+
+  logger.info('[RemotionRender] Bundle ready');
+  return _bundleUrl;
+}
+
+// ── Main render function ──────────────────────────────────────────────────────
 
 /**
  * Render a lesson MP4 using the free pipeline:
  *   edge-tts → Pexels/Pollinations → Remotion
  *
- * Renders to a temp dir, uploads MP4 (+ MP3) to Supabase course-videos, then deletes temp files.
+ * Output is written to public/generated/lessons/lesson-<id>.mp4
+ * Returns the public URL path.
  */
-export async function renderLessonVideo(
-  input: RemotionLessonInput,
-  options?: RenderLessonVideoOptions,
-): Promise<RemotionRenderResult> {
+export async function renderLessonVideo(input: RemotionLessonInput): Promise<RemotionRenderResult> {
   const { lessonId, domainKey = 'default', instructorId } = input;
   const instructor = getInstructor(instructorId);
-  const paths = lessonRenderTempPaths(lessonId);
-
-  const releaseAfterJob = shouldReleaseRemotionBundleAfterJob();
-  const ownsBundle = releaseAfterJob && !options?.sharedBundleSession;
-
-  if (ownsBundle) {
-    await retainRemotionBundle();
-  }
+  const paths = getOutputPaths(lessonId);
 
   try {
-    await mkdir(paths.dir, { recursive: true });
+    await mkdir(paths.outputDir, { recursive: true });
 
     // ── Step 1: Generate narration audio via edge-tts ─────────────────────────
     logger.info(`[RemotionRender] Generating TTS for lesson ${lessonId}`);
@@ -246,7 +262,7 @@ export async function renderLessonVideo(
     // ── Step 4: Bundle and render ─────────────────────────────────────────────
     logger.info(`[RemotionRender] Rendering MP4 (${totalFrames} frames @ 30fps = ${duration}s)`);
 
-    const bundleUrl = await getRemotionBundleUrl();
+    const bundleUrl = await getBundleUrl();
 
     const composition = await selectComposition({
       serveUrl: bundleUrl,
@@ -288,14 +304,10 @@ export async function renderLessonVideo(
 
     logger.info(`[RemotionRender] MP4 written: ${paths.videoPath}`);
 
-    const audioUrl = await uploadLessonMediaBuffer(await readFile(paths.audioPath), lessonId, 'mp3');
-    const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, lessonId, 'mp4');
-    await rm(paths.dir, { recursive: true, force: true }).catch(() => {});
-
     return {
       success: true,
-      videoUrl,
-      audioUrl,
+      videoUrl: paths.videoUrl,
+      audioUrl: paths.audioUrl,
       duration,
       method: 'remotion-free',
     };
@@ -303,18 +315,14 @@ export async function renderLessonVideo(
     const msg = err instanceof Error ? err.message : String(err);
     logger.error('[RemotionRender] Render failed: ' + msg);
 
+    // Clean up partial output
     await unlink(paths.videoPath).catch(() => {});
-    await rm(paths.dir, { recursive: true, force: true }).catch(() => {});
 
     return {
       success: false,
       error: msg,
       method: 'remotion-free',
     };
-  } finally {
-    if (ownsBundle) {
-      await releaseRemotionBundle();
-    }
   }
 }
 
@@ -335,37 +343,21 @@ export async function renderLessonVideoBatch(
   onProgress?: (done: number, total: number, current: RemotionLessonInput) => void,
 ): Promise<BatchRenderResult[]> {
   const results: BatchRenderResult[] = [];
-  const releaseAfterJob = shouldReleaseRemotionBundleAfterJob();
 
-  if (releaseAfterJob) {
-    await retainRemotionBundle();
-  }
+  for (let i = 0; i < lessons.length; i++) {
+    const lesson = lessons[i];
+    onProgress?.(i, lessons.length, lesson);
 
-  try {
-    for (let i = 0; i < lessons.length; i++) {
-      const lesson = lessons[i];
-      onProgress?.(i, lessons.length, lesson);
+    const result = await renderLessonVideo(lesson);
+    results.push({ lessonId: lesson.lessonId, title: lesson.title, result });
 
-      const result = await renderLessonVideo(lesson, {
-        sharedBundleSession: releaseAfterJob,
-      });
-      results.push({ lessonId: lesson.lessonId, title: lesson.title, result });
-
-      // Brief pause between renders to let GC run
-      if (i < lessons.length - 1) {
-        await new Promise((r) => setTimeout(r, 500));
-      }
-    }
-
-    if (lessons.length > 0) {
-      onProgress?.(lessons.length, lessons.length, lessons[lessons.length - 1]!);
-    }
-  } finally {
-    if (releaseAfterJob) {
-      await releaseRemotionBundle();
+    // Brief pause between renders to let GC run
+    if (i < lessons.length - 1) {
+      await new Promise((r) => setTimeout(r, 500));
     }
   }
 
+  onProgress?.(lessons.length, lessons.length, lessons[lessons.length - 1]);
   return results;
 }
 

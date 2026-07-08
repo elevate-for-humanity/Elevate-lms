@@ -4,9 +4,8 @@
 // No synthetic stats, no fake deltas.
 
 // SitePreviewTarget is defined in @/components/admin/dashboard/types — import from there.
-import { getAdminClient } from '@/lib/supabase/admin';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import { getDegradedAdminDashboardData } from '@/lib/admin/degraded-dashboard-data';
 import { logger } from '@/lib/logger';
 import {
   calculatePriorityScore,
@@ -17,10 +16,6 @@ import {
 import type { AdminDashboardData, DegradedSection } from '@/components/admin/dashboard/types';
 import { PENDING_APPLICATION_STATUSES } from '@/lib/admin/application-statuses';
 import { getSystemHealth } from './dashboard/get-system-health';
-import {
-  isLikelyTestOrDemoRecord,
-  isTestOrSuspiciousPayment,
-} from '@/lib/admin/dashboard/format-metrics';
 import { withTimeout } from '@/lib/utils/withTimeout';
 
 function toSafeNumber(value: unknown): number {
@@ -37,27 +32,13 @@ function dollarsToCents(value: unknown): number {
   return Math.round(toSafeNumber(value) * 100);
 }
 
-
-function normalizeDedupePart(value: unknown): string {
-  return String(value ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
-}
-
-function timestampBucket(value: unknown, bucketMs = 10 * 60 * 1000): string {
-  const time = new Date(String(value ?? '')).getTime();
-  if (!Number.isFinite(time)) return '';
-  return String(Math.floor(time / bucketMs));
-}
-
-function uniqueBy<T>(rows: T[], keyFor: (row: T) => string): T[] {
-  const seen = new Set<string>();
-  const unique: T[] = [];
-  for (const row of rows) {
-    const key = keyFor(row);
-    if (key && seen.has(key)) continue;
-    if (key) seen.add(key);
-    unique.push(row);
-  }
-  return unique;
+function isLikelyTestRecord(...values: Array<unknown>): boolean {
+  const text = values
+    .filter(Boolean)
+    .map(String)
+    .join(' ')
+    .toLowerCase();
+  return /\b(sample|test|demo|example|placeholder)\b/.test(text);
 }
 
 function sumCentsFromRows<T extends Record<string, unknown>>(
@@ -127,44 +108,13 @@ function lastMonthEnd() {
 
 const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-const DASHBOARD_LOAD_TIMEOUT_MS = 25_000;
-
 export async function getAdminDashboardData(): Promise<AdminDashboardData> {
-  try {
-    return await withTimeout(
-      loadAdminDashboardData(),
-      DASHBOARD_LOAD_TIMEOUT_MS,
-      'loadAdminDashboardData',
-    );
-  } catch (err) {
-    logger.error('[getAdminDashboardData] fatal — returning degraded dashboard', err);
-    return getDegradedAdminDashboardData();
-  }
-}
-
-async function loadAdminDashboardData(): Promise<AdminDashboardData> {
-  let supabase;
-  try {
-    supabase = await createClient();
-  } catch (err) {
-    logger.error('[getAdminDashboardData] createClient failed', err);
-    return getDegradedAdminDashboardData();
-  }
-
-  const adminClient = await getAdminClient();
-  
-  // Validate service role client is available
-  // Admin dashboard requires elevated privileges - fail fast if not configured
-  if (!adminClient) {
-    logger.error('[getAdminDashboardData] Service role client not available', {
-      hint: 'Ensure SUPABASE_SERVICE_ROLE_KEY is configured'
-    });
-    return getDegradedAdminDashboardData();
-  }
-  
-  // Use service role client directly - no fallback to anon client
-  // Anon client lacks elevated privileges and causes silent query failures
-  const db = adminClient;
+  const supabase = await createClient();
+  const adminClient = await requireAdminClient();
+  // Fall back to the anon client if the service role key is absent.
+  // Queries that require elevated privileges will return empty results
+  // rather than crashing the entire dashboard.
+  const db = adminClient ?? supabase;
 
   const thisMonthStart  = monthStart();
   const lastMonthStartS = lastMonthStart();
@@ -173,36 +123,9 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
   // ── Auth first (fast — local JWT decode, no DB round-trip) ──────────────
   const authRes = await supabase.auth.getUser();
   const { data: { user }, error: authError } = authRes;
-  
-  // Differentiate between expected and unexpected auth errors
-  if (authError) {
-    // "Auth session missing!" is EXPECTED when user is not logged in
-    // This is not a warning - it's normal behavior for unauthenticated requests
-    const EXPECTED_AUTH_ERRORS = [
-      'Auth session missing!',
-      'No Auth session found',
-      'Session expired',
-    ];
-    const isExpectedAuthError = EXPECTED_AUTH_ERRORS.some(
-      expected => authError.message?.includes(expected)
-    );
-    
-    if (isExpectedAuthError) {
-      // Debug log only in dev - this is expected behavior
-      if (process.env.NODE_ENV === 'development') {
-        logger.debug('[dashboard] No authenticated user', { 
-          message: authError.message 
-        });
-      }
-      // else: silently continue with null user (expected for public dashboard)
-    } else {
-      // UNEXPECTED auth error - might indicate a real problem
-      logger.error('[dashboard] getUser failed (unexpected)', { 
-        message: authError.message,
-        code: authError.status,
-      });
-    }
-  }
+  // Log but never throw — page-level requireAdmin() already enforces auth.
+  // A transient getUser() failure should degrade gracefully, not crash the dashboard.
+  if (authError) logger.warn('[dashboard] getUser failed — continuing with null user', { message: authError.message });
 
   // ── All DB queries in a single Promise.all — one round-trip to Supabase ──
   const [
@@ -313,7 +236,7 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
       .limit(10),
 
     db.from('applications')
-      .select('id, first_name, last_name, full_name, email, program_interest, program_slug, status, created_at, submitted_at')
+      .select('id, first_name, last_name, full_name, program_interest, status, created_at')
       .order('created_at', { ascending: false })
       .limit(10),
 
@@ -389,11 +312,10 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
       .order('participant_id', { ascending: true })
       .limit(10),
 
-    // Active enrollments missing funding — profiles hydrated after Promise.all
-    // (program_enrollments.user_id has ambiguous/no embed FK to profiles in PostgREST)
+    // Active enrollments missing funding — join profiles for display name/email
     // Exclude apprenticeship programs (barber/cosmetology are self-pay by design)
     db.from('program_enrollments')
-      .select('id, user_id, program_id, program_slug, enrollment_state, funding_source')
+      .select('id, user_id, program_id, program_slug, enrollment_state, funding_source, profiles(full_name, email)')
       .in('enrollment_state', ['active', 'onboarding', 'enrolled'])
       .not('access_granted_at', 'is', null)
       .is('revoked_at', null)
@@ -520,45 +442,8 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
   const newAppsToday = (newAppsTodayRes as any)?.error ? 0 : ((newAppsTodayRes as any)?.count ?? 0);
 
   const now2 = Date.now();
-  // Hydrate learner names for missing-funding rows (no reliable profiles embed on enrollments)
-  const missingFundingRaw = missingFundingEnrollmentsRes.error
-    ? []
-    : (missingFundingEnrollmentsRes.data ?? []);
-  if (missingFundingEnrollmentsRes.error) {
-    logger.error(
-      '[dashboard] missing funding enrollments query failed',
-      missingFundingEnrollmentsRes.error,
-    );
-  }
-  const missingFundingUserIds = [
-    ...new Set(missingFundingRaw.map((row: { user_id?: string | null }) => row.user_id).filter(Boolean)),
-  ] as string[];
-  const missingFundingProfileMap: Record<string, { full_name: string | null; email: string | null }> =
-    {};
-  if (missingFundingUserIds.length > 0) {
-    const { data: missingFundingProfiles, error: missingFundingProfilesError } = await db
-      .from('profiles')
-      .select('id, full_name, email')
-      .in('id', missingFundingUserIds);
-    if (missingFundingProfilesError) {
-      logger.error('[dashboard] missing funding profile hydrate failed', missingFundingProfilesError);
-    }
-    for (const profile of missingFundingProfiles ?? []) {
-      if (profile.id) {
-        missingFundingProfileMap[profile.id] = {
-          full_name: profile.full_name ?? null,
-          email: profile.email ?? null,
-        };
-      }
-    }
-  }
-  const missingFundingEnrollments = missingFundingRaw.map((row: any) => ({
-    ...row,
-    profiles: row.user_id ? (missingFundingProfileMap[row.user_id] ?? null) : null,
-  }));
-
   const staleLeads = staleLeadsData
-    .filter((l: any) => !isLikelyTestOrDemoRecord(l.first_name, l.last_name, l.email))
+    .filter((l: any) => !isLikelyTestRecord(l.first_name, l.last_name, l.email))
     .map((l: any) => ({
       id: l.id,
       name: [l.first_name, l.last_name].filter(Boolean).join(' ') || l.email || null,
@@ -596,9 +481,7 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
   // ── Applications with aging ───────────────────────────────────────────────
   const now = Date.now();
   const pendingApps = (pendingAppsRes.data ?? [])
-    .filter((app: any) =>
-      !isLikelyTestOrDemoRecord(app.full_name, app.first_name, app.last_name, app.email),
-    )
+    .filter((app: any) => !isLikelyTestRecord(app.full_name, app.first_name, app.last_name, app.email))
     .map((app: any) => {
     const createdAt = app.submitted_at || app.created_at;
     const ageDays = Math.floor((now - new Date(createdAt).getTime()) / 86400000);
@@ -698,21 +581,8 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
   type RecentPayment = import('@/components/admin/dashboard/types').RecentPayment;
   const recentPayments: RecentPayment[] = [];
 
-  const pushRecentPayment = (payment: RecentPayment) => {
-    if (
-      isTestOrSuspiciousPayment({
-        email: payment.email,
-        label: payment.label,
-        amountCents: payment.amountCents,
-      })
-    ) {
-      return;
-    }
-    recentPayments.push(payment);
-  };
-
   for (const row of (recentStripeSessionsRes.error ? [] : (recentStripeSessionsRes.data ?? [])) as any[]) {
-    pushRecentPayment({
+    recentPayments.push({
       id: row.session_id,
       email: row.email ?? null,
       amountCents: toSafeNumber(row.amount),
@@ -722,7 +592,7 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
     });
   }
   for (const row of barberSubscriptionRows as any[]) {
-    pushRecentPayment({
+    recentPayments.push({
       id: row.id,
       email: row.customer_email ?? null,
       amountCents: dollarsToCents(row.amount_paid_at_checkout),
@@ -732,7 +602,7 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
     });
   }
   for (const row of cosmetologySubscriptionRows as any[]) {
-    pushRecentPayment({
+    recentPayments.push({
       id: row.id,
       email: row.customer_email ?? null,
       amountCents: dollarsToCents(row.amount_paid_at_checkout),
@@ -742,7 +612,7 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
     });
   }
   for (const row of barberPaymentRows as any[]) {
-    pushRecentPayment({
+    recentPayments.push({
       id: row.id,
       email: null,
       amountCents: dollarsToCents(row.amount_paid),
@@ -873,9 +743,7 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
   // RPC returns fully-enriched rows (profiles + program names joined server-side).
   // Falls back to empty array if the RPC is not yet applied in Supabase.
   const nowMs = Date.now();
-  const inactiveLearners = inactiveLearnersData
-    .filter((e: any) => !isLikelyTestOrDemoRecord(e.full_name, e.email))
-    .map((e: any) => {
+  const inactiveLearners = inactiveLearnersData.map((e: any) => {
     const lastActivityMs = e.last_activity ? new Date(e.last_activity).getTime()
       : e.enrolled_at ? new Date(e.enrolled_at).getTime() : nowMs;
     const daysInactive = Math.floor((nowMs - lastActivityMs) / 86_400_000);
@@ -1055,9 +923,7 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
       }
     }
   }
-  const recentStudents = recentStudentsData
-    .filter((s: any) => !isLikelyTestOrDemoRecord(s.full_name, s.email))
-    .map((s: any) => ({
+  const recentStudents = recentStudentsData.map((s: any) => ({
     id: s.id,
     full_name: s.full_name ?? null,
     email: s.email ?? null,
@@ -1129,35 +995,22 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
     timestamp: e.created_at,
   }));
 
-  const appActivityItems = (recentAppsActivityRes.data ?? [])
-    .filter((a: any) => !isLikelyTestOrDemoRecord(a.full_name, a.first_name, a.last_name, a.email))
-    .map((a: any) => {
-      const name = a.full_name || [a.first_name, a.last_name].filter(Boolean).join(' ') || 'Someone';
-      return {
-        id: `app-${a.id}`,
-        title: `${name} applied — ${a.program_interest ?? 'unknown program'}`,
-        timestamp: a.created_at,
-      };
-    });
+  const appActivityItems = (recentAppsActivityRes.data ?? []).map((a: any) => {
+    const name = a.full_name || [a.first_name, a.last_name].filter(Boolean).join(' ') || 'Someone';
+    return {
+      id: `app-${a.id}`,
+      title: `${name} applied — ${a.program_interest ?? 'unknown program'}`,
+      timestamp: a.created_at,
+    };
+  });
 
-  const recentActivityItems = uniqueBy(
-    [...enrollActivityItems, ...appActivityItems]
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()),
-    (item) => `${normalizeDedupePart(item.title)}|${timestampBucket(item.timestamp)}`,
-  ).slice(0, 15);
+  const recentActivityItems = [...enrollActivityItems, ...appActivityItems]
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, 15);
 
-  const recentApplications = uniqueBy(
-    (recentAppsActivityRes.data ?? []).filter((app: any) =>
-      !isLikelyTestOrDemoRecord(app.full_name, app.first_name, app.last_name, app.email),
-    ),
-    (app: any) => [
-      normalizeDedupePart(app.email),
-      normalizeDedupePart(app.full_name || [app.first_name, app.last_name].filter(Boolean).join(' ')),
-      normalizeDedupePart(app.program_slug ?? app.program_interest),
-      normalizeDedupePart(app.status),
-      timestampBucket(app.submitted_at || app.created_at),
-    ].join('|'),
-  ).map((app: any) => {
+  const recentApplications = (recentAppsActivityRes.data ?? [])
+    .filter((app: any) => !isLikelyTestRecord(app.full_name, app.first_name, app.last_name))
+    .map((app: any) => {
       const createdAt = app.created_at;
       const ageDays = Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000);
       const slug = app.program_slug ?? app.program_interest ?? null;
@@ -1185,7 +1038,7 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
     },
     {
       label: 'Admin',
-      url: process.env.NEXT_PUBLIC_ADMIN_URL || '',
+      url: process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org',
     },
     {
       label: 'LMS',
@@ -1195,7 +1048,7 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
 
   return {
     counts: {
-      pendingApplications: totalPendingCount,
+      pendingApplications: pendingApps,
       activeEnrollments:     activeEnrollCount,
       revenueThisMonthCents: revenueThisMonthCents,
       certificatesIssued:    certsCount,
@@ -1214,7 +1067,6 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
     recentActivity: recentActivityItems,
     recentStudents,
     recentApplications,
-    pendingApplications: pendingApps,
     blockedPrograms,
     inactiveLearners,
     pendingSubmissions,
@@ -1223,12 +1075,11 @@ async function loadAdminDashboardData(): Promise<AdminDashboardData> {
     pendingWioaDocs,
     stalledApplications: stalledApplicationsRes.data ?? [],
     noOutcomeEnrollments: noOutcomeEnrollmentsRes.data ?? [],
-    missingFundingEnrollments,
+    missingFundingEnrollments: missingFundingEnrollmentsRes.data ?? [],
     profile: adminProfile,
     generatedAt: new Date().toISOString(),
     sitePreviewTargets,
     degradedSections,
     systemHealth,
-    isSuperAdmin: adminProfile?.role === 'admin',
   };
 }

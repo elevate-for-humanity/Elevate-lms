@@ -1,35 +1,54 @@
-export function extractJSON(text: string): unknown {
-  // Try direct parse first
-  try {
-    return JSON.parse(text);
-  } catch {
-    // Try to extract JSON from text that might have surrounding content
-    // Look for markdown code blocks first
-    const codeBlockMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
-    if (codeBlockMatch) {
-      try {
-        return JSON.parse(codeBlockMatch[1]);
-      } catch {
-        throw new Error('Incomplete JSON structure');
+/**
+ * lib/extract-json.ts
+ *
+ * Robust JSON extraction from AI model output.
+ *
+ * LLMs frequently wrap JSON in markdown fences, prose preambles, and trailing
+ * commentary even when explicitly told not to. Regex stripping is fragile.
+ * This uses bracket-matching to find the outermost JSON structure, making it
+ * immune to whatever decoration the model adds around the payload.
+ */
+
+/**
+ * Extract and parse the first complete JSON object or array from a string.
+ * Works on raw LLM output — handles markdown fences, prose, trailing text.
+ *
+ * @throws if no valid JSON structure is found
+ */
+export function extractJSON<T = unknown>(text: string): T {
+  const objStart = text.indexOf('{');
+  const arrStart = text.indexOf('[');
+
+  let jsonStart: number;
+  if (objStart === -1 && arrStart === -1) throw new Error('No JSON structure found in response');
+  else if (objStart === -1) jsonStart = arrStart;
+  else if (arrStart === -1) jsonStart = objStart;
+  else jsonStart = Math.min(objStart, arrStart);
+
+  const openChar = text[jsonStart];
+  const closeChar = openChar === '{' ? '}' : ']';
+
+  const stack: string[] = [];
+  let inString = false;
+  let escape = false;
+
+  for (let i = jsonStart; i < text.length; i++) {
+    const ch = text[i];
+
+    if (escape) { escape = false; continue; }
+    if (ch === '\\' && inString) { escape = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+
+    if (!inString) {
+      if (ch === '{' || ch === '[') stack.push(ch);
+      else if (ch === '}' || ch === ']') {
+        stack.pop();
+        if (stack.length === 0) {
+          return JSON.parse(text.slice(jsonStart, i + 1)) as T;
+        }
       }
     }
-    
-    // Look for JSON object or array in text - need balanced braces
-    // Check for complete JSON structure
-    const completeMatch = text.match(/\{[^{}]*\}/) || text.match(/\[[^\]]*\]/);
-    if (completeMatch) {
-      try {
-        return JSON.parse(completeMatch[0]);
-      } catch {
-        throw new Error('Incomplete JSON structure');
-      }
-    }
-    
-    // Check if there are any braces suggesting incomplete JSON
-    if (text.includes('{') || text.includes('[')) {
-      throw new Error('Incomplete JSON structure');
-    }
-    
-    throw new Error('No JSON structure found');
   }
+
+  throw new Error('Incomplete JSON structure in response');
 }

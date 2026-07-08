@@ -68,7 +68,7 @@ export async function createEnrollmentFromPayment(
 
     let finalStudentId = initialStudentId;
     let isNewUser = false;
-    let _tempPassword: string | null = null;
+    let tempPassword = '';
 
     // If no studentId, find or create user account
     if (!finalStudentId && email) {
@@ -82,12 +82,12 @@ export async function createEnrollmentFromPayment(
         logger.info('[Enrollment] Found existing user', { email, userId: finalStudentId });
       } else {
         // Generate temporary password
-        _tempPassword = `EFH-${randomBytes(8).toString('hex')}-Temp!`;
+        tempPassword = `EFH-${randomBytes(8).toString('hex')}-Temp!`;
 
         // Create new user account
         const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
           email: email.toLowerCase(),
-          password: _tempPassword ?? '',
+          password: tempPassword,
           email_confirm: true,
           user_metadata: {
             first_name: firstName || '',

@@ -1,7 +1,7 @@
 /**
  * Staged ingestion helpers for large documents.
  *
- * Keep requests under 60s for reliability on long-running containers.
+ * ECS: no hard timeout, but keep requests under 60s for reliability.
  * Safe budget breakdown:
  *   - File parse:        ~2s
  *   - Chunk summarize:   ~3s per chunk × max 4 chunks = ~12s
@@ -56,12 +56,11 @@ export function chunkText(text: string, maxChars = CHUNK_SIZE): string[] {
   const chunks: string[] = [];
   let current = '';
   for (const para of paragraphs) {
-    const proposed = current ? current + '\n\n' + para : para;
-    if (current.length > 0 && proposed.length > maxChars) {
+    if (current.length + para.length + 2 > maxChars && current.length > 0) {
       chunks.push(current.trim());
       current = para;
     } else {
-      current = proposed;
+      current += (current ? '\n\n' : '') + para;
     }
   }
   if (current.trim()) chunks.push(current.trim());

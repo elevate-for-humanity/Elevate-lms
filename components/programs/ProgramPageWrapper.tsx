@@ -69,7 +69,7 @@ export const PROGRAM_CATEGORIES: Record<string, { name: string; href: string }> 
   'software-development': { name: 'Technology', href: '/programs/technology' },
 
   // Business
-  'business-administration': { name: 'Business & Financial', href: '/programs/business-administration' },
+  'tax-preparation': { name: 'Business & Financial', href: '/programs/business-administration' },
   'tax-entrepreneurship': { name: 'Business & Financial', href: '/programs/business-administration' },
   bookkeeping: { name: 'Business & Financial', href: '/programs/business-administration' },
 };

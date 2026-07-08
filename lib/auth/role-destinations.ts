@@ -19,30 +19,22 @@
 
 export type UserRole =
   | 'student'
+  | 'instructor'
   | 'admin'
-  | 'advisor'
-  | 'staff'
-  | 'employer'
-  | 'workforce_board'
-  | 'partner'
-  | 'sponsor'
-  | 'mentor'
+  | 'super_admin'
   | 'org_admin'
+  | 'staff'
   | 'program_holder'
   | 'delegate'
+  | 'partner'
+  | 'sponsor'
+  | 'employer'
+  | 'mentor'
   | 'creator'
-  | 'instructor'
+  | 'workforce_board'
   | 'case_manager'
   | 'provider_admin'
-  | 'super_admin'
   | 'grant_client'
-  | 'partner_admin'
-  | 'host_shop'
-  | 'government'
-  | 'testing_center'
-  | 'financial_aid'
-  | 'compliance'
-  | 'dev_studio';
 
 /**
  * Maps every role to its canonical post-auth landing page.
@@ -55,14 +47,15 @@ export type UserRole =
 export const ROLE_DESTINATIONS: Record<string, string> = {
   // ── Platform admins ───────────────────────────────────────────────
   // Admin roles always land on the admin app, never the LMS
-  admin: '/admin/dashboard',
-  org_admin: '/admin/dashboard',
+  super_admin: 'https://admin.elevateforhumanity.org/admin/dashboard',
+  admin: 'https://admin.elevateforhumanity.org/admin/dashboard',
+  org_admin: 'https://admin.elevateforhumanity.org/admin/dashboard',
 
   // ── Internal Elevate staff ────────────────────────────────────────
-  staff: '/admin/staff-portal/dashboard',
+  staff: 'https://admin.elevateforhumanity.org/admin/staff-portal/dashboard',
 
   // ── Education staff ───────────────────────────────────────────────
-  instructor: '/admin/instructor/dashboard',
+  instructor: 'https://admin.elevateforhumanity.org/admin/instructor/dashboard',
   mentor: '/mentor/dashboard',
   creator: '/creator/products',
 
@@ -77,9 +70,7 @@ export const ROLE_DESTINATIONS: Record<string, string> = {
 
   // ── Employer & industry partners ─────────────────────────────────
   employer: '/employer/dashboard',
-  host_shop: '/admin/host-shop/dashboard', // Host shop portal - track apprentices, OJT, WOTC
   partner: '/partner/dashboard', // smart-routes to /partner/attendance
-  partner_admin: '/partner/dashboard',
 
   // ── Learners ──────────────────────────────────────────────────────
   student: '/learner/dashboard',

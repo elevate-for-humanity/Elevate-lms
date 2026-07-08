@@ -91,14 +91,14 @@ const CFG = {
     ],
   },
   fssa: {
-    name: '',
+    name: 'FSSA IMPACT',
     agencyShort: 'FSSA / DFR',
     iccRequired: false,
     iccUrl: '',
     appointmentUrl: '',
     phone: '1-800-403-0864',
     timeEstimate: '1–3 weeks',
-    note: ' is for current SNAP or TANF recipients. You must be referred by your FSSA case worker — you cannot self-apply.',
+    note: 'FSSA IMPACT is for current SNAP or TANF recipients. You must be referred by your FSSA case worker — you cannot self-apply.',
     steps: [
       'Contact your FSSA/DFR case worker and request an IMPACT training referral',
       'Your case worker assesses your eligibility for training support',
@@ -249,10 +249,10 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-slate-400" />
                 <a
-                  href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
+                  href="tel:${PLATFORM_DEFAULTS.supportPhone}"
                   className="text-brand-blue-600 font-semibold hover:underline"
                 >
-                  {PLATFORM_DEFAULTS.supportPhone}
+                  ${PLATFORM_DEFAULTS.supportPhone}
                 </a>
               </div>
             </div>
@@ -525,10 +525,10 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
               <p className="text-xs text-slate-500">
                 Select "Self-pay" above to see all payment options, or call us at{' '}
                 <a
-                  href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
+                  href="tel:${PLATFORM_DEFAULTS.supportPhone}"
                   className="text-brand-blue-600 font-semibold hover:underline"
                 >
-                  {PLATFORM_DEFAULTS.supportPhone}
+                  ${PLATFORM_DEFAULTS.supportPhone}
                 </a>
                 .
               </p>

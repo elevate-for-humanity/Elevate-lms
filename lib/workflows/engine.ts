@@ -189,12 +189,10 @@ async function execAiAction(config: Record<string, unknown>, ctx: RunContext) {
   const resolvedPrompt = String(interpolate(prompt, ctx.triggerPayload));
   logger.info('[workflow/ai_action] calling aiChat', { run_id: ctx.runId, prompt_length: resolvedPrompt.length });
   try {
-    const response = await aiChat({
-      messages: [
-        { role: 'system', content: 'You are an operational AI assistant for Elevate for Humanity. Respond concisely and factually.' },
-        { role: 'user', content: resolvedPrompt },
-      ],
-    });
+    const response = await aiChat([
+      { role: 'system', content: 'You are an operational AI assistant for Elevate for Humanity. Respond concisely and factually.' },
+      { role: 'user', content: resolvedPrompt },
+    ]);
     const persistTable = config.persist_table as string | undefined;
     const persistMatch = config.persist_match as Record<string, unknown> | string | undefined;
     const persistField = config.persist_field as string | undefined;
@@ -224,7 +222,7 @@ async function execStep(step: WorkflowStep, ctx: RunContext): Promise<{ ok: bool
     case 'ai_action':         return execAiAction(step.action_config, ctx);
     default:
       logger.warn('[workflow/engine] unknown action_type', { action_type: step.action_type, run_id: ctx.runId });
-      return { ok: false, output: { error: `Unsupported workflow action_type '${step.action_type}'` } };
+      return { ok: true, output: { note: `action_type '${step.action_type}' not implemented` } };
   }
 }
 
@@ -245,19 +243,17 @@ async function execStepWithRetry(
     if (lastResult.ok) return { ...lastResult, attempts };
   }
   // Dead-letter
-  await Promise.resolve(
-    db.from('workflow_dead_letters').insert({
-      workflow_id: ctx.workflowId,
-      run_id: ctx.runId,
-      step_id: step.id,
-      action_type: step.action_type,
-      action_config: step.action_config,
-      trigger_payload: ctx.triggerPayload,
-      error: (lastResult.output.error as string) ?? 'Step failed after max retries',
-      attempts,
-      created_at: new Date().toISOString(),
-    })
-  ).catch((err: unknown) => logger.warn('[workflow/engine] dead-letter write failed (non-fatal)', { run_id: ctx.runId, error: String(err) }));
+  await db.from('workflow_dead_letters').insert({
+    workflow_id: ctx.workflowId,
+    run_id: ctx.runId,
+    step_id: step.id,
+    action_type: step.action_type,
+    action_config: step.action_config,
+    trigger_payload: ctx.triggerPayload,
+    error: (lastResult.output.error as string) ?? 'Step failed after max retries',
+    attempts,
+    created_at: new Date().toISOString(),
+  }).catch((err: unknown) => logger.error('[workflow/engine] dead-letter write failed', { run_id: ctx.runId, error: String(err) }));
   logger.error('[workflow/engine] step exhausted retries → dead-letter', {
     run_id: ctx.runId, step_id: step.id, action_type: step.action_type, attempts,
   });
@@ -356,17 +352,13 @@ export async function executeWorkflow(
       duration_ms: stepDuration, attempts, error: stepError,
     });
 
-    await Promise.resolve(
-      db.from('workflow_step_logs').insert({
-        run_id: runId, step_id: step.id, step_order: step.step_order,
-        action_type: step.action_type, status: stepStatus, output,
-        error_message: stepError ?? null, duration_ms: stepDuration, attempts,
-      })
-    ).catch((e: unknown) => logger.warn('[workflow/engine] step log write failed', { run_id: runId, error: String(e) }));
+    await db.from('workflow_step_logs').insert({
+      run_id: runId, step_id: step.id, step_order: step.step_order,
+      action_type: step.action_type, status: stepStatus, output,
+      error_message: stepError ?? null, duration_ms: stepDuration, attempts,
+    }).catch((e: unknown) => logger.warn('[workflow/engine] step log write failed', { run_id: runId, error: String(e) }));
 
-    await Promise.resolve(
-      db.from('workflow_runs').update({ steps_done: stepsDone }).eq('id', runId)
-    ).catch((e: unknown) => logger.warn('[workflow/engine] progress update failed', { run_id: runId, error: String(e) }));
+    await db.from('workflow_runs').update({ steps_done: stepsDone }).eq('id', runId).catch(() => {});
 
     if (finalStatus === 'failed') break;
   }

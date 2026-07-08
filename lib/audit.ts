@@ -41,43 +41,30 @@ async function onAuditFailure(context: string, error: unknown, event: Record<str
     const fallbackClient = await getAdminClient();
     if (!fallbackClient) return;
     // Fire-and-forget: don't await, don't let this throw
-    try {
-      await fallbackClient
-        .from('audit_failures')
-        .insert({
-          context,
-          error_message: errorMessage,
-          original_event: event,
-        });
-    } catch { /* silently ignore audit failures */ }
+    fallbackClient
+      .from('audit_failures')
+      .insert({
+        context,
+        error_message: errorMessage,
+        original_event: event,
+      })
+      .then(() => {})
+      .catch(() => {});
   } catch {
     // If even creating the client fails, fall through to file
   }
 
   // Channel 4: Local file — last resort if DB is completely unreachable.
-  // NOTE: /tmp is ephemeral (wiped on container restart).
+  // NOTE: On ECS, /tmp is ephemeral (wiped on container restart).
   // This channel is only durable in long-lived runtimes (dev, Docker, VMs).
   // On serverless, stderr (channel 1) is the real last resort.
   if (typeof globalThis.process !== 'undefined') {
     try {
-      const { appendFileSync, statSync, unlinkSync } = require('node:fs') as typeof import('node:fs');
-      const fallbackPath = '/tmp/audit-fallback.jsonl';
-      const maxBytes = Number(process.env.AUDIT_FALLBACK_MAX_BYTES || 2 * 1024 * 1024);
-      try {
-        const size = statSync(fallbackPath).size;
-        if (size > maxBytes) {
-          unlinkSync(fallbackPath);
-        }
-      } catch {
-        /* file may not exist */
-      }
-      const failureRecord = {
-        context,
-        error: errorMessage,
-        timestamp: new Date().toISOString(),
-      };
+      // Dynamic require: fs is unavailable in edge runtime, so this is
+      // guarded by the process check and wrapped in try/catch.
+      const { appendFileSync } = require('node:fs');
       const line = JSON.stringify({ ...failureRecord, event }) + '\n';
-      appendFileSync(fallbackPath, line);
+      appendFileSync('/tmp/audit-fallback.jsonl', line);
     } catch {
       // stderr already has it — edge runtime or fs unavailable
     }
@@ -91,7 +78,6 @@ function onAuditSuccess() {
 export type AuditEvent = {
   tenantId?: string | null;
   userId?: string | null;
-  actor_id?: string | null; // Alias for userId - used in database schema
   action: string;
   resourceType?: string | null;
   resourceId?: string | null;
@@ -163,8 +149,7 @@ function sanitizeMetadata(metadata: Record<string, any>): Record<string, any> {
 export async function logAuditEvent(event: AuditEvent): Promise<void> {
   const payload = {
     tenant_id: event.tenantId,
-    user_id: event.userId || event.actor_id,
-    actor_id: event.actor_id || event.userId,
+    user_id: event.userId,
     action: event.action,
     resource_type: event.resourceType,
     resource_id: event.resourceId,

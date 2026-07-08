@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import type { ProgramKey } from '@/lib/programs/host-shops';
 
 type ShopOption = {
@@ -90,9 +89,9 @@ export default function HostShopSelect({ program, value, onChange }: Props) {
       {shops.length === 0 && !loading && (
         <p className="mt-1 text-xs text-slate-500">
           No approved shops on file yet.{' '}
-          <Link href="/programs/barber-apprenticeship/host-shops" className="underline">
+          <a href="/programs/barber-apprenticeship/host-shops" className="underline">
             Learn about becoming a training site.
-          </Link>
+          </a>
         </p>
       )}
     </div>

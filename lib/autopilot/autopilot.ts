@@ -5,22 +5,19 @@
  * Can be called from anywhere in the application
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AutopilotWorker = any;
+import type { Request, Response } from 'express';
 
 // This will be imported dynamically to avoid build issues
-let autopilotWorker: AutopilotWorker | null = null;
+let autopilotWorker: any = null;
 
-async function getAutopilotWorker(): Promise<AutopilotWorker | null> {
+async function getAutopilotWorker() {
   if (!autopilotWorker) {
     try {
       // Try to load the autopilot worker if it exists
       // This is optional and may not be present in all deployments
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const workerModule = require('../../workers/self-healing-autopilot.js');
+      const workerModule = await import('../../workers/self-healing-autopilot.js');
       autopilotWorker = workerModule.default || workerModule;
-    } catch {
-      // Module not available - return null
+    } catch (error) {
       return null;
     }
   }
@@ -31,28 +28,28 @@ async function getAutopilotWorker(): Promise<AutopilotWorker | null> {
  * GET /api/autopilot/status
  * Get autopilot status
  */
-export async function getStatus(_req: unknown, res: { status: (code: number) => { json: (obj: unknown) => unknown }; json: (obj: unknown) => unknown }): Promise<void> {
+export async function getStatus(req: Request, res: Response) {
   try {
     const worker = await getAutopilotWorker();
 
     if (!worker) {
-      res.status(503).json({
+      return res.status(503).json({
         error: 'Autopilot worker not available',
       });
-      return;
     }
 
     res.json({
       status: 'ok',
       running: worker.isRunning,
       config: {
-        hasNorthflankAccess: !!worker.config?.NORTHFLANK_API_TOKEN,
-        hasSupabaseUrl: !!worker.config?.VITE_SUPABASE_URL,
-        hasStripeKey: !!worker.config?.VITE_STRIPE_PUBLISHABLE_KEY,
-        siteUrl: worker.config?.VITE_SITE_URL || 'not set',
+        hasAwsAccess: !!worker.config.AWS_ACCESS_KEY_ID,
+        hasSupabaseUrl: !!worker.config.VITE_SUPABASE_URL,
+        hasStripeKey: !!worker.config.VITE_STRIPE_PUBLISHABLE_KEY,
+        siteUrl: worker.config.VITE_SITE_URL || 'not set',
       },
     });
-  } catch {
+  } catch (error) {
+    /* Error handled silently */
     res.status(500).json({
       error: 'Failed to get autopilot status',
       message: 'Operation failed',
@@ -64,15 +61,14 @@ export async function getStatus(_req: unknown, res: { status: (code: number) => 
  * POST /api/autopilot/health-check
  * Trigger manual health check
  */
-export async function triggerHealthCheck(_req: unknown, res: { status: (code: number) => { json: (obj: unknown) => unknown }; json: (obj: unknown) => unknown }): Promise<void> {
+export async function triggerHealthCheck(req: Request, res: Response) {
   try {
     const worker = await getAutopilotWorker();
 
     if (!worker) {
-      res.status(503).json({
+      return res.status(503).json({
         error: 'Autopilot worker not available',
       });
-      return;
     }
 
     const health = await worker.checkHealth();
@@ -81,7 +77,8 @@ export async function triggerHealthCheck(_req: unknown, res: { status: (code: nu
       status: 'ok',
       health,
     });
-  } catch {
+  } catch (error) {
+    /* Error handled silently */
     res.status(500).json({
       error: 'Health check failed',
       message: 'Operation failed',
@@ -93,15 +90,14 @@ export async function triggerHealthCheck(_req: unknown, res: { status: (code: nu
  * POST /api/autopilot/self-heal
  * Trigger manual self-heal
  */
-export async function triggerSelfHeal(_req: unknown, res: { status: (code: number) => { json: (obj: unknown) => unknown }; json: (obj: unknown) => unknown }): Promise<void> {
+export async function triggerSelfHeal(req: Request, res: Response) {
   try {
     const worker = await getAutopilotWorker();
 
     if (!worker) {
-      res.status(503).json({
+      return res.status(503).json({
         error: 'Autopilot worker not available',
       });
-      return;
     }
 
     const success = await worker.selfHeal();
@@ -111,7 +107,8 @@ export async function triggerSelfHeal(_req: unknown, res: { status: (code: numbe
       healed: success,
       message: success ? 'Self-heal successful' : 'Self-heal failed',
     });
-  } catch {
+  } catch (error) {
+    /* Error handled silently */
     res.status(500).json({
       error: 'Self-heal failed',
       message: 'Operation failed',
@@ -123,15 +120,14 @@ export async function triggerSelfHeal(_req: unknown, res: { status: (code: numbe
  * POST /api/autopilot/sync-secrets
  * Sync secrets to GitHub and deployment platform
  */
-export async function syncSecrets(_req: unknown, res: { status: (code: number) => { json: (obj: unknown) => unknown }; json: (obj: unknown) => unknown }): Promise<void> {
+export async function syncSecrets(req: Request, res: Response) {
   try {
     const worker = await getAutopilotWorker();
 
     if (!worker) {
-      res.status(503).json({
+      return res.status(503).json({
         error: 'Autopilot worker not available',
       });
-      return;
     }
 
     const results = {
@@ -143,7 +139,8 @@ export async function syncSecrets(_req: unknown, res: { status: (code: number) =
       synced: results,
       message: 'Secrets synced successfully',
     });
-  } catch {
+  } catch (error) {
+    /* Error handled silently */
     res.status(500).json({
       error: 'Secret sync failed',
       message: 'Operation failed',
@@ -155,23 +152,21 @@ export async function syncSecrets(_req: unknown, res: { status: (code: number) =
  * POST /api/autopilot/start
  * Start the autopilot worker
  */
-export async function startWorker(_req: unknown, res: { status: (code: number) => { json: (obj: unknown) => unknown }; json: (obj: unknown) => unknown }): Promise<void> {
+export async function startWorker(req: Request, res: Response) {
   try {
     const worker = await getAutopilotWorker();
 
     if (!worker) {
-      res.status(503).json({
+      return res.status(503).json({
         error: 'Autopilot worker not available',
       });
-      return;
     }
 
     if (worker.isRunning) {
-      res.json({
+      return res.json({
         status: 'ok',
         message: 'Autopilot already running',
       });
-      return;
     }
 
     await worker.start();
@@ -180,7 +175,8 @@ export async function startWorker(_req: unknown, res: { status: (code: number) =
       status: 'ok',
       message: 'Autopilot started successfully',
     });
-  } catch {
+  } catch (error) {
+    /* Error handled silently */
     res.status(500).json({
       error: 'Failed to start autopilot',
       message: 'Operation failed',
@@ -192,15 +188,14 @@ export async function startWorker(_req: unknown, res: { status: (code: number) =
  * POST /api/autopilot/stop
  * Stop the autopilot worker
  */
-export async function stopWorker(_req: unknown, res: { status: (code: number) => { json: (obj: unknown) => unknown }; json: (obj: unknown) => unknown }): Promise<void> {
+export async function stopWorker(req: Request, res: Response) {
   try {
     const worker = await getAutopilotWorker();
 
     if (!worker) {
-      res.status(503).json({
+      return res.status(503).json({
         error: 'Autopilot worker not available',
       });
-      return;
     }
 
     worker.stop();
@@ -209,7 +204,8 @@ export async function stopWorker(_req: unknown, res: { status: (code: number) =>
       status: 'ok',
       message: 'Autopilot stopped successfully',
     });
-  } catch {
+  } catch (error) {
+    /* Error handled silently */
     res.status(500).json({
       error: 'Failed to stop autopilot',
       message: 'Operation failed',

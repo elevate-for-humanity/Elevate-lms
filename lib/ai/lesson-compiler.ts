@@ -22,7 +22,6 @@ import {
   LESSON_COMPILER_SYSTEM,
   buildLessonCompilerPrompt,
 } from '@/lib/ai/prompts/lesson-compiler';
-import { logger } from '@/lib/logger';
 
 // ── Zod schemas ───────────────────────────────────────────────────────────────
 
@@ -155,20 +154,13 @@ export function renderLessonContent(compiled: CompiledLesson): string {
 // ── Core compiler ─────────────────────────────────────────────────────────────
 
 function parseJSON(raw: string): unknown {
-  const cleaned = raw
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/\s*```$/i, '')
-    .trim();
-  try {
-    return JSON.parse(cleaned);
-  } catch (error) {
-    logger.error('[lesson-compiler] JSON parse error', {
-      raw: cleaned.slice(0, 200) + (cleaned.length > 200 ? '...' : ''),
-      error: error instanceof Error ? error.message : String(error)
-    });
-    throw new Error(`Failed to parse AI response as JSON: ${error instanceof Error ? error.message : 'Unknown error'}`), { cause: error };
-  }
+  return JSON.parse(
+    raw
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim(),
+  );
 }
 
 export async function compileLesson(args: CompileLessonArgs): Promise<CompiledLesson> {

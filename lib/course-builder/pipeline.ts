@@ -31,7 +31,7 @@ import { logger } from '@/lib/logger';
  * Format: up to 4 uppercase alpha chars + 3-digit numeric suffix.
  * Examples:
  *   "hvac-epa-608-v1"        → "HVAC608"
- *   
+ *   "tax-prep-enrolled-agent" → "TAXP001"
  *   "cosmetology-fundamentals" → "COSM001"
  *
  * The numeric suffix is derived from the slug so the same slug always

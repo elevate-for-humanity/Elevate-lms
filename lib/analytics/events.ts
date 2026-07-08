@@ -3,6 +3,10 @@
  *
  * CORE FUNNEL EVENTS (Required for institutional analytics):
  * - page_view: Baseline traffic
+ * - start_tax_prep: Tax funnel entry
+ * - complete_tax_prep: Tax funnel completion
+ * - refund_advance_viewed: Advance visibility
+ * - refund_advance_opt_in: Risk monitoring
  * - store_product_view: Store intent
  * - checkout_started: Revenue funnel
  * - purchase_completed: Conversion
@@ -12,6 +16,7 @@
  * DATA HYGIENE:
  * - IP anonymization ON (configured in gtag)
  * - No PII in event names or params
+ * - No raw tax data tracked
  * - Respect cookie consent
  *
  * CONTENT GROUPINGS:
@@ -29,13 +34,13 @@ type EventCategory =
   | 'video'
   | 'download'
   | 'error'
-  
+  | 'tax_funnel'
   | 'demo_trial_funnel'
   | 'store'
   | 'lms'
   | 'enrollment';
 
-type ContentGroup = 'marketing' | 'resources' | 'lms_public' | 'store' ;
+type ContentGroup = 'marketing' | 'resources' | 'lms_public' | 'store' | 'tax';
 
 interface TrackEventParams {
   action: string;
@@ -82,7 +87,47 @@ export function setContentGroup(group: ContentGroup) {
 
 // ============================================
 // TAX PREPARATION FUNNEL (REQUIRED)
-// Tax funnel events removed - program archived
+// ============================================
+
+export const TaxFunnelEvents = {
+  // Tax funnel entry
+  startTaxPrep: (source?: string) => {
+    trackEvent({
+      action: 'start_tax_prep',
+      category: 'tax_funnel',
+      label: source || 'direct',
+      contentGroup: 'tax',
+    });
+  },
+
+  // Tax funnel completion
+  completeTaxPrep: (filingType?: string) => {
+    trackEvent({
+      action: 'complete_tax_prep',
+      category: 'tax_funnel',
+      label: filingType || 'standard',
+      contentGroup: 'tax',
+    });
+  },
+
+  // Refund advance viewed
+  refundAdvanceViewed: () => {
+    trackEvent({
+      action: 'refund_advance_viewed',
+      category: 'tax_funnel',
+      contentGroup: 'tax',
+    });
+  },
+
+  // Refund advance opt-in (risk monitoring)
+  refundAdvanceOptIn: () => {
+    trackEvent({
+      action: 'refund_advance_opt_in',
+      category: 'tax_funnel',
+      contentGroup: 'tax',
+    });
+  },
+};
 
 // ============================================
 // STORE / CHECKOUT FUNNEL (REQUIRED)

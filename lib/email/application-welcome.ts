@@ -151,6 +151,16 @@ const PROGRAMS: Record<string, ProgramInfo> = {
     funding: ['wioa', 'wrg'],
     etplApproved: true,
   },
+  'tax-prep': {
+    name: 'Tax Preparation Program',
+    description:
+      'Prepare individual and business tax returns using professional software. Work for a firm or start your own business.',
+    credentials: 'IRS PTIN, VITA Certification, QuickBooks Pro Advisor',
+    careerOutlook: 'Firms: $15-$25/hour. Self-employed: $50-$200+ per return.',
+    duration: '10 Weeks (150 Hours)',
+    funding: ['wioa', 'wrg'],
+    etplApproved: true,
+  },
   'peer-recovery-specialist-jri': {
     name: 'Certified Peer Recovery Coach',
     description:
@@ -428,7 +438,7 @@ ${buildNextStepsHtml(p)}
 function buildText(firstName: string, p: ProgramInfo): string {
   const selfPay = isSelfPayOnly(p);
 
-  let fundingText: string;
+  let fundingText = '';
   if (selfPay) {
     fundingText = `PROGRAM COST
 The ${p.name} program is self-pay or employer-sponsored. Contact us at ${PLATFORM_DEFAULTS.supportPhone} to discuss payment options.`;
@@ -445,7 +455,7 @@ The ${p.name} program is self-pay or employer-sponsored. Contact us at ${PLATFOR
     }
   }
 
-  let stepsText: string;
+  let stepsText = '';
   if (selfPay) {
     stepsText = `NEXT STEPS
 1. Call us at ${PLATFORM_DEFAULTS.supportPhone} to discuss enrollment, schedule, and payment options.

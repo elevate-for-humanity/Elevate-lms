@@ -22,13 +22,8 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   cohortSize: '10–15 participants per cohort',
   fundingStatement: '$0 with WIOA or Next Level Jobs funding. Self-pay: $5,000. BNPL financing available through Affirm and Sezzle.',
   selfPayCost: '$5,000',
-  salePrice: '$5,000',
   badge: 'Funding Available',
   badgeColor: 'green',
-  deliveryModel: 'hybrid',
-  deliveryModelDetail: 'hybrid',
-  fundingOptions: ['wioa', 'wrg', 'wioa', 'self_pay'],
-  enrollmentType: 'internal',
   credentials: [
     {
       name: 'Certified Clinical Medical Assistant (CCMA)',
@@ -342,7 +337,12 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   ],
   paymentTerms:
     'WIOA, Next Level Jobs, and WRG funding accepted. Payment plans available for self-pay students.',
+  // ─── Content model ──────────────────────────────────────────────
+  deliveryModel: 'hybrid',
+  deliveryModelDetail: 'hybrid',
   partnerProvider: 'careersafe',
+  fundingOptions: ['wioa', 'impact', 'self_pay'],
+  enrollmentType: 'internal',
   partnerCourses: [
     {
       courseId: 'careersafe-patient-safety',
@@ -416,10 +416,10 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: true,
+    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. FSSA Gov Portal and WIOA Title I funding available for eligible Indiana residents.',
+    fundingNotes: 'Indiana ETPL-listed. FSSA IMPACT and WIOA Title I funding available for eligible Indiana residents.',
   },
 };

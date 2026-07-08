@@ -1,8 +1,5 @@
 import OpenAI from 'openai';
 
-// Re-export OpenAI type for consumers that need to type their client
-export type { OpenAI };
-
 // Canonical placeholder sentinels — must match lib/ai/providers/openai.ts and app/api/grants/draft/route.ts
 const PLACEHOLDER_KEYS = ['placeholder-build-key', 'sk-placeholder-build-key'];
 

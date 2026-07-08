@@ -511,10 +511,9 @@ export const CANONICAL_DECISIONS = [
     rationale: 'Platform feels alive. Admins see failures immediately without refreshing.',
   },
   {
-    id: 'northflank-health-gate',
-    decision:
-      'LMS and Admin deploy workflows (Northflank) run post-deploy curl smoke on /api/ping. Failed deploys fail the GitHub Action; fix forward on main.',
-    rationale: 'No blind deployments. Broken images are caught in CI before operators assume production is healthy.',
+    id: 'ecs-health-gate',
+    decision: 'All ECS deploys (LMS + Admin) run post-deploy health checks via curl. Failure triggers automatic rollback via aws ecs update-service --force-new-deployment.',
+    rationale: 'No blind deployments. Broken deploys are caught and reverted automatically.',
   },
   {
     id: 'mission-control-canonical',

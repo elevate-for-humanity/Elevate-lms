@@ -32,6 +32,7 @@ const PROGRAM_NAMES: Record<string, string> = {
   electrical: 'Electrical Technician',
   'peer-recovery-specialist-jri': 'Peer Recovery Specialist',
   bookkeeping: 'Bookkeeping',
+  'tax-prep-financial-services': 'Tax Preparation & Financial Services',
   'Home Health Aide': 'Home Health Aide',
   Accounting: 'Accounting',
   Entrepreneurship: 'Entrepreneurship',

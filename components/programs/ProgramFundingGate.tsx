@@ -12,7 +12,7 @@
  * Flow:
  *   Step 1 — Indiana resident? (all state funding requires residency)
  *   Step 2 (Indiana) — Which funding situation applies?
- *     a) SNAP/TANF recipient →  path
+ *     a) SNAP/TANF recipient → FSSA IMPACT path
  *     b) Employer sponsor → employer-paid path
  *     c) Neither → self-pay
  *   Step 2 (non-Indiana) — Self-pay only, with explanation
@@ -139,7 +139,7 @@ export default function ProgramFundingGate({
                   Indiana state funding requires Indiana residency
                 </p>
                 <p className="text-sm text-amber-700 mt-1">
-                   and employer apprenticeship funding are Indiana programs. If you live
+                  FSSA IMPACT and employer apprenticeship funding are Indiana programs. If you live
                   outside Indiana, self-pay enrollment is available immediately — no waiting on
                   approvals.
                 </p>
@@ -174,7 +174,7 @@ export default function ProgramFundingGate({
                   path: 'fssa' as FundingPath,
                   icon: <Heart className="w-5 h-5 text-purple-600" />,
                   label: 'I receive SNAP or TANF benefits',
-                  sub: 'You may qualify for  — free training funded by your case worker',
+                  sub: 'You may qualify for FSSA IMPACT — free training funded by your case worker',
                   activeCls: 'border-purple-500 bg-purple-50',
                 },
                 {
@@ -219,7 +219,7 @@ export default function ProgramFundingGate({
           </div>
         )}
 
-        {/* ──  path ── */}
+        {/* ── FSSA IMPACT path ── */}
         {isResident === true && fundingPath === 'fssa' && (
           <FssaPath
             confirmed={confirmed}
@@ -255,7 +255,7 @@ export default function ProgramFundingGate({
   );
 }
 
-// ──  sub-panel ─────────────────────────────────────────────────────
+// ── FSSA IMPACT sub-panel ─────────────────────────────────────────────────────
 
 function FssaPath({
   confirmed,
@@ -272,7 +272,7 @@ function FssaPath({
         <div className="flex items-start gap-3">
           <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-bold text-purple-900"> — Free Training</p>
+            <p className="text-sm font-bold text-purple-900">FSSA IMPACT — Free Training</p>
             <p className="text-sm text-purple-800 mt-1">
               Indiana&rsquo;s SNAP Employment &amp; Training (IMPACT) program can cover 100% of
               tuition for eligible recipients. You must be referred by your FSSA/DFR case worker —
@@ -486,11 +486,8 @@ function SelfPayOptions({
           <p className="font-bold text-slate-800 mb-1">Questions?</p>
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4 text-slate-400" />
-            <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
-              className="hover:text-blue-600"
-            >
-              {PLATFORM_DEFAULTS.supportPhone}
+            <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" className="hover:text-blue-600">
+              ${PLATFORM_DEFAULTS.supportPhone}
             </a>
           </div>
         </div>

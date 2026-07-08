@@ -52,28 +52,14 @@ export function formatCentsCompact(cents: number): string {
   return `$${dollars.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
 }
 
-/** Names/emails that indicate seeded demo rows — exclude from admin dashboard KPIs. */
-export function isLikelyTestOrDemoRecord(...values: Array<unknown>): boolean {
-  const text = values
-    .filter(Boolean)
-    .map(String)
-    .join(' ')
-    .toLowerCase();
-  if (!text.trim()) return false;
-  if (/\b(sample|test|demo|example|placeholder|verification|e2e)\b/.test(text)) return true;
-  if (/@(student|test)\.elevate\.edu\b/.test(text)) return true;
-  if (/\b(stu\d+|testuser|fakeuser)\b/.test(text)) return true;
-  if (/\bmarcus\s+johnson\b/.test(text)) return true;
-  if (/\bsarah\s+chen\b/.test(text)) return true;
-  return false;
-}
-
 export function isTestOrSuspiciousPayment(fields: {
   email?: string | null;
   label?: string | null;
   amountCents: number;
 }): boolean {
-  if (isLikelyTestOrDemoRecord(fields.email, fields.label)) return true;
+  const text = [fields.email, fields.label].filter(Boolean).join(' ').toLowerCase();
+  if (/\b(sample|test|demo|example|placeholder|verification)\b/.test(text)) return true;
+  if (/@student\.elevate\.edu\b/.test(text)) return true;
   if (fields.amountCents <= 101) return true;
   if (fields.amountCents > MAX_PAYMENT_CENTS) return true;
   return false;

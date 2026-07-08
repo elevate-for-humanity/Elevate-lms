@@ -2,8 +2,6 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 
 export const BEAUTY_CAREER_EDUCATOR: ProgramSchema = {
   slug: 'beauty-career-educator',
-  active: true,
-  public_visible: true,
   title: 'Beauty & Career Educator Training',
   subtitle:
     '12-week hybrid program combining salon services, peer teaching, entrepreneurship, and workforce readiness.',
@@ -285,13 +283,12 @@ export const BEAUTY_CAREER_EDUCATOR: ProgramSchema = {
     'Earn your Rise Up credential, CPR/First Aid, and OSHA 10 in 12 weeks. WIOA-funded beauty and career educator training in Indianapolis.',
 
 
-  fundingOptions: ['wioa', 'employer_paid', 'self_pay'],
+  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
   funding: {
+    wioa_eligible: false,
     fssa_eligible: false,
-    wioa_eligible: true,
-    wrg_eligible: true,
+    wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes:
-      'ETPL-approved program. WIOA, Workforce Ready Grant, and FSSA Gov Portal eligibility determined by your case manager or WorkOne office.',
+    fundingNotes: 'Eligibility for WIOA/FSSA funding determined by the applicable workforce or funding agency.',
   },
 };

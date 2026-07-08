@@ -9,7 +9,6 @@ import { logger } from '@/lib/logger';
 
 import { createBrowserClient as createSupabaseBrowserClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { getBrowserPublicSupabaseConfig } from '@/lib/supabase/public-config';
 
 // Chainable stub that returns empty data for every query method.
 // Prevents "Cannot read properties of null (reading 'from')" across 130+ components.
@@ -82,22 +81,20 @@ const noOpClient = {
 
 let warnedOnce = false;
 
-let cachedClient: SupabaseClient<any> | null = null;
-let cachedConfigKey: string | null = null;
-
-/** Call after runtime config is injected (hydrate or head script). */
-export function resetSupabaseBrowserClientCache(): void {
-  cachedClient = null;
-  cachedConfigKey = null;
-  warnedOnce = false;
-}
-
 export function createBrowserClient(): SupabaseClient<any> {
-  const publicConfig = getBrowserPublicSupabaseConfig();
-  const supabaseUrl = publicConfig?.url;
-  const supabaseAnonKey = publicConfig?.anonKey;
+  // process.env.NEXT_PUBLIC_* is inlined by Next.js at build time.
+  // Fallback literals ensure the client works even when Turbopack
+  // fails to inline env vars in dev (known issue with some env setups).
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
+  const misconfigured =
+    !supabaseUrl ||
+    !supabaseAnonKey ||
+    supabaseAnonKey === 'placeholder' ||
+    supabaseUrl.includes('placeholder');
+
+  if (misconfigured) {
     if (!warnedOnce) {
       logger.error(
         '[Supabase Browser] Auth is misconfigured (missing or placeholder NEXT_PUBLIC_SUPABASE_*). Login and client actions will not work.',
@@ -107,15 +104,8 @@ export function createBrowserClient(): SupabaseClient<any> {
     return noOpClient;
   }
 
-  const configKey = `${supabaseUrl}:${supabaseAnonKey.slice(0, 12)}`;
-  if (cachedClient && cachedConfigKey === configKey) {
-    return cachedClient;
-  }
-
   try {
     const client = createSupabaseBrowserClient(supabaseUrl, supabaseAnonKey);
-    cachedClient = client;
-    cachedConfigKey = configKey;
 
     // Silently clear stale sessions when the refresh token is invalid or expired.
     // Without this, Supabase logs "Invalid Refresh Token: Refresh Token Not Found"
@@ -126,26 +116,7 @@ export function createBrowserClient(): SupabaseClient<any> {
         // Refresh succeeded but returned no session — sign out to clear cookies
         client.auth.signOut().catch(() => {});
       }
-      // Handle case where refresh token was already used (parallel requests)
-      if (event === 'TOKEN_REFRESHED' && session === null) {
-        client.auth.signOut().catch(() => {});
-      }
     });
-
-    // Also wrap getUser for consistency
-    const originalGetUser = client.auth.getUser.bind(client.auth);
-    client.auth.getUser = async () => {
-      const result = await originalGetUser();
-      if (
-        result.error &&
-        (result.error.message?.includes('refresh_token_already_used') ||
-          result.error.code === 'refresh_token_already_used')
-      ) {
-        await client.auth.signOut().catch(() => {});
-        return { data: { user: null }, error: null };
-      }
-      return result;
-    };
 
     // Intercept token refresh errors by wrapping getSession — Supabase fires
     // these synchronously on client init when the stored refresh token is stale.
@@ -156,9 +127,7 @@ export function createBrowserClient(): SupabaseClient<any> {
         result.error &&
         (result.error.message?.includes('Refresh Token Not Found') ||
           result.error.message?.includes('Invalid Refresh Token') ||
-          result.error.message?.includes('refresh_token_not_found') ||
-          result.error.message?.includes('refresh_token_already_used') ||
-          result.error.code === 'refresh_token_already_used')
+          result.error.message?.includes('refresh_token_not_found'))
       ) {
         // Stale cookie — clear it silently so the user gets a clean anonymous state
         await client.auth.signOut().catch(() => {});
@@ -173,13 +142,5 @@ export function createBrowserClient(): SupabaseClient<any> {
   }
 }
 
-import { safeGetUser as safeGetUserShared } from './shared';
-
 // Legacy export for backwards compatibility
 export const createClient = createBrowserClient;
-
-/**
- * Safely extract user from Supabase auth response.
- * Prevents "Cannot read properties of null (reading 'id')" crash when data is null.
- */
-export const safeGetUser = safeGetUserShared;

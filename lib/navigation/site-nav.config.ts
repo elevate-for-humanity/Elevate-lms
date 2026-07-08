@@ -46,6 +46,16 @@ export const headerNavigation: NavGroup[] = [
         description: 'HVAC, Building Maintenance',
       },
       {
+        label: 'Barber Apprenticeship',
+        href: '/programs/barber-apprenticeship',
+        description: 'DOL-registered earn while you learn',
+      },
+      {
+        label: 'Cosmetology Apprenticeship',
+        href: '/programs/cosmetology-apprenticeship',
+        description: 'Indiana cosmetology license track',
+      },
+      {
         label: 'CDL Training',
         href: '/programs/cdl-training',
         description: 'Commercial Driver License',
@@ -61,29 +71,9 @@ export const headerNavigation: NavGroup[] = [
         description: 'IT and tech careers',
       },
       {
-        label: 'Beauty & Cosmetology Apprenticeships',
-        href: '/programs/beauty-apprenticeships',
-        description: 'Barber, cosmetology, esthetician, nails',
-      },
-      {
-        label: 'Barber Apprenticeship',
-        href: '/programs/barber-apprenticeship',
-        description: 'DOL-registered earn while you learn',
-      },
-      {
-        label: 'Cosmetology Apprenticeship',
-        href: '/programs/cosmetology-apprenticeship',
-        description: 'Indiana cosmetology license track',
-      },
-      {
-        label: 'Esthetician Apprenticeship',
-        href: '/programs/esthetician-apprenticeship',
-        description: 'Skincare and spa treatments',
-      },
-      {
-        label: 'Nail Technician Apprenticeship',
-        href: '/programs/nail-technician-apprenticeship',
-        description: 'Manicures, pedicures, nail art',
+        label: 'Apprenticeships',
+        href: '/programs/apprenticeships',
+        description: 'Earn while you learn programs',
       },
       {
         label: 'Find Your Path',
@@ -156,9 +146,9 @@ export const headerNavigation: NavGroup[] = [
         description: 'Build your workforce',
       },
       {
-        label: 'Host Shops',
-        href: '/partners/host-shops',
-        description: 'Barber, cosmetology, esthetician host shops',
+        label: 'Partner Benefits',
+        href: '/employer/dashboard',
+        description: 'Why partner with us',
       },
       {
         label: 'Employer Login',
@@ -184,26 +174,6 @@ export const headerNavigation: NavGroup[] = [
         label: 'Apprenticeship Licensing',
         href: '/pricing/sponsor-licensing',
         description: 'RAPIDS apprenticeship infrastructure - $750/mo',
-      },
-      {
-        label: 'Barber Host Shop',
-        href: '/barber-host-shop',
-        description: 'Host barber apprentices',
-      },
-      {
-        label: 'Cosmetology Host Shop',
-        href: '/cosmetology-host-shop',
-        description: 'Host cosmetology apprentices',
-      },
-      {
-        label: 'Esthetician Host Shop',
-        href: '/esthetician-host-shop',
-        description: 'Host esthetician apprentices',
-      },
-      {
-        label: 'Nail Tech Host Shop',
-        href: '/nail-host-shop',
-        description: 'Host nail technician apprentices',
       },
       {
         label: 'Program Holder Portal',
@@ -383,9 +353,50 @@ export const headerNavigation: NavGroup[] = [
     items: [
       { label: 'All Services', href: '/services', description: 'Our service offerings' },
       {
-        label: 'Career Training',
-        href: '/career-training',
-        description: 'Indiana workforce programs',
+        label: 'Career Training IL',
+        href: '/career-training-illinois',
+        description: 'Illinois programs',
+      },
+      {
+        label: 'Career Training IN',
+        href: '/career-training-indiana',
+        description: 'Indiana programs',
+      },
+      { label: 'Career Training OH', href: '/career-training-ohio', description: 'Ohio programs' },
+      {
+        label: 'Career Training TN',
+        href: '/career-training-tennessee',
+        description: 'Tennessee programs',
+      },
+      {
+        label: 'Career Training TX',
+        href: '/career-training-texas',
+        description: 'Texas programs',
+      },
+      {
+        label: 'Community Services IL',
+        href: '/community-services-illinois',
+        description: 'IL community services',
+      },
+      {
+        label: 'Community Services IN',
+        href: '/community-services-indiana',
+        description: 'IN community services',
+      },
+      {
+        label: 'Community Services OH',
+        href: '/community-services-ohio',
+        description: 'OH community services',
+      },
+      {
+        label: 'Community Services TN',
+        href: '/community-services-tennessee',
+        description: 'TN community services',
+      },
+      {
+        label: 'Community Services TX',
+        href: '/community-services-texas',
+        description: 'TX community services',
       },
       {
         label: 'Community Services',
@@ -475,6 +486,7 @@ export const footerNavigation = {
     links: [
       { label: 'DOL Funding', href: '/funding/dol' },
       { label: 'Federal Programs', href: '/funding/federal-programs' },
+      { label: 'State Programs', href: '/funding/state-programs' },
       { label: 'JRI Funding', href: '/funding/jri' },
       { label: 'WRG Funding', href: '/funding/wrg' },
       { label: 'Scholarships', href: '/scholarships' },
@@ -558,7 +570,7 @@ export const footerNavigation = {
       { label: 'Analytics', href: '/analytics' },
       { label: 'Approvals', href: '/approvals' },
       { label: 'Call Now', href: '/call-now' },
-      { label: 'Connect', href: '/career-services' },
+      { label: 'Connect', href: '/connect' },
       { label: 'Donations', href: '/donate' },
       { label: 'Ecosystem', href: '/ecosystem' },
       { label: 'Email', href: '/email' },
@@ -574,7 +586,7 @@ export const footerNavigation = {
       { label: 'Share', href: '/share' },
       { label: 'Social', href: '/social' },
       { label: 'Community Tax Support', href: '/tax' },
-      { label: 'Microclasses', href: '/programs' },
+      { label: 'Microclasses', href: '/microclasses' },
       { label: 'Educator Hub', href: '/educatorhub' },
       { label: 'Hub About', href: '/hub/about' },
       { label: 'Funding Impact', href: '/fundingimpact' },
@@ -646,7 +658,7 @@ export const footerNavigation = {
       { label: 'Access Paused', href: '/access-paused' },
       { label: 'License Suspended', href: '/license-suspended' },
       { label: 'Reset Password', href: '/auth/reset-password' },
-      { label: 'Verify Email', href: '/verify' },
+      { label: 'Verify Email', href: '/verify-email' },
       { label: 'Enterprise', href: '/enterprise' },
       { label: 'Licensing', href: '/licensing' },
       { label: 'Payment Cancel', href: '/payment/cancel' },

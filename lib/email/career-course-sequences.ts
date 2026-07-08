@@ -41,7 +41,7 @@ function wrap(body: string): string {
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
   <div style="text-align: center; margin-bottom: 28px;">
-    <img src="${SITE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt="${PLATFORM_DEFAULTS.orgName}" style="height: 60px;">
+    <img src="${SITE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt={PLATFORM_DEFAULTS.orgName} style="height: 60px;">
   </div>
   ${body}
   <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;">

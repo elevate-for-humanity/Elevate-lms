@@ -155,8 +155,8 @@ export async function runAutomations(db: SupabaseClient): Promise<AutomationRunR
       })
       .eq('id', action.id);
 
-    let outcome: 'success' | 'failure' | 'skipped';
-    let detail: string;
+    let outcome: 'success' | 'failure' | 'skipped' = 'skipped';
+    let detail = '';
 
     try {
       const cfg = action.action_config ?? {};
@@ -168,15 +168,15 @@ export async function runAutomations(db: SupabaseClient): Promise<AutomationRunR
           reference_table: action.reference_table,
         });
         outcome = r.ok ? 'success' : 'failure';
-        detail = r.detail ?? '';
+        detail = r.detail;
       } else if (action.action_type === 'escalate') {
         const r = await escalate(db, cfg, action.reference_id, action.reference_table);
         outcome = r.ok ? 'success' : 'failure';
-        detail = r.detail ?? '';
+        detail = r.detail;
       } else if (action.action_type === 'retry_job') {
         const r = await retryJob(db, action.reference_id, cfg);
         outcome = r.ok ? 'success' : 'failure';
-        detail = r.detail ?? '';
+        detail = r.detail;
       } else {
         outcome = 'skipped';
         detail = `unknown action_type: ${action.action_type}`;

@@ -19,8 +19,8 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 30, handsOnLab: 40, examPrep: 8, careerPlacement: 2 },
   schedule: 'Monthly cohorts — full-time intensive, day or evening options',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: '$0 with WIOA or Workforce Ready Grant. Self-pay: $5,000.',
-  selfPayCost: '$5,000',
+  fundingStatement: '$0 with WIOA or Workforce Ready Grant. Self-pay: $4,950.',
+  selfPayCost: '$4,950',
   badge: 'ETPL Approved',
   badgeColor: 'green',
 
@@ -32,14 +32,14 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
       validity: '2 years',
     },
     {
-      name: 'CPR',
+      name: 'CPR/AED/First Aid Certification',
       issuer: 'American Heart Association',
       description:
-        'Industry-recognized BLS CPR and AED certification for healthcare and public safety settings.',
+        'BLS-level CPR, AED operation, and first aid for healthcare and public safety settings.',
       validity: '2 years',
     },
     {
-      name: 'OSHA 10 - CareerSafe',
+      name: 'OSHA 10-Hour Safety Certification',
       issuer: 'CareerSafe',
       description:
         'OSHA-authorized workplace safety training for healthcare and public safety environments.',
@@ -175,9 +175,8 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
 
   complianceAlignment: [
     {
-      standard: 'Indiana ETPL Program #10004621',
-      description:
-        'Provider: 2Exclusive LLC-S · Elevate for Humanity Training Center · Indianapolis, Marion County. WIOA Individual Training Account eligible.',
+      standard: 'ETPL Program ID #10004621',
+      description: 'Approved on Indiana ETPL for WIOA Individual Training Account funding.',
     },
     {
       standard: 'NREMT EMR Standards',
@@ -279,8 +278,7 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
   ],
   equipmentIncluded: 'CPR mannequin access, AED trainer, and all course materials provided.',
   modality: 'Hybrid — online theory modules plus in-person hands-on skills training.',
-  facilityInfo:
-    'Elevate for Humanity Training Center, Indianapolis, Indiana (Marion County). Monthly cohort start dates.',
+  facilityInfo: 'Elevate training center, Indianapolis. Monthly cohort start dates.',
   employerPartners: [
     'Hospitals and healthcare systems',
     'Schools and childcare centers',
@@ -325,14 +323,12 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
     'Earn EMR, CPR/AED, First Aid, and OSHA 10 certifications in 4 weeks. WIOA-funded Emergency Health & Safety Technician program in Indianapolis.',
 
 
-  fundingOptions: ['wioa', 'wrg', 'self_pay', 'employer_paid'],
+  fundingOptions: ['self_pay', 'employer_paid'],
   funding: {
+    wioa_eligible: false,
     fssa_eligible: false,
-    wioa_eligible: true,
-    wrg_eligible: true,
-    etpl_approved: true,
+    wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes:
-      'ETPL Program #10004621. WIOA and Workforce Ready Grant eligible through WorkOne Marion County. Self-pay: $4,950.',
+    fundingNotes: 'Short certification. Eligibility for standalone WIOA/FSSA funding determined by the applicable workforce agency.',
   },
 };

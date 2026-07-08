@@ -1,4 +1,5 @@
-
+'use client';
+import { logger } from '@/lib/logger';
 
 /**
  * ProgramDetailPage — Institutional Program Detail Template v1
@@ -17,7 +18,7 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import ProgramApplyForm from '@/components/programs/ProgramApplyForm';
 import { PayNowButton } from '@/components/programs/PayNowButton';
-import type { HeroBannerConfig } from '@/content/heroBanners';
+import heroBanners, { type HeroBannerConfig } from '@/content/heroBanners';
 import {
   BookOpen,
   Clock,
@@ -39,63 +40,30 @@ import {
   getEnrollmentTracks,
 } from '@/lib/programs/program-schema';
 import { DeliveryBadge, FundingSection } from './ProgramTruthBadges';
-import ProgramFundingProcessSection from './ProgramFundingProcessSection';
-import { resolveProgramFundingStatus } from '@/lib/programs/funding-visibility';
-import { ICC_URL, ICC_INSTRUCTION, hero as heroTokens } from '@/lib/page-design-tokens';
-import { DEFAULT_HERO_VIDEO } from '@/lib/images/hero-banner-media';
-import { formatDeliveryDisclosure } from '@/lib/programs/program-schema';
-import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
-import ProgramAtAGlance from '@/components/programs/ProgramAtAGlance';
-import ProgramCredentialsSection from '@/components/programs/ProgramCredentialsSection';
-import ProgramEmploymentPathway from '@/components/programs/ProgramEmploymentPathway';
-import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
-import { ACTIVE_BNPL_PROVIDERS, BNPL_PROVIDER_SUMMARY } from '@/lib/bnpl-config';
-import { PAYMENT_TERM_WEEKS as BARBER_PAYMENT_WEEKS } from '@/lib/barber/pricing';
-
-/** Self-pay installment weeks — may differ from program duration (e.g. barber: 29 vs 52). */
-const PAYMENT_WEEKS_BY_SLUG: Record<string, number> = {
-  'barber-apprenticeship': BARBER_PAYMENT_WEEKS,
-};
-
-/** Programs with a dedicated multi-step apply flow — skip generic inline form. */
-const DEDICATED_APPLY_SLUGS = new Set([
-  'barber-apprenticeship',
-  'cosmetology-apprenticeship',
-  'esthetician-apprenticeship',
-  'nail-technician-apprenticeship',
-]);
+import { ICC_URL, ICC_INSTRUCTION } from '@/lib/page-design-tokens';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 interface Props {
   program: ProgramSchema;
   /** Banner data passed from the server page — bypasses client-side JSON cache limitation. */
   banner?: HeroBannerConfig | null;
-  /** Pre-resolved hero poster image URL from server -- do NOT call resolveSiteImagePath here (uses 'fs'). */
-  heroPosterSrc?: string;
   /** Replaces the default video/image hero entirely. */
   heroOverride?: React.ReactNode;
-  /** Optional alert strip below the hero (e.g. enrollment open banner). */
-  announcement?: React.ReactNode;
-  /** Program-specific process section (e.g. apprenticeship steps) — renders after overview. */
-  processSlot?: React.ReactNode;
   children?: React.ReactNode;
 }
 
 export default function ProgramDetailPage({
   program: p,
   banner: bannerProp,
-  heroPosterSrc: heroPosterSrcProp,
   heroOverride,
-  announcement,
-  processSlot,
   children,
 }: Props) {
-  
   // Dev-time validation
   if (process.env.NODE_ENV === 'development') {
     const errors = validateProgram(p);
     if (errors.length > 0) {
-      console.warn(`[ProgramDetailPage] Validation errors for "${p.slug}":`);
-      errors.forEach((e) => console.warn(`  ${e.field}: ${e.message}`));
+      logger.warn(`[ProgramDetailPage] Validation errors for "${p.slug}":`);
+      errors.forEach((e) => logger.warn(`  ${e.field}: ${e.message}`));
     }
   }
 
@@ -103,7 +71,6 @@ export default function ProgramDetailPage({
   const hoursRange = getTotalHoursRange(p);
   const primaryCTA = getPrimaryCTA(p);
   const enrollmentTracks = getEnrollmentTracks(p);
-  const deliveryDisclosure = formatDeliveryDisclosure(p.deliveredBy);
   const selfPayNumeric = Number((p.selfPayCost || '').replace(/[^0-9.]/g, '')) || 0;
   // Use depositAmount from program data if set, otherwise fall back to $600 minimum.
   const bnplDepositStart = p.depositAmount
@@ -111,18 +78,13 @@ export default function ProgramDetailPage({
     : ['barber-apprenticeship', 'cosmetology-apprenticeship', 'esthetician', 'nail-technician-apprenticeship'].includes(p.slug)
       ? 600
       : null;
-  const paymentPlanWeeks = PAYMENT_WEEKS_BY_SLUG[p.slug] ?? p.durationWeeks;
   const estimatedWeeklyAfterDeposit =
-    bnplDepositStart && selfPayNumeric > bnplDepositStart && paymentPlanWeeks > 0
-      ? Math.ceil((selfPayNumeric - bnplDepositStart) / paymentPlanWeeks)
+    bnplDepositStart && selfPayNumeric > bnplDepositStart && p.durationWeeks > 0
+      ? Math.ceil((selfPayNumeric - bnplDepositStart) / p.durationWeeks)
       : null;
-  const hasDedicatedApply = DEDICATED_APPLY_SLUGS.has(p.slug);
-  const fundingStatus = resolveProgramFundingStatus(p);
-  const hasIndianaFunding =
-    fundingStatus.showWorkforceFundingProcess || fundingStatus.isImpactFundable;
-  const hasWIOAFunding = fundingStatus.isWioaFundable || fundingStatus.isWrgFundable;
-  const hasImpactOnly =
-    fundingStatus.isImpactFundable && !fundingStatus.showWorkforceFundingProcess;
+  const hasIndianaFunding = p.fundingOptions?.some(f => f === 'wioa' || f === 'wrg' || f === 'impact');
+  const hasWIOAFunding = p.fundingOptions?.some(f => f === 'wioa' || f === 'wrg') ?? false;
+  const hasImpactOnly = !hasWIOAFunding && (p.fundingOptions?.includes('impact') ?? false);
   // Only beauty/apprenticeship programs have a working /eligibility page
   // (served by [program]/eligibility which calls getBeautyProgram)
   const eligibilityPageSlugs = new Set([
@@ -151,20 +113,33 @@ export default function ProgramDetailPage({
             // bannerProp is passed from the server page.tsx — use it first.
             // heroBanners Proxy returns {} on the client (loadJsonOnce is server-only).
             // Check pageKey to distinguish a real banner from the empty fallback object.
-            const banner = bannerProp;
-            // Render the video hero only when a real video source is configured.
-            // Programs without a dedicated video (e.g. beauty/culinary, which have
-            // no beauty video assets) fall through to the still-image hero so they
-            // never inherit another program's video.
-            if (banner?.pageKey && banner.videoSrcDesktop) {
+            const banner = bannerProp ?? heroBanners[p.slug];
+            if (banner?.pageKey) {
               const bannerCtas = [
                 banner.primaryCta,
                 ...(banner.secondaryCta ? [banner.secondaryCta] : []),
               ];
+              // Use HeroPicture when no video is configured — avoids passing
+              // undefined to HeroVideo's required videoSrcDesktop prop.
+              if (!banner.videoSrcDesktop) {
+                return (
+                  <HeroPicture
+                    src={banner.posterImage ?? p.heroImage}
+                    alt={p.heroImageAlt ?? banner.microLabel ?? p.title}
+                    microLabel={banner.microLabel}
+                    analyticsName={banner.analyticsName}
+                    belowHeroHeadline={banner.belowHeroHeadline}
+                    belowHeroSubheadline={banner.belowHeroSubheadline}
+                    ctas={bannerCtas}
+                    trustIndicators={banner.trustIndicators}
+                    transcript={banner.transcript}
+                  />
+                );
+              }
               return (
                 <HeroVideo
-                  videoSrcDesktop={banner.videoSrcDesktop ?? DEFAULT_HERO_VIDEO}
-                  videoSrcMobile={banner.videoSrcMobile}
+                  videoSrcDesktop={banner.videoSrcDesktop}
+                  posterImage={banner.posterImage}
                   voiceoverSrc={banner.voiceoverSrc}
                   microLabel={banner.microLabel}
                   analyticsName={banner.analyticsName}
@@ -176,18 +151,19 @@ export default function ProgramDetailPage({
                 />
               );
             }
-            // Fallback: picture hero when hero-banners.json has no entry
-            // heroPosterSrcProp is pre-resolved by the server page.tsx
+            // Fallback: plain image hero for programs without a banner entry
             return (
-              <HeroPicture
-                src={heroPosterSrcProp ?? ''}
-                alt={p.heroImageAlt ?? p.title}
-                heightStyle={heroTokens.imageWrap}
-                microLabel={p.badge ?? p.category}
-                belowHeroHeadline={p.title}
-                belowHeroSubheadline={p.subtitle}
-                ctas={primaryCTA?.href ? [{ label: primaryCTA.label, href: primaryCTA.href }] : undefined}
-              />
+              <div className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
+        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
+                <Image
+                  src={p.heroImage}
+                  alt={p.heroImageAlt}
+                  fill
+                  className="object-cover object-center"
+                  priority
+                  sizes="100vw" placeholder="empty"
+                />
+              </div>
             );
           })()}
 
@@ -274,8 +250,14 @@ export default function ProgramDetailPage({
                 </div>
 
                 {/* Delivery disclosure */}
-                {deliveryDisclosure && (
-                  <p className="mt-4 text-xs text-slate-500">{deliveryDisclosure}</p>
+                {p.deliveredBy && (
+                  <p className="mt-4 text-xs text-slate-500">
+                    {p.deliveredBy === 'Elevate'
+                      ? `Delivered directly by ${PLATFORM_DEFAULTS.orgName}.`
+                      : p.deliveredBy === 'Partner'
+                        ? 'Delivered by an approved training partner.'
+                        : `Delivered by ${PLATFORM_DEFAULTS.orgName} or an approved training partner.`}
+                  </p>
                 )}
               </div>
 
@@ -292,7 +274,7 @@ export default function ProgramDetailPage({
                     </div>
                   )}
 
-                  {primaryCTA && primaryCTA.href && (
+                  {primaryCTA && (
                     <>
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
                         {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
@@ -342,18 +324,6 @@ export default function ProgramDetailPage({
           </div>
         </div>
       </section>
-
-      {announcement ? (
-        <section className="border-b border-slate-100 bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">{announcement}</div>
-        </section>
-      ) : null}
-
-      <ProgramAtAGlance program={p} />
-      <ProgramCredentialsSection program={p} />
-      <ProgramEmploymentPathway program={p} />
-
-      {processSlot}
 
       {/* CREDIBILITY STRIP */}
       <section className="py-8 border-y border-slate-100">
@@ -407,24 +377,22 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
-      {/* 5-STEP WORKFORCE PATHWAY — hidden when a program supplies its own process narrative */}
-      {!processSlot && (
-        <section className="py-12 bg-slate-50 border-y border-slate-100">
-          <div className="max-w-6xl mx-auto px-4">
-            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Full Workforce Pathway</h2>
-            <p className="text-slate-600 text-sm mb-8">Built for agency deployment: intake to wage outcome in one system.</p>
-            <div className="grid gap-3 md:grid-cols-5">
-              {pathwaySteps.map((item) => (
-                <div key={item.step} className="rounded-xl border border-slate-200 bg-white p-4">
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-brand-red-600 mb-2">{item.step}</p>
-                  <h3 className="text-sm font-extrabold text-slate-900 mb-1">{item.title}</h3>
-                  <p className="text-xs text-slate-600 leading-relaxed">{item.detail}</p>
-                </div>
-              ))}
-            </div>
+      {/* 5-STEP WORKFORCE PATHWAY */}
+      <section className="py-12 bg-slate-50 border-y border-slate-100">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Full Workforce Pathway</h2>
+          <p className="text-slate-600 text-sm mb-8">Built for agency deployment: intake to wage outcome in one system.</p>
+          <div className="grid gap-3 md:grid-cols-5">
+            {pathwaySteps.map((item) => (
+              <div key={item.step} className="rounded-xl border border-slate-200 bg-white p-4">
+                <p className="text-[10px] uppercase tracking-widest font-bold text-brand-red-600 mb-2">{item.step}</p>
+                <h3 className="text-sm font-extrabold text-slate-900 mb-1">{item.title}</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">{item.detail}</p>
+              </div>
+            ))}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* CURRICULUM */}
       <section className="py-12">
@@ -456,91 +424,6 @@ export default function ProgramDetailPage({
           </div>
         </div>
       </section>
-
-      {/* TECHNOLOGY ETPL SECTIONS - Only show for tech programs */}
-      {p.technologyCareerPathways && p.technologyCareerPathways.length > 0 && (
-        <>
-          {/* Technology Career Pathways */}
-          <section className="py-12 bg-slate-50 border-y border-slate-100">
-            <div className="max-w-6xl mx-auto px-4">
-              <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Technology Career Pathways</h2>
-              <p className="text-slate-500 text-sm mb-6">
-                This program prepares you for multiple entry points into the technology industry.
-              </p>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {p.technologyCareerPathways.map((career, i) => (
-                  <div key={i} className="flex items-center gap-3 bg-white rounded-lg border border-slate-200 p-3">
-                    <div className="w-8 h-8 rounded-full bg-brand-blue-100 flex items-center justify-center flex-shrink-0">
-                      <TrendingUp className="w-4 h-4 text-brand-blue-600" />
-                    </div>
-                    <span className="text-sm font-medium text-slate-700">{career}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Additional Technology Certifications */}
-          {p.additionalCertifications && p.additionalCertifications.length > 0 && (
-            <section className="py-12">
-              <div className="max-w-6xl mx-auto px-4">
-                <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Additional Technology Certifications Supported</h2>
-                <p className="text-slate-500 text-sm mb-6">
-                  Beyond the primary credentials, this program prepares you for additional industry certifications.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {p.additionalCertifications.map((cert, i) => (
-                    <span key={i} className="inline-flex items-center gap-1.5 bg-brand-blue-50 text-brand-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-brand-blue-200">
-                      <Award className="w-3.5 h-3.5" />
-                      {cert}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* Technology Skills */}
-          {p.technologySkills && p.technologySkills.length > 0 && (
-            <section className="py-12 bg-slate-900 text-white">
-              <div className="max-w-6xl mx-auto px-4">
-                <h2 className="text-2xl font-extrabold mb-2">Technology Skills You&apos;ll Learn</h2>
-                <p className="text-slate-300 text-sm mb-6">
-                  Core competencies developed throughout this program align with industry standards.
-                </p>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {p.technologySkills.map((skill, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm">
-                      <div className="w-2 h-2 rounded-full bg-brand-red-500 flex-shrink-0" />
-                      <span className="text-slate-100">{skill}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* WIOA Eligible Technology Pathway */}
-          {p.etplProgramId && (
-            <section className="py-8 bg-brand-green-50 border-y-2 border-brand-green-500">
-              <div className="max-w-6xl mx-auto px-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-brand-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-extrabold text-slate-900 mb-1">WIOA Eligible Technology Pathway</h2>
-                    <p className="text-slate-600 text-sm leading-relaxed">
-                      This program is approved on Indiana ETPL (Program ID {p.etplProgramId}) and may qualify for{' '}
-                      <strong>WIOA, WorkOne, Workforce Ready Grant, JRI, Vocational Rehabilitation,</strong> and approved workforce funding sources.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
-        </>
-      )}
 
       {/* WHAT'S INCLUDED */}
       {((p.partnerCourses && p.partnerCourses.length > 0) ||
@@ -695,7 +578,7 @@ export default function ProgramDetailPage({
             <div className="bg-white rounded-2xl border-2 border-brand-green-500 shadow-sm p-7 flex flex-col">
               <div className="flex items-center gap-2 mb-4">
                 <span className="bg-brand-green-100 text-brand-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                  Workforce Funded
+                  Lowest Cost Path
                 </span>
               </div>
               <h3 className="text-lg font-extrabold text-slate-900 mb-1">
@@ -710,7 +593,7 @@ export default function ProgramDetailPage({
               <div className="space-y-2">
                 {hasWIOAFunding && (
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {['WorkOne', 'WIOA', 'Trade Act', 'JRI'].map((prog) => (
+                    {['WorkOne', 'WIOA', 'Trade Act', 'SNAP E&T', 'JRI'].map((prog) => (
                       <span
                         key={prog}
                         className="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-lg"
@@ -722,7 +605,7 @@ export default function ProgramDetailPage({
                 )}
                 {hasImpactOnly && (
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {['Indiana Only'].map((prog) => (
+                    {['FSSA IMPACT', 'SNAP E&T', 'Indiana Only'].map((prog) => (
                       <span
                         key={prog}
                         className="bg-purple-100 text-purple-700 text-xs font-semibold px-2.5 py-1 rounded-lg"
@@ -740,7 +623,7 @@ export default function ProgramDetailPage({
                 </Link>
                 <p className="text-center text-xs text-slate-500 mt-1">
                   {hasImpactOnly
-                    ? 'Indiana residents · contact WorkOne for funding options'
+                    ? 'Indiana SNAP/TANF recipients · must be referred by FSSA case worker'
                     : 'Free to apply · no payment today · takes 2 minutes'}
                 </p>
               </div>
@@ -805,40 +688,6 @@ export default function ProgramDetailPage({
             </div>
           </div>
 
-          {(enrollmentTracks.selfPay.available || p.fundingOptions?.includes('self_pay')) && (
-            <div id="payment-calculator" className="mt-10 max-w-2xl mx-auto scroll-mt-24">
-              <div className="text-center mb-6">
-                <p className="text-xs font-bold uppercase tracking-widest text-brand-blue-600 mb-2">
-                  Self-pay options
-                </p>
-                <h3 className="text-xl font-extrabold text-slate-900">Payment plan calculator</h3>
-                <p className="text-slate-500 text-sm mt-2">
-                  Adjust your deposit to see weekly payments. BNPL available at checkout.
-                </p>
-              </div>
-              <PaymentPlanCalculator programSlug={p.slug} />
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
-                {ACTIVE_BNPL_PROVIDERS.map((provider) => (
-                  <span
-                    key={provider.id}
-                    className={`text-xs font-semibold px-2.5 py-1 rounded-full ${provider.badgeBg} ${provider.badgeText}`}
-                  >
-                    {provider.name}
-                  </span>
-                ))}
-              </div>
-              <p className="text-center text-xs text-slate-500 mt-3">{BNPL_PROVIDER_SUMMARY}</p>
-              <p className="text-center text-sm mt-4">
-                <Link
-                  href={p.cta.applyHref || `/apply?program=${p.slug}`}
-                  className="font-semibold text-brand-blue-600 hover:underline"
-                >
-                  Start application →
-                </Link>
-              </p>
-            </div>
-          )}
-
           {/* Reassurance line */}
           <p className="text-center text-slate-500 text-sm mt-8">
             Not in Indiana or not currently funding-eligible?{' '}
@@ -851,11 +700,12 @@ export default function ProgramDetailPage({
           {/* Indiana funding context — shown for IMPACT-only programs */}
           {hasImpactOnly && (
             <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm text-amber-900 max-w-3xl mx-auto">
-              <p className="font-bold mb-1">Indiana residents: additional funding may be available</p>
+              <p className="font-bold mb-1">Indiana residents: funding is available through FSSA IMPACT</p>
               <p className="text-amber-800 mb-3">
-                This program may not be on Indiana&rsquo;s ETPL and does not qualify for WIOA or the
-                Workforce Ready Grant. However, additional Indiana workforce funding sources may be available.
-                Contact your local WorkOne office to learn about eligibility.
+                This program is not on Indiana&rsquo;s ETPL and does not qualify for WIOA or the
+                Workforce Ready Grant. However, Indiana SNAP and TANF recipients may qualify for
+                free training through the FSSA IMPACT (SNAP Employment &amp; Training) program.
+                Contact your FSSA/DFR case worker to request a training referral.
               </p>
               <p className="text-amber-800">
                 <strong>Outside Indiana?</strong> Self-pay enrollment is available to everyone —
@@ -876,9 +726,9 @@ export default function ProgramDetailPage({
           <div className="mt-8 rounded-xl border border-slate-200 bg-white p-5">
             <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4">Next Step</p>
             <div className="flex flex-col sm:flex-row gap-3">
-              {primaryCTA && primaryCTA.href && (
+              {primaryCTA && (
                 <Link
-                  href={primaryCTA.href}
+                  href={primaryCTA.external ? primaryCTA.href : '#apply'}
                   target={primaryCTA.external ? '_blank' : '_self'}
                   rel={primaryCTA.external ? 'noopener noreferrer' : undefined}
                   className="inline-flex items-center justify-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-5 py-3 rounded-lg transition-colors text-sm"
@@ -909,8 +759,6 @@ export default function ProgramDetailPage({
           </div>
         </div>{/* max-w-5xl */}
       </section>
-
-      <ProgramFundingProcessSection program={p} />
 
       {/* EMPLOYER PROOF */}
       <section className="py-12 border-t border-slate-100 bg-slate-50">
@@ -953,7 +801,7 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
-      {/* ===== APPLICATION ===== */}
+      {/* ===== INLINE APPLICATION FORM ===== */}
       <section id="apply" className="py-16 bg-white border-t border-slate-100">
         <div className="max-w-2xl mx-auto px-4">
           <div className="mb-8 text-center">
@@ -967,33 +815,7 @@ export default function ProgramDetailPage({
               Free to apply · No payment required · An advisor will contact you within 1 business day
             </p>
           </div>
-          {hasDedicatedApply ? (
-            <div className="text-center">
-              <p className="text-slate-600 text-sm mb-6 leading-relaxed">
-                This program uses a guided application with eligibility and host-shop matching steps.
-                {processSlot ? (
-                  <>
-                    {' '}
-                    Review{' '}
-                    <Link href="#how-it-works" className="font-semibold text-brand-blue-600 hover:underline">
-                      how it works
-                    </Link>{' '}
-                    above, then continue when you are ready.
-                  </>
-                ) : (
-                  ' Continue when you are ready.'
-                )}
-              </p>
-              <Link
-                href={p.cta.applyHref || `/programs/${p.slug}/apply`}
-                className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors"
-              >
-                Continue to Application
-              </Link>
-            </div>
-          ) : (
-            <ProgramApplyForm programSlug={p.slug} programTitle={p.title} />
-          )}
+          <ProgramApplyForm programSlug={p.slug} programTitle={p.title} />
         </div>
       </section>
 
@@ -1017,7 +839,7 @@ export default function ProgramDetailPage({
           {/* Two distinct paths — applicant vs enrolled */}
           <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">
             {/* Primary CTA — driven by enrollmentType */}
-            {primaryCTA && primaryCTA.href && (
+            {primaryCTA && (
               <div className="flex flex-col items-center gap-1.5">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
@@ -1062,41 +884,7 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
-      {/* Program Resources — dynamic links to sub-pages */}
-      <section className="py-8 border-t border-slate-100">
-        <div className="max-w-5xl mx-auto px-4">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Program Resources</p>
-          <div className="flex flex-wrap gap-2">
-            {hasEligibilityPage && (
-              <Link href={`/programs/${p.slug}/eligibility`} className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:border-brand-blue-300 transition-colors">
-                Eligibility
-              </Link>
-            )}
-            <Link href={`/programs/${p.slug}/apply`} className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:border-brand-blue-300 transition-colors">
-              Apply
-            </Link>
-            {eligibilityPageSlugs.has(p.slug) && (
-              <Link href={`/programs/${p.slug}/orientation`} className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:border-brand-blue-300 transition-colors">
-                Orientation
-              </Link>
-            )}
-            {p.slug === 'hvac-technician' && (
-              <>
-                <Link href={`/programs/${p.slug}/curriculum`} className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:border-brand-blue-300 transition-colors">
-                  Curriculum
-                </Link>
-                <Link href={`/programs/${p.slug}/course`} className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:border-brand-blue-300 transition-colors">
-                  Course Details
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
       {children && <div>{children}</div>}
-
-      <CredentialAuthorityFootnote />
     </div>
   );
 }

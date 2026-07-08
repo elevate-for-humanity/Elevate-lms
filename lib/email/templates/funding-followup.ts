@@ -24,7 +24,7 @@ function wrap(body: string): string {
 <body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif">
   <div style="max-width:600px;margin:32px auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)">
     <div style="background:#dc2626;padding:28px 32px">
-      <img src="${SITE}/logo.jpg" alt="${PLATFORM_DEFAULTS.orgName}" height="40" style="display:block">
+      <img src="${SITE}/logo.jpg" alt={PLATFORM_DEFAULTS.orgName} height="40" style="display:block">
     </div>
     <div style="padding:32px">
       ${body}

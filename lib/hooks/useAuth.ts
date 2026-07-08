@@ -7,32 +7,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
-export type UserRole =
-  | 'student'
-  | 'admin'
-  | 'advisor'
-  | 'staff'
-  | 'employer'
-  | 'workforce_board'
-  | 'partner'
-  | 'sponsor'
-  | 'mentor'
-  | 'org_admin'
-  | 'program_holder'
-  | 'delegate'
-  | 'creator'
-  | 'instructor'
-  | 'case_manager'
-  | 'provider_admin'
-  | 'super_admin'
-  | 'grant_client'
-  | 'partner_admin'
-  | 'host_shop'
-  | 'government'
-  | 'testing_center'
-  | 'financial_aid'
-  | 'compliance'
-  | 'dev_studio';
+export type UserRole = 'student' | 'staff' | 'employer' | 'admin';
 
 export interface AuthUser extends User {
   role?: UserRole;

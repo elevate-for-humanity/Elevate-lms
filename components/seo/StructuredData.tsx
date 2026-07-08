@@ -195,8 +195,8 @@ export function OrganizationStructuredData() {
       postalCode: '46240',
       addressCountry: 'US',
     },
-    telephone: `+1-${PLATFORM_DEFAULTS.supportPhone.replace(/\D/g, '').replace(/^1/, '')}`,
-    email: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
+    telephone: '+1-${PLATFORM_DEFAULTS.supportPhone}',
+    email: 'info@${PLATFORM_DEFAULTS.canonicalDomain}',
     sameAs: [
       'https://www.linkedin.com/company/elevate-for-humanity',
       'https://www.facebook.com/profile.php?id=61571046346179',

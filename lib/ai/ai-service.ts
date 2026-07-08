@@ -80,45 +80,6 @@ function resolveImageProvider(): AIImageProvider {
   throw new Error('No AI image provider available. Set OPENAI_API_KEY or STABILITY_API_KEY.');
 }
 
-// -- Chain Helpers --
-
-function getChatProviderChain(preferred?: AIProviderName): AIProvider[] {
-  const chain: AIProvider[] = [];
-
-  if (preferred && preferred !== 'none' && chatProviders[preferred]) {
-    const p = chatProviders[preferred]();
-    if (p.isAvailable()) chain.push(p);
-  }
-
-  for (const name of ['openai', 'gemini', 'groq', 'azure']) {
-    if (name === (preferred as string)) continue;
-    const p = chatProviders[name]();
-    if (p.isAvailable()) chain.push(p);
-  }
-
-  return chain;
-}
-
-function breakerForProvider(name: string) {
-  return (breakers as any)[name] || breakers.openai;
-}
-
-function isRetryableProviderError(err: any): boolean {
-  const msg = err instanceof Error ? err.message : String(err);
-  return !msg.includes('401') && !msg.includes('403') && !msg.includes('404');
-}
-
-function shouldTryNextProvider(err: any): boolean {
-  const msg = err instanceof Error ? err.message : String(err);
-  return (
-    msg.includes('429') ||
-    msg.includes('500') ||
-    msg.includes('503') ||
-    msg.includes('timeout') ||
-    msg.includes('unavailable')
-  );
-}
-
 // -- Public API --
 
 /**
@@ -126,58 +87,25 @@ function shouldTryNextProvider(err: any): boolean {
  * Provider is selected via options.provider, then AI_PROVIDER env var (default: openai).
  * Falls back automatically if the preferred provider is unavailable.
  */
-
-// Overload for convenience: pass messages array + options separately
-export async function aiChat(
-  messages: ChatCompletionOptions['messages'],
-  options?: Partial<Omit<ChatCompletionOptions, 'messages'>>,
-): Promise<ChatCompletionResult>;
-// Full options object
-export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult>;
-// Implementation
-export async function aiChat(
-  optionsOrMessages: ChatCompletionOptions | ChatCompletionOptions['messages'],
-  maybeOptions?: Partial<Omit<ChatCompletionOptions, 'messages'>>,
-): Promise<ChatCompletionResult> {
-  const options: ChatCompletionOptions = Array.isArray(optionsOrMessages)
-    ? { messages: optionsOrMessages, ...maybeOptions }
-    : optionsOrMessages;
-  const preferred =
-    options.provider && options.provider !== 'none' ? options.provider : undefined;
-  const chain = getChatProviderChain(preferred);
-
-  if (chain.length === 0) {
-    throw new Error(
-      'No AI chat provider available. Set OPENAI_API_KEY, GEMINI_API_KEY, GROQ_API_KEY, or AZURE_OPENAI_API_KEY.',
-    );
+export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
+  let provider;
+  if (options.provider && options.provider !== 'none' && chatProviders[options.provider]) {
+    const explicit = chatProviders[options.provider]();
+    provider = explicit.isAvailable() ? explicit : resolveChatProvider();
+  } else {
+    provider = resolveChatProvider();
   }
-
-  let lastError: unknown;
-  for (let i = 0; i < chain.length; i++) {
-    const provider = chain[i]!;
-    const hasNext = i < chain.length - 1;
-    try {
-      return await withResilience(() => provider.chat(options), {
-        circuitBreaker: breakerForProvider(provider.name),
-        attempts: 2,
-        baseDelayMs: 1000,
-        label: `aiChat:${provider.name}`,
-        shouldRetry: isRetryableProviderError,
-      });
-    } catch (err) {
-      lastError = err;
-      if (hasNext && shouldTryNextProvider(err)) {
-        logger.warn('[aiChat] Provider unavailable; trying next in chain', {
-          provider: provider.name,
-          error: err instanceof Error ? err.message : String(err),
-        });
-        continue;
-      }
-      throw err;
-    }
-  }
-
-  throw lastError ?? new Error('All AI chat providers failed');
+  return withResilience(() => provider.chat(options), {
+    circuitBreaker: breakers.openai,
+    attempts: 2,
+    baseDelayMs: 1000,
+    label: 'aiChat',
+    shouldRetry: (err) => {
+      // Don't retry on auth errors or content policy violations
+      const msg = err instanceof Error ? err.message : String(err);
+      return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
+    },
+  });
 }
 
 /**

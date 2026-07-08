@@ -18,55 +18,30 @@
 import { cache } from 'react';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
-import { sanitizePlatformValue } from '@/lib/config/sanitize-platform-value';
 
 // ── Build-time / env-var defaults ─────────────────────────────────────────────
 // These are the fallback values used when platform_settings has no row for a key.
-// Override via runtime environment variables or .env.local.
-
-const ENV_DEFAULTS = {
-  orgName: 'Elevate for Humanity',
-  orgLegalName: 'Elevate for Humanity Career & Technical Institute',
-  siteUrl: 'https://www.elevateforhumanity.org',
-  supportEmail: 'support@elevateforhumanity.org',
-  supportPhone: '(317) 314-3757',
-  emailFromName: 'Elevate for Humanity',
-  emailFromAddress: 'noreply@elevateforhumanity.org',
-  certificateHolder: 'Elevate for Humanity',
-  canonicalDomain: 'www.elevateforhumanity.org',
-} as const;
+// Override via environment variables in ECS task definition or .env.local.
 
 export const PLATFORM_DEFAULTS = {
-  orgName: sanitizePlatformValue(process.env.NEXT_PUBLIC_ORG_NAME, ENV_DEFAULTS.orgName),
-  orgLegalName: sanitizePlatformValue(
-    process.env.NEXT_PUBLIC_ORG_LEGAL_NAME,
-    ENV_DEFAULTS.orgLegalName,
-  ),
-  siteUrl: sanitizePlatformValue(process.env.NEXT_PUBLIC_SITE_URL, ENV_DEFAULTS.siteUrl),
-  supportEmail: sanitizePlatformValue(
-    process.env.NEXT_PUBLIC_SUPPORT_EMAIL,
-    ENV_DEFAULTS.supportEmail,
-  ),
-  supportPhone: sanitizePlatformValue(
-    process.env.NEXT_PUBLIC_SUPPORT_PHONE,
-    ENV_DEFAULTS.supportPhone,
-  ),
-  emailFromName: sanitizePlatformValue(
-    process.env.NEXT_PUBLIC_EMAIL_FROM_NAME,
-    ENV_DEFAULTS.emailFromName,
-  ),
-  emailFromAddress: sanitizePlatformValue(
-    process.env.NEXT_PUBLIC_EMAIL_FROM_ADDRESS,
-    ENV_DEFAULTS.emailFromAddress,
-  ),
-  certificateHolder: sanitizePlatformValue(
-    process.env.NEXT_PUBLIC_CERT_HOLDER,
-    ENV_DEFAULTS.certificateHolder,
-  ),
-  canonicalDomain: sanitizePlatformValue(
-    process.env.NEXT_PUBLIC_CANONICAL_DOMAIN,
-    ENV_DEFAULTS.canonicalDomain,
-  ),
+  orgName: process.env.NEXT_PUBLIC_ORG_NAME ?? 'Elevate for Humanity',
+  orgLegalName:
+    process.env.NEXT_PUBLIC_ORG_LEGAL_NAME ??
+    'Elevate for Humanity Career & Technical Institute',
+  siteUrl:
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org',
+  supportEmail:
+    process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? 'support@elevateforhumanity.org',
+  supportPhone:
+    process.env.NEXT_PUBLIC_SUPPORT_PHONE ?? '(317) 314-3757',
+  emailFromName:
+    process.env.NEXT_PUBLIC_EMAIL_FROM_NAME ?? 'Elevate for Humanity',
+  emailFromAddress:
+    process.env.NEXT_PUBLIC_EMAIL_FROM_ADDRESS ?? 'noreply@elevateforhumanity.org',
+  certificateHolder:
+    process.env.NEXT_PUBLIC_CERT_HOLDER ?? 'Elevate for Humanity',
+  canonicalDomain:
+    process.env.NEXT_PUBLIC_CANONICAL_DOMAIN ?? 'www.elevateforhumanity.org',
 } as const;
 
 export type PlatformConfig = typeof PLATFORM_DEFAULTS;
@@ -106,24 +81,15 @@ export const getPlatformConfig = cache(async (): Promise<PlatformConfig> => {
     );
 
     return {
-      orgName: sanitizePlatformValue(s['site_name'], PLATFORM_DEFAULTS.orgName),
-      orgLegalName: sanitizePlatformValue(s['org_legal_name'], PLATFORM_DEFAULTS.orgLegalName),
-      siteUrl: sanitizePlatformValue(s['site_url'], PLATFORM_DEFAULTS.siteUrl),
-      supportEmail: sanitizePlatformValue(s['support_email'], PLATFORM_DEFAULTS.supportEmail),
-      supportPhone: sanitizePlatformValue(s['contact_phone'], PLATFORM_DEFAULTS.supportPhone),
-      emailFromName: sanitizePlatformValue(s['email_from_name'], PLATFORM_DEFAULTS.emailFromName),
-      emailFromAddress: sanitizePlatformValue(
-        s['email_from_address'],
-        PLATFORM_DEFAULTS.emailFromAddress,
-      ),
-      certificateHolder: sanitizePlatformValue(
-        s['certificate_holder'],
-        PLATFORM_DEFAULTS.certificateHolder,
-      ),
-      canonicalDomain: sanitizePlatformValue(
-        s['canonical_domain'],
-        PLATFORM_DEFAULTS.canonicalDomain,
-      ),
+      orgName: s['site_name'] || PLATFORM_DEFAULTS.orgName,
+      orgLegalName: s['org_legal_name'] || PLATFORM_DEFAULTS.orgLegalName,
+      siteUrl: s['site_url'] || PLATFORM_DEFAULTS.siteUrl,
+      supportEmail: s['support_email'] || PLATFORM_DEFAULTS.supportEmail,
+      supportPhone: s['contact_phone'] || PLATFORM_DEFAULTS.supportPhone,
+      emailFromName: s['email_from_name'] || PLATFORM_DEFAULTS.emailFromName,
+      emailFromAddress: s['email_from_address'] || PLATFORM_DEFAULTS.emailFromAddress,
+      certificateHolder: s['certificate_holder'] || PLATFORM_DEFAULTS.certificateHolder,
+      canonicalDomain: s['canonical_domain'] || PLATFORM_DEFAULTS.canonicalDomain,
     };
   } catch (err) {
     logger.warn('[getPlatformConfig] unexpected error — using env defaults', err);

@@ -9,30 +9,16 @@ import { NextResponse } from 'next/server';
 
 export type UserRole =
   | 'student'
-  | 'admin'
-  | 'advisor'
-  | 'staff'
-  | 'employer'
-  | 'workforce_board'
-  | 'partner'
-  | 'sponsor'
-  | 'mentor'
-  | 'org_admin'
-  | 'program_holder'
-  | 'delegate'
-  | 'creator'
   | 'instructor'
-  | 'case_manager'
-  | 'provider_admin'
+  | 'admin'
   | 'super_admin'
-  | 'grant_client'
-  | 'partner_admin'
-  | 'host_shop'
-  | 'government'
-  | 'testing_center'
-  | 'financial_aid'
-  | 'compliance'
-  | 'dev_studio';
+  | 'staff'
+  | 'program_holder'
+  | 'provider_admin'
+  | 'case_manager'
+  | 'employer'
+  | 'partner'
+  | 'delegate';
 
 export interface AuthGuardOptions {
   requireAuth?: boolean;
@@ -120,7 +106,7 @@ export async function authGuard(options: AuthGuardOptions = {}): Promise<AuthGua
 
   // Check email verification
   if (requireEmailVerified && !user.email_confirmed_at) {
-    redirect('/verify');
+    redirect('/verify-email');
   }
 
   // Check role authorization
@@ -159,7 +145,7 @@ export async function requireAuth() {
 export async function requireAdmin() {
   const { user, role } = await authGuard({
     requireAuth: true,
-    allowedRoles: ['admin', 'staff'],
+    allowedRoles: ['admin', 'super_admin', 'staff'],
   });
 
   return user;
@@ -241,6 +227,7 @@ export async function getUserRole(): Promise<UserRole | null> {
 
 const PERMISSIONS: Record<UserRole, string[]> = {
   admin: ['*'], // All permissions
+  super_admin: ['*'],
   staff: ['view_students', 'view_programs', 'view_analytics', 'manage_enrollments'],
   instructor: [
     'view_students',
@@ -521,7 +508,7 @@ export async function apiAuthGuard(options: AuthGuardOptions = {}): Promise<{
 export async function apiRequireAdmin() {
   const result = await apiAuthGuard({
     requireAuth: true,
-    allowedRoles: ['admin', 'staff'],
+    allowedRoles: ['admin', 'super_admin', 'staff'],
   });
 
   if (!result.authorized) {

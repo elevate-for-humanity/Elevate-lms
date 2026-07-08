@@ -238,9 +238,7 @@ export async function generateCourse(opts: CourseGeneratorOptions): Promise<Gene
     raw = result.content;
   } catch (err) {
     logger.error('[CourseGenerator] AI call failed', err);
-    const e = new Error('AI generation failed. Check OPENAI_API_KEY is configured.');
-    (e as { cause?: unknown }).cause = err;
-    throw e;
+    throw new Error('AI generation failed. Check OPENAI_API_KEY is configured.');
   }
 
   // Attempt parse; retry once with repair if it fails
@@ -267,9 +265,7 @@ export async function generateCourse(opts: CourseGeneratorOptions): Promise<Gene
       parsed = JSON.parse(extractJSON(repairResult.content));
     } catch (repairErr) {
       logger.error('[CourseGenerator] JSON repair failed', repairErr);
-      const e = new Error('AI returned malformed JSON after repair attempt.');
-      (e as { cause?: unknown }).cause = repairErr;
-      throw e;
+      throw new Error('AI returned malformed JSON after repair attempt.');
     }
   }
 

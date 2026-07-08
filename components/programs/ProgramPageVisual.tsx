@@ -41,11 +41,11 @@ export function ProgramPageVisual({ program }: Props) {
   return (
     <div className="min-h-screen bg-white">
       {/* HERO - Full width, visual-first */}
-      <section className="relative h-[clamp(260px,38vw,420px)] flex items-end">
+      <section className="relative h-[70vh] min-h-[500px] flex items-end">
         {program.heroVideo ? (
           <CanonicalVideo
             src={program.heroVideo}
-            poster={program.heroImage || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-default.jpg'}
+            poster={program.heroImage || '/images/og-default.jpg'}
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (

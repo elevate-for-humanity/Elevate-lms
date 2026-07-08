@@ -30,7 +30,7 @@ MEMORANDUM OF UNDERSTANDING (MOU)
 
 This Memorandum of Understanding ("MOU") outlines the partnership between:
 
-${PLATFORM_DEFAULTS.orgName} Career & Technical Institute
+${PLATFORM_DEFAULTS.orgName} Career & Training Institute
 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName}
 ("Institute")
 
@@ -158,7 +158,7 @@ Date: ${data.date}
 
 INSTITUTE ACKNOWLEDGMENT
 
-${PLATFORM_DEFAULTS.orgName} Career & Technical Institute
+${PLATFORM_DEFAULTS.orgName} Career & Training Institute
 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName}
 
 Signature: ______________________________

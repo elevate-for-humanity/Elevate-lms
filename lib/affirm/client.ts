@@ -18,7 +18,7 @@
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-// Read from consolidated API_KEYS_JSON first,
+// Read from consolidated API_KEYS_JSON first (reduces SSM parameter count),
 // then fall back to individual env vars.
 let _apiKeys: Record<string, string> = {};
 try {

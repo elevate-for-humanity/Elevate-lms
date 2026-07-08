@@ -100,8 +100,7 @@ export async function streamPlatformChat(
     return;
   }
   const decoder = new TextDecoder();
-  let buffer: string;
-  buffer = '';
+  let buffer = '';
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -148,8 +147,7 @@ export async function streamExecuteCommand(
   }
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
-  let buffer: string;
-  buffer = '';
+  let buffer = '';
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;

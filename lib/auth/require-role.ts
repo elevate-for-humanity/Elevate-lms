@@ -1,19 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
-
-function expandAllowedRoles(allowedRoles: string[]): string[] {
-  const expanded = new Set(allowedRoles);
-  // Routes that allow admin should also include org_admin
-  if (expanded.has('admin')) {
-    expanded.add('org_admin');
-  }
-  // Routes that allow staff should also include org_admin
-  if (expanded.has('staff')) {
-    expanded.add('org_admin');
-  }
-  return Array.from(expanded);
-}
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export interface AuthResult {
   user: {
@@ -28,8 +16,6 @@ export interface AuthResult {
     first_name?: string;
     last_name?: string;
     full_name?: string;
-    avatar_url?: string | null;
-    onboarding_completed?: boolean | null;
   };
   /** All roles this user holds (profile.role + any user_roles entries). Use this for inline role checks instead of profile.role to support multi-role users. */
   effectiveRoles: string[];
@@ -65,10 +51,10 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
       }
     }
     // Admin app has no /login page — redirect to /admin-login on the LMS.
-    // SERVICE_ROLE=admin is set in the admin container environment.
+    // SERVICE_ROLE=admin is set in the admin ECS task definition.
     const loginPath =
       process.env.SERVICE_ROLE === 'admin'
-        ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/login?redirect=${encodeURIComponent(returnPath)}`
+        ? `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/admin-login?redirect=${encodeURIComponent(returnPath)}`
         : `/login?redirect=${encodeURIComponent(returnPath)}`;
     redirect(loginPath);
   }
@@ -92,21 +78,18 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
     redirect('/onboarding/learner?reason=profile_missing');
   }
 
-  // Load secondary roles from user_roles table (multi-role users).
-  // Select both the FK-joined name and the direct `role` TEXT column as fallback.
+  // Load secondary roles from user_roles table (multi-role users)
   const { data: userRoleRows } = await supabase
     .from('user_roles')
-    .select('role, roles(name)')
+    .select('roles(name)')
     .eq('user_id', user.id);
   const secondaryRoles = (userRoleRows || [])
-    .flatMap((r: any) => [r.roles?.name, r.role])
-    .filter((v): v is string => typeof v === 'string' && v.trim() !== '')
-    .map((v) => v.trim());
+    .map((r: any) => r.roles?.name)
+    .filter(Boolean) as string[];
 
   const effectiveRoles = Array.from(new Set([profile.role, ...secondaryRoles]));
-  const expandedAllowedRoles = expandAllowedRoles(allowedRoles);
 
-  const allowed = effectiveRoles.some((r) => expandedAllowedRoles.includes(r));
+  const allowed = effectiveRoles.some((r) => allowedRoles.includes(r));
 
   if (!allowed) {
     const unauthorizedPath =
@@ -143,7 +126,7 @@ export async function hasRole(requiredRole: string): Promise<boolean> {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile?.role) return false;
-  const expandedAllowedRoles = expandAllowedRoles([requiredRole]);
-  return expandedAllowedRoles.includes(profile.role);
+  return (
+    profile?.role === requiredRole || profile?.role === 'admin' || profile?.role === 'super_admin'
+  );
 }

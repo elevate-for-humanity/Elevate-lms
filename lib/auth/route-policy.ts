@@ -7,8 +7,8 @@
  * Policies:
  *   public              — no auth required
  *   authenticated       — any logged-in user
- *   admin               — admin | admin | staff
- *   instructor_or_admin — instructor | admin | admin | staff
+ *   admin               — admin | super_admin | staff
+ *   instructor_or_admin — instructor | admin | super_admin | staff
  */
 
 export type AccessPolicy = 'public' | 'authenticated' | 'admin' | 'instructor_or_admin';

@@ -19,47 +19,9 @@ export const SOFTWARE_DEV: ProgramSchema = {
   cohortSize: '10–14 participants per cohort',
   fundingStatement: '$0 with WIOA or Next Level Jobs funding',
   selfPayCost: '$5,000',
-  fundingOptions: ['wioa', 'wrg', 'wioa', 'self_pay'],
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'Funding Available',
   badgeColor: 'green',
-  // ETPL Program ID for Indiana ETPL compliance
-  etplProgramId: '10005179',
-  // Technology-specific fields for ETPL alignment
-  technologyCareerPathways: [
-    'Software Developer',
-    'Web Developer',
-    'IT Support Specialist',
-    'Help Desk Technician',
-    'Cybersecurity Support Technician',
-    'Network Support Technician',
-    'AI Productivity Specialist',
-    'Data Technician',
-    'Technical Operations Specialist',
-  ],
-  additionalCertifications: [
-    'PCEP Certified Entry-Level Python Programmer',
-    'IT Specialist Python',
-    'IT Specialist HTML & CSS',
-    'IT Specialist JavaScript',
-    'IT Specialist Databases',
-    'IT Specialist Networking',
-    'IT Specialist Cybersecurity',
-    'IT Specialist Artificial Intelligence',
-  ],
-  technologySkills: [
-    'Python Programming',
-    'HTML/CSS',
-    'JavaScript',
-    'GitHub',
-    'SQL & Databases',
-    'API Fundamentals',
-    'AI Productivity Tools',
-    'Prompt Engineering',
-    'Software Development Lifecycle',
-    'Technical Documentation',
-    'Version Control',
-    'Automation Fundamentals',
-  ],
   credentials: [
     {
       name: 'IT Specialist — Python',
@@ -278,8 +240,8 @@ export const SOFTWARE_DEV: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: true,
+    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',

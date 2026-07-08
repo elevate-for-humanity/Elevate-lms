@@ -102,7 +102,7 @@ export async function assignAIInstructor({
       },
     };
   } catch (data: any) {
-    logger.info('AI instructor assignment data', { data });
+    logger.data('AI instructor assignment data', data);
     return {
       success: false,
       data: data instanceof Error ? data.message : String(data),

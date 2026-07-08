@@ -27,27 +27,24 @@ export function useAvatarOnLoad(pageId: string | undefined) {
     if (!pageId) return;
     if (hasSpoken.current) return;
 
-    const config = getAvatarConfig();
-    const avatarEnabled = (config as { enabled?: boolean }).enabled ?? false;
-    const avatarMessage = (config as { message?: string }).message;
-    const avatarSpeakOnLoad = (config as { speakOnLoad?: boolean }).speakOnLoad ?? false;
-
     // DEV-ONLY: Enforcement warnings
     if (process.env.NODE_ENV === 'development') {
+      const config = getAvatarConfig(pageId);
+
       // Warn if enabled but no message
-      if (avatarEnabled && avatarSpeakOnLoad && !avatarMessage) {
+      if (config.enabled && config.speakOnLoad && !config.message) {
         logger.warn(`[AvatarEngine] Avatar enabled but no message for: ${pageId}`);
       }
 
       // Warn if disabled without being explicitly silent
-      if (!avatarEnabled && avatarMessage) {
+      if (!config.enabled && config.message) {
         logger.warn(`[AvatarEngine] Avatar has message but is disabled: ${pageId}`);
       }
 
       // Warn about potential marketing pages without config
       const marketingPatterns = ['/about', '/contact', '/careers', '/funding', '/testimonials'];
       const isMarketingPage = marketingPatterns.some((p) => pageId.startsWith(p));
-      if (isMarketingPage && !avatarEnabled) {
+      if (isMarketingPage && !config.enabled) {
         logger.warn(`[AvatarEngine] Marketing page without avatar config: ${pageId}`);
       }
     }

@@ -19,7 +19,7 @@ export const PROJECT_MANAGEMENT: ProgramSchema = {
   cohortSize: '12–18 participants per cohort',
   fundingStatement: '$0 with WIOA or Next Level Jobs funding',
   selfPayCost: '$2,000',
-  fundingOptions: ['wioa', 'wioa', 'self_pay'],
+  fundingOptions: ['wioa', 'impact', 'self_pay'],
   badge: 'Funding Available',
   badgeColor: 'green',
   credentials: [
@@ -222,8 +222,8 @@ export const PROJECT_MANAGEMENT: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: true,
+    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',

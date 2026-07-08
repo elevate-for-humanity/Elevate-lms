@@ -22,7 +22,7 @@ export const ESTHETICIAN: ProgramSchema = {
   cohortSize: '8–12 participants per cohort',
   fundingStatement:
     '$0 with WIOA or Workforce Ready Grant. Self-pay starts at a $600 deposit, then weekly or BNPL options.',
-  selfPayCost: '$2,500',
+  selfPayCost: '$4,575',
   fundingOptions: ['wioa', 'wrg', 'self_pay'],
   badge: 'ETPL Approved',
   badgeColor: 'green',
@@ -312,8 +312,8 @@ export const ESTHETICIAN: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: true,
+    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',

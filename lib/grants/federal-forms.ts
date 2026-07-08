@@ -5,7 +5,6 @@
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
-import { logger } from '@/lib/logger';
 import { getEntityByUEI } from '@/lib/integrations/sam-gov';
 
 async function getDb() {
@@ -260,8 +259,7 @@ export async function generateSF424(
   projectDates: { start: string; end: string },
   funding: SF424Data['funding'],
 ): Promise<SF424Data> {
-  const db = await getDb();
-  const { data: entity, error: entityError } = await db
+  const { data: entity, error: entityError } = await getDb()
     .from('entities')
     .select('*')
     .eq('id', entityId)
@@ -271,7 +269,7 @@ export async function generateSF424(
     throw new Error('Entity not found');
   }
 
-  const { data: grant, error: grantError } = await db
+  const { data: grant, error: grantError } = await getDb()
     .from('grant_opportunities')
     .select('*')
     .eq('id', grantId)
@@ -342,8 +340,7 @@ export async function generateSF424A(
   grantId: string,
   budgetData: SF424AData['sections']['budgetCategories'],
 ): Promise<SF424AData> {
-  const db = await getDb();
-  const { data: grant } = await db
+  const { data: grant } = await getDb()
     .from('grant_opportunities')
     .select('*')
     .eq('id', grantId)
@@ -398,14 +395,13 @@ export async function generateSF424A(
  * Generate SF-LLL Lobbying Disclosure form
  */
 export async function generateSFLLL(entityId: string, grantId: string): Promise<SFLLLData> {
-  const db = await getDb();
-  const { data: entity } = await db
+  const { data: entity } = await getDb()
     .from('entities')
     .select('*')
     .eq('id', entityId)
     .maybeSingle();
 
-  const { data: grant } = await db
+  const { data: grant } = await getDb()
     .from('grant_opportunities')
     .select('*')
     .eq('id', grantId)
@@ -448,7 +444,7 @@ export async function generateAllFederalForms(applicationId: string): Promise<{
   sflll: SFLLLData;
 }> {
   const db = await getDb();
-  await setAuditContext(db, { systemActor: 'grants_federal_forms' }).catch((e) => logger.warn('[grants/federal-forms] Failed to set audit context', { error: e instanceof Error ? e.message : String(e) }));
+  await setAuditContext(db, { systemActor: 'grants_federal_forms' }).catch(() => {});
   const { data: app, error } = await db
     .from('grant_applications')
     .select('*, grant:grant_opportunities(*), entity:entities(*)')

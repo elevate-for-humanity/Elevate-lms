@@ -24,7 +24,7 @@ export type AppRole =
   | 'student'
   | 'instructor'
   | 'admin'
-  | 'admin'
+  | 'super_admin'
   | 'org_admin'
   | 'staff'
   | 'program_holder'

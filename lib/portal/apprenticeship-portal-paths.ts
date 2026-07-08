@@ -1,15 +1,8 @@
 /**
- * Per-program apprenticeship home URLs.
+ * Per-program apprenticeship portal URLs.
  * Used by login, learner dashboard, and portal router — keep in sync.
  */
 
-import { APPRENTICESHIP_PORTAL_ENROLLMENT_STATES } from '@/lib/enrollment/enrollment-flow';
-
-// Canonical program-specific apprentice dashboards. MUST stay in sync with
-// SLUG_TO_PORTAL (derived from APPRENTICE_PORTAL_CONFIGS in ApprenticePortalShell)
-// and the ApprenticeSubNav "Dashboard" tab. Do not point these at the generic
-// /apprentice hub — that creates a parallel dashboard and diverges login routing
-// from the rest of the app (see tests/unit/portal-routing.test.ts).
 export const APPRENTICESHIP_SLUG_TO_PORTAL_PATH: Record<string, string> = {
   'barber-apprenticeship': '/portal/barber',
   'cosmetology-apprenticeship': '/portal/cosmetology',
@@ -31,8 +24,14 @@ export const APPRENTICESHIP_SLUG_TO_PORTAL_TYPE: Record<string, string> = {
   plumbing: 'plumbing',
 };
 
-/** @see APPRENTICESHIP_PORTAL_ENROLLMENT_STATES in enrollment-flow.ts */
-export const ACTIVE_ENROLLMENT_STATES = APPRENTICESHIP_PORTAL_ENROLLMENT_STATES;
+export const ACTIVE_ENROLLMENT_STATES = [
+  'active',
+  'enrolled',
+  'onboarding',
+  'confirmed',
+  'orientation_complete',
+  'documents_complete',
+] as const;
 
 export function portalPathForProgramSlug(programSlug: string | null | undefined): string | null {
   if (!programSlug) return null;
@@ -42,8 +41,4 @@ export function portalPathForProgramSlug(programSlug: string | null | undefined)
 export function portalTypeForProgramSlug(programSlug: string | null | undefined): string | null {
   if (!programSlug) return null;
   return APPRENTICESHIP_SLUG_TO_PORTAL_TYPE[programSlug] ?? null;
-}
-
-export function isApprenticeshipPortalType(portalType: string | null | undefined): boolean {
-  return !!portalType && Object.values(APPRENTICESHIP_SLUG_TO_PORTAL_TYPE).includes(portalType);
 }

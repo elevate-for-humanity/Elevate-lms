@@ -5,7 +5,6 @@
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
-import { logger } from '@/lib/logger';
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
 import JSZip from 'jszip';
 
@@ -46,7 +45,7 @@ export interface PackageAttachment {
  * Generate Word document from grant narrative
  */
 export async function generateNarrativeDocx(applicationId: string): Promise<Buffer> {
-  const { data: app, error } = await (await getDb())
+  const { data: app, error } = await getDb()
     .from('grant_applications')
     .select('*, grant:grant_opportunities(*), entity:entities(*)')
     .eq('id', applicationId)
@@ -114,7 +113,7 @@ export async function generateNarrativeDocx(applicationId: string): Promise<Buff
  * Generate PDF from narrative (using HTML to PDF conversion)
  */
 export async function generateNarrativePdf(applicationId: string): Promise<Buffer> {
-  const { data: app, error } = await (await getDb())
+  const { data: app, error } = await getDb()
     .from('grant_applications')
     .select('*, grant:grant_opportunities(*), entity:entities(*)')
     .eq('id', applicationId)
@@ -214,7 +213,7 @@ function convertMarkdownToHtml(markdown: string): string {
  * Generate capability statement PDF
  */
 export async function generateCapabilityStatement(entityId: string): Promise<Buffer> {
-  const { data: entity, error } = await (await getDb())
+  const { data: entity, error } = await getDb()
     .from('entities')
     .select('*')
     .eq('id', entityId)
@@ -327,7 +326,7 @@ export async function generateCapabilityStatement(entityId: string): Promise<Buf
  * Generate budget spreadsheet (simplified Excel format)
  */
 export async function generateBudgetSpreadsheet(applicationId: string): Promise<Buffer> {
-  const { data: app, error } = await (await getDb())
+  const { data: app, error } = await getDb()
     .from('grant_applications')
     .select('*')
     .eq('id', applicationId)
@@ -358,7 +357,7 @@ Total,,0
  */
 export async function buildGrantPackage(applicationId: string): Promise<GrantPackage> {
   const db = await getDb();
-  await setAuditContext(db, { systemActor: 'grants_package_builder' }).catch((e) => logger.warn('[grants/package-builder] Failed to set audit context', { error: e instanceof Error ? e.message : String(e) }));
+  await setAuditContext(db, { systemActor: 'grants_package_builder' }).catch(() => {});
   const { data: app, error } = await db
     .from('grant_applications')
     .select('*, grant:grant_opportunities(*), entity:entities(*)')

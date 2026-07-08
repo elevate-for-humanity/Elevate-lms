@@ -19,13 +19,11 @@ import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import { logger } from '@/lib/logger';
 
-import { PENDING_ONBOARDING_STATES } from '@/lib/enrollment/enrollment-flow';
-
 const ACCESS_STATES = [
   'active',
   'in_progress',
   'enrolled',
-  'onboarding',
+  'confirmed',
   'pending_funding_verification',
 ];
 
@@ -36,7 +34,6 @@ export interface EnrollmentDTO {
   course_id: string | null;
   program_id: string | null;
   program_slug: string | null;
-  host_shop_id: string | null;
   status: string | null;
   enrollment_state: string | null;
   progress_percent: number | null;
@@ -47,16 +44,6 @@ export interface EnrollmentDTO {
     title: string;
     description: string | null;
     duration_hours: number | null;
-    image: string | null;
-    hero_image?: string | null;
-  } | null;
-  host_shop?: {
-    id: string;
-    name: string;
-    address?: string | null;
-    city?: string | null;
-    state?: string | null;
-    zip?: string | null;
   } | null;
   _isApprenticeship?: boolean;
 }
@@ -202,14 +189,14 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
   const warnings: string[] = [];
 
   // ── 1. IDENTITY ────────────────────────────────────────────────────
-  const { user, profile } = await requireRole(['student', 'admin']);
+  const { user, profile } = await requireRole(['student', 'admin', 'super_admin']);
   const supabase = await createClient();
 
   // ── 2. ENROLLMENTS (required) ──────────────────────────────────────
   const { data: programEnrollments, error: enrollmentError } = await supabase
     .from('program_enrollments')
     .select(
-      `id, course_id, program_id, program_slug, host_shop_id,
+      `id, course_id, program_id, program_slug,
        status, enrollment_state, progress_percent,
        enrolled_at, access_granted_at, cohort_id`,
     )
@@ -230,7 +217,7 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
     enrollmentCourseIds.length > 0
       ? await supabase
           .from('courses')
-          .select('id, title, description, duration_hours, image')
+          .select('id, title, description, duration_hours')
           .in('id', enrollmentCourseIds)
       : { data: [], error: null };
 
@@ -277,27 +264,9 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
 
   const apMap = new Map<string, any>((apprenticeshipPrograms ?? []).map((p: any) => [p.id, p]));
 
-  // ── 5.1 HOST SHOP DETAILS (manual join) ───────────────────────────
-  const hostShopIds = rows.map((e) => e.host_shop_id).filter(Boolean) as string[];
-  const { data: hostShopRows, error: hsErr } =
-    hostShopIds.length > 0
-      ? await supabase
-          .from('organizations')
-          .select('id, name, address, city, state, zip')
-          .in('id', hostShopIds)
-      : { data: [], error: null };
-
-  if (hsErr) {
-    warnings.push('organizations lookup failed');
-    logger.warn('loadLearnerDashboard: organizations lookup failed', hsErr);
-  }
-
-  const hostShopMap = new Map<string, any>((hostShopRows ?? []).map((hs: any) => [hs.id, hs]));
-
   // ── 6. NORMALIZE ENROLLMENTS ───────────────────────────────────────
   const normalizedEnrollments: EnrollmentDTO[] = rows.map((e: any) => {
     let courses: EnrollmentDTO['courses'] = null;
-    const host_shop = hostShopMap.get(e.host_shop_id) ?? null;
 
     if (e.course_id) {
       const course = courseMap.get(e.course_id) ?? trainingCourseMap.get(e.course_id);
@@ -307,32 +276,20 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
           title: course.title ?? course.course_name ?? 'Course',
           description: course.description ?? null,
           duration_hours: course.duration_hours ?? null,
-          image: course.image ?? null,
         };
       }
     } else if (e.program_id && apMap.has(e.program_id)) {
       const ap = apMap.get(e.program_id);
-      const slug = e.program_slug?.toLowerCase() ?? '';
-      // Map program slugs to hero images
-      const heroImageMap: Record<string, string> = {
-        'barber-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship-hero.jpg',
-        'cosmetology-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-apprenticeship-hero.webp',
-        'nail-technician-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-tech-hero.webp',
-        'esthetician-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-tech-hero.webp',
-      };
-      const hero_image = heroImageMap[slug] || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-apprenticeship-hero.jpg';
       courses = {
         id: ap.id,
         title: ap.name ?? 'Apprenticeship Program',
         description: ap.description ?? null,
         duration_hours: null,
-        image: null,
-        hero_image,
       };
-      return { ...e, courses, host_shop, _isApprenticeship: true } as EnrollmentDTO;
+      return { ...e, courses, _isApprenticeship: true } as EnrollmentDTO;
     }
 
-    return { ...e, courses, host_shop } as EnrollmentDTO;
+    return { ...e, courses } as EnrollmentDTO;
   });
 
   const seen = new Set<string>();
@@ -603,7 +560,13 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
     .from('program_enrollments')
     .select('id, enrollment_state, next_required_action, full_name, program_id, program_slug')
     .eq('user_id', user.id)
-    .in('enrollment_state', [...PENDING_ONBOARDING_STATES])
+    .in('enrollment_state', [
+      'applied',
+      'approved',
+      'confirmed',
+      'orientation_complete',
+      'documents_complete',
+    ])
     .order('enrolled_at', { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -668,14 +631,7 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
 
   return {
     user: { id: user.id, email: user.email },
-    profile: {
-      id: profile.id,
-      first_name: profile.first_name ?? null,
-      last_name: profile.last_name ?? null,
-      role: profile.role,
-      avatar_url: profile.avatar_url ?? null,
-      onboarding_completed: profile.onboarding_completed ?? null,
-    },
+    profile,
     enrollments,
     activeEnrollments,
     completedEnrollments,

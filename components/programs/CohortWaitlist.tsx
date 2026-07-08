@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 import { Calendar, MapPin, Users, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 
@@ -71,9 +70,9 @@ export default function CohortWaitlist({ programSlug, programName }: CohortWaitl
             {result.success && (
               <p className="text-sm mt-1">
                 We&apos;ll email you when enrollment opens. You can also{' '}
-                <Link href="/apply" className="underline font-medium">
+                <a href="/apply" className="underline font-medium">
                   apply now
-                </Link>{' '}
+                </a>{' '}
                 to start your onboarding early.
               </p>
             )}

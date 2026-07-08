@@ -70,6 +70,7 @@ export async function getEmailStats(timeframe: '24h' | '7d' | '30d' = '24h') {
     failureRate: total > 0 ? ((failed / total) * 100).toFixed(2) : '0',
     byProvider: {
       sendgrid: logs.filter((l) => l.provider === 'sendgrid').length,
+      sendgrid: logs.filter((l) => l.provider === 'sendgrid').length,
       fallback: logs.filter((l) => l.provider === 'fallback').length,
     },
   };

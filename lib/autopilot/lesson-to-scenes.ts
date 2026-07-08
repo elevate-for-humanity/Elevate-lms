@@ -8,10 +8,7 @@
  * Cost per lesson: ~$0.20 (4 DALL-E images × $0.04 + GPT-4o ~$0.04)
  */
 
-// Import OpenAI type from the AI service (not the raw SDK to satisfy lint rules)
-import type { OpenAI } from '@/lib/ai/openai-client';
 import { getOpenAIClient } from '@/lib/ai/openai-client';
-import { logger } from '@/lib/logger';
 import fs from 'fs/promises';
 import path from 'path';
 import type { VideoScene } from '../../server/video-generator-v2';
@@ -156,17 +153,7 @@ Return JSON only:
     .replace(/^```json?\s*/i, '')
     .replace(/\s*```$/i, '')
     .trim();
-  
-  // Safe JSON parsing with error logging
-  try {
-    return JSON.parse(cleaned) as ScenePlan;
-  } catch (error) {
-    logger.error('[lesson-to-scenes] JSON parse error', {
-      raw: cleaned.slice(0, 200) + (cleaned.length > 200 ? '...' : ''),
-      error: error instanceof Error ? error.message : String(error)
-    });
-    throw new Error(`Failed to parse AI response as JSON: ${error instanceof Error ? error.message : 'Unknown error'}`), { cause: error };
-  }
+  return JSON.parse(cleaned) as ScenePlan;
 }
 
 /**

@@ -18,7 +18,7 @@ const faqs = [
   {
     question: 'What do I tell the advisor?',
     answer:
-      `Tell them you are working with ${PLATFORM_DEFAULTS.orgName} and the program you're interested in.`,
+      "Tell them you are working with {PLATFORM_DEFAULTS.orgName} and the program you're interested in.",
   },
   {
     question: "What if I don't qualify for funding?",

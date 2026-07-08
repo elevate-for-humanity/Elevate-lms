@@ -2,8 +2,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
-import { hero as heroTokens } from '@/lib/page-design-tokens';
-import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
 
 export interface LandingPageConfig {
   breadcrumbs: { label: string; href?: string }[];
@@ -51,7 +49,8 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
 
       {/* Hero — clean full-bleed image, no overlay or text on top */}
       <section
-        className={heroTokens.imageWrap}
+        className="relative w-full overflow-hidden"
+        style={{ height: 'clamp(320px, 45vw, 560px)' }}
         aria-label={`${config.hero.title} hero image`}
       >
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
@@ -59,11 +58,9 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
           src={config.hero.image}
           alt={config.hero.title}
           fill
-          className="object-cover object-center sm:object-[center_35%]"
+          className="object-cover object-center"
           priority
-          sizes={heroTokens.imageSizes}
-          quality={75}
-          placeholder="empty"
+          sizes="100vw" placeholder="empty"
         />
         {/* Micro-label — bottom-left, 2–4 words max */}
         {config.hero.tag && (
@@ -163,8 +160,6 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
           </div>
         </div>
       </section>
-
-      <CredentialAuthorityFootnote />
     </div>
   );
 }

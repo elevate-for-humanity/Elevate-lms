@@ -51,7 +51,7 @@ const PROGRAM_TITLES: Record<string, string> = {
   'project-management': 'Project Management',
   'office-administration': 'Office Administration',
   'bookkeeping': 'Bookkeeping & QuickBooks',
-  
+  'tax-preparation': 'Tax Preparation',
   'entrepreneurship': 'Entrepreneurship & Small Business',
 };
 
@@ -195,7 +195,7 @@ export async function runPostApprovalActions(input: PostApprovalInput): Promise<
 
     logger.info('[post-approval] Enrollment email sent', { to: studentEmail, program: programTitle });
   } catch (err) {
-    logger.warn('[post-approval] Enrollment email failed (non-fatal)', { err });
+    logger.error('[post-approval] Enrollment email failed (non-fatal)', err);
   }
 
   // Teams notification — non-fatal
@@ -210,6 +210,6 @@ export async function runPostApprovalActions(input: PostApprovalInput): Promise<
       Funding: fundingLabel ?? 'N/A',
       'Enrollment ID': enrollmentId ?? 'N/A',
     },
-  ).catch((err) => logger.warn('[post-approval] Teams notification failed (non-fatal)', { err }));
+  ).catch((err) => logger.error('[post-approval] Teams notification failed', err));
 }
 

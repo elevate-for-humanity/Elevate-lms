@@ -1,11 +1,11 @@
 /**
- * internalFetch — fetch wrapper for service-to-service calls.
+ * internalFetch — fetch wrapper for service-to-service calls on ECS.
  *
- * Containers have a configurable timeout (default 30s for internal calls). Internal self-calls
+ * ECS tasks have a configurable timeout (default 30s for internal calls). Internal self-calls
  * (e.g. /api/email/send, /api/ocr/extract) can stall indefinitely if the
  * target function cold-starts slowly or DNS resolution hangs. Without a
  * timeout these calls consume the full 26s budget, causing cascading
- * timeouts visible as 21-23s durations in runtime logs.
+ * timeouts visible as 21-23s durations in CloudWatch logs.
  *
  * Default timeout: 10s — leaves headroom for the caller to handle the
  * error and return a response before the 30s timeout.

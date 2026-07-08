@@ -296,7 +296,7 @@ export function TrialBanner() {
       <div className="bg-red-600 text-white px-4 py-2 text-center text-sm">
         <strong>Payment overdue.</strong> Please update your payment method to continue using all
         features.
-        <a href="/store/licenses" className="ml-2 underline">
+        <a href="/account/billing" className="ml-2 underline">
           Update Payment →
         </a>
       </div>

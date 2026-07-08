@@ -81,18 +81,15 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
     }
 
     // Step 4: Resolve latest published course version
-    let version: { id: string } | null = null;
-    try {
-      const result = await supabase
-        .from('course_versions')
-        .select('id')
-        .eq('course_id', data.courseId)
-        .eq('is_published', true)
-        .order('version_number', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      version = result?.data ?? null;
-    } catch { /* ignore */ }
+    const { data: version } = (await supabase
+      .from('course_versions')
+      .select('id')
+      .eq('course_id', data.courseId)
+      .eq('is_published', true)
+      .order('version_number', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .catch(() => ({ data: null }))) as { data: { id: string } | null };
 
     // Step 5: Resolve program_slug — required by DB trigger on program_enrollments
     // Look up the course slug directly (courses.slug matches programs.slug for canonical courses)
@@ -123,24 +120,22 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
     }
 
     // Step 6: Audit log (fire-and-forget)
-    try {
-      await supabase
-        .from('audit_logs')
-        .insert({
-          user_id: data.userId,
-          action: 'enrollment_created',
-          resource_type: 'enrollment',
-          resource_id: enrollment.id,
-          metadata: {
-            course_id: data.courseId,
-            course_title: course.title,
-            version_id: version?.id ?? null,
-            table: 'program_enrollments',
-          },
-        });
-    } catch (err) {
-      logger.warn('Audit log failed (non-fatal)', { err });
-    }
+    supabase
+      .from('audit_logs')
+      .insert({
+        user_id: data.userId,
+        action: 'enrollment_created',
+        resource_type: 'enrollment',
+        resource_id: enrollment.id,
+        metadata: {
+          course_id: data.courseId,
+          course_title: course.title,
+          version_id: version?.id ?? null,
+          table: 'program_enrollments',
+        },
+      })
+      .then(() => {})
+      .catch((err: unknown) => logger.error('Audit log failed', err));
 
     return {
       success: true,

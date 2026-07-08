@@ -23,7 +23,7 @@ export type {
 export { validateBlueprint } from './validateBlueprint';
 
 import type { CredentialBlueprint } from './types';
-import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
+import { STATIC_PROGRAM_MAP } from '@/data/programs';
 import { buildProgramBlueprints } from './program-blueprint-factory';
 
 // ── Blueprint registry ────────────────────────────────────────────────────────

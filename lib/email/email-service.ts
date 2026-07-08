@@ -27,7 +27,7 @@ export const emailTemplates = {
         <p>Hi ${name},</p>
         <p>You've been successfully enrolled in <strong>${programName}</strong>.</p>
         <p>You can now access your course materials and start learning.</p>
-        <a href="${process.env.NEXT_PUBLIC_SITE_URL}/learner/dashboard" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 16px;">
+        <a href="${process.env.NEXT_PUBLIC_SITE_URL}/dashboard" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 16px;">
           Go to Dashboard
         </a>
       </div>
@@ -70,7 +70,7 @@ export const emailTemplates = {
         <p>Hi ${name},</p>
         <p>This is a reminder that <strong>${assignmentName}</strong> is due on ${dueDate}.</p>
         <p>Make sure to submit your work on time.</p>
-        <a href="${process.env.NEXT_PUBLIC_SITE_URL}/learner/dashboard" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 16px;">
+        <a href="${process.env.NEXT_PUBLIC_SITE_URL}/dashboard" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 16px;">
           View Assignment
         </a>
       </div>

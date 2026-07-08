@@ -3,7 +3,7 @@
  *
  * Solves three problems:
  *   1. Discipline-based hydration: every route must remember hydrateProcessEnv().
- *      One missed call → silent secret failure on container cold starts.
+ *      One missed call → silent secret failure on ECS cold starts.
  *   2. Silent degradation: routes check `if (!secret) return safeError(...)` but
  *      never tell you *which* secret is missing or *when* it went missing.
  *   3. Auth boilerplate: every protected route repeats the same guard + check pattern.
@@ -75,18 +75,17 @@ export interface RuntimeOptions {
   /**
    * Auth requirement.
    *   'user'  — any authenticated user
-   *   'admin' — admin, admin, or staff
+   *   'admin' — admin, super_admin, or staff
    * Omit for public routes.
    */
   auth?: AuthMode;
   /**
    * Cron route — validates cron secret header against CRON_SECRET env var.
    * Automatically adds 'CRON_SECRET' to required secrets.
-   *   true        — defaults to 'x-header' for backwards compatibility
-   *   'x-header'  — checks x-cron-secret header
-   *   'bearer'    — checks Authorization: Bearer <secret> header (manual / external cron)
+   *   'x-header'  — checks x-cron-secret header (AWS EventBridge cron)
+   *   'bearer'    — checks Authorization: Bearer <secret> header (Vercel/manual cron)
    */
-  cron?: 'x-header' | 'bearer' | true;
+  cron?: 'x-header' | 'bearer';
 }
 
 export interface RuntimeContext {
@@ -120,7 +119,7 @@ export function withRuntime(optionsOrHandler: RuntimeOptions | AnyHandler, handl
   }
   const options = optionsOrHandler;
   return async function wrappedHandler(req: NextRequest): Promise<NextResponse> {
-    // 1. Hydrate process.env from Supabase app_secrets (cold-start safe)
+    // 1. Hydrate process.env from Supabase app_secrets (ECS cold-start safe)
     await hydrateProcessEnv();
 
     // 2. Validate required secrets — fail hard, not silent
@@ -152,15 +151,14 @@ export function withRuntime(optionsOrHandler: RuntimeOptions | AnyHandler, handl
     // 3. Cron secret validation
     if (options.cron) {
       const cronSecret = env['CRON_SECRET'];
-      const cronMode = options.cron === true ? 'x-header' : options.cron;
       const provided =
-        cronMode === 'bearer'
+        options.cron === 'bearer'
           ? req.headers.get('authorization')?.replace(/^Bearer\s+/, '')
           : req.headers.get('x-cron-secret');
       if (provided !== cronSecret) {
         logger.warn('[withRuntime] Cron secret mismatch', {
           route: req.nextUrl.pathname,
-          mode: cronMode,
+          mode: options.cron,
           ip: req.headers.get('x-forwarded-for') ?? 'unknown',
         });
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

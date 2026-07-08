@@ -13,8 +13,8 @@ export function formatHTML(html: string): string {
     .trim();
 }
 
-export function formatJSON(data: unknown): string {
-  return JSON.stringify(data, null, 2);
+export function formatJSON(data: any): string {
+  return JSON.stringify(json, null, 2);
 }
 
 export function sanitizeFilename(filename: string): string {

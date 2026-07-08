@@ -151,7 +151,18 @@ export function getProgramById(programId: string): ProgramCatalogEntry | undefin
   return Object.values(PROGRAM_CATALOG).find((p) => p.program_id === programId);
 }
 
-export { formatCurrency, formatHours } from '@/lib/format';
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+export function formatHours(hours: number): string {
+  return hours.toLocaleString();
+}
 
 /**
  * Calculate weekly payment based on hours per week

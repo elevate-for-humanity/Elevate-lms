@@ -51,7 +51,7 @@ let _tokenExpiresAt = 0;
  * Cached in-process for 55 minutes — one token fetch per container lifetime.
  */
 async function getZoomAccessToken(): Promise<string> {
-  // Ensure secrets are loaded from platform/runtime stores.
+  // Ensure secrets are loaded from platform_secrets / SSM
   const { hydrateProcessEnv } = await import('@/lib/secrets');
   await hydrateProcessEnv();
 

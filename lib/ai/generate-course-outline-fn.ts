@@ -100,7 +100,7 @@ export async function generateCourseOutlineFn(prompt: string): Promise<GenerateR
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     // Call GPT-4o
-    let raw: string;
+    let raw = '';
     try {
       const completion = await openai.chat.completions.create({
         model: 'gpt-4.1',
@@ -121,7 +121,7 @@ export async function generateCourseOutlineFn(prompt: string): Promise<GenerateR
     }
 
     // Parse
-    let parsed: unknown;
+    let parsed: unknown = null;
     try {
       parsed = JSON.parse(raw);
     } catch {

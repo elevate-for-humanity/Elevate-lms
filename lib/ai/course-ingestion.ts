@@ -18,7 +18,6 @@ import { getOpenAIClient } from '@/lib/ai/openai-client';
 import { compileAllLessons } from '@/lib/ai/lesson-compiler';
 import type { CompiledLesson } from '@/lib/ai/lesson-compiler';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { logger } from '@/lib/logger';
 
 export type SourceType = 'prompt' | 'syllabus' | 'script' | 'transcript' | 'document';
 
@@ -196,15 +195,7 @@ function parseJSON(raw: string): any {
     .replace(/^```\s*/i, '')
     .replace(/\s*```$/i, '')
     .trim();
-  try {
-    return JSON.parse(cleaned);
-  } catch (error) {
-    logger.error('[course-ingestion] JSON parse error', {
-      raw: cleaned.slice(0, 200) + (cleaned.length > 200 ? '...' : ''),
-      error: error instanceof Error ? error.message : String(error)
-    });
-    throw new Error(`Failed to parse AI response as JSON: ${error instanceof Error ? error.message : 'Unknown error'}`), { cause: error };
-  }
+  return JSON.parse(cleaned);
 }
 
 function chunkText(text: string, maxChars = 12000): string[] {
@@ -213,12 +204,11 @@ function chunkText(text: string, maxChars = 12000): string[] {
   const chunks: string[] = [];
   let current = '';
   for (const para of paragraphs) {
-    const proposed = current ? current + '\n\n' + para : para;
-    if (current.length > 0 && proposed.length > maxChars) {
+    if (current.length + para.length + 2 > maxChars && current.length > 0) {
       chunks.push(current.trim());
       current = para;
     } else {
-      current = proposed;
+      current += (current ? '\n\n' : '') + para;
     }
   }
   if (current.trim()) chunks.push(current.trim());

@@ -169,11 +169,6 @@ export const PRE_AUTH_TABLES: PreAuthTableConfig[] = [
     reason: 'System-generated notifications. Written by job processor.',
   },
   {
-    table: 'admin_alerts',
-    mode: 'anonymous',
-    reason: 'System-generated alerts from cron jobs and monitoring.',
-  },
-  {
     table: 'testing_enforcement',
     mode: 'anonymous',
     reason: 'No-show enforcement record. Written by cron job.',

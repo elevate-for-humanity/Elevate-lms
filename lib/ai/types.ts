@@ -27,7 +27,6 @@ export interface ChatCompletionOptions {
 export interface ChatCompletionResult {
   content: string;
   model: string;
-  provider?: string;
   usage?: {
     promptTokens: number;
     completionTokens: number;

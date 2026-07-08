@@ -10,7 +10,6 @@
  * - Never infers structure from DB rows.
  */
 
-import { createClient } from '@supabase/supabase-js';
 import type { CredentialBlueprint } from '../blueprints/types';
 import { validateBlueprint } from '../blueprints/validateBlueprint';
 import { requireAdminClient } from '@/lib/supabase/admin';

@@ -183,7 +183,7 @@ function validateAndFormatField(
     return { formatted: blank(), issues };
   }
 
-  let str: string | null;
+  let str: string | null = null;
 
   // Date handling
   if (spec.type === 'DT') {
@@ -654,7 +654,7 @@ async function main() {
     console.info('Using LIVE Supabase adapter');
   } else {
     // Test adapter with sample data
-    console.info('Using local sample adapter. Pass --live for Supabase data.');
+    console.info('Using TEST adapter (dummy data). Pass --live for real data.');
     adapter = {
       async fetchParticipantsForQuarter() {
         return [

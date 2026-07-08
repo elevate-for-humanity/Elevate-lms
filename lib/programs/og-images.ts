@@ -14,68 +14,69 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
  * All paths are relative to /public and must exist in the repo.
  */
 
-export const PROGRAM_OG_DEFAULT = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-image.jpg';
+export const PROGRAM_OG_DEFAULT = '/images/og-image.jpg';
 
 export const PROGRAM_OG_IMAGES: Record<string, string> = {
   // ── Skilled Trades ────────────────────────────────────────────────────────
-  'hvac-technician':                'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hvac-hero.webp',
-  'hvac':                           'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hvac-hero.webp',
-  'electrical':                     'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-electrical-apply-hero.webp',
-  'plumbing':                       'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-plumbing-apply-hero.jpg',
-  'welding':                        'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-welding-apply-hero.webp',
-  'cdl-training':                   'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-cdl-hero.webp',
-  'diesel-mechanic':                'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hvac-hero.webp',
-  'forklift':                       'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hvac-hero.webp',
-  'construction-trades-certification': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-welding-apply-hero.webp',
+  'hvac-technician':                '/images/pages/programs-hvac-hero.webp',
+  'hvac':                           '/images/pages/programs-hvac-hero.webp',
+  'electrical':                     '/images/pages/programs-electrical-apply-hero.webp',
+  'plumbing':                       '/images/pages/programs-plumbing-apply-hero.jpg',
+  'welding':                        '/images/pages/programs-welding-apply-hero.webp',
+  'cdl-training':                   '/images/pages/programs-cdl-hero.webp',
+  'diesel-mechanic':                '/images/pages/programs-hvac-hero.webp',
+  'forklift':                       '/images/pages/programs-hvac-hero.webp',
+  'construction-trades-certification': '/images/pages/programs-welding-apply-hero.webp',
 
   // ── Healthcare ────────────────────────────────────────────────────────────
-  'cna':                            'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-cna-hero.webp',
-  'cna-certification':              'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-cna-hero.webp',
-  'certified-nursing-assistant':    'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-cna-hero.webp',
-  'medical-assistant':              'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-medical-apply-hero.webp',
-  'phlebotomy':                     'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-medical-apply-hero.webp',
-  'pharmacy-technician':            'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-medical-apply-hero.webp',
-  'home-health-aide':               'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-cna-hero.webp',
-  'peer-recovery-specialist':       'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-cna-hero.webp',
-  'sanitation-infection-control':   'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-medical-apply-hero.webp',
-  'emergency-health-safety':        'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-medical-apply-hero.webp',
-  'cpr-first-aid':                  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-medical-apply-hero.webp',
+  'cna':                            '/images/pages/programs-cna-hero.webp',
+  'cna-certification':              '/images/pages/programs-cna-hero.webp',
+  'certified-nursing-assistant':    '/images/pages/programs-cna-hero.webp',
+  'medical-assistant':              '/images/pages/programs-medical-apply-hero.webp',
+  'phlebotomy':                     '/images/pages/programs-medical-apply-hero.webp',
+  'pharmacy-technician':            '/images/pages/programs-medical-apply-hero.webp',
+  'home-health-aide':               '/images/pages/programs-cna-hero.webp',
+  'peer-recovery-specialist':       '/images/pages/programs-cna-hero.webp',
+  'sanitation-infection-control':   '/images/pages/programs-medical-apply-hero.webp',
+  'emergency-health-safety':        '/images/pages/programs-medical-apply-hero.webp',
+  'cpr-first-aid':                  '/images/pages/programs-medical-apply-hero.webp',
 
   // ── Beauty / Apprenticeships ──────────────────────────────────────────────
-  'barber-apprenticeship':          'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-hero-main.webp',
-  'barber':                         'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-hero-main.webp',
-  'cosmetology-apprenticeship':     'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-hero.webp',
-  'esthetician':                    'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-esthetician-client-services-card.jpg',
-  'esthetician-apprenticeship':     'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-esthetician-client-services-card.jpg',
-  'nail-technician-apprenticeship': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-tech-hero.webp',
-  'culinary-apprenticeship':        'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hvac-hero.webp',
+  'barber-apprenticeship':          '/images/pages/barber-hero-main.jpg',
+  'barber':                         '/images/pages/barber-hero-main.jpg',
+  'cosmetology-apprenticeship':     '/images/pages/cosmetology-hero.webp',
+  'esthetician':                    '/images/programs/efh-esthetician-client-services-card.jpg',
+  'esthetician-apprenticeship':     '/images/programs/efh-esthetician-client-services-card.jpg',
+  'nail-technician-apprenticeship': '/images/pages/nail-tech-hero.webp',
+  'culinary-apprenticeship':        '/images/pages/programs-hvac-hero.webp',
 
   // ── Technology ────────────────────────────────────────────────────────────
-  'cybersecurity-analyst':          'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity-hero.webp',
-  'cybersecurity':                  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cybersecurity-hero.webp',
-  'it-help-desk':                   'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/networking-hero.webp',
-  'it-support':                     'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/networking-hero.webp',
-  'network-administration':         'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/networking-hero.webp',
-  'network-support-technician':     'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/networking-hero.webp',
-  'software-development':           'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/networking-hero.webp',
-  'web-development':                'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/networking-hero.webp',
-  'cad-drafting':                   'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/networking-hero.webp',
+  'cybersecurity-analyst':          '/images/pages/cybersecurity-hero.webp',
+  'cybersecurity':                  '/images/pages/cybersecurity-hero.webp',
+  'it-help-desk':                   '/images/pages/networking-hero.webp',
+  'it-support':                     '/images/pages/networking-hero.webp',
+  'network-administration':         '/images/pages/networking-hero.webp',
+  'network-support-technician':     '/images/pages/networking-hero.webp',
+  'software-development':           '/images/pages/networking-hero.webp',
+  'web-development':                '/images/pages/networking-hero.webp',
+  'cad-drafting':                   '/images/pages/networking-hero.webp',
 
   // ── Business ─────────────────────────────────────────────────────────────
-  'business-administration':        'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-business-startup-marketing-hero.jpg',
-  'business':                       'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-business-startup-marketing-hero.jpg',
-  'bookkeeping':                    'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-business-startup-marketing-hero.jpg',
-  'finance-bookkeeping-accounting': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-business-startup-marketing-hero.jpg',
-  'office-administration':          'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-business-startup-marketing-hero.jpg',
-  'project-management':             'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-business-startup-marketing-hero.jpg',
-  'entrepreneurship':               'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-business-startup-marketing-hero.jpg',
-  'graphic-design':                 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-business-startup-marketing-hero.jpg',
-  
+  'business-administration':        '/images/programs/efh-business-startup-marketing-hero.jpg',
+  'business':                       '/images/programs/efh-business-startup-marketing-hero.jpg',
+  'bookkeeping':                    '/images/programs/efh-business-startup-marketing-hero.jpg',
+  'finance-bookkeeping-accounting': '/images/programs/efh-business-startup-marketing-hero.jpg',
+  'office-administration':          '/images/programs/efh-business-startup-marketing-hero.jpg',
+  'project-management':             '/images/programs/efh-business-startup-marketing-hero.jpg',
+  'entrepreneurship':               '/images/programs/efh-business-startup-marketing-hero.jpg',
+  'graphic-design':                 '/images/programs/efh-business-startup-marketing-hero.jpg',
+  'tax-preparation':                '/images/pages/tax-main-hero.webp',
+  'tax-prep-financial-services':    '/images/pages/tax-main-hero.webp',
 
   // ── Hospitality / Other ───────────────────────────────────────────────────
-  'hospitality':                    'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hvac-hero.webp',
-  'technology':                     'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/networking-hero.webp',
-  'direct-support-professional':    'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-cna-hero.webp',
+  'hospitality':                    '/images/pages/programs-hvac-hero.webp',
+  'technology':                     '/images/pages/networking-hero.webp',
+  'direct-support-professional':    '/images/pages/programs-cna-hero.webp',
 };
 
 /** Returns the OG image path for a program slug. Always returns a valid path. */

@@ -266,7 +266,8 @@ export function validateCoiText(
     /general liability|commercial general liability|cgl/.test(t) ||
     (acordFormDetected && /commercial general/.test(t));
 
-  let glAggregate: number | null;
+  let glPerOccurrence: number | null = null;
+  let glAggregate: number | null = null;
 
   // Extract the GL section of the document to scope limit parsing.
   // This prevents grabbing umbrella/auto/WC limits.
@@ -274,7 +275,7 @@ export function validateCoiText(
     extractSection(/general liability|commercial general liability|cgl/i, raw, 500) || raw; // fallback to full text if section not found
 
   // Find "Each Occurrence" limit within GL section only
-  const glPerOccurrence = findMoneyInSection(glSection, /each occurrence|per occurrence|each\s+occ/i);
+  glPerOccurrence = findMoneyInSection(glSection, /each occurrence|per occurrence|each\s+occ/i);
 
   // Find "General Aggregate" limit within GL section only
   glAggregate = findMoneyInSection(glSection, /general aggregate|gen['']?l?\s*aggregate/i);

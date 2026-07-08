@@ -25,8 +25,8 @@ export async function updateProgramProgress(userId: string, courseId: string): P
     return;
   }
 
-  let progressPercent: number;
-  let courseCompleted: boolean;
+  let progressPercent = 0;
+  let courseCompleted = false;
 
   try {
     const progress = await getLearnerProgress(userId, courseId);

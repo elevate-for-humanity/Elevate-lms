@@ -33,11 +33,6 @@ const SUBSCRIPTION_TIERS = new Set([
   'org_annual',
   'team_monthly',
   'team_annual',
-  // SaaS base plans (store/plans)
-  'solo_monthly',
-  'solo_annual',
-  'business_monthly',
-  'business_annual',
 ]);
 
 // DB tiers that MUST have expires_at (time-boxed)
@@ -403,7 +398,7 @@ export type AccessMode =
   | 'blocked_billing_issue'; // Subscription billing problem
 
 // Roles that get admin-level access during billing hold
-const ADMIN_ROLES = new Set(['admin', 'org_admin', 'executive']);
+const ADMIN_ROLES = new Set(['super_admin', 'admin', 'org_admin', 'executive']);
 
 export function isAdminRole(role: string | null | undefined): boolean {
   return !!role && ADMIN_ROLES.has(role);

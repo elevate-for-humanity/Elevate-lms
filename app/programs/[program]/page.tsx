@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+
 import { createPublicClient } from '@/lib/supabase/public';
+import { programs as staticPrograms } from '@/content/cf-programs';
 import { getStaticProgram } from '@/data/programs/index';
 import ProgramDetailPageComponent from '@/components/programs/ProgramDetailPage';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
@@ -13,15 +15,15 @@ import HeroPicture from '@/components/marketing/HeroPicture';
 import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import LiveJobPostings from '@/components/careers/LiveJobPostings';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { resolveSlug } from '@/lib/program-registry';
+
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = PLATFORM_DEFAULTS.siteUrl;
 
-// Default hero video fallback
-const DEFAULT_HERO_VIDEO = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/hero-home-fast.mp4';
-
-// Slugs that have a dedicated /programs/{slug}/apply page
+// Slugs that have a dedicated /programs/{slug}/apply page.
+// All others fall back to /apply?program={slug} (generic intake).
+// Only slugs with a real /programs/{slug}/apply page.tsx go here.
+// Everything else falls back to /apply?program={slug}.
 const DEDICATED_APPLY_SLUGS = new Set([
   'barber-apprenticeship',
   'cosmetology-apprenticeship',
@@ -29,7 +31,7 @@ const DEDICATED_APPLY_SLUGS = new Set([
   'peer-recovery-specialist',
 ]);
 
-// Programs that show live job postings on their page
+// Programs that show live job postings
 const LIVE_JOBS_PROGRAM_SLUGS = new Set([
   'barber-apprenticeship',
   'cosmetology-apprenticeship',
@@ -47,23 +49,6 @@ function getApplyHref(program: string): string {
     : `/apply?program=${program}`;
 }
 
-// Resolve hero poster source with fallback logic
-function resolveHeroPosterSrc(slug: string, opts: {
-  banner?: import('@/content/heroBanners').HeroBannerConfig | null;
-  dbImageUrl?: string;
-  heroImage?: string;
-}): string {
-  if (opts.banner?.posterImage) return opts.banner.posterImage;
-  if (opts.dbImageUrl) return opts.dbImageUrl;
-  if (opts.heroImage) return opts.heroImage;
-  return `/images/pages/${slug.replace(/-/g, '-')}.webp`;
-}
-
-// Get program OG image fallback
-function getProgramOgImage(slug: string): string | undefined {
-  return `/images/pages/${slug}.webp`;
-}
-
 export async function generateMetadata({
   params,
 }: {
@@ -79,8 +64,7 @@ export async function generateMetadata({
   };
 
   // Static ProgramSchema — preferred source for metadata
-  const canonicalSlug = resolveSlug(program) || program;
-  const sp = getStaticProgram(canonicalSlug);
+  const sp = getStaticProgram(program);
   if (sp) {
     const title = sp.metaTitle || `${sp.title} | ${PLATFORM_DEFAULTS.orgName}`;
     const description = sp.metaDescription || sp.subtitle || '';
@@ -94,13 +78,27 @@ export async function generateMetadata({
     };
   }
 
+  // cf-programs fallback
+  const cfp = staticPrograms.find((p) => p.slug === program);
+  if (cfp) {
+    const title = `${cfp.title} | ${PLATFORM_DEFAULTS.orgName}`;
+    const description = cfp.summary;
+    return {
+      title,
+      description,
+      alternates: { canonical: `${SITE_URL}/programs/${program}` },
+      openGraph: { ...ogBase, title, description, images: [{ url: ogImage, width: 1200, height: 630, alt: cfp.title }] },
+      twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
+    };
+  }
+
   // DB fallback — programs with no static definition
   const db = createPublicClient();
   if (db) {
     const { data } = await db
       .from('programs')
       .select('title, description, short_description')
-      .eq('slug', canonicalSlug)
+      .eq('slug', program)
       .maybeSingle();
     if (data) {
       const title = `${data.title} | ${PLATFORM_DEFAULTS.orgName}`;
@@ -115,11 +113,7 @@ export async function generateMetadata({
     }
   }
 
-  return {
-    title: program.replace(/-/g, ' '),
-    description: '',
-    alternates: { canonical: `${SITE_URL}/programs/${program}` },
-  };
+  return {};
 }
 
 // Funding sources shown on every program page
@@ -192,7 +186,6 @@ function ProgramPage({
   slug,
   sections,
   banner,
-  imageUrl,
 }: {
   title: string;
   summary: string;
@@ -202,55 +195,41 @@ function ProgramPage({
   slug: string;
   sections?: Array<{ heading: string; body: string }>;
   banner?: import('@/content/heroBanners').HeroBannerConfig | null;
-  imageUrl?: string | null;
 }) {
-  // Ensure imageUrl always resolves to a valid URL
-  const safeImageUrl = imageUrl || getProgramOgImage(slug) || '';
-  const heroPosterSrc = resolveHeroPosterSrc(slug, {
-    banner,
-    dbImageUrl: safeImageUrl,
-    heroImage: getProgramOgImage(slug),
-  });
   const learnItems = sections?.find(
     (s) => s.heading.toLowerCase().includes('learn') || s.heading.toLowerCase().includes('module'),
   );
 
   return (
     <main className="bg-white">
-      {/* HERO — always show media; banner copy when present */}
-      {banner?.pageKey ? (
-        <HeroVideo
-          videoSrcDesktop={banner.videoSrcDesktop ?? DEFAULT_HERO_VIDEO}
-          videoSrcMobile={banner.videoSrcMobile}
-          voiceoverSrc={banner.voiceoverSrc}
-          microLabel={banner.microLabel}
-          analyticsName={banner.analyticsName}
-          belowHeroHeadline={banner.belowHeroHeadline}
-          belowHeroSubheadline={banner.belowHeroSubheadline}
-          ctas={[banner.primaryCta, ...(banner.secondaryCta ? [banner.secondaryCta] : [])]}
-          trustIndicators={banner.trustIndicators}
-          transcript={banner.transcript}
-        />
-      ) : (
-        <HeroPicture
-          src={heroPosterSrc}
-          alt={banner?.microLabel ?? title}
-          heightStyle="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden"
-          microLabel={banner?.microLabel}
-          analyticsName={banner?.analyticsName ?? slug}
-          belowHeroHeadline={banner?.belowHeroHeadline ?? title}
-          belowHeroSubheadline={banner?.belowHeroSubheadline ?? (summary || description)}
-          ctas={
-            banner?.pageKey
-              ? [banner.primaryCta, ...(banner.secondaryCta ? [banner.secondaryCta] : [])]
-              : [
-                  { label: 'Apply Now', href: getApplyHref(slug), variant: 'primary' as const },
-                  { label: 'Check Eligibility', href: '/check-eligibility', variant: 'secondary' as const },
-                ]
-          }
-          trustIndicators={banner?.trustIndicators}
-          transcript={banner?.transcript}
-        />
+      {/* HERO — video or image banner if available */}
+      {banner?.pageKey && (
+        banner.videoSrcDesktop ? (
+          <HeroVideo
+            videoSrcDesktop={banner.videoSrcDesktop}
+            posterImage={banner.posterImage}
+            voiceoverSrc={banner.voiceoverSrc}
+            microLabel={banner.microLabel}
+            analyticsName={banner.analyticsName}
+            belowHeroHeadline={banner.belowHeroHeadline}
+            belowHeroSubheadline={banner.belowHeroSubheadline}
+            ctas={[banner.primaryCta, ...(banner.secondaryCta ? [banner.secondaryCta] : [])]}
+            trustIndicators={banner.trustIndicators}
+            transcript={banner.transcript}
+          />
+        ) : (
+          <HeroPicture
+            src={banner.posterImage ?? ''}
+            alt={banner.microLabel ?? title}
+            microLabel={banner.microLabel}
+            analyticsName={banner.analyticsName}
+            belowHeroHeadline={banner.belowHeroHeadline}
+            belowHeroSubheadline={banner.belowHeroSubheadline}
+            ctas={[banner.primaryCta, ...(banner.secondaryCta ? [banner.secondaryCta] : [])]}
+            trustIndicators={banner.trustIndicators}
+            transcript={banner.transcript}
+          />
+        )
       )}
 
       {/* SECTION 1: OUTCOME FIRST */}
@@ -527,12 +506,10 @@ function ProgramPage({
 
 export default async function ProgramDetailPage({ params }: { params: Promise<{ program: string }> }) {
   const { program } = await params;
-  const loaded = await loadProgramForPage(program);
 
   // Static ProgramSchema — richest renderer, always preferred when available.
   // Overlay DB title/description if the program also exists in the DB.
-  const canonicalSlug = resolveSlug(program) || program;
-  const sp = getStaticProgram(canonicalSlug);
+  const sp = getStaticProgram(program);
   if (sp) {
     const db = createPublicClient();
     let mergedProgram = sp;
@@ -540,7 +517,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
       const { data: dbRow } = await db
         .from('programs')
         .select('title, description, short_description, credential, duration_weeks')
-        .eq('slug', canonicalSlug)
+        .eq('slug', program)
         .maybeSingle();
       if (dbRow) {
         mergedProgram = {
@@ -551,11 +528,6 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
       }
     }
     const banner = heroBanners[mergedProgram.slug] ?? null;
-    const heroPosterSrc = resolveHeroPosterSrc(program, {
-      banner,
-      dbImageUrl: mergedProgram.heroImage,
-      heroImage: mergedProgram.heroImage,
-    });
     return (
       <>
         <ProgramStructuredData
@@ -563,17 +535,18 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
             id: mergedProgram.slug,
             name: mergedProgram.title,
             slug: mergedProgram.slug,
-            description: mergedProgram.subtitle ?? '',
+            description: mergedProgram.subtitle,
             duration_weeks: mergedProgram.durationWeeks,
-            price: parseInt((mergedProgram.selfPayCost ?? '$0').replace(/[^0-9]/g, ''), 10),
+            price: parseInt(mergedProgram.selfPayCost.replace(/[^0-9]/g, ''), 10),
             image_url: mergedProgram.heroImage,
             category: mergedProgram.category,
-            outcomes: (mergedProgram.outcomes ?? []).map((o) => o.statement),
+            outcomes: mergedProgram.outcomes.map((o) => o.statement),
           }}
         />
-        <ProgramDetailPageComponent program={mergedProgram} banner={banner} heroPosterSrc={heroPosterSrc} />
+        <ProgramDetailPageComponent program={mergedProgram} banner={banner} />
         {LIVE_JOBS_PROGRAM_SLUGS.has(program) ? (
           <LiveJobPostings
+            programSlug={program}
             heading={`Hiring for ${mergedProgram.title} graduates`}
             limit={6}
             className="bg-slate-50 border-t border-slate-100"
@@ -584,6 +557,23 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
     );
   }
 
+  // cf-programs fallback (legacy marketing data)
+  const cfProgram = staticPrograms.find((p) => p.slug === program);
+  if (cfProgram) {
+    return (
+      <>
+        <ProgramPage
+          title={cfProgram.title}
+          summary={cfProgram.summary}
+          description={cfProgram.description}
+          slug={cfProgram.slug}
+          sections={cfProgram.sections}
+          banner={heroBanners[cfProgram.slug] ?? null}
+        />
+        <OnetLaborData slug={cfProgram.slug} />
+      </>
+    );
+  }
 
   // DB fallback — programs that exist only in the database with no static definition
   const db = createPublicClient();
@@ -591,7 +581,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
     const { data: p } = await db
       .from('programs')
       .select('slug, title, description, short_description, credential, duration_weeks, image_url')
-      .eq('slug', canonicalSlug)
+      .eq('slug', program)
       .maybeSingle();
 
     if (p) {
@@ -605,7 +595,6 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
             durationWeeks={p.duration_weeks}
             slug={p.slug}
             banner={heroBanners[p.slug] ?? heroBanners[p.slug.replace(/-apprenticeship$/, '')] ?? null}
-            imageUrl={p.image_url || getProgramOgImage(p.slug) || null}
             sections={
               p.description && p.description !== p.short_description
                 ? [{ heading: 'About This Program', body: p.description }]

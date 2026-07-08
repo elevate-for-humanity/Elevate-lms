@@ -3,9 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import { ICC_URL, ICC_INSTRUCTION, hero as heroTokens } from '@/lib/page-design-tokens';
+import { ICC_URL, ICC_INSTRUCTION } from '@/lib/page-design-tokens';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
 import { InView } from '@/components/ui/InView';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
@@ -198,7 +197,7 @@ export default function ProgramPageLayout({
         }
         if (c.heroImage) {
           return (
-            <div className={`${heroTokens.imageWrap} w-full overflow-hidden`}>
+            <div className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
               <Image
                 src={c.heroImage}
@@ -283,7 +282,7 @@ export default function ProgramPageLayout({
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {[
                 { label: 'Duration', value: c.duration, icon: '⏱' },
-                { label: 'Format', value: c.format },
+                { label: 'Format', value: c.format, icon: '📍' },
                 { label: 'Cost', value: c.cost, icon: '💰' },
                 { label: 'Credentials', value: c.credential, icon: '🏆' },
               ].map((f) => (
@@ -928,8 +927,6 @@ export default function ProgramPageLayout({
           </div>
         </section>
       </InView>
-
-      <CredentialAuthorityFootnote className="border-t-0" />
 
       {/* ===== TRUST BAR ===== */}
       <section className="py-8 bg-slate-50 border-t border-slate-100">

@@ -20,15 +20,12 @@ export type EventCategory =
   | 'enrollment'
   | 'deployment'
   | 'payment'
-  | 'billing'
-  | 'funding'
   | 'auth'
   | 'ai'
   | 'compliance'
   | 'program'
   | 'migration'
-  | 'system'
-  | 'knowledge';
+  | 'system';
 
 export type EventSeverity = 'info' | 'warning' | 'error' | 'critical';
 

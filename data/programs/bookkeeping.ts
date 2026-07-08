@@ -308,7 +308,7 @@ export const BOOKKEEPING: ProgramSchema = {
   // ─── Content model ──────────────────────────────────────────────
   deliveryModel: 'internal',
   deliveryModelDetail: 'internal_lms',
-  fundingOptions: ['wioa', 'self_pay'],
+  fundingOptions: ['impact', 'self_pay'],
   enrollmentType: 'internal',
   lmsCourseSlug: 'bookkeeping-quickbooks',
 
@@ -347,8 +347,8 @@ export const BOOKKEEPING: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: true,
+    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',

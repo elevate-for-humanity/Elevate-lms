@@ -54,17 +54,13 @@ async function flagAtRisk(params: Params, db: SupabaseClient): Promise<ExecuteRe
   const enrollmentIds = (params.enrollmentIds as string[]) ?? (params.enrollmentId ? [params.enrollmentId as string] : []);
   if (!enrollmentIds.length) return { success: false, message: 'No enrollment IDs provided.' };
 
-  // Use any type to bypass strict select() signature issues with count option
-  const result = await (db as any)
+  const { error, count } = await db
     .from('program_enrollments')
     .update({ status: 'at_risk', at_risk_reason: params.reason ?? 'Flagged by Ellie', at_risk_flagged_at: new Date().toISOString() })
     .in('id', enrollmentIds)
     .select('id', { count: 'exact', head: true });
 
-  const error = result.error as ReturnType<typeof db.from> extends { select: () => infer R } ? R extends { select: () => infer S } ? S extends Promise<{ error: infer E }> ? E : never : never : never | null;
-  const count = result.count as number | null;
-
-  if (error) throw new Error(`Failed to flag enrollments: ${error.message || error}`);
+  if (error) throw new Error(`Failed to flag enrollments: ${error.message}`);
   return { success: true, message: `${count ?? enrollmentIds.length} enrollment(s) flagged as at-risk.` };
 }
 
@@ -72,14 +68,11 @@ async function unflagAtRisk(params: Params, db: SupabaseClient): Promise<Execute
   const enrollmentIds = (params.enrollmentIds as string[]) ?? (params.enrollmentId ? [params.enrollmentId as string] : []);
   if (!enrollmentIds.length) return { success: false, message: 'No enrollment IDs provided.' };
 
-  const result = await (db as any)
+  const { error, count } = await db
     .from('program_enrollments')
     .update({ status: 'active', at_risk_reason: null, at_risk_flagged_at: null })
     .in('id', enrollmentIds)
     .select('id', { count: 'exact', head: true });
-
-  const error = result.error;
-  const count = result.count;
 
   if (error) throw new Error(`Failed to clear at-risk flags: ${error.message}`);
   return { success: true, message: `${count ?? enrollmentIds.length} enrollment(s) cleared.` };

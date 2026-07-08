@@ -139,6 +139,17 @@ export const PROGRAMS: Record<string, ProgramFacts> = {
     careerOutcomes: ['Cybersecurity analyst', 'Security operations'],
     applyUrl: '/apply?program=cybersecurity',
   },
+  'tax-prep-financial-services': {
+    slug: 'tax-prep-financial-services',
+    name: 'Financial Literacy Program',
+    category: 'Business & Financial',
+    credentials: ['Tax preparation certification'],
+    duration: 'Program-dependent',
+    format: 'Hybrid',
+    fundingNotes: ['Self-pay and funded options available'],
+    careerOutcomes: ['Tax preparer', 'Financial services associate'],
+    applyUrl: '/apply?program=tax-prep-financial-services',
+  },
   'certified-peer-recovery-coach': {
     slug: 'certified-peer-recovery-coach',
     name: 'Certified Peer Recovery Coach',

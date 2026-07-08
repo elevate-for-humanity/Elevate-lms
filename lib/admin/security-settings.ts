@@ -5,11 +5,11 @@
  * TTL: 60 seconds — stale values are acceptable for enforcement settings.
  *
  * Env vars are always the primary source. DB values are the fallback when
- * the env var is absent. This means runtime secrets override the UI.
+ * the env var is absent. This means SSM/ECS secrets override the UI.
  *
  * Keys read:
  *   ip_allowlist          — comma-separated CIDRs/IPs (fallback for ADMIN_IP_ALLOWLIST)
- *   mfa_required          — 'true'/'false' — force MFA for admin/admin
+ *   mfa_required          — 'true'/'false' — force MFA for admin/super_admin
  *   session_timeout       — idle timeout in minutes (fallback for hardcoded 30)
  *   max_login_attempts    — lockout threshold (future use)
  *   lockout_duration_minutes — lockout window (future use)
@@ -42,11 +42,8 @@ async function fetchFromDb(): Promise<SecuritySettings> {
   try {
     // Dynamic import — avoids pulling Supabase into the middleware bundle
     // on cold start before the cache is warm.
-    const { getAdminClient } = await import('@/lib/supabase/admin');
-    const db = await getAdminClient();
-    if (!db) {
-      throw new Error('Admin client unavailable');
-    }
+    const { createClient } = await import('@/lib/supabase/admin');
+    const db = createClient();
     const { data: rows } = await db
       .from('platform_settings')
       .select('key, value')
@@ -111,18 +108,7 @@ export async function getSecuritySettings(): Promise<SecuritySettings> {
       return settings;
     }).catch((err) => {
       _inflight = null;
-      logger.warn('[security-settings] fetch failed, using defaults', {
-        detail: err instanceof Error ? err.message : String(err),
-      });
-      const fallback: SecuritySettings = {
-        ...DEFAULT,
-        ipAllowlist: (process.env.ADMIN_IP_ALLOWLIST || '')
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean),
-      };
-      _cache = { settings: fallback, expiresAt: Date.now() + TTL_MS };
-      return fallback;
+      throw err;
     });
   }
 

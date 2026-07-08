@@ -1,7 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   ACTIVE_ENROLLMENT_STATES,
-  isApprenticeshipPortalType,
   portalPathForProgramSlug,
   portalTypeForProgramSlug,
 } from '@/lib/portal/apprenticeship-portal-paths';
@@ -35,12 +34,6 @@ export async function resolveStudentHomePath(
   }
 
   if (cachedPortalType) {
-    if (isApprenticeshipPortalType(cachedPortalType)) {
-      // portal_type values are the program keys (barber, cosmetology, …) → /portal/{program}.
-      // Matches APPRENTICESHIP_SLUG_TO_PORTAL_PATH / SLUG_TO_PORTAL (single canonical dashboard).
-      return `/portal/${cachedPortalType}`;
-    }
-
     const canonical = PORTAL_PATHS[cachedPortalType as PortalKey];
     if (canonical) return canonical;
     // Per-program portal_type values (barber, cosmetology, …)

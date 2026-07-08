@@ -27,8 +27,8 @@ export const PEER_RECOVERY: ProgramSchema = {
   metaTitle: 'Peer Recovery Specialist (CPRS) | Indiana Certification | Elevate for Humanity',
   metaDescription:
     'Earn your Indiana Certified Peer Recovery Specialist (CPRS) credential in 8 weeks. WIOA funding available. Help others overcome addiction and mental health challenges.',
-  fundingStatement: 'WIOA and FSSA Gov Portal funding available for eligible Indiana residents.',
-  fundingOptions: ['wioa', 'wioa', 'self_pay'],
+  fundingStatement: 'WIOA and FSSA IMPACT funding available for eligible Indiana residents.',
+  fundingOptions: ['wioa', 'impact', 'self_pay'],
   badge: 'ETPL Approved',
   badgeColor: 'green',
 
@@ -278,10 +278,10 @@ export const PEER_RECOVERY: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: true,
+    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. WIOA and FSSA Gov Portal funding available. DMHA-recognized credential pathway.',
+    fundingNotes: 'Indiana ETPL-listed. WIOA and FSSA IMPACT funding available. DMHA-recognized credential pathway.',
   },
 };

@@ -14,14 +14,11 @@
 import type Stripe from 'stripe';
 import type { StripeEventHandler } from './types';
 import {
-  runBarberPostPayment,
-} from '@/lib/enrollment/barber-post-payment';
-import {
+  createOrUpdateEnrollment,
   linkOrphanedEnrollments,
   normalizeFundingSource,
-  createOrUpdateEnrollment,
 } from '@/lib/enrollment-service';
-import { handleTestingCheckoutSession } from '@/lib/stripe/handlers/testing-checkout-completed';
+import { runBarberPostPayment } from '@/lib/enrollment/barber-post-payment';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
@@ -45,40 +42,6 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
   }
 
   const kind = session.metadata?.kind;
-  const metaProgram =
-    session.metadata?.program ?? session.metadata?.program_slug ?? '';
-
-  // ── TESTING CENTER (exam fees / enforcement) ─────────────────────────────
-  const testingPaymentType = session.metadata?.payment_type;
-  if (testingPaymentType === 'testing_fee' || testingPaymentType === 'testing_enforcement') {
-    await handleTestingCheckoutSession(session, supabase);
-    return;
-  }
-
-  // ── APPRENTICESHIP ENROLLMENT (SELF-PAY) ──────────────────────────────────
-  if (kind === 'apprenticeship_enrollment' || session.metadata?.checkout_type === 'barber_enrollment') {
-    // ... preserved barber logic
-  }
-
-  // ── COSMETOLOGY APPRENTICESHIP ───────────────────────────────────────────
-  if (session.metadata?.program === 'cosmetology-apprenticeship' || session.metadata?.checkout_type === 'cosmetology_enrollment') {
-    try {
-      const customerId = session.customer as string;
-      const customerEmail = session.customer_details?.email || session.customer_email || '';
-      
-      // Update or create cosmetology_subscriptions
-      await supabase.from('cosmetology_subscriptions').insert({
-        stripe_customer_id: customerId,
-        customer_email: customerEmail,
-        status: 'active',
-        created_at: new Date().toISOString(),
-      });
-
-      logger.info(`[webhook/stripe] Cosmetology enrollment complete: ${customerId}`);
-    } catch (err) {
-      logger.error('[webhook/stripe] Cosmetology handler error:', err);
-    }
-  }
 
   // ── CANONICAL PROGRAM ENROLLMENT ──────────────────────────────────────────
   if (kind === 'program_enrollment') {
@@ -113,7 +76,7 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
           .update({
             status: 'active',
             payment_status: 'paid',
-            enrollment_state: 'onboarding',
+            enrollment_state: 'confirmed',
             enrollment_confirmed_at: now,
             stripe_checkout_session_id: session.id,
             amount_paid_cents: amountPaidCents,
@@ -376,83 +339,11 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
 
       const customerEmail = session.customer_email ?? session.customer_details?.email;
       if (customerEmail) {
-        await linkOrphanedEnrollments(supabase, customerEmail).catch((e) => logger.warn('[webhook/checkout] Failed to link orphaned enrollments', { email: customerEmail, error: e instanceof Error ? e.message : String(e) }));
+        await linkOrphanedEnrollments(supabase, customerEmail).catch(() => {});
       }
     } catch (err) {
       Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook', kind } });
       logger.error('[webhook/checkout] Error processing apprenticeship_enrollment:', err);
-    }
-    return;
-  }
-
-  // ── WORKFORCE FUNDED ENROLLMENT (WIOA / sponsor checkout) ───────────────
-  const paymentType = session.metadata?.payment_type;
-  if (kind === 'funded_enrollment' || paymentType === 'funded_enrollment') {
-    try {
-      const studentId = session.metadata?.student_id;
-      const programId = session.metadata?.program_id;
-      const programSlug = session.metadata?.program_slug;
-      const fundingSource = session.metadata?.funding_source ?? 'WIOA';
-      const amountPaidCents = session.amount_total ?? 0;
-
-      if (!studentId || !programId) {
-        logger.error('[webhook/checkout] funded_enrollment missing metadata', undefined, {
-          sessionId: session.id,
-          metadata: session.metadata,
-        });
-        return;
-      }
-
-      await supabase
-        .from('funding_payments')
-        .update({
-          status: 'paid',
-          paid_at: new Date().toISOString(),
-          amount: amountPaidCents / 100,
-        })
-        .eq('stripe_checkout_session_id', session.id);
-
-      const result = await createOrUpdateEnrollment(supabase, {
-        userId: studentId,
-        programId,
-        programSlug,
-        fundingSource: normalizeFundingSource(fundingSource),
-        amountPaidCents,
-        stripeCheckoutSessionId: session.id,
-        email: session.metadata?.student_email ?? session.customer_email ?? undefined,
-      });
-
-      if (result.error) {
-        logger.error('[webhook/checkout] funded_enrollment enrollment failed', undefined, {
-          error: result.error,
-        });
-        return;
-      }
-
-      await auditLog({
-        action: AuditAction.ENROLLMENT_CREATED,
-        entity: AuditEntity.ENROLLMENT,
-        entityId: result.id,
-        actorId: studentId,
-        metadata: {
-          program_id: programId,
-          program_slug: programSlug,
-          funding_source: fundingSource,
-          amount_paid_cents: amountPaidCents,
-          checkout_session_id: session.id,
-          action: result.action,
-          path: 'funded_enrollment',
-        },
-      });
-
-      logger.info('[webhook/checkout] funded_enrollment complete', {
-        enrollmentId: result.id,
-        programSlug,
-        studentId,
-      });
-    } catch (err) {
-      Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook', kind: 'funded_enrollment' } });
-      logger.error('[webhook/checkout] Error processing funded_enrollment:', err);
     }
     return;
   }

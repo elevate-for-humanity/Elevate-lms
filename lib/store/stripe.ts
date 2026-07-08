@@ -3,11 +3,6 @@ import { getStripe } from '@/lib/stripe/client';
 import type Stripe from 'stripe';
 
 /**
- * Configure and export a shared Stripe instance
- */
-export const stripe = getStripe();
-
-/**
  * Create a Stripe checkout session for a product
  */
 export async function createCheckoutSession({

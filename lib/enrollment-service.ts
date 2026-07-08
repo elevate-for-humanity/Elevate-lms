@@ -83,8 +83,8 @@ export async function createOrUpdateEnrollment(
     stripePaymentIntentId,
     status,
     paymentStatus,
-    enrollmentState = 'onboarding',
-    nextRequiredAction = 'CONFIRM_ENROLLMENT',
+    enrollmentState = 'confirmed',
+    nextRequiredAction = 'ORIENTATION',
     email,
     fullName,
   } = input;
@@ -141,7 +141,7 @@ export async function createOrUpdateEnrollment(
       .single();
 
     if (error) {
-      logger.error('[enrollment-service] Upsert failed', error);
+      logger.error('[enrollment-service] Upsert failed:', error.message);
       return { id: '', action: 'created', error: 'ENROLLMENT_UPSERT_FAILED' };
     }
 
@@ -169,7 +169,7 @@ export async function createOrUpdateEnrollment(
     return { id: enrollment.id, action };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    logger.error('[enrollment-service] Unexpected error', { message: msg });
+    logger.error('[enrollment-service] Unexpected error:', msg);
     return { id: '', action: 'created', error: 'ENROLLMENT_UNEXPECTED_ERROR' };
   }
 }
@@ -211,7 +211,7 @@ export async function linkOrphanedBarberSubscriptions(
     .select('id');
 
   if (error) {
-    logger.error('[enrollment-service] linkOrphanedBarberSubscriptions failed', error);
+    logger.error('[enrollment-service] linkOrphanedBarberSubscriptions failed:', error.message);
     return { linked: 0 };
   }
 
@@ -252,7 +252,7 @@ export async function linkOrphanedApplications(
     .select('id');
 
   if (error) {
-    logger.error('[enrollment-service] linkOrphanedApplications failed', error);
+    logger.error('[enrollment-service] linkOrphanedApplications failed:', error.message);
     return { linked: 0 };
   }
 
@@ -289,7 +289,7 @@ export async function linkOrphanedEnrollments(
     .select('id');
 
   if (error) {
-    logger.error('[enrollment-service] linkOrphanedEnrollments failed', error);
+    logger.error('[enrollment-service] linkOrphanedEnrollments failed:', error.message);
     return { linked: 0 };
   }
 

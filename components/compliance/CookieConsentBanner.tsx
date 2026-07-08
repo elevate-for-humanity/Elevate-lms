@@ -54,7 +54,7 @@ export default function CookieConsentBanner() {
 
     // Apply marketing cookies
     if (prefs.marketing && typeof window !== 'undefined') {
-      // Enable Globe Pixel, etc.
+      // Enable Facebook Pixel, etc.
       if ((window as any).fbq) {
         (window as any).fbq('consent', 'grant');
       }

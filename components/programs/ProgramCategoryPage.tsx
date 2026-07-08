@@ -7,7 +7,6 @@ import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import HeroAvatarGuide from '@/components/HeroAvatarGuide';
 import { Clock, ArrowRight } from 'lucide-react';
-import { hero as heroTokens } from '@/lib/page-design-tokens';
 
 interface Program {
   title: string;
@@ -88,7 +87,7 @@ export default function ProgramCategoryPage({
   return (
     <div className="min-h-screen bg-white">
       {/* Hero — video frame only, no text overlay */}
-      <section className={`relative w-full ${heroTokens.imageWrap}`}>
+      <section className="relative w-full h-[45vh] sm:h-[50vh] min-h-[280px] overflow-hidden">
         <CanonicalVideo
           src={heroVideoSrc}
           poster={heroPosterImage}

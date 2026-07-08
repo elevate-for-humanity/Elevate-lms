@@ -13,9 +13,6 @@ export interface ResolvedEnrollment {
   orientationCompletedAt: string | null;
   documentsSubmittedAt: string | null;
   accessGrantedAt: string | null;
-  stripeSubscriptionId: string | null;
-  paymentStatus: string | null;
-  amountPaidCents: number;
   createdAt: string | null;
 }
 
@@ -46,9 +43,6 @@ function normalizeProgramEnrollment(row: any): ResolvedEnrollment {
     orientationCompletedAt: row.orientation_completed_at ?? null,
     documentsSubmittedAt: row.documents_submitted_at ?? null,
     accessGrantedAt: row.access_granted_at ?? null,
-    stripeSubscriptionId: row.stripe_subscription_id ?? null,
-    paymentStatus: row.payment_status ?? null,
-    amountPaidCents: Number(row.amount_paid_cents ?? 0),
     createdAt: row.created_at ?? row.enrolled_at ?? null,
   };
 }
@@ -68,9 +62,6 @@ function normalizeTrainingEnrollment(row: any): ResolvedEnrollment {
     orientationCompletedAt: row.orientation_completed_at ?? null,
     documentsSubmittedAt: row.documents_submitted_at ?? null,
     accessGrantedAt: row.approved_at ?? null,
-    stripeSubscriptionId: row.stripe_subscription_id ?? null,
-    paymentStatus: row.payment_status ?? null,
-    amountPaidCents: Number(row.amount_paid_cents ?? 0),
     createdAt: row.created_at ?? row.enrolled_at ?? null,
   };
 }
@@ -84,7 +75,7 @@ export async function resolveLatestEnrollment({
     client
       .from('program_enrollments')
       .select(
-        'id, user_id, status, enrollment_state, program_slug, course_id, progress_percent, orientation_completed_at, documents_submitted_at, access_granted_at, stripe_subscription_id, payment_status, amount_paid_cents, created_at, enrolled_at, programs:program_id(slug, title, name)',
+        'id, user_id, status, enrollment_state, program_slug, course_id, progress_percent, orientation_completed_at, documents_submitted_at, access_granted_at, created_at, enrolled_at, programs:program_id(slug, title, name)',
       )
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
@@ -93,7 +84,7 @@ export async function resolveLatestEnrollment({
     client
       .from('program_enrollments')
       .select(
-        'id, user_id, status, course_id, progress_percent, orientation_completed_at, documents_submitted_at, stripe_subscription_id, payment_status, amount_paid_cents, created_at, enrolled_at, programs:program_id(slug, title, name)',
+        'id, user_id, status, course_id, progress_percent, orientation_completed_at, documents_submitted_at, created_at, enrolled_at, programs:program_id(slug, title, name)',
       )
       .eq('user_id', userId)
       .order('enrolled_at', { ascending: false })
@@ -102,9 +93,7 @@ export async function resolveLatestEnrollment({
   ]);
 
   const normalizedProgram = programResp.data ? normalizeProgramEnrollment(programResp.data) : null;
-  const normalizedTraining = trainingResp.data
-    ? normalizeTrainingEnrollment(trainingResp.data)
-    : null;
+  const normalizedTraining = trainingResp.data ? normalizeTrainingEnrollment(trainingResp.data) : null;
 
   if (!normalizedProgram && !normalizedTraining) return null;
   if (normalizedProgram && !normalizedTraining) return normalizedProgram;
@@ -127,7 +116,7 @@ export async function listUnifiedEnrollments(
     client
       .from('program_enrollments')
       .select(
-        'id, user_id, status, enrollment_state, program_slug, course_id, progress_percent, orientation_completed_at, documents_submitted_at, access_granted_at, stripe_subscription_id, payment_status, amount_paid_cents, created_at, enrolled_at, programs:program_id(slug, title, name)',
+        'id, user_id, status, enrollment_state, program_slug, course_id, progress_percent, orientation_completed_at, documents_submitted_at, access_granted_at, created_at, enrolled_at, programs:program_id(slug, title, name)',
       )
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
@@ -135,7 +124,7 @@ export async function listUnifiedEnrollments(
     client
       .from('program_enrollments')
       .select(
-        'id, user_id, status, course_id, progress_percent, orientation_completed_at, documents_submitted_at, stripe_subscription_id, payment_status, amount_paid_cents, created_at, enrolled_at, programs:program_id(slug, title, name)',
+        'id, user_id, status, course_id, progress_percent, orientation_completed_at, documents_submitted_at, created_at, enrolled_at, programs:program_id(slug, title, name)',
       )
       .eq('user_id', userId)
       .order('enrolled_at', { ascending: false })
@@ -160,8 +149,6 @@ export function hasLmsAccess(enrollment: ResolvedEnrollment | null): boolean {
   if (enrollment.accessGrantedAt) return true;
   // Fallback: enrollment_state in ACCESS_STATES covers pre-fix rows and
   // training_enrollments where access_granted_at was never backfilled.
-  return (
-    ACCESS_STATES.has(enrollment.enrollmentState ?? '') ||
-    ACCESS_STATES.has(enrollment.status ?? '')
-  );
+  return ACCESS_STATES.has(enrollment.enrollmentState ?? '') ||
+    ACCESS_STATES.has(enrollment.status ?? '');
 }

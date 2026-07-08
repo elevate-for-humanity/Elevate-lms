@@ -11,17 +11,11 @@
  *
  * Use this when a high-quality still image is available and video is not
  * required. Accepts the same prop shape as HeroVideo for easy swapping.
- *
- * ⚠️ IMPORTANT: This is a Client Component. Do NOT call resolveSiteImagePath()
- * here - that function uses 'fs' which is server-only. Pass pre-resolved paths
- * from the parent Server Component.
  */
 
 import Image from 'next/image';
 import { useId, useState } from 'react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
-import { hero as heroTokens } from '@/lib/page-design-tokens';
 
 export interface HeroPictureCta {
   label: string;
@@ -30,10 +24,8 @@ export interface HeroPictureCta {
 }
 
 export interface HeroPictureProps {
-  /** Desktop hero image (2560×1440 WebP) — relative to /public */
+  /** Path to the hero image (relative to /public) */
   src: string;
-  /** Mobile hero image (1080×1350 WebP) — uses src when omitted */
-  srcMobile?: string;
   /** Alt text — describe the scene, not the brand */
   alt: string;
   /** 2–4 word micro-label rendered in bottom-left corner of image */
@@ -57,8 +49,8 @@ export interface HeroPictureProps {
   /** Render below-hero content as children instead of structured props */
   children?: React.ReactNode;
   /**
-   * Image height — defaults to locked program hero tokens (45vh, max 560px).
-   * Pass a Tailwind class string to override, e.g. 'h-[360px]'.
+   * Image height class — defaults to 'clamp(260px, 40vw, 480px)' matching HeroVideo.
+   * Pass a Tailwind height class to override, e.g. 'h-[360px]'.
    */
   heightStyle?: string;
   /** Next/Image priority — true for above-the-fold heroes (default: true) */
@@ -67,7 +59,6 @@ export interface HeroPictureProps {
 
 export default function HeroPicture({
   src,
-  srcMobile,
   alt,
   microLabel,
   showBrandBug = false,
@@ -85,39 +76,24 @@ export default function HeroPicture({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
 
-  // NOTE: src is expected to be pre-resolved by the Server Component parent.
-  // resolveSiteImagePath() uses 'fs' which is server-only and cannot be called here.
-  const imageSrcDesktop = src;
-  const imageSrcMobile = srcMobile ?? src;
-  const wrapClass = heightStyle ?? heroTokens.homepageWrap;
+  const frameStyle = heightStyle ? undefined : { height: 'clamp(400px, 56vw, 780px)' };
 
   return (
     <div className={`w-full ${className}`}>
       {/* IMAGE FRAME */}
       <section
-        className={`relative w-full overflow-hidden ${wrapClass}`}
+        className={`relative w-full overflow-hidden ${heightStyle ?? ''}`}
+        style={frameStyle}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero image'}
       >
-        {/* Mobile 4:5 — program-desktop.webp / hero-mobile.webp pair */}
+        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src={imageSrcMobile}
+          src={src}
           alt={alt}
           fill
-          sizes={IMAGE_SIZES.hero}
-          quality={75}
-          className={`object-cover object-center sm:hidden ${heroTokens.imageFill}`}
-          priority={priority}
-          placeholder="empty"
-        />
-        <Image
-          src={imageSrcDesktop}
-          alt={alt}
-          fill
-          sizes={IMAGE_SIZES.hero}
-          quality={75}
-          className={`hidden sm:block object-cover object-center ${heroTokens.imageFill}`}
-          priority={priority}
-          placeholder="empty"
+          sizes="100vw"
+          className="object-cover object-center"
+          priority={priority} placeholder="empty"
         />
 
         {/* ON-IMAGE ELEMENTS (only these two are allowed) */}
@@ -127,7 +103,7 @@ export default function HeroPicture({
           <div className="absolute top-4 left-4 z-10">
             {/* IMAGE-CONTRACT: allow raw img because legacy markup */}
             <img
-              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
+              src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
               alt={PLATFORM_DEFAULTS.orgName}
               className="h-7 w-auto opacity-90"
             />

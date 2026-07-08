@@ -4,7 +4,7 @@ export const CNA: ProgramSchema = {
   slug: 'cna',
   title: 'Certified Nursing Assistant (CNA)',
   subtitle:
-    'Indiana state CNA certification in 6 weeks. Clinical rotations at licensed healthcare facilities. State exam proctored on-site. WIOA funding available for eligible participants. Self-pay: $2,500.',
+    'Indiana state CNA certification in 4 weeks. Clinical rotations at licensed healthcare facilities. State exam proctored on-site. FSSA IMPACT funding available for eligible participants. Self-pay: $2,500 (Sale: $1,850).',
   sector: 'healthcare',
   category: 'Healthcare',
   programType: 'workforce',
@@ -15,8 +15,7 @@ export const CNA: ProgramSchema = {
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
-  durationWeeks: 6,
-  enrollmentStartLabel: 'Cohorts forming now — apply today',
+  durationWeeks: 4,
   hoursPerWeekMin: 30,
   hoursPerWeekMax: 40,
   hoursBreakdown: {
@@ -28,10 +27,11 @@ export const CNA: ProgramSchema = {
   schedule: 'Mon–Fri, 30–40 hours per week',
   cohortSize: '8–12 participants per cohort',
   fundingStatement:
-    'WIOA funding available for eligible participants. Covers tuition, books, and exam fees when approved. Self-pay: $2,500. BNPL available.',
-  selfPayCost: '$2,500',
+    'FSSA IMPACT funding available for eligible participants (SNAP/TANF recipients). Covers tuition, books, and state exam fees when approved. Eligibility is not guaranteed. Self-pay: $2,500 (Sale: $1,850). BNPL available.',
+  selfPayCost: '$1,850',
   regularPrice: '$2,500',
-  badge: 'Funding Available',
+  salePrice: '$1,850',
+  badge: 'FSSA Eligible',
   badgeColor: 'blue',
 
   credentials: [
@@ -82,7 +82,7 @@ export const CNA: ProgramSchema = {
     {
       statement:
         'Pass the Indiana state CNA written and skills exam — proctored on-site at Elevate',
-      assessedAt: 'Week 6',
+      assessedAt: 'Week 4',
     },
     {
       statement: 'Document patient care observations accurately in a simulated medical record',
@@ -143,10 +143,9 @@ export const CNA: ProgramSchema = {
         'Complete supervised clinical hours at a licensed Indiana facility with competency sign-offs',
     },
     {
-      week: 'Weeks 5–6',
-      title: 'Exam Prep & State Testing',
-      competencyMilestone:
-        'Pass Indiana state CNA written and skills exam proctored on-site; career placement briefing',
+      week: 'Week 4',
+      title: 'State Exam',
+      competencyMilestone: 'Pass Indiana state CNA written and skills exam proctored on-site',
     },
   ],
 
@@ -178,12 +177,10 @@ export const CNA: ProgramSchema = {
       ],
     },
     {
-      title: 'Weeks 5–6: State Exam & Placement',
+      title: 'Week 4: State Exam',
       topics: [
-        'Skills review and mock exams aligned to Indiana Nurse Aide Registry standards',
         'Sit for the Indiana state CNA written exam — 70 questions, 90-minute time limit',
         'Demonstrate 5 randomly selected clinical skills for the state skills examiner — proctored on-site at Elevate',
-        'Career placement briefing with healthcare employer partners',
       ],
     },
   ],
@@ -192,7 +189,7 @@ export const CNA: ProgramSchema = {
     {
       standard: 'Indiana State Department of Health — CNA Curriculum',
       description:
-        "Program meets Indiana's minimum 75-hour CNA training requirement including required clinical hours, delivered in a 6-week accelerated format.",
+        "Program meets Indiana's minimum 75-hour CNA training requirement including required clinical hours, delivered in an accelerated 4-week format.",
     },
     {
       standard: 'OBRA 1987 (Omnibus Budget Reconciliation Act)',
@@ -200,9 +197,9 @@ export const CNA: ProgramSchema = {
         'Federal law establishing minimum training and competency standards for nursing assistants in Medicare/Medicaid facilities.',
     },
     {
-      standard: 'WIOA Funded Training',
+      standard: 'FSSA IMPACT Program',
       description:
-        'Indiana ETPL-listed training provider. WIOA funding available for eligible participants.',
+        'Eligible training provider under the Indiana FSSA IMPACT program for SNAP and TANF recipients pursuing healthcare careers.',
     },
   ],
 
@@ -237,12 +234,12 @@ export const CNA: ProgramSchema = {
     {
       question: 'Is the state exam included?',
       answer:
-        'Yes. The Indiana state CNA written and skills exam is proctored on-site at Elevate during Weeks 5–6. The exam fee is included in tuition or covered by funding when applicable.',
+        'Yes. The Indiana state CNA written and skills exam is proctored on-site at Elevate during Week 4. The exam fee is included in tuition or covered by funding when applicable.',
     },
     {
       question: 'What funding is available?',
       answer:
-        'CNA is funded through WIOA Title I for eligible adults and dislocated workers. Many students pay $0. Eligibility is determined through WIOA intake. Self-pay tuition is $2,500. BNPL financing available through Affirm, Sezzle, Klarna, and more.',
+        'CNA is funded through the FSSA IMPACT program for eligible SNAP and TANF recipients. Many students pay $0. Eligibility is determined through FSSA intake. Self-pay tuition is $2,500 (currently on sale for $1,850). BNPL financing available through Affirm, Sezzle, Klarna, and more.',
     },
     {
       question: 'Where are the clinical rotations?',
@@ -269,18 +266,18 @@ export const CNA: ProgramSchema = {
 
   metaTitle: 'CNA Program — Indiana State Certification in 4 Weeks | Elevate for Humanity',
   metaDescription:
-    'Indiana state CNA certification in 4 weeks. Clinical rotations at licensed facilities. State exam proctored on-site. WIOA funding available for eligible participants. Self-pay: $2,500. Indianapolis.',
+    'Indiana state CNA certification in 4 weeks. Clinical rotations at licensed facilities. State exam proctored on-site. FSSA IMPACT funding available for eligible participants. Self-pay: $2,500 (Sale: $1,850). Indianapolis.',
 
   enrollmentType: 'internal',
   deliveryModel: 'internal',
-  fundingOptions: ['wioa', 'self_pay'],
+  fundingOptions: ['impact', 'self_pay'],
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: true,
+    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. WIOA Title I Adult/Dislocated Worker funding available for eligible participants.',
+    fundingNotes: 'Indiana ETPL-listed. FSSA IMPACT covers eligible SNAP/TANF recipients. WIOA Title I Adult/Dislocated Worker funding available.',
   },
 };

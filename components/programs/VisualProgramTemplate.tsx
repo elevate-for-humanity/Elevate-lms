@@ -7,7 +7,6 @@ import type { Program } from '@/lib/types/program';
 import { ProgramTutorCTA } from '@/components/ProgramTutorCTA';
 import { PROGRAMS } from '@/lib/ai/programRegistry';
 import HeroVideo from '@/components/marketing/HeroVideo';
-import { ProgramMediaCard } from '@/components/programs/ProgramMediaCard';
 import { Check, Clock, Award, DollarSign, MapPin, ArrowRight } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -38,50 +37,57 @@ const PROGRAM_HERO_MEDIA: Record<
   'hvac-technician': {
     video: '/videos/hvac-hero-final.mp4',
     audio: '/audio/heroes/skilled-trades.mp3',
-    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-hero.webp',
+    poster: '/images/pages/hvac-hero.webp',
     microLabel: 'HVAC Technician',
-    script: `HVAC Technicians are in demand across Indiana — and the shortage is growing. The Elevate HVAC Technician program runs 6 weeks and prepares you for EPA Section 608 certification, OSHA 10-Hour, and entry-level employment at $18 to $28 per hour. You train on real equipment. You leave with a nationally recognized credential. Most students qualify for full funding through WIOA or the Workforce Ready Grant. Apply today.`,
+    script: `HVAC Technicians are in demand across Indiana — and the shortage is growing. The Elevate HVAC Technician program runs 12 weeks and prepares you for EPA Section 608 certification, OSHA 10-Hour, and entry-level employment at $18 to $28 per hour. You train on real equipment. You leave with a nationally recognized credential. Most students qualify for full funding through WIOA or the Workforce Ready Grant. Apply today.`,
   },
   'barber-apprenticeship': {
     video: '/videos/barber-hero-final.mp4',
     videoMobile: '/videos/barber-hero.mp4',
     audio: '/audio/heroes/barber.mp3',
-    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-hero-main.webp',
+    poster: '/images/pages/barber-hero-main.jpg',
     microLabel: 'Barber Apprenticeship',
     script: `Barbering is one of the fastest paths to a licensed, self-employed career in Indiana. The Elevate Barber Apprenticeship is a 52-week DOL Registered Apprenticeship — you work in a licensed shop, earn a wage from day one, and graduate with your Indiana Barber License. No classroom-only training. No unpaid hours. Most apprentices are fully funded through WIOA or the Indiana Workforce Ready Grant. Apply today.`,
   },
   'cosmetology-apprenticeship': {
     video: '/videos/cosmetology-salon.mp4',
     audio: '/audio/heroes/cosmetology.mp3',
-    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-hero.webp',
+    poster: '/images/pages/cosmetology-hero.webp',
     microLabel: 'Cosmetology Apprenticeship',
     script: `The Elevate Cosmetology Apprenticeship puts you in a licensed salon from week one. You earn a wage while completing your 2,000 required hours toward your Indiana Cosmetology License. Most apprentices qualify for full funding through WIOA or the Workforce Ready Grant. Apply today.`,
   },
   'nail-technician-apprenticeship': {
     video: '/videos/nail-tech.mp4',
     audio: '/audio/heroes/nail-tech.mp3',
-    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-tech-hero.webp',
+    poster: '/images/pages/nail-tech-hero.webp',
     microLabel: 'Nail Tech Apprenticeship',
     script: `The Nail Technician Apprenticeship at Elevate is a paid, hands-on program in a licensed salon. Complete your required hours, earn your Indiana Nail Technician License, and build a client base — all at the same time. Funding available through WIOA. Apply today.`,
   },
   'cna-cert': {
     video: '/videos/healthcare-cna.mp4',
     audio: '/audio/heroes/cna.mp3',
-    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-hero.jpg',
+    poster: '/images/pages/cna-hero.jpg',
     microLabel: 'CNA Training',
     script: `Certified Nursing Assistants are the backbone of patient care in Indiana. The Elevate CNA program runs 6 weeks — classroom instruction plus hands-on clinical practice — and ends with your Indiana CNA certification exam on-site. Starting wages range from $16 to $22 per hour. Most students qualify for full funding. Apply today.`,
   },
   'cdl-training': {
     video: '/videos/cdl-hero.mp4',
     audio: '/audio/heroes/cdl.mp3',
-    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-hero.webp',
+    poster: '/images/pages/cdl-hero.webp',
     microLabel: 'CDL Class A',
     script: `CDL drivers are needed everywhere — and Indiana employers are hiring now. The Elevate CDL Class A program runs 4 weeks and prepares you for your commercial driver license skills test. Starting wages range from $22 to $38 per hour. Most students qualify for full funding through WIOA. Apply today.`,
+  },
+  'tax-prep': {
+    video: '/videos/tax-career-paths.mp4',
+    audio: '/audio/heroes/tax.mp3',
+    poster: '/images/pages/tax-hero.webp',
+    microLabel: 'Tax Preparation',
+    script: `Tax preparation is a year-round career. The Elevate Tax Preparation program runs 8 weeks and prepares you for the IRS Annual Filing Season Program. Starting wages from $18 to $35 per hour. Funding available through WIOA. Apply today.`,
   },
   'peer-recovery-specialist': {
     video: '/videos/healthcare-cna.mp4',
     audio: '/audio/heroes/healthcare.mp3',
-    poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-hero.webp',
+    poster: '/images/pages/healthcare-hero.webp',
     microLabel: 'Peer Recovery Specialist',
     script: `Peer Recovery Specialists help others navigate addiction recovery using their own lived experience. The Elevate PRS program prepares you for Indiana state certification. Starting wages from $16 to $24 per hour. Funding available through WIOA and JRI. Apply today.`,
   },
@@ -90,7 +96,7 @@ const PROGRAM_HERO_MEDIA: Record<
 const DEFAULT_MEDIA = {
   video: '/videos/programs-overview-video-with-narration.mp4',
   audio: '/audio/heroes/programs.mp3',
-  poster: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/programs-hero.webp',
+  poster: '/images/pages/programs-hero.webp',
   microLabel: 'Career Training',
   script: `${PLATFORM_DEFAULTS.orgName} offers short-term career training programs in healthcare, skilled trades, technology, and business. Most programs run 4 to 16 weeks. Funding is available for eligible Indiana residents. Every program ends with a nationally recognized credential and direct employer introductions. Apply today.`,
 };
@@ -183,14 +189,26 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
                 sub: 'Job placement included',
               },
             ].map((card, i) => (
-              <ProgramMediaCard
+              <div
                 key={i}
-                src={card.img}
-                alt={card.label}
-                title={card.label}
-                subtitle={card.sub}
-                className="hover:shadow-md transition-shadow"
-              />
+                className="group rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+              >
+                <div className="relative aspect-[4/3]">
+        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
+                  <Image
+                    src={card.img}
+                    alt={card.label}
+                    fill
+                    sizes="(max-width: 640px) 50vw, 25vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300" placeholder="empty"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <p className="text-white font-bold text-sm leading-tight">{card.label}</p>
+                    <p className="text-slate-300 text-xs mt-0.5 leading-tight">{card.sub}</p>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -208,12 +226,19 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
               {program.whatYouLearn.slice(0, 6).map((item: string, i: number) => (
-                <div key={i} className="flex flex-col gap-2">
-                  <ProgramMediaCard
+                <div key={i} className="relative aspect-[4/3] rounded-2xl overflow-hidden group">
+                  <Image
                     src={images.tiles[i % images.tiles.length]}
                     alt={item}
-                    title={item}
+                    fill
+                    sizes="(max-width: 640px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300" placeholder="empty"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 flex items-start gap-2">
+                    <Check className="w-4 h-4 text-brand-green-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-white text-sm font-semibold leading-snug">{item}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -359,14 +384,26 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
                 desc: 'Career services connects you with employers',
               },
             ].map((s) => (
-              <ProgramMediaCard
+              <div
                 key={s.step}
-                src={s.img}
-                alt={s.label}
-                title={s.label}
-                subtitle={s.desc}
-                step={s.step}
-              />
+                className="relative aspect-square rounded-2xl overflow-hidden shadow-md"
+              >
+                <Image
+                  src={s.img}
+                  alt={s.label}
+                  fill
+                  sizes="(max-width: 640px) 50vw, 25vw"
+                  className="object-cover" placeholder="empty"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 to-transparent" />
+                <div className="absolute top-3 left-3 w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-extrabold text-sm shadow">
+                  {s.step}
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-3">
+                  <p className="text-white font-bold text-sm">{s.label}</p>
+                  <p className="text-slate-300 text-xs mt-0.5 leading-tight">{s.desc}</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>

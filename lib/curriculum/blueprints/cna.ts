@@ -1,12 +1,4 @@
 /**
- * cna Blueprint
- * 
- * © 2026 Elevate for Humanity
- * All Rights Reserved
- *
- * Version: 1.0.0
- */
-/**
  * lib/curriculum/blueprints/cna.ts
  *
  * Certified Nursing Assistant (CNA) — Indiana Board of Nursing aligned.
@@ -51,7 +43,7 @@ export const cnaBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'Lisa Thompson, RN',
     instructorTitle: 'Certified Nursing Assistant Program Director',
-    instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+    instructorImagePath: '/images/instructors/lisa-thompson.jpg',
     topBarColor: '#0ea5e9',
     accentColor: '#6366f1',
     backgroundColor: '#0f172a',

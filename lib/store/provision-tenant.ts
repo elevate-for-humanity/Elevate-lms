@@ -25,8 +25,12 @@ interface ProvisionTenantParams {
  */
 function generateTemporaryPassword(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
+  let password = '';
   const randomBytes = crypto.randomBytes(16);
-  return Array.from({ length: 16 }, (_, i) => chars[randomBytes[i] % chars.length]).join('');
+  for (let i = 0; i < 16; i++) {
+    password += chars[randomBytes[i] % chars.length];
+  }
+  return password;
 }
 
 /**

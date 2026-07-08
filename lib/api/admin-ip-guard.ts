@@ -5,7 +5,7 @@
  * Controlled by ADMIN_IP_ALLOWLIST env var — comma-separated CIDRs or IPs.
  * If the env var is not set, the guard is a no-op (allows all IPs).
  *
- * Recommended: set in runtime env or secret group. Leave unset in dev.
+ * Recommended: set in SSM /elevate/ADMIN_IP_ALLOWLIST. Leave unset in dev.
  *
  * Usage in an API route:
  *   import { checkAdminIP } from '@/lib/api/admin-ip-guard';
@@ -18,6 +18,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
+import { getSecuritySettings } from '@/lib/admin/security-settings';
 
 function ipInCidr(ip: string, cidr: string): boolean {
   if (!cidr.includes('/')) return ip === cidr;
@@ -43,8 +45,26 @@ function isAllowed(ip: string, allowlist: string[]): boolean {
 }
 
 /**
+ * Async version — reads allowlist from cache (env var → platform_settings DB fallback).
+ * Use this in middleware and API routes where async is available.
+ */
+export async function checkAdminIPAsync(request: NextRequest): Promise<NextResponse | null> {
+  const { ipAllowlist } = await getSecuritySettings();
+  if (ipAllowlist.length === 0) return null;
+
+  const forwarded = request.headers.get('x-forwarded-for');
+  const ip = forwarded?.split(',')[0]?.trim() ?? request.headers.get('x-real-ip') ?? '';
+
+  if (!isAllowed(ip, ipAllowlist)) {
+    logger.warn('Admin IP guard: blocked request', { ip, path: request.nextUrl.pathname });
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  return null;
+}
+
+/**
  * Sync version — reads from env var only (no DB fallback).
- * Use in Edge middleware so bundles do not trace Supabase admin code.
+ * Use in contexts where async is not available.
  */
 export function checkAdminIP(request: NextRequest): NextResponse | null {
   const raw = process.env.ADMIN_IP_ALLOWLIST ?? '';
@@ -55,16 +75,8 @@ export function checkAdminIP(request: NextRequest): NextResponse | null {
   const ip = forwarded?.split(',')[0]?.trim() ?? request.headers.get('x-real-ip') ?? '';
 
   if (!isAllowed(ip, allowlist)) {
-    console.warn('Admin IP guard: blocked request (sync)', { ip, path: request.nextUrl.pathname });
+    logger.warn('Admin IP guard: blocked request (sync)', { ip, path: request.nextUrl.pathname });
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
   return null;
-}
-
-/**
- * Async version — for API routes that may need DB lookups in the future.
- * Currently just wraps the sync version.
- */
-export async function checkAdminIPAsync(request: NextRequest): Promise<NextResponse | null> {
-  return checkAdminIP(request);
 }

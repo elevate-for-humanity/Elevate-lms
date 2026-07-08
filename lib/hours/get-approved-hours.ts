@@ -38,8 +38,9 @@ export async function getApprovedHoursByType(
   // table that may contain duplicates; do NOT sum both.
   let query = db
     .from('hour_entries')
-    .select('hours_claimed, accepted_hours, source_type, category, status, approval_status')
-    .eq('user_id', userId);
+    .select('hours_claimed, accepted_hours, source_type, category')
+    .eq('user_id', userId)
+    .in('status', ['approved', 'locked']);
 
   if (programSlug) {
     query = query.eq('program_slug', programSlug);
@@ -55,14 +56,6 @@ export async function getApprovedHoursByType(
   let rti = 0;
 
   for (const row of data) {
-    const approvalStatus = (row as { approval_status?: string | null }).approval_status;
-    const lifecycleStatus = (row as { status?: string | null }).status;
-    const isApproved =
-      lifecycleStatus === 'approved' ||
-      lifecycleStatus === 'locked' ||
-      approvalStatus === 'approved';
-    if (!isApproved) continue;
-
     const hrs = Number(row.accepted_hours) || Number(row.hours_claimed) || 0;
 
     if (OJL_SOURCE_TYPES.has(row.source_type)) {

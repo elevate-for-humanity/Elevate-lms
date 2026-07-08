@@ -7,7 +7,6 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
 import { notifyGrantSubmitted } from './notification-system';
 import { logAuditEvent } from '@/lib/audit';
-import { logger } from '@/lib/logger';
 
 async function getDb() {
   return requireAdminClient();
@@ -55,7 +54,7 @@ export async function recordSubmission(
   submission: Omit<SubmissionRecord, 'id' | 'timeline'>,
 ): Promise<SubmissionRecord> {
   const db = await getDb();
-  await setAuditContext(db, { systemActor: 'grants_submission_tracker' }).catch((e) => logger.warn('[grants/submission-tracker] Failed to set audit context', { error: e instanceof Error ? e.message : String(e) }));
+  await setAuditContext(db, { systemActor: 'grants_submission_tracker' }).catch(() => {});
   const timeline: SubmissionTimelineEvent[] = [
     {
       timestamp: submission.submittedAt,
@@ -134,7 +133,7 @@ export async function addTimelineEvent(
   event: Omit<SubmissionTimelineEvent, 'timestamp'>,
 ): Promise<void> {
   const db = await getDb();
-  await setAuditContext(db, { systemActor: 'grants_submission_tracker' }).catch((e) => logger.warn('[grants/submission-tracker] Failed to set audit context', { error: e instanceof Error ? e.message : String(e) }));
+  await setAuditContext(db, { systemActor: 'grants_submission_tracker' }).catch(() => {});
   const { data: submission } = await db
     .from('grant_submissions')
     .select('timeline')
@@ -164,7 +163,7 @@ export async function updateSubmissionStatus(
   performedBy?: string,
 ): Promise<void> {
   const db = await getDb();
-  await setAuditContext(db, { systemActor: 'grants_submission_tracker' }).catch((e) => logger.warn('[grants/submission-tracker] Failed to set audit context', { error: e instanceof Error ? e.message : String(e) }));
+  await setAuditContext(db, { systemActor: 'grants_submission_tracker' }).catch(() => {});
   await db.from('grant_submissions').update({ status, notes }).eq('id', submissionId);
 
   await addTimelineEvent(submissionId, {
@@ -188,7 +187,7 @@ export async function recordEmailSubmission(
     attachments: string[];
   },
 ): Promise<SubmissionRecord> {
-  const { data: app } = await (await getDb())
+  const { data: app } = await getDb()
     .from('grant_applications')
     .select('grant_id, entity_id')
     .eq('id', applicationId)
@@ -223,7 +222,7 @@ export async function recordPortalSubmission(
     confirmationReceipt?: string;
   },
 ): Promise<SubmissionRecord> {
-  const { data: app } = await (await getDb())
+  const { data: app } = await getDb()
     .from('grant_applications')
     .select('grant_id, entity_id')
     .eq('id', applicationId)
@@ -253,7 +252,7 @@ export async function recordPortalSubmission(
 export async function getSubmissionHistory(
   applicationId: string,
 ): Promise<SubmissionRecord | null> {
-  const { data, error }: any = await (await getDb())
+  const { data, error }: any = await getDb()
     .from('grant_submissions')
     .select('*')
     .eq('application_id', applicationId)
@@ -285,7 +284,7 @@ export async function getSubmissionHistory(
  * Get all submissions
  */
 export async function getAllSubmissions(): Promise<SubmissionRecord[]> {
-  const { data, error }: any = await (await getDb())
+  const { data, error }: any = await getDb()
     .from('grant_submissions')
     .select('*')
     .order('submitted_at', { ascending: false });
@@ -334,7 +333,7 @@ export async function checkDeadlinesAndNotify(): Promise<void> {
     const endOfDay = new Date(targetDate);
     endOfDay.setHours(23, 59, 59, 999);
 
-    const { data: grants } = await (await getDb())
+    const { data: grants } = await getDb()
       .from('grant_opportunities')
       .select('id, title, due_date')
       .gte('due_date', startOfDay.toISOString())

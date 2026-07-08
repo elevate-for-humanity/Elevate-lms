@@ -15,7 +15,6 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Volume2, VolumeX } from 'lucide-react';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { hero as heroTokens } from '@/lib/page-design-tokens';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                               */
@@ -32,7 +31,7 @@ export interface HeroVideoProps {
   videoSrcDesktop: string;
   /** Mobile video source — falls back to desktop if omitted */
   videoSrcMobile?: string;
-  /** @deprecated Posters are not used on marketing heroes — video-only frame. */
+  /** Poster image shown while video loads — optional */
   posterImage?: string;
   /** Voiceover audio track — starts on first user interaction */
   voiceoverSrc?: string;
@@ -56,13 +55,6 @@ export interface HeroVideoProps {
   className?: string;
   /** Render below-hero content as children instead of structured props */
   children?: React.ReactNode;
-  /**
-   * When true, hero video uses preload=auto (home page only).
-   * Default false — metadata preload avoids blocking LCP on inner pages.
-   */
-  eagerVideoLoad?: boolean;
-  /** Tighter below-hero typography and spacing (home page). */
-  compactBelowHero?: boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -72,6 +64,7 @@ export interface HeroVideoProps {
 export default function HeroVideo({
   videoSrcDesktop,
   videoSrcMobile,
+  posterImage,
   voiceoverSrc,
   microLabel,
   showBrandBug = false,
@@ -83,8 +76,6 @@ export default function HeroVideo({
   analyticsName,
   className = '',
   children,
-  eagerVideoLoad = false,
-  compactBelowHero = false,
 }: HeroVideoProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -98,7 +89,7 @@ export default function HeroVideo({
   const [videoSrc, setVideoSrc] = useState(videoSrcDesktop);
   const [ttsSupported, setTtsSupported] = useState(false);
 
-  useEffect((): void => {
+  useEffect(() => {
     if (videoSrcMobile && window.innerWidth < 768) {
       setVideoSrc(videoSrcMobile);
     }
@@ -153,7 +144,7 @@ export default function HeroVideo({
 
   // src is resolved synchronously in useState initializer above — no swap needed.
 
-  useEffect((): void => {
+  useEffect(() => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
     // Voices may not be loaded yet on first render (Chrome async loads them).
@@ -205,16 +196,31 @@ export default function HeroVideo({
     <div ref={wrapperRef} className={`w-full ${className}`}>
       {/* VIDEO FRAME */}
       {/* Height is intentionally restrained so the first viewport includes the message below the video. */}
+      {/* posterImage is set as CSS backgroundImage so the poster renders from
+          SSR immediately — no bg-slate-900 dark flash before client hydration.
+          CanonicalVideo then renders its own poster <img> (z:1) and video (z:2)
+          on top. Both show the same image so the transition is seamless. */}
       <section
-        className={`relative w-full overflow-hidden bg-slate-900 ${heroTokens.imageWrap}`}
+        className="relative w-full overflow-hidden"
+        style={{
+          height: 'clamp(280px, 42vw, 560px)',
+          ...(posterImage ? {
+            backgroundImage: `url(${posterImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          } : {}),
+        }}
         aria-label={analyticsName ? `${analyticsName} hero video` : 'Hero video'}
       >
+        {/* autoPlayOnMount — hero is always above the fold; start immediately.
+            loop — prevents the poster fading back in when the video ends. */}
         <CanonicalVideo
           src={videoSrc}
-          className="absolute inset-0 w-full h-full object-cover object-center sm:object-[center_35%]"
+          poster={posterImage}
+          className="absolute inset-0 w-full h-full object-cover object-center"
           autoPlayOnMount
           loop
-          preloadFull={eagerVideoLoad}
+          preloadFull
         />
 
         {/* Hidden audio element for voiceover */}
@@ -235,7 +241,7 @@ export default function HeroVideo({
           <div className="absolute top-4 left-4 z-10">
             {/* IMAGE-CONTRACT: allow raw img because legacy markup */}
             <img
-              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
+              src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
               alt={PLATFORM_DEFAULTS.orgName}
               className="h-7 w-auto opacity-90"
             />
@@ -278,60 +284,32 @@ export default function HeroVideo({
       {/* BELOW-HERO CONTENT */}
       {/* All primary messaging lives here — never on the video */}
       {(belowHeroHeadline || belowHeroSubheadline || ctas || trustIndicators || children) && (
-        <section
-          className={
-            compactBelowHero
-              ? 'border-b border-slate-100 py-4 sm:py-5'
-              : heroTokens.belowPanel
-          }
-        >
-          <div className="max-w-3xl mx-auto px-4 sm:px-6">
+        <section className="border-b border-slate-100 py-8 sm:py-14">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
             {children ? (
               children
             ) : (
               <>
                 {belowHeroHeadline && (
-                  <h1
-                    className={
-                      compactBelowHero
-                        ? 'text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 leading-snug mb-2'
-                        : heroTokens.belowHeadline
-                    }
-                  >
+                  <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-3 sm:mb-4">
                     {belowHeroHeadline}
                   </h1>
                 )}
                 {belowHeroSubheadline && (
-                  <p
-                    className={
-                      compactBelowHero
-                        ? 'text-slate-600 text-sm sm:text-[0.9375rem] leading-relaxed mb-4 max-w-xl'
-                        : 'text-slate-700 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 max-w-2xl'
-                    }
-                  >
+                  <p className="text-slate-700 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 max-w-2xl">
                     {belowHeroSubheadline}
                   </p>
                 )}
                 {ctas && ctas.length > 0 && (
-                  <div
-                    className={
-                      compactBelowHero
-                        ? 'flex flex-col sm:flex-row gap-2 mb-2'
-                        : 'flex flex-col sm:flex-row gap-3 mb-6'
-                    }
-                  >
+                  <div className="flex flex-col sm:flex-row gap-3 mb-6">
                     {ctas.map((cta) => (
                       <a
                         key={cta.href}
                         href={cta.href}
                         className={
                           cta.variant === 'secondary'
-                            ? compactBelowHero
-                              ? 'text-center border border-slate-300 text-slate-700 font-semibold px-5 py-2 rounded-lg hover:bg-slate-50 transition-colors text-sm'
-                              : 'text-center border border-slate-300 text-slate-700 font-bold px-7 py-3.5 rounded-lg hover:bg-slate-50 transition-colors text-sm'
-                            : compactBelowHero
-                              ? 'text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-5 py-2 rounded-lg transition-colors text-sm'
-                              : 'text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3.5 rounded-lg transition-colors text-sm'
+                            ? 'text-center border border-slate-300 text-slate-700 font-bold px-7 py-3.5 rounded-lg hover:bg-slate-50 transition-colors text-sm'
+                            : 'text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3.5 rounded-lg transition-colors text-sm'
                         }
                       >
                         {cta.label}

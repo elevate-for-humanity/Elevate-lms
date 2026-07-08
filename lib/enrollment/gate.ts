@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { apprenticeshipLmsCoursePath } from '@/lib/portal/program-portal-paths';
 
 export type EnrollmentState =
   | 'applied'
@@ -50,12 +49,28 @@ export function getNextRequiredAction(enrollment: {
     };
   }
 
-  // 3. Open RTI course on Elevate LMS
-  const lmsPath = apprenticeshipLmsCoursePath(programSlug);
+  const courseId = resolveCourseId(programSlug);
+  if (courseId) {
+    return {
+      label: 'Begin Your Program',
+      href: `/lms/courses/${courseId}`,
+      description: 'Open your training program and start the first lesson',
+    };
+  }
+
+  const portalPath = SLUG_TO_PORTAL[programSlug];
+  if (portalPath) {
+    return {
+      label: 'Go to Your Dashboard',
+      href: portalPath,
+      description: 'Track hours, documents, and apprenticeship progress',
+    };
+  }
+
   return {
-    label: lmsPath ? 'Open RTI course' : 'Open training',
-    href: lmsPath ?? '/lms/courses',
-    description: 'Continue your related technical instruction on Elevate LMS',
+    label: 'View Programs',
+    href: '/programs',
+    description: 'Explore available training programs',
   };
 }
 

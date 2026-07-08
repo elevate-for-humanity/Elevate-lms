@@ -70,8 +70,12 @@ async function logProvisioningEvent(
 
 function generateTemporaryPassword(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
+  let password = '';
   const randomBytes = crypto.randomBytes(16);
-  return Array.from({ length: 16 }, (_, i) => chars[randomBytes[i] % chars.length]).join('');
+  for (let i = 0; i < 16; i++) {
+    password += chars[randomBytes[i] % chars.length];
+  }
+  return password;
 }
 
 function generateSlug(name: string): string {
@@ -222,12 +226,11 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
     );
 
     await logProvisioningEvent(correlationId, 'admin_created', 'started', tenantId);
-    const { data: users } = await supabase.auth.admin.listUsers();
-    const existingUser = users?.users.find(u => u.email === email);
+    const { data: existingUser } = await supabase.auth.admin.getUserByEmail(email);
     let temporaryPassword: string | undefined;
 
-    if (existingUser) {
-      adminUserId = existingUser.id;
+    if (existingUser?.user) {
+      adminUserId = existingUser.user.id;
       await supabase
         .from('profiles')
         .update({ tenant_id: tenantId, role: 'admin' })
@@ -332,8 +335,8 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
     await logAuditEvent({
       action: 'LICENSE_PROVISIONED',
       actor_id: adminUserId || 'system:license_provisioning',
-      resourceType: 'license',
-      resourceId: licenseId,
+      target_type: 'license',
+      target_id: licenseId,
       metadata: {
         correlation_id: correlationId,
         tenant_id: tenantId,
@@ -361,8 +364,8 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
     await logAuditEvent({
       action: 'LICENSE_PROVISIONING_FAILED',
       actor_id: 'system:license_provisioning',
-      resourceType: 'license',
-      resourceId: correlationId,
+      target_type: 'license',
+      target_id: correlationId,
       metadata: {
         correlation_id: correlationId,
         tenant_id: tenantId,
@@ -423,8 +426,8 @@ export async function suspendLicense(tenantId: string, reason: string): Promise<
   await logAuditEvent({
     action: 'LICENSE_SUSPENDED',
     actor_id: 'system:license_enforcement',
-    resourceType: 'tenant',
-    resourceId: tenantId,
+    target_type: 'tenant',
+    target_id: tenantId,
     metadata: { reason, correlation_id: correlationId },
   });
 
@@ -462,8 +465,8 @@ export async function reactivateLicense(tenantId: string): Promise<void> {
   await logAuditEvent({
     action: 'LICENSE_REACTIVATED',
     actor_id: 'system:license_enforcement',
-    resourceType: 'tenant',
-    resourceId: tenantId,
+    target_type: 'tenant',
+    target_id: tenantId,
     metadata: { correlation_id: correlationId },
   });
 

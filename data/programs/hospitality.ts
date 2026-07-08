@@ -20,18 +20,9 @@ export const HOSPITALITY: ProgramSchema = {
   schedule: 'Flexible — evenings and weekends available',
   cohortSize: '10–15 participants per cohort',
   fundingStatement:
-    'WIOA and Workforce Ready Grant funding available for eligible Indiana residents.',
-  selfPayCost: 'See individual courses',
-  fundingOptions: ['wioa', 'wrg', 'wioa', 'self_pay'],
-
-  // Individual course pricing
-  coursePricing: [
-    { slug: 'start-hospitality', name: 'Start in Hospitality', price: 89, credentials: ['Hospitality Certificate'] },
-    { slug: 'servsafe-food-handler', name: 'ServSafe Food Handler', price: 29, credentials: ['ServSafe Food Handler'] },
-    { slug: 'servsafe-manager', name: 'ServSafe Manager', price: 199, credentials: ['ServSafe Manager Certification'] },
-    { slug: 'servsuccess', name: 'ServSuccess Professional', price: 129, credentials: ['ServSuccess Certificate'] },
-    { slug: 'guest-service-gold', name: 'Guest Service Gold', price: 0, credentials: ['Guest Service Gold Certification'] },
-  ],
+    'WIOA and Workforce Ready Grant funding available for eligible Indiana residents. Self-pay options available.',
+  selfPayCost: '$1,800',
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'In Demand',
   badgeColor: 'blue',
   credentials: [
@@ -63,7 +54,6 @@ export const HOSPITALITY: ProgramSchema = {
     },
     { statement: 'Coordinate event setup and execution', assessedAt: 'Week 7' },
     { statement: 'Pass ServSafe Food Handler certification exam', assessedAt: 'Week 6' },
-    { statement: 'Maintain cleanliness and safety standards per brand guidelines', assessedAt: 'Week 3' },
   ],
   careerPathway: [
     {
@@ -267,8 +257,8 @@ export const HOSPITALITY: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: true,
+    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',

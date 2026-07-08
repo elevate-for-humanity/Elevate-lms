@@ -16,15 +16,9 @@ const KEY = process.env.ONET_API_KEY ?? '';
 // Cache TTL: 7 days (O*NET data updates quarterly)
 const REVALIDATE = 60 * 60 * 24 * 7;
 
-// Rate-limit logging: only warn once per process lifetime
-let _keyMissingWarned = false;
-
 async function onetFetch<T>(path: string): Promise<T | null> {
   if (!KEY) {
-    if (!_keyMissingWarned) {
-      logger.warn('[onet] ONET_API_KEY not set — skipping fetch');
-      _keyMissingWarned = true;
-    }
+    logger.warn('[onet] ONET_API_KEY not set — skipping fetch');
     return null;
   }
   try {

@@ -1,73 +1,97 @@
-/* ACT WorkKeys NCRC pricing for Elevate Testing Center.
- * 
- * STRIPE PAYMENT LINKS (Live):
- * - Applied Math: https://buy.stripe.com/aFacN53YYcjk2FR93rgIo15 ($55)
- * - Graphic Literacy: https://buy.stripe.com/9B64gzeDCgzAcgr4NbgIo16 ($55)
- * - Workplace Documents: https://buy.stripe.com/7sY7sLanm4QS80b6VjgIo17 ($55)
- * - Full NCRC Bundle (all 3): https://buy.stripe.com/00w5kD3YY6Z0a8j5RfgIo18 ($165)
- * 
- * Price breakdown per test ($55):
- * - ACT voucher fee: $18
- * - Proctor time (45 min): $22
- * - Facility overhead: $12
- * - Total cost: $52 | Margin: $3 (5.5%)
- */
+/* ACT WorkKeys NCRC pricing for Elevate Testing Center. ⚠️ VERIFY BEFORE LAUNCH: ACT institutional per-assessment fee. Typical authorized center rate: $13.50–$22 assessment. Check your ACT agreement and update VOUCHER_COST_PER_ASSESSMENT. Cost structure per seat: Voucher (ACT fee): $18 ← ⚠️ ESTIMATE — verify against your ACT agreement Proctor time: $22 ← 45-min session, allocated hourly rate Overhead: $12 ← facility + ops per seat True cost seat: $52 Previous pricing (what you were charging): Individual: $45 → was LOSING ~$7 test Full NCRC: $120 → was LOSING ~$36 bundle Agency ref: $35 → was LOSING ~$17 test Corrected pricing (engine-enforced, ~50% margin): Individual: $99 Full NCRC: $269 (3 × $52 true cost = $156 → $269 at 42% margin) Agency ref: $79 (reduced from individual — still profitable) Retake: $65 (voucher + reduced overhead only) No-show fee: $50 */
 
-export const WORKKEYS_STRIPE_PRICES = {
-  appliedMath: {
-    stripePriceId: 'price_1TmhS1H4a2yrVOt5X3YQMfZp',
-    name: 'Applied Math',
-    shortName: 'AM',
-    price: 55,
-    paymentLink: 'https://buy.stripe.com/aFacN53YYcjk2FR93rgIo15',
-    description: 'Measures math skills for workplace tasks — measurements, calculations, data interpretation, and problem-solving. Calculator provided. 33 questions, 55 minutes.',
-    duration: '55 minutes',
-    questions: 33,
-  },
-  graphicLiteracy: {
-    stripePriceId: 'price_1TmhS1H4a2yrVOt5w4PekjLd',
-    name: 'Graphic Literacy',
-    shortName: 'GL',
-    price: 55,
-    paymentLink: 'https://buy.stripe.com/9B64gzeDCgzAcgr4NbgIo16',
-    description: 'Reading and interpreting workplace graphics — charts, graphs, diagrams, tables, and maps. Uses information to make decisions. 38 questions, 55 minutes.',
-    duration: '55 minutes',
-    questions: 38,
-  },
-  workplaceDocuments: {
-    stripePriceId: 'price_1TmhS2H4a2yrVOt5lepQDywp',
-    name: 'Workplace Documents',
-    shortName: 'WD',
-    price: 55,
-    paymentLink: 'https://buy.stripe.com/7sY7sLanm4QS80b6VjgIo17',
-    description: 'Reading and using workplace documents — forms, policies, schedules, instructions, and procedures. Finding information and following directions. 35 questions, 55 minutes.',
-    duration: '55 minutes',
-    questions: 35,
-  },
-  ncrcBundle: {
-    name: 'Full NCRC Bundle',
-    shortName: 'ALL-3',
-    price: 165,
-    paymentLink: 'https://buy.stripe.com/00w5kD3YY6Z0a8j5RfgIo18',
-    description: 'All 3 WorkKeys assessments in one session. Save $55 vs individual tests. Complete all 3 to earn your NCRC credential.',
-    duration: '3+ hours',
-    questions: 106,
-    savings: 55,
-  },
-} as const;
+import { calculatePrice, calculateRetakePrice, calculateNoShowFee } from '../pricing-engine';
 
-// Legacy exports for backward compatibility
+// ─── Cost inputs ─────────────────────────────────────────────────────────────
+
+/** ⚠️ ESTIMATE — verify against your ACT WorkKeys agreement */
+const VOUCHER_COST_PER_ASSESSMENT = 18;
+const PROCTOR_COST = 22;
+const OVERHEAD_COST = 12;
+
+// ─── Calculated prices ───────────────────────────────────────────────────────
+
+const individual = calculatePrice({
+  voucherCost: VOUCHER_COST_PER_ASSESSMENT,
+  proctorCost: PROCTOR_COST,
+  overheadCost: OVERHEAD_COST,
+  provider: 'workkeys',
+});
+
+// NCRC = 3 assessments. Proctor cost is shared across the session (not 3×).
+const ncrcTrueCost = VOUCHER_COST_PER_ASSESSMENT * 3 + PROCTOR_COST + OVERHEAD_COST;
+const ncrcPrice = Math.ceil(ncrcTrueCost * 1.9); // same multiplier as individual
+const ncrcProfit = ncrcPrice - ncrcTrueCost;
+const ncrcMargin = ncrcProfit / ncrcPrice;
+
+// Agency referral — WorkOne / WIOA-referred candidates.
+// Reduced price is a business decision, not a cost reduction.
+// Must still clear the margin floor — if it doesn't, raise it.
+const agencyPrice = Math.ceil(individual.price * 0.8); // 20% below individual
+const agencyMargin = (agencyPrice - individual.trueCost) / agencyPrice;
+
+if (agencyMargin < 0.3) {
+  throw new Error(
+    `[workkeys-pricing] Agency referral price $${agencyPrice} produces ` +
+      `${(agencyMargin * 100).toFixed(1)}% margin — below 30% floor. Raise agency price.`,
+  );
+}
+
 export const WORKKEYS_PRICING = {
-  individual: { price: 55, trueCost: 52, margin: 0.054 },
-  ncrc: { price: 165, trueCost: 156, margin: 0.054 },
-  agencyReferral: { price: 45, trueCost: 52, margin: -0.155 },
-  retake: { price: 45, feeCents: 4500 },
-  noShow: { price: 50, feeCents: 5000 },
+  /**
+   * Per-assessment (individual test-taker, single section).
+   * Applied Math · Workplace Documents · Graphic Literacy
+   */
+  individual: {
+    price: individual.price,
+    trueCost: individual.trueCost,
+    margin: individual.margin,
+  },
+
+  /**
+   * Full NCRC bundle — all 3 assessments in one session.
+   * Discount vs 3× individual because proctor time is shared.
+   */
+  ncrc: {
+    price: ncrcPrice,
+    trueCost: ncrcTrueCost,
+    margin: ncrcMargin,
+  },
+
+  /**
+   * WorkOne / WIOA agency referral rate.
+   * ⚠️  Confirm with WorkOne whether this rate is contractually required.
+   *     If it's discretionary, consider eliminating it — you're subsidizing
+   *     a government agency's program costs.
+   */
+  agencyReferral: {
+    price: agencyPrice,
+    trueCost: individual.trueCost,
+    margin: agencyMargin,
+  },
+
+  /** Retake fee — voucher + reduced overhead, no full proctor allocation */
+  retake: calculateRetakePrice(VOUCHER_COST_PER_ASSESSMENT),
+
+  /** No-show fee — covers wasted proctor time + admin */
+  noShow: calculateNoShowFee(PROCTOR_COST, OVERHEAD_COST),
 } as const;
 
+/** Fee rows for display in proctoring-capabilities.ts */
 export const WORKKEYS_FEES = [
-  { label: 'Applied Math', amount: 55, note: '$55 per test' },
-  { label: 'Graphic Literacy', amount: 55, note: '$55 per test' },
-  { label: 'Workplace Documents', amount: 55, note: '$55 per test' },
-  { label: 'Full NCRC Bundle', amount: 165, note: 'Save $55 — all 3 tests' },
+  {
+    label: 'Per assessment (individual)',
+    amount: WORKKEYS_PRICING.individual.price,
+    note: 'Applied Math · Workplace Documents · Graphic Literacy',
+  },
+  {
+    label: 'Full NCRC (3 assessments)',
+    amount: WORKKEYS_PRICING.ncrc.price,
+    note: 'All 3 sections in one session — save vs individual rate',
+  },
+  {
+    label: 'Per assessment (workforce agency referral)',
+    amount: WORKKEYS_PRICING.agencyReferral.price,
+    note: 'WorkOne / WIOA-referred candidates',
+  },
 ] as const;

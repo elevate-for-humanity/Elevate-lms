@@ -75,7 +75,7 @@ export const PROGRAM_CONFIGS: Record<string, ProgramConfig> = {
     slug: 'barbershop-apprenticeship',
     name: 'Indiana Barber Apprenticeship',
     shortName: 'Barber Apprenticeship',
-    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    heroImage: '/images/pages/training-classroom.webp',
     description:
       "Host apprentices in your shop. Develop talent. Grow your team through Indiana's USDOL Registered Barber Apprenticeship.",
     registeredApprenticeship: true,
@@ -206,7 +206,7 @@ export const PROGRAM_CONFIGS: Record<string, ProgramConfig> = {
     slug: 'cosmetology-apprenticeship',
     name: 'Indiana Cosmetology Apprenticeship',
     shortName: 'Cosmetology Apprenticeship',
-    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    heroImage: '/images/pages/training-classroom.webp',
     description:
       "Host cosmetology apprentices at your salon. Build your team through Indiana's USDOL Registered Cosmetology Apprenticeship.",
     registeredApprenticeship: true,
@@ -291,7 +291,7 @@ export const PROGRAM_CONFIGS: Record<string, ProgramConfig> = {
     slug: 'cna-clinical-partner',
     name: 'CNA Clinical Partner Program',
     shortName: 'CNA Clinical Partner',
-    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    heroImage: '/images/pages/training-classroom.webp',
     description:
       'Host CNA students for clinical rotations at your healthcare facility. Help train the next generation of certified nursing assistants.',
     registeredApprenticeship: false,
@@ -400,7 +400,7 @@ export const PROGRAM_CONFIGS: Record<string, ProgramConfig> = {
     slug: 'hvac-apprenticeship',
     name: 'HVAC Technician Apprenticeship',
     shortName: 'HVAC Apprenticeship',
-    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    heroImage: '/images/pages/training-classroom.webp',
     description:
       'Host HVAC apprentices at your company. Train the next generation of HVAC technicians through structured on-the-job learning.',
     registeredApprenticeship: true,
@@ -494,7 +494,7 @@ export const PROGRAM_CONFIGS: Record<string, ProgramConfig> = {
     slug: 'cdl-training-partner',
     name: 'CDL Training Partner Program',
     shortName: 'CDL Training Partner',
-    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    heroImage: '/images/pages/training-classroom.webp',
     description:
       'Partner with Elevate to provide CDL training and job placement. Host students for behind-the-wheel training at your fleet. Next cohort starts October 2026.',
     registeredApprenticeship: false,
@@ -577,7 +577,7 @@ export const PROGRAM_CONFIGS: Record<string, ProgramConfig> = {
     slug: 'welding-apprenticeship',
     name: 'Welding Apprenticeship',
     shortName: 'Welding Apprenticeship',
-    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    heroImage: '/images/pages/training-classroom.webp',
     description:
       'Host welding apprentices at your shop or fabrication facility. Train skilled welders through structured on-the-job learning.',
     registeredApprenticeship: true,
@@ -657,7 +657,7 @@ export const PROGRAM_CONFIGS: Record<string, ProgramConfig> = {
     slug: 'electrical-apprenticeship',
     name: 'Electrical Apprenticeship',
     shortName: 'Electrical Apprenticeship',
-    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    heroImage: '/images/pages/training-classroom.webp',
     description:
       'Host electrical apprentices at your company. Train licensed electricians through structured on-the-job learning.',
     registeredApprenticeship: true,
@@ -753,7 +753,7 @@ export const PROGRAM_CONFIGS: Record<string, ProgramConfig> = {
     slug: 'plumbing-apprenticeship',
     name: 'Plumbing Apprenticeship',
     shortName: 'Plumbing Apprenticeship',
-    heroImage: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
+    heroImage: '/images/pages/hvac-technician.webp',
     description:
       'Host plumbing apprentices at your company. Train licensed plumbers through structured on-the-job learning.',
     registeredApprenticeship: true,

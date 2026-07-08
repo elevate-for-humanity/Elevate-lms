@@ -131,8 +131,8 @@ export async function promoteToCurriculum(
     const moduleTitle = (mod?.title as string) ?? '';
 
     // Parse content blob → script_text + key_terms
-    let keyTerms: string[];
-    let scriptText: string;
+    let scriptText = '';
+    let keyTerms: string[] = [];
     try {
       const c =
         typeof lesson.content === 'string'

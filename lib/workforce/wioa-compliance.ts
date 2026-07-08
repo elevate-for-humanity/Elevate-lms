@@ -369,8 +369,8 @@ export function determineWRGEligibility(
 ): WRGEligibility {
   const requirements: string[] = [];
   let eligible = true;
-  let grantAmount: number;
-  let programType: 'short-term' | 'long-term' | 'apprenticeship';
+  let grantAmount = 0;
+  let programType: 'short-term' | 'long-term' | 'apprenticeship' = 'short-term';
 
   // Must be Indiana resident
   requirements.push('Indiana resident');

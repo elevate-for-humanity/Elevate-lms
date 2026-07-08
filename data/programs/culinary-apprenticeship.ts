@@ -235,12 +235,12 @@ export const CULINARY: ProgramSchema = {
     'Earn ServSafe certification through a paid culinary apprenticeship. Hands-on training in professional kitchens. Indianapolis.',
 
 
-  fundingOptions: ['wioa', 'employer_paid', 'self_pay'],
+  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
   funding: {
-    fssa_eligible: false,
     wioa_eligible: false,
+    fssa_eligible: true,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes: 'DOL Registered Apprenticeship. FSSA Gov Portal may be available. WIOA apprenticeship funding eligibility determined by Indiana DWD.',
+    fundingNotes: 'DOL Registered Apprenticeship. FSSA IMPACT may be available. WIOA apprenticeship funding eligibility determined by Indiana DWD.',
   },
 };

@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { getAdminClient, requireAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 
 export interface ProgramHolderContext {
@@ -45,7 +45,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['program_holder', 'admin', 'staff'].includes(profile.role)) {
+  if (!profile || !['program_holder', 'admin', 'super_admin', 'staff'].includes(profile.role)) {
     redirect('/unauthorized');
   }
 

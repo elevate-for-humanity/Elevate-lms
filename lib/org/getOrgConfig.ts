@@ -38,14 +38,6 @@ export interface OrgConfig {
     max_students?: number | null;
     max_staff?: number | null;
   };
-  license?: {
-    features?: Record<string, boolean>;
-    limits?: {
-      max_students?: number | null;
-      max_staff?: number | null;
-      max_programs?: number | null;
-    };
-  };
 }
 
 export const getOrgConfig = cache(

@@ -35,7 +35,6 @@ import { MEDICAL_ASSISTANT } from './medical-assistant';
 import { COSMETOLOGY } from './cosmetology-apprenticeship';
 import { CNA } from './cna';
 import { ESTHETICIAN } from './esthetician';
-import { ESTHETICIAN_APPRENTICESHIP } from './esthetician-apprenticeship';
 import { NAIL_TECH } from './nail-technician-apprenticeship';
 import { CULINARY } from './culinary-apprenticeship';
 import { SANITATION } from './sanitation-infection-control';
@@ -47,7 +46,6 @@ import { HOSPITALITY } from './hospitality';
 import { TECHNOLOGY } from './technology';
 import { QMA } from './qma';
 import { BEAUTY_CAREER_EDUCATOR } from './beauty-career-educator';
-import { COMMUNITY_HEALTH_WORKER } from './community-health-worker';
 
 const STATIC_PROGRAMS: ProgramSchema[] = [
   // Programs with dedicated page.tsx - registered here for [slug] fallback and sitemap
@@ -61,7 +59,6 @@ const STATIC_PROGRAMS: ProgramSchema[] = [
   COSMETOLOGY,
   CNA,
   ESTHETICIAN,
-  ESTHETICIAN_APPRENTICESHIP,
   NAIL_TECH,
   CULINARY,
   SANITATION,
@@ -83,7 +80,6 @@ const STATIC_PROGRAMS: ProgramSchema[] = [
   FORKLIFT,
   GRAPHIC_DESIGN,
   HOME_HEALTH_AIDE,
-  COMMUNITY_HEALTH_WORKER,
   IT_HELP_DESK,
   NETWORK_ADMIN,
   NETWORK_SUPPORT,

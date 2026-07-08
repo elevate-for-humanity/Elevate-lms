@@ -267,10 +267,9 @@ export async function validateRequestBody<T>(request: Request, schema: z.ZodSche
     return schema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const message = `Validation failed: ${error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`;
-      const err = new Error(message);
-      (err as { cause?: unknown }).cause = error;
-      throw err;
+      throw new Error(
+        `Validation failed: ${error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`,
+      );
     }
     throw error;
   }

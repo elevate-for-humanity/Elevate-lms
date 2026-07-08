@@ -8,30 +8,13 @@ import { logger } from '@/lib/logger';
 
 export type UserRole =
   | 'student'
-  | 'admin'
   | 'advisor'
-  | 'staff'
-  | 'employer'
-  | 'workforce_board'
-  | 'partner'
-  | 'sponsor'
-  | 'mentor'
-  | 'org_admin'
-  | 'program_holder'
-  | 'delegate'
-  | 'creator'
-  | 'instructor'
-  | 'case_manager'
-  | 'provider_admin'
+  | 'admin'
   | 'super_admin'
-  | 'grant_client'
-  | 'partner_admin'
-  | 'host_shop'
-  | 'government'
-  | 'testing_center'
-  | 'financial_aid'
-  | 'compliance'
-  | 'dev_studio';
+  | 'partner'
+  | 'program_holder'
+  | 'employer'
+  | 'workforce_board';
 
 /**
  * Require specific role(s) for access
@@ -92,6 +75,7 @@ const ROLE_HIERARCHY: Record<UserRole, number> = {
   workforce_board: 3,
   advisor: 4,
   admin: 5,
+  super_admin: 6,
 };
 
 export function hasRoleOrHigher(session: Session, minimumRole: UserRole): boolean {

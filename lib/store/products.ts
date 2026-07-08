@@ -53,7 +53,7 @@ export const digitalWorkbooks: StoreProduct[] = [
       'Complete study guide with all course materials, practice exercises, and state exam prep',
     longDescription:
       'This comprehensive workbook includes all reading materials from the Barber Apprenticeship program, organized practice exercises, state licensing exam preparation, and quick reference guides. Perfect for students who want offline study materials or supplemental resources.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'barber-001',
     programName: 'Barber Apprenticeship',
     inStock: true,
@@ -79,7 +79,7 @@ export const digitalWorkbooks: StoreProduct[] = [
       'Comprehensive CNA study materials with 500+ practice questions and skills checklist',
     longDescription:
       'Master your CNA certification with this complete study guide featuring all course materials, 500+ practice questions, clinical skills checklist, and state-specific exam preparation.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'cna-001',
     programName: 'CNA Training',
     inStock: true,
@@ -104,7 +104,7 @@ export const digitalWorkbooks: StoreProduct[] = [
     description: 'Technical diagrams, practice problems, and EPA 608 certification prep',
     longDescription:
       'Complete HVAC training workbook with technical diagrams, electrical schematics, practice problems, and comprehensive EPA 608 certification preparation for all types.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'hvac-001',
     programName: 'HVAC Technician',
     inStock: true,
@@ -131,7 +131,7 @@ export const digitalWorkbooks: StoreProduct[] = [
       'All course materials, clinical skills guide, and certification prep in one bundle',
     longDescription:
       'The ultimate Medical Assistant study package including all course materials, clinical procedures guide, administrative skills, and complete certification exam preparation.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'medical-assistant-001',
     programName: 'Medical Assistant',
     inStock: true,
@@ -160,7 +160,7 @@ export const videoCourses: StoreProduct[] = [
     description: 'Complete video library with all barber training demonstrations and techniques',
     longDescription:
       'Lifetime access to our complete barber training video library featuring professional demonstrations of cuts, fades, shaves, and styling techniques. Stream or download for offline viewing.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'barber-001',
     programName: 'Barber Apprenticeship',
     inStock: true,
@@ -185,7 +185,7 @@ export const videoCourses: StoreProduct[] = [
     description: 'Step-by-step video demonstrations of all required CNA clinical skills',
     longDescription:
       'Master all required CNA clinical skills with our comprehensive video library featuring step-by-step demonstrations, common mistakes to avoid, and exam tips.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'cna-001',
     programName: 'CNA Training',
     inStock: true,
@@ -215,7 +215,7 @@ export const certificationPrep: StoreProduct[] = [
       'Complete state barber licensing exam preparation with practice tests and study materials',
     longDescription:
       'Prepare for your state barber licensing exam with our comprehensive prep course featuring practice exams, study guides, and test-taking strategies. 90-day access.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'barber-001',
     programName: 'Barber Apprenticeship',
     inStock: true,
@@ -240,7 +240,7 @@ export const certificationPrep: StoreProduct[] = [
     description: 'State-specific CNA exam preparation with practice tests and skills videos',
     longDescription:
       'Pass your CNA state exam with confidence using our targeted prep package including practice tests, skills videos, and state-specific content. 60-day access.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'cna-001',
     programName: 'CNA Training',
     inStock: true,
@@ -265,7 +265,7 @@ export const certificationPrep: StoreProduct[] = [
     description: 'Complete EPA 608 certification prep for Core, Type I, Type II, and Type III',
     longDescription:
       'Master the EPA 608 certification exam with our comprehensive prep course covering Core, Type I, Type II, and Type III. Includes practice exams and study materials. 90-day access.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'hvac-001',
     programName: 'HVAC Technician',
     inStock: true,
@@ -295,7 +295,7 @@ export const physicalProducts: StoreProduct[] = [
       'Complete professional barber tool kit with clippers, scissors, combs, and carrying case',
     longDescription:
       'Everything you need to start your barber career. This professional-grade kit includes premium clippers, scissors, combs, brushes, and a durable carrying case.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'barber-001',
     programName: 'Barber Apprenticeship',
     inStock: true,
@@ -321,7 +321,7 @@ export const physicalProducts: StoreProduct[] = [
     description: 'Professional scrubs set including top and pants, available in sizes S-3XL',
     longDescription:
       'Comfortable, durable scrubs designed for healthcare professionals. Includes matching top and pants in professional navy blue. Multiple sizes available.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'cna-001',
     programName: 'CNA Training',
     inStock: true,
@@ -346,7 +346,7 @@ export const physicalProducts: StoreProduct[] = [
     description: 'Essential HVAC tools including gauges, vacuum pump, and carrying case',
     longDescription:
       'Professional HVAC starter kit with all essential tools for residential and commercial work. Includes manifold gauges, vacuum pump, and durable carrying case.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'hvac-001',
     programName: 'HVAC Technician',
     inStock: true,
@@ -372,7 +372,7 @@ export const physicalProducts: StoreProduct[] = [
     description: 'OSHA-compliant safety glasses, gloves, and protective equipment',
     longDescription:
       'Complete safety equipment bundle for all trades programs. OSHA-compliant and industry-standard protective gear.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/comp-home-hero.webp',
     programId: 'all',
     programName: 'All Programs',
     inStock: true,

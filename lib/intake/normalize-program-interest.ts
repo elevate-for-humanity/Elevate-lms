@@ -3,9 +3,6 @@ const PROGRAM_INTEREST_ALIASES: Record<string, string> = {
   barber: 'barber-apprenticeship',
   'barber apprenticeship': 'barber-apprenticeship',
   'barber apprentice': 'barber-apprenticeship',
-  cdl: 'cdl-training',
-  'cdl training': 'cdl-training',
-  'cdl class a': 'cdl-training',
 };
 
 export function normalizeProgramInterest(programInterest: string | undefined): string | undefined {

@@ -18,7 +18,7 @@ export type TenantCompliance = {
 };
 
 export async function getTenantCompliance(tenantId: string): Promise<TenantCompliance> {
-  const supabase = await getSupabaseAdmin();
+  const supabase = getSupabaseAdmin();
   await setAuditContext(supabase, { systemActor: 'tenant_compliance' });
   const { data: tenant } = await supabase
     .from('tenants')
@@ -41,7 +41,7 @@ export async function updateTenantCompliance(
   tenantId: string,
   compliance: Partial<TenantCompliance>,
 ): Promise<void> {
-  const supabase = await getSupabaseAdmin();
+  const supabase = getSupabaseAdmin();
   await setAuditContext(supabase, { systemActor: 'tenant_compliance' });
 
   const updates: Record<string, boolean> = {};

@@ -2,19 +2,18 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 /**
  * Canonical URL helpers.
  *
- * All URLs come from runtime environment variables.
+ * All URLs come from environment variables set in AWS SSM (/elevate/*).
  * No localhost fallbacks — missing vars in production are caught at call time.
  *
- * Required runtime variables:
- *   NEXT_PUBLIC_SITE_URL               https://www.elevateforhumanity.org
- *   NEXT_PUBLIC_ADMIN_URL              
- *   NEXT_PUBLIC_COLLABORATION_WS_URL   wss://collab.elevateforhumanity.org
+ * Required SSM parameters:
+ *   /elevate/NEXT_PUBLIC_SITE_URL               https://www.elevateforhumanity.org
+ *   /elevate/NEXT_PUBLIC_ADMIN_URL              https://admin.elevateforhumanity.org
+ *   /elevate/NEXT_PUBLIC_COLLABORATION_WS_URL   wss://collab.elevateforhumanity.org
  */
 
-const DEFAULT_ADMIN_URL = '';
-
-function resolveUrl(name: string, fallback: string): string {
-  const val = (process.env[name] || '').trim() || fallback;
+function requireUrl(name: string): string {
+  const val = (process.env[name] || '').trim();
+  if (!val) throw new Error(`Missing required environment variable: ${name}`);
   return val.replace(/\/$/, '');
 }
 
@@ -27,30 +26,24 @@ export function getPublicSiteUrl(): string {
 
 /** LMS app base URL — canonical public site (www), not the admin subdomain */
 export function getSiteUrl(): string {
-  return resolveUrl('NEXT_PUBLIC_SITE_URL', PLATFORM_DEFAULTS.siteUrl);
+  return requireUrl('NEXT_PUBLIC_SITE_URL');
 }
 
-/** Admin app base URL —  */
+/** Admin app base URL — https://admin.${PLATFORM_DEFAULTS.canonicalDomain} */
 export function getAdminUrl(): string {
-  const url = resolveUrl('NEXT_PUBLIC_ADMIN_URL', DEFAULT_ADMIN_URL);
+  const url = requireUrl('NEXT_PUBLIC_ADMIN_URL');
   try {
     const parsed = new URL(url);
-    if (!parsed.hostname.includes('.')) {
-      throw new Error('NEXT_PUBLIC_ADMIN_URL must be a fully qualified hostname');
+    if (parsed.hostname.toLowerCase().endsWith('.elb.amazonaws.com')) {
+      throw new Error('NEXT_PUBLIC_ADMIN_URL must not be a raw ALB hostname');
     }
     return `${parsed.protocol}//${parsed.host}`;
   } catch (e) {
-    const message = e instanceof Error ? e.message : String(e);
-    const err = new Error(`Invalid NEXT_PUBLIC_ADMIN_URL: ${message}`);
-    (err as { cause?: unknown }).cause = e;
-    throw err;
+    throw new Error(`Invalid NEXT_PUBLIC_ADMIN_URL: ${e instanceof Error ? e.message : e}`);
   }
 }
 
 /** WebSocket URL for Yjs collaboration */
 export function getCollaborationWsUrl(): string {
-  return resolveUrl(
-    'NEXT_PUBLIC_COLLABORATION_WS_URL',
-    'wss://collab.elevateforhumanity.org',
-  );
+  return requireUrl('NEXT_PUBLIC_COLLABORATION_WS_URL');
 }

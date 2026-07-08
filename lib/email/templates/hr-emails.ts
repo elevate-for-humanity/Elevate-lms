@@ -34,7 +34,7 @@ function layout(body: string) {
   <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;margin-top:24px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
     <!-- Header -->
     <div style="background:${BRAND.primary};padding:28px 32px;text-align:center">
-      <img src="${BASE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt="${PLATFORM_DEFAULTS.orgName}" height="60" style="display:block;margin:0 auto 12px" />
+      <img src="${BASE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt={PLATFORM_DEFAULTS.orgName} height="60" style="display:block;margin:0 auto 12px" />
       <p style="color:#94a3b8;font-size:13px;margin:0">Workforce Development · Career Training · Indianapolis, IN</p>
     </div>
     <!-- Body -->

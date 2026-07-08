@@ -54,7 +54,7 @@ export async function createCourse(input: CourseCreate) {
   return data;
 }
 
-export async function listCourses(options?: { status?: string; programId?: string }) {
+export async function listCourses() {
   const supabase = await getSupabase();
   const { data, error } = await supabase
     .from('lms_courses')
@@ -99,7 +99,7 @@ export async function deleteCourse(id: string) {
 
 // ============ LESSONS ============
 // All lesson CRUD targets course_lessons (canonical).
-// training_lessons is the active HVAC lesson store — writable via admin CurriculumLessonManager.
+// training_lessons is a read-only HVAC archive — do not write to it.
 export async function createLesson(input: LessonCreate) {
   const supabase = await getSupabase();
   const { data, error } = await supabase
@@ -459,7 +459,7 @@ export async function listApplications(filters?: { status?: string; programId?: 
   } = await supabase.auth.getUser();
   if (!user) throw new Error('Unauthorized');
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!profile || !['admin', 'staff', 'org_admin'].includes(profile.role)) {
+  if (!profile || !['admin', 'super_admin', 'staff', 'org_admin'].includes(profile.role)) {
     throw new Error('Forbidden');
   }
 

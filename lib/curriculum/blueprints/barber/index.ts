@@ -1,14 +1,6 @@
-/**
- * Barber Apprenticeship Blueprint
- * 
- * © 2026 Elevate for Humanity
- * All Rights Reserved
- * 
- * Version: 1.0.0
- * License: Apprenticeship License
- * 
- * Canonical curriculum for Barber Apprenticeship program.
- * Use enrollment_type to enable/disable apprenticeship features.
+/* Barber Apprenticeship Blueprint — modular source
+ * Master blueprint lives here; module content is split into ./module-1.ts … ./module-8.ts
+ * Seeding: pnpm tsx scripts/seed-course-from-blueprint.ts --blueprint barber-apprenticeship-v1 --program <programId>
  */
 import type { CredentialBlueprint, BlueprintVideoConfig } from '../types';
 import { barberModule1 } from './module-1';
@@ -25,7 +17,7 @@ const BARBER_VIDEO_CONFIG: BlueprintVideoConfig = {
   template: 'elevate-slide',
   instructorName: 'Brandon Williams',
   instructorTitle: 'Master Barber · 12 yrs',
-  instructorImagePath: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/instructors/instructor-barber.jpg',
+  instructorImagePath: '/images/team/instructors/instructor-barber.jpg',
   topBarColor: '#ea580c',
   accentColor: '#0f172a',
   backgroundColor: '#ffffff',
@@ -35,8 +27,6 @@ const BARBER_VIDEO_CONFIG: BlueprintVideoConfig = {
   segments: ['intro', 'concept', 'visual', 'application', 'wrapup'],
   generateDalleImage: true,
   dalleImageStyle: 'natural',
-  width: 1920,
-  height: 1080,
 };
 
 export const barberApprenticeshipBlueprint: CredentialBlueprint = {
@@ -60,7 +50,7 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
   },
 
   expectedModuleCount: 8,
-  expectedLessonCount: 50,
+  expectedLessonCount: 58,
 
   certificationPathway: {
     certificationBodyId: 'cb000000-0000-0000-0000-000000000006',

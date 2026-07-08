@@ -12,7 +12,7 @@
  *      - Burned-in captions (Whisper transcription)
  *      - Music bed (-22 dB under narration)
  *      - Branded outro card (3 s)
- *   4. Upload to course-videos/{programSlug}/{slug}.mp4 (R2 when large + configured, else Supabase)
+ *   4. Upload to Supabase course-videos/{programSlug}/{slug}.mp4
  *   5. Update course_lessons.video_url
  *
  * The pipeline is driven entirely by VideoProfile — no per-program code.
@@ -23,7 +23,6 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { BROLL_MAP, pickBrollKey } from './broll-map';
-import { uploadCourseVideosObject } from './upload-lesson-media';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -208,8 +207,9 @@ async function getOrFetchBroll(brollKey: string, tmpDir: string): Promise<string
   execSync(`curl -sL "${clipUrl}" -o "${tmpPath}"`, { stdio: 'pipe' });
   execSync(`ffmpeg -y -i "${tmpPath}" -t 30 -c copy "${trimPath}" 2>/dev/null`, { stdio: 'pipe' });
 
-  const url = await uploadCourseVideosObject(
+  const url = await uploadToSupabase(
     fs.readFileSync(trimPath),
+    'course-videos',
     storagePath,
     'video/mp4',
   );
@@ -354,11 +354,11 @@ export async function processLesson(
   // Loop clips until we cover the full audio duration
   const clipDuration = 30; // each clip is trimmed to 30 s
   const loopsNeeded = Math.ceil(duration / (clipPaths.length * clipDuration)) + 1;
-  const concatContent: string[] = [];
+  let concatContent = '';
   for (let i = 0; i < loopsNeeded; i++) {
-    for (const p of clipPaths) concatContent.push(`file '${p}'`);
+    for (const p of clipPaths) concatContent += `file '${p}'\n`;
   }
-  fs.writeFileSync(concatPath, concatContent.join('\n') + '\n');
+  fs.writeFileSync(concatPath, concatContent);
 
   const brollAssembled = path.join(tmpDir, `${slug}-broll.mp4`);
   execSync(
@@ -453,8 +453,9 @@ export async function processLesson(
   );
 
   // ── Upload final video ────────────────────────────────────────────────────
-  const videoUrl = await uploadCourseVideosObject(
+  const videoUrl = await uploadToSupabase(
     fs.readFileSync(finalVideo),
+    'course-videos',
     `${profile.programSlug}/${slug}.mp4`,
     'video/mp4',
   );

@@ -17,7 +17,6 @@
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { logger } from '@/lib/logger';
 import { fetchOnetOccupation, isOnetConfigured, type OnetOccupation } from './onet';
 import {
   fetchBlsWages,

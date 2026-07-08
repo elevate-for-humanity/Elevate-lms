@@ -3,7 +3,7 @@ import { logger } from '@/lib/logger';
  * File Storage Service
  *
  * Handles secure file storage and signed URL generation for digital downloads.
- * Supports Cloudflare R2 or another explicitly configured S3-compatible store.
+ * Supports Cloudflare R2 (S3-compatible) and AWS S3.
  */
 
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
@@ -11,23 +11,24 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 // Storage configuration
 const STORAGE_CONFIG = {
+  // Use R2 if configured, otherwise fall back to S3
   endpoint: process.env.R2_ENDPOINT || undefined,
-  region: process.env.R2_REGION || 'auto',
+  region: process.env.AWS_REGION || 'auto',
   credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY || '',
-    secretAccessKey: process.env.R2_SECRET_KEY || '',
+    accessKeyId: process.env.R2_ACCESS_KEY || process.env.AWS_ACCESS_KEY_ID || '',
+    secretAccessKey: process.env.R2_SECRET_KEY || process.env.AWS_SECRET_ACCESS_KEY || '',
   },
-  bucket: process.env.R2_BUCKET || 'elevate-media',
+  bucket: process.env.R2_BUCKET || process.env.AWS_S3_BUCKET || 'elevate-media',
 };
 
-// Initialize S3-compatible client.
+// Initialize S3 client (works with R2 and S3)
 let s3Client: S3Client | null = null;
 
 function getS3Client(): S3Client {
   if (!s3Client) {
     if (!STORAGE_CONFIG.credentials.accessKeyId || !STORAGE_CONFIG.credentials.secretAccessKey) {
       throw new Error(
-        'Storage credentials not configured. Set R2_ACCESS_KEY and R2_SECRET_KEY.',
+        'Storage credentials not configured. Set R2_ACCESS_KEY/R2_SECRET_KEY or AWS credentials.',
       );
     }
 
@@ -35,7 +36,7 @@ function getS3Client(): S3Client {
       endpoint: STORAGE_CONFIG.endpoint,
       region: STORAGE_CONFIG.region,
       credentials: STORAGE_CONFIG.credentials,
-      forcePathStyle: !!STORAGE_CONFIG.endpoint,
+      forcePathStyle: !!STORAGE_CONFIG.endpoint, // Required for R2
     });
   }
   return s3Client;
@@ -88,7 +89,7 @@ export const PRODUCT_FILES: Record<
 
 /**
  * Get public fallback URL for a product
- * Used when object storage is not configured
+ * Used when R2/S3 is not configured
  */
 export function getPublicFallbackUrl(productId: string, baseUrl: string): string | null {
   const fileInfo = PRODUCT_FILES[productId];

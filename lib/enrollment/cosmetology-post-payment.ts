@@ -205,7 +205,7 @@ export async function runCosmetologyPostPayment(
 
     steps['crm_reminder'] = 'ok';
   } catch (err) {
-    logger.warn('[cosmetology-post-payment] CRM reminder failed (non-fatal)', { err });
+    logger.error('[cosmetology-post-payment] CRM reminder failed (non-fatal)', err);
     steps['crm_reminder'] = 'failed';
   }
 
@@ -246,7 +246,7 @@ export async function runCosmetologyPostPayment(
 
     await sendEmail({
       to: 'elevate4humanityedu@gmail.com',
-      from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
+      from: '${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>',
       replyTo: 'elevate4humanityedu@gmail.com',
       subject: `New Enrollment: ${studentName} — Cosmetology Apprenticeship`,
       html: `
@@ -300,7 +300,7 @@ export async function runCosmetologyPostPayment(
 
     steps['admin_email'] = 'ok';
   } catch (err) {
-    logger.warn('[cosmetology-post-payment] Admin notification email failed (non-fatal)', { err });
+    logger.error('[cosmetology-post-payment] Admin notification email failed (non-fatal)', err);
     steps['admin_email'] = 'failed';
   }
 

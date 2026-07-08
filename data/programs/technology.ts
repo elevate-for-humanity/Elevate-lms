@@ -21,7 +21,7 @@ export const TECHNOLOGY: ProgramSchema = {
   fundingStatement:
     'WIOA and Workforce Ready Grant funding available for eligible Indiana residents. Self-pay options available.',
   selfPayCost: '$3,500',
-  fundingOptions: ['wioa', 'wrg', 'wioa', 'self_pay'],
+  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'High Demand',
   badgeColor: 'blue',
   credentials: [
@@ -50,7 +50,6 @@ export const TECHNOLOGY: ProgramSchema = {
     },
     { statement: 'Identify and respond to common cybersecurity threats', assessedAt: 'Week 10' },
     { statement: 'Pass CompTIA A+ Core 1 and Core 2 exams', assessedAt: 'Week 12' },
-    { statement: 'Set up and manage user accounts, permissions, and security policies', assessedAt: 'Week 7' },
   ],
   careerPathway: [
     {
@@ -265,8 +264,8 @@ export const TECHNOLOGY: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: true,
+    fssa_eligible: true,
     wrg_eligible: true,
     jobReadyIndyEligible: true,
     fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',

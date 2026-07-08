@@ -4,7 +4,7 @@ export const NAIL_TECH: ProgramSchema = {
   slug: 'nail-technician-apprenticeship',
   title: 'Nail Technician Apprenticeship',
   subtitle:
-    'Earn your Indiana nail technician license through a registered apprenticeship. 2,000 hours of supervised training.',
+    'Earn your Indiana nail technician license through a registered apprenticeship. 600 hours of supervised training.',
   sector: 'personal-services',
   category: 'Nail Technology',
   programType: 'apprenticeship',
@@ -12,16 +12,16 @@ export const NAIL_TECH: ProgramSchema = {
   heroImageAlt: 'Nail technician apprentice performing a manicure',
   deliveryMode: 'in-person',
   deliveredBy: 'Partner',
-  durationWeeks: 52,
-  hoursPerWeekMin: 15,
-  hoursPerWeekMax: 20,
-  hoursBreakdown: { onlineInstruction: 500, handsOnLab: 400, examPrep: 50, careerPlacement: 50 },
-  schedule: 'Flexible — 15–20 hrs/week (OJT at host salon + RTI online)',
+  durationWeeks: 20,
+  hoursPerWeekMin: 25,
+  hoursPerWeekMax: 30,
+  hoursBreakdown: { onlineInstruction: 60, handsOnLab: 450, examPrep: 40, careerPlacement: 50 },
+  schedule: 'Mon–Fri, varies by salon (25–30 hrs/week)',
   cohortSize: '1–3 apprentices per salon',
   fundingStatement:
     'Paid apprenticeship track available. For self-pay enrollment, BNPL starts at a $600 deposit with weekly payment options.',
-  selfPayCost: '$2,500',
-  fundingOptions: ['wioa', 'employer_paid', 'self_pay'],
+  selfPayCost: '$5,000',
+  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
   badge: 'Earn & Learn',
   badgeColor: 'purple',
   credentials: [
@@ -209,8 +209,8 @@ export const NAIL_TECH: ProgramSchema = {
     { title: 'Salon Owner', salary: '$45,000–$80,000+' },
   ],
   cta: {
-    applyHref: '/programs/nail-technician-apprenticeship/apply',
-    requestInfoHref: '/contact?program=nail-technician-apprenticeship',
+    applyHref: '/apply?program=nail-technician-apprenticeship',
+    requestInfoHref: '/programs/nail-technician-apprenticeship/request-info',
     careerConnectHref:
       'https://www.indianacareerconnect.com/jobs/search?q=nail+technician&location=Indiana',
     advisorHref: '/contact',
@@ -255,10 +255,10 @@ export const NAIL_TECH: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
     wioa_eligible: false,
+    fssa_eligible: true,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes: 'DOL Registered Apprenticeship. FSSA Gov Portal may be available. WIOA apprenticeship funding eligibility determined by Indiana DWD.',
+    fundingNotes: 'DOL Registered Apprenticeship. FSSA IMPACT may be available. WIOA apprenticeship funding eligibility determined by Indiana DWD.',
   },
 };

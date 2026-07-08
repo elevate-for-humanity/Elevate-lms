@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Phone, Mail, Award, FileText, Star, BadgeCheck } from 'lucide-react';
+import { Phone, Mail } from 'lucide-react';
 import type { Program } from '@/lib/types/program';
 import { ProgramPaymentButton } from './ProgramPaymentButton';
 import { PricingTiers } from './PricingTiers';
@@ -154,19 +154,19 @@ export function ProgramTemplate({ program }: { program: Program }) {
             {/* Credentials & Outcomes Box */}
             <div className="mt-8 bg-gradient-to-br from-brand-blue-50 to-indigo-50 border-2 border-brand-blue-200 rounded-2xl p-6">
               <h3 className="text-xl font-bold mb-4 text-brand-blue-900 flex items-center gap-2">
-                <Award className="w-6 h-6 text-brand-blue-600" /> Credentials You'll Earn
+                <span className="text-2xl">🎓</span> Credentials You'll Earn
               </h3>
 
               {/* Certificate of Completion */}
               <div className="mb-4 bg-white rounded-xl p-4 border border-brand-blue-100">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <FileText className="w-5 h-5 text-brand-blue-600" />
+                    <span className="text-brand-blue-600 font-bold">📜</span>
                   </div>
                   <div>
                     <h4 className="font-bold text-slate-900">Certificate of Completion</h4>
                     <p className="text-sm text-slate-600">
-                      Issued by {PLATFORM_DEFAULTS.orgName} upon successful program completion
+                      Issued by ${PLATFORM_DEFAULTS.orgName} upon successful program completion
                     </p>
                   </div>
                 </div>
@@ -290,7 +290,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
               {program.highlights.map((highlight, i) => (
                 <div key={i} className="bg-white border border-slate-200 rounded-xl p-6">
                   <div className="flex items-start gap-3">
-                    <BadgeCheck className="w-6 h-6 text-brand-orange-500 shrink-0" />
+                    <span className="text-2xl">⭐</span>
                     <p className="text-black">{highlight}</p>
                   </div>
                 </div>

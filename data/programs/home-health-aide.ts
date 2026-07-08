@@ -19,9 +19,8 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 30, handsOnLab: 40, examPrep: 6, careerPlacement: 4 },
   schedule: 'Day or evening options — monthly cohort start dates',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement:
-    'WIOA and Workforce Ready Grant funding available for eligible Indiana residents. Self-pay available.',
-  selfPayCost: '$3,500',
+  fundingStatement: '$0 with WIOA or Workforce Ready Grant. Self-pay: $4,700.',
+  selfPayCost: '$4,700',
   fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'ETPL Approved',
   badgeColor: 'green',
@@ -313,8 +312,10 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
 
 
   funding: {
-    fssa_eligible: false,
-    isSelfPay: true,
-    fundingNotes: 'Self-pay and payment plans available. BNPL options accepted at checkout.',
+    wioa_eligible: true,
+    fssa_eligible: true,
+    wrg_eligible: false,
+    jobReadyIndyEligible: true,
+    fundingNotes: 'Indiana ETPL-listed. FSSA IMPACT and WIOA Title I funding available. WRG eligibility determined by Indiana DWD.',
   },
 };

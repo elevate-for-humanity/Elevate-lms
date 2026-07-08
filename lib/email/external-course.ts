@@ -31,7 +31,7 @@ export async function sendExternalCourseLoginEmail(params: ExternalCourseLoginEm
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1e293b">
         <div style="background:#1e293b;padding:24px 32px">
           <img src="${SITE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
-               alt="${PLATFORM_DEFAULTS.orgName}" height="48" style="display:block" />
+               alt={PLATFORM_DEFAULTS.orgName} height="48" style="display:block" />
         </div>
 
         <div style="padding:32px">
@@ -109,7 +109,7 @@ export async function sendExternalCourseApprovedEmail(params: ExternalCourseAppr
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1e293b">
         <div style="background:#1e293b;padding:24px 32px">
           <img src="${SITE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
-               alt="${PLATFORM_DEFAULTS.orgName}" height="48" style="display:block" />
+               alt={PLATFORM_DEFAULTS.orgName} height="48" style="display:block" />
         </div>
 
         <div style="padding:32px">
@@ -172,7 +172,7 @@ export async function sendAdminExternalCoursePurchaseAlert(
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1e293b">
         <div style="background:#1e293b;padding:24px 32px">
           <img src="${SITE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
-               alt="${PLATFORM_DEFAULTS.orgName}" height="48" style="display:block" />
+               alt={PLATFORM_DEFAULTS.orgName} height="48" style="display:block" />
         </div>
 
         <div style="padding:32px">

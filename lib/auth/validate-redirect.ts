@@ -1,3 +1,4 @@
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 /**
  * Validate a redirect URL parameter to prevent open-redirect attacks.
  * Allows:
@@ -7,56 +8,11 @@
  * Returns the validated URL/path or the fallback if invalid.
  */
 
-const CANONICAL_DOMAIN = process.env.NEXT_PUBLIC_CANONICAL_DOMAIN || 'www.elevateforhumanity.org';
-
 const TRUSTED_HOSTS = [
-  CANONICAL_DOMAIN,
-  'elevateforhumanity.org',
-  '',
+  PLATFORM_DEFAULTS.canonicalDomain,
+  PLATFORM_DEFAULTS.canonicalDomain,
+  'admin.elevateforhumanity.org',
 ];
-
-/** Pathname + query (and hash) for post-login return URLs. */
-export function buildReturnPath(pathname: string, search = '', hash = ''): string {
-  const path = pathname.startsWith('/') ? pathname : `/${pathname}`;
-  return `${path}${search}${hash}`;
-}
-
-/**
- * Build a clean return path by stripping any existing `redirect` or `next`
- * query params from the original URL. This prevents double-encoding when the
- * login page re-encodes the redirect parameter.
- */
-export function buildCleanReturnPath(pathname: string, search = ''): string {
-  const path = pathname.startsWith('/') ? pathname : `/${pathname}`;
-  // Strip existing redirect/next params to avoid double-encoding
-  const params = new URLSearchParams(search);
-  params.delete('redirect');
-  params.delete('next');
-  const cleanSearch = params.toString() ? `?${params.toString()}` : '';
-  return `${path}${cleanSearch}`;
-}
-
-/** Read canonical ?redirect= with legacy ?next= fallback. */
-export function readRedirectParam(
-  searchParams: Pick<URLSearchParams, 'get'>,
-): string | null {
-  return searchParams.get('redirect') ?? searchParams.get('next');
-}
-
-/** Build /login?redirect=… with proper encoding (preserves nested query strings). */
-export function buildLoginUrl(base: string | URL, returnPath: string): URL {
-  const loginUrl = new URL('/login', base);
-  loginUrl.searchParams.set('redirect', returnPath);
-  return loginUrl;
-}
-
-/** Resolve a validated redirect target to an absolute URL for server redirects. */
-export function resolveRedirectLocation(target: string, origin: string): URL {
-  if (target.startsWith('https://')) {
-    return new URL(target);
-  }
-  return new URL(target, origin);
-}
 
 export function validateRedirect(url: string | null | undefined, fallback: string = '/'): string {
   if (!url || typeof url !== 'string') return fallback;

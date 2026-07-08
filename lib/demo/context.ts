@@ -57,7 +57,7 @@ export type DemoRole =
   | 'demo_staff'
   | 'demo_partner'
   | 'demo_learner'
-  | 'admin';
+  | 'super_admin';
 
 /**
  * Demo user credentials (for display in role switcher)

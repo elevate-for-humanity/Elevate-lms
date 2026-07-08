@@ -1,6 +1,5 @@
 'use client';
 
-import { hero as heroTokens } from '@/lib/page-design-tokens';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -226,7 +225,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
       </div>
 
       {/* Hero Image — clean, no text overlay */}
-      <section className={`${heroTokens.imageWrap} overflow-hidden`}>
+      <section className="relative h-[45vh] min-h-[280px] max-h-[560px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
           src={config.heroImage.src}

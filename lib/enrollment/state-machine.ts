@@ -57,7 +57,7 @@ export function getActionRoute(action: EnrollmentAction, programSlug?: string | 
     case 'wait_for_approval':
       return '/lms/dashboard';
     case 'complete_onboarding':
-      return '/enrollment/orientation';
+      return '/lms/onboarding';
     case 'complete_payment':
       return slug ? `/apply/${slug}/payment` : '/lms/dashboard';
     case 'wait_for_funding_verification':

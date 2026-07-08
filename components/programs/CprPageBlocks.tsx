@@ -77,7 +77,7 @@ function SplitBlock() {
         {/* Image side */}
         <div className="relative h-64 sm:h-80 lg:h-auto min-h-[340px] overflow-hidden bg-slate-100">
           <Image
-            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cpr-training-real.webp"
+            src="/images/pages/cpr-training-real.webp"
             alt="CPR training in progress"
             fill
             className="object-cover object-center"
@@ -113,20 +113,12 @@ function SplitBlock() {
                 </li>
               ))}
             </ul>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/apply?program=cpr-first-aid"
-                className="inline-block bg-slate-900 hover:bg-slate-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm"
-              >
-                Apply — $130
-              </Link>
-              <Link
-                href="/programs/cpr-first-aid/payment/bnpl"
-                className="inline-block border-2 border-slate-900 text-slate-900 hover:bg-slate-50 font-bold px-6 py-3 rounded-lg transition-colors text-sm"
-              >
-                Pay with BNPL
-              </Link>
-            </div>
+            <Link
+              href="/apply?program=cpr-first-aid"
+              className="inline-block bg-slate-900 hover:bg-slate-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm"
+            >
+              Enroll — $130
+            </Link>
           </div>
         </div>
       </div>
@@ -374,7 +366,7 @@ export default function CprPageBlocks() {
   return (
     <>
       <FactsStrip />
-      <FullBleedImage src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cpr-first-aid.webp" alt="CPR and first aid training" />
+      <FullBleedImage src="/images/pages/cpr-first-aid.webp" alt="CPR and first aid training" />
       <SplitBlock />
       <StatsBand />
       <WhatComesWithIt />

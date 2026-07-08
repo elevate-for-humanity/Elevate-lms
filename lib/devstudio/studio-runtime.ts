@@ -1,5 +1,5 @@
 /**
- * Dev Studio Runtime — the remote worker that clones the repo,
+ * Dev Studio Runtime — the AWS ECS worker (elevate-studio) that clones the repo,
  * runs pnpm, and serves the PTY used for git/build/terminal in Dev Studio.
  *
  * User-facing name is intentionally NOT "shell" — that implied a separate,
@@ -9,7 +9,7 @@
 import type { ShellProbe } from '@/lib/devstudio/shell-probe';
 
 export const DEV_STUDIO_RUNTIME_LABEL = 'Dev Studio Runtime';
-export const DEV_STUDIO_RUNTIME_SERVICE = 'elevate-studio';
+export const DEV_STUDIO_RUNTIME_ECS_SERVICE = 'elevate-studio';
 
 export type StudioRuntimePhase =
   | 'not_configured'
@@ -47,12 +47,12 @@ export function buildStudioRuntimeCompletion(input: {
       label: 'Admin app wired to runtime',
       done: input.adminConfigured,
       detail: input.adminConfigured
-        ? 'STUDIO_SHELL_WS_URL + secrets present on admin runtime'
-        : 'Set STUDIO_SHELL_WS_URL, STUDIO_SHELL_SECRET, and STUDIO_TOKEN_SECRET in admin runtime env, then redeploy admin',
+        ? 'STUDIO_SHELL_WS_URL + secrets present on admin task'
+        : 'Set STUDIO_SHELL_WS_URL, STUDIO_SHELL_SECRET, and STUDIO_TOKEN_SECRET (SSM → admin ECS task), then redeploy admin',
     },
     {
-      id: 'runtime-running',
-      label: 'Runtime service reachable',
+      id: 'ecs-running',
+      label: 'Runtime service running on AWS',
       done: input.probe.reachable,
       detail: input.probe.reachable
         ? 'Internal /health reachable'
@@ -63,10 +63,10 @@ export function buildStudioRuntimeCompletion(input: {
       label: 'GitHub token on runtime task',
       done: input.hasGitHubToken && !missingGithub,
       detail: missingGithub
-        ? 'Add GITHUB_TOKEN to the studio runtime environment'
+        ? 'Add GITHUB_TOKEN to elevate-studio ECS task (SSM /elevate/GITHUB_TOKEN)'
         : input.hasGitHubToken
           ? 'Token available for clone'
-          : 'Set GITHUB_TOKEN in Secrets or runtime environment for the studio task',
+          : 'Set GITHUB_TOKEN in Secrets or SSM for the studio task',
     },
     {
       id: 'repo-ready',
@@ -92,10 +92,10 @@ export function buildStudioRuntimeCompletion(input: {
 
   const coreDone =
     steps.find((s) => s.id === 'admin-wiring')?.done &&
-    steps.find((s) => s.id === 'runtime-running')?.done &&
+    steps.find((s) => s.id === 'ecs-running')?.done &&
     steps.find((s) => s.id === 'repo-ready')?.done;
 
-  let phase: StudioRuntimePhase;
+  let phase: StudioRuntimePhase = 'not_configured';
   if (!input.adminConfigured) phase = 'not_configured';
   else if (!input.probe.reachable) phase = 'offline';
   else if (!input.probe.ready) phase = 'booting';

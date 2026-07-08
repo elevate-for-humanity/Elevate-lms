@@ -11,6 +11,7 @@ import heroBanners from '@/content/heroBanners';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
+import LiveJobPostings from '@/components/careers/LiveJobPostings';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { resolveSlug } from '@/lib/program-registry';
 export const dynamic = 'force-dynamic';
@@ -26,6 +27,18 @@ const DEDICATED_APPLY_SLUGS = new Set([
   'cosmetology-apprenticeship',
   'hvac-technician',
   'peer-recovery-specialist',
+]);
+
+// Programs that show live job postings on their page
+const LIVE_JOBS_PROGRAM_SLUGS = new Set([
+  'barber-apprenticeship',
+  'cosmetology-apprenticeship',
+  'hvac-technician',
+  'medical-assistant',
+  'cna',
+  'electrical',
+  'plumbing',
+  'welding',
 ]);
 
 function getApplyHref(program: string): string {
@@ -561,7 +574,6 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
         <ProgramDetailPageComponent program={mergedProgram} banner={banner} heroPosterSrc={heroPosterSrc} />
         {LIVE_JOBS_PROGRAM_SLUGS.has(program) ? (
           <LiveJobPostings
-            programSlug={program}
             heading={`Hiring for ${mergedProgram.title} graduates`}
             limit={6}
             className="bg-slate-50 border-t border-slate-100"

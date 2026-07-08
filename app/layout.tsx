@@ -2,12 +2,16 @@ import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import StructuredData from '@/components/StructuredData';
+// MUST be first - breaks circular dependency with MarketingChromeGuard
+// PublicLayout imports MarketingChromeGuardLoader which imports MarketingChromeGuard
+// which imports shouldHideMarketingHeader from app-routes. Importing app-routes
+// first ensures the module is fully evaluated before the circular chain.
+import { generateChromeSuppressionScript, shouldHideMarketingHeader } from '@/lib/layout/app-routes';
 import PublicLayout from '@/components/layout/PublicLayout';
 import ToasterClient from '@/components/ui/ToasterClient';
 import { SkipToContent } from '@/components/ui/SkipToContent';
 import RootWidgets from '@/components/layout/RootWidgets';
 import ClientOnlyFeatures from '@/components/layout/ClientOnlyFeatures';
-import { generateChromeSuppressionScript } from '@/lib/layout/app-routes';
 import PWAManager from '@/components/PWAManager';
 import AuthRedirectHandler from '@/components/auth/AuthRedirectHandler';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';

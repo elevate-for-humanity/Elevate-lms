@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { Shield, FileText, Users, Scale, Accessibility } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Equal Opportunity | Elevate for Humanity',

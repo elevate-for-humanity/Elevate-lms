@@ -46,7 +46,7 @@ export default async function PartnerDashboardPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  const allowedRoles = ['partner', 'admin', 'super_admin', 'staff'];
+  const allowedRoles = ['partner', 'program_holder', 'admin', 'super_admin', 'staff'];
   if (!profile || !allowedRoles.includes(profile.role)) {
     redirect('/unauthorized');
   }
@@ -54,6 +54,11 @@ export default async function PartnerDashboardPage() {
   // Admins/staff have no partners row — send them to their own dashboard
   if (['admin', 'super_admin', 'staff'].includes(profile.role)) {
     redirect('/admin/dashboard');
+  }
+
+  // Program holders get a simplified partner view
+  if (profile.role === 'program_holder') {
+    redirect('/partners/dashboard');
   }
 
   // Resolve partner record via partner_users join (partners has no user_id column)

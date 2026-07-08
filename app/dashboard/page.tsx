@@ -30,16 +30,14 @@ export default async function DashboardPage() {
       redirect('/admin/dashboard');
       break;
     case 'program_holder':
-      redirect('/program-holder/dashboard');
+    case 'partner':
+      redirect('/partner/dashboard');
       break;
     case 'host_shop':
       redirect('/host-shop/dashboard');
       break;
     case 'employer':
       redirect('/employer/dashboard');
-      break;
-    case 'partner':
-      redirect('/partner/dashboard');
       break;
     case 'instructor':
       redirect('/admin/instructor/dashboard');

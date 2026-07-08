@@ -9,7 +9,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // Video specs - audio files that need video versions

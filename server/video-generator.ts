@@ -18,7 +18,7 @@ let _registerFont: any = null;
 async function ensureDeps() {
   if (_ffmpeg) return;
   const ff = (await import('fluent-ffmpeg')).default;
-  const canvasMod = await import('canvas');
+  const canvasMod = await import('@napi-rs/canvas');
   _ffmpeg = ff;
   _createCanvas = canvasMod.createCanvas;
   _loadImage = canvasMod.loadImage;

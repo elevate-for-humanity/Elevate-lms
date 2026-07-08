@@ -63,7 +63,7 @@ async function tts(text: string, out: string): Promise<number> {
 }
 
 async function slidePng(title: string, bullets: string[], out: string) {
-  const { createCanvas } = await import('canvas');
+  const { createCanvas } = await import('@napi-rs/canvas');
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#0a0a0a';

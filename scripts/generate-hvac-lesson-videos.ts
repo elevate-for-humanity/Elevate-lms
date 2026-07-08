@@ -401,7 +401,7 @@ async function renderSlideOverlay(
   outPath: string,
   instructorImagePath: string,
 ): Promise<void> {
-  const { createCanvas, loadImage } = await import('canvas');
+  const { createCanvas, loadImage } = await import('@napi-rs/canvas');
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
 

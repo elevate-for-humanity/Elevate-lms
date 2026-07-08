@@ -22,7 +22,7 @@ let _loadImage: any;
 
 async function ensureDeps() {
   if (_createCanvas) return;
-  const canvas = await import(/* webpackIgnore: true */ 'canvas');
+  const canvas = await import(/* webpackIgnore: true */ '@napi-rs/canvas');
   _createCanvas = canvas.createCanvas;
   _loadImage = canvas.loadImage;
 }

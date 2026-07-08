@@ -11,6 +11,7 @@ export const FORKLIFT: ProgramSchema = {
   programType: 'workforce',
   heroImage: '/images/pexels/forklift.webp',
   heroImageAlt: 'Forklift operator training in a warehouse setting',
+  videoSrc: '/videos/hvac-hero-final.mp4',
   deliveryMode: 'hybrid',
   deliveredBy: 'Partner',
   durationWeeks: 1,

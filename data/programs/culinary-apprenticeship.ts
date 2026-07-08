@@ -9,6 +9,7 @@ export const CULINARY: ProgramSchema = {
   programType: 'apprenticeship',
   heroImage: '/images/pexels/culinary.webp',
   heroImageAlt: 'Culinary apprentice preparing food in a professional kitchen',
+  videoSrc: '/videos/graduation-success.mp4',
   deliveryMode: 'in-person',
   deliveredBy: 'Partner',
   durationWeeks: 26,

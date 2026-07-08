@@ -11,6 +11,7 @@ export const SANITATION: ProgramSchema = {
   programType: 'certification',
   heroImage: '/images/pexels/medical-assistant.webp',
   heroImageAlt: 'Sanitation and infection control training in a clinical setting',
+  videoSrc: '/videos/cna-hero.mp4',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
   durationWeeks: 2,

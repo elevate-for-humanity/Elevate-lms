@@ -11,6 +11,7 @@ export const CONSTRUCTION_TRADES: ProgramSchema = {
   programType: 'workforce',
   heroImage: '/images/pexels/electrical.webp',
   heroImageAlt: 'Construction trades students in safety gear on a job site',
+  videoSrc: '/videos/hvac-hero-final.mp4',
   deliveryMode: 'hybrid',
   deliveredBy: 'Partner',
   durationWeeks: 8,

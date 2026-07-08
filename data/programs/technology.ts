@@ -10,6 +10,7 @@ export const TECHNOLOGY: ProgramSchema = {
   programType: 'workforce',
   heroImage: '/images/pexels/webdev.webp',
   heroImageAlt: 'Technology student working on a computer',
+  videoSrc: '/videos/it-technology.mp4',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
   durationWeeks: 12,

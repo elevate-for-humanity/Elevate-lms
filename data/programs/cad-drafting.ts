@@ -9,6 +9,7 @@ export const CAD_DRAFTING: ProgramSchema = {
   programType: 'workforce',
   heroImage: '/images/pexels/webdev.webp',
   heroImageAlt: 'CAD drafting student working on technical drawings',
+  videoSrc: '/videos/it-technology.mp4',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
   durationWeeks: 10,

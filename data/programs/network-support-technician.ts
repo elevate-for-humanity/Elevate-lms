@@ -9,6 +9,7 @@ export const NETWORK_SUPPORT: ProgramSchema = {
   programType: 'workforce',
   heroImage: '/images/pexels/network.webp',
   heroImageAlt: 'Network support technician troubleshooting a connection',
+  videoSrc: '/videos/it-technology.mp4',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
   durationWeeks: 6,

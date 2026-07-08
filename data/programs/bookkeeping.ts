@@ -12,7 +12,7 @@ export const BOOKKEEPING: ProgramSchema = {
 
   heroImage: '/images/pexels/bookkeeping.webp',
   heroImageAlt: 'Bookkeeping and accounting training program',
-  videoSrc: '/videos/business-finance.mp4',
+  videoSrc: '/videos/career-services-hero.mp4',
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

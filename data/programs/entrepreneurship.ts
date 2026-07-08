@@ -9,6 +9,7 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
   programType: 'workforce',
   heroImage: '/images/pexels/business.webp',
   heroImageAlt: 'Entrepreneur working on a business plan',
+  videoSrc: '/videos/partner-business.mp4',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
   durationWeeks: 6,

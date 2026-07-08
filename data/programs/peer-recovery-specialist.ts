@@ -10,6 +10,7 @@ export const PEER_RECOVERY: ProgramSchema = {
   programType: 'workforce',
   heroImage: '/images/pexels/medical-assistant.webp',
   heroImageAlt: 'Peer recovery specialist in a counseling session',
+  videoSrc: '/videos/cna-hero.mp4',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
   durationWeeks: 8,

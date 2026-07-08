@@ -11,6 +11,7 @@ export const HOSPITALITY: ProgramSchema = {
   programType: 'workforce',
   heroImage: '/images/pexels/culinary.webp',
   heroImageAlt: 'Hospitality professional at a hotel front desk',
+  videoSrc: '/videos/graduation-success.mp4',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
   durationWeeks: 8,

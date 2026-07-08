@@ -11,6 +11,7 @@ export const QMA: ProgramSchema = {
 
   heroImage: '/images/pexels/medical-assistant.webp',
   heroImageAlt: 'Qualified Medication Aide student preparing medications in a residential care facility',
+  videoSrc: '/videos/cna-hero.mp4',
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

@@ -11,7 +11,7 @@ export const HVAC_TECHNICIAN: ProgramSchema = {
 
   heroImage: '/images/pexels/hvac.webp',
   heroImageAlt: 'HVAC technician servicing a rooftop unit in Indianapolis',
-  videoSrc: '/videos/hvac-hero.mp4',
+  videoSrc: '/videos/hvac-hero-final.mp4',
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

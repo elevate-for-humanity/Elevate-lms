@@ -9,6 +9,7 @@ export const WEB_DEVELOPMENT: ProgramSchema = {
   programType: 'workforce',
   heroImage: '/images/pexels/webdev.webp',
   heroImageAlt: 'Web development student coding on a laptop',
+  videoSrc: '/videos/it-technology.mp4',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
   durationWeeks: 12,

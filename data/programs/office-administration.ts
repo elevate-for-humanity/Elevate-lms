@@ -12,7 +12,7 @@ export const OFFICE_ADMINISTRATION: ProgramSchema = {
 
   heroImage: '/images/pexels/business.webp',
   heroImageAlt: 'Office administration and business training program',
-  videoSrc: '/videos/business-finance.mp4',
+  videoSrc: '/videos/career-services-hero.mp4',
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

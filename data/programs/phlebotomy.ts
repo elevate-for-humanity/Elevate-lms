@@ -17,6 +17,7 @@ export const PHLEBOTOMY: ProgramSchema = {
 
   heroImage: '/images/pexels/phlebotomy.webp',
   heroImageAlt: 'Phlebotomy student practicing venipuncture technique',
+  videoSrc: '/videos/cna-hero.mp4',
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',

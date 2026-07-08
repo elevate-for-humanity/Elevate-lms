@@ -46,3 +46,17 @@ export const STATES: Record<string, StateConfig> = {
     },
   },
 };
+
+/**
+ * Get state configuration by slug
+ */
+export function getStateConfig(slug: string): StateConfig | undefined {
+  return STATES[slug];
+}
+
+/**
+ * Get all states except the specified one
+ */
+export function getOtherStates(excludeSlug: string): StateConfig[] {
+  return Object.values(STATES).filter((state) => state.slug !== excludeSlug);
+}

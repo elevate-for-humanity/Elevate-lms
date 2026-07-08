@@ -1,10 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Shield, Award, CheckCircle, Building2, Users, GraduationCap } from 'lucide-react';
+import Image from 'next/image';
 
 interface TrustBadge {
-  icon: React.ReactNode;
+  img: string;
+  imgAlt: string;
   label: string;
   sublabel?: string;
   highlight?: boolean;
@@ -17,34 +18,40 @@ interface TrustBadgesProps {
 
 const BADGES: TrustBadge[] = [
   {
-    icon: <Shield className="w-5 h-5" />,
+    img: '/images/partners/dol-badge.webp',
+    imgAlt: 'Department of Labor Registered Apprenticeship Sponsor Badge',
     label: 'DOL Registered',
     sublabel: 'Apprenticeship Sponsor',
     highlight: true,
   },
   {
-    icon: <Award className="w-5 h-5" />,
+    img: '/images/partners/wioa-badge.webp',
+    imgAlt: 'WIOA Approved Training Provider Badge',
     label: 'WIOA Approved',
     sublabel: 'Training Provider',
     highlight: true,
   },
   {
-    icon: <CheckCircle className="w-5 h-5" />,
+    img: '/images/partners/etpl-badge.webp',
+    imgAlt: 'ETPL Eligible Training Provider Badge',
     label: 'ETPL Listed',
     sublabel: 'Eligible Training Provider',
   },
   {
-    icon: <Building2 className="w-5 h-5" />,
+    img: '/images/employers/employers-group.webp',
+    imgAlt: '40+ Employer Hiring Partners',
     label: '40+ Employers',
     sublabel: 'Hiring Partners',
   },
   {
-    icon: <Users className="w-5 h-5" />,
+    img: '/images/graduates/graduates-celebration.webp',
+    imgAlt: '2,000+ Successful Graduates',
     label: '2,000+ Graduates',
     sublabel: 'Successfully Placed',
   },
   {
-    icon: <GraduationCap className="w-5 h-5" />,
+    img: '/images/certifications/pass-rate-badge.webp',
+    imgAlt: '98% License Exam Pass Rate',
     label: '98% Pass Rate',
     sublabel: 'License Exam Success',
     highlight: true,
@@ -62,9 +69,13 @@ const HeroBadge = ({ badge, index }: { badge: TrustBadge; index: number }) => (
         : 'bg-white/90 text-slate-700'
     }`}
   >
-    <span className={badge.highlight ? 'text-white' : 'text-brand-red-600'}>
-      {badge.icon}
-    </span>
+    <Image
+      src={badge.img}
+      alt={badge.imgAlt}
+      width={20}
+      height={20}
+      className="object-contain"
+    />
     <div className="text-xs">
       <div className="font-semibold">{badge.label}</div>
       {badge.sublabel && (
@@ -102,7 +113,15 @@ export function TrustBadges({ variant = 'section', className = '' }: TrustBadges
             transition={{ delay: index * 0.05 }}
             className="flex flex-col items-center text-center p-4 bg-white/10 rounded-xl border border-white/10"
           >
-            <span className="text-brand-red-400 mb-2">{badge.icon}</span>
+            <div className="relative w-12 h-12 mb-2">
+              <Image
+                src={badge.img}
+                alt={badge.imgAlt}
+                fill
+                className="object-contain"
+                sizes="48px"
+              />
+            </div>
             <div className="text-white font-semibold text-sm">{badge.label}</div>
             {badge.sublabel && (
               <div className="text-white/60 text-xs">{badge.sublabel}</div>
@@ -113,7 +132,7 @@ export function TrustBadges({ variant = 'section', className = '' }: TrustBadges
     );
   }
 
-  // Section variant - horizontal row
+  // Section variant - horizontal row with images
   return (
     <div className={`flex flex-wrap justify-center gap-6 ${className}`}>
       {BADGES.map((badge, index) => (
@@ -127,7 +146,13 @@ export function TrustBadges({ variant = 'section', className = '' }: TrustBadges
             badge.highlight ? 'text-brand-red-600' : 'text-slate-600'
           }`}
         >
-          {badge.icon}
+          <Image
+            src={badge.img}
+            alt={badge.imgAlt}
+            width={24}
+            height={24}
+            className="object-contain"
+          />
           <span className="font-semibold text-sm">{badge.label}</span>
         </motion.div>
       ))}

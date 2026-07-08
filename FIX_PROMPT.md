@@ -1,274 +1,282 @@
-# Elevate LMS - COMPREHENSIVE FIX PROMPT
+# Elevate LMS - Systematic Fix Prompt
 
-**ROLE**: You are a Senior Next.js Developer. Fix ALL issues systematically. Do NOT skip anything.
+Use this prompt to systematically audit and fix issues.
 
 ---
 
-## THE FIX PROMPT (Copy and Paste)
+## THE PROMPT
+
+Do a complete line-by-line audit of the Elevate LMS codebase focusing on these three areas:
+
+### 1. SERVER-ONLY CODE IN CLIENT COMPONENTS
+
+Search for ALL files importing 'fs' or 'path' and verify they are NOT in client components.
+
+Run this command and check EVERY result:
+
+```bash
+grep -rn "from 'fs'\|from \"fs\"\|from 'path'\|from \"path\"\|existsSync\|process.cwd" --include="*.tsx" components/
+```
+
+If a client component (has 'use client' directive) imports any of these, FIX IT:
+
+- Move the server-only code to a Server Component parent
+- Pass the resolved value as a prop to the Client Component
+- NEVER call fs/path functions in client-side code
+
+### 2. UNNECESSARY 'use client' DIRECTIVES
+
+For EVERY component with 'use client', verify it NEEDS it:
+
+- Does it use useState, useEffect, useCallback, useRef, useTransition, useOptimistic?
+- Does it have event handlers (onClick, onChange, onSubmit)?
+- Does it use dynamic imports with ssr:false?
+- Does it use browser-only APIs (window, document, localStorage)?
+
+If NO to all above, REMOVE 'use client' - it causes unnecessary client-side rendering and hydration issues.
+
+### 3. DUPLICATE ROUTES AND MISSING PAGES
+
+Check for:
+
+- Static pages at `app/programs/[slug]/page.tsx` that duplicate the dynamic `[program]` route
+- Pages that exist in navigation/sitemap but not in `app/`
+- Pages with stubs/placeholder content instead of real content
+
+Check canonical routes:
+
+```bash
+cat lib/routes/canonical-routes.json
+```
+
+Compare to actual pages:
+
+```bash
+find app/programs -name "page.tsx" | sort
+```
+
+For EACH issue found:
+
+- Document the exact file and line number
+- Explain the root cause
+- Provide the fix
+- Verify the fix works
+- Commit with clear message
+
+---
+
+## VERIFICATION
+
+After ANY fix:
+
+```bash
+grep -n "resolveSiteImagePath\|resolveHeroPosterSrc\|from 'fs'" components/**/*.tsx
+```
+
+Verify NO client components call server-only functions
+
+Navigate to affected pages and check browser console for errors
+
+Test the specific error from the browser console
+
+---
+
+## OUTPUT FORMAT
+
+For each fix:
 
 ```
-FIX THIS CODEBASE COMPLETELY. Follow these steps IN ORDER. Report each fix.
-
-## PHASE 1: FIND AND FIX SERVER-ONLY CODE IN CLIENT COMPONENTS
-
-### Step 1.1: Find all files importing fs/path
-```bash
-grep -rn "from 'fs'\|from \"fs\"\|from 'path'\|from \"path\"\|existsSync\|process.cwd" --include="*.tsx" components/ --include="*.ts" . | grep -v node_modules | grep -v ".next" | grep -v "tests/" | grep -v "app/api/" | grep -v "scripts/" | grep -v "lib/images/site-image-paths.ts" | head -50
+FILE: [path]
+ISSUE: [description]
+LINE: [line numbers]
+ROOT CAUSE: [why it's broken]
+FIX: [what to do]
+VERIFY: [how to confirm it's fixed]
 ```
 
-### Step 1.2: For each result, check if it's in a 'use client' component
+---
+
+## EXAMPLE ERRORS TO LOOK FOR
+
+### Error: "(0, i.existsSync) is not a function"
+
+- **Cause**: `fs.existsSync` called in client-side code
+- **Fix**: Pre-resolve paths in server component, pass as prop
+
+### Error: "Cannot read properties of undefined"
+
+- **Cause**: Client component trying to access server-only data
+- **Fix**: Pass data as props from server component
+
+### Error: "useSearchParams needs a Suspense boundary"
+
+- **Cause**: Using useSearchParams without wrapping in Suspense
+- **Fix**: Wrap component or the usage in `<Suspense>`
+
+### Error: "(0, r.shouldHideMarketingHeader) is not a function"
+
+- **Cause**: Function exported but not defined, or circular dependency
+- **Fix**: Verify function is properly defined and exported, check barrel files
+
+---
+
+## AUDIT CHECKLIST
+
+### Step 1: Find all 'use client' components
+
 ```bash
-for f in $(grep -rl "'use client'" --include="*.tsx" components/ 2>/dev/null); do
+grep -rl "'use client'" --include="*.tsx" components/ | head -50
+```
+
+### Step 2: Check each for server-only imports
+
+```bash
+for f in $(grep -rl "'use client'" --include="*.tsx" components/); do
   for imp in "from 'fs'" "from \"fs\"" "from 'path'" "from \"path\""; do
-    if grep -q "$imp" "$f" 2>/dev/null; then
-      echo "❌ SERVER IN CLIENT: $f"
+    if grep -q "$imp" "$f"; then
+      echo "❌ SERVER-ONLY IN CLIENT: $f"
     fi
   done
 done
 ```
 
-### Step 1.3: Fix Pattern for resolveSiteImagePath in Client Components
-IF a client component calls resolveSiteImagePath():
-1. REMOVE the import of resolveSiteImagePath
-2. ADD a prop parameter for the pre-resolved path
-3. USE the prop directly instead of calling the function
-4. UPDATE the server component that renders this client component to pass the pre-resolved path
+### Step 3: Check for unnecessary 'use client'
 
-Example:
-```typescript
-// BEFORE (client component)
-import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
-const src = resolveSiteImagePath(props.imageUrl);
+```bash
+for f in $(grep -rl "'use client'" --include="*.tsx" components/); do
+  if ! grep -q "useState\|useEffect\|useCallback\|useRef\|onClick\|onChange\|ssr:false" "$f"; then
+    echo "⚠️ UNNECESSARY 'use client': $f"
+  fi
+done
+```
 
-// AFTER (client component)
+### Step 4: Check for duplicate routes
+
+```bash
+echo "=== Static program pages ===" && ls app/programs/*/page.tsx 2>/dev/null
+echo "=== Dynamic route ===" && ls app/programs/\[program\]/page.tsx 2>/dev/null
+```
+
+### Step 5: Check browser console for errors
+
+Navigate to affected pages and look for:
+
+- TypeError messages
+- ReferenceError messages
+- Hydration mismatch warnings
+
+---
+
+## QUICK FIX COMMANDS
+
+### Remove 'use client' if unnecessary
+
+```bash
+# First line is 'use client', remove it
+sed -i '1d' components/path/ComponentName.tsx
+# Then manually clean up empty line at top
+```
+
+### Add heroPosterSrc prop passing
+
+In server page:
+
+```tsx
+import { resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
+
+// Before render:
+const heroPosterSrc = resolveHeroPosterSrc(slug, { banner, heroImage });
+
+// In component:
+<MyClientComponent heroPosterSrc={heroPosterSrc} />
+```
+
+In client component:
+
+```tsx
 interface Props {
-  imageUrl: string; // Pre-resolved by server
-  // ...
+  heroPosterSrc?: string;
+  // ... other props
 }
-const src = props.imageUrl; // Use directly, no function call
-```
 
-### Step 1.4: Verify HeroPicture.tsx is fixed
-```bash
-grep -n "imageSrcDesktop = src\|imageSrcDesktop = resolveSiteImagePath" components/marketing/HeroPicture.tsx
-```
-MUST show: imageSrcDesktop = src
-
-### Step 1.5: Verify ProgramDetailPage.tsx passes heroPosterSrc
-```bash
-grep -n "heroPosterSrc=" app/programs/\[program\]/page.tsx
-```
-MUST show: heroPosterSrc={heroPosterSrc}
-
----
-
-## PHASE 2: FIX UNNECESSARY 'use client' DIRECTIVES
-
-### Step 2.1: Find all 'use client' components
-```bash
-grep -rl "'use client'" --include="*.tsx" components/ 2>/dev/null | wc -l
-```
-
-### Step 2.2: Check each for actual need of 'use client'
-```bash
-for f in $(grep -rl "'use client'" --include="*.tsx" components/ 2>/dev/null | head -50); do
-  has_hooks=$(grep -c "useState\|useEffect\|useCallback\|useRef\|useTransition\|useOptimistic" "$f" 2>/dev/null || echo 0)
-  has_handlers=$(grep -c "onClick\|onChange\|onSubmit\|onKeyDown" "$f" 2>/dev/null || echo 0)
-  has_dynamic=$(grep -c "ssr:false" "$f" 2>/dev/null || echo 0)
-  has_search=$(grep -c "useSearchParams" "$f" 2>/dev/null || echo 0)
-  
-  if [ "$has_hooks" -eq 0 ] && [ "$has_handlers" -eq 0 ] && [ "$has_dynamic" -eq 0 ] && [ "$has_search" -eq 0 ]; then
-    echo "⚠️ UNNECESSARY 'use client': $f (hooks=$has_hooks handlers=$has_handlers)"
-  fi
-done
-```
-
-### Step 2.3: Fix - Remove 'use client' ONLY IF:
-- Component has NO hooks (useState, useEffect, useCallback, useRef, useTransition, useOptimistic)
-- Component has NO event handlers (onClick, onChange, onSubmit, onKeyDown)
-- Component does NOT use dynamic() with ssr:false
-- Component does NOT use useSearchParams
-- Component does NOT use browser APIs (window, document, localStorage, sessionStorage)
-
-### Step 2.4: To remove 'use client'
-1. Open the file
-2. Delete the line containing "'use client';"
-3. Remove any empty line at the top
-4. Save
-
-### Step 2.5: DO NOT remove 'use client' from:
-- HeroVideo.tsx (uses useState, useEffect, useCallback)
-- CanonicalVideo.tsx (uses useState, useEffect)
-- ClientWidgets.tsx (uses useState, useEffect, usePathname)
-- Any component using dynamic() with ssr:false
-- Any component using useSearchParams
-
----
-
-## PHASE 3: FIX DUPLICATE ROUTES AND MISSING PAGES
-
-### Step 3.1: List all static program pages
-```bash
-ls app/programs/*/page.tsx 2>/dev/null | sed 's|app/programs/||;s|/page.tsx||' | grep -v "\[program\]" | sort
-```
-
-### Step 3.2: List canonical routes
-```bash
-cat lib/routes/canonical-routes.json | jq -r '.canonicalRoutes.programs | to_entries[] | .value' 2>/dev/null | sed 's|/programs/||' | sort
-```
-
-### Step 3.3: Find missing pages (in canonical but not in app/)
-```bash
-canonical=$(cat lib/routes/canonical-routes.json | jq -r '.canonicalRoutes.programs | to_entries[] | .value' 2>/dev/null | sed 's|/programs/||')
-for slug in $canonical; do
-  if [ ! -d "app/programs/$slug" ] && [ "$slug" != "[program]" ]; then
-    echo "MISSING: /programs/$slug"
-  fi
-done
-```
-
-### Step 3.4: Verify dynamic route exists
-```bash
-test -f "app/programs/[program]/page.tsx" && echo "✅ Dynamic route exists" || echo "❌ Dynamic route MISSING"
-```
-
-### Step 3.5: Verify dynamic route loads programs correctly
-```bash
-grep -n "getStaticProgram\|loadProgram\|resolveSlug" app/programs/\[program\]/page.tsx | head -10
+export default function MyClientComponent({ heroPosterSrc, ... }: Props) {
+  // Use heroPosterSrc directly, NOT call resolveHeroPosterSrc()
+}
 ```
 
 ---
 
-## PHASE 4: VERIFY ALL FIXES
+## TESTING
 
-### Step 4.1: No server-only calls in client components
-```bash
-grep -rn "resolveSiteImagePath(" components/**/*.tsx 2>/dev/null | grep -v "// \|\/\* " | head -5
-```
-Should return: (empty or comments only)
+After any fix:
 
-### Step 4.2: HeroPicture uses src prop directly
 ```bash
-grep -A1 "const imageSrcDesktop" components/marketing/HeroPicture.tsx
+grep -rn "resolveSiteImagePath\|existsSync" components/**/*.tsx | grep -v "// \|/\*"
 ```
-Should show: const imageSrcDesktop = src;
 
-### Step 4.3: ProgramDetailPage has heroPosterSrc prop
-```bash
-grep "heroPosterSrc?" components/programs/ProgramDetailPage.tsx
-```
-Should show the interface with heroPosterSrc?: string
+Check browser console on affected pages
 
-### Step 4.4: All program pages pass heroPosterSrc
-```bash
-grep -l "ProgramMarketingPage\|ProgramDetailPage" app/programs/*/page.tsx 2>/dev/null | while read f; do
-  if ! grep -q "heroPosterSrc" "$f"; then
-    echo "❌ MISSING heroPosterSrc: $f"
-  fi
-done
-```
+Verify page renders without errors
 
 ---
 
-## PHASE 5: COMMIT AND PUSH
+## CURRENT KNOWN ISSUES
 
-### Step 5.1: Check git status
-```bash
-git status
+### shouldHideMarketingHeader Runtime Error
+
+**Error**: `(0, r.shouldHideMarketingHeader) is not a function`
+
+**Root Cause**: Function was imported in `components/layout/MarketingChromeGuard.tsx` but never exported from `lib/layout/app-routes.ts`
+
+**Fix**: Add the function to `lib/layout/app-routes.ts`:
+
+```ts
+export function shouldHideMarketingHeader(pathname: string): boolean {
+  const customHeaderPrefixes = [
+    '/contact',
+    '/about',
+    '/blog',
+    '/faq',
+    '/privacy',
+    '/terms',
+    '/accessibility',
+    '/support',
+    '/careers',
+  ] as const;
+
+  return customHeaderPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(prefix + '/'),
+  );
+}
 ```
 
-### Step 5.2: Commit with clear message
-```bash
-git add -A
-git commit -m "fix: [brief description of all fixes]"
-```
+### dynamic-imports.tsx ssr:false Error
 
-### Step 5.3: Push
-```bash
-git push origin main
-```
+**Error**: `ssr: false is not allowed with next/dynamic in Server Components`
+
+**Fix**: Add `'use client'` directive at the top of `lib/dynamic-imports.tsx`
 
 ---
 
-## COMMON ERRORS AND FIXES
+## WORKFLOWS
 
-### Error: "(0, i.existsSync) is not a function"
-CAUSE: fs.existsSync called in browser
-FIX: Move fs calls to server, pass result as prop
+### Deploy LMS Workflow
 
-### Error: "BAILOUT_TO_CLIENT_SIDE_RENDERING"
-CAUSE: Client component without proper SSR
-FIX: Remove unnecessary 'use client' or wrap in Suspense
+- File: `.github/workflows/deploy-lms.yml`
+- Service: Northflank `elevate-lms`
+- Triggers: Push to main with paths affecting `app/`, `components/`, `lib/`, etc.
 
-### Error: "Hydration failed"
-CAUSE: Server/client mismatch
-FIX: Ensure client components don't use server-only code
+### Deploy Marketing Workflow
 
-### Error: "useSearchParams needs a Suspense boundary"
-CAUSE: useSearchParams without Suspense
-FIX: Wrap component using useSearchParams in <Suspense fallback={...}>
+- File: `.github/workflows/deploy-marketing.yml`
+- Service: Northflank `elevate-lms-build` (marketing)
+- Triggers: Push to main with same paths
+- Note: Waits for LMS deploy to complete first
 
----
+### Build Checkpoints
 
-## RULES
-
-1. ALWAYS verify each fix before moving to the next
-2. NEVER leave 'use client' on components that don't need it
-3. NEVER call server-only functions (fs, path) in client code
-4. ALWAYS pass pre-resolved values as props
-5. ALWAYS test after fixing (run grep commands)
-6. ALWAYS commit with clear messages
-7. If unsure, ASK before making changes
-```
-
----
-
-## HOW TO USE THIS PROMPT
-
-1. Copy everything between the triple backticks (```)
-2. Paste into a new OpenHands conversation
-3. Let it run - it will fix everything systematically
-4. It will report each fix as it goes
-5. Verify with git status when done
-
----
-
-## VERIFICATION CHECKLIST (Run after any fix)
-
-```bash
-# 1. No resolveSiteImagePath calls in components (except lib)
-grep -rn "resolveSiteImagePath(" components/**/*.tsx 2>/dev/null
-
-# 2. No fs/path imports in client components
-for f in $(grep -rl "'use client'" --include="*.tsx" components/ 2>/dev/null); do
-  grep -q "from 'fs'\|from \"fs\"" "$f" && echo "❌ $f"
-done
-
-# 3. HeroPicture uses src directly
-grep "imageSrcDesktop = src" components/marketing/HeroPicture.tsx
-
-# 4. ProgramDetailPage passes heroPosterSrc
-grep "heroPosterSrc=" app/programs/\[program\]/page.tsx
-
-# 5. Build passes
-pnpm build 2>&1 | tail -20
-```
-
----
-
-## KNOWN ISSUES TO FIX
-
-1. ProgramDetailPage had 'use client' but no hooks - FIXED
-2. HeroPicture called resolveSiteImagePath - FIXED  
-3. Some pages may be missing heroPosterSrc prop - CHECK AND FIX
-
----
-
-## BROWSER TESTING
-
-After all fixes, test these pages in browser (F12 → Console):
-- https://app.elevateforhumanity.org/programs/cna
-- https://app.elevateforhumanity.org/programs/hvac-technician
-- https://app.elevateforhumanity.org/programs/phlebotomy
-
-Look for: `(0, i.existsSync) is not a function` - should be GONE.
+| Service | Workflow | Northflank Service |
+|---------|----------|-------------------|
+| LMS | deploy-lms.yml | elevate-lms |
+| Marketing (www) | deploy-marketing.yml | elevate-lms-build |
+| Admin | deploy-admin.yml | elevate-admin |

@@ -2,6 +2,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const GRAPHIC_DESIGN: ProgramSchema = {
   slug: 'graphic-design',
   title: 'Graphic Design',
+  videoSrc: '/videos/it-technology.mp4',
   subtitle:
     'Learn Adobe Photoshop, Illustrator, and InDesign. Prepare for Adobe Certified Professional credentials in 10 weeks.',
   sector: 'technology',

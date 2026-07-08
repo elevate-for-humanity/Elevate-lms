@@ -64,6 +64,7 @@ export const COMMUNITY_HEALTH_WORKER: ProgramSchema = {
   careerPathway: [
     {
       title: 'Community Health Worker',
+  videoSrc: '/videos/cna-hero.mp4',
       timeframe: '0–1 year',
       requirements: 'CHW certificate + employer onboarding',
       salaryRange: 'Employer-set',

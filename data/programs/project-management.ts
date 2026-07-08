@@ -2,6 +2,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const PROJECT_MANAGEMENT: ProgramSchema = {
   slug: 'project-management',
   title: 'Project Management',
+  videoSrc: '/videos/career-services-hero.mp4',
   subtitle:
     'Prepare for Certiport Project Management certification. Agile, Scrum, and traditional PM methodologies in 6 weeks.',
   sector: 'business',

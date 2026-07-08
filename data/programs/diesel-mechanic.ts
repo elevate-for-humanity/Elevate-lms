@@ -3,6 +3,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const DIESEL_MECHANIC: ProgramSchema = {
   slug: 'diesel-mechanic',
   title: 'Diesel Mechanic',
+  videoSrc: '/videos/hvac-hero-final.mp4',
   subtitle:
     'Diagnose and repair diesel engines, transmissions, and hydraulic systems. OSHA 10 and ASE prep in 12 weeks.',
   sector: 'skilled-trades',
@@ -74,6 +75,7 @@ export const DIESEL_MECHANIC: ProgramSchema = {
     },
     {
       title: 'Diesel Mechanic',
+  videoSrc: '/videos/hvac-hero-final.mp4',
       timeframe: '1–3 years',
       requirements: 'ASE T-series certification',
       salaryRange: '$45,000–$65,000',
@@ -296,6 +298,7 @@ export const DIESEL_MECHANIC: ProgramSchema = {
   },
   careers: [
     { title: 'Diesel Mechanic', salary: '$45,000–$65,000' },
+  videoSrc: '/videos/hvac-hero-final.mp4',
     { title: 'Heavy Equipment Mechanic', salary: '$48,000–$68,000' },
     { title: 'Fleet Maintenance Technician', salary: '$42,000–$60,000' },
     { title: 'Mobile Diesel Technician', salary: '$50,000–$70,000' },

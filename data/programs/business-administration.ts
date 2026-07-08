@@ -2,6 +2,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const BUSINESS_ADMIN: ProgramSchema = {
   slug: 'business',
   title: 'Business Administration',
+  videoSrc: '/videos/partner-business.mp4',
   subtitle:
     'Prepare for Certiport business certifications. Microsoft Office, QuickBooks, and business fundamentals in 8 weeks.',
   sector: 'business',

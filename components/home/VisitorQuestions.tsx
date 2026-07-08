@@ -52,7 +52,7 @@ const QUESTIONS: Question[] = [
     id: 'why-trust',
     icon: <Shield className="w-5 h-5" />,
     question: 'Why should I trust Elevate?',
-    answer: 'Elevate is a DOL-registered apprenticeship sponsor, WIOA-approved training provider, and WorkOne partner. We have helped over 2,000 graduates earn credentials and find employment. Our 98% license exam pass rate and partnerships with 40+ employers demonstrate our commitment to your success.',
+    answer: 'Elevate is a DOL-registered apprenticeship sponsor, WIOA-approved training provider, and WorkOne partner. Our 98% license exam pass rate and partnerships with 40+ employers demonstrate our commitment to your success. We provide hands-on training with job placement support.',
     category: 'trust',
   },
   

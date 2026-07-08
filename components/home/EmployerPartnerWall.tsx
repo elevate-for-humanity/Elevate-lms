@@ -145,7 +145,7 @@ export function EmployerPartnerWall({ className = '' }: EmployerPartnerWallProps
             Employer Partners
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">
-            40+ Employers Ready to Hire Our Graduates
+            40+ Employers Ready to Hire
           </h2>
           <p className="text-slate-600 max-w-2xl mx-auto">
             Our employer partnerships mean you're not just earning a credential—you're earning a job offer.

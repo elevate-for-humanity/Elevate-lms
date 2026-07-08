@@ -18,39 +18,39 @@ interface TrustBadgesProps {
 
 const BADGES: TrustBadge[] = [
   {
-    img: '/images/partners/dol-badge.webp',
+    img: '/images/pages/federal-compliance-hero.webp',
     imgAlt: 'Department of Labor Registered Apprenticeship Sponsor Badge',
     label: 'DOL Registered',
     sublabel: 'Apprenticeship Sponsor',
     highlight: true,
   },
   {
-    img: '/images/partners/wioa-badge.webp',
+    img: '/images/pages/wioa-meeting.webp',
     imgAlt: 'WIOA Approved Training Provider Badge',
     label: 'WIOA Approved',
     sublabel: 'Training Provider',
     highlight: true,
   },
   {
-    img: '/images/partners/etpl-badge.webp',
+    img: '/images/pages/credential-partners-hero.webp',
     imgAlt: 'ETPL Eligible Training Provider Badge',
     label: 'ETPL Listed',
     sublabel: 'Eligible Training Provider',
   },
   {
-    img: '/images/employers/employers-group.webp',
+    img: '/images/pages/hire-graduates-page-1.webp',
     imgAlt: '40+ Employer Hiring Partners',
     label: '40+ Employers',
     sublabel: 'Hiring Partners',
   },
   {
-    img: '/images/graduates/graduates-celebration.webp',
-    imgAlt: '2,000+ Successful Graduates',
-    label: '2,000+ Graduates',
-    sublabel: 'Successfully Placed',
+    img: '/images/pages/certifications-page-1.webp',
+    imgAlt: 'Industry Credentials',
+    label: 'Industry Credentials',
+    sublabel: 'Licensed Training',
   },
   {
-    img: '/images/certifications/pass-rate-badge.webp',
+    img: '/images/pages/certifications.webp',
     imgAlt: '98% License Exam Pass Rate',
     label: '98% Pass Rate',
     sublabel: 'License Exam Success',

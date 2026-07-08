@@ -158,13 +158,13 @@ export function JourneySelector() {
         <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
           <StatItem 
             icon={<Users className="w-5 h-5" />}
-            value="1,247"
-            label="Students Enrolled"
+            value="100%"
+            label="Funding Support"
           />
           <StatItem 
             icon={<GraduationCap className="w-5 h-5" />}
-            value="92%"
-            label="Graduation Rate"
+            value="94%"
+            label="Completion Rate"
           />
           <StatItem 
             icon={<CreditCard className="w-5 h-5" />}

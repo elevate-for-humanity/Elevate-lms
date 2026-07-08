@@ -11,31 +11,31 @@ import Link from 'next/link';
 
 const TRUST_ITEMS = [
   {
-    img: '/images/partners/usdol.webp',
+    img: '/images/pages/federal-compliance-hero.webp',
     label: 'DOL Registered',
     sub: 'Federal apprenticeship sponsor',
     href: '/compliance/apprenticeship-structure',
   },
   {
-    img: '/images/partners/dwd.webp',
+    img: '/images/pages/wioa-meeting.webp',
     label: 'ETPL Approved',
     sub: 'WIOA-funded tuition eligible',
     href: '/federal-compliance',
   },
   {
-    img: '/images/pages/career-services-hero.webp',
+    img: '/images/pages/credential-partners-hero.webp',
     label: 'WIOA Aligned',
     sub: 'Title I & II compliant',
     href: '/eligibility',
   },
   {
-    img: '/images/partners/nextleveljobs.webp',
+    img: '/images/pages/workforce-board.webp',
     label: 'RAPIDS Tracked',
     sub: 'DOL apprenticeship system',
     href: '/compliance/apprenticeship-structure',
   },
   {
-    img: '/images/partners/workone.webp',
+    img: '/images/pages/workone-partners.webp',
     label: 'WorkOne Partner',
     sub: 'Indiana DWD aligned',
     href: '/partners/workforce',
@@ -49,11 +49,11 @@ const TRUST_ITEMS = [
 ];
 
 const PARTNER_LOGOS = [
-  { src: '/images/partners/usdol.webp', alt: 'US Department of Labor', href: '/federal-compliance' },
-  { src: '/images/partners/dwd.webp', alt: 'Indiana Department of Workforce Development', href: '/partners/workforce' },
-  { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana', href: '/partners/workforce' },
-  { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs', href: '/eligibility' },
-  { src: '/images/partners/osha.webp', alt: 'OSHA Authorized', href: '/compliance' },
+  { src: '/images/pages/federal-compliance-hero.webp', alt: 'US Department of Labor', href: '/federal-compliance' },
+  { src: '/images/pages/workforce-board.webp', alt: 'Indiana Department of Workforce Development', href: '/partners/workforce' },
+  { src: '/images/pages/workone-partners.webp', alt: 'WorkOne Indiana', href: '/partners/workforce' },
+  { src: '/images/pages/credential-partners-hero.webp', alt: 'Next Level Jobs', href: '/eligibility' },
+  { src: '/images/pages/certifications.webp', alt: 'OSHA Authorized', href: '/compliance' },
 ];
 
 export function HomeTrustBar() {

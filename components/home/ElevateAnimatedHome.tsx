@@ -48,10 +48,10 @@ const PROGRAMS = [
 ];
 
 const STATS = [
-  { value: '2,500+', label: 'Students Trained' },
   { value: '94%', label: 'Completion Rate' },
   { value: '87%', label: 'Job Placement' },
   { value: '$28K', label: 'Avg. Starting Pay' },
+  { value: '100%', label: 'Funding Support' },
 ];
 
 const STEPS = [

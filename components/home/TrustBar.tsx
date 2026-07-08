@@ -106,8 +106,8 @@ const TRUST_ITEMS: TrustItem[] = [
   // Outcomes
   {
     icon: <Users className="w-5 h-5" />,
-    label: '2,000+ Graduates',
-    sublabel: 'Successfully Placed',
+    label: '100% Funding',
+    sublabel: 'Assistance Available',
     highlight: true,
     category: 'outcome',
   },

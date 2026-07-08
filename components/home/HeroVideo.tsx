@@ -20,7 +20,7 @@ const HERO_SLIDES = [
   {
     id: 2,
     headline: 'Your Career Transformation Starts Here',
-    subheadline: 'Over 2,000 graduates have transformed their lives through Elevate programs. Join them and start your journey today.',
+    subheadline: 'Start your journey today. Our programs are funded, our credentials are recognized, and our employer partners are ready to hire.',
     cta: { text: 'Explore Programs', href: '/programs' },
     background: 'from-brand-red-900/50 via-slate-900 to-slate-800',
   },
@@ -187,10 +187,10 @@ export function HeroVideo({ className = '' }: HeroVideoProps) {
               aria-label="Key statistics"
             >
               {[
-                { value: '2,000+', label: 'Graduates' },
+                { value: '94%', label: 'Completion' },
                 { value: '40+', label: 'Employers' },
                 { value: '98%', label: 'Pass Rate' },
-                { value: '4', label: 'Locations' },
+                { value: '100%', label: 'Funding Help' },
               ].map((stat) => (
                 <div key={stat.label} className="text-center" role="listitem">
                   <p className="text-2xl font-extrabold text-white">{stat.value}</p>

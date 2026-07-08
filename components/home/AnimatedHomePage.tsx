@@ -32,7 +32,7 @@ const PROGRAMS: Program[] = [
 ];
 
 const STATS: Stat[] = [
-  { value: '2,000+', label: 'Graduates Placed' },
+  { value: '94%', label: 'Completion Rate' },
   { value: '98%', label: 'License Pass Rate' },
   { value: '4', label: 'Campus Locations' },
   { value: '40+', label: 'Years Experience' },

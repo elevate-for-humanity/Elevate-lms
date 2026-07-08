@@ -51,7 +51,7 @@ const LogoItem = ({ employer, index }: { employer: EmployerLogo; index: number }
 
 export function AnimatedLogoStrip({
   title = 'Our Employer Partners',
-  subtitle = 'Graduates hired by leading industry employers',
+  subtitle = 'Talent hired by leading industry employers',
   employers = DEFAULT_EMPLOYERS,
   className = '',
 }: AnimatedLogoStripProps) {

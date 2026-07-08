@@ -1,21 +1,23 @@
 import { Metadata } from 'next';
-import { getAdminDashboardData } from '@/lib/admin/get-admin-dashboard-data';
-import { normalizeAdminDashboardData } from '@/lib/admin/normalize-dashboard-data';
-import { AdminDashboardContent } from '@/components/admin/dashboard/DashboardShell';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Admin Dashboard | Elevate For Humanity',
+  title: 'Instructor Dashboard | Elevate For Humanity',
+  robots: { index: false, follow: false },
 };
 
-// Auth and role enforcement is handled by apps/admin/app/admin/layout.tsx.
-export default async function AdminDashboardPage() {
-  const data = normalizeAdminDashboardData(await getAdminDashboardData());
+export default async function InstructorDashboardPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  return (
-    <>
-      <AdminDashboardContent data={data} />
-    </>
-  );
+  if (!user) {
+    redirect('/login?redirect=/admin/instructor/dashboard');
+  }
+
+  // For now, instructors get redirected to admin dashboard
+  // TODO: Create dedicated instructor dashboard with classes, students, grades
+  redirect('/admin/dashboard');
 }

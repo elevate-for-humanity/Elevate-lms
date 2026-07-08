@@ -5,9 +5,6 @@
  * with error handling and graceful fallbacks to prevent segfaults.
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type PDFDocumentType = any;
-
 // Track initialization state
 let sharpInstance: typeof import('sharp') | null = null;
 let canvasInstance: typeof import('@napi-rs/canvas') | null = null;
@@ -58,10 +55,8 @@ export async function withSegfaultProtection<T>(
  * Execute PDFKit operations with segfault protection
  */
 export async function withPDFKit<T>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setup: (doc: any) => void,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  finish: (doc: any) => Promise<T>,
+  setup: (doc: unknown) => void,
+  finish: (doc: unknown) => Promise<T>,
   options?: Record<string, unknown>
 ): Promise<{ result: T | null; error?: string }> {
   const { PDFDocument, available } = await getPDFKit();
@@ -222,8 +217,7 @@ export async function getPDFKit(): Promise<{
  */
 export async function processImageWithSharp(
   input: Buffer | string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  operations: (pipeline: any) => any,
+  operations: (pipeline: unknown) => unknown,
   fallback?: () => Promise<Buffer>
 ): Promise<{ result: Buffer | null; error?: string }> {
   try {
@@ -236,9 +230,8 @@ export async function processImageWithSharp(
       return { result: null, error: 'sharp not available' };
     }
 
-    // sharp(input) creates a pipeline - use default import
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sharpFn = (sharp as any).default || (sharp as any);
+    // sharp(input) creates a pipeline
+    const sharpFn = (sharp as unknown as { default?: unknown }).default || sharp;
     let pipeline = sharpFn(input);
     pipeline = operations(pipeline);
     const result = await pipeline.toBuffer();
@@ -263,8 +256,7 @@ export async function processImageWithSharp(
 export async function withCanvas(
   width: number,
   height: number,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  operation: (canvas: any) => void,
+  operation: (canvas: unknown) => void,
   fallback?: () => Promise<void>
 ): Promise<{ success: boolean; error?: string }> {
   try {
@@ -301,8 +293,7 @@ export async function createPDFDocument(
   options?: Record<string, unknown>,
   fallback?: () => Promise<Buffer>
 ): Promise<{
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  doc: any;
+  doc: unknown;
   available: boolean;
   error?: string;
 }> {

@@ -9,7 +9,7 @@ import type { PDFDocument as PDFKitDocument } from 'pdfkit';
 
 // Track initialization state
 let sharpInstance: typeof import('sharp') | null = null;
-let canvasInstance: typeof import('canvas') | null = null;
+let canvasInstance: typeof import('@napi-rs/canvas') | null = null;
 let pdfkitInstance: typeof import('pdfkit') | null = null;
 let initializationError: string | null = null;
 
@@ -124,7 +124,7 @@ export async function initializeNativeModules(): Promise<{
 
   // Try canvas
   try {
-    canvasInstance = await import('canvas');
+    canvasInstance = await import('@napi-rs/canvas');
     result.modules.canvas = true;
   } catch (e) {
     console.warn('[NativeModules] canvas initialization failed:', e);
@@ -176,7 +176,7 @@ export async function getSharp(): Promise<{
  * Get canvas instance with error handling
  */
 export async function getCanvas(): Promise<{
-  canvas: typeof import('canvas') | null;
+  canvas: typeof import('@napi-rs/canvas') | null;
   available: boolean;
 }> {
   if (canvasInstance) {
@@ -184,7 +184,7 @@ export async function getCanvas(): Promise<{
   }
 
   try {
-    const canvas = await import('canvas');
+    const canvas = await import('@napi-rs/canvas');
     canvasInstance = canvas;
     return { canvas, available: true };
   } catch (e) {
@@ -259,7 +259,7 @@ export async function processImageWithSharp(
 export async function withCanvas(
   width: number,
   height: number,
-  operation: (canvas: import('canvas').Canvas) => void,
+  operation: (canvas: import('@napi-rs/canvas').Canvas) => void,
   fallback?: () => Promise<void>
 ): Promise<{ success: boolean; error?: string }> {
   try {

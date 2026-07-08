@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { FileText, ShieldCheck, ClipboardCheck, BookOpen, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'For Providers | Elevate for Humanity',

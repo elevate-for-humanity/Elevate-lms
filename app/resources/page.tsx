@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { GraduationCap, DollarSign, Shield, Briefcase, ExternalLink } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Resources | Elevate for Humanity',

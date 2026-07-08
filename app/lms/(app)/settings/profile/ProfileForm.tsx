@@ -4,33 +4,33 @@ import { useState } from 'react';
 import { User, Mail, Phone, MapPin, Camera, Save, Loader2 } from 'lucide-react';
 
 interface ProfileFormProps {
-  initialData?: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    bio: string;
-    avatar?: string;
+  profile?: {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip_code?: string;
+    bio?: string;
+    avatar_url?: string;
   };
 }
 
-export function ProfileForm({ initialData }: ProfileFormProps) {
+export function ProfileForm({ profile }: ProfileFormProps) {
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [form, setForm] = useState(initialData || {
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    bio: '',
+  const [form, setForm] = useState({
+    firstName: profile?.first_name || '',
+    lastName: profile?.last_name || '',
+    email: profile?.email || '',
+    phone: profile?.phone || '',
+    address: profile?.address || '',
+    city: profile?.city || '',
+    state: profile?.state || '',
+    zipCode: profile?.zip_code || '',
+    bio: profile?.bio || '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,12 +60,8 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="flex items-center gap-6">
         <div className="relative">
-          <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
-            {form.avatar ? (
-              <img src={form.avatar} alt="Profile" className="w-full h-full rounded-full object-cover" />
-            ) : (
-              <User className="w-12 h-12 text-gray-400" />
-            )}
+          <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+            <User className="w-12 h-12 text-gray-400" />
           </div>
           <button type="button" className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700">
             <Camera className="w-4 h-4" />

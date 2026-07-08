@@ -3,6 +3,20 @@ export async function register() {
     const { registerConnectionGuards } = await import('./lib/server/register-connection-guards.cjs');
     registerConnectionGuards();
 
+    // Initialize native modules (sharp, canvas, pdfkit) early to catch issues
+    // This prevents runtime segfaults when these modules are first accessed
+    const { initializeNativeModules } = await import('./lib/native-modules');
+    try {
+      const initResult = await initializeNativeModules();
+      console.log('[NativeModules] Initialization:', initResult);
+      if (!initResult.success) {
+        console.warn('[NativeModules] Some modules failed to initialize:', initResult.error);
+      }
+    } catch (err) {
+      // Non-fatal - native modules may not be available in all environments
+      console.warn('[NativeModules] Initialization error:', err);
+    }
+
     // Load runtime secrets from Supabase into process.env.
     // Platform env vars are injected by Northflank at container start.
     const { applyNormalizedSupabaseUrlToEnv } = await import('./lib/supabase/normalize-url');

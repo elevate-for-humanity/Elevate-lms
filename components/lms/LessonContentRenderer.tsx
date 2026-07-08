@@ -36,7 +36,7 @@ import {
 import dynamic from 'next/dynamic';
 
 const LessonVideoWithSimulation = dynamic(
-  () => import('@/components/lms/LessonVideoWithSimulation'),
+  () => import('@/components/lms/LessonVideoWithSimulation').then(m => m.default || m),
   { ssr: false },
 );
 

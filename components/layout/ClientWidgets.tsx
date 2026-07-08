@@ -12,13 +12,13 @@ const LoadingDiv = () => <div className="hidden" />;
 
 // Lazy load sticky mobile CTA - shows on program pages
 const StickyMobileCTA = dynamic(
-  () => import('@/components/programs/StickyMobileCTA').then((mod) => mod.default || mod),
+  () => import('@/components/programs/StickyMobileCTA').then((mod) => mod.StickyMobileCTA || mod),
   { ssr: false, loading: LoadingDiv }
 );
 
 // Mobile bottom navigation for authenticated users
 const BottomNav = dynamic(
-  () => import('@/components/BottomNav').then((mod) => mod.default || mod),
+  () => import('@/components/BottomNav').then((mod) => mod.BottomNav || mod.default || mod),
   { ssr: false, loading: LoadingDiv }
 );
 
@@ -42,7 +42,7 @@ const SecurityMonitor = dynamic(
 
 // Offline indicator - shows when user loses connectivity
 const OfflineIndicator = dynamic(
-  () => import('@/components/offline-indicator').then((mod) => mod.default || mod),
+  () => import('@/components/offline-indicator').then((mod) => mod.OfflineIndicator || mod.default || mod),
   { ssr: false, loading: LoadingDiv }
 );
 

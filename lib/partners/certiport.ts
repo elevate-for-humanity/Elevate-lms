@@ -233,7 +233,7 @@ that reflect real workplace tasks covered by this certification.
  */
 export function getCertiportContextForProgram(programSlug: string): string {
   const codes = getCertiportExamsForProgram(programSlug);
-  if (codes.length === 0) return `';
+  if (codes.length === 0) return '';
   return codes
     .map((code) => getCertiportContextForCourse(code))
     .filter(Boolean)

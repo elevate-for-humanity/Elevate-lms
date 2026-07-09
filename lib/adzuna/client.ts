@@ -246,3 +246,9 @@ function stripHtml(html: string): string {
     .trim()
     .slice(0, 500);
 }
+
+/**
+ * Attribution text required for Adzuna API usage.
+ * Display this on any page showing Adzuna job data.
+ */
+export const ADZUNA_ATTRIBUTION = 'Jobs sourced by Adzuna';

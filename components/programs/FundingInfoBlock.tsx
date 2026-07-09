@@ -134,7 +134,7 @@ export default function FundingInfoBlock({
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-amber-600 shrink-0" />
-            <span><strong>Pay in full</strong> — one-time payment{regularPrice && regularPrice > selfPayPrice ? ` at sale price $${selfPayPrice.toLocaleString()}` : `'}</span>
+            <span><strong>Pay in full</strong> — one-time payment{regularPrice && regularPrice > selfPayPrice ? ` at sale price $${selfPayPrice.toLocaleString()}` : ''}</span>
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-amber-600 shrink-0" />

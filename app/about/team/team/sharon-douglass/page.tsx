@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Sharon Douglass | Our Team`,
+  title: 'Sharon Douglass | Our Team',
   description: `Sharon Douglass — Respiratory Therapy & Health Informatics Specialist at ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute.`,
 };
 

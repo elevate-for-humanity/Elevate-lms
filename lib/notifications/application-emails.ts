@@ -161,7 +161,7 @@ export async function sendApplicationConfirmation(application: ApplicationData) 
  * without needing to log in first.
  */
 export async function sendAdminApplicationNotification(application: ApplicationData) {
-  const submitted = new Date(application.submittedAt).toLocaleString(`en-US', {
+  const submitted = new Date(application.submittedAt).toLocaleString('en-US', {
     month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit',
   });
 

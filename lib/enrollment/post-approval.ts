@@ -112,7 +112,7 @@ export async function runPostApprovalActions(input: PostApprovalInput): Promise<
 
     ${fundingLabel ? `<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin:0 0 24px;">
       <p style="margin:0;font-size:13px;color:#166534;"><strong>Funding:</strong> ${fundingLabel}</p>
-    </div>` : `'}
+    </div> : ''}
 
     <!-- Account / Login -->
     <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:10px;padding:24px;margin:0 0 24px;text-align:center;">

@@ -93,7 +93,7 @@ export default function EmployerMOUSignForm({ programs }: { programs: string[] }
   const inputCls = "w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
   const labelCls = "block text-sm font-medium text-slate-700 mb-1";
 
-  if (step === `done') {
+  if (step === 'done') {
     return (
       <div className="text-center py-10 space-y-6">
         <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto" />

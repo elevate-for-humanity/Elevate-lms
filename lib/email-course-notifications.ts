@@ -91,7 +91,7 @@ export async function sendCourseEnrollmentEmail(data: CourseEnrollmentData) {
                         <td style="color: #111827; font-size: 14px; font-weight: 600;">${startDate}</td>
                       </tr>
                       `
-                          : `'
+                          : ''
                       }
                       <tr>
                         <td style="color: #6b7280; font-size: 14px;">Credentials:</td>
@@ -227,7 +227,7 @@ export async function sendCourseStartReminderEmail(data: CourseEnrollmentData) {
                       <li style="margin-bottom: 8px;">Log in to your dashboard and review course materials</li>
                       <li style="margin-bottom: 8px;">Test your internet connection and device</li>
                       <li style="margin-bottom: 8px;">Prepare any required materials or supplies</li>
-                      ${liveSessionInfo ? `<li style="margin-bottom: 8px;">Add live session times to your calendar</li>` : `'}
+                      ${liveSessionInfo ? `<li style="margin-bottom: 8px;">Add live session times to your calendar</li>` : ''}
                     </ul>
                   </div>
 

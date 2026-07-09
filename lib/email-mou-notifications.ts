@@ -22,7 +22,7 @@ export async function sendMOUSignedConfirmation(data: MOUSignedNotificationData)
         <div style="background:#f3f4f6;padding:20px;border-radius:8px;margin:20px 0">
           <p><strong>Program Holder:</strong> ${data.programHolderName}</p>
           <p><strong>Signed by:</strong> ${data.signerName}, ${data.signerTitle}</p>
-          <p><strong>Date:</strong> ${new Date(data.signedAt).toLocaleDateString(`en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <p><strong>Date:</strong> ${new Date(data.signedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
         <p>Questions? <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}">info@${PLATFORM_DEFAULTS.canonicalDomain}</a></p>
         <p>Best regards,<br><strong>${PLATFORM_DEFAULTS.orgName}</strong></p>

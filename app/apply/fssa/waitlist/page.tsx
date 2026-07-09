@@ -87,7 +87,7 @@ export default function FssaWaitlistPage() {
               <li>
                 <Link href="/programs" className="text-brand-blue-600 underline">
                   Browse all programs
-                </Link>{' `}
+                </Link>{' '}
                 to confirm your program of interest
               </li>
             </ul>
@@ -160,7 +160,7 @@ export default function FssaWaitlistPage() {
                 <input
                   type="text"
                   value={form.firstName}
-                  onChange={(e) => update(`firstName', e.target.value)}
+                  onChange={(e) => update('firstName', e.target.value)}
                   className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-400"
                 />
               </div>

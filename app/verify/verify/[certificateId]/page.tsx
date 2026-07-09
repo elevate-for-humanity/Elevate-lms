@@ -42,7 +42,7 @@ export default async function VerifyCertificatePage({
 
   // Start to find certificate in multiple tables
   let certificate = null;
-  let studentName = `';
+  let studentName = '';
   let courseName = '';
   let completionDate = '';
   let certificateType = '';

@@ -292,7 +292,7 @@ async function _POST(req: Request) {
     // Build notes field with all the extra data
     const notes = [
       `Reference: ${referenceNumber}`,
-      body.city ? `City: ${body.city}` : `',
+      body.city ? `City: ${body.city}` : ''
       body.state ? `State: ${body.state}` : '',
       body.address ? `Address: ${body.address}` : '',
       body.zip ? `ZIP: ${body.zip}` : '',

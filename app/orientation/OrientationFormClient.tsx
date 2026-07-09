@@ -39,7 +39,7 @@ export default function OrientationFormClient() {
             return;
           }
 
-          const zoomLink = data.meetingUrl || `';
+          const zoomLink = data.meetingUrl || ''
 
           // Open Google Calendar with the real Zoom link
           const startDT = `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;

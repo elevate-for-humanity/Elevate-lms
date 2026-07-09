@@ -41,7 +41,7 @@ export type LizzyContainerProps = {
 export function LizzyContainer({
   sites,
   defaultPreviewUrl,
-  className = `',
+  className = '',
   previewMinHeight = 380,
   isSuperAdmin = false,
   pendingApplications = [],

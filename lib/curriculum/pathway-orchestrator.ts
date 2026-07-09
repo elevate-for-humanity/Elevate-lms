@@ -198,7 +198,7 @@ export async function orchestratePathway(
   for (const program of programs) {
     const category = program.slug;
     const providerConstraint = buildProviderConstraintPrompt(category);
-    contentContexts.push(`\n### Program: ${program.title}\n${providerConstraint}`);
+    contentContexts.push(`\n### Program: ${program.title}\n${providerConstraint}') };
 
     // MS Learn content
     if (program.certiportExamCode) {
@@ -210,8 +210,8 @@ export async function orchestratePathway(
     } else {
       const msModules = await searchMSLearn(program.title, 5).catch(() => []);
       if (msModules.length > 0) {
-        const list = msModules.map((m) => `- ${m.title}: ${m.summary.slice(0, 100)}`).join('\n');
-        contentContexts.push(`\n## Microsoft Learn: ${program.title}\n${list}`);
+        const list = msModules.map((m) => `- ${m.title}: ${m.summary.slice(0, 100)}') }.join('\n');
+        contentContexts.push(`\n## Microsoft Learn: ${program.title}\n${list}') };
       }
     }
 
@@ -222,18 +222,18 @@ export async function orchestratePathway(
     // IBM SkillsBuild topics
     const ibmTopics = IBM_SKILLSBUILD_TOPICS[category] || IBM_SKILLSBUILD_TOPICS['professional-development'] || [];
     if (ibmTopics.length > 0) {
-      contentContexts.push(`\n## IBM SkillsBuild: ${program.title}\n${ibmTopics.map((t) => `- ${t}`).join('\n')}`);
+      contentContexts.push(`\n## IBM SkillsBuild: ${program.title}\n${ibmTopics.map((t) => `- ${t}') }.join('\n')}') };
     }
 
     // Google Career Certificate topics
     const googleTopics = GOOGLE_CERT_TOPICS[category] || [];
     if (googleTopics.length > 0) {
-      contentContexts.push(`\n## Google Career Certificates: ${program.title}\n${googleTopics.map((t) => `- ${t}`).join('\n')}`);
+      contentContexts.push(`\n## Google Career Certificates: ${program.title}\n${googleTopics.map((t) => `- ${t}') }.join('\n')}') };
     }
   }
 
   const totalWeeks = programs.reduce((sum, p) => sum + p.durationWeeks, 0);
-  const contentContext = contentContexts.join('\n\n`);
+  const contentContext = contentContexts.join('\n\n') };
 
   // 2. Use reasoning model to assemble the pathway
   const systemPrompt = `You are a workforce curriculum orchestration engine for ${PLATFORM_DEFAULTS.orgName} Career and Technical Institute.
@@ -259,7 +259,7 @@ TARGET WORKFORCE OUTCOME: ${targetOutcome}
 TOTAL DURATION: ${totalWeeks} weeks
 
 PROGRAMS IN SEQUENCE:
-${programs.map((p, i) => `${i + 1}. ${p.title} (${p.durationWeeks} weeks)${p.certiportExamCode ? ` → ${p.certiportExamCode} exam` : `'}${p.socCode ? ` | SOC: ${p.socCode}` : ''}`).join('\n')}
+${programs.map((p, i) => `${i + 1}. ${p.title} (${p.durationWeeks} weeks)${p.certiportExamCode ? ` → ${p.certiportExamCode} exam` : `''}${p.socCode ? ` | SOC: ${p.socCode}` : ''}') }.join('\n')}
 
 APPROVED CONTENT SOURCES:
 ${contentContext}

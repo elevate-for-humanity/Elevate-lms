@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Delores Reynolds | Our Team`,
+  title: 'Delores Reynolds | Our Team',
   description: `Delores Reynolds — Social Media & Digital Engagement Coordinator at ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute.`,
 };
 

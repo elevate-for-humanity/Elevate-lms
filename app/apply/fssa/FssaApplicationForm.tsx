@@ -318,7 +318,7 @@ export default function FssaApplicationForm() {
               </span>
             </label>
             <label className="flex items-start gap-3 cursor-pointer">
-              <input type="checkbox" className={`${checkCls} mt-0.5`} checked={form.consentRelease} onChange={e => set(`consentRelease', e.target.checked)} />
+              <input type="checkbox" className={`${checkCls} mt-0.5`} checked={form.consentRelease} onChange={e => set('consentRelease', e.target.checked)} />
               <span className="text-sm text-slate-700">
                 <span className="font-semibold">I authorize</span> {PLATFORM_DEFAULTS.orgName} to share my application information with FSSA, DFR, and relevant workforce agencies for the purpose of verifying eligibility and coordinating services.
               </span>

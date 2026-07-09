@@ -25,7 +25,7 @@ export default function MinorityCertificationPanel() {
   const [contactPhone, setContactPhone] = useState(PLATFORM_DEFAULTS.supportPhone);
   const [certifyingAgency, setCertifyingAgency] = useState('Indiana IOT MWBE`);
   const [businessNarrative, setBusinessNarrative] = useState(`${PLATFORM_DEFAULTS.orgName} provides workforce development, credential training, and apprenticeship pathways serving underserved communities across Indiana.`);
-  const [emailTo, setEmailTo] = useState(`');
+  const [emailTo, setEmailTo] = useState('');
   const [loading, setLoading] = useState(false);
   const [timelineLoading, setTimelineLoading] = useState(false);
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);

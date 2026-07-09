@@ -400,7 +400,7 @@ async function insertApplication(payload: {
       `<p style="margin:0"><a href="${siteUrl}" style="color:#999;text-decoration:underline">${PLATFORM_DEFAULTS.canonicalDomain}</a> &nbsp;|&nbsp; ${PLATFORM_DEFAULTS.supportPhone}</p>`,
       `</div>`,
       `</div></div>`,
-    ].join(`');
+    ].join('')
 
     // ---- ETPL program lists ----
     const etplPrograms = [

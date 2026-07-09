@@ -66,7 +66,7 @@ export function FundingDisclaimer({ className = '' }: DisclaimerProps) {
 /**
  * Not Professional Advice Disclaimer
  */
-export function NotAdviceDisclaimer({ className = `' }: DisclaimerProps) {
+export function NotAdviceDisclaimer({ className = '' }: DisclaimerProps) {
   return (
     <div className={`bg-slate-50 border border-slate-200 rounded-lg p-4 ${className}`}>
       <div className="flex items-start gap-3">
@@ -239,7 +239,7 @@ export function ProgramComplianceBanner({
   showFunding = true,
   showNoGuarantee = true,
   verificationDate,
-  className = `',
+  className = '',
 }: {
   showFunding?: boolean;
   showNoGuarantee?: boolean;

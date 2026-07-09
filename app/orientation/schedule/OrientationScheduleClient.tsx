@@ -73,7 +73,7 @@ export default function OrientationScheduleClient() {
         return;
       }
 
-      const meetingUrl = data.meetingUrl || `';
+      const meetingUrl = data.meetingUrl || ''
       setZoomUrl(meetingUrl);
 
       // Open Google Calendar invite
@@ -138,7 +138,7 @@ export default function OrientationScheduleClient() {
             key={type}
             onClick={() => {
               setSessionType(type);
-              setTime(`');
+              setTime('');
             }}
             className={`flex items-center justify-center gap-2 py-4 px-3 text-sm font-bold transition-colors ${
               sessionType === type

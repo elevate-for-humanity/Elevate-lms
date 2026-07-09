@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Elizabeth Greene | Our Team`,
+  title: 'Elizabeth Greene | Our Team',
   description: `Elizabeth Greene — Founder & Chief Executive Officer at ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute.`,
 };
 

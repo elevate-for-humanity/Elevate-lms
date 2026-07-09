@@ -105,7 +105,7 @@ export const hrEmailTemplates = {
       <p>If you have questions, reply to this email or call <strong>${PLATFORM_DEFAULTS.supportPhone}</strong>.</p>
       <p>We appreciate your interest in joining our mission.</p>
       <p style="margin-bottom:0">Warm regards,<br><strong>${PLATFORM_DEFAULTS.orgName} HR Team</strong></p>
-    `),
+    ') },
   }),
 
   // ── 2. Thank You for Applying ─────────────────────────────────────────────
@@ -121,7 +121,7 @@ export const hrEmailTemplates = {
       ${divider()}
       <p style="color:${BRAND.muted};font-size:14px">Application Reference: <strong>${p.applicationId ?? 'Pending'}</strong></p>
       <p style="margin-bottom:0">Thank you again,<br><strong>Elizabeth Greene</strong><br>Founder &amp; CEO, ${PLATFORM_DEFAULTS.orgName}</p>
-    `),
+    ') },
   }),
 
   // ── 3. Next Steps (Competency Test Invite) ────────────────────────────────
@@ -142,18 +142,18 @@ export const hrEmailTemplates = {
           <li>Results are reviewed by our hiring team, not auto-rejected</li>
         </ul>
       </div>
-      ${btn('Start Competency Assessment`, p.testLink ?? `${BASE_URL}/careers/assessment`)}
+      ${btn('Start Competency Assessment`, p.testLink ?? `${BASE_URL}/careers/assessment') }}
       <p style="text-align:center;color:${BRAND.muted};font-size:13px;margin-top:-12px">Link expires in 7 days</p>
       <p>After completing the assessment, our team will reach out within 2 business days to schedule your interview.</p>
       <p style="margin-bottom:0">Best,<br><strong>${PLATFORM_DEFAULTS.orgName} HR Team</strong></p>
-    `),
+    ') },
   }),
 
   // ── 4. Interview Scheduled ────────────────────────────────────────────────
   interview_scheduled: (p: HrEmailParams) => ({
     from: FROM,
     replyTo: REPLY_TO,
-    subject: `Interview Scheduled — ${p.position ?? PLATFORM_DEFAULTS.orgName} · ${p.interviewDate ?? `'}`,
+    subject: `Interview Scheduled — ${p.position ?? PLATFORM_DEFAULTS.orgName} · ${p.interviewDate ?? ''}`,
     html: layout(`
       <h2 style="color:${BRAND.primary};margin-top:0">Your Interview is Confirmed</h2>
       <p>Hi ${p.firstName},</p>
@@ -178,7 +178,7 @@ export const hrEmailTemplates = {
         </ul>
       </div>
       <p style="margin-bottom:0">See you soon,<br><strong>${PLATFORM_DEFAULTS.orgName} HR Team</strong></p>
-    `),
+    ') },
   }),
 
   // ── 5. Welcome Aboard ─────────────────────────────────────────────────────
@@ -206,7 +206,7 @@ export const hrEmailTemplates = {
       ${btn('Start Onboarding', p.onboardingLink ?? `${BASE_URL}/onboarding/staff`, BRAND.accent)}
       <p>If you have any questions before your start date, don't hesitate to reach out. We`re here to make your transition as smooth as possible.</p>
       <p style="margin-bottom:0">With excitement,<br><strong>Elizabeth Greene</strong><br>Founder &amp; CEO, ${PLATFORM_DEFAULTS.orgName}</p>
-    `),
+    ') },
   }),
 
   // ── 6. Hire Letter (Formal Offer) ─────────────────────────────────────────
@@ -216,7 +216,7 @@ export const hrEmailTemplates = {
     subject: `Offer Letter — ${p.position ?? `Position`} at ${PLATFORM_DEFAULTS.orgName}`,
     html: layout(`
       <h2 style="color:${BRAND.primary};margin-top:0">Formal Offer of Employment</h2>
-      <p style="color:${BRAND.muted};font-size:13px">Date: ${new Date().toLocaleDateString(`en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      <p style="color:${BRAND.muted};font-size:13px">Date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
       <p>Dear ${p.firstName}${p.lastName ? ' ' + p.lastName : ''},</p>
       <p>On behalf of ${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute, I am pleased to formally offer you the position of <strong>${p.position ?? `Staff Member'}</strong>${p.department ? ` within our <strong>${p.department}</strong> department` : ''}.</p>
       <div style="background:${BRAND.light};border:1px solid #e2e8f0;border-radius:8px;padding:20px;margin:20px 0">
@@ -231,12 +231,12 @@ export const hrEmailTemplates = {
       </div>
       <p>This offer is contingent upon successful completion of your onboarding requirements, including identity verification, W-9 submission, and acknowledgment of the Employee Handbook.</p>
       <p>To accept this offer, please complete your onboarding portal within <strong>5 business days</strong>.</p>
-      ${btn('Accept Offer & Start Onboarding', p.onboardingLink ?? `${BASE_URL}/onboarding/staff`)}
+      ${btn('Accept Offer & Start Onboarding', p.onboardingLink ?? `${BASE_URL}/onboarding/staff') }}
       <p>We look forward to having you on the team. Please don`t hesitate to contact HR with any questions.</p>
       <p style="margin-bottom:0">Sincerely,<br><strong>Elizabeth Greene</strong><br>Founder &amp; CEO<br>${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute</p>
       ${divider()}
       <p style="font-size:12px;color:${BRAND.muted}">This offer letter does not constitute a contract of employment. Employment at ${PLATFORM_DEFAULTS.orgName} is at-will and may be terminated by either party at any time.</p>
-    `),
+    ') },
   }),
 
   // ── 7. Onboarding Start ───────────────────────────────────────────────────
@@ -277,7 +277,7 @@ export const hrEmailTemplates = {
       </div>
       <p>See you tomorrow!</p>
       <p style="margin-bottom:0">Warmly,<br><strong>${PLATFORM_DEFAULTS.orgName} HR Team</strong></p>
-    `),
+    ') },
   }),
 };
 

@@ -129,7 +129,7 @@ export async function sendCertificateIssuedEmail(params: {
       <tr><td style="padding:6px 0;color:#64748b;width:40%">Certificate Number</td><td><strong>${params.certificateNumber}</strong></td></tr>
       <tr><td style="padding:6px 0;color:#64748b">Program</td><td>${params.programName}</td></tr>
       <tr><td style="padding:6px 0;color:#64748b">Credential</td><td>${params.credentialName}</td></tr>
-      <tr><td style="padding:6px 0;color:#64748b">Issued</td><td>${new Date(params.issuedAt).toLocaleDateString(`en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</td></tr>
+      <tr><td style="padding:6px 0;color:#64748b">Issued</td><td>${new Date(params.issuedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</td></tr>
     </table>
 
     <p style="text-align:center;margin:24px 0">

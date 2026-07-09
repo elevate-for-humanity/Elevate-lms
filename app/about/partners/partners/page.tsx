@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description:
     `${PLATFORM_DEFAULTS.orgName} partners with workforce boards, employers, credential providers, and government agencies to deliver funded credential pathway programs in Indianapolis.`,
   alternates: {
-    canonical: `https://www.elevateforhumanity.org/about/partners',
+    canonical: `https://www.elevateforhumanity.org/about/partners`
   },
 };
 

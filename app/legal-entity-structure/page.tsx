@@ -87,7 +87,7 @@ export default function LegalEntityStructurePage() {
                 desc: `Sponsor of record: ${RAPIDS_CONFIG.sponsorOfRecord}. Program ID: ${RAPIDS_CONFIG.programNumber}.`,
               },
               {
-                title: 'WIOA / ETPL referrals`,
+                title: 'WIOA / ETPL referrals',
                 desc: `Training provider listings use ${PLATFORM_DEFAULTS.orgName} and ETPL-approved program titles.`,
               },
               {
@@ -97,7 +97,7 @@ export default function LegalEntityStructurePage() {
             ],
           },
           cta: {
-            heading: `Questions about entity or sponsorship?',
+            heading: `Questions about entity or sponsorship?`
             subtitle: 'Our compliance team can confirm the correct legal name for your document.',
             primaryLabel: 'Contact compliance',
             primaryHref: '/contact?topic=legal-entity',

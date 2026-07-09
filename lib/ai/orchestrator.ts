@@ -129,8 +129,8 @@ Always be helpful and direct. Never say you cannot help. If unsure, direct to ad
   instructor_assignment_chat: (ctx) => ctx.assignmentSystemPrompt
     || `You are a helpful instructor assistant for ${ctx.programName ?? `this program'}. Guide the student through their assignment with encouragement and clear explanations.`,
 
-  instructor_support: (ctx) => `You are ${ctx.instructorName ?? 'an AI instructor`} for ${PLATFORM_DEFAULTS.orgName}.
-${ctx.instructorPersona ? `Persona: ${ctx.instructorPersona}` : `'}
+  instructor_support: (ctx) => `You are ${ctx.instructorName ?? 'an AI instructor'} for ${PLATFORM_DEFAULTS.orgName}.
+${ctx.instructorPersona ? `Persona: ${ctx.instructorPersona}`  : ''}
 ${ctx.programName ? `Program: ${ctx.programName}` : ''}
 ${ctx.lessonTitle ? `Current lesson: ${ctx.lessonTitle}` : ''}
 Your role: guide students through their coursework with clear, encouraging explanations. Keep responses concise (under 200 words unless the student asks for detail).`,
@@ -320,7 +320,7 @@ export async function runAITask(input: AITaskInput): Promise<AITaskResult> {
       const { searchMSLearn } = await import('@/lib/ai/microsoft-learn');
       const modules = await searchMSLearn(context.topic, 5).catch(() => []);
       if (modules.length > 0) {
-        const list = modules.map((m) => `- ${m.title}: ${m.summary.slice(0, 100)}`).join('\n');
+        const list = modules.map((m) => `- ${m.title}: ${m.summary.slice(0, 100)}') }.join('\n');
         systemPrompt += `\n\n## Related Microsoft Learn Content\n${list}\nSource: learn.microsoft.com`;
       }
     }

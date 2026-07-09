@@ -44,7 +44,7 @@ export default function AuthRedirectHandler() {
     // Magic links are generated with redirect_to=${PLATFORM_DEFAULTS.siteUrl}?next=/apprentice
     // Supabase preserves query params on the base URL even when it strips the path.
     const searchParams = new URLSearchParams(window.location.search);
-    const next = validateRedirect(readRedirectParam(searchParams), `');
+    const next = validateRedirect(readRedirectParam(searchParams), '');
 
     // If the user landed on a payment/checkout page via magic link, keep them
     // there after auth — do not redirect to their role destination.

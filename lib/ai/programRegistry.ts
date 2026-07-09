@@ -211,11 +211,11 @@ export function buildSystemPrompt(slug: string): string {
     `Application link: ${p.applyUrl}`,
   ]
     .filter(Boolean)
-    .join('\n`);
+    .join('\n') };
 
   return [
     `You are the Elevate AI Tutor for the ${p.name} program at ${PLATFORM_DEFAULTS.orgName}.`,
-    `',
+     ''
     'RULES:',
     `- ONLY answer questions about the ${p.name} program using the facts below.`,
     '- Do NOT provide legal, medical, or financial advice.',

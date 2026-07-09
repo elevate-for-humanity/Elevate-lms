@@ -5,13 +5,13 @@
  *
  * Usage in Durable:
  * <div id="efh-embed" data-page="programs"></div>
- * <script src="https://elevateforhumanity.onrender.com/embed.js"></script>
+ * <script src="https://www.elevateforhumanity.org/embed.js"></script>
  */
 
 (function () {
   'use strict';
 
-  const BASE_URL = 'https://elevateforhumanity.onrender.com';
+  const BASE_URL = 'https://www.elevateforhumanity.org';
 
   // Available pages that can be embedded
   const EMBEDDABLE_PAGES = [

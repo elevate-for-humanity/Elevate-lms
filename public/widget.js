@@ -18,15 +18,15 @@
  * 4. Full Page Embed:
  * <div class="efh-widget" data-type="page" data-page="hub" data-height="600px"></div>
  *
- * <script src="https://elevateforhumanity.onrender.com/widget.js"></script>
+ * <script src="https://www.elevateforhumanity.org/widget.js"></script>
  */
 
 (function () {
   'use strict';
 
   const CONFIG = {
-    baseUrl: 'https://elevateforhumanity.onrender.com',
-    apiUrl: 'https://elevateforhumanity.onrender.com/api',
+    baseUrl: 'https://www.elevateforhumanity.org',
+    apiUrl: 'https://www.elevateforhumanity.org/api',
     styles: {
       primary: '#2563eb',
       secondary: '#64748b',

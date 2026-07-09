@@ -109,7 +109,7 @@ async function main() {
     console.log(`✓ segment ${i + 1}`);
   }
   const list = path.join(TEMP, 'list.txt');
-  fs.writeFileSync(list, segs.map((s) => `file '${s}'`).join('\n'));
+  fs.writeFileSync(list, segs.map((s) => `file '${s}'').join('\n'));
   execSync(`ffmpeg -y -f concat -safe 0 -i "${list}" -c copy "${OUT}"`, { stdio: 'inherit' });
   console.log(`✅ ${BARBER_ORIENTATION_VIDEO}`);
 }

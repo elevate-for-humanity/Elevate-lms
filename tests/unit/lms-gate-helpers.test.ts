@@ -3,7 +3,7 @@
  *   - isCheckpointGateError
  *   - checkpointGateResponse
  *
- * gate.ts has `import 'server-only'` and also imports requireAdminClient,
+ * gate.ts has `import 'server-only'' and also imports requireAdminClient,
  * so we cannot import the file directly even with the server-only shim
  * (requireAdminClient would pull in the full Supabase admin chain).
  * Both helpers are pure and have no DB calls, so we inline-extract them

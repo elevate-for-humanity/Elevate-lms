@@ -18,7 +18,7 @@ import {
   DollarSign,
   ArrowRight,
   Target,
-} from 'lucide-react`;
+} from 'lucide-react';
 
 export const metadata: Metadata = {
   title: `Submissions OS | Admin | ${PLATFORM_DEFAULTS.orgName}`,

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Shield, CheckCircle, Award, ExternalLink } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Credential Verification | ${PLATFORM_DEFAULTS.orgName}`,

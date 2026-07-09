@@ -657,7 +657,7 @@ function buildSegmentClean(
 // ── ffmpeg: Concatenate segments into final video ────────────────────
 function assembleVideo(segmentPaths: string[], outPath: string): void {
   const concatFile = outPath.replace('.mp4', '-concat.txt');
-  fs.writeFileSync(concatFile, segmentPaths.map((p) => `file '${p}'`).join('\n'));
+  fs.writeFileSync(concatFile, segmentPaths.map((p) => `file '${p}'').join('\n'));
   execSync(`ffmpeg -y -f concat -safe 0 -i "${concatFile}" -c copy "${outPath}"`, {
     stdio: 'pipe',
   });

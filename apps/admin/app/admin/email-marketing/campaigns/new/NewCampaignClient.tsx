@@ -202,7 +202,7 @@ export default function NewCampaignPage() {
           {/* Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow p-6">
-              {step === 'details` && (
+              {step === 'details' && (
                 <div className="space-y-6">
                   <h2 className="text-xl font-semibold">Campaign Details</h2>
 

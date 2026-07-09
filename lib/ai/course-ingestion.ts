@@ -68,7 +68,7 @@ export interface CourseBlueprint {
   title: string;
   subtitle: string;
   description: string;
-  skill_level: 'beginner' | 'intermediate' | 'advanced`;
+  skill_level: 'beginner' | 'intermediate' | 'advanced';
   estimated_duration_hours: number;
   category: string;
   target_audience: string;

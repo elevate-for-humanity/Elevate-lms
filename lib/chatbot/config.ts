@@ -58,7 +58,7 @@ Would you like to continue?`,
     enabled: true,
     delaySeconds: 12,
     showOnAllPages: true,
-    position: 'bottom-right`,
+    position: 'bottom-right',
   },
 };
 

@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Monitor, Wrench, HeartHandshake, Building2, MapPin, ShieldCheck } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 const SITE_URL = PLATFORM_DEFAULTS.siteUrl;
 

@@ -100,7 +100,7 @@ export function generateLicenseWelcomeEmail(data: LicenseWelcomeEmailData): {
                       </tr>
                       <tr>
                         <td style="color: #6b7280; font-size: 14px;">Max Users</td>
-                        <td style="color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${data.maxUsers === 999999 ? 'Unlimited` : data.maxUsers.toLocaleString()}</td>
+                        <td style="color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${data.maxUsers === 999999 ? 'Unlimited' : data.maxUsers.toLocaleString()}</td>
                       </tr>
                     </table>
                   </td>

@@ -304,7 +304,7 @@ function validateSitemap(whitelist: string[]) {
 
   // Check for blocked routes in sitemap
   for (const pattern of BLOCKED_PATTERNS) {
-    if (content.includes(`'${pattern}'`) || content.includes(`"${pattern}"`)) {
+    if (content.includes(`'${pattern}'') || content.includes(`"${pattern}"`)) {
       // Check if it's in the excluded list (which is OK)
       if (!content.includes('EXCLUDED') && !content.includes('excluded')) {
         errors.push({

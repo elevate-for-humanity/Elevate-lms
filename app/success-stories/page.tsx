@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
 import { SuccessStories } from '@/components/marketing/SuccessStories';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Success Stories | ${PLATFORM_DEFAULTS.orgName}`,

@@ -106,7 +106,7 @@ export async function submitVerificationDecision(
     const orgName = holder.organization_name || 'your organization';
 
     const subject =
-      decision === 'approved`
+      decision === 'approved'
         ? `Your Program Holder Application Has Been Approved — ${PLATFORM_DEFAULTS.orgName}`
         : `Update on Your Program Holder Application — ${PLATFORM_DEFAULTS.orgName}`;
 

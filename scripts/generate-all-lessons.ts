@@ -262,17 +262,17 @@ function compositeVideo(
       const safeLabel = label.text.replace(/[^a-zA-Z0-9 &\-\/\.]/g, '');
       const alpha = `if(lt(t,${label.fadeInSec}),0,if(lt(t,${label.fadeInSec}+0.8),min((t-${label.fadeInSec})/0.8\\,1),if(lt(t,${tEnd}),1,0)))`;
 
-      fc += `,drawbox=x=${lx - 8}:y=${ly - 6}:w=260:h=38:color=black@0.8:t=fill:enable='between(t,${label.fadeInSec},${tEnd})'`;
-      fc += `,drawtext=fontfile=${FONT_BOLD}:text='${safeLabel}':fontcolor=0x00FF88:fontsize=24:x=${lx}:y=${ly}:alpha='${alpha}':enable='between(t,${label.fadeInSec},${tEnd})'`;
+      fc += `,drawbox=x=${lx - 8}:y=${ly - 6}:w=260:h=38:color=black@0.8:t=fill:enable='between(t,${label.fadeInSec},${tEnd})'';
+      fc += `,drawtext=fontfile=${FONT_BOLD}:text='${safeLabel}':fontcolor=0x00FF88:fontsize=24:x=${lx}:y=${ly}:alpha='${alpha}':enable='between(t,${label.fadeInSec},${tEnd})'';
 
       // Arrow
       const arrowY = ly + 12;
-      fc += `,drawbox=x=390:y=${arrowY - 1}:w=${lx - 402}:h=3:color=0x00FF88@0.5:t=fill:enable='between(t,${label.fadeInSec},${tEnd})'`;
-      fc += `,drawbox=x=${lx - 10}:y=${arrowY - 5}:w=6:h=12:color=0x00FF88@0.7:t=fill:enable='between(t,${label.fadeInSec},${tEnd})'`;
+      fc += `,drawbox=x=390:y=${arrowY - 1}:w=${lx - 402}:h=3:color=0x00FF88@0.5:t=fill:enable='between(t,${label.fadeInSec},${tEnd})'';
+      fc += `,drawbox=x=${lx - 10}:y=${arrowY - 5}:w=6:h=12:color=0x00FF88@0.7:t=fill:enable='between(t,${label.fadeInSec},${tEnd})'';
     });
 
     // Outro text
-    fc += `,drawtext=fontfile=${FONT_BOLD}:text='Start the Quiz Below':fontcolor=0x00FF88:fontsize=28:x=(w-text_w)/2:y=660:alpha='if(lt(t,${duration - 5}),0,min((t-${duration - 5})/0.8\\,1))':enable='gte(t,${duration - 5})'`;
+    fc += `,drawtext=fontfile=${FONT_BOLD}:text='Start the Quiz Below':fontcolor=0x00FF88:fontsize=28:x=(w-text_w)/2:y=660:alpha='if(lt(t,${duration - 5}),0,min((t-${duration - 5})/0.8\\,1))':enable='gte(t,${duration - 5})'';
 
     fc += `[out]`;
 
@@ -292,10 +292,10 @@ function compositeVideo(
     labels.forEach((label) => {
       const safeLabel = label.text.replace(/[^a-zA-Z0-9 &\-\/\.]/g, '');
       const alpha = `if(lt(t,${label.fadeInSec}),0,if(lt(t,${label.fadeInSec}+0.8),min((t-${label.fadeInSec})/0.8\\,1),if(lt(t,${duration}),1,0)))`;
-      fc += `,drawtext=fontfile=${FONT_BOLD}:text='${safeLabel}':fontcolor=0x00FF88:fontsize=28:x=(w-text_w)/2:y=660:alpha='${alpha}':enable='between(t,${label.fadeInSec},${label.fadeInSec + 5})'`;
+      fc += `,drawtext=fontfile=${FONT_BOLD}:text='${safeLabel}':fontcolor=0x00FF88:fontsize=28:x=(w-text_w)/2:y=660:alpha='${alpha}':enable='between(t,${label.fadeInSec},${label.fadeInSec + 5})'';
     });
 
-    fc += `,drawtext=fontfile=${FONT_BOLD}:text='Start the Quiz Below':fontcolor=0x00FF88:fontsize=28:x=(w-text_w)/2:y=660:alpha='if(lt(t,${duration - 5}),0,min((t-${duration - 5})/0.8\\,1))':enable='gte(t,${duration - 5})'`;
+    fc += `,drawtext=fontfile=${FONT_BOLD}:text='Start the Quiz Below':fontcolor=0x00FF88:fontsize=28:x=(w-text_w)/2:y=660:alpha='if(lt(t,${duration - 5}),0,min((t-${duration - 5})/0.8\\,1))':enable='gte(t,${duration - 5})'';
 
     fc += `[out]`;
 

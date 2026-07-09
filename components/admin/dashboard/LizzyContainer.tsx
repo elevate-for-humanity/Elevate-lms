@@ -9,7 +9,7 @@ import { mergePreviewTargets } from '@/lib/admin/merge-preview-targets';
 const DEFAULT_TARGETS: PreviewTarget[] = [
   { label: 'Public site', url: process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl },
   {
-    label: 'Admin`,
+    label: 'Admin',
     url: process.env.NEXT_PUBLIC_ADMIN_URL ?? `https://admin.${PLATFORM_DEFAULTS.canonicalDomain}`,
   },
   {

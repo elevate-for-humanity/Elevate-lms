@@ -107,7 +107,7 @@ export default async function ParentDashboardPage() {
 
       <div className="max-w-5xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Parent Portal', href: '/parent-portal' }, { label: 'Dashboard` }]}
+          items={[{ label: 'Parent Portal', href: '/parent-portal' }, { label: 'Dashboard' }]}
         />
       </div>
 

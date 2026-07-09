@@ -294,7 +294,7 @@ export async function importUsers(users: BulkImportUser[]): Promise<ImportResult
     await logAuditEvent({
       action: 'BULK_USER_IMPORT',
       actor_id: 'session_user', // server client — auth.uid() available to L2 triggers
-      target_type: 'profiles`,
+      target_type: 'profiles',
       metadata: {
         total_rows: users.length,
         success_count: successCount,

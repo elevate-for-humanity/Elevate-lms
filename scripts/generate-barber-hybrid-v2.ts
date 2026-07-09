@@ -252,7 +252,7 @@ function buildSegment(panelPng: string, audioMp3: string, duration: number, outP
 
 function assembleVideo(segPaths: string[], outPath: string): void {
   const cf = outPath.replace('.mp4', '-concat.txt');
-  fs.writeFileSync(cf, segPaths.map((p) => `file '${p}'`).join('\n'));
+  fs.writeFileSync(cf, segPaths.map((p) => `file '${p}'').join('\n'));
   execSync(`ffmpeg -y -f concat -safe 0 -i "${cf}" -c copy -movflags +faststart "${outPath}"`, {
     stdio: 'pipe',
   });

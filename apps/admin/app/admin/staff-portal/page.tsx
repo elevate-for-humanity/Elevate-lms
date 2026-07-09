@@ -104,7 +104,7 @@ export default async function StaffPortalLanding() {
           <h1 className="text-3xl font-bold text-slate-900 mb-1">
             {user && profile?.full_name
               ? `Welcome, ${profile.full_name.split(' ')[0]}`
-              : 'Staff Portal`}
+              : 'Staff Portal'}
           </h1>
           <p className="text-slate-600 text-sm">
             ${PLATFORM_DEFAULTS.orgName} · Staff &amp; Instructor Tools

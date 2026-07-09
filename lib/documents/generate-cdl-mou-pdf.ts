@@ -232,7 +232,7 @@ export async function generateCDLMOUPdf(data: CDLMOUPDFData): Promise<Uint8Array
 
   // ── Purpose ─────────────────────────────────────────────────────────────────
   checkY(80);
-  page.drawText('PURPOSE`, {
+  page.drawText('PURPOSE', {
     x: margin,
     y,
     size: 10,

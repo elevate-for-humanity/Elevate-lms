@@ -328,7 +328,7 @@ async function main() {
   process.stdout.write('Stitching...');
   const stitched = path.join(TEMP_DIR, 'stitched.mp4');
   const cf = path.join(TEMP_DIR, 'concat.txt');
-  fs.writeFileSync(cf, segPaths.map((p) => `file '${p}'`).join('\n'));
+  fs.writeFileSync(cf, segPaths.map((p) => `file '${p}'').join('\n'));
   execSync(`ffmpeg -y -f concat -safe 0 -i "${cf}" -c copy "${stitched}"`, { stdio: 'pipe' });
   console.log(' ✓');
 

@@ -144,7 +144,7 @@ export default function BarberDocumentsPage() {
       const response = await fetch('/api/enrollment/submit-documents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ program: 'barber-apprenticeship` }),
+        body: JSON.stringify({ program: 'barber-apprenticeship' }),
       });
 
       const data = await response.json();

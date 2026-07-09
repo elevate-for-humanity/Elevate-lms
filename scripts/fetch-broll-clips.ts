@@ -700,7 +700,7 @@ function normalizeAndConcat(inputs: string[], outPath: string): number {
   if (normalized.length === 0) throw new Error('No clips normalized');
 
   const listFile = path.join(TMP_DIR, `list_${path.basename(outPath)}.txt`);
-  fs.writeFileSync(listFile, normalized.map((f) => `file '${f}'`).join('\n'));
+  fs.writeFileSync(listFile, normalized.map((f) => `file '${f}'').join('\n'));
   execSync(`"${FFMPEG_BIN}" -y -f concat -safe 0 -i "${listFile}" -c copy "${outPath}"`, {
     stdio: 'pipe',
     maxBuffer: 300 * 1024 * 1024,

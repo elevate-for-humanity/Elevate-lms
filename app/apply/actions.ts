@@ -1177,7 +1177,7 @@ async function sendProgramHolderWelcomeEmail(
     // Fallback: magic link to set-password
     try {
       const { data: linkData } = await adminDb.auth.admin.generateLink({
-        type: 'magiclink`,
+        type: 'magiclink',
         email: opts.email,
         options: { redirectTo },
       });

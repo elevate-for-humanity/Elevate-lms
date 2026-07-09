@@ -13,7 +13,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const TUITION_FINANCING_POLICY = {
   version: '1.0',
-  effectiveDate: '2025-01-15`,
+  effectiveDate: '2025-01-15',
 
   /**
    * POLICY STATEMENT

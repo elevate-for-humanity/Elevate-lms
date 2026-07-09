@@ -65,7 +65,7 @@ export async function sendOnboardingEmail(params: SendOnboardingParams): Promise
     const firstName = (params.name || '').split(' ')[0] || 'there';
     const programName = formatProgramName(params.program);
     const isBarber = isBarberProgram(params.program);
-    const emailType = isBarber ? 'barber' : 'workone`;
+    const emailType = isBarber ? 'barber' : 'workone';
 
     const template = isBarber
       ? barberOnboardingEmail({ firstName, programName, applicantEmail: params.email })

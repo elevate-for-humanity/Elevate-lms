@@ -14,7 +14,7 @@ import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { HomeSegmentedCTA } from '@/components/home/HomeSegmentedCTA';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { Skeleton } from '@/components/ui/skeleton';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // Revalidate every 5 minutes — allows live enrollment stats to refresh
 // without a full rebuild.
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     type: `website',
   },
   twitter: {
-    card: 'summary_large_image`,
+    card: 'summary_large_image',
     title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training & Apprenticeships`,
     description:
       `Funded training, DOL-registered apprenticeships, and job placement — often at no cost.',

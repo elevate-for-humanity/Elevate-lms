@@ -235,7 +235,7 @@ export class VideoGenerator {
     const fileListPath = path.join(this.tempDir, 'filelist.txt');
 
     // Create file list for FFmpeg concat
-    const fileList = sceneVideos.map((v) => `file '${v}'`).join('\n');
+    const fileList = sceneVideos.map((v) => `file '${v}'').join('\n');
     await writeFile(fileListPath, fileList);
 
     return new Promise((resolve, reject) => {

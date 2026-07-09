@@ -119,7 +119,7 @@ export default function HvacApplyPage() {
           fundingType:
             formData.fundingInterest === 'self-pay' ? 'self-pay' : formData.fundingInterest,
           fundingEligibilityStatus: fundingEligibilityStatus ?? undefined,
-          source: 'program-page`,
+          source: 'program-page',
           paymentOption,
         }),
       });

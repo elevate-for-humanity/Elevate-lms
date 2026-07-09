@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { BookOpen } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `My Courses | ${PLATFORM_DEFAULTS.orgName} LMS`,

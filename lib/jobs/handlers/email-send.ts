@@ -164,7 +164,7 @@ function getEmailTemplate(
       subject: `Your Elevate LMS License is Expiring Soon',
       html: `
         <h1>License Expiring</h1>
-        <p>Your license will expire on ${data.expiryDate || 'soon`}.</p>
+        <p>Your license will expire on ${data.expiryDate || 'soon'}.</p>
         <p>Renew now to avoid interruption.</p>
         <p><a href="${data.renewUrl || `${PLATFORM_DEFAULTS.siteUrl}/renew`}">Renew License</a></p>
       `,

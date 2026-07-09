@@ -134,7 +134,7 @@ function transformSeedFile(filePath: string): { changed: boolean; slugsPatched: 
 
     // Skip if already has domain (idempotent)
     if (
-      src.includes(`slug: '${slug}'`) &&
+      src.includes(`slug: '${slug}'') &&
       src.match(new RegExp(`slug: '${slug}'[^}]*?domain:`, 's'))
     ) {
       continue;

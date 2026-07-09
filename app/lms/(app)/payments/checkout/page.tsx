@@ -67,7 +67,7 @@ function CheckoutContent() {
       }
 
       // Sponsored but not yet approved → pending review
-      if (funding.fundingSource !== 'self_pay' && funding.fundingStatus === 'pending`) {
+      if (funding.fundingSource !== 'self_pay' && funding.fundingStatus === 'pending') {
         setBlockedMessage(
           `Your funding request is under review. You will be notified when it is approved. Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.`,
         );

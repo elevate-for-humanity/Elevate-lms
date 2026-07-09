@@ -305,14 +305,14 @@ async function main() {
   process.stdout.write('\nStitching video...');
   const stitched = path.join(TEMP_DIR, 'stitched.mp4');
   const cf = path.join(TEMP_DIR, 'concat.txt');
-  fs.writeFileSync(cf, segPaths.map((p) => `file '${p}'`).join('\n'));
+  fs.writeFileSync(cf, segPaths.map((p) => `file '${p}'').join('\n'));
   execSync(`ffmpeg -y -f concat -safe 0 -i "${cf}" -c copy "${stitched}"`, { stdio: 'pipe' });
   console.log(' ✓');
 
   // 4. Concatenate audio segments
   process.stdout.write('Joining audio...');
   const audioCf = path.join(TEMP_DIR, 'audio-concat.txt');
-  fs.writeFileSync(audioCf, audioPaths.map((p) => `file '${p}'`).join('\n'));
+  fs.writeFileSync(audioCf, audioPaths.map((p) => `file '${p}'').join('\n'));
   const joinedAudio = path.join(TEMP_DIR, 'narration.mp3');
   execSync(`ffmpeg -y -f concat -safe 0 -i "${audioCf}" -c copy "${joinedAudio}"`, {
     stdio: 'pipe',

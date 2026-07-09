@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Plug, Circle, Code, Zap, Database, Mail, CreditCard, Users } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic`;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Integrations & API | ${PLATFORM_DEFAULTS.orgName} Store`,
@@ -243,7 +243,7 @@ export default async function IntegrationsPage() {
     "name": "John Doe",
     "email": "john@example.com",
     "program": "barber-apprenticeship"
-  }'`}</code>
+  }''}</code>
               </pre>
             </div>
           </div>

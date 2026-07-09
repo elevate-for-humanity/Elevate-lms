@@ -3,7 +3,7 @@ import { logger } from '@/lib/logger';
 
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 /**
  * Invisible Watermark Component
  *

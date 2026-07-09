@@ -48,7 +48,7 @@ async function loadSendGridKey(db: ReturnType<typeof createClient>) {
 function documentChecklistHtml() {
   const items = REQUIRED_DOCS.map(
     (d) => `<li style="margin-bottom:8px">${d}</li>`,
-  ).join('`);
+  ).join('');
   return `
 <p style="margin:0 0 12px;font-size:14px;line-height:1.7;color:#475569">
 <strong>Required documents</strong> — please reply to this email with clear, complete copies (PDF preferred). If we already received a file that was cropped, expired, or unreadable, <strong>resend the full document</strong> as attachments.

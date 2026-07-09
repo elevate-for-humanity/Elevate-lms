@@ -240,7 +240,7 @@ async function processPendingEmails(supabase: any, workflow: any, now: Date) {
       let subject = step.subject;
 
       Object.entries(variables).forEach(([key, value]) => {
-        const regex = new RegExp(`{{${key}}}`, 'g`);
+        const regex = new RegExp(`{{${key}}}`, 'g');
         html = html.replace(regex, String(value));
         subject = subject.replace(regex, String(value));
       });

@@ -111,7 +111,7 @@ export async function POST(req: Request) {
       await resend.emails.send({
         from: process.env.EMAIL_FROM || PLATFORM_DEFAULTS.emailFromAddress,
         to: email,
-        subject: 'Shop Partner Application Received - ' + PLATFORM_DEFAULTS.orgName + '`,
+        subject: 'Shop Partner Application Received - ' + PLATFORM_DEFAULTS.orgName + '',
         text: `
 Hello ${owner_name},
 

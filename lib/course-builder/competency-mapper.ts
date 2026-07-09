@@ -73,7 +73,7 @@ export function validateCompetencyCoverage(template: CourseTemplate): Competency
       signoffOnlyViolations: [],
       valid: true,
       errors: [],
-      warnings: [`No competencies registered for program '${template.programSlug}'`],
+      warnings: [`No competencies registered for program '${template.programSlug}''],
     };
   }
 
@@ -204,7 +204,7 @@ export async function markCompetencyAchieved(
   if (def?.requiresInstructorSignoff) {
     const quizOnlyMethods: AchievedVia[] = ['quiz', 'exam'];
     if (quizOnlyMethods.includes(opts.achievedVia)) {
-      const msg = `Competency '${opts.competencyKey}' requires instructor signoff — cannot be achieved via '${opts.achievedVia}'`;
+      const msg = `Competency '${opts.competencyKey}' requires instructor signoff — cannot be achieved via '${opts.achievedVia}'';
       logger.warn('[competency-mapper] Signoff-only violation blocked', {
         competencyKey: opts.competencyKey,
         achievedVia: opts.achievedVia,

@@ -75,7 +75,7 @@ export default function EnrollmentBookingPage({ programs = [] }: { programs?: Pr
           ...formData,
           date: selectedDate,
           time: selectedTime,
-          type: 'enrollment_consultation`,
+          type: 'enrollment_consultation',
         }),
       });
 

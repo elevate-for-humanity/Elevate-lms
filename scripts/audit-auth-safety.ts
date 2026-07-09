@@ -173,22 +173,22 @@ if (unsafeCount > 0 || needsReviewCount > 0) {
     
     for (const issue of result.issues) {
       console.log(`Line ${issue.line} - ${issue.risk} Risk: ${issue.pattern}`);
-      console.log('```');
+      console.log('''`');
       console.log(issue.code);
-      console.log('```\n');
+      console.log('''`\n');
     }
   }
   
   console.log('\n## Recommended Fix\n');
   console.log('Add null guard after getUser():\n');
-  console.log('```typescript');
+  console.log('''`typescript');
   console.log('const { data: { user } } = await supabase.auth.getUser();');
   console.log('');
   console.log('// Add this guard:');
   console.log('if (!user) {');
   console.log("  redirect('/login');");
   console.log('}');
-  console.log('```');
+  console.log('''`');
 } else {
   console.log('\n✅ All scanned files are safe!');
 }

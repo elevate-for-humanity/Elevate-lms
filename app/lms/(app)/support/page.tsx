@@ -114,7 +114,7 @@ export default async function SupportPage() {
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Support` }]} />
+        <Breadcrumbs items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Support' }]} />
       </div>
       <div className="max-w-5xl mx-auto px-4">
         {/* Header */}

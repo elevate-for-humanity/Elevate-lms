@@ -113,7 +113,7 @@ function cancellationEmailHtml(name: string, startTime: string): string {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric`,
+    day: 'numeric',
   });
   return `
 <!DOCTYPE html>
@@ -232,7 +232,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: `api' }
 
       await db.from('testing_appointment_reminders').insert([
         { appointment_id: appt.id, send_at: reminder24h.toISOString(), type: '24h', sent: false },
-        { appointment_id: appt.id, send_at: reminder1h.toISOString(), type: '1h`, sent: false },
+        { appointment_id: appt.id, send_at: reminder1h.toISOString(), type: '1h', sent: false },
       ]);
     }
 
@@ -312,7 +312,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: `api' }
         .from('testing_appointment_reminders')
         .update({ sent: true, canceled: true })
         .eq('appointment_id', appt.id)
-        .eq('sent`, false);
+        .eq('sent', false);
     }
 
     // Cancellation email

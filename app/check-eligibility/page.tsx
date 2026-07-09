@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { CheckCircle, DollarSign, Users, ArrowRight } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Check Eligibility | ${PLATFORM_DEFAULTS.orgName}`,

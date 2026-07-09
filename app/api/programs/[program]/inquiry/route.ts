@@ -80,7 +80,7 @@ export async function POST(request: NextRequest, { params }: { params: { program
         <p><strong>Email:</strong> ${email}</p>
         ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
         ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
-        ${fundingQuestion ? `<p><strong>Funding question:</strong> ${fundingQuestion}</p>` : '`}
+        ${fundingQuestion ? `<p><strong>Funding question:</strong> ${fundingQuestion}</p>` : ''}
         <p><a href="${PLATFORM_DEFAULTS.siteUrl}/admin/applications/review/${application.id}">View in Admin</a></p>
       `,
     });

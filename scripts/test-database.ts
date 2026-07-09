@@ -180,13 +180,13 @@ async function testDuplicatePolicies() {
       const { error } = await supabase.from(table).select('id').limit(1);
 
       category.tests.push({
-        name: `RLS active on '${table}'`,
+        name: `RLS active on '${table}'',
         passed: true,
         details: 'Table accessible with policies',
       });
     } catch (error: any) {
       category.tests.push({
-        name: `RLS active on '${table}'`,
+        name: `RLS active on '${table}'',
         passed: false,
         error: error.message,
       });

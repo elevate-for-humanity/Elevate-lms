@@ -236,7 +236,7 @@ function buildEmail(r: typeof ALL_RECIPIENTS[0], pdfB64: string): string {
     `You can also sign electronically at: ${mouUrl}`,
     '',
     `Questions? Contact Elizabeth Greene:`,
-    `Phone: ' + PLATFORM_DEFAULTS.supportPhone + '`,
+    `Phone: ' + PLATFORM_DEFAULTS.supportPhone + '',
     `Email: elevate4humanityedu@gmail.com`,
     '',
     `Warm regards,`,

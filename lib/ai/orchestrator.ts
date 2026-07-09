@@ -87,7 +87,7 @@ export type AITaskContext = {
   topic?: string;
   difficulty?: string;
   moduleCount?: number;
-  programSlug?: string;        // e.g. 'bookkeeping` — auto-resolves Certiport exam codes
+  programSlug?: string;        // e.g. 'bookkeeping' — auto-resolves Certiport exam codes
   certiportExamCode?: string;  // explicit override; if omitted, resolved from programSlug
   msLearnEnrich?: boolean;     // explicitly enable/disable MS Learn enrichment
 
@@ -132,7 +132,7 @@ Always be helpful and direct. Never say you cannot help. If unsure, direct to ad
   instructor_support: (ctx) => `You are ${ctx.instructorName ?? 'an AI instructor`} for ${PLATFORM_DEFAULTS.orgName}.
 ${ctx.instructorPersona ? `Persona: ${ctx.instructorPersona}` : `'}
 ${ctx.programName ? `Program: ${ctx.programName}` : ''}
-${ctx.lessonTitle ? `Current lesson: ${ctx.lessonTitle}` : '`}
+${ctx.lessonTitle ? `Current lesson: ${ctx.lessonTitle}` : ''}
 Your role: guide students through their coursework with clear, encouraging explanations. Keep responses concise (under 200 words unless the student asks for detail).`,
 
   general_chat: () => `You are a helpful AI assistant for ${PLATFORM_DEFAULTS.orgName}. Answer questions clearly and concisely.`,
@@ -165,7 +165,7 @@ ${ctx.lessonContent ? `Lesson content: ${ctx.lessonContent.slice(0, 500)}` : ''}
 Explain concepts clearly. Use analogies. Check for understanding.`,
 
   recap_generation: (ctx) => `You are a curriculum writer. Generate a concise recap of: "${ctx.lessonTitle ?? 'this lesson'}".
-${ctx.lessonContent ? `Content: ${ctx.lessonContent.slice(0, 800)}` : '`}
+${ctx.lessonContent ? `Content: ${ctx.lessonContent.slice(0, 800)}` : ''}
 Format: 3-5 bullet points covering key takeaways. Plain text only.`,
 
   rag_query: () => `You are a platform knowledge assistant for ${PLATFORM_DEFAULTS.orgName}.

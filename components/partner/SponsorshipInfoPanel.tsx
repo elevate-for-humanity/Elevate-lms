@@ -23,7 +23,7 @@ interface Props {
   variant?: 'full' | 'compact' | 'tooltip';
 }
 
-export function SponsorshipInfoPanel({ programId, partnerId, variant = 'full` }: Props) {
+export function SponsorshipInfoPanel({ programId, partnerId, variant = 'full' }: Props) {
   const [info, setInfo] = useState<SponsorshipInfo>({
     sponsor_name: `2Exclusive LLC-S (DBA ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute)`,
     curriculum_type: `Partner-provided + required online components',

@@ -146,7 +146,7 @@ export function StudentPortfolio() {
           setCertificates(
             certData.map((c) => ({
               id: c.id,
-              title: (c.training_programs as any)?.name || c.program_name || 'Certificate`,
+              title: (c.training_programs as any)?.name || c.program_name || 'Certificate',
               issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
               date: c.issued_at?.split(`T')[0] || '',
               credentialUrl: c.verification_url || `/verify/${c.id}`,
@@ -225,7 +225,7 @@ export function StudentPortfolio() {
       category: 'Web Development',
       imageUrl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
       technologies: ['Vue.js', 'Firebase', 'Vuetify', 'Netlify'],
-      completedDate: '2023-08`,
+      completedDate: '2023-08',
       liveUrl: `https://www.${PLATFORM_DEFAULTS.canonicalDomain}/demo/portfolio`,
       achievements: [`200+ templates', 'SEO optimized', 'One-click deployment'],
     },

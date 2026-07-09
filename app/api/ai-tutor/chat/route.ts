@@ -10,7 +10,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-export const dynamic = 'force-dynamic`;
+export const dynamic = 'force-dynamic';
 
 const SYSTEM_PROMPTS: Record<string, string> = {
   chat: `You are an AI tutor for ${PLATFORM_DEFAULTS.orgName}, a workforce development platform in Indianapolis, Indiana. You help students studying for career certifications in healthcare, skilled trades, technology, business, and other fields. Provide clear, accurate, educational responses. Reference Indiana-specific licensing requirements, employers, and resources when relevant. Keep responses focused and practical.`,

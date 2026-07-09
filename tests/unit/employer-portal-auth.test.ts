@@ -58,9 +58,9 @@ function assertCanonicalRoleSet(src: string, pagePath: string): void {
   const match = src.match(/await requireRole\(\s*(\[[^\]]+\])/);
   if (!match) return; // call exists but couldn't parse — skip role set check
   const roleArray = match[1];
-  expect(roleArray, `${pagePath}: role set must include 'employer'`).toContain("'employer'");
-  expect(roleArray, `${pagePath}: role set must include 'admin'`).toContain("'admin'");
-  expect(roleArray, `${pagePath}: role set must include 'admin'`).toContain("'admin'");
+  expect(roleArray, `${pagePath}: role set must include 'employer'').toContain("'employer'");
+  expect(roleArray, `${pagePath}: role set must include 'admin'').toContain("'admin'");
+  expect(roleArray, `${pagePath}: role set must include 'admin'').toContain("'admin'");
 }
 
 // ---------------------------------------------------------------------------

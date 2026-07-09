@@ -90,7 +90,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
           <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0;">Payment Details</h3>
             <p style="margin: 5px 0;"><strong>Program:</strong> ${programName}</p>
-            <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString(`en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric` })}</p>
+            <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString(`en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
             <p style="margin: 5px 0;"><strong>Status:</strong> Confirmed</p>
           </div>
           
@@ -294,7 +294,7 @@ async function sendAdminEnrollmentNotification(
             <p style="margin: 5px 0;"><strong>Email:</strong> ${studentEmail}</p>
             <p style="margin: 5px 0;"><strong>Program:</strong> ${programName}</p>
             <p style="margin: 5px 0;"><strong>Student ID:</strong> ${studentId}</p>
-            <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString(`en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit` })}</p>
+            <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString(`en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
           </div>
           
           <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
@@ -387,7 +387,7 @@ async function sendPaymentFailedEmail(studentId: string, programId: string): Pro
   const { data: program } = await supabaseClient
     .from('programs')
     .select('title')
-    .eq('id`, programId)
+    .eq('id', programId)
     .maybeSingle();
 
   if (!student?.email) return;
@@ -688,7 +688,7 @@ async function sendPaymentConfirmationEmail(
   const { data: student } = await supabase
     .from('profiles')
     .select('email, full_name')
-    .eq('id`, studentId)
+    .eq('id', studentId)
     .maybeSingle();
 
   if (!student?.email) return;
@@ -728,7 +728,7 @@ async function sendPaymentCompletionEmail(studentId: string, programId: string):
   const { data: program } = await supabase
     .from('programs')
     .select('title')
-    .eq('id`, programId)
+    .eq('id', programId)
     .maybeSingle();
 
   if (!student?.email) return;

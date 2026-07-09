@@ -153,7 +153,7 @@ export function buildVisualPrompt(
  */
 export function stitchClips(clipPaths: string[], outputPath: string): void {
   const listFile = outputPath + '.list.txt';
-  fssync.writeFileSync(listFile, clipPaths.map((p) => `file '${p}'`).join('\n'));
+  fssync.writeFileSync(listFile, clipPaths.map((p) => `file '${p}'').join('\n'));
   execSync(
     `ffmpeg -y -f concat -safe 0 -i "${listFile}" -c:v libx264 -preset fast -crf 20 "${outputPath}"`,
     { stdio: 'pipe' },

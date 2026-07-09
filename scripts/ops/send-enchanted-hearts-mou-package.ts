@@ -225,7 +225,7 @@ async function main() {
 
   const { steps } = await buildJourneyLinks(db, HOLDER.email, 'program_holder');
   const stepsHtml = journeyStepsHtml(steps, { primaryIndex: 0 });
-  const orgSlug = HOLDER.organizationName.replace(/[^a-zA-Z0-9]+/g, '-`);
+  const orgSlug = HOLDER.organizationName.replace(/[^a-zA-Z0-9]+/g, '-');
 
   const mouHtml = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>

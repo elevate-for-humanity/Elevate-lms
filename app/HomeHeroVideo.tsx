@@ -40,7 +40,7 @@ export default function HomeHeroVideo() {
     };
     if (video.readyState >= 2) play();
     else video.addEventListener('loadeddata', play, { once: true });
-    return () => video.removeEventListener('loadeddata`, play);
+    return () => video.removeEventListener('loadeddata', play);
   }, []);
 
   const playVoiceover = useCallback(() => {

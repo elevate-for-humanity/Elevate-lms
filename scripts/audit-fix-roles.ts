@@ -107,7 +107,7 @@ for (const u of authUsers) {
   // Invalid or missing role
   const role = (p.role || '').trim().toLowerCase();
   if (!role || !VALID_ROLES.has(role)) {
-    issues.push({ type: 'BAD_ROLE', id, email: authEmail, detail: `role='${role || 'NULL'}'`, fix: `SET role=student` });
+    issues.push({ type: 'BAD_ROLE', id, email: authEmail, detail: `role='${role || 'NULL'}'', fix: `SET role=student` });
     if (!DRY_RUN) {
       const { error } = await db.from('profiles').update({ role: 'student' }).eq('id', id);
       if (error) console.error(`  [ERR] fix role ${id}: ${error.message}`);
@@ -118,7 +118,7 @@ for (const u of authUsers) {
   // Email mismatch
   const profileEmail = (p.email || '').toLowerCase().trim();
   if (authEmail && profileEmail && profileEmail !== authEmail) {
-    issues.push({ type: 'EMAIL_MISMATCH', id, email: authEmail, detail: `profile.email='${p.email}' vs auth.email='${authEmail}'`, fix: `SET email=${authEmail}` });
+    issues.push({ type: 'EMAIL_MISMATCH', id, email: authEmail, detail: `profile.email='${p.email}' vs auth.email='${authEmail}'', fix: `SET email=${authEmail}` });
     if (!DRY_RUN) {
       const { error } = await db.from('profiles').update({ email: authEmail }).eq('id', id);
       if (error) console.error(`  [ERR] fix email ${id}: ${error.message}`);

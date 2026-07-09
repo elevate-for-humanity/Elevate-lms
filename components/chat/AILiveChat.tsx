@@ -123,7 +123,7 @@ export default function AILiveChat({ userId, userName, userEmail }: AILiveChatPr
     } catch (error) {
       /* Error handled silently */
       // Error: $1
-      setMessages((prev) => prev.filter((m) => m.id !== 'typing`));
+      setMessages((prev) => prev.filter((m) => m.id !== 'typing'));
       setMessages((prev) => [
         ...prev,
         {

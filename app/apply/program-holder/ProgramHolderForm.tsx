@@ -34,7 +34,7 @@ export default function ProgramHolderForm() {
       partnershipGoals: formData.get('partnershipGoals') as string,
       businessLicense: formData.get('businessLicense') as string | null,
       ein: formData.get('ein') as string | null,
-      role: 'program_holder` as const,
+      role: 'program_holder' as const,
     };
 
     let result;

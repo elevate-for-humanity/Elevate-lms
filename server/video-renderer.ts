@@ -333,7 +333,7 @@ export async function concatenateVideos(videoPaths: string[], outputPath: string
     try {
       // Create concat file
       const concatFilePath = path.join(path.dirname(outputPath), 'concat-list.txt');
-      const concatContent = videoPaths.map((p) => `file '${p}'`).join('\n');
+      const concatContent = videoPaths.map((p) => `file '${p}'').join('\n');
       await fs.writeFile(concatFilePath, concatContent);
 
       _ffmpeg!()

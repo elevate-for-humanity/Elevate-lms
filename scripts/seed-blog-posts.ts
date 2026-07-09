@@ -22,7 +22,7 @@ Marcus Thompson, 34, had spent 8 years climbing the ladder in retail management.
 
 ## Discovering a New Path
 
-Marcus's unemployment counselor at WorkOne Indianapolis suggested WIOA-funded training. That's when he found ' + PLATFORM_DEFAULTS.orgName + '`s HVAC Technician program.
+Marcus's unemployment counselor at WorkOne Indianapolis suggested WIOA-funded training. That's when he found ${PLATFORM_DEFAULTS.orgName}'s HVAC Technician program.
 
 "When I saw the job outlook—95% placement rate, average starting salary of $45,000—I knew I had to try."
 

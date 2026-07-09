@@ -65,7 +65,7 @@ function esc(v: string): string {
 function renderStringArray(items?: string[], indent = 6): string {
   if (!items?.length) return '[]';
   const pad = ' '.repeat(indent);
-  return `[\n${items.map((i) => `${pad}'${esc(i)}'`).join(',\n')}\n${' '.repeat(indent - 2)}]`;
+  return `[\n${items.map((i) => `${pad}'${esc(i)}'').join(',\n')}\n${' '.repeat(indent - 2)}]`;
 }
 
 function renderCompetencyChecks(checks: CompetencyCheck[], indent = 6): string {
@@ -150,7 +150,7 @@ function renderModule(m: ModuleSeed): string {
     slug: '${esc(m.slug)}',
     title: '${esc(m.title)}',
     order: ${m.order},
-    objective: ${m.objective ? `'${esc(m.objective)}'` : 'undefined'},
+    objective: ${m.objective ? `'${esc(m.objective)}'' : 'undefined'},
     lessons: [\n${lessons.join(',\n')}\n    ],
   }`;
 }

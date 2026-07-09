@@ -61,7 +61,7 @@ export default function MedicalAssistantEnrollPage() {
         const r = await fetch('/api/sezzle/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: PROGRAM.price * 100, programId: PROGRAM.slug, programSlug: PROGRAM.slug, programName: PROGRAM.name, enrollmentId: data.enrollmentId, email: formData.email, name: `${formData.firstName} ${formData.lastName}` }) });
         const d = await r.json(); if (d.url || d.checkout_url) { window.location.href = d.url || d.checkout_url; return; }
       }
-      if (paymentOption === 'payment-plan`) {
+      if (paymentOption === 'payment-plan') {
         window.location.href = `/enroll/payment?application_id=${data.enrollmentId}&program=medical-assistant&amount=${customDown}&type=down-payment`;
       } else {
         window.location.href = `/enroll/payment?application_id=${data.enrollmentId}&program=medical-assistant&amount=${PROGRAM.price}&type=full-payment`;

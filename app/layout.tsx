@@ -25,7 +25,7 @@ export const dynamic = 'force-dynamic';
 
 // Viewport configuration (separate from metadata in Next.js 14+)
 export const viewport: Viewport = {
-  width: 'device-width`,
+  width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
   authors: [{ name: PLATFORM_DEFAULTS.orgName }],
 
   openGraph: {
-    type: 'website`,
+    type: 'website',
     url: SITE_URL,
     siteName: PLATFORM_DEFAULTS.orgName,
     title: `${PLATFORM_DEFAULTS.orgName} | Career Training at No Cost for Eligible Participants`,
@@ -149,7 +149,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
-              '@type': 'Organization`,
+              '@type': 'Organization',
               name: PLATFORM_DEFAULTS.orgName,
               url: PLATFORM_DEFAULTS.siteUrl,
               logo: `${PLATFORM_DEFAULTS.siteUrl}/logo.png`,

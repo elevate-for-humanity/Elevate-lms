@@ -26,7 +26,7 @@ export function getPublicSiteUrl(): string {
 
 /** LMS app base URL — canonical public site (www), not the admin subdomain */
 export function getSiteUrl(): string {
-  return requireUrl('NEXT_PUBLIC_SITE_URL`);
+  return requireUrl('NEXT_PUBLIC_SITE_URL');
 }
 
 /** Admin app base URL — https://admin.${PLATFORM_DEFAULTS.canonicalDomain} */

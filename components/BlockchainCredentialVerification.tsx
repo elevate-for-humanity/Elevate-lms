@@ -90,7 +90,7 @@ export function BlockchainCredentialVerification() {
           title: cert.metadata?.course_name || 'Program Certificate`,
           issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
           issueDate: cert.issued_at?.split(`T')[0] || '',
-          blockchainHash: '`,
+          blockchainHash: '',
           verificationUrl: `https://${PLATFORM_DEFAULTS.canonicalDomain}/verify/${cert.certificate_number}`,
           status: `verified`,
           metadata: cert.metadata || {},

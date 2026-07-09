@@ -166,7 +166,7 @@ function SamGovScreenshot({ variant }: { variant: string }) {
                     )}
                   </div>
                   <span
-                    className={`text-sm ${item.status === 'complete' ? 'text-slate-900' : 'text-slate-700`}`}
+                    className={`text-sm ${item.status === 'complete' ? 'text-slate-900' : 'text-slate-700'}`}
                   >
                     {item.step}
                   </span>

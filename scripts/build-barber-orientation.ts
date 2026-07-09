@@ -222,7 +222,7 @@ async function main() {
     }
 
     const listFile = path.join(TEMP_DIR, 'concat.txt');
-    fs.writeFileSync(listFile, scenePaths.map((file) => `file '${file}'`).join('\n'));
+    fs.writeFileSync(listFile, scenePaths.map((file) => `file '${file}'').join('\n'));
     const rawPath = path.join(TEMP_DIR, 'raw.mp4');
 
     process.stdout.write('\n  concat scenes...');

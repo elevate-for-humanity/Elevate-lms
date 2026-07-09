@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
       } else if (next_status === 'rejected') {
         // Rejection email — all program types
         const programName =
-          application.program_slug || application.program_interest || 'the program`;
+          application.program_slug || application.program_interest || 'the program';
         await sendEmail({
           to: [application.email],
           from: `${PLATFORM_DEFAULTS.orgName} <info@${PLATFORM_DEFAULTS.canonicalDomain}>`,

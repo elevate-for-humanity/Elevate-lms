@@ -312,7 +312,7 @@ export default function FssaApplicationForm() {
               </span>
             </label>
             <label className="flex items-start gap-3 cursor-pointer">
-              <input type="checkbox" className={`${checkCls} mt-0.5`} checked={form.consentContact} onChange={e => set('consentContact`, e.target.checked)} />
+              <input type="checkbox" className={`${checkCls} mt-0.5`} checked={form.consentContact} onChange={e => set('consentContact', e.target.checked)} />
               <span className="text-sm text-slate-700">
                 <span className="font-semibold">I consent</span> to be contacted by ${PLATFORM_DEFAULTS.orgName} staff by phone, email, or text regarding my application and program enrollment. <span className="text-red-500">*</span>
               </span>

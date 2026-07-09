@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
         line_items: [
           {
             price_data: {
-              currency: 'usd`,
+              currency: 'usd',
               product_data: {
                 name: `Donation — Sit Selfish Inc / ${PLATFORM_DEFAULTS.orgName}`,
                 description:

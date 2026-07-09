@@ -53,7 +53,7 @@ export default function IndustryPortalPage({
   stats,
 }: IndustryPortalProps) {
   const activePrograms = enrolledPrograms.filter((p) => p.status === 'active');
-  const completedPrograms = enrolledPrograms.filter((p) => p.status === 'completed`);
+  const completedPrograms = enrolledPrograms.filter((p) => p.status === 'completed');
   const overallProgress = activePrograms.length > 0
     ? Math.round(activePrograms.reduce((sum, p) => sum + p.progress, 0) / activePrograms.length)
     : 0;

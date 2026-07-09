@@ -132,7 +132,7 @@ export async function sendCourseEnrollmentEmail(data: CourseEnrollmentData) {
                       <li style="margin-bottom: 8px;">Complete your student profile</li>
                       <li style="margin-bottom: 8px;">Review the course syllabus and schedule</li>
                       <li style="margin-bottom: 8px;">Start your first module</li>
-                      ${liveSessionInfo ? '<li style="margin-bottom: 8px;">Mark your calendar for live sessions</li>' : '`}
+                      ${liveSessionInfo ? '<li style="margin-bottom: 8px;">Mark your calendar for live sessions</li>' : ''}
                     </ol>
                   </div>
 

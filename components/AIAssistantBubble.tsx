@@ -39,7 +39,7 @@ export function AIAssistantBubble() {
     if (messages.length === 0) {
       setMessages([
         {
-          role: 'assistant`,
+          role: 'assistant',
           content:
             `Welcome to ${PLATFORM_DEFAULTS.orgName}! I`m your AI assistant. How can I help you today?\n\n• Learn about our training programs\n• Check WIOA eligibility\n• Start your application\n• Talk to a human`,
         },

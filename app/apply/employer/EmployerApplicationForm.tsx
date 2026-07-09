@@ -45,7 +45,7 @@ export default function EmployerApplicationForm() {
       website: formData.get('website') as string,
       hiringNeeds: formData.get('hiringNeeds') as string,
       positionsAvailable: formData.get('positionsAvailable') as string,
-      role: 'employer` as const,
+      role: 'employer' as const,
     };
 
     const result = await submitEmployerApplication(data);

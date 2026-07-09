@@ -37,7 +37,7 @@ type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 function MOUBuilder() {
   const [mou, setMou] = useState<MOUTemplate>({
     ...MOU_TEMPLATE_DEFAULT,
-    partnerOrganization: 'Partner Organization Name`,
+    partnerOrganization: 'Partner Organization Name',
     purpose:
       `This Memorandum of Understanding establishes a collaborative framework between ${PLATFORM_DEFAULTS.orgName} and [Partner] to deliver workforce training, credential preparation, and employment placement services.`,
     background:

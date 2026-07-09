@@ -18,7 +18,7 @@ export async function concatSceneVideos(
   if (scenePaths.length === 0) throw new Error('No scene videos to concatenate');
 
   const listPath = path.join(tempDir, 'concat.txt');
-  await fs.writeFile(listPath, scenePaths.map((p) => `file '${p}'`).join('\n'));
+  await fs.writeFile(listPath, scenePaths.map((p) => `file '${p}'').join('\n'));
 
   const tmpConcat = outputPath + '.concat.tmp.mp4';
   const tmpFinal = outputPath + '.final.tmp.mp4';

@@ -27,7 +27,7 @@ export default function QuickApplyForm() {
           email: fd.get('email') as string,
           phone: fd.get('phone') as string,
           program: fd.get('programInterest') as string,
-          source: 'quick_apply`,
+          source: 'quick_apply',
         }),
       });
 

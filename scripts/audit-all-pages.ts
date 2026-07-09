@@ -116,8 +116,8 @@ function auditFile(filePath: string): AuditResult {
   ];
 
   for (const { wrong, correct } of wrongTables) {
-    if (content.includes(`'${wrong}'`) || content.includes(`"${wrong}"`)) {
-      result.issues.push(`Using wrong table/bucket name '${wrong}', should be '${correct}'`);
+    if (content.includes(`'${wrong}'') || content.includes(`"${wrong}"`)) {
+      result.issues.push(`Using wrong table/bucket name '${wrong}', should be '${correct}'');
       result.status = 'error';
     }
   }

@@ -24,7 +24,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './'),
       // server-only is a Next.js compile-time guard that throws when imported
       // outside the server bundle. Map it to an empty shim so unit tests
-      // can import engine files that contain `import 'server-only'` without
+      // can import engine files that contain `import 'server-only'' without
       // crashing. Tests never run in a real server context.
       'server-only': path.resolve(__dirname, 'tests/shims/server-only.ts'),
     },

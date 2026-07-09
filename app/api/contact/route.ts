@@ -175,7 +175,7 @@ async function sendEmailNotification(data: z.infer<typeof ContactSchema>) {
         <p><strong>Email:</strong> ${data.email}</p>
         ${data.phone ? `<p><strong>Phone:</strong> ${data.phone}</p>` : ''}
         ${data.program ? `<p><strong>Program Interest:</strong> ${data.program}</p>` : ''}
-        ${data.role ? `<p><strong>Role:</strong> ${data.role}</p>` : '`}
+        ${data.role ? `<p><strong>Role:</strong> ${data.role}</p>` : ''}
         <p><strong>Message:</strong><br>${data.message}</p>
         <hr>
         <p><em>Submitted from ${PLATFORM_DEFAULTS.canonicalDomain}</em></p>

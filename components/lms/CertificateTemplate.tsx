@@ -115,7 +115,7 @@ export function CertificatePreview({
       format: [1056, 816],
     });
 
-    pdf.addImage(imgData, 'PNG`, 0, 0, 1056, 816);
+    pdf.addImage(imgData, 'PNG', 0, 0, 1056, 816);
     pdf.save(`certificate-${certificateNumber}.pdf`);
   };
 

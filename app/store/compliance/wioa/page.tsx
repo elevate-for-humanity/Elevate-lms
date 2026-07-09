@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Home, ChevronRight, Download, FileText, Users, BarChart3, Shield, CheckCircle, } from 'lucide-react';
 import AvatarGuide from '@/components/AvatarGuide';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `WIOA Compliance Tools | ${PLATFORM_DEFAULTS.orgName} Store`,

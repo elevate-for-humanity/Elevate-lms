@@ -3,7 +3,7 @@
  * and the /api/emails/* routes. sendEmail is re-exported from ./sendgrid.
  */
 import { sendEmail } from './sendgrid';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export { sendEmail };
 
 // Email templates

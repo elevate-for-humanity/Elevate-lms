@@ -130,7 +130,7 @@ export default async function StudentApplicationPage({
   searchParams: Promise<{ program?: string }>;
 }) {
   const params = await searchParams;
-  const initialProgram = resolveSlug(params?.program || '') || '`;
+  const initialProgram = resolveSlug(params?.program || '') || '';
 
   return (
     <div className="min-h-screen bg-white">

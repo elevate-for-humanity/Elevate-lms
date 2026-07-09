@@ -167,7 +167,7 @@ Generate 4-6 scenes with narration and diagram descriptions.`;
 
   // Parse JSON from response (handle markdown code blocks)
   let jsonStr = raw;
-  if (raw.includes('```')) {
+  if (raw.includes('''`')) {
     jsonStr = raw
       .replace(/```json?\n?/g, '')
       .replace(/```/g, '')
@@ -205,7 +205,7 @@ function compositeVideo(
   }
 
   // Create concat file
-  const concatContent = sceneVideos.map((v) => `file '${v}'`).join('\n');
+  const concatContent = sceneVideos.map((v) => `file '${v}'').join('\n');
   fs.writeFileSync(concatFile, concatContent);
 
   // Concatenate all scenes

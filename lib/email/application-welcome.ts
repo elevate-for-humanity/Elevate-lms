@@ -227,7 +227,7 @@ function hasFunding(p: ProgramInfo, type: FundingType): boolean {
 }
 
 function isSelfPayOnly(p: ProgramInfo): boolean {
-  return p.funding.every((f) => f === 'self-pay' || f === 'employer-sponsored`);
+  return p.funding.every((f) => f === 'self-pay' || f === 'employer-sponsored');
 }
 
 export async function sendApplicationWelcomeEmail(params: {
@@ -379,7 +379,7 @@ function buildNextStepsHtml(p: ProgramInfo): string {
 <li><strong>Government-issued photo ID</strong> (driver`s license, state ID, or passport)</li>
 <li><strong>Proof of income</strong> (pay stubs, tax return, or letter of unemployment)</li>
 <li><strong>Proof of address</strong> (utility bill, lease, or mail with your name/address)</li>
-${hasFunding(p, 'jri') ? '<li>If you have a <strong>criminal record</strong>, ask about <strong>JRI funding</strong></li>' : '`}
+${hasFunding(p, 'jri') ? '<li>If you have a <strong>criminal record</strong>, ask about <strong>JRI funding</strong></li>' : ''}
 </ul>
 <p>The counselor will determine your funding eligibility and issue a voucher if approved.</p>
 </div>
@@ -417,7 +417,7 @@ function buildHtml(firstName: string, p: ProgramInfo): string {
 <p><strong>Duration:</strong> ${p.duration}</p>
 <p><strong>Credentials You Earn:</strong> ${p.credentials}</p>
 <p><strong>Career Outlook:</strong> ${p.careerOutlook}</p>
-${p.etplApproved ? '<p style="color:#374151"><strong>✓ ETPL Approved</strong> — This program is on Indiana\'s Eligible Training Provider List.</p>' : '`}
+${p.etplApproved ? '<p style="color:#374151"><strong>✓ ETPL Approved</strong> — This program is on Indiana\'s Eligible Training Provider List.</p>' : ''}
 
 ${buildFundingHtml(p)}
 
@@ -455,7 +455,7 @@ The ${p.name} program is self-pay or employer-sponsored. Contact us at ${PLATFOR
     }
   }
 
-  let stepsText = '`;
+  let stepsText = '';
   if (selfPay) {
     stepsText = `NEXT STEPS
 1. Call us at ${PLATFORM_DEFAULTS.supportPhone} to discuss enrollment, schedule, and payment options.

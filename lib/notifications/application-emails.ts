@@ -248,7 +248,7 @@ export async function sendAdminApplicationNotification(application: ApplicationD
   <div style="background:#fff;border:1px solid #e2e8f0;border-top:none;padding:24px 32px;">
     <h3 style="margin:0 0 12px;font-size:15px;color:#0f172a;text-transform:uppercase;letter-spacing:0.05em;">Notes</h3>
     <p style="margin:0;font-size:13px;color:#374151;background:#f8fafc;padding:12px;border-radius:6px;">${application.notes}</p>
-  </div>` : '`}
+  </div>` : ''}
 
   <!-- Footer -->
   <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;padding:16px 32px;text-align:center;">

@@ -194,7 +194,7 @@ function validateLessons(modules: CredentialBlueprint['modules']): void {
 
       const key = `${mod.orderIndex}:${lesson.order}`;
       if (orderKeys.has(key))
-        throw new Error(`Duplicate order ${lesson.order} in module '${mod.slug}'`);
+        throw new Error(`Duplicate order ${lesson.order} in module '${mod.slug}'');
       orderKeys.add(key);
 
       const stepType = inferStepType(lesson.slug);

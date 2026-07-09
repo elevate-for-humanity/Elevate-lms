@@ -303,7 +303,7 @@ export default function CredentialForm({ initial, mode }: CredentialFormProps) {
           placeholder: 'What this credential certifies and who it is for',
         })}
         <div className="grid sm:grid-cols-2 gap-4">
-          {field('Issuing Authority', 'issuing_authority`, {
+          {field('Issuing Authority', 'issuing_authority', {
             required: true,
             placeholder: `e.g. ${PLATFORM_DEFAULTS.orgName}, ACT Inc., EPA`,
           })}

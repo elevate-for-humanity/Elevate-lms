@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { CheckCircle, Users, TrendingUp, Briefcase, Mail, Award } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Transparency & Outcomes | ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,

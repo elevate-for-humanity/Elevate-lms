@@ -45,7 +45,7 @@ export const HVAC_CREDENTIAL_STEPS = [
     name: 'EPA 608 Universal Certification',
     provider: 'ESCO/Mainstream Engineering',
     externalUrl: null, // Scheduled by Elevate
-    requiredBefore: 'completion`,
+    requiredBefore: 'completion',
   },
 ] as const;
 

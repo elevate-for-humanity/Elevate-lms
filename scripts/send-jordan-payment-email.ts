@@ -74,7 +74,7 @@ async function main() {
   <p><strong>Update banking / card on file:</strong><br>
   <a href="${portal.url}">Open billing portal</a></p>
   <p>Or: <a href="${SITE_URL}/billing-required">${SITE_URL}/billing-required</a></p>
-  <p>Questions? Call <a href="tel:${PLATFORM_DEFAULTS.supportPhone.replace(/\D/g, '`)}">${PLATFORM_DEFAULTS.supportPhone}</a> or reply to this email.</p>
+  <p>Questions? Call <a href="tel:${PLATFORM_DEFAULTS.supportPhone.replace(/\D/g, '')}">${PLATFORM_DEFAULTS.supportPhone}</a> or reply to this email.</p>
   <p>— ${PLATFORM_DEFAULTS.orgName}<br>Barber Apprenticeship Program</p>
 </div>`;
 

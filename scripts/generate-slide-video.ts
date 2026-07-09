@@ -343,7 +343,7 @@ Content: ${lesson.content.substring(0, 4000)}`;
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       const raw = await callGPT(sys, user, true);
-      const json = raw.includes('```')
+      const json = raw.includes('''`')
         ? raw
             .replace(/```json?\n?/g, '')
             .replace(/```/g, '')
@@ -555,7 +555,7 @@ function buildSegment(
 
   // Concat all parts
   const concatFile = path.join(tmp, `concat_${segIdx}.txt`);
-  fs.writeFileSync(concatFile, parts.map((p) => `file '${p}'`).join('\n'));
+  fs.writeFileSync(concatFile, parts.map((p) => `file '${p}'').join('\n'));
   const noAudio = path.join(tmp, `noaudio_${segIdx}.mp4`);
   execSync(`ffmpeg -y -f concat -safe 0 -i "${concatFile}" -c copy "${noAudio}"`, {
     stdio: 'pipe',
@@ -586,7 +586,7 @@ function concatSegments(segs: string[], out: string): void {
   const tmp = path.dirname(out);
   const raw = path.join(tmp, 'raw_concat.mp4');
   const cf = path.join(tmp, 'final_concat.txt');
-  fs.writeFileSync(cf, segs.map((s) => `file '${s}'`).join('\n'));
+  fs.writeFileSync(cf, segs.map((s) => `file '${s}'').join('\n'));
   execSync(`ffmpeg -y -f concat -safe 0 -i "${cf}" -c copy "${raw}"`, { stdio: 'pipe' });
   // Add 2.5s hold on last frame with silent audio for a clean ending
   execSync(

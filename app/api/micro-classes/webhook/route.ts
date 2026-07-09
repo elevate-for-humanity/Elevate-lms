@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'DB insert failed' }, { status: 500 });
   }
 
-  const firstName = customerName.split(' ')[0] || 'there`;
+  const firstName = customerName.split(' ')[0] || 'there';
 
   // Email student their access instructions
   const studentHtml = `

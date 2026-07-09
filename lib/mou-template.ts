@@ -1,4 +1,4 @@
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 /**
  * MOU Template Generator
  * Generates a Memorandum of Understanding for Training Providers

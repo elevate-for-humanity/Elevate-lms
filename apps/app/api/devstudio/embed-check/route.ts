@@ -44,7 +44,7 @@ function checkHeaders(res: Response): EmbedResult {
     // 'self' → same-origin framing is allowed; the admin app embeds its own
     //          origin so this is embeddable. Do NOT block on 'self'.
     if (/^'none'$/i.test(fa)) {
-      return { embeddable: false, reason: `CSP frame-ancestors: 'none'` };
+      return { embeddable: false, reason: `CSP frame-ancestors: 'none'' };
     }
   }
 

@@ -1,7 +1,7 @@
 /**
  * Unit tests for the activity-tab checkpoint score recording bug.
  *
- * Bug: The `activeActivity === 'checkpoint'` branch in the NHA-style activity
+ * Bug: The `activeActivity === 'checkpoint'' branch in the NHA-style activity
  * tab view called `markComplete()` directly without first POSTing the score to
  * `/api/lessons/[lessonId]/checkpoint`. This meant:
  *
@@ -14,7 +14,7 @@
  *      could never receive their certificate.
  *
  * Fix: The `onComplete` handler in the activity tab now mirrors the standalone
- * `step_type === 'checkpoint'` branch — it POSTs to the checkpoint API first,
+ * `step_type === 'checkpoint'' branch — it POSTs to the checkpoint API first,
  * updates local `passedCheckpointIds` state on pass, then calls `markComplete`.
  *
  * These tests cover the logic extracted from the fixed handler.
@@ -316,7 +316,7 @@ describe('activity tab checkpoint score recording', () => {
 
 describe('standalone checkpoint branch (regression guard)', () => {
   /**
-   * The standalone `step_type === 'checkpoint'` branch (rendered when the
+   * The standalone `step_type === 'checkpoint'' branch (rendered when the
    * lesson is a checkpoint and the activity tab is NOT active) already called
    * the checkpoint API correctly. These tests confirm that contract is
    * unchanged — the fix must not break the existing path.

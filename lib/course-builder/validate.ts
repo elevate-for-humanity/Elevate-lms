@@ -298,7 +298,7 @@ export function validateCourseTemplate(template: CourseTemplate): CourseValidati
   for (const mod of template.modules ?? []) {
     for (const lesson of mod.lessons ?? []) {
       if (seen.has(lesson.slug))
-        allErrors.push(mkErr(mod.slug, lesson.slug, 'slug', `duplicate slug '${lesson.slug}'`));
+        allErrors.push(mkErr(mod.slug, lesson.slug, 'slug', `duplicate slug '${lesson.slug}''));
       seen.add(lesson.slug);
     }
   }

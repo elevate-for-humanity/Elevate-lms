@@ -95,7 +95,7 @@ let report = `# Platform Readiness Report
 
 for (const result of results) {
   report += `### ${result.passed ? '✅' : '❌'} ${result.name}\n\n`;
-  report += '```\n';
+  report += '''`\n';
   report += result.output;
   report += '\n```\n\n';
 }

@@ -67,7 +67,7 @@ async function handleClickToCall(phoneNumber: string) {
   // No server-side calling needed - completely free!
   return NextResponse.json({
     success: true,
-    method: 'client-side`,
+    method: 'client-side',
     telLink: `tel:+1${PLATFORM_DEFAULTS.supportPhone}`, // Your office number
     message: `Opening phone dialer...',
   });

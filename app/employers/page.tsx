@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { ArrowRight, Users, Building2, Briefcase, CheckCircle, Award } from 'lucide-react`;
+import { ArrowRight, Users, Building2, Briefcase, CheckCircle, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: `Hire Trained Workers | ${PLATFORM_DEFAULTS.orgName}`,

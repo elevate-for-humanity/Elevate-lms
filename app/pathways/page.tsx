@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { TrendingUp, ArrowRight } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Career Pathways | ${PLATFORM_DEFAULTS.orgName}`,

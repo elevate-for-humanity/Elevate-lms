@@ -59,7 +59,7 @@ What would you like to know more about?`,
     // Build context from previous messages if provided
     const conversationHistory =
       context?.previousMessages?.map((msg: any) => ({
-        role: msg.sender === `user' ? 'user' : 'assistant`,
+        role: msg.sender === 'user' ? 'user' : 'assistant',
         content: msg.content,
       })) || [];
 

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Clock, ArrowRight } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `CNA Waitlist | ${PLATFORM_DEFAULTS.orgName}`,

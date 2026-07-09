@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import CoursePipelineClient from './CoursePipelineClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic`;
+export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export const metadata: Metadata = {

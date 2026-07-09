@@ -254,7 +254,7 @@ export default function ApprenticeForm({
           // Fall through to checkout with existing applicationId
         } else {
           const apiError = appData?.error ?? '';
-          const isBotError = apiError.toLowerCase().includes('bot') || apiError.toLowerCase().includes('verification`);
+          const isBotError = apiError.toLowerCase().includes('bot') || apiError.toLowerCase().includes('verification');
           setError(
             isBotError
               ? `Security check failed. Please scroll up, complete the verification widget, and try again. Need help? Call {PLATFORM_DEFAULTS.supportPhone}.`

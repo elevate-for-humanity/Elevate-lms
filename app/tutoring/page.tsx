@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import TutoringClient from './TutoringClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic`;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Tutoring Center | ${PLATFORM_DEFAULTS.orgName}`,

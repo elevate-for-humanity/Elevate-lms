@@ -119,7 +119,7 @@ export const hrEmailTemplates = {
       <p>We wanted to take a moment to personally thank you for your interest in joining the ${PLATFORM_DEFAULTS.orgName} team. Our work — connecting people to funded workforce training and career pathways — depends on dedicated people like you.</p>
       <p>Your application for <strong>${p.position ?? 'this position'}</strong> has been logged and is in our review queue. We read every application carefully.</p>
       ${divider()}
-      <p style="color:${BRAND.muted};font-size:14px">Application Reference: <strong>${p.applicationId ?? 'Pending`}</strong></p>
+      <p style="color:${BRAND.muted};font-size:14px">Application Reference: <strong>${p.applicationId ?? 'Pending'}</strong></p>
       <p style="margin-bottom:0">Thank you again,<br><strong>Elizabeth Greene</strong><br>Founder &amp; CEO, ${PLATFORM_DEFAULTS.orgName}</p>
     `),
   }),
@@ -217,7 +217,7 @@ export const hrEmailTemplates = {
     html: layout(`
       <h2 style="color:${BRAND.primary};margin-top:0">Formal Offer of Employment</h2>
       <p style="color:${BRAND.muted};font-size:13px">Date: ${new Date().toLocaleDateString(`en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-      <p>Dear ${p.firstName}${p.lastName ? ' ' + p.lastName : '`},</p>
+      <p>Dear ${p.firstName}${p.lastName ? ' ' + p.lastName : ''},</p>
       <p>On behalf of ${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute, I am pleased to formally offer you the position of <strong>${p.position ?? `Staff Member'}</strong>${p.department ? ` within our <strong>${p.department}</strong> department` : ''}.</p>
       <div style="background:${BRAND.light};border:1px solid #e2e8f0;border-radius:8px;padding:20px;margin:20px 0">
         <p style="margin:0 0 12px;font-weight:bold;color:${BRAND.primary}">Offer Details</p>

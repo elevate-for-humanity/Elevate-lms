@@ -6,7 +6,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const runtime = 'nodejs`;
+export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 async function _POST(request: NextRequest) {

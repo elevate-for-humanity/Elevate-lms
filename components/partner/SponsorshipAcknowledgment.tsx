@@ -23,7 +23,7 @@ interface SponsorshipAcknowledgmentProps {
 
 const DEFAULT_ITEMS: AcknowledgmentItem[] = [
   {
-    key: 'sponsor`,
+    key: 'sponsor',
     label: `I understand ${PLATFORM_DEFAULTS.orgName} is the Program Sponsor`,
     description:
       `EFH is responsible for program approval, workforce alignment, compliance, and reporting.',
@@ -44,7 +44,7 @@ const DEFAULT_ITEMS: AcknowledgmentItem[] = [
     required: true,
   },
   {
-    key: 'enrollment`,
+    key: 'enrollment',
     label: `I understand all funded enrollments flow through ${PLATFORM_DEFAULTS.orgName}`,
     description:
       `Partners do not independently enroll students into funded programs. All enrollments must be processed through EFH.',

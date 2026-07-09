@@ -67,7 +67,7 @@ export default function EmployerMOUSignForm({ programs }: { programs: string[] }
           programs: selectedPrograms,
           signed_at: new Date().toISOString(),
           signature_data: signatureData,
-          mou_version: '2025-employer-01`,
+          mou_version: '2025-employer-01',
           create_partner: true,
         }),
       });

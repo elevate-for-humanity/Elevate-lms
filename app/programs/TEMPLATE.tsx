@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Clock, DollarSign, MapPin, Award } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // COPY THIS TEMPLATE FOR ALL PROGRAM PAGES
 // Replace the metadata and content sections below

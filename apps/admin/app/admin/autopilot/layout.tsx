@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireDevToolsAccess } from '@/lib/admin/guards';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Admin | Automation | ${PLATFORM_DEFAULTS.orgName}`,

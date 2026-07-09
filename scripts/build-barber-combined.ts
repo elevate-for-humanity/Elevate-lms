@@ -110,7 +110,7 @@ function build() {
 
   fs.writeFileSync(
     listFile,
-    segmentFiles.map((f) => `file '${f.replace(/'/g, "'\\''")}'`).join('\n'),
+    segmentFiles.map((f) => `file '${f.replace(/'/g, "'\\''")}'').join('\n'),
   );
 
   const stitchedVideo = path.join(tmpDir, 'stitched-video.mp4');

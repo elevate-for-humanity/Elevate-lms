@@ -56,7 +56,7 @@ export async function createNotification(
   const db = await getDb();
   await setAuditContext(db, { systemActor: 'grants_notification_system' }).catch(() => {});
   const { data, error }: any = await db
-    .from('grant_notifications`)
+    .from('grant_notifications')
     .insert({
       type: notification.type,
       grant_id: notification.grantId,

@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
           <p style="color:#475569;font-size:14px;line-height:1.5;margin:2px 0">${step}</p>
         </div>`,
           )
-          .join('`)}
+          .join('')}
       </div>
     </div>
 

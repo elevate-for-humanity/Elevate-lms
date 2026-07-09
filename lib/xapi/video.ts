@@ -29,7 +29,7 @@ export async function sendVideoStatement(input: VideoStatementInput) {
       actor: client.createActor(input.learnerId, `User ${input.learnerId}`),
       verb: {
         id: verbMap[input.verb],
-        display: { 'en-US`: input.verb },
+        display: { 'en-US': input.verb },
       },
       object: {
         id: `${PLATFORM_DEFAULTS.siteUrl}/video/${input.videoId}`,

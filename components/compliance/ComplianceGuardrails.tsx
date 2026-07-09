@@ -39,7 +39,7 @@ export function NoGuaranteeDisclaimer({ className = '' }: DisclaimerProps) {
 /**
  * Funding Disclaimer - Required on WIOA/grant-related pages
  */
-export function FundingDisclaimer({ className = '` }: DisclaimerProps) {
+export function FundingDisclaimer({ className = '' }: DisclaimerProps) {
   return (
     <div className={`bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 ${className}`}>
       <div className="flex items-start gap-3">
@@ -208,7 +208,7 @@ export function ApplicationConsent({
 /**
  * Footer Compliance Links
  */
-export function ComplianceFooterLinks({ className = '` }: DisclaimerProps) {
+export function ComplianceFooterLinks({ className = '' }: DisclaimerProps) {
   return (
     <div className={`text-xs text-slate-700 ${className}`}>
       <div className="flex flex-wrap gap-x-4 gap-y-1">

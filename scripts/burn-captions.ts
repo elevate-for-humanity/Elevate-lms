@@ -63,7 +63,7 @@ function buildDrawtext(captions: Caption[], frameH: number, videoH: number): str
         `fontsize=28:fontcolor=white:` +
         `x=(w-text_w)/2:y=${captionY}:` +
         `box=1:boxcolor=black@0.0:boxborderw=0:` +
-        `enable='between(t,${c.start},${c.end})'`
+        `enable='between(t,${c.start},${c.end})''
       );
     })
     .join(',');

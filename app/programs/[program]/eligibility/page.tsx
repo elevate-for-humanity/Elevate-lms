@@ -7,7 +7,7 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import ProgramFundingGate from '@/components/programs/ProgramFundingGate';
 import heroBanners from '@/content/heroBanners';
 import { getBeautyProgram } from '@/lib/programs/beauty-programs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 interface Props {
   params: Promise<{ program: string }>;

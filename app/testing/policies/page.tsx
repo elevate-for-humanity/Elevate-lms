@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { FileText } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Testing Policies | ${PLATFORM_DEFAULTS.orgName}`,

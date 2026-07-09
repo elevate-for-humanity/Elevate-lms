@@ -15,7 +15,7 @@ export const appointmentEmailTemplates = {
       firstName: string;
       date: string;
       time: string;
-      format: 'phone' | 'zoom`;
+      format: 'phone' | 'zoom';
       zoomLink?: string;
       rescheduleLink?: string;
     }) => `
@@ -31,7 +31,7 @@ export const appointmentEmailTemplates = {
         </div>
 
         ${
-          data.format === 'phone`
+          data.format === 'phone'
             ? `
           <p><strong>We will call you</strong> at the number you provided at the scheduled time.</p>
         `
@@ -68,7 +68,7 @@ export const appointmentEmailTemplates = {
       firstName: string;
       date: string;
       time: string;
-      format: `phone' | 'zoom`;
+      format: `phone' | 'zoom';
       zoomLink?: string;
       rescheduleLink?: string;
     }) => `
@@ -130,7 +130,7 @@ Phone: ${PLATFORM_DEFAULTS.supportPhone}
             <a href="${data.zoomLink}" style="display: inline-block; padding: 12px 24px; background-color: #ea580c; color: white; text-decoration: none; border-radius: 6px;">Join Zoom Meeting</a>
           </p>
         `
-            : '`
+            : ''
         }
 
         ${
@@ -167,7 +167,7 @@ This is a reminder about your appointment tomorrow.
 ⏰ Time: ${data.time}
 📞 Format: ${data.format === 'phone' ? 'Phone Call' : 'Zoom Video'}
 
-${data.format === 'zoom' && data.zoomLink ? `Join Zoom Meeting: ${data.zoomLink}\n\n` : '`}${data.rescheduleLink ? `Need to reschedule? ${data.rescheduleLink}\nOr call ${PLATFORM_DEFAULTS.supportPhone}.\n\n` : ``}We look forward to speaking with you.
+${data.format === 'zoom' && data.zoomLink ? `Join Zoom Meeting: ${data.zoomLink}\n\n` : ''}${data.rescheduleLink ? `Need to reschedule? ${data.rescheduleLink}\nOr call ${PLATFORM_DEFAULTS.supportPhone}.\n\n` : ``}We look forward to speaking with you.
 
 —
 ${PLATFORM_DEFAULTS.orgName}

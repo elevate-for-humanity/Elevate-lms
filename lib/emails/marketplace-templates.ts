@@ -1,4 +1,4 @@
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 // Email templates for marketplace transactions
 
 export interface BuyerDeliveryEmailData {

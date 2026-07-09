@@ -2,7 +2,7 @@
  * Unit tests for the completion rule evaluator in lib/lms/completion-evaluator.ts
  *
  * evaluateCourseRule is a pure switch function with no DB calls, but the file
- * has `import 'server-only'` at the top (because evaluateCourseCompletion and
+ * has `import 'server-only'' at the top (because evaluateCourseCompletion and
  * checkProgramCompletion call requireAdminClient). The pure helper is not
  * exported, so we inline-extract it here, mirroring the source exactly.
  *

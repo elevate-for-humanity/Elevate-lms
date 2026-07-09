@@ -307,7 +307,7 @@ async function sendDMCATakedown(data: { domain: string; url: string; timestamp: 
   const dmcaNotice = `
 DMCA TAKEDOWN NOTICE PURSUANT TO 17 U.S.C. § 512(c)
 
-Date: ${new Date().toISOString().split('T`)[0]}
+Date: ${new Date().toISOString().split('T)[0]}
 
 To Whom It May Concern:
 

@@ -250,7 +250,7 @@ async function _POST(req: Request) {
       const siteUrl = ((process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl);
 
       const session = await stripe.checkout.sessions.create({
-        mode: 'payment`,
+        mode: 'payment',
         customer_email: `accounting@${PLATFORM_DEFAULTS.canonicalDomain}`, // Elevate pays, not student
         line_items: [
           {

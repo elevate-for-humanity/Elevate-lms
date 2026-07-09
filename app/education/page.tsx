@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { ArrowRight, CheckCircle, GraduationCap, Users, Award } from 'lucide-react`;
+import { ArrowRight, CheckCircle, GraduationCap, Users, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: `Education & Training | ${PLATFORM_DEFAULTS.orgName}`,

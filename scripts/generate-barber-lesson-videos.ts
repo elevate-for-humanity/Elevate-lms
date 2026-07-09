@@ -311,7 +311,7 @@ function buildScene(clipPath: string, audioPath: string, outPath: string): void 
 // All scenes are encoded identically so stream copy is clean and seamless.
 function concatScenes(scenePaths: string[], outPath: string, tmpDir: string): void {
   const listFile = path.join(tmpDir, 'scenes.txt');
-  fs.writeFileSync(listFile, scenePaths.map((p) => `file '${p}'`).join('\n'));
+  fs.writeFileSync(listFile, scenePaths.map((p) => `file '${p}'').join('\n'));
   execSync(
     `ffmpeg -y -f concat -safe 0 -i "${listFile}" -c copy -movflags +faststart "${outPath}"`,
     { stdio: 'pipe', maxBuffer: 500 * 1024 * 1024 },
@@ -488,7 +488,7 @@ async function main() {
         `Building chapter: ${lessonFiles.length} lessons → ${path.basename(chapterPath)}`,
       );
       const tmpList = path.join(os.tmpdir(), `chapter-${MODULE_FILTER}.txt`);
-      fs.writeFileSync(tmpList, lessonFiles.map((f) => `file '${f}'`).join('\n'));
+      fs.writeFileSync(tmpList, lessonFiles.map((f) => `file '${f}'').join('\n'));
       const raw = path.join(os.tmpdir(), `chapter-${MODULE_FILTER}-raw.mp4`);
       execSync(`ffmpeg -y -f concat -safe 0 -i "${tmpList}" -c copy "${raw}"`, {
         stdio: 'pipe',

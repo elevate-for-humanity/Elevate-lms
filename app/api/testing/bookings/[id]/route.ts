@@ -100,7 +100,7 @@ async function _PATCH(req: NextRequest, { params }: { params: Promise<{ id: stri
   }
 
   // Send confirmation email when status changes to 'confirmed'
-  if (status === 'confirmed` && booking) {
+  if (status === 'confirmed' && booking) {
     const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,sans-serif">

@@ -84,7 +84,7 @@ export default async function CMIDashboardPage() {
   const counts = (students ?? []).reduce<Record<string, number>>((acc, s) => {
     const app = Array.isArray(s.applications) ? s.applications[0] : s.applications;
     const effectiveStatus = (app as { revoked_at?: string | null } | null)?.revoked_at
-      ? 'revoked`
+      ? 'revoked'
       : s.status;
     acc[effectiveStatus] = (acc[effectiveStatus] ?? 0) + 1;
     return acc;

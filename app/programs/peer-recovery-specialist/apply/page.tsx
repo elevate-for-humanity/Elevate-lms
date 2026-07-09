@@ -115,7 +115,7 @@ export default function PeerRecoveryApplyPage() {
       }
 
       router.push(
-        `/programs/peer-recovery-specialist/apply/success${data.id ? `?id=${data.id}` : '`}`,
+        `/programs/peer-recovery-specialist/apply/success${data.id ? `?id=${data.id}` : ''}`,
       );
     } catch {
       setError(`Unexpected error. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);

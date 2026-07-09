@@ -23,7 +23,7 @@ describe('portal auth route coverage (proxy.ts)', () => {
   ];
 
   it.each(requiredAuthPrefixes)('PROTECTED_ROUTES includes %s', (prefix) => {
-    expect(proxySource).toContain(`'${prefix}'`);
+    expect(proxySource).toContain(`'${prefix}'');
   });
 
   it('PROTECTED_ROUTES includes instructor prefix', () => {

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Award, CheckCircle, Clock, DollarSign, ChevronRight, Phone } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `ASE Certification Testing | ${PLATFORM_DEFAULTS.orgName}`,

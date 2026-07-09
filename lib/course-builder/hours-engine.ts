@@ -117,11 +117,11 @@ export function validateHours(template: CourseTemplate): HoursValidationResult {
         );
       } else if (lesson.durationMinutes < minDuration(lesson.type)) {
         warnings.push(
-          `${mod.slug}/${lesson.slug}: duration ${lesson.durationMinutes}m is below minimum ${minDuration(lesson.type)}m for type '${lesson.type}'`,
+          `${mod.slug}/${lesson.slug}: duration ${lesson.durationMinutes}m is below minimum ${minDuration(lesson.type)}m for type '${lesson.type}'',
         );
       } else if (lesson.durationMinutes > maxDuration(lesson.type)) {
         warnings.push(
-          `${mod.slug}/${lesson.slug}: duration ${lesson.durationMinutes}m exceeds maximum ${maxDuration(lesson.type)}m for type '${lesson.type}'`,
+          `${mod.slug}/${lesson.slug}: duration ${lesson.durationMinutes}m exceeds maximum ${maxDuration(lesson.type)}m for type '${lesson.type}'',
         );
       }
     }

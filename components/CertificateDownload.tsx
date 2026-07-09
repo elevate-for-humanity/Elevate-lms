@@ -266,7 +266,7 @@ export default function CertificateDownload({
   // Print certificate
   const printCertificate = () => {
     const svg = generateSVG();
-    const printWindow = window.open('', '_blank`);
+    const printWindow = window.open('', '_blank');
     if (printWindow) {
       printWindow.document.write(`
         <html>

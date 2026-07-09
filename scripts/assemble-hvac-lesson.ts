@@ -114,13 +114,13 @@ function buildDiagramSegment(
 
     const alpha = `if(lt(t,${fadeIn}),0,if(lt(t,${fadeIn}+0.8),min((t-${fadeIn})/0.8\\,1),1))`;
 
-    fc += `,drawbox=x=${lx - 8}:y=${ly - 6}:w=260:h=38:color=black@0.8:t=fill:enable='gte(t,${fadeIn})'`;
-    fc += `,drawtext=fontfile=${FONT_BOLD}:text='${safeLabel}':fontcolor=0x00FF88:fontsize=24:x=${lx}:y=${ly}:alpha='${alpha}':enable='gte(t,${fadeIn})'`;
+    fc += `,drawbox=x=${lx - 8}:y=${ly - 6}:w=260:h=38:color=black@0.8:t=fill:enable='gte(t,${fadeIn})'';
+    fc += `,drawtext=fontfile=${FONT_BOLD}:text='${safeLabel}':fontcolor=0x00FF88:fontsize=24:x=${lx}:y=${ly}:alpha='${alpha}':enable='gte(t,${fadeIn})'';
 
     // Arrow from Brandon area
     const arrowY = ly + 12;
-    fc += `,drawbox=x=390:y=${arrowY - 1}:w=${lx - 402}:h=3:color=0x00FF88@0.5:t=fill:enable='gte(t,${fadeIn})'`;
-    fc += `,drawbox=x=${lx - 10}:y=${arrowY - 5}:w=6:h=12:color=0x00FF88@0.7:t=fill:enable='gte(t,${fadeIn})'`;
+    fc += `,drawbox=x=390:y=${arrowY - 1}:w=${lx - 402}:h=3:color=0x00FF88@0.5:t=fill:enable='gte(t,${fadeIn})'';
+    fc += `,drawbox=x=${lx - 10}:y=${arrowY - 5}:w=6:h=12:color=0x00FF88@0.7:t=fill:enable='gte(t,${fadeIn})'';
   });
 
   fc += `[out]`;
@@ -162,7 +162,7 @@ function buildTitleCardSegment(
   labels.forEach((label) => {
     const safeLabel = safe(label.text);
     const alpha = `if(lt(t,${label.fadeInSec}),0,if(lt(t,${label.fadeInSec}+0.8),min((t-${label.fadeInSec})/0.8\\,1),1))`;
-    fc += `,drawtext=fontfile=${FONT_BOLD}:text='${safeLabel}':fontcolor=0x00FF88:fontsize=28:x=(w-text_w)/2:y=660:alpha='${alpha}':enable='between(t,${label.fadeInSec},${label.fadeInSec + 6})'`;
+    fc += `,drawtext=fontfile=${FONT_BOLD}:text='${safeLabel}':fontcolor=0x00FF88:fontsize=28:x=(w-text_w)/2:y=660:alpha='${alpha}':enable='between(t,${label.fadeInSec},${label.fadeInSec + 6})'';
   });
 
   fc += `[out]`;
@@ -300,7 +300,7 @@ function assembleLesson(lessonNumber: number, dryRun: boolean, force: boolean): 
 
   // Concatenate all segments
   const concatList = path.join(tmpDir, 'concat.txt');
-  fs.writeFileSync(concatList, segments.map((s) => `file '${s}'`).join('\n'));
+  fs.writeFileSync(concatList, segments.map((s) => `file '${s}'').join('\n'));
 
   execSync(`ffmpeg -y -f concat -safe 0 -i "${concatList}" -c copy "${finalPath}" 2>/dev/null`);
 

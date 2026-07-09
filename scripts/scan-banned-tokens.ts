@@ -131,7 +131,7 @@ function isInUserFacingString(line: string, matchIndex: number, token: string): 
   }
 
   // In a string literal
-  const quotesBefore = (beforeMatch.match(/["'`]/g) || []).length;
+  const quotesBefore = (beforeMatch.match(/["'']/g) || []).length;
   if (quotesBefore % 2 === 1) {
     return true;
   }
@@ -153,7 +153,7 @@ function classifyHit(context: string, token: string): 'IMPLEMENT' | 'REMOVE' | '
   }
 
   // If it's a string literal in UI, fix the copy
-  if (context.includes('"') || context.includes("'") || context.includes('`')) {
+  if (context.includes('"') || context.includes("'") || context.includes(''')) {
     return 'FIX_COPY';
   }
 

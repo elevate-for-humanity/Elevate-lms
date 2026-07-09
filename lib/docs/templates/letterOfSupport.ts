@@ -1,4 +1,4 @@
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const LETTER_OF_SUPPORT_TEMPLATE = `
 {{date}}
 

@@ -195,7 +195,7 @@ export const POST = withRuntime({ rateLimit: 'contact' }, async (req) => {
         <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b;width:140px">Confirmation Code</td><td style="padding:8px 0;font-weight:800;font-size:18px;letter-spacing:2px;color:#1E3A5F">${confirmationCode}</td></tr>
         <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Exam</td><td style="padding:8px 0;font-weight:600">${examLabel}</td></tr>
         <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Seats</td><td style="padding:8px 0;font-weight:600">${seats}</td></tr>
-        ${isOrg ? `<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Organization</td><td style="padding:8px 0;font-weight:600">${organization}</td></tr>` : '`}
+        ${isOrg ? `<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Organization</td><td style="padding:8px 0;font-weight:600">${organization}</td></tr>` : ''}
         <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Preferred Date</td><td style="padding:8px 0;font-weight:600">${formatBookingDate(preferredDate)}</td></tr>
         <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b">Preferred Time</td><td style="padding:8px 0;font-weight:600">${preferredTime}</td></tr>
         <tr><td style="padding:8px 0;color:#64748b">Status</td><td style="padding:8px 0"><span style="background:#fef3c7;color:#92400e;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600">Pending Confirmation</span></td></tr>
@@ -232,7 +232,7 @@ export const POST = withRuntime({ rateLimit: 'contact' }, async (req) => {
     <tr><td style="padding:6px 12px 6px 0;color:#64748b">Type</td><td style="padding:6px 0">${isOrg ? `Organization — ${organization} (${participantCount} seats)` : 'Individual'}</td></tr>
     <tr><td style="padding:6px 12px 6px 0;color:#64748b">Preferred Date</td><td style="padding:6px 0;font-weight:600">${formatBookingDate(preferredDate)} at ${preferredTime}</td></tr>
     ${alternateDate ? `<tr><td style="padding:6px 12px 6px 0;color:#64748b">Alternate Date</td><td style="padding:6px 0">${formatBookingDate(alternateDate)}</td></tr>` : ''}
-    ${notes ? `<tr><td style="padding:6px 12px 6px 0;color:#64748b">Notes</td><td style="padding:6px 0">${notes}</td></tr>` : '`}
+    ${notes ? `<tr><td style="padding:6px 12px 6px 0;color:#64748b">Notes</td><td style="padding:6px 0">${notes}</td></tr>` : ''}
   </table>
   <p style="margin-top:20px"><a href="${BASE_URL}/admin/testing" style="background:#1E3A5F;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:bold">Manage in Admin →</a></p>
 </body></html>`;

@@ -40,7 +40,7 @@ const REQUIRED_DOCS = [
 
 function enchantedMouHtml() {
   const signUrl = `${SITE_URL}/login?redirect=${encodeURIComponent('/program-holder/sign-mou')}`;
-  const first = 'Shawndra`;
+  const first = 'Shawndra';
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;color:#1e293b">
@@ -78,7 +78,7 @@ for <strong>${ENCHANTED.organizationName}</strong>.
 function barberHostMouHtml() {
   const first = BARBER_HOST.contactName.split(` ')[0];
   const signUrl = `${SITE_URL}/login?redirect=${encodeURIComponent('/partners/barber-host-shop/sign-mou')}`;
-  const docList = REQUIRED_DOCS.map((d) => `<li style="margin-bottom:8px">${d}</li>`).join('`);
+  const docList = REQUIRED_DOCS.map((d) => `<li style="margin-bottom:8px">${d}</li>`).join('');
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;color:#1e293b">

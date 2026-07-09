@@ -117,7 +117,7 @@ export class SocialMediaAutomation {
    * Select platform for rotation
    */
   private selectPlatform(index: number): 'facebook' | 'linkedin' | 'youtube' {
-    const platforms: ('facebook' | 'linkedin' | 'youtube')[] = ['facebook', 'linkedin', 'youtube`];
+    const platforms: ('facebook' | 'linkedin' | 'youtube')[] = ['facebook', 'linkedin', 'youtube'];
     return platforms[index % platforms.length];
   }
   /**

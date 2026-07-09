@@ -210,7 +210,7 @@ function patchBlueprintFile(
   let src = fs.readFileSync(filePath, 'utf-8');
 
   // Find the lesson block by slug
-  const slugMarker = `slug: '${slug}'`;
+  const slugMarker = `slug: '${slug}'';
   const slugIdx = src.indexOf(slugMarker);
   if (slugIdx === -1) {
     console.error(`  ✗ Could not find slug ${slug} in blueprint file`);
@@ -228,7 +228,7 @@ function patchBlueprintFile(
     return false;
   }
 
-  const contentEnd = src.indexOf('`,', contentStart) + 2;
+  const contentEnd = src.indexOf('',', contentStart) + 2;
   if (contentEnd <= contentStart) {
     console.error(`  ✗ Could not find end of content block for ${slug}`);
     return false;

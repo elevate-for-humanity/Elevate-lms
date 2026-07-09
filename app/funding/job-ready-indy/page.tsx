@@ -130,7 +130,7 @@ export default function JobReadyIndyPage() {
           <div className="space-y-6">
             {[
               {
-                step: '1`,
+                step: '1',
                 title: `Contact ${PLATFORM_DEFAULTS.orgName}`,
                 desc: `Call ${PLATFORM_DEFAULTS.supportPhone} or apply online. Our enrollment team will confirm your eligibility and match you to the right program.`,
               },

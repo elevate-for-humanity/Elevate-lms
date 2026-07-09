@@ -230,7 +230,7 @@ async function _POST(request: NextRequest) {
               subject: 'Payment Received — Complete Your Cosmetology Apprenticeship Application',
               html: `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
-<p>Hi ${customerName || 'there`},</p>
+<p>Hi ${customerName || 'there'},</p>
 <p>Your payment for the <strong>Cosmetology Apprenticeship</strong> program has been received. Your spot is reserved.</p>
 <p><strong>Payment:</strong> ${paymentSummary}</p>
 <p style="font-size:16px;font-weight:bold;margin:24px 0 8px">Your next steps — complete in order:</p>
@@ -279,7 +279,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
                 subject: 'Your Coursework Access — Cosmetology Apprenticeship',
                 html: `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
-<p>Hi ${customerName || 'there`},</p>
+<p>Hi ${customerName || 'there'},</p>
 <p>Your related instruction is available in the <strong>Elevate LMS</strong>. Log in to your student portal to access your courses.</p>
 <p style="text-align:center;margin:24px 0;">
   <a href="${LMS_URL}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:white;text-decoration:none;border-radius:8px;font-weight:bold;">Go to My Courses →</a>

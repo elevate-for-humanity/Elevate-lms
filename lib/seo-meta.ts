@@ -4,7 +4,7 @@
  */
 
 import { Metadata } from 'next';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 const baseUrl = PLATFORM_DEFAULTS.siteUrl;
 const siteName = PLATFORM_DEFAULTS.orgName;
@@ -13,18 +13,17 @@ const defaultImage = `${baseUrl}/images/og-default.jpg`;
 // Homepage Meta
 export const homePageMeta: Metadata = {
   title: `Free Job Training Programs | ${PLATFORM_DEFAULTS.orgName}`,
-  description:
-    `Get trained for free in high-demand careers. WIOA-funded programs in barbering, healthcare, HVAC, and more. No debt. Real careers. Indiana.',
+  description: `Get trained for free in high-demand careers. WIOA-funded programs in barbering, healthcare, HVAC, and more. No debt. Real careers. Indiana.`,
   keywords: [
     'free job training',
     'WIOA programs',
     'workforce development',
     'career training Indiana',
-    'free certification programs`,
+    'free certification programs',
   ],
   openGraph: {
     title: `Free Job Training Programs | ${PLATFORM_DEFAULTS.orgName}`,
-    description: `Get trained for free in high-demand careers. No debt. Real careers.',
+    description: `Get trained for free in high-demand careers. No debt. Real careers.`,
     url: baseUrl,
     siteName,
     images: [{ url: defaultImage }],
@@ -65,7 +64,7 @@ export function generateProgramMeta(program: {
       url,
       siteName,
       images: [{ url: program.image || defaultImage }],
-      type: 'website`,
+      type: 'website',
     },
 
     alternates: {
@@ -91,7 +90,7 @@ export function generateBlogMeta(post: {
   return {
     title,
     description,
-    keywords: [post.category || `workforce development', 'career training', 'job training'],
+    keywords: [post.category || 'workforce development', 'career training', 'job training'],
     authors: [{ name: post.author }],
     openGraph: {
       title: post.title,
@@ -99,7 +98,7 @@ export function generateBlogMeta(post: {
       url,
       siteName,
       images: [{ url: post.image || defaultImage }],
-      type: 'article`,
+      type: 'article',
       publishedTime: post.publishedAt,
       authors: [post.author],
     },
@@ -113,8 +112,7 @@ export function generateBlogMeta(post: {
 // Application Page Meta
 export const applicationPageMeta: Metadata = {
   title: `Apply for Free Job Training | ${PLATFORM_DEFAULTS.orgName}`,
-  description:
-    `Apply now for free workforce training. WIOA, WRG, and JRI funding available. Start your career transformation today.',
+  description: `Apply now for free workforce training. WIOA, WRG, and JRI funding available. Start your career transformation today.`,
   keywords: [
     'apply for training',
     'WIOA application',
@@ -127,7 +125,7 @@ export const applicationPageMeta: Metadata = {
     url: `${baseUrl}/apply`,
     siteName,
     images: [{ url: defaultImage }],
-    type: 'website`,
+    type: 'website',
   },
   alternates: {
     canonical: `${baseUrl}/apply`,
@@ -137,14 +135,13 @@ export const applicationPageMeta: Metadata = {
 // Contact Page Meta
 export const contactPageMeta: Metadata = {
   title: `Contact Us | ${PLATFORM_DEFAULTS.orgName}`,
-  description:
-    `Get in touch with ${PLATFORM_DEFAULTS.orgName}. Questions about programs, enrollment, or funding? We`re here to help.`,
+  description: `Get in touch with ${PLATFORM_DEFAULTS.orgName}. Questions about programs, enrollment, or funding? We're here to help.`,
   openGraph: {
     title: `Contact Us | ${PLATFORM_DEFAULTS.orgName}`,
     description: "Questions about programs, enrollment, or funding? We're here to help.",
     url: `${baseUrl}/contact`,
     siteName,
-    type: 'website`,
+    type: 'website',
   },
   alternates: {
     canonical: `${baseUrl}/contact`,
@@ -154,8 +151,7 @@ export const contactPageMeta: Metadata = {
 // Grants Page Meta
 export const grantsPageMeta: Metadata = {
   title: `Federal Grant Opportunities | SAM.gov | ${PLATFORM_DEFAULTS.orgName}`,
-  description:
-    `Search federal grant and contract opportunities from SAM.gov. Find funding for workforce development, education, and community programs.',
+  description: `Search federal grant and contract opportunities from SAM.gov. Find funding for workforce development, education, and community programs.`,
   keywords: [
     'federal grants',
     'SAM.gov',
@@ -168,7 +164,7 @@ export const grantsPageMeta: Metadata = {
     description: 'Search federal grant and contract opportunities.',
     url: `${baseUrl}/grants`,
     siteName,
-    type: 'website`,
+    type: 'website',
   },
   alternates: {
     canonical: `${baseUrl}/grants`,
@@ -200,7 +196,7 @@ export function generatePolicyMeta(policy: {
 // Helper: Truncate description to optimal length
 export function truncateDescription(text: string, maxLength: number = 160): string {
   if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength - 3) + `...';
+  return text.substring(0, maxLength - 3) + '...';
 }
 
 // Helper: Generate keywords from text

@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { data: certificate } = await supabase
     .from('certificates')
     .select('title')
-    .eq('id`, certificateId)
+    .eq('id', certificateId)
     .maybeSingle();
 
   return {

@@ -304,7 +304,7 @@ export async function sendAtRiskAlertToAdvisor(
 
       <p><strong>Risk Factors:</strong></p>
       <ul>
-        ${riskFactors.map((factor) => `<li>${factor}</li>`).join('`)}
+        ${riskFactors.map((factor) => `<li>${factor}</li>`).join('')}
       </ul>
 
       <p>

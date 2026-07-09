@@ -15,7 +15,7 @@ import HeroPicture from '@/components/marketing/HeroPicture';
 import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import LiveJobPostings from '@/components/careers/LiveJobPostings';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { BeautyApprenticeship } from '@/components/programs/BeautyApprenticeship';
+import { BeautyApprenticeshipPage } from '@/components/programs/BeautyApprenticeship';
 
 // Premium beauty apprenticeship programs
 const BEAUTY_APPRENTICESHIP_SLUGS = new Set([
@@ -83,7 +83,7 @@ export async function generateMetadata({
       description,
       alternates: { canonical: `${SITE_URL}/programs/${program}` },
       openGraph: { ...ogBase, title, description, images: [{ url: img.startsWith('http') ? img : `${SITE_URL}${img}`, width: 1200, height: 630, alt: sp.title }] },
-      twitter: { card: 'summary_large_image', title, description, images: [img.startsWith('http`) ? img : `${SITE_URL}${img}`] },
+      twitter: { card: 'summary_large_image', title, description, images: [img.startsWith('http') ? img : `${SITE_URL}${img}`] },
     };
   }
 
@@ -107,7 +107,7 @@ export async function generateMetadata({
     const { data } = await db
       .from('programs')
       .select('title, description, short_description')
-      .eq('slug`, program)
+      .eq('slug', program)
       .maybeSingle();
     if (data) {
       const title = `${data.title} | ${PLATFORM_DEFAULTS.orgName}`;
@@ -518,8 +518,8 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
   // Use Premium Beauty Apprenticeship Page for beauty programs
   if (BEAUTY_APPRENTICESHIP_SLUGS.has(program)) {
-    const programType = program.replace(`-apprenticeship', '') as 'barber' | 'cosmetology' | 'esthetics' | 'manicurist';
-    return <BeautyApprenticeship program={programType} />;
+    const programType = program.replace('-apprenticeship', '') as 'barber' | 'cosmetology' | 'esthetics' | 'manicurist';
+    return <BeautyApprenticeshipPage program={programType} />;
   }
 
   // Static ProgramSchema — richest renderer, always preferred when available.

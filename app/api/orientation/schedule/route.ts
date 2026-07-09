@@ -43,7 +43,7 @@ async function _POST(request: Request) {
     const safeName = sanitize(String(name));
     const safeEmail = sanitize(String(email));
 
-    const isBarbershop = sessionType === 'barbershop`;
+    const isBarbershop = sessionType === 'barbershop';
     const topic = isBarbershop
       ? `${PLATFORM_DEFAULTS.orgName} — Barbershop Walk-Through: ${safeName}`
       : `${PLATFORM_DEFAULTS.orgName} — Orientation: ${safeName}`;

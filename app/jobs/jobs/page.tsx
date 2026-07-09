@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Briefcase, MapPin, Clock, ExternalLink, BadgeCheck, Zap, Building2, ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const revalidate = 900; // 15 min
 

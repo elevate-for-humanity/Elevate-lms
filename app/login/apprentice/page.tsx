@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Scissors, GraduationCap } from 'lucide-react';
 import ApprenticeLoginForm from './ApprenticeLoginForm';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Apprentice Login — ${PLATFORM_DEFAULTS.orgName}`,

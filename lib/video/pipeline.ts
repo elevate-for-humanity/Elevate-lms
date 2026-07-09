@@ -385,26 +385,26 @@ export async function processLesson(
     // Chapter title — top-left, first 5 s, fade in/out
     `drawtext=fontfile='${bold}':text='${chapterTitle}':fontcolor=${white}:fontsize=28:x=32:y=32` +
       `:box=1:boxcolor=0x000000@0.55:boxborderw=8` +
-      `:alpha='if(lt(t,0.4),t/0.4,if(lt(t,4.6),1,if(lt(t,5),1-(t-4.6)/0.4,0)))'`,
+      `:alpha='if(lt(t,0.4),t/0.4,if(lt(t,4.6),1,if(lt(t,5),1-(t-4.6)/0.4,0)))'',
   ];
 
   if (moduleLabel) {
     overlayFilters.push(
       `drawtext=fontfile='${semi}':text='${moduleLabel}':fontcolor=${white}@0.7:fontsize=18:x=32:y=68` +
-        `:alpha='if(lt(t,0.4),t/0.4,if(lt(t,4.6),1,if(lt(t,5),1-(t-4.6)/0.4,0)))'`,
+        `:alpha='if(lt(t,0.4),t/0.4,if(lt(t,4.6),1,if(lt(t,5),1-(t-4.6)/0.4,0)))'',
     );
   }
 
   // Lower third — instructor name + title, seconds 6–10
   overlayFilters.push(
     // Bar
-    `drawbox=x=0:y=h-80:w=420:h=80:color=${accent}@0.88:t=fill` + `:enable='between(t,6,10)'`,
+    `drawbox=x=0:y=h-80:w=420:h=80:color=${accent}@0.88:t=fill` + `:enable='between(t,6,10)'',
     // Name
     `drawtext=fontfile='${bold}':text='${instrName}':fontcolor=${white}:fontsize=22:x=16:y=h-62` +
-      `:enable='between(t,6,10)'`,
+      `:enable='between(t,6,10)'',
     // Title
     `drawtext=fontfile='${semi}':text='${instrTitle}':fontcolor=${white}@0.85:fontsize=16:x=16:y=h-36` +
-      `:enable='between(t,6,10)'`,
+      `:enable='between(t,6,10)'',
   );
 
   const overlaidBroll = path.join(tmpDir, `${slug}-overlaid.mp4`);
@@ -413,7 +413,7 @@ export async function processLesson(
   // Apply overlays (captions via subtitles filter if SRT exists)
   const subtitleFilter =
     srtContent && fs.existsSync(srtPath)
-      ? `,subtitles='${srtPath.replace(/'/g, "\\'")}':force_style='FontName=DejaVu Sans,FontSize=18,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,Outline=2,Shadow=1,Alignment=2'`
+      ? `,subtitles='${srtPath.replace(/'/g, "\\'")}':force_style='FontName=DejaVu Sans,FontSize=18,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,Outline=2,Shadow=1,Alignment=2''
       : '';
 
   execSync(

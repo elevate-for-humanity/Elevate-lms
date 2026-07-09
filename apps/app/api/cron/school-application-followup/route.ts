@@ -36,7 +36,7 @@ const PROGRAM_LABELS: Record<string, string> = {
 
 // ── Email templates ───────────────────────────────────────────────────────────
 
-function header(subtitle = '`) {
+function header(subtitle = '') {
   return `
   <div style="background:linear-gradient(135deg,#7c3aed,#a855f7);padding:32px;text-align:center">
     <p style="color:rgba(255,255,255,0.75);font-size:11px;margin:0 0 6px;text-transform:uppercase;letter-spacing:1px">Sponsored by ${PLATFORM_DEFAULTS.orgName}</p>

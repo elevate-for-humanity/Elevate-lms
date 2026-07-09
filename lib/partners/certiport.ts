@@ -210,7 +210,7 @@ export function getProgramsForExam(examCode: string): string[] {
  */
 export function getCertiportContextForCourse(examCode: string): string {
   const exam = (CERTIPORT_EXAMS as any)[examCode];
-  if (!exam) return '`;
+  if (!exam) return '';
 
   return `
 ## Certiport Exam Alignment: ${exam.name}

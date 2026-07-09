@@ -235,7 +235,7 @@ function CheckoutPageInner() {
             Complete Your Enrollment
           </h1>
           <p className="text-lg text-black">{programData.name}</p>
-          {program === 'barber-apprenticeship` && (
+          {program === 'barber-apprenticeship' && (
             <p className="text-sm text-slate-600 mt-1">
               Fee-based enrollment within a USDOL Registered Apprenticeship framework.
               <br />
@@ -281,7 +281,7 @@ function CheckoutPageInner() {
                   </Link>
                 </div>
               )}
-              {program === 'barber-apprenticeship` && (
+              {program === 'barber-apprenticeship' && (
                 <>
                   <div className="bg-purple-50 rounded-lg p-4 text-sm text-black mb-4">
                     <p className="font-bold mb-2">

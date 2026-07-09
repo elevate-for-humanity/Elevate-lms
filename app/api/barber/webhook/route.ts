@@ -403,7 +403,7 @@ async function _POST(request: NextRequest) {
   <li><strong>Access your dashboard</strong> — log hours, track progress, and access your coursework in the Elevate LMS once orientation is complete.</li>
 </ol>
 
-${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive every Friday starting next week.</p>` : '`}
+${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive every Friday starting next week.</p>` : ''}
 
 <p>Questions? Call <a href="tel:${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a> or reply to this email.</p>
 <p>— ${PLATFORM_DEFAULTS.orgName}</p>
@@ -607,7 +607,7 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
   <li><strong>Access your dashboard</strong> — log hours, track progress, and access your coursework in the Elevate LMS once orientation is complete.</li>
 </ol>
 
-${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive every Friday starting next week.</p>` : '`}
+${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive every Friday starting next week.</p>` : ''}
 
 <p>Questions? Call <a href="tel:${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a> or reply to this email.</p>
 <p>— ${PLATFORM_DEFAULTS.orgName}</p>
@@ -650,7 +650,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
               subject: 'Your Coursework Access — Barber Apprenticeship',
               html: `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
-<p>Hi ${customerName || 'there`},</p>
+<p>Hi ${customerName || 'there'},</p>
 <p>Your related instruction is available in the <strong>Elevate LMS</strong>. Log in to your student portal to access your courses.</p>
 <p style="text-align:center;margin:24px 0;">
   <a href="${LMS_URL}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:white;text-decoration:none;border-radius:8px;font-weight:bold;">Go to My Courses →</a>
@@ -1095,7 +1095,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             await sendEmail({
               to: subRecord.customer_email,
               subject: 'Your Barber Apprenticeship access has been restored',
-              html: `<p>Hi ${subRecord.customer_name || 'Apprentice`},</p><p>Your payment was processed and your access has been fully restored.</p><p><a href="${siteUrl}/learner/dashboard">Go to Dashboard</a></p><p>— ${PLATFORM_DEFAULTS.orgName}</p>`,
+              html: `<p>Hi ${subRecord.customer_name || 'Apprentice'},</p><p>Your payment was processed and your access has been fully restored.</p><p><a href="${siteUrl}/learner/dashboard">Go to Dashboard</a></p><p>— ${PLATFORM_DEFAULTS.orgName}</p>`,
             }).then(()=>{}, ()=>{});
           }
 

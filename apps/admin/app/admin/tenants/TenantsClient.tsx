@@ -67,7 +67,7 @@ export default function TenantsClient({
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Provisioning failed`);
+      if (!res.ok) throw new Error(data.error ?? 'Provisioning failed');
 
       setSuccess(`Tenant "${form.organizationName}" provisioned. Welcome email sent to ${form.contactEmail}.`);
       setForm(EMPTY_FORM);

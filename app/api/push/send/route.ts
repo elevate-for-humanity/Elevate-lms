@@ -9,7 +9,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const runtime = 'nodejs';
 
-export const dynamic = 'force-dynamic`;
+export const dynamic = 'force-dynamic';
 
 // Initialize web-push with VAPID keys
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;

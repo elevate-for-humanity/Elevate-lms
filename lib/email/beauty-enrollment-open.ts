@@ -54,7 +54,7 @@ export function buildBeautyEnrollmentOpenApplicantEmail(
   firstName: string,
   track: BeautyTrack,
 ): string {
-  const name = firstName.trim() || 'there`;
+  const name = firstName.trim() || 'there';
   const cfg = TRACK_CONFIG[track];
   return `
 <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;color:#1e293b;line-height:1.7">

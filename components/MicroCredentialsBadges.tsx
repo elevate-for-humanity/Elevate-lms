@@ -30,7 +30,7 @@ export default function MicroCredentialsBadges() {
       icon: '🏆',
       description: 'Demonstrated advanced proficiency in JavaScript programming',
       category: 'Technical',
-      earnedDate: '2024-01-15`,
+      earnedDate: '2024-01-15',
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
       verificationUrl: `https://verify.elevateforhumanity.com/badge/js-master-001',
       requirements: [
@@ -45,7 +45,7 @@ export default function MicroCredentialsBadges() {
       icon: '⚛️',
       description: 'Proficient in building modern React applications',
       category: 'Technical',
-      earnedDate: '2024-01-10`,
+      earnedDate: '2024-01-10',
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
       verificationUrl: `https://verify.elevateforhumanity.com/badge/react-dev-002',
       requirements: [
@@ -60,7 +60,7 @@ export default function MicroCredentialsBadges() {
       icon: '👥',
       description: 'Demonstrated leadership and team collaboration skills',
       category: 'Soft Skills',
-      earnedDate: '2024-01-20`,
+      earnedDate: '2024-01-20',
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
       verificationUrl: `https://verify.elevateforhumanity.com/badge/team-leader-003',
       requirements: [
@@ -74,7 +74,7 @@ export default function MicroCredentialsBadges() {
       name: 'Database Expert',
       icon: '🗄️',
       description: 'Advanced database design and optimization skills',
-      category: 'Technical`,
+      category: 'Technical',
       progress: 65,
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
       requirements: [
@@ -102,7 +102,7 @@ export default function MicroCredentialsBadges() {
       name: 'Full-Stack Developer',
       icon: '💻',
       description: 'Comprehensive full-stack development expertise',
-      category: 'Technical`,
+      category: 'Technical',
       progress: 45,
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
       requirements: [

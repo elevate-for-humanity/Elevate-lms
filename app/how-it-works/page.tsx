@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { HowItWorksAndPlatform } from '@/components/marketing/HowItWorksAndPlatform';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `How It Works | ${PLATFORM_DEFAULTS.orgName}`,

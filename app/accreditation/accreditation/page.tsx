@@ -3,7 +3,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Shield, CheckCircle, Building2, Users, TrendingUp, Mail } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Institutional Status | ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,

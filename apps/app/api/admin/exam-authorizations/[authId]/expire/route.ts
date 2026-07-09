@@ -33,7 +33,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ aut
   if (fetchErr || !existing) return safeError('Authorization not found', 404);
 
   if (['expired', 'revoked', 'passed', 'failed'].includes(existing.status)) {
-    return safeError(`Cannot expire: status is '${existing.status}'`, 409);
+    return safeError(`Cannot expire: status is '${existing.status}'', 409);
   }
 
   const { error: updateErr } = await db

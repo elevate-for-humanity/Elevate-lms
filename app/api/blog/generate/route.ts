@@ -76,7 +76,7 @@ async function _POST(request: NextRequest) {
       model: 'gpt-4.1',
       messages: [
         {
-          role: 'system`,
+          role: 'system',
           content: `You are a professional content writer for ${PLATFORM_DEFAULTS.orgName}, a workforce development organization in Indianapolis, Indiana. Write engaging, informative blog posts about career training, apprenticeships, and workforce development. Use a professional but accessible tone. Include practical information, statistics when relevant, and clear calls-to-action.`,
         },
         {

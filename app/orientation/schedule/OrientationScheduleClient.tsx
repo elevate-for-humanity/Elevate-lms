@@ -83,7 +83,7 @@ export default function OrientationScheduleClient() {
       const endDate = new Date(endMs);
       const endDT = `${endDate.toISOString().slice(0, 10).replace(/-/g, '')}T${endDate.toTimeString().slice(0, 5).replace(':', '')}00`;
       const title =
-        sessionType === 'barbershop`
+        sessionType === 'barbershop'
           ? `${PLATFORM_DEFAULTS.orgName} — Barbershop Walk-Through`
           : `${PLATFORM_DEFAULTS.orgName} — Orientation`;
       const details = `Session for ${name} (${email})%0A%0AZoom Link: ${meetingUrl}`;

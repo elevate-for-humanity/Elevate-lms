@@ -11,7 +11,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-export const dynamic = 'force-dynamic`;
+export const dynamic = 'force-dynamic';
 
 const SYSTEM_PROMPT = `You are an AI instructor assistant for ${PLATFORM_DEFAULTS.orgName}, a workforce training institution. Your role is to guide students through their programs and courses with consistent, helpful support.
 

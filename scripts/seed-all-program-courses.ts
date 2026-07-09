@@ -46,7 +46,7 @@ async function main() {
       const staticProgram = getStaticProgram(blueprint.programSlug);
       if (!staticProgram) {
         console.log(
-          `- SKIP ${blueprint.id} — no matching program row and no static program file for slug '${blueprint.programSlug}'`,
+          `- SKIP ${blueprint.id} — no matching program row and no static program file for slug '${blueprint.programSlug}'',
         );
         return;
       }

@@ -39,7 +39,7 @@ function ConfirmContent() {
     );
   }
 
-  if (status === 'error`) {
+  if (status === 'error') {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="max-w-md text-center">

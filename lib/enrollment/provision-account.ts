@@ -192,7 +192,7 @@ function buildWelcomeEmail(opts: {
     <div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:20px;margin:0 0 16px;">
       <h3 style="margin:0 0 10px;color:#92400e;font-size:15px;">Your Portal Login</h3>
       <p style="margin:0 0 6px;color:#374151;font-size:14px;">
-        <strong>Email:</strong> ${opts.loginUrl.replace('https://', '`)} — use the email address you applied with
+        <strong>Email:</strong> ${opts.loginUrl.replace('https://', '')} — use the email address you applied with
       </p>
       <p style="margin:0 0 14px;color:#374151;font-size:14px;">
         <strong>Password:</strong> You need to set one — click the button below (link expires in 24 hours).

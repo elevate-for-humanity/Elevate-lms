@@ -4,7 +4,7 @@ import { getStateConfig } from '@/config/states';
 import { StateCareerTrainingPage } from '@/components/templates';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic`;
+export const dynamic = 'force-dynamic';
 
 interface Props {
   params: Promise<{ state: string }>;
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'website',
     },
     twitter: {
-      card: 'summary_large_image`,
+      card: 'summary_large_image',
       title: `${state.careerTraining.headline} | ${PLATFORM_DEFAULTS.orgName}`,
       description: state.careerTraining.description,
       images: [`/og-default.webp'],

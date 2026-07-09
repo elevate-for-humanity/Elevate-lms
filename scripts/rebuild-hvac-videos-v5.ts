@@ -366,7 +366,7 @@ function assembleVideo(
 ): void {
   const dir = path.dirname(outPath);
   const concatFile = path.join(dir, 'concat.txt');
-  fs.writeFileSync(concatFile, segmentPaths.map((p) => `file '${p}'`).join('\n'));
+  fs.writeFileSync(concatFile, segmentPaths.map((p) => `file '${p}'').join('\n'));
 
   const rawConcat = path.join(dir, 'raw-concat.mp4');
   execSync(`ffmpeg -y -f concat -safe 0 -i "${concatFile}" -c copy "${rawConcat}"`, {

@@ -320,7 +320,7 @@ function LoginForm() {
             </button>
             <button
               type="button"
-              onClick={() => { setShow2FA(false); setTwoFACode(''); setTwoFAError('`); }}
+              onClick={() => { setShow2FA(false); setTwoFACode(''); setTwoFAError(''); }}
               className="w-full text-sm text-slate-400 hover:text-slate-600 text-center"
             >
               ← Back to login

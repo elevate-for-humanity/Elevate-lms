@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
       </tr>
     `;
     })
-    .join('`);
+    .join('');
 
   const overdueCount = rows.filter(
     (r) => r.payout_due_date && new Date(r.payout_due_date) < now,
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
 
   await sendEmail({
     to: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
-    subject: `⚠️ ${rows.length} Partner Payout${rows.length > 1 ? `s' : '`} Due Within 2 Days — $${totalOwed.toLocaleString()} Owed`,
+    subject: `⚠️ ${rows.length} Partner Payout${rows.length > 1 ? `s' : ''} Due Within 2 Days — $${totalOwed.toLocaleString()} Owed`,
     html: `
 <div style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;padding:20px;">
   <div style="background:#1e293b;padding:20px;border-radius:8px 8px 0 0;">

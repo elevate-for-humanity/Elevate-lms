@@ -598,7 +598,7 @@ export async function verifyUploadAndIssueCertificate(
   const [profileRes, programRes, credRes] = await Promise.all([
     db.from('profiles').select('full_name, email').eq('id', req.user_id).maybeSingle(),
     db.from('programs').select('title').eq('id', req.program_id).maybeSingle(),
-    db.from('credential_registry').select('name').eq('id`, req.credential_id).maybeSingle(),
+    db.from('credential_registry').select('name').eq('id', req.credential_id).maybeSingle(),
   ]);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${PLATFORM_DEFAULTS.canonicalDomain}`;

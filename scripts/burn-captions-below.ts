@@ -70,7 +70,7 @@ function main() {
         `drawtext=text='${safe}':` +
         `fontfile=${font}:fontsize=30:fontcolor=white:` +
         `x=(w-text_w)/2:y=(h-text_h)/2:` +
-        `enable='between(t,${c.start.toFixed(3)},${c.end.toFixed(3)})'`
+        `enable='between(t,${c.start.toFixed(3)},${c.end.toFixed(3)})''
       );
     })
     .join(',');

@@ -1,5 +1,5 @@
 import 'server-only';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 /**
  * Program Holder Responsibilities Guide
  * Complete documentation of all duties and obligations

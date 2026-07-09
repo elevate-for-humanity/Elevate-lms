@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const runtime = 'nodejs`;
+export const runtime = 'nodejs';
 export const maxDuration = 30;
 
 const SYSTEM_PROMPT = `You are an AI Career Counselor for ${PLATFORM_DEFAULTS.orgName}, a workforce development organization in Indianapolis.

@@ -1,7 +1,7 @@
 import { requireRole } from '@/lib/auth/require-role';
 import { Metadata } from 'next';
 import { Briefcase, Building, MapPin, Clock, ArrowRight } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Careers & Job Openings | ${PLATFORM_DEFAULTS.orgName}`,

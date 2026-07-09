@@ -116,7 +116,7 @@ export class XAPIClient {
     },
     ANSWERED: {
       id: 'http://adlnet.gov/expapi/verbs/answered',
-      display: { 'en-US': 'answered` },
+      display: { 'en-US': 'answered' },
     },
   };
   // Track course started
@@ -135,7 +135,7 @@ export class XAPIClient {
           name: { `en-US': courseName },
           type: 'http://adlnet.gov/expapi/activities/course',
         },
-        objectType: 'Activity`,
+        objectType: 'Activity',
       },
     });
   }
@@ -172,7 +172,7 @@ export class XAPIClient {
           name: { `en-US': lessonName },
           type: 'http://adlnet.gov/expapi/activities/lesson',
         },
-        objectType: 'Activity`,
+        objectType: 'Activity',
       },
       result,
     });
@@ -196,7 +196,7 @@ export class XAPIClient {
           name: { `en-US': quizName },
           type: 'http://adlnet.gov/expapi/activities/assessment',
         },
-        objectType: 'Activity`,
+        objectType: 'Activity',
       },
       result: {
         score: {

@@ -13,7 +13,7 @@ import { Shield } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 interface PathwayDisclosureProps {
-  variant?: 'full' | 'compact' | 'inline`;
+  variant?: 'full' | 'compact' | 'inline';
   className?: string;
 }
 

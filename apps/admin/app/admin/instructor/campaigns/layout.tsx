@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Instructor | Campaigns | ${PLATFORM_DEFAULTS.orgName}`,

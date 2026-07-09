@@ -201,7 +201,7 @@ function assembleLesson(manifest: LessonManifest, force: boolean): string | null
 
   // Concatenate all parts
   const concatFile = path.join(TEMP_DIR, `concat-${manifest.lessonNumber}.txt`);
-  const concatContent = partFiles.map((f) => `file '${path.resolve(f)}'`).join('\n');
+  const concatContent = partFiles.map((f) => `file '${path.resolve(f)}'').join('\n');
   fs.writeFileSync(concatFile, concatContent);
 
   run(

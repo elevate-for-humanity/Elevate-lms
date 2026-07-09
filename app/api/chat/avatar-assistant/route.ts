@@ -61,7 +61,7 @@ function buildSystemPrompt(req: ChatRequest): string {
       wrg: 'Workforce Ready Grant (Indiana state)',
       jri: 'Job Ready Indy',
       self_pay: 'Self-pay',
-      employer_sponsored: 'Employer-sponsored`,
+      employer_sponsored: 'Employer-sponsored',
     };
     prompt += `Funding path: ${fundingLabels[req.fundingType] || req.fundingType}\n\n`;
   }

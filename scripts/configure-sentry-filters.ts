@@ -65,7 +65,7 @@ const FILTERS: FilterConfig[] = [
   "https://sentry.io/api/0/projects/${SENTRY_ORG}/${SENTRY_PROJECT}/filters/" \\
   -H "Authorization: Bearer ${SENTRY_TOKEN}" \\
   -H "Content-Type: application/json" \\
-  -d '{"id":"ignored","active":true}'`,
+  -d '{"id":"ignored","active":true}'',
   },
   {
     id: 'browser-extension',
@@ -75,7 +75,7 @@ const FILTERS: FilterConfig[] = [
   "https://sentry.io/api/0/projects/${SENTRY_ORG}/${SENTRY_PROJECT}/filters/" \\
   -H "Authorization: Bearer ${SENTRY_TOKEN}" \\
   -H "Content-Type: application/json" \\
-  -d '{"id":"browser-extension","active":true}'`,
+  -d '{"id":"browser-extension","active":true}'',
   },
   {
     id: 'localhost',
@@ -85,7 +85,7 @@ const FILTERS: FilterConfig[] = [
   "https://sentry.io/api/0/projects/${SENTRY_ORG}/${SENTRY_PROJECT}/filters/" \\
   -H "Authorization: Bearer ${SENTRY_TOKEN}" \\
   -H "Content-Type: application/json" \\
-  -d '{"id":"localhost","active":true}'`,
+  -d '{"id":"localhost","active":true}'',
   },
   {
     id: 'web-crawler',
@@ -95,7 +95,7 @@ const FILTERS: FilterConfig[] = [
   "https://sentry.io/api/0/projects/${SENTRY_ORG}/${SENTRY_PROJECT}/filters/" \\
   -H "Authorization: Bearer ${SENTRY_TOKEN}" \\
   -H "Content-Type: application/json" \\
-  -d '{"id":"web-crawler","active":true}'`,
+  -d '{"id":"web-crawler","active":true}'',
   },
 ];
 

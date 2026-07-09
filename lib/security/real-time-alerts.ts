@@ -287,7 +287,7 @@ function formatEmailBody(alert: SecurityAlert): string {
             <div class="value"><pre>${JSON.stringify(alert.metadata, null, 2)}</pre></div>
           </div>
           `
-              : '`
+              : ''
           }
         </div>
         <div class="footer">

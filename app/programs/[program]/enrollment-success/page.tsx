@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getBeautyProgram, colorClasses } from '@/lib/programs/beauty-programs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic`;
+export const dynamic = 'force-dynamic';
 
 interface Props {
   params: Promise<{ program: string }>;

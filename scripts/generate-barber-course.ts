@@ -307,7 +307,7 @@ function generateLesson(seed: LessonSeed): BlueprintLesson {
 function toTsObject(value: unknown): string {
   return JSON.stringify(value, null, 2)
     .replace(/"([^"]+)":/g, '$1:')
-    .replace(/"/g, `'`);
+    .replace(/"/g, `'');
 }
 
 function safeConstName(slug: string): string {

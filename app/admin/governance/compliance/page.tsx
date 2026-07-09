@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Scale, AlertTriangle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Compliance & Disclosure Framework | Governance | ${PLATFORM_DEFAULTS.orgName}`,

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Loader2, Wand2, Download, Clock3, Send } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 type TimelineEvent = {
   id: string;
@@ -23,9 +23,9 @@ export default function MinorityCertificationPanel() {
   const [businessAddress, setBusinessAddress] = useState('8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240');
   const [contactEmail, setContactEmail] = useState('info@elevateforhumanity.org');
   const [contactPhone, setContactPhone] = useState(PLATFORM_DEFAULTS.supportPhone);
-  const [certifyingAgency, setCertifyingAgency] = useState('Indiana IOT MWBE`);
+  const [certifyingAgency, setCertifyingAgency] = useState('Indiana IOT MWBE');
   const [businessNarrative, setBusinessNarrative] = useState(`${PLATFORM_DEFAULTS.orgName} provides workforce development, credential training, and apprenticeship pathways serving underserved communities across Indiana.`);
-  const [emailTo, setEmailTo] = useState(`');
+  const [emailTo, setEmailTo] = useState('');
   const [loading, setLoading] = useState(false);
   const [timelineLoading, setTimelineLoading] = useState(false);
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);

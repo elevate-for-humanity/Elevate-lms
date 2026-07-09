@@ -263,13 +263,13 @@ export default function InstitutionalGovernancePage() {
                       method: 'Classroom / Shop / Web-Based',
                     },
                     {
-                      occ: 'Barber`,
+                      occ: 'Barber',
                       provider: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
                       hours: `260',
                       method: 'Classroom / Web-Based',
                     },
                     {
-                      occ: 'Esthetician`,
+                      occ: 'Esthetician',
                       provider: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
                       hours: `300',
                       method: 'Classroom / Web-Based',

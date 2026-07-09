@@ -136,7 +136,7 @@ export async function generateWelcomePacket(data: WelcomePacketData): Promise<{
   ];
 
   // Insert packet items
-  const { error: itemsError } = await supabase.from('welcome_packet_items`).insert(
+  const { error: itemsError } = await supabase.from('welcome_packet_items').insert(
     items.map((item) => ({
       packet_id: packet.id,
       item_id: item.id,
@@ -419,7 +419,7 @@ export async function sendWelcomePacketReminder(packetId: string): Promise<void>
     <p>You have ${items.length} required item${items.length > 1 ? 's' : ''} remaining in your welcome packet:</p>
 
     <ul>
-      ${items.map((item) => `<li>${item.title}</li>`).join('`)}
+      ${items.map((item) => `<li>${item.title}</li>`).join('')}
     </ul>
 
     <p>Please complete these items before your first day to ensure a smooth start to your program.</p>

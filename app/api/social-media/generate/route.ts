@@ -62,7 +62,7 @@ async function _POST(req: Request) {
     }
 
     if (contentSource === 'manual') {
-      return NextResponse.json({ success: true, posts: Array(count).fill('`) });
+      return NextResponse.json({ success: true, posts: Array(count).fill('') });
     }
 
     const programInfo = PROGRAM_INFO[program as keyof typeof PROGRAM_INFO] || PROGRAM_INFO.all;

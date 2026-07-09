@@ -21,7 +21,7 @@ export async function sendWorkOneHoldEmail(params: WorkOneHoldEmailParams) {
 
   const refLine = referenceNumber
     ? `<p style="margin:0 0 8px">Reference number: <strong>${referenceNumber}</strong></p>`
-    : '`;
+    : '';
 
   const html = `
 <!DOCTYPE html>

@@ -113,7 +113,7 @@ export default function StoreCartView({ checkoutError, addParam }: StoreCartView
         throw new Error(syncData.error || 'Could not prepare checkout');
       }
 
-      const form = document.getElementById('store-cart-checkout-form`) as HTMLFormElement | null;
+      const form = document.getElementById('store-cart-checkout-form') as HTMLFormElement | null;
       form?.requestSubmit();
     } catch (err) {
       setCheckoutMessage(

@@ -140,7 +140,7 @@ export default function ApplicationActions({
   };
 
   // Pre-filled inquiry email
-  const program = programInterest.replace(/-/g, ' `).replace(/\b\w/g, (c) => c.toUpperCase());
+  const program = programInterest.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const inquirySubject = encodeURIComponent(`Your Application Inquiry — ${program}`);
   const inquiryBody = encodeURIComponent(
     `Hi ${applicantName},\n\nThank you for your interest in the ${program} program at ${PLATFORM_DEFAULTS.orgName}.\n\nWe wanted to follow up regarding your application and answer any questions you may have.\n\nPlease reply to this email or call us at ${PLATFORM_DEFAULTS.supportPhone}.\n\nBest regards,\n${PLATFORM_DEFAULTS.orgName}\n${PLATFORM_DEFAULTS.supportPhone}\nelevate4humanityedu@gmail.com`,

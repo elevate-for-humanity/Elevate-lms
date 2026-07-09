@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 type Props = { params: Promise<{ slug: string }> };
 
 const CHECKOUT_ERROR_MESSAGES: Record<string, string> = {
-  'payment-unavailable`: `Checkout is temporarily unavailable. Please try again later or call ${PLATFORM_DEFAULTS.supportPhone}.`,
+  'payment-unavailable': `Checkout is temporarily unavailable. Please try again later or call ${PLATFORM_DEFAULTS.supportPhone}.`,
   `checkout-failed':     'We could not start your checkout session. Please try again.',
   'invalid-product':     'This product is not available for purchase. Please contact support.',
   'rate-limited':        'Too many requests. Please wait a moment and try again.',

@@ -20,7 +20,7 @@ export default function ApprovalsPage() {
   return (
     <div className="bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Approvals` }]} />
+        <Breadcrumbs items={[{ label: 'Approvals' }]} />
       </div>
       {/* Hero Section with Background Image */}
       <section className="relative h-48 md:h-64 w-full overflow-hidden">

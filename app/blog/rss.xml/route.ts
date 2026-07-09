@@ -29,7 +29,7 @@ export async function GET() {
       <author>${post.author_name}</author>
     </item>`,
       )
-      .join('`);
+      .join('');
 
     const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">

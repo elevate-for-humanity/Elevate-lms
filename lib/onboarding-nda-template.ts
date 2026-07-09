@@ -312,7 +312,7 @@ ${data.companyName ? `Company: ${data.companyName}` : ''}
 Signature: _______________________________
 Date: ${data.effectiveDate}
 ${data.recipientEmail ? `Email: ${data.recipientEmail}` : ''}
-${data.recipientAddress ? `Address: ${data.recipientAddress}` : '`}
+${data.recipientAddress ? `Address: ${data.recipientAddress}` : ''}
 
 ---
 

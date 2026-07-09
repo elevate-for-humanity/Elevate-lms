@@ -6,7 +6,7 @@ import { PlatformShell } from '@/components/platform/PlatformShell';
 import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic`;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: {

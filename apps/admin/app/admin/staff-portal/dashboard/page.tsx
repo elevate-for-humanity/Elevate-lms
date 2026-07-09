@@ -148,7 +148,7 @@ export default async function StaffDashboard() {
                 {atRiskCount || 0}
               </span>
             </div>
-            <div className={`text-sm ${(atRiskCount || 0) > 0 ? 'text-yellow-900' : 'text-black`}`}>
+            <div className={`text-sm ${(atRiskCount || 0) > 0 ? 'text-yellow-900' : 'text-black'}`}>
               At-Risk Students
             </div>
           </div>

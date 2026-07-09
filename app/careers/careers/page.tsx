@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     type: 'website',
   },
   twitter: {
-    card: 'summary_large_image`,
+    card: 'summary_large_image',
     title: `Careers at ${PLATFORM_DEFAULTS.orgName}`,
     description: `Join our mission to provide career training at no cost to eligible participants.',
     images: ['/og-default.webp'],

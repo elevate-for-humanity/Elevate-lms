@@ -266,7 +266,7 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
 
     const composition = await selectComposition({
       serveUrl: bundleUrl,
-      id: 'ElevateLesson`,
+      id: 'ElevateLesson',
       inputProps: compositionProps,
     });
 

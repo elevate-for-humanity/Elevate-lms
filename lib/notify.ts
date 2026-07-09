@@ -30,13 +30,13 @@ export async function notifySendgrid(subject: string, text: string) {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${SENDGRID_KEY}`,
-      'Content-Type': 'application/json`,
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       personalizations: [{ to: [{ email: ALERT_EMAIL_TO }] }],
       from: { email: SENDGRID_FROM, name: `${PLATFORM_DEFAULTS.orgName} Alerts` },
       subject,
-      content: [{ type: `text/plain', value: text }],
+      content: [{ type: 'text/plain', value: text }],
     }),
   });
 }

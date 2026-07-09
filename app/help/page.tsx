@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { HelpCircle, MessageCircle, Mail, Phone, Book, Video } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Help & Support | ${PLATFORM_DEFAULTS.orgName}`,

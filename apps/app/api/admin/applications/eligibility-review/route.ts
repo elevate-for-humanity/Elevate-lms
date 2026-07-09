@@ -108,7 +108,7 @@ export async function PATCH(req: NextRequest) {
       const messages: Record<string, { subject: string; body: string }> = {
         enroll: {
           subject: 'Your Application Has Been Approved — Next Steps`,
-          body: `Hi ${app.first_name},<br/><br/>Your application to ${PLATFORM_DEFAULTS.orgName} has been reviewed and <strong>approved for enrollment</strong>. A team member will contact you shortly with next steps.<br/><br/>${reviewer_notes ? `<strong>Note from our team:</strong> ${reviewer_notes}<br/><br/>` : `'}`,
+          body: `Hi ${app.first_name},<br/><br/>Your application to ${PLATFORM_DEFAULTS.orgName} has been reviewed and <strong>approved for enrollment</strong>. A team member will contact you shortly with next steps.<br/><br/>${reviewer_notes ? `<strong>Note from our team:</strong> ${reviewer_notes}<br/><br/>` : ''}`,
         },
         hold: {
           subject: 'Your Application — Additional Information Required',

@@ -35,7 +35,7 @@ export function extractWatermark(content: string): {
   const match = content.match(/<!-- wm:([A-Za-z0-9+/=]+) -->/);
   if (!match) return null;
   try {
-    const decoded = Buffer.from(match[1], 'base64').toString('utf-8`);
+    const decoded = Buffer.from(match[1], 'base64').toString('utf-8');
     const data = JSON.parse(decoded);
     return {
       userId: data.u,

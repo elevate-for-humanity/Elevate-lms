@@ -8,7 +8,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Our Mission`,
+  title: 'Our Mission',
   description:
     `${PLATFORM_DEFAULTS.orgName} creates accessible career pathways, credential-bearing workforce training, and community support for underserved populations across Indiana and the Midwest.`,
   alternates: { canonical: `https://www.elevateforhumanity.org/about/mission' },
@@ -60,7 +60,7 @@ export default function MissionPage() {
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'About', href: '/about' }, { label: 'Our Mission` }]} />
+          <Breadcrumbs items={[{ label: 'About', href: '/about' }, { label: 'Our Mission' }]} />
         </div>
       </div>
 

@@ -214,7 +214,7 @@ export async function generateEmployerMOUPdf(data: EmployerMOUPDFData): Promise<
 
   // ── Purpose ─────────────────────────────────────────────────────────────────
   checkY(80);
-  page.drawText('PURPOSE`, { x: margin, y, size: 10, font: boldFont, color: rgb(0.08, 0.22, 0.48) });
+  page.drawText('PURPOSE', { x: margin, y, size: 10, font: boldFont, color: rgb(0.08, 0.22, 0.48) });
   y -= lineH;
   y = drawWrappedText(
     page,

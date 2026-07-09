@@ -136,7 +136,7 @@ async function sendMail(
 }
 
 function mouEmailHtml(stepsHtml: string) {
-  const first = 'Shawndra`;
+  const first = 'Shawndra';
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;color:#1e293b">

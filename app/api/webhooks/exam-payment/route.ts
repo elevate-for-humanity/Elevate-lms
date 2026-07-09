@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
           to: profile.email,
           subject: `Exam fee confirmed — schedule your ${credential.name} exam`,
           html: `
-            <p>Hi ${profile.full_name ?? 'there`},</p>
+            <p>Hi ${profile.full_name ?? 'there'},</p>
             <p>Your exam fee for the <strong>${credential.name}</strong> credential has been confirmed.</p>
             <p>You can now schedule your exam. Log in to your dashboard and visit
             <strong>My Credentials</strong> to see your scheduling options.</p>

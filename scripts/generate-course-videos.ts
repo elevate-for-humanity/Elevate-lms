@@ -589,7 +589,7 @@ async function main() {
     if (files.length) {
       const tmpList = path.join(os.tmpdir(), `chapter-${MODULE_FILTER}.txt`);
       const rawPath = path.join(os.tmpdir(), `chapter-${MODULE_FILTER}-raw.mp4`);
-      fs.writeFileSync(tmpList, files.map((f) => `file '${f}'`).join('\n'));
+      fs.writeFileSync(tmpList, files.map((f) => `file '${f}'').join('\n'));
       execSync(`"${FFMPEG_BIN}" -y -f concat -safe 0 -i "${tmpList}" -c copy "${rawPath}"`, {
         stdio: 'pipe',
         maxBuffer: 2000 * 1024 * 1024,

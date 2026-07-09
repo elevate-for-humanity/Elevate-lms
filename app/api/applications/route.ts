@@ -268,7 +268,7 @@ async function _POST(req: Request) {
         .eq('normalized_phone', normalizedPhone)
         .eq('program_interest', program)
         .neq('source', 'intake-form')
-        .gte('created_at`, oneDayAgo)
+        .gte('created_at', oneDayAgo)
         .limit(1)
         .maybeSingle();
       if (!phoneQuery.error) {
@@ -604,7 +604,7 @@ async function _POST(req: Request) {
           <h4 style="color: #1e40af; margin-bottom: 8px;">What happens next:</h4>
           <ol style="color: #1e3a8a; padding-left: 20px; line-height: 1.8;">
             <li>Our enrollment team reviews your application (1–2 business days)</li>
-            <li>We verify your funding status with ${fundingType === 'wioa' ? 'WorkOne' : fundingType === 'wrg' ? 'Indiana Career Connect' : 'FSSA`}</li>
+            <li>We verify your funding status with ${fundingType === 'wioa' ? 'WorkOne' : fundingType === 'wrg' ? 'Indiana Career Connect' : 'FSSA'}</li>
             <li>Once verified, we contact you to complete enrollment and schedule your start date</li>
             <li>You begin training - no tuition due until funding is confirmed</li>
           </ol>
@@ -698,7 +698,7 @@ async function _POST(req: Request) {
           <p><strong>Funding Eligibility Status:</strong> ${eligibilityStatus || 'N/A'}</p>
           <p><strong>Application Status:</strong> ${applicationStatus}</p>
           ${body.hasCaseManager ? `<p><strong>Has Case Manager:</strong> ${body.hasCaseManager}</p>` : ''}
-          ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : '`}
+          ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
           ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ""}
           <div style="text-align:center;margin:24px 0;">
             <a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${data.id}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Review &amp; Enroll -></a>

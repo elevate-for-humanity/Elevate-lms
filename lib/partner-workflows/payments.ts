@@ -82,7 +82,7 @@ export async function createPartnerPaymentSession(request: PaymentRequest): Prom
       line_items: [
         {
           price_data: {
-            currency: request.currency || 'usd`,
+            currency: request.currency || 'usd',
             product_data: {
               name: `${provider.provider_name} Certification`,
               description: `Access to ${provider.provider_name} courses and certifications`,

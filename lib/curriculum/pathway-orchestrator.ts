@@ -345,7 +345,7 @@ export async function suggestPathways(learnerGoal: string, currentPrograms: stri
     model: 'gpt-4.1-mini',
     messages: [
       {
-        role: 'system`,
+        role: 'system',
         content: `You are a workforce pathway advisor for ${PLATFORM_DEFAULTS.orgName}.
 Suggest 2-3 specific program sequences from our catalog that lead to the learner`s goal.
 Available programs: ${currentPrograms.join(', ')}.

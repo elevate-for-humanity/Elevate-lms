@@ -7,7 +7,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Policies`,
+  title: 'Policies',
   description: `Academic, enrollment, refund, conduct, and privacy policies for ${PLATFORM_DEFAULTS.orgName} programs.`,
   alternates: { canonical: `https://www.elevateforhumanity.org/policies' },
 };

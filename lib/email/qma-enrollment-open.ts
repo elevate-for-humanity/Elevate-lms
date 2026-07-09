@@ -30,7 +30,7 @@ export function isQmaProgram(slugOrInterest: string): boolean {
 }
 
 export function buildQmaEnrollmentOpenApplicantEmail(firstName: string): string {
-  const name = firstName.trim() || 'there`;
+  const name = firstName.trim() || 'there';
   return `
 <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;color:#1e293b;line-height:1.7">
   <img src="${SITE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt="${PLATFORM_DEFAULTS.orgName}" style="height:56px;margin-bottom:20px"/>

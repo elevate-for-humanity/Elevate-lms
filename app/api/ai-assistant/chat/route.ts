@@ -16,7 +16,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 30;
 
 type AssistantHistoryMessage = {
-  role: 'user' | 'assistant`;
+  role: 'user' | 'assistant';
   content: string;
 };
 

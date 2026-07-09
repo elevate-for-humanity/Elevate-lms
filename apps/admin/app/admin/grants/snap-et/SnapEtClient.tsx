@@ -78,7 +78,7 @@ const DEFAULTS: FormState = {
   reimb_per_participant: '$97',
   submission_date: 'April 28, 2026',
   signature_name: 'Elizabeth Greene',
-  signature_title: 'Executive Director`,
+  signature_title: 'Executive Director',
   signature_org: `2exclusive llc-s dba ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
   signature_date: `02/28/2026',
 };

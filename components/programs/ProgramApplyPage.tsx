@@ -423,7 +423,7 @@ export default function ProgramApplyPage({ program }: Props) {
                 </div>
               )}
 
-              {formData.fundingInterest !== 'self-pay` && (
+              {formData.fundingInterest !== 'self-pay' && (
                 <div className="bg-white/10 rounded-xl p-4">
                   <div className="text-center">
                     <div className="text-2xl font-black">May be $0</div>

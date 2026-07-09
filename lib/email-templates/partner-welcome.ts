@@ -104,7 +104,7 @@ export function getPartnerWelcomeEmail(data: PartnerWelcomeData): {
       ${data.contactPhone ? `<p style="margin: 5px 0;"><strong>Phone:</strong> ${data.contactPhone}</p>` : ''}
     </div>
     `
-        : '`
+        : ''
     }
 
     <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
@@ -178,7 +178,7 @@ NEED HELP?
 ${data.contactEmail ? `Email: ${data.contactEmail}` : ''}
 ${data.contactPhone ? `Phone: ${data.contactPhone}` : ''}
 `
-    : '`
+    : ''
 }
 
 ---

@@ -83,7 +83,7 @@ Today's lesson is "${lesson.title}". ${typeIntro[lesson.type] || ''}
 
 ${lesson.description || ''}
 
-${lesson.durationMinutes ? `This lesson is approximately ${lesson.durationMinutes} minutes.` : '`}
+${lesson.durationMinutes ? `This lesson is approximately ${lesson.durationMinutes} minutes.` : ''}
 
 The full AI-generated lecture for this lesson is being prepared and will be available shortly. In the meantime, review the lesson materials and feel free to ask the AI tutor any questions you have.
 

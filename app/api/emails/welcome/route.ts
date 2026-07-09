@@ -66,7 +66,7 @@ async function _POST(request: Request) {
     const html = emailTemplates.welcome(studentName, courseName, loginUrl);
 
     await sendEmail({
-      to: profile?.email || '`,
+      to: profile?.email || '',
       subject: `Welcome to ${courseName} - ${PLATFORM_DEFAULTS.orgName}`,
       html,
     });

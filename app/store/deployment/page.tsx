@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Rocket, Server, Code, CheckCircle, Clock, Zap, Shield, Database } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic`;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Deployment & Setup | ${PLATFORM_DEFAULTS.orgName} Store`,

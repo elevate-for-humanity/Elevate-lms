@@ -51,7 +51,7 @@ async function createProduct(config: ProductConfig) {
 
   // Check if product already exists
   const existingProducts = await stripe.products.search({
-    query: `name:'${config.name}'`,
+    query: `name:'${config.name}'',
   });
 
   let product: Stripe.Product;

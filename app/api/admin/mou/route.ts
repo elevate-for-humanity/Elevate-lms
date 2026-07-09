@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     if (mouErr) {
       logger.error('[admin/mou] create failed', mouErr);
-      return safeInternalError(mouErr, 'Failed to create MOU`);
+      return safeInternalError(mouErr, 'Failed to create MOU');
     }
 
     // Send email if partner_email provided
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
           <p>- ${PLATFORM_DEFAULTS.orgName}</p>
         `,
         text: `MOU from ${PLATFORM_DEFAULTS.orgName}\n\n${mouContent?.replace(/<[^>]+>/g, ` `)}\n\nContact: partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
-        replyTo: `partnerships@' + PLATFORM_DEFAULTS.canonicalDomain,
+        replyTo: `partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
       });
 
       // Update status to sent

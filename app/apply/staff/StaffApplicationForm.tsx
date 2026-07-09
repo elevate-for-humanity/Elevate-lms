@@ -28,7 +28,7 @@ export default function StaffApplicationForm() {
       education: formData.get('education') as string,
       certifications: formData.get('certifications') as string,
       availability: formData.get('availability') as string,
-      coverLetter: formData.get('coverLetter`) as string,
+      coverLetter: formData.get('coverLetter') as string,
     };
 
     const result = await submitStaffApplication(data);

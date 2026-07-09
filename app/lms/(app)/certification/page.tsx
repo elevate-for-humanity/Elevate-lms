@@ -191,7 +191,7 @@ export default async function CertificationPage() {
                                 ? 'text-red-500'
                                 : isSponsoredPending
                                   ? 'text-orange-500'
-                                  : 'text-brand-blue-500`
+                                  : 'text-brand-blue-500'
                             }`}
                           />
                           <div className="flex-1 min-w-0">

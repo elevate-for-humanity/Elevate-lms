@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { CheckCircle, AlertCircle, ChevronRight, ChevronLeft } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // FSSA DFR Third Party Provider (TPP) Questionnaire
 // Sections mirror the actual Indiana FSSA SNAP E&T TPP application

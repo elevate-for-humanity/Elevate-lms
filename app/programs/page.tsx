@@ -143,7 +143,7 @@ const staticProgramFallback: Prog[] = Array.from(STATIC_PROGRAM_MAP.values())
       title: program.title,
       description: program.subtitle || program.metaDescription || null,
       category: normalizeCategory(program.category, program.sector, program.programType),
-      duration: program.durationWeeks ? `${program.durationWeeks} week${program.durationWeeks === 1 ? '' : 's`}` : null,
+      duration: program.durationWeeks ? `${program.durationWeeks} week${program.durationWeeks === 1 ? '' : 's}` : null,
       credential: program.credentials?.[0]?.name ?? null,
       funding_eligible: hasFunding,
     };

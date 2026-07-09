@@ -89,7 +89,7 @@ ${
 ${
   data.rescheduleLink
     ? `If you need to reschedule, please use this link: ${data.rescheduleLink}\nOr call us at ${PLATFORM_DEFAULTS.supportPhone}.`
-    : 'If you need to reschedule, please call us at ${PLATFORM_DEFAULTS.supportPhone}.'
+    : `If you need to reschedule, please call us at ${PLATFORM_DEFAULTS.supportPhone}.`
 }
 
 —

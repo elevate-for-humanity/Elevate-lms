@@ -181,7 +181,7 @@ export class EmailService {
 
   private getWelcomeTemplate(userName: string): EmailTemplate {
     return {
-      subject: 'Welcome to ${PLATFORM_DEFAULTS.orgName}',
+      subject: `Welcome to ${PLATFORM_DEFAULTS.orgName}`,
       html: this.wrap(`
         <p style="margin: 0 0 16px;">Hello ${userName},</p>
         <p style="margin: 0 0 16px;">Your account is active. Here's what you have access to:</p>

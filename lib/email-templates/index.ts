@@ -72,9 +72,9 @@ function signatureBlock(senderName?: string, senderTitle?: string): string {
 export const emailTemplates = {
   // Welcome email
   welcome: (data: { name: string; loginUrl: string }) => ({
-    subject: 'Welcome to ${PLATFORM_DEFAULTS.orgName}',
+    subject: `Welcome to ${PLATFORM_DEFAULTS.orgName}`,
     html: wrapEmail(
-      'Welcome to ${PLATFORM_DEFAULTS.orgName}',
+      `Welcome to ${PLATFORM_DEFAULTS.orgName}`,
       `
           <p style="margin: 0 0 14px 0; line-height: 1.6; color: #334155; font-size: 14px;">Dear ${data.name},</p>
           <p style="margin: 0 0 14px 0; line-height: 1.6; color: #334155; font-size: 14px;">Your account has been created. You now have access to the Elevate for Humanity training platform.</p>

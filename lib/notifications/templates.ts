@@ -372,7 +372,7 @@ Please reach out to the apprentice to coordinate their first day. Questions? Rep
 
     case 'employer_application_received':
       return {
-        subject: 'Application Received — ${PLATFORM_DEFAULTS.orgName} Employer Partnership',
+        subject: `Application Received — ${PLATFORM_DEFAULTS.orgName} Employer Partnership`,
         html: baseTemplate(`
           <h2 style="color: ${BRAND_COLOR};">Application Received</h2>
           <p>Dear ${data.contact_name},</p>
@@ -439,7 +439,7 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
 
     case 'employer_activated':
       return {
-        subject: 'Welcome to ${PLATFORM_DEFAULTS.orgName} — Your Employer Portal Is Live',
+        subject: `Welcome to ${PLATFORM_DEFAULTS.orgName} — Your Employer Portal Is Live`,
         html: baseTemplate(`
           <h2 style="color: #16a34a;">Welcome to ${PLATFORM_DEFAULTS.orgName}</h2>
           <p>Dear ${data.contact_name},</p>
@@ -538,7 +538,7 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
         };
       } else {
         return {
-          subject: 'Application Update — ${PLATFORM_DEFAULTS.orgName}',
+          subject: `Application Update — ${PLATFORM_DEFAULTS.orgName}`,
           html: baseTemplate(`
             <h2 style="color: #dc2626;">Application Not Approved</h2>
             <p>Dear ${data.contact_name},</p>
@@ -675,7 +675,7 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
 
     default:
       return {
-        subject: 'Notification from ${PLATFORM_DEFAULTS.orgName}',
+        subject: `Notification from ${PLATFORM_DEFAULTS.orgName}`,
         html: baseTemplate(`
           <p>You have a new notification. Please log in to view details.</p>
         `),

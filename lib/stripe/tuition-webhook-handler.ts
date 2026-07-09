@@ -121,7 +121,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
     // EMAIL 2: WELCOME LETTER - Complete Enrollment
     // ============================================
     await resend.emails.send({
-      from: '${PLATFORM_DEFAULTS.orgName} <admissions@${PLATFORM_DEFAULTS.canonicalDomain}>',
+      from: `${PLATFORM_DEFAULTS.orgName} <admissions@${PLATFORM_DEFAULTS.canonicalDomain}>`,
       to: student.email,
       subject: `ACTION REQUIRED: Complete Your Enrollment - ${programName}`,
       html: `
@@ -272,7 +272,7 @@ async function sendAdminEnrollmentNotification(
 
   try {
     await resend.emails.send({
-      from: '${PLATFORM_DEFAULTS.orgName} <system@${PLATFORM_DEFAULTS.canonicalDomain}>',
+      from: `${PLATFORM_DEFAULTS.orgName} <system@${PLATFORM_DEFAULTS.canonicalDomain}>`,
       to: adminEmail,
       subject: `🎉 New Enrollment: ${studentName} - ${programName}`,
       html: `
@@ -393,7 +393,7 @@ async function sendPaymentFailedEmail(studentId: string, programId: string): Pro
   if (!student?.email) return;
 
   await resend.emails.send({
-    from: 'Elevate LMS <billing@${PLATFORM_DEFAULTS.canonicalDomain}>',
+    from: 'Elevate LMS <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
     to: student.email,
     subject: 'Payment Failed - Action Required',
     html: `
@@ -695,7 +695,7 @@ async function sendPaymentConfirmationEmail(
 
   await resend.emails
     .send({
-      from: '${PLATFORM_DEFAULTS.orgName} <billing@${PLATFORM_DEFAULTS.canonicalDomain}>',
+      from: `${PLATFORM_DEFAULTS.orgName} <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
       to: student.email,
       subject: `Payment Received - ${paymentNumber} of ${totalPayments}`,
       html: `
@@ -735,7 +735,7 @@ async function sendPaymentCompletionEmail(studentId: string, programId: string):
 
   await resend.emails
     .send({
-      from: '${PLATFORM_DEFAULTS.orgName} <billing@${PLATFORM_DEFAULTS.canonicalDomain}>',
+      from: `${PLATFORM_DEFAULTS.orgName} <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
       to: student.email,
       subject: 'Congratulations! Tuition Paid in Full',
       html: `

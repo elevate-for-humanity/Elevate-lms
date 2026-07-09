@@ -24,24 +24,24 @@ import { logger } from '@/lib/logger';
 // Override via environment variables in ECS task definition or .env.local.
 
 export const PLATFORM_DEFAULTS = {
-  orgName: process.env.NEXT_PUBLIC_ORG_NAME ?? 'Elevate for Humanity',
+  orgName: process.env.NEXT_PUBLIC_ORG_NAME ?? `Elevate for Humanity`,
   orgLegalName:
     process.env.NEXT_PUBLIC_ORG_LEGAL_NAME ??
-    'Elevate for Humanity Career & Technical Institute',
+    `Elevate for Humanity Career & Technical Institute`,
   siteUrl:
-    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org',
+    process.env.NEXT_PUBLIC_SITE_URL ?? `https://www.elevateforhumanity.org`,
   supportEmail:
-    process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? 'support@elevateforhumanity.org',
+    process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? `support@elevateforhumanity.org`,
   supportPhone:
-    process.env.NEXT_PUBLIC_SUPPORT_PHONE ?? '(317) 314-3757',
+    process.env.NEXT_PUBLIC_SUPPORT_PHONE ?? `(317) 314-3757`,
   emailFromName:
-    process.env.NEXT_PUBLIC_EMAIL_FROM_NAME ?? 'Elevate for Humanity',
+    process.env.NEXT_PUBLIC_EMAIL_FROM_NAME ?? `Elevate for Humanity`,
   emailFromAddress:
-    process.env.NEXT_PUBLIC_EMAIL_FROM_ADDRESS ?? 'noreply@elevateforhumanity.org',
+    process.env.NEXT_PUBLIC_EMAIL_FROM_ADDRESS ?? `noreply@elevateforhumanity.org`,
   certificateHolder:
-    process.env.NEXT_PUBLIC_CERT_HOLDER ?? 'Elevate for Humanity',
+    process.env.NEXT_PUBLIC_CERT_HOLDER ?? `Elevate for Humanity`,
   canonicalDomain:
-    process.env.NEXT_PUBLIC_CANONICAL_DOMAIN ?? 'www.elevateforhumanity.org',
+    process.env.NEXT_PUBLIC_CANONICAL_DOMAIN ?? `www.elevateforhumanity.org`,
 } as const;
 
 export type PlatformConfig = typeof PLATFORM_DEFAULTS;

@@ -33,9 +33,9 @@ export const organizationSchema: WithContext<Organization> = {
   },
   contactPoint: {
     '@type': 'ContactPoint',
-    telephone: '+1-${PLATFORM_DEFAULTS.supportPhone}',
+    telephone: `+1-${PLATFORM_DEFAULTS.supportPhone}`,
     contactType: 'Admissions',
-    email: 'info@${PLATFORM_DEFAULTS.canonicalDomain}',
+    email: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
   },
   sameAs: [
     'https://www.facebook.com/share/1BUqvUAnCo/',

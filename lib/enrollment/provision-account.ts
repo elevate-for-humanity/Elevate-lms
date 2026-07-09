@@ -66,7 +66,7 @@ export async function provisionAccount(
       const { sendEmail } = await import('@/lib/email/sendgrid');
       await sendEmail({
         to: normalizedEmail,
-        from: '${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>',
+        from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
         replyTo: 'elevate4humanityedu@gmail.com',
         subject: `You're enrolled in ${programName} — ${PLATFORM_DEFAULTS.orgName}`,
         html: buildWelcomeEmail({
@@ -153,7 +153,7 @@ export async function provisionAccount(
     const { sendEmail } = await import('@/lib/email/sendgrid');
     await sendEmail({
       to: normalizedEmail,
-      from: '${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>',
+      from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
       replyTo: 'elevate4humanityedu@gmail.com',
       subject: `Welcome to ${programName} — Set your password to access your portal`,
       html: buildWelcomeEmail({

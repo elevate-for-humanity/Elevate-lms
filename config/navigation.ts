@@ -58,12 +58,10 @@ export const headerNav: NavSection[] = [
     href: '/admin/partners',
     items: [
       { label: 'Partner Network', href: '/admin/partners' },
-      { label: 'Training Providers', href: '/training-providers' },
       { label: 'For Employers', href: '/employers' },
       { label: 'Hire Graduates', href: '/hire-graduates' },
       { label: 'Workforce Partners', href: '/workforce-partners' },
       { label: 'Career Services', href: '/career-services' },
-      { label: 'Mentorship', href: '/mentorship' },
     ],
   },
   {
@@ -136,26 +134,10 @@ export const headerNav: NavSection[] = [
     ],
   },
   {
-    label: 'Community',
-    href: '/community',
-    items: [
-      { label: 'Community Hub', href: '/community' },
-      { label: 'Discussion Forums', href: '/forums' },
-      { label: 'Study Groups', href: '/study-groups' },
-      { label: 'LMS Forums', href: '/lms/forums' },
-      { label: 'LMS Study Groups', href: '/lms/study-groups' },
-      { label: 'Success Stories', href: '/success-stories' },
-      { label: 'Student Handbook', href: '/legal/student-handbook' },
-    ],
-  },
-  {
     label: 'Services',
     items: [
-      { label: 'Marketplace', href: '/marketplace' },
       { label: 'Book Appointment', href: '/booking' },
       { label: 'Career Services', href: '/career-services' },
-      { label: 'Mentorship', href: '/mentorship' },
-      { label: 'Tax Services', href: '/tax-services' },
     ],
   },
   {
@@ -168,7 +150,6 @@ export const headerNav: NavSection[] = [
       { label: 'Webinars', href: '/webinars' },
       { label: 'News', href: '/news' },
       { label: 'Events', href: '/events' },
-      { label: 'Career Center', href: '/career-center' },
       { label: 'Alumni', href: '/alumni' },
       { label: 'FAQ', href: '/faq' },
       { label: 'Help & Tutorials', href: '/help/tutorials' },

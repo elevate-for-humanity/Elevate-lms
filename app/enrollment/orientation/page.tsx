@@ -12,7 +12,7 @@ import {
   normalizeEnrollmentState,
 } from '@/lib/enrollment/enrollment-flow';
 
-export default function EnrollmentOrientationPage() {
+export default function EnrollMentorientationPage() {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
 

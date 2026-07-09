@@ -197,7 +197,7 @@ export default async function HostShopsPage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-brand-orange-600 font-bold text-xl">→</span>
-                  <span className="text-lg">Professional mentorship</span>
+                  <span className="text-lg">Professional instructor support</span>
                 </li>
               </ul>
             </div>

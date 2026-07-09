@@ -29,7 +29,7 @@ const PACKAGES = [
     programs: [
       { name: 'Essential', price: 2490, deposit: 249, weekly: 48, features: ['Online RTI coursework', 'Exam prep materials', 'Digital textbooks', 'Email support'] },
       { name: 'Complete', price: 4980, deposit: 600, weekly: 84, popular: true, features: ['Everything in Essential', 'Professional barber kit', 'State board exam fee', 'CPR certification', 'Career placement', '1-on-1 coaching'] },
-      { name: 'Premium', price: 6980, deposit: 1000, weekly: 115, features: ['Everything in Complete', 'Advanced techniques', 'Business bootcamp', 'Marketing training', 'VIP mentorship', 'Equipment upgrades'] },
+      { name: 'Premium', price: 6980, deposit: 1000, weekly: 115, features: ['Everything in Complete', 'Advanced techniques', 'Business bootcamp', 'Marketing training', 'VIP instructor support', 'Equipment upgrades'] },
     ]
   },
   {
@@ -42,7 +42,7 @@ const PACKAGES = [
     programs: [
       { name: 'Essential', price: 2490, deposit: 249, weekly: 48, features: ['Online RTI coursework', 'Exam prep materials', 'Digital textbooks', 'Email support'] },
       { name: 'Complete', price: 4980, deposit: 600, weekly: 84, popular: true, features: ['Everything in Essential', 'Professional cosmetology kit', 'State board exam fee', 'CPR certification', 'Career placement', 'Color theory training'] },
-      { name: 'Premium', price: 6980, deposit: 1000, weekly: 115, features: ['Everything in Complete', 'Advanced coloring', 'Balayage training', 'Business bootcamp', 'VIP mentorship', 'Equipment upgrades'] },
+      { name: 'Premium', price: 6980, deposit: 1000, weekly: 115, features: ['Everything in Complete', 'Advanced coloring', 'Balayage training', 'Business bootcamp', 'VIP instructor support', 'Equipment upgrades'] },
     ]
   },
   {
@@ -55,7 +55,7 @@ const PACKAGES = [
     programs: [
       { name: 'Essential', price: 2490, deposit: 249, weekly: 48, features: ['Online RTI coursework', 'Exam prep materials', 'Digital textbooks', 'Email support'] },
       { name: 'Complete', price: 4980, deposit: 600, weekly: 84, popular: true, features: ['Everything in Essential', 'Professional esthetics kit', 'State board exam fee', 'CPR certification', 'Career placement', 'Chemical peel training'] },
-      { name: 'Premium', price: 6980, deposit: 1000, weekly: 115, features: ['Everything in Complete', 'Advanced facials', 'Medical esthetics intro', 'Business bootcamp', 'VIP mentorship', 'Equipment upgrades'] },
+      { name: 'Premium', price: 6980, deposit: 1000, weekly: 115, features: ['Everything in Complete', 'Advanced facials', 'Medical esthetics intro', 'Business bootcamp', 'VIP instructor support', 'Equipment upgrades'] },
     ]
   },
   {
@@ -68,7 +68,7 @@ const PACKAGES = [
     programs: [
       { name: 'Essential', price: 2490, deposit: 249, weekly: 48, features: ['Online RTI coursework', 'Exam prep materials', 'Digital textbooks', 'Email support'] },
       { name: 'Complete', price: 4980, deposit: 600, weekly: 84, popular: true, features: ['Everything in Essential', 'Professional nail kit', 'State board exam fee', 'CPR certification', 'Career placement', 'Gel & acrylic training'] },
-      { name: 'Premium', price: 6980, deposit: 1000, weekly: 115, features: ['Everything in Complete', 'Advanced nail art', '3D designs', 'Business bootcamp', 'VIP mentorship', 'Equipment upgrades'] },
+      { name: 'Premium', price: 6980, deposit: 1000, weekly: 115, features: ['Everything in Complete', 'Advanced nail art', '3D designs', 'Business bootcamp', 'VIP instructor support', 'Equipment upgrades'] },
     ]
   },
 ];

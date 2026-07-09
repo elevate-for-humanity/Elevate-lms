@@ -201,7 +201,7 @@ export default function CosmetologyHostSalonsPage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-brand-orange-600 font-bold text-xl">&rarr;</span>
-                  <span className="text-lg">Professional mentorship</span>
+                  <span className="text-lg">Professional instructor support</span>
                 </li>
               </ul>
             </div>

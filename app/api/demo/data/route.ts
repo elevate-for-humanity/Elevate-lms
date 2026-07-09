@@ -72,7 +72,7 @@ export const demoData = {
       { id: 's1', title: 'Practical Training', date: '2025-01-15', time: '9:00 AM - 5:00 PM', type: 'training', location: 'Elite Cuts Barbershop' },
       { id: 's2', title: 'Theory Quiz: Module 8', date: '2025-01-16', time: '7:00 PM', type: 'quiz', location: 'Online' },
       { id: 's3', title: 'Skills Assessment: Fades', date: '2025-01-18', time: '10:00 AM', type: 'assessment', location: 'Training Center' },
-      { id: 's4', title: 'Live Q&A with Mentor', date: '2025-01-20', time: '6:00 PM', type: 'mentorship', location: 'Google Meet' },
+      { id: 's4', title: 'Live Q&A with Instructor', date: '2025-01-20', time: '6:00 PM', type: 'instructor support', location: 'Google Meet' },
     ],
     achievements: [
       { id: 'a1', title: 'First 500 Hours', earned_at: '2024-12-15', icon: '🎯' },

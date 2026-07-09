@@ -320,32 +320,6 @@ export const headerNavigation: NavGroup[] = [
         href: '/community/marketplace',
         description: 'Community marketplace',
       },
-      {
-        label: 'Mentorship',
-        href: '/mentorship/career-guidance',
-        description: 'Career mentorship',
-      },
-      { label: 'Goal Setting', href: '/mentorship/goal-setting', description: 'Set career goals' },
-      {
-        label: 'Industry Insights',
-        href: '/mentorship/industry-insights',
-        description: 'Industry knowledge',
-      },
-      {
-        label: 'Networking',
-        href: '/mentorship/networking',
-        description: 'Professional networking',
-      },
-      {
-        label: 'Skill Development',
-        href: '/mentorship/skill-development',
-        description: 'Build skills',
-      },
-      {
-        label: 'Ongoing Support',
-        href: '/mentorship/ongoing-support',
-        description: 'Continued mentorship',
-      },
     ],
   },
   {
@@ -501,9 +475,7 @@ export const footerNavigation = {
     links: [
       { label: 'Career Services', href: '/career-services' },
       { label: 'Employment Support', href: '/employment-support' },
-      { label: 'Career Center', href: '/career-center' },
       { label: 'Career Counseling', href: '/career-counseling' },
-      { label: 'Mentorship', href: '/mentorship/career-guidance' },
       { label: 'Networking Events', href: '/career-services/networking-events' },
       { label: 'Ongoing Support', href: '/career-services/ongoing-support' },
       { label: 'Community Services', href: '/community-services' },

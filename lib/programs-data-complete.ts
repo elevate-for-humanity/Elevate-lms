@@ -30,9 +30,9 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     name: 'Business Start-Up & Marketing Program',
     tagline: 'Launch your own business with Rise Forward',
     description:
-      "The Business Start-Up & Marketing Program with Rise Forward equips participants with hands-on skills to launch their own business ventures. Students will learn the fundamentals of entrepreneurship, digital marketing, LLC formation, business planning, customer service, and resume development. The program includes guided startup support, mentorship, and ends with a business match stipend and laptop kit to empower real-world implementation. Ideal for youth ready to explore self-employment and leadership pathways in today's economy.",
+      "The Business Start-Up & Marketing Program with Rise Forward equips participants with hands-on skills to launch their own business ventures. Students will learn the fundamentals of entrepreneurship, digital marketing, LLC formation, business planning, customer service, and resume development. The program includes guided startup support, instructor support, and ends with a business match stipend and laptop kit to empower real-world implementation. Ideal for youth ready to explore self-employment and leadership pathways in today's economy.",
     summary:
-      'Learn entrepreneurship, digital marketing, LLC formation, and business planning with mentorship and startup support.',
+      'Learn entrepreneurship, digital marketing, LLC formation, and business planning with instructor support and startup support.',
     bullets: [
       '5-week accelerated program',
       '32 instructional hours (8 hours/week)',
@@ -158,7 +158,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
       '180 instructional hours (15 hours/week)',
       'O*NET 21-1093.00 - Social and Human Service Assistants',
       'Certified Peer Recovery Specialist (CPRS) pathway',
-      'Trauma-informed coaching and mentorship',
+      'Trauma-informed coaching and instructor support',
       'Crisis response and peer navigation',
       'No prior credential required',
       '100% online with tutoring support',
@@ -717,7 +717,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
       'Funding and financing options',
       'Customer acquisition and retention',
       'Operations and inventory management',
-      'Mentorship from successful entrepreneurs',
+      'Instructorship from successful entrepreneurs',
       'Pitch competition and startup funding opportunities',
     ],
     funding: ['WIOA', 'WRG', 'Small Business Grants'],

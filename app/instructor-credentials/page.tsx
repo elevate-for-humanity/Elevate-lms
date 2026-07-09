@@ -34,13 +34,13 @@ const PROGRAM_CREDENTIALS = [
     instructorRequirements: [
       'Active Indiana Master Barber License',
       'Minimum 3 years of professional barbering experience',
-      'Completion of instructor training or apprenticeship mentor certification',
+      'Completion of instructor training or apprenticeship instructor certification',
       'Current CPR/First Aid certification (for clinical supervision)',
     ],
     programHolderRole:
       'Barber Apprenticeship Coordinator — manages apprentice placement, RTI scheduling, and RAPIDS documentation under licensed barber school supervision.',
     smeScope:
-      'Licensed master barbers at host shops provide supplemental hands-on mentoring and technique instruction.',
+      'Licensed master barbers at host shops provide supplemental hands-on instruction and technique instruction.',
     credentialIssued:
       'Indiana Barber License — issued by Indiana Professional Licensing Agency (PLA)',
     regulatoryBody: 'Indiana Professional Licensing Agency (PLA)',
@@ -58,7 +58,7 @@ const PROGRAM_CREDENTIALS = [
     programHolderRole:
       'Healthcare Training Manager — coordinates clinical rotation scheduling, student progress tracking, and exam preparation under nursing program oversight.',
     smeScope:
-      'Experienced CNAs and healthcare professionals provide supplemental skills practice and patient care mentoring.',
+      'Experienced CNAs and healthcare professionals provide supplemental skills practice and patient care instruction.',
     credentialIssued: 'CNA Certification — issued by Indiana State Department of Health (ISDH)',
     regulatoryBody: 'Indiana State Department of Health (ISDH)',
   },
@@ -75,7 +75,7 @@ const PROGRAM_CREDENTIALS = [
     programHolderRole:
       'CDL Program Coordinator — manages student enrollment, DOT physical scheduling, behind-the-wheel hour tracking, and BMV exam coordination.',
     smeScope:
-      'Experienced commercial drivers provide supplemental road mentoring and pre-trip inspection practice.',
+      'Experienced commercial drivers provide supplemental road instruction and pre-trip inspection practice.',
     credentialIssued: 'CDL Class A or Class B — issued by Indiana Bureau of Motor Vehicles (BMV)',
     regulatoryBody: 'FMCSA (Federal Motor Carrier Safety Administration) / Indiana BMV',
   },
@@ -109,7 +109,7 @@ const PROGRAM_CREDENTIALS = [
     programHolderRole:
       'Technology Program Lead — manages module sequencing, lab environment setup, practice exam scheduling, and student progress tracking.',
     smeScope:
-      'Certified IT professionals provide supplemental tutoring, lab mentoring, and exam preparation support.',
+      'Certified IT professionals provide supplemental tutoring, lab support, and exam preparation support.',
     credentialIssued: 'IT Specialist — Device Configuration & Management — issued by Certiport',
     regulatoryBody: 'Certiport',
   },
@@ -143,7 +143,7 @@ const PROGRAM_CREDENTIALS = [
     programHolderRole:
       'Trades Program Lead — coordinates shop scheduling, safety compliance, welding process instruction, and certification testing.',
     smeScope:
-      'AWS-certified welders provide supplemental technique instruction, joint preparation labs, and weld quality mentoring.',
+      'AWS-certified welders provide supplemental technique instruction, joint preparation labs, and weld quality instruction.',
     credentialIssued: 'AWS D1.1 Certification + OSHA 10-Hour — issued by AWS and OSHA',
     regulatoryBody: 'AWS (American Welding Society) / OSHA',
   },
@@ -160,7 +160,7 @@ const PROGRAM_CREDENTIALS = [
     programHolderRole:
       'Trades Program Lead — coordinates lab scheduling, NEC code instruction, safety compliance, and NCCER assessment administration.',
     smeScope:
-      'Licensed electricians provide supplemental wiring labs, code interpretation mentoring, and job site safety instruction.',
+      'Licensed electricians provide supplemental wiring labs, code interpretation support, and job site safety instruction.',
     credentialIssued: 'OSHA 10-Hour + NCCER Core Certification — issued by OSHA and NCCER',
     regulatoryBody: 'Indiana DOE / OSHA / NCCER',
   },
@@ -234,7 +234,7 @@ export default function InstructorCredentialsPage() {
             <div className="bg-white rounded-lg p-4 text-center">
               <Award aria-label="award" className="w-6 h-6 text-brand-blue-600 mx-auto mb-2" />
               <p className="text-sm font-semibold text-slate-900">Subject Matter Experts</p>
-              <p className="text-xs text-slate-600 mt-1">Supplemental instruction and mentoring</p>
+              <p className="text-xs text-slate-600 mt-1">Supplemental instruction and support</p>
             </div>
           </div>
 

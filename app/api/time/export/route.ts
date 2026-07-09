@@ -33,7 +33,7 @@ async function _GET(req: Request) {
 
   const userEmail = user.email;
 
-  // Find program holders where this user is the mentor
+  // Find program holders where this user is the Instructor
   const { data: programHolders } = await supabase
     .from('program_holders')
     .select('id')

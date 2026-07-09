@@ -34,7 +34,7 @@ const partnerTypes = [
       'Signed Employer Partnership Agreement',
       'DOL RAPIDS registration (apprenticeship sponsors)',
       'Wage and benefit documentation',
-      'Apprentice supervision and mentorship plan',
+      'Apprentice supervision and instructor support plan',
     ],
     href: '/for-employers',
     cta: 'Partner as an Employer',

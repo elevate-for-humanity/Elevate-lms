@@ -455,17 +455,17 @@ export const programs: Program[] = [
     name: 'Business Start-up & Marketing',
     heroTitle: 'Business Start-up & Marketing Program with Rise Forward',
     heroSubtitle:
-      '5-week intensive program to launch your business with mentorship, stipend, and laptop kit',
+      '5-week intensive program to launch your business with instructor support, stipend, and laptop kit',
     shortDescription:
       'Hands-on entrepreneurship training with LLC formation, digital marketing, and real-world startup support',
     longDescription:
-      "The Business Start-Up & Marketing Program with Rise Forward equips participants with hands-on skills to launch their own business ventures. Students will learn the fundamentals of entrepreneurship, digital marketing, LLC formation, business planning, customer service, and resume development. The program includes guided startup support, mentorship, and ends with a business match stipend and laptop kit to empower real-world implementation. Ideal for youth ready to explore self-employment and leadership pathways in today's economy.\n\nIn just 5 weeks, you'll gain industry-recognized certifications in retail operations and marketing, learn how to create a business plan, develop marketing strategies, form an LLC, and build your professional image and online presence. This program is designed for aspiring entrepreneurs ages 16+ who want to launch their own business or advance in retail management.\n\nCredentialing Partners:\n• National Retail Federation (NRF) - Business of Retail Certified Specialist (https://nrf.com)\n• National Retail Federation (NRF) - Retail Industry Fundamentals Specialist (https://nrf.com)\n• Rise Forward Foundation - Business Development Support (https://riseforwardfoundation.org)\n\nProgram Benefits:\n• Business match stipend upon completion\n• Laptop kit for business operations\n• One-on-one mentorship\n• LLC formation guidance\n• Professional resume development\n\nCIP Code: 52.0701 - Entrepreneurship/Entrepreneurial Studies",
+      "The Business Start-Up & Marketing Program with Rise Forward equips participants with hands-on skills to launch their own business ventures. Students will learn the fundamentals of entrepreneurship, digital marketing, LLC formation, business planning, customer service, and resume development. The program includes guided startup support, instructor support, and ends with a business match stipend and laptop kit to empower real-world implementation. Ideal for youth ready to explore self-employment and leadership pathways in today's economy.\n\nIn just 5 weeks, you'll gain industry-recognized certifications in retail operations and marketing, learn how to create a business plan, develop marketing strategies, form an LLC, and build your professional image and online presence. This program is designed for aspiring entrepreneurs ages 16+ who want to launch their own business or advance in retail management.\n\nCredentialing Partners:\n• National Retail Federation (NRF) - Business of Retail Certified Specialist (https://nrf.com)\n• National Retail Federation (NRF) - Retail Industry Fundamentals Specialist (https://nrf.com)\n• Rise Forward Foundation - Business Development Support (https://riseforwardfoundation.org)\n\nProgram Benefits:\n• Business match stipend upon completion\n• Laptop kit for business operations\n• One-on-one instructor support\n• LLC formation guidance\n• Professional resume development\n\nCIP Code: 52.0701 - Entrepreneurship/Entrepreneurial Studies",
     heroImage: '/images/pages/business-sector.webp',
     heroImageAlt: 'Young entrepreneur planning business strategy',
     heroVideo: '/videos/partner-business.mp4',
     duration: '5 weeks',
     schedule: 'Quarterly cohorts - Flexible scheduling options',
-    delivery: 'Hybrid - Online coursework + In-person workshops and mentorship',
+    delivery: 'Hybrid - Online coursework + In-person workshops and instructor support',
     credential:
       'Business of Retail Certified Specialist (NRF), Retail Industry Fundamentals Specialist (NRF), Certificate of Completion',
     approvals: [
@@ -487,7 +487,7 @@ export const programs: Program[] = [
       'Digital marketing and social media strategies',
       'Business match stipend upon completion',
       'Free laptop kit for business operations',
-      'One-on-one mentorship and startup support',
+      'One-on-one instructor support and startup support',
       'Resume and professional image development',
       'Fast 5-week completion',
     ],
@@ -712,9 +712,9 @@ export const programs: Program[] = [
     shortDescription:
       'Accessible training for justice-involved individuals, career changers, and those with lived experience to become certified peer recovery coaches',
     longDescription:
-      "The Public Safety Reentry Specialist Program prepares you to support individuals reentering society after incarceration or overcoming substance use challenges. In 45 days, you'll earn multiple certifications including Certified Peer Recovery Coach (CPRC), Certified Peer Support Professional, Certified Community Healthcare Worker (CCHW), CPR, and Rise Up career readiness. This program combines lived experience with professional training to help you make a meaningful impact in your community.\n\nThis program is designed to be inclusive and accessible to all learners—regardless of age, background, or education level. It welcomes youth ages 16+, adults seeking career change, justice-involved individuals reentering the workforce, and those receiving support through SNAP, WIOA, or other public assistance programs. No prior credential or diploma is required for enrollment. We provide built-in support, including tutoring, digital literacy training, and guided instruction to ensure all participants have the tools they need to succeed.\n\nInstructors hold Certified Peer Recovery Specialist (CPRS) credentials or equivalent, with subject matter experience in reentry, public safety, peer navigation, or crisis response. Program leadership holds credentials in trauma-informed coaching, CPR/AED instruction, and lived-experience mentorship for justice-impacted individuals.\n\nCredentialing Partners:\n• Indiana Certification Board (ICB) - Certified Peer Recovery Coach (CPRC) (https://indianacertificationboard.org)\n• National Alliance of Peer Specialists - Certified Peer Support Professional (https://na4ps.org)\n• Certified Community Healthcare Worker (CCHW) Programs\n• American Heart Association - CPR/AED (https://cpr.heart.org)\n• Rise Up - Career Readiness Certification (https://riseup.com)\n\nCIP Code: 43.0112 - Securities Services Administration/Management",
+      "The Public Safety Reentry Specialist Program prepares you to support individuals reentering society after incarceration or overcoming substance use challenges. In 45 days, you'll earn multiple certifications including Certified Peer Recovery Coach (CPRC), Certified Peer Support Professional, Certified Community Healthcare Worker (CCHW), CPR, and Rise Up career readiness. This program combines lived experience with professional training to help you make a meaningful impact in your community.\n\nThis program is designed to be inclusive and accessible to all learners—regardless of age, background, or education level. It welcomes youth ages 16+, adults seeking career change, justice-involved individuals reentering the workforce, and those receiving support through SNAP, WIOA, or other public assistance programs. No prior credential or diploma is required for enrollment. We provide built-in support, including tutoring, digital literacy training, and guided instruction to ensure all participants have the tools they need to succeed.\n\nInstructors hold Certified Peer Recovery Specialist (CPRS) credentials or equivalent, with subject matter experience in reentry, public safety, peer navigation, or crisis response. Program leadership holds credentials in trauma-informed coaching, CPR/AED instruction, and lived-experience instructor support for justice-impacted individuals.\n\nCredentialing Partners:\n• Indiana Certification Board (ICB) - Certified Peer Recovery Coach (CPRC) (https://indianacertificationboard.org)\n• National Alliance of Peer Specialists - Certified Peer Support Professional (https://na4ps.org)\n• Certified Community Healthcare Worker (CCHW) Programs\n• American Heart Association - CPR/AED (https://cpr.heart.org)\n• Rise Up - Career Readiness Certification (https://riseup.com)\n\nCIP Code: 43.0112 - Securities Services Administration/Management",
     heroImage: '/images/pages/career-counseling.webp',
-    heroImageAlt: 'Peer recovery coach providing support and mentorship',
+    heroImageAlt: 'Peer recovery coach providing support and instructor support',
     heroVideo: '/videos/career-services-hero.mp4',
     duration: '45 days (6-7 weeks)',
     schedule: 'Year-round enrollment - First come, first served',
@@ -744,7 +744,7 @@ export const programs: Program[] = [
       'Community Healthcare Worker (CCHW) certification',
       'CPR and Rise Up certifications',
       'Trauma-informed coaching approach',
-      'Lived-experience mentorship',
+      'Lived-experience instructor support',
       'Year-round enrollment',
       'Justice-involved individuals welcome',
     ],
@@ -1833,7 +1833,7 @@ export const programs: Program[] = [
     duration: '16 weeks',
     clockHours: 640,
     schedule: '640 hours',
-    delivery: 'Hybrid (Classroom + Mentorship)',
+    delivery: 'Hybrid (Classroom + Instruction)',
     credential: 'Small Business Owner',
     approvals: [`${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`],
     fundingOptions: ['WIOA', 'Small business grants', 'SBA loans', 'Self-funded'],

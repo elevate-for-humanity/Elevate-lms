@@ -180,7 +180,7 @@ export default function InternshipEvaluationPage() {
           <div className="bg-white border border-slate-200 rounded-lg p-5 text-sm text-slate-700 space-y-2">
             <p>☐ Recommend for permanent hire at this organization</p>
             <p>☐ Recommend for placement at partner organization</p>
-            <p>☐ Recommend for continued mentorship / self-employment track</p>
+            <p>☐ Recommend for continued instructor support / self-employment track</p>
             <p>☐ Recommend additional training before placement</p>
           </div>
 

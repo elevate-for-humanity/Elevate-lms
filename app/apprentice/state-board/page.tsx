@@ -224,7 +224,7 @@ export default async function StateBoardExamPage() {
                 )}
                 <div>
                   <p className="font-medium text-slate-900">Practical skills verified</p>
-                  <p className="text-sm text-slate-500">Mentor sign-off on hands-on competencies</p>
+                  <p className="text-sm text-slate-500">Instructor sign-off on hands-on competencies</p>
                 </div>
               </div>
               <Link

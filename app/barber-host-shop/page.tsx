@@ -5,21 +5,21 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Barber Host Shop | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Host barber apprentices in your barbershop. Earn OJT reimbursement, mentor the next generation, and build your pipeline.',
+  description: 'Host barber apprentices in your barbershop. Earn OJT reimbursement, Instructor the next generation, and build your pipeline.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/barber-host-shop' },
 };
 
 const benefits = [
   { icon: DollarSign, title: 'OJT Wage Reimbursement', desc: 'Get reimbursed for on-the-job training hours.' },
   { icon: Users, title: 'Build Your Team', desc: 'Train apprentices to your standards and hire when ready.' },
-  { icon: Scissors, title: 'Mentor the Next Generation', desc: 'Give back to your community and grow the trade.' },
+  { icon: Scissors, title: 'Instructor the Next Generation', desc: 'Give back to your community and grow the trade.' },
 ];
 
 const requirements = [
   'Licensed barbershop in Indiana',
   'Active barber license for yourself',
   'Space for apprentice workstation',
-  'Willingness to mentor and train',
+  'Willingness to Instructor and train',
 ];
 
 export default function BarberHostShopPage() {
@@ -36,7 +36,7 @@ export default function BarberHostShopPage() {
             Host Barber Apprentices
           </h1>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-10">
-            Earn OJT reimbursement, mentor future barbers, and build your team. Partner with {PLATFORM_DEFAULTS.orgName} today.
+            Earn OJT reimbursement, Instructor future barbers, and build your team. Partner with {PLATFORM_DEFAULTS.orgName} today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/partners/barber-host-shop/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-colors text-lg">

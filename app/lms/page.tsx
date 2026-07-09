@@ -74,7 +74,7 @@ export default function LmsRootPage() {
                 <Users className="w-6 h-6 text-purple-600" />
               </div>
               <h3 className="font-bold text-lg mb-2">Get Support</h3>
-              <p className="text-sm text-slate-600">Connect with instructors, career coaches, and peer mentors.</p>
+              <p className="text-sm text-slate-600">Connect with instructors, career coaches, and peer Instructors.</p>
             </div>
           </div>
 

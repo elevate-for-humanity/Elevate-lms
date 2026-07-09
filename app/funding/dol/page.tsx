@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const benefits = [
   'Earn wages during training — paid on-the-job learning',
   'Industry-recognized credentials upon completion',
-  'Structured mentorship from experienced professionals',
+  'Structured instructor support from experienced professionals',
   'Funding may cover full tuition for eligible participants',
   'Direct pathway to full-time employment',
   'Portable, nationally recognized certification',
@@ -100,7 +100,7 @@ export default async function DOLFundingPage() {
               Registered Apprenticeships let you earn wages during training through paid on-the-job
               learning. You receive industry-recognized credentials upon completion that are
               portable and nationally recognized. Experienced professionals provide structured
-              mentorship throughout the program. Funding may cover full tuition for eligible
+              instructor support throughout the program. Funding may cover full tuition for eligible
               participants, and the apprenticeship creates a direct pathway to full-time employment
               with the training employer.
             </p>

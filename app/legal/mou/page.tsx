@@ -101,7 +101,7 @@ export default async function MOUPage() {
             <h2 className="text-2xl font-bold text-black mb-4">6. Student Services</h2>
             <p className="text-black mb-4">Both parties commit to providing students with:</p>
             <ul className="list-disc pl-6 text-black space-y-2 mb-4">
-              <li>Quality training and mentorship</li>
+              <li>Quality training and instructor support</li>
               <li>Safe and professional learning environments</li>
               <li>Clear expectations and progress tracking</li>
               <li>Support services and resources</li>

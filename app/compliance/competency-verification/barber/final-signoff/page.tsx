@@ -109,7 +109,7 @@ export default function FinalSignoffPage() {
                 <td className="p-2 border text-center print:p-1">☐</td>
               </tr>
               <tr>
-                <td className="p-2 border print:p-1">Supplemental Hours (LMS, mentoring)</td>
+                <td className="p-2 border print:p-1">Supplemental Hours (LMS, Instructoring)</td>
                 <td className="p-2 border text-center print:p-1">356 hours</td>
                 <td className="p-2 border text-center print:p-1">&nbsp;</td>
                 <td className="p-2 border text-center print:p-1">☐</td>

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 const APPRENTICESHIPS = [
-  { slug: 'barber-apprenticeship', title: 'Barber Apprenticeship', duration: '52 weeks', credential: 'Indiana Barber License', salary: '$35,000-$55,000/yr', highlight: 'Most Popular', description: 'Learn classic and modern cutting techniques while earning at partner barbershops.', features: ['Paid on-the-job training', 'No tuition upfront', 'State license prep', '1-on-1 mentorship'] },
+  { slug: 'barber-apprenticeship', title: 'Barber Apprenticeship', duration: '52 weeks', credential: 'Indiana Barber License', salary: '$35,000-$55,000/yr', highlight: 'Most Popular', description: 'Learn classic and modern cutting techniques while earning at partner barbershops.', features: ['Paid on-the-job training', 'No tuition upfront', 'State license prep', '1-on-1 instructor support'] },
   { slug: 'cosmetology-apprenticeship', title: 'Cosmetology Apprenticeship', duration: '52 weeks', credential: 'Indiana Cosmetology License', salary: '$30,000-$50,000/yr', description: 'Master hair, makeup, and nail techniques at partner salons.', features: ['Paid training', 'Flexible schedule', 'Industry certifications', 'Job placement'] },
   { slug: 'esthetician-apprenticeship', title: 'Esthetician Apprenticeship', duration: '36 weeks', credential: 'Indiana Esthetician License', salary: '$28,000-$45,000/yr', description: 'Learn skincare, facials, and advanced treatments at partner spas.', features: ['Hands-on training', 'Skincare expertise', 'Spa environment', 'Growing demand'] },
 ];
@@ -23,7 +23,7 @@ const BENEFITS = [
   { icon: DollarSign, title: 'Earn While You Learn', description: 'Get paid for on-the-job training while earning credentials.' },
   { icon: GraduationCap, title: 'No Tuition Upfront', description: 'Most apprentices pay $0 through workforce funding.' },
   { icon: Shield, title: 'DOL-Registered', description: 'Nationally recognized credentials employers trust.' },
-  { icon: Users, title: '1-on-1 Mentorship', description: 'Learn from experienced professionals.' },
+  { icon: Users, title: '1-on-1 Instructorship', description: 'Learn from experienced professionals.' },
   { icon: Clock, title: 'Flexible Schedule', description: 'Evening and weekend options available.' },
   { icon: CheckCircle, title: 'Job Placement', description: 'Access to employer network for career placement.' },
 ];

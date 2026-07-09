@@ -114,7 +114,7 @@ export default function HostShopPage() {
                 'Active Indiana barbershop or cosmetology license',
                 'Licensed barber or cosmetologist supervisor on staff',
                 'Clean, professional workspace meeting state board standards',
-                'Willingness to train and mentor apprentices',
+                'Willingness to train and Instructor apprentices',
                 'Ability to verify apprentice hours worked',
               ].map((req, i) => (
                 <li key={i} className="flex items-start gap-3 text-lg text-slate-700">

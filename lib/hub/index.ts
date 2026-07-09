@@ -5,4 +5,3 @@
 export * from './activity-feed';
 export * from './cohorts';
 export * from './job-matching';
-export * from './mentor-matching';

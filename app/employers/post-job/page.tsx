@@ -128,7 +128,7 @@ export default function EmployerPostJobPage() {
                 </li>
                 <li className="flex items-center gap-2 text-slate-700">
                   <CheckCircle2 className="w-5 h-5 text-green-600" />
-                  Mentor training provided
+                  Instructor training provided
                 </li>
                 <li className="flex items-center gap-2 text-slate-700">
                   <CheckCircle2 className="w-5 h-5 text-green-600" />

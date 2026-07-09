@@ -325,7 +325,7 @@ export function getLearnerDashboardData(userId?: string): LearnerDashboardData {
       },
       {
         id: 'event-004',
-        title: 'Live Q&A with Mentor',
+        title: 'Live Q&A with Instructor',
         date: formatDateDisplay(6),
         time: '6:00 PM',
         duration: 60,

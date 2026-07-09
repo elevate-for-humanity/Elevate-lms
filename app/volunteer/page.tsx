@@ -4,7 +4,7 @@ import { Heart, Users, Calendar } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Volunteer | Elevate for Humanity',
-  keywords: ["volunteer", "mentor", "workforce training", "Indiana"], description: 'Volunteer opportunities to support workforce development.',
+  keywords: ["volunteer", "workforce training", "Indiana"], description: 'Volunteer opportunities to support workforce development.',
 };
 
 export default function VolunteerPage() {
@@ -19,12 +19,12 @@ export default function VolunteerPage() {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6">Make a Difference</h2>
-          <p className="text-slate-600 mb-6">Volunteers help our students succeed. From mentoring to event support.</p>
+          <p className="text-slate-600 mb-6">Volunteers help our students succeed. From tutoring to event support.</p>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl p-6 shadow">
               <Users className="w-10 h-10 text-brand-blue-600 mb-4" />
-              <h3 className="font-bold mb-2">Mentorship</h3>
-              <p className="text-slate-600 text-sm">Share your career experience.</p>
+              <h3 className="font-bold mb-2">Tutoring</h3>
+              <p className="text-slate-600 text-sm">Help students with coursework and test prep.</p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow">
               <Calendar className="w-10 h-10 text-brand-blue-600 mb-4" />

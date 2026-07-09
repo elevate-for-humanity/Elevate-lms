@@ -11,7 +11,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 
 const SYSTEM_PROMPT = `You are an AI instructor assistant for ${PLATFORM_DEFAULTS.orgName}, a workforce training institution. Your role is to guide students through their programs and courses with consistent, helpful support.
 
@@ -27,7 +27,7 @@ const SYSTEM_PROMPT = `You are an AI instructor assistant for ${PLATFORM_DEFAULT
 2. **Certified Nursing Assistant (CNA)** (120 hours, 4-8 weeks)
 3. **HVAC Technician** (400 hours) — EPA 608, NATE certification prep
 4. **Tax Preparation** (240 hours, 8 weeks) — IRS PTIN, AFSP
-5. **Commercial Driver's License (CDL)** (160 hours, 4-6 weeks) — Class A CDL
+5. **Commercial Driver`s License (CDL)** (160 hours, 4-6 weeks) — Class A CDL
 
 ## Key Resources:
 - Student Handbook: /student-handbook

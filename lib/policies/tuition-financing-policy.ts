@@ -13,7 +13,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const TUITION_FINANCING_POLICY = {
   version: '1.0',
-  effectiveDate: '2025-01-15',
+  effectiveDate: '2025-01-15`,
 
   /**
    * POLICY STATEMENT
@@ -38,7 +38,7 @@ waiving fees, or making verbal promises about payment flexibility.
      * Default risk is carried by the financing provider, not the Institute.
      */
     thirdPartyFinancing: {
-      name: 'Third-Party Tuition Financing',
+      name: `Third-Party Tuition Financing',
       description:
         'Finance your tuition through an approved education lender. Get approved in minutes, pay over 6-24 months.',
       providers: ['Klarna/Afterpay/Zip', 'Klarna', 'Climb Credit'],

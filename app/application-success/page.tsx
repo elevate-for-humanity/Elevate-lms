@@ -3,10 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 import { generateMetadata } from '@/lib/seo/metadata';
 
 export const metadata: Metadata = generateMetadata({
-  title: 'Application-Success',
+  title: 'Application-Success`,
   description:
     `Application-Success - ${PLATFORM_DEFAULTS.orgName} workforce training and career development programs in Indianapolis.`,
-  path: '/application-success',
+  path: `/application-success',
 });
 
 import Link from 'next/link';

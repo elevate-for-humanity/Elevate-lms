@@ -349,7 +349,7 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
   }
 
   // ── UNRECOGNISED KIND — log and no-op ─────────────────────────────────────
-  logger.info('[webhook/checkout] Unrecognised session kind — no-op', {
+  logger.info('[webhook/checkout] Unrecognised session kind — no-op`, {
     sessionId: session.id,
     kind,
     mode: session.mode,
@@ -376,7 +376,7 @@ function buildEnrollmentEmail({
     <p style="margin:4px 0 0;color:#94a3b8;font-size:13px">Career &amp; Technical Institute</p>
   </div>
   <div style="padding:32px">
-    <h1 style="margin:0 0 16px;font-size:22px">You're enrolled, ${firstName}!</h1>
+    <h1 style="margin:0 0 16px;font-size:22px">You`re enrolled, ${firstName}!</h1>
     <p style="color:#475569;line-height:1.6;margin:0 0 8px">
       Your payment has been received and your enrollment in <strong>${programTitle}</strong> is confirmed.
     </p>

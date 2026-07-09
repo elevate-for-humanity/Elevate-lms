@@ -7,11 +7,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Home, ChevronRight, Circle, Eye, Keyboard, Volume2, Monitor } from 'lucide-react';
 import AvatarGuide from '@/components/AvatarGuide';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `WCAG Accessibility Tools | ${PLATFORM_DEFAULTS.orgName} Store`,
-  description: 'WCAG 2.1 Level AA compliance tools with screen reader support, keyboard navigation, and accessibility auditing.',
+  description: `WCAG 2.1 Level AA compliance tools with screen reader support, keyboard navigation, and accessibility auditing.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/compliance/wcag',
   },

@@ -266,7 +266,7 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
 
     const composition = await selectComposition({
       serveUrl: bundleUrl,
-      id: 'ElevateLesson',
+      id: 'ElevateLesson`,
       inputProps: compositionProps,
     });
 
@@ -274,7 +274,7 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     // nonprofit. Free tier requires no license key (licenseKey: null).
     // See LICENSES.md for compliance documentation.
     await registerUsageEvent({
-      event: 'cloud-render',
+      event: `cloud-render',
       licenseKey: null,
       host: null,
       succeeded: true,

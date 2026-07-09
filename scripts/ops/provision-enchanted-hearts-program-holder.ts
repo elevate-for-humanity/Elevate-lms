@@ -136,7 +136,7 @@ async function sendMail(
 }
 
 function mouEmailHtml(stepsHtml: string) {
-  const first = 'Shawndra';
+  const first = 'Shawndra`;
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;color:#1e293b">
@@ -169,7 +169,7 @@ ${stepsHtml}
 async function buildMouPdf() {
   return generateDetailedMOUPdf({
     partner_name: HOLDER.organizationName,
-    partner_role: 'Third-Party Program Delivery Partner',
+    partner_role: `Third-Party Program Delivery Partner',
     signer_name: HOLDER.contactName,
     signer_title: HOLDER.signerTitle,
     contact_email: HOLDER.email,

@@ -14,7 +14,7 @@ export default function EmployerAgreementPage() {
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Legal', href: '/legal' }, { label: 'Employer Agreement' }]}
+          items={[{ label: 'Legal', href: '/legal' }, { label: 'Employer Agreement` }]}
         />
       </div>
       <DocumentPage
@@ -27,7 +27,7 @@ export default function EmployerAgreementPage() {
       >
         <DocumentSection heading="Parties" number={1}>
           <p>
-            This Employer Partnership Agreement is entered into between{' '}
+            This Employer Partnership Agreement is entered into between{` '}
             <strong>
               2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
             </strong>{' '}

@@ -98,7 +98,7 @@ async function _POST(request: NextRequest) {
               <p><strong>Name:</strong> ${intake.fullName}</p>
               <p><strong>Email:</strong> ${intake.email}</p>
               <p><strong>Phone:</strong> ${intake.phone}</p>
-              <p><strong>City:</strong> ${intake.city || 'Not provided'}</p>
+              <p><strong>City:</strong> ${intake.city || 'Not provided`}</p>
               <p><strong>Agreement Signed:</strong> Yes (${agreement.key})</p>
               <p><a href="${PLATFORM_DEFAULTS.siteUrl}/portal/admin/apprentices">View in Admin Portal</a></p>
             `,
@@ -106,7 +106,7 @@ async function _POST(request: NextRequest) {
         },
       );
     } catch (err) {
-      logger.error('Unhandled error', err instanceof Error ? err : undefined);
+      logger.error(`Unhandled error', err instanceof Error ? err : undefined);
     }
 
     return NextResponse.json({

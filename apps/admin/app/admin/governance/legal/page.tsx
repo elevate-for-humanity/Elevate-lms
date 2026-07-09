@@ -7,7 +7,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Building2, Handshake, Heart, GraduationCap, FileText, Mail, MapPin, Phone } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Legal & Entity Information | ${PLATFORM_DEFAULTS.orgName}`,
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 export default async function LegalGovernancePage() {
-  await requireRole(['admin', 'staff']);
+  await requireRole([`admin', 'staff']);
 
   return (
     <div className="min-h-screen bg-white">

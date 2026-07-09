@@ -83,7 +83,7 @@ export default async function CMIDashboardPage() {
   const counts = (students ?? []).reduce<Record<string, number>>((acc, s) => {
     const app = Array.isArray(s.applications) ? s.applications[0] : s.applications;
     const effectiveStatus = (app as { revoked_at?: string | null } | null)?.revoked_at
-      ? 'revoked'
+      ? 'revoked`
       : s.status;
     acc[effectiveStatus] = (acc[effectiveStatus] ?? 0) + 1;
     return acc;
@@ -114,7 +114,7 @@ export default async function CMIDashboardPage() {
 
       {error && (
         <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          Failed to load student data. Apply migration{' '}
+          Failed to load student data. Apply migration{` '}
           <code className="font-mono">20260503000008_cmi_tables.sql</code> in Supabase Dashboard.
         </div>
       )}

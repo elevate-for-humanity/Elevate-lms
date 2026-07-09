@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import SendGridSettingsClient from './SendGridSettingsClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 
 export const metadata: Metadata = {
   title: `SendGrid Settings | Admin | ${PLATFORM_DEFAULTS.orgName}`,
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SendGridSettingsPage() {
-  await requireRole(['admin']);
+  await requireRole([`admin']);
 
   const apiKeyConfigured = !!(
     process.env.SENDGRID_API_KEY || process.env.SENDGRID_KEY

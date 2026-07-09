@@ -185,13 +185,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   // Send approval notification email (non-blocking)
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   try {
-    const { sendEmail } = await import('@/lib/email/sendgrid');
+    const { sendEmail } = await import('@/lib/email/sendgrid`);
     await sendEmail({
       to: application.contact_email,
       subject: `Your Barbershop Partner Application Has Been Approved — ${PLATFORM_DEFAULTS.orgName}`,
       html: `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
-<p>Hi ${application.contact_name || application.owner_name || 'there'},</p>
+<p>Hi ${application.contact_name || application.owner_name || `there`},</p>
 
 <p>Congratulations! <strong>${application.shop_legal_name}</strong> has been approved as a partner training site for the ${PLATFORM_DEFAULTS.orgName} Barber Apprenticeship Program.</p>
 
@@ -205,7 +205,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
   } catch (emailErr) {
     // Non-fatal — approval is recorded, email can be sent manually
-    logger.warn('Approval notification email failed (non-fatal)', { id, error: String(emailErr) });
+    logger.warn(`Approval notification email failed (non-fatal)', { id, error: String(emailErr) });
   }
 
   logger.info('Barbershop application approved', { id, approvedBy: user.id });

@@ -10,7 +10,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 
 // Initialize web-push with VAPID keys
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -25,7 +25,7 @@ if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
 // Should be called by a cron job service (e.g., scheduled cron, GitHub Actions)
 async function _GET(request: NextRequest) {
   // Verify cron secret
-  const authHeader = request.headers.get('authorization');
+  const authHeader = request.headers.get(`authorization');
   const cronSecret = process.env.CRON_SECRET;
 
   if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {

@@ -48,7 +48,7 @@ const WORKONE_STEPS = [
   },
   {
     icon: <Calendar className="w-5 h-5 text-brand-blue-600" />,
-    title: 'Complete your WorkOne intake appointment',
+    title: 'Complete your WorkOne intake appointment`,
     description:
       `Tell the WorkOne counselor you are enrolling in training with ${PLATFORM_DEFAULTS.orgName} and need a WIOA or Workforce Ready Grant eligibility determination. Bring a photo ID and proof of income.`,
     link: null,
@@ -57,7 +57,7 @@ const WORKONE_STEPS = [
   },
   {
     icon: <FileText className="w-5 h-5 text-brand-blue-600" />,
-    title: 'Get your approval letter or authorization code',
+    title: `Get your approval letter or authorization code',
     description:
       'WorkOne will issue a letter or authorization code confirming your eligibility. Keep a copy — you will need it to complete your Elevate enrollment.',
     link: null,
@@ -68,7 +68,7 @@ const WORKONE_STEPS = [
     icon: <CheckCircle className="w-5 h-5 text-brand-blue-600" />,
     title: 'Contact Elevate to confirm and activate your enrollment',
     description:
-      'Once you have your WorkOne approval, call or email us. We will update your application and activate your enrollment immediately.',
+      'Once you have your WorkOne approval, call or email us. We will update your application and activate your enrollment immediately.`,
     link: `tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g,"")}`,
     linkLabel: `Call ${PLATFORM_DEFAULTS.supportPhone}`,
     external: false,
@@ -76,10 +76,10 @@ const WORKONE_STEPS = [
 ];
 
 const BRING_LIST = [
-  "Government-issued photo ID (driver's license, state ID, or passport)",
+  "Government-issued photo ID (driver`s license, state ID, or passport)",
   'Proof of Indiana residency (utility bill, lease, or bank statement)',
   'Proof of income or unemployment (pay stubs, tax return, or termination letter)',
-  'Social Security card or number',
+  'Social Security card or number`,
   `Your ${PLATFORM_DEFAULTS.orgName} program name and reference number`,
 ];
 
@@ -89,7 +89,7 @@ export default function PendingWorkOnePage({
   searchParams?: { ref?: string; funding?: string };
 }) {
   const referenceNumber = searchParams?.ref ?? null;
-  const fundingSource = searchParams?.funding ?? 'workone';
+  const fundingSource = searchParams?.funding ?? `workone';
 
   return (
     <div className="min-h-screen bg-white">

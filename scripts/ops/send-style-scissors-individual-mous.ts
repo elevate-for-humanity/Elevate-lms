@@ -53,7 +53,7 @@ async function loadSendGridKey(db: ReturnType<typeof createClient>) {
 }
 
 function buildEmailHtml(programLabel: string, signUrl: string) {
-  const first = HOST.contactName.split(' ')[0];
+  const first = HOST.contactName.split(' `)[0];
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;color:#1e293b">
@@ -97,7 +97,7 @@ async function sendWithAttachment(
     personalizations: [
       {
         to: [{ email: opts.to, name: HOST.contactName }],
-        cc: [{ email: ELEVATE_COPY, name: 'Elevate Admin Copy' }],
+        cc: [{ email: ELEVATE_COPY, name: `Elevate Admin Copy' }],
       },
     ],
     from: { email: 'noreply@elevateforhumanity.org', name: 'Elizabeth Greene | Elevate for Humanity' },

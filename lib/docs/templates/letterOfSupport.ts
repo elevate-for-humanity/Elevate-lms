@@ -1,4 +1,4 @@
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 export const LETTER_OF_SUPPORT_TEMPLATE = `
 {{date}}
 
@@ -9,7 +9,7 @@ Re: Letter of Support for {{program_name}}
 
 To Whom It May Concern,
 
-On behalf of {{partner_name}}, I am writing to express our strong support for ${PLATFORM_DEFAULTS.orgName}'s {{program_name}} initiative in {{city}}, {{state}}.
+On behalf of {{partner_name}}, I am writing to express our strong support for ${PLATFORM_DEFAULTS.orgName}`s {{program_name}} initiative in {{city}}, {{state}}.
 
 ${PLATFORM_DEFAULTS.orgName} has demonstrated a clear commitment to providing high-quality, workforce-aligned training in partnership with employers, community organizations, and public agencies. Through this collaboration, participants will gain the technical skills, professional behaviors, and wraparound supports needed to enter and advance in careers in {{sector_description}}.
 

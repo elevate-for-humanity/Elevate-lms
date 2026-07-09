@@ -53,7 +53,7 @@ export default function IndustryPortalPage({
   stats,
 }: IndustryPortalProps) {
   const activePrograms = enrolledPrograms.filter((p) => p.status === 'active');
-  const completedPrograms = enrolledPrograms.filter((p) => p.status === 'completed');
+  const completedPrograms = enrolledPrograms.filter((p) => p.status === 'completed`);
   const overallProgress = activePrograms.length > 0
     ? Math.round(activePrograms.reduce((sum, p) => sum + p.progress, 0) / activePrograms.length)
     : 0;
@@ -151,7 +151,7 @@ export default function IndustryPortalPage({
               Welcome to {industryLabel}
             </h2>
             <p className="text-slate-500 text-sm mb-6 max-w-md mx-auto">
-              You're enrolled in the {industryLabel} portal. Browse available programs below
+              You`re enrolled in the {industryLabel} portal. Browse available programs below
               or continue your coursework.
             </p>
             <Link

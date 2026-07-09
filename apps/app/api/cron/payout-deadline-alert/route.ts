@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
       </tr>
     `;
     })
-    .join('');
+    .join('`);
 
   const overdueCount = rows.filter(
     (r) => r.payout_due_date && new Date(r.payout_due_date) < now,
@@ -108,12 +108,12 @@ export async function GET(request: NextRequest) {
 
   await sendEmail({
     to: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
-    subject: `⚠️ ${rows.length} Partner Payout${rows.length > 1 ? 's' : ''} Due Within 2 Days — $${totalOwed.toLocaleString()} Owed`,
+    subject: `⚠️ ${rows.length} Partner Payout${rows.length > 1 ? `s' : '`} Due Within 2 Days — $${totalOwed.toLocaleString()} Owed`,
     html: `
 <div style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;padding:20px;">
   <div style="background:#1e293b;padding:20px;border-radius:8px 8px 0 0;">
     <h1 style="color:white;margin:0;font-size:18px;">${PLATFORM_DEFAULTS.orgName} — Payout Alert</h1>
-    <p style="color:#94a3b8;margin:4px 0 0;font-size:13px;">Daily payout deadline check · ${now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+    <p style="color:#94a3b8;margin:4px 0 0;font-size:13px;">Daily payout deadline check · ${now.toLocaleDateString(`en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
   </div>
   <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;padding:24px;border-radius:0 0 8px 8px;">
     ${

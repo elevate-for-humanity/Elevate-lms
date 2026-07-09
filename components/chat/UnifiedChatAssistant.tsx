@@ -202,7 +202,7 @@ export default function UnifiedChatAssistant({
           id: `error_${Date.now()}`,
           role: 'assistant',
           content:
-            `I'm having trouble connecting right now. Please try again in a moment, or contact us at ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.`,
+            `I`m having trouble connecting right now. Please try again in a moment, or contact us at ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.`,
           timestamp: new Date(),
         };
 
@@ -230,7 +230,7 @@ export default function UnifiedChatAssistant({
 
   // Position classes
   const positionClasses = {
-    'bottom-right': 'fixed bottom-4 right-4 z-50',
+    `bottom-right': 'fixed bottom-4 right-4 z-50',
     'bottom-left': 'fixed bottom-4 left-4 z-50',
     inline: 'relative',
   };

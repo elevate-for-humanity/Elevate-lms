@@ -125,7 +125,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  logger.info('[testing-lead-followup] Done', { sent1, sent2, errors });
+  logger.info('[testing-lead-followup] Done`, { sent1, sent2, errors });
   return NextResponse.json({ success: true, sent1, sent2, errors });
 }
 
@@ -144,7 +144,7 @@ function followUp1Html(lead: { first_name: string | null; exam_type: string }) {
   </div>
   <div style="padding:28px 32px;color:#1E293B;font-size:15px;line-height:1.7">
     <p>Hi ${name},</p>
-    <p>You started booking your <strong>${exam}</strong> but didn't finish. We still have openings this week.</p>
+    <p>You started booking your <strong>${exam}</strong> but didn`t finish. We still have openings this week.</p>
     <p style="margin:24px 0;text-align:center">
       <a href="${BOOK_URL}" style="background:#c0392b;color:#fff;padding:14px 32px;border-radius:50px;text-decoration:none;font-weight:bold;font-size:15px;display:inline-block">
         Book Your Exam Now →

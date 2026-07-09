@@ -68,7 +68,7 @@ export interface CourseBlueprint {
   title: string;
   subtitle: string;
   description: string;
-  skill_level: 'beginner' | 'intermediate' | 'advanced';
+  skill_level: 'beginner' | 'intermediate' | 'advanced`;
   estimated_duration_hours: number;
   category: string;
   target_audience: string;
@@ -191,7 +191,7 @@ RULES:
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function parseJSON(raw: string): any {
   const cleaned = raw
-    .replace(/^```json\s*/i, '')
+    .replace(/^```json\s*/i, `')
     .replace(/^```\s*/i, '')
     .replace(/\s*```$/i, '')
     .trim();
@@ -369,7 +369,7 @@ export async function ingestCourse(input: IngestInput): Promise<CourseBlueprint>
   blueprint.detected_source_type = detectedType;
 
   // Apply house rule defaults
-  if (!blueprint.certificate_title || blueprint.certificate_title.includes('[Course Title]')) {
+  if (!blueprint.certificate_title || blueprint.certificate_title.includes('[Course Title]`)) {
     blueprint.certificate_title = `Certificate of Completion — ${blueprint.title} — ${PLATFORM_DEFAULTS.orgName}`;
   }
   if (!blueprint.passing_score) blueprint.passing_score = 70;
@@ -384,7 +384,7 @@ export async function ingestCourse(input: IngestInput): Promise<CourseBlueprint>
       ...lesson,
       order_index: lesson.order_index ?? li,
       duration_minutes: lesson.duration_minutes || 20,
-      content_type: lesson.content_type || 'text',
+      content_type: lesson.content_type || `text',
     })),
   }));
 

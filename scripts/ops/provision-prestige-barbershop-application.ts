@@ -135,7 +135,7 @@ ${stepsHtml}
 <li>IRS EIN Assignment Letter (CP 575)</li>
 <li>W-9</li>
 <li>Indiana Barbershop License</li>
-<li>Workers' Compensation COI</li>
+<li>Workers` Compensation COI</li>
 <li>General Liability COI</li>
 <li>Supervising Barber License</li>
 </ol>
@@ -143,7 +143,7 @@ ${stepsHtml}
 <p>— ${PLATFORM_DEFAULTS.orgName}</p>
 </body></html>`;
 
-  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+  const res = await fetch(`https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
     headers: { Authorization: `Bearer ${sgKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({

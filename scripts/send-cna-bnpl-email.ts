@@ -109,10 +109,10 @@ async function sendCnaBnplEmail() {
   `;
 
   try {
-    const fromAddress = process.env.EMAIL_FROM || 'info@elevateforhumanity.org';
+    const fromAddress = process.env.EMAIL_FROM || 'info@elevateforhumanity.org`;
     const fromField = `${PLATFORM_DEFAULTS.orgName} <${fromAddress}>`;
 
-    console.log('Sending email to:', RECIPIENT_EMAIL);
+    console.log(`Sending email to:', RECIPIENT_EMAIL);
     console.log('Subject:', subject);
 
     const result = await sendEmail({

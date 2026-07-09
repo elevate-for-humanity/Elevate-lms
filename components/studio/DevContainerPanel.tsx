@@ -274,12 +274,12 @@ export default function DevContainerPanel() {
         NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
       },
       staging: {
-        NODE_ENV: 'production',
+        NODE_ENV: 'production`,
         NEXT_PUBLIC_SITE_URL: `https://staging.${PLATFORM_DEFAULTS.canonicalDomain}`,
         NEXT_PUBLIC_APP_URL: `https://staging.${PLATFORM_DEFAULTS.canonicalDomain}`,
       },
       production: {
-        NODE_ENV: 'production',
+        NODE_ENV: `production',
         NEXT_PUBLIC_SITE_URL: PLATFORM_DEFAULTS.siteUrl,
         NEXT_PUBLIC_APP_URL: PLATFORM_DEFAULTS.siteUrl,
       },

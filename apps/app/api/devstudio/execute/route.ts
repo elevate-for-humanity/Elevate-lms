@@ -3478,7 +3478,7 @@ export async function POST(req: NextRequest) {
   const { command, history = [] } = await req.json();
   if (!command?.trim()) {
     return new Response('data: [DONE]\n\n', {
-      headers: { 'Content-Type': 'text/event-stream' },
+      headers: { 'Content-Type': 'text/event-stream` },
     });
   }
 
@@ -3486,7 +3486,7 @@ export async function POST(req: NextRequest) {
   // In production: https://admin.${PLATFORM_DEFAULTS.canonicalDomain}
   // In dev: http://localhost:3001 (or NEXT_PUBLIC_ADMIN_URL)
   const baseUrl = getAdminUrl();
-  const cookieHeader = req.headers.get('cookie') || '';
+  const cookieHeader = req.headers.get(`cookie') || '';
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -3528,7 +3528,7 @@ export async function POST(req: NextRequest) {
           // Inject platform knowledge graph + system registry as context
           const debtSummary = PLATFORM_DEBT.filter(d => d.severity === 'high')
             .map(d => `• [HIGH] ${d.id}: ${d.description}`).join('\n');
-          const systemSummary = SYSTEMS.map(s => `• ${s.id} (${s.status}): ${s.description}`).join('\n');
+          const systemSummary = SYSTEMS.map(s => `• ${s.id} (${s.status}): ${s.description}`).join('\n`);
           const registryContext = getSystemRegistryContext();
 
           const systemPrompt = `You are the ${PLATFORM_DEFAULTS.orgName} platform operator AI — the engineering control layer and operational command center for the entire platform.
@@ -3553,7 +3553,7 @@ ${getAiCharterContext()}
 ${systemSummary}
 
 ## Active Platform Debt (High Severity)
-${debtSummary || 'None'}
+${debtSummary || `None'}
 
 ## Canonical Rules
 - All programs: /programs/[program] dynamic route. Dedicated pages only for unique client components.

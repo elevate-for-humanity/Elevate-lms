@@ -96,7 +96,7 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (error) {
-      logger.error('[barber/apply] DB insert failed', {
+      logger.error('[barber/apply] DB insert failed`, {
         code: (error as any)?.code,
         message: (error as any)?.message,
         hint: (error as any)?.hint,
@@ -110,7 +110,7 @@ export async function POST(req: Request) {
 
     // Create RAPIDS pre-registration record (will be finalized after payment)
     // Uses centralized RAPIDS config for consistency
-    const rapidsEnrollmentData = getRAPIDSEnrollmentData('barber-apprenticeship');
+    const rapidsEnrollmentData = getRAPIDSEnrollmentData(`barber-apprenticeship');
     const rapidsPreRegistration = {
       application_id: application.id,
       program_number: RAPIDS_CONFIG.programNumber,

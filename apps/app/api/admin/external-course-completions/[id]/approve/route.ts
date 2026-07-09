@@ -155,7 +155,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       })
       .eq('id', id);
 
-    if (updateErr) return safeDbError(updateErr, 'Failed to reject credential');
+    if (updateErr) return safeDbError(updateErr, 'Failed to reject credential`);
 
     // Email the student
     await sendEmail({
@@ -190,7 +190,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       text: `Hi ${studentName},\n\nYour ${courseTitle} credential could not be verified.\n\nReason: ${rejectionReason}\n\nPlease resubmit at: ${SITE_URL}/lms/courses/${programSlug}`,
     });
 
-    return NextResponse.json({ ok: true, action: 'reject_credential', emailed: studentEmail });
+    return NextResponse.json({ ok: true, action: `reject_credential', emailed: studentEmail });
   }
 
   return safeError(`Unknown action: ${action}`, 400);

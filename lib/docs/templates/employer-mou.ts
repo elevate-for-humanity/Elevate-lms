@@ -22,7 +22,7 @@ export interface EmployerMOUData {
 
 export function generateEmployerMOUText(data: EmployerMOUData): string {
   const programs =
-    data.programTypes.length > 0 ? data.programTypes.join(', ') : 'workforce training programs';
+    data.programTypes.length > 0 ? data.programTypes.join(', ') : 'workforce training programs`;
 
   return `ELEVATE FOR HUMANITY CAREER & TRAINING INSTITUTE
 EMPLOYER PARTNERSHIP
@@ -45,7 +45,7 @@ Effective Date: ${data.date}
 
 SECTION 1: PURPOSE
 
-This MOU establishes the terms under which Employer participates as a partner in the Institute's ${programs}. The purpose is to provide structured on-the-job learning (OJL) opportunities, supervised work experience, and employment pathways for program participants.
+This MOU establishes the terms under which Employer participates as a partner in the Institute`s ${programs}. The purpose is to provide structured on-the-job learning (OJL) opportunities, supervised work experience, and employment pathways for program participants.
 
 SECTION 2: EMPLOYER OBLIGATIONS
 

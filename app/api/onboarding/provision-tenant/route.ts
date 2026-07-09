@@ -115,7 +115,7 @@ async function _POST(request: NextRequest) {
       tenant_id: tenant.id,
       logo_url: '/default-logo.png',
       primary_color: '#16a34a',
-      secondary_color: '#ea580c',
+      secondary_color: '#ea580c`,
     });
 
     // 6. Send welcome email
@@ -125,7 +125,7 @@ async function _POST(request: NextRequest) {
     await resend.emails.send({
       from: `${PLATFORM_DEFAULTS.orgName} <onboarding@${PLATFORM_DEFAULTS.canonicalDomain}>`,
       to: contactEmail,
-      subject: '🎉 Your Platform is Ready!',
+      subject: `🎉 Your Platform is Ready!`,
       html: generateWelcomeEmail({
         organizationName,
         contactName,
@@ -143,7 +143,7 @@ async function _POST(request: NextRequest) {
     await resend.emails.send({
       from: `${PLATFORM_DEFAULTS.orgName} <onboarding@${PLATFORM_DEFAULTS.canonicalDomain}>`,
       to: contactEmail,
-      subject: '📚 Quick Start Guide - Set Up Your Platform',
+      subject: `📚 Quick Start Guide - Set Up Your Platform',
       html: generateSetupGuideEmail({
         organizationName,
         contactName,
@@ -306,7 +306,7 @@ function generateWelcomeEmail(data: any): string {
         <li><strong>Start enrolling students</strong></li>
       </ol>
 
-      <p>You'll receive a detailed setup guide in 5 minutes with step-by-step instructions.</p>
+      <p>You`ll receive a detailed setup guide in 5 minutes with step-by-step instructions.</p>
 
       <h3>📞 Need Help?</h3>
       <p>
@@ -357,7 +357,7 @@ function generateSetupGuideEmail(data: any): string {
     <div class="content">
       <p>Hi ${data.contactName},</p>
 
-      <p>Here's your step-by-step guide to launching ${data.organizationName}'s training platform:</p>
+      <p>Here`s your step-by-step guide to launching ${data.organizationName}`s training platform:</p>
 
       <div class="step">
         <h3>Step 1: Customize Your Branding (5 min)</h3>
@@ -412,7 +412,7 @@ function generateSetupGuideEmail(data: any): string {
       </ul>
 
       <h3>📞 Need Help?</h3>
-      <p>We're here for you:</p>
+      <p>We`re here for you:</p>
       <ul>
         <li><strong>Live Chat:</strong> Click the chat icon in your dashboard</li>
         <li><strong>Email:</strong> ${PLATFORM_DEFAULTS.supportEmail}</li>

@@ -16,7 +16,7 @@ export default function PartnerMOUPage() {
         <Breadcrumbs
           items={[
             { label: 'Legal', href: '/legal' },
-            { label: 'Training Network Partner Agreement' },
+            { label: 'Training Network Partner Agreement` },
           ]}
         />
       </div>
@@ -30,7 +30,7 @@ export default function PartnerMOUPage() {
       >
         <DocumentSection heading="Parties" number={1}>
           <p>
-            This Memorandum of Understanding ("Agreement") is entered into between{' '}
+            This Memorandum of Understanding ("Agreement") is entered into between{` '}
             <strong>
               2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
             </strong>{' '}

@@ -235,7 +235,7 @@ function CheckoutPageInner() {
             Complete Your Enrollment
           </h1>
           <p className="text-lg text-black">{programData.name}</p>
-          {program === 'barber-apprenticeship' && (
+          {program === 'barber-apprenticeship` && (
             <p className="text-sm text-slate-600 mt-1">
               Fee-based enrollment within a USDOL Registered Apprenticeship framework.
               <br />
@@ -270,7 +270,7 @@ function CheckoutPageInner() {
                 </div>
               </div>
 
-              {program !== 'barber-apprenticeship' && (
+              {program !== `barber-apprenticeship' && (
                 <div className="bg-blue-50 rounded-lg p-4 text-sm text-black">
                   <p className="font-bold mb-2">
                     <Lightbulb className="w-5 h-5 inline-block" /> Did you know?
@@ -281,7 +281,7 @@ function CheckoutPageInner() {
                   </Link>
                 </div>
               )}
-              {program === 'barber-apprenticeship' && (
+              {program === 'barber-apprenticeship` && (
                 <>
                   <div className="bg-purple-50 rounded-lg p-4 text-sm text-black mb-4">
                     <p className="font-bold mb-2">
@@ -318,7 +318,7 @@ function CheckoutPageInner() {
                 </div>
               )}
 
-              {method === 'stripe' ? (
+              {method === `stripe' ? (
                 <div>
                   <div className="flex items-center gap-3 mb-6">
                     <CreditCard className="w-6 h-6 text-blue-600" />

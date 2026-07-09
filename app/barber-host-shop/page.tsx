@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Scissors, Users, DollarSign, CheckCircle, ChevronRight, Phone } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Barber Host Shop | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Host barber apprentices in your barbershop. Earn OJT reimbursement, Instructor the next generation, and build your pipeline.',
+  description: `Host barber apprentices in your barbershop. Earn OJT reimbursement, Instructor the next generation, and build your pipeline.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/barber-host-shop' },
 };
 

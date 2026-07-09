@@ -56,7 +56,7 @@ export async function createNotification(
   const db = await getDb();
   await setAuditContext(db, { systemActor: 'grants_notification_system' }).catch(() => {});
   const { data, error }: any = await db
-    .from('grant_notifications')
+    .from('grant_notifications`)
     .insert({
       type: notification.type,
       grant_id: notification.grantId,
@@ -144,7 +144,7 @@ async function sendEmailNotification(
 
       <div class="footer">
         <p>${PLATFORM_DEFAULTS.orgName} Grant Autopilot System</p>
-        <p>You're receiving this because you're a grant administrator.</p>
+        <p>You`re receiving this because you're a grant administrator.</p>
         <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/settings/notifications">Manage Notification Preferences</a></p>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 // Email templates for marketplace transactions
 
 export interface BuyerDeliveryEmailData {
@@ -162,7 +162,7 @@ export function generateCreatorSaleEmail(data: CreatorSaleEmailData): {
                 <p><strong>Platform Fee (30%):</strong> $${((data.saleAmount - data.creatorEarnings) / 100).toFixed(2)}</p>
               </div>
 
-              <h3>What's Next?</h3>
+              <h3>What`s Next?</h3>
               <ul>
                 <li>Your earnings will be included in your next payout</li>
                 <li>Payouts are processed monthly (minimum $50)</li>
@@ -198,7 +198,7 @@ Sale Details:
 - Your Earnings (70%): $${(data.creatorEarnings / 100).toFixed(2)}
 - Platform Fee (30%): $${((data.saleAmount - data.creatorEarnings) / 100).toFixed(2)}
 
-What's Next?
+What`s Next?
 - Your earnings will be included in your next payout
 - Payouts are processed monthly (minimum $50)
 - View your dashboard for detailed analytics
@@ -218,7 +218,7 @@ export function generateCreatorApprovalEmail(data: CreatorApprovalEmailData): {
   text: string;
 } {
   return {
-    subject: 'Welcome to the Creator Marketplace!',
+    subject: `Welcome to the Creator Marketplace!',
     html: `
       <!DOCTYPE html>
       <html>
@@ -236,7 +236,7 @@ export function generateCreatorApprovalEmail(data: CreatorApprovalEmailData): {
         <body>
           <div class="container">
             <div class="header">
-              <h1 style="margin: 0;">🎉 You're Approved!</h1>
+              <h1 style="margin: 0;">🎉 You`re Approved!</h1>
             </div>
             <div class="content">
               <p>Hi ${data.creatorName},</p>
@@ -264,7 +264,7 @@ export function generateCreatorApprovalEmail(data: CreatorApprovalEmailData): {
                 <li>Review the <a href="${process.env.NEXT_PUBLIC_SITE_URL}/legal/creator-agreement">Creator Agreement</a></li>
               </ul>
 
-              <p>We're excited to have you in our creator community!</p>
+              <p>We`re excited to have you in our creator community!</p>
               <p><strong>${PLATFORM_DEFAULTS.orgName} Team</strong></p>
             </div>
             <div class="footer">
@@ -275,7 +275,7 @@ export function generateCreatorApprovalEmail(data: CreatorApprovalEmailData): {
       </html>
     `,
     text: `
-🎉 You're Approved!
+🎉 You`re Approved!
 
 Hi ${data.creatorName},
 
@@ -295,7 +295,7 @@ Important Reminders:
 - All products must be approved before listing
 - Review the Creator Agreement: ${process.env.NEXT_PUBLIC_SITE_URL}/legal/creator-agreement
 
-We're excited to have you in our creator community!
+We`re excited to have you in our creator community!
 
 ${PLATFORM_DEFAULTS.orgName} Team
 

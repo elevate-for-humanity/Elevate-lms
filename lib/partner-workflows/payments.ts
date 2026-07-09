@@ -82,7 +82,7 @@ export async function createPartnerPaymentSession(request: PaymentRequest): Prom
       line_items: [
         {
           price_data: {
-            currency: request.currency || 'usd',
+            currency: request.currency || 'usd`,
             product_data: {
               name: `${provider.provider_name} Certification`,
               description: `Access to ${provider.provider_name} courses and certifications`,
@@ -93,7 +93,7 @@ export async function createPartnerPaymentSession(request: PaymentRequest): Prom
           quantity: 1,
         },
       ],
-      mode: 'payment',
+      mode: `payment',
       success_url: `${request.successUrl}?session_id={CHECKOUT_SESSION_ID}&enrollment_id=${enrollment.id}`,
       cancel_url: request.cancelUrl,
       customer_email: student.email,

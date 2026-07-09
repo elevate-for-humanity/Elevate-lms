@@ -93,7 +93,7 @@ async function _POST(req: Request) {
         <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;margin:24px 0">
           <p style="margin:0 0 8px;font-size:15px;font-weight:bold;color:#15803d">✅ This program may be fully funded</p>
           <p style="margin:0;font-size:14px;color:#166534;line-height:1.7">
-            <strong>${programLabel}</strong> is listed on Indiana's Eligible Training Provider List (ETPL).
+            <strong>${programLabel}</strong> is listed on Indiana`s Eligible Training Provider List (ETPL).
             That means it can be covered at <strong>no cost to you</strong> through WIOA or the Workforce Ready Grant —
             if you qualify.
           </p>
@@ -122,13 +122,13 @@ async function _POST(req: Request) {
         <h3 style="font-size:16px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Your Next Steps</h3>
         <ol style="margin:0 0 20px;padding-left:20px;font-size:14px;color:#333;line-height:1.9">
           <li>Our admissions team will contact you within <strong>1–2 business days</strong> to discuss your options</li>
-          <li>We'll review available scholarships, employer sponsorship, and payment plans with you</li>
+          <li>We`ll review available scholarships, employer sponsorship, and payment plans with you</li>
           <li>Once funding is confirmed, <a href="${siteUrl}/apply/student?program=${programSlug}" style="color:#1a1a1a;font-weight:bold">complete your enrollment application</a></li>
-          <li>You'll receive your start date and orientation details by email</li>
+          <li>You`ll receive your start date and orientation details by email</li>
         </ol>
         <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 20px">
           Questions about cost or payment? Call us at <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color:#1a1a1a">${PLATFORM_DEFAULTS.supportPhone}</a>
-          or reply to this email — we'll find a path that works for you.
+          or reply to this email — we`ll find a path that works for you.
         </p>`;
 
     const confirmationHtml = `

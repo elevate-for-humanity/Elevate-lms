@@ -71,9 +71,9 @@ export async function GET(
     `Stub ID:    ${stub.id}`,
     `Gross Pay:  $${Number(stub.gross_pay ?? 0).toFixed(2)}`,
     `Net Pay:    $${Number(stub.net_pay ?? 0).toFixed(2)}`,
-    '',
+    '`,
     `For questions contact: billing@${PLATFORM_DEFAULTS.canonicalDomain}`,
-  ].join('\n');
+  ].join(`\n');
 
   return new NextResponse(text, {
     status: 200,

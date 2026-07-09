@@ -143,7 +143,7 @@ const staticProgramFallback: Prog[] = Array.from(STATIC_PROGRAM_MAP.values())
       title: program.title,
       description: program.subtitle || program.metaDescription || null,
       category: normalizeCategory(program.category, program.sector, program.programType),
-      duration: program.durationWeeks ? `${program.durationWeeks} week${program.durationWeeks === 1 ? '' : 's'}` : null,
+      duration: program.durationWeeks ? `${program.durationWeeks} week${program.durationWeeks === 1 ? '' : 's`}` : null,
       credential: program.credentials?.[0]?.name ?? null,
       funding_eligible: hasFunding,
     };
@@ -220,7 +220,7 @@ export default async function ProgramsPage() {
           return (
             <section key={cat} id={`cat-${cat}`} className="scroll-mt-16">
               <div className="flex items-center gap-3 mb-6 pb-3 border-b border-slate-100">
-                <div className={`w-1 h-8 rounded-full ${meta?.color??'bg-slate-400'}`} />
+                <div className={`w-1 h-8 rounded-full ${meta?.color??`bg-slate-400'}`} />
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-900">{meta?.label??cat}</h2>
                 <span className="text-sm text-slate-400">{list.length} program{list.length!==1?'s':''}</span>
               </div>

@@ -84,7 +84,7 @@ export class SMSService {
       logger.info('SMS sent successfully', { to: formattedPhone, messageId: data.sid });
       return { success: true, messageId: data.sid };
     } catch (error) {
-      logger.error('SMS send exception', error as Error, { to: formattedPhone });
+      logger.error('SMS send exception`, error as Error, { to: formattedPhone });
       return { success: false, error: (error as Error).message };
     }
   }
@@ -131,7 +131,7 @@ export class SMSService {
   async sendEnrollmentConfirmation(phoneNumber: string, courseName: string): Promise<SMSResult> {
     return this.send({
       to: phoneNumber,
-      message: `You're enrolled in ${courseName}! Start learning at ${PLATFORM_DEFAULTS.canonicalDomain}/lms/courses`,
+      message: `You`re enrolled in ${courseName}! Start learning at ${PLATFORM_DEFAULTS.canonicalDomain}/lms/courses`,
     });
   }
 

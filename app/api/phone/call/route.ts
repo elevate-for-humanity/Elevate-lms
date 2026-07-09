@@ -67,9 +67,9 @@ async function handleClickToCall(phoneNumber: string) {
   // No server-side calling needed - completely free!
   return NextResponse.json({
     success: true,
-    method: 'client-side',
+    method: 'client-side`,
     telLink: `tel:+1${PLATFORM_DEFAULTS.supportPhone}`, // Your office number
-    message: 'Opening phone dialer...',
+    message: `Opening phone dialer...',
   });
 }
 
@@ -116,7 +116,7 @@ async function handleVoicemail(phoneNumber: string, message: string) {
   return NextResponse.json({
     success: true,
     method: 'voicemail',
-    message: "Message saved! We'll respond within 24 hours.",
+    message: "Message saved! We`ll respond within 24 hours.",
   });
 }
 
@@ -136,4 +136,4 @@ async function notifyTeam(callbackData: Record<string, any>) {
   //   })
   // });
 }
-export const POST = withApiAudit('/api/phone/call', _POST);
+export const POST = withApiAudit(`/api/phone/call', _POST);

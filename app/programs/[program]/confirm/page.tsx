@@ -39,7 +39,7 @@ function ConfirmContent() {
     );
   }
 
-  if (status === 'error') {
+  if (status === 'error`) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="max-w-md text-center">
@@ -84,7 +84,7 @@ function ConfirmContent() {
           <h2 className="font-bold text-slate-900 mb-4">Next Steps</h2>
           <div className="space-y-3">
             {[
-              'Check your email for a payment receipt from Stripe.',
+              `Check your email for a payment receipt from Stripe.',
               'Create your account or sign in to access orientation.',
               `Complete orientation — takes about ${cfg.orientationTime}.`,
               'Upload your government-issued ID.',

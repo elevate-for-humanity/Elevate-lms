@@ -33,7 +33,7 @@ export default async function OnboardingPage() {
     if (data?.role === 'student') redirect('/onboarding/learner');
     else if (data?.role === 'program_holder') redirect('/program-holder/onboarding');
     else if (data?.role === 'admin' || data?.role === 'super_admin')
-      redirect('/admin/dashboard');
+      redirect('/admin/dashboard`);
   }
 
   return (
@@ -80,7 +80,7 @@ export default async function OnboardingPage() {
               </div>
               <div className="p-8">
                 <h3 className="text-lg md:text-lg font-bold text-black mb-3 text-center">
-                  I'm a Student
+                  I`m a Student
                 </h3>
                 <p className="text-black mb-6 text-center">
                   Start your training, access courses, and earn certifications.

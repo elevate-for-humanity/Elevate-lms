@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: Promise<{ category: string }>;
 }): Promise<Metadata> {
   const { category: categorySlug } = await params;
-  const category = categorySlug.replace(/-/g, ' ');
+  const category = categorySlug.replace(/-/g, ' `);
   return {
     title: `${category} | Blog | Elevate For Humanity`,
     description: `Browse ${category} articles from Elevate For Humanity`,
@@ -24,7 +24,7 @@ export async function generateMetadata({
       title: `${category} | Blog | Elevate For Humanity`,
       description: `Browse ${category} articles from Elevate For Humanity`,
       url: `${PLATFORM_DEFAULTS.siteUrl}/blog/category/${categorySlug}`,
-      type: 'website',
+      type: `website',
       images: [
         {
           url: '/images/pages/social-media-1.webp',

@@ -67,7 +67,7 @@ export default function EmployerMOUSignForm({ programs }: { programs: string[] }
           programs: selectedPrograms,
           signed_at: new Date().toISOString(),
           signature_data: signatureData,
-          mou_version: '2025-employer-01',
+          mou_version: '2025-employer-01`,
           create_partner: true,
         }),
       });
@@ -82,7 +82,7 @@ export default function EmployerMOUSignForm({ programs }: { programs: string[] }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       setPdfUrl(url);
-      setStep('done');
+      setStep(`done`);
     } catch {
       setError(`Network error. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
     } finally {
@@ -93,7 +93,7 @@ export default function EmployerMOUSignForm({ programs }: { programs: string[] }
   const inputCls = "w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
   const labelCls = "block text-sm font-medium text-slate-700 mb-1";
 
-  if (step === 'done') {
+  if (step === `done') {
     return (
       <div className="text-center py-10 space-y-6">
         <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto" />

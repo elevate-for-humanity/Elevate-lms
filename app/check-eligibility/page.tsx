@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 import { CheckCircle, DollarSign, Users, ArrowRight } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Check Eligibility | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Check if you qualify for workforce training funding and programs.',
+  description: `Check if you qualify for workforce training funding and programs.',
 };
 
 const ELIGIBILITY_TYPES = [

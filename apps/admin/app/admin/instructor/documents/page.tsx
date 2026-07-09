@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import InstructorDocumentsClient from './InstructorDocumentsClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 
 export const metadata: Metadata = {
   title: `Instructor Documents | ${PLATFORM_DEFAULTS.orgName}`,
@@ -25,7 +25,7 @@ export default async function InstructorDocumentsPage({
 
 
   // Guard against null user
-  if (!user) redirect('/login');
+  if (!user) redirect(`/login');
   const db = await requireAdminClient();
   const { data: profile } = await db
     .from('profiles')

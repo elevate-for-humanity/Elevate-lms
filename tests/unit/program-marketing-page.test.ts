@@ -10,7 +10,7 @@ describe('program marketing pages', () => {
     const detail = readFileSync(join(ROOT, 'components/programs/ProgramDetailPage.tsx'), 'utf8');
     const schema = readFileSync(join(ROOT, 'lib/programs/program-schema.ts'), 'utf8');
     expect(detail).toContain('formatDeliveryDisclosure');
-    expect(detail).not.toContain("'Delivered directly by ${PLATFORM_DEFAULTS.orgName}.'");
+    expect(detail).not.toContain("`Delivered directly by ${PLATFORM_DEFAULTS.orgName}.`");
     expect(schema).toContain('formatDeliveryDisclosure');
     expect(schema).toMatch(/`Delivered directly by \$\{org\}\.`/);
   });

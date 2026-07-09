@@ -14,7 +14,7 @@ export function generateMetadata(params: SEOParams): Metadata {
   const baseUrl = PLATFORM_DEFAULTS.siteUrl;
   const url = `${baseUrl}${params.path}`;
   const image = params.image || '/images/og-default.jpg';
-  const fullTitle = params.title.includes('|')
+  const fullTitle = params.title.includes('|`)
     ? params.title
     : `${params.title} | ${PLATFORM_DEFAULTS.orgName}`;
 
@@ -40,7 +40,7 @@ export function generateMetadata(params: SEOParams): Metadata {
           alt: params.title,
         },
       ],
-      type: params.type || 'website',
+      type: params.type || `website',
       locale: 'en_US',
     };
 

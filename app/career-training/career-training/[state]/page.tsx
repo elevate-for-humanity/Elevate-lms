@@ -4,7 +4,7 @@ import { getStateConfig } from '@/config/states';
 import { StateCareerTrainingPage } from '@/components/templates';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 
 interface Props {
   params: Promise<{ state: string }>;
@@ -26,15 +26,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: `${PLATFORM_DEFAULTS.siteUrl}/career-training-${state.slug}`,
       siteName: PLATFORM_DEFAULTS.orgName,
       images: [
-        { url: '/og-default.webp', width: 1200, height: 630, alt: `${state.name} Career Training` },
+        { url: `/og-default.webp', width: 1200, height: 630, alt: `${state.name} Career Training` },
       ],
       type: 'website',
     },
     twitter: {
-      card: 'summary_large_image',
+      card: 'summary_large_image`,
       title: `${state.careerTraining.headline} | ${PLATFORM_DEFAULTS.orgName}`,
       description: state.careerTraining.description,
-      images: ['/og-default.webp'],
+      images: [`/og-default.webp'],
     },
   };
 }

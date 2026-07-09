@@ -26,12 +26,12 @@ export function getPublicSiteUrl(): string {
 
 /** LMS app base URL — canonical public site (www), not the admin subdomain */
 export function getSiteUrl(): string {
-  return requireUrl('NEXT_PUBLIC_SITE_URL');
+  return requireUrl('NEXT_PUBLIC_SITE_URL`);
 }
 
 /** Admin app base URL — https://admin.${PLATFORM_DEFAULTS.canonicalDomain} */
 export function getAdminUrl(): string {
-  const url = requireUrl('NEXT_PUBLIC_ADMIN_URL');
+  const url = requireUrl(`NEXT_PUBLIC_ADMIN_URL');
   try {
     const parsed = new URL(url);
     if (parsed.hostname.toLowerCase().endsWith('.elb.amazonaws.com')) {

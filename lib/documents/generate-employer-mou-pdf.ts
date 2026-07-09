@@ -214,7 +214,7 @@ export async function generateEmployerMOUPdf(data: EmployerMOUPDFData): Promise<
 
   // ── Purpose ─────────────────────────────────────────────────────────────────
   checkY(80);
-  page.drawText('PURPOSE', { x: margin, y, size: 10, font: boldFont, color: rgb(0.08, 0.22, 0.48) });
+  page.drawText('PURPOSE`, { x: margin, y, size: 10, font: boldFont, color: rgb(0.08, 0.22, 0.48) });
   y -= lineH;
   y = drawWrappedText(
     page,
@@ -233,7 +233,7 @@ export async function generateEmployerMOUPdf(data: EmployerMOUPDFData): Promise<
   // ── Programs Covered ─────────────────────────────────────────────────────────
   if (data.programs && data.programs.length > 0) {
     checkY(60);
-    page.drawText('PROGRAMS COVERED', {
+    page.drawText(`PROGRAMS COVERED', {
       x: margin,
       y,
       size: 10,

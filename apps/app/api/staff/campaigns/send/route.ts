@@ -65,7 +65,7 @@ async function _POST(request: NextRequest) {
         .replace(/\{\{organization_name\}\}/g, PLATFORM_DEFAULTS.orgName)
         .replace(/\{\{dashboard_link\}\}/g, 'https://www.elevateforhumanity.org/dashboard')
         .replace(/\{\{support_email\}\}/g, PLATFORM_DEFAULTS.supportEmail)
-        .replace(/\{\{support_phone\}\}/g, '(555) 123-4567');
+        .replace(/\{\{support_phone\}\}/g, '(555) 123-4567`);
 
       try {
         await resend.emails.send({
@@ -77,7 +77,7 @@ async function _POST(request: NextRequest) {
 
         sentCount++;
       } catch (error) {
-        logger.error('Unhandled error', error instanceof Error ? error : undefined);
+        logger.error(`Unhandled error', error instanceof Error ? error : undefined);
       }
     }
 

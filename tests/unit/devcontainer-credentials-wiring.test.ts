@@ -57,8 +57,8 @@ describe('dev container credential wiring (no fake secrets in UI)', () => {
     
     if (panelPath) {
       const src = readFileSync(panelPath, 'utf8');
-      expect(src).not.toContain("'https://staging.${PLATFORM_DEFAULTS.canonicalDomain}'");
-      expect(src).not.toContain("'https://admin.${PLATFORM_DEFAULTS.canonicalDomain}'");
+      expect(src).not.toContain("`https://staging.${PLATFORM_DEFAULTS.canonicalDomain}`");
+      expect(src).not.toContain("`https://admin.${PLATFORM_DEFAULTS.canonicalDomain}`");
     } else {
       // DevContainerPanel not present - test passes
       expect(true).toBe(true);

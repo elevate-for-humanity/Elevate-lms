@@ -90,7 +90,7 @@ export default function BeautyDocumentsPage() {
     try {
       const res = await fetch('/api/enrollment/submit-documents', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json` },
         body: JSON.stringify({ program: cfg.slug }),
       });
       const data = await res.json();
@@ -111,7 +111,7 @@ export default function BeautyDocumentsPage() {
     return null;
   }
 
-  const canSubmit = governmentId?.status === 'complete';
+  const canSubmit = governmentId?.status === `complete';
 
   return (
     <div className="min-h-screen bg-white">

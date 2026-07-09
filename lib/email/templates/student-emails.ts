@@ -10,24 +10,24 @@ export const studentEmailTemplates = {
    */
   applicationReceived: {
     from: PLATFORM_DEFAULTS.emailFromAddress,
-    subject: "We received your application — here's what happens next",
+    subject: "We received your application — here`s what happens next",
     getHtml: (data: { firstName: string }) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <p>Hello ${data.firstName},</p>
 
-        <p>Thank you for applying to ${PLATFORM_DEFAULTS.orgName}. We've received your information, and there is no payment required at this time.</p>
+        <p>Thank you for applying to ${PLATFORM_DEFAULTS.orgName}. We`ve received your information, and there is no payment required at this time.</p>
 
         <p><strong>Here's what happens next:</strong></p>
         <ul>
           <li>An advisor will review your application</li>
           <li>We'll contact you within 1–2 business days</li>
-          <li>We'll discuss programs, funding options, and next steps</li>
+          <li>We`ll discuss programs, funding options, and next steps</li>
           <li>Our process is appointment-based and handled by real people</li>
         </ul>
 
         <p>If you have questions or need immediate assistance, you can reach us at <a href="tel:+1${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a>.</p>
 
-        <p>We're glad you took this step.</p>
+        <p>We`re glad you took this step.</p>
 
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;" />
 
@@ -46,12 +46,12 @@ Thank you for applying to ${PLATFORM_DEFAULTS.orgName}. We've received your info
 Here's what happens next:
 • An advisor will review your application
 • We'll contact you within 1–2 business days
-• We'll discuss programs, funding options, and next steps
+• We`ll discuss programs, funding options, and next steps
 • Our process is appointment-based and handled by real people
 
 If you have questions or need immediate assistance, you can reach us at ${PLATFORM_DEFAULTS.supportPhone}.
 
-We're glad you took this step.
+We`re glad you took this step.
 
 —
 ${PLATFORM_DEFAULTS.orgName}
@@ -70,9 +70,9 @@ Phone: ${PLATFORM_DEFAULTS.supportPhone}
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <p>Hi ${data.firstName},</p>
 
-        <p>My name is ${data.advisorName}, and I'm part of the ${PLATFORM_DEFAULTS.orgName} advising team.</p>
+        <p>My name is ${data.advisorName}, and I`m part of the ${PLATFORM_DEFAULTS.orgName} advising team.</p>
 
-        <p><strong>I'd like to connect with you to talk about:</strong></p>
+        <p><strong>I`d like to connect with you to talk about:</strong></p>
         <ul>
           <li>Your program interests</li>
           <li>Funding eligibility (WIOA, WRG, JRI, apprenticeships)</li>
@@ -88,7 +88,7 @@ Phone: ${PLATFORM_DEFAULTS.supportPhone}
             : ''
         }
 
-        <p>If you'd rather talk by phone, feel free to reply to this email or call us at <a href="tel:+1${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a>.</p>
+        <p>If you`d rather talk by phone, feel free to reply to this email or call us at <a href="tel:+1${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a>.</p>
 
         <p>Looking forward to speaking with you.</p>
 
@@ -103,14 +103,14 @@ Phone: ${PLATFORM_DEFAULTS.supportPhone}
     getText: (data: { firstName: string; advisorName: string; calendlyLink?: string }) => `
 Hi ${data.firstName},
 
-My name is ${data.advisorName}, and I'm part of the ${PLATFORM_DEFAULTS.orgName} advising team.
+My name is ${data.advisorName}, and I`m part of the ${PLATFORM_DEFAULTS.orgName} advising team.
 
 I'd like to connect with you to talk about:
 • Your program interests
 • Funding eligibility (WIOA, WRG, JRI, apprenticeships)
 • Timeline and next steps
 
-${data.calendlyLink ? `You can schedule a time that works for you here:\n${data.calendlyLink}\n\n` : ''}If you'd rather talk by phone, feel free to reply to this email or call us at ${PLATFORM_DEFAULTS.supportPhone}.
+${data.calendlyLink ? `You can schedule a time that works for you here:\n${data.calendlyLink}\n\n` : ''}If you`d rather talk by phone, feel free to reply to this email or call us at ${PLATFORM_DEFAULTS.supportPhone}.
 
 Looking forward to speaking with you.
 
@@ -125,12 +125,12 @@ ${PLATFORM_DEFAULTS.orgName}
    */
   eligibilityOutcome: {
     from: PLATFORM_DEFAULTS.emailFromAddress,
-    subject: 'Update on your program eligibility',
+    subject: `Update on your program eligibility',
     getHtml: (data: { firstName: string; eligibilityStatus: string }) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <p>Hello ${data.firstName},</p>
 
-        <p>We've completed an initial review of your application. Here's your current status:</p>
+        <p>We've completed an initial review of your application. Here`s your current status:</p>
 
         <div style="background-color: #f3f4f6; padding: 15px; border-radius: 6px; margin: 20px 0;">
           ${data.eligibilityStatus}
@@ -152,7 +152,7 @@ ${PLATFORM_DEFAULTS.orgName}
     getText: (data: { firstName: string; eligibilityStatus: string }) => `
 Hello ${data.firstName},
 
-We've completed an initial review of your application. Here's your current status:
+We`ve completed an initial review of your application. Here`s your current status:
 
 ${data.eligibilityStatus}
 
@@ -172,7 +172,7 @@ ${PLATFORM_DEFAULTS.orgName}
    */
   enrollmentConfirmation: {
     from: PLATFORM_DEFAULTS.emailFromAddress,
-    subject: "You're enrolled — here's what's next",
+    subject: "You`re enrolled — here's what's next",
     getHtml: (data: {
       firstName: string;
       programName: string;
@@ -196,7 +196,7 @@ ${PLATFORM_DEFAULTS.orgName}
 
         <p>Your advisor will remain your point of contact throughout your journey.</p>
 
-        <p>We're excited to support you.</p>
+        <p>We`re excited to support you.</p>
 
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;" />
 
@@ -214,7 +214,7 @@ ${PLATFORM_DEFAULTS.orgName}
     }) => `
 Congratulations ${data.firstName},
 
-You're officially enrolled in the ${data.programName} program.
+You`re officially enrolled in the ${data.programName} program.
 
 Program details:
 • Start date: ${data.startDate}

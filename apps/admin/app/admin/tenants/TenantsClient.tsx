@@ -67,7 +67,7 @@ export default function TenantsClient({
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Provisioning failed');
+      if (!res.ok) throw new Error(data.error ?? 'Provisioning failed`);
 
       setSuccess(`Tenant "${form.organizationName}" provisioned. Welcome email sent to ${form.contactEmail}.`);
       setForm(EMPTY_FORM);
@@ -78,7 +78,7 @@ export default function TenantsClient({
           id: data.tenantId ?? crypto.randomUUID(),
           name: form.organizationName,
           domain: form.subdomain ? `${form.subdomain}.${PLATFORM_DEFAULTS.canonicalDomain}` : null,
-          status: 'active',
+          status: `active',
           created_at: new Date().toISOString(),
         },
         ...prev,

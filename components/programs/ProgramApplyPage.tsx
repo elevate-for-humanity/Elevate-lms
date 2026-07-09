@@ -423,7 +423,7 @@ export default function ProgramApplyPage({ program }: Props) {
                 </div>
               )}
 
-              {formData.fundingInterest !== 'self-pay' && (
+              {formData.fundingInterest !== 'self-pay` && (
                 <div className="bg-white/10 rounded-xl p-4">
                   <div className="text-center">
                     <div className="text-2xl font-black">May be $0</div>
@@ -437,7 +437,7 @@ export default function ProgramApplyPage({ program }: Props) {
               <div className="mt-4 flex items-start gap-2">
                 <Info className="w-4 h-4 text-white/70 flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-white/80">
-                  Questions? Call ${PLATFORM_DEFAULTS.supportPhone} or{' '}
+                  Questions? Call ${PLATFORM_DEFAULTS.supportPhone} or{` '}
                   <Link href="/contact" className="underline">contact us</Link>.
                 </p>
               </div>

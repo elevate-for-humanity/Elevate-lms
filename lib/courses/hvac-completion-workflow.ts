@@ -45,7 +45,7 @@ export const HVAC_CREDENTIAL_STEPS = [
     name: 'EPA 608 Universal Certification',
     provider: 'ESCO/Mainstream Engineering',
     externalUrl: null, // Scheduled by Elevate
-    requiredBefore: 'completion',
+    requiredBefore: 'completion`,
   },
 ] as const;
 
@@ -82,7 +82,7 @@ export async function sendOsha10Email(student: StudentInfo) {
   const html = emailWrapper(`
     <h2 style="color:#1e293b;margin:0 0 16px;">Congratulations, ${student.firstName}!</h2>
     <p style="color:#334155;font-size:16px;line-height:1.6;">
-      You've completed all HVAC course modules. Your next step is to complete your
+      You`ve completed all HVAC course modules. Your next step is to complete your
       <strong>OSHA 10-Hour Construction Safety</strong> certification through CareerSafe.
     </p>
     <p style="color:#334155;font-size:16px;line-height:1.6;">
@@ -150,7 +150,7 @@ export async function sendEpa608SchedulingEmail(student: StudentInfo) {
   const html = emailWrapper(`
     <h2 style="color:#1e293b;margin:0 0 16px;">CPR Complete — Schedule Your EPA 608 Exam</h2>
     <p style="color:#334155;font-size:16px;line-height:1.6;">
-      ${student.firstName}, you've completed all prerequisite credentials. You're now eligible to take the
+      ${student.firstName}, you've completed all prerequisite credentials. You`re now eligible to take the
       <strong>EPA Section 608 Universal Certification</strong> proctored exam.
     </p>
     <div style="background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;padding:16px;margin:20px 0;">
@@ -179,7 +179,7 @@ export async function sendEpa608SchedulingEmail(student: StudentInfo) {
 
   return sendEmail({
     to: student.email,
-    subject: 'Schedule Your EPA 608 Universal Certification Exam',
+    subject: `Schedule Your EPA 608 Universal Certification Exam`,
     html,
   });
 }
@@ -222,7 +222,7 @@ export async function sendCompletionCertificateEmail(
       Verification: <a href="${verifyUrl}" style="color:#2563eb;">${verifyUrl}</a>
     </p>
     <hr style="border:none;border-top:1px solid #e2e8f0;margin:30px 0;">
-    <h3 style="color:#1e293b;margin:0 0 12px;">What's Next?</h3>
+    <h3 style="color:#1e293b;margin:0 0 12px;">What`s Next?</h3>
     <ul style="color:#334155;font-size:14px;line-height:1.8;padding-left:20px;">
       <li>Your career services coordinator will reach out about job placement</li>
       <li>Update your resume with your new credentials</li>

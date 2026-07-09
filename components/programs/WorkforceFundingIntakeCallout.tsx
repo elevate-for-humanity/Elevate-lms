@@ -4,11 +4,11 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 const STEPS = [
   {
-    title: 'Start online at Indiana Career Connect',
+    title: 'Start online at Indiana Career Connect`,
     detail: `Create or sign in at Indiana Career Connect and search for "${PLATFORM_DEFAULTS.orgName}" as your training provider.`,
   },
   {
-    title: 'Or visit your nearest WorkOne career center',
+    title: `Or visit your nearest WorkOne career center',
     detail:
       'WorkOne staff complete the WIOA and Workforce Ready Grant eligibility assessment. Funding approval happens at WorkOne — not at your training school.',
   },

@@ -28,14 +28,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { data: certificate } = await supabase
     .from('certificates')
     .select('title')
-    .eq('id', certificateId)
+    .eq('id`, certificateId)
     .maybeSingle();
 
   return {
     title: certificate
       ? `${certificate.title} | Certificate`
       : `Certificate | ${PLATFORM_DEFAULTS.orgName}`,
-    description: 'View and verify this certificate of completion.',
+    description: `View and verify this certificate of completion.',
   };
 }
 

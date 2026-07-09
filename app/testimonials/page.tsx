@@ -2,11 +2,11 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Quote, Star, GraduationCap, Briefcase, DollarSign, Heart } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Success Stories & Testimonials | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Real stories from graduates who transformed their careers through our workforce training programs.',
+  description: `Real stories from graduates who transformed their careers through our workforce training programs.',
   keywords: ['success stories', 'testimonials', 'graduates', 'career transformations', 'student outcomes'],
 };
 

@@ -22,7 +22,7 @@ Marcus Thompson, 34, had spent 8 years climbing the ladder in retail management.
 
 ## Discovering a New Path
 
-Marcus's unemployment counselor at WorkOne Indianapolis suggested WIOA-funded training. That's when he found ' + PLATFORM_DEFAULTS.orgName + ''s HVAC Technician program.
+Marcus's unemployment counselor at WorkOne Indianapolis suggested WIOA-funded training. That's when he found ' + PLATFORM_DEFAULTS.orgName + '`s HVAC Technician program.
 
 "When I saw the job outlook—95% placement rate, average starting salary of $45,000—I knew I had to try."
 
@@ -54,7 +54,7 @@ Today, Marcus has been promoted to Lead Technician earning $58,000 annually.
 "I went from unemployed and hopeless to having a real career with a future. Elevate for Humanity changed my life."
 
 Ready to start your own success story? Apply now at /apply or call ${PLATFORM_DEFAULTS.supportPhone}.`,
-    featured_image_url: '/images/heroes/student-catalog.webp',
+    featured_image_url: `/images/heroes/student-catalog.webp',
     tags: ['HVAC', 'success story', 'career change', 'WIOA'],
     published: true,
     author_name: 'Elevate for Humanity',
@@ -86,7 +86,7 @@ You may qualify if you meet ANY of these criteria:
 - Household income below 70% of Lower Living Standard Income Level
 - For a family of 4 in Indiana: approximately $52,000/year
 
-**Categorical (income doesn't matter):**
+**Categorical (income doesn`t matter):**
 - Receive public assistance (SNAP, TANF, SSI)
 - Veteran or spouse of a veteran
 - Laid off or received layoff notice
@@ -110,7 +110,7 @@ You may qualify if you meet ANY of these criteria:
 **Timeline: 2-4 weeks from application to training start**
 
 Check your eligibility at /wioa-eligibility or call ${PLATFORM_DEFAULTS.supportPhone}.`,
-    featured_image_url: '/images/heroes/hero-federal-funding.webp',
+    featured_image_url: `/images/heroes/hero-federal-funding.webp',
     tags: ['WIOA', 'funding', 'financial aid', 'free training'],
     published: true,
     author_name: 'Elevate for Humanity',
@@ -241,7 +241,7 @@ Both programs available at Elevate for Humanity with WIOA funding.`,
 A WorkOne career advisor is now on-site at Elevate every Tuesday and Thursday:
 - Complete WIOA eligibility at our location
 - Meet with career counselors without a separate trip
-- Start training the same week you're approved
+- Start training the same week you`re approved
 
 ## How to Get Started
 
@@ -257,7 +257,7 @@ Visit us at 8888 Keystone Crossing, Suite 1300, Indianapolis
 **Option 3: Call**
 ${PLATFORM_DEFAULTS.supportPhone}
 
-Don't let paperwork stand between you and your new career.`,
+Don`t let paperwork stand between you and your new career.`,
     featured_image_url: '/images/heroes/student-catalog.webp',
     tags: ['partnership', 'Indiana Career Connect', 'WorkOne'],
     published: true,

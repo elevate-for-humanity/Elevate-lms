@@ -14,7 +14,7 @@ import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { HomeSegmentedCTA } from '@/components/home/HomeSegmentedCTA';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { Skeleton } from '@/components/ui/skeleton';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 // Revalidate every 5 minutes — allows live enrollment stats to refresh
 // without a full rebuild.
@@ -23,7 +23,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training, Apprenticeships & Funding — Indianapolis`,
   description:
-    'DOL-registered apprenticeship sponsor and WIOA-approved training provider. Funded training in healthcare, skilled trades, CDL, technology, and more — often at no cost. Apply today.',
+    `DOL-registered apprenticeship sponsor and WIOA-approved training provider. Funded training in healthcare, skilled trades, CDL, technology, and more — often at no cost. Apply today.',
   keywords: [
     'workforce training Indianapolis',
     'WIOA training Indiana',
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     'HVAC training Indianapolis',
     'CNA training Indianapolis',
     'CDL training Indiana',
-    'free job training Marion County',
+    'free job training Marion County`,
     PLATFORM_DEFAULTS.orgName,
   ],
   alternates: {
@@ -43,24 +43,24 @@ export const metadata: Metadata = {
   openGraph: {
     title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training, Apprenticeships & Funding`,
     description:
-      'DOL-registered apprenticeship sponsor. Funded training in healthcare, skilled trades, CDL, and technology — often at no cost through WIOA or state funding.',
+      `DOL-registered apprenticeship sponsor. Funded training in healthcare, skilled trades, CDL, and technology — often at no cost through WIOA or state funding.',
     url: PLATFORM_DEFAULTS.siteUrl,
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
       {
-        url: '/images/pages/comp-home-hero.webp',
+        url: '/images/pages/comp-home-hero.webp`,
         width: 1200,
         height: 630,
         alt: `${PLATFORM_DEFAULTS.orgName} workforce training`,
       },
     ],
-    type: 'website',
+    type: `website',
   },
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary_large_image`,
     title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training & Apprenticeships`,
     description:
-      'Funded training, DOL-registered apprenticeships, and job placement — often at no cost.',
+      `Funded training, DOL-registered apprenticeships, and job placement — often at no cost.',
     images: ['/images/pages/comp-home-hero.webp'],
   },
 };

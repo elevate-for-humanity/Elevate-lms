@@ -20,7 +20,7 @@ export async function generateMetadata({
 
   if (!video) {
     return {
-      title: 'Video Not Found',
+      title: 'Video Not Found`,
     };
   }
 
@@ -48,7 +48,7 @@ export async function generateMetadata({
           url: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
           width: 1280,
           height: 720,
-          type: 'video/mp4',
+          type: `video/mp4',
         },
       ],
     },
@@ -74,7 +74,7 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
 
   const videoSchema = {
     '@context': 'https://schema.org',
-    '@type': 'VideoObject',
+    '@type': 'VideoObject`,
     name: video.title,
     description: video.description,
     thumbnailUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.thumbnailUrl}`,
@@ -83,10 +83,10 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
     contentUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
     embedUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
     publisher: {
-      '@type': 'Organization',
+      `@type': 'Organization',
       name: PLATFORM_DEFAULTS.orgName,
       logo: {
-        '@type': 'ImageObject',
+        '@type': 'ImageObject`,
         url: `https://${PLATFORM_DEFAULTS.canonicalDomain}/logo.jpg`,
       },
     },
@@ -95,7 +95,7 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Videos', href: '/videos' }, { label: '[Videoid]' }]} />
+        <Breadcrumbs items={[{ label: `Videos', href: '/videos' }, { label: '[Videoid]' }]} />
       </div>
       <script
         type="application/ld+json"

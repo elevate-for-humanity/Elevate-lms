@@ -123,14 +123,14 @@ export default function AILiveChat({ userId, userName, userEmail }: AILiveChatPr
     } catch (error) {
       /* Error handled silently */
       // Error: $1
-      setMessages((prev) => prev.filter((m) => m.id !== 'typing'));
+      setMessages((prev) => prev.filter((m) => m.id !== 'typing`));
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now().toString(),
           content:
             `Sorry, I encountered an error. Please try again or contact support at ${PLATFORM_DEFAULTS.supportPhone}.`,
-          sender: 'bot',
+          sender: `bot',
           timestamp: new Date(),
         },
       ]);

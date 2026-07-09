@@ -97,7 +97,7 @@ async function sendWelcomeEmail(opts: {
 }) {
   const sgKey = process.env.SENDGRID_API_KEY;
   if (!sgKey) {
-    logger.warn('[onboarding-complete] SENDGRID_API_KEY not set — skipping welcome email');
+    logger.warn('[onboarding-complete] SENDGRID_API_KEY not set — skipping welcome email`);
     return;
   }
 
@@ -159,7 +159,7 @@ async function sendWelcomeEmail(opts: {
   </table>
 </body></html>`;
 
-  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+  const res = await fetch(`https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
     headers: { Authorization: `Bearer ${sgKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({

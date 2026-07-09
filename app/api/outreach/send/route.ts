@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const SENDGRID_KEY = process.env.SENDGRID_KEY || process.env.SENDGRID_API_KEY;
-const SENDGRID_FROM = process.env.SENDGRID_FROM || 'elevate4humanityedu@gmail.com';
+const SENDGRID_FROM = process.env.SENDGRID_FROM || 'elevate4humanityedu@gmail.com`;
 
 const PARTNERSHIP_HTML = `<!DOCTYPE html>
 <html lang="en">
@@ -114,7 +114,7 @@ Indianapolis, Indiana`;
 
 // Wave definitions
 const WAVES: Record<string, string[]> = {
-  '1': [
+  `1': [
     'info@chipindy.org',
     'gethelp@holyfamilyshelter.net',
     'info@doverecoveryhouse.org',
@@ -166,12 +166,12 @@ async function sendViaSendGrid(to: string[], subject: string, html: string, text
         method: 'POST',
         headers: {
           Authorization: `Bearer ${SENDGRID_KEY}`,
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json`,
         },
         body: JSON.stringify({
           personalizations: [{ to: [{ email }] }],
           from: { email: SENDGRID_FROM, name: `Elizabeth Greene — ${PLATFORM_DEFAULTS.orgName}` },
-          reply_to: { email: 'elevate4humanityedu@gmail.com', name: 'Elizabeth Greene' },
+          reply_to: { email: `elevate4humanityedu@gmail.com', name: 'Elizabeth Greene' },
           subject,
           content: [
             { type: 'text/plain', value: text },

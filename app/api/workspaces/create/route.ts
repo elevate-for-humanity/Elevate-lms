@@ -8,7 +8,7 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { startWorkspaceTrial } from '@/lib/workspace/start-workspace-trial';
 import { logger } from '@/lib/logger';
 import { resend } from '@/lib/resend';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 async function sendWorkspaceWelcomeEmail(params: {
   email: string;
@@ -41,7 +41,7 @@ async function sendWorkspaceWelcomeEmail(params: {
 async function _POST(request: NextRequest) {
   await hydrateProcessEnv();
 
-  const rateLimited = await applyRateLimit(request, 'contact');
+  const rateLimited = await applyRateLimit(request, `contact');
   if (rateLimited) return rateLimited;
 
   try {

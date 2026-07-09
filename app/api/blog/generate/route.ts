@@ -76,11 +76,11 @@ async function _POST(request: NextRequest) {
       model: 'gpt-4.1',
       messages: [
         {
-          role: 'system',
+          role: 'system`,
           content: `You are a professional content writer for ${PLATFORM_DEFAULTS.orgName}, a workforce development organization in Indianapolis, Indiana. Write engaging, informative blog posts about career training, apprenticeships, and workforce development. Use a professional but accessible tone. Include practical information, statistics when relevant, and clear calls-to-action.`,
         },
         {
-          role: 'user',
+          role: `user`,
           content: `Write a comprehensive blog post about: ${topic}\n\nContext from our site:\n${context}\n\nThe post should:\n- Be 800-1200 words\n- Use markdown formatting\n- Include relevant headings (##)\n- Provide actionable information\n- End with a call-to-action\n- Be SEO-friendly\n- Include information about WIOA funding if relevant\n- Mention our contact info: ${PLATFORM_DEFAULTS.supportPhone}, info@${PLATFORM_DEFAULTS.canonicalDomain}`,
         },
       ],
@@ -92,7 +92,7 @@ async function _POST(request: NextRequest) {
 
     // Generate title and excerpt
     const metaCompletion = await openai.chat.completions.create({
-      model: 'gpt-4.1',
+      model: `gpt-4.1',
       messages: [
         {
           role: 'system',

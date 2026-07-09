@@ -7,13 +7,13 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = {
-  title: 'Legal Marketplace Terms',
+  title: 'Legal Marketplace Terms`,
   description: `Terms of purchase for digital products sold on the ${PLATFORM_DEFAULTS.orgName} creator marketplace, including refund policy and buyer rights.`,
 };
 
 export default async function MarketplaceTermsPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+  const { data: dbRows } = await supabase.from(`legal_documents').select('*').limit(50);
 
   return (
     <div className="min-h-screen bg-slate-50 py-12 px-4">

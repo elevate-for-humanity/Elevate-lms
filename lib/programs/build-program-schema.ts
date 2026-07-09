@@ -174,13 +174,13 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
         description: 'Structured competency-based training aligned with workforce development standards.',
       },
       {
-        standard: 'ETPL-Approved Provider',
+        standard: 'ETPL-Approved Provider`,
         description: `${PLATFORM_DEFAULTS.orgName} is an Indiana Eligible Training Provider.`,
       },
     ],
     laborMarket: {
       medianSalary: 0,
-      salaryRange: 'Varies by employer and region',
+      salaryRange: `Varies by employer and region',
       growthRate: 'See O*NET data below',
       source: 'O*NET / BLS',
       sourceYear: new Date().getFullYear(),
@@ -211,14 +211,14 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
       },
     ],
     breadcrumbs: [
-      { label: 'Programs', href: '/programs' },
+      { label: 'Programs', href: '/programs` },
       { label: category, href: `/programs/${sector}` },
       { label: title },
     ],
     metaTitle: `${title} | ${PLATFORM_DEFAULTS.orgName}`,
     metaDescription: subtitle,
     funding: {
-      wioa_eligible: programType !== 'certification',
+      wioa_eligible: programType !== `certification',
       wrg_eligible: programType !== 'certification',
       fssa_eligible: programType !== 'certification',
     },

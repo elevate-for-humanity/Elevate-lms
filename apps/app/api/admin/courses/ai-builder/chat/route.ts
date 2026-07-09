@@ -23,7 +23,7 @@ import { refreshSecrets } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 export const maxDuration = 120;
 
 const SYSTEM_PROMPT = `You are an expert instructional designer for ${PLATFORM_DEFAULTS.orgName}, a workforce development LMS.
@@ -82,7 +82,7 @@ WORKFLOW:
 }
 
 RULES:
-- Be conversational and concise. Don't ask more than 3 questions at once.
+- Be conversational and concise. Don`t ask more than 3 questions at once.
 - If the user gives you enough info upfront, skip straight to generation.
 - Content must be specific and practical — no generic filler.
 - Each module should have 3-6 lessons.

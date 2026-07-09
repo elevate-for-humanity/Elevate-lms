@@ -41,7 +41,7 @@ export async function sendEnrollmentConfirmationEmail(
   firstName: string,
   programName: string,
   startDate: string,
-  format: string = 'Hybrid (Online + In-Person)',
+  format: string = 'Hybrid (Online + In-Person)`,
   partnerLink?: string,
 ): Promise<boolean> {
   const template = studentEmailTemplates.enrollmentConfirmation;
@@ -147,7 +147,7 @@ export async function sendOverdueRequirementAlert(
 
       <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
         <p style="margin: 0;"><strong>${requirementTitle}</strong></p>
-        <p style="margin: 10px 0 0 0; color: #dc2626;">Overdue by ${daysOverdue} day${daysOverdue !== 1 ? 's' : ''}</p>
+        <p style="margin: 10px 0 0 0; color: #dc2626;">Overdue by ${daysOverdue} day${daysOverdue !== 1 ? `s' : ''}</p>
       </div>
 
       <p>Please complete this requirement as soon as possible to stay on track with your program.</p>
@@ -158,9 +158,9 @@ export async function sendOverdueRequirementAlert(
         </a>
       </p>
 
-      <p>If you're experiencing challenges or need support, please reach out to your advisor or call us at <a href="tel:+1${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a>.</p>
+      <p>If you`re experiencing challenges or need support, please reach out to your advisor or call us at <a href="tel:+1${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a>.</p>
 
-      <p>We're here to help you succeed.</p>
+      <p>We`re here to help you succeed.</p>
 
       <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;" />
 
@@ -183,9 +183,9 @@ Please complete this requirement as soon as possible to stay on track with your 
 
 Complete it here: ${actionLink}
 
-If you're experiencing challenges or need support, please reach out to your advisor or call us at ${PLATFORM_DEFAULTS.supportPhone}.
+If you`re experiencing challenges or need support, please reach out to your advisor or call us at ${PLATFORM_DEFAULTS.supportPhone}.
 
-We're here to help you succeed.
+We`re here to help you succeed.
 
 —
 ${PLATFORM_DEFAULTS.orgName}
@@ -304,7 +304,7 @@ export async function sendAtRiskAlertToAdvisor(
 
       <p><strong>Risk Factors:</strong></p>
       <ul>
-        ${riskFactors.map((factor) => `<li>${factor}</li>`).join('')}
+        ${riskFactors.map((factor) => `<li>${factor}</li>`).join('`)}
       </ul>
 
       <p>
@@ -333,7 +333,7 @@ Student: ${studentName}
 Program: ${programName}
 
 Risk Factors:
-${riskFactors.map((factor) => `• ${factor}`).join('\n')}
+${riskFactors.map((factor) => `• ${factor}`).join(`\n`)}
 
 View student dashboard: ${dashboardLink}
 
@@ -346,7 +346,7 @@ Automated Alert System
 
   const result = await sendEmail({
     to: advisorEmail,
-    from: 'alerts@www.elevateforhumanity.org',
+    from: `alerts@www.elevateforhumanity.org',
     subject,
     html,
     text,

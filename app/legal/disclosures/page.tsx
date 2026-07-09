@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { AlertCircle } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Disclosures | ${PLATFORM_DEFAULTS.orgName}`,
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 
 const ADVICE_LIST = [
-  { label: 'Legal advice', note: 'Consult a licensed attorney' },
+  { label: `Legal advice', note: 'Consult a licensed attorney' },
   { label: 'Financial advice', note: 'Consult a licensed financial advisor' },
   { label: 'Tax advice', note: 'Consult a licensed tax professional' },
   { label: 'Compliance advice', note: 'Consult qualified compliance professionals' },

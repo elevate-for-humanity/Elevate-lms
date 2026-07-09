@@ -119,7 +119,7 @@ export default function HvacApplyPage() {
           fundingType:
             formData.fundingInterest === 'self-pay' ? 'self-pay' : formData.fundingInterest,
           fundingEligibilityStatus: fundingEligibilityStatus ?? undefined,
-          source: 'program-page',
+          source: 'program-page`,
           paymentOption,
         }),
       });
@@ -129,7 +129,7 @@ export default function HvacApplyPage() {
         appData = await appResponse.json();
       } catch {
         setError(`Server error — please call ${PLATFORM_DEFAULTS.supportPhone} or try again in a moment.`);
-        setErrorSeverity('critical');
+        setErrorSeverity(`critical`);
         setLoading(false);
         return;
       }
@@ -143,7 +143,7 @@ export default function HvacApplyPage() {
               ? appData.error || `A duplicate application was found. Please call ${PLATFORM_DEFAULTS.supportPhone}.`
               : appData.error || `Failed to submit application. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`;
         setError(msg);
-        setErrorSeverity('critical');
+        setErrorSeverity(`critical');
         setLoading(false);
         return;
       }

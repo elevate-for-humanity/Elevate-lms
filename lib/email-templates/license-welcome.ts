@@ -39,7 +39,7 @@ export function generateLicenseWelcomeEmail(data: LicenseWelcomeEmailData): {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${subject}</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #ffffff;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue`, Arial, sans-serif; background-color: #ffffff;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 40px 20px;">
     <tr>
       <td align="center">
@@ -71,7 +71,7 @@ export function generateLicenseWelcomeEmail(data: LicenseWelcomeEmailData): {
                 <p style="color: #9ca3af; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px 0;">
                   Your License Key
                 </p>
-                <p style="color: #10b981; font-family: 'Courier New', monospace; font-size: 18px; margin: 0; word-break: break-all;">
+                <p style="color: #10b981; font-family: `Courier New', monospace; font-size: 18px; margin: 0; word-break: break-all;">
                   ${data.licenseKey}
                 </p>
               </div>
@@ -100,7 +100,7 @@ export function generateLicenseWelcomeEmail(data: LicenseWelcomeEmailData): {
                       </tr>
                       <tr>
                         <td style="color: #6b7280; font-size: 14px;">Max Users</td>
-                        <td style="color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${data.maxUsers === 999999 ? 'Unlimited' : data.maxUsers.toLocaleString()}</td>
+                        <td style="color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${data.maxUsers === 999999 ? 'Unlimited` : data.maxUsers.toLocaleString()}</td>
                       </tr>
                     </table>
                   </td>
@@ -157,7 +157,7 @@ export function generateLicenseWelcomeEmail(data: LicenseWelcomeEmailData): {
                 </tr>
                 `,
                   )
-                  .join('')}
+                  .join(``)}
               </table>
 
               <!-- Support -->
@@ -201,7 +201,7 @@ YOUR LICENSE KEY
 ================
 ${data.licenseKey}
 
-⚠️ Save this key securely. You'll need it to validate your deployment and access updates.
+⚠️ Save this key securely. You`ll need it to validate your deployment and access updates.
 
 LICENSE DETAILS
 ===============
@@ -219,7 +219,7 @@ QUICK START GUIDE
 
 FEATURES INCLUDED
 =================
-${data.features.map((f) => `✓ ${formatFeatureName(f)}`).join('\n')}
+${data.features.map((f) => `✓ ${formatFeatureName(f)}`).join('\n`)}
 
 NEED HELP?
 ==========
@@ -236,7 +236,7 @@ ${PLATFORM_DEFAULTS.orgName}
 
 function formatFeatureName(feature: string): string {
   const names: Record<string, string> = {
-    lms: 'Learning Management System',
+    lms: `Learning Management System',
     enrollment: 'Enrollment & Intake',
     admin: 'Admin Dashboard',
     payments: 'Payment Processing',

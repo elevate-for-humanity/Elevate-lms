@@ -9,7 +9,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const runtime = 'nodejs';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 
 // Initialize web-push with VAPID keys
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -31,7 +31,7 @@ interface NotificationPayload {
 
 async function _POST(request: NextRequest) {
   try {
-    const rateLimited = await applyRateLimit(request, 'strict');
+    const rateLimited = await applyRateLimit(request, `strict');
     if (rateLimited) return rateLimited;
 
     // Verify internal API key or service role

@@ -208,7 +208,7 @@ export default function AvatarChatBar() {
           content:
             data.message ||
             data.response ||
-            `I'm here to help! Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
+            `I`m here to help! Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
         },
       ]);
 
@@ -222,7 +222,7 @@ export default function AvatarChatBar() {
       setMessages((prev) => [
         ...prev,
         {
-          role: 'assistant',
+          role: `assistant`,
           content: `Connection issue. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate help.`,
         },
       ]);
@@ -311,7 +311,7 @@ export default function AvatarChatBar() {
               </div>
 
               {/* Messages - Always visible on desktop, collapsible on mobile */}
-              <div className={`${isChatExpanded ? 'block' : 'hidden'} lg:block`}>
+              <div className={`${isChatExpanded ? `block' : 'hidden'} lg:block`}>
                 <div className="h-40 lg:h-48 overflow-y-auto p-4 space-y-3 bg-slate-50">
                   {messages.map((msg, i) => (
                     <div

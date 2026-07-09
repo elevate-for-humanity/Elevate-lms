@@ -7,10 +7,10 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Security and Data Protection',
+  title: 'Security and Data Protection`,
   description:
     `Security controls, data protection standards, incident response posture, and operational safeguards used across ${PLATFORM_DEFAULTS.orgName} systems.`,
-  alternates: { canonical: 'https://www.elevateforhumanity.org/governance/security' },
+  alternates: { canonical: `https://www.elevateforhumanity.org/governance/security' },
 };
 
 const controls = [

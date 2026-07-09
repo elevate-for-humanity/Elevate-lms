@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const runtime = 'nodejs';
+export const runtime = 'nodejs`;
 export const maxDuration = 30;
 
 const SYSTEM_PROMPT = `You are an AI Career Counselor for ${PLATFORM_DEFAULTS.orgName}, a workforce development organization in Indianapolis.
@@ -40,7 +40,7 @@ Keep responses conversational but informative (3-5 sentences).`;
 
 export async function POST(req: NextRequest) {
   try {
-    const rateLimited = await applyRateLimit(req, 'api');
+    const rateLimited = await applyRateLimit(req, `api');
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();

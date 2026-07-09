@@ -7,7 +7,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Security & Data Protection Statement | ${PLATFORM_DEFAULTS.orgName}`,
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SecurityDocumentPage() {
-  await requireRole(['admin', 'staff']);
+  await requireRole([`admin', 'staff']);
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',

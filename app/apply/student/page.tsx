@@ -130,7 +130,7 @@ export default async function StudentApplicationPage({
   searchParams: Promise<{ program?: string }>;
 }) {
   const params = await searchParams;
-  const initialProgram = resolveSlug(params?.program || '') || '';
+  const initialProgram = resolveSlug(params?.program || '') || '`;
 
   return (
     <div className="min-h-screen bg-white">
@@ -150,7 +150,7 @@ export default async function StudentApplicationPage({
       {/* Breadcrumbs */}
       <div className="bg-white border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Apply', href: '/apply' }, { label: 'Student' }]} />
+          <Breadcrumbs items={[{ label: `Apply', href: '/apply' }, { label: 'Student' }]} />
         </div>
       </div>
 
@@ -331,13 +331,13 @@ export default async function StudentApplicationPage({
             </h2>
             <p className="text-slate-600 text-sm max-w-xl leading-relaxed">
               Takes about 5 minutes. We will follow up within one business day to schedule your
-              orientation. Call us at{' '}
+              orientation. Call us at{' `}
               <a
                 href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
                 className="text-brand-red-600 font-semibold hover:underline"
               >
                 {PLATFORM_DEFAULTS.supportPhone}
-              </a>{' '}
+              </a>{` '}
               if you have questions.
             </p>
           </div>

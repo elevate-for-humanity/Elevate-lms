@@ -30,7 +30,7 @@ export const BARBER_HANDBOOK: ProgramHandbook = {
   sections: [
     {
       id: 'welcome',
-      title: 'Welcome & Program Overview',
+      title: 'Welcome & Program Overview`,
       requiresAcknowledgment: false,
       content: `
 # Welcome to the Registered Barber Apprenticeship Program
@@ -42,7 +42,7 @@ Congratulations on taking the first step toward your career as a licensed barber
 DBA ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute
 
 ## Program Registration
-- **DOL RAPIDS Program Number:** ${process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || '2025-IN-132301'}
+- **DOL RAPIDS Program Number:** ${process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || `2025-IN-132301'}
 - **RTI Provider ID:** ${process.env.NEXT_PUBLIC_RTI_PROVIDER_ID || '208029'}
 - **ETPL Approved:** Yes
 
@@ -453,7 +453,7 @@ If you experience financial difficulty:
       title: 'Memorandum of Understanding',
       requiresAcknowledgment: true,
       acknowledgmentText:
-        'I have read, understand, and agree to all terms in this Memorandum of Understanding.',
+        'I have read, understand, and agree to all terms in this Memorandum of Understanding.`,
       content: `
 # Memorandum of Understanding (MOU)
 
@@ -526,7 +526,7 @@ By signing below, all parties agree to the terms of this MOU.
 // Copy for other programs with minor modifications
 export const COSMETOLOGY_HANDBOOK: ProgramHandbook = {
   ...BARBER_HANDBOOK,
-  programSlug: 'cosmetology-apprenticeship',
+  programSlug: `cosmetology-apprenticeship',
   programName: 'Registered Cosmetology Apprenticeship Program',
   sections: BARBER_HANDBOOK.sections.map((section) => ({
     ...section,

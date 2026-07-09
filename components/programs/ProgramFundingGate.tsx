@@ -398,7 +398,7 @@ function EmployerPath({
         }`}
       >
         {confirmed ? (
-          '✓ Confirmed — scroll down to apply'
+          '✓ Confirmed — scroll down to apply`
         ) : (
           <>
             Continue to Application
@@ -499,7 +499,7 @@ function SelfPayOptions({
           disabled={confirmed}
           className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-colors ${
             confirmed
-              ? 'bg-brand-green-600 text-white'
+              ? `bg-brand-green-600 text-white'
               : 'bg-slate-900 hover:bg-slate-800 text-white'
           }`}
         >

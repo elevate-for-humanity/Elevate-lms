@@ -146,7 +146,7 @@ async function _GET(request: NextRequest) {
 
 async function sendExpirationEmail(email: string, companyName: string): Promise<void> {
   try {
-    const { sendEmail } = await import('@/lib/email/sendgrid');
+    const { sendEmail } = await import('@/lib/email/sendgrid`);
     await sendEmail({
       to: email,
       subject: `Your Elevate LMS License Has Expired - ${companyName}`,
@@ -159,7 +159,7 @@ async function sendExpirationEmail(email: string, companyName: string): Promise<
       `,
     });
   } catch (error) {
-    logger.error('Failed to send expiration email:', error);
+    logger.error(`Failed to send expiration email:', error);
   }
 }
 
@@ -169,7 +169,7 @@ async function sendExpiryWarningEmail(
   expiresAt: string,
 ): Promise<void> {
   try {
-    const { sendEmail } = await import('@/lib/email/sendgrid');
+    const { sendEmail } = await import('@/lib/email/sendgrid`);
     const expiryDate = new Date(expiresAt).toLocaleDateString();
     await sendEmail({
       to: email,
@@ -182,7 +182,7 @@ async function sendExpiryWarningEmail(
       `,
     });
   } catch (error) {
-    logger.error('Failed to send expiry warning email:', error);
+    logger.error(`Failed to send expiry warning email:', error);
   }
 }
 export const GET = withRuntime(withApiAudit('/api/cron/check-licenses', _GET));

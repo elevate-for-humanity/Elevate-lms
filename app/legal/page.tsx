@@ -8,9 +8,9 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Legal',
+  title: 'Legal`,
   description: `Legal documents, policies, and disclosures for ${PLATFORM_DEFAULTS.orgName}. Terms of service, privacy policy, license agreements, and compliance disclosures.`,
-  alternates: { canonical: 'https://www.elevateforhumanity.org/legal' },
+  alternates: { canonical: `https://www.elevateforhumanity.org/legal' },
 };
 
 const LEGAL_DOCS = [

@@ -271,8 +271,8 @@ function generateBrandCard(
     // Lesson title / sign-off
     `[t1]drawtext=fontfile='${semi}':text='${line2}':fontcolor=${fg}@0.75:fontsize=24:x=(w-text_w)/2:y=340:alpha='if(lt(t,0.5),t/0.5,1)'[t2]`,
     // Elevate logo text bottom-right
-    `[t2]drawtext=fontfile='${bold}':text=${PLATFORM_DEFAULTS.canonicalDomain}:fontcolor=${fg}@0.4:fontsize=16:x=w-text_w-24:y=h-36[out]`,
-  ].join(';');
+    `[t2]drawtext=fontfile='${bold}`:text=${PLATFORM_DEFAULTS.canonicalDomain}:fontcolor=${fg}@0.4:fontsize=16:x=w-text_w-24:y=h-36[out]`,
+  ].join(`;');
 
   execSync(
     `ffmpeg -y -f lavfi -i "color=c=${bg}:size=1280x720:rate=30" -vf "${filter}" -t 3 -c:v libx264 -preset fast -crf 20 -an "${outPath}" 2>/dev/null`,

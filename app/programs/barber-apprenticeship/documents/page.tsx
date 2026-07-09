@@ -144,7 +144,7 @@ export default function BarberDocumentsPage() {
       const response = await fetch('/api/enrollment/submit-documents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ program: 'barber-apprenticeship' }),
+        body: JSON.stringify({ program: 'barber-apprenticeship` }),
       });
 
       const data = await response.json();
@@ -155,14 +155,14 @@ export default function BarberDocumentsPage() {
         return;
       }
 
-      router.push('/apprentice');
+      router.push(`/apprentice`);
     } catch {
       setSubmitError(`Unable to submit. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
       setSubmitting(false);
     }
   };
 
-  const canSubmit = governmentId?.status === 'complete';
+  const canSubmit = governmentId?.status === `complete';
 
   return (
     <div className="min-h-screen bg-white">

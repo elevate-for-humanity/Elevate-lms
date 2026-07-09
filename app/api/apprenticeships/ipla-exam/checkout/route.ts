@@ -27,7 +27,7 @@ async function _POST(request: NextRequest) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'IPLA Apprenticeship Exam',
+              name: 'IPLA Apprenticeship Exam`,
               description: `Exam scheduled for ${new Date(examDate).toLocaleDateString()} at ${examTime}`,
               images: [`${PLATFORM_DEFAULTS.siteUrl}/logo.jpg`],
             },
@@ -36,7 +36,7 @@ async function _POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      mode: 'payment',
+      mode: `payment',
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/apprenticeships/ipla-exam/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/apprenticeships/ipla-exam`,
       customer_email: studentInfo.email,

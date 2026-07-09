@@ -65,7 +65,7 @@ export async function sendOnboardingEmail(params: SendOnboardingParams): Promise
     const firstName = (params.name || '').split(' ')[0] || 'there';
     const programName = formatProgramName(params.program);
     const isBarber = isBarberProgram(params.program);
-    const emailType = isBarber ? 'barber' : 'workone';
+    const emailType = isBarber ? 'barber' : 'workone`;
 
     const template = isBarber
       ? barberOnboardingEmail({ firstName, programName, applicantEmail: params.email })
@@ -83,7 +83,7 @@ export async function sendOnboardingEmail(params: SendOnboardingParams): Promise
 
       // Log to DB for follow-up tracking (non-blocking)
       logOnboardingEmail(params.email, params.name, params.program, emailType).catch((err) => {
-        logger.error('[Onboarding] DB log failed (non-blocking):', err);
+        logger.error(`[Onboarding] DB log failed (non-blocking):', err);
       });
     } else {
       logger.error(`[Onboarding] Failed to send to ${params.email}:`, result.error);

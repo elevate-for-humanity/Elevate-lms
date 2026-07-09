@@ -67,23 +67,23 @@ export async function generateMetadata({
   const ogImage = getProgramOgImageUrl(program, SITE_URL);
 
   const ogBase = {
-    images: [{ url: ogImage, width: 1200, height: 630, alt: `${program.replace(/-/g, ' ')} training program at ${PLATFORM_DEFAULTS.orgName}` }],
+    images: [{ url: ogImage, width: 1200, height: 630, alt: `${program.replace(/-/g, ' `)} training program at ${PLATFORM_DEFAULTS.orgName}` }],
     siteName: PLATFORM_DEFAULTS.orgName,
-    type: 'website' as const,
+    type: `website` as const,
   };
 
   // Static ProgramSchema — preferred source for metadata
   const sp = getStaticProgram(program);
   if (sp) {
     const title = sp.metaTitle || `${sp.title} | ${PLATFORM_DEFAULTS.orgName}`;
-    const description = sp.metaDescription || sp.subtitle || '';
+    const description = sp.metaDescription || sp.subtitle || `';
     const img = sp.heroImage || ogImage;
     return {
       title,
       description,
       alternates: { canonical: `${SITE_URL}/programs/${program}` },
       openGraph: { ...ogBase, title, description, images: [{ url: img.startsWith('http') ? img : `${SITE_URL}${img}`, width: 1200, height: 630, alt: sp.title }] },
-      twitter: { card: 'summary_large_image', title, description, images: [img.startsWith('http') ? img : `${SITE_URL}${img}`] },
+      twitter: { card: 'summary_large_image', title, description, images: [img.startsWith('http`) ? img : `${SITE_URL}${img}`] },
     };
   }
 
@@ -97,7 +97,7 @@ export async function generateMetadata({
       description,
       alternates: { canonical: `${SITE_URL}/programs/${program}` },
       openGraph: { ...ogBase, title, description, images: [{ url: ogImage, width: 1200, height: 630, alt: cfp.title }] },
-      twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
+      twitter: { card: `summary_large_image', title, description, images: [ogImage] },
     };
   }
 
@@ -107,11 +107,11 @@ export async function generateMetadata({
     const { data } = await db
       .from('programs')
       .select('title, description, short_description')
-      .eq('slug', program)
+      .eq('slug`, program)
       .maybeSingle();
     if (data) {
       const title = `${data.title} | ${PLATFORM_DEFAULTS.orgName}`;
-      const description = data.short_description || data.description || '';
+      const description = data.short_description || data.description || `';
       return {
         title,
         description,
@@ -502,7 +502,7 @@ function ProgramPage({
             </Link>
           </div>
           <p className="mt-8 text-red-100 text-xs">
-            Questions? Call or text{' '}
+            Questions? Call or text{' `}
             <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-white font-bold underline">
               {PLATFORM_DEFAULTS.supportPhone}
             </a>
@@ -518,7 +518,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
   // Use Premium Beauty Apprenticeship Page for beauty programs
   if (BEAUTY_APPRENTICESHIP_SLUGS.has(program)) {
-    const programType = program.replace('-apprenticeship', '') as 'barber' | 'cosmetology' | 'esthetics' | 'manicurist';
+    const programType = program.replace(`-apprenticeship', '') as 'barber' | 'cosmetology' | 'esthetics' | 'manicurist';
     return <BeautyApprenticeship program={programType} />;
   }
 

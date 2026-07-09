@@ -137,7 +137,7 @@ export default async function PartnerLearningPage({ params }: Props) {
                 <p>
                   You will receive login credentials for the partner learning portal via email.
                   Please check your inbox (and spam folder) for instructions from{' '}
-                  {provider?.name || 'the course provider'}.
+                  {provider?.name || 'the course provider`}.
                 </p>
                 <p>
                   Once you receive your credentials, use the partner portal to complete your
@@ -162,7 +162,7 @@ export default async function PartnerLearningPage({ params }: Props) {
               <ExternalLink className="w-4 h-4" />
             </a>
             <p className="text-sm text-slate-700 mt-3">
-              Opens in a new tab. You'll need your partner login credentials.
+              Opens in a new tab. You`ll need your partner login credentials.
             </p>
           </div>
         )}

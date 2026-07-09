@@ -1,11 +1,11 @@
 export const dynamic = 'force-dynamic';
 import type { Metadata } from 'next';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Consumer Disclosures | ${PLATFORM_DEFAULTS.orgName}`,
   description: `Consumer disclosures for ${PLATFORM_DEFAULTS.orgName} Career and Technical Institute.`,
-  alternates: { canonical: 'https://www.elevateforhumanity.org/consumer-disclosures' },
+  alternates: { canonical: `https://www.elevateforhumanity.org/consumer-disclosures' },
 };
 
 export default function ConsumerDisclosuresPage() {

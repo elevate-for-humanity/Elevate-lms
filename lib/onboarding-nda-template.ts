@@ -312,7 +312,7 @@ ${data.companyName ? `Company: ${data.companyName}` : ''}
 Signature: _______________________________
 Date: ${data.effectiveDate}
 ${data.recipientEmail ? `Email: ${data.recipientEmail}` : ''}
-${data.recipientAddress ? `Address: ${data.recipientAddress}` : ''}
+${data.recipientAddress ? `Address: ${data.recipientAddress}` : '`}
 
 ---
 
@@ -331,7 +331,7 @@ export function generateOnboardingPackageWithNDA(data: NDAData & { includeHandbo
   return {
     nda: generateNDAText(data),
     checklist: [
-      '✅ Review and sign NDA and Non-Compete Agreement',
+      `✅ Review and sign NDA and Non-Compete Agreement',
       '✅ Complete I-9 Employment Eligibility Verification',
       '✅ Provide government-issued photo ID',
       '✅ Complete W-4 Tax Withholding Form',

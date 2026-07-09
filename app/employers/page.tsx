@@ -1,12 +1,12 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { ArrowRight, Users, Building2, Briefcase, CheckCircle, Award } from 'lucide-react';
+import { ArrowRight, Users, Building2, Briefcase, CheckCircle, Award } from 'lucide-react`;
 
 export const metadata: Metadata = {
   title: `Hire Trained Workers | ${PLATFORM_DEFAULTS.orgName}`,
   description:
-    'Partner with us to hire trained workers from our workforce development programs. Healthcare, trades, technology, and business graduates ready to work.',
+    `Partner with us to hire trained workers from our workforce development programs. Healthcare, trades, technology, and business graduates ready to work.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/employers' },
 };
 

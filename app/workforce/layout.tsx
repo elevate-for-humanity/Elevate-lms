@@ -6,12 +6,12 @@ import { PlatformShell } from '@/components/platform/PlatformShell';
 import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 
 export const metadata: Metadata = {
   title: {
     default: `Workforce Portal | ${PLATFORM_DEFAULTS.orgName}`,
-    template: '%s | Workforce Portal',
+    template: `%s | Workforce Portal',
   },
   description: 'Participant management, placements, compliance, and workforce outcomes.',
   robots: { index: false, follow: false },

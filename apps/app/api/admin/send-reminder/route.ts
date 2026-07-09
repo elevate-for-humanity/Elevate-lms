@@ -118,22 +118,22 @@ async function _POST(req: Request) {
     switch (reminder_type) {
       case 'workone_24hr':
         message = `Reminder: You have a WorkOne appointment tomorrow${
-          checklist?.workone_appointment_date ? ` at ${checklist.workone_appointment_date}` : ''
+          checklist?.workone_appointment_date ? ` at ${checklist.workone_appointment_date}` : '`
         }. Please attend and tell them you are enrolling with ${PLATFORM_DEFAULTS.orgName}. Call ${PLATFORM_DEFAULTS.supportPhone} if you need help.`;
         break;
-      case 'workone_2hr':
+      case `workone_2hr':
         message = `Reminder: Your WorkOne appointment is in 2 hours${
-          checklist?.workone_location ? ` at ${checklist.workone_location}` : ''
+          checklist?.workone_location ? ` at ${checklist.workone_location}` : '`
         }. Tell them you are enrolling with ${PLATFORM_DEFAULTS.orgName}.`;
         break;
-      case 'workone_followup':
-        message = `Hi ${app.first_name}, we noticed you haven't attended your WorkOne appointment yet. Please call us at ${PLATFORM_DEFAULTS.supportPhone} if you need help rescheduling.`;
+      case `workone_followup':
+        message = `Hi ${app.first_name}, we noticed you haven`t attended your WorkOne appointment yet. Please call us at ${PLATFORM_DEFAULTS.supportPhone} if you need help rescheduling.`;
         break;
-      case 'icc_reminder':
+      case `icc_reminder`:
         message = `Hi ${app.first_name}, please create your account at IndianaCareerConnect.com and schedule your WorkOne appointment. Call ${PLATFORM_DEFAULTS.supportPhone} if you need help.`;
         break;
       default:
-        return NextResponse.json({ error: 'Invalid reminder type' }, { status: 400 });
+        return NextResponse.json({ error: `Invalid reminder type' }, { status: 400 });
     }
 
     // Send SMS

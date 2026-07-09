@@ -8,10 +8,10 @@ import { LicenseDemo } from '@/components/store/LicenseDemo';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Managed Enterprise LMS Platform',
+  title: 'Managed Enterprise LMS Platform`,
   description: `Run your organization on an enterprise LMS operated by ${PLATFORM_DEFAULTS.orgName}. Your branding, your domain, our infrastructure.`,
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/licenses/managed-platform',
+    canonical: `https://www.elevateforhumanity.org/store/licenses/managed-platform',
   },
 };
 

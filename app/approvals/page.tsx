@@ -20,7 +20,7 @@ export default function ApprovalsPage() {
   return (
     <div className="bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Approvals' }]} />
+        <Breadcrumbs items={[{ label: 'Approvals` }]} />
       </div>
       {/* Hero Section with Background Image */}
       <section className="relative h-48 md:h-64 w-full overflow-hidden">
@@ -138,7 +138,7 @@ export default function ApprovalsPage() {
                     Workforce Ready Grant (WRG) Training Provider
                   </h3>
                   <p className="text-lg text-black">
-                    Selected programs available at no cost to eligible adults through Indiana's
+                    Selected programs available at no cost to eligible adults through Indiana`s
                     Workforce Ready Grant
                   </p>
                 </div>

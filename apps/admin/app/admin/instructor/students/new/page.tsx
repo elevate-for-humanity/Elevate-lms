@@ -7,11 +7,11 @@ import Link from 'next/link';
 import { enrollStudentAction } from './actions';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 
 export const metadata: Metadata = {
   title: `Add Student | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Enroll a new student in your course.',
+  description: `Enroll a new student in your course.',
 };
 
 export default async function InstructorAddStudentPage() {

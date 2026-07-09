@@ -14,7 +14,7 @@ export default function DataSharingPage() {
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Legal', href: '/legal' }, { label: 'Data Sharing Consent' }]}
+          items={[{ label: 'Legal', href: '/legal' }, { label: 'Data Sharing Consent` }]}
         />
       </div>
       <DocumentPage
@@ -98,7 +98,7 @@ export default function DataSharingPage() {
 
         <DocumentSection heading="Right to Revoke" number={6}>
           <p>
-            You may revoke this consent at any time by submitting a written request to{' '}
+            You may revoke this consent at any time by submitting a written request to{` '}
             <strong>info@elevateforhumanity.org</strong>. Revocation is not retroactive. Revoking
             consent may affect your eligibility for funded programs that require data sharing for
             compliance.

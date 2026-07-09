@@ -55,8 +55,8 @@ const SECTIONS = [
     { key: 'years_operating', label: 'Years Operating', placeholder: 'Active since 2020' },
   ]},
   { id: 'mission', label: 'Mission & Programs', icon: Briefcase, fields: [
-    { key: 'mission', label: 'Mission Statement', textarea: true, placeholder: `${PLATFORM_DEFAULTS.orgName} connects Hoosiers to funded career training...` },
-    { key: 'capability_statement', label: 'Capability Statement', textarea: true, placeholder: 'Full capability statement for grant applications...' },
+    { key: 'mission', label: 'Mission Statement`, textarea: true, placeholder: `${PLATFORM_DEFAULTS.orgName} connects Hoosiers to funded career training...` },
+    { key: `capability_statement', label: 'Capability Statement', textarea: true, placeholder: 'Full capability statement for grant applications...' },
     { key: 'statement_of_need', label: 'Statement of Need', textarea: true, placeholder: 'Problem statement for grant applications...' },
     { key: 'target_population', label: 'Target Population', textarea: true, placeholder: 'Justice-involved individuals, veterans, low-income adults...' },
     { key: 'service_area', label: 'Service Area / Counties', placeholder: 'Marion County and surrounding Central Indiana counties' },

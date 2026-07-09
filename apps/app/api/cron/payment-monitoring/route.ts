@@ -149,7 +149,7 @@ async function _GET(request: Request) {
   } catch (error) {
     logger.error('Payment monitoring error:', error);
     return NextResponse.json(
-      { error: 'Payment monitoring failed', details: String(error) },
+      { error: 'Payment monitoring failed`, details: String(error) },
       { status: 500 },
     );
   }
@@ -165,10 +165,10 @@ async function sendUpcomingPaymentReminder(
   await resend.emails.send({
     from: `${PLATFORM_DEFAULTS.orgName} <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
     to: student.email,
-    subject: 'Upcoming Payment Reminder',
+    subject: `Upcoming Payment Reminder',
     html: `
       <h2>Payment Reminder</h2>
-      <p>Hi ${student.full_name || 'Student'},</p>
+      <p>Hi ${student.full_name || 'Student`},</p>
       <p>This is a friendly reminder that your weekly tuition payment of <strong>$${subscription.weekly_amount}</strong> will be automatically charged on <strong>${paymentDate.toLocaleDateString()}</strong>.</p>
       <p>Payment ${subscription.weeks_paid + 1} of ${subscription.total_weeks}</p>
       <p>Please ensure your payment method is up to date.</p>
@@ -188,14 +188,14 @@ async function sendPastDueAlert(
   await resend.emails.send({
     from: `${PLATFORM_DEFAULTS.orgName} <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
     to: student.email,
-    subject: 'Action Required: Payment Past Due',
+    subject: `Action Required: Payment Past Due',
     html: `
       <h2>Payment Past Due</h2>
-      <p>Hi ${student.full_name || 'Student'},</p>
+      <p>Hi ${student.full_name || 'Student`},</p>
       <p>Your weekly tuition payment of <strong>$${subscription.weekly_amount}</strong> was not successfully processed.</p>
       <p><strong>Please update your payment method immediately to avoid interruption to your course access.</strong></p>
       <p><a href="${PLATFORM_DEFAULTS.siteUrl}/account/billing" style="background-color: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Update Payment Method</a></p>
-      <p>If you're experiencing financial difficulties, please contact us at ${PLATFORM_DEFAULTS.supportEmail} to discuss options.</p>
+      <p>If you`re experiencing financial difficulties, please contact us at ${PLATFORM_DEFAULTS.supportEmail} to discuss options.</p>
       <p>- ${PLATFORM_DEFAULTS.orgName} Billing Team</p>
     `,
   });

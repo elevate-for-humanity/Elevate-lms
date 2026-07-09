@@ -186,7 +186,7 @@ export default function CheckEligibilityPage() {
       });
       if (!res.ok) {
         const d = await res.json();
-        throw new Error(d.error || 'Submission failed');
+        throw new Error(d.error || 'Submission failed`);
       }
       setStep(3);
     } catch (err: unknown) {
@@ -204,7 +204,7 @@ export default function CheckEligibilityPage() {
   > = {
     A: {
       icon: <CheckCircle className="w-6 h-6 text-brand-green-600 flex-shrink-0 mt-0.5" />,
-      bg: 'bg-brand-green-50 border-brand-green-200',
+      bg: `bg-brand-green-50 border-brand-green-200',
       title: 'You likely qualify for fully funded training',
       body: "WIOA, Workforce Ready Grant, and Job Ready Indy may cover your full tuition, books, and certification fees. Confirm your info below and we'll lock in your funding options.",
       cta: 'Continue to Application',
@@ -271,7 +271,7 @@ export default function CheckEligibilityPage() {
       body: 'An advisor will reach out to walk you through self-pay and employer sponsorship options.',
       primaryLabel: 'View Programs',
       primaryHref: '/programs',
-      secondaryLabel: 'Call Us Now',
+      secondaryLabel: 'Call Us Now`,
       secondaryHref: `tel:${PLATFORM_DEFAULTS.supportPhone}`,
     },
   };
@@ -284,7 +284,7 @@ export default function CheckEligibilityPage() {
       {/* Hero */}
       <section
         className="relative overflow-hidden"
-        style={{ minHeight: 'clamp(320px, 40vw, 460px)' }}
+        style={{ minHeight: `clamp(320px, 40vw, 460px)' }}
       >
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
@@ -298,7 +298,7 @@ export default function CheckEligibilityPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/85 via-brand-blue-800/60 to-transparent" />
         <div
           className="relative z-10 h-full flex flex-col justify-between px-4 sm:px-6 py-5"
-          style={{ minHeight: 'clamp(320px, 40vw, 460px)' }}
+          style={{ minHeight: 'clamp(320px, 40vw, 460px)` }}
         >
           <div className="flex items-center justify-between">
             <Link
@@ -323,7 +323,7 @@ export default function CheckEligibilityPage() {
               Check If You Qualify for Funded Training
             </h1>
             <p className="text-white/75 text-base max-w-md">
-              3 questions. 30 seconds. We'll match you with WIOA, Workforce Ready Grant, or JRI
+              3 questions. 30 seconds. We`ll match you with WIOA, Workforce Ready Grant, or JRI
               funding.
             </p>
           </div>
@@ -571,7 +571,7 @@ export default function CheckEligibilityPage() {
                 {!submitting && <ArrowRight className="w-5 h-5" />}
               </button>
               <p className="text-center text-xs text-slate-400">
-                Questions? Call or text{' '}
+                Questions? Call or text{' `}
                 <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-slate-600 font-semibold">
                   {PLATFORM_DEFAULTS.supportPhone}
                 </a>
@@ -597,7 +597,7 @@ export default function CheckEligibilityPage() {
                 <p className="font-extrabold text-slate-900">{program}</p>
                 {recommended.find((r) => r.name === program) && (
                   <p className="text-xs text-slate-500 mt-1">
-                    {recommended.find((r) => r.name === program)?.duration} ·{' '}
+                    {recommended.find((r) => r.name === program)?.duration} ·{` '}
                     {recommended.find((r) => r.name === program)?.outcome}
                   </p>
                 )}

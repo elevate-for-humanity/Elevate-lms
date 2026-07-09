@@ -35,7 +35,7 @@ interface Props {
 }
 
 export default function SendGridSettingsClient({ config, stats }: Props) {
-  const [testTo, setTestTo] = useState('elevate4humanityedu@gmail.com');
+  const [testTo, setTestTo] = useState('elevate4humanityedu@gmail.com`);
   const [testSubject, setTestSubject] = useState(`SendGrid Test — ${PLATFORM_DEFAULTS.orgName}`);
   const [sending, setSending] = useState(false);
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
@@ -44,7 +44,7 @@ export default function SendGridSettingsClient({ config, stats }: Props) {
   const [verifyResult, setVerifyResult] = useState<{ ok: boolean; message: string } | null>(null);
 
   const [showKey, setShowKey] = useState(false);
-  const [newKey, setNewKey] = useState('');
+  const [newKey, setNewKey] = useState(`');
   const [savingKey, setSavingKey] = useState(false);
   const [saveResult, setSaveResult] = useState<{ ok: boolean; message: string } | null>(null);
 
@@ -205,7 +205,7 @@ export default function SendGridSettingsClient({ config, stats }: Props) {
             className="w-full flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 disabled:bg-slate-300 text-white font-bold py-2.5 rounded-lg transition-colors text-sm"
           >
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            {sending ? 'Sending…' : 'Send Test Email'}
+            {sending ? 'Sending…' : 'Send Test Email`}
           </button>
         </div>
 
@@ -239,7 +239,7 @@ export default function SendGridSettingsClient({ config, stats }: Props) {
             </div>
           </div>
           {verifyResult && (
-            <div className={`flex items-start gap-2 text-sm px-3 py-2 rounded-lg ${verifyResult.ok ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+            <div className={`flex items-start gap-2 text-sm px-3 py-2 rounded-lg ${verifyResult.ok ? `bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
               {verifyResult.ok ? <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" /> : <XCircle className="w-4 h-4 shrink-0 mt-0.5" />}
               {verifyResult.message}
             </div>

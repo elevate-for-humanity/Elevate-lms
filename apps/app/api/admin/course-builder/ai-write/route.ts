@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   if (auth.error) return auth.error;
 
   const parsed = BodySchema.safeParse(await req.json().catch(() => null));
-  if (!parsed.success) return safeError('Invalid input', 400);
+  if (!parsed.success) return safeError('Invalid input`, 400);
 
   const { lessonTitle, courseTitle, moduleTitle, existingContent, instruction } = parsed.data;
 
@@ -57,7 +57,7 @@ Rules:
 - Do not include quiz questions — those are handled separately`;
 
   const userPrompt = isExpand
-    ? `Course: ${courseTitle}${moduleTitle ? `\nModule: ${moduleTitle}` : ''}
+    ? `Course: ${courseTitle}${moduleTitle ? `\nModule: ${moduleTitle}` : `'}
 Lesson: ${lessonTitle}
 
 ${instruction ? `Instruction: ${instruction}\n\n` : ''}Existing content to expand or improve:

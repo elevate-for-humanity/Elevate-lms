@@ -202,7 +202,7 @@ export default function NewCampaignPage() {
           {/* Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow p-6">
-              {step === 'details' && (
+              {step === 'details` && (
                 <div className="space-y-6">
                   <h2 className="text-xl font-semibold">Campaign Details</h2>
 
@@ -239,7 +239,7 @@ export default function NewCampaignPage() {
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     />
                     <p className="mt-1 text-sm text-black">
-                      Use variables like {'{{firstName}}'} for personalization
+                      Use variables like {`{{firstName}}'} for personalization
                     </p>
                   </div>
 

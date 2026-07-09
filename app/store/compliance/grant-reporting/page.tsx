@@ -6,11 +6,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Home, ChevronRight, FileText, BarChart3, Calendar, Download } from 'lucide-react';
 import AvatarGuide from '@/components/AvatarGuide';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Grant Reporting Tools | ${PLATFORM_DEFAULTS.orgName} Store`,
-  description: 'Automated grant reporting with customizable templates, outcome tracking, and one-click exports for federal and state workforce grants.',
+  description: `Automated grant reporting with customizable templates, outcome tracking, and one-click exports for federal and state workforce grants.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/compliance/grant-reporting',
   },

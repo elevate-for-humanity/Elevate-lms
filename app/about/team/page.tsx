@@ -2,11 +2,11 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Users, Heart, Target, Sparkles, Briefcase, GraduationCap } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Our Team | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Meet the dedicated professionals behind Elevate for Humanity who are committed to workforce development and career success.',
+  description: `Meet the dedicated professionals behind Elevate for Humanity who are committed to workforce development and career success.',
   keywords: ['team', 'staff', 'workforce development', 'career counselors', 'Indianapolis'],
 };
 

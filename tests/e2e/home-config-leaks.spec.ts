@@ -6,7 +6,7 @@ test.describe('Homepage PLATFORM_DEFAULTS leaks', () => {
     await page.waitForLoadState('domcontentloaded');
     const html = await page.content();
     expect(html).not.toContain('{PLATFORM_DEFAULTS.orgName}');
-    expect(html).not.toContain('${PLATFORM_DEFAULTS.orgName}');
+    expect(html).not.toContain(`${PLATFORM_DEFAULTS.orgName}`);
   });
 
   test('employer strip image alt is human-readable', async ({ page }) => {

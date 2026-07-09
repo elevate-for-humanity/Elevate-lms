@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 import { Users, Handshake, Building, ArrowRight } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Partnerships | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Partner with Elevate for Humanity to train your workforce or host apprentices.',
+  description: `Partner with Elevate for Humanity to train your workforce or host apprentices.',
 };
 
 const PARTNER_TYPES = [

@@ -355,7 +355,7 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
     checkY(18);
     const rowBg = parseInt(num) % 2 === 0 ? C.rowAlt : C.white;
     rect(ML, y - 3, contentW, 16, rowBg);
-    txt(num + '.', ML + 6, y + 5, bold, 9, C.subText);
+    txt(num + '.`, ML + 6, y + 5, bold, 9, C.subText);
     txt(title, ML + 22, y + 5, bold, 9, C.black);
     txt(desc, ML + 180, y + 5, regular, 8, C.gray);
     y -= 18;
@@ -384,7 +384,7 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
   // ════════════════════════════════════════════════════════════════════════════
   // SECTION 1 — ORGANIZATION INFORMATION
   // ════════════════════════════════════════════════════════════════════════════
-  sectionHeader('Organization Information', '1');
+  sectionHeader(`Organization Information', '1');
 
   fieldRow([
     { label: 'Legal Organization Name', value: data.org_name },

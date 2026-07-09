@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Elizabeth Greene | Our Team',
+  title: 'Elizabeth Greene | Our Team`,
   description: `Elizabeth Greene — Founder & Chief Executive Officer at ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute.`,
 };
 
@@ -15,7 +15,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-5xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Team', href: '/about/team' }, { label: 'Elizabeth Greene' }]} />
+        <Breadcrumbs items={[{ label: `Team', href: '/about/team' }, { label: 'Elizabeth Greene' }]} />
       </div>
 
       <section className="py-10 sm:py-16">

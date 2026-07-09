@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Shield } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 export const revalidate = 60;
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 const FERPA_ACTIONS = [
-  'ferpa.access_request',
+  `ferpa.access_request',
   'ferpa.disclosure',
   'ferpa.consent',
   'ferpa.opt_out',

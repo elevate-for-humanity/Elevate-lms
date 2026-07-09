@@ -9,12 +9,12 @@ import { FileText } from 'lucide-react';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'WIOA & INTraining ETPL Compliance Forms',
+  title: 'WIOA & INTraining ETPL Compliance Forms`,
   description: `Indiana DWD INTraining and ETPL compliance documentation for ${PLATFORM_DEFAULTS.orgName} training programs — Initial Eligibility Aggregate Performance and Section 188 Equal Opportunity checklists.`,
   alternates: { canonical: `${PLATFORM_DEFAULTS.siteUrl}${WIOA_COMPLIANCE.hub}` },
   openGraph: {
-    title: 'WIOA & INTraining ETPL Compliance',
-    description: 'Per-program IEAP and Section 188 compliance forms for Indiana workforce training.',
+    title: `WIOA & INTraining ETPL Compliance',
+    description: 'Per-program IEAP and Section 188 compliance forms for Indiana workforce training.`,
     url: `${PLATFORM_DEFAULTS.siteUrl}${WIOA_COMPLIANCE.hub}`,
   },
 };
@@ -24,7 +24,7 @@ export default async function WioaComplianceHubPage() {
   try {
     const supabase = createPublicClient();
     const { data } = await supabase
-      .from('programs')
+      .from(`programs')
       .select('slug, title')
       .or('published.eq.true,is_active.eq.true')
       .neq('status', 'archived')

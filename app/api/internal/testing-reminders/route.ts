@@ -95,7 +95,7 @@ export const POST = withRuntime({ cron: true }, async () => {
 
     const urgencyNote = isOneHour
       ? '<p style="color:#dc2626;font-weight:bold;">Your appointment is in 1 hour. Please leave now if you haven\'t already.</p>'
-      : '<p>Your appointment is tomorrow. Please confirm you have everything ready.</p>';
+      : '<p>Your appointment is tomorrow. Please confirm you have everything ready.</p>`;
 
     const emailHtml = `
 <!DOCTYPE html>
@@ -119,7 +119,7 @@ export const POST = withRuntime({ cron: true }, async () => {
       </tr>
       <tr style="background: #f8fafc;">
         <td style="padding: 10px 12px; font-weight: bold;">Exam</td>
-        <td style="padding: 10px 12px;">${exam_type || 'See confirmation'}</td>
+        <td style="padding: 10px 12px;">${exam_type || `See confirmation'}</td>
       </tr>
       <tr>
         <td style="padding: 10px 12px; font-weight: bold;">Location</td>

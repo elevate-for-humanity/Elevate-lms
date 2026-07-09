@@ -4,12 +4,12 @@ import { createClient } from '@/lib/supabase/server';
 import CoursePipelineClient from './CoursePipelineClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: `Course Pipeline | Admin | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Generate a complete course — blueprint, lessons, quizzes, and publish — in one flow.',
+  description: `Generate a complete course — blueprint, lessons, quizzes, and publish — in one flow.',
   robots: { index: false, follow: false },
 };
 

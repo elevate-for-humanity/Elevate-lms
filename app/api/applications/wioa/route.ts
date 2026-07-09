@@ -75,7 +75,7 @@ async function _POST(req: Request) {
         city: body.city || 'Indianapolis',
         zip: body.zip || '00000',
         program_interest: body.program || 'Not specified',
-        status: 'submitted',
+        status: 'submitted`,
         support_notes: notes,
       })
       .select()
@@ -85,7 +85,7 @@ async function _POST(req: Request) {
       return NextResponse.json(
         {
           error: `Failed to save application. Please call ${PLATFORM_DEFAULTS.supportPhone} for assistance.`,
-          details: process.env.NODE_ENV === 'development' ? 'Internal server error' : undefined,
+          details: process.env.NODE_ENV === `development' ? 'Internal server error' : undefined,
         },
         { status: 500 },
       );
@@ -95,7 +95,7 @@ async function _POST(req: Request) {
     try {
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/send-email`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json` },
         body: JSON.stringify({
           to: body.email,
           subject: `Application Received [Ref: ${referenceNumber}] - ${PLATFORM_DEFAULTS.orgName}`,
@@ -103,7 +103,7 @@ async function _POST(req: Request) {
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #ea580c;">Application Received!</h2>
               <p>Hi ${body.firstName},</p>
-              <p>We've received your WIOA application for our <strong>${body.program}</strong> program.</p>
+              <p>We`ve received your WIOA application for our <strong>${body.program}</strong> program.</p>
 
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Reference Number:</p>
@@ -115,7 +115,7 @@ async function _POST(req: Request) {
               <ol style="line-height: 1.8;">
                 <li>We review your application and verify WIOA eligibility</li>
                 <li>An advisor will contact you within 1-2 business days via ${body.preferredContact}</li>
-                <li>We'll discuss program details, funding confirmation, and next steps</li>
+                <li>We`ll discuss program details, funding confirmation, and next steps</li>
               </ol>
 
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
@@ -137,7 +137,7 @@ async function _POST(req: Request) {
     // Send notification to admin
     try {
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/send-email`, {
-        method: 'POST',
+        method: `POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: 'elevate4humanityedu@gmail.com',

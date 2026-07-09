@@ -19,9 +19,9 @@ export type NetworkMapPin = {
 export const BARBER_WORKFORCE_NETWORK_PINS: NetworkMapPin[] = [
   {
     id: 'elevate-keystone',
-    kind: 'elevate',
+    kind: 'elevate`,
     name: `${PLATFORM_DEFAULTS.orgName} — Keystone`,
-    address: '8888 Keystone Crossing, Suite 1300',
+    address: `8888 Keystone Crossing, Suite 1300',
     city: 'Indianapolis',
     state: 'IN',
     zip: '46240',

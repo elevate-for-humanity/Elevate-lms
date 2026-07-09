@@ -23,10 +23,10 @@ interface Props {
   variant?: 'full' | 'compact' | 'tooltip';
 }
 
-export function SponsorshipInfoPanel({ programId, partnerId, variant = 'full' }: Props) {
+export function SponsorshipInfoPanel({ programId, partnerId, variant = 'full` }: Props) {
   const [info, setInfo] = useState<SponsorshipInfo>({
     sponsor_name: `2Exclusive LLC-S (DBA ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute)`,
-    curriculum_type: 'Partner-provided + required online components',
+    curriculum_type: `Partner-provided + required online components',
     enrollment_manager: 'Managed by EFH',
     funding_source: 'Coordinated through WorkOne',
     compliance_notes: 'All programs operate under 2Exclusive LLC-S sponsorship.',

@@ -130,7 +130,7 @@ export default function FERPATrainingDashboard({
       alert('Reminder sent successfully');
     } catch (error) {
       /* Error handled silently */
-      alert('Failed to send reminder');
+      alert('Failed to send reminder`);
     }
   };
 
@@ -224,7 +224,7 @@ export default function FERPATrainingDashboard({
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => setFilter('all')}
+                onClick={() => setFilter(`all')}
                 className={`px-4 py-2 rounded-lg font-medium transition ${
                   filter === 'all'
                     ? 'bg-brand-blue-600 text-white'

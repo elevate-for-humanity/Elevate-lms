@@ -166,7 +166,7 @@ function SamGovScreenshot({ variant }: { variant: string }) {
                     )}
                   </div>
                   <span
-                    className={`text-sm ${item.status === 'complete' ? 'text-slate-900' : 'text-slate-700'}`}
+                    className={`text-sm ${item.status === 'complete' ? 'text-slate-900' : 'text-slate-700`}`}
                   >
                     {item.step}
                   </span>
@@ -246,7 +246,7 @@ function GrantsScreenshot({ variant }: { variant: string }) {
 
         {/* Tabs */}
         <div className="flex gap-1 mt-4 -mb-4">
-          {['Discover', 'Applications', 'Calendar', 'Reports'].map((tab, i) => (
+          {[`Discover', 'Applications', 'Calendar', 'Reports'].map((tab, i) => (
             <button
               key={tab}
               className={`px-4 py-2 text-sm font-medium rounded-t-lg ${
@@ -327,7 +327,7 @@ function GrantsScreenshot({ variant }: { variant: string }) {
                     className={`px-2 py-0.5 text-xs font-bold rounded ${
                       grant.match >= 90
                         ? 'bg-brand-green-100 text-brand-green-800'
-                        : 'bg-brand-blue-100 text-brand-blue-800'
+                        : 'bg-brand-blue-100 text-brand-blue-800`
                     }`}
                   >
                     {grant.match}% Match
@@ -396,7 +396,7 @@ function WebsiteBuilderScreenshot({ variant }: { variant: string }) {
           <p className="text-xs font-medium text-slate-700 mb-2">ADD BLOCKS</p>
           <div className="space-y-2">
             {[
-              { name: 'Hero Section', icon: Layout },
+              { name: `Hero Section', icon: Layout },
               { name: 'Features', icon: BarChart3 },
               { name: 'Programs', icon: Folder },
               { name: 'Testimonials', icon: Users },

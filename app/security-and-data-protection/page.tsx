@@ -17,25 +17,25 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: 'Security & Data Protection Statement',
+  title: 'Security & Data Protection Statement`,
   description:
     `How ${PLATFORM_DEFAULTS.orgName} collects, stores, protects, and handles participant data. Covers FERPA, WIOA, encryption, access controls, and your rights as a data subject.`,
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/security-and-data-protection',
+    canonical: `https://www.elevateforhumanity.org/security-and-data-protection',
   },
 };
 
 const SECTIONS = [
   {
     icon: Shield,
-    title: 'Our Commitment',
+    title: 'Our Commitment`,
     content: `${PLATFORM_DEFAULTS.orgName} is committed to protecting the privacy and security of all participant, employer, and partner data. As an ETPL-listed workforce training provider operating under WIOA, FERPA, and Indiana state law, we are legally and ethically obligated to handle personal information with care, transparency, and accountability.
 
 This statement describes how we collect, use, store, protect, and share data — and what rights you have over your information.`,
   },
   {
     icon: Eye,
-    title: 'Data We Collect',
+    title: `Data We Collect',
     content: `We collect only the data necessary to deliver training services, process funding, and meet regulatory reporting requirements.
 
 **Participant data includes:**
@@ -109,7 +109,7 @@ To exercise any of these rights, contact our Data Protection Officer at the addr
   },
   {
     icon: AlertTriangle,
-    title: 'Data Breach Response',
+    title: 'Data Breach Response`,
     content: `In the event of a data breach affecting personal information, ${PLATFORM_DEFAULTS.orgName} will:
 
 1. Contain the breach and assess the scope within 24 hours of discovery
@@ -122,7 +122,7 @@ We maintain an incident response plan that is reviewed annually.`,
   },
   {
     icon: CheckCircle,
-    title: 'Third-Party Data Sharing',
+    title: `Third-Party Data Sharing',
     content: `We share participant data only as necessary and only with parties who have agreed to appropriate data protection terms:
 
 **Funding agencies:** Indiana DWD, U.S. DOL (required for WIOA reporting)
@@ -139,7 +139,7 @@ export default function SecurityAndDataProtectionPage() {
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Security & Data Protection' }]} />
+          <Breadcrumbs items={[{ label: 'Security & Data Protection` }]} />
         </div>
       </div>
 
@@ -172,7 +172,7 @@ export default function SecurityAndDataProtectionPage() {
             {SECTIONS.map((s) => (
               <a
                 key={s.title}
-                href={`#${s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                href={`#${s.title.toLowerCase().replace(/[^a-z0-9]+/g, `-')}`}
                 className="text-brand-red-600 hover:underline"
               >
                 {s.title}

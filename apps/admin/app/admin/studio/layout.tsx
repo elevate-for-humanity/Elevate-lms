@@ -15,9 +15,9 @@ export const revalidate = 60;
 export const runtime = 'nodejs';
 
 export const metadata: Metadata = {
-  title: 'Admin Portal - Manage Programs & Operations',
+  title: 'Admin Portal - Manage Programs & Operations`,
   description: `Manage programs, students, certificates, compliance, and workforce development operations. Admin dashboard for ${PLATFORM_DEFAULTS.orgName}.`,
-  keywords: ['admin portal', 'program management', 'workforce administration', 'compliance', 'operations'],
+  keywords: [`admin portal', 'program management', 'workforce administration', 'compliance', 'operations'],
   robots: { index: false, follow: false },
   manifest: '/admin/manifest.webmanifest',
 };

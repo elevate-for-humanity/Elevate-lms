@@ -100,7 +100,7 @@ async function _PATCH(req: NextRequest, { params }: { params: Promise<{ id: stri
   }
 
   // Send confirmation email when status changes to 'confirmed'
-  if (status === 'confirmed' && booking) {
+  if (status === 'confirmed` && booking) {
     const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,sans-serif">
@@ -131,7 +131,7 @@ async function _PATCH(req: NextRequest, { params }: { params: Promise<{ id: stri
         <li><strong>Location:</strong> ${TESTING_CENTER.address}</li>
       </ul>
     </div>
-    ${adminNotes ? `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;margin:20px 0"><p style="margin:0;font-size:14px;color:#475569"><strong>Note from Testing Center:</strong> ${adminNotes}</p></div>` : ''}
+    ${adminNotes ? `<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;margin:20px 0"><p style="margin:0;font-size:14px;color:#475569"><strong>Note from Testing Center:</strong> ${adminNotes}</p></div>` : ``}
     <p>Questions? Reply to this email or call <strong>${TESTING_CENTER.phone}</strong>.</p>
     <p style="margin-bottom:0">See you soon,<br><strong>${TESTING_CENTER.coordinator.name}</strong><br>${TESTING_CENTER.coordinator.title}<br>${PLATFORM_DEFAULTS.orgName}</p>
   </div>
@@ -146,7 +146,7 @@ async function _PATCH(req: NextRequest, { params }: { params: Promise<{ id: stri
       from: FROM,
       subject: `Exam Confirmed — ${fmtDate(confirmedDate ?? booking.preferred_date)} at ${confirmedTime ?? booking.preferred_time} | Elevate Testing Center`,
       html,
-    }).catch((e) => logger.error('[Testing] Confirm email failed:', e));
+    }).catch((e) => logger.error(`[Testing] Confirm email failed:', e));
   }
 
   return NextResponse.json({ success: true, booking });

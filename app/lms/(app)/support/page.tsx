@@ -114,7 +114,7 @@ export default async function SupportPage() {
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Support' }]} />
+        <Breadcrumbs items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Support` }]} />
       </div>
       <div className="max-w-5xl mx-auto px-4">
         {/* Header */}
@@ -274,7 +274,7 @@ export default async function SupportPage() {
                         </span>
                         <span
                           className={`px-2 py-1 rounded text-xs font-medium ${
-                            ticket.status === 'open'
+                            ticket.status === `open'
                               ? 'bg-yellow-100 text-yellow-700'
                               : ticket.status === 'resolved'
                                 ? 'bg-brand-green-100 text-brand-green-700'

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Clipboard, Phone } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `WorkKeys Testing | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Prepare for WorkKeys assessments for employment and certification.',
+  description: `Prepare for WorkKeys assessments for employment and certification.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/workkeys' },
 };
 

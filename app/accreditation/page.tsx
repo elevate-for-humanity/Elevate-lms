@@ -2,11 +2,11 @@
 
 import { Metadata } from 'next';
 import { Shield, CheckCircle, Award, GraduationCap } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Accreditation & Certifications | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Elevate for Humanity is accredited and our programs meet industry standards.',
+  description: `Elevate for Humanity is accredited and our programs meet industry standards.',
 };
 
 const ACCREDITATIONS = [

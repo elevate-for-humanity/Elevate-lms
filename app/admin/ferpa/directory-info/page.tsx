@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import DirectoryInfoClient from './DirectoryInfoClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 export const revalidate = 60;
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 const DIRECTORY_FIELDS = [
-  { key: 'directory_name', label: 'Student Name', description: 'Full legal name' },
+  { key: `directory_name', label: 'Student Name', description: 'Full legal name' },
   {
     key: 'directory_enrollment_status',
     label: 'Enrollment Status',

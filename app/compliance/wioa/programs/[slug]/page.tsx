@@ -15,7 +15,7 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const program = await fetchProgramForWioaPublic(slug);
-  if (!program) return { title: 'Program not found' };
+  if (!program) return { title: 'Program not found` };
   const path = WIOA_COMPLIANCE.programHub(slug);
   return {
     title: `${program.title} — WIOA / ETPL compliance`,
@@ -39,7 +39,7 @@ export default async function ProgramWioaComplianceHubPage({ params }: Props) {
       description="Separate pages for each required Indiana workforce form."
       canonicalPath={canonicalPath}
       breadcrumbItems={[
-        { label: 'Compliance', href: '/compliance' },
+        { label: `Compliance', href: '/compliance' },
         { label: 'WIOA / ETPL', href: WIOA_COMPLIANCE.hub },
         { label: program.title },
       ]}

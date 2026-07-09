@@ -73,8 +73,8 @@ function FallbackChatWidget() {
         text:
           data.reply ||
           data.response ||
-          `I'm having trouble right now. Please call us at ${PLATFORM_DEFAULTS.supportPhone} for assistance.`,
-        sender: 'bot',
+          `I`m having trouble right now. Please call us at ${PLATFORM_DEFAULTS.supportPhone} for assistance.`,
+        sender: `bot',
         timestamp: new Date(),
       };
 
@@ -82,8 +82,8 @@ function FallbackChatWidget() {
     } catch (error) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: `I'm having trouble connecting. Please call us at ${PLATFORM_DEFAULTS.supportPhone} or visit elevateforhumanity.org/apply to get started!`,
-        sender: 'bot',
+        text: `I`m having trouble connecting. Please call us at ${PLATFORM_DEFAULTS.supportPhone} or visit elevateforhumanity.org/apply to get started!`,
+        sender: `bot',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);

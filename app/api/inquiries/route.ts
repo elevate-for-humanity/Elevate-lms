@@ -104,7 +104,7 @@ async function _POST(req: Request) {
         `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/api/email/send`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json` },
           body: JSON.stringify({
             to: body.email,
             subject: `Inquiry Received - ${PLATFORM_DEFAULTS.orgName}`,
@@ -112,8 +112,8 @@ async function _POST(req: Request) {
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #ea580c;">Thank you for your inquiry!</h2>
               <p>Hi ${firstName},</p>
-              <p>We've received your inquiry and an advisor will contact you within 1-2 business days.</p>
-              ${body.program ? `<p>You expressed interest in: <strong>${body.program}</strong></p>` : ''}
+              <p>We`ve received your inquiry and an advisor will contact you within 1-2 business days.</p>
+              ${body.program ? `<p>You expressed interest in: <strong>${body.program}</strong></p>` : '`}
 
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Application ID:</p>
@@ -136,7 +136,7 @@ async function _POST(req: Request) {
       await internalFetch(
         `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/api/email/send`,
         {
-          method: 'POST',
+          method: `POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             to: 'elevate4humanityedu@gmail.com',
@@ -147,14 +147,14 @@ async function _POST(req: Request) {
             <p><strong>Email:</strong> ${body.email}</p>
             <p><strong>Phone:</strong> ${body.phone || 'Not provided'}</p>
             ${body.program ? `<p><strong>Program Interest:</strong> ${body.program}</p>` : ''}
-            ${body.message ? `<p><strong>Message:</strong><br>${body.message}</p>` : ''}
+            ${body.message ? `<p><strong>Message:</strong><br>${body.message}</p>` : '`}
             <p><a href="${PLATFORM_DEFAULTS.siteUrl}/admin/applications">View in Admin Portal</a></p>
           `,
           }),
         },
       );
     } catch (emailError) {
-      logger.error('Unhandled error', emailError instanceof Error ? emailError : undefined);
+      logger.error(`Unhandled error', emailError instanceof Error ? emailError : undefined);
     }
 
     return NextResponse.json(

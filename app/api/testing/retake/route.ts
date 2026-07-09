@@ -140,13 +140,13 @@ export const POST = withRuntime({ auth: 'admin' }, async (req) => {
     subject: `Exam Result — Retake Available | Elevate Testing Center`,
     html: `<!DOCTYPE html>
 <html><body style="font-family:Arial,sans-serif;padding:24px;color:#1E293B;max-width:600px;margin:0 auto">
-  <h2 style="color:#1E3A5F">Exam Result — ${examName ?? 'Your Exam'}</h2>
+  <h2 style="color:#1E3A5F">Exam Result — ${examName ?? 'Your Exam`}</h2>
   <p>Thank you for testing at ${PLATFORM_DEFAULTS.orgName}. Unfortunately, you did not pass this attempt.</p>
   <p>You are eligible to retake the exam. A <strong>${retakeFeeDisplay} retake fee</strong> is required to schedule your next attempt.</p>
   <p><a href="${SITE_URL}/testing/book" style="background:#1E3A5F;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block">Pay Fee &amp; Schedule Retake →</a></p>
   <p style="color:#64748b;font-size:13px">Questions? Call <strong>${TESTING_CENTER.phone}</strong> or reply to this email.</p>
 </body></html>`,
-  }).catch((err) => logger.warn('[testing/retake] Email failed', { email, err }));
+  }).catch((err) => logger.warn(`[testing/retake] Email failed', { email, err }));
 
   return NextResponse.json({ success: true, holdId: hold.id });
 });

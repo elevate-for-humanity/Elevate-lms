@@ -4,17 +4,17 @@ import Image from 'next/image';
 import { createPublicClient } from '@/lib/supabase/public';
 import { Briefcase, MapPin, Clock, ExternalLink, BadgeCheck, Zap, Building2, ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const revalidate = 900; // 15 min
 
 export const metadata: Metadata = {
   title: `Job Board | ${PLATFORM_DEFAULTS.orgName}`,
   description:
-    'Browse job openings from Elevate employer partners, OJT opportunities, apprenticeship positions, and WIOA-approved placements in Indiana.',
+    `Browse job openings from Elevate employer partners, OJT opportunities, apprenticeship positions, and WIOA-approved placements in Indiana.`,
   openGraph: {
     title: `Job Board | ${PLATFORM_DEFAULTS.orgName}`,
-    description: 'Workforce-aligned job openings — OJT, apprenticeships, and WIOA-approved positions.',
+    description: `Workforce-aligned job openings — OJT, apprenticeships, and WIOA-approved positions.',
   },
 };
 

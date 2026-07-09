@@ -135,12 +135,12 @@ async function sendEmailAlert(alert: SecurityAlert, emails?: string[]): Promise<
     const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json`,
         Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
       },
       body: JSON.stringify({
         personalizations: emails.map((email) => ({ to: [{ email }] })),
-        from: { email: `security@${PLATFORM_DEFAULTS.canonicalDomain}`, name: 'EFH Security' },
+        from: { email: `security@${PLATFORM_DEFAULTS.canonicalDomain}`, name: `EFH Security' },
         subject,
         content: [
           {
@@ -287,7 +287,7 @@ function formatEmailBody(alert: SecurityAlert): string {
             <div class="value"><pre>${JSON.stringify(alert.metadata, null, 2)}</pre></div>
           </div>
           `
-              : ''
+              : '`
           }
         </div>
         <div class="footer">
@@ -306,7 +306,7 @@ function formatEmailBody(alert: SecurityAlert): string {
 function getSeverityColor(severity: AlertSeverity): string {
   switch (severity) {
     case AlertSeverity.CRITICAL:
-      return '#dc2626'; // red-600
+      return `#dc2626'; // red-600
     case AlertSeverity.HIGH:
       return '#ea580c'; // orange-600
     case AlertSeverity.MEDIUM:

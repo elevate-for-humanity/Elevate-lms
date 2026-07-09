@@ -9,11 +9,11 @@ import {
 import { requireRole } from '@/lib/auth/require-role';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 
 export const metadata: Metadata = {
   title: `Admin Portal | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Manage your workforce development programs, students, and operations.',
+  description: `Manage your workforce development programs, students, and operations.',
 };
 
 interface NavCard {

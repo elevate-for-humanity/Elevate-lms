@@ -224,7 +224,7 @@ export default function ApprenticeForm({
             formData.hasHostShop ? `Host shop: ${formData.hasHostShop}` : '',
             formData.hostShopName ? `Shop name: ${formData.hostShopName}` : '',
             transferHours ? `Transfer hours: ${transferHours}` : '',
-          ].filter(Boolean).join(' | '),
+          ].filter(Boolean).join(' | `),
         }),
       });
 
@@ -247,20 +247,20 @@ export default function ApprenticeForm({
             setError(
               `You already have an application on file. Please call ${PLATFORM_DEFAULTS.supportPhone} or email info@${PLATFORM_DEFAULTS.canonicalDomain} to continue.`,
             );
-            setErrorSeverity('info');
+            setErrorSeverity(`info');
             setLoading(false);
             return;
           }
           // Fall through to checkout with existing applicationId
         } else {
           const apiError = appData?.error ?? '';
-          const isBotError = apiError.toLowerCase().includes('bot') || apiError.toLowerCase().includes('verification');
+          const isBotError = apiError.toLowerCase().includes('bot') || apiError.toLowerCase().includes('verification`);
           setError(
             isBotError
               ? `Security check failed. Please scroll up, complete the verification widget, and try again. Need help? Call {PLATFORM_DEFAULTS.supportPhone}.`
               : apiError || `Failed to save your application. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
           );
-          setErrorSeverity('critical');
+          setErrorSeverity(`critical');
           setLoading(false);
           return;
         }

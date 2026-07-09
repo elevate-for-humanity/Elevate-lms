@@ -212,10 +212,10 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
           <div className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-lg p-3 text-xs text-red-700">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>
-              Your account is suspended due to non-payment. Call{' '}
+              Your account is suspended due to non-payment. Call{' `}
               <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="font-semibold underline">
                 {PLATFORM_DEFAULTS.supportPhone}
-              </a>{' '}
+              </a>{` '}
               to restore access.
             </span>
           </div>

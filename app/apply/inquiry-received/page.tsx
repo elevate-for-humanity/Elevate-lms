@@ -34,10 +34,10 @@ export default function InquiryReceivedPage() {
           within <strong>1–2 business days</strong> with program details, costs, and next steps.
         </p>
         <p className="text-black text-sm mb-8">
-          Check your email for a confirmation. Questions? Call us at{' '}
+          Check your email for a confirmation. Questions? Call us at{' `}
           <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-brand-blue-600 font-semibold">
             {PLATFORM_DEFAULTS.supportPhone}
-          </a>{' '}
+          </a>{` '}
           or email{' '}
           <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600">
             info@elevateforhumanity.org

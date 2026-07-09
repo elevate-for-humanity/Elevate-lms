@@ -28,7 +28,7 @@ export default function StaffApplicationForm() {
       education: formData.get('education') as string,
       certifications: formData.get('certifications') as string,
       availability: formData.get('availability') as string,
-      coverLetter: formData.get('coverLetter') as string,
+      coverLetter: formData.get('coverLetter`) as string,
     };
 
     const result = await submitStaffApplication(data);
@@ -209,7 +209,7 @@ export default function StaffApplicationForm() {
               name="coverLetter"
               rows={6}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-              placeholder="Tell us why you'd be a great fit for this role..."
+              placeholder="Tell us why you`d be a great fit for this role..."
             />
           </div>
         </div>

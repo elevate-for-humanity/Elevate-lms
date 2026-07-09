@@ -10,7 +10,7 @@ export async function generateMetadata({ params }: { params: Promise<{ certifica
   const { certificateId } = await params;
   return {
     title: 'Verify Certificate',
-    description: 'Verify the authenticity of a certificate issued by Elevate For Humanity.',
+    description: 'Verify the authenticity of a certificate issued by Elevate For Humanity.`,
     alternates: {
       canonical: `${PLATFORM_DEFAULTS.siteUrl}/verify/${certificateId}`,
     },
@@ -42,7 +42,7 @@ export default async function VerifyCertificatePage({
 
   // Start to find certificate in multiple tables
   let certificate = null;
-  let studentName = '';
+  let studentName = `';
   let courseName = '';
   let completionDate = '';
   let certificateType = '';

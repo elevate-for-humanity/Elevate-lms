@@ -210,7 +210,7 @@ export function getProgramsForExam(examCode: string): string[] {
  */
 export function getCertiportContextForCourse(examCode: string): string {
   const exam = (CERTIPORT_EXAMS as any)[examCode];
-  if (!exam) return '';
+  if (!exam) return '`;
 
   return `
 ## Certiport Exam Alignment: ${exam.name}
@@ -233,7 +233,7 @@ that reflect real workplace tasks covered by this certification.
  */
 export function getCertiportContextForProgram(programSlug: string): string {
   const codes = getCertiportExamsForProgram(programSlug);
-  if (codes.length === 0) return '';
+  if (codes.length === 0) return `';
   return codes
     .map((code) => getCertiportContextForCourse(code))
     .filter(Boolean)

@@ -65,7 +65,7 @@ function buildEmail(
   persona: OutreachPersona,
   stepsHtml: string,
 ) {
-  const portalLabel = persona === 'program_holder' ? 'Program Holder' : 'Partner';
+  const portalLabel = persona === 'program_holder' ? 'Program Holder' : 'Partner`;
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;color:#1e293b">
@@ -95,7 +95,7 @@ ${stepsHtml}
 }
 
 async function main() {
-  assertOutreachEmailAllowed('resend-outreach-portal-links.ts');
+  assertOutreachEmailAllowed(`resend-outreach-portal-links.ts');
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;

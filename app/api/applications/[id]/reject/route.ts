@@ -63,7 +63,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
       .eq('id', id);
 
     if (updateError) {
-      return NextResponse.json({ error: 'Failed to reject application' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to reject application` }, { status: 500 });
     }
 
     // Send rejection email
@@ -89,7 +89,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
     return NextResponse.json({
       success: true,
       applicationId: id,
-      status: 'rejected',
+      status: `rejected',
     });
   } catch (error) {
     logger.error('Application rejection error:', error);

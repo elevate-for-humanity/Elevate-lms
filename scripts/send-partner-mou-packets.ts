@@ -173,7 +173,7 @@ function buildEmail(r: typeof ALL_RECIPIENTS[0], pdfB64: string): string {
           <p style="font-size:14px;color:#444;line-height:1.7;margin:0 0 16px;">
             <strong>Organization:</strong> ${r.org}<br>
             <strong>Partnership Type:</strong> ${r.type}<br>
-            <strong>Programs:</strong> ${r.programs.join(', ')}
+            <strong>Programs:</strong> ${r.programs.join(', `)}
           </p>
 
           <p style="font-size:14px;color:#444;line-height:1.7;margin:0 0 24px;">
@@ -224,7 +224,7 @@ function buildEmail(r: typeof ALL_RECIPIENTS[0], pdfB64: string): string {
 
   const text = [
     `Dear ${firstName},`,
-    '',
+    `',
     `Thank you for your partnership with Elevate for Humanity Technical and Career Institute.`,
     `We are excited to formalize our collaboration through this Memorandum of Understanding (MOU).`,
     '',

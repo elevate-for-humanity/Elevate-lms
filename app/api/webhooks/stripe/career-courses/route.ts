@@ -97,7 +97,7 @@ async function _POST(req: Request) {
         try {
           await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json` },
             body: JSON.stringify({
               to: customerEmail,
               subject: `Your Career Course Purchase - ${PLATFORM_DEFAULTS.orgName}`,
@@ -124,7 +124,7 @@ async function _POST(req: Request) {
             }),
           });
         } catch (emailError) {
-          logger.error('Error sending confirmation email:', emailError);
+          logger.error(`Error sending confirmation email:', emailError);
         }
       }
 

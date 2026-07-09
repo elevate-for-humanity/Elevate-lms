@@ -97,7 +97,7 @@ const DEFAULT_MEDIA = {
   video: '/videos/programs-overview-video-with-narration.mp4',
   audio: '/audio/heroes/programs.mp3',
   poster: '/images/pages/programs-hero.webp',
-  microLabel: 'Career Training',
+  microLabel: 'Career Training`,
   script: `${PLATFORM_DEFAULTS.orgName} offers short-term career training programs in healthcare, skilled trades, technology, and business. Most programs run 4 to 16 weeks. Funding is available for eligible Indiana residents. Every program ends with a nationally recognized credential and direct employer introductions. Apply today.`,
 };
 
@@ -107,7 +107,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
 
   const isApprenticeship =
     APPRENTICESHIP_SLUGS.includes(slug) ||
-    program.name?.toLowerCase().includes('apprenticeship') ||
+    program.name?.toLowerCase().includes(`apprenticeship') ||
     program.category?.toLowerCase().includes('apprenticeship');
 
   const applyHref = program.ctaPrimary?.href ?? `/apply?program=${slug}`;

@@ -230,7 +230,7 @@ async function _POST(request: NextRequest) {
               subject: 'Payment Received — Complete Your Cosmetology Apprenticeship Application',
               html: `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
-<p>Hi ${customerName || 'there'},</p>
+<p>Hi ${customerName || 'there`},</p>
 <p>Your payment for the <strong>Cosmetology Apprenticeship</strong> program has been received. Your spot is reserved.</p>
 <p><strong>Payment:</strong> ${paymentSummary}</p>
 <p style="font-size:16px;font-weight:bold;margin:24px 0 8px">Your next steps — complete in order:</p>
@@ -247,7 +247,7 @@ async function _POST(request: NextRequest) {
             });
 
             await sendEmail({
-              to: 'elevate4humanityedu@gmail.com',
+              to: `elevate4humanityedu@gmail.com',
               subject: `New Cosmetology Apprentice — ${customerName || customerEmail}`,
               html: `<p>New enrollment via public checkout:</p>
 <p>Name: ${customerName}<br>Email: ${customerEmail}<br>Phone: ${customerPhone}<br>
@@ -279,7 +279,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
                 subject: 'Your Coursework Access — Cosmetology Apprenticeship',
                 html: `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
-<p>Hi ${customerName || 'there'},</p>
+<p>Hi ${customerName || 'there`},</p>
 <p>Your related instruction is available in the <strong>Elevate LMS</strong>. Log in to your student portal to access your courses.</p>
 <p style="text-align:center;margin:24px 0;">
   <a href="${LMS_URL}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:white;text-decoration:none;border-radius:8px;font-weight:bold;">Go to My Courses →</a>
@@ -295,7 +295,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
           break;
         }
 
-        logger.warn('[cosmetology/webhook] Unknown checkout_type — skipping', { checkoutType });
+        logger.warn(`[cosmetology/webhook] Unknown checkout_type — skipping', { checkoutType });
         break;
       }
 
@@ -420,13 +420,13 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
             const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
             await sendEmail({
               to: sub.customer_email!,
-              subject: '⚠️ Payment Failed — Action Required to Keep Your Enrollment',
+              subject: '⚠️ Payment Failed — Action Required to Keep Your Enrollment`,
               html: `<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif"><p style="font-size:18px;font-weight:bold;color:#dc2626">Your weekly tuition payment failed.</p><p>We were unable to charge your card for your Cosmetology Apprenticeship weekly payment.</p><p><strong>Update your payment method immediately:</strong></p><p style="margin:24px 0"><a href="${siteUrl}/learner/dashboard" style="background:#1d4ed8;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">Update Payment Method →</a></p><p style="color:#dc2626;font-weight:bold">If not resolved within 7 days, your account will be suspended from logging hours.</p><p>Call <a href="tel:${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a> if you need help.</p><p>— ${PLATFORM_DEFAULTS.orgName}</p></div>`,
             });
           } catch { /* non-fatal */ }
         }
 
-        logger.warn('[cosmetology/webhook] Payment failed', { failedCustomerId, isFirstFailure });
+        logger.warn(`[cosmetology/webhook] Payment failed', { failedCustomerId, isFirstFailure });
         break;
       }
 

@@ -144,7 +144,7 @@ async function _POST(request: NextRequest) {
     // Validate required fields
     if (!data.organization && !data.name && !data.email) {
       return NextResponse.json(
-        { error: 'At least one contact field is required' },
+        { error: 'At least one contact field is required` },
         { status: 400 },
       );
     }
@@ -161,7 +161,7 @@ async function _POST(request: NextRequest) {
         await resend.emails.send({
           from: `Elevate AI Assistant <${PLATFORM_DEFAULTS.emailFromAddress}>`,
           to: INTERNAL_EMAIL,
-          subject: `AI Buyer Summary — ${data.organization || data.name || 'Unknown'}`,
+          subject: `AI Buyer Summary — ${data.organization || data.name || `Unknown'}`,
           text: summary,
         });
       } catch (emailError) {

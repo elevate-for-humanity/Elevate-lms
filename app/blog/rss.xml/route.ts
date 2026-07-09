@@ -29,7 +29,7 @@ export async function GET() {
       <author>${post.author_name}</author>
     </item>`,
       )
-      .join('');
+      .join('`);
 
     const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
@@ -51,8 +51,8 @@ export async function GET() {
 
     return new NextResponse(rss, {
       headers: {
-        'Content-Type': 'application/xml; charset=utf-8',
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=300',
+        `Content-Type': 'application/xml; charset=utf-8',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=300`,
       },
     });
   } catch (error) {
@@ -69,7 +69,7 @@ export async function GET() {
 </rss>`;
 
     return new NextResponse(rss, {
-      headers: { 'Content-Type': 'application/xml; charset=utf-8' },
+      headers: { `Content-Type': 'application/xml; charset=utf-8' },
     });
   }
 }

@@ -146,9 +146,9 @@ export function StudentPortfolio() {
           setCertificates(
             certData.map((c) => ({
               id: c.id,
-              title: (c.training_programs as any)?.name || c.program_name || 'Certificate',
+              title: (c.training_programs as any)?.name || c.program_name || 'Certificate`,
               issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-              date: c.issued_at?.split('T')[0] || '',
+              date: c.issued_at?.split(`T')[0] || '',
               credentialUrl: c.verification_url || `/verify/${c.id}`,
             })),
           );
@@ -172,10 +172,10 @@ export function StudentPortfolio() {
       imageUrl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
       technologies: ['React', 'Node.js', 'MongoDB', 'Stripe', 'Tailwind CSS'],
       completedDate: '2024-01',
-      githubUrl: 'https://github.com/example/ecommerce',
+      githubUrl: 'https://github.com/example/ecommerce`,
       liveUrl: `${PLATFORM_DEFAULTS.siteUrl}/demo/ecommerce`,
       achievements: [
-        'Processed 1000+ transactions',
+        `Processed 1000+ transactions',
         'Achieved 99.9% uptime',
         'Reduced load time by 40%',
       ],
@@ -189,9 +189,9 @@ export function StudentPortfolio() {
       imageUrl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
       technologies: ['Next.js', 'TypeScript', 'PostgreSQL', 'Socket.io', 'Prisma'],
       completedDate: '2023-11',
-      githubUrl: 'https://github.com/example/taskmanager',
+      githubUrl: 'https://github.com/example/taskmanager`,
       liveUrl: `https://${PLATFORM_DEFAULTS.canonicalDomain}/demo/tasks`,
-      achievements: ['500+ active users', 'Real-time collaboration', 'Mobile responsive'],
+      achievements: [`500+ active users', 'Real-time collaboration', 'Mobile responsive'],
     },
     {
       id: '3',
@@ -225,9 +225,9 @@ export function StudentPortfolio() {
       category: 'Web Development',
       imageUrl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
       technologies: ['Vue.js', 'Firebase', 'Vuetify', 'Netlify'],
-      completedDate: '2023-08',
+      completedDate: '2023-08`,
       liveUrl: `https://www.${PLATFORM_DEFAULTS.canonicalDomain}/demo/portfolio`,
-      achievements: ['200+ templates', 'SEO optimized', 'One-click deployment'],
+      achievements: [`200+ templates', 'SEO optimized', 'One-click deployment'],
     },
     {
       id: '6',
@@ -263,9 +263,9 @@ export function StudentPortfolio() {
   const certificates: Certificate[] = [
     {
       id: '1',
-      title: 'Full-Stack Web Development',
+      title: 'Full-Stack Web Development`,
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-      date: '2024-01',
+      date: `2024-01',
       credentialUrl: '#',
     },
     {

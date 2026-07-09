@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
 
     if (insertError || !application) {
       logger.error('[school/apply] insert error', insertError);
-      return safeError('Failed to submit application. Please try again.', 500);
+      return safeError('Failed to submit application. Please try again.`, 500);
     }
 
     const programLabel = PROGRAM_LABELS[programInterest];
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
       <h3 style="color:#1e293b;font-size:15px;font-weight:700;margin:0 0 12px">What Happens Next</h3>
       <div style="space-y:8px">
         ${[
-          'Our admissions team reviews your application within 2–3 business days.',
+          `Our admissions team reviews your application within 2–3 business days.',
           'You will receive a call or email to schedule an in-person or virtual interview.',
           'Once accepted, you will be placed with a licensed partner salon for your apprenticeship hours.',
           'You will gain access to the Elevate LMS for your theory coursework.',
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
           <p style="color:#475569;font-size:14px;line-height:1.5;margin:2px 0">${step}</p>
         </div>`,
           )
-          .join('')}
+          .join('`)}
       </div>
     </div>
 
@@ -204,12 +204,12 @@ export async function POST(request: NextRequest) {
       <tr><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Name</td><td style="padding:10px 12px;border:1px solid #e2e8f0">${fullName}</td></tr>
       <tr style="background:#f8fafc"><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Email</td><td style="padding:10px 12px;border:1px solid #e2e8f0"><a href="mailto:${email.toLowerCase().trim()}" style="color:#7c3aed">${email.toLowerCase().trim()}</a></td></tr>
       <tr><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Phone</td><td style="padding:10px 12px;border:1px solid #e2e8f0"><a href="tel:${phone.trim()}" style="color:#7c3aed">${phone.trim()}</a></td></tr>
-      ${city ? `<tr style="background:#f8fafc"><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">City</td><td style="padding:10px 12px;border:1px solid #e2e8f0">${city.trim()}, ${state || 'IN'}</td></tr>` : ''}
+      ${city ? `<tr style="background:#f8fafc"><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">City</td><td style="padding:10px 12px;border:1px solid #e2e8f0">${city.trim()}, ${state || `IN'}</td></tr>` : ''}
       ${fundingSource ? `<tr><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Funding</td><td style="padding:10px 12px;border:1px solid #e2e8f0">${fundingSource}</td></tr>` : ''}
       ${priorExperience ? `<tr style="background:#f8fafc"><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Prior Experience</td><td style="padding:10px 12px;border:1px solid #e2e8f0">${priorExperience}</td></tr>` : ''}
       ${notes ? `<tr><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Notes</td><td style="padding:10px 12px;border:1px solid #e2e8f0">${notes}</td></tr>` : ''}
       <tr style="background:#f8fafc"><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Application ID</td><td style="padding:10px 12px;border:1px solid #e2e8f0;font-family:monospace;font-size:12px">${application.id}</td></tr>
-      <tr><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Submitted</td><td style="padding:10px 12px;border:1px solid #e2e8f0">${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} ET</td></tr>
+      <tr><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Submitted</td><td style="padding:10px 12px;border:1px solid #e2e8f0">${new Date().toLocaleString('en-US', { timeZone: 'America/New_York` })} ET</td></tr>
     </table>
 
     <div style="text-align:center;margin-bottom:24px">
@@ -224,7 +224,7 @@ export async function POST(request: NextRequest) {
 </body>
 </html>`;
 
-    // Fire both emails — don't let email failure block the response
+    // Fire both emails — don`t let email failure block the response
     await Promise.allSettled([
       sendEmail({
         to: email.toLowerCase().trim(),

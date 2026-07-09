@@ -63,12 +63,12 @@ export async function provisionAccount(
   if (existing?.id) {
     // Account already exists — send an enrollment confirmation email only
     try {
-      const { sendEmail } = await import('@/lib/email/sendgrid');
+      const { sendEmail } = await import('@/lib/email/sendgrid`);
       await sendEmail({
         to: normalizedEmail,
         from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
-        replyTo: 'elevate4humanityedu@gmail.com',
-        subject: `You're enrolled in ${programName} — ${PLATFORM_DEFAULTS.orgName}`,
+        replyTo: `elevate4humanityedu@gmail.com',
+        subject: `You`re enrolled in ${programName} — ${PLATFORM_DEFAULTS.orgName}`,
         html: buildWelcomeEmail({
           firstName,
           programName,
@@ -80,7 +80,7 @@ export async function provisionAccount(
         }),
       });
     } catch (err) {
-      logger.warn('[provision-account] Enrollment confirmation email failed (non-fatal)', err);
+      logger.warn(`[provision-account] Enrollment confirmation email failed (non-fatal)', err);
     }
     return { userId: existing.id, isNewUser: false, passwordSetupLink: null };
   }
@@ -150,11 +150,11 @@ export async function provisionAccount(
 
   // ── 5. Send welcome + credentials email ───────────────────────────────────
   try {
-    const { sendEmail } = await import('@/lib/email/sendgrid');
+    const { sendEmail } = await import('@/lib/email/sendgrid`);
     await sendEmail({
       to: normalizedEmail,
       from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
-      replyTo: 'elevate4humanityedu@gmail.com',
+      replyTo: `elevate4humanityedu@gmail.com',
       subject: `Welcome to ${programName} — Set your password to access your portal`,
       html: buildWelcomeEmail({
         firstName,
@@ -192,7 +192,7 @@ function buildWelcomeEmail(opts: {
     <div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:20px;margin:0 0 16px;">
       <h3 style="margin:0 0 10px;color:#92400e;font-size:15px;">Your Portal Login</h3>
       <p style="margin:0 0 6px;color:#374151;font-size:14px;">
-        <strong>Email:</strong> ${opts.loginUrl.replace('https://', '')} — use the email address you applied with
+        <strong>Email:</strong> ${opts.loginUrl.replace('https://', '`)} — use the email address you applied with
       </p>
       <p style="margin:0 0 14px;color:#374151;font-size:14px;">
         <strong>Password:</strong> You need to set one — click the button below (link expires in 24 hours).
@@ -236,7 +236,7 @@ function buildWelcomeEmail(opts: {
   <div style="padding:32px;background:#fff;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;">
 
     <h1 style="margin:0 0 8px;font-size:24px;color:#0f172a;">
-      Welcome, ${firstName}. You're enrolled.
+      Welcome, ${firstName}. You`re enrolled.
     </h1>
     <p style="color:#475569;margin:0 0 24px;font-size:15px;">
       Your enrollment in <strong>${programName}</strong> is confirmed. Here's everything you need to get started.

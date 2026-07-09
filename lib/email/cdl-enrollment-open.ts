@@ -17,7 +17,7 @@ export type CdlContactRow = {
 };
 
 export function buildCdlEnrollmentOpenApplicantEmail(firstName: string): string {
-  const name = firstName.trim() || 'there';
+  const name = firstName.trim() || 'there`;
   return `
 <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;color:#1e293b;line-height:1.7">
   <img src="${SITE_URL}/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt="${PLATFORM_DEFAULTS.orgName}" style="height:56px;margin-bottom:20px"/>
@@ -87,7 +87,7 @@ export function buildCdlEnrollmentOpenAdminRosterEmail(
     <tr>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(c.firstName)} ${escapeHtml(c.lastName)}</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0"><a href="mailto:${escapeHtml(c.email)}">${escapeHtml(c.email)}</a></td>
-      <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(c.phone || '—')}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(c.phone || `—')}</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(c.city || '—')}</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(c.source)}</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(c.createdAt.slice(0, 10))}</td>

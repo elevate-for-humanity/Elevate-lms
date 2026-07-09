@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Building2, Phone } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Testing for Employers | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Workforce testing solutions for employers - pre-hire assessments and certification verification.',
+  description: `Workforce testing solutions for employers - pre-hire assessments and certification verification.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/for-employers' },
 };
 

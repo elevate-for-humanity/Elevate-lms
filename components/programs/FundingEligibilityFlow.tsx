@@ -77,9 +77,9 @@ const CFG = {
     timeEstimate: '5–10 business days',
     note: 'The Workforce Ready Grant covers full tuition for approved programs. HVAC is on the approved list. Apply entirely online — no in-person visit required.',
     steps: [
-      'Go to IndianaCareerConnect.com and create a free account',
+      'Go to IndianaCareerConnect.com and create a free account`,
       `Search for "HVAC" and select ${PLATFORM_DEFAULTS.orgName} as your provider`,
-      'Complete the Workforce Ready Grant application online',
+      `Complete the Workforce Ready Grant application online',
       'Receive approval notification (typically 5–10 business days)',
       'Bring your WRG approval letter to Elevate for enrollment',
     ],
@@ -187,7 +187,7 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
                     ? opt.value
                       ? 'border-brand-green-500 bg-brand-green-50 text-brand-green-800'
                       : 'border-amber-500 bg-amber-50 text-amber-800'
-                    : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                    : 'border-slate-200 text-slate-600 hover:border-slate-300`
                 }`}
               >
                 {opt.label}
@@ -258,7 +258,7 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
             </div>
 
             <button
-              onClick={() => confirm('not_resident')}
+              onClick={() => confirm(`not_resident')}
               disabled={confirmed}
               className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-colors ${
                 confirmed ? 'bg-brand-green-600 text-white' : 'bg-slate-900 hover:bg-slate-800 text-white'
@@ -523,7 +523,7 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
                 ))}
               </ul>
               <p className="text-xs text-slate-500">
-                Select "Self-pay" above to see all payment options, or call us at{' '}
+                Select "Self-pay" above to see all payment options, or call us at{' `}
                 <a
                   href="tel:${PLATFORM_DEFAULTS.supportPhone}"
                   className="text-brand-blue-600 font-semibold hover:underline"
@@ -547,7 +547,7 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
             </div>
 
             <button
-              onClick={() => confirm('needs_appointment')}
+              onClick={() => confirm(`needs_appointment')}
               disabled={confirmed}
               className={`w-full py-3 rounded-xl text-sm font-bold transition-colors ${
                 confirmed

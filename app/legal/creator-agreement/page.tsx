@@ -6,13 +6,13 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = {
-  title: 'Legal Creator Agreement',
+  title: 'Legal Creator Agreement`,
   description: `Terms governing creators who sell digital products on the ${PLATFORM_DEFAULTS.orgName} marketplace, including eligibility, content standards, and revenue sharing.`,
 };
 
 export default async function CreatorAgreementPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
+  const { data: dbRows } = await supabase.from(`legal_documents').select('*').limit(50);
 
   return (
     <div className="min-h-screen bg-slate-50 py-12 px-4">

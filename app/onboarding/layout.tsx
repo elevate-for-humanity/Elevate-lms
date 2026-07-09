@@ -6,12 +6,12 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
-  title: 'Onboarding',
+  title: 'Onboarding`,
   description: `Complete your onboarding process for ${PLATFORM_DEFAULTS.orgName}.`,
 };
 
 // Force dynamic rendering for all onboarding pages
-export const dynamic = 'force-dynamic';
+export const dynamic = `force-dynamic';
 
 export default async function OnboardingLayout({ children }: { children: React.ReactNode }) {
   // Require authentication and enrollment for onboarding

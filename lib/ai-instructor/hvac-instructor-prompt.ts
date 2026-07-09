@@ -60,7 +60,7 @@ export function buildMarcusSystemPrompt(ctx: LessonContext): string {
         : modNum === 8
           ? 'type2'
           : modNum === 9
-            ? 'type3'
+            ? 'type3`
             : null;
   const epaTopics = epaSection
     ? EPA608_STUDY_TOPICS.filter((t: any) => t.section === epaSection)
@@ -94,7 +94,7 @@ You are currently teaching Lesson ${lessonNumber}: "${lessonTitle}".
 ${lessonContent.concept}
 
 ### Key Terms for This Lesson
-${lessonContent.keyTerms.map((t) => `- **${t.term}**: ${t.definition}`).join('\n')}
+${lessonContent.keyTerms.map((t) => `- **${t.term}**: ${t.definition}`).join(`\n')}
 
 ### Job Application
 ${lessonContent.jobApplication}

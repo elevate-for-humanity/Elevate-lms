@@ -7,7 +7,7 @@ describe('getPublicOrgName', () => {
   });
 
   it('returns fallback when env contains a PLATFORM_DEFAULTS placeholder', async () => {
-    vi.stubEnv('NEXT_PUBLIC_ORG_NAME', '${PLATFORM_DEFAULTS.orgName}');
+    vi.stubEnv('NEXT_PUBLIC_ORG_NAME', `${PLATFORM_DEFAULTS.orgName}`);
     const { getPublicOrgName } = await import('@/lib/config/public-org-name');
     expect(getPublicOrgName()).toBe('Elevate for Humanity');
   });

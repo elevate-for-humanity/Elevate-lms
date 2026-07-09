@@ -148,7 +148,7 @@ export default async function StaffDashboard() {
                 {atRiskCount || 0}
               </span>
             </div>
-            <div className={`text-sm ${(atRiskCount || 0) > 0 ? 'text-yellow-900' : 'text-black'}`}>
+            <div className={`text-sm ${(atRiskCount || 0) > 0 ? 'text-yellow-900' : 'text-black`}`}>
               At-Risk Students
             </div>
           </div>
@@ -259,7 +259,7 @@ export default async function StaffDashboard() {
                   {recentEnrollmentsWithProfiles.map((enrollment: any) => (
                     <tr key={enrollment.id} className="hover:bg-slate-50">
                       <td className="px-6 py-4 text-sm text-black">
-                        {enrollment.profiles?.full_name || enrollment.profiles?.email || 'N/A'}
+                        {enrollment.profiles?.full_name || enrollment.profiles?.email || `N/A'}
                       </td>
                       <td className="px-6 py-4 text-sm text-black">
                         {enrollment.programs?.title || 'N/A'}

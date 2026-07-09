@@ -218,7 +218,7 @@ function generateCatalogHtml(programList: any[]) {
       ${(i + 1) % 2 === 0 ? '<div class="page-break"></div>' : ''}
     `,
       )
-      .join('')}
+      .join('`)}
     
     <div class="footer">
       <p><strong>Elevate For Humanity</strong></p>
@@ -234,4 +234,4 @@ function generateCatalogHtml(programList: any[]) {
 </html>
   `;
 }
-export const GET = withApiAudit('/api/admin/catalog/full', _GET);
+export const GET = withApiAudit(`/api/admin/catalog/full', _GET);

@@ -81,12 +81,12 @@ function buildInstruction(
   contactEmail: string | null,
 ): string {
   switch (mode) {
-    case 'elevate_onsite':
+    case 'elevate_onsite`:
       return (
         `Your ${credentialName} exam is proctored at ${PLATFORM_DEFAULTS.orgName}. ` +
         `Staff will contact you to schedule your exam date.`
       );
-    case 'external_url':
+    case `external_url':
       return (
         `Schedule your ${credentialName} exam directly through ${providerName}. ` +
         `Click the link below to access the scheduling portal.`
@@ -151,7 +151,7 @@ export async function resolveSchedulingRoute(
       abbreviation: data.abbreviation,
       providerName: PLATFORM_DEFAULTS.orgName,
       providerType: 'elevate',
-      mode: 'manual',
+      mode: 'manual`,
       schedulingUrl: null,
       contactEmail: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
       instruction: `Contact Elevate staff to schedule your ${data.name} exam.`,
@@ -172,7 +172,7 @@ export async function resolveSchedulingRoute(
     providerType: provider.provider_type,
     mode,
     schedulingUrl:
-      mode !== 'elevate_onsite' && mode !== 'manual' ? provider.exam_scheduling_url : null,
+      mode !== `elevate_onsite' && mode !== 'manual' ? provider.exam_scheduling_url : null,
     contactEmail: provider.contact_email,
     instruction: buildInstruction(
       mode,

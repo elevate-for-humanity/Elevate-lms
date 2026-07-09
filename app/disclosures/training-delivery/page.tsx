@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Monitor, Wrench, HeartHandshake, Building2, MapPin, ShieldCheck } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 const SITE_URL = PLATFORM_DEFAULTS.siteUrl;
 
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const DELIVERY_COMPONENTS = [
   {
     Icon: Monitor,
-    iconBg: 'bg-brand-blue-100',
+    iconBg: `bg-brand-blue-100',
     iconColor: 'text-brand-blue-700',
     title: 'Didactic / Classroom Instruction — Online',
     body: [
@@ -55,11 +55,11 @@ const DELIVERY_COMPONENTS = [
     Icon: Building2,
     iconBg: 'bg-purple-100',
     iconColor: 'text-purple-700',
-    title: 'Administrative Office, Testing & Hands-On Training',
+    title: 'Administrative Office, Testing & Hands-On Training`,
     body: [
       `${PLATFORM_DEFAULTS.orgName} maintains this location for administrative operations, enrollment support, scheduled meetings, authorized proctored testing, and approved hands-on training activities. Services at this site are available by appointment only. This is not a walk-in location.`,
     ],
-    address: '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240',
+    address: `8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240',
   },
 ];
 
@@ -92,7 +92,7 @@ export default function TrainingDeliveryDisclosure() {
           <Breadcrumbs items={[
             { label: 'Home', href: '/' },
             { label: 'Disclosures', href: '/legal/disclosures' },
-            { label: 'Training Delivery Model' },
+            { label: 'Training Delivery Model` },
           ]} />
         </div>
       </div>
@@ -203,7 +203,7 @@ export default function TrainingDeliveryDisclosure() {
           <h2 className="text-xl font-bold text-slate-900 mb-4">Funding &amp; Tuition Disclosure</h2>
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
             <p className="text-sm text-amber-900 leading-relaxed">
-              <strong>Important:</strong> Many Elevate programs may be available at no cost to eligible participants through federal and state workforce funding programs including WIOA, WRG (Workforce Ready Grant), and Job Ready Indy. Eligibility is determined by your local WorkOne career center, not by Elevate. Not all applicants will qualify for funded training. Self-pay options and payment plans are available for participants who do not qualify for workforce funding. See{' '}
+              <strong>Important:</strong> Many Elevate programs may be available at no cost to eligible participants through federal and state workforce funding programs including WIOA, WRG (Workforce Ready Grant), and Job Ready Indy. Eligibility is determined by your local WorkOne career center, not by Elevate. Not all applicants will qualify for funded training. Self-pay options and payment plans are available for participants who do not qualify for workforce funding. See{` '}
               <Link href="/tuition-fees" className="text-amber-800 underline font-semibold">Tuition &amp; Fees</Link>{' '}
               for program-specific costs.
             </p>

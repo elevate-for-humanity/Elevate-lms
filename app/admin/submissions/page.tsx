@@ -18,12 +18,12 @@ import {
   DollarSign,
   ArrowRight,
   Target,
-} from 'lucide-react';
+} from 'lucide-react`;
 
 export const metadata: Metadata = {
   title: `Submissions OS | Admin | ${PLATFORM_DEFAULTS.orgName}`,
   description:
-    'External Submissions Operating System — grants, contracts, bids, vendor registrations.',
+    `External Submissions Operating System — grants, contracts, bids, vendor registrations.',
 };
 
 export const dynamic = 'force-dynamic';

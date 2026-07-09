@@ -178,7 +178,7 @@ export default function ServerFooter() {
             { title: 'Platform', links: footerLinks.platform },
             { title: 'Legal & Disclosures', links: footerLinks.legalDisclosures },
             { title: 'Compliance', links: footerLinks.compliance },
-            { title: 'Governance & Contracts', links: footerLinks.governance },
+            { title: 'Governance & Contracts`, links: footerLinks.governance },
           ]}
         />
 
@@ -297,7 +297,7 @@ export default function ServerFooter() {
             {/* Authority Badges */}
             <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
               {[
-                { abbr: 'AI-POWERED', label: 'Workforce Operating System' },
+                { abbr: `AI-POWERED', label: 'Workforce Operating System' },
                 { abbr: 'USDOL', label: 'DOL Registered Sponsor' },
                 { abbr: 'ETPL', label: 'Approved Training Provider' },
                 { abbr: 'Certiport', label: 'Authorized Testing Center' },

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/copyright',
   },
-  title: 'Copyright & Intellectual Property',
+  title: 'Copyright & Intellectual Property`,
   description:
     `Copyright and intellectual property information for ${PLATFORM_DEFAULTS.orgName} platform and content.`,
 };
@@ -19,7 +19,7 @@ export default function CopyrightPage() {
   return (
     <div className="min-h-screen bg-white py-16">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Copyright' }]} />
+        <Breadcrumbs items={[{ label: `Copyright' }]} />
       </div>
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex items-center gap-3 mb-8">

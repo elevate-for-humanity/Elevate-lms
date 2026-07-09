@@ -18,7 +18,7 @@ const PENDING_STATUSES = ['pending', 'submitted', 'in_review'];
 function buildFollowUpHtml(firstName: string, programInterest: string): string {
   const program = programInterest
     ? programInterest.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-    : 'your program of interest';
+    : 'your program of interest`;
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
 <body style="font-family:Arial,sans-serif;line-height:1.8;color:#333;margin:0;padding:0">
@@ -80,8 +80,8 @@ function buildFollowUpHtml(firstName: string, programInterest: string): string {
 
 function buildFollowUpText(firstName: string, programInterest: string): string {
   const program = programInterest
-    ? programInterest.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-    : 'your program of interest';
+    ? programInterest.replace(/-/g, ` ').replace(/\b\w/g, (c) => c.toUpperCase())
+    : 'your program of interest`;
 
   return `Hi ${firstName},
 
@@ -111,7 +111,7 @@ ${SITE_URL}`;
 }
 
 export async function POST(request: Request) {
-  const rateLimited = await applyRateLimit(request, 'strict');
+  const rateLimited = await applyRateLimit(request, `strict');
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);

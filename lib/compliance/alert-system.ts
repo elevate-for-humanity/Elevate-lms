@@ -222,7 +222,7 @@ export const PERFORMANCE_ALERTS: AlertTimeline[] = [
 export const ALERT_EMAIL_TEMPLATES = {
   // CRITICAL REPORT - 7 DAYS
   critical_report_7day_info: {
-    subject: 'Upcoming: {{report_name}} Due in 7 Days',
+    subject: 'Upcoming: {{report_name}} Due in 7 Days`,
     body: `
 Hi {{contact_name}},
 
@@ -251,7 +251,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
 
   // CRITICAL REPORT - 3 DAYS
   critical_report_3day_reminder: {
-    subject: 'Reminder: {{report_name}} Due in 3 Days',
+    subject: `Reminder: {{report_name}} Due in 3 Days',
     body: `
 Hi {{contact_name}},
 
@@ -266,7 +266,7 @@ CURRENT STATUS:
 {{completion_status}}
 
 ACTION REQUIRED:
-Please acknowledge this email and confirm you're working on it.
+Please acknowledge this email and confirm you`re working on it.
 
 [Complete Report Now] {{dashboard_link}}
 [Acknowledge Receipt] {{acknowledge_link}}
@@ -283,7 +283,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
 
   // CRITICAL REPORT - 1 DAY
   critical_report_1day_warning: {
-    subject: '⚠️ Warning: {{report_name}} Due Tomorrow',
+    subject: `⚠️ Warning: {{report_name}} Due Tomorrow`,
     body: `
 Hi {{contact_name}},
 
@@ -314,7 +314,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
 
   // CRITICAL REPORT - DUE TODAY
   critical_report_due_today: {
-    subject: '🚨 URGENT: {{report_name}} Due TODAY',
+    subject: `🚨 URGENT: {{report_name}} Due TODAY',
     body: `
 Hi {{contact_name}},
 
@@ -335,7 +335,7 @@ AUTOMATIC CONSEQUENCES IF NOT SUBMITTED:
 SUBMIT RIGHT NOW:
 [Complete Report] {{dashboard_link}}
 
-We're here to help. Call us if you need assistance:
+We`re here to help. Call us if you need assistance:
 ${PLATFORM_DEFAULTS.supportPhone}
 
 ${PLATFORM_DEFAULTS.orgName} Compliance Team
@@ -344,7 +344,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
 
   // CRITICAL REPORT - 1 DAY OVERDUE
   critical_report_1day_overdue: {
-    subject: '🚨 CRITICAL: {{report_name}} OVERDUE - Action Required',
+    subject: `🚨 CRITICAL: {{report_name}} OVERDUE - Action Required`,
     body: `
 Hi {{contact_name}},
 
@@ -379,7 +379,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
 
   // CRITICAL REPORT - FINAL WARNING
   critical_report_final_warning: {
-    subject: '🚨 FINAL WARNING: {{report_name}} - Enforcement in 48 Hours',
+    subject: `🚨 FINAL WARNING: {{report_name}} - Enforcement in 48 Hours`,
     body: `
 Hi {{contact_name}},
 
@@ -419,7 +419,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
 
   // PERFORMANCE - EARLY WARNING
   performance_early_warning: {
-    subject: 'Performance Notice: {{metric_name}} Trending Down',
+    subject: `Performance Notice: {{metric_name}} Trending Down',
     body: `
 Hi {{contact_name}},
 
@@ -444,7 +444,7 @@ RESOURCES AVAILABLE:
 [View Detailed Report] {{dashboard_link}}
 [Schedule Support Call] {{calendar_link}}
 
-We're here to help you succeed. Let's address this early.
+We're here to help you succeed. Let`s address this early.
 
 ${PLATFORM_DEFAULTS.orgName} Success Team
     `,
@@ -452,7 +452,7 @@ ${PLATFORM_DEFAULTS.orgName} Success Team
 
   // PERFORMANCE - WARNING
   performance_warning: {
-    subject: '⚠️ Performance Warning: {{metric_name}} Below Threshold',
+    subject: `⚠️ Performance Warning: {{metric_name}} Below Threshold',
     body: `
 Hi {{contact_name}},
 
@@ -480,7 +480,7 @@ ACTION PLAN:
 [View Performance Report] {{dashboard_link}}
 [Schedule Support Call] {{calendar_link}}
 
-We want you to succeed. Let's work together to improve these numbers.
+We want you to succeed. Let`s work together to improve these numbers.
 
 ${PLATFORM_DEFAULTS.orgName} Success Team
     `,
@@ -488,7 +488,7 @@ ${PLATFORM_DEFAULTS.orgName} Success Team
 
   // PERFORMANCE - CRITICAL
   performance_critical: {
-    subject: '🚨 Performance Critical: Immediate Action Required',
+    subject: `🚨 Performance Critical: Immediate Action Required',
     body: `
 Hi {{contact_name}},
 
@@ -524,7 +524,7 @@ Mandatory Call Scheduled:
 📅 {{call_date}} at {{call_time}}
 📞 We'll call you at {{phone_number}}
 
-This is serious. Let's fix it together.
+This is serious. Let`s fix it together.
 
 ${PLATFORM_DEFAULTS.orgName} Compliance Team
     `,
@@ -532,7 +532,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
 
   // PERFORMANCE - FINAL WARNING
   performance_final_warning: {
-    subject: 'FINAL WARNING: Performance - Probation in 7 Days',
+    subject: `FINAL WARNING: Performance - Probation in 7 Days`,
     body: `
 Hi {{contact_name}},
 
@@ -583,7 +583,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
  */
 export interface MassAlertJob {
   id: string;
-  type: 'daily_check' | 'weekly_check' | 'monthly_check' | 'quarterly_check';
+  type: `daily_check' | 'weekly_check' | 'monthly_check' | 'quarterly_check';
   scheduledFor: Date;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   totalProgramHolders: number;

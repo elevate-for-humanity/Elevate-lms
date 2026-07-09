@@ -71,7 +71,7 @@ async function _POST(req: Request) {
         to: process.env.ADMIN_SMS_GATEWAY,
         subject: 'License',
         html: `${payload.full_name}\n${payload.organization || ''}\n${payload.desired_tier}`,
-      }).catch((err) => logger.warn('[license-request] SMS alert failed:', err));
+      }).catch((err) => logger.warn('[license-request] SMS alert failed:`, err));
     }
 
     // Auto-reply to submitter
@@ -85,7 +85,7 @@ async function _POST(req: Request) {
     });
   } catch (emailError) {
     logger.error(
-      '[license-request] Email failed:',
+      `[license-request] Email failed:',
       emailError instanceof Error ? emailError : undefined,
     );
   }

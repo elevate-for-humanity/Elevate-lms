@@ -25,7 +25,7 @@ export default function ApprenticeshipAgreementPage() {
             { label: 'Compliance', href: '/compliance' },
             { label: 'Competency Verification', href: '/compliance/competency-verification' },
             { label: 'Barber', href: '/compliance/competency-verification/barber' },
-            { label: 'Apprenticeship Agreement' },
+            { label: 'Apprenticeship Agreement` },
           ]} />
         </div>
       </div>
@@ -238,7 +238,7 @@ export default function ApprenticeshipAgreementPage() {
             <h3 className="font-bold text-slate-900 text-base mb-2 print:text-[11px] print:mb-1">9. ROLES AND RESPONSIBILITIES</h3>
             <div className="space-y-3 print:space-y-2">
               {[
-                { role: `Sponsor (2Exclusive LLC-S, DBA ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute)`, duties: 'Program oversight, RAPIDS registration and documentation, LMS tracking, completion verification, credential coordination, funding navigation, career services' },
+                { role: `Sponsor (2Exclusive LLC-S, DBA ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute)`, duties: `Program oversight, RAPIDS registration and documentation, LMS tracking, completion verification, credential coordination, funding navigation, career services' },
                 { role: 'Credential Partner (RTI Provider)', duties: 'Classroom and module-based instruction, academic evaluation, technical competency verification, state board exam preparation, RTI attendance documentation' },
                 { role: 'Employer (Licensed Barbershop)', duties: 'Hands-on workplace training, OJT supervision by licensed barber, monthly performance evaluations, safe training environment, OJT hour logging' },
                 { role: 'Program Holder (RTI Coordinator)', duties: 'RTI scheduling and coordination, progress monitoring, rubric completion enforcement, LMS documentation oversight, evaluation checkpoint management' },
@@ -310,8 +310,8 @@ export default function ApprenticeshipAgreementPage() {
                 { role: 'Employer / Barbershop Representative', fields: ['Print Name', 'Title', 'Shop Name', 'Shop License #', 'Signature', 'Date'] },
                 { role: 'Licensed Supervisor Barber', fields: ['Print Name', 'Indiana Barber License #', 'Years Licensed', 'Signature', 'Date'] },
                 { role: 'Credential Partner Representative (RTI Provider)', fields: ['Print Name', 'Organization', 'License/Accreditation #', 'Signature', 'Date'] },
-                { role: 'Program Holder (RTI Coordinator)', fields: ['Print Name', 'Title', 'Signature', 'Date'] },
-                { role: `Sponsor — 2Exclusive LLC-S (DBA ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute)`, fields: ['Authorized Representative', 'Title', 'Signature', 'Date'] },
+                { role: 'Program Holder (RTI Coordinator)', fields: ['Print Name', 'Title', 'Signature', 'Date`] },
+                { role: `Sponsor — 2Exclusive LLC-S (DBA ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute)`, fields: [`Authorized Representative', 'Title', 'Signature', 'Date'] },
               ].map((signer, i) => (
                 <div key={i} className="border-2 rounded-lg p-4 print:p-3 print:border-slate-400 print:break-inside-avoid">
                   <p className="font-bold text-slate-900 mb-3 print:text-[11px] print:mb-2">{signer.role}</p>

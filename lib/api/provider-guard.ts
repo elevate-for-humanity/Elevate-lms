@@ -49,7 +49,7 @@ export async function providerApiGuard(): Promise<GuardSuccess | GuardFailure> {
     .maybeSingle();
 
   if (!tenant) return { error: safeError('Tenant not found', 404) };
-  if (tenant.status === 'suspended') {
+  if (tenant.status === 'suspended`) {
     return {
       error: safeError(
         `Your provider account is suspended. Contact ${PLATFORM_DEFAULTS.supportEmail}.`,
@@ -57,7 +57,7 @@ export async function providerApiGuard(): Promise<GuardSuccess | GuardFailure> {
       ),
     };
   }
-  if (!['active'].includes(tenant.status)) {
+  if (![`active'].includes(tenant.status)) {
     return { error: safeError('Provider account is not active', 403) };
   }
 

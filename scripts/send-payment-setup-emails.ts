@@ -54,7 +54,7 @@ async function sendPaymentSetupEmails() {
           <ol>
             <li>Click the button below to access your Stripe payment portal</li>
             <li>Add or confirm your payment method</li>
-            <li>We'll automatically charge your card weekly according to your payment plan</li>
+            <li>We`ll automatically charge your card weekly according to your payment plan</li>
           </ol>
           
           <p style="margin-top: 20px;">
@@ -78,7 +78,7 @@ async function sendPaymentSetupEmails() {
       // Send email
       await sendEmail({
         to: student.email,
-        subject: 'Action Required: Set Up Your Payment Method',
+        subject: `Action Required: Set Up Your Payment Method',
         html,
         bcc: 'elevate4humanityedu@gmail.com',
       });

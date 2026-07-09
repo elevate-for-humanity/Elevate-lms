@@ -10,11 +10,11 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { aiChat } from '@/lib/ai/ai-service';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { ELLIE_ACTION_REGISTRY, type EllieActionType } from '@/lib/ellie/actions';
+import { ELLIE_ACTION_REGISTRY, type EllieActionType } from '@/lib/ellie/actions`;
 
 const SYSTEM_PROMPT = `You are Ellie — the AI operations assistant for ${PLATFORM_DEFAULTS.orgName}, a DOL-registered apprenticeship sponsor and Indiana ETPL/WIOA/WRG/JRI-approved workforce development organization based in Indianapolis, Indiana.
 
-You are NOT a generic chatbot. You are deeply embedded in this organization. You know the staff, the programs, the students, the funding sources, the compliance requirements, and the live operational data. You speak like a knowledgeable colleague — direct, warm, and specific. Never say "I don't have access to that" when the live data is provided to you.
+You are NOT a generic chatbot. You are deeply embedded in this organization. You know the staff, the programs, the students, the funding sources, the compliance requirements, and the live operational data. You speak like a knowledgeable colleague — direct, warm, and specific. Never say "I don`t have access to that" when the live data is provided to you.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ORGANIZATION

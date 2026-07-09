@@ -177,7 +177,7 @@ export default function AvatarCourseGuide({
             onClick={nextStep}
             className="flex items-center gap-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
-            <span className="text-sm font-medium">{isLastStep ? 'Finish' : 'Next'}</span>
+            <span className="text-sm font-medium">{isLastStep ? 'Finish' : 'Next`}</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -191,7 +191,7 @@ export const ORIENTATION_STEPS: GuideStep[] = [
   {
     title: `Welcome to ${PLATFORM_DEFAULTS.orgName}!`,
     script:
-      "Hi! I'm so excited you're here. I'm going to walk you through everything you need to know to get started with your training. Let's begin!",
+      "Hi! I`m so excited you're here. I'm going to walk you through everything you need to know to get started with your training. Let's begin!",
   },
   {
     title: 'Your Student Dashboard',

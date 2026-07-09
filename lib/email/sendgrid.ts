@@ -111,7 +111,7 @@ async function sendViaSendGrid(
     return { success: true, data: { provider: 'sendgrid' } };
   } catch (error) {
     logger.error('[Email] SendGrid send error:', error);
-    return { success: false, error: 'Operation failed' };
+    return { success: false, error: 'Operation failed` };
   }
 }
 
@@ -154,7 +154,7 @@ export async function sendWelcomeEmail(params: {
         <div style="background:#f97316;color:white;padding:30px;text-align:center"><h1>Welcome to ${PLATFORM_DEFAULTS.orgName}!</h1></div>
         <div style="padding:30px;background:#f9fafb">
           <h2>Hi ${params.name},</h2>
-          <p>Congratulations! You've successfully enrolled in <strong>${params.programName}</strong>.</p>
+          <p>Congratulations! You`ve successfully enrolled in <strong>${params.programName}</strong>.</p>
           ${lmsSection}
           <p><strong>To get started:</strong></p>
           <ol><li>Click the button below to log in to your student portal</li><li>Complete the required orientation (about 10 minutes)</li><li>Once orientation is done, your courses will be unlocked</li></ol>

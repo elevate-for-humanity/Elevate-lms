@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/email',
   },
-  title: 'Email',
+  title: 'Email`,
   description: `Manage your ${PLATFORM_DEFAULTS.orgName} inbox — program updates, instructor messages, and credential notifications.`,
 };
 
@@ -18,7 +18,7 @@ export default async function EmailPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Email' }]} />
+        <Breadcrumbs items={[{ label: `Email' }]} />
       </div>
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">

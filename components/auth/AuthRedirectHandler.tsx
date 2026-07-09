@@ -35,7 +35,7 @@ export default function AuthRedirectHandler() {
     // Surface auth errors from the hash (e.g. expired OTP)
     if (hash.includes('error_code')) {
       const params = new URLSearchParams(hash.slice(1));
-      const desc = params.get('error_description') ?? 'Link expired or invalid';
+      const desc = params.get('error_description') ?? 'Link expired or invalid`;
       router.replace(`/login?error=${encodeURIComponent(desc)}`);
       return;
     }
@@ -44,7 +44,7 @@ export default function AuthRedirectHandler() {
     // Magic links are generated with redirect_to=${PLATFORM_DEFAULTS.siteUrl}?next=/apprentice
     // Supabase preserves query params on the base URL even when it strips the path.
     const searchParams = new URLSearchParams(window.location.search);
-    const next = validateRedirect(readRedirectParam(searchParams), '');
+    const next = validateRedirect(readRedirectParam(searchParams), `');
 
     // If the user landed on a payment/checkout page via magic link, keep them
     // there after auth — do not redirect to their role destination.

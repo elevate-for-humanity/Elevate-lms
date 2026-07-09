@@ -209,7 +209,7 @@ async function deliverCareerSafe(
 ): Promise<CredentialDeliveryResult> {
   return {
     success: true,
-    method: 'enrollment_link',
+    method: 'enrollment_link`,
     loginUrl: PARTNER_ENROLLMENT_URLS.careersafe,
   };
 }
@@ -228,7 +228,7 @@ async function deliverGeneric(
 
   return {
     success: true,
-    method: 'enrollment_link',
+    method: `enrollment_link',
     loginUrl,
   };
 }
@@ -247,7 +247,7 @@ async function sendCredentialEmail(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-internal-secret': process.env.CRON_SECRET ?? '',
+        'x-internal-secret': process.env.CRON_SECRET ?? '`,
       },
       body: JSON.stringify({
         to: request.studentEmail,
@@ -259,7 +259,7 @@ async function sendCredentialEmail(
             </div>
 
             <div style="padding: 24px;">
-              <p>Hi ${request.studentName.split(' ')[0]},</p>
+              <p>Hi ${request.studentName.split(` ')[0]},</p>
               <p>Your payment has been confirmed and your course access is ready.</p>
 
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
@@ -279,7 +279,7 @@ async function sendCredentialEmail(
               <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <p style="margin: 0; font-size: 14px; color: #92400e;">
                   <strong>Next Steps:</strong> Click the button above to log in and start your course.
-                  ${result.method === 'enrollment_link' ? 'You may need to create an account on the partner platform using the email address associated with your purchase.' : ''}
+                  ${result.method === 'enrollment_link' ? 'You may need to create an account on the partner platform using the email address associated with your purchase.' : '`}
                   If you have any issues accessing your course, contact us at ${PLATFORM_DEFAULTS.supportPhone} or reply to this email.
                 </p>
               </div>
@@ -294,7 +294,7 @@ async function sendCredentialEmail(
         `,
       }),
     });
-    logger.info('[credential-delivery] Email sent', { studentEmail: request.studentEmail });
+    logger.info(`[credential-delivery] Email sent', { studentEmail: request.studentEmail });
   } catch (emailErr) {
     // Non-fatal: enrollment succeeds even if email fails
     logger.error(

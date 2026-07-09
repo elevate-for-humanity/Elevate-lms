@@ -411,7 +411,7 @@ export const DISQUALIFICATION_CRITERIA: DisqualificationCriteria[] = [
  */
 export const EMAIL_TEMPLATES = {
   fraud_suspension: {
-    subject: 'IMMEDIATE SUSPENSION - Fraudulent Activity Detected',
+    subject: 'IMMEDIATE SUSPENSION - Fraudulent Activity Detected`,
     body: `
 Dear {{program_holder_name}},
 
@@ -447,7 +447,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
   },
 
   false_reporting_suspension: {
-    subject: 'SUSPENSION NOTICE - False Reporting Detected',
+    subject: `SUSPENSION NOTICE - False Reporting Detected`,
     body: `
 Dear {{program_holder_name}},
 
@@ -482,7 +482,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
   },
 
   credential_misuse_termination: {
-    subject: 'MOU TERMINATION - Credential Misuse',
+    subject: `MOU TERMINATION - Credential Misuse`,
     body: `
 Dear {{program_holder_name}},
 
@@ -516,7 +516,7 @@ ${PLATFORM_DEFAULTS.orgName} Legal & Compliance Team
   },
 
   three_strikes_termination: {
-    subject: 'MOU TERMINATION NOTICE - Three Strike Policy',
+    subject: `MOU TERMINATION NOTICE - Three Strike Policy`,
     body: `
 Dear {{program_holder_name}},
 
@@ -557,7 +557,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
   },
 
   data_quality_restriction: {
-    subject: 'ACCESS RESTRICTED - Low Data Quality',
+    subject: `ACCESS RESTRICTED - Low Data Quality`,
     body: `
 Dear {{program_holder_name}},
 
@@ -599,7 +599,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
   },
 
   critical_report_overdue: {
-    subject: 'URGENT - Critical Report Overdue - Access Restricted',
+    subject: `URGENT - Critical Report Overdue - Access Restricted`,
     body: `
 Dear {{program_holder_name}},
 
@@ -670,7 +670,7 @@ export function getEmailTemplate(templateName: string): {
 } {
   return (
     EMAIL_TEMPLATES[templateName as keyof typeof EMAIL_TEMPLATES] || {
-      subject: 'Compliance Notice',
+      subject: `Compliance Notice',
       body: 'Please contact compliance team.',
     }
   );

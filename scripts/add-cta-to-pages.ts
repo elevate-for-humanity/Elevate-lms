@@ -5,7 +5,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 const CTA_SECTION = `
       {/* CTA Section */}
@@ -31,7 +31,7 @@ const CTA_SECTION = `
         </div>
       </section>`;
 
-const PHONE_IMPORT = ', Phone';
+const PHONE_IMPORT = `, Phone';
 
 // Pages that should NOT get a CTA (internal/utility pages)
 const SKIP_PAGES = [

@@ -15,7 +15,7 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const program = await fetchProgramForWioaPublic(slug);
-  if (!program) return { title: 'Program not found' };
+  if (!program) return { title: 'Program not found` };
   const path = WIOA_COMPLIANCE.programIeap(slug);
   return {
     title: `${program.title} — Initial Eligibility Aggregate Performance`,
@@ -39,7 +39,7 @@ export default async function ProgramIeapPublicPage({ params }: Props) {
         description="Not required for established ETPL programs."
         canonicalPath={path}
         breadcrumbItems={[
-          { label: 'Compliance', href: '/compliance' },
+          { label: `Compliance', href: '/compliance' },
           { label: 'WIOA / ETPL', href: WIOA_COMPLIANCE.hub },
           { label: program.title, href: WIOA_COMPLIANCE.programHub(slug) },
           { label: 'IEAP' },

@@ -13,7 +13,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl;
 const PHONE = PLATFORM_DEFAULTS.supportPhone;
-const ICC_URL = 'https://www.in.gov/dwd/indiana-career-connect/';
+const ICC_URL = 'https://www.in.gov/dwd/indiana-career-connect/`;
 
 // ── Shared chrome ────────────────────────────────────────────────────────────
 
@@ -64,7 +64,7 @@ export function pendingFundingFollowupHtml(params: {
     ? `<p style="background:#fef2f2;border-left:4px solid #dc2626;padding:12px 16px;border-radius:4px;margin:20px 0">
         <strong>Your application is still waiting.</strong> Spots in this program fill quickly — completing your WorkOne appointment keeps your place in line.
        </p>`
-    : '';
+    : ``;
 
   const html = wrap(`
     <h2 style="margin-top:0;color:#111">Hi ${firstName},</h2>
@@ -82,12 +82,12 @@ export function pendingFundingFollowupHtml(params: {
       </ol>
     </div>
 
-    ${btn('Book a WorkOne Appointment', ICC_URL)}
+    ${btn(`Book a WorkOne Appointment`, ICC_URL)}
 
     <p>Or call us and we can walk you through it together:</p>
     <p style="font-size:18px;font-weight:bold;text-align:center"><a href="tel:+1${PLATFORM_DEFAULTS.supportPhone}" style="color:#dc2626">${PHONE}</a></p>
 
-    <p style="color:#6b7280;font-size:14px">If you've already been to WorkOne, reply to this email or call us — we may already have your referral and just need to match it to your application.</p>
+    <p style="color:#6b7280;font-size:14px">If you`ve already been to WorkOne, reply to this email or call us — we may already have your referral and just need to match it to your application.</p>
   `);
 
   return { subject, html };
@@ -111,7 +111,7 @@ export function pendingAdminReviewFollowupHtml(params: {
     ? `<p>We wanted to give you a quick update: your <strong>${programName}</strong> application is still under review. We're verifying your funding authorization with WorkOne / Indiana Career Connect.</p>
        <p>This process typically takes 3–5 business days from the time your WorkOne counselor submits the referral. If it's been longer than that, please call us — we can check the status directly.</p>`
     : `<p>Good news — we received your <strong>${programName}</strong> application and it's now in our review queue.</p>
-       <p>We're verifying your funding authorization with WorkOne / Indiana Career Connect. Once confirmed, we'll activate your enrollment and send you login details for the student portal.</p>`;
+       <p>We're verifying your funding authorization with WorkOne / Indiana Career Connect. Once confirmed, we`ll activate your enrollment and send you login details for the student portal.</p>`;
 
   const html = wrap(`
     <h2 style="margin-top:0;color:#111">Hi ${firstName},</h2>
@@ -126,7 +126,7 @@ export function pendingAdminReviewFollowupHtml(params: {
       </ul>
     </div>
 
-    ${btn('Check Application Status', `${SITE}/apply/status`)}
+    ${btn(`Check Application Status', `${SITE}/apply/status`)}
 
     <p style="text-align:center;color:#6b7280">Or call / text us directly: <a href="tel:+1${PLATFORM_DEFAULTS.supportPhone}" style="color:#dc2626;font-weight:bold">${PHONE}</a></p>
   `);

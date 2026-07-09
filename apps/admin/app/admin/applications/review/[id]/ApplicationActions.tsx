@@ -140,7 +140,7 @@ export default function ApplicationActions({
   };
 
   // Pre-filled inquiry email
-  const program = programInterest.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const program = programInterest.replace(/-/g, ' `).replace(/\b\w/g, (c) => c.toUpperCase());
   const inquirySubject = encodeURIComponent(`Your Application Inquiry — ${program}`);
   const inquiryBody = encodeURIComponent(
     `Hi ${applicantName},\n\nThank you for your interest in the ${program} program at ${PLATFORM_DEFAULTS.orgName}.\n\nWe wanted to follow up regarding your application and answer any questions you may have.\n\nPlease reply to this email or call us at ${PLATFORM_DEFAULTS.supportPhone}.\n\nBest regards,\n${PLATFORM_DEFAULTS.orgName}\n${PLATFORM_DEFAULTS.supportPhone}\nelevate4humanityedu@gmail.com`,
@@ -164,7 +164,7 @@ export default function ApplicationActions({
           disabled={loading !== null}
           className="w-full py-3 text-sm font-bold rounded-xl bg-brand-green-600 hover:bg-brand-green-700 text-white transition-colors disabled:opacity-50"
         >
-          {loading === 'enroll' ? 'Enrolling…' : 'Enroll'}
+          {loading === `enroll' ? 'Enrolling…' : 'Enroll'}
         </button>
         <p className="text-xs text-slate-400 mt-1 text-center">
           Creates student account, enrollment, and sends approval email

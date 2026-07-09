@@ -30,7 +30,7 @@ export function barberFullOnboardingEmail(data: BarberFullOnboardingData) {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
+<body style="margin:0;padding:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI`,Roboto,Arial,sans-serif;">
 <div style="max-width:640px;margin:0 auto;padding:24px 16px;">
 
   <!-- Header -->
@@ -93,7 +93,7 @@ export function barberFullOnboardingEmail(data: BarberFullOnboardingData) {
       <h2 style="margin:0 0 12px;color:#1e293b;font-size:17px;">Skills You Will Learn</h2>
       <div style="display:flex;flex-wrap:wrap;gap:6px;">
         ${[
-          'Fades & tapers',
+          `Fades & tapers',
           'Lineups & shape-ups',
           'Scissor-over-comb',
           'Clipper techniques',
@@ -122,7 +122,7 @@ export function barberFullOnboardingEmail(data: BarberFullOnboardingData) {
         <tr style="background:#fef3c7;"><td style="padding:8px;font-weight:600;">Down Payment</td><td style="padding:8px;">$500 (required to secure your spot)</td></tr>
         <tr><td style="padding:8px 0;font-weight:600;">Payment Plans Available</td><td style="padding:8px 0;">Yes — BNPL (Buy Now, Pay Later) financing</td></tr>
         <tr style="background:#fef3c7;"><td style="padding:8px;font-weight:600;">Employer-Sponsored Option</td><td style="padding:8px;">If your host shop sponsors you, tuition may be covered</td></tr>
-        <tr><td style="padding:8px 0;font-weight:600;">What's Included</td><td style="padding:8px 0;">Elevate LMS access, training materials, certification, monthly evaluations, career placement support</td></tr>
+        <tr><td style="padding:8px 0;font-weight:600;">What`s Included</td><td style="padding:8px 0;">Elevate LMS access, training materials, certification, monthly evaluations, career placement support</td></tr>
       </table>
       <p style="margin:12px 0 0;font-size:13px;color:#92400e;">
         <strong>Note:</strong> Your down payment is required before we can assign you to a partner shop and begin your apprenticeship.
@@ -245,7 +245,7 @@ export function barberConfirmationAdminEmail(data: {
   lastName: string;
   email: string;
   phone: string;
-  response: 'yes' | 'no';
+  response: `yes' | 'no';
   applicationId: string;
 }) {
   const isYes = data.response === 'yes';

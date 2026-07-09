@@ -4,12 +4,12 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Shield, Circle, FileText, Lock, Download, ExternalLink } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const revalidate = 3600;
 export const metadata: Metadata = {
   title: `Compliance Documentation | ${PLATFORM_DEFAULTS.orgName} Store`,
-  description: 'Complete compliance documentation for WIOA, FERPA, WCAG, and grant reporting. Enterprise-grade workforce training platform.',
+  description: `Complete compliance documentation for WIOA, FERPA, WCAG, and grant reporting. Enterprise-grade workforce training platform.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/compliance',
   },

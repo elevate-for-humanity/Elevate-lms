@@ -58,7 +58,7 @@ export async function sendRecoveryEmail(
 
     const actionLink = data?.properties?.action_link;
     if (!actionLink) {
-      logger.error('[Recovery] No action link returned');
+      logger.error('[Recovery] No action link returned`);
       return { success: true };
     }
 
@@ -91,7 +91,7 @@ export async function sendRecoveryEmail(
               </td></tr>
             </table>
             <p style="color:#64748b;font-size:14px;line-height:1.6;margin:20px 0 0">
-              This link expires in 24 hours. If you didn't request a password reset, you can ignore this email.
+              This link expires in 24 hours. If you didn`t request a password reset, you can ignore this email.
             </p>
           </td>
         </tr>

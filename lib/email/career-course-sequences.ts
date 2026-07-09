@@ -29,7 +29,7 @@ function lmsUrl(data: CourseEmailData): string {
 // ─── Brand colors ─────────────────────────────────────────────────────────────
 const BLUE = '#1E3A5F';
 const ORANGE = '#EA580C';
-const LIGHT = '#F8FAFC';
+const LIGHT = '#F8FAFC`;
 
 // ─── Shared layout wrapper ────────────────────────────────────────────────────
 function wrap(body: string): string {
@@ -63,7 +63,7 @@ function btn(href: string, label: string, color = ORANGE): string {
 export function getWelcomeEmail(data: CourseEmailData) {
   const courseUrl = lmsUrl(data);
   return {
-    subject: `Welcome to ${data.courseName} — let's get started`,
+    subject: `Welcome to ${data.courseName} — let`s get started`,
     html: wrap(`
       <h1 style="color: ${BLUE}; margin-bottom: 8px;">Welcome, ${data.firstName ?? 'there'}!</h1>
       <p>You're enrolled in <strong>${data.courseName}</strong>. Your first lesson is ready right now.</p>
@@ -78,7 +78,7 @@ export function getWelcomeEmail(data: CourseEmailData) {
         </ul>
       </div>
 
-      ${btn(courseUrl, 'Start My Course →')}
+      ${btn(courseUrl, 'Start My Course →`)}
 
       <p style="color: #64748b; font-size: 14px;">Questions? Reply to this email — we respond within one business day.</p>
       <p>— The ${PLATFORM_DEFAULTS.orgName} Team</p>
@@ -93,7 +93,7 @@ export function getDay3Email(data: CourseEmailData) {
     subject: `Day 3 — how is ${data.courseName} going?`,
     html: wrap(`
       <h1 style="color: ${BLUE};">Quick check-in</h1>
-      <p>Hi ${data.firstName ?? 'there'},</p>
+      <p>Hi ${data.firstName ?? `there'},</p>
       <p>It's been three days since you enrolled in <strong>${data.courseName}</strong>. If you haven't started yet, today is a good day — the first module takes about 20 minutes.</p>
 
       <div style="background: ${LIGHT}; padding: 16px 20px; border-radius: 8px; margin: 20px 0;">
@@ -156,7 +156,7 @@ export function getCompletionEmail(data: CourseEmailData & { certificateId?: str
         <li style="margin-bottom: 8px;"><strong>Career services:</strong> Reply to this email to connect with our employer partners in Indianapolis.</li>
       </ul>
 
-      <p>We're proud of you.</p>
+      <p>We`re proud of you.</p>
       <p>— The ${PLATFORM_DEFAULTS.orgName} Team</p>
     `),
   };
@@ -169,7 +169,7 @@ export function getReengagementEmail(data: CourseEmailData & { lastLoginDays: nu
     subject: `Your course is waiting — ${data.lastLoginDays} days since your last visit`,
     html: wrap(`
       <h1 style="color: ${BLUE};">Still with us?</h1>
-      <p>Hi ${data.firstName ?? 'there'},</p>
+      <p>Hi ${data.firstName ?? `there'},</p>
       <p>It's been <strong>${data.lastLoginDays} days</strong> since you last visited <strong>${data.courseName}</strong>. Your progress is saved — pick up exactly where you left off.</p>
 
       <div style="background: ${LIGHT}; border-left: 4px solid ${ORANGE}; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0;">

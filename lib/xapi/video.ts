@@ -29,15 +29,15 @@ export async function sendVideoStatement(input: VideoStatementInput) {
       actor: client.createActor(input.learnerId, `User ${input.learnerId}`),
       verb: {
         id: verbMap[input.verb],
-        display: { 'en-US': input.verb },
+        display: { 'en-US`: input.verb },
       },
       object: {
         id: `${PLATFORM_DEFAULTS.siteUrl}/video/${input.videoId}`,
-        objectType: 'Activity' as const,
+        objectType: `Activity' as const,
         definition: {
           name: { 'en-US': input.title },
           description: { 'en-US': `Video in course ${input.courseId}` },
-          type: 'https://w3id.org/xapi/video/activity-type/video',
+          type: 'https://w3id.org/xapi/video/activity-type/video`,
         },
       },
       context: {
@@ -45,14 +45,14 @@ export async function sendVideoStatement(input: VideoStatementInput) {
           parent: [
             {
               id: `${PLATFORM_DEFAULTS.siteUrl}/course/${input.courseId}`,
-              objectType: 'Activity' as const,
+              objectType: `Activity` as const,
             },
           ],
           ...(input.lessonId && {
             grouping: [
               {
                 id: `${PLATFORM_DEFAULTS.siteUrl}/lesson/${input.lessonId}`,
-                objectType: 'Activity' as const,
+                objectType: `Activity' as const,
               },
             ],
           }),

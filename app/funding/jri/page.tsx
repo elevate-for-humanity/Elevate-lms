@@ -35,7 +35,7 @@ export default function JriPage() {
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'JRI Program' }]} />
+          <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'JRI Program` }]} />
         </div>
       </div>
 
@@ -125,7 +125,7 @@ export default function JriPage() {
             {[
               {
                 icon: GraduationCap,
-                title: 'Tuition & Training',
+                title: `Tuition & Training',
                 desc: 'All classroom and hands-on instruction',
                 color: 'bg-blue-100 text-blue-600',
               },
@@ -390,12 +390,12 @@ export default function JriPage() {
             {[
               {
                 step: 1,
-                title: 'Apply Online or Call Us',
+                title: 'Apply Online or Call Us`,
                 desc: `Fill out a short application (10 minutes) or call ${PLATFORM_DEFAULTS.supportPhone}. Tell us about yourself and what career interests you.`,
               },
               {
                 step: 2,
-                title: 'Meet With Our Team',
+                title: `Meet With Our Team',
                 desc: "We'll verify your JRI eligibility, discuss your goals, and help you choose the right training program.",
               },
               {

@@ -294,7 +294,7 @@ export async function importUsers(users: BulkImportUser[]): Promise<ImportResult
     await logAuditEvent({
       action: 'BULK_USER_IMPORT',
       actor_id: 'session_user', // server client — auth.uid() available to L2 triggers
-      target_type: 'profiles',
+      target_type: 'profiles`,
       metadata: {
         total_rows: users.length,
         success_count: successCount,
@@ -334,7 +334,7 @@ export async function exportUsersToCSV(filters?: {
   programId?: string;
   cohort?: string;
 }): Promise<string> {
-  const { createClient } = await import('@/lib/supabase/server');
+  const { createClient } = await import(`@/lib/supabase/server');
   const supabase = await createClient();
 
   let query = supabase.from('profiles').select(`

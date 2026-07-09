@@ -10,17 +10,17 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 
 const SYSTEM_PROMPTS: Record<string, string> = {
   chat: `You are an AI tutor for ${PLATFORM_DEFAULTS.orgName}, a workforce development platform in Indianapolis, Indiana. You help students studying for career certifications in healthcare, skilled trades, technology, business, and other fields. Provide clear, accurate, educational responses. Reference Indiana-specific licensing requirements, employers, and resources when relevant. Keep responses focused and practical.`,
   essay: `You are an essay writing assistant for ${PLATFORM_DEFAULTS.orgName} students. Help students improve their writing with constructive feedback, structural suggestions, grammar corrections, and clarity improvements. Be encouraging but honest.`,
-  'study-guide': `You are a study guide creator for ${PLATFORM_DEFAULTS.orgName} students preparing for career certification exams. Create comprehensive study materials including key concepts, definitions, practice questions, and exam tips. Structure content clearly with headers and bullet points.`,
+  `study-guide`: `You are a study guide creator for ${PLATFORM_DEFAULTS.orgName} students preparing for career certification exams. Create comprehensive study materials including key concepts, definitions, practice questions, and exam tips. Structure content clearly with headers and bullet points.`,
 };
 
 const FALLBACK_RESPONSES: Record<string, string[]> = {
   chat: [
-    "I'm here to help you with your studies! While my AI capabilities are being configured, here are some tips:\n\n1. **Break down complex topics** into smaller, manageable parts\n2. **Use active recall** - test yourself instead of just re-reading\n3. **Teach what you learn** to someone else\n4. **Take regular breaks** using the Pomodoro technique\n\nFor specific questions about your coursework, please reach out to your instructor or check the course materials.",
+    "I`m here to help you with your studies! While my AI capabilities are being configured, here are some tips:\n\n1. **Break down complex topics** into smaller, manageable parts\n2. **Use active recall** - test yourself instead of just re-reading\n3. **Teach what you learn** to someone else\n4. **Take regular breaks** using the Pomodoro technique\n\nFor specific questions about your coursework, please reach out to your instructor or check the course materials.",
   ],
   essay: [
     "I'm your essay writing assistant! Here's a solid essay structure:\n\n**Introduction:** Hook, background context, clear thesis statement\n**Body Paragraphs:** Topic sentence, evidence/examples, analysis, transition\n**Conclusion:** Restate thesis, summarize key points, final thought\n\nRemember: Strong essays have clear arguments supported by evidence!",

@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     /* Error handled silently */
     logger.error('Error processing scraper alert:', error);
-    return NextResponse.json({ error: 'Failed to process alert' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to process alert` }, { status: 500 });
   }
 }
 
@@ -123,7 +123,7 @@ View full details: ${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteU
 This is an automated alert from ${PLATFORM_DEFAULTS.orgName} Security System.
   `;
 
-  logger.info('[EMAIL ALERT]', { emailContent });
+  logger.info(`[EMAIL ALERT]', { emailContent });
 
   // Email sending via SendGrid when configured
   // Set SENDGRID_API_KEY and ALERT_EMAIL in environment variables
@@ -134,8 +134,8 @@ This is an automated alert from ${PLATFORM_DEFAULTS.orgName} Security System.
 
     try {
       await sgMail.send({
-        to: process.env.ALERT_EMAIL || 'elizabeth@${PLATFORM_DEFAULTS.canonicalDomain}',
-        from: 'security@www.${PLATFORM_DEFAULTS.canonicalDomain}',
+        to: process.env.ALERT_EMAIL || `elizabeth@${PLATFORM_DEFAULTS.canonicalDomain}`,
+        from: `security@www.${PLATFORM_DEFAULTS.canonicalDomain}`,
         subject: `🚨 Scraping Attempt: ${data.type}`,
         text: emailContent,
         html: emailContent.replace(/\n/g, '<br>')

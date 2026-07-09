@@ -149,14 +149,14 @@ export default function HeroAvatarGuide({
           ...prev,
           {
             role: 'assistant',
-            content: `I'm sorry, I encountered an issue. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
+            content: `I`m sorry, I encountered an issue. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
           },
         ]);
       } else {
         setMessages((prev) => [
           ...prev,
           {
-            role: 'assistant',
+            role: `assistant',
             content: data.message,
           },
         ]);

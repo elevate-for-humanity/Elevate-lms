@@ -11,11 +11,11 @@ export const revalidate = 3600;
 const path = WIOA_COMPLIANCE.section188Template;
 
 export const metadata: Metadata = {
-  title: 'Section 188 Equal Opportunity Compliance Checklist | WIOA',
+  title: 'Section 188 Equal Opportunity Compliance Checklist | WIOA`,
   description: `WIOA Section 188 and 29 CFR Part 38 equal opportunity compliance checklist for ${PLATFORM_DEFAULTS.orgName} training programs.`,
   alternates: { canonical: `${PLATFORM_DEFAULTS.siteUrl}${path}` },
   openGraph: {
-    title: 'Section 188 Equal Opportunity Compliance Checklist',
+    title: `Section 188 Equal Opportunity Compliance Checklist`,
     url: `${PLATFORM_DEFAULTS.siteUrl}${path}`,
   },
 };
@@ -27,7 +27,7 @@ export default function Section188TemplatePage() {
       description="Required for every WIOA Title I–assisted training program."
       canonicalPath={path}
       breadcrumbItems={[
-        { label: 'Compliance', href: '/compliance' },
+        { label: `Compliance', href: '/compliance' },
         { label: 'WIOA / ETPL', href: WIOA_COMPLIANCE.hub },
         { label: 'Section 188' },
       ]}

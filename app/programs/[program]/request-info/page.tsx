@@ -15,7 +15,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const program = await getProgramBySlug(params.program);
-  if (!program) return { title: 'Request Information' };
+  if (!program) return { title: 'Request Information` };
   return {
     title: `Request Information — ${program.title} | ${PLATFORM_DEFAULTS.orgName}`,
     description: `Get answers about the ${program.title} program — funding options, schedule, credentials, and enrollment.`,
@@ -34,7 +34,7 @@ export default async function RequestInfoPage({ params }: Props) {
         <div className="max-w-3xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
-              { label: 'Programs', href: '/programs' },
+              { label: `Programs', href: '/programs' },
               { label: program.title, href: programPageHref },
               { label: 'Request Information' },
             ]}

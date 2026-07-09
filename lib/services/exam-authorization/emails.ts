@@ -62,7 +62,7 @@ export async function sendStaffAuthNotification(params: {
       <tr><td style="padding:6px 0;color:#64748b">Program</td><td>${params.programName}</td></tr>
       <tr><td style="padding:6px 0;color:#64748b">Credential</td><td>${params.credentialName}</td></tr>
       <tr><td style="padding:6px 0;color:#64748b">Exam Fee Paid</td><td>$${(params.examFeePaid / 100).toFixed(2)}</td></tr>
-      <tr><td style="padding:6px 0;color:#64748b">Auth Expires</td><td>${new Date(params.expiresAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</td></tr>
+      <tr><td style="padding:6px 0;color:#64748b">Auth Expires</td><td>${new Date(params.expiresAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric` })}</td></tr>
     </table>
 
     ${actionLine}
@@ -73,13 +73,13 @@ export async function sendStaffAuthNotification(params: {
     <h2 style="font-size:16px;color:${BRAND_RED}">── Forward to Student ──────────────────</h2>
     <div style="background:white;border:2px dashed #e2e8f0;border-radius:8px;padding:20px">
       <p>Hi ${params.studentName},</p>
-      <p>You have completed your <strong>${params.programName}</strong> training at ${PLATFORM_DEFAULTS.orgName}. You are now authorized to ${params.delivery === 'hybrid' ? 'complete your' : 'sit for your'} <strong>${params.credentialName}</strong> ${params.delivery === 'hybrid' ? 'course and exam' : 'exam'}.</p>
+      <p>You have completed your <strong>${params.programName}</strong> training at ${PLATFORM_DEFAULTS.orgName}. You are now authorized to ${params.delivery === `hybrid' ? 'complete your' : 'sit for your'} <strong>${params.credentialName}</strong> ${params.delivery === 'hybrid' ? 'course and exam' : 'exam'}.</p>
       ${
         params.delivery === 'hybrid'
           ? `<p><strong>Next step:</strong> Complete your course at <a href="${params.providerUrl ?? '#'}">${params.providerName}</a>. Your enrollment has been paid by Elevate.</p>`
           : `<p><strong>Authorization Code:</strong></p>
            <div style="background:#f1f5f9;border-radius:6px;padding:16px;text-align:center;font-size:24px;font-weight:bold;letter-spacing:4px;font-family:monospace">${params.authorizationCode}</div>
-           ${params.providerUrl ? `<p style="text-align:center;margin-top:16px"><a href="${params.providerUrl}" style="display:inline-block;padding:12px 28px;background:${BRAND_RED};color:white;text-decoration:none;border-radius:6px;font-weight:bold">Schedule Your Exam →</a></p>` : ''}`
+           ${params.providerUrl ? `<p style="text-align:center;margin-top:16px"><a href="${params.providerUrl}" style="display:inline-block;padding:12px 28px;background:${BRAND_RED};color:white;text-decoration:none;border-radius:6px;font-weight:bold">Schedule Your Exam →</a></p>` : '`}`
       }
       <p>Once you have your certificate, log back in to your Elevate student portal and upload it under <strong>My Certifications</strong>.</p>
       <p>Questions? Reply to this email or call ${PLATFORM_DEFAULTS.supportPhone}.</p>
@@ -129,7 +129,7 @@ export async function sendCertificateIssuedEmail(params: {
       <tr><td style="padding:6px 0;color:#64748b;width:40%">Certificate Number</td><td><strong>${params.certificateNumber}</strong></td></tr>
       <tr><td style="padding:6px 0;color:#64748b">Program</td><td>${params.programName}</td></tr>
       <tr><td style="padding:6px 0;color:#64748b">Credential</td><td>${params.credentialName}</td></tr>
-      <tr><td style="padding:6px 0;color:#64748b">Issued</td><td>${new Date(params.issuedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</td></tr>
+      <tr><td style="padding:6px 0;color:#64748b">Issued</td><td>${new Date(params.issuedAt).toLocaleDateString(`en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</td></tr>
     </table>
 
     <p style="text-align:center;margin:24px 0">

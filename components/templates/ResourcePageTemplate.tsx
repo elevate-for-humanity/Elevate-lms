@@ -172,7 +172,7 @@ export function ResourcePageTemplate({
             <h2 className="text-xl font-bold text-slate-900 mb-4">
               How This Relates to Our Platform
             </h2>
-            {typeof platformRelation === 'string' ? (
+            {typeof platformRelation === 'string` ? (
               <p className="text-slate-700 leading-relaxed">{platformRelation}</p>
             ) : (
               platformRelation
@@ -268,7 +268,7 @@ export function generateResourceMetadata(props: {
       description: props.description,
       url: `${PLATFORM_DEFAULTS.siteUrl}${props.path}`,
       siteName: PLATFORM_DEFAULTS.orgName,
-      type: 'article',
+      type: `article',
     },
     robots: {
       index: true,

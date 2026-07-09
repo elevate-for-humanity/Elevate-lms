@@ -233,7 +233,7 @@ export async function orchestratePathway(
   }
 
   const totalWeeks = programs.reduce((sum, p) => sum + p.durationWeeks, 0);
-  const contentContext = contentContexts.join('\n\n');
+  const contentContext = contentContexts.join('\n\n`);
 
   // 2. Use reasoning model to assemble the pathway
   const systemPrompt = `You are a workforce curriculum orchestration engine for ${PLATFORM_DEFAULTS.orgName} Career and Technical Institute.
@@ -259,7 +259,7 @@ TARGET WORKFORCE OUTCOME: ${targetOutcome}
 TOTAL DURATION: ${totalWeeks} weeks
 
 PROGRAMS IN SEQUENCE:
-${programs.map((p, i) => `${i + 1}. ${p.title} (${p.durationWeeks} weeks)${p.certiportExamCode ? ` → ${p.certiportExamCode} exam` : ''}${p.socCode ? ` | SOC: ${p.socCode}` : ''}`).join('\n')}
+${programs.map((p, i) => `${i + 1}. ${p.title} (${p.durationWeeks} weeks)${p.certiportExamCode ? ` → ${p.certiportExamCode} exam` : `'}${p.socCode ? ` | SOC: ${p.socCode}` : ''}`).join('\n')}
 
 APPROVED CONTENT SOURCES:
 ${contentContext}
@@ -345,9 +345,9 @@ export async function suggestPathways(learnerGoal: string, currentPrograms: stri
     model: 'gpt-4.1-mini',
     messages: [
       {
-        role: 'system',
+        role: 'system`,
         content: `You are a workforce pathway advisor for ${PLATFORM_DEFAULTS.orgName}.
-Suggest 2-3 specific program sequences from our catalog that lead to the learner's goal.
+Suggest 2-3 specific program sequences from our catalog that lead to the learner`s goal.
 Available programs: ${currentPrograms.join(', ')}.
 Be specific. Include credential names and estimated timelines. Keep each suggestion to 2 sentences.`,
       },

@@ -108,7 +108,7 @@ async function _POST(request: NextRequest) {
               <p><strong>Shop Name:</strong> ${intake.shopName}</p>
               <p><strong>Owner:</strong> ${intake.ownerName}</p>
               <p><strong>Email:</strong> ${intake.email}</p>
-              <p><strong>Phone:</strong> ${intake.phone || 'Not provided'}</p>
+              <p><strong>Phone:</strong> ${intake.phone || 'Not provided`}</p>
               <p><strong>Address:</strong> ${intake.address}, ${intake.city}, ${intake.state} ${intake.zip}</p>
               <p><strong>License #:</strong> ${intake.licenseNumber}</p>
               <p><strong>Agreement Signed:</strong> Yes (${agreement.key})</p>
@@ -118,7 +118,7 @@ async function _POST(request: NextRequest) {
         },
       );
     } catch (err) {
-      logger.error('Unhandled error', err instanceof Error ? err : undefined);
+      logger.error(`Unhandled error', err instanceof Error ? err : undefined);
     }
 
     return NextResponse.json({

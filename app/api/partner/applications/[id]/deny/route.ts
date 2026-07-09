@@ -57,7 +57,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
     try {
       await internalFetch(`${siteUrl}/api/email/send`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json` },
         body: JSON.stringify({
           to: application.contact_email,
           subject: `Partner Application Update - ${PLATFORM_DEFAULTS.orgName}`,
@@ -92,7 +92,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
         }),
       });
     } catch (emailError) {
-      logger.warn('Failed to send denial email:', emailError);
+      logger.warn(`Failed to send denial email:', emailError);
     }
 
     return NextResponse.json({ success: true });

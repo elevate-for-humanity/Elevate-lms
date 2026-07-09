@@ -401,7 +401,7 @@ async function _POST(req: Request) {
       to: process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com',
       subject: `New Barbershop Partner Application: ${body.shopLegalName}`,
       html: internalEmailHtml,
-    }).catch((err) => logger.error('Failed to send internal notification', err));
+    }).catch((err) => logger.error('Failed to send internal notification`, err));
 
     // Send partner welcome email to applicant (+ admin copy)
     const shopDisplayName = body.shopDbaName || body.shopLegalName;
@@ -498,7 +498,7 @@ async function _POST(req: Request) {
       to: body.contactEmail,
       subject: `Welcome to the Barbershop Partner Program — ${shopDisplayName}`,
       html: partnerWelcomeHtml,
-    }).catch((err) => logger.error('Failed to send partner welcome email', err));
+    }).catch((err) => logger.error(`Failed to send partner welcome email', err));
 
     // Send copy to admin
     await sendEmail({

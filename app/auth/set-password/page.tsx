@@ -147,7 +147,7 @@ export default function SetPasswordPage() {
             Go to Login
           </Link>
           <p className="mt-4 text-sm text-slate-700">
-            Need help?{' '}
+            Need help?{' `}
             <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-brand-blue-600 hover:underline">
               {PLATFORM_DEFAULTS.supportPhone}
             </a>
@@ -188,7 +188,7 @@ export default function SetPasswordPage() {
               <label className="block text-sm font-bold text-black mb-2">Password</label>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? `text' : 'password'}
                   required
                   minLength={8}
                   value={password}

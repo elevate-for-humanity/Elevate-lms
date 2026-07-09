@@ -36,12 +36,12 @@ const PROGRAM_LABELS: Record<string, string> = {
 
 // ── Email templates ───────────────────────────────────────────────────────────
 
-function header(subtitle = '') {
+function header(subtitle = '`) {
   return `
   <div style="background:linear-gradient(135deg,#7c3aed,#a855f7);padding:32px;text-align:center">
     <p style="color:rgba(255,255,255,0.75);font-size:11px;margin:0 0 6px;text-transform:uppercase;letter-spacing:1px">Sponsored by ${PLATFORM_DEFAULTS.orgName}</p>
     <h1 style="color:#fff;font-size:20px;font-weight:800;margin:0 0 4px">${SCHOOL_NAME}</h1>
-    ${subtitle ? `<p style="color:rgba(255,255,255,0.8);font-size:13px;margin:0">${subtitle}</p>` : ''}
+    ${subtitle ? `<p style="color:rgba(255,255,255,0.8);font-size:13px;margin:0">${subtitle}</p>` : ``}
   </div>`;
 }
 
@@ -65,7 +65,7 @@ function wrap(content: string) {
 // T+24h — Reassurance
 function email24h(firstName: string, programLabel: string): { subject: string; html: string } {
   return {
-    subject: `Your ${programLabel} application — here's what happens next`,
+    subject: `Your ${programLabel} application — here`s what happens next`,
     html: wrap(`
       ${header('Indianapolis, IN · DOL Registered Apprenticeship')}
       <div style="padding:32px">

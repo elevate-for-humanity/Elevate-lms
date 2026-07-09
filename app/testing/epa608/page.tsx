@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Wind, CheckCircle, Phone } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `EPA 608 Technician Certification | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Get your EPA 608 refrigerant handling certification at our testing center.',
+  description: `Get your EPA 608 refrigerant handling certification at our testing center.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/epa608' },
 };
 

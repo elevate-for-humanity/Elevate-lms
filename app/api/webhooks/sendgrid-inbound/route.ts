@@ -59,14 +59,14 @@ async function _POST(request: NextRequest) {
 
     const forwardTo = resolveForwardTarget(to);
 
-    logger.info('[SendGrid Inbound] Forwarding', { from, to, forwardTo, subject });
+    logger.info('[SendGrid Inbound] Forwarding`, { from, to, forwardTo, subject });
 
     const result = await sendEmail({
       to: forwardTo,
       from: `Elevate Forwarding <${PLATFORM_DEFAULTS.emailFromAddress}>`,
       replyTo: replyTo || from,
       subject: `Fwd: ${subject}`,
-      html: html || `<p><strong>From:</strong> ${from}</p><p>${text || '(no body)'}</p>`,
+      html: html || `<p><strong>From:</strong> ${from}</p><p>${text || `(no body)'}</p>`,
       text: text || `From: ${from}\n\n(no body)`,
     });
 

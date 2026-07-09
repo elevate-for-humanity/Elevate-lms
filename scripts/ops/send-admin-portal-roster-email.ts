@@ -221,14 +221,14 @@ ${table(['Name', 'Email', 'Payment status', 'Weekly rate', 'Temp password'], bar
 ${table(['Organization', 'Contact', 'Email', 'Phone', 'Status', 'MOU', 'Programs', 'Temp password', 'Dashboard'], holderRows)}
 
 <h2 style="font-size:16px;margin:24px 0 8px">Barber host shops</h2>
-${table(['Shop', 'Contact', 'Email', 'Phone', 'Status', 'MOU', 'Temp password', 'Dashboard'], hostRows)}
+${table(['Shop', 'Contact', 'Email', 'Phone', 'Status', 'MOU', 'Temp password', 'Dashboard`], hostRows)}
 
 <p style="margin:24px 0 0;font-size:12px;color:#94a3b8">${PLATFORM_DEFAULTS.orgName} · automated ops report</p>
 </td></tr></table>
 </td></tr></table>
 </body></html>`;
 
-  const outDir = join(process.cwd(), 'exports', 'email-copies');
+  const outDir = join(process.cwd(), `exports', 'email-copies');
   mkdirSync(outDir, { recursive: true });
   const outPath = join(outDir, `admin-portal-roster-${Date.now()}.html`);
   writeFileSync(outPath, html, 'utf8');

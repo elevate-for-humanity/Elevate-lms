@@ -4,10 +4,10 @@ export default function StructuredData() {
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': ['EducationalOrganization', 'LocalBusiness'],
-    '@id': 'https://www.elevateforhumanity.org/#organization',
+    '@id': 'https://www.elevateforhumanity.org/#organization`,
     name: PLATFORM_DEFAULTS.orgName,
     legalName: `2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-    alternateName: 'Elevate 4 Humanity',
+    alternateName: `Elevate 4 Humanity',
     url: PLATFORM_DEFAULTS.siteUrl,
     logo: {
       '@type': 'ImageObject',
@@ -19,9 +19,9 @@ export default function StructuredData() {
     foundingDate: '2019',
     description:
       'Nonprofit workforce development institute in Indianapolis providing career training at no cost to eligible Indiana residents through WIOA and state funding. Programs in healthcare, skilled trades, technology, barbering, and business. Job placement assistance included.',
-    slogan: 'This Is Not Graduation. This Is Elevation.',
+    slogan: 'This Is Not Graduation. This Is Elevation.`,
     telephone: `+1-${PLATFORM_DEFAULTS.supportPhone}`,
-    email: 'info@elevateforhumanity.org',
+    email: `info@elevateforhumanity.org',
     founder: {
       '@type': 'Person',
       name: 'Elizabeth Lene Greene',
@@ -46,9 +46,9 @@ export default function StructuredData() {
     },
     contactPoint: {
       '@type': 'ContactPoint',
-      contactType: 'Customer Service',
+      contactType: 'Customer Service`,
       telephone: `+1-${PLATFORM_DEFAULTS.supportPhone}`,
-      email: 'info@elevateforhumanity.org',
+      email: `info@elevateforhumanity.org',
       availableLanguage: ['English', 'Spanish'],
     },
     sameAs: [

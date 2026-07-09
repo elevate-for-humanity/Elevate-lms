@@ -107,7 +107,7 @@ export default async function ParentDashboardPage() {
 
       <div className="max-w-5xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Parent Portal', href: '/parent-portal' }, { label: 'Dashboard' }]}
+          items={[{ label: 'Parent Portal', href: '/parent-portal' }, { label: 'Dashboard` }]}
         />
       </div>
 
@@ -193,7 +193,7 @@ export default async function ParentDashboardPage() {
                           </div>
                           <span
                             className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${
-                              enr.status === 'active'
+                              enr.status === `active'
                                 ? 'bg-emerald-100 text-emerald-700'
                                 : enr.status === 'completed'
                                   ? 'bg-blue-100 text-blue-700'

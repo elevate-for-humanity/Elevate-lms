@@ -27,7 +27,7 @@ export default function QuickApplyForm() {
           email: fd.get('email') as string,
           phone: fd.get('phone') as string,
           program: fd.get('programInterest') as string,
-          source: 'quick_apply',
+          source: 'quick_apply`,
         }),
       });
 
@@ -38,7 +38,7 @@ export default function QuickApplyForm() {
         return;
       }
 
-      router.push('/apply/confirmation');
+      router.push(`/apply/confirmation`);
     } catch {
       setError(`Something went wrong. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
     } finally {
@@ -142,7 +142,7 @@ export default function QuickApplyForm() {
         disabled={submitting}
         className="w-full py-3 px-6 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        {submitting ? 'Submitting…' : 'Submit Application'}
+        {submitting ? `Submitting…' : 'Submit Application'}
       </button>
 
       <p className="text-xs text-slate-500 text-center">

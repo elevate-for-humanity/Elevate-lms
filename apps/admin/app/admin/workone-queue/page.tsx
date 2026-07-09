@@ -6,13 +6,13 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Clock, CheckCircle, AlertTriangle, Phone, Mail, ExternalLink, Link2, ArrowRight } from 'lucide-react';
 import WorkOneApproveButton from './WorkOneApproveButton';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `WorkOne Queue | Admin | ${PLATFORM_DEFAULTS.orgName}`,
 };
 
-export const dynamic = 'force-dynamic';
+export const dynamic = `force-dynamic';
 export const revalidate = 60;
 
 export default async function WorkOneQueuePage() {

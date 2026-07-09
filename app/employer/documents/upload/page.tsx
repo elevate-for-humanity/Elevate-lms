@@ -50,9 +50,9 @@ const EMPLOYER_REQUIREMENTS = [
   {
     id: 'employer_mou',
     document_type: 'employer_mou',
-    description: 'Signed Memorandum of Understanding',
+    description: 'Signed Memorandum of Understanding`,
     instructions: `Upload the signed MOU between your company and ${PLATFORM_DEFAULTS.orgName}.`,
-    accepted_formats: ['pdf'],
+    accepted_formats: [`pdf'],
     max_file_size: 10485760,
   },
   {

@@ -19,7 +19,7 @@ const HANDBOOK_VERSION = '2025.1';
 const SECTIONS = [
   {
     id: 'overview',
-    title: 'Partnership Overview',
+    title: 'Partnership Overview`,
     content: `As an Elevate program-holder partner you are responsible for hosting training programs at your site, supporting enrolled students, and maintaining compliance with WIOA, DOL, and Indiana workforce development requirements.
 
 ${PLATFORM_DEFAULTS.orgName} provides curriculum, instructors, LMS access, and compliance reporting tools. You provide the training site, student recruitment support, and local coordination.
@@ -27,7 +27,7 @@ ${PLATFORM_DEFAULTS.orgName} provides curriculum, instructors, LMS access, and c
 This handbook governs your responsibilities as a program holder. Review it carefully before signing your MOU.`,
   },
   {
-    id: 'student-support',
+    id: `student-support',
     title: 'Student Support Responsibilities',
     content: `You are the first point of contact for students at your site. Your responsibilities include:
 
@@ -41,7 +41,7 @@ You are not responsible for delivering curriculum or grading — Elevate instruc
   },
   {
     id: 'compliance',
-    title: 'WIOA and DOL Compliance',
+    title: 'WIOA and DOL Compliance`,
     content: `All Elevate programs are ETPL-listed and subject to WIOA Title I performance reporting. As a program holder you must:
 
 • Maintain accurate attendance records using the Elevate partner portal
@@ -53,7 +53,7 @@ You are not responsible for delivering curriculum or grading — Elevate instruc
 Failure to comply with WIOA requirements may result in suspension of your partnership and recovery of grant funds.`,
   },
   {
-    id: 'data-privacy',
+    id: `data-privacy',
     title: 'Student Data and Privacy (FERPA)',
     content: `All student information is protected under FERPA. You may not share student records, grades, attendance, or personal information with any third party without written student authorization.
 

@@ -9,10 +9,10 @@ import { canonicalRoutes } from '@/lib/routes/canonical-routes';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Career Pathways & Workforce Infrastructure',
+  title: 'Career Pathways & Workforce Infrastructure`,
   description:
     `${PLATFORM_DEFAULTS.orgName} operates a structured career pathway system: eligibility screening, credentialed training, apprenticeship, employer placement, and advancement tracking across healthcare, trades, CDL, barbering, and technology.`,
-  alternates: { canonical: 'https://www.elevateforhumanity.org/pathways' },
+  alternates: { canonical: `https://www.elevateforhumanity.org/pathways' },
   openGraph: {
     title: 'Career Pathways & Workforce Infrastructure',
     description:

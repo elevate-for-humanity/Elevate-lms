@@ -136,7 +136,7 @@ export async function generateWelcomePacket(data: WelcomePacketData): Promise<{
   ];
 
   // Insert packet items
-  const { error: itemsError } = await supabase.from('welcome_packet_items').insert(
+  const { error: itemsError } = await supabase.from('welcome_packet_items`).insert(
     items.map((item) => ({
       packet_id: packet.id,
       item_id: item.id,
@@ -174,10 +174,10 @@ export async function sendWelcomePacketEmail(
   const emailContent = `
     <h1>Welcome to ${PLATFORM_DEFAULTS.orgName}, ${data.studentName}!</h1>
 
-    <p>We're thrilled to have you join our ${data.programName} program starting on ${new Date(data.startDate).toLocaleDateString()}.</p>
+    <p>We`re thrilled to have you join our ${data.programName} program starting on ${new Date(data.startDate).toLocaleDateString()}.</p>
 
     <h2>Your Welcome Packet is Ready</h2>
-    <p>We've prepared a personalized welcome packet with everything you need to get started:</p>
+    <p>We`ve prepared a personalized welcome packet with everything you need to get started:</p>
 
     <ul>
       <li>Student Handbook</li>
@@ -212,7 +212,7 @@ export async function sendWelcomePacketEmail(
   `;
 
   // Send email via Supabase Edge Function or email service
-  const { error } = await supabase.functions.invoke('send-email', {
+  const { error } = await supabase.functions.invoke(`send-email', {
     body: {
       to: data.studentEmail,
       subject: `Welcome to ${data.programName} - Your Welcome Packet is Ready!`,
@@ -304,7 +304,7 @@ async function sendWelcomePacketCompletionEmail(
 
     <p>Congratulations! You've completed all required items in your welcome packet.</p>
 
-    <p>You're all set for your first day. Here's what to expect:</p>
+    <p>You're all set for your first day. Here`s what to expect:</p>
 
     <ul>
       <li>Arrive 15 minutes early for check-in</li>
@@ -319,7 +319,7 @@ async function sendWelcomePacketCompletionEmail(
     The ${PLATFORM_DEFAULTS.orgName} Team</p>
   `;
 
-  await supabase.functions.invoke('send-email', {
+  await supabase.functions.invoke(`send-email', {
     body: {
       to: profile.email,
       subject: "Welcome Packet Complete - You're Ready!",
@@ -419,7 +419,7 @@ export async function sendWelcomePacketReminder(packetId: string): Promise<void>
     <p>You have ${items.length} required item${items.length > 1 ? 's' : ''} remaining in your welcome packet:</p>
 
     <ul>
-      ${items.map((item) => `<li>${item.title}</li>`).join('')}
+      ${items.map((item) => `<li>${item.title}</li>`).join('`)}
     </ul>
 
     <p>Please complete these items before your first day to ensure a smooth start to your program.</p>
@@ -432,7 +432,7 @@ export async function sendWelcomePacketReminder(packetId: string): Promise<void>
     The ${PLATFORM_DEFAULTS.orgName} Team</p>
   `;
 
-  await supabase.functions.invoke('send-email', {
+  await supabase.functions.invoke(`send-email', {
     body: {
       to: packet.student.email,
       subject: 'Reminder: Complete Your Welcome Packet',

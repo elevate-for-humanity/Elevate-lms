@@ -282,8 +282,8 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
   // Org name in header
   const hx = logoImg ? ML + (logoImg.width / logoImg.height) * 52 + 12 : ML;
   txt(PLATFORM_DEFAULTS.orgLegalName, hx, H - 30, bold, 11, C.headerText);
-  txt('8888 Keystone Crossing, Suite 1300  ·  Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}', hx, H - 44, regular, 8, rgb(0.75, 0.85, 1));
-  txt('elevate4humanityedu@gmail.com  ·  ${PLATFORM_DEFAULTS.canonicalDomain}', hx, H - 56, regular, 8, rgb(0.75, 0.85, 1));
+  txt(`8888 Keystone Crossing, Suite 1300  ·  Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}`, hx, H - 44, regular, 8, rgb(0.75, 0.85, 1));
+  txt(`elevate4humanityedu@gmail.com  ·  ${PLATFORM_DEFAULTS.canonicalDomain}`, hx, H - 56, regular, 8, rgb(0.75, 0.85, 1));
 
   y = H - 90;
 
@@ -355,7 +355,7 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
     checkY(18);
     const rowBg = parseInt(num) % 2 === 0 ? C.rowAlt : C.white;
     rect(ML, y - 3, contentW, 16, rowBg);
-    txt(num + '.', ML + 6, y + 5, bold, 9, C.subText);
+    txt(num + '.`, ML + 6, y + 5, bold, 9, C.subText);
     txt(title, ML + 22, y + 5, bold, 9, C.black);
     txt(desc, ML + 180, y + 5, regular, 8, C.gray);
     y -= 18;
@@ -384,7 +384,7 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
   // ════════════════════════════════════════════════════════════════════════════
   // SECTION 1 — ORGANIZATION INFORMATION
   // ════════════════════════════════════════════════════════════════════════════
-  sectionHeader('Organization Information', '1');
+  sectionHeader(`Organization Information', '1');
 
   fieldRow([
     { label: 'Legal Organization Name', value: data.org_name },
@@ -713,7 +713,7 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
     subHeader(`${label}  [${comp.offered ? 'OFFERED' : 'NOT OFFERED'}]`);
 
     if (!comp.offered) {
-      txt('This component is not offered by ${PLATFORM_DEFAULTS.orgName} at this time.', ML + 6, y, italic, 8.5, C.gray);
+      txt(`This component is not offered by ${PLATFORM_DEFAULTS.orgName} at this time.`, ML + 6, y, italic, 8.5, C.gray);
       y -= 16;
       continue;
     }

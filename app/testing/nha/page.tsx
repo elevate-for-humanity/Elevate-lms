@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Stethoscope, CheckCircle, Phone } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `NHA Certification Testing | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Prepare for and take NHA healthcare certification exams at our testing center.',
+  description: `Prepare for and take NHA healthcare certification exams at our testing center.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/nha' },
 };
 

@@ -14,7 +14,7 @@ export default function ProgramLicenseAgreementPage() {
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Legal', href: '/legal' }, { label: 'Program Licensing Agreement' }]}
+          items={[{ label: 'Legal', href: '/legal' }, { label: 'Program Licensing Agreement` }]}
         />
       </div>
       <DocumentPage
@@ -36,7 +36,7 @@ export default function ProgramLicenseAgreementPage() {
             <li>
               <strong>
                 2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
-              </strong>{' '}
+              </strong>{` '}
               ("Operating Company"), a for-profit limited liability company operating under Indiana
               law, responsible for enrollment operations, tuition collection, technology
               infrastructure, marketing, and training network expansion.

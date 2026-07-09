@@ -63,7 +63,7 @@ export default function OrientationScheduleClient() {
     try {
       const res = await fetch('/api/orientation/schedule', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json` },
         body: JSON.stringify({ name, email, date, time, sessionType }),
       });
       const data = await res.json();
@@ -73,7 +73,7 @@ export default function OrientationScheduleClient() {
         return;
       }
 
-      const meetingUrl = data.meetingUrl || '';
+      const meetingUrl = data.meetingUrl || `';
       setZoomUrl(meetingUrl);
 
       // Open Google Calendar invite
@@ -83,12 +83,12 @@ export default function OrientationScheduleClient() {
       const endDate = new Date(endMs);
       const endDT = `${endDate.toISOString().slice(0, 10).replace(/-/g, '')}T${endDate.toTimeString().slice(0, 5).replace(':', '')}00`;
       const title =
-        sessionType === 'barbershop'
+        sessionType === 'barbershop`
           ? `${PLATFORM_DEFAULTS.orgName} — Barbershop Walk-Through`
           : `${PLATFORM_DEFAULTS.orgName} — Orientation`;
       const details = `Session for ${name} (${email})%0A%0AZoom Link: ${meetingUrl}`;
       const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)}`;
-      window.open(calUrl, '_blank');
+      window.open(calUrl, `_blank`);
 
       setSuccess(true);
     } catch {
@@ -104,7 +104,7 @@ export default function OrientationScheduleClient() {
         <div className="w-16 h-16 rounded-full bg-brand-green-100 flex items-center justify-center mx-auto">
           <span className="w-8 h-8 rounded-full bg-brand-green-600 inline-block flex-shrink-0" aria-hidden="true" />
         </div>
-        <h2 className="text-2xl font-black text-black">You're Scheduled!</h2>
+        <h2 className="text-2xl font-black text-black">You`re Scheduled!</h2>
         <p className="text-black">
           A confirmation email with your Zoom link has been sent to <strong>{email}</strong>. A
           Google Calendar invite just opened in a new tab.
@@ -120,7 +120,7 @@ export default function OrientationScheduleClient() {
           </a>
         )}
         <p className="text-black text-sm">
-          Questions? Call{' '}
+          Questions? Call{' `}
           <a href={`tel:${PLATFORM_DEFAULTS.supportPhone}`} className="text-brand-blue-600 font-semibold hover:underline">
             {PLATFORM_DEFAULTS.supportPhone}
           </a>
@@ -138,7 +138,7 @@ export default function OrientationScheduleClient() {
             key={type}
             onClick={() => {
               setSessionType(type);
-              setTime('');
+              setTime(`');
             }}
             className={`flex items-center justify-center gap-2 py-4 px-3 text-sm font-bold transition-colors ${
               sessionType === type

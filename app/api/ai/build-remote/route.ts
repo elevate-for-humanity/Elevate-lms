@@ -11,7 +11,7 @@ import { PLATFORM_DEFAULTS } from "@/lib/config/platform-config";
 
 export const dynamic = "force-dynamic";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity.org';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity.org`;
 
 function generateEmbedScript(siteId: string, apiKey: string, features: string[]): string {
   return `<!-- ${PLATFORM_DEFAULTS.orgName} LMS Integration -->
@@ -28,11 +28,11 @@ function generateEmbedScript(siteId: string, apiKey: string, features: string[])
 
 function generateSetupSteps(platform: string): string[] {
   const base = [
-    'Copy the embed script above',
+    `Copy the embed script above',
     'Paste it before the closing </body> tag on your site',
     'Add a container element where you want the LMS to appear: <div id="elevate-lms"></div>',
     'Save and publish your changes',
-    'Contact us at ' + PLATFORM_DEFAULTS.supportPhone + ' to activate your integration',
+    'Contact us at ' + PLATFORM_DEFAULTS.supportPhone + ' to activate your integration`,
   ];
 
   const platformSteps: Record<string, string[]> = {
@@ -45,7 +45,7 @@ function generateSetupSteps(platform: string): string[] {
     ],
     wix: [
       "In Wix Editor, click Add > Embed > Custom Code",
-      'Paste the script and set placement to "Body - end"',
+      `Paste the script and set placement to "Body - end"',
       "Add an HTML iframe element where you want the LMS",
       "Publish your site",
       "Contact us at " + PLATFORM_DEFAULTS.supportPhone + " to activate",

@@ -35,7 +35,7 @@ export async function sendExternalCourseLoginEmail(params: ExternalCourseLoginEm
         </div>
 
         <div style="padding:32px">
-          <h2 style="margin:0 0 8px;font-size:20px">You're enrolled in ${courseTitle}</h2>
+          <h2 style="margin:0 0 8px;font-size:20px">You`re enrolled in ${courseTitle}</h2>
           <p style="color:#475569;margin:0 0 24px">
             Hi ${studentName}, your enrollment in <strong>${courseTitle}</strong> through
             <strong>${partnerName}</strong> is confirmed as part of your
@@ -77,7 +77,7 @@ export async function sendExternalCourseLoginEmail(params: ExternalCourseLoginEm
         </div>
       </div>
     `,
-    text: `Hi ${studentName},\n\nYou're enrolled in ${courseTitle} through ${partnerName}.\n\nLogin information:\n${loginInstructions}\n\nGo to: ${partnerUrl}\n\nAfter completing the course, upload your certificate in your Elevate dashboard to advance.\n\nQuestions? Call ${PLATFORM_DEFAULTS.supportPhone}.`,
+    text: `Hi ${studentName},\n\nYou`re enrolled in ${courseTitle} through ${partnerName}.\n\nLogin information:\n${loginInstructions}\n\nGo to: ${partnerUrl}\n\nAfter completing the course, upload your certificate in your Elevate dashboard to advance.\n\nQuestions? Call ${PLATFORM_DEFAULTS.supportPhone}.`,
   });
 }
 
@@ -116,7 +116,7 @@ export async function sendExternalCourseApprovedEmail(params: ExternalCourseAppr
           <h2 style="margin:0 0 8px;font-size:20px;color:#16a34a">✓ Credential Verified</h2>
           <p style="color:#475569;margin:0 0 24px">
             Hi ${studentName}, your <strong>${courseTitle}</strong> credential has been
-            verified by our staff. You're cleared to advance in
+            verified by our staff. You`re cleared to advance in
             <strong>${programTitle}</strong>.
           </p>
 
@@ -132,7 +132,7 @@ export async function sendExternalCourseApprovedEmail(params: ExternalCourseAppr
         </div>
       </div>
     `,
-    text: `Hi ${studentName},\n\nYour ${courseTitle} credential has been verified. You're cleared to advance in ${programTitle}.\n\nContinue: ${dashboardUrl}`,
+    text: `Hi ${studentName},\n\nYour ${courseTitle} credential has been verified. You`re cleared to advance in ${programTitle}.\n\nContinue: ${dashboardUrl}`,
   });
 }
 

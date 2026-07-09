@@ -83,7 +83,7 @@ async function _POST(req: NextRequest) {
     // Strict domain whitelist — hardcoded, not config-driven
     const allowedOrigins = new Set([
       PLATFORM_DEFAULTS.siteUrl,
-      'https://elevateforhumanity.org',
+      'https://elevateforhumanity.org`,
     ]);
     const urlsToCheck = audioUrl ? [audioUrl] : audioUrls;
     for (const url of urlsToCheck) {
@@ -106,7 +106,7 @@ async function _POST(req: NextRequest) {
       const talk = await createTalk({ photoUrl, audioUrl });
       const result = await pollTalkResult(talk.id, 60, 5000);
 
-      await db.from('audit_logs').insert({
+      await db.from(`audit_logs').insert({
         actor_id: user.id,
         actor_role: profile.role,
         action: 'generate_avatar_video',

@@ -3,7 +3,7 @@
  * and the /api/emails/* routes. sendEmail is re-exported from ./sendgrid.
  */
 import { sendEmail } from './sendgrid';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 export { sendEmail };
 
 // Email templates
@@ -33,7 +33,7 @@ export const emailTemplates = {
                 <td style="padding: 40px 30px;">
                   <h2 style="margin: 0 0 20px 0; color: #111827; font-size: 24px;">Hi ${studentName},</h2>
                   <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                    Welcome to ${PLATFORM_DEFAULTS.orgName}! We're excited to have you enrolled in <strong>${courseName}</strong>.
+                    Welcome to ${PLATFORM_DEFAULTS.orgName}! We`re excited to have you enrolled in <strong>${courseName}</strong>.
                   </p>
                   <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
                     Your learning journey starts now. Access your course materials, track your progress, and earn your certificate by completing all required lessons and assessments.
@@ -51,7 +51,7 @@ export const emailTemplates = {
                   </table>
 
                   <div style="margin: 30px 0; padding: 20px; background-color: #f9fafb; border-left: 4px solid #e5e7eb; border-radius: 4px;">
-                    <h3 style="margin: 0 0 10px 0; color: #1e293b; font-size: 18px;">What's Next?</h3>
+                    <h3 style="margin: 0 0 10px 0; color: #1e293b; font-size: 18px;">What`s Next?</h3>
                     <ul style="margin: 0; padding-left: 20px; color: #374151;">
                       <li style="margin-bottom: 8px;">Complete your profile</li>
                       <li style="margin-bottom: 8px;">Review the course syllabus</li>
@@ -115,7 +115,7 @@ export const emailTemplates = {
                 <td style="padding: 40px 30px;">
                   <h2 style="margin: 0 0 20px 0; color: #111827; font-size: 24px;">Hi ${studentName},</h2>
                   <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                    We noticed you haven't logged into your <strong>${courseName}</strong> course in ${daysSinceLogin} days.
+                    We noticed you haven`t logged into your <strong>${courseName}</strong> course in ${daysSinceLogin} days.
                     Don't let your momentum slip away!
                   </p>
                   <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
@@ -137,7 +137,7 @@ export const emailTemplates = {
                     <h3 style="margin: 0 0 10px 0; color: #92400e; font-size: 18px;">Need Support?</h3>
                     <p style="margin: 0; color: #78350f; font-size: 14px; line-height: 1.6;">
                       If you're facing challenges or have questions, we're here to help. Reach out to your case manager
-                      or contact our support team. Don't let obstacles stop your progress!
+                      or contact our support team. Don`t let obstacles stop your progress!
                     </p>
                   </div>
                 </td>
@@ -193,7 +193,7 @@ export const emailTemplates = {
                 <td style="padding: 40px 30px;">
                   <h2 style="margin: 0 0 20px 0; color: #111827; font-size: 24px;">Amazing work, ${studentName}!</h2>
                   <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                    You've successfully completed <strong>${courseName}</strong>! This is a significant achievement
+                    You`ve successfully completed <strong>${courseName}</strong>! This is a significant achievement
                     and a major step forward in your career journey.
                   </p>
                   <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
@@ -226,7 +226,7 @@ export const emailTemplates = {
                   </div>
 
                   <p style="margin: 20px 0 0 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                    We're proud of your dedication and hard work. Keep building your future!
+                    We`re proud of your dedication and hard work. Keep building your future!
                   </p>
                 </td>
               </tr>
@@ -309,7 +309,7 @@ export const emailTemplates = {
                   </div>
 
                   <p style="margin: 20px 0 0 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
-                    Congratulations on this achievement! We're proud to have been part of your learning journey.
+                    Congratulations on this achievement! We`re proud to have been part of your learning journey.
                   </p>
                 </td>
               </tr>

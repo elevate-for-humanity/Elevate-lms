@@ -64,7 +64,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
     // EMAIL 1: MIKADY - Payment Confirmation
     // ============================================
     await resend.emails.send({
-      from: 'Elevate for Humanity <billing@elevateforhumanity.org>',
+      from: 'Elevate for Humanity <billing@elevateforhumanity.org>`,
       to: student.email,
       subject: `Payment Confirmed - ${programName}`,
       html: `
@@ -90,7 +90,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
           <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0;">Payment Details</h3>
             <p style="margin: 5px 0;"><strong>Program:</strong> ${programName}</p>
-            <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString(`en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric` })}</p>
             <p style="margin: 5px 0;"><strong>Status:</strong> Confirmed</p>
           </div>
           
@@ -155,7 +155,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
               <li style="margin-bottom: 15px;">
                 <strong>Upload Required Documents:</strong>
                 <ul style="margin-top: 5px;">
-                  <li>Government-Issued ID (Driver's License, State ID, or Passport)</li>
+                  <li>Government-Issued ID (Driver`s License, State ID, or Passport)</li>
                   <li>Social Security Card</li>
                   <li>Transfer Hours Documentation</li>
                 </ul>
@@ -268,7 +268,7 @@ async function sendAdminEnrollmentNotification(
   const sendgridKey = process.env.SENDGRID_API_KEY;
   if (!sendgridKey) return;
 
-  const adminEmail = process.env.ADMIN_EMAIL || 'elevate4humanityedu@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL || 'elevate4humanityedu@gmail.com`;
 
   try {
     await resend.emails.send({
@@ -294,7 +294,7 @@ async function sendAdminEnrollmentNotification(
             <p style="margin: 5px 0;"><strong>Email:</strong> ${studentEmail}</p>
             <p style="margin: 5px 0;"><strong>Program:</strong> ${programName}</p>
             <p style="margin: 5px 0;"><strong>Student ID:</strong> ${studentId}</p>
-            <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+            <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString(`en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit` })}</p>
           </div>
           
           <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
@@ -324,7 +324,7 @@ async function sendAdminEnrollmentNotification(
 
     logger.info(`Admin notification sent for new enrollment: ${studentName}`);
   } catch (error) {
-    logger.error('Failed to send admin notification:', error);
+    logger.error(`Failed to send admin notification:', error);
   }
 }
 
@@ -387,7 +387,7 @@ async function sendPaymentFailedEmail(studentId: string, programId: string): Pro
   const { data: program } = await supabaseClient
     .from('programs')
     .select('title')
-    .eq('id', programId)
+    .eq('id`, programId)
     .maybeSingle();
 
   if (!student?.email) return;
@@ -395,11 +395,11 @@ async function sendPaymentFailedEmail(studentId: string, programId: string): Pro
   await resend.emails.send({
     from: `Elevate LMS <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
     to: student.email,
-    subject: 'Payment Failed - Action Required',
+    subject: `Payment Failed - Action Required',
     html: `
       <h1>Payment Failed</h1>
       <p>Hi ${student.full_name || 'Student'},</p>
-      <p>We were unable to process your tuition payment for <strong>${program?.title || 'your program'}</strong>.</p>
+      <p>We were unable to process your tuition payment for <strong>${program?.title || 'your program`}</strong>.</p>
       <p>Please update your payment method to avoid interruption to your course access.</p>
       <p><a href="${PLATFORM_DEFAULTS.siteUrl}/account/billing">Update Payment Method</a></p>
       <p>If you have questions, contact us at ${PLATFORM_DEFAULTS.supportEmail}</p>
@@ -410,7 +410,7 @@ async function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
-    throw new Error('Supabase configuration missing');
+    throw new Error(`Supabase configuration missing');
   }
   return await requireAdminClient();
 }
@@ -688,7 +688,7 @@ async function sendPaymentConfirmationEmail(
   const { data: student } = await supabase
     .from('profiles')
     .select('email, full_name')
-    .eq('id', studentId)
+    .eq('id`, studentId)
     .maybeSingle();
 
   if (!student?.email) return;
@@ -700,15 +700,15 @@ async function sendPaymentConfirmationEmail(
       subject: `Payment Received - ${paymentNumber} of ${totalPayments}`,
       html: `
       <h2>Payment Confirmed</h2>
-      <p>Hi ${student.full_name || 'Student'},</p>
-      <p>We've received your ${interval}ly tuition payment of <strong>$${amount.toFixed(2)}</strong>.</p>
+      <p>Hi ${student.full_name || `Student'},</p>
+      <p>We`ve received your ${interval}ly tuition payment of <strong>$${amount.toFixed(2)}</strong>.</p>
       <p><strong>Payment Progress:</strong> ${paymentNumber} of ${totalPayments} payments completed</p>
       <p>Remaining: ${totalPayments - paymentNumber} payments</p>
       <p>Thank you for staying on track with your education!</p>
       <p>- ${PLATFORM_DEFAULTS.orgName}</p>
     `,
     })
-    .catch((err) => logger.error('Failed to send payment confirmation:', err));
+    .catch((err) => logger.error(`Failed to send payment confirmation:', err));
 }
 
 /**
@@ -728,7 +728,7 @@ async function sendPaymentCompletionEmail(studentId: string, programId: string):
   const { data: program } = await supabase
     .from('programs')
     .select('title')
-    .eq('id', programId)
+    .eq('id`, programId)
     .maybeSingle();
 
   if (!student?.email) return;
@@ -737,17 +737,17 @@ async function sendPaymentCompletionEmail(studentId: string, programId: string):
     .send({
       from: `${PLATFORM_DEFAULTS.orgName} <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
       to: student.email,
-      subject: 'Congratulations! Tuition Paid in Full',
+      subject: `Congratulations! Tuition Paid in Full',
       html: `
       <h2>🎉 Tuition Paid in Full!</h2>
       <p>Hi ${student.full_name || 'Student'},</p>
       <p>Congratulations! You have successfully completed all tuition payments for <strong>${program?.title || 'your program'}</strong>.</p>
       <p>Your dedication to your education is inspiring. Keep up the great work!</p>
-      <p>If you have any questions, please don't hesitate to reach out.</p>
+      <p>If you have any questions, please don`t hesitate to reach out.</p>
       <p>- ${PLATFORM_DEFAULTS.orgName}</p>
     `,
     })
-    .catch((err) => logger.error('Failed to send completion email:', err));
+    .catch((err) => logger.error(`Failed to send completion email:', err));
 }
 
 /**

@@ -43,7 +43,7 @@ async function _POST(request: NextRequest) {
     if (!isAIAvailable()) {
       // Fallback response when OpenAI is not configured
       return NextResponse.json({
-        response: `Thanks for your message! I'm here to help you learn about our programs.
+        response: `Thanks for your message! I`m here to help you learn about our programs.
 
 **Quick Info:**
 • Training is 100% FREE for eligible Indiana residents through WIOA funding
@@ -59,7 +59,7 @@ What would you like to know more about?`,
     // Build context from previous messages if provided
     const conversationHistory =
       context?.previousMessages?.map((msg: any) => ({
-        role: msg.sender === 'user' ? 'user' : 'assistant',
+        role: msg.sender === `user' ? 'user' : 'assistant`,
         content: msg.content,
       })) || [];
 
@@ -108,7 +108,7 @@ What would you like to know more about?`,
 - Answer questions about programs, eligibility, and the application process
 - Help visitors find the right program for their goals
 - Provide clear next steps
-- If you don't know something specific, direct them to contact us or visit the website
+- If you don`t know something specific, direct them to contact us or visit the website
 - Never make guarantees about job placement or specific outcomes
 - For complaints, refunds, or complex issues, direct to phone support
 

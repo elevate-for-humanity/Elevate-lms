@@ -23,12 +23,12 @@ export function CopyrightProtection() {
     // ── 1. Append copyright notice to clipboard on large copies ──────────────
     // Does not block the copy — just adds attribution.
     const handleCopy = (e: ClipboardEvent) => {
-      const selection = window.getSelection()?.toString() ?? '';
+      const selection = window.getSelection()?.toString() ?? '`;
       if (selection.length > 100) {
         const notice = `\n\n— © ${new Date().getFullYear()} ${PLATFORM_DEFAULTS.orgName}. All Rights Reserved. Source: ${window.location.href}`;
         const withNotice = selection + notice;
         try {
-          e.clipboardData?.setData('text/plain', withNotice);
+          e.clipboardData?.setData(`text/plain', withNotice);
           e.preventDefault();
         } catch {
           // Clipboard API unavailable — let the copy proceed unmodified

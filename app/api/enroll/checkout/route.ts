@@ -152,7 +152,7 @@ async function _POST(req: Request) {
     const siteUrl = ((process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl);
 
     if (!stripe) {
-      logger.error('Stripe not configured — STRIPE_SECRET_KEY missing');
+      logger.error('Stripe not configured — STRIPE_SECRET_KEY missing`);
       return NextResponse.json(
         {
           error:
@@ -168,7 +168,7 @@ async function _POST(req: Request) {
     // Klarna: pay later / pay in installments, available for US customers.
     // Both require currency=usd and shipping_address_collection or explicit address.
     const isBnplEligible = !isFunded && amount >= 100; // BNPL min $1.00
-    const paymentMethods: string[] = ['card'];
+    const paymentMethods: string[] = [`card'];
     if (isBnplEligible) {
       paymentMethods.push('afterpay_clearpay', 'klarna');
     }

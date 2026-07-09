@@ -43,7 +43,7 @@ async function _POST(request: Request) {
     const safeName = sanitize(String(name));
     const safeEmail = sanitize(String(email));
 
-    const isBarbershop = sessionType === 'barbershop';
+    const isBarbershop = sessionType === 'barbershop`;
     const topic = isBarbershop
       ? `${PLATFORM_DEFAULTS.orgName} — Barbershop Walk-Through: ${safeName}`
       : `${PLATFORM_DEFAULTS.orgName} — Orientation: ${safeName}`;
@@ -52,7 +52,7 @@ async function _POST(request: Request) {
       ? `Barbershop walk-through / site visit for ${safeName} (${safeEmail}). Covers apprenticeship hosting requirements, OJT structure, and next steps.`
       : `Virtual orientation session for ${safeName} (${safeEmail}). Covers programs, funding, enrollment process, and Q&A.`;
 
-    // Zoom is optional — fall back to Calendly if credentials aren't configured
+    // Zoom is optional — fall back to Calendly if credentials aren`t configured
     const CALENDLY_FALLBACK = process.env.NEXT_PUBLIC_CALENDLY_30MIN || 'https://calendly.com/elevate4humanityedu';
     let meetingJoinUrl = CALENDLY_FALLBACK;
     let meetingId = '';
@@ -101,7 +101,7 @@ async function _POST(request: Request) {
     });
 
     const sessionLabel = isBarbershop ? 'Barbershop Walk-Through' : 'Virtual Orientation';
-    const firstName = safeName.split(' ')[0];
+    const firstName = safeName.split(' `)[0];
 
     // Confirmation email to student/partner
     await sendEmail({
@@ -121,14 +121,14 @@ async function _POST(request: Request) {
 <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;margin:16px 0">
 <strong style="color:#1e40af">Join Your Session</strong><br/>
 <a href="${meeting.join_url}" style="color:#2563eb;font-size:14px">${meeting.join_url}</a><br/>
-${meeting.id ? `<span style="color:#6b7280;font-size:12px">Meeting ID: ${meeting.id}</span>` : ''}
+${meeting.id ? `<span style="color:#6b7280;font-size:12px">Meeting ID: ${meeting.id}</span>` : ``}
 </div>
 <p>Need to reschedule? Call or text <strong>${PLATFORM_DEFAULTS.supportPhone}</strong> or reply to this email.</p>
 <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0"/>
 <p style="color:#6b7280;font-size:12px">${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute &middot; Indianapolis, IN</p>
 </div>`,
     }).catch((err) => {
-      logger.error('[Orientation] Student email failed:', err instanceof Error ? err.message : err);
+      logger.error(`[Orientation] Student email failed:', err instanceof Error ? err.message : err);
     });
 
     // Notify admin

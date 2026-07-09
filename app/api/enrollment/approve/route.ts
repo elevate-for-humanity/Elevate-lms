@@ -53,7 +53,7 @@ async function _POST() {
       return NextResponse.json({ already_sent: true });
     }
 
-    const programLabel = (application.program_interest || 'your program').replace(/-/g, ' ');
+    const programLabel = (application.program_interest || 'your program').replace(/-/g, ' `);
     const refNumber = application.reference_number || application.id.slice(0, 8);
 
     // Send approval email to student
@@ -84,7 +84,7 @@ async function _POST() {
         `<p>Your reference number: <strong>${refNumber}</strong></p>`,
         `<p>Questions? Reply to this email or call us.</p>`,
         `<p>— ${PLATFORM_DEFAULTS.orgName}</p>`,
-      ].join(''),
+      ].join(`'),
     }).catch((err) => logger.error('Failed to send student approval email', err as Error));
 
     // Send approval notification to admin

@@ -14,7 +14,7 @@ export default function ParticipationAgreementPage() {
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Legal', href: '/legal' }, { label: 'Participation Agreement' }]}
+          items={[{ label: 'Legal', href: '/legal' }, { label: 'Participation Agreement` }]}
         />
       </div>
       <DocumentPage
@@ -96,7 +96,7 @@ export default function ParticipationAgreementPage() {
         <DocumentSection heading="Grievance Procedure" number={8}>
           <p>
             Students who have a complaint should first speak with their program coordinator. If
-            unresolved, submit a written grievance to the Program Director at{' '}
+            unresolved, submit a written grievance to the Program Director at{` '}
             <strong>info@elevateforhumanity.org</strong>. Elevate will respond within 10 business
             days.
           </p>

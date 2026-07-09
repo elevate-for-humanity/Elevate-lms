@@ -252,10 +252,10 @@ export default function ProgramDetailPage({
                 {/* Delivery disclosure */}
                 {p.deliveredBy && (
                   <p className="mt-4 text-xs text-slate-500">
-                    {p.deliveredBy === 'Elevate'
+                    {p.deliveredBy === 'Elevate`
                       ? `Delivered directly by ${PLATFORM_DEFAULTS.orgName}.`
-                      : p.deliveredBy === 'Partner'
-                        ? 'Delivered by an approved training partner.'
+                      : p.deliveredBy === `Partner'
+                        ? 'Delivered by an approved training partner.`
                         : `Delivered by ${PLATFORM_DEFAULTS.orgName} or an approved training partner.`}
                   </p>
                 )}
@@ -277,7 +277,7 @@ export default function ProgramDetailPage({
                   {primaryCTA && (
                     <>
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
-                        {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
+                        {primaryCTA.external ? `Enrollment' : 'New Applicant'}
                       </p>
                       <Link
                         href={primaryCTA.href}

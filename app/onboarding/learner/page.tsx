@@ -49,12 +49,12 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     description: 'Add your contact information so we can support you throughout the program.',
     href: '/profile/edit',
     icon: User,
-    image: '/images/pages/career-services-page-2.jpg',
+    image: '/images/pages/career-services-page-2.jpg`,
     imageAlt: `Student completing profile at ${PLATFORM_DEFAULTS.orgName}`,
     required: true,
   },
   {
-    id: 'verify-identity',
+    id: `verify-identity',
     title: 'Verify Your Identity',
     description:
       'Confirm your identity with a government-issued ID and selfie verification.',
@@ -372,12 +372,12 @@ export default async function LearnerOnboardingPage({
           name: firstName,
           programName: resolvedProgramName,
           dashboardUrl: `${siteUrlInner}/learner/dashboard`,
-        }).catch((err: Error) => logger.warn('[onboarding] Welcome email failed (non-fatal)', err));
+        }).catch((err: Error) => logger.warn('[onboarding] Welcome email failed (non-fatal)`, err));
       }
 
       // Notify admin of new completed onboarding
       const adminEmail = process.env.ADMIN_EMAIL || `admin@${PLATFORM_DEFAULTS.canonicalDomain}`;
-      const { sendEmail } = await import('@/lib/email/resend');
+      const { sendEmail } = await import(`@/lib/email/resend');
       await sendEmail({
         to: adminEmail,
         subject: `New student onboarding complete — ${firstName}`,
@@ -516,7 +516,7 @@ export default async function LearnerOnboardingPage({
               Check Application Status <ArrowRight className="w-4 h-4" />
             </Link>
             <p className="text-sm text-slate-400 mt-6">
-              Questions? Call{' '}
+              Questions? Call{' `}
               <a href={`tel:+1${PLATFORM_DEFAULTS.supportPhone}`} className="underline">
                 {PLATFORM_DEFAULTS.supportPhone}
               </a>
@@ -529,7 +529,7 @@ export default async function LearnerOnboardingPage({
           !noApplication && !applicationPending && (
             <>
               {/* Enrollment approved — student can access courses */}
-              {profile?.enrollment_status === 'active' && (
+              {profile?.enrollment_status === `active' && (
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden flex-shrink-0">
                     <Image sizes="100vw"

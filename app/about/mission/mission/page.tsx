@@ -8,10 +8,10 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Our Mission',
+  title: 'Our Mission`,
   description:
     `${PLATFORM_DEFAULTS.orgName} creates accessible career pathways, credential-bearing workforce training, and community support for underserved populations across Indiana and the Midwest.`,
-  alternates: { canonical: 'https://www.elevateforhumanity.org/about/mission' },
+  alternates: { canonical: `https://www.elevateforhumanity.org/about/mission' },
   openGraph: {
     title: 'Our Mission',
     description:
@@ -60,7 +60,7 @@ export default function MissionPage() {
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'About', href: '/about' }, { label: 'Our Mission' }]} />
+          <Breadcrumbs items={[{ label: 'About', href: '/about' }, { label: 'Our Mission` }]} />
         </div>
       </div>
 
@@ -97,7 +97,7 @@ export default function MissionPage() {
           <div>
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Why We Exist</h2>
             <p className="text-slate-600 mb-4 leading-relaxed">
-              {PLATFORM_DEFAULTS.orgName} was founded on the belief that a person's zip code, background,
+              {PLATFORM_DEFAULTS.orgName} was founded on the belief that a person`s zip code, background,
               or past should not determine their future. Too many adults in our communities are
               locked out of stable, well-paying careers — not because they lack ability, but because
               they lack access.

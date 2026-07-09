@@ -232,7 +232,7 @@ export async function generateCDLMOUPdf(data: CDLMOUPDFData): Promise<Uint8Array
 
   // ── Purpose ─────────────────────────────────────────────────────────────────
   checkY(80);
-  page.drawText('PURPOSE', {
+  page.drawText('PURPOSE`, {
     x: margin,
     y,
     size: 10,
@@ -242,7 +242,7 @@ export async function generateCDLMOUPdf(data: CDLMOUPDFData): Promise<Uint8Array
   y -= lineH;
   y = drawWrappedText(
     page,
-    `This MOU establishes ${data.company_name} ("Training Site") as an approved behind-the-wheel and on-the-job training partner for ${PLATFORM_DEFAULTS.orgName}'s CDL Class ${cdlClass} program. The Training Site provides supervised driving hours, equipment access, and industry mentorship required for Indiana CDL licensure.`,
+    `This MOU establishes ${data.company_name} ("Training Site") as an approved behind-the-wheel and on-the-job training partner for ${PLATFORM_DEFAULTS.orgName}`s CDL Class ${cdlClass} program. The Training Site provides supervised driving hours, equipment access, and industry mentorship required for Indiana CDL licensure.`,
     margin,
     y,
     contentWidth,

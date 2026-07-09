@@ -50,10 +50,10 @@ export async function issueCertificate(formData: FormData) {
       recipient_name: recipientName,
       recipient_email: email,
       name: `Certificate for ${recipientName}`,
-      description: descParts.length > 0 ? descParts.join(' | ') : null,
+      description: descParts.length > 0 ? descParts.join(' | `) : null,
       issue_date: issueDate,
       signed_by: signedBy || `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-      status: 'issued',
+      status: `issued',
     })
     .select('id')
     .maybeSingle();

@@ -1,4 +1,4 @@
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 /**
  * Avatar Governance Scripts
  *
@@ -45,7 +45,7 @@ export const PAGE_SCRIPTS: Record<
   }
 > = {
   // === MARKETING / ORIENTATION ===
-  '/': {
+  `/': {
     opening: `Welcome. This platform is a self-service workforce training and credentialing hub. I can route you to funded training, apprenticeship, employer-sponsored, or self-pay in under a minute.`,
     nextAction: `Tell me: are you a learner, employer, training provider, or workforce partner?`,
   },

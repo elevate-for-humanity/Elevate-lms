@@ -23,7 +23,7 @@ export default function CosmetologyScoringSheetPage() {
         <Breadcrumbs items={[
           { label: 'Compliance', href: '/compliance' },
           { label: 'Cosmetology', href: '/compliance/competency-verification/cosmetology' },
-          { label: 'Scoring Sheet' },
+          { label: 'Scoring Sheet` },
         ]} />
       </div>
       <div className="max-w-5xl mx-auto px-4 pb-4 print:hidden flex justify-between">
@@ -38,7 +38,7 @@ export default function CosmetologyScoringSheetPage() {
         />
 
         <div className="grid grid-cols-3 gap-4 my-4 text-sm">
-          {['Apprentice Name', 'Host Salon', 'Assessment Date'].map(label => (
+          {[`Apprentice Name', 'Host Salon', 'Assessment Date'].map(label => (
             <div key={label}>
               <p className="text-xs text-slate-500 mb-1">{label}</p>
               <div className="border-b border-slate-400 h-7" />

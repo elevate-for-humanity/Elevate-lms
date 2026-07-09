@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { CheckCircle, AlertCircle, ChevronRight, ChevronLeft } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 // FSSA DFR Third Party Provider (TPP) Questionnaire
 // Sections mirror the actual Indiana FSSA SNAP E&T TPP application
@@ -90,7 +90,7 @@ type SurveyData = {
 
 const INITIAL: SurveyData = {
   org_name: `2Exclusive LLC-S (DBA: ${PLATFORM_DEFAULTS.orgLegalName})`,
-  org_type: 'nonprofit',
+  org_type: `nonprofit',
   ein: '',
   uei: 'VX2GK5S8SZH8',
   address: '8888 Keystone Crossing, Suite 1300',

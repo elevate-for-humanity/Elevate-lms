@@ -14,7 +14,7 @@ export default function ProgramHostAgreementPage() {
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Legal', href: '/legal' }, { label: 'Master Program Host Agreement' }]}
+          items={[{ label: 'Legal', href: '/legal' }, { label: 'Master Program Host Agreement` }]}
         />
       </div>
       <DocumentPage
@@ -27,7 +27,7 @@ export default function ProgramHostAgreementPage() {
       >
         <DocumentSection heading="Parties and Purpose" number={1}>
           <p>
-            This Master Program Host Agreement ("Agreement") is entered into between{' '}
+            This Master Program Host Agreement ("Agreement") is entered into between{` '}
             <strong>
               2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
             </strong>{' '}

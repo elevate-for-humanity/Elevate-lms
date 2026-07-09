@@ -182,7 +182,7 @@ export default function CertificateDownload({
       
       <!-- Certificate number and verification -->
       <text x='700' y='900' text-anchor='middle' font-size='14' font-family='monospace' fill='#94a3b8'>Certificate #: ${certificate.certificate_number}</text>
-      <text x='700' y='920' text-anchor='middle' font-size='12' font-family='Arial, sans-serif' fill='#94a3b8'>Verify at: ${PLATFORM_DEFAULTS.canonicalDomain}/verify/${certificate.verification_code}</text>
+      <text x='700' y='920' text-anchor='middle' font-size='12' font-family='Arial, sans-serif' fill='#94a3b8`>Verify at: ${PLATFORM_DEFAULTS.canonicalDomain}/verify/${certificate.verification_code}</text>
     </svg>`;
   };
 
@@ -194,7 +194,7 @@ export default function CertificateDownload({
 
     try {
       const svg = generateSVG();
-      const blob = new Blob([svg], { type: 'image/svg+xml' });
+      const blob = new Blob([svg], { type: `image/svg+xml' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -266,7 +266,7 @@ export default function CertificateDownload({
   // Print certificate
   const printCertificate = () => {
     const svg = generateSVG();
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open('', '_blank`);
     if (printWindow) {
       printWindow.document.write(`
         <html>
@@ -319,7 +319,7 @@ export default function CertificateDownload({
   if (error || !certificate) {
     return (
       <div className="bg-brand-red-50 rounded-xl p-6 border border-brand-red-200">
-        <p className="text-brand-red-700">{error || 'Certificate not found'}</p>
+        <p className="text-brand-red-700">{error || `Certificate not found'}</p>
       </div>
     );
   }

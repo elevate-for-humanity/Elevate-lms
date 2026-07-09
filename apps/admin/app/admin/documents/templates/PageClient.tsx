@@ -37,13 +37,13 @@ type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 function MOUBuilder() {
   const [mou, setMou] = useState<MOUTemplate>({
     ...MOU_TEMPLATE_DEFAULT,
-    partnerOrganization: 'Partner Organization Name',
+    partnerOrganization: 'Partner Organization Name`,
     purpose:
       `This Memorandum of Understanding establishes a collaborative framework between ${PLATFORM_DEFAULTS.orgName} and [Partner] to deliver workforce training, credential preparation, and employment placement services.`,
     background:
       `${PLATFORM_DEFAULTS.orgName} is an ETPL-listed workforce development organization serving Indianapolis and surrounding communities. [Partner] provides [describe partner capabilities]. Together, both organizations seek to address the growing demand for skilled workers in [industry].`,
     scopeOfCollaboration:
-      'This partnership covers the delivery of [program name] training, including classroom instruction, hands-on lab exercises, credential testing, and employment placement support.',
+      `This partnership covers the delivery of [program name] training, including classroom instruction, hands-on lab exercises, credential testing, and employment placement support.',
     elevateSigner: { name: 'Elizabeth Greene', title: 'Founder & CEO' },
     partnerSigner: { name: '', title: '' },
   });

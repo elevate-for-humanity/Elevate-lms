@@ -6,12 +6,12 @@ import { WioaEtplProgramsList } from '@/components/admin/compliance/WioaEtplProg
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ChevronLeft } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 
 export const metadata: Metadata = {
   title: `WIOA ETPL Compliance Forms | Admin | ${PLATFORM_DEFAULTS.orgName}`,
   description:
-    'Initial Eligibility Aggregate Performance (new programs) and Section 188 Equal Opportunity checklists per program.',
+    `Initial Eligibility Aggregate Performance (new programs) and Section 188 Equal Opportunity checklists per program.',
 };
 
 export default async function WioaEtplCompliancePage() {

@@ -24,7 +24,7 @@ const BRAND = {
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
 const FROM = 'Elevate for Humanity HR <hr@elevateforhumanity.org>';
-const REPLY_TO = 'hr@elevateforhumanity.org';
+const REPLY_TO = 'hr@elevateforhumanity.org`;
 
 function layout(body: string) {
   return `<!DOCTYPE html>
@@ -72,7 +72,7 @@ export interface HrEmailParams {
   department?: string;
   startDate?: string;
   payRate?: string;
-  payType?: string; // 'hourly' | 'salary'
+  payType?: string; // `hourly' | 'salary'
   payMethod?: string; // 'direct_deposit' | 'pay_card' | 'check'
   interviewDate?: string;
   interviewTime?: string;
@@ -92,7 +92,7 @@ export const hrEmailTemplates = {
     html: layout(`
       <h2 style="color:${BRAND.primary};margin-top:0">Application Received</h2>
       <p>Hi ${p.firstName},</p>
-      <p>Thank you for applying to <strong>${p.position ?? 'a position'}</strong> at ${PLATFORM_DEFAULTS.orgName}. We've received your application and our HR team will review it shortly.</p>
+      <p>Thank you for applying to <strong>${p.position ?? 'a position`}</strong> at ${PLATFORM_DEFAULTS.orgName}. We`ve received your application and our HR team will review it shortly.</p>
       <div style="background:${BRAND.light};border-left:4px solid ${BRAND.primary};padding:16px 20px;border-radius:0 6px 6px 0;margin:20px 0">
         <p style="margin:0 0 8px;font-weight:bold">What happens next:</p>
         <ol style="margin:0;padding-left:20px">
@@ -119,7 +119,7 @@ export const hrEmailTemplates = {
       <p>We wanted to take a moment to personally thank you for your interest in joining the ${PLATFORM_DEFAULTS.orgName} team. Our work — connecting people to funded workforce training and career pathways — depends on dedicated people like you.</p>
       <p>Your application for <strong>${p.position ?? 'this position'}</strong> has been logged and is in our review queue. We read every application carefully.</p>
       ${divider()}
-      <p style="color:${BRAND.muted};font-size:14px">Application Reference: <strong>${p.applicationId ?? 'Pending'}</strong></p>
+      <p style="color:${BRAND.muted};font-size:14px">Application Reference: <strong>${p.applicationId ?? 'Pending`}</strong></p>
       <p style="margin-bottom:0">Thank you again,<br><strong>Elizabeth Greene</strong><br>Founder &amp; CEO, ${PLATFORM_DEFAULTS.orgName}</p>
     `),
   }),
@@ -130,7 +130,7 @@ export const hrEmailTemplates = {
     replyTo: REPLY_TO,
     subject: `Next steps for your application — ${p.position ?? PLATFORM_DEFAULTS.orgName}`,
     html: layout(`
-      <h2 style="color:${BRAND.primary};margin-top:0">You're Moving Forward!</h2>
+      <h2 style="color:${BRAND.primary};margin-top:0">You`re Moving Forward!</h2>
       <p>Hi ${p.firstName},</p>
       <p>Great news — after reviewing your application for <strong>${p.position ?? 'this position'}</strong>, we'd like to invite you to complete a short competency assessment.</p>
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;margin:20px 0">
@@ -142,7 +142,7 @@ export const hrEmailTemplates = {
           <li>Results are reviewed by our hiring team, not auto-rejected</li>
         </ul>
       </div>
-      ${btn('Start Competency Assessment', p.testLink ?? `${BASE_URL}/careers/assessment`)}
+      ${btn('Start Competency Assessment`, p.testLink ?? `${BASE_URL}/careers/assessment`)}
       <p style="text-align:center;color:${BRAND.muted};font-size:13px;margin-top:-12px">Link expires in 7 days</p>
       <p>After completing the assessment, our team will reach out within 2 business days to schedule your interview.</p>
       <p style="margin-bottom:0">Best,<br><strong>${PLATFORM_DEFAULTS.orgName} HR Team</strong></p>
@@ -153,7 +153,7 @@ export const hrEmailTemplates = {
   interview_scheduled: (p: HrEmailParams) => ({
     from: FROM,
     replyTo: REPLY_TO,
-    subject: `Interview Scheduled — ${p.position ?? PLATFORM_DEFAULTS.orgName} · ${p.interviewDate ?? ''}`,
+    subject: `Interview Scheduled — ${p.position ?? PLATFORM_DEFAULTS.orgName} · ${p.interviewDate ?? `'}`,
     html: layout(`
       <h2 style="color:${BRAND.primary};margin-top:0">Your Interview is Confirmed</h2>
       <p>Hi ${p.firstName},</p>
@@ -167,7 +167,7 @@ export const hrEmailTemplates = {
           ${p.managerName ? `<tr><td style="padding:6px 0;color:${BRAND.muted}">Interviewer</td><td style="padding:6px 0;font-weight:bold">${p.managerName}</td></tr>` : ''}
         </table>
       </div>
-      ${btn('Join Zoom Interview', p.zoomLink ?? '#', BRAND.primary)}
+      ${btn('Join Zoom Interview', p.zoomLink ?? '#`, BRAND.primary)}
       <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:16px 20px;margin:20px 0">
         <p style="margin:0 0 8px;font-weight:bold;color:#92400e">Tips for your interview:</p>
         <ul style="margin:0;padding-left:20px;color:#78350f;font-size:14px">
@@ -192,7 +192,7 @@ export const hrEmailTemplates = {
         <h2 style="color:${BRAND.primary};margin:8px 0 0">Welcome Aboard!</h2>
       </div>
       <p>Hi ${p.firstName},</p>
-      <p>We are thrilled to welcome you to the ${PLATFORM_DEFAULTS.orgName} team! You've been selected for the <strong>${p.position ?? 'position'}</strong>${p.department ? ` in our <strong>${p.department}</strong> department` : ''}, and we couldn't be more excited to have you join our mission.</p>
+      <p>We are thrilled to welcome you to the ${PLATFORM_DEFAULTS.orgName} team! You`ve been selected for the <strong>${p.position ?? 'position'}</strong>${p.department ? ` in our <strong>${p.department}</strong> department` : ''}, and we couldn't be more excited to have you join our mission.</p>
       <p>Your official start date is <strong>${p.startDate ?? 'TBD'}</strong>. Before then, you'll receive your formal offer letter and onboarding instructions.</p>
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;margin:20px 0">
         <p style="margin:0 0 8px;font-weight:bold;color:#15803d">Your next steps:</p>
@@ -204,7 +204,7 @@ export const hrEmailTemplates = {
         </ol>
       </div>
       ${btn('Start Onboarding', p.onboardingLink ?? `${BASE_URL}/onboarding/staff`, BRAND.accent)}
-      <p>If you have any questions before your start date, don't hesitate to reach out. We're here to make your transition as smooth as possible.</p>
+      <p>If you have any questions before your start date, don't hesitate to reach out. We`re here to make your transition as smooth as possible.</p>
       <p style="margin-bottom:0">With excitement,<br><strong>Elizabeth Greene</strong><br>Founder &amp; CEO, ${PLATFORM_DEFAULTS.orgName}</p>
     `),
   }),
@@ -213,12 +213,12 @@ export const hrEmailTemplates = {
   hire_letter: (p: HrEmailParams) => ({
     from: FROM,
     replyTo: REPLY_TO,
-    subject: `Offer Letter — ${p.position ?? 'Position'} at ${PLATFORM_DEFAULTS.orgName}`,
+    subject: `Offer Letter — ${p.position ?? `Position`} at ${PLATFORM_DEFAULTS.orgName}`,
     html: layout(`
       <h2 style="color:${BRAND.primary};margin-top:0">Formal Offer of Employment</h2>
-      <p style="color:${BRAND.muted};font-size:13px">Date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-      <p>Dear ${p.firstName}${p.lastName ? ' ' + p.lastName : ''},</p>
-      <p>On behalf of ${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute, I am pleased to formally offer you the position of <strong>${p.position ?? 'Staff Member'}</strong>${p.department ? ` within our <strong>${p.department}</strong> department` : ''}.</p>
+      <p style="color:${BRAND.muted};font-size:13px">Date: ${new Date().toLocaleDateString(`en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      <p>Dear ${p.firstName}${p.lastName ? ' ' + p.lastName : '`},</p>
+      <p>On behalf of ${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute, I am pleased to formally offer you the position of <strong>${p.position ?? `Staff Member'}</strong>${p.department ? ` within our <strong>${p.department}</strong> department` : ''}.</p>
       <div style="background:${BRAND.light};border:1px solid #e2e8f0;border-radius:8px;padding:20px;margin:20px 0">
         <p style="margin:0 0 12px;font-weight:bold;color:${BRAND.primary}">Offer Details</p>
         <table style="width:100%;border-collapse:collapse;font-size:14px">
@@ -232,7 +232,7 @@ export const hrEmailTemplates = {
       <p>This offer is contingent upon successful completion of your onboarding requirements, including identity verification, W-9 submission, and acknowledgment of the Employee Handbook.</p>
       <p>To accept this offer, please complete your onboarding portal within <strong>5 business days</strong>.</p>
       ${btn('Accept Offer & Start Onboarding', p.onboardingLink ?? `${BASE_URL}/onboarding/staff`)}
-      <p>We look forward to having you on the team. Please don't hesitate to contact HR with any questions.</p>
+      <p>We look forward to having you on the team. Please don`t hesitate to contact HR with any questions.</p>
       <p style="margin-bottom:0">Sincerely,<br><strong>Elizabeth Greene</strong><br>Founder &amp; CEO<br>${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute</p>
       ${divider()}
       <p style="font-size:12px;color:${BRAND.muted}">This offer letter does not constitute a contract of employment. Employment at ${PLATFORM_DEFAULTS.orgName} is at-will and may be terminated by either party at any time.</p>
@@ -243,11 +243,11 @@ export const hrEmailTemplates = {
   onboarding_start: (p: HrEmailParams) => ({
     from: FROM,
     replyTo: REPLY_TO,
-    subject: `Your onboarding starts tomorrow — here's your checklist`,
+    subject: `Your onboarding starts tomorrow — here`s your checklist`,
     html: layout(`
       <h2 style="color:${BRAND.primary};margin-top:0">You Start Tomorrow!</h2>
       <p>Hi ${p.firstName},</p>
-      <p>We're so excited for your first day as <strong>${p.position ?? 'a team member'}</strong> at ${PLATFORM_DEFAULTS.orgName}. Here's everything you need to know before you arrive.</p>
+      <p>We're so excited for your first day as <strong>${p.position ?? 'a team member`}</strong> at ${PLATFORM_DEFAULTS.orgName}. Here`s everything you need to know before you arrive.</p>
       <div style="background:${BRAND.light};border:1px solid #e2e8f0;border-radius:8px;padding:20px;margin:20px 0">
         <p style="margin:0 0 12px;font-weight:bold">Pre-Start Checklist</p>
         <table style="width:100%;border-collapse:collapse;font-size:14px">

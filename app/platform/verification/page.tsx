@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Shield, CheckCircle, Award, ExternalLink } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Credential Verification | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Verify blockchain-issued credentials and certificates. Instant, tamper-proof verification for employers and institutions.',
+  description: `Verify blockchain-issued credentials and certificates. Instant, tamper-proof verification for employers and institutions.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/platform/verification' },
 };
 

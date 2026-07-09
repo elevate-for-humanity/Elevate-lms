@@ -6,12 +6,12 @@ import { getPlatformHealth } from '@/lib/platform/platform-health';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic`;
 export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: `Platform Console | Admin | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'SaaS provisioning, trials, workspaces, and platform operations.',
+  description: `SaaS provisioning, trials, workspaces, and platform operations.',
 };
 
 export default async function PlatformConsolePage() {
@@ -93,7 +93,7 @@ export default async function PlatformConsolePage() {
         <section className="rounded-xl border border-slate-800 bg-slate-900 p-6">
           <h2 className="text-lg font-semibold text-white">Customer launch funnel</h2>
           <p className="mt-2 text-sm text-slate-400">
-            Canonical self-service entry:{' '}
+            Canonical self-service entry:{' `}
             <a
               href={`${PLATFORM_DEFAULTS.siteUrl}/launch`}
               className="text-brand-blue-300 underline"
@@ -101,7 +101,7 @@ export default async function PlatformConsolePage() {
               rel="noreferrer"
             >
               /launch
-            </a>{' '}
+            </a>{` '}
             → workspace provision → trial subdomain → operator.
           </p>
         </section>

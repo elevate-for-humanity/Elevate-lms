@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 // Canonical privacy policy lives at /legal/privacy — redirect permanently.
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Privacy Policy | ${PLATFORM_DEFAULTS.orgName}`,
@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPolicyRedirect() {
-  redirect('/legal/privacy');
+  redirect(`/legal/privacy');
 }

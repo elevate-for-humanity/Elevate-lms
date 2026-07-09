@@ -40,7 +40,7 @@ async function loadSendGridKey(db: ReturnType<typeof createClient>) {
 }
 
 function buildEmailHtml(stepsHtml: string) {
-  const first = HOST.contactName.split(' ')[0];
+  const first = HOST.contactName.split(' `)[0];
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;color:#1e293b">
@@ -73,7 +73,7 @@ After we receive your signed MOU, Elizabeth will follow up with next steps for o
 }
 
 async function main() {
-  assertOutreachEmailAllowed('send-aaron-barber-mou.ts');
+  assertOutreachEmailAllowed(`send-aaron-barber-mou.ts');
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;

@@ -403,7 +403,7 @@ async function _POST(request: NextRequest) {
   <li><strong>Access your dashboard</strong> — log hours, track progress, and access your coursework in the Elevate LMS once orientation is complete.</li>
 </ol>
 
-${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive every Friday starting next week.</p>` : ''}
+${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive every Friday starting next week.</p>` : '`}
 
 <p>Questions? Call <a href="tel:${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a> or reply to this email.</p>
 <p>— ${PLATFORM_DEFAULTS.orgName}</p>
@@ -411,7 +411,7 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
               `,
             });
           } catch (emailErr) {
-            logger.error('Failed to send welcome email:', emailErr);
+            logger.error(`Failed to send welcome email:', emailErr);
           }
 
           // Admin notification — action required to grant LMS access
@@ -607,7 +607,7 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
   <li><strong>Access your dashboard</strong> — log hours, track progress, and access your coursework in the Elevate LMS once orientation is complete.</li>
 </ol>
 
-${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive every Friday starting next week.</p>` : ''}
+${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive every Friday starting next week.</p>` : '`}
 
 <p>Questions? Call <a href="tel:${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a> or reply to this email.</p>
 <p>— ${PLATFORM_DEFAULTS.orgName}</p>
@@ -617,7 +617,7 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
 
             // Admin notification
             await sendEmail({
-              to: 'elevate4humanityedu@gmail.com',
+              to: `elevate4humanityedu@gmail.com',
               subject: `New Barber Apprentice — ${customerName || customerEmail}`,
               html: `<p>New enrollment via public checkout:</p>
 <p>Name: ${customerName}<br>Email: ${customerEmail}<br>Phone: ${customerPhone}<br>
@@ -650,7 +650,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
               subject: 'Your Coursework Access — Barber Apprenticeship',
               html: `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
-<p>Hi ${customerName || 'there'},</p>
+<p>Hi ${customerName || 'there`},</p>
 <p>Your related instruction is available in the <strong>Elevate LMS</strong>. Log in to your student portal to access your courses.</p>
 <p style="text-align:center;margin:24px 0;">
   <a href="${LMS_URL}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:white;text-decoration:none;border-radius:8px;font-weight:bold;">Go to My Courses →</a>
@@ -661,7 +661,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
               `,
             });
           } catch (lmsEmailErr) {
-            logger.error('[barber/webhook] LMS access email failed (non-fatal):', lmsEmailErr);
+            logger.error(`[barber/webhook] LMS access email failed (non-fatal):', lmsEmailErr);
           }
           } // end if (!applicationId) — legacy path
 
@@ -797,7 +797,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             
             await sendEmail({
               to: customerEmail,
-              subject: 'Welcome to Barber Apprenticeship - Dashboard Access',
+              subject: 'Welcome to Barber Apprenticeship - Dashboard Access`,
               html: `
 <p>Hello,</p>
 
@@ -830,7 +830,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             // Also send internal notification
             try {
               await sendEmail({
-                to: process.env.REPLY_TO_EMAIL || 'elevate4humanityedu@gmail.com',
+                to: process.env.REPLY_TO_EMAIL || `elevate4humanityedu@gmail.com',
                 subject: `New Barber Enrollment: ${customerName || customerEmail}`,
                 html: `
                   <h2>New Barber Apprenticeship Enrollment</h2>
@@ -983,7 +983,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
             await sendEmail({
               to: studentEmail,
-              subject: '⚠️ Payment Failed — Action Required to Keep Your Enrollment',
+              subject: '⚠️ Payment Failed — Action Required to Keep Your Enrollment`,
               html: `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
 <p style="font-size:18px;font-weight:bold;color:#dc2626">Your weekly tuition payment failed.</p>
@@ -1005,7 +1005,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 </div>`,
             });
           } catch (emailErr) {
-            logger.error('[Barber Webhook] Failed to send payment-failed email', emailErr instanceof Error ? emailErr : new Error(String(emailErr)), { studentEmail });
+            logger.error(`[Barber Webhook] Failed to send payment-failed email', emailErr instanceof Error ? emailErr : new Error(String(emailErr)), { studentEmail });
           }
         }
 
@@ -1095,7 +1095,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             await sendEmail({
               to: subRecord.customer_email,
               subject: 'Your Barber Apprenticeship access has been restored',
-              html: `<p>Hi ${subRecord.customer_name || 'Apprentice'},</p><p>Your payment was processed and your access has been fully restored.</p><p><a href="${siteUrl}/learner/dashboard">Go to Dashboard</a></p><p>— ${PLATFORM_DEFAULTS.orgName}</p>`,
+              html: `<p>Hi ${subRecord.customer_name || 'Apprentice`},</p><p>Your payment was processed and your access has been fully restored.</p><p><a href="${siteUrl}/learner/dashboard">Go to Dashboard</a></p><p>— ${PLATFORM_DEFAULTS.orgName}</p>`,
             }).then(()=>{}, ()=>{});
           }
 
@@ -1103,7 +1103,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         }
 
         // Decrement weeks remaining
-        const currentWeeks = parseInt(subscription.metadata?.weeks_remaining || '0');
+        const currentWeeks = parseInt(subscription.metadata?.weeks_remaining || `0');
         if (currentWeeks > 0) {
           const newWeeksRemaining = currentWeeks - 1;
           
@@ -1133,7 +1133,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 
 <p>You have successfully completed all tuition payments for your Barber Apprenticeship program.</p>
 
-<p><strong>What's next:</strong></p>
+<p><strong>What`s next:</strong></p>
 <p>• Continue logging your apprenticeship hours<br>
 • Complete your coursework in the Elevate LMS<br>
 • Prepare for your state board exam</p>
@@ -1147,7 +1147,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
                 });
               }
             } catch (cancelErr) {
-              logger.error('Failed to auto-cancel subscription:', cancelErr);
+              logger.error(`Failed to auto-cancel subscription:', cancelErr);
             }
           }
         }

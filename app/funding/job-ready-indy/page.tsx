@@ -8,10 +8,10 @@ import PageVideoHero from '@/components/ui/PageVideoHero';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Job Ready Indy',
+  title: 'Job Ready Indy`,
   description:
     `Job Ready Indy is an Indianapolis workforce initiative connecting residents to funded career training, credentials, and employment. ${PLATFORM_DEFAULTS.orgName} is an approved Job Ready Indy training provider.`,
-  alternates: { canonical: 'https://www.elevateforhumanity.org/funding/job-ready-indy' },
+  alternates: { canonical: `https://www.elevateforhumanity.org/funding/job-ready-indy' },
 };
 
 export default function JobReadyIndyPage() {
@@ -130,12 +130,12 @@ export default function JobReadyIndyPage() {
           <div className="space-y-6">
             {[
               {
-                step: '1',
+                step: '1`,
                 title: `Contact ${PLATFORM_DEFAULTS.orgName}`,
                 desc: `Call ${PLATFORM_DEFAULTS.supportPhone} or apply online. Our enrollment team will confirm your eligibility and match you to the right program.`,
               },
               {
-                step: '2',
+                step: `2',
                 title: 'Choose Your Program',
                 desc: 'Select from credential pathways in healthcare, skilled trades, technology, CDL, and more — all aligned with Marion County employer demand.',
               },

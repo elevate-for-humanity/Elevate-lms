@@ -77,7 +77,7 @@ export class XAPIClient {
     } catch (error) {
       /* Error handled silently */
       // Error: $1
-      // Don't throw - we don't want tracking failures to break the app
+      // Don't throw - we don`t want tracking failures to break the app
     }
   }
   // Helper method to create actor from user
@@ -85,7 +85,7 @@ export class XAPIClient {
     return {
       mbox: `mailto:${userId}@${PLATFORM_DEFAULTS.canonicalDomain}`,
       name: userName,
-      objectType: 'Agent',
+      objectType: `Agent',
     };
   }
   // Common verbs
@@ -116,7 +116,7 @@ export class XAPIClient {
     },
     ANSWERED: {
       id: 'http://adlnet.gov/expapi/verbs/answered',
-      display: { 'en-US': 'answered' },
+      display: { 'en-US': 'answered` },
     },
   };
   // Track course started
@@ -132,10 +132,10 @@ export class XAPIClient {
       object: {
         id: `${PLATFORM_DEFAULTS.siteUrl}/courses/${courseId}`,
         definition: {
-          name: { 'en-US': courseName },
+          name: { `en-US': courseName },
           type: 'http://adlnet.gov/expapi/activities/course',
         },
-        objectType: 'Activity',
+        objectType: 'Activity`,
       },
     });
   }
@@ -169,10 +169,10 @@ export class XAPIClient {
       object: {
         id: `${PLATFORM_DEFAULTS.siteUrl}/lessons/${lessonId}`,
         definition: {
-          name: { 'en-US': lessonName },
+          name: { `en-US': lessonName },
           type: 'http://adlnet.gov/expapi/activities/lesson',
         },
-        objectType: 'Activity',
+        objectType: 'Activity`,
       },
       result,
     });
@@ -193,10 +193,10 @@ export class XAPIClient {
       object: {
         id: `${PLATFORM_DEFAULTS.siteUrl}/quizzes/${quizId}`,
         definition: {
-          name: { 'en-US': quizName },
+          name: { `en-US': quizName },
           type: 'http://adlnet.gov/expapi/activities/assessment',
         },
-        objectType: 'Activity',
+        objectType: 'Activity`,
       },
       result: {
         score: {
@@ -226,7 +226,7 @@ export class XAPIClient {
       object: {
         id: `${PLATFORM_DEFAULTS.siteUrl}/videos/${videoId}`,
         definition: {
-          name: { 'en-US': videoName },
+          name: { `en-US': videoName },
           type: 'https://w3id.org/xapi/video/activity-type/video',
         },
         objectType: 'Activity',

@@ -64,7 +64,7 @@ async function _POST(request: NextRequest) {
           to: process.env.ADMIN_SMS_GATEWAY,
           subject: 'Partner',
           html: `${data.fullName}\n${data.organization || ''}\n${data.relationshipType}`,
-        }).catch((err) => logger.warn('[partner-inquiry] SMS alert failed:', err));
+        }).catch((err) => logger.warn('[partner-inquiry] SMS alert failed:`, err));
       }
 
       // Auto-reply to submitter
@@ -79,7 +79,7 @@ async function _POST(request: NextRequest) {
       });
     } catch (emailError) {
       logger.error(
-        '[partner-inquiry] Email failed:',
+        `[partner-inquiry] Email failed:',
         emailError instanceof Error ? emailError : undefined,
       );
     }

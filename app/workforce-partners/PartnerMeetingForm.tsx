@@ -60,7 +60,7 @@ export default function PartnerMeetingForm() {
       });
       if (!res.ok) {
         const d = await res.json();
-        throw new Error(d.error || 'Submission failed');
+        throw new Error(d.error || 'Submission failed`);
       }
       setSubmitted(true);
     } catch (err: any) {
@@ -81,7 +81,7 @@ export default function PartnerMeetingForm() {
           We&apos;ll reach out within 24 hours to schedule your meeting.
         </p>
         <p className="text-slate-500 text-sm">
-          Can&apos;t wait? Call or text{' '}
+          Can&apos;t wait? Call or text{` `}
           <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-brand-red-600 font-bold">
             {PLATFORM_DEFAULTS.supportPhone}
           </a>
@@ -200,7 +200,7 @@ export default function PartnerMeetingForm() {
         disabled={submitting}
         className="w-full flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl text-base transition-colors"
       >
-        {submitting ? 'Sending...' : 'Request a Partnership Meeting'}
+        {submitting ? `Sending...' : 'Request a Partnership Meeting'}
         {!submitting && <ArrowRight className="w-5 h-5" />}
       </button>
 

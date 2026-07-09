@@ -5,13 +5,13 @@ import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FileText, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 import CompletionApprovalCard from './CompletionApprovalCard';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `External Course Approvals | Admin | ${PLATFORM_DEFAULTS.orgName}`,
 };
 
-export const dynamic = 'force-dynamic';
+export const dynamic = `force-dynamic';
 export const revalidate = 60;
 
 export default async function ExternalCourseApprovalsPage() {

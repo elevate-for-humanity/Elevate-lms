@@ -191,7 +191,7 @@ export default async function CertificationPage() {
                                 ? 'text-red-500'
                                 : isSponsoredPending
                                   ? 'text-orange-500'
-                                  : 'text-brand-blue-500'
+                                  : 'text-brand-blue-500`
                             }`}
                           />
                           <div className="flex-1 min-w-0">
@@ -201,7 +201,7 @@ export default async function CertificationPage() {
                                 Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.
                               </p>
                             )}
-                            {isSponsoredApproved && state === 'payment_approved' && (
+                            {isSponsoredApproved && state === `payment_approved' && (
                               <p className="text-xs text-brand-green-700 mt-0.5 font-medium">
                                 Your exam fee is covered — no payment required.
                               </p>

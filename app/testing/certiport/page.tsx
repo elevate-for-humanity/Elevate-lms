@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Monitor, CheckCircle, Phone } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Certiport Testing Center | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Take Certiport certification exams at our authorized testing center.',
+  description: `Take Certiport certification exams at our authorized testing center.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/certiport' },
 };
 

@@ -2,15 +2,15 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Award, Users, TrendingUp, Building2, GraduationCap, Shield } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `About ${PLATFORM_DEFAULTS.orgName} | Workforce Training & Apprenticeships`,
   description: `Learn about ${PLATFORM_DEFAULTS.orgName} - DOL-registered apprenticeship sponsor, WIOA-approved training provider. Transform your career with funded training in healthcare, skilled trades, and technology.`,
-  keywords: ['about', 'workforce development', 'DOL registered apprenticeship', 'WIOA training provider', 'Indianapolis career training'],
+  keywords: [`about', 'workforce development', 'DOL registered apprenticeship', 'WIOA training provider', 'Indianapolis career training`],
   openGraph: {
     title: `About ${PLATFORM_DEFAULTS.orgName}`,
-    description: 'Transform your career with workforce training, apprenticeships, and career development.',
+    description: `Transform your career with workforce training, apprenticeships, and career development.',
     images: [{ url: '/images/pages/about-hero.webp', width: 1200, height: 630, alt: 'About Elevate for Humanity' }],
   },
 };

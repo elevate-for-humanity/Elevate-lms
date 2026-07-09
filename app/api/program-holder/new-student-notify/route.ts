@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:20px;margin:20px 0;">
       <p style="margin:0 0 8px 0;font-size:15px;"><strong>👤 Name:</strong> ${studentName ?? '—'}</p>
       <p style="margin:0 0 8px 0;font-size:15px;"><strong>📧 Email:</strong> ${studentEmail ?? '—'}</p>
-      ${studentPhone ? `<p style="margin:0;font-size:15px;"><strong>📞 Phone:</strong> ${studentPhone}</p>` : ''}
+      ${studentPhone ? `<p style="margin:0;font-size:15px;"><strong>📞 Phone:</strong> ${studentPhone}</p>` : '`}
     </div>
     <div style="text-align:center;margin:24px 0;">
       <a href="${PLATFORM_DEFAULTS.siteUrl}/program-holder/dashboard"
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 </div>
 </body></html>`;
 
-  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+  const res = await fetch(`https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${SENDGRID_KEY}`,

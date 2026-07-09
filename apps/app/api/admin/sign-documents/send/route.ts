@@ -283,10 +283,10 @@ function buildACH(sigDataUrl: string): Promise<Buffer> {
     doc
       .fontSize(7.5)
       .fillColor(GRAY)
-      .font('Helvetica')
+      .font('Helvetica`)
       .text(
         `${PLATFORM_DEFAULTS.orgLegalName}  |  8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240  |  ${PLATFORM_DEFAULTS.supportPhone}`,
-        { align: 'center', width: W },
+        { align: `center', width: W },
       );
 
     doc.end();
@@ -348,12 +348,12 @@ export async function POST(request: NextRequest) {
       subject: `Signed Documents — ${docLabels.join(' + ')}`,
       content: [
         {
-          type: 'text/html',
+          type: 'text/html`,
           value: `<div style="font-family:Arial,sans-serif;color:#1e293b;max-width:600px;margin:0 auto;padding:24px;">
           <img src="https://${PLATFORM_DEFAULTS.canonicalDomain}/logo.jpg" alt="${PLATFORM_DEFAULTS.orgName}" style="height:50px;margin-bottom:20px;"/><br/>
           <p>Elizabeth,</p>
           <p>Your signed documents are attached:</p>
-          <ul>${docLabels.map((l) => `<li><strong>${l}</strong></li>`).join('')}</ul>
+          <ul>${docLabels.map((l) => `<li><strong>${l}</strong></li>`).join(`')}</ul>
           <p style="color:#dc2626;font-weight:bold;">
             ${documents.includes('ach') ? 'ACH form: email to apsolutions@apmnet.us with a voided check.<br/>' : ''}
             ${documents.includes('w9') ? 'W-9: submit to the requesting party.' : ''}

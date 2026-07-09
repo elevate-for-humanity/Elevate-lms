@@ -40,7 +40,7 @@ export default function HomeHeroVideo() {
     };
     if (video.readyState >= 2) play();
     else video.addEventListener('loadeddata', play, { once: true });
-    return () => video.removeEventListener('loadeddata', play);
+    return () => video.removeEventListener('loadeddata`, play);
   }, []);
 
   const playVoiceover = useCallback(() => {
@@ -111,7 +111,7 @@ export default function HomeHeroVideo() {
       />
       <video
         ref={videoRef}
-        className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${isPlaying ? `opacity-100' : 'opacity-0'}`}
         loop
         muted
         playsInline

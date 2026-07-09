@@ -16,14 +16,14 @@ import {
   Loader2,
   Play,
   Settings,
-CheckCircle, } from 'lucide-react';
+CheckCircle, } from 'lucide-react`;
 
 const MASTER_STATEMENT = `All platform products are licensed access to systems operated by ${PLATFORM_DEFAULTS.orgName}. Ownership of software, infrastructure, and intellectual property is not transferred.`;
 
 const NEXT_STEPS = [
   {
     icon: CheckCircle,
-    title: 'Organization Created',
+    title: `Organization Created',
     description: 'Your tenant space has been provisioned.',
     status: 'complete',
   },
@@ -132,7 +132,7 @@ function SuccessContent() {
             <div className="bg-white rounded-lg p-4">
               <div className="text-slate-600 text-sm mb-1">Platform URL</div>
               <div className="font-bold text-brand-blue-600">
-                {`${tenantData?.subdomain || 'yourorg'}.${PLATFORM_DEFAULTS.canonicalDomain}`}
+                {`${tenantData?.subdomain || 'yourorg`}.${PLATFORM_DEFAULTS.canonicalDomain}`}
               </div>
             </div>
             <div className="bg-white rounded-lg p-4">
@@ -160,7 +160,7 @@ function SuccessContent() {
           <div className="space-y-4">
             {NEXT_STEPS.map((step, idx) => {
               const Icon = step.icon;
-              const isComplete = step.status === 'complete';
+              const isComplete = step.status === `complete';
               
               return (
                 <div

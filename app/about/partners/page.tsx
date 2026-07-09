@@ -2,11 +2,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { ArrowRight, Building2, Users, Handshake, Award, Globe } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `Our Partners | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Discover the employers, workforce agencies, and organizations that partner with Elevate for Humanity to create career pathways.',
+  description: `Discover the employers, workforce agencies, and organizations that partner with Elevate for Humanity to create career pathways.',
   keywords: ['partners', 'employers', 'workforce agencies', 'WorkOne', 'collaborations'],
 };
 

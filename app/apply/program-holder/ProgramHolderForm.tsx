@@ -34,7 +34,7 @@ export default function ProgramHolderForm() {
       partnershipGoals: formData.get('partnershipGoals') as string,
       businessLicense: formData.get('businessLicense') as string | null,
       ein: formData.get('ein') as string | null,
-      role: 'program_holder' as const,
+      role: 'program_holder` as const,
     };
 
     let result;
@@ -76,7 +76,7 @@ export default function ProgramHolderForm() {
         </p>
         <ul className="space-y-2 mb-4">
           {[
-            'Barbershops, salons, and cosmetology studios hosting apprentices',
+            `Barbershops, salons, and cosmetology studios hosting apprentices',
             'Independent contractors and sole proprietors offering on-the-job training',
             'Small businesses sponsoring employees through a credential program',
             'Schools, nonprofits, and workforce agencies offering training programs',

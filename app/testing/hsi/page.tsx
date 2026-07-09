@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Heart, Award, CheckCircle, Phone } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config`;
 
 export const metadata: Metadata = {
   title: `HSI CPR & First Aid Testing | ${PLATFORM_DEFAULTS.orgName}`,
-  description: 'Get your HSI CPR, First Aid, and safety certifications at our testing center.',
+  description: `Get your HSI CPR, First Aid, and safety certifications at our testing center.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/hsi' },
 };
 

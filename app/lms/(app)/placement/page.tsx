@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getActiveJobs } from '@/lib/data/jobs';
 import JobCard from '@/components/jobs/JobCard';
+import AdzunaJobsSection from '@/components/dashboards/AdzunaJobsSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -112,6 +113,9 @@ export default async function PlacementPage() {
             </Link>
           ))}
         </div>
+
+        {/* Adzuna Job Market Section */}
+        <AdzunaJobsSection programJobTitle="Medical Assistant" limit={5} />
 
         {/* Job listings */}
         <div>

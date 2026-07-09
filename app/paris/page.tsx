@@ -43,10 +43,10 @@ export default function ParisPage() {
             AI Career Guidance
           </div>
           <h2 className="text-4xl font-bold text-slate-900 mb-4">
-            Meet ZORA
+            Meet PARIS
           </h2>
           <p className="text-xl text-slate-600 mb-8">
-            Zero Obstacles, Ready Advisors — Your personal AI career guide
+            Personalized AI Recruitment, Interview & Success System — Your personal AI career guide
           </p>
           
           {/* Features */}
@@ -83,7 +83,7 @@ export default function ParisPage() {
       <section className="py-12 px-4 bg-white border-t border-slate-200">
         <div className="max-w-3xl mx-auto">
           <h3 className="text-2xl font-bold text-slate-900 text-center mb-8">
-            How the ZORA Interview Works
+            How the PARIS Interview Works
           </h3>
           <div className="grid md:grid-cols-4 gap-6">
             <div className="text-center">

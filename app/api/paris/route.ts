@@ -1,5 +1,5 @@
 /**
- * PARIS — Zero Obstacles, Ready Advisors
+ * PARIS — Personalized AI Recruitment, Interview & Success System
  * AI Career Guidance Interview Agent
  * 
  * This route handles the career guidance interview conversation.
@@ -18,7 +18,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-// POST /api/paris — Send a message to Zora
+// POST /api/paris — Send a message to PARIS
 async function _POST(req: NextRequest) {
   try {
     // Rate limiting

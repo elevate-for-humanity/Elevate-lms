@@ -1,4 +1,6 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import type { ReadonlyURLSearchParams } from 'next/navigation';
+
 /**
  * Validate a redirect URL parameter to prevent open-redirect attacks.
  * Allows:
@@ -7,6 +9,22 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
  *
  * Returns the validated URL/path or the fallback if invalid.
  */
+
+/**
+ * Read and extract the redirect URL from search params.
+ * Supports both 'redirect' and legacy 'next' params.
+ */
+export function readRedirectParam(
+  searchParams: ReadonlyURLSearchParams | URLSearchParams | null,
+): string | null {
+  if (!searchParams) return null;
+
+  // Support both 'redirect' and legacy 'next' param names
+  const redirect = searchParams.get('redirect') ?? searchParams.get('next');
+  if (redirect && typeof redirect === 'string') return redirect;
+
+  return null;
+}
 
 const TRUSTED_HOSTS = [
   PLATFORM_DEFAULTS.canonicalDomain,

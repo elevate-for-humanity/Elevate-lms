@@ -486,8 +486,8 @@ function SelfPayOptions({
           <p className="font-bold text-slate-800 mb-1">Questions?</p>
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4 text-slate-400" />
-            <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" className="hover:text-blue-600">
-              ${PLATFORM_DEFAULTS.supportPhone}
+            <a href={`tel:${PLATFORM_DEFAULTS.supportPhone}`} className="hover:text-blue-600">
+              {PLATFORM_DEFAULTS.supportPhone}
             </a>
           </div>
         </div>

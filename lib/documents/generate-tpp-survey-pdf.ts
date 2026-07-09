@@ -282,8 +282,8 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
   // Org name in header
   const hx = logoImg ? ML + (logoImg.width / logoImg.height) * 52 + 12 : ML;
   txt(PLATFORM_DEFAULTS.orgLegalName, hx, H - 30, bold, 11, C.headerText);
-  txt('8888 Keystone Crossing, Suite 1300  ·  Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}', hx, H - 44, regular, 8, rgb(0.75, 0.85, 1));
-  txt('elevate4humanityedu@gmail.com  ·  ${PLATFORM_DEFAULTS.canonicalDomain}', hx, H - 56, regular, 8, rgb(0.75, 0.85, 1));
+  txt(`8888 Keystone Crossing, Suite 1300  ·  Indianapolis, IN 46240  ·  ${PLATFORM_DEFAULTS.supportPhone}`, hx, H - 44, regular, 8, rgb(0.75, 0.85, 1));
+  txt(`elevate4humanityedu@gmail.com  ·  ${PLATFORM_DEFAULTS.canonicalDomain}`, hx, H - 56, regular, 8, rgb(0.75, 0.85, 1));
 
   y = H - 90;
 
@@ -713,7 +713,7 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
     subHeader(`${label}  [${comp.offered ? 'OFFERED' : 'NOT OFFERED'}]`);
 
     if (!comp.offered) {
-      txt('This component is not offered by ${PLATFORM_DEFAULTS.orgName} at this time.', ML + 6, y, italic, 8.5, C.gray);
+      txt(`This component is not offered by ${PLATFORM_DEFAULTS.orgName} at this time.`, ML + 6, y, italic, 8.5, C.gray);
       y -= 16;
       continue;
     }

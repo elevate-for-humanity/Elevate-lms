@@ -249,10 +249,10 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-slate-400" />
                 <a
-                  href="tel:${PLATFORM_DEFAULTS.supportPhone}"
+                  href={`tel:${PLATFORM_DEFAULTS.supportPhone}`}
                   className="text-brand-blue-600 font-semibold hover:underline"
                 >
-                  ${PLATFORM_DEFAULTS.supportPhone}
+                  {PLATFORM_DEFAULTS.supportPhone}
                 </a>
               </div>
             </div>
@@ -525,10 +525,10 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
               <p className="text-xs text-slate-500">
                 Select "Self-pay" above to see all payment options, or call us at{' '}
                 <a
-                  href="tel:${PLATFORM_DEFAULTS.supportPhone}"
+                  href={`tel:${PLATFORM_DEFAULTS.supportPhone}`}
                   className="text-brand-blue-600 font-semibold hover:underline"
                 >
-                  ${PLATFORM_DEFAULTS.supportPhone}
+                  {PLATFORM_DEFAULTS.supportPhone}
                 </a>
                 .
               </p>

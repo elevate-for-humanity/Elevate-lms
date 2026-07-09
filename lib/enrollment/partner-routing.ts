@@ -143,7 +143,7 @@ async function ensurePartnerEnrollment(params: {
         .maybeSingle();
 
       if (raceErr || !raceRow) {
-        throw new Error(`partner_enrollment race recovery failed: ${raceErr?.message}`);
+        throw new Error(`partner_enrollment race recovery failed: ${raceErr?.message}`, { cause: err });
       }
 
       logger.info('[partner-routing] partner_enrollment race resolved', {
@@ -155,7 +155,7 @@ async function ensurePartnerEnrollment(params: {
       });
       return { id: raceRow.id, outcome: 'already_exists' };
     }
-    throw new Error(`Failed creating partner_enrollment: ${err.message}`);
+    throw new Error(`Failed creating partner_enrollment: ${err.message}`, { cause: err });
   }
 }
 
@@ -205,7 +205,7 @@ async function ensureCmiStudent(params: {
         .maybeSingle();
 
       if (raceErr || !raceRow) {
-        throw new Error(`cmi_student race recovery failed: ${raceErr?.message}`);
+        throw new Error(`cmi_student race recovery failed: ${raceErr?.message}`, { cause: err });
       }
 
       logger.info('[partner-routing] cmi_student race resolved', {
@@ -215,7 +215,7 @@ async function ensureCmiStudent(params: {
       });
       return { id: raceRow.id, outcome: 'already_exists' };
     }
-    throw new Error(`Failed creating cmi_student: ${err.message}`);
+    throw new Error(`Failed creating cmi_student: ${err.message}`, { cause: err });
   }
 }
 

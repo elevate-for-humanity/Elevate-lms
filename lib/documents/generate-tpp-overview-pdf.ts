@@ -395,7 +395,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
     '6331 N Keystone Ave, Indianapolis, IN 46220 — Barbering, cosmetology, nail technician, esthetician programs. Near IndyGo Route 39 (Keystone). Operated by Naomi Jordan / Rebuilds Mind and Body Studio LLC.',
     '7116 N College Ave, Indianapolis, IN — Manufacturing and construction trades training: forklift, building services, diesel mechanic. Near IndyGo Route 28 (College).',
   ].forEach(l => bul(l));
-  para('All locations are accessible by IndyGo public transit. Transportation assistance (bus passes and mileage reimbursement) is provided to all participants who require it to attend training. Online and hybrid program components are available statewide via Elevate\'s proprietary LMS platform at ${PLATFORM_DEFAULTS.canonicalDomain}.');
+  para(`All locations are accessible by IndyGo public transit. Transportation assistance (bus passes and mileage reimbursement) is provided to all participants who require it to attend training. Online and hybrid program components are available statewide via Elevate's proprietary LMS platform at ${PLATFORM_DEFAULTS.canonicalDomain}.`);
   y -= 8;
 
   // ══════════════════════════════════════════════════════════════════
@@ -793,7 +793,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
       benefits: '$10,200',
       total: '$78,200',
       fte: '1.0',
-      bio: 'Multi-licensed beauty professional holding Indiana Nail Technician License, Nail Instructor License, and Esthetician License. Oversees the nail program at Textures Institute of Cosmetology. Manages enrollment operations for ${PLATFORM_DEFAULTS.orgName}.',
+      bio: `Multi-licensed beauty professional holding Indiana Nail Technician License, Nail Instructor License, and Esthetician License. Oversees the nail program at Textures Institute of Cosmetology. Manages enrollment operations for ${PLATFORM_DEFAULTS.orgName}.`,
       responsibilities: 'Manages all student enrollment processes, admissions intake, and enrollment documentation. Oversees all beauty industry programs: Cosmetology Apprenticeship, Nail Technician Apprenticeship, Esthetician, Barber Apprenticeship, and Beauty Career Educator. Coordinates with Textures Institute of Cosmetology and all beauty program holder partners. Manages Milady curriculum delivery and licensing exam preparation.',
     },
     {

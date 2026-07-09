@@ -285,10 +285,10 @@ export async function generateCDLStudentMOUPdf(data: CDLStudentMOUData): Promise
   y -= boxH + 16;
 
   body(
-    'Referral partners entering into this MOU agree to submit a $500 referral contribution per student at the ' +
-    'time of class start. ${PLATFORM_DEFAULTS.orgName} will fund the remaining balance of the program cost (up to the ' +
-    'full program price less $500) on behalf of the referred student. The referral partner is not responsible ' +
-    'for any additional tuition beyond the $500 per-student contribution.'
+    `Referral partners entering into this MOU agree to submit a $500 referral contribution per student at the ` +
+    `time of class start. ${PLATFORM_DEFAULTS.orgName} will fund the remaining balance of the program cost (up to the ` +
+    `full program price less $500) on behalf of the referred student. The referral partner is not responsible ` +
+    `for any additional tuition beyond the $500 per-student contribution.`
   );
   gap(4);
 

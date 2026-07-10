@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         ? 'Eligibility Check'
         : source === 'workforce-partners'
           ? 'Agency Partner Inquiry'
-          : 'Direct Application`;
+          : 'Direct Application';;
     const html = `
 <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1a1a1a">
   <div style="text-align:center;padding:24px">

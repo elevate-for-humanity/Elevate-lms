@@ -186,7 +186,7 @@ export default function CheckEligibilityPage() {
       });
       if (!res.ok) {
         const d = await res.json();
-        throw new Error(d.error || 'Submission failed`);
+        throw new Error(d.error || 'Submission failed');
       }
       setStep(3);
     } catch (err: unknown) {
@@ -271,7 +271,7 @@ export default function CheckEligibilityPage() {
       body: 'An advisor will reach out to walk you through self-pay and employer sponsorship options.',
       primaryLabel: 'View Programs',
       primaryHref: '/programs',
-      secondaryLabel: 'Call Us Now`,
+      secondaryLabel: 'Call Us Now',
       secondaryHref: `tel:${PLATFORM_DEFAULTS.supportPhone}`,
     },
   };
@@ -571,7 +571,7 @@ export default function CheckEligibilityPage() {
                 {!submitting && <ArrowRight className="w-5 h-5" />}
               </button>
               <p className="text-center text-xs text-slate-400">
-                Questions? Call or text{' `}
+                Questions? Call or text{
                 <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-slate-600 font-semibold">
                   {PLATFORM_DEFAULTS.supportPhone}
                 </a>

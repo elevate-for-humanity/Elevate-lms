@@ -107,7 +107,7 @@ async function _POST(request: NextRequest) {
               <tr><td style="padding:8px 0;color:#64748b">Name</td><td style="padding:8px 0">${firstName} ${lastName}</td></tr>
               <tr><td style="padding:8px 0;color:#64748b">Email</td><td style="padding:8px 0">${email}</td></tr>
               <tr><td style="padding:8px 0;color:#64748b">Phone</td><td style="padding:8px 0">${phone}</td></tr>
-              <tr><td style="padding:8px 0;color:#64748b">Payment Option</td><td style="padding:8px 0">${paymentOption === 'plan' ? 'Payment Plan' : 'Full Payment`}</td></tr>
+              <tr><td style="padding:8px 0;color:#64748b">Payment Option</td><td style="padding:8px 0">${paymentOption === 'plan' ? 'Payment Plan' : 'Full Payment'}</td></tr>
               <tr><td style="padding:8px 0;color:#64748b">Application ID</td><td style="padding:8px 0;font-family:monospace;font-size:12px">${enrollment.id}</td></tr>
             </table>
             <p><strong>Next step:</strong> Complete your payment to secure your seat. If you were redirected to checkout, your payment link is active.</p>

@@ -214,7 +214,7 @@ export async function POST(request: NextRequest) {
             <p style="margin:0 0 8px;font-size:13px;font-weight:bold;color:#64748b;text-transform:uppercase;letter-spacing:.05em">Application Summary</p>
             <table style="width:100%;font-size:14px;border-collapse:collapse">
               <tr><td style="padding:4px 0;color:#64748b;width:40%">Organization</td><td style="padding:4px 0;font-weight:600">${orgName}</td></tr>
-              <tr><td style="padding:4px 0;color:#64748b">Type</td><td style="padding:4px 0;font-weight:600">${String(orgType).replace(/_/g, ' `)}</td></tr>
+              <tr><td style="padding:4px 0;color:#64748b">Type</td><td style="padding:4px 0;font-weight:600">${String(orgType).replace(/_/g, ' ')}</td></tr>
               <tr><td style="padding:4px 0;color:#64748b">Contact</td><td style="padding:4px 0;font-weight:600">${contactName}${contactTitle ? `, ${contactTitle}` : ""}</td></tr>
               <tr><td style="padding:4px 0;color:#64748b">Reference ID</td><td style="padding:4px 0;font-family:monospace;font-size:12px">${applicationId}</td></tr>
             </table>

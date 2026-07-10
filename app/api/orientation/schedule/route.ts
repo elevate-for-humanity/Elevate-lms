@@ -101,7 +101,7 @@ async function _POST(request: Request) {
     });
 
     const sessionLabel = isBarbershop ? 'Barbershop Walk-Through' : 'Virtual Orientation';
-    const firstName = safeName.split(' `)[0];
+    const firstName = safeName.split(``)[0];
 
     // Confirmation email to student/partner
     await sendEmail({

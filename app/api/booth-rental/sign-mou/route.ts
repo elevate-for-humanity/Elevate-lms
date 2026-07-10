@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
       to: renterEmail,
       subject: 'Booth Rental Agreement Signed — ' + PLATFORM_DEFAULTS.orgName + '',
       html: `
-        <h2>Welcome, ${signatureName.split(' `)[0]}!</h2>
+        <h2>Welcome, ${signatureName.split(``)[0]}!</h2>
         <p>Your Booth Rental Agreement has been signed and your rental is now active.</p>
         <h3>What happens next:</h3>
         <ul>

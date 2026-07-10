@@ -516,7 +516,7 @@ export default async function LearnerOnboardingPage({
               Check Application Status <ArrowRight className="w-4 h-4" />
             </Link>
             <p className="text-sm text-slate-400 mt-6">
-              Questions? Call{' `}
+              Questions? Call{
               <a href={`tel:+1${PLATFORM_DEFAULTS.supportPhone}`} className="underline">
                 {PLATFORM_DEFAULTS.supportPhone}
               </a>

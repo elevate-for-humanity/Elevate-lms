@@ -53,7 +53,7 @@ async function _POST() {
       return NextResponse.json({ already_sent: true });
     }
 
-    const programLabel = (application.program_interest || 'your program').replace(/-/g, ' `);
+    const programLabel = (application.program_interest || 'your program').replace(/-/g, ' ');
     const refNumber = application.reference_number || application.id.slice(0, 8);
 
     // Send approval email to student

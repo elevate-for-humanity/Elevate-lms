@@ -518,7 +518,9 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
   // Use Premium Beauty Apprenticeship Page for beauty programs
   if (BEAUTY_APPRENTICESHIP_SLUGS.has(program)) {
-    const programType = program.replace('-apprenticeship', '') as 'barber' | 'cosmetology' | 'esthetics' | 'nail-technician';
+    const rawType = program.replace('-apprenticeship', '');
+    // Map URL slugs to component prop values
+    const programType = (rawType === 'esthetician' ? 'esthetics' : rawType) as 'barber' | 'cosmetology' | 'esthetics' | 'nail-technician';
     return <BeautyApprenticeshipPage program={programType} />;
   }
 

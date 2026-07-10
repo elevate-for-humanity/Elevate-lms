@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { BARBER_COURSE_ID, BARBER_PROGRAM_SLUG } from '@/lib/barber/constants';
-import { BARBER_CURRICULUM_COVER } from '@/lib/barber/branding';
+import { PRESTIGE_ELEVATION_BARBER_CURRICULUM } from '@/lib/barber/branding';
 import { logger } from '@/lib/logger';
 
 export async function ensureBarberLmsEnrollment(
@@ -68,7 +68,7 @@ export async function publishBarberCourseCatalog(db: SupabaseClient): Promise<vo
         'DOL registered barber apprenticeship RTI — 8 modules, video lessons, checkpoints, and Indiana licensure prep.',
       status: 'published',
       is_active: true,
-      thumbnail_url: BARBER_CURRICULUM_COVER,
+      thumbnail_url: PRESTIGE_ELEVATION_BARBER_CURRICULUM,
       updated_at: new Date().toISOString(),
     })
     .eq('id', BARBER_COURSE_ID);

@@ -5,7 +5,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { getApprovedHoursByType } from '@/lib/hours/get-approved-hours';
 import { getNextRequiredAction } from '@/lib/enrollment/gate';
 import { BARBER_COURSE_ID, BARBER_PROGRAM_SLUG } from '@/lib/barber/constants';
-import { BARBER_CURRICULUM_COVER, BARBER_LMS_COURSE_PATH } from '@/lib/barber/branding';
+import { PRESTIGE_ELEVATION_BARBER_CURRICULUM, BARBER_LMS_COURSE_PATH } from '@/lib/barber/branding';
 
 /**
  * Barber Apprenticeship RTI (Related Technical Instruction) Configuration
@@ -202,7 +202,7 @@ export async function loadBarberDashboardData(): Promise<BarberDashboardData> {
     lms: {
       courseId: BARBER_COURSE_ID,
       coursePath: BARBER_LMS_COURSE_PATH,
-      coverUrl: courseRow?.thumbnail_url || BARBER_CURRICULUM_COVER,
+      coverUrl: courseRow?.thumbnail_url || PRESTIGE_ELEVATION_BARBER_CURRICULUM,
       accessGranted: Boolean(enrollment?.access_granted_at),
       title: courseRow?.title ?? 'Prestige Elevation™ Barbering RTI',
     },

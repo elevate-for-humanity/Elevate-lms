@@ -814,7 +814,7 @@ function FAQSection() {
 
 // ============= MAIN PAGE COMPONENT =============
 
-export function BeautyApprenticeshipPage({ program: programType }: BeautyApprenticeshipPageProps) {
+export function BeautyApprenticeship({ program: programType }: BeautyApprenticeshipPageProps) {
   const program = PROGRAM_DATA[programType];
   
   return (
@@ -1506,4 +1506,4 @@ export function BeautyApprenticeshipPage({ program: programType }: BeautyApprent
   );
 }
 
-export default BeautyApprenticeshipPage;
+export default BeautyApprenticeship;

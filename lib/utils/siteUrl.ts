@@ -13,7 +13,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 function requireUrl(name: string): string {
   const val = (process.env[name] || '').trim();
-  if (!val) throw new Error(`Missing required environment variable: ${name}`);
+  if (!val) throw new Error('Missing required environment variable: ${name}');
   return val.replace(/\/$/, '');
 }
 
@@ -31,7 +31,7 @@ export function getSiteUrl(): string {
 
 /** Admin app base URL — https://admin.${PLATFORM_DEFAULTS.canonicalDomain} */
 export function getAdminUrl(): string {
-  const url = requireUrl(`NEXT_PUBLIC_ADMIN_URL');
+  const url = requireUrl('NEXT_PUBLIC_ADMIN_URL');
   try {
     const parsed = new URL(url);
     if (parsed.hostname.toLowerCase().endsWith('.elb.amazonaws.com')) {

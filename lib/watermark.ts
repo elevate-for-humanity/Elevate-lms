@@ -21,7 +21,7 @@ export function watermarkContent(content: string, data: WatermarkData): string {
     }),
   ).toString('base64');
   // Add invisible HTML comment
-  const invisibleWatermark = `<!-- wm:${watermark} -->`;
+  const invisibleWatermark = '<!-- wm:${watermark} -->`;
   return content + invisibleWatermark;
 }
 /**
@@ -105,7 +105,7 @@ Platform: ${PLATFORM_DEFAULTS.orgName} LMS
 Value: $2.5M - $8M
   `.trim();
   try {
-    await notifySendgrid(`Build Deployment Alert', message);
+    await notifySendgrid('Build Deployment Alert', message);
     //
   } catch (error) {
     /* Error handled silently */

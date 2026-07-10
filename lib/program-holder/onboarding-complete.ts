@@ -159,9 +159,9 @@ async function sendWelcomeEmail(opts: {
   </table>
 </body></html>`;
 
-  const res = await fetch(`https://api.sendgrid.com/v3/mail/send', {
+  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${sgKey}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: `Bearer ${sgKey}', 'Content-Type': 'application/json' },
     body: JSON.stringify({
       from: { email: PLATFORM_DEFAULTS.emailFromAddress, name: PLATFORM_DEFAULTS.orgName },
       reply_to: { email: 'elevate4humanityedu@gmail.com', name: PLATFORM_DEFAULTS.orgName },

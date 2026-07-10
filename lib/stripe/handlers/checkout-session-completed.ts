@@ -148,7 +148,7 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
       });
 
       logger.info(
-        `[webhook/checkout] program_enrollment ${result.action}: ${programSlug} for ${userId}`,
+        `[webhook/checkout] program_enrollment ${result.action}: ${programSlug} for ${userId}',
       );
 
       // Send enrollment confirmation email
@@ -167,7 +167,7 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
           const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl;
           const isDeposit = amountPaidCents < 500_000; // < $5,000 = deposit
 
-          await fetch(`${siteUrl}/api/email/send`, {
+          await fetch('${siteUrl}/api/email/send`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -385,7 +385,7 @@ function buildEnrollmentEmail({
         ? `<p style="color:#d97706;font-size:13px;margin:0 0 16px">
         <strong>Deposit received.</strong> Your remaining balance will be due before your program start date.
         We will contact you with payment instructions.
-      </p>`
+      </p>'
         : ''
     }
     <p style="color:#475569;line-height:1.6;margin:0 0 24px">

@@ -22,7 +22,7 @@ export const organizationSchema: WithContext<Organization> = {
   '@type': 'Organization',
   name: PLATFORM_DEFAULTS.orgName,
   url: baseUrl,
-  logo: `${baseUrl}/images/logo.png`,
+  logo: '${baseUrl}/images/logo.png',
   description:
     'Free workforce training programs in high-demand careers. WIOA-funded training in barbering, healthcare, HVAC, and more.',
   address: {
@@ -33,12 +33,12 @@ export const organizationSchema: WithContext<Organization> = {
   },
   contactPoint: {
     '@type': 'ContactPoint',
-    telephone: `+1-${PLATFORM_DEFAULTS.supportPhone}`,
+    telephone: '+1-${PLATFORM_DEFAULTS.supportPhone}`,
     contactType: `Admissions`,
     email: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
   },
   sameAs: [
-    `https://www.facebook.com/share/1BUqvUAnCo/',
+    'https://www.facebook.com/share/1BUqvUAnCo/',
     'https://www.linkedin.com/company/elevateforhumanity',
     'https://www.instagram.com/elevateforhumanity',
   ],
@@ -118,7 +118,7 @@ export function generateArticleSchema(article: {
       name: PLATFORM_DEFAULTS.orgName,
       logo: {
         '@type': 'ImageObject',
-        url: `${baseUrl}/images/logo.png`,
+        url: '${baseUrl}/images/logo.png`,
       },
     },
     datePublished: article.datePublished,

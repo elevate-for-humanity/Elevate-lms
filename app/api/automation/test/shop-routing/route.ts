@@ -104,9 +104,9 @@ async function _POST(request: Request) {
         .from('partners')
         .insert({
           name: `Test ${shop.name}`,
-          owner_name: 'Test Owner`,
+          owner_name: 'Test Owner',
           email: `shop-${Date.now()}-${Math.random().toString(36).slice(2)}@test.${PLATFORM_DEFAULTS.canonicalDomain}`,
-          phone: `555-0100',
+          phone: '555-0100',
           address_line1: '123 Test St',
           city: 'Indianapolis',
           state: 'IN',

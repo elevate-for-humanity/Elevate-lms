@@ -411,7 +411,7 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
               `,
             });
           } catch (emailErr) {
-            logger.error(`Failed to send welcome email`, emailErr);
+            logger.error('Failed to send welcome email', emailErr);
           }
 
           // Admin notification — action required to grant LMS access
@@ -617,7 +617,7 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
 
             // Admin notification
             await sendEmail({
-              to: `elevate4humanityedu@gmail.com',
+              to: 'elevate4humanityedu@gmail.com',
               subject: `New Barber Apprentice — ${customerName || customerEmail}`,
               html: `<p>New enrollment via public checkout:</p>
 <p>Name: ${customerName}<br>Email: ${customerEmail}<br>Phone: ${customerPhone}<br>
@@ -797,7 +797,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             
             await sendEmail({
               to: customerEmail,
-              subject: 'Welcome to Barber Apprenticeship - Dashboard Access`,
+              subject: 'Welcome to Barber Apprenticeship - Dashboard Access',
               html: `
 <p>Hello,</p>
 

@@ -208,7 +208,7 @@ async function _POST(req: Request) {
           {
             error: claim.samePayload
               ? 'Duplicate submission detected. Your application is already being processed.'
-              : 'Idempotency key has already been used with a different payload.`,
+              : 'Idempotency key has already been used with a different payload.',
           },
           { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
         );
@@ -229,7 +229,7 @@ async function _POST(req: Request) {
 
     // Program state gate - reject submissions for waitlisted or closed programs
     const enrollmentState = await getProgramEnrollmentState(supabase, program);
-    if (enrollmentState === `waitlist') {
+    if (enrollmentState === 'waitlist') {
       return NextResponse.json(
         {
           error: 'This program is currently waitlisted. Join the waitlist to be notified when the next cohort opens.',

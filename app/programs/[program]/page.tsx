@@ -67,7 +67,7 @@ export async function generateMetadata({
   const ogImage = getProgramOgImageUrl(program, SITE_URL);
 
   const ogBase = {
-    images: [{ url: ogImage, width: 1200, height: 630, alt: `${program.replace(/-/g, ' `)} training program at ${PLATFORM_DEFAULTS.orgName}` }],
+    images: [{ url: ogImage, width: 1200, height: 630, alt: `${program.replace(/-/g, ' ')} training program at ${PLATFORM_DEFAULTS.orgName}` }],
     siteName: PLATFORM_DEFAULTS.orgName,
     type: `website` as const,
   };

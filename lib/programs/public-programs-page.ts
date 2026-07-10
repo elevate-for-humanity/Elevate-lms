@@ -59,6 +59,7 @@ export const PROGRAMS_PAGE_SUPPRESSED_SLUGS = new Set([
 ]);
 
 export type ProgramsPageRow = {
+  program_id: string;
   slug: string;
   title: string;
   description: string | null;
@@ -175,6 +176,7 @@ export async function buildProgramsCatalogMetadata(): Promise<Metadata> {
 
 function mapListingToRows(listing: ProgramsListingItem[]): ProgramsPageRow[] {
   return listing.map((p) => ({
+    program_id: p.program_id ?? p.slug,
     slug: p.slug,
     title: p.title,
     description: p.description,

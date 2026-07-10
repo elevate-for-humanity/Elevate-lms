@@ -112,7 +112,7 @@ const SUPPRESSED = new Set([
   'jri', // parent umbrella for badge system
 ]);
 
-type Prog = {slug:string;title:string;description:string|null;category:string;duration:string|null;credential:string|null;funding_eligible:boolean};
+type Prog = {program_id?:string;slug:string;title:string;description:string|null;category:string;duration:string|null;credential:string|null;funding_eligible:boolean};
 
 function normalizeCategory(category?: string | null, sector?: string | null, programType?: string | null): string {
   const raw = (category ?? '').trim().toLowerCase();

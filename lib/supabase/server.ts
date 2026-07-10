@@ -142,3 +142,6 @@ export function createPublicClient(): SupabaseClient<any> {
 
 // Backward-compatible alias for existing imports.
 export const createSupabaseServerClient = createClient;
+
+// Re-export safeGetUser from shared for backward compatibility
+export { safeGetUser } from '@/lib/supabase/shared';

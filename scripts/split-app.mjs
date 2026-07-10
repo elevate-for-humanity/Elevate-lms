@@ -103,16 +103,27 @@ const MARKETING_OWNED = new Set([
   // AI
   'ai', 'ai-tutor',
   // Public
-  'login', 'signup', 'forgot-password', 'reset-password', 'verify-email', 'verify-credentials', 'admin-login'
+  'login', 'signup', 'forgot-password', 'reset-password', 'verify-email', 'verify-credentials', 'admin-login',
+  // Additional public pages (missing from categorization)
+  'academic-integrity', 'accreditation', 'application-success', 'apprenticeships', 'apprenticeship-programs',
+  'beauty-checkout', 'call-now', 'certification-testing', 'consumer-disclosures', 'consumer-education',
+  'contracts', 'copyright', 'downloads', 'ebook', 'email', 'enroll', 'error', 'faq', 'governance',
+  'handbook', 'help', 'institutional-governance', 'instructor-credentials', 'jobs',
+  'legal-entity-structure', 'license-suspended', 'mou', 'orientation-video', 'parent-portal',
+  'paris', 'partner', 'partner-learning', 'partners', 'partnerships', 'philanthropy', 'policies',
+  'portal', 'privacy-policy', 'refund-policy', 'security', 'security-and-data-protection',
+  'share', 'sitemap', 'staff', 'start-trial', 'status', 'student-resources', 'support',
+  'tax', 'tenant-site', 'terms-of-service', 'thankyou', 'tuition-fees', 'unauthorized',
+  'update-password', 'verify-identity', 'workforce', 'workkeys'
 ]);
 
 // Routes OWNED by ADMIN (kept in Admin build)
 const ADMIN_OWNED = new Set([
   'admin', 'admin-login',
   // Admin sub-routes
-  'admin-login',
-  // Auth
-  '(auth)/admin'
+  'analytics', 'approvals', 'apps', 'create-course', 'dashboard', 'dev', 'file-manager',
+  'install-app', 'operator', 'partner-operating-model', 'partner-upload', 'preview',
+  'provider', 'settings', 'sign', 'builder', 'connects', 'creator', 'instructor'
 ]);
 
 // Routes OWNED by LMS (kept in LMS build)
@@ -137,7 +148,11 @@ const LMS_OWNED = new Set([
   'schedule-consultation',
   'student-support',
   'actions',
-  'subscription'
+  'subscription',
+  // Additional LMS pages
+  'accept-invite', 'access-paused', 'banking', 'billing', 'billing-required', 'card',
+  'leaderboard', 'offline', 'orientation-video', 'payment', 'payment-error', 'proctor',
+  'transcript', 'tutoring', 'verification-approvals'
 ]);
 
 // Route prefixes to exclude for each scope

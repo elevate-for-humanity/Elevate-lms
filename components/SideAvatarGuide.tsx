@@ -157,7 +157,7 @@ export default function SideAvatarGuide({
         setMessages((prev) => [
           ...prev,
           {
-            role: `assistant',
+            role: 'assistant',
             content: data.message,
           },
         ]);

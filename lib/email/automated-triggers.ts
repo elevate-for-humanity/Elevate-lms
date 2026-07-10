@@ -147,7 +147,7 @@ export async function sendOverdueRequirementAlert(
 
       <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
         <p style="margin: 0;"><strong>${requirementTitle}</strong></p>
-        <p style="margin: 10px 0 0 0; color: #dc2626;">Overdue by ${daysOverdue} day${daysOverdue !== 1 ? `s' : ''}</p>
+        <p style="margin: 10px 0 0 0; color: #dc2626;">Overdue by ${daysOverdue} day${daysOverdue !== 1 ? 's' : ''}</p>
       </div>
 
       <p>Please complete this requirement as soon as possible to stay on track with your program.</p>
@@ -346,7 +346,7 @@ Automated Alert System
 
   const result = await sendEmail({
     to: advisorEmail,
-    from: `alerts@www.elevateforhumanity.org',
+    from: 'alerts@www.elevateforhumanity.org',
     subject,
     html,
     text,

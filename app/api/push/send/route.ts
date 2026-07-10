@@ -31,7 +31,7 @@ interface NotificationPayload {
 
 async function _POST(request: NextRequest) {
   try {
-    const rateLimited = await applyRateLimit(request, `strict');
+    const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 
     // Verify internal API key or service role

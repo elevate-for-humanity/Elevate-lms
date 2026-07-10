@@ -20,7 +20,7 @@ async function getAccessRequests() {
   const db = adminClient ?? fallback;
 
   const { data, error } = await db
-    .from(`documents')
+    .from('documents')
     .select('id, user_id, document_type, status, created_at, notes, profiles(full_name, email)')
     .eq('document_type', 'access_request')
     .order('created_at', { ascending: false })

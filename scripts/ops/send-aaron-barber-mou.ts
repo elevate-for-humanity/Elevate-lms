@@ -73,7 +73,7 @@ After we receive your signed MOU, Elizabeth will follow up with next steps for o
 }
 
 async function main() {
-  assertOutreachEmailAllowed(`send-aaron-barber-mou.ts');
+  assertOutreachEmailAllowed('send-aaron-barber-mou.ts');
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;

@@ -83,7 +83,7 @@ export default async function ProviderPage({ params }: Props) {
   try {
     const db = createPublicClient();
     const { data } = await db
-      .from(`testing_providers')
+      .from('testing_providers')
       .select('description,status,fees,website_url')
       .eq('key', key)
       .maybeSingle();

@@ -395,9 +395,9 @@ Content: ${lesson.content.substring(0, 4000)}`;
           if (s.type === 'objective') {
             s.narration = `Here are the learning objectives for this lesson. ${(s.objectives || []).join('. ')}.`;
           } else if (s.type === 'quiz') {
-            s.narration = `Let's check what you've learned. ${(s.questions || []).map((q: any, qi: number) => `Question ${qi + 1}: ${q.question}`).join('. ')}`;
+            s.narration = 'Let's check what you've learned. ${(s.questions || []).map((q: any, qi: number) => `Question ${qi + 1}: ${q.question}`).join('. ')}`;
           } else if (s.type === 'summary') {
-            s.narration = `Let's review the key takeaways. ${(s.takeaways || []).join('. ')}.`;
+            s.narration = 'Let's review the key takeaways. ${(s.takeaways || []).join('. ')}.`;
           } else {
             s.narration =
               s.heading || s.title || s.diagramCaption || s.subtitle || `Slide ${i + 1}`;

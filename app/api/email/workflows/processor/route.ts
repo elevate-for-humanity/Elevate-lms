@@ -260,7 +260,7 @@ async function processPendingEmails(supabase: any, workflow: any, now: Date) {
       if (nextStep < steps.length) {
         const nextStepData = steps[nextStep];
         const delayMinutes =
-          nextStepData.delayUnit === `minutes'
+          nextStepData.delayUnit === 'minutes'
             ? nextStepData.delay
             : nextStepData.delayUnit === 'hours'
               ? nextStepData.delay * 60

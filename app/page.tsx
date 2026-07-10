@@ -54,7 +54,7 @@ export const metadata: Metadata = {
         alt: `${PLATFORM_DEFAULTS.orgName} workforce training`,
       },
     ],
-    type: `website',
+    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',

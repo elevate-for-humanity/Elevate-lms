@@ -56,7 +56,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       user_id: row.user_id,
       type: 'deadline_reminder',
       title: 'Good morning — continue your course today',
-      message: `You're ${Math.round(row.progress_percent ?? 0)}% through ${course?.title ?? 'your course'}. Log in to keep your momentum.`,
+      message: 'You're ${Math.round(row.progress_percent ?? 0)}% through ${course?.title ?? 'your course'}. Log in to keep your momentum.`,
       action_url: `/lms/courses/${row.course_id}`,
       link: `/lms/courses/${row.course_id}`,
       read: false,

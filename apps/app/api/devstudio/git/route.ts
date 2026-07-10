@@ -777,7 +777,7 @@ export async function POST(request: NextRequest) {
       }
 
       git(['commit', '-m', msg, `--author=Admin Studio <admin@${PLATFORM_DEFAULTS.canonicalDomain}>`]);
-      const hash = git([`rev-parse', '--short', 'HEAD']);
+      const hash = git(['rev-parse', '--short', 'HEAD']);
       return NextResponse.json({ ok: true, hash, message: msg, repo, workdir: REPO_DIR });
     }
 

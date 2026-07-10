@@ -161,6 +161,6 @@ Elizabeth Greene — Director, ${PLATFORM_DEFAULTS.orgName} Career & Technical I
     subject: `Next step for your ${programName} application — Visit WorkOne`,
     html,
     text,
-    replyTo: `elevate4humanityedu@gmail.com',
+    replyTo: 'elevate4humanityedu@gmail.com',
   });
 }

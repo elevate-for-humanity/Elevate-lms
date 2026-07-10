@@ -73,7 +73,7 @@ export default function CertificateGenerator({
     const url = encodeURIComponent(PLATFORM_DEFAULTS.siteUrl);
     window.open(
       `https://www.linkedin.com/sharing/share-offsite/?url=${url}&summary=${text}`,
-      `_blank',
+      '_blank',
       'noopener,noreferrer,width=600,height=500',
     );
   };

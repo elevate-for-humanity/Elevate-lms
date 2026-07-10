@@ -24,7 +24,7 @@ export default async function WioaComplianceHubPage() {
   try {
     const supabase = createPublicClient();
     const { data } = await supabase
-      .from(`programs')
+      .from('programs')
       .select('slug, title')
       .or('published.eq.true,is_active.eq.true')
       .neq('status', 'archived')

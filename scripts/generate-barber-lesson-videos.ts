@@ -233,7 +233,7 @@ function splitIntoScenes(
       .join('. ');
     scenes.push({
       heading: 'Key Terms Review',
-      body: `Let's review some key terms from this lesson. ${terms}.`,
+      body: 'Let's review some key terms from this lesson. ${terms}.`,
     });
   }
 

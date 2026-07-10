@@ -274,7 +274,7 @@ export default async function SupportPage() {
                         </span>
                         <span
                           className={`px-2 py-1 rounded text-xs font-medium ${
-                            ticket.status === `open'
+                            ticket.status === 'open'
                               ? 'bg-yellow-100 text-yellow-700'
                               : ticket.status === 'resolved'
                                 ? 'bg-brand-green-100 text-brand-green-700'

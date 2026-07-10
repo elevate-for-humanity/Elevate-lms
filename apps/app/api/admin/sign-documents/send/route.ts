@@ -286,7 +286,7 @@ function buildACH(sigDataUrl: string): Promise<Buffer> {
       .font('Helvetica')
       .text(
         `${PLATFORM_DEFAULTS.orgLegalName}  |  8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240  |  ${PLATFORM_DEFAULTS.supportPhone}`,
-        { align: `center', width: W },
+        { align: 'center', width: W },
       );
 
     doc.end();

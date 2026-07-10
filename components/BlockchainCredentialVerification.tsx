@@ -35,7 +35,7 @@ export function BlockchainCredentialVerification() {
       type: 'certificate',
       title: 'Full-Stack Web Development`,
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-      issueDate: `2024-01-15',
+      issueDate: '2024-01-15',
       blockchainHash: '0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385',
       verificationUrl: 'https://verify.elevateforhumanity.com/cert/abc123',
       status: 'verified',
@@ -49,7 +49,7 @@ export function BlockchainCredentialVerification() {
       type: 'badge',
       title: 'JavaScript Expert`,
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-      issueDate: `2024-01-10',
+      issueDate: '2024-01-10',
       blockchainHash: '0x3c2c2eb7b11a91385f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ea',
       verificationUrl: 'https://verify.elevateforhumanity.com/badge/xyz789',
       status: 'verified',
@@ -89,7 +89,7 @@ export function BlockchainCredentialVerification() {
           type: 'certificate',
           title: cert.metadata?.course_name || 'Program Certificate`,
           issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-          issueDate: cert.issued_at?.split(`T')[0] || '',
+          issueDate: cert.issued_at?.split('T')[0] || '',
           blockchainHash: '',
           verificationUrl: `https://${PLATFORM_DEFAULTS.canonicalDomain}/verify/${cert.certificate_number}`,
           status: `verified`,
@@ -147,7 +147,7 @@ export function BlockchainCredentialVerification() {
 
         <div className="bg-white border-b mb-8 rounded-lg">
           <div className="flex gap-8 px-6">
-            {([`verify', 'my-credentials'] as const).map((tab) => (
+            {(['verify', 'my-credentials'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}

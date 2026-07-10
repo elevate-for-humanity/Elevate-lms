@@ -106,7 +106,7 @@ async function _POST(req: NextRequest) {
       const talk = await createTalk({ photoUrl, audioUrl });
       const result = await pollTalkResult(talk.id, 60, 5000);
 
-      await db.from(`audit_logs').insert({
+      await db.from('audit_logs').insert({
         actor_id: user.id,
         actor_role: profile.role,
         action: 'generate_avatar_video',

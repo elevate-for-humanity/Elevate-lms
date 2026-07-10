@@ -25,7 +25,7 @@ if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
 // Should be called by a cron job service (e.g., scheduled cron, GitHub Actions)
 async function _GET(request: NextRequest) {
   // Verify cron secret
-  const authHeader = request.headers.get(`authorization');
+  const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
   if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {

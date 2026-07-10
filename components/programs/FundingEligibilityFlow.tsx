@@ -258,7 +258,7 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
             </div>
 
             <button
-              onClick={() => confirm(`not_resident')}
+              onClick={() => confirm('not_resident')}
               disabled={confirmed}
               className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-colors ${
                 confirmed ? 'bg-brand-green-600 text-white' : 'bg-slate-900 hover:bg-slate-800 text-white'
@@ -292,7 +292,7 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
                 },
                 {
                   value: 'in_process' as const,
-                  label: `I'm currently in the ${cfg.agencyShort} process`,
+                  label: 'I'm currently in the ${cfg.agencyShort} process`,
                   sub: 'Appointment scheduled or application under review',
                   active: 'border-brand-blue-500 bg-brand-blue-50',
                 },
@@ -547,7 +547,7 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
             </div>
 
             <button
-              onClick={() => confirm(`needs_appointment')}
+              onClick={() => confirm('needs_appointment')}
               disabled={confirmed}
               className={`w-full py-3 rounded-xl text-sm font-bold transition-colors ${
                 confirmed

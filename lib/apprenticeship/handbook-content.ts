@@ -42,7 +42,7 @@ Congratulations on taking the first step toward your career as a licensed barber
 DBA ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute
 
 ## Program Registration
-- **DOL RAPIDS Program Number:** ${process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || `2025-IN-132301'}
+- **DOL RAPIDS Program Number:** ${process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || '2025-IN-132301'}
 - **RTI Provider ID:** ${process.env.NEXT_PUBLIC_RTI_PROVIDER_ID || '208029'}
 - **ETPL Approved:** Yes
 
@@ -526,7 +526,7 @@ By signing below, all parties agree to the terms of this MOU.
 // Copy for other programs with minor modifications
 export const COSMETOLOGY_HANDBOOK: ProgramHandbook = {
   ...BARBER_HANDBOOK,
-  programSlug: `cosmetology-apprenticeship',
+  programSlug: 'cosmetology-apprenticeship',
   programName: 'Registered Cosmetology Apprenticeship Program',
   sections: BARBER_HANDBOOK.sections.map((section) => ({
     ...section,

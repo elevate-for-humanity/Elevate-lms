@@ -230,7 +230,7 @@ export default function UnifiedChatAssistant({
 
   // Position classes
   const positionClasses = {
-    `bottom-right': 'fixed bottom-4 right-4 z-50',
+    'bottom-right': 'fixed bottom-4 right-4 z-50',
     'bottom-left': 'fixed bottom-4 left-4 z-50',
     inline: 'relative',
   };

@@ -156,7 +156,7 @@ export default function HeroAvatarGuide({
         setMessages((prev) => [
           ...prev,
           {
-            role: `assistant',
+            role: 'assistant',
             content: data.message,
           },
         ]);

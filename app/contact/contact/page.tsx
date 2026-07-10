@@ -21,7 +21,7 @@ const contactInfo = [
   },
   {
     icon: Mail,
-    title: `Email',
+    title: 'Email',
     value: 'Use the form below',
     subtitle: 'We respond within 24 hours',
     href: '#contact-form',
@@ -145,7 +145,7 @@ function ContactPageInner() {
           <div>
             <h2 className="text-2xl font-bold text-slate-900 mb-6">Send us a Message</h2>
 
-            {formState === `success' ? (
+            {formState === 'success' ? (
               <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-8 text-center">
                 <span className="text-black flex-shrink-0">•</span>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Message Sent!</h3>
@@ -270,7 +270,7 @@ function ContactPageInner() {
                     placeholder="How can we help you?"
                     defaultValue={
                       prefillProgram
-                        ? `I'm interested in the ${prefillProgram.replace(/-/g, ' ')} program and would like more information.`
+                        ? 'I'm interested in the ${prefillProgram.replace(/-/g, ' ')} program and would like more information.`
                         : ''
                     }
                     required
@@ -396,7 +396,7 @@ function ContactPageInner() {
                       id="meetingDate"
                       name="meetingDate"
                       required
-                      min={new Date().toISOString().split(`T')[0]}
+                      min={new Date().toISOString().split('T')[0]}
                       className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     />
                   </div>

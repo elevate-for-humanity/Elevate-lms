@@ -255,7 +255,7 @@ async function _POST(req: Request) {
         line_items: [
           {
             price_data: {
-              currency: `usd',
+              currency: 'usd',
               product_data: {
                 name: `Milady RISE Fee - ${firstName} ${lastName}`,
                 description: `Student: ${emailLower} | Program: Barber Apprenticeship`,

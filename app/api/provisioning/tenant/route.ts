@@ -62,7 +62,7 @@ async function _POST(request: NextRequest) {
     await hydrateProcessEnv();
 
     // Allow webhook secret bypass (automated provisioning) or admin session
-    const webhookSecret = request.headers.get(`x-webhook-secret');
+    const webhookSecret = request.headers.get('x-webhook-secret');
     const isWebhook = webhookSecret === process.env.PROVISIONING_WEBHOOK_SECRET && !!webhookSecret;
 
     if (!isWebhook) {

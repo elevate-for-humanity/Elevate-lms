@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 const DIRECTORY_FIELDS = [
-  { key: `directory_name', label: 'Student Name', description: 'Full legal name' },
+  { key: 'directory_name', label: 'Student Name', description: 'Full legal name' },
   {
     key: 'directory_enrollment_status',
     label: 'Enrollment Status',

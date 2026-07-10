@@ -384,7 +384,7 @@ export async function ingestCourse(input: IngestInput): Promise<CourseBlueprint>
       ...lesson,
       order_index: lesson.order_index ?? li,
       duration_minutes: lesson.duration_minutes || 20,
-      content_type: lesson.content_type || `text',
+      content_type: lesson.content_type || 'text',
     })),
   }));
 

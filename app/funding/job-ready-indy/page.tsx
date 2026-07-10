@@ -135,7 +135,7 @@ export default function JobReadyIndyPage() {
                 desc: `Call ${PLATFORM_DEFAULTS.supportPhone} or apply online. Our enrollment team will confirm your eligibility and match you to the right program.`,
               },
               {
-                step: `2',
+                step: '2',
                 title: 'Choose Your Program',
                 desc: 'Select from credential pathways in healthcare, skilled trades, technology, CDL, and more — all aligned with Marion County employer demand.',
               },

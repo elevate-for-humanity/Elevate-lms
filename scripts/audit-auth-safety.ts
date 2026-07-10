@@ -181,7 +181,7 @@ if (unsafeCount > 0 || needsReviewCount > 0) {
   
   console.log('\n## Recommended Fix\n');
   console.log('Add null guard after getUser():\n');
-  console.log('''`typescript');
+  console.log(''''typescript');
   console.log('const { data: { user } } = await supabase.auth.getUser();');
   console.log('');
   console.log('// Add this guard:');

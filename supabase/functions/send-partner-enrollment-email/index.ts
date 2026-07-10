@@ -18,7 +18,7 @@ const EMAIL_FROM = Deno.env.get('EMAIL_FROM') ?? 'no-reply@www.elevateforhumanit
 const APP_NAME = 'Elevate For Humanity';
 
 function buildSubject(data: RequestBody): string {
-  return `You're enrolled in ${data.courseName} (${data.partnerName})`;
+  return 'You're enrolled in ${data.courseName} (${data.partnerName})`;
 }
 
 function buildTextBody(data: RequestBody): string {

@@ -27,7 +27,7 @@ export default function Section188TemplatePage() {
       description="Required for every WIOA Title I–assisted training program."
       canonicalPath={path}
       breadcrumbItems={[
-        { label: `Compliance', href: '/compliance' },
+        { label: 'Compliance', href: '/compliance' },
         { label: 'WIOA / ETPL', href: WIOA_COMPLIANCE.hub },
         { label: 'Section 188' },
       ]}

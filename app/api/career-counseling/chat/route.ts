@@ -40,7 +40,7 @@ Keep responses conversational but informative (3-5 sentences).`;
 
 export async function POST(req: NextRequest) {
   try {
-    const rateLimited = await applyRateLimit(req, `api');
+    const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();

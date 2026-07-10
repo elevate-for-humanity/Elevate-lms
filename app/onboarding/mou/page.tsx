@@ -35,7 +35,7 @@ const MOU_SECTIONS = [
 Elevate is the sole Program Owner and primary training provider. The Collaborating Party is a delivery-site collaborator operating under one of the participation tiers defined in Section 5. This Agreement does not create a partnership, joint venture, or shared ownership of any kind.`,
   },
   {
-    id: `not-a-partnership',
+    id: 'not-a-partnership',
     title: '2. What This Agreement Is Not',
     content: `A "partnership" is a business relationship in which two or more parties jointly own and operate a business, share governance authority, and share profits, losses, and decision-making control. That is not this relationship.
 
@@ -44,7 +44,7 @@ This Agreement does not create a partnership, joint venture, franchise, co-owner
 The Collaborating Party may not represent itself as a co-owner, partner, co-founder, or governing authority of ${PLATFORM_DEFAULTS.orgName} in any public communication, grant application, funding proposal, or legal document.`,
   },
   {
-    id: `network',
+    id: 'network',
     title: '3. Training Network Model and Indiana ETPL',
     content: `Elevate operates a Training Network Model in which Elevate serves as the sole Program Owner and Primary Training Provider. Authorized organizations participate as approved Training Network Sites for the purpose of delivering in-person or hybrid components of the program under Elevate's standardized delivery model.
 
@@ -72,7 +72,7 @@ All programs delivered under this Agreement must comply with federal nondiscrimi
 The Collaborating Party may not modify curriculum, alter tuition, issue credentials, apply for workforce funding on behalf of Elevate programs, or enter into agreements on behalf of Elevate.`,
   },
   {
-    id: `tiers',
+    id: 'tiers',
     title: '5. Participation Tiers',
     content: `The Collaborating Party participates under one of the following tiers as designated in Schedule A:
 

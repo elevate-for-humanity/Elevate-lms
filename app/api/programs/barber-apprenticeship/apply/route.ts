@@ -110,7 +110,7 @@ export async function POST(req: Request) {
 
     // Create RAPIDS pre-registration record (will be finalized after payment)
     // Uses centralized RAPIDS config for consistency
-    const rapidsEnrollmentData = getRAPIDSEnrollmentData(`barber-apprenticeship');
+    const rapidsEnrollmentData = getRAPIDSEnrollmentData('barber-apprenticeship');
     const rapidsPreRegistration = {
       application_id: application.id,
       program_number: RAPIDS_CONFIG.programNumber,

@@ -83,7 +83,7 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
     contentUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
     embedUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
     publisher: {
-      `@type': 'Organization',
+      '@type': 'Organization',
       name: PLATFORM_DEFAULTS.orgName,
       logo: {
         '@type': 'ImageObject',
@@ -95,7 +95,7 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: `Videos', href: '/videos' }, { label: '[Videoid]' }]} />
+        <Breadcrumbs items={[{ label: 'Videos', href: '/videos' }, { label: '[Videoid]' }]} />
       </div>
       <script
         type="application/ld+json"

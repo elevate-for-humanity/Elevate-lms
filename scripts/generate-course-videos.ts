@@ -210,7 +210,7 @@ function buildFullLessonScript(title: string, moduleName: string, content: strin
     '',
     ...lines,
     '',
-    `That's everything for ${title}. Take the quiz when you're ready, and I'll see you in the next lesson.`,
+    'That's everything for ${title}. Take the quiz when you're ready, and I'll see you in the next lesson.`,
   ].join('\n');
 }
 

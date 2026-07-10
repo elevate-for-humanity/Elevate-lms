@@ -145,7 +145,7 @@ export function ProgramDetails({ program }: { program: Program }) {
                     </svg>
                     <div>
                       <p className="text-xs font-semibold text-brand-blue-900 mb-1">
-                        {`Can't Wait for Funding? Pay in 4 with ${BNPL_PROVIDER_NAMES}`}
+                        {'Can't Wait for Funding? Pay in 4 with ${BNPL_PROVIDER_NAMES}`}
                       </p>
                       <p className="text-xs text-brand-blue-800">
                         Start training immediately and split your payment into easy monthly

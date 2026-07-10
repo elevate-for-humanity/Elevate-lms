@@ -107,7 +107,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
 
   const isApprenticeship =
     APPRENTICESHIP_SLUGS.includes(slug) ||
-    program.name?.toLowerCase().includes(`apprenticeship') ||
+    program.name?.toLowerCase().includes('apprenticeship') ||
     program.category?.toLowerCase().includes('apprenticeship');
 
   const applyHref = program.ctaPrimary?.href ?? `/apply?program=${slug}`;

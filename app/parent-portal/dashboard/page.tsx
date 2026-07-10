@@ -193,7 +193,7 @@ export default async function ParentDashboardPage() {
                           </div>
                           <span
                             className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${
-                              enr.status === `active'
+                              enr.status === 'active'
                                 ? 'bg-emerald-100 text-emerald-700'
                                 : enr.status === 'completed'
                                   ? 'bg-blue-100 text-blue-700'

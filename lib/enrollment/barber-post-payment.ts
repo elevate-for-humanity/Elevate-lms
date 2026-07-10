@@ -262,7 +262,7 @@ export async function runBarberPostPayment(
     await sendEmail({
       to: 'elevate4humanityedu@gmail.com`,
       from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
-      replyTo: `elevate4humanityedu@gmail.com',
+      replyTo: 'elevate4humanityedu@gmail.com',
       subject: `New Enrollment: ${studentName} — Barber Apprenticeship`,
       html: `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a;">

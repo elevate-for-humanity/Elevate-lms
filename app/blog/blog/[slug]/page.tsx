@@ -97,7 +97,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       title: post.title,
       description: post.excerpt,
       url: `${PLATFORM_DEFAULTS.siteUrl}/blog/${slug}`,
-      type: `article',
+      type: 'article',
       publishedTime: post.published_at,
       authors: [post.author_name],
       images: [
@@ -130,7 +130,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
   const postUrl = `${PLATFORM_DEFAULTS.siteUrl}/blog/${slug}`;
 
   const publishedDate = post.published_at
-    ? new Date(post.published_at).toLocaleDateString(`en-US', {
+    ? new Date(post.published_at).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',

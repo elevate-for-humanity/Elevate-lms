@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
         },
       ],
       metadata: {
-        payment_type: `testing_fee',
+        payment_type: 'testing_fee',
         exam_type: examType,
         exam_name: displayName,
         booking_type: bookingType ?? 'individual',

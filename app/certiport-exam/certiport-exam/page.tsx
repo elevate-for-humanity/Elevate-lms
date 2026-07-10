@@ -177,7 +177,7 @@ function CertiportExamContent() {
   }
 
   // If request is pending
-  if (existingRequest?.status === `pending' || existingRequest?.status === 'paid') {
+  if (existingRequest?.status === 'pending' || existingRequest?.status === 'paid') {
     return (
       <div className="min-h-screen bg-white py-12 px-4">
         <div className="max-w-2xl mx-auto">

@@ -162,7 +162,7 @@ export default function BarberDocumentsPage() {
     }
   };
 
-  const canSubmit = governmentId?.status === `complete';
+  const canSubmit = governmentId?.status === 'complete';
 
   return (
     <div className="min-h-screen bg-white">

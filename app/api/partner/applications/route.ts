@@ -164,7 +164,7 @@ async function _POST(request: NextRequest) {
 
     // Send notification to admin
     try {
-      const adminEmail = process.env.ADMIN_EMAIL || `elevate4humanityedu@gmail.com';
+      const adminEmail = process.env.ADMIN_EMAIL || 'elevate4humanityedu@gmail.com';
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
       await internalFetch(`${siteUrl}/api/email/send`, {
         method: 'POST',

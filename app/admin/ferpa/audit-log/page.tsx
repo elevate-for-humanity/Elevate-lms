@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 const FERPA_ACTIONS = [
-  `ferpa.access_request',
+  'ferpa.access_request',
   'ferpa.disclosure',
   'ferpa.consent',
   'ferpa.opt_out',

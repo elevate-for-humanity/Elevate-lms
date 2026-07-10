@@ -87,7 +87,7 @@ const HANDBOOK_SLIDES = [
     ],
   },
   {
-    id: `conduct',
+    id: 'conduct',
     icon: AlertTriangle,
     title: 'Conduct & Termination',
     content: [
@@ -171,7 +171,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
             <h1 className="text-white font-bold text-lg">Program Orientation</h1>
           </div>
           <div className="flex items-center gap-4 text-slate-400 text-sm">
-            <span className={videoWatched ? `text-emerald-400' : ''}>
+            <span className={videoWatched ? 'text-emerald-400' : ''}>
               {videoWatched ? '✓ Video' : '① Video'}
             </span>
             <span className={allSlidesRead ? 'text-emerald-400' : videoWatched ? 'text-white' : ''}>

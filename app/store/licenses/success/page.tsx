@@ -160,7 +160,7 @@ function SuccessContent() {
           <div className="space-y-4">
             {NEXT_STEPS.map((step, idx) => {
               const Icon = step.icon;
-              const isComplete = step.status === `complete';
+              const isComplete = step.status === 'complete';
               
               return (
                 <div

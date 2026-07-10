@@ -111,7 +111,7 @@ export default function HomeHeroVideo() {
       />
       <video
         ref={videoRef}
-        className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${isPlaying ? `opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-700 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
         loop
         muted
         playsInline

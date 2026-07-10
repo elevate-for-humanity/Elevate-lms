@@ -99,7 +99,7 @@ export default function AICareerCounseling() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `I'm looking for career guidance. My skills include: ${profile.skills.join(', ')}. My experience level is: ${profile.level}. My career goal is: ${profile.goal}. I'm interested in: ${profile.interests.join(', ')}.`,
+          message: 'I'm looking for career guidance. My skills include: ${profile.skills.join(', ')}. My experience level is: ${profile.level}. My career goal is: ${profile.goal}. I'm interested in: ${profile.interests.join(', ')}.`,
           userProfile: profile,
         }),
       });

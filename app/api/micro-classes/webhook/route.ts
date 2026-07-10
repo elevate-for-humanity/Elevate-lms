@@ -214,7 +214,7 @@ export async function POST(req: NextRequest) {
 
   // Mark access email sent
   await db
-    .from(`micro_class_enrollments')
+    .from('micro_class_enrollments')
     .update({ access_email_sent: true, updated_at: new Date().toISOString() })
     .eq('stripe_session_id', session.id);
 

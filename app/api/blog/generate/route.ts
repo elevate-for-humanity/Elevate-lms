@@ -92,7 +92,7 @@ async function _POST(request: NextRequest) {
 
     // Generate title and excerpt
     const metaCompletion = await openai.chat.completions.create({
-      model: `gpt-4.1',
+      model: 'gpt-4.1',
       messages: [
         {
           role: 'system',

@@ -27,7 +27,7 @@ export default function IeapTemplatePage() {
       description="Required for new programs before initial Indiana INTraining / ETPL listing."
       canonicalPath={path}
       breadcrumbItems={[
-        { label: `Compliance', href: '/compliance' },
+        { label: 'Compliance', href: '/compliance' },
         { label: 'WIOA / ETPL', href: WIOA_COMPLIANCE.hub },
         { label: 'IEAP' },
       ]}

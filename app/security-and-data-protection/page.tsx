@@ -172,7 +172,7 @@ export default function SecurityAndDataProtectionPage() {
             {SECTIONS.map((s) => (
               <a
                 key={s.title}
-                href={`#${s.title.toLowerCase().replace(/[^a-z0-9]+/g, `-')}`}
+                href={`#${s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
                 className="text-brand-red-600 hover:underline"
               >
                 {s.title}

@@ -24,7 +24,7 @@ export async function generateMetadata({
       title: `Articles by ${author} | Elevate For Humanity`,
       description: `Read articles written by ${author}`,
       url: `${PLATFORM_DEFAULTS.siteUrl}/blog/author/${authorSlug}`,
-      type: `website',
+      type: 'website',
       images: [
         {
           url: '/images/pages/social-media-1.webp',

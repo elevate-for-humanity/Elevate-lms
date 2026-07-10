@@ -77,7 +77,7 @@ export function checkLimits(planId: PlanId, usage: UsageMetrics): LimitCheck {
         limit: limits.learners,
         percentUsed: 100,
         upgradeRequired: true,
-        message: `You've reached the ${limits.learners} student limit on your ${plan.name} plan.`,
+        message: 'You've reached the ${limits.learners} student limit on your ${plan.name} plan.`,
       };
     }
   }
@@ -92,7 +92,7 @@ export function checkLimits(planId: PlanId, usage: UsageMetrics): LimitCheck {
         limit: limits.admins,
         percentUsed: 100,
         upgradeRequired: true,
-        message: `You've reached the ${limits.admins} admin limit on your ${plan.name} plan.`,
+        message: 'You've reached the ${limits.admins} admin limit on your ${plan.name} plan.`,
       };
     }
   }
@@ -107,7 +107,7 @@ export function checkLimits(planId: PlanId, usage: UsageMetrics): LimitCheck {
         limit: limits.programs,
         percentUsed: 100,
         upgradeRequired: true,
-        message: `You've reached the ${limits.programs} program limit on your ${plan.name} plan.`,
+        message: 'You've reached the ${limits.programs} program limit on your ${plan.name} plan.`,
       };
     }
   }
@@ -175,7 +175,7 @@ export function isApproachingLimit(
         approaching: true,
         metric: 'students',
         percentUsed: Math.round(percent),
-        message: `You're using ${usage.activeStudents} of ${limits.learners} students (${Math.round(percent)}%).`,
+        message: 'You're using ${usage.activeStudents} of ${limits.learners} students (${Math.round(percent)}%).`,
       };
     }
   }
@@ -188,7 +188,7 @@ export function isApproachingLimit(
         approaching: true,
         metric: 'admins',
         percentUsed: Math.round(percent),
-        message: `You're using ${usage.adminUsers} of ${limits.admins} admin seats (${Math.round(percent)}%).`,
+        message: 'You're using ${usage.adminUsers} of ${limits.admins} admin seats (${Math.round(percent)}%).`,
       };
     }
   }
@@ -201,7 +201,7 @@ export function isApproachingLimit(
         approaching: true,
         metric: 'programs',
         percentUsed: Math.round(percent),
-        message: `You're using ${usage.programs} of ${limits.programs} programs (${Math.round(percent)}%).`,
+        message: 'You're using ${usage.programs} of ${limits.programs} programs (${Math.round(percent)}%).`,
       };
     }
   }
@@ -284,19 +284,19 @@ export function getLimitReachedMessage(
     case 'students':
       return {
         title: 'Student Limit Reached',
-        body: `You've reached the student limit on your ${planName} plan. New enrollments are paused until you upgrade.`,
+        body: 'You've reached the student limit on your ${planName} plan. New enrollments are paused until you upgrade.`,
         cta: 'Upgrade Now',
       };
     case 'admins':
       return {
         title: 'Admin Limit Reached',
-        body: `You've reached the admin user limit on your ${planName} plan. Remove an admin or upgrade to add more.`,
+        body: 'You've reached the admin user limit on your ${planName} plan. Remove an admin or upgrade to add more.`,
         cta: 'Upgrade Now',
       };
     case 'programs':
       return {
         title: 'Program Limit Reached',
-        body: `You've reached the program limit on your ${planName} plan. Upgrade to create more programs.`,
+        body: 'You've reached the program limit on your ${planName} plan. Upgrade to create more programs.`,
         cta: 'Upgrade Now',
       };
     case 'sites':

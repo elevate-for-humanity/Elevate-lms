@@ -67,7 +67,7 @@ export async function provisionAccount(
       await sendEmail({
         to: normalizedEmail,
         from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
-        replyTo: `elevate4humanityedu@gmail.com',
+        replyTo: 'elevate4humanityedu@gmail.com',
         subject: `You`re enrolled in ${programName} — ${PLATFORM_DEFAULTS.orgName}`,
         html: buildWelcomeEmail({
           firstName,
@@ -154,7 +154,7 @@ export async function provisionAccount(
     await sendEmail({
       to: normalizedEmail,
       from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
-      replyTo: `elevate4humanityedu@gmail.com',
+      replyTo: 'elevate4humanityedu@gmail.com',
       subject: `Welcome to ${programName} — Set your password to access your portal`,
       html: buildWelcomeEmail({
         firstName,

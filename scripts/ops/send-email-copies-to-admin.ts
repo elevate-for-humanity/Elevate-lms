@@ -114,7 +114,7 @@ Your barber apprenticeship <strong>host shop application</strong> for <strong>${
 
 const TEMPLATES: { id: string; subject: string; intendedTo: string; html: string; note: string }[] = [
   {
-    id: `enchanted-program-holder-mou',
+    id: 'enchanted-program-holder-mou',
     subject: `Program Holder MOU — ${ENCHANTED.organizationName} (signature required)`,
     intendedTo: ENCHANTED.email,
     html: enchantedMouHtml(),

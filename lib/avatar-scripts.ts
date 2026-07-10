@@ -57,7 +57,7 @@ export const PAGE_SCRIPTS: Record<
 
   // === PROGRAM DISCOVERY ===
   '/programs': {
-    opening: `You're in the program catalog. Filter by industry, location, and funding type. Funded options require eligibility verification; self-pay does not.`,
+    opening: 'You're in the program catalog. Filter by industry, location, and funding type. Funded options require eligibility verification; self-pay does not.`,
     nextAction: `Open one program card to view details.`,
   },
 

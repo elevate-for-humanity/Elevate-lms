@@ -110,7 +110,7 @@ Summary.`,
 // ─── Document Type Templates ─────────────────────────────────────
 
 export type DocumentTemplate =
-  | `program-description'
+  | 'program-description'
   | 'mou-partnership'
   | 'workforce-submission'
   | 'credential-alignment'

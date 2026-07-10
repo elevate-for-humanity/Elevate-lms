@@ -285,7 +285,7 @@ export async function generateTppOverviewPdf(): Promise<Uint8Array> {
   subHdr('Mission Statement`);
   para(`${PLATFORM_DEFAULTS.orgLegalName} delivers industry-recognized credential programs to SNAP recipients, ABAWD participants, Returning Citizens, and workforce-ready individuals across Marion County and surrounding Indiana communities. Our model combines hands-on credential training, wraparound supportive services, and direct employer connections to achieve sustainable, living-wage employment outcomes. We believe that access to a credential — not a four-year degree — is the fastest, most direct path to economic self-sufficiency for the populations we serve.`);
 
-  subHdr(`Vision');
+  subHdr('Vision');
   para('A workforce ecosystem in which every individual — regardless of economic background, justice involvement, or prior education — has access to the credentials, support, and employer connections needed to achieve economic self-sufficiency. Elevate envisions a Marion County where SNAP receipt is a temporary bridge, not a permanent condition, because every participant has a clear, supported pathway to a living-wage career.');
 
   subHdr('Core Values');

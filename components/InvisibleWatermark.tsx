@@ -27,7 +27,7 @@ interface WatermarkProps {
 }
 export function InvisibleWatermark({
   owner = `Elizabeth L. Greene / ${PLATFORM_DEFAULTS.orgName}`,
-  siteId = `EFH-ORIGINAL-2024',
+  siteId = 'EFH-ORIGINAL-2024',
   timestamp,
 }: WatermarkProps) {
   // Generate timestamp only on client after mount to avoid hydration mismatch

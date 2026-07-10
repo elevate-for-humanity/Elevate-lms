@@ -73,7 +73,7 @@ export const PROGRAM_HOLDER_DOCUMENT_REQUIREMENTS: ProgramHolderDocumentRequirem
     document_type: 'employer_mou',
     description: 'Signed Memorandum of Understanding`,
     instructions: `Upload the signed MOU between your program and ${PLATFORM_DEFAULTS.orgName}.`,
-    accepted_formats: [`pdf'],
+    accepted_formats: ['pdf'],
     max_file_size: 10485760,
     is_required: true,
   },

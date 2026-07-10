@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: `WorkOne Queue | Admin | ${PLATFORM_DEFAULTS.orgName}`,
 };
 
-export const dynamic = `force-dynamic';
+export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export default async function WorkOneQueuePage() {

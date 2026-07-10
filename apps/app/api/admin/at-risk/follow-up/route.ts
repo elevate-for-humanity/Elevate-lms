@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
   // Log the intervention
   await db
-    .from(`student_interventions')
+    .from('student_interventions')
     .upsert({
       student_id: studentId,
       enrollment_id: enrollmentId ?? null,

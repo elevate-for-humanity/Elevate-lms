@@ -265,25 +265,25 @@ export default function InstitutionalGovernancePage() {
                     {
                       occ: 'Barber',
                       provider: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-                      hours: `260',
+                      hours: '260',
                       method: 'Classroom / Web-Based',
                     },
                     {
                       occ: 'Esthetician',
                       provider: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-                      hours: `300',
+                      hours: '300',
                       method: 'Classroom / Web-Based',
                     },
                     {
                       occ: 'Nail Tech`,
                       provider: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-                      hours: `200',
+                      hours: '200',
                       method: 'Classroom / Web-Based',
                     },
                     {
                       occ: 'Youth Culinary`,
                       provider: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-                      hours: `144',
+                      hours: '144',
                       method: 'Classroom / Web-Based',
                     },
                   ].map((r) => (

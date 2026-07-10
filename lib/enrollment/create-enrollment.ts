@@ -317,7 +317,7 @@ async function sendEnrollmentWelcomeEmail(params: {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #1e3a8a;">Welcome to ${PLATFORM_DEFAULTS.orgName}!</h2>
-            <p>Hi ${firstName || `there'},</p>
+            <p>Hi ${firstName || 'there'},</p>
             <p>Congratulations! Your enrollment in <strong>${programDetails?.name || 'your program'}</strong> is now <span style="color: #22c55e; font-weight: bold;">ACTIVE</span>.</p>
             
             ${loginSection}

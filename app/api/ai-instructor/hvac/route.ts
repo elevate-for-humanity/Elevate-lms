@@ -125,8 +125,8 @@ export async function POST(req: NextRequest) {
     if (!reply) {
       // Gemini unavailable — return a useful fallback so the lesson still works
       const fallback = isOpening
-        ? `I'm Marcus Johnson, your HVAC instructor. Today we're covering "${lessonTitle}". Before I dive in — what do you already know about this topic? Even if the answer is nothing, that's fine. Tell me where you're starting from.`
-        : `I'm having trouble connecting right now. Review the lesson content above, then come back and ask me a specific question about what you don't understand.`;
+        ? 'I'm Marcus Johnson, your HVAC instructor. Today we're covering "${lessonTitle}". Before I dive in — what do you already know about this topic? Even if the answer is nothing, that's fine. Tell me where you're starting from.`
+        : 'I'm having trouble connecting right now. Review the lesson content above, then come back and ask me a specific question about what you don't understand.`;
       return NextResponse.json({ message: fallback, fallback: true });
     }
 

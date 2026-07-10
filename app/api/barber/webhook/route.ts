@@ -830,7 +830,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
             // Also send internal notification
             try {
               await sendEmail({
-                to: process.env.REPLY_TO_EMAIL || `elevate4humanityedu@gmail.com',
+                to: process.env.REPLY_TO_EMAIL || 'elevate4humanityedu@gmail.com',
                 subject: `New Barber Enrollment: ${customerName || customerEmail}`,
                 html: `
                   <h2>New Barber Apprenticeship Enrollment</h2>
@@ -1103,7 +1103,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
         }
 
         // Decrement weeks remaining
-        const currentWeeks = parseInt(subscription.metadata?.weeks_remaining || `0');
+        const currentWeeks = parseInt(subscription.metadata?.weeks_remaining || '0');
         if (currentWeeks > 0) {
           const newWeeksRemaining = currentWeeks - 1;
           

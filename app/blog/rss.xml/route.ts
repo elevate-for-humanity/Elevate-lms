@@ -51,7 +51,7 @@ export async function GET() {
 
     return new NextResponse(rss, {
       headers: {
-        `Content-Type': 'application/xml; charset=utf-8',
+        'Content-Type': 'application/xml; charset=utf-8',
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=300`,
       },
     });
@@ -69,7 +69,7 @@ export async function GET() {
 </rss>`;
 
     return new NextResponse(rss, {
-      headers: { `Content-Type': 'application/xml; charset=utf-8' },
+      headers: { 'Content-Type': 'application/xml; charset=utf-8' },
     });
   }
 }

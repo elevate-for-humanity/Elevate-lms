@@ -188,7 +188,7 @@ export default function SetPasswordPage() {
               <label className="block text-sm font-bold text-black mb-2">Password</label>
               <div className="relative">
                 <input
-                  type={showPassword ? `text' : 'password'}
+                  type={showPassword ? 'text' : 'password'}
                   required
                   minLength={8}
                   value={password}

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default async function MarketplaceTermsPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from(`legal_documents').select('*').limit(50);
+  const { data: dbRows } = await supabase.from('legal_documents').select('*').limit(50);
 
   return (
     <div className="min-h-screen bg-slate-50 py-12 px-4">

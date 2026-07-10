@@ -148,7 +148,7 @@ export function StudentPortfolio() {
               id: c.id,
               title: (c.training_programs as any)?.name || c.program_name || 'Certificate',
               issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-              date: c.issued_at?.split(`T')[0] || '',
+              date: c.issued_at?.split('T')[0] || '',
               credentialUrl: c.verification_url || `/verify/${c.id}`,
             })),
           );
@@ -265,7 +265,7 @@ export function StudentPortfolio() {
       id: '1',
       title: 'Full-Stack Web Development`,
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-      date: `2024-01',
+      date: '2024-01',
       credentialUrl: '#',
     },
     {

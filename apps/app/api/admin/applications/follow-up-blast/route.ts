@@ -111,7 +111,7 @@ ${SITE_URL}`;
 }
 
 export async function POST(request: Request) {
-  const rateLimited = await applyRateLimit(request, `strict');
+  const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);

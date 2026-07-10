@@ -7,7 +7,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = {
   title: `About ${PLATFORM_DEFAULTS.orgName} | Workforce Training & Apprenticeships`,
   description: `Learn about ${PLATFORM_DEFAULTS.orgName} - DOL-registered apprenticeship sponsor, WIOA-approved training provider. Transform your career with funded training in healthcare, skilled trades, and technology.`,
-  keywords: [`about', 'workforce development', 'DOL registered apprenticeship', 'WIOA training provider', 'Indianapolis career training`],
+  keywords: ['about', 'workforce development', 'DOL registered apprenticeship', 'WIOA training provider', 'Indianapolis career training`],
   openGraph: {
     title: `About ${PLATFORM_DEFAULTS.orgName}`,
     description: `Transform your career with workforce training, apprenticeships, and career development.',

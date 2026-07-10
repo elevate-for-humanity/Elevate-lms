@@ -34,7 +34,7 @@ export default async function BeautyEnrollmentSuccessPage({ params }: Props) {
 
   // Find enrollment — try by user_id first, then by email for pre-auth enrollments
   let { data: enrollment } = await supabase
-    .from(`program_enrollments')
+    .from('program_enrollments')
     .select('id, enrolled_at, status, program_id, user_id, programs(name, slug)')
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false })

@@ -48,7 +48,7 @@ export function canEnrollStudent(
     if (currentStudentCount >= plan.limits.learners) {
       return {
         allowed: false,
-        reason: `You've reached the ${plan.limits.learners} student limit on your ${plan.name} plan. Contact sales to continue.`,
+        reason: 'You've reached the ${plan.limits.learners} student limit on your ${plan.name} plan. Contact sales to continue.`,
         upgradeRequired: true,
         redirectTo: '/store/request-license?tier=implementation_plus_annual',
       };
@@ -89,7 +89,7 @@ export function canAddAdmin(
     if (currentAdminCount >= plan.limits.admins) {
       return {
         allowed: false,
-        reason: `You've reached the ${plan.limits.admins} admin limit on your ${plan.name} plan.`,
+        reason: 'You've reached the ${plan.limits.admins} admin limit on your ${plan.name} plan.`,
         upgradeRequired: true,
         redirectTo: '/store/request-license?tier=implementation_plus_annual',
       };
@@ -130,7 +130,7 @@ export function canCreateProgram(
     if (currentProgramCount >= plan.limits.programs) {
       return {
         allowed: false,
-        reason: `You've reached the ${plan.limits.programs} program limit on your ${plan.name} plan.`,
+        reason: 'You've reached the ${plan.limits.programs} program limit on your ${plan.name} plan.`,
         upgradeRequired: true,
         redirectTo: '/account/billing',
       };
@@ -240,7 +240,7 @@ export function getLicenseHealth(
   if (!limitCheck.withinLimits && limitCheck.message) {
     blockers.push(limitCheck.message);
   } else if (limitCheck.percentUsed >= 80) {
-    warnings.push(`You're using ${limitCheck.percentUsed}% of your plan limits.`);
+    warnings.push('You're using ${limitCheck.percentUsed}% of your plan limits.`);
   }
 
   // Determine recommended action

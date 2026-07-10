@@ -35,7 +35,7 @@ export const TOURS: Record<DemoLicenseType, Tour> = {
       {
         id: 'welcome',
         title: 'Welcome to the Admin Dashboard',
-        narrative: `You're about to experience the complete administrative control center for workforce training programs.
+        narrative: 'You're about to experience the complete administrative control center for workforce training programs.
 
 This dashboard is where training providers, community colleges, and workforce development organizations manage their entire operation—from student enrollment to compliance reporting.
 
@@ -147,7 +147,7 @@ Reports can be scheduled to run automatically and emailed to stakeholders.`,
       {
         id: 'purchase',
         title: 'Ready to Get Started?',
-        narrative: `You've seen how the Institution/Admin license gives you complete control over your training operation.
+        narrative: 'You've seen how the Institution/Admin license gives you complete control over your training operation.
 
 **What you get:**
 - Unlimited admin users
@@ -272,7 +272,7 @@ Documents can be signed electronically and are stored securely for audit purpose
       {
         id: 'purchase',
         title: 'Ready to Access the Pipeline?',
-        narrative: `You've seen how the Partner/Employer license connects you directly to trained talent.
+        narrative: 'You've seen how the Partner/Employer license connects you directly to trained talent.
 
 **What you get:**
 - Direct candidate pipeline access
@@ -414,7 +414,7 @@ Reports are generated automatically from system data—no manual data entry or r
       {
         id: 'purchase',
         title: 'Ready to Transform Your Workforce System?',
-        narrative: `You've seen how the Workforce/Program license provides end-to-end workforce development infrastructure.
+        narrative: 'You've seen how the Workforce/Program license provides end-to-end workforce development infrastructure.
 
 **What you get:**
 - Multi-stakeholder coordination

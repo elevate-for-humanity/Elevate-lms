@@ -27,7 +27,7 @@ const COMPACT_DISCLOSURE = `This program is part of the ${PLATFORM_DEFAULTS.orgN
 const INLINE_DISCLOSURE = `All programs require eligibility screening before enrollment.`;
 
 export default function PathwayDisclosure({
-  variant = `full',
+  variant = 'full',
   className = '',
 }: PathwayDisclosureProps) {
   if (variant === 'inline') {

@@ -54,7 +54,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     required: true,
   },
   {
-    id: `verify-identity',
+    id: 'verify-identity',
     title: 'Verify Your Identity',
     description:
       'Confirm your identity with a government-issued ID and selfie verification.',
@@ -529,7 +529,7 @@ export default async function LearnerOnboardingPage({
           !noApplication && !applicationPending && (
             <>
               {/* Enrollment approved — student can access courses */}
-              {profile?.enrollment_status === `active' && (
+              {profile?.enrollment_status === 'active' && (
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden flex-shrink-0">
                     <Image sizes="100vw"

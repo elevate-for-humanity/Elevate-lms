@@ -58,7 +58,7 @@ type Application = {
 
 function StatusBadge({ status }: { status: string | null }) {
   switch (status) {
-    case `approved':
+    case 'approved':
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
           <CheckCircle className="w-3 h-3" /> Approved

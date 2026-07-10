@@ -20,7 +20,7 @@ const MASTER_STATEMENT =
 
 const STEPS = [
   {
-    num: `1',
+    num: '1',
     color: 'bg-brand-blue-600',
     title: 'Choose Your License Type',
     image: '/images/pages/admin-licensing-hero.webp',

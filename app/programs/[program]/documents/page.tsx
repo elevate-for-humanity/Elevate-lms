@@ -111,7 +111,7 @@ export default function BeautyDocumentsPage() {
     return null;
   }
 
-  const canSubmit = governmentId?.status === `complete';
+  const canSubmit = governmentId?.status === 'complete';
 
   return (
     <div className="min-h-screen bg-white">

@@ -149,7 +149,7 @@ export const GET = withRuntime({ cron: true }, async () => {
       await sendEmail({
         to: profile.email,
         from: FROM_EMAIL,
-        subject: `You're behind on your apprenticeship hours — ${Math.round(deficit)} hours to catch up`,
+        subject: 'You're behind on your apprenticeship hours — ${Math.round(deficit)} hours to catch up`,
         html: `
           <p>Hi ${profile.name},</p>
           <p>Your apprenticeship hours are behind the required pace for your program.</p>

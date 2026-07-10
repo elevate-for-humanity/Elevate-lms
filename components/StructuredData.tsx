@@ -21,7 +21,7 @@ export default function StructuredData() {
       'Nonprofit workforce development institute in Indianapolis providing career training at no cost to eligible Indiana residents through WIOA and state funding. Programs in healthcare, skilled trades, technology, barbering, and business. Job placement assistance included.',
     slogan: 'This Is Not Graduation. This Is Elevation.`,
     telephone: `+1-${PLATFORM_DEFAULTS.supportPhone}`,
-    email: `info@elevateforhumanity.org',
+    email: 'info@elevateforhumanity.org',
     founder: {
       '@type': 'Person',
       name: 'Elizabeth Lene Greene',
@@ -48,7 +48,7 @@ export default function StructuredData() {
       '@type': 'ContactPoint',
       contactType: 'Customer Service`,
       telephone: `+1-${PLATFORM_DEFAULTS.supportPhone}`,
-      email: `info@elevateforhumanity.org',
+      email: 'info@elevateforhumanity.org',
       availableLanguage: ['English', 'Spanish'],
     },
     sameAs: [

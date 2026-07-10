@@ -265,7 +265,7 @@ ${stepsHtml}
     html: mouHtml,
     attachments: [
       {
-        content: Buffer.from(part1).toString(`base64'),
+        content: Buffer.from(part1).toString('base64'),
         filename: `Elevate-MOU-Part-1-Master-Agreement-${orgSlug}.pdf`,
       },
       {

@@ -168,7 +168,7 @@ async function _POST(req: Request) {
     // Klarna: pay later / pay in installments, available for US customers.
     // Both require currency=usd and shipping_address_collection or explicit address.
     const isBnplEligible = !isFunded && amount >= 100; // BNPL min $1.00
-    const paymentMethods: string[] = [`card'];
+    const paymentMethods: string[] = ['card'];
     if (isBnplEligible) {
       paymentMethods.push('afterpay_clearpay', 'klarna');
     }

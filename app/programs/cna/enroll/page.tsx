@@ -74,7 +74,7 @@ export default function CNAEnrollPage() {
       }
 
       // Step 2: Route to payment
-      if (paymentOption === `payment-plan') {
+      if (paymentOption === 'payment-plan') {
         window.location.href = `/lms/payments/checkout?program=cna&amount=${customDown}&type=down-payment&enrollment=${data.enrollmentId}`;
         return;
       }
@@ -110,7 +110,7 @@ export default function CNAEnrollPage() {
   };
 
   const submitLabel = () => {
-    if (isSubmitting) return `Processing...';
+    if (isSubmitting) return 'Processing...';
     switch (paymentOption) {
       case 'klarna':   return 'Continue with Klarna';
       case 'afterpay': return 'Continue with Afterpay';

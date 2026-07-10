@@ -53,7 +53,7 @@ export async function issueCertificate(formData: FormData) {
       description: descParts.length > 0 ? descParts.join(' | `) : null,
       issue_date: issueDate,
       signed_by: signedBy || `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-      status: `issued',
+      status: 'issued',
     })
     .select('id')
     .maybeSingle();

@@ -27,7 +27,7 @@ export const appointmentEmailTemplates = {
         <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
           <p style="margin: 0;">📅 <strong>Date:</strong> ${data.date}</p>
           <p style="margin: 10px 0;">⏰ <strong>Time:</strong> ${data.time}</p>
-          <p style="margin: 10px 0;">📞 <strong>Format:</strong> ${data.format === `phone' ? 'Phone Call' : 'Zoom Video'}</p>
+          <p style="margin: 10px 0;">📞 <strong>Format:</strong> ${data.format === 'phone' ? 'Phone Call' : 'Zoom Video'}</p>
         </div>
 
         ${
@@ -68,7 +68,7 @@ export const appointmentEmailTemplates = {
       firstName: string;
       date: string;
       time: string;
-      format: `phone' | 'zoom';
+      format: 'phone' | 'zoom';
       zoomLink?: string;
       rescheduleLink?: string;
     }) => `
@@ -78,7 +78,7 @@ Your appointment with ${PLATFORM_DEFAULTS.orgName} is confirmed.
 
 📅 Date: ${data.date}
 ⏰ Time: ${data.time}
-📞 Format: ${data.format === `phone' ? 'Phone Call' : 'Zoom Video'}
+📞 Format: ${data.format === 'phone' ? 'Phone Call' : 'Zoom Video'}
 
 ${
   data.format === 'phone'
@@ -155,7 +155,7 @@ Phone: ${PLATFORM_DEFAULTS.supportPhone}
       firstName: string;
       date: string;
       time: string;
-      format: `phone' | 'zoom';
+      format: 'phone' | 'zoom';
       zoomLink?: string;
       rescheduleLink?: string;
     }) => `
@@ -217,7 +217,7 @@ Phone: ${PLATFORM_DEFAULTS.supportPhone}
     getText: (data: {
       firstName: string;
       time: string;
-      format: `phone' | 'zoom';
+      format: 'phone' | 'zoom';
       zoomLink?: string;
     }) => `
 Hello ${data.firstName},

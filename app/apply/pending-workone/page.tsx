@@ -89,7 +89,7 @@ export default function PendingWorkOnePage({
   searchParams?: { ref?: string; funding?: string };
 }) {
   const referenceNumber = searchParams?.ref ?? null;
-  const fundingSource = searchParams?.funding ?? `workone';
+  const fundingSource = searchParams?.funding ?? 'workone';
 
   return (
     <div className="min-h-screen bg-white">

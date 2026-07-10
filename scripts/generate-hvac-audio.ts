@@ -75,7 +75,7 @@ function buildScript(defId: string): string {
   const parts = defId.split('-');
   const moduleNum = parseInt(parts[1], 10);
 
-  const hook = MODULE_HOOKS[moduleNum] ?? `Let's get into this lesson.`;
+  const hook = MODULE_HOOKS[moduleNum] ?? 'Let's get into this lesson.`;
 
   if (!content) {
     return `${hook}\n\nReview the lesson materials carefully and take notes on the key concepts. Apply what you learn on every service call.`;

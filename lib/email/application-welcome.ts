@@ -263,7 +263,7 @@ function buildFundingHtml(p: ProgramInfo): string {
   let html = `
 <h2 style="color:#1e293b;font-size:18px;border-bottom:2px solid #f97316;padding-bottom:6px;margin-top:28px">HOW FUNDING WORKS &mdash; YOU MAY QUALIFY FOR FREE TRAINING</h2>`;
 
-  if (hasFunding(p, `wioa') || hasFunding(p, 'wrg') || hasFunding(p, 'next-level-jobs')) {
+  if (hasFunding(p, 'wioa') || hasFunding(p, 'wrg') || hasFunding(p, 'next-level-jobs')) {
     html += `
 <div style="background:#f9fafb;border:1px solid #e5e7eb;padding:16px;border-radius:8px;margin:12px 0">
 <h3 style="margin-top:0;color:#1e293b">WIOA Funding (Workforce Innovation and Opportunity Act)</h3>
@@ -464,7 +464,7 @@ The ${p.name} program is self-pay or employer-sponsored. Contact us at ${PLATFOR
     stepsText = `NEXT STEPS — DO THIS NOW
 1. Create account at www.indianacareerconnect.com (Job Seeker account)
 2. Call your local WorkOne: (317) 890-4640. Say "I want an appointment for WIOA funding for ${p.name} through ${PLATFORM_DEFAULTS.orgName}"
-3. Attend appointment. Bring: photo ID, proof of income, proof of address${hasFunding(p, `jri') ? '. Ask about JRI if applicable.' : ''}
+3. Attend appointment. Bring: photo ID, proof of income, proof of address${hasFunding(p, 'jri') ? '. Ask about JRI if applicable.' : ''}
 4. Call us back at ${PLATFORM_DEFAULTS.supportPhone} with your funding status. Update progress at ${SITE_URL}/next-steps
 
 DO NOT WAIT — appointments take 1-2 weeks to schedule.`;

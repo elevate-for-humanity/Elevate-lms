@@ -202,7 +202,7 @@ export function canAddApprentice(subscription: SubscriptionInfo | null, currentC
   if (currentCount >= maxApprentices) {
     return {
       allowed: false,
-      reason: `You've reached your apprentice limit (${maxApprentices}). Upgrade to add more.`
+      reason: 'You've reached your apprentice limit (${maxApprentices}). Upgrade to add more.`
     };
   }
 

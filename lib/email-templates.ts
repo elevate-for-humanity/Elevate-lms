@@ -751,7 +751,7 @@ export function renderTemplate(key: EmailTemplateKey, variables: Record<string, 
 
   // Replace variables
   Object.entries(variables).forEach(([key, value]) => {
-    const regex = new RegExp(`{{${key}}}`, `g');
+    const regex = new RegExp(`{{${key}}}`, 'g');
     html = html.replace(regex, value);
     subject = subject.replace(regex, value);
   });

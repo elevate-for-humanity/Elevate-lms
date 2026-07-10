@@ -165,18 +165,18 @@ export default function BarberChatAssistant() {
       if (data.error) {
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: `I'm not sure about that. For specific questions, please contact us at ${PLATFORM_DEFAULTS.supportPhone} or email our contact form.`,
+          content: 'I'm not sure about that. For specific questions, please contact us at ${PLATFORM_DEFAULTS.supportPhone} or email our contact form.`,
         }]);
       } else {
         setMessages(prev => [...prev, {
-          role: `assistant',
+          role: 'assistant',
           content: data.message,
         }]);
       }
     } catch {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: `I'm having trouble connecting. Please try again or contact us at ${PLATFORM_DEFAULTS.supportPhone}.`,
+        content: 'I'm having trouble connecting. Please try again or contact us at ${PLATFORM_DEFAULTS.supportPhone}.`,
       }]);
     } finally {
       setIsLoading(false);

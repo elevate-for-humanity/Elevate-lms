@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const DELIVERY_COMPONENTS = [
   {
     Icon: Monitor,
-    iconBg: `bg-brand-blue-100',
+    iconBg: 'bg-brand-blue-100',
     iconColor: 'text-brand-blue-700',
     title: 'Didactic / Classroom Instruction — Online',
     body: [

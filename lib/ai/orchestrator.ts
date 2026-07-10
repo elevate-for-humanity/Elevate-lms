@@ -138,7 +138,7 @@ Your role: guide students through their coursework with clear, encouraging expla
   general_chat: () => `You are a helpful AI assistant for ${PLATFORM_DEFAULTS.orgName}. Answer questions clearly and concisely.`,
 
   course_generation: (ctx) => `You are a curriculum architect. Generate structured course blueprints as JSON.
-Difficulty: ${ctx.difficulty ?? `intermediate'}. Topic: ${ctx.topic ?? 'general'}.
+Difficulty: ${ctx.difficulty ?? 'intermediate'}. Topic: ${ctx.topic ?? 'general'}.
 Return only valid JSON matching the CourseTemplate schema.`,
 
   lesson_generation: (ctx) => `You are a curriculum writer for ${ctx.programName ?? 'workforce training'}.

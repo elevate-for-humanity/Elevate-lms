@@ -228,7 +228,7 @@ ${table(['Shop', 'Contact', 'Email', 'Phone', 'Status', 'MOU', 'Temp password', 
 </td></tr></table>
 </body></html>`;
 
-  const outDir = join(process.cwd(), `exports', 'email-copies');
+  const outDir = join(process.cwd(), 'exports', 'email-copies');
   mkdirSync(outDir, { recursive: true });
   const outPath = join(outDir, `admin-portal-roster-${Date.now()}.html`);
   writeFileSync(outPath, html, 'utf8');

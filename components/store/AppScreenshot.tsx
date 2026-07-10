@@ -246,7 +246,7 @@ function GrantsScreenshot({ variant }: { variant: string }) {
 
         {/* Tabs */}
         <div className="flex gap-1 mt-4 -mb-4">
-          {[`Discover', 'Applications', 'Calendar', 'Reports'].map((tab, i) => (
+          {['Discover', 'Applications', 'Calendar', 'Reports'].map((tab, i) => (
             <button
               key={tab}
               className={`px-4 py-2 text-sm font-medium rounded-t-lg ${

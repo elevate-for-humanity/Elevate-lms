@@ -85,7 +85,7 @@ async function _POST(req: Request) {
       return NextResponse.json(
         {
           error: `Failed to save application. Please call ${PLATFORM_DEFAULTS.supportPhone} for assistance.`,
-          details: process.env.NODE_ENV === `development' ? 'Internal server error' : undefined,
+          details: process.env.NODE_ENV === 'development' ? 'Internal server error' : undefined,
         },
         { status: 500 },
       );
@@ -137,7 +137,7 @@ async function _POST(req: Request) {
     // Send notification to admin
     try {
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/send-email`, {
-        method: `POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: 'elevate4humanityedu@gmail.com',

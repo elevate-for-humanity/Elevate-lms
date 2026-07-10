@@ -265,7 +265,7 @@ export const ONBOARDING_STEPS: GuideStep[] = [
 export const COURSE_INTRO_STEPS = (courseName: string): GuideStep[] => [
   {
     title: `Welcome to ${courseName}!`,
-    script: `I'm thrilled to be your guide through ${courseName}. This course will give you the skills and knowledge you need for a rewarding career. Let me show you around.`,
+    script: 'I'm thrilled to be your guide through ${courseName}. This course will give you the skills and knowledge you need for a rewarding career. Let me show you around.`,
   },
   {
     title: 'Course Overview',

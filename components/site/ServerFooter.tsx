@@ -297,7 +297,7 @@ export default function ServerFooter() {
             {/* Authority Badges */}
             <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
               {[
-                { abbr: `AI-POWERED', label: 'Workforce Operating System' },
+                { abbr: 'AI-POWERED', label: 'Workforce Operating System' },
                 { abbr: 'USDOL', label: 'DOL Registered Sponsor' },
                 { abbr: 'ETPL', label: 'Approved Training Provider' },
                 { abbr: 'Certiport', label: 'Authorized Testing Center' },

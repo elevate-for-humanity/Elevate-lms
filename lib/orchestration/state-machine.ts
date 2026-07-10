@@ -229,7 +229,7 @@ export function getStudentState(data: {
       dominantAction: {
         label: 'Continue Learning',
         href: '/lms/courses',
-        description: `You're ${courseProgress}% complete`,
+        description: 'You're ${courseProgress}% complete`,
       },
       availableSections: ['orientation', 'programs', 'courses', 'progress', 'support'],
       lockedSections: [

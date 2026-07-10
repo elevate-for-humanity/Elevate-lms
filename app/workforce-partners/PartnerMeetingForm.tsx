@@ -200,7 +200,7 @@ export default function PartnerMeetingForm() {
         disabled={submitting}
         className="w-full flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl text-base transition-colors"
       >
-        {submitting ? `Sending...' : 'Request a Partnership Meeting'}
+        {submitting ? 'Sending...' : 'Request a Partnership Meeting'}
         {!submitting && <ArrowRight className="w-5 h-5" />}
       </button>
 

@@ -114,7 +114,7 @@ Indianapolis, Indiana`;
 
 // Wave definitions
 const WAVES: Record<string, string[]> = {
-  `1': [
+  '1': [
     'info@chipindy.org',
     'gethelp@holyfamilyshelter.net',
     'info@doverecoveryhouse.org',
@@ -171,7 +171,7 @@ async function sendViaSendGrid(to: string[], subject: string, html: string, text
         body: JSON.stringify({
           personalizations: [{ to: [{ email }] }],
           from: { email: SENDGRID_FROM, name: `Elizabeth Greene — ${PLATFORM_DEFAULTS.orgName}` },
-          reply_to: { email: `elevate4humanityedu@gmail.com', name: 'Elizabeth Greene' },
+          reply_to: { email: 'elevate4humanityedu@gmail.com', name: 'Elizabeth Greene' },
           subject,
           content: [
             { type: 'text/plain', value: text },

@@ -130,7 +130,7 @@ export default function AILiveChat({ userId, userName, userEmail }: AILiveChatPr
           id: Date.now().toString(),
           content:
             `Sorry, I encountered an error. Please try again or contact support at ${PLATFORM_DEFAULTS.supportPhone}.`,
-          sender: `bot',
+          sender: 'bot',
           timestamp: new Date(),
         },
       ]);

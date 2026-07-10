@@ -396,7 +396,7 @@ export async function notifyFundingAssigned(
     userId: studentId,
     type: 'funding',
     title: 'Funding Approved',
-    message: `You've been approved for ${fundingSource} funding: $${amount.toFixed(2)}`,
+    message: 'You've been approved for ${fundingSource} funding: $${amount.toFixed(2)}`,
     actionUrl: `/learner/dashboard`,
     actionLabel: 'View Details',
     metadata: {
@@ -418,7 +418,7 @@ export async function notifyEnrollmentConfirmed(
     userId: studentId,
     type: 'success',
     title: 'Enrollment Confirmed',
-    message: `You're enrolled in ${programName}. Start date: ${startDate}`,
+    message: 'You're enrolled in ${programName}. Start date: ${startDate}`,
     actionUrl: `/learner/dashboard`,
     actionLabel: 'View Dashboard',
     metadata: {

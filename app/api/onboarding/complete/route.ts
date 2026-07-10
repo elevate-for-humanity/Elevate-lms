@@ -48,7 +48,7 @@ async function sendEnrollmentConfirmationEmail({
 
   await sendEmail({
     to,
-    subject: `You're enrolled in ${programName} — ${PLATFORM_DEFAULTS.orgName}`,
+    subject: 'You're enrolled in ${programName} — ${PLATFORM_DEFAULTS.orgName}`,
     html: `
       <div style="max-width:600px;margin:0 auto;font-family:Georgia,serif;color:#1a1a1a;background:#ffffff">
         <div style="text-align:center;padding:32px 24px 24px">
@@ -96,7 +96,7 @@ async function sendEnrollmentConfirmationEmail({
 
 async function _POST(request: NextRequest) {
   try {
-    const rateLimited = await applyRateLimit(request, `api');
+    const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();

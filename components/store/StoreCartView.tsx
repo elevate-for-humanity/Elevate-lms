@@ -151,7 +151,7 @@ export default function StoreCartView({ checkoutError, addParam }: StoreCartView
         <h1 className="text-2xl font-bold text-slate-900">Shopping Cart</h1>
         {cart.itemCount > 0 && (
           <span className="text-sm text-slate-500">
-            {cart.itemCount} {cart.itemCount === 1 ? `item' : 'items'}
+            {cart.itemCount} {cart.itemCount === 1 ? 'item' : 'items'}
           </span>
         )}
       </div>

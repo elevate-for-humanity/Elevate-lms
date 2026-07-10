@@ -78,7 +78,7 @@ Keep responses concise (2-4 paragraphs max), practical, and encouraging. Focus o
       return NextResponse.json({ text: reply });
     } catch (err: any) {
       // Fallback if AI is not configured
-      const fallback = `I'm ${instructor.shortName}, your AI instructor for the ${program.title} program. ` +
+      const fallback = 'I'm ${instructor.shortName}, your AI instructor for the ${program.title} program. ` +
         `Right now the full AI engine is not connected, but here's how you can think about your question:\n\n` +
         `1. Re-read the relevant module or lesson for this topic.\n` +
         `2. Write down what part is confusing you (steps, terms, or expectations).\n` +

@@ -41,7 +41,7 @@ export default async function ProgramSection188PublicPage({ params }: Props) {
       description="Equal opportunity and nondiscrimination compliance for this training program."
       canonicalPath={path}
       breadcrumbItems={[
-        { label: `Compliance', href: '/compliance' },
+        { label: 'Compliance', href: '/compliance' },
         { label: 'WIOA / ETPL', href: WIOA_COMPLIANCE.hub },
         { label: program.title, href: WIOA_COMPLIANCE.programHub(slug) },
         { label: 'Section 188' },

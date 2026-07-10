@@ -186,7 +186,7 @@ async function sendEmailNotification(data: z.infer<typeof ContactSchema>) {
     if (process.env.ADMIN_SMS_GATEWAY) {
       await sendEmail({
         to: process.env.ADMIN_SMS_GATEWAY,
-        subject: `Contact',
+        subject: 'Contact',
         html: `${data.name}\n${data.email}\n${data.message.substring(0, 100)}`,
       }).catch((err) => logger.warn('[contact] SMS alert failed:', err));
     }

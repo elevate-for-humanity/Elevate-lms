@@ -583,7 +583,7 @@ ${PLATFORM_DEFAULTS.orgName} Compliance Team
  */
 export interface MassAlertJob {
   id: string;
-  type: `daily_check' | 'weekly_check' | 'monthly_check' | 'quarterly_check';
+  type: 'daily_check' | 'weekly_check' | 'monthly_check' | 'quarterly_check';
   scheduledFor: Date;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   totalProgramHolders: number;

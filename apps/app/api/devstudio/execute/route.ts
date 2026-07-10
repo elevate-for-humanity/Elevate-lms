@@ -3486,7 +3486,7 @@ export async function POST(req: NextRequest) {
   // In production: https://admin.${PLATFORM_DEFAULTS.canonicalDomain}
   // In dev: http://localhost:3001 (or NEXT_PUBLIC_ADMIN_URL)
   const baseUrl = getAdminUrl();
-  const cookieHeader = req.headers.get(`cookie') || '';
+  const cookieHeader = req.headers.get('cookie') || '';
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -3553,7 +3553,7 @@ ${getAiCharterContext()}
 ${systemSummary}
 
 ## Active Platform Debt (High Severity)
-${debtSummary || `None'}
+${debtSummary || 'None'}
 
 ## Canonical Rules
 - All programs: /programs/[program] dynamic route. Dedicated pages only for unique client components.

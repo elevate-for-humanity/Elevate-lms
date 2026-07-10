@@ -245,7 +245,7 @@ export function barberConfirmationAdminEmail(data: {
   lastName: string;
   email: string;
   phone: string;
-  response: `yes' | 'no';
+  response: 'yes' | 'no';
   applicationId: string;
 }) {
   const isYes = data.response === 'yes';

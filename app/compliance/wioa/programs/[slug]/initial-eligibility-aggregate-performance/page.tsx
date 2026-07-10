@@ -39,7 +39,7 @@ export default async function ProgramIeapPublicPage({ params }: Props) {
         description="Not required for established ETPL programs."
         canonicalPath={path}
         breadcrumbItems={[
-          { label: `Compliance', href: '/compliance' },
+          { label: 'Compliance', href: '/compliance' },
           { label: 'WIOA / ETPL', href: WIOA_COMPLIANCE.hub },
           { label: program.title, href: WIOA_COMPLIANCE.programHub(slug) },
           { label: 'IEAP' },

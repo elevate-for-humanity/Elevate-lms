@@ -94,7 +94,7 @@ export const metadata: Metadata = {
   },
 
   robots: {
-    index: process.env.NODE_ENV === `production',
+    index: process.env.NODE_ENV === 'production',
     follow: process.env.NODE_ENV === 'production',
     nocache: process.env.NODE_ENV !== 'production',
     googleBot: {

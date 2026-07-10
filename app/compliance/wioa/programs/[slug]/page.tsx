@@ -39,7 +39,7 @@ export default async function ProgramWioaComplianceHubPage({ params }: Props) {
       description="Separate pages for each required Indiana workforce form."
       canonicalPath={canonicalPath}
       breadcrumbItems={[
-        { label: `Compliance', href: '/compliance' },
+        { label: 'Compliance', href: '/compliance' },
         { label: 'WIOA / ETPL', href: WIOA_COMPLIANCE.hub },
         { label: program.title },
       ]}

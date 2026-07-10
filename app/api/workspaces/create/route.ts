@@ -41,7 +41,7 @@ async function sendWorkspaceWelcomeEmail(params: {
 async function _POST(request: NextRequest) {
   await hydrateProcessEnv();
 
-  const rateLimited = await applyRateLimit(request, `contact');
+  const rateLimited = await applyRateLimit(request, 'contact');
   if (rateLimited) return rateLimited;
 
   try {

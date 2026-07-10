@@ -25,7 +25,7 @@ export const dynamic = 'force-dynamic';
 
 const CART_ERROR_MESSAGES: Record<string, string> = {
   'payment-unavailable': `Checkout is temporarily unavailable. Please try again later or call ${PLATFORM_DEFAULTS.supportPhone}.`,
-  `checkout-failed': 'We could not start your checkout session. Please try again.',
+  'checkout-failed': 'We could not start your checkout session. Please try again.',
 };
 
 export default async function CartPage({

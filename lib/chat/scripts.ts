@@ -228,7 +228,7 @@ Need help with any of these steps?`,
 
 Does this make sense? Would you like me to provide an example or explain it differently?`,
 
-      create_study_guide: `Here's a study guide for {topic}:
+      create_study_guide: 'Here's a study guide for {topic}:
 
 **Key Concepts:**
 {key_concepts}

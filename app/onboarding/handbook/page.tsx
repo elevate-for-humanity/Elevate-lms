@@ -27,7 +27,7 @@ ${PLATFORM_DEFAULTS.orgName} provides curriculum, instructors, LMS access, and c
 This handbook governs your responsibilities as a program holder. Review it carefully before signing your MOU.`,
   },
   {
-    id: `student-support',
+    id: 'student-support',
     title: 'Student Support Responsibilities',
     content: `You are the first point of contact for students at your site. Your responsibilities include:
 
@@ -53,7 +53,7 @@ You are not responsible for delivering curriculum or grading — Elevate instruc
 Failure to comply with WIOA requirements may result in suspension of your partnership and recovery of grant funds.`,
   },
   {
-    id: `data-privacy',
+    id: 'data-privacy',
     title: 'Student Data and Privacy (FERPA)',
     content: `All student information is protected under FERPA. You may not share student records, grades, attendance, or personal information with any third party without written student authorization.
 

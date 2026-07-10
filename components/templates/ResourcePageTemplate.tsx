@@ -268,7 +268,7 @@ export function generateResourceMetadata(props: {
       description: props.description,
       url: `${PLATFORM_DEFAULTS.siteUrl}${props.path}`,
       siteName: PLATFORM_DEFAULTS.orgName,
-      type: `article',
+      type: 'article',
     },
     robots: {
       index: true,

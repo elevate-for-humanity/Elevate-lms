@@ -247,7 +247,7 @@ async function _POST(request: NextRequest) {
             });
 
             await sendEmail({
-              to: `elevate4humanityedu@gmail.com',
+              to: 'elevate4humanityedu@gmail.com',
               subject: `New Cosmetology Apprentice — ${customerName || customerEmail}`,
               html: `<p>New enrollment via public checkout:</p>
 <p>Name: ${customerName}<br>Email: ${customerEmail}<br>Phone: ${customerPhone}<br>

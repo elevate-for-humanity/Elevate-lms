@@ -34,7 +34,7 @@ export default async function RequestInfoPage({ params }: Props) {
         <div className="max-w-3xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
-              { label: `Programs', href: '/programs' },
+              { label: 'Programs', href: '/programs' },
               { label: program.title, href: programPageHref },
               { label: 'Request Information' },
             ]}

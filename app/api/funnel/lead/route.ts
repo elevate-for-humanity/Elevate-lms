@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
   </div>
   <div style="padding:0 24px 32px">
     <h2 style="color:#dc2626;margin:0 0 4px">New Lead — ${sourceLabel}</h2>
-    <p style="color:#666;font-size:13px;margin:0 0 20px">${new Date().toLocaleString(`en-US', { timeZone: 'America/Indiana/Indianapolis' })} ET</p>
+    <p style="color:#666;font-size:13px;margin:0 0 20px">${new Date().toLocaleString('en-US', { timeZone: 'America/Indiana/Indianapolis' })} ET</p>
     <table style="border-collapse:collapse;width:100%;font-size:14px">
       <tr><td style="padding:8px 12px;font-weight:bold;background:#f9f9f9;width:140px">Name</td><td style="padding:8px 12px">${name.trim()}</td></tr>
       <tr><td style="padding:8px 12px;font-weight:bold;background:#f9f9f9">Phone</td><td style="padding:8px 12px"><a href="tel:${normalizedPhone}" style="color:#dc2626;font-weight:bold">${normalizedPhone}</a></td></tr>

@@ -143,7 +143,7 @@ export default function HvacApplyPage() {
               ? appData.error || `A duplicate application was found. Please call ${PLATFORM_DEFAULTS.supportPhone}.`
               : appData.error || `Failed to submit application. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`;
         setError(msg);
-        setErrorSeverity(`critical');
+        setErrorSeverity('critical');
         setLoading(false);
         return;
       }

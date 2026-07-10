@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: `Individual Employment Plans | Admin | ${PLATFORM_DEFAULTS.orgName}`,
 };
 
-export const dynamic = `force-dynamic';
+export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 const STATUS_META: Record<string, { label: string; color: string; icon: React.ReactNode }> = {

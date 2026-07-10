@@ -29,7 +29,7 @@ export default async function BeautyEligibilityPage({ params }: Props) {
   if (!cfg) return notFound();
 
   const b = heroBanners[cfg.slug as keyof typeof heroBanners];
-  const fullDollars = (cfg.fullTuitionCents / 100).toLocaleString(`en-US', { style: 'currency', currency: 'USD' });
+  const fullDollars = (cfg.fullTuitionCents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
   const depositDollars = (cfg.depositCents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
   return (

@@ -72,7 +72,7 @@ export interface HrEmailParams {
   department?: string;
   startDate?: string;
   payRate?: string;
-  payType?: string; // `hourly' | 'salary'
+  payType?: string; // 'hourly' | 'salary'
   payMethod?: string; // 'direct_deposit' | 'pay_card' | 'check'
   interviewDate?: string;
   interviewTime?: string;

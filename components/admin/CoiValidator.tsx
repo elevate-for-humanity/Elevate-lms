@@ -371,7 +371,7 @@ function ResultDisplay({ result, onReset }: { result: DecisionResult; onReset: (
           <FieldRow
             label="ACORD 25 Form"
             ok={f.acordFormDetected}
-            detail={f.acordFormDetected ? `Detected' : 'Not detected (non-standard format)'}
+            detail={f.acordFormDetected ? 'Detected' : 'Not detected (non-standard format)'}
             informational
             icon={<FileSearch className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-700" />}
           />

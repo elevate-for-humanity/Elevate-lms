@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       </tr>
       <tr>
         <td style="padding:8px 0;font-weight:600;">Sent at</td>
-        <td style="padding:8px 0;">${new Date().toLocaleString(`en-US', { timeZone: 'America/Indiana/Indianapolis` })} ET</td>
+        <td style="padding:8px 0;">${new Date().toLocaleString('en-US', { timeZone: 'America/Indiana/Indianapolis` })} ET</td>
       </tr>
     </table>
     <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />

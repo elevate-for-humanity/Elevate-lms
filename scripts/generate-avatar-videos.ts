@@ -152,7 +152,7 @@ Ready to join the digital workforce?`,
     id: 'ai-tutor',
     avatarId: 'Annie_expressive11_public',
     voiceId: '42d00d4aac5441279d8536cd6b52c53c',
-    script: `I'm your AI tutor, here to help you succeed! Ask me to explain concepts, create study guides, or generate practice questions. 
+    script: 'I'm your AI tutor, here to help you succeed! Ask me to explain concepts, create study guides, or generate practice questions. 
 I'm available twenty-four seven to support your learning. 
 What would you like to study today?`,
     filename: 'avatar-ai-tutor.mp4',

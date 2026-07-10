@@ -57,7 +57,7 @@ export async function providerApiGuard(): Promise<GuardSuccess | GuardFailure> {
       ),
     };
   }
-  if (![`active'].includes(tenant.status)) {
+  if (!['active'].includes(tenant.status)) {
     return { error: safeError('Provider account is not active', 403) };
   }
 

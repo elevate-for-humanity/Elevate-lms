@@ -136,7 +136,7 @@ async function _POST(req: Request) {
       await internalFetch(
         `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/api/email/send`,
         {
-          method: `POST',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             to: 'elevate4humanityedu@gmail.com',

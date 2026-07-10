@@ -151,8 +151,13 @@ const staticProgramFallback: Prog[] = Array.from(STATIC_PROGRAM_MAP.values())
   .sort((a, b) => a.title.localeCompare(b.title));
 
 export default async function ProgramsPage() {
-  const { programs: catalogPrograms } = await getPublicProgramsPageData();
+  const { programs: catalogPrograms, catalogSource } = await getPublicProgramsPageData();
   const programs: Prog[] = catalogPrograms;
+  
+  // Log data source for debugging
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[ProgramsPage] Data source: ${catalogSource} (${programs.length} programs)`);
+  }
 
   const grouped:Record<string,Prog[]>={};
   programs.forEach(p=>{if(!grouped[p.category])grouped[p.category]=[];grouped[p.category].push(p);});

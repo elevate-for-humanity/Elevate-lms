@@ -4,7 +4,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Check Eligibility | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Check if you qualify for workforce training funding and programs.',
+  description: 'Check if you qualify for workforce training funding and programs.',
 };
 
 const ELIGIBILITY_TYPES = [

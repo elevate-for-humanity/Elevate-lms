@@ -348,7 +348,7 @@ export async function POST(request: NextRequest) {
       subject: `Signed Documents — ${docLabels.join(' + ')}`,
       content: [
         {
-          type: 'text/html`,
+          type: 'text/html',
           value: `<div style="font-family:Arial,sans-serif;color:#1e293b;max-width:600px;margin:0 auto;padding:24px;">
           <img src="https://${PLATFORM_DEFAULTS.canonicalDomain}/logo.jpg" alt="${PLATFORM_DEFAULTS.orgName}" style="height:50px;margin-bottom:20px;"/><br/>
           <p>Elizabeth,</p>

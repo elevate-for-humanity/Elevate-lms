@@ -6,7 +6,7 @@ import ForgotPasswordForm from './ForgotPasswordForm';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Forgot Password | Reset Your Account`,
+  title: 'Forgot Password | Reset Your Account',
   description:
     `Reset your ${PLATFORM_DEFAULTS.orgName} account password. Enter your email to receive a password reset link.`,
   alternates: { canonical: 'https://www.elevateforhumanity.org/forgot-password' },

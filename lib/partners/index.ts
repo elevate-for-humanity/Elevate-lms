@@ -9,7 +9,7 @@ import {
   CourseEnrollment,
   ProgressData,
   CertificateData,
-} from './base`;
+} from './base';
 
 /**
  * Partner API Integration Layer
@@ -91,4 +91,4 @@ export function getPartnerClient(partner: PartnerType): BasePartnerAPI {
   return new PendingPartnerAPI(partner, config);
 }
 
-export * from `./base';
+export * from './base';

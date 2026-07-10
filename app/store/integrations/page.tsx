@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Integrations & API | ${PLATFORM_DEFAULTS.orgName} Store`,
-  description: `Salesforce, Zapier, REST API, webhooks, and custom integrations. Connect your workforce platform to your existing systems.',
+  description: 'Salesforce, Zapier, REST API, webhooks, and custom integrations. Connect your workforce platform to your existing systems.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/integrations',
   },
@@ -243,7 +243,7 @@ export default async function IntegrationsPage() {
     "name": "John Doe",
     "email": "john@example.com",
     "program": "barber-apprenticeship"
-  }''}</code>
+  }'`}</code>
               </pre>
             </div>
           </div>

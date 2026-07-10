@@ -118,7 +118,7 @@ async function _POST(request: NextRequest) {
           </div>
         </div>
       `,
-    }).catch((err) => logger.warn(`[enroll/cna] Confirmation email failed`, { err }));
+    }).catch((err) => logger.warn('[enroll/cna] Confirmation email failed', { err }));
 
     return success({ enrollmentId: enrollment.id });
   } catch (err: unknown) {

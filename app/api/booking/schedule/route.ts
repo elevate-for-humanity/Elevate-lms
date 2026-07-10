@@ -105,7 +105,7 @@ async function _POST(req: Request) {
         subject: `Meeting Request Received - ${PLATFORM_DEFAULTS.orgName}`,
         html: `
           <h2>Your Meeting Request Has Been Received</h2>
-          <p>Hi ${data.name.split(` ')[0]},</p>
+          <p>Hi ${data.name.split(' ')[0]},</p>
           <p>We received your request for a <strong>${data.meetingType === 'virtual' ? 'virtual meeting' : 'phone call'}</strong>.</p>
           <p><strong>Requested Date:</strong> ${dateStr}<br>
           <strong>Requested Time:</strong> ${data.time}</p>
@@ -121,7 +121,7 @@ async function _POST(req: Request) {
           to: process.env.ADMIN_SMS_GATEWAY,
           subject: `Meeting`,
           html: `${data.name}\n${data.meetingType}\n${dateStr} ${data.time}`,
-        }).catch((err) => logger.warn(`[booking] SMS alert failed:`, err));
+        }).catch((err) => logger.warn('[booking] SMS alert failed:', err));
       }
     } catch (emailErr) {
       logger.error('Failed to send meeting notification email:', emailErr);

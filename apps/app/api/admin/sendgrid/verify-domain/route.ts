@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const res = await fetch('https://api.sendgrid.com/v3/whitelabel/domains`, {
+    const res = await fetch('https://api.sendgrid.com/v3/whitelabel/domains', {
       headers: { Authorization: `Bearer ${key}` },
     });
 
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       ok: false,
-      message: `Domain not yet verified. Missing DNS records: ${missing.join(`, ') || 'unknown'}. Add them in your registrar and try again.`,
+      message: `Domain not yet verified. Missing DNS records: ${missing.join(', ') || 'unknown'}. Add them in your registrar and try again.`,
       domain: match,
     });
   } catch (err) {

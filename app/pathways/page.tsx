@@ -6,7 +6,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Career Pathways | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Explore career pathways and advancement opportunities.',
+  description: 'Explore career pathways and advancement opportunities.',
 };
 
 const PATHWAYS = [

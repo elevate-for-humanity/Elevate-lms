@@ -327,7 +327,7 @@ function GrantsScreenshot({ variant }: { variant: string }) {
                     className={`px-2 py-0.5 text-xs font-bold rounded ${
                       grant.match >= 90
                         ? 'bg-brand-green-100 text-brand-green-800'
-                        : 'bg-brand-blue-100 text-brand-blue-800`
+                        : 'bg-brand-blue-100 text-brand-blue-800'
                     }`}
                   >
                     {grant.match}% Match
@@ -396,7 +396,7 @@ function WebsiteBuilderScreenshot({ variant }: { variant: string }) {
           <p className="text-xs font-medium text-slate-700 mb-2">ADD BLOCKS</p>
           <div className="space-y-2">
             {[
-              { name: `Hero Section', icon: Layout },
+              { name: 'Hero Section', icon: Layout },
               { name: 'Features', icon: BarChart3 },
               { name: 'Programs', icon: Folder },
               { name: 'Testimonials', icon: Users },

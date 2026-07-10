@@ -334,7 +334,7 @@ export async function exportUsersToCSV(filters?: {
   programId?: string;
   cohort?: string;
 }): Promise<string> {
-  const { createClient } = await import(`@/lib/supabase/server');
+  const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
 
   let query = supabase.from('profiles').select(`

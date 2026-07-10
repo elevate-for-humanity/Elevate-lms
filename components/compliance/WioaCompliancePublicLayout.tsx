@@ -33,7 +33,7 @@ export function WioaCompliancePublicLayout({
       <section className="border-t border-slate-200 py-8 px-4">
         <div className="max-w-3xl mx-auto text-sm text-slate-600">
           <p>
-            Staff complete and sign forms in the{` '}
+            Staff complete and sign forms in the{' '}
             <Link href="/login?redirect=/admin/compliance/wioa-etpl" className="text-brand-blue-600 hover:underline">
               admin compliance portal
             </Link>

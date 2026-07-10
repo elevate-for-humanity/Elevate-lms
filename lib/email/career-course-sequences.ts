@@ -29,7 +29,7 @@ function lmsUrl(data: CourseEmailData): string {
 // ─── Brand colors ─────────────────────────────────────────────────────────────
 const BLUE = '#1E3A5F';
 const ORANGE = '#EA580C';
-const LIGHT = '#F8FAFC`;
+const LIGHT = '#F8FAFC';
 
 // ─── Shared layout wrapper ────────────────────────────────────────────────────
 function wrap(body: string): string {
@@ -63,7 +63,7 @@ function btn(href: string, label: string, color = ORANGE): string {
 export function getWelcomeEmail(data: CourseEmailData) {
   const courseUrl = lmsUrl(data);
   return {
-    subject: `Welcome to ${data.courseName} — let`s get started`,
+    subject: `Welcome to ${data.courseName} — let's get started`,
     html: wrap(`
       <h1 style="color: ${BLUE}; margin-bottom: 8px;">Welcome, ${data.firstName ?? 'there'}!</h1>
       <p>You're enrolled in <strong>${data.courseName}</strong>. Your first lesson is ready right now.</p>
@@ -78,7 +78,7 @@ export function getWelcomeEmail(data: CourseEmailData) {
         </ul>
       </div>
 
-      ${btn(courseUrl, 'Start My Course →`)}
+      ${btn(courseUrl, 'Start My Course →')}
 
       <p style="color: #64748b; font-size: 14px;">Questions? Reply to this email — we respond within one business day.</p>
       <p>— The ${PLATFORM_DEFAULTS.orgName} Team</p>
@@ -156,7 +156,7 @@ export function getCompletionEmail(data: CourseEmailData & { certificateId?: str
         <li style="margin-bottom: 8px;"><strong>Career services:</strong> Reply to this email to connect with our employer partners in Indianapolis.</li>
       </ul>
 
-      <p>We`re proud of you.</p>
+      <p>We're proud of you.</p>
       <p>— The ${PLATFORM_DEFAULTS.orgName} Team</p>
     `),
   };

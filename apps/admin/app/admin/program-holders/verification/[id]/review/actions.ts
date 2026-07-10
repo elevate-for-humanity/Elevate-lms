@@ -111,7 +111,7 @@ export async function submitVerificationDecision(
         : `Update on Your Program Holder Application — ${PLATFORM_DEFAULTS.orgName}`;
 
     const html =
-      decision === `approved`
+      decision === 'approved'
         ? `<p>Hi ${firstName},</p>
          <p>Congratulations! Your program holder application for <strong>${orgName}</strong> has been <strong>approved</strong> by Elevate for Humanity.</p>
          <p>You can now log in to your Program Holder Portal to get started:</p>
@@ -120,14 +120,14 @@ export async function submitVerificationDecision(
          <br/><p>Warm regards,<br/>Elevate for Humanity Team</p>`
         : `<p>Hi ${firstName},</p>
          <p>Thank you for applying to become a Program Holder with ${PLATFORM_DEFAULTS.orgName}.</p>
-         <p>After reviewing your application for <strong>${orgName}</strong>, we are unable to approve it at this time${notes ? `: ' + notes : '.'}</p>
+         <p>After reviewing your application for <strong>${orgName}</strong>, we are unable to approve it at this time${notes ? ': ' + notes : '.'}</p>
          <p>If you believe this decision was made in error or would like to discuss next steps, please contact us at <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}">info@${PLATFORM_DEFAULTS.canonicalDomain}</a>.</p>
          <br/><p>Warm regards,<br/>${PLATFORM_DEFAULTS.orgName} Team</p>`;
 
     try {
       await sendEmail({
         to: [recipientEmail],
-        from: `Elevate for Humanity <info@elevateforhumanity.org>',
+        from: 'Elevate for Humanity <info@elevateforhumanity.org>',
         subject,
         html,
       });

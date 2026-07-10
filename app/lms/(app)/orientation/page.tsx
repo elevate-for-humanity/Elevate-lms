@@ -65,7 +65,7 @@ export default async function OrientationPage() {
               description="Learn about our programs, what to expect, and how to succeed in your training journey."
               videoUrl="/videos/orientation-full.mp4"
               onComplete={async () => {
-                `use server';
+                'use server';
                 const supabase = await createClient();
                 const {
                   data: { user },

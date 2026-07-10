@@ -32,7 +32,7 @@ function generateSetupSteps(platform: string): string[] {
     'Paste it before the closing </body> tag on your site',
     'Add a container element where you want the LMS to appear: <div id="elevate-lms"></div>',
     'Save and publish your changes',
-    `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate your integration`,
+    'Contact us at ' + PLATFORM_DEFAULTS.supportPhone + ' to activate your integration',
   ];
 
   const platformSteps: Record<string, string[]> = {
@@ -44,25 +44,25 @@ function generateSetupSteps(platform: string): string[] {
       `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate`,
     ],
     wix: [
-      'In Wix Editor, click Add > Embed > Custom Code',
+      "In Wix Editor, click Add > Embed > Custom Code",
       'Paste the script and set placement to "Body - end"',
-      'Add an HTML iframe element where you want the LMS',
-      'Publish your site',
-      `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate`,
+      "Add an HTML iframe element where you want the LMS",
+      "Publish your site",
+      "Contact us at " + PLATFORM_DEFAULTS.supportPhone + " to activate",
     ],
     squarespace: [
-      'In Squarespace, go to Settings → Advanced → Code Injection',
-      'Paste the script in the Footer section',
-      'Add a Code Block where you want the LMS to appear',
-      'Save and publish',
-      `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate`,
+      "In Squarespace, go to Settings → Advanced → Code Injection",
+      "Paste the script in the Footer section",
+      "Add a Code Block where you want the LMS to appear",
+      "Save and publish",
+      "Contact us at " + PLATFORM_DEFAULTS.supportPhone + " to activate",
     ],
     shopify: [
-      'In Shopify Admin, go to Online Store → Themes → Edit Code',
-      'Open theme.liquid and paste before </body>',
-      'Add a custom section for the LMS widget',
-      'Save the theme',
-      `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate`,
+      "In Shopify Admin, go to Online Store → Themes → Edit Code",
+      "Open theme.liquid and paste before </body>",
+      "Add a custom section for the LMS widget",
+      "Save the theme",
+      "Contact us at " + PLATFORM_DEFAULTS.supportPhone + " to activate",
     ],
   };
 

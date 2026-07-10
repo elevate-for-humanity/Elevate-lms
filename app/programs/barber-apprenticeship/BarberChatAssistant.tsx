@@ -88,7 +88,7 @@ Payment is collected after your enrollment is approved.
 
 Questions? Contact us: ${PLATFORM_DEFAULTS.supportPhone}`,
 
-  `schedule|hours per week|part time|full time': `You choose your schedule with your host shop:
+  'schedule|hours per week|part time|full time': `You choose your schedule with your host shop:
 
 • **Full-time (40 hrs/week)**: ~12-15 months to complete
 • **Part-time (25-30 hrs/week)**: ~18-24 months to complete
@@ -165,7 +165,7 @@ export default function BarberChatAssistant() {
       if (data.error) {
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: 'I'm not sure about that. For specific questions, please contact us at ${PLATFORM_DEFAULTS.supportPhone} or email our contact form.`,
+          content: `I'm not sure about that. For specific questions, please contact us at ${PLATFORM_DEFAULTS.supportPhone} or email our contact form.`,
         }]);
       } else {
         setMessages(prev => [...prev, {
@@ -176,7 +176,7 @@ export default function BarberChatAssistant() {
     } catch {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'I'm having trouble connecting. Please try again or contact us at ${PLATFORM_DEFAULTS.supportPhone}.`,
+        content: `I'm having trouble connecting. Please try again or contact us at ${PLATFORM_DEFAULTS.supportPhone}.`,
       }]);
     } finally {
       setIsLoading(false);

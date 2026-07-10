@@ -143,7 +143,7 @@ export default async function StaffPortalLanding() {
                     <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
                   )}
                   <span
-                    className={`text-sm font-medium flex-1 ${item.done ? `text-slate-400 line-through' : 'text-slate-800'}`}
+                    className={`text-sm font-medium flex-1 ${item.done ? 'text-slate-400 line-through' : 'text-slate-800'}`}
                   >
                     {item.label}
                   </span>

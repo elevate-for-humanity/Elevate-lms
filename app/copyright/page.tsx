@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/copyright',
   },
-  title: 'Copyright & Intellectual Property`,
+  title: 'Copyright & Intellectual Property',
   description:
     `Copyright and intellectual property information for ${PLATFORM_DEFAULTS.orgName} platform and content.`,
 };

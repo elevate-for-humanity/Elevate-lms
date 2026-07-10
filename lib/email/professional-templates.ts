@@ -21,7 +21,7 @@ function emailLayout(content: string): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI`, Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #ffffff; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #ffffff; }
     .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
     .header { padding: 40px 20px; text-align: center; border-bottom: 2px solid #e5e7eb; }
     .header h1 { color: #1e293b; margin: 0; font-size: 28px; font-weight: bold; }
@@ -87,7 +87,7 @@ export function completionEmail(data: {
       <div class="content">
         <h2>🎓 Congratulations!</h2>
         <p>Hi ${data.firstName},</p>
-        <p>You`ve completed <strong>${data.courseName}</strong>!</p>
+        <p>You've completed <strong>${data.courseName}</strong>!</p>
         <div class="success-box"><p style="margin:0;"><strong>Certificate:</strong> ${data.certificateNumber}</p></div>
         <div style="text-align:center;"><a href="${data.certificateUrl}" class="button">Download Certificate →</a></div>
       </div>

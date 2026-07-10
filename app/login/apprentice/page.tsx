@@ -8,7 +8,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Apprentice Login — ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Sign in to your apprenticeship portal. Track hours, competencies, and training progress.',
+  description: 'Sign in to your apprenticeship portal. Track hours, competencies, and training progress.',
 };
 
 export const dynamic = 'force-dynamic';

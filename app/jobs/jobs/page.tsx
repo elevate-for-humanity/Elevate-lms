@@ -11,10 +11,10 @@ export const revalidate = 900; // 15 min
 export const metadata: Metadata = {
   title: `Job Board | ${PLATFORM_DEFAULTS.orgName}`,
   description:
-    `Browse job openings from Elevate employer partners, OJT opportunities, apprenticeship positions, and WIOA-approved placements in Indiana.`,
+    'Browse job openings from Elevate employer partners, OJT opportunities, apprenticeship positions, and WIOA-approved placements in Indiana.',
   openGraph: {
     title: `Job Board | ${PLATFORM_DEFAULTS.orgName}`,
-    description: `Workforce-aligned job openings — OJT, apprenticeships, and WIOA-approved positions.',
+    description: 'Workforce-aligned job openings — OJT, apprenticeships, and WIOA-approved positions.',
   },
 };
 

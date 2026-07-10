@@ -37,7 +37,7 @@ export async function sendStaffAuthNotification(params: {
 }) {
   const actionLine =
     params.delivery === 'hybrid'
-      ? '<p><strong>Action:</strong> Forward the student section below to <strong>${params.studentEmail}</strong>. Include their enrollment link to <strong>${params.providerName}</strong>.</p>`
+      ? `<p><strong>Action:</strong> Forward the student section below to <strong>${params.studentEmail}</strong>. Include their enrollment link to <strong>${params.providerName}</strong>.</p>`
       : `<p><strong>Action:</strong> Forward the student section below to <strong>${params.studentEmail}</strong> with their exam authorization code.</p>`;
 
   const providerSection = params.providerUrl
@@ -76,10 +76,10 @@ export async function sendStaffAuthNotification(params: {
       <p>You have completed your <strong>${params.programName}</strong> training at ${PLATFORM_DEFAULTS.orgName}. You are now authorized to ${params.delivery === 'hybrid' ? 'complete your' : 'sit for your'} <strong>${params.credentialName}</strong> ${params.delivery === 'hybrid' ? 'course and exam' : 'exam'}.</p>
       ${
         params.delivery === 'hybrid'
-          ? '<p><strong>Next step:</strong> Complete your course at <a href="${params.providerUrl ?? '#'}">${params.providerName}</a>. Your enrollment has been paid by Elevate.</p>`
+          ? `<p><strong>Next step:</strong> Complete your course at <a href="${params.providerUrl ?? '#'}">${params.providerName}</a>. Your enrollment has been paid by Elevate.</p>`
           : `<p><strong>Authorization Code:</strong></p>
            <div style="background:#f1f5f9;border-radius:6px;padding:16px;text-align:center;font-size:24px;font-weight:bold;letter-spacing:4px;font-family:monospace">${params.authorizationCode}</div>
-           ${params.providerUrl ? `<p style="text-align:center;margin-top:16px"><a href="${params.providerUrl}" style="display:inline-block;padding:12px 28px;background:${BRAND_RED};color:white;text-decoration:none;border-radius:6px;font-weight:bold">Schedule Your Exam →</a></p>' : ''}`
+           ${params.providerUrl ? `<p style="text-align:center;margin-top:16px"><a href="${params.providerUrl}" style="display:inline-block;padding:12px 28px;background:${BRAND_RED};color:white;text-decoration:none;border-radius:6px;font-weight:bold">Schedule Your Exam →</a></p>` : ''}`
       }
       <p>Once you have your certificate, log back in to your Elevate student portal and upload it under <strong>My Certifications</strong>.</p>
       <p>Questions? Reply to this email or call ${PLATFORM_DEFAULTS.supportPhone}.</p>

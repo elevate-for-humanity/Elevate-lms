@@ -125,7 +125,7 @@ export function buildBeautyEnrollmentOpenAdminRosterEmail(
     <tr>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(r.firstName)} ${escapeHtml(r.lastName)}</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0"><a href="mailto:${escapeHtml(r.email)}">${escapeHtml(r.email)}</a></td>
-      <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(r.phone || `—')}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(r.phone || '—')}</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(r.city || '—')}</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(r.programLabel)}</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(r.status || '—')}</td>

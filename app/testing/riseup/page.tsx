@@ -5,7 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `RISE UP Certification | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `RISE UP retail industry certification training and testing.',
+  description: 'RISE UP retail industry certification training and testing.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/riseup' },
 };
 

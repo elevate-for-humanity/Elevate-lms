@@ -63,12 +63,12 @@ export async function provisionAccount(
   if (existing?.id) {
     // Account already exists — send an enrollment confirmation email only
     try {
-      const { sendEmail } = await import('@/lib/email/sendgrid`);
+      const { sendEmail } = await import('@/lib/email/sendgrid');
       await sendEmail({
         to: normalizedEmail,
         from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
         replyTo: 'elevate4humanityedu@gmail.com',
-        subject: `You`re enrolled in ${programName} — ${PLATFORM_DEFAULTS.orgName}`,
+        subject: `You're enrolled in ${programName} — ${PLATFORM_DEFAULTS.orgName}`,
         html: buildWelcomeEmail({
           firstName,
           programName,
@@ -80,7 +80,7 @@ export async function provisionAccount(
         }),
       });
     } catch (err) {
-      logger.warn(`[provision-account] Enrollment confirmation email failed (non-fatal)`, err);
+      logger.warn('[provision-account] Enrollment confirmation email failed (non-fatal)', err);
     }
     return { userId: existing.id, isNewUser: false, passwordSetupLink: null };
   }
@@ -150,7 +150,7 @@ export async function provisionAccount(
 
   // ── 5. Send welcome + credentials email ───────────────────────────────────
   try {
-    const { sendEmail } = await import('@/lib/email/sendgrid`);
+    const { sendEmail } = await import('@/lib/email/sendgrid');
     await sendEmail({
       to: normalizedEmail,
       from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
@@ -236,7 +236,7 @@ function buildWelcomeEmail(opts: {
   <div style="padding:32px;background:#fff;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;">
 
     <h1 style="margin:0 0 8px;font-size:24px;color:#0f172a;">
-      Welcome, ${firstName}. You`re enrolled.
+      Welcome, ${firstName}. You're enrolled.
     </h1>
     <p style="color:#475569;margin:0 0 24px;font-size:15px;">
       Your enrollment in <strong>${programName}</strong> is confirmed. Here's everything you need to get started.

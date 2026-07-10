@@ -5,7 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Barber Host Shop | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Host barber apprentices in your barbershop. Earn OJT reimbursement, Instructor the next generation, and build your pipeline.',
+  description: 'Host barber apprentices in your barbershop. Earn OJT reimbursement, Instructor the next generation, and build your pipeline.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/barber-host-shop' },
 };
 

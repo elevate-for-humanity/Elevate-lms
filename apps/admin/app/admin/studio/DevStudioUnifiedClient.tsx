@@ -31,7 +31,6 @@ import {
   Workflow,
 } from 'lucide-react';
 import { getSkillsLoader, type Skill } from '@/lib/studio/skills-loader';
-import CareerIntelligencePanel from '@/components/dashboards/CareerIntelligencePanel';
 
 // Import OpenHands-style components
 const WebContainerSandbox = dynamic(
@@ -63,7 +62,7 @@ interface CourseBuilderProps {
   initialProgramId?: string;
 }
 
-type Workspace = 'studio' | 'command' | 'deploy' | 'files' | 'environments' | 'health' | 'secrets' | 'integrations' | 'workflows' | 'career';
+type Workspace = 'studio' | 'command' | 'deploy' | 'files' | 'environments' | 'health' | 'secrets' | 'integrations' | 'workflows';
 type StudioMode = 'ask' | 'run' | 'courses';
 
 const UnifiedEllieChat = dynamic(() => import('@/components/studio/UnifiedEllieChat'), {
@@ -105,7 +104,6 @@ const WORKSPACES: { id: Workspace; label: string; Icon: ElementType<{ className?
   { id: 'health', label: 'Health', Icon: Activity },
   { id: 'secrets', label: 'Secrets', Icon: Key },
   { id: 'integrations', label: 'Integrations', Icon: Plug },
-  { id: 'career', label: 'Career AI', Icon: Briefcase },
 ];
 
 const QUICK_ACTIONS = [

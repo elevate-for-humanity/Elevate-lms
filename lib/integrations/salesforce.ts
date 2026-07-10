@@ -73,7 +73,7 @@ export async function createOrUpdateContact(data: ContactData): Promise<string |
   try {
     // Check if contact exists
     const searchResponse = await fetch(
-      `${instanceUrl}/services/data/v58.0/query?q=SELECT+Id+FROM+Contact+WHERE+Email='${encodeURIComponent(data.email)}'',
+      `${instanceUrl}/services/data/v58.0/query?q=SELECT+Id+FROM+Contact+WHERE+Email='${encodeURIComponent(data.email)}'`,
       {
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -199,7 +199,7 @@ export async function createOrUpdateAccount(data: AccountData): Promise<string |
     // Check if account exists
     const searchResponse = await fetch(
       `${instanceUrl}/services/data/v57.0/query?q=${encodeURIComponent(
-        `SELECT Id FROM Account WHERE Name = '${data.name.replace(/'/g, "\\'")}'',
+        `SELECT Id FROM Account WHERE Name = '${data.name.replace(/'/g, "\\'")}'`,
       )}`,
       {
         headers: {

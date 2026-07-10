@@ -368,7 +368,7 @@ export async function renderLessonVideoBatch(
  * Used when the caller doesn't provide an explicit domainKey.
  */
 export function inferDomainKey(courseName: string, lessonTitle = ''): string {
-  const text = `${courseName} ${lessonTitle}'.toLowerCase();
+  const text = `${courseName} ${lessonTitle}`.toLowerCase();
 
   if (text.match(/hvac|refriger|air.?condition|heat|cool/)) return 'hvac';
   if (text.match(/electric|wiring|circuit/)) return 'electrical';

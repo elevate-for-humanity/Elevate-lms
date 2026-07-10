@@ -155,7 +155,7 @@ async function _POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     logger.error(
-      `Email delivery error:',
+      'Email delivery error:',
       error instanceof Error ? error : new Error(String(error)),
     );
     return NextResponse.json(

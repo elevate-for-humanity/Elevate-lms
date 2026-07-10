@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'Connect',
   description: `${PLATFORM_DEFAULTS.orgName} - Career training and workforce development programs.`,
   alternates: {
-    canonical: `https://www.elevateforhumanity.org/connect',
+    canonical: 'https://www.elevateforhumanity.org/connect',
   },
 };
 

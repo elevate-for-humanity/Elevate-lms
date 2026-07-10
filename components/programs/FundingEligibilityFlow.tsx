@@ -77,9 +77,9 @@ const CFG = {
     timeEstimate: '5–10 business days',
     note: 'The Workforce Ready Grant covers full tuition for approved programs. HVAC is on the approved list. Apply entirely online — no in-person visit required.',
     steps: [
-      'Go to IndianaCareerConnect.com and create a free account`,
+      'Go to IndianaCareerConnect.com and create a free account',
       `Search for "HVAC" and select ${PLATFORM_DEFAULTS.orgName} as your provider`,
-      `Complete the Workforce Ready Grant application online',
+      'Complete the Workforce Ready Grant application online',
       'Receive approval notification (typically 5–10 business days)',
       'Bring your WRG approval letter to Elevate for enrollment',
     ],
@@ -187,7 +187,7 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
                     ? opt.value
                       ? 'border-brand-green-500 bg-brand-green-50 text-brand-green-800'
                       : 'border-amber-500 bg-amber-50 text-amber-800'
-                    : 'border-slate-200 text-slate-600 hover:border-slate-300`
+                    : 'border-slate-200 text-slate-600 hover:border-slate-300'
                 }`}
               >
                 {opt.label}
@@ -249,10 +249,10 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-slate-400" />
                 <a
-                  href="tel:${PLATFORM_DEFAULTS.supportPhone}"
+                  href={`tel:${PLATFORM_DEFAULTS.supportPhone}`}
                   className="text-brand-blue-600 font-semibold hover:underline"
                 >
-                  ${PLATFORM_DEFAULTS.supportPhone}
+                  {PLATFORM_DEFAULTS.supportPhone}
                 </a>
               </div>
             </div>
@@ -292,7 +292,7 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
                 },
                 {
                   value: 'in_process' as const,
-                  label: 'I'm currently in the ${cfg.agencyShort} process`,
+                  label: `I'm currently in the ${cfg.agencyShort} process`,
                   sub: 'Appointment scheduled or application under review',
                   active: 'border-brand-blue-500 bg-brand-blue-50',
                 },
@@ -523,12 +523,12 @@ export default function FundingEligibilityFlow({ fundingType, onReady }: Props) 
                 ))}
               </ul>
               <p className="text-xs text-slate-500">
-                Select "Self-pay" above to see all payment options, or call us at{' `}
+                Select "Self-pay" above to see all payment options, or call us at{' '}
                 <a
-                  href="tel:${PLATFORM_DEFAULTS.supportPhone}"
+                  href={`tel:${PLATFORM_DEFAULTS.supportPhone}`}
                   className="text-brand-blue-600 font-semibold hover:underline"
                 >
-                  ${PLATFORM_DEFAULTS.supportPhone}
+                  {PLATFORM_DEFAULTS.supportPhone}
                 </a>
                 .
               </p>

@@ -6,10 +6,10 @@ import { Activity, Clock, AlertTriangle } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Platform Status`,
+  title: 'Platform Status',
   description: `Current operational status of ${PLATFORM_DEFAULTS.orgName} platform services.`,
   alternates: {
-    canonical: `https://www.elevateforhumanity.org/status',
+    canonical: 'https://www.elevateforhumanity.org/status',
   },
 };
 

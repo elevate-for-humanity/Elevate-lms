@@ -8,14 +8,14 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/share' },
-  title: 'Share Elevate`,
+  title: 'Share Elevate',
   description:
     `Help someone you know access career training at no cost. Share ${PLATFORM_DEFAULTS.orgName} with friends, family, or community members.`,
 };
 
 const SHARE_OPTIONS = [
   {
-    title: `Refer a Friend or Family Member',
+    title: 'Refer a Friend or Family Member',
     desc: 'Know someone looking for career training? Send them our way. Many programs are available at no cost through WIOA and DOL funding.',
     icon: Users,
     href: '/enroll',
@@ -30,10 +30,10 @@ const SHARE_OPTIONS = [
   },
   {
     title: 'Email Our Programs Page',
-    desc: 'Send a direct link to our programs page so someone can browse available training options.`,
+    desc: 'Send a direct link to our programs page so someone can browse available training options.',
     icon: Mail,
     href: `mailto:?subject=Check out ${PLATFORM_DEFAULTS.orgName}&body=I thought you might be interested in free career training programs: https://www.elevateforhumanity.org/programs`,
-    cta: `Send via Email',
+    cta: 'Send via Email',
   },
 ];
 

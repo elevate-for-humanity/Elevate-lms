@@ -10,7 +10,7 @@ export const platformEmailTemplates = {
    */
   inquiryReceived: {
     from: PLATFORM_DEFAULTS.emailFromAddress,
-    subject: 'Platform inquiry received`,
+    subject: 'Platform inquiry received',
     getHtml: (data: { name: string }) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <p>Hello ${data.name},</p>
@@ -18,7 +18,7 @@ export const platformEmailTemplates = {
         <p>Thank you for your interest in the ${PLATFORM_DEFAULTS.orgName} platform.</p>
 
         <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
-          <p style="margin: 0;"><strong>We`ll review your inquiry and follow up to:</strong></p>
+          <p style="margin: 0;"><strong>We'll review your inquiry and follow up to:</strong></p>
           <ul style="margin: 10px 0;">
             <li>Discuss your use case</li>
             <li>Schedule a demo</li>
@@ -38,7 +38,7 @@ Hello ${data.name},
 
 Thank you for your interest in the ${PLATFORM_DEFAULTS.orgName} platform.
 
-We`ll review your inquiry and follow up to:
+We'll review your inquiry and follow up to:
 • Discuss your use case
 • Schedule a demo
 • Review licensing options
@@ -53,7 +53,7 @@ ${PLATFORM_DEFAULTS.orgName}
    */
   licensingProposal: {
     from: `partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
-    subject: `Platform licensing proposal',
+    subject: 'Platform licensing proposal',
     getHtml: (data: { name: string }) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <p>Hello ${data.name},</p>
@@ -66,7 +66,7 @@ ${PLATFORM_DEFAULTS.orgName}
           <li>Pricing and onboarding timeline</li>
         </ul>
 
-        <p>Please review and let us know if you`d like to proceed.</p>
+        <p>Please review and let us know if you'd like to proceed.</p>
 
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;" />
 
@@ -83,7 +83,7 @@ Attached is your platform licensing proposal, including:
 • Compliance considerations
 • Pricing and onboarding timeline
 
-Please review and let us know if you`d like to proceed.
+Please review and let us know if you'd like to proceed.
 
 —
 ${PLATFORM_DEFAULTS.orgName}
@@ -100,7 +100,7 @@ ${PLATFORM_DEFAULTS.orgName}
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <p>Hello ${data.name},</p>
 
-        <p>We`ve received your payment.</p>
+        <p>We've received your payment.</p>
 
         <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #e5e7eb;">
           <p style="margin: 0;"><strong>Next steps:</strong></p>
@@ -123,7 +123,7 @@ ${PLATFORM_DEFAULTS.orgName}
     getText: (data: { name: string }) => `
 Hello ${data.name},
 
-We`ve received your payment.
+We've received your payment.
 
 Next steps:
 • Account provisioning

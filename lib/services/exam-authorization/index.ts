@@ -82,13 +82,13 @@ export async function initiateCertification(
   const pathwayQuery = db
     .from('program_certification_pathways')
     .select(
-      '
+      `
       id, credential_name, credential_abbreviation,
       exam_fee_cents, fee_payer,
       eligibility_review_required, application_url,
       credential_registry_id,
       certification_bodies ( id, name, website, application_url )
-    ',
+    `,
     )
     .eq('program_id', programId)
     .eq('is_active', true);
@@ -601,7 +601,7 @@ export async function verifyUploadAndIssueCertificate(
     db.from('credential_registry').select('name').eq('id', req.credential_id).maybeSingle(),
   ]);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://${PLATFORM_DEFAULTS.canonicalDomain}`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${PLATFORM_DEFAULTS.canonicalDomain}`;
   const downloadUrl = `${siteUrl}/learner/certifications/${cert.id}/download`;
 
   if (profileRes.data && programRes.data && credRes.data) {

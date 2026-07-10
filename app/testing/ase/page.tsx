@@ -5,7 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `ASE Certification Testing | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Prepare for ASE automotive certification exams. Expert instructors, practice tests, and testing center access.',
+  description: 'Prepare for ASE automotive certification exams. Expert instructors, practice tests, and testing center access.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/ase' },
 };
 

@@ -168,7 +168,7 @@ async function deliverCertiport(
       const response = await fetch('https://api.certiport.com/v1/students', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${process.env.CERTIPORT_API_KEY}',
+          Authorization: `Bearer ${process.env.CERTIPORT_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -265,8 +265,8 @@ async function sendCredentialEmail(
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
                 <h3 style="margin-top: 0; color: #1e293b;">${request.courseName}</h3>
                 <p style="margin: 4px 0; color: #64748b;">Provider: ${request.providerName}</p>
-                ${result.username ? `<p style="margin: 4px 0;"><strong>Username:</strong> ${result.username}</p>' : ''}
-                ${result.accessCode ? `<p style="margin: 4px 0;"><strong>Access Code:</strong> ${result.accessCode}</p>' : ''}
+                ${result.username ? `<p style="margin: 4px 0;"><strong>Username:</strong> ${result.username}</p>` : ''}
+                ${result.accessCode ? `<p style="margin: 4px 0;"><strong>Access Code:</strong> ${result.accessCode}</p>` : ''}
               </div>
 
               <div style="text-align: center; margin: 24px 0;">
@@ -294,7 +294,7 @@ async function sendCredentialEmail(
         `,
       }),
     });
-    logger.info(`[credential-delivery] Email sent`, { studentEmail: request.studentEmail });
+    logger.info('[credential-delivery] Email sent', { studentEmail: request.studentEmail });
   } catch (emailErr) {
     // Non-fatal: enrollment succeeds even if email fails
     logger.error(

@@ -12,7 +12,7 @@
  *   3. Sends the appropriate email template and records the send in
  *      `application_followups` (created by migration below).
  *   4. After 2 follow-ups with no response, flags the application as
- *      `next_step = 'call_required'' for the admin dashboard.
+ *      `next_step = 'call_required'` for the admin dashboard.
  *
  * Auth: CRON_SECRET header.
  */

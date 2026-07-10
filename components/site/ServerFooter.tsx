@@ -178,7 +178,7 @@ export default function ServerFooter() {
             { title: 'Platform', links: footerLinks.platform },
             { title: 'Legal & Disclosures', links: footerLinks.legalDisclosures },
             { title: 'Compliance', links: footerLinks.compliance },
-            { title: 'Governance & Contracts`, links: footerLinks.governance },
+            { title: 'Governance & Contracts', links: footerLinks.governance },
           ]}
         />
 

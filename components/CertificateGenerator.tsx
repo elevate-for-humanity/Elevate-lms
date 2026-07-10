@@ -65,7 +65,7 @@ export default function CertificateGenerator({
 
   const handleShare = () => {
     // Deep-link to LinkedIn's share dialog pre-filled with certificate details.
-    // LinkedIn`s certification add flow requires their API; this opens the
+    // LinkedIn's certification add flow requires their API; this opens the
     // profile share as the closest publicly available option.
     const text = encodeURIComponent(
       `I just completed "${courseName}" through ${PLATFORM_DEFAULTS.orgName}! Certificate ID: ${certificateId}`,

@@ -85,7 +85,7 @@ async function _POST(req: Request) {
     });
   } catch (emailError) {
     logger.error(
-      `[license-request] Email failed:',
+      '[license-request] Email failed:',
       emailError instanceof Error ? emailError : undefined,
     );
   }

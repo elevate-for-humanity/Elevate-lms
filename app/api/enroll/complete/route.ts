@@ -134,7 +134,7 @@ async function _POST(req: Request) {
         if (linkError) {
           logger.warn('Recovery link generation failed', linkError);
         } else if (linkData?.properties?.action_link) {
-          const { sendEmail } = await import('@/lib/email/sendgrid`);
+          const { sendEmail } = await import('@/lib/email/sendgrid');
           await sendEmail({
             to: emailLower,
             subject: `Set Your Password — ${PLATFORM_DEFAULTS.orgName}`,

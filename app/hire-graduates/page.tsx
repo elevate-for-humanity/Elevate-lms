@@ -6,7 +6,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Hire Our Graduates | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Hire trained graduates from Elevate for Humanity workforce programs.',
+  description: 'Hire trained graduates from Elevate for Humanity workforce programs.',
 };
 
 const BENEFITS = [

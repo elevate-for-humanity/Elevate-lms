@@ -100,7 +100,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     studentName = studentProfile?.full_name || studentProfile?.first_name || studentName;
   }
 
-  const firstName = studentName.split(' `)[0];
+  const firstName = studentName.split(' ')[0];
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
 
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             </p>
           </div>
         </div>`,
-    }).catch((e) => logger.warn(`[grant-access] Email failed`, e));
+    }).catch((e) => logger.warn('[grant-access] Email failed', e));
   }
 
   logger.info('[grant-access] Access granted', {

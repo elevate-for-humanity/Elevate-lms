@@ -131,7 +131,7 @@ export class SocialMediaAutomation {
         `🎓 New day, new opportunities! Join thousands who have transformed their careers through our programs. SAM.gov registered contractor. #GovernmentContracts #Training`,
       ],
       afternoon: [
-        `📊 Did you know? 87% of our graduates find employment within 6 months. Join our success stories! Free certifications available. #JobPlacement #Success',
+        '📊 Did you know? 87% of our graduates find employment within 6 months. Join our success stories! Free certifications available. #JobPlacement #Success',
         '💼 Employers: Looking for trained, certified professionals? Partner with us for OJT, apprenticeships, and more. Tax credits available! #Hiring #Workforce',
         '🎯 Afternoon update: New grant opportunities available for workforce training. Check our programs page for details. #Grants #Funding',
       ],

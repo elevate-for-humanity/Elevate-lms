@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 </div>
 </body></html>`;
 
-  const res = await fetch(`https://api.sendgrid.com/v3/mail/send', {
+  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${SENDGRID_KEY}`,

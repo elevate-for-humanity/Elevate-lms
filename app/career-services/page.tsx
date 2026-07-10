@@ -6,7 +6,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Career Services | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Career coaching, job placement, resume building, and interview prep services to help you launch your career after training.',
+  description: 'Career coaching, job placement, resume building, and interview prep services to help you launch your career after training.',
   keywords: ['career services', 'job placement', 'resume help', 'interview prep', 'career coaching'],
 };
 

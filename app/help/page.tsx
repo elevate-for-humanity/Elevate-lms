@@ -5,7 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Help & Support | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Get help with enrollment, programs, funding, and more.',
+  description: 'Get help with enrollment, programs, funding, and more.',
 };
 
 const FAQ_TOPICS = [

@@ -8,7 +8,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Apply — Cosmetology Apprenticeship`,
+  title: 'Apply — Cosmetology Apprenticeship',
   description:
     `Apply to the ${PLATFORM_DEFAULTS.orgName} DOL-registered cosmetology apprenticeship — as an apprentice or as a partner salon.`,
   alternates: { canonical: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship/apply' },

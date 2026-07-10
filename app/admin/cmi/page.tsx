@@ -115,7 +115,7 @@ export default async function CMIDashboardPage() {
 
       {error && (
         <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          Failed to load student data. Apply migration{` '}
+          Failed to load student data. Apply migration{' '}
           <code className="font-mono">20260503000008_cmi_tables.sql</code> in Supabase Dashboard.
         </div>
       )}

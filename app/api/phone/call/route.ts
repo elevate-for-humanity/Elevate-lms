@@ -69,7 +69,7 @@ async function handleClickToCall(phoneNumber: string) {
     success: true,
     method: 'client-side',
     telLink: `tel:+1${PLATFORM_DEFAULTS.supportPhone}`, // Your office number
-    message: `Opening phone dialer...',
+    message: 'Opening phone dialer...',
   });
 }
 
@@ -136,4 +136,4 @@ async function notifyTeam(callbackData: Record<string, any>) {
   //   })
   // });
 }
-export const POST = withApiAudit(`/api/phone/call', _POST);
+export const POST = withApiAudit('/api/phone/call', _POST);

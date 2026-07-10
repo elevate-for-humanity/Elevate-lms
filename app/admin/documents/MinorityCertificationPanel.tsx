@@ -13,7 +13,7 @@ type TimelineEvent = {
 
 export default function MinorityCertificationPanel() {
   const [businessName, setBusinessName] = useState(`${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`);
-  const [ownerName, setOwnerName] = useState(`Elizabeth Greene');
+  const [ownerName, setOwnerName] = useState('Elizabeth Greene');
   const [ownerEthnicity, setOwnerEthnicity] = useState('Black / African American');
   const [ownerGender, setOwnerGender] = useState('Female');
   const [ownershipPercent, setOwnershipPercent] = useState('100%');
@@ -23,7 +23,7 @@ export default function MinorityCertificationPanel() {
   const [businessAddress, setBusinessAddress] = useState('8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240');
   const [contactEmail, setContactEmail] = useState('info@elevateforhumanity.org');
   const [contactPhone, setContactPhone] = useState(PLATFORM_DEFAULTS.supportPhone);
-  const [certifyingAgency, setCertifyingAgency] = useState('Indiana IOT MWBE`);
+  const [certifyingAgency, setCertifyingAgency] = useState('Indiana IOT MWBE');
   const [businessNarrative, setBusinessNarrative] = useState(`${PLATFORM_DEFAULTS.orgName} provides workforce development, credential training, and apprenticeship pathways serving underserved communities across Indiana.`);
   const [emailTo, setEmailTo] = useState('');
   const [loading, setLoading] = useState(false);

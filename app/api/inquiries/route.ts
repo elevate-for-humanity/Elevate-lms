@@ -154,7 +154,7 @@ async function _POST(req: Request) {
         },
       );
     } catch (emailError) {
-      logger.error(`Unhandled error`, emailError instanceof Error ? emailError : undefined);
+      logger.error('Unhandled error', emailError instanceof Error ? emailError : undefined);
     }
 
     return NextResponse.json(

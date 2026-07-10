@@ -33,7 +33,7 @@ export default async function OnboardingPage() {
     if (data?.role === 'student') redirect('/onboarding/learner');
     else if (data?.role === 'program_holder') redirect('/program-holder/onboarding');
     else if (data?.role === 'admin' || data?.role === 'super_admin')
-      redirect('/admin/dashboard`);
+      redirect('/admin/dashboard');
   }
 
   return (

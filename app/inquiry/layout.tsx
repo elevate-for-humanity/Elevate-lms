@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     `Begin your application for career training programs at ${PLATFORM_DEFAULTS.orgName}. Funding may be available through WIOA, grants, or employer sponsorship.`,
   alternates: {
-    canonical: `https://www.elevateforhumanity.org/inquiry',
+    canonical: 'https://www.elevateforhumanity.org/inquiry',
   },
 };
 

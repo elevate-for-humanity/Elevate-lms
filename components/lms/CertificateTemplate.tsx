@@ -121,13 +121,13 @@ export function CertificatePreview({
 
   const shareOnLinkedIn = () => {
     const url = `https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${encodeURIComponent(courseName)}&organizationId=elevate-for-humanity&issueYear=${new Date(completionDate).getFullYear()}&issueMonth=${new Date(completionDate).getMonth() + 1}&certUrl=${encodeURIComponent(`${PLATFORM_DEFAULTS.siteUrl}/verify/${certificateNumber}`)}`;
-    window.open(url, `_blank`);
+    window.open(url, '_blank');
   };
 
   const copyVerificationLink = () => {
     const link = `${PLATFORM_DEFAULTS.siteUrl}/verify/${certificateNumber}`;
     navigator.clipboard.writeText(link);
-    alert(`Verification link copied to clipboard!');
+    alert('Verification link copied to clipboard!');
   };
 
   return (

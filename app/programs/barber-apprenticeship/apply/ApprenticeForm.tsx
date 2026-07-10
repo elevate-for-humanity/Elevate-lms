@@ -224,7 +224,7 @@ export default function ApprenticeForm({
             formData.hasHostShop ? `Host shop: ${formData.hasHostShop}` : '',
             formData.hostShopName ? `Shop name: ${formData.hostShopName}` : '',
             transferHours ? `Transfer hours: ${transferHours}` : '',
-          ].filter(Boolean).join(' | `),
+          ].filter(Boolean).join(' | '),
         }),
       });
 

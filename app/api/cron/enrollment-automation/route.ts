@@ -66,7 +66,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     if (app.applicant_email) {
       await sendEmail({
         to: app.applicant_email,
-        subject: 'You're enrolled — ${app.program_name ?? 'your program'} | Elevate`,
+        subject: `You're enrolled — ${app.program_name ?? 'your program'} | Elevate`,
         html: `<p>Hi ${app.applicant_name ?? 'there'},</p><p>You've been enrolled in <strong>${app.program_name ?? 'your program'}</strong>. Log in to start your coursework.</p><p><a href="https://www.elevateforhumanity.org/lms/courses">Go to your courses →</a></p><p>— Elevate for Humanity</p>`,
       }).catch((e: unknown) => logger.warn('[cron/enrollment-automation] Welcome email failed', { error: String(e) }));
     }

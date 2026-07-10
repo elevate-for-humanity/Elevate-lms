@@ -4,7 +4,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const emailTemplates = {
   welcome: {
     name: 'Welcome Email',
-    subject: 'Welcome to ' + PLATFORM_DEFAULTS.orgName + '!`,
+    subject: 'Welcome to ' + PLATFORM_DEFAULTS.orgName + '!',
     html: `
 <!DOCTYPE html>
 <html>
@@ -31,7 +31,7 @@ export const emailTemplates = {
               <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">Hi {{firstName}},</p>
 
               <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-                We`re excited to have you join ' + PLATFORM_DEFAULTS.orgName + '! You're taking the first step toward a life-changing career.
+                We're excited to have you join ' + PLATFORM_DEFAULTS.orgName + '! You're taking the first step toward a life-changing career.
               </p>
 
               <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">
@@ -39,7 +39,7 @@ export const emailTemplates = {
               </p>
 
               <div style="background-color: #f1f5f9; border-left: 4px solid #ea580c; padding: 20px; margin: 0 0 30px 0;">
-                <h3 style="color: #1e293b; margin: 0 0 10px 0; font-size: 18px;">What`s Next?</h3>
+                <h3 style="color: #1e293b; margin: 0 0 10px 0; font-size: 18px;">What's Next?</h3>
                 <ul style="color: #475569; margin: 0; padding-left: 20px;">
                   <li style="margin-bottom: 8px;">Complete your application</li>
                   <li style="margin-bottom: 8px;">Schedule your orientation</li>
@@ -79,7 +79,7 @@ export const emailTemplates = {
   },
 
   programEnrollment: {
-    name: `Program Enrollment',
+    name: 'Program Enrollment',
     subject: "You're Enrolled in {{programName}}!",
     html: `
 <!DOCTYPE html>
@@ -104,7 +104,7 @@ export const emailTemplates = {
               <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">Hi {{firstName}},</p>
 
               <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-                Congratulations! You`re officially enrolled in <strong>{{programName}}</strong>.
+                Congratulations! You're officially enrolled in <strong>{{programName}}</strong>.
               </p>
 
               <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
@@ -156,7 +156,7 @@ export const emailTemplates = {
   },
 
   courseReminder: {
-    name: `Course Reminder',
+    name: 'Course Reminder',
     subject: 'Reminder: {{courseName}} starts {{startTime}}',
     html: `
 <!DOCTYPE html>
@@ -316,7 +316,7 @@ export const emailTemplates = {
   },
 
   partnerOutreach: {
-    name: 'Partner Outreach`,
+    name: 'Partner Outreach',
     subject: `Partnership Opportunity with ${PLATFORM_DEFAULTS.orgName}`,
     html: `
 <!DOCTYPE html>
@@ -333,7 +333,7 @@ export const emailTemplates = {
               <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">Dear {{partnerName}},</p>
 
               <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-                ${PLATFORM_DEFAULTS.orgName} is Indiana`s leading workforce training provider, offering 100% funded programs in high-demand careers.
+                ${PLATFORM_DEFAULTS.orgName} is Indiana's leading workforce training provider, offering 100% funded programs in high-demand careers.
               </p>
 
               <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 0 0 30px 0;">
@@ -366,7 +366,7 @@ export const emailTemplates = {
 
   employerPitch: {
     name: 'Employer Pitch',
-    subject: 'Hire Skilled Talent Through Our Training Programs`,
+    subject: 'Hire Skilled Talent Through Our Training Programs',
     html: `
 <!DOCTYPE html>
 <html>
@@ -455,7 +455,7 @@ export const emailTemplates = {
   },
 
   studentNurture: {
-    name: `Student Nurture',
+    name: 'Student Nurture',
     subject: '{{firstName}}, Keep Up the Great Work!',
     html: `
 <!DOCTYPE html>
@@ -467,7 +467,7 @@ export const emailTemplates = {
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px;">
           <tr>
             <td style="padding: 40px 30px; text-align: center; border-bottom: 2px solid #e5e7eb;">
-              <h1 style="color: #1e293b; margin: 0; font-size: 28px;">You`re Making Progress!</h1>
+              <h1 style="color: #1e293b; margin: 0; font-size: 28px;">You're Making Progress!</h1>
             </td>
           </tr>
 
@@ -534,7 +534,7 @@ export const emailTemplates = {
   },
 
   applicationFollowUp: {
-    name: `Application Follow-Up',
+    name: 'Application Follow-Up',
     subject: 'Complete Your Application - {{programName}}',
     html: `
 <!DOCTYPE html>
@@ -563,7 +563,7 @@ export const emailTemplates = {
               </p>
 
               <div style="background-color: #fff7ed; border: 2px solid #ea580c; border-radius: 8px; padding: 25px; margin: 0 0 30px 0;">
-                <h3 style="color: #9a3412; margin: 0 0 15px 0; font-size: 20px;">What You`ll Get:</h3>
+                <h3 style="color: #9a3412; margin: 0 0 15px 0; font-size: 20px;">What You'll Get:</h3>
                 <table width="100%" cellpadding="0" cellspacing="0">
                   <tr>
                     <td style="padding: 8px 0; color: #7c2d12;">
@@ -624,7 +624,7 @@ export const emailTemplates = {
   },
 
   workoneUpdate: {
-    name: `WorkOne Update',
+    name: 'WorkOne Update',
     subject: 'WorkOne Partnership Update - {{month}}',
     html: `
 <!DOCTYPE html>
@@ -648,7 +648,7 @@ export const emailTemplates = {
               </p>
 
               <p style="color: #334155; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">
-                Here`s our monthly update on student enrollments, completions, and placements through our WIOA partnership.
+                Here's our monthly update on student enrollments, completions, and placements through our WIOA partnership.
               </p>
 
               <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 25px; margin: 0 0 30px 0;">

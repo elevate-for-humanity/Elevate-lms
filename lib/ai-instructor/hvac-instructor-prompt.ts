@@ -94,7 +94,7 @@ You are currently teaching Lesson ${lessonNumber}: "${lessonTitle}".
 ${lessonContent.concept}
 
 ### Key Terms for This Lesson
-${lessonContent.keyTerms.map((t) => `- **${t.term}**: ${t.definition}`).join(`\n')}
+${lessonContent.keyTerms.map((t) => `- **${t.term}**: ${t.definition}`).join('\n')}
 
 ### Job Application
 ${lessonContent.jobApplication}

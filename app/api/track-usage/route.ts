@@ -307,7 +307,7 @@ async function sendDMCATakedown(data: { domain: string; url: string; timestamp: 
   const dmcaNotice = `
 DMCA TAKEDOWN NOTICE PURSUANT TO 17 U.S.C. § 512(c)
 
-Date: ${new Date().toISOString().split('T)[0]}
+Date: ${new Date().toISOString().split('T')[0]}
 
 To Whom It May Concern:
 
@@ -348,7 +348,7 @@ Elevate for Humanity Career & Technical Institute
   `.trim();
 
   const dmcaHtml = `
-    <div style="font-family: `Courier New`, monospace; max-width: 700px; margin: 0 auto; padding: 24px; border: 2px solid #991b1b; background: #fff;">
+    <div style="font-family: 'Courier New', monospace; max-width: 700px; margin: 0 auto; padding: 24px; border: 2px solid #991b1b; background: #fff;">
       <div style="text-align: center; padding: 16px; border-bottom: 2px solid #e5e7eb; color: #1e293b; margin: -24px -24px 24px -24px;">
         <h1 style="margin: 0; font-size: 18px;">DMCA TAKEDOWN NOTICE</h1>
         <p style="margin: 4px 0 0; font-size: 12px;">Pursuant to 17 U.S.C. § 512(c)</p>
@@ -366,7 +366,7 @@ Elevate for Humanity Career & Technical Institute
   });
 
   if (providerResult.success) {
-    logger.info('[DMCA] Takedown notice sent to', { abuseEmail });
+    logger.info('[DMCA] Takedown notice sent to:', { abuseEmail });
   } else {
     logger.error('[DMCA] Failed to send takedown to:', new Error(String(providerResult.error)), { abuseEmail });
   }

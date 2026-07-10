@@ -27,7 +27,7 @@ export default function ProgramHostAgreementPage() {
       >
         <DocumentSection heading="Parties and Purpose" number={1}>
           <p>
-            This Master Program Host Agreement ("Agreement") is entered into between{` '}
+            This Master Program Host Agreement ("Agreement") is entered into between{' '}
             <strong>
               2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
             </strong>{' '}

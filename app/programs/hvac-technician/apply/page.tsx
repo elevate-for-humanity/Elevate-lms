@@ -129,7 +129,7 @@ export default function HvacApplyPage() {
         appData = await appResponse.json();
       } catch {
         setError(`Server error — please call ${PLATFORM_DEFAULTS.supportPhone} or try again in a moment.`);
-        setErrorSeverity(`critical`);
+        setErrorSeverity('critical');
         setLoading(false);
         return;
       }

@@ -134,8 +134,8 @@ This is an automated alert from ${PLATFORM_DEFAULTS.orgName} Security System.
 
     try {
       await sgMail.send({
-        to: process.env.ALERT_EMAIL || `elizabeth@${PLATFORM_DEFAULTS.canonicalDomain}`,
-        from: `security@www.${PLATFORM_DEFAULTS.canonicalDomain}`,
+        to: process.env.ALERT_EMAIL || 'elizabeth@${PLATFORM_DEFAULTS.canonicalDomain}',
+        from: 'security@www.${PLATFORM_DEFAULTS.canonicalDomain}',
         subject: `🚨 Scraping Attempt: ${data.type}`,
         text: emailContent,
         html: emailContent.replace(/\n/g, '<br>')

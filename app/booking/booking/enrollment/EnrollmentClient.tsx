@@ -103,7 +103,7 @@ export default function EnrollmentBookingPage({ programs = [] }: { programs?: Pr
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-4">Appointment Confirmed!</h1>
           <p className="text-slate-700 mb-6">
-            Your enrollment consultation is scheduled for <strong>{selectedDate}</strong> at{` '}
+            Your enrollment consultation is scheduled for <strong>{selectedDate}</strong> at{' '}
             <strong>{selectedTime}</strong>.
           </p>
           <div className="bg-white rounded-xl border p-6 mb-6 text-left">

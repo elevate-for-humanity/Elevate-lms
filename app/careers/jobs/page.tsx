@@ -5,7 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Careers & Job Openings | ${PLATFORM_DEFAULTS.orgName}`,
-  keywords: ["career training", "workforce development", "job training", "WIOA"], description: `View current career opportunities and job openings at Elevate for Humanity.',
+  keywords: ["career training", "workforce development", "job training", "WIOA"], description: 'View current career opportunities and job openings at Elevate for Humanity.',
 };
 
 const JOB_OPENINGS = [

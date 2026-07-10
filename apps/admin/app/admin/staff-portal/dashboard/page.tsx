@@ -259,7 +259,7 @@ export default async function StaffDashboard() {
                   {recentEnrollmentsWithProfiles.map((enrollment: any) => (
                     <tr key={enrollment.id} className="hover:bg-slate-50">
                       <td className="px-6 py-4 text-sm text-black">
-                        {enrollment.profiles?.full_name || enrollment.profiles?.email || `N/A'}
+                        {enrollment.profiles?.full_name || enrollment.profiles?.email || 'N/A'}
                       </td>
                       <td className="px-6 py-4 text-sm text-black">
                         {enrollment.programs?.title || 'N/A'}

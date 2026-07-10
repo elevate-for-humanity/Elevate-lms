@@ -165,7 +165,7 @@ export function buildSegmentScripts(lesson: {
       .join('. '),
 
     // Segment 3: Application
-    'Here's a real-world example. ${example}`,
+    `Here's a real-world example. ${example}`,
 
     // Segment 4: Wrap-up
     `To summarize: ${summary}. Complete the knowledge check to continue.`,

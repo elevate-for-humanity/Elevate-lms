@@ -174,7 +174,7 @@ export const POST = withRuntime({ rateLimit: 'contact' }, async (req) => {
 
   const isOrg = bookingType === 'organization';
   const examLabel = examName || examType;
-  const seats = isOrg ? `${participantCount} seats` : '1 seat`;
+  const seats = isOrg ? `${participantCount} seats` : '1 seat';
 
   // ── Confirmation email to candidate/org ──────────────────────────────────
   const candidateHtml = `<!DOCTYPE html>
@@ -227,7 +227,7 @@ export const POST = withRuntime({ rateLimit: 'contact' }, async (req) => {
   <table style="border-collapse:collapse;font-size:14px;width:100%;max-width:500px">
     <tr><td style="padding:6px 12px 6px 0;color:#64748b">Name</td><td style="padding:6px 0;font-weight:600">${firstName} ${lastName}</td></tr>
     <tr><td style="padding:6px 12px 6px 0;color:#64748b">Email</td><td style="padding:6px 0">${email}</td></tr>
-    <tr><td style="padding:6px 12px 6px 0;color:#64748b">Phone</td><td style="padding:6px 0">${phone || `—'}</td></tr>
+    <tr><td style="padding:6px 12px 6px 0;color:#64748b">Phone</td><td style="padding:6px 0">${phone || '—'}</td></tr>
     <tr><td style="padding:6px 12px 6px 0;color:#64748b">Exam</td><td style="padding:6px 0;font-weight:600">${examLabel}</td></tr>
     <tr><td style="padding:6px 12px 6px 0;color:#64748b">Type</td><td style="padding:6px 0">${isOrg ? `Organization — ${organization} (${participantCount} seats)` : 'Individual'}</td></tr>
     <tr><td style="padding:6px 12px 6px 0;color:#64748b">Preferred Date</td><td style="padding:6px 0;font-weight:600">${formatBookingDate(preferredDate)} at ${preferredTime}</td></tr>

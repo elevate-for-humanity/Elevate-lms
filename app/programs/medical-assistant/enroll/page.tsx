@@ -50,7 +50,7 @@ export default function MedicalAssistantEnrollPage() {
         body: JSON.stringify({ ...formData, programSlug: PROGRAM.slug, programName: PROGRAM.name, paymentOption, paymentPlan: paymentOption === 'payment-plan' ? { downPayment: customDown, weeklyPayment, weeks: customWeeks } : null }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Enrollment failed`);
+      if (!res.ok) throw new Error(data.error || 'Enrollment failed');
       const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (!data.enrollmentId || !uuidPattern.test(data.enrollmentId)) throw new Error(`Enrollment could not be confirmed. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);
 
@@ -89,7 +89,7 @@ export default function MedicalAssistantEnrollPage() {
           <div className="lg:col-span-3 space-y-6">
             {step === 1 && (
               <>
-                <FundingInfoBlock programName={PROGRAM.name} fundingSources={[`WIOA (Workforce Innovation & Opportunity Act)', 'Next Level Jobs / Workforce Ready Grant', 'EmployIndy']} selfPayPrice={PROGRAM.price} />
+                <FundingInfoBlock programName={PROGRAM.name} fundingSources={['WIOA (Workforce Innovation & Opportunity Act)', 'Next Level Jobs / Workforce Ready Grant', 'EmployIndy']} selfPayPrice={PROGRAM.price} />
                 <div className="bg-white rounded-2xl border border-slate-200 p-6">
                   <h2 className="text-xl font-bold mb-4">Ready to Enroll? Start Here</h2>
                   <div className="space-y-4">

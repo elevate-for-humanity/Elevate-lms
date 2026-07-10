@@ -109,7 +109,7 @@ export function getPartnerWelcomeEmail(data: PartnerWelcomeData): {
 
     <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
       <p style="color: #6b7280; font-size: 14px; margin: 0;">
-        This enrollment was created through <strong>${PLATFORM_DEFAULTS.orgName}</strong>. If you didn`t request this enrollment, please contact us immediately.
+        This enrollment was created through <strong>${PLATFORM_DEFAULTS.orgName}</strong>. If you didn't request this enrollment, please contact us immediately.
       </p>
     </div>
 
@@ -183,7 +183,7 @@ ${data.contactPhone ? `Phone: ${data.contactPhone}` : ''}
 
 ---
 This enrollment was created through ${PLATFORM_DEFAULTS.orgName}.
-If you didn`t request this enrollment, please contact us immediately.
+If you didn't request this enrollment, please contact us immediately.
 
 ${PLATFORM_DEFAULTS.orgName}
 ${PLATFORM_DEFAULTS.siteUrl}
@@ -253,7 +253,7 @@ export function getPartnerCompletionEmail(data: {
 
     <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #e5e7eb; text-align: center;">
       <p style="color: #6b7280; font-size: 16px; margin: 0;">
-        Keep up the great work! We`re proud of your achievement.
+        Keep up the great work! We're proud of your achievement.
       </p>
     </div>
 
@@ -276,7 +276,7 @@ export function getPartnerCompletionEmail(data: {
 
 Hi ${data.studentName},
 
-You did it! You`ve successfully completed ${data.courseName || data.providerName}.
+You did it! You've successfully completed ${data.courseName || data.providerName}.
 
 COURSE COMPLETED!
 Completed on ${new Date(data.completedAt).toLocaleDateString()}
@@ -296,7 +296,7 @@ WHAT'S NEXT?
 - Explore additional courses to continue your learning journey
 - Apply your new skills in real-world projects
 
-Keep up the great work! We`re proud of your achievement.
+Keep up the great work! We're proud of your achievement.
 
 ---
 ${PLATFORM_DEFAULTS.orgName}
@@ -323,7 +323,7 @@ export function getPartnerMilestoneEmail(data: {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${subject}</title>
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, `Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
 
   <!-- Header -->
   <div style="padding: 40px 20px; text-align: center; border-bottom: 2px solid #e5e7eb; border-radius: 10px 10px 0 0;">
@@ -354,7 +354,7 @@ export function getPartnerMilestoneEmail(data: {
 
     <div style="margin: 30px 0;">
       <h3 style="color: #1f2937; font-size: 18px;">Keep Going!</h3>
-      <p style="color: #4b5563;">You're doing great! Keep up the momentum and you`ll reach your goal in no time.</p>
+      <p style="color: #4b5563;">You're doing great! Keep up the momentum and you'll reach your goal in no time.</p>
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
@@ -380,7 +380,7 @@ export function getPartnerMilestoneEmail(data: {
 
 Hi ${data.studentName},
 
-You`re making great progress in ${data.courseName}!
+You're making great progress in ${data.courseName}!
 
 ${data.milestone}
 You're ${data.progress}% complete!

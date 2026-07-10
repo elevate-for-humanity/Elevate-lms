@@ -9,7 +9,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
  * ```
  * await enqueueEmail({
  *   emailType: 'license_activated',
- *   to: `user@${PLATFORM_DEFAULTS.canonicalDomain}`,
+ *   to: 'user@${PLATFORM_DEFAULTS.canonicalDomain}',
  *   correlationId: paymentIntentId,
  *   tenantId: tenant.id,
  *   templateData: { plan: 'professional', tenantName: 'Acme Corp' }

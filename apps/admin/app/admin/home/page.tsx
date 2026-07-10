@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Admin Portal | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Manage your workforce development programs, students, and operations.',
+  description: 'Manage your workforce development programs, students, and operations.',
 };
 
 interface NavCard {

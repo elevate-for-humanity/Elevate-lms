@@ -43,7 +43,7 @@ function MOUBuilder() {
     background:
       `${PLATFORM_DEFAULTS.orgName} is an ETPL-listed workforce development organization serving Indianapolis and surrounding communities. [Partner] provides [describe partner capabilities]. Together, both organizations seek to address the growing demand for skilled workers in [industry].`,
     scopeOfCollaboration:
-      `This partnership covers the delivery of [program name] training, including classroom instruction, hands-on lab exercises, credential testing, and employment placement support.',
+      'This partnership covers the delivery of [program name] training, including classroom instruction, hands-on lab exercises, credential testing, and employment placement support.',
     elevateSigner: { name: 'Elizabeth Greene', title: 'Founder & CEO' },
     partnerSigner: { name: '', title: '' },
   });

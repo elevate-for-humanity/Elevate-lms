@@ -233,36 +233,36 @@ function validateAndWarn(blueprint: CourseBlueprint): void {
 
   const allLessonTitles: string[] = [];
   blueprint.modules?.forEach((mod, mi) => {
-    if (!mod.title?.trim()) warnings.push(`Module ${mi + 1} has no title.') };
+    if (!mod.title?.trim()) warnings.push(`Module ${mi + 1} has no title.`);
     if (!mod.lessons?.length || mod.lessons.length < 2) {
-      warnings.push(`Module ${mi + 1} "${mod.title}" has fewer than 2 lessons.') };
+      warnings.push(`Module ${mi + 1} "${mod.title}" has fewer than 2 lessons.`);
     }
     mod.lessons?.forEach((lesson, li) => {
-      if (!lesson.title?.trim()) warnings.push(`Module ${mi + 1}, Lesson ${li + 1} has no title.') };
+      if (!lesson.title?.trim()) warnings.push(`Module ${mi + 1}, Lesson ${li + 1} has no title.`);
       if ((lesson.duration_minutes || 0) < 5) {
         warnings.push(
           `Lesson "${lesson.title}" is very short (${lesson.duration_minutes || 0} min). Review content.`,
         );
       }
       if ((lesson.content?.length || 0) < 50) {
-        warnings.push(`Lesson "${lesson.title}" has minimal content. Expand before publishing.') };
+        warnings.push(`Lesson "${lesson.title}" has minimal content. Expand before publishing.`);
       }
       if (allLessonTitles.includes(lesson.title)) {
-        warnings.push(`Duplicate lesson title: "${lesson.title}".') };
+        warnings.push(`Duplicate lesson title: "${lesson.title}".`);
       }
       allLessonTitles.push(lesson.title);
     });
   });
 
   blueprint.quiz_questions?.forEach((q, qi) => {
-    if (!q.question_text?.trim()) warnings.push(`Quiz question ${qi + 1} has no text.') };
+    if (!q.question_text?.trim()) warnings.push(`Quiz question ${qi + 1} has no text.`);
     if (!q.options?.length || q.options.length < 2) {
-      warnings.push(`Quiz question ${qi + 1} has fewer than 2 answer options.') };
+      warnings.push(`Quiz question ${qi + 1} has fewer than 2 answer options.`);
     }
     if (!q.correct_answer?.trim()) {
-      warnings.push(`Quiz question ${qi + 1} has no correct answer set.') };
+      warnings.push(`Quiz question ${qi + 1} has no correct answer set.`);
     } else if (q.options?.length && !q.options.includes(q.correct_answer)) {
-      warnings.push(`Quiz question ${qi + 1}: correct answer not found in options list.') };
+      warnings.push(`Quiz question ${qi + 1}: correct answer not found in options list.`);
     }
   });
 
@@ -369,7 +369,7 @@ export async function ingestCourse(input: IngestInput): Promise<CourseBlueprint>
   blueprint.detected_source_type = detectedType;
 
   // Apply house rule defaults
-  if (!blueprint.certificate_title || blueprint.certificate_title.includes('[Course Title]') }) {
+  if (!blueprint.certificate_title || blueprint.certificate_title.includes('[Course Title]')) {
     blueprint.certificate_title = `Certificate of Completion — ${blueprint.title} — ${PLATFORM_DEFAULTS.orgName}`;
   }
   if (!blueprint.passing_score) blueprint.passing_score = 70;

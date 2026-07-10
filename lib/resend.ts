@@ -59,7 +59,7 @@ function parseFrom(from: string): { email: string; name?: string } {
 
 /**
  * Resend SDK compatibility shim.
- * Files that `import { Resend } from 'resend'' and `new Resend(key)` will
+ * Files that `import { Resend } from 'resend'` and `new Resend(key)` will
  * be caught at build time. Those files should be migrated to use
- * `import { resend } from '@/lib/resend'' or `import { sendEmail } from '@/lib/email/sendgrid''.
+ * `import { resend } from '@/lib/resend'` or `import { sendEmail } from '@/lib/email/sendgrid'`.
  */

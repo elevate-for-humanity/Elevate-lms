@@ -6,7 +6,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Success Stories | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Real stories from graduates who transformed their careers through our workforce training programs.',
+  description: 'Real stories from graduates who transformed their careers through our workforce training programs.',
 };
 
 export default function SuccessStoriesPage() {

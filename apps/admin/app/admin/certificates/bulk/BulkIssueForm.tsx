@@ -62,7 +62,7 @@ export default function BulkIssueForm({
     try {
       const res = await fetch('/api/admin/certificates/bulk', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           enrollmentIds: Array.from(selected),
           templateId,
@@ -72,7 +72,7 @@ export default function BulkIssueForm({
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || `Bulk issuance failed');
+      if (!res.ok) throw new Error(data.error || 'Bulk issuance failed');
       setResult({ success: data.issued || 0, failed: data.failed || 0 });
     } catch (err: any) {
       setError('Failed to issue certificates. Please try again.');

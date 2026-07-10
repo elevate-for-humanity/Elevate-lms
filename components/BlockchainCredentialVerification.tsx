@@ -33,7 +33,7 @@ export function BlockchainCredentialVerification() {
     {
       id: '1',
       type: 'certificate',
-      title: 'Full-Stack Web Development`,
+      title: 'Full-Stack Web Development',
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
       issueDate: '2024-01-15',
       blockchainHash: '0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385',
@@ -47,7 +47,7 @@ export function BlockchainCredentialVerification() {
     {
       id: '2',
       type: 'badge',
-      title: 'JavaScript Expert`,
+      title: 'JavaScript Expert',
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
       issueDate: '2024-01-10',
       blockchainHash: '0x3c2c2eb7b11a91385f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ea',
@@ -87,12 +87,12 @@ export function BlockchainCredentialVerification() {
         setVerificationResult({
           id: cert.id,
           type: 'certificate',
-          title: cert.metadata?.course_name || 'Program Certificate`,
+          title: cert.metadata?.course_name || 'Program Certificate',
           issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
           issueDate: cert.issued_at?.split('T')[0] || '',
           blockchainHash: '',
           verificationUrl: `https://${PLATFORM_DEFAULTS.canonicalDomain}/verify/${cert.certificate_number}`,
-          status: `verified`,
+          status: 'verified',
           metadata: cert.metadata || {},
         });
       } else {

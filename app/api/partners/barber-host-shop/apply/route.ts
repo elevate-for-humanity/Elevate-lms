@@ -498,7 +498,7 @@ async function _POST(req: Request) {
       to: body.contactEmail,
       subject: `Welcome to the Barbershop Partner Program — ${shopDisplayName}`,
       html: partnerWelcomeHtml,
-    }).catch((err) => logger.error(`Failed to send partner welcome email` err));
+    }).catch((err) => logger.error('Failed to send partner welcome email', err));
 
     // Send copy to admin
     await sendEmail({

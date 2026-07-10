@@ -5,7 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Grants & Funding | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Learn about grants and funding options for workforce training.',
+  description: 'Learn about grants and funding options for workforce training.',
 };
 
 const GRANTS = [

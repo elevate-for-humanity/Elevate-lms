@@ -96,7 +96,7 @@ export async function runPostApprovalActions(input: PostApprovalInput): Promise<
 
     await sendEmail({
       to: studentEmail,
-      subject: `You`re Enrolled — ${programTitle} | ${PLATFORM_DEFAULTS.orgName}`,
+      subject: `You're Enrolled — ${programTitle} | ${PLATFORM_DEFAULTS.orgName}`,
       html: `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a;">
 
@@ -112,7 +112,7 @@ export async function runPostApprovalActions(input: PostApprovalInput): Promise<
 
     ${fundingLabel ? `<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin:0 0 24px;">
       <p style="margin:0;font-size:13px;color:#166534;"><strong>Funding:</strong> ${fundingLabel}</p>
-    </div> : ''}
+    </div>` : ''}
 
     <!-- Account / Login -->
     <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:10px;padding:24px;margin:0 0 24px;text-align:center;">
@@ -142,7 +142,7 @@ export async function runPostApprovalActions(input: PostApprovalInput): Promise<
       <tr>
         <td style="padding:12px 14px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;vertical-align:top;">
           <p style="margin:0 0 3px;font-weight:700;font-size:13px;color:#0f172a;">2 &nbsp;Upload your government-issued ID</p>
-          <p style="margin:0;font-size:12px;color:#64748b;">Required before your coursework unlocks. Driver`s license, state ID, or passport accepted.</p>
+          <p style="margin:0;font-size:12px;color:#64748b;">Required before your coursework unlocks. Driver's license, state ID, or passport accepted.</p>
         </td>
       </tr>
       <tr><td style="height:6px;"></td></tr>
@@ -193,7 +193,7 @@ export async function runPostApprovalActions(input: PostApprovalInput): Promise<
 </div>`,
     });
 
-    logger.info(`[post-approval] Enrollment email sent`, { to: studentEmail, program: programTitle });
+    logger.info('[post-approval] Enrollment email sent', { to: studentEmail, program: programTitle });
   } catch (err) {
     logger.error('[post-approval] Enrollment email failed (non-fatal)', err);
   }

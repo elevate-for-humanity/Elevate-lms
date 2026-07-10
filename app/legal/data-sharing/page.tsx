@@ -98,7 +98,7 @@ export default function DataSharingPage() {
 
         <DocumentSection heading="Right to Revoke" number={6}>
           <p>
-            You may revoke this consent at any time by submitting a written request to{` '}
+            You may revoke this consent at any time by submitting a written request to{' '}
             <strong>info@elevateforhumanity.org</strong>. Revocation is not retroactive. Revoking
             consent may affect your eligibility for funded programs that require data sharing for
             compliance.

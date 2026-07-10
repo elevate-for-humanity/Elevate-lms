@@ -83,7 +83,7 @@ export function ApplicationForm() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Submission failed`);
+        throw new Error(result.error || 'Submission failed');
       }
 
       if (!result.referenceNumber) {
@@ -93,7 +93,7 @@ export function ApplicationForm() {
       setApplicationId(result.referenceNumber);
       setStep(6);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : `Submission failed. Please try again.';
+      const message = err instanceof Error ? err.message : 'Submission failed. Please try again.';
       setSubmitError(message);
     } finally {
       setSubmitting(false);

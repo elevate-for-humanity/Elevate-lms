@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function TermsOfServiceRedirect() {
-  redirect(`/terms');
+  redirect('/terms');
 }

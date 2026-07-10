@@ -176,7 +176,7 @@ export async function PATCH(
           .from('program_phases')
           .delete()
           .eq('program_id', programId)
-          .not('id', 'in', `(${incomingPhaseIds.map((id) => `'${id}'').join(',')})`);
+          .not('id', 'in', `(${incomingPhaseIds.map((id) => `'${id}'`).join(',')})`);
       } else {
         await db.from('program_phases').delete().eq('program_id', programId);
       }
@@ -187,7 +187,7 @@ export async function PATCH(
           .from('program_modules')
           .delete()
           .eq('program_id', programId)
-          .not('id', 'in', `(${incomingModuleIds.map((id) => `'${id}'').join(',')})`);
+          .not('id', 'in', `(${incomingModuleIds.map((id) => `'${id}'`).join(',')})`);
       } else {
         await db.from('program_modules').delete().eq('program_id', programId);
       }
@@ -279,7 +279,7 @@ async function upsertLessons(db: any, moduleId: string, lessons: any[]) {
       .from('program_lessons')
       .delete()
       .eq('module_id', moduleId)
-      .not('id', 'in', `(${incomingIds.map((id) => `'${id}'').join(',')})`);
+      .not('id', 'in', `(${incomingIds.map((id) => `'${id}'`).join(',')})`);
   } else {
     await db.from('program_lessons').delete().eq('module_id', moduleId);
   }

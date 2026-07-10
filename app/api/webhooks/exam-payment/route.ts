@@ -176,7 +176,7 @@ export async function POST(req: NextRequest) {
       }
     } catch (emailErr) {
       logger.error(
-        `exam-payment webhook: email send failed',
+        'exam-payment webhook: email send failed',
         emailErr instanceof Error ? emailErr : undefined,
       );
     }

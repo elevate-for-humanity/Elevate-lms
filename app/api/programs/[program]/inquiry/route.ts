@@ -85,7 +85,7 @@ export async function POST(request: NextRequest, { params }: { params: { program
       `,
     });
   } catch (emailErr) {
-    logger.error(`Failed to send inquiry notification email` emailErr);
+    logger.error('Failed to send inquiry notification email', emailErr);
     // Non-fatal — inquiry is saved
   }
 

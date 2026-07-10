@@ -127,13 +127,13 @@ async function _POST(req: Request) {
         }. Tell them you are enrolling with ${PLATFORM_DEFAULTS.orgName}.`;
         break;
       case 'workone_followup':
-        message = `Hi ${app.first_name}, we noticed you haven`t attended your WorkOne appointment yet. Please call us at ${PLATFORM_DEFAULTS.supportPhone} if you need help rescheduling.`;
+        message = `Hi ${app.first_name}, we noticed you haven't attended your WorkOne appointment yet. Please call us at ${PLATFORM_DEFAULTS.supportPhone} if you need help rescheduling.`;
         break;
-      case `icc_reminder`:
+      case 'icc_reminder':
         message = `Hi ${app.first_name}, please create your account at IndianaCareerConnect.com and schedule your WorkOne appointment. Call ${PLATFORM_DEFAULTS.supportPhone} if you need help.`;
         break;
       default:
-        return NextResponse.json({ error: `Invalid reminder type' }, { status: 400 });
+        return NextResponse.json({ error: 'Invalid reminder type' }, { status: 400 });
     }
 
     // Send SMS

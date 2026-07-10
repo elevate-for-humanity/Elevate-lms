@@ -10,7 +10,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Press & Media`,
+  title: 'Press & Media',
   description:
     `Press coverage, media resources, and contact information for journalists covering ${PLATFORM_DEFAULTS.orgName} workforce development programs.`,
   alternates: { canonical: 'https://www.elevateforhumanity.org/press' },

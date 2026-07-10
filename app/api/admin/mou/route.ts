@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
         to: partner_email,
         subject: `MOU from ${PLATFORM_DEFAULTS.orgName} - ${mouTitle ?? "Partnership Agreement"}`,
         html: `
-          <p>Dear ${partner_name ?? `Partner`},</p>
+          <p>Dear ${partner_name ?? 'Partner'},</p>
           <p>${PLATFORM_DEFAULTS.orgName} has prepared a Memorandum of Understanding for your review.</p>
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:24px;margin:16px 0">
             ${mouContent}
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
           <p>- ${PLATFORM_DEFAULTS.orgName}</p>
         `,
         text: `MOU from ${PLATFORM_DEFAULTS.orgName}\n\n${mouContent?.replace(/<[^>]+>/g, ` `)}\n\nContact: partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
-        replyTo: `partnerships@${PLATFORM_DEFAULTS.canonicalDomain}`,
+        replyTo: 'partnerships@' + PLATFORM_DEFAULTS.canonicalDomain,
       });
 
       // Update status to sent

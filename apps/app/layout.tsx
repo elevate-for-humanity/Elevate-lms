@@ -29,13 +29,13 @@ export const metadata: Metadata = {
   metadataBase: new URL(ADMIN_METADATA_BASE),
   title: {
     default: 'Elevate Admin',
-    template: '%s | Elevate Admin`,
+    template: '%s | Elevate Admin',
   },
   description: `${PLATFORM_DEFAULTS.orgName} — Admin Portal`,
   robots: { index: false, follow: false },
   icons: {
     icon: [
-      { url: `/favicon.ico', type: 'image/x-icon', sizes: '32x32' },
+      { url: '/favicon.ico', type: 'image/x-icon', sizes: '32x32' },
       { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/favicon.png', type: 'image/png', sizes: '192x192' },
     ],
     shortcut: '/favicon.ico',

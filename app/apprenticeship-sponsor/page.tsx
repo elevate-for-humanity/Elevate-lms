@@ -19,7 +19,7 @@ import heroBanners from '@/content/heroBanners';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Registered Apprenticeship Sponsor`,
+  title: 'Registered Apprenticeship Sponsor',
   description:
     `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute is a USDOL Registered Apprenticeship Sponsor providing RTI, apprenticeship governance, and coordination with licensed employer training sites.`,
   alternates: { canonical: 'https://www.elevateforhumanity.org/apprenticeship-sponsor' },

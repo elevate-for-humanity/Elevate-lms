@@ -44,7 +44,7 @@ export default async function WorkOneRegionPage({
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
-              { label: `Find WorkOne', href: '/find-workone' },
+              { label: 'Find WorkOne', href: '/find-workone' },
               { label: region.name },
             ]}
           />

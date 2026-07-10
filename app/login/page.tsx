@@ -352,7 +352,7 @@ function LoginForm() {
         <div className="max-w-md mx-auto px-4">
           <div className="bg-white rounded-lg shadow-lg p-8">
             {/* Portal-specific header when redirecting to a known portal */}
-            {next?.startsWith(`/portal/apprentice') && (
+            {next?.startsWith('/portal/apprentice') && (
               <div className="mb-5 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-center">
                 <p className="text-xs font-bold text-amber-700 uppercase tracking-widest">Apprentice Portal</p>
                 <p className="text-xs text-amber-600 mt-0.5">DOL Registered Apprenticeship</p>
@@ -561,10 +561,10 @@ function LoginForm() {
 
           <div className="mt-6 text-center text-sm text-black">
             <p>
-              Need help?{' `}
+              Need help?{' '}
               <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-brand-blue-600 font-semibold">
                 {PLATFORM_DEFAULTS.supportPhone}
-              </a>{` '}
+              </a>{' '}
               or{' '}
               <Link href="/support" className="text-brand-blue-600 font-semibold">
                 support center

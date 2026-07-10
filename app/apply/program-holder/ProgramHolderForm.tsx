@@ -76,7 +76,7 @@ export default function ProgramHolderForm() {
         </p>
         <ul className="space-y-2 mb-4">
           {[
-            `Barbershops, salons, and cosmetology studios hosting apprentices',
+            'Barbershops, salons, and cosmetology studios hosting apprentices',
             'Independent contractors and sole proprietors offering on-the-job training',
             'Small businesses sponsoring employees through a credential program',
             'Schools, nonprofits, and workforce agencies offering training programs',

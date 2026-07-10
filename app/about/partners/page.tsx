@@ -6,7 +6,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Our Partners | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Discover the employers, workforce agencies, and organizations that partner with Elevate for Humanity to create career pathways.',
+  description: 'Discover the employers, workforce agencies, and organizations that partner with Elevate for Humanity to create career pathways.',
   keywords: ['partners', 'employers', 'workforce agencies', 'WorkOne', 'collaborations'],
 };
 

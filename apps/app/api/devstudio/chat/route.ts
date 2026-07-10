@@ -668,7 +668,7 @@ export const maxDuration = 60;
 
 
 export const metadata: Metadata = {
-  title: `${pageTitle} | ${PLATFORM_DEFAULTS.orgName}`,
+  title: '${pageTitle} | ${PLATFORM_DEFAULTS.orgName}',
   description: '${pageTitle} for ${audience}.',
 };
 

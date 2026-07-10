@@ -82,7 +82,7 @@ export default function EmployerMOUSignForm({ programs }: { programs: string[] }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       setPdfUrl(url);
-      setStep(`done`);
+      setStep('done');
     } catch {
       setError(`Network error. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
     } finally {

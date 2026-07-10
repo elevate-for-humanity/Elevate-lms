@@ -208,7 +208,7 @@ export default function AvatarChatBar() {
           content:
             data.message ||
             data.response ||
-            `I`m here to help! Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
+            `I'm here to help! Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
         },
       ]);
 
@@ -222,7 +222,7 @@ export default function AvatarChatBar() {
       setMessages((prev) => [
         ...prev,
         {
-          role: `assistant`,
+          role: 'assistant',
           content: `Connection issue. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate help.`,
         },
       ]);

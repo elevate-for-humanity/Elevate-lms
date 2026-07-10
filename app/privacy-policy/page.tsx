@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPolicyRedirect() {
-  redirect(`/legal/privacy');
+  redirect('/legal/privacy');
 }

@@ -10,7 +10,7 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: `System Health | Admin | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Platform service status, connectivity checks, and active alerts.',
+  description: 'Platform service status, connectivity checks, and active alerts.',
 };
 
 export default async function SystemHealthPage() {

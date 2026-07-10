@@ -162,7 +162,7 @@ export default async function ParentPortalPage() {
                     <p className="font-bold text-black truncate">{s.full_name}</p>
                     <p className="text-black text-sm truncate">{s.program}</p>
                     <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-green-100 text-brand-green-800 capitalize">
-                      {s.enrollment_state.replace(/_/g, ` ')}
+                      {s.enrollment_state.replace(/_/g, ' ')}
                     </span>
                   </div>
                   <Link

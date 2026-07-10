@@ -130,7 +130,7 @@ export default function FERPATrainingDashboard({
       alert('Reminder sent successfully');
     } catch (error) {
       /* Error handled silently */
-      alert('Failed to send reminder`);
+      alert('Failed to send reminder');
     }
   };
 
@@ -148,7 +148,7 @@ export default function FERPATrainingDashboard({
               <Link href="/ferpa" className="px-4 py-2 text-black hover:text-black font-medium">
                 FERPA Portal
               </Link>
-              <Link href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/dashboard" className="px-4 py-2 text-black hover:text-black font-medium">
+              <Link href={`https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/dashboard`} className="px-4 py-2 text-black hover:text-black font-medium">
                 Admin Dashboard
               </Link>
             </div>

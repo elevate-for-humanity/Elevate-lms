@@ -28,7 +28,7 @@ export function CopyrightProtection() {
         const notice = `\n\n— © ${new Date().getFullYear()} ${PLATFORM_DEFAULTS.orgName}. All Rights Reserved. Source: ${window.location.href}`;
         const withNotice = selection + notice;
         try {
-          e.clipboardData?.setData(`text/plain`, withNotice);
+          e.clipboardData?.setData('text/plain', withNotice);
           e.preventDefault();
         } catch {
           // Clipboard API unavailable — let the copy proceed unmodified

@@ -155,7 +155,7 @@ export default function BarberDocumentsPage() {
         return;
       }
 
-      router.push(`/apprentice`);
+      router.push('/apprentice');
     } catch {
       setSubmitError(`Unable to submit. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
       setSubmitting(false);

@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
         <h2 style="color:#1e293b">Hi ${firstName},</h2>
         <p>We noticed you haven't been active in your program recently and we want to make sure you have the support you need.</p>
         <p>Your success matters to us. If you're facing any challenges — scheduling, funding, personal circumstances — please reach out and we'll work with you.</p>
-        <p><strong>Reply to this email</strong> or call us directly and we`ll connect you with your case manager.</p>
+        <p><strong>Reply to this email</strong> or call us directly and we'll connect you with your case manager.</p>
         <p style="margin-top:24px">— ${PLATFORM_DEFAULTS.orgName} Student Services</p>
       </div>
     `,

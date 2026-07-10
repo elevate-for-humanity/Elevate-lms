@@ -9,7 +9,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Program Name | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Program description for SEO',
+  description: 'Program description for SEO',
 };
 
 export default function ProgramTemplate() {

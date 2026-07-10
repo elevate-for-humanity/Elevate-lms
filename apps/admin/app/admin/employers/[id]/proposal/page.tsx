@@ -12,7 +12,7 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: `Employer Proposal | Admin | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `View and manage employer partnership proposals.',
+  description: 'View and manage employer partnership proposals.',
 };
 
 export default async function EmployerProposalPage({

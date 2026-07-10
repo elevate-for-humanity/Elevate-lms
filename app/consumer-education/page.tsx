@@ -27,7 +27,7 @@ export default function ConsumerEducationPage() {
           heading: 'Financial Literacy for Working Adults',
           paragraphs: [
             `${PLATFORM_DEFAULTS.orgName} provides free consumer education resources to help Indiana residents make informed financial decisions, access benefits they qualify for, and protect themselves from predatory practices.`,
-            `Our VITA-certified volunteers prepare free federal and state tax returns for households earning under $67,000. We also offer workshops on budgeting, credit building, and navigating public benefits.`,
+            'Our VITA-certified volunteers prepare free federal and state tax returns for households earning under $67,000. We also offer workshops on budgeting, credit building, and navigating public benefits.',
           ],
           image: '/images/pages/community-page-4.webp',
         },

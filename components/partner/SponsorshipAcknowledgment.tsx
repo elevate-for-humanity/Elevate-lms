@@ -26,7 +26,7 @@ const DEFAULT_ITEMS: AcknowledgmentItem[] = [
     key: 'sponsor',
     label: `I understand ${PLATFORM_DEFAULTS.orgName} is the Program Sponsor`,
     description:
-      `EFH is responsible for program approval, workforce alignment, compliance, and reporting.',
+      'EFH is responsible for program approval, workforce alignment, compliance, and reporting.',
     required: true,
   },
   {
@@ -47,7 +47,7 @@ const DEFAULT_ITEMS: AcknowledgmentItem[] = [
     key: 'enrollment',
     label: `I understand all funded enrollments flow through ${PLATFORM_DEFAULTS.orgName}`,
     description:
-      `Partners do not independently enroll students into funded programs. All enrollments must be processed through EFH.',
+      'Partners do not independently enroll students into funded programs. All enrollments must be processed through EFH.',
     required: true,
   },
   {

@@ -9,7 +9,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Governance Contact | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Contact information for governance, compliance, and diligence inquiries.',
+  description: 'Contact information for governance, compliance, and diligence inquiries.',
   robots: {
     index: false,
     follow: false,

@@ -5,7 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `OSHA Safety Training | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `OSHA safety training and certification at our testing center.',
+  description: 'OSHA safety training and certification at our testing center.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/osha' },
 };
 

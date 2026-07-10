@@ -3478,7 +3478,7 @@ export async function POST(req: NextRequest) {
   const { command, history = [] } = await req.json();
   if (!command?.trim()) {
     return new Response('data: [DONE]\n\n', {
-      headers: { 'Content-Type': 'text/event-stream` },
+      headers: { 'Content-Type': 'text/event-stream' },
     });
   }
 
@@ -3528,7 +3528,7 @@ export async function POST(req: NextRequest) {
           // Inject platform knowledge graph + system registry as context
           const debtSummary = PLATFORM_DEBT.filter(d => d.severity === 'high')
             .map(d => `• [HIGH] ${d.id}: ${d.description}`).join('\n');
-          const systemSummary = SYSTEMS.map(s => `• ${s.id} (${s.status}): ${s.description}`).join('\n`);
+          const systemSummary = SYSTEMS.map(s => `• ${s.id} (${s.status}): ${s.description}`).join('\n');
           const registryContext = getSystemRegistryContext();
 
           const systemPrompt = `You are the ${PLATFORM_DEFAULTS.orgName} platform operator AI — the engineering control layer and operational command center for the entire platform.

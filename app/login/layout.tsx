@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     `Sign in to your ${PLATFORM_DEFAULTS.orgName} account to access your training programs and career services.`,
   alternates: {
-    canonical: `https://www.elevateforhumanity.org/login',
+    canonical: 'https://www.elevateforhumanity.org/login',
   },
   robots: {
     index: false,

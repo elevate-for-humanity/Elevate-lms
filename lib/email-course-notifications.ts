@@ -68,7 +68,7 @@ export async function sendCourseEnrollmentEmail(data: CourseEnrollmentData) {
                 <td style="padding: 40px 30px;">
                   <h2 style="margin: 0 0 20px 0; color: #111827; font-size: 24px;">Hi ${studentName},</h2>
                   <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                    Congratulations! You`ve successfully enrolled in <strong>${courseName}</strong> at ${PLATFORM_DEFAULTS.orgName}.
+                    Congratulations! You've successfully enrolled in <strong>${courseName}</strong> at ${PLATFORM_DEFAULTS.orgName}.
                   </p>
 
                   <!-- Course Details Box -->
@@ -254,7 +254,7 @@ export async function sendCourseStartReminderEmail(data: CourseEnrollmentData) {
                   </table>
 
                   <p style="margin: 30px 0 0 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
-                    We`re excited to see you in class! Questions? Email <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}" style="color: #3b82f6;">info@${PLATFORM_DEFAULTS.canonicalDomain}</a>
+                    We're excited to see you in class! Questions? Email <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}" style="color: #3b82f6;">info@${PLATFORM_DEFAULTS.canonicalDomain}</a>
                   </p>
                 </td>
               </tr>
@@ -334,7 +334,7 @@ export async function sendLiveSessionReminderEmail(data: {
                 <td style="padding: 40px 30px;">
                   <h2 style="margin: 0 0 20px 0; color: #111827; font-size: 24px;">Hi ${studentName},</h2>
                   <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                    Don`t forget! You have a live instruction session tomorrow for <strong>${courseName}</strong>.
+                    Don't forget! You have a live instruction session tomorrow for <strong>${courseName}</strong>.
                   </p>
 
                   <div style="margin: 30px 0; padding: 20px; background-color: #f9fafb; border-left: 4px solid #e5e7eb; border-radius: 4px;">

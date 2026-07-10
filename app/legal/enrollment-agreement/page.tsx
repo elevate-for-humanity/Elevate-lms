@@ -26,7 +26,7 @@ export default function EnrollmentAgreementPage() {
       >
         <DocumentSection heading="Parties" number={1}>
           <p>
-            This Enrollment Agreement is entered into between{` '}
+            This Enrollment Agreement is entered into between{' '}
             <strong>
               2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
             </strong>{' '}

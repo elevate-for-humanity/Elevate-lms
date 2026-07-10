@@ -125,7 +125,7 @@ export default function PeerRecoveryApplyPage() {
   }
 
   const field =
-    `w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-slate-500 focus:outline-none';
+    'w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-slate-500 focus:outline-none';
 
   return (
     <main className="min-h-screen bg-white text-slate-900">

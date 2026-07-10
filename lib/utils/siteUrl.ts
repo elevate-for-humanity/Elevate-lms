@@ -13,7 +13,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 function requireUrl(name: string): string {
   const val = (process.env[name] || '').trim();
-  if (!val) throw new Error('Missing required environment variable: ${name}');
+  if (!val) throw new Error(`Missing required environment variable: ${name}`);
   return val.replace(/\/$/, '');
 }
 
@@ -39,7 +39,7 @@ export function getAdminUrl(): string {
     }
     return `${parsed.protocol}//${parsed.host}`;
   } catch (e) {
-    throw new Error(`Invalid NEXT_PUBLIC_ADMIN_URL: ${e instanceof Error ? e.message : e}`);
+    throw new Error(`Invalid NEXT_PUBLIC_ADMIN_URL: ${e instanceof Error ? e.message : e}`, { cause: e });
   }
 }
 

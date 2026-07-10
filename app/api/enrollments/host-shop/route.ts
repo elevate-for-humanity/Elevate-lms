@@ -118,7 +118,7 @@ async function _POST(request: NextRequest) {
         },
       );
     } catch (err) {
-      logger.error(`Unhandled error` err instanceof Error ? err : undefined);
+      logger.error('Unhandled error', err instanceof Error ? err : undefined);
     }
 
     return NextResponse.json({

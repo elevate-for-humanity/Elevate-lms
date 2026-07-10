@@ -583,7 +583,7 @@ Questions? Reply to this email or call ${SUPPORT_PHONE}`,
             <p style="margin: 0; font-size: 14px;"><strong>Insurance requirement:</strong> Your COI must be on file and approved before apprentices can be placed at your shop. Ask your insurance agent for an ACORD 25 certificate naming &quot;Elevate for Humanity&quot; as Certificate Holder.</p>
           </div>
 
-          ${button(`Sign In to Partner Portal \u2192`, data.login_link || `${PLATFORM_DEFAULTS.siteUrl}/login`)}
+          ${button('Sign In to Partner Portal \u2192', data.login_link || `${PLATFORM_DEFAULTS.siteUrl}/login`)}
 
           <p><strong>What happens next:</strong></p>
           <ul style="padding-left: 20px; line-height: 1.8;">

@@ -375,7 +375,7 @@ async function insertApplication(payload: {
   }
   const referenceNumber = generateReferenceNumber();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
-  const programLabel = payload.programInterest.replace(/-/g, ' `);
+  const programLabel = payload.programInterest.replace(/-/g, ' ');
 
   // Auto-enrollment: insert application, create account, enroll in courses, send onboarding email.
 
@@ -400,7 +400,7 @@ async function insertApplication(payload: {
       `<p style="margin:0"><a href="${siteUrl}" style="color:#999;text-decoration:underline">${PLATFORM_DEFAULTS.canonicalDomain}</a> &nbsp;|&nbsp; ${PLATFORM_DEFAULTS.supportPhone}</p>`,
       `</div>`,
       `</div></div>`,
-    ].join('')
+    ].join('');
 
     // ---- ETPL program lists ----
     const etplPrograms = [
@@ -488,7 +488,7 @@ async function insertApplication(payload: {
     const isPaymentGated = payload.programInterest.toLowerCase().includes('barber');
     if (isPaymentGated) {
       logger.info(
-        '[Apply] Skipping student welcome email - payment-gated program, webhook will send after payment`,
+        '[Apply] Skipping student welcome email - payment-gated program, webhook will send after payment',
         { email: payload.email },
       );
       return;
@@ -791,7 +791,7 @@ export async function submitStudentApplication(data: StudentApplicationData) {
     email: data.email,
     phone: data.phone,
     password: data.password,
-    city: data.city || `Not provided',
+    city: data.city || 'Not provided',
     zip: data.zipCode || '00000',
     programInterest: data.programInterest || 'Not specified',
     fundingType: data.requestedFundingSource || null,
@@ -1242,7 +1242,7 @@ async function sendProgramHolderWelcomeEmail(
 </body></html>`;
 
   try {
-    const res = await fetch(`https://api.sendgrid.com/v3/mail/send', {
+    const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: { Authorization: `Bearer ${sgKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({

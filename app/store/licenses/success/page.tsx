@@ -23,7 +23,7 @@ const MASTER_STATEMENT = `All platform products are licensed access to systems o
 const NEXT_STEPS = [
   {
     icon: CheckCircle,
-    title: `Organization Created',
+    title: 'Organization Created',
     description: 'Your tenant space has been provisioned.',
     status: 'complete',
   },

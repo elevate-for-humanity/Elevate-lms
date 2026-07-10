@@ -89,7 +89,7 @@ export async function POST(
       .select('id')
       .eq('email', body.email)
       .maybeSingle();
-    if (!profile) return safeError(`No user found with email '${body.email}'', 404);
+    if (!profile) return safeError(`No user found with email '${body.email}'`, 404);
     userId = profile.id;
   }
 

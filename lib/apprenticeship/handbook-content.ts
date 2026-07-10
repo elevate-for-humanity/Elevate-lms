@@ -30,7 +30,7 @@ export const BARBER_HANDBOOK: ProgramHandbook = {
   sections: [
     {
       id: 'welcome',
-      title: 'Welcome & Program Overview`,
+      title: 'Welcome & Program Overview',
       requiresAcknowledgment: false,
       content: `
 # Welcome to the Registered Barber Apprenticeship Program
@@ -453,7 +453,7 @@ If you experience financial difficulty:
       title: 'Memorandum of Understanding',
       requiresAcknowledgment: true,
       acknowledgmentText:
-        'I have read, understand, and agree to all terms in this Memorandum of Understanding.`,
+        'I have read, understand, and agree to all terms in this Memorandum of Understanding.',
       content: `
 # Memorandum of Understanding (MOU)
 

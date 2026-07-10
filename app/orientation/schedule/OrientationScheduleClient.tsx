@@ -88,7 +88,7 @@ export default function OrientationScheduleClient() {
           : `${PLATFORM_DEFAULTS.orgName} — Orientation`;
       const details = `Session for ${name} (${email})%0A%0AZoom Link: ${meetingUrl}`;
       const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)}`;
-      window.open(calUrl, `_blank`);
+      window.open(calUrl, '_blank');
 
       setSuccess(true);
     } catch {

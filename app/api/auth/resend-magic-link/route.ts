@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
         </div>`,
     });
 
-    logger.info(`[resend-magic-link] Sent`, { email });
+    logger.info('[resend-magic-link] Sent', { email });
     return NextResponse.json({ ok: true });
   } catch (err) {
     logger.error('[resend-magic-link] Unexpected error', err);

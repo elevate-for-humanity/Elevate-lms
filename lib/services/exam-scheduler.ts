@@ -83,22 +83,22 @@ function buildInstruction(
   switch (mode) {
     case 'elevate_onsite':
       return (
-        'Your ${credentialName} exam is proctored at ${PLATFORM_DEFAULTS.orgName}. ` +
+        `Your ${credentialName} exam is proctored at ${PLATFORM_DEFAULTS.orgName}. ` +
         `Staff will contact you to schedule your exam date.`
       );
     case 'external_url':
       return (
-        'Schedule your ${credentialName} exam directly through ${providerName}. ` +
-        'Click the link below to access the scheduling portal.'
+        `Schedule your ${credentialName} exam directly through ${providerName}. ` +
+        `Click the link below to access the scheduling portal.`
       );
     case 'state_portal':
       return (
-        'Schedule your ${credentialName} exam through the ${providerName} portal. ` +
-        'You will need your program completion documentation.'
+        `Schedule your ${credentialName} exam through the ${providerName} portal. ` +
+        `You will need your program completion documentation.`
       );
     case 'manual':
       return (
-        'Contact ${contactEmail ?? 'Elevate staff'} to schedule your ${credentialName} exam ` +
+        `Contact ${contactEmail ?? 'Elevate staff'} to schedule your ${credentialName} exam ` +
         `through ${providerName}.`
       );
   }
@@ -119,7 +119,7 @@ export async function resolveSchedulingRoute(
   const { data, error } = await db
     .from('credential_registry')
     .select(
-      '
+      `
       id,
       name,
       abbreviation,
@@ -131,7 +131,7 @@ export async function resolveSchedulingRoute(
         verification_adapter,
         contact_email
       )
-    ',
+    `,
     )
     .eq('id', credentialId)
     .maybeSingle();
@@ -153,7 +153,7 @@ export async function resolveSchedulingRoute(
       providerType: 'elevate',
       mode: 'manual',
       schedulingUrl: null,
-      contactEmail: 'info@${PLATFORM_DEFAULTS.canonicalDomain}`,
+      contactEmail: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
       instruction: `Contact Elevate staff to schedule your ${data.name} exam.`,
     };
   }

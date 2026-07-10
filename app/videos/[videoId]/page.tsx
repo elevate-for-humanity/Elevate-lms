@@ -48,7 +48,7 @@ export async function generateMetadata({
           url: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
           width: 1280,
           height: 720,
-          type: `video/mp4',
+          type: 'video/mp4',
         },
       ],
     },

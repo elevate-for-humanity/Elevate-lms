@@ -6,7 +6,7 @@ import { ArrowRight, CheckCircle, GraduationCap, Users, Award } from 'lucide-rea
 export const metadata: Metadata = {
   title: `Education & Training | ${PLATFORM_DEFAULTS.orgName}`,
   description:
-    `Explore our education and training programs. Healthcare, skilled trades, technology, beauty, and business programs with WIOA and workforce funding available.',
+    'Explore our education and training programs. Healthcare, skilled trades, technology, beauty, and business programs with WIOA and workforce funding available.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/education' },
 };
 

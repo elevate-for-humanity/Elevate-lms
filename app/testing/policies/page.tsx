@@ -4,7 +4,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `Testing Policies | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Testing center policies, procedures, and requirements.',
+  description: 'Testing center policies, procedures, and requirements.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/policies' },
 };
 

@@ -9,7 +9,7 @@ import { canonicalRoutes } from '@/lib/routes/canonical-routes';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Career Pathways & Workforce Infrastructure`,
+  title: 'Career Pathways & Workforce Infrastructure',
   description:
     `${PLATFORM_DEFAULTS.orgName} operates a structured career pathway system: eligibility screening, credentialed training, apprenticeship, employer placement, and advancement tracking across healthcare, trades, CDL, barbering, and technology.`,
   alternates: { canonical: 'https://www.elevateforhumanity.org/pathways' },
@@ -540,7 +540,7 @@ export default function PathwaysPage() {
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                 <Image
-                  src="/images/pages/instructor-support-page-3.webp"
+                  src="/images/pages/instructor support-page-3.webp"
                   alt="Ongoing support"
                   fill
                   sizes="80px"

@@ -140,7 +140,7 @@ async function _POST(request: NextRequest) {
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
                 <h3 style="margin-top: 0;">Application Details</h3>
                 <p><strong>Shop:</strong> ${shopName}</p>
-                <p><strong>Programs:</strong> ${programsRequested.join(`, ')}</p>
+                <p><strong>Programs:</strong> ${programsRequested.join(', ')}</p>
                 <p><strong>Application ID:</strong> ${application.id}</p>
               </div>
               

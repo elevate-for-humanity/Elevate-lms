@@ -38,7 +38,7 @@ export default function CosmetologyScoringSheetPage() {
         />
 
         <div className="grid grid-cols-3 gap-4 my-4 text-sm">
-          {[`Apprentice Name', 'Host Salon', 'Assessment Date'].map(label => (
+          {['Apprentice Name', 'Host Salon', 'Assessment Date'].map(label => (
             <div key={label}>
               <p className="text-xs text-slate-500 mb-1">{label}</p>
               <div className="border-b border-slate-400 h-7" />

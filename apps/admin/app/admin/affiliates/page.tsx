@@ -20,7 +20,7 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: `Affiliate Management | Admin | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Manage affiliate partners and track referral performance',
+  description: 'Manage affiliate partners and track referral performance',
 };
 
 async function getAffiliateData() {

@@ -204,7 +204,7 @@ export async function sendCompletionNudges() {
         },
         body: JSON.stringify({
           to: profile.email,
-          subject: 'You're almost done with ${program.name}!`,
+          subject: `You're almost done with ${program.name}!`,
           html: `
             <h2>You're So Close!</h2>
             <p>Hi ${firstName},</p>

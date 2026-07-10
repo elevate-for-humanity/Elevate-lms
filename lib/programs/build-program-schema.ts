@@ -44,7 +44,7 @@ function defaultCredentials(
     {
       name: primary,
       issuer: 'Industry-recognized certifying body',
-      description: 'Credential earned on successful completion of ${title}.',
+      description: `Credential earned on successful completion of ${title}.`,
       validity: 'Varies by credential',
     },
     {
@@ -64,7 +64,7 @@ function defaultCredentials(
 
 function defaultOutcomes(title: string): ProgramSchema['outcomes'] {
   return [
-    { statement: `Demonstrate core competencies required for ${title} roles', assessedAt: 'Mid-program' },
+    { statement: `Demonstrate core competencies required for ${title} roles`, assessedAt: 'Mid-program' },
     { statement: 'Complete structured lessons, labs, and checkpoint assessments', assessedAt: 'Ongoing' },
     { statement: 'Meet employer-aligned safety and professionalism standards', assessedAt: 'Final week' },
     { statement: 'Pass required skills evaluations with instructor sign-off where applicable', assessedAt: 'Final assessment' },
@@ -79,7 +79,7 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
   const subtitle =
     input.subtitle?.trim() ||
     input.description?.trim()?.slice(0, 200) ||
-    `Workforce training program — ${title}';
+    `Workforce training program — ${title}`;
   const durationWeeks = Math.max(1, input.durationWeeks ?? 8);
   const hoursPerWeekMin = 10;
   const hoursPerWeekMax = 20;
@@ -88,7 +88,7 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
   const sector = sectorFromCategory(category);
   const programType = programTypeFromSlug(slug, durationWeeks);
   const heroImage = input.imageUrl?.trim() || getProgramOgImage(slug);
-  const applyHref = input.applyHref ?? '/apply?program=${slug}`;
+  const applyHref = input.applyHref ?? `/apply?program=${slug}`;
 
   const descriptionParagraphs =
     input.description?.trim() ?
@@ -106,7 +106,7 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
     category,
     programType,
     heroImage,
-    heroImageAlt: `${title} training program',
+    heroImageAlt: `${title} training program`,
     deliveryMode: programType === 'certification' ? 'online' : 'hybrid',
     deliveredBy: 'Elevate',
     durationWeeks,
@@ -127,7 +127,7 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
     outcomes: defaultOutcomes(title),
     careerPathway: [
       {
-        title: `${title} (Entry Level)',
+        title: `${title} (Entry Level)`,
         timeframe: '0–1 year',
         requirements: 'Program completion + credential',
         salaryRange: 'Employer-set',
@@ -152,12 +152,12 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
         competencyMilestone: 'Core concepts and safety fundamentals',
       },
       {
-        week: `Weeks 3–${Math.max(3, durationWeeks - 1)}',
+        week: `Weeks 3–${Math.max(3, durationWeeks - 1)}`,
         title: 'Applied Skills',
         competencyMilestone: 'Hands-on practice and module checkpoints',
       },
       {
-        week: `Week ${durationWeeks}',
+        week: `Week ${durationWeeks}`,
         title: 'Assessment & Credential',
         competencyMilestone: 'Final evaluation and career placement support',
       },
@@ -187,12 +187,12 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
       region: 'Indianapolis MSA',
     },
     careers: [
-      { title: `${title} (Entry Level)', salary: 'Employer-set' },
+      { title: `${title} (Entry Level)`, salary: 'Employer-set' },
       { title: 'Related skilled roles', salary: 'Employer-set' },
     ],
     cta: {
       applyHref,
-      requestInfoHref: `/contact?program=${slug}',
+      requestInfoHref: `/contact?program=${slug}`,
       careerConnectHref:
         programType === 'apprenticeship' || programType === 'workforce' ?
           'https://www.indianacareerconnect.com/'
@@ -207,7 +207,7 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
       },
       {
         question: 'How do I apply?',
-        answer: 'Submit an application at ${applyHref}. An enrollment advisor will contact you within 1–2 business days.`,
+        answer: `Submit an application at ${applyHref}. An enrollment advisor will contact you within 1–2 business days.`,
       },
     ],
     breadcrumbs: [

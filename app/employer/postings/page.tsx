@@ -58,10 +58,10 @@ export default async function EmployerPostingsPage() {
             Post a Job
           </Link>
           <p className="text-slate-500 text-sm mt-4">
-            Or contact us at{
+            Or contact us at{' '}
             <a href={`tel:${PLATFORM_DEFAULTS.supportPhone}`} className="text-blue-600 hover:underline">
               {PLATFORM_DEFAULTS.supportPhone}
-            </a>{` '}
+            </a>{' '}
             for assistance
           </p>
         </div>

@@ -41,12 +41,12 @@ export async function sendApplicationConfirmation(
       <ul>
         <li>Our admissions team will review your application</li>
         <li>We may contact you for additional information</li>
-        <li>You`ll receive an email when a decision is made</li>
+        <li>You'll receive an email when a decision is made</li>
       </ul>
       <p>Questions? Reply to this email or call us at ${PLATFORM_DEFAULTS.supportPhone}.</p>
       <p>Best regards,<br>${PLATFORM_DEFAULTS.orgName} Team</p>
     `,
-    text: `Hi ${name}, Thank you for applying to ${programName}. We`ve received your application and will review it shortly.`,
+    text: `Hi ${name}, Thank you for applying to ${programName}. We've received your application and will review it shortly.`,
   });
 }
 
@@ -111,7 +111,7 @@ export async function sendProgramHolderApplicationConfirmation(
 ) {
   return sendEmail({
     to: email,
-    subject: 'Program Holder Application Received`,
+    subject: 'Program Holder Application Received',
     html: `
       <h1>Application Received</h1>
       <p>Thank you for applying to become a program holder with ${PLATFORM_DEFAULTS.orgName}.</p>
@@ -119,12 +119,12 @@ export async function sendProgramHolderApplicationConfirmation(
       <p><strong>Next Steps:</strong></p>
       <ol>
         <li>Our team will review your application</li>
-        <li>We`ll verify your organization details</li>
+        <li>We'll verify your organization details</li>
         <li>You'll receive approval within 3-5 business days</li>
       </ol>
       <p>Questions? Contact us at ${ADMIN_EMAIL}</p>
     `,
-    text: `Thank you for applying to become a program holder. We`ll review your application and get back to you within 3-5 business days.`,
+    text: `Thank you for applying to become a program holder. We'll review your application and get back to you within 3-5 business days.`,
   });
 }
 
@@ -205,7 +205,7 @@ export async function sendStudentAcceptanceNotification(
 ) {
   return sendEmail({
     to: email,
-    subject: `Student Application Accepted`,
+    subject: 'Student Application Accepted',
     html: `
       <h1>Application Accepted!</h1>
       <p>Hi ${studentName},</p>
@@ -228,7 +228,7 @@ export async function sendStudentDeclineNotification(
 ) {
   return sendEmail({
     to: email,
-    subject: `Student Application Status',
+    subject: 'Student Application Status',
     html: `
       <h1>Application Update</h1>
       <p>Hi ${studentName},</p>

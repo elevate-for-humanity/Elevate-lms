@@ -99,7 +99,7 @@ export async function generateCertificatePDF(data: CertificateData): Promise<Blo
   });
 
   // "has successfully completed"
-  const completedText = 'has successfully completed`;
+  const completedText = 'has successfully completed';
   const completedWidth = timesItalic.widthOfTextAtSize(completedText, 16);
   page.drawText(completedText, {
     x: (width - completedWidth) / 2,
@@ -154,7 +154,7 @@ export async function generateCertificatePDF(data: CertificateData): Promise<Blo
     color: darkSlate,
   });
 
-  const subtitle = `Career & Technical Institute';
+  const subtitle = 'Career & Technical Institute';
   const subtitleWidth = timesRoman.widthOfTextAtSize(subtitle, 12);
   page.drawText(subtitle, {
     x: (width - subtitleWidth) / 2,

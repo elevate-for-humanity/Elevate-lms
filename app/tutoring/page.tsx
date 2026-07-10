@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Tutoring Center | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `One-on-one and small group tutoring for every program. Up to 3 sessions per week included with enrollment.',
+  description: 'One-on-one and small group tutoring for every program. Up to 3 sessions per week included with enrollment.',
   robots: { index: false, follow: false },
 };
 

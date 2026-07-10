@@ -82,7 +82,7 @@ const HANDBOOK_SLIDES = [
       'If a payment fails, you will receive an immediate email with a link to update your card.',
       'Program access is suspended if a failed payment is not resolved within 7 days.',
       'Suspended students cannot log hours or access coursework. Suspended hours do not count toward your total.',
-      'Enrollment may be terminated after 7 days of non-payment. Amounts already paid are non-refundable.`,
+      'Enrollment may be terminated after 7 days of non-payment. Amounts already paid are non-refundable.',
       `Call ${PLATFORM_DEFAULTS.supportPhone} before a payment fails — we can work with you proactively.`,
     ],
   },
@@ -92,7 +92,7 @@ const HANDBOOK_SLIDES = [
     title: 'Conduct & Termination',
     content: [
       `You represent ${PLATFORM_DEFAULTS.orgName} at your host shop. Professional conduct is required at all times.`,
-      `Violations that may result in immediate termination: GPS fraud, harassment, theft, or falsifying hours.',
+      'Violations that may result in immediate termination: GPS fraud, harassment, theft, or falsifying hours.',
       'Your host shop may request your removal at any time. Elevate will attempt to place you at another shop, but this is not guaranteed.',
       'If you voluntarily leave the program, amounts already paid are non-refundable.',
       'Questions about your standing? Contact your advisor before taking any action.',
@@ -152,7 +152,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
       if (!response.ok) {
         throw new Error('Failed to complete orientation');
       }
-      router.push('/programs/barber-apprenticeship/documents`);
+      router.push('/programs/barber-apprenticeship/documents');
     } catch {
       setSubmitError(`We could not save your orientation completion. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
     } finally {

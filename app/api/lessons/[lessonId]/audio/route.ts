@@ -117,7 +117,7 @@ async function generateFullScript(ctx: LessonContext): Promise<string> {
     video:
       'This is a VIDEO LECTURE lesson. Teach the full content as a complete lecture with real-world examples from job sites.',
     assignment:
-      'This is an ASSIGNMENT lesson. Explain what students need to do, walk through the requirements, give tips for success.`,
+      'This is an ASSIGNMENT lesson. Explain what students need to do, walk through the requirements, give tips for success.',
   };
 
   const systemPrompt = `You are ${instructor.name}, ${instructor.title} at ${PLATFORM_DEFAULTS.orgName}. You have 20 years of field experience. Write lecture scripts that sound natural and conversational — exactly as you would speak in a classroom.`;

@@ -99,9 +99,9 @@ export default async function OrientationCompletePage() {
                   </a>{' '}
                   and create a free account
                 </>,
-                'Schedule an appointment with your local WorkOne office,
+                'Schedule an appointment with your local WorkOne office',
                 `Tell them you are enrolling in training at ${PLATFORM_DEFAULTS.orgName}`,
-                `They will confirm your eligibility and issue a training `voucher`,
+                'They will confirm your eligibility and issue a training voucher',
               ].map((step, i) => (
                 <li key={i} className="flex items-start gap-2 text-xs text-amber-800">
                   <span className="flex-shrink-0 w-4 h-4 rounded-full bg-amber-200 text-amber-900 font-bold text-[10px] flex items-center justify-center mt-0.5">
@@ -155,10 +155,10 @@ export default async function OrientationCompletePage() {
         </div>
 
         <p className="text-center text-xs text-slate-700 mt-6">
-          Questions? Call{
+          Questions? Call{' '}
           <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="underline">
             {PLATFORM_DEFAULTS.supportPhone}
-          </a>{` '}
+          </a>{' '}
           or email{' '}
           <a href="mailto:elevate4humanityedu@gmail.com" className="underline">
             info@elevateforhumanity.org

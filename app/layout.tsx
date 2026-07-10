@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   },
 
   description:
-    `Nonprofit workforce development institute in Indianapolis. Career training in healthcare, skilled trades, CDL, technology, and business at no cost to eligible Indiana residents through WIOA and state funding. Enroll today.',
+    'Nonprofit workforce development institute in Indianapolis. Career training in healthcare, skilled trades, CDL, technology, and business at no cost to eligible Indiana residents through WIOA and state funding. Enroll today.',
 
   // Homepage canonical - child pages should override with their own
   alternates: {
@@ -82,10 +82,10 @@ export const metadata: Metadata = {
     siteName: PLATFORM_DEFAULTS.orgName,
     title: `${PLATFORM_DEFAULTS.orgName} | Career Training at No Cost for Eligible Participants`,
     description:
-      `Learn job-ready skills through career training programs in healthcare, skilled trades, CDL, and technology. Training at no cost to eligible Indiana residents through WIOA and state funding.',
+      'Learn job-ready skills through career training programs in healthcare, skilled trades, CDL, and technology. Training at no cost to eligible Indiana residents through WIOA and state funding.',
     images: [
       {
-        url: '/images/og-image.jpg`,
+        url: '/images/og-image.jpg',
         width: 1200,
         height: 630,
         alt: `${PLATFORM_DEFAULTS.orgName} — workforce training programs in Indianapolis`,
@@ -155,7 +155,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               logo: `${PLATFORM_DEFAULTS.siteUrl}/logo.png`,
               image: `https://${PLATFORM_DEFAULTS.canonicalDomain}/images/og-image.jpg`,
               sameAs: [
-                `https://www.facebook.com/elevateforhumanity',
+                'https://www.facebook.com/elevateforhumanity',
                 'https://www.linkedin.com/company/elevate-for-humanity',
               ],
             }),

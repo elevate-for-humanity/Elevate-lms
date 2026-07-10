@@ -191,7 +191,7 @@ export const ORIENTATION_STEPS: GuideStep[] = [
   {
     title: `Welcome to ${PLATFORM_DEFAULTS.orgName}!`,
     script:
-      "Hi! I`m so excited you're here. I'm going to walk you through everything you need to know to get started with your training. Let's begin!",
+      "Hi! I'm so excited you're here. I'm going to walk you through everything you need to know to get started with your training. Let's begin!",
   },
   {
     title: 'Your Student Dashboard',
@@ -265,7 +265,7 @@ export const ONBOARDING_STEPS: GuideStep[] = [
 export const COURSE_INTRO_STEPS = (courseName: string): GuideStep[] => [
   {
     title: `Welcome to ${courseName}!`,
-    script: 'I'm thrilled to be your guide through ${courseName}. This course will give you the skills and knowledge you need for a rewarding career. Let me show you around.`,
+    script: `I'm thrilled to be your guide through ${courseName}. This course will give you the skills and knowledge you need for a rewarding career. Let me show you around.`,
   },
   {
     title: 'Course Overview',

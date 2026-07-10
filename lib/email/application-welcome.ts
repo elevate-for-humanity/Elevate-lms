@@ -317,7 +317,7 @@ function buildFundingHtml(p: ProgramInfo): string {
     html += `
 <div style="background:#f9fafb;border:1px solid #e5e7eb;padding:16px;border-radius:8px;margin:12px 0">
 <h3 style="margin-top:0;color:#374151">Next Level Jobs (Indiana)</h3>
-<p>Indiana`s Next Level Jobs program provides free training in high-demand fields. This program may qualify &mdash; your WorkOne counselor can confirm eligibility.</p>
+<p>Indiana's Next Level Jobs program provides free training in high-demand fields. This program may qualify &mdash; your WorkOne counselor can confirm eligibility.</p>
 </div>`;
   }
 
@@ -376,7 +376,7 @@ function buildNextStepsHtml(p: ProgramInfo): string {
 <h3 style="margin-top:0">Step 3: Attend Your WorkOne Appointment</h3>
 <p>Bring:</p>
 <ul>
-<li><strong>Government-issued photo ID</strong> (driver`s license, state ID, or passport)</li>
+<li><strong>Government-issued photo ID</strong> (driver's license, state ID, or passport)</li>
 <li><strong>Proof of income</strong> (pay stubs, tax return, or letter of unemployment)</li>
 <li><strong>Proof of address</strong> (utility bill, lease, or mail with your name/address)</li>
 ${hasFunding(p, 'jri') ? '<li>If you have a <strong>criminal record</strong>, ask about <strong>JRI funding</strong></li>' : ''}
@@ -389,7 +389,7 @@ ${hasFunding(p, 'jri') ? '<li>If you have a <strong>criminal record</strong>, as
 <p>Once you have met with WorkOne:</p>
 <ol>
 <li><strong>Call us at ${PLATFORM_DEFAULTS.supportPhone}</strong> or reply to this email with:
-<ul><li>Whether you were approved for funding</li><li>Your WorkOne counselor`s name</li><li>When you want to start</li></ul></li>
+<ul><li>Whether you were approved for funding</li><li>Your WorkOne counselor's name</li><li>When you want to start</li></ul></li>
 <li><strong>Log in and update your progress</strong> so we can track where you are:<br>
 <a href="${SITE_URL}/next-steps" style="color:#f97316;font-weight:bold">${SITE_URL}/next-steps</a></li>
 </ol>
@@ -438,12 +438,12 @@ ${buildNextStepsHtml(p)}
 function buildText(firstName: string, p: ProgramInfo): string {
   const selfPay = isSelfPayOnly(p);
 
-  let fundingText = ``;
+  let fundingText = '';
   if (selfPay) {
     fundingText = `PROGRAM COST
 The ${p.name} program is self-pay or employer-sponsored. Contact us at ${PLATFORM_DEFAULTS.supportPhone} to discuss payment options.`;
   } else {
-    fundingText = `HOW FUNDING WORKS\n';
+    fundingText = 'HOW FUNDING WORKS\n';
     if (hasFunding(p, 'wioa')) {
       fundingText += `WIOA: Federal program that can cover 100% of tuition, books, tools, transportation. Qualify if unemployed, underemployed, receiving assistance, veteran, youth 16-24, or low-income.\n`;
     }

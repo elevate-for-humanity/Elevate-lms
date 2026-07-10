@@ -32,7 +32,7 @@ export default function MicroCredentialsBadges() {
       category: 'Technical',
       earnedDate: '2024-01-15',
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-      verificationUrl: `https://verify.elevateforhumanity.com/badge/js-master-001',
+      verificationUrl: 'https://verify.elevateforhumanity.com/badge/js-master-001',
       requirements: [
         'Complete JavaScript Advanced course',
         'Score 90%+ on final assessment',
@@ -47,7 +47,7 @@ export default function MicroCredentialsBadges() {
       category: 'Technical',
       earnedDate: '2024-01-10',
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-      verificationUrl: `https://verify.elevateforhumanity.com/badge/react-dev-002',
+      verificationUrl: 'https://verify.elevateforhumanity.com/badge/react-dev-002',
       requirements: [
         'Complete React Fundamentals',
         'Build component library',
@@ -62,7 +62,7 @@ export default function MicroCredentialsBadges() {
       category: 'Soft Skills',
       earnedDate: '2024-01-20',
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-      verificationUrl: `https://verify.elevateforhumanity.com/badge/team-leader-003',
+      verificationUrl: 'https://verify.elevateforhumanity.com/badge/team-leader-003',
       requirements: [
         'Lead 2+ team projects',
         'Complete leadership training',
@@ -78,7 +78,7 @@ export default function MicroCredentialsBadges() {
       progress: 65,
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
       requirements: [
-        `Complete Database Design course',
+        'Complete Database Design course',
         'Optimize query performance',
         'Design normalized schema',
       ],
@@ -88,11 +88,11 @@ export default function MicroCredentialsBadges() {
       name: 'Problem Solver',
       icon: '🧩',
       description: 'Exceptional analytical and problem-solving abilities',
-      category: 'Soft Skills`,
+      category: 'Soft Skills',
       progress: 80,
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
       requirements: [
-        `Solve 50+ coding challenges',
+        'Solve 50+ coding challenges',
         'Complete critical thinking course',
         'Case study presentation',
       ],
@@ -106,7 +106,7 @@ export default function MicroCredentialsBadges() {
       progress: 45,
       issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
       requirements: [
-        `Complete frontend specialization',
+        'Complete frontend specialization',
         'Complete backend specialization',
         'Build full-stack application',
         'Deploy to production',

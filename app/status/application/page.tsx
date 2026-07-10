@@ -212,10 +212,10 @@ function StatusContent() {
       <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
         <p className="font-medium text-slate-900">Questions about your application?</p>
         <p className="mt-1 text-sm text-slate-700">
-          Call{' `}
+          Call{' '}
           <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="font-medium text-brand-blue-600 hover:underline">
             {PLATFORM_DEFAULTS.supportPhone}
-          </a>{` '}
+          </a>{' '}
           or email{' '}
           <a
             href="mailto:info@elevateforhumanity.org"

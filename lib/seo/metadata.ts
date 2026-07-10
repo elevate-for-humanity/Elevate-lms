@@ -12,7 +12,7 @@ interface SEOParams {
 
 export function generateMetadata(params: SEOParams): Metadata {
   const baseUrl = PLATFORM_DEFAULTS.siteUrl;
-  const url = `${baseUrl}${params.path}';
+  const url = `${baseUrl}${params.path}`;
   const image = params.image || '/images/og-default.jpg';
   const fullTitle = params.title.includes('|')
     ? params.title

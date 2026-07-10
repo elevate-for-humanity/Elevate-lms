@@ -311,7 +311,7 @@ export default function ApprenticeshipAgreementPage() {
                 { role: 'Licensed Supervisor Barber', fields: ['Print Name', 'Indiana Barber License #', 'Years Licensed', 'Signature', 'Date'] },
                 { role: 'Credential Partner Representative (RTI Provider)', fields: ['Print Name', 'Organization', 'License/Accreditation #', 'Signature', 'Date'] },
                 { role: 'Program Holder (RTI Coordinator)', fields: ['Print Name', 'Title', 'Signature', 'Date'] },
-                { role: `Sponsor — 2Exclusive LLC-S (DBA ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute)`, fields: [`Authorized Representative', 'Title', 'Signature', 'Date'] },
+                { role: `Sponsor — 2Exclusive LLC-S (DBA ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute)`, fields: ['Authorized Representative', 'Title', 'Signature', 'Date'] },
               ].map((signer, i) => (
                 <div key={i} className="border-2 rounded-lg p-4 print:p-3 print:border-slate-400 print:break-inside-avoid">
                   <p className="font-bold text-slate-900 mb-3 print:text-[11px] print:mb-2">{signer.role}</p>

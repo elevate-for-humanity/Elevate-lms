@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
       to: renterEmail,
       subject: 'Booth Rental Agreement Signed — ' + PLATFORM_DEFAULTS.orgName + '',
       html: `
-        <h2>Welcome, ${signatureName.split(``)[0]}!</h2>
+        <h2>Welcome, ${signatureName.split(' ')[0]}!</h2>
         <p>Your Booth Rental Agreement has been signed and your rental is now active.</p>
         <h3>What happens next:</h3>
         <ul>
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
         <table>
           <tr><td><strong>Name</strong></td><td>${renterName}</td></tr>
           <tr><td><strong>Email</strong></td><td>${renterEmail}</td></tr>
-          <tr><td><strong>Discipline</strong></td><td>${discipline ?? `N/A'}</td></tr>
+          <tr><td><strong>Discipline</strong></td><td>${discipline ?? 'N/A'}</td></tr>
           <tr><td><strong>Stripe Session</strong></td><td>${sessionId}</td></tr>
           <tr><td><strong>Subscription</strong></td><td>${subscriptionId ?? 'N/A'}</td></tr>
           <tr><td><strong>Signed At</strong></td><td>${new Date().toLocaleString()}</td></tr>

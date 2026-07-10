@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: `Build and customize your learning experience with ${PLATFORM_DEFAULTS.orgName}.`,
   robots: { index: false, follow: false },
   alternates: {
-    canonical: `https://www.elevateforhumanity.org/builder',
+    canonical: 'https://www.elevateforhumanity.org/builder',
   },
 };
 

@@ -150,7 +150,7 @@ export default function SideAvatarGuide({
           ...prev,
           {
             role: 'assistant',
-            content: `I`m sorry, I encountered an issue. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
+            content: `I'm sorry, I encountered an issue. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
           },
         ]);
       } else {

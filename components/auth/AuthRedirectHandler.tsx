@@ -35,7 +35,7 @@ export default function AuthRedirectHandler() {
     // Surface auth errors from the hash (e.g. expired OTP)
     if (hash.includes('error_code')) {
       const params = new URLSearchParams(hash.slice(1));
-      const desc = params.get('error_description') ?? 'Link expired or invalid`;
+      const desc = params.get('error_description') ?? 'Link expired or invalid';
       router.replace(`/login?error=${encodeURIComponent(desc)}`);
       return;
     }

@@ -112,7 +112,7 @@ const SUPPRESSED = new Set([
   'jri', // parent umbrella for badge system
 ]);
 
-type Prog = {program_id?:string;slug:string;title:string;description:string|null;category:string;duration:string|null;credential:string|null;funding_eligible:boolean};
+type Prog = {slug:string;title:string;description:string|null;category:string;duration:string|null;credential:string|null;funding_eligible:boolean};
 
 function normalizeCategory(category?: string | null, sector?: string | null, programType?: string | null): string {
   const raw = (category ?? '').trim().toLowerCase();
@@ -143,7 +143,7 @@ const staticProgramFallback: Prog[] = Array.from(STATIC_PROGRAM_MAP.values())
       title: program.title,
       description: program.subtitle || program.metaDescription || null,
       category: normalizeCategory(program.category, program.sector, program.programType),
-      duration: program.durationWeeks ? `${program.durationWeeks} week${program.durationWeeks === 1 ? '' : 's}` : null,
+      duration: program.durationWeeks ? `${program.durationWeeks} week${program.durationWeeks === 1 ? '' : 's'}` : null,
       credential: program.credentials?.[0]?.name ?? null,
       funding_eligible: hasFunding,
     };

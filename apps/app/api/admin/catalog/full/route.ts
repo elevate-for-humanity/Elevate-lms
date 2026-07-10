@@ -234,4 +234,4 @@ function generateCatalogHtml(programList: any[]) {
 </html>
   `;
 }
-export const GET = withApiAudit(`/api/admin/catalog/full', _GET);
+export const GET = withApiAudit('/api/admin/catalog/full', _GET);

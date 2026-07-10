@@ -73,7 +73,7 @@ export async function GET(
     `Net Pay:    $${Number(stub.net_pay ?? 0).toFixed(2)}`,
     '',
     `For questions contact: billing@${PLATFORM_DEFAULTS.canonicalDomain}`,
-  ].join(`\n');
+  ].join('\n');
 
   return new NextResponse(text, {
     status: 200,

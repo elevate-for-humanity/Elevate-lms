@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: {
     default: `Case Manager Portal | ${PLATFORM_DEFAULTS.orgName}`,
-    template: `%s | Case Manager Portal',
+    template: '%s | Case Manager Portal',
   },
   description: 'Manage participant cases, track progress, and report outcomes.',
 };

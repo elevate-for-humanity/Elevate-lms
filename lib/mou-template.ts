@@ -72,7 +72,7 @@ c. Maintain reasonable attendance expectations, sign-in procedures, and communic
 
 d. Enter case notes, progress updates, and follow-up information into the Elevate portal as requested.
 
-e. Notify Elevate promptly of any issues that may impact a participant`s participation, safety, or eligibility.
+e. Notify Elevate promptly of any issues that may impact a participant's participation, safety, or eligibility.
 
 f. Comply with all applicable laws, policies, and regulations relating to workplace safety, nondiscrimination, confidentiality, and workforce programs.
 

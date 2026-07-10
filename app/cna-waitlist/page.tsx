@@ -4,7 +4,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `CNA Waitlist | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Join the waitlist for our CNA certification program.',
+  description: 'Join the waitlist for our CNA certification program.',
 };
 
 export default function CNAWaitlistPage() {

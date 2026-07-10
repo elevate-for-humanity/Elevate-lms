@@ -155,7 +155,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
               <li style="margin-bottom: 15px;">
                 <strong>Upload Required Documents:</strong>
                 <ul style="margin-top: 5px;">
-                  <li>Government-Issued ID (Driver`s License, State ID, or Passport)</li>
+                  <li>Government-Issued ID (Driver's License, State ID, or Passport)</li>
                   <li>Social Security Card</li>
                   <li>Transfer Hours Documentation</li>
                 </ul>
@@ -210,7 +210,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
       `,
     });
 
-    logger.info(`Welcome letter sent to ${student.email} for program ${programName}');
+    logger.info(`Welcome letter sent to ${student.email} for program ${programName}`);
 
     // Record emails sent
     await supabaseClient
@@ -220,7 +220,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
           user_id: studentId,
           email_type: 'payment_confirmation',
           recipient_email: student.email,
-          subject: 'Payment Confirmed - ${programName}',
+          subject: `Payment Confirmed - ${programName}`,
           status: 'sent',
           sent_at: new Date().toISOString(),
         },
@@ -228,7 +228,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
           user_id: studentId,
           email_type: 'welcome_letter',
           recipient_email: student.email,
-          subject: 'ACTION REQUIRED: Complete Your Enrollment - ${programName}',
+          subject: `ACTION REQUIRED: Complete Your Enrollment - ${programName}`,
           status: 'sent',
           sent_at: new Date().toISOString(),
         },
@@ -324,7 +324,7 @@ async function sendAdminEnrollmentNotification(
 
     logger.info(`Admin notification sent for new enrollment: ${studentName}`);
   } catch (error) {
-    logger.error('Failed to send admin notification', error);
+    logger.error('Failed to send admin notification:', error);
   }
 }
 
@@ -396,7 +396,7 @@ async function sendPaymentFailedEmail(studentId: string, programId: string): Pro
     from: `Elevate LMS <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
     to: student.email,
     subject: 'Payment Failed - Action Required',
-    html: '
+    html: `
       <h1>Payment Failed</h1>
       <p>Hi ${student.full_name || 'Student'},</p>
       <p>We were unable to process your tuition payment for <strong>${program?.title || 'your program'}</strong>.</p>
@@ -458,7 +458,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promis
   const programId = metadata.program_id;
   const paymentOption = metadata.payment_option;
 
-  logger.info(`Checkout completed: ${paymentOption} for student ${studentId}');
+  logger.info(`Checkout completed: ${paymentOption} for student ${studentId}`);
 
   // Record payment in database
   await supabase.from('tuition_payments').insert({
@@ -571,7 +571,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice): Promise<void> {
   const paymentInterval = subscription.metadata.payment_interval || 'month';
   const amountPaid = invoice.amount_paid / 100;
 
-  logger.info('${paymentInterval}ly payment of $${amountPaid} received for student ${studentId}');
+  logger.info(`${paymentInterval}ly payment of $${amountPaid} received for student ${studentId}`);
 
   // Record payment in tuition_payments
   await supabase.from('tuition_payments').insert({
@@ -701,14 +701,14 @@ async function sendPaymentConfirmationEmail(
       html: `
       <h2>Payment Confirmed</h2>
       <p>Hi ${student.full_name || 'Student'},</p>
-      <p>We`ve received your ${interval}ly tuition payment of <strong>$${amount.toFixed(2)}</strong>.</p>
+      <p>We've received your ${interval}ly tuition payment of <strong>$${amount.toFixed(2)}</strong>.</p>
       <p><strong>Payment Progress:</strong> ${paymentNumber} of ${totalPayments} payments completed</p>
       <p>Remaining: ${totalPayments - paymentNumber} payments</p>
       <p>Thank you for staying on track with your education!</p>
       <p>- ${PLATFORM_DEFAULTS.orgName}</p>
     `,
     })
-    .catch((err) => logger.error('Failed to send payment confirmation', err));
+    .catch((err) => logger.error('Failed to send payment confirmation:', err));
 }
 
 /**
@@ -738,16 +738,16 @@ async function sendPaymentCompletionEmail(studentId: string, programId: string):
       from: `${PLATFORM_DEFAULTS.orgName} <billing@${PLATFORM_DEFAULTS.canonicalDomain}>`,
       to: student.email,
       subject: 'Congratulations! Tuition Paid in Full',
-      html: '
+      html: `
       <h2>🎉 Tuition Paid in Full!</h2>
       <p>Hi ${student.full_name || 'Student'},</p>
       <p>Congratulations! You have successfully completed all tuition payments for <strong>${program?.title || 'your program'}</strong>.</p>
       <p>Your dedication to your education is inspiring. Keep up the great work!</p>
-      <p>If you have any questions, please don`t hesitate to reach out.</p>
+      <p>If you have any questions, please don't hesitate to reach out.</p>
       <p>- ${PLATFORM_DEFAULTS.orgName}</p>
     `,
     })
-    .catch((err) => logger.error('Failed to send completion email', err));
+    .catch((err) => logger.error('Failed to send completion email:', err));
 }
 
 /**
@@ -770,7 +770,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice): Promise<void
   const studentId = subscription.metadata.student_id;
   const programId = subscription.metadata.program_id;
 
-  logger.info('Payment failed for student ${studentId}');
+  logger.info(`Payment failed for student ${studentId}`);
 
   // Record failed payment
   await supabase.from('tuition_payments').insert({
@@ -830,14 +830,14 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
 
     if (isComplete) {
       // Subscription completed successfully
-      logger.info(`Subscription completed for student ${studentId}');
+      logger.info(`Subscription completed for student ${studentId}`);
       await supabase
         .from('tuition_subscriptions')
         .update({ status: 'completed' })
         .eq('stripe_subscription_id', subscription.id);
     } else {
       // Subscription cancelled before completion
-      logger.info(`Subscription cancelled early for student ${studentId}');
+      logger.info(`Subscription cancelled early for student ${studentId}`);
       await supabase
         .from('tuition_subscriptions')
         .update({ status: 'cancelled' })

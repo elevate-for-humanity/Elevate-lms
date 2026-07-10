@@ -83,7 +83,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
   if (!post) {
     return {
-      title: 'Post Not Found`,
+      title: 'Post Not Found',
     };
   }
 
@@ -113,7 +113,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt,
-      images: [post.image || '/images/pages/social-media-1.webp`],
+      images: [post.image || '/images/pages/social-media-1.webp'],
     },
   };
 }

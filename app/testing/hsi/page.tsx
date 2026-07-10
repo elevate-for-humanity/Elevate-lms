@@ -5,7 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `HSI CPR & First Aid Testing | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Get your HSI CPR, First Aid, and safety certifications at our testing center.',
+  description: 'Get your HSI CPR, First Aid, and safety certifications at our testing center.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/hsi' },
 };
 

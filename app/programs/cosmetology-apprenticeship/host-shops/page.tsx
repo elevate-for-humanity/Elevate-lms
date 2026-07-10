@@ -8,11 +8,11 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import HostShopSyllabusRequirement from '@/components/programs/beauty/HostShopSyllabusRequirement';
 
 export const metadata: Metadata = {
-  title: 'Become a Host Salon | Cosmetology Apprenticeship`,
+  title: 'Become a Host Salon | Cosmetology Apprenticeship',
   description:
     `Partner with ${PLATFORM_DEFAULTS.orgName} as a host salon for our USDOL Registered Cosmetology Apprenticeship program. Train the next generation of licensed cosmetologists.`,
   alternates: {
-    canonical: `https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship/host-shops',
+    canonical: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship/host-shops',
   },
 };
 

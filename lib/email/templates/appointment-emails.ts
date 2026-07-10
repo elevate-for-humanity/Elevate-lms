@@ -82,7 +82,7 @@ Your appointment with ${PLATFORM_DEFAULTS.orgName} is confirmed.
 
 ${
   data.format === 'phone'
-    ? 'We will call you at the number you provided at the scheduled time.`
+    ? 'We will call you at the number you provided at the scheduled time.'
     : `Your secure Zoom meeting link:\n${data.zoomLink}\n\nPlease join from a quiet location with a stable internet connection.`
 }
 
@@ -103,7 +103,7 @@ Phone: ${PLATFORM_DEFAULTS.supportPhone}
    */
   appointmentReminder24h: {
     from: PLATFORM_DEFAULTS.emailFromAddress,
-    subject: `Reminder: Your appointment tomorrow',
+    subject: 'Reminder: Your appointment tomorrow',
     getHtml: (data: {
       firstName: string;
       date: string;
@@ -138,7 +138,7 @@ Phone: ${PLATFORM_DEFAULTS.supportPhone}
             ? `
           <p>Need to reschedule? <a href="${data.rescheduleLink}">Click here</a> or call <a href="tel:+1${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a>.</p>
         `
-            : ``
+            : ''
         }
 
         <p>We look forward to speaking with you.</p>
@@ -167,7 +167,7 @@ This is a reminder about your appointment tomorrow.
 ⏰ Time: ${data.time}
 📞 Format: ${data.format === 'phone' ? 'Phone Call' : 'Zoom Video'}
 
-${data.format === 'zoom' && data.zoomLink ? `Join Zoom Meeting: ${data.zoomLink}\n\n` : ''}${data.rescheduleLink ? `Need to reschedule? ${data.rescheduleLink}\nOr call ${PLATFORM_DEFAULTS.supportPhone}.\n\n` : ``}We look forward to speaking with you.
+${data.format === 'zoom' && data.zoomLink ? `Join Zoom Meeting: ${data.zoomLink}\n\n` : ''}${data.rescheduleLink ? `Need to reschedule? ${data.rescheduleLink}\nOr call ${PLATFORM_DEFAULTS.supportPhone}.\n\n` : ''}We look forward to speaking with you.
 
 —
 ${PLATFORM_DEFAULTS.orgName}
@@ -180,7 +180,7 @@ Phone: ${PLATFORM_DEFAULTS.supportPhone}
    */
   appointmentReminder1h: {
     from: PLATFORM_DEFAULTS.emailFromAddress,
-    subject: `Starting soon: Your appointment in 1 hour',
+    subject: 'Starting soon: Your appointment in 1 hour',
     getHtml: (data: {
       firstName: string;
       time: string;
@@ -195,7 +195,7 @@ Phone: ${PLATFORM_DEFAULTS.supportPhone}
         ${
           data.format === 'phone'
             ? `
-          <p>We`ll call you at the scheduled time.</p>
+          <p>We'll call you at the scheduled time.</p>
         `
             : `
           <p style="text-align: center; margin: 20px 0;">

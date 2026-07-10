@@ -154,7 +154,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
             {/* Credentials & Outcomes Box */}
             <div className="mt-8 bg-gradient-to-br from-brand-blue-50 to-indigo-50 border-2 border-brand-blue-200 rounded-2xl p-6">
               <h3 className="text-xl font-bold mb-4 text-brand-blue-900 flex items-center gap-2">
-                <span className="text-2xl">🎓</span> Credentials You`ll Earn
+                <span className="text-2xl">🎓</span> Credentials You'll Earn
               </h3>
 
               {/* Certificate of Completion */}
@@ -213,7 +213,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
             </div>
           </div>
 
-          {/* Middle: What You`ll Learn */}
+          {/* Middle: What You'll Learn */}
           <div className="md:col-span-2">
             <h2 className="text-3xl font-bold mb-6 text-black">What You'll Learn</h2>
 

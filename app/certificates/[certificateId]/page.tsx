@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: certificate
       ? `${certificate.title} | Certificate`
       : `Certificate | ${PLATFORM_DEFAULTS.orgName}`,
-    description: `View and verify this certificate of completion.',
+    description: 'View and verify this certificate of completion.',
   };
 }
 

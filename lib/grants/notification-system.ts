@@ -144,7 +144,7 @@ async function sendEmailNotification(
 
       <div class="footer">
         <p>${PLATFORM_DEFAULTS.orgName} Grant Autopilot System</p>
-        <p>You`re receiving this because you're a grant administrator.</p>
+        <p>You're receiving this because you're a grant administrator.</p>
         <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/settings/notifications">Manage Notification Preferences</a></p>
       </div>
     </div>

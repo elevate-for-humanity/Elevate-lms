@@ -71,7 +71,7 @@ export const FORMATTING_RULES = {
   headingEveryNParagraphs: 4,
   maxListItems: 5, // beyond 5, use a subsection
   bannedFillerWords: ['things', 'various', 'stuff', 'etc.', 'really', 'very', 'basically'],
-  tone: 'Professional, direct, single-spaced. No marketing language in compliance sections.`,
+  tone: 'Professional, direct, single-spaced. No marketing language in compliance sections.',
 } as const;
 
 // ─── Prompt Library ──────────────────────────────────────────────

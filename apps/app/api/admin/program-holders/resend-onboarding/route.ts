@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     subject: `Your Onboarding Link — ${PLATFORM_DEFAULTS.orgName}`,
     content: [
       {
-        type: `text/html`,
+        type: 'text/html',
         value: `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;font-family:Arial,sans-serif;background:#f8fafc">
@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
     ],
   };
 
-  const sgRes = await fetch(`https://api.sendgrid.com/v3/mail/send', {
+  const sgRes = await fetch('https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${sgKey}`,

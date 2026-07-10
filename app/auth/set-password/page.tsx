@@ -147,7 +147,7 @@ export default function SetPasswordPage() {
             Go to Login
           </Link>
           <p className="mt-4 text-sm text-slate-700">
-            Need help?{' `}
+            Need help?{' '}
             <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-brand-blue-600 hover:underline">
               {PLATFORM_DEFAULTS.supportPhone}
             </a>

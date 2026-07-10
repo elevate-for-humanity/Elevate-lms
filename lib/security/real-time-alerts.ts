@@ -252,7 +252,7 @@ function formatEmailBody(alert: SecurityAlert): string {
             <div class="label">User ID:</div>
             <div class="value">${alert.userId}</div>
           </div>
-          '
+          `
               : ''
           }
           ${
@@ -262,7 +262,7 @@ function formatEmailBody(alert: SecurityAlert): string {
             <div class="label">IP Address:</div>
             <div class="value">${alert.ipAddress}</div>
           </div>
-          '
+          `
               : ''
           }
           ${
@@ -272,7 +272,7 @@ function formatEmailBody(alert: SecurityAlert): string {
             <div class="label">User Agent:</div>
             <div class="value">${alert.userAgent}</div>
           </div>
-          '
+          `
               : ''
           }
           <div class="field">
@@ -286,7 +286,7 @@ function formatEmailBody(alert: SecurityAlert): string {
             <div class="label">Additional Details:</div>
             <div class="value"><pre>${JSON.stringify(alert.metadata, null, 2)}</pre></div>
           </div>
-          '
+          `
               : ''
           }
         </div>
@@ -345,7 +345,7 @@ export async function monitorFailedLogins(userId: string, ipAddress: string): Pr
     .from('audit_logs')
     .select('*')
     .eq('action', 'failed_login')
-    .or('user_id.eq.${userId},ip_address.eq.${ipAddress}')
+    .or(`user_id.eq.${userId},ip_address.eq.${ipAddress}`)
     .gte('created_at', fifteenMinutesAgo.toISOString());
   if (attempts && attempts.length >= ALERT_THRESHOLDS.failedLogins) {
     await sendSecurityAlert({

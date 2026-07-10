@@ -147,21 +147,21 @@ function getEmailTemplate(
         <h1>Welcome to Elevate LMS!</h1>
         <p>Your license has been activated.</p>
         <p>Plan: ${data.plan || 'Professional'}</p>
-        <p>Tenant: ${data.tenantName || 'Your Organization`}</p>
+        <p>Tenant: ${data.tenantName || 'Your Organization'}</p>
         <p><a href="${data.loginUrl || `${PLATFORM_DEFAULTS.siteUrl}/login`}">Login to your dashboard</a></p>
       `,
     },
     license_suspended: {
-      subject: `Action Required: Your Elevate LMS License is Suspended',
+      subject: 'Action Required: Your Elevate LMS License is Suspended',
       html: `
         <h1>License Suspended</h1>
-        <p>Your license has been suspended due to: ${data.reason || 'payment issue`}</p>
+        <p>Your license has been suspended due to: ${data.reason || 'payment issue'}</p>
         <p>Please update your billing information to restore access.</p>
         <p><a href="${data.billingUrl || `${PLATFORM_DEFAULTS.siteUrl}/billing`}">Update Billing</a></p>
       `,
     },
     license_expiring: {
-      subject: `Your Elevate LMS License is Expiring Soon',
+      subject: 'Your Elevate LMS License is Expiring Soon',
       html: `
         <h1>License Expiring</h1>
         <p>Your license will expire on ${data.expiryDate || 'soon'}.</p>
@@ -170,7 +170,7 @@ function getEmailTemplate(
       `,
     },
     payment_failed: {
-      subject: `Payment Failed - Action Required`,
+      subject: 'Payment Failed - Action Required',
       html: `
         <h1>Payment Failed</h1>
         <p>We were unable to process your payment.</p>
@@ -179,7 +179,7 @@ function getEmailTemplate(
       `,
     },
     welcome: {
-      subject: `Welcome to Elevate LMS`,
+      subject: 'Welcome to Elevate LMS',
       html: `
         <h1>Welcome!</h1>
         <p>Thank you for joining Elevate LMS.</p>
@@ -187,7 +187,7 @@ function getEmailTemplate(
       `,
     },
     password_reset: {
-      subject: `Reset Your Password',
+      subject: 'Reset Your Password',
       html: `
         <h1>Password Reset</h1>
         <p>Click the link below to reset your password:</p>

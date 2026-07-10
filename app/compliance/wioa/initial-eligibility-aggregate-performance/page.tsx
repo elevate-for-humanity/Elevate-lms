@@ -11,11 +11,11 @@ export const revalidate = 3600;
 const path = WIOA_COMPLIANCE.ieapTemplate;
 
 export const metadata: Metadata = {
-  title: 'Initial Eligibility Aggregate Performance | WIOA ETPL`,
+  title: 'Initial Eligibility Aggregate Performance | WIOA ETPL',
   description: `Indiana INTraining / ETPL Initial Eligibility Aggregate Performance (IEAP) form requirements for new training programs at ${PLATFORM_DEFAULTS.orgName}.`,
   alternates: { canonical: `${PLATFORM_DEFAULTS.siteUrl}${path}` },
   openGraph: {
-    title: `Initial Eligibility Aggregate Performance (IEAP)`,
+    title: 'Initial Eligibility Aggregate Performance (IEAP)',
     url: `${PLATFORM_DEFAULTS.siteUrl}${path}`,
   },
 };

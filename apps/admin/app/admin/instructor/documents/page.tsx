@@ -25,7 +25,7 @@ export default async function InstructorDocumentsPage({
 
 
   // Guard against null user
-  if (!user) redirect(`/login');
+  if (!user) redirect('/login');
   const db = await requireAdminClient();
   const { data: profile } = await db
     .from('profiles')

@@ -331,7 +331,7 @@ export function generateOnboardingPackageWithNDA(data: NDAData & { includeHandbo
   return {
     nda: generateNDAText(data),
     checklist: [
-      `✅ Review and sign NDA and Non-Compete Agreement',
+      '✅ Review and sign NDA and Non-Compete Agreement',
       '✅ Complete I-9 Employment Eligibility Verification',
       '✅ Provide government-issued photo ID',
       '✅ Complete W-4 Tax Withholding Form',

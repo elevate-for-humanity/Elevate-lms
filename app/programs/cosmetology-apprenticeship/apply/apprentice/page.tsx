@@ -7,7 +7,7 @@ import CosmetologyApprenticeForm from '../CosmetologyApprenticeForm';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Cosmetology Apprentice Application`,
+  title: 'Cosmetology Apprentice Application',
   description:
     `Apply to enroll in the ${PLATFORM_DEFAULTS.orgName} DOL-registered cosmetology apprenticeship program.`,
   alternates: { canonical: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship/apply/apprentice' },

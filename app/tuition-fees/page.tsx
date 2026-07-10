@@ -7,11 +7,11 @@ import { createClient } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Tuition & Fees`,
+  title: 'Tuition & Fees',
   description:
     `Complete tuition and fee schedule for all programs at ${PLATFORM_DEFAULTS.orgName}. Transparent pricing with no hidden costs.`,
   alternates: {
-    canonical: `https://www.elevateforhumanity.org/tuition-fees',
+    canonical: 'https://www.elevateforhumanity.org/tuition-fees',
   },
 };
 
@@ -228,7 +228,7 @@ export default async function TuitionFeesPage() {
               ${PLATFORM_DEFAULTS.orgName}
             </li>
             <li>
-              • See our{` '}
+              • See our{' '}
               <Link href="/refund-policy" className="text-brand-orange-600 hover:underline">
                 Refund Policy
               </Link>{' '}

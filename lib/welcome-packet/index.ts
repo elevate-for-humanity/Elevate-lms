@@ -174,10 +174,10 @@ export async function sendWelcomePacketEmail(
   const emailContent = `
     <h1>Welcome to ${PLATFORM_DEFAULTS.orgName}, ${data.studentName}!</h1>
 
-    <p>We`re thrilled to have you join our ${data.programName} program starting on ${new Date(data.startDate).toLocaleDateString()}.</p>
+    <p>We're thrilled to have you join our ${data.programName} program starting on ${new Date(data.startDate).toLocaleDateString()}.</p>
 
     <h2>Your Welcome Packet is Ready</h2>
-    <p>We`ve prepared a personalized welcome packet with everything you need to get started:</p>
+    <p>We've prepared a personalized welcome packet with everything you need to get started:</p>
 
     <ul>
       <li>Student Handbook</li>
@@ -228,7 +228,7 @@ export async function sendWelcomePacketEmail(
   // Log email sent
   await supabase.from('email_logs').insert({
     recipient: data.studentEmail,
-    subject: `Welcome to ${data.programName}',
+    subject: `Welcome to ${data.programName}`,
     type: 'welcome_packet',
     sent_at: new Date().toISOString(),
   });
@@ -297,7 +297,7 @@ async function sendWelcomePacketCompletionEmail(
 
   if (!profile) return;
 
-  const emailContent = '
+  const emailContent = `
     <h1>Welcome Packet Complete! 🎉</h1>
 
     <p>Hi ${profile.full_name},</p>
@@ -389,13 +389,13 @@ export async function sendWelcomePacketReminder(packetId: string): Promise<void>
   const { data: packet } = await supabase
     .from('welcome_packets')
     .select(
-      '
+      `
       *,
       student:profiles(full_name, email),
       enrollment:enrollments(
         program:programs(name)
       )
-    ',
+    `,
     )
     .eq('id', packetId)
     .maybeSingle();
@@ -411,7 +411,7 @@ export async function sendWelcomePacketReminder(packetId: string): Promise<void>
 
   if (!items || items.length === 0) return;
 
-  const emailContent = '
+  const emailContent = `
     <h1>Reminder: Complete Your Welcome Packet</h1>
 
     <p>Hi ${packet.student.full_name},</p>
@@ -419,7 +419,7 @@ export async function sendWelcomePacketReminder(packetId: string): Promise<void>
     <p>You have ${items.length} required item${items.length > 1 ? 's' : ''} remaining in your welcome packet:</p>
 
     <ul>
-      ${items.map((item) => `<li>${item.title}</li>').join('')}
+      ${items.map((item) => `<li>${item.title}</li>`).join('')}
     </ul>
 
     <p>Please complete these items before your first day to ensure a smooth start to your program.</p>

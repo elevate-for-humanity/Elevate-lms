@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
     if (currentStatus !== flow.from) {
       return NextResponse.json(
         {
-          error: `Cannot ${step}: expected status '${flow.from}', got '${currentStatus}'',
+          error: `Cannot ${step}: expected status '${flow.from}', got '${currentStatus}'`,
           completed_steps: steps,
         },
         { status: 422 },

@@ -66,7 +66,7 @@ export default function CNAEnrollPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Enrollment failed`);
+      if (!res.ok) throw new Error(data.error || 'Enrollment failed');
 
       const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (!data.enrollmentId || !uuidPattern.test(data.enrollmentId)) {
@@ -101,7 +101,7 @@ export default function CNAEnrollPage() {
       if (checkoutData.url) {
         window.location.href = checkoutData.url;
       } else {
-        throw new Error('No checkout URL returned. Please try again or call ` + PLATFORM_DEFAULTS.supportPhone);
+        throw new Error('No checkout URL returned. Please try again or call ' + PLATFORM_DEFAULTS.supportPhone);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : `Something went wrong. Call ${PLATFORM_DEFAULTS.supportPhone}.`);

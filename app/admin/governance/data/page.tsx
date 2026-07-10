@@ -9,7 +9,7 @@ import { Shield, Clock, Trash2, Lock, Database, Eye, AlertTriangle } from 'lucid
 
 export const metadata: Metadata = {
   title: `Data Governance | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Data retention, deletion policies, and governance framework for the Elevate Workforce Operating System.',
+  description: 'Data retention, deletion policies, and governance framework for the Elevate Workforce Operating System.',
   robots: {
     index: false,
     follow: false,

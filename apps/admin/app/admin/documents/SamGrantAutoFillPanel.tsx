@@ -101,14 +101,14 @@ export default function SamGrantAutoFillPanel() {
     try {
       const res = await fetch('/api/admin/grants/sam/prefill', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           grant: selected,
           organization: {
             legalName: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
             contactEmail: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
             contactPhone: PLATFORM_DEFAULTS.supportPhone,
-            address: `8888 Keystone Crossing, Suite 1300',
+            address: '8888 Keystone Crossing, Suite 1300',
             city: 'Indianapolis',
             state: 'IN',
             zip: '46240',

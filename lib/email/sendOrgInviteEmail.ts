@@ -26,7 +26,7 @@ export async function sendOrgInviteEmail({
         <p>This invitation will expire in 7 days.</p>
         <p>If you did not expect this invitation, you can safely ignore this email.</p>
       `,
-      text: 'You've been invited to join ${organizationName}\n\n${inviterName ? `${inviterName} has invited you to join their organization.\n\n` : ''}Click the link below to accept the invitation:\n${inviteUrl}\n\nThis invitation will expire in 7 days.`,
+      text: `You've been invited to join ${organizationName}\n\n${inviterName ? `${inviterName} has invited you to join their organization.\n\n` : ''}Click the link below to accept the invitation:\n${inviteUrl}\n\nThis invitation will expire in 7 days.`,
     });
 
     return { success: result.success, error: result.error };

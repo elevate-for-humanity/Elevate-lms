@@ -28,7 +28,7 @@ export default function FundingInfoBlock({
         <p className="text-brand-green-800 text-sm leading-relaxed mb-4">
           {programName} is approved for federal and state workforce funding. Eligible Indiana 
           residents can have <strong>100% of tuition, books, and certification exam fees covered</strong> through 
-          programs like {fundingSources.join(', `)}. Eligibility is based on income, employment status, 
+          programs like {fundingSources.join(', ')}. Eligibility is based on income, employment status, 
           and other factors determined by your local workforce office.
         </p>
         <div className="space-y-2 mb-4">

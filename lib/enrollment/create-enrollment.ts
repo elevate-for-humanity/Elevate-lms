@@ -313,7 +313,7 @@ async function sendEnrollmentWelcomeEmail(params: {
       },
       body: JSON.stringify({
         to: email,
-        subject: `Welcome to ${programDetails?.name || 'Your Program`} - Your Access is Ready!`,
+        subject: `Welcome to ${programDetails?.name || 'Your Program'} - Your Access is Ready!`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #1e3a8a;">Welcome to ${PLATFORM_DEFAULTS.orgName}!</h2>
@@ -322,7 +322,7 @@ async function sendEnrollmentWelcomeEmail(params: {
             
             ${loginSection}
             
-            <h3>What`s Next?</h3>
+            <h3>What's Next?</h3>
             <ul>
               <li>Log in to your student portal</li>
               <li>Complete your profile</li>
@@ -337,7 +337,7 @@ async function sendEnrollmentWelcomeEmail(params: {
       }),
     });
 
-    logger.info(`[Enrollment] Welcome email sent`, { email, programId });
+    logger.info('[Enrollment] Welcome email sent', { email, programId });
   } catch (error) {
     logger.error('[Enrollment] Failed to send welcome email', error);
   }

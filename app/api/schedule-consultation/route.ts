@@ -120,13 +120,13 @@ async function _POST(request: Request) {
       html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
 // IMAGE-CONTRACT: allow raw img because legacy markup
 <img src="${PLATFORM_DEFAULTS.siteUrl}/logo.jpg" alt="Elevate" width="120" style="margin-bottom:20px"/>
-<h2 style="color:#111827">Hi ${name.split(` ')[0]},</h2>
+<h2 style="color:#111827">Hi ${name.split(' ')[0]},</h2>
 <p>Your consultation with our enrollment team is confirmed.</p>
 <table style="width:100%;border-collapse:collapse;margin:16px 0">
 <tr><td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;width:140px">Meeting</td><td style="padding:10px;border:1px solid #e5e7eb">${typeLabel}</td></tr>
 <tr><td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold">Date</td><td style="padding:10px;border:1px solid #e5e7eb">${dateFormatted}</td></tr>
 <tr><td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold">Time</td><td style="padding:10px;border:1px solid #e5e7eb">${appointment_time} (Eastern)</td></tr>
-<tr><td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold">Location</td><td style="padding:10px;border:1px solid #e5e7eb">${zoomUrl ? 'Zoom Video Call' : 'Phone / In-Person — details to follow`}</td></tr>
+<tr><td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold">Location</td><td style="padding:10px;border:1px solid #e5e7eb">${zoomUrl ? 'Zoom Video Call' : 'Phone / In-Person — details to follow'}</td></tr>
 </table>
 ${
   zoomUrl

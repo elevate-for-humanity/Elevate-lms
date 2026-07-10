@@ -45,7 +45,7 @@ export async function sendVideoStatement(input: VideoStatementInput) {
           parent: [
             {
               id: `${PLATFORM_DEFAULTS.siteUrl}/course/${input.courseId}`,
-              objectType: `Activity` as const,
+              objectType: 'Activity' as const,
             },
           ],
           ...(input.lessonId && {

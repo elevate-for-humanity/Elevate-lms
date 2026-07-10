@@ -6,10 +6,10 @@ import VerifyClient from './VerifyClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Verify Certificate`,
+  title: 'Verify Certificate',
   description: `Verify the authenticity of certificates issued by ${PLATFORM_DEFAULTS.orgName}.`,
   alternates: {
-    canonical: `https://www.elevateforhumanity.org/verify',
+    canonical: 'https://www.elevateforhumanity.org/verify',
   },
 };
 

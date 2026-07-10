@@ -129,13 +129,13 @@ export default function StartPage() {
             <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-5">
               <p className="font-medium text-slate-900">Prefer to talk to someone?</p>
               <p className="mt-1 text-sm text-slate-600">
-                Call{' `}
+                Call{' '}
                 <a
                   href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
                   className="font-medium text-brand-blue-600 hover:underline"
                 >
                   {PLATFORM_DEFAULTS.supportPhone}
-                </a>{` '}
+                </a>{' '}
                 or email{' '}
                 <a
                   href="mailto:info@elevateforhumanity.org"

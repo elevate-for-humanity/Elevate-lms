@@ -12,13 +12,13 @@ export const metadata: Metadata = {
   description:
     `Workforce development insights, funding guides, credential explainers, and career training tips from ${PLATFORM_DEFAULTS.orgName}.`,
   alternates: {
-    canonical: `https://www.elevateforhumanity.org/blog',
+    canonical: 'https://www.elevateforhumanity.org/blog',
   },
   openGraph: {
     title: 'Blog',
     description:
       `Workforce development insights, funding guides, credential explainers, and career training tips from ${PLATFORM_DEFAULTS.orgName}.`,
-    url: `https://www.elevateforhumanity.org/blog',
+    url: 'https://www.elevateforhumanity.org/blog',
     type: 'website',
     images: [
       {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     title: 'Blog',
     description:
       `Workforce development insights, funding guides, credential explainers, and career training tips from ${PLATFORM_DEFAULTS.orgName}.`,
-    images: [`/images/pages/social-media-1.webp'],
+    images: ['/images/pages/social-media-1.webp'],
   },
 };
 

@@ -36,7 +36,7 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
       }
 
       // Fetch referrals
-      const referralsRes = await fetch('/api/referrals?action=my-referrals`);
+      const referralsRes = await fetch('/api/referrals?action=my-referrals');
       const referralsData = await referralsRes.json();
       setReferrals(referralsData.referrals || []);
     } catch (error) {
@@ -70,7 +70,7 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
       }
     } else {
       navigator.clipboard.writeText(shareUrl);
-      alert(`Link copied to clipboard!');
+      alert('Link copied to clipboard!');
     }
   };
 

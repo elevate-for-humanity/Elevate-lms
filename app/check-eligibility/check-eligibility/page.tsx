@@ -204,7 +204,7 @@ export default function CheckEligibilityPage() {
   > = {
     A: {
       icon: <CheckCircle className="w-6 h-6 text-brand-green-600 flex-shrink-0 mt-0.5" />,
-      bg: `bg-brand-green-50 border-brand-green-200',
+      bg: 'bg-brand-green-50 border-brand-green-200',
       title: 'You likely qualify for fully funded training',
       body: "WIOA, Workforce Ready Grant, and Job Ready Indy may cover your full tuition, books, and certification fees. Confirm your info below and we'll lock in your funding options.",
       cta: 'Continue to Application',
@@ -571,7 +571,7 @@ export default function CheckEligibilityPage() {
                 {!submitting && <ArrowRight className="w-5 h-5" />}
               </button>
               <p className="text-center text-xs text-slate-400">
-                Questions? Call or text{
+                Questions? Call or text{' '}
                 <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-slate-600 font-semibold">
                   {PLATFORM_DEFAULTS.supportPhone}
                 </a>
@@ -597,7 +597,7 @@ export default function CheckEligibilityPage() {
                 <p className="font-extrabold text-slate-900">{program}</p>
                 {recommended.find((r) => r.name === program) && (
                   <p className="text-xs text-slate-500 mt-1">
-                    {recommended.find((r) => r.name === program)?.duration} ·{` '}
+                    {recommended.find((r) => r.name === program)?.duration} ·{' '}
                     {recommended.find((r) => r.name === program)?.outcome}
                   </p>
                 )}

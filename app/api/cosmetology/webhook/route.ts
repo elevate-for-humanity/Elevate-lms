@@ -295,7 +295,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
           break;
         }
 
-        logger.warn(`[cosmetology/webhook] Unknown checkout_type — skipping`, { checkoutType });
+        logger.warn('[cosmetology/webhook] Unknown checkout_type — skipping', { checkoutType });
         break;
       }
 
@@ -420,13 +420,13 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
             const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
             await sendEmail({
               to: sub.customer_email!,
-              subject: '⚠️ Payment Failed — Action Required to Keep Your Enrollment`,
+              subject: '⚠️ Payment Failed — Action Required to Keep Your Enrollment',
               html: `<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif"><p style="font-size:18px;font-weight:bold;color:#dc2626">Your weekly tuition payment failed.</p><p>We were unable to charge your card for your Cosmetology Apprenticeship weekly payment.</p><p><strong>Update your payment method immediately:</strong></p><p style="margin:24px 0"><a href="${siteUrl}/learner/dashboard" style="background:#1d4ed8;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">Update Payment Method →</a></p><p style="color:#dc2626;font-weight:bold">If not resolved within 7 days, your account will be suspended from logging hours.</p><p>Call <a href="tel:${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a> if you need help.</p><p>— ${PLATFORM_DEFAULTS.orgName}</p></div>`,
             });
           } catch { /* non-fatal */ }
         }
 
-        logger.warn(`[cosmetology/webhook] Payment failed`, { failedCustomerId, isFirstFailure });
+        logger.warn('[cosmetology/webhook] Payment failed', { failedCustomerId, isFirstFailure });
         break;
       }
 

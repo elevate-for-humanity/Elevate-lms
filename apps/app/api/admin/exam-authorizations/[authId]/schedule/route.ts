@@ -33,7 +33,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ aut
 
   if (fetchErr || !existing) return safeError('Authorization not found', 404);
   if (!['authorized', 'pending', 'fee_charged'].includes(existing.status)) {
-    return safeError(`Cannot schedule: status is '${existing.status}'', 409);
+    return safeError(`Cannot schedule: status is '${existing.status}'`, 409);
   }
 
   // Insert scheduling record

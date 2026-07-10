@@ -10,7 +10,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = {
   title: `SEO & Indexing Governance | ${PLATFORM_DEFAULTS.orgName}`,
   description:
-    `How search engine indexing is controlled and enforced to protect platform credibility and prevent accidental exposure.',
+    'How search engine indexing is controlled and enforced to protect platform credibility and prevent accidental exposure.',
   robots: {
     index: false,
     follow: false,
@@ -98,7 +98,7 @@ export default async function SeoIndexingPage() {
             Publishing is not the same as indexing.
           </p>
           <p className="text-slate-700">
-            Public pages default to{' `}
+            Public pages default to{' '}
             <code className="bg-slate-200 px-2 py-0.5 rounded text-sm">noindex</code> unless
             explicitly approved. Indexing is a governance decision, not a content decision.
           </p>
@@ -169,7 +169,7 @@ export default async function SeoIndexingPage() {
 <link rel="canonical" href="${PLATFORM_DEFAULTS.siteUrl}/page-path">`}
             </pre>
             <p className="text-sm text-slate-600 mt-4">
-              See{` '}
+              See{' '}
               <code className="bg-slate-200 px-2 py-0.5 rounded">
                 config/seo-index-whitelist.json
               </code>{' '}

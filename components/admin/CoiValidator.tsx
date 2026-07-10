@@ -327,7 +327,7 @@ function ResultDisplay({ result, onReset }: { result: DecisionResult; onReset: (
           <p className="text-sm opacity-80">
             Extraction: {result.method} &middot; {v.extractedTextChars.toLocaleString('en-US')}{' '}
             chars
-            {f.acordFormDetected && ' \u00B7 ACORD form detected`}
+            {f.acordFormDetected && ' \u00B7 ACORD form detected'}
             {f.ocrConfidence !== null && ` \u00B7 OCR confidence: ${f.ocrConfidence.toFixed(0)}%`}
           </p>
         </div>

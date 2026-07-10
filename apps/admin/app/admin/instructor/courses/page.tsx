@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `My Courses | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Manage your courses',
+  description: 'Manage your courses',
 };
 
 export default async function InstructorCoursesPage() {

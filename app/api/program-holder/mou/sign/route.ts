@@ -141,7 +141,7 @@ async function _POST(req: NextRequest) {
       }),
     });
   } catch (emailErr) {
-    logger.error(`Admin MOU notification failed` emailErr);
+    logger.error('Admin MOU notification failed', emailErr);
     // Non-fatal — MOU is still signed
   }
 

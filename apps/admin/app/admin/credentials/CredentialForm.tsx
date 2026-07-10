@@ -307,7 +307,7 @@ export default function CredentialForm({ initial, mode }: CredentialFormProps) {
             required: true,
             placeholder: `e.g. ${PLATFORM_DEFAULTS.orgName}, ACT Inc., EPA`,
           })}
-          {field(`Issuing Authority URL', 'issuing_authority_url', { placeholder: 'https://...' })}
+          {field('Issuing Authority URL', 'issuing_authority_url', { placeholder: 'https://...' })}
         </div>
       </section>
 

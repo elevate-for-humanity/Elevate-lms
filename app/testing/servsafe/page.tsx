@@ -5,7 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `ServSafe Food Handler Certification | ${PLATFORM_DEFAULTS.orgName}`,
-  description: `Get your ServSafe food handler and manager certification at our testing center.',
+  description: 'Get your ServSafe food handler and manager certification at our testing center.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/servsafe' },
 };
 

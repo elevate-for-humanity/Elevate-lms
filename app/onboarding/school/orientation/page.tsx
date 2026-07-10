@@ -45,7 +45,7 @@ export default async function SchoolOrientationPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?redirect=/onboarding/school/orientation');
+  if (!user) redirect('/login?redirect=/onboarding/school/orientation');
 
   const { data: profile } = await supabase
     .from('profiles')

@@ -187,10 +187,10 @@ export default async function DownloadsPage() {
         <div className="container mx-auto px-4">
           <p className="text-center text-amber-800">
             <strong>Note:</strong> Documents are available upon request. Click "Call to Request" or
-            call{' `}
+            call{' '}
             <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="font-bold underline">
               {PLATFORM_DEFAULTS.supportPhone}
-            </a>{` `}
+            </a>{' '}
             to receive any document.
           </p>
         </div>

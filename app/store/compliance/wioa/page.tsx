@@ -11,7 +11,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: `WIOA Compliance Tools | ${PLATFORM_DEFAULTS.orgName} Store`,
-  description: `Complete WIOA compliance toolkit with participant tracking, performance metrics, PIRL exports, and automated quarterly reporting.',
+  description: 'Complete WIOA compliance toolkit with participant tracking, performance metrics, PIRL exports, and automated quarterly reporting.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/compliance/wioa',
   },

@@ -233,7 +233,7 @@ export async function generateEmployerMOUPdf(data: EmployerMOUPDFData): Promise<
   // ── Programs Covered ─────────────────────────────────────────────────────────
   if (data.programs && data.programs.length > 0) {
     checkY(60);
-    page.drawText(`PROGRAMS COVERED', {
+    page.drawText('PROGRAMS COVERED', {
       x: margin,
       y,
       size: 10,

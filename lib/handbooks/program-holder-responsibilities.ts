@@ -779,7 +779,7 @@ STUDENT / PARTICIPANT RESPONSIBILITIES GUIDE
 
 WELCOME, STUDENT!
 
-Congratulations on enrolling in Elevate For Humanity`s training program! This guide outlines your responsibilities as a participant. Following these guidelines will help you succeed in your training and achieve your career goals.
+Congratulations on enrolling in Elevate For Humanity's training program! This guide outlines your responsibilities as a participant. Following these guidelines will help you succeed in your training and achieve your career goals.
 
 ---
 

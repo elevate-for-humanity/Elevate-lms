@@ -17,11 +17,11 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Instructor Credentials & RTI Provider Qualifications`,
+  title: 'Instructor Credentials & RTI Provider Qualifications',
   description:
     `Instructor qualification standards, credential partner requirements, and RTI provider documentation for ${PLATFORM_DEFAULTS.orgName} workforce training and registered apprenticeship programs.`,
   alternates: {
-    canonical: `https://www.elevateforhumanity.org/instructor-credentials',
+    canonical: 'https://www.elevateforhumanity.org/instructor-credentials',
   },
 };
 

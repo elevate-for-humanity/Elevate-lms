@@ -2,11 +2,11 @@ import { Metadata } from 'next';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Blog & Success Stories`,
+  title: 'Blog & Success Stories',
   description:
     `Read success stories from our graduates, workforce development insights, program updates, and career training tips from ${PLATFORM_DEFAULTS.orgName}.`,
   alternates: {
-    canonical: `https://www.elevateforhumanity.org/blog',
+    canonical: 'https://www.elevateforhumanity.org/blog',
     types: {
       'application/rss+xml': 'https://www.elevateforhumanity.org/blog/rss.xml',
     },

@@ -99,7 +99,7 @@ function buildScenesFromScript(lesson: {
     scene_number: recapNum,
     title: 'Recap',
     bullets: bullet_points.slice(-3),
-    narration: 'Let's review what we covered in ${title}. Complete the knowledge check to continue.`,
+    narration: `Let's review what we covered in ${title}. Complete the knowledge check to continue.`,
     clip_keyword: 'learning education',
   });
 

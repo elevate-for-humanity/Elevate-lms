@@ -80,7 +80,7 @@ function buildFollowUpHtml(firstName: string, programInterest: string): string {
 
 function buildFollowUpText(firstName: string, programInterest: string): string {
   const program = programInterest
-    ? programInterest.replace(/-/g, ` ').replace(/\b\w/g, (c) => c.toUpperCase())
+    ? programInterest.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
     : 'your program of interest';
 
   return `Hi ${firstName},

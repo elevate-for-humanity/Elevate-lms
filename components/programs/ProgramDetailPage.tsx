@@ -255,7 +255,7 @@ export default function ProgramDetailPage({
                     {p.deliveredBy === 'Elevate'
                       ? `Delivered directly by ${PLATFORM_DEFAULTS.orgName}.`
                       : p.deliveredBy === 'Partner'
-                        ? 'Delivered by an approved training partner.`
+                        ? 'Delivered by an approved training partner.'
                         : `Delivered by ${PLATFORM_DEFAULTS.orgName} or an approved training partner.`}
                   </p>
                 )}

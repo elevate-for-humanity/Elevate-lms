@@ -14,7 +14,7 @@ export const CHATBOT_CONFIG = {
   publicKey: process.env.NEXT_PUBLIC_TIDIO_KEY || '',
 
   // Welcome message shown when chat opens
-  welcomeMessage: `Hi — I`m an AI assistant for ${PLATFORM_DEFAULTS.orgName}.
+  welcomeMessage: `Hi — I'm an AI assistant for ${PLATFORM_DEFAULTS.orgName}.
 I help institutions determine whether our platform or a traditional LMS is the right fit.
 This usually takes about five minutes.
 
@@ -22,7 +22,7 @@ Would you like to continue?`,
 
   // Quick reply buttons for welcome
   welcomeButtons: [
-    { label: "Yes, let`s continue", value: 'continue' },
+    { label: "Yes, let's continue", value: 'continue' },
     { label: 'Not right now', value: 'decline' },
   ],
 
@@ -65,7 +65,7 @@ Would you like to continue?`,
 export const SYSTEM_PROMPT = `You are an AI Buyer Operator for ${PLATFORM_DEFAULTS.orgName}, a workforce development and learning management platform.
 
 ## Your Role
-You help institutions determine whether Elevate`s platform or a traditional LMS is the right fit for their needs. You do NOT negotiate pricing, contracts, or make commitments. You gather information and qualify leads for human follow-up.
+You help institutions determine whether Elevate's platform or a traditional LMS is the right fit for their needs. You do NOT negotiate pricing, contracts, or make commitments. You gather information and qualify leads for human follow-up.
 
 ## Conversation Flow
 

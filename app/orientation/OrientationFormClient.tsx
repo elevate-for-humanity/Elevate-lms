@@ -44,11 +44,11 @@ export default function OrientationFormClient() {
           // Open Google Calendar with the real Zoom link
           const startDT = `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;
           const endH = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
-          const endDT = `${date.replace(/-/g, '')}T${endH}${time.split(':`)[1]}00`;
+          const endDT = `${date.replace(/-/g, '')}T${endH}${time.split(':')[1]}00`;
           const details = `Orientation for ${name} (${email})%0A%0AZoom Link: ${zoomLink}`;
           const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`${PLATFORM_DEFAULTS.orgName} — Orientation`)}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)}&location=Zoom`;
 
-          window.open(calUrl, `_blank`);
+          window.open(calUrl, '_blank');
         } catch {
           setError(`Something went wrong. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);
         } finally {
@@ -121,7 +121,7 @@ export default function OrientationFormClient() {
         disabled={loading}
         className="w-full bg-brand-red-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading ? `Creating meeting...' : 'Book Orientation via Google Calendar'}
+        {loading ? 'Creating meeting...' : 'Book Orientation via Google Calendar'}
       </button>
     </form>
   );

@@ -107,7 +107,7 @@ export async function PATCH(req: NextRequest) {
     if (app?.email) {
       const messages: Record<string, { subject: string; body: string }> = {
         enroll: {
-          subject: 'Your Application Has Been Approved — Next Steps`,
+          subject: 'Your Application Has Been Approved — Next Steps',
           body: `Hi ${app.first_name},<br/><br/>Your application to ${PLATFORM_DEFAULTS.orgName} has been reviewed and <strong>approved for enrollment</strong>. A team member will contact you shortly with next steps.<br/><br/>${reviewer_notes ? `<strong>Note from our team:</strong> ${reviewer_notes}<br/><br/>` : ''}`,
         },
         hold: {
@@ -125,7 +125,7 @@ export async function PATCH(req: NextRequest) {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
-          'Content-Type': 'application/json`,
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           personalizations: [
@@ -137,7 +137,7 @@ export async function PATCH(req: NextRequest) {
           from: { email: `info@${PLATFORM_DEFAULTS.canonicalDomain}`, name: PLATFORM_DEFAULTS.orgName },
           content: [
             {
-              type: `text/html`,
+              type: 'text/html',
               value: `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;color:#1e293b;max-width:600px;margin:0 auto;padding:20px;">${msg.body}<p>Thank you,<br/><strong>${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute</strong><br/>${PLATFORM_DEFAULTS.supportPhone} | info@${PLATFORM_DEFAULTS.canonicalDomain}</p></body></html>`,
             },
           ],

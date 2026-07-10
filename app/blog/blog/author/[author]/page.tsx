@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: Promise<{ author: string }>;
 }): Promise<Metadata> {
   const { author: authorSlug } = await params;
-  const author = authorSlug.replace(/-/g, ' `);
+  const author = authorSlug.replace(/-/g, ' ');
   return {
     title: `Articles by ${author} | Elevate For Humanity`,
     description: `Read articles written by ${author}`,

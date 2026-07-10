@@ -131,7 +131,7 @@ export class SMSService {
   async sendEnrollmentConfirmation(phoneNumber: string, courseName: string): Promise<SMSResult> {
     return this.send({
       to: phoneNumber,
-      message: `You`re enrolled in ${courseName}! Start learning at ${PLATFORM_DEFAULTS.canonicalDomain}/lms/courses`,
+      message: `You're enrolled in ${courseName}! Start learning at ${PLATFORM_DEFAULTS.canonicalDomain}/lms/courses`,
     });
   }
 

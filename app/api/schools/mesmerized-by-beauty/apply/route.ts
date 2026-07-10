@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
 
     if (insertError || !application) {
       logger.error('[school/apply] insert error', insertError);
-      return safeError('Failed to submit application. Please try again.`, 500);
+      return safeError('Failed to submit application. Please try again.', 500);
     }
 
     const programLabel = PROGRAM_LABELS[programInterest];
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
       <h3 style="color:#1e293b;font-size:15px;font-weight:700;margin:0 0 12px">What Happens Next</h3>
       <div style="space-y:8px">
         ${[
-          `Our admissions team reviews your application within 2–3 business days.',
+          'Our admissions team reviews your application within 2–3 business days.',
           'You will receive a call or email to schedule an in-person or virtual interview.',
           'Once accepted, you will be placed with a licensed partner salon for your apprenticeship hours.',
           'You will gain access to the Elevate LMS for your theory coursework.',

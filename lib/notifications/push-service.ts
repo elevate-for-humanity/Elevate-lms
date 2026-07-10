@@ -155,7 +155,7 @@ export class PushNotificationService {
   async sendCourseEnrollmentNotification(userId: string, courseName: string): Promise<void> {
     await this.sendToUser(userId, {
       title: 'Course Enrollment Confirmed',
-      body: 'You've been enrolled in ${courseName}`,
+      body: `You've been enrolled in ${courseName}`,
       icon: '/icon-192x192.png',
       badge: '/icon-72.png',
       url: '/lms/courses',
@@ -263,7 +263,7 @@ export class PushNotificationService {
     const changeText = change > 0 ? `up ${change}` : `down ${Math.abs(change)}`;
     await this.sendToUser(userId, {
       title: 'Leaderboard Update',
-      body: 'You're now #${position} (${changeText} positions)`,
+      body: `You're now #${position} (${changeText} positions)`,
       icon: '/icon-192x192.png',
       badge: '/icon-72.png',
       url: '/lms/leaderboard',

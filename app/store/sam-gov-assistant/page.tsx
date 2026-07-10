@@ -194,7 +194,7 @@ export default function SamGovAssistantPage() {
         const thankYouMessage: Message = {
           id: `thanks-${Date.now()}`,
           type: 'assistant',
-          content: 'You're welcome! Good luck with your SAM.gov registration and federal funding journey.
+          content: `You're welcome! Good luck with your SAM.gov registration and federal funding journey.
 
 **Bookmark these links:**
 - [SAM.gov](https://sam.gov) - Registration site

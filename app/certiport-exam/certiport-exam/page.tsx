@@ -131,7 +131,7 @@ function CertiportExamContent() {
   if (existingRequest?.status === 'voucher_assigned' && existingRequest.voucherCode) {
     return (
       <div className="min-h-screen bg-white py-12 px-4">
-        {' `}
+        {' '}
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">

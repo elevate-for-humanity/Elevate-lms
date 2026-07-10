@@ -79,7 +79,7 @@ async function _POST(request: NextRequest) {
       });
     } catch (emailError) {
       logger.error(
-        `[partner-inquiry] Email failed:',
+        '[partner-inquiry] Email failed:',
         emailError instanceof Error ? emailError : undefined,
       );
     }

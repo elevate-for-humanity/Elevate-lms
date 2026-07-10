@@ -384,7 +384,7 @@ export async function generateTppSurveyPdf(data: TppSurveyData): Promise<Uint8Ar
   // ════════════════════════════════════════════════════════════════════════════
   // SECTION 1 — ORGANIZATION INFORMATION
   // ════════════════════════════════════════════════════════════════════════════
-  sectionHeader(`Organization Information', '1');
+  sectionHeader('Organization Information', '1');
 
   fieldRow([
     { label: 'Legal Organization Name', value: data.org_name },

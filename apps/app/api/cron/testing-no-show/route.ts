@@ -114,7 +114,7 @@ export async function GET(req: NextRequest) {
     await sendEmail({
       to: booking.email,
       from: FROM,
-      subject: 'Missed Exam Appointment — Rescheduling Fee Required | Elevate Testing Center`,
+      subject: 'Missed Exam Appointment — Rescheduling Fee Required | Elevate Testing Center',
       html: `<!DOCTYPE html>
 <html><body style="font-family:Arial,sans-serif;padding:24px;color:#1E293B;max-width:600px;margin:0 auto">
   <h2 style="color:#1E3A5F">Missed Appointment — ${booking.exam_name}</h2>
@@ -124,7 +124,7 @@ export async function GET(req: NextRequest) {
   <p><a href="${SITE_URL}/testing/book" style="background:#dc2626;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block">Pay Fee &amp; Rebook →</a></p>
   <p style="color:#64748b;font-size:13px">If you believe this is an error, call <strong>${PLATFORM_DEFAULTS.supportPhone}</strong> within 48 hours.</p>
 </body></html>`,
-    }).catch((err) => logger.warn(`[cron/no-show] Email failed`, { email: booking.email, err }));
+    }).catch((err) => logger.warn('[cron/no-show] Email failed', { email: booking.email, err }));
 
     processed++;
   }

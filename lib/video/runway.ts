@@ -84,7 +84,7 @@ export async function pollRunwayTask(
       headers: headers(),
     });
 
-    if (!res.ok) throw new Error(`Runway poll failed (${res.status})');
+    if (!res.ok) throw new Error(`Runway poll failed (${res.status})`);
 
     const task = (await res.json()) as RunwayTask;
 
@@ -112,14 +112,14 @@ export async function generateRunwayClip(
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
   const taskId = await submitRunwayTask(opts);
-  process.stdout.write(`  Runway task ${taskId} ');
+  process.stdout.write(`  Runway task ${taskId} `);
 
   const videoUrl = await pollRunwayTask(taskId);
   process.stdout.write(' done\n');
 
   // Download
   const res = await fetch(videoUrl);
-  if (!res.ok) throw new Error('Failed to download clip: ${res.status}`);
+  if (!res.ok) throw new Error(`Failed to download clip: ${res.status}`);
   await fs.writeFile(outputPath, Buffer.from(await res.arrayBuffer()));
 }
 
@@ -132,7 +132,7 @@ export function buildVisualPrompt(
   segment: string,
   imagePrompt?: string,
 ): string {
-  const base = imagePrompt ? imagePrompt : `${lessonTitle}, professional training environment';
+  const base = imagePrompt ? imagePrompt : `${lessonTitle}, professional training environment`;
 
   const cinematic = 'cinematic lighting, shallow depth of field, 4K, professional';
 
@@ -145,7 +145,7 @@ export function buildVisualPrompt(
   };
 
   const style = segmentStyle[segment] ?? 'professional training shot';
-  return '${base}, ${style}, ${cinematic}`;
+  return `${base}, ${style}, ${cinematic}`;
 }
 
 /**
@@ -153,9 +153,9 @@ export function buildVisualPrompt(
  */
 export function stitchClips(clipPaths: string[], outputPath: string): void {
   const listFile = outputPath + '.list.txt';
-  fssync.writeFileSync(listFile, clipPaths.map((p) => 'file '${p}'').join('\n'));
+  fssync.writeFileSync(listFile, clipPaths.map((p) => `file '${p}'`).join('\n'));
   execSync(
-    'ffmpeg -y -f concat -safe 0 -i "${listFile}" -c:v libx264 -preset fast -crf 20 "${outputPath}"`,
+    `ffmpeg -y -f concat -safe 0 -i "${listFile}" -c:v libx264 -preset fast -crf 20 "${outputPath}"`,
     { stdio: 'pipe' },
   );
   fssync.unlinkSync(listFile);

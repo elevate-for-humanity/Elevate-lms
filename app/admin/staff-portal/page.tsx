@@ -104,7 +104,7 @@ export default async function StaffPortalLanding() {
           <h1 className="text-3xl font-bold text-slate-900 mb-1">
             {user && profile?.full_name
               ? `Welcome, ${profile.full_name.split(' ')[0]}`
-              : 'Staff Portal`}
+              : 'Staff Portal'}
           </h1>
           <p className="text-slate-600 text-sm">
             ${PLATFORM_DEFAULTS.orgName} · Staff &amp; Instructor Tools
@@ -143,7 +143,7 @@ export default async function StaffPortalLanding() {
                     <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
                   )}
                   <span
-                    className={`text-sm font-medium flex-1 ${item.done ? `text-slate-400 line-through' : 'text-slate-800'}`}
+                    className={`text-sm font-medium flex-1 ${item.done ? 'text-slate-400 line-through' : 'text-slate-800'}`}
                   >
                     {item.label}
                   </span>

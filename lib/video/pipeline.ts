@@ -90,14 +90,14 @@ function buildNarration(title: string, content: string, maxChars = 4000): string
     .replace(/^#{1,4}\s+/gm, '')
     .replace(/\*\*(.*?)\*\*/g, '$1')
     .replace(/\*(.*?)\*/g, '$1')
-    .replace(/'(.*?)'/g, '$1')
+    .replace(/`(.*?)`/g, '$1')
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
     .replace(/^\s*[-*+]\s+/gm, '')
     .replace(/^\s*\d+\.\s+/gm, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 
-  const intro = 'Welcome. Today's lesson is ${title}. Let's get into it.\n\n';
+  const intro = `Welcome. Today's lesson is ${title}. Let's get into it.\n\n`;
   const outro = `\n\nThat wraps up ${title}. Complete the activities before moving on. Great work today.`;
   const body = clean.slice(0, maxChars - intro.length - outro.length - 10);
   return intro + body + outro;
@@ -179,7 +179,7 @@ async function uploadToSupabase(
   const res = await fetch(`${SUPA_URL}/storage/v1/object/${bucket}/${storagePath}`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${SUPA_SVC}',
+      Authorization: `Bearer ${SUPA_SVC}`,
       'Content-Type': contentType,
       'x-upsert': 'true',
     },
@@ -200,7 +200,7 @@ async function getOrFetchBroll(brollKey: string, tmpDir: string): Promise<string
 
   const query = BROLL_MAP[brollKey] || BROLL_MAP['default'];
   const clipUrl = await fetchPexelsClipUrl(query);
-  if (!clipUrl) throw new Error('No Pexels clip for: ${query}`);
+  if (!clipUrl) throw new Error(`No Pexels clip for: ${query}`);
 
   const tmpPath = path.join(tmpDir, `${brollKey}.mp4`);
   const trimPath = path.join(tmpDir, `${brollKey}-trim.mp4`);
@@ -263,19 +263,19 @@ function generateBrandCard(
   // Top accent bar + program name + lesson title (intro) or sign-off (outro)
   const filter = [
     // Background
-    'color=c=${bg}:size=1280x720:rate=30[bg]`,
+    `color=c=${bg}:size=1280x720:rate=30[bg]`,
     // Accent bar top
     `[bg]drawbox=x=0:y=0:w=1280:h=8:color=${accent}:t=fill[bar]`,
     // Program name
-    '[bar]drawtext=fontfile='${bold}':text='${line1}':fontcolor=${fg}:fontsize=36:x=(w-text_w)/2:y=280:alpha='if(lt(t,0.3),t/0.3,1)'[t1]',
+    `[bar]drawtext=fontfile='${bold}':text='${line1}':fontcolor=${fg}:fontsize=36:x=(w-text_w)/2:y=280:alpha='if(lt(t,0.3),t/0.3,1)'[t1]`,
     // Lesson title / sign-off
-    '[t1]drawtext=fontfile='${semi}':text='${line2}':fontcolor=${fg}@0.75:fontsize=24:x=(w-text_w)/2:y=340:alpha='if(lt(t,0.5),t/0.5,1)'[t2]',
+    `[t1]drawtext=fontfile='${semi}':text='${line2}':fontcolor=${fg}@0.75:fontsize=24:x=(w-text_w)/2:y=340:alpha='if(lt(t,0.5),t/0.5,1)'[t2]`,
     // Elevate logo text bottom-right
-    '[t2]drawtext=fontfile='${bold}`:text=${PLATFORM_DEFAULTS.canonicalDomain}:fontcolor=${fg}@0.4:fontsize=16:x=w-text_w-24:y=h-36[out]`,
+    `[t2]drawtext=fontfile='${bold}':text=${PLATFORM_DEFAULTS.canonicalDomain}:fontcolor=${fg}@0.4:fontsize=16:x=w-text_w-24:y=h-36[out]`,
   ].join(';');
 
   execSync(
-    'ffmpeg -y -f lavfi -i "color=c=${bg}:size=1280x720:rate=30" -vf "${filter}" -t 3 -c:v libx264 -preset fast -crf 20 -an "${outPath}" 2>/dev/null`,
+    `ffmpeg -y -f lavfi -i "color=c=${bg}:size=1280x720:rate=30" -vf "${filter}" -t 3 -c:v libx264 -preset fast -crf 20 -an "${outPath}" 2>/dev/null`,
     { stdio: 'pipe', timeout: 30000 },
   );
 }
@@ -299,7 +299,7 @@ export async function processLesson(
 
   // ── 1. TTS narration ──────────────────────────────────────────────────────
   log(`  [1/7] TTS narration…`);
-  const audioPath = path.join(tmpDir, `${slug}.mp3');
+  const audioPath = path.join(tmpDir, `${slug}.mp3`);
   const narration = buildNarration(lesson.title, lesson.content || '');
   await generateTTS(narration, audioPath, profile.ttsVoice, profile.ttsSpeed);
   const duration = getAudioDuration(audioPath);
@@ -308,12 +308,12 @@ export async function processLesson(
   await uploadToSupabase(
     fs.readFileSync(audioPath),
     'lesson-audio',
-    '${profile.programSlug}/${slug}.mp3',
+    `${profile.programSlug}/${slug}.mp3`,
     'audio/mpeg',
   );
 
   // ── 2. Whisper captions ───────────────────────────────────────────────────
-  log('  [2/7] Captions (Whisper)…`);
+  log(`  [2/7] Captions (Whisper)…`);
   const srtContent = await transcribeToSrt(audioPath);
   const srtPath = path.join(tmpDir, `${slug}.srt`);
   if (srtContent) writeSrtFile(srtContent, srtPath);
@@ -344,19 +344,19 @@ export async function processLesson(
   // ── 4. Intro / outro cards ────────────────────────────────────────────────
   log(`  [4/7] Intro/outro cards…`);
   const introPath = path.join(tmpDir, `${slug}-intro.mp4`);
-  const outroPath = path.join(tmpDir, `${slug}-outro.mp4');
+  const outroPath = path.join(tmpDir, `${slug}-outro.mp4`);
   generateBrandCard(introPath, profile, lesson.title, 'intro');
   generateBrandCard(outroPath, profile, lesson.title, 'outro');
 
   // ── 5. Concat b-roll to match audio duration ──────────────────────────────
-  log('  [5/7] Assembling b-roll…`);
-  const concatPath = path.join(tmpDir, `concat-${slug}.txt');
+  log(`  [5/7] Assembling b-roll…`);
+  const concatPath = path.join(tmpDir, `concat-${slug}.txt`);
   // Loop clips until we cover the full audio duration
   const clipDuration = 30; // each clip is trimmed to 30 s
   const loopsNeeded = Math.ceil(duration / (clipPaths.length * clipDuration)) + 1;
   let concatContent = '';
   for (let i = 0; i < loopsNeeded; i++) {
-    for (const p of clipPaths) concatContent += 'file '${p}'\n';
+    for (const p of clipPaths) concatContent += `file '${p}'\n`;
   }
   fs.writeFileSync(concatPath, concatContent);
 
@@ -369,7 +369,7 @@ export async function processLesson(
   );
 
   // ── 6. Overlay: chapter title + lower third + captions ───────────────────
-  log(`  [6/7] Text overlays + captions…');
+  log(`  [6/7] Text overlays + captions…`);
   const bold = fontPath('bold');
   const semi = fontPath('semi');
   const accent = hexToFfmpeg(profile.accentColor);
@@ -383,41 +383,41 @@ export async function processLesson(
   // Build vf chain
   const overlayFilters: string[] = [
     // Chapter title — top-left, first 5 s, fade in/out
-    'drawtext=fontfile='${bold}':text='${chapterTitle}':fontcolor=${white}:fontsize=28:x=32:y=32` +
+    `drawtext=fontfile='${bold}':text='${chapterTitle}':fontcolor=${white}:fontsize=28:x=32:y=32` +
       `:box=1:boxcolor=0x000000@0.55:boxborderw=8` +
-      ':alpha='if(lt(t,0.4),t/0.4,if(lt(t,4.6),1,if(lt(t,5),1-(t-4.6)/0.4,0)))'',
+      `:alpha='if(lt(t,0.4),t/0.4,if(lt(t,4.6),1,if(lt(t,5),1-(t-4.6)/0.4,0)))'`,
   ];
 
   if (moduleLabel) {
     overlayFilters.push(
-      'drawtext=fontfile='${semi}':text='${moduleLabel}':fontcolor=${white}@0.7:fontsize=18:x=32:y=68` +
-        ':alpha='if(lt(t,0.4),t/0.4,if(lt(t,4.6),1,if(lt(t,5),1-(t-4.6)/0.4,0)))'',
+      `drawtext=fontfile='${semi}':text='${moduleLabel}':fontcolor=${white}@0.7:fontsize=18:x=32:y=68` +
+        `:alpha='if(lt(t,0.4),t/0.4,if(lt(t,4.6),1,if(lt(t,5),1-(t-4.6)/0.4,0)))'`,
     );
   }
 
   // Lower third — instructor name + title, seconds 6–10
   overlayFilters.push(
     // Bar
-    `drawbox=x=0:y=h-80:w=420:h=80:color=${accent}@0.88:t=fill` + ':enable='between(t,6,10)'',
+    `drawbox=x=0:y=h-80:w=420:h=80:color=${accent}@0.88:t=fill` + `:enable='between(t,6,10)'`,
     // Name
-    'drawtext=fontfile='${bold}':text='${instrName}':fontcolor=${white}:fontsize=22:x=16:y=h-62` +
-      ':enable='between(t,6,10)'',
+    `drawtext=fontfile='${bold}':text='${instrName}':fontcolor=${white}:fontsize=22:x=16:y=h-62` +
+      `:enable='between(t,6,10)'`,
     // Title
-    'drawtext=fontfile='${semi}':text='${instrTitle}':fontcolor=${white}@0.85:fontsize=16:x=16:y=h-36` +
-      ':enable='between(t,6,10)'',
+    `drawtext=fontfile='${semi}':text='${instrTitle}':fontcolor=${white}@0.85:fontsize=16:x=16:y=h-36` +
+      `:enable='between(t,6,10)'`,
   );
 
-  const overlaidBroll = path.join(tmpDir, '${slug}-overlaid.mp4');
+  const overlaidBroll = path.join(tmpDir, `${slug}-overlaid.mp4`);
   const vfChain = overlayFilters.join(',');
 
   // Apply overlays (captions via subtitles filter if SRT exists)
   const subtitleFilter =
     srtContent && fs.existsSync(srtPath)
-      ? ',subtitles='${srtPath.replace(/'/g, "\\'")}':force_style='FontName=DejaVu Sans,FontSize=18,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,Outline=2,Shadow=1,Alignment=2''
+      ? `,subtitles='${srtPath.replace(/'/g, "\\'")}':force_style='FontName=DejaVu Sans,FontSize=18,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,Outline=2,Shadow=1,Alignment=2'`
       : '';
 
   execSync(
-    'ffmpeg -y -i "${brollAssembled}" -vf "${vfChain}${subtitleFilter}" ` +
+    `ffmpeg -y -i "${brollAssembled}" -vf "${vfChain}${subtitleFilter}" ` +
       `-c:v libx264 -preset fast -crf 22 -an "${overlaidBroll}" 2>/dev/null`,
     { stdio: 'pipe', timeout: 300000 },
   );
@@ -429,7 +429,7 @@ export async function processLesson(
   const finalConcatPath = path.join(tmpDir, `final-concat-${slug}.txt`);
   fs.writeFileSync(
     finalConcatPath,
-    'file '${introPath}'\nfile '${overlaidBroll}'\nfile '${outroPath}'\n',
+    `file '${introPath}'\nfile '${overlaidBroll}'\nfile '${outroPath}'\n`,
   );
 
   const videoNoAudio = path.join(tmpDir, `${slug}-noaudio.mp4`);
@@ -456,7 +456,7 @@ export async function processLesson(
   const videoUrl = await uploadToSupabase(
     fs.readFileSync(finalVideo),
     'course-videos',
-    '${profile.programSlug}/${slug}.mp4',
+    `${profile.programSlug}/${slug}.mp4`,
     'video/mp4',
   );
 

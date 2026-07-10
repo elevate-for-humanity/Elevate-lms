@@ -16,7 +16,7 @@ const contactInfo = [
     icon: Phone,
     title: 'Phone',
     value: PLATFORM_DEFAULTS.supportPhone,
-    subtitle: 'Mon-Fri 8am-6pm EST`,
+    subtitle: 'Mon-Fri 8am-6pm EST',
     href: `tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g,"")}`,
   },
   {
@@ -270,7 +270,7 @@ function ContactPageInner() {
                     placeholder="How can we help you?"
                     defaultValue={
                       prefillProgram
-                        ? 'I'm interested in the ${prefillProgram.replace(/-/g, ' ')} program and would like more information.`
+                        ? `I'm interested in the ${prefillProgram.replace(/-/g, ' ')} program and would like more information.`
                         : ''
                     }
                     required
@@ -343,10 +343,10 @@ function ContactPageInner() {
                     const startDT = `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;
                     const endH = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
                     const endDT = `${date.replace(/-/g, '')}T${endH}${time.split(':')[1]}00`;
-                    const details = `Meeting with ${name} (${email})%0A%0ATopic: ${encodeURIComponent(topic || 'General inquiry`)}%0A%0AZoom Link: ${zoomLink}`;
+                    const details = `Meeting with ${name} (${email})%0A%0ATopic: ${encodeURIComponent(topic || 'General inquiry')}%0A%0AZoom Link: ${zoomLink}`;
                     const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`${PLATFORM_DEFAULTS.orgName} — Meeting`)}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)},${encodeURIComponent(`info@${PLATFORM_DEFAULTS.canonicalDomain}`)}&location=Zoom`;
 
-                    window.open(calUrl, `_blank`);
+                    window.open(calUrl, '_blank');
                   } catch {
                     alert(`Failed to schedule meeting. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);
                   }
@@ -475,7 +475,7 @@ function ContactPageInner() {
                 above to book a meeting and you will receive your personal Zoom link automatically.
               </p>
               <p className="text-black text-sm">
-                Questions? Call{' `}
+                Questions? Call{' '}
                 <a
                   href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
                   className="text-brand-blue-600 font-medium hover:underline"
@@ -504,15 +504,15 @@ function ContactPageInner() {
         <div className="space-y-4">
           {[
             {
-              q: `What are your office hours?',
+              q: 'What are your office hours?',
               a: "Our team is available Monday-Friday, 9am-5pm EST. You can leave a message anytime and we'll respond within 1-2 business days.",
             },
             {
-              q: 'How quickly will I get a response?`,
+              q: 'How quickly will I get a response?',
               a: `We typically respond to inquiries within 1-2 business days. For urgent matters, please contact us directly at ${PLATFORM_DEFAULTS.supportPhone}.`,
             },
             {
-              q: `Can I visit your office in person?',
+              q: 'Can I visit your office in person?',
               a: 'Elevate is a hybrid training institute — not a walk-in location. Our address is 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. All visits are by appointment only. Use the calendar above to schedule.',
             },
             {

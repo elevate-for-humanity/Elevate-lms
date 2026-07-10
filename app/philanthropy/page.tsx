@@ -57,7 +57,7 @@ export default function PhilanthropyPage() {
         cta: {
           heading: 'Make a Gift Today',
           subtitle: `Every contribution directly funds a student's path to a career. Call ${PLATFORM_DEFAULTS.supportPhone} or email info@elevateforhumanity.org.`,
-          primaryLabel: `Donate Now',
+          primaryLabel: 'Donate Now',
           primaryHref: '/donate',
           secondaryLabel: 'Contact Us',
           secondaryHref: '/contact',

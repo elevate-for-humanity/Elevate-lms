@@ -127,10 +127,10 @@ Funding: SNAP E&T, WIOA, employer sponsorship, payment plans.
 Always be helpful and direct. Never say you cannot help. If unsure, direct to admissions@${PLATFORM_DEFAULTS.canonicalDomain}.`,
 
   instructor_assignment_chat: (ctx) => ctx.assignmentSystemPrompt
-    || `You are a helpful instructor assistant for ${ctx.programName ?? `this program'}. Guide the student through their assignment with encouragement and clear explanations.`,
+    || `You are a helpful instructor assistant for ${ctx.programName ?? 'this program'}. Guide the student through their assignment with encouragement and clear explanations.`,
 
   instructor_support: (ctx) => `You are ${ctx.instructorName ?? 'an AI instructor'} for ${PLATFORM_DEFAULTS.orgName}.
-${ctx.instructorPersona ? `Persona: ${ctx.instructorPersona}`  : ''}
+${ctx.instructorPersona ? `Persona: ${ctx.instructorPersona}` : ''}
 ${ctx.programName ? `Program: ${ctx.programName}` : ''}
 ${ctx.lessonTitle ? `Current lesson: ${ctx.lessonTitle}` : ''}
 Your role: guide students through their coursework with clear, encouraging explanations. Keep responses concise (under 200 words unless the student asks for detail).`,
@@ -144,7 +144,7 @@ Return only valid JSON matching the CourseTemplate schema.`,
   lesson_generation: (ctx) => `You are a curriculum writer for ${ctx.programName ?? 'workforce training'}.
 Write lesson content in plain HTML (h2, p, ul, ol only). 300-500 words. Be practical and direct.`,
 
-  quiz_generation: (ctx) => `You are an assessment designer for ${ctx.programName ?? 'workforce training`}.
+  quiz_generation: (ctx) => `You are an assessment designer for ${ctx.programName ?? 'workforce training'}.
 Generate multiple-choice questions as a JSON array: [{ question, options: string[4], correct: 0-3, explanation }].
 Return only valid JSON.`,
 
@@ -153,14 +153,14 @@ Return only valid JSON.`,
   diagnostics: () => `You are a platform diagnostics assistant. Analyze system state, identify anomalies, and provide structured findings with severity levels.`,
 
   social_generation: (ctx) => `You are a social media writer for ${PLATFORM_DEFAULTS.orgName}, a nonprofit workforce development org.
-${ctx.programName ? `Focus: ${ctx.programName}` : ``}
+${ctx.programName ? `Focus: ${ctx.programName}` : ''}
 Write engaging, authentic content. Avoid corporate jargon. Highlight real student impact.`,
 
   grant_generation: () => `You are a grant writing specialist for ${PLATFORM_DEFAULTS.orgName}. Write compelling, evidence-based grant content aligned with workforce development funding priorities (WIOA, DOL, SNAP E&T).`,
 
   career_counseling: () => `You are a career counselor at ${PLATFORM_DEFAULTS.orgName}. Help students explore career paths, understand program options, and plan their workforce development journey. Be encouraging and realistic.`,
 
-  lesson_explanation: (ctx) => `You are a patient tutor helping a student understand: "${ctx.lessonTitle ?? `this lesson'}".
+  lesson_explanation: (ctx) => `You are a patient tutor helping a student understand: "${ctx.lessonTitle ?? 'this lesson'}".
 ${ctx.lessonContent ? `Lesson content: ${ctx.lessonContent.slice(0, 500)}` : ''}
 Explain concepts clearly. Use analogies. Check for understanding.`,
 
@@ -193,7 +193,7 @@ const BLOCKED_PATTERNS = [
 function moderateInput(text: string): { blocked: boolean; reason?: string } {
   for (const pattern of BLOCKED_PATTERNS) {
     if (pattern.test(text)) {
-      return { blocked: true, reason: `Content policy violation' };
+      return { blocked: true, reason: 'Content policy violation' };
     }
   }
   return { blocked: false };
@@ -320,7 +320,7 @@ export async function runAITask(input: AITaskInput): Promise<AITaskResult> {
       const { searchMSLearn } = await import('@/lib/ai/microsoft-learn');
       const modules = await searchMSLearn(context.topic, 5).catch(() => []);
       if (modules.length > 0) {
-        const list = modules.map((m) => `- ${m.title}: ${m.summary.slice(0, 100)}') }.join('\n');
+        const list = modules.map((m) => `- ${m.title}: ${m.summary.slice(0, 100)}`).join('\n');
         systemPrompt += `\n\n## Related Microsoft Learn Content\n${list}\nSource: learn.microsoft.com`;
       }
     }

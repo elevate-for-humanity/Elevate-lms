@@ -44,7 +44,7 @@ export async function notifySlack(
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: '''`' + JSON.stringify(opts.context, null, 2).slice(0, 2900) + ''``',
+        text: '```' + JSON.stringify(opts.context, null, 2).slice(0, 2900) + '```',
       },
     });
   }

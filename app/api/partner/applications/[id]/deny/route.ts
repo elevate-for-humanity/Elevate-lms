@@ -92,7 +92,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
         }),
       });
     } catch (emailError) {
-      logger.warn(`Failed to send denial email`, emailError);
+      logger.warn('Failed to send denial email:', emailError);
     }
 
     return NextResponse.json({ success: true });

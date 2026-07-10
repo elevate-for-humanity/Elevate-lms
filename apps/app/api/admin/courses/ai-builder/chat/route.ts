@@ -82,7 +82,7 @@ WORKFLOW:
 }
 
 RULES:
-- Be conversational and concise. Don`t ask more than 3 questions at once.
+- Be conversational and concise. Don't ask more than 3 questions at once.
 - If the user gives you enough info upfront, skip straight to generation.
 - Content must be specific and practical — no generic filler.
 - Each module should have 3-6 lessons.

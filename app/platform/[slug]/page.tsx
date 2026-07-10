@@ -21,7 +21,7 @@ const CHECKOUT_ERROR_MESSAGES: Record<string, string> = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const product = await getCatalogProduct(slug).catch(() => null);
-  if (!product) return { title: 'Product Not Found` };
+  if (!product) return { title: 'Product Not Found' };
   return {
     title: `${product.name} | Elevate For Humanity`,
     description: product.description,
@@ -40,7 +40,7 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const checkoutError = errorSlug
-    ? (CHECKOUT_ERROR_MESSAGES[errorSlug] ?? `Something went wrong. Please try again.')
+    ? (CHECKOUT_ERROR_MESSAGES[errorSlug] ?? 'Something went wrong. Please try again.')
     : null;
 
   const billingLabel = product.billingType === 'subscription' ? 'Per month' : 'One-time payment';

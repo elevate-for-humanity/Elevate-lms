@@ -19,14 +19,14 @@ export type HostShopMouMeta = {
 
 const BARBER_SECTIONS: MouSection[] = [
   {
-    title: '1. Parties and Purpose`,
+    title: '1. Parties and Purpose',
     content: `This Memorandum of Understanding ("MOU") is entered into between 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute ("Sponsor") and the barbershop identified at execution ("Worksite Partner" or "Shop").
 
 This MOU establishes the terms under which the Shop will serve as a worksite for the Indiana Barber Host Shop Program, RAPIDS Program ID: 2025-IN-132301, a USDOL Registered Apprenticeship sponsored by ${PLATFORM_DEFAULTS.orgName}.
 
 WHAT THIS AGREEMENT IS: This is a worksite hosting agreement for a federally registered apprenticeship program. The Shop is hosting an apprentice employee and providing on-the-job training under federal Department of Labor oversight.
 
-WHAT THIS AGREEMENT IS NOT: This MOU does not make the Shop a Training Network Partner, a co-owner of Elevate programs, a revenue-sharing partner, or a program delivery site for any Elevate training program other than the barber host shop. The Shop has no ownership rights, governance authority, or decision-making authority over Elevate`s programs, curriculum, credentials, or brand.`,
+WHAT THIS AGREEMENT IS NOT: This MOU does not make the Shop a Training Network Partner, a co-owner of Elevate programs, a revenue-sharing partner, or a program delivery site for any Elevate training program other than the barber host shop. The Shop has no ownership rights, governance authority, or decision-making authority over Elevate's programs, curriculum, credentials, or brand.`,
   },
   {
     title: '2. Program Structure — Non-Negotiable Federal Requirements',
@@ -42,7 +42,7 @@ Program requirements:
 The Sponsor maintains sole authority over: RTI curriculum and delivery; competency assessment standards; RAPIDS registration and reporting; completion certificate issuance; program standards and modifications.`,
   },
   {
-    title: '3. Sponsor Responsibilities`,
+    title: '3. Sponsor Responsibilities',
     content: `${PLATFORM_DEFAULTS.orgName} agrees to:
 
 • Maintain USDOL/RAPIDS registration and all required federal reporting
@@ -55,7 +55,7 @@ The Sponsor maintains sole authority over: RTI curriculum and delivery; competen
 • Serve as the point of contact with Indiana DWD and USDOL for all program matters`,
   },
   {
-    title: `4. Worksite Partner Responsibilities — Non-Negotiable',
+    title: '4. Worksite Partner Responsibilities — Non-Negotiable',
     content: `These responsibilities are required by federal apprenticeship law and USDOL program standards. They are not optional and are not subject to modification.
 
 The Shop agrees to:
@@ -116,16 +116,16 @@ After termination: the Shop must submit all outstanding OJT hour records to the 
 
 The Shop may not disclose apprentice PII (name, contact information, wage information, program records) to any third party without written apprentice consent and Sponsor authorization, except as required for program administration or by law.
 
-The Shop also receives access to Elevate's operational procedures, program materials, and business information through this collaboration. This information is confidential. The Shop may not disclose or use Elevate`s confidential information for any purpose other than fulfilling its obligations under this MOU.
+The Shop also receives access to Elevate's operational procedures, program materials, and business information through this collaboration. This information is confidential. The Shop may not disclose or use Elevate's confidential information for any purpose other than fulfilling its obligations under this MOU.
 
 A full Non-Disclosure Agreement is available at ${PLATFORM_DEFAULTS.canonicalDomain}/legal/nda and is incorporated by reference into this MOU.`,
   },
   {
-    title: `8. Non-Compete and Non-Replication',
+    title: '8. Non-Compete and Non-Replication',
     content: `The Shop receives access to Elevate's registered apprenticeship program structure, curriculum relationships, RAPIDS registration, and credential pathways through this collaboration. This access is provided to support the apprentice — not to enable the Shop to replicate the program independently.
 
 During the term of this MOU and for three (3) years following termination, the Shop agrees not to:
-• Use Elevate`s program structure, RAPIDS registration, or DWD relationships to independently register or operate a competing USDOL Registered Apprenticeship program in barbering
+• Use Elevate's program structure, RAPIDS registration, or DWD relationships to independently register or operate a competing USDOL Registered Apprenticeship program in barbering
 • Solicit or redirect Elevate apprentice candidates, instructors, or credential partners into a competing program derived from the Elevate apprenticeship model
 • Represent to any funding agency, employer, or student that the Shop independently operates the Indiana Barber Host Shop Program
 
@@ -134,7 +134,7 @@ These restrictions do not prevent the Shop from: operating as a barbershop, empl
 A full Non-Compete Agreement is available at ${PLATFORM_DEFAULTS.canonicalDomain}/legal/non-compete and is incorporated by reference into this MOU.`,
   },
   {
-    title: `9. Partner Handbook — Required Reading`,
+    title: '9. Partner Handbook — Required Reading',
     content: `The Worksite Partner Handbook is incorporated by reference into this MOU and forms part of this agreement. The Handbook details the day-to-day responsibilities, compensation requirements, hour tracking procedures, prohibited practices, and communication expectations that govern the worksite relationship.
 
 By signing this MOU, the Shop confirms that it has read and understood the Partner Handbook in full prior to signing. The Handbook is available at: ${PLATFORM_DEFAULTS.canonicalDomain}/partners/barber-host-shop/handbook
@@ -142,7 +142,7 @@ By signing this MOU, the Shop confirms that it has read and understood the Partn
 Failure to comply with the standards set out in the Handbook constitutes a breach of this MOU and may result in immediate termination of the partnership and notification to USDOL.`,
   },
   {
-    title: `10. Dispute Resolution',
+    title: '10. Dispute Resolution',
     content: `The parties agree to attempt to resolve any disputes through good-faith negotiation first. If a dispute cannot be resolved through negotiation within 15 business days, either party may submit the dispute to mediation.
 
 If mediation is unsuccessful, the parties consent to jurisdiction in Marion County, Indiana. This MOU is governed by the laws of the State of Indiana.
@@ -153,14 +153,14 @@ USDOL/RAPIDS compliance disputes are subject to federal apprenticeship regulatio
 
 const COSMETOLOGY_SECTIONS: MouSection[] = [
   {
-    title: '1. Parties and Purpose`,
+    title: '1. Parties and Purpose',
     content: `This Memorandum of Understanding ("MOU") is entered into between 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute ("Sponsor") and the salon identified at execution ("Worksite Partner" or "Salon").
 
 This MOU establishes the terms under which the Salon will serve as a worksite for the Indiana Cosmetology Apprenticeship Program, RAPIDS Program ID: 2025-IN-132302, a USDOL Registered Apprenticeship sponsored by ${PLATFORM_DEFAULTS.orgName}.
 
 WHAT THIS AGREEMENT IS: This is a worksite hosting agreement for a federally registered apprenticeship program. The Salon is hosting an apprentice employee and providing on-the-job training under federal Department of Labor oversight.
 
-WHAT THIS AGREEMENT IS NOT: This MOU does not make the Salon a Training Network Partner, a co-owner of Elevate programs, a revenue-sharing partner, or a program delivery site for any Elevate training program other than the cosmetology apprenticeship. The Salon has no ownership rights, governance authority, or decision-making authority over Elevate`s programs, curriculum, credentials, or brand.`,
+WHAT THIS AGREEMENT IS NOT: This MOU does not make the Salon a Training Network Partner, a co-owner of Elevate programs, a revenue-sharing partner, or a program delivery site for any Elevate training program other than the cosmetology apprenticeship. The Salon has no ownership rights, governance authority, or decision-making authority over Elevate's programs, curriculum, credentials, or brand.`,
   },
   {
     title: '2. Program Structure — Non-Negotiable Federal Requirements',
@@ -176,7 +176,7 @@ Program requirements:
 The Sponsor maintains sole authority over: RTI curriculum and delivery; competency assessment standards; RAPIDS registration and reporting; completion certificate issuance; program standards and modifications.`,
   },
   {
-    title: '3. Sponsor Responsibilities`,
+    title: '3. Sponsor Responsibilities',
     content: `${PLATFORM_DEFAULTS.orgName} agrees to:
 
 • Maintain USDOL/RAPIDS registration and all required federal reporting
@@ -189,7 +189,7 @@ The Sponsor maintains sole authority over: RTI curriculum and delivery; competen
 • Serve as the point of contact with Indiana DWD and USDOL for all program matters`,
   },
   {
-    title: `4. Worksite Partner Responsibilities — Non-Negotiable',
+    title: '4. Worksite Partner Responsibilities — Non-Negotiable',
     content: `These responsibilities are required by federal apprenticeship law and USDOL program standards. They are not optional and are not subject to modification.
 
 The Salon agrees to:
@@ -250,12 +250,12 @@ After termination: the Salon must submit all outstanding OJT hour records to the
 
 The Salon may not disclose apprentice PII (name, contact information, wage information, program records) to any third party without written apprentice consent and Sponsor authorization, except as required for program administration or by law.
 
-The Salon also receives access to Elevate's operational procedures, program materials, and business information through this collaboration. This information is confidential. The Salon may not disclose or use Elevate`s confidential information for any purpose other than fulfilling its obligations under this MOU.
+The Salon also receives access to Elevate's operational procedures, program materials, and business information through this collaboration. This information is confidential. The Salon may not disclose or use Elevate's confidential information for any purpose other than fulfilling its obligations under this MOU.
 
 A full Non-Disclosure Agreement is available at ${PLATFORM_DEFAULTS.canonicalDomain}/legal/nda and is incorporated by reference into this MOU.`,
   },
   {
-    title: `8. Non-Compete and Non-Replication',
+    title: '8. Non-Compete and Non-Replication',
     content: `The Salon receives access to Elevate's registered apprenticeship program structure, curriculum relationships, RAPIDS registration, and credential pathways through this collaboration. This access is provided to support the apprentice — not to enable the Salon to replicate the program independently.
 
 During the term of this MOU and for three (3) years following termination, the Salon agrees not to:
@@ -266,7 +266,7 @@ During the term of this MOU and for three (3) years following termination, the S
 These restrictions do not prevent the Salon from: operating as a salon, employing licensed cosmetologists, hiring apprentices through other registered programs, or participating in training programs that are not substantially similar to the Elevate apprenticeship model.`,
   },
   {
-    title: '9. Partner Handbook — Required Reading`,
+    title: '9. Partner Handbook — Required Reading',
     content: `The Worksite Partner Handbook is incorporated by reference into this MOU and forms part of this agreement. The Handbook details the day-to-day responsibilities, compensation requirements, hour tracking procedures, prohibited practices, and communication expectations that govern the worksite relationship.
 
 By signing this MOU, the Salon confirms that it has read and understood the Partner Handbook in full prior to signing. The Handbook is available at: ${PLATFORM_DEFAULTS.canonicalDomain}/partners/cosmetology-host-shop/handbook
@@ -274,7 +274,7 @@ By signing this MOU, the Salon confirms that it has read and understood the Part
 Failure to comply with the standards set out in the Handbook constitutes a breach of this MOU and may result in immediate termination of the partnership and notification to USDOL.`,
   },
   {
-    title: `10. Dispute Resolution',
+    title: '10. Dispute Resolution',
     content: `The parties agree to attempt to resolve any disputes through good-faith negotiation first. If a dispute cannot be resolved through negotiation within 15 business days, either party may submit the dispute to mediation.
 
 If mediation is unsuccessful, the parties consent to jurisdiction in Marion County, Indiana. This MOU is governed by the laws of the State of Indiana.
@@ -285,14 +285,14 @@ USDOL/RAPIDS compliance disputes are subject to federal apprenticeship regulatio
 
 const ESTHETICIAN_SECTIONS: MouSection[] = [
   {
-    title: '1. Parties and Purpose`,
+    title: '1. Parties and Purpose',
     content: `This Memorandum of Understanding ("MOU") is entered into between 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute ("Sponsor") and the esthetics spa or salon identified at execution ("Worksite Partner" or "Spa/Salon").
 
 This MOU establishes the terms under which the Spa/Salon will serve as a worksite for the Indiana Esthetics Apprenticeship Program, RAPIDS Program ID: 2025-IN-132303, a USDOL Registered Apprenticeship sponsored by ${PLATFORM_DEFAULTS.orgName}.
 
 WHAT THIS AGREEMENT IS: This is a worksite hosting agreement for a federally registered apprenticeship program. The Spa/Salon is hosting an apprentice employee and providing on-the-job training under federal Department of Labor oversight.
 
-WHAT THIS AGREEMENT IS NOT: This MOU does not make the Spa/Salon a Training Network Partner, a co-owner of Elevate programs, a revenue-sharing partner, or a program delivery site for any Elevate training program other than the esthetics apprenticeship. The Spa/Salon has no ownership rights, governance authority, or decision-making authority over Elevate`s programs, curriculum, credentials, or brand.`,
+WHAT THIS AGREEMENT IS NOT: This MOU does not make the Spa/Salon a Training Network Partner, a co-owner of Elevate programs, a revenue-sharing partner, or a program delivery site for any Elevate training program other than the esthetics apprenticeship. The Spa/Salon has no ownership rights, governance authority, or decision-making authority over Elevate's programs, curriculum, credentials, or brand.`,
   },
   {
     title: '2. Program Structure — Non-Negotiable Federal Requirements',
@@ -308,7 +308,7 @@ Program requirements:
 The Sponsor maintains sole authority over: RTI curriculum and delivery; competency assessment standards; RAPIDS registration and reporting; completion certificate issuance; program standards and modifications.`,
   },
   {
-    title: '3. Sponsor Responsibilities`,
+    title: '3. Sponsor Responsibilities',
     content: `${PLATFORM_DEFAULTS.orgName} agrees to:
 
 • Maintain USDOL/RAPIDS registration and all required federal reporting
@@ -321,7 +321,7 @@ The Sponsor maintains sole authority over: RTI curriculum and delivery; competen
 • Serve as the point of contact with Indiana DWD and USDOL for all program matters`,
   },
   {
-    title: `4. Worksite Partner Responsibilities — Non-Negotiable',
+    title: '4. Worksite Partner Responsibilities — Non-Negotiable',
     content: `These responsibilities are required by federal apprenticeship law and USDOL program standards. They are not optional and are not subject to modification.
 
 The Spa/Salon agrees to:
@@ -385,7 +385,7 @@ During the term of this MOU and for three (3) years following termination, the S
 These restrictions do not prevent the Spa/Salon from: operating as a spa/salon, employing licensed estheticians, hiring apprentices through other registered programs, or participating in training programs that are not substantially similar to the Elevate apprenticeship model.`,
   },
   {
-    title: '9. Partner Handbook — Required Reading`,
+    title: '9. Partner Handbook — Required Reading',
     content: `The Worksite Partner Handbook is incorporated by reference into this MOU and forms part of this agreement. The Handbook details day-to-day responsibilities, compensation requirements, hour tracking procedures, and communication expectations.
 
 By signing this MOU, the Spa/Salon confirms that it has read and understood the Partner Handbook in full prior to signing. The Handbook is available at: ${PLATFORM_DEFAULTS.canonicalDomain}/partners/esthetician-host-shop/handbook
@@ -393,7 +393,7 @@ By signing this MOU, the Spa/Salon confirms that it has read and understood the 
 Failure to comply with the standards set out in the Handbook constitutes a breach of this MOU.`,
   },
   {
-    title: `10. Dispute Resolution',
+    title: '10. Dispute Resolution',
     content: `The parties agree to attempt to resolve any disputes through good-faith negotiation first. If a dispute cannot be resolved through negotiation within 15 business days, either party may submit the dispute to mediation.
 
 If mediation is unsuccessful, the parties consent to jurisdiction in Marion County, Indiana. This MOU is governed by the laws of the State of Indiana.
@@ -404,7 +404,7 @@ USDOL/RAPIDS compliance disputes are subject to federal apprenticeship regulatio
 
 const NAIL_SECTIONS: MouSection[] = [
   {
-    title: '1. Parties and Purpose`,
+    title: '1. Parties and Purpose',
     content: `This Memorandum of Understanding ("MOU") is entered into between 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute ("Sponsor") and the nail salon or spa identified at execution ("Worksite Partner" or "Nail Salon").
 
 This MOU establishes the terms under which the Nail Salon will serve as a worksite for the Indiana Nail Technician Apprenticeship Program, RAPIDS Program ID: 2025-IN-132304, a USDOL Registered Apprenticeship sponsored by ${PLATFORM_DEFAULTS.orgName}.
@@ -414,7 +414,7 @@ WHAT THIS AGREEMENT IS: This is a worksite hosting agreement for a federally reg
 WHAT THIS AGREEMENT IS NOT: This MOU does not make the Nail Salon a Training Network Partner, a co-owner of Elevate programs, a revenue-sharing partner, or a program delivery site for any Elevate training program other than the nail technician apprenticeship.`,
   },
   {
-    title: `2. Program Structure — Non-Negotiable Federal Requirements',
+    title: '2. Program Structure — Non-Negotiable Federal Requirements',
     content: `The Indiana Nail Technician Apprenticeship Program is a USDOL Registered Apprenticeship. Its structure is set by federal law and the registered program standards. These terms are not negotiable.
 
 Program requirements:
@@ -427,7 +427,7 @@ Program requirements:
 The Sponsor maintains sole authority over: RTI curriculum and delivery; competency assessment standards; RAPIDS registration and reporting; completion certificate issuance; program standards and modifications.`,
   },
   {
-    title: '3. Sponsor Responsibilities`,
+    title: '3. Sponsor Responsibilities',
     content: `${PLATFORM_DEFAULTS.orgName} agrees to:
 
 • Maintain USDOL/RAPIDS registration and all required federal reporting
@@ -440,7 +440,7 @@ The Sponsor maintains sole authority over: RTI curriculum and delivery; competen
 • Serve as the point of contact with Indiana DWD and USDOL for all program matters`,
   },
   {
-    title: `4. Worksite Partner Responsibilities — Non-Negotiable',
+    title: '4. Worksite Partner Responsibilities — Non-Negotiable',
     content: `These responsibilities are required by federal apprenticeship law and USDOL program standards. They are not optional and are not subject to modification.
 
 The Nail Salon agrees to:
@@ -504,7 +504,7 @@ During the term of this MOU and for three (3) years following termination, the N
 These restrictions do not prevent the Nail Salon from: operating as a nail salon, employing licensed nail technicians, hiring apprentices through other registered programs, or participating in training programs that are not substantially similar to the Elevate apprenticeship model.`,
   },
   {
-    title: '9. Partner Handbook — Required Reading`,
+    title: '9. Partner Handbook — Required Reading',
     content: `The Worksite Partner Handbook is incorporated by reference into this MOU and forms part of this agreement. The Handbook details day-to-day responsibilities, compensation requirements, hour tracking procedures, and communication expectations.
 
 By signing this MOU, the Nail Salon confirms that it has read and understood the Partner Handbook in full prior to signing. The Handbook is available at: ${PLATFORM_DEFAULTS.canonicalDomain}/partners/nail-technician-host-shop/handbook
@@ -512,7 +512,7 @@ By signing this MOU, the Nail Salon confirms that it has read and understood the
 Failure to comply with the standards set out in the Handbook constitutes a breach of this MOU.`,
   },
   {
-    title: `10. Dispute Resolution',
+    title: '10. Dispute Resolution',
     content: `The parties agree to attempt to resolve any disputes through good-faith negotiation first. If a dispute cannot be resolved through negotiation within 15 business days, either party may submit the dispute to mediation.
 
 If mediation is unsuccessful, the parties consent to jurisdiction in Marion County, Indiana. This MOU is governed by the laws of the State of Indiana.

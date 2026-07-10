@@ -13,7 +13,7 @@ type TimelineEvent = {
 
 export default function MinorityCertificationPanel() {
   const [businessName, setBusinessName] = useState(`${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`);
-  const [ownerName, setOwnerName] = useState(`Elizabeth Greene');
+  const [ownerName, setOwnerName] = useState('Elizabeth Greene');
   const [ownerEthnicity, setOwnerEthnicity] = useState('Black / African American');
   const [ownerGender, setOwnerGender] = useState('Female');
   const [ownershipPercent, setOwnershipPercent] = useState('100%');

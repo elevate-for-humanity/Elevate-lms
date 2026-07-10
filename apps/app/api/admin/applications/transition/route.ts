@@ -200,12 +200,12 @@ export async function POST(req: NextRequest) {
           subject: `Update on Your Application — ${PLATFORM_DEFAULTS.orgName}`,
           html: `<p>Hi ${firstName},</p>
 <p>Thank you for your interest in <strong>${programName}</strong> at Elevate for Humanity.</p>
-<p>After careful review, we are unable to move forward with your application at this time${reason ? `: ' + reason : '.'}</p>
+<p>After careful review, we are unable to move forward with your application at this time${reason ? ': ' + reason : '.'}</p>
 <p>We encourage you to reapply in the future or explore other programs we offer at <a href="${PLATFORM_DEFAULTS.siteUrl}/programs">${PLATFORM_DEFAULTS.canonicalDomain}/programs</a>.</p>
 <p>If you have questions, please contact us at <a href="mailto:info@elevateforhumanity.org">info@elevateforhumanity.org</a>.</p>
 <br/><p>Warm regards,<br/>Elevate for Humanity Team</p>`,
         });
-      } else if (next_status === `approved`) {
+      } else if (next_status === 'approved') {
         // Generic approval email for non-barber programs
         if (!isBarber) {
           await sendEmail({
@@ -213,7 +213,7 @@ export async function POST(req: NextRequest) {
             from: `${PLATFORM_DEFAULTS.orgName} <info@${PLATFORM_DEFAULTS.canonicalDomain}>`,
             subject: `Your Application Has Been Approved — ${PLATFORM_DEFAULTS.orgName}`,
             html: `<p>Hi ${firstName},</p>
-<p>Congratulations! Your application for <strong>${application.program_slug || application.program_interest || `the program`}</strong> has been <strong>approved</strong>.</p>
+<p>Congratulations! Your application for <strong>${application.program_slug || application.program_interest || 'the program'}</strong> has been <strong>approved</strong>.</p>
 <p>Please log in to your portal to complete enrollment:</p>
 <p><a href="${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard">Access Your Portal →</a></p>
 <p>Questions? Contact us at <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}">info@elevateforhumanity.org</a>.</p>

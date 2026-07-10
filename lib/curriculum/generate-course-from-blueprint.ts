@@ -42,7 +42,7 @@ export async function generateCourseFromBlueprint(
     (await getBlueprintByProgramSlug(args.blueprintSlug));
 
   if (!blueprint) {
-    throw new Error(`generateCourseFromBlueprint: no blueprint found for '${args.blueprintSlug}'');
+    throw new Error(`generateCourseFromBlueprint: no blueprint found for '${args.blueprintSlug}'`);
   }
 
   const buildMode: BuildMode = args.mode === 'full' ? 'replace' : 'missing-only';

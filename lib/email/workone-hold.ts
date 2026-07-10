@@ -60,7 +60,7 @@ export async function sendWorkOneHoldEmail(params: WorkOneHoldEmailParams) {
             <div style="background:#f0f9ff;border-left:4px solid #0ea5e9;border-radius:6px;padding:16px 20px;margin:0 0 24px">
               <p style="margin:0 0 8px;font-weight:700;color:#0c4a6e;font-size:14px">What is WorkOne?</p>
               <p style="margin:0;color:#0c4a6e;font-size:13px;line-height:1.6">
-                WorkOne is Indiana`s workforce development agency. They administer WIOA (Workforce Innovation
+                WorkOne is Indiana's workforce development agency. They administer WIOA (Workforce Innovation
                 and Opportunity Act) funding that pays for approved training programs like ours.
                 A WorkOne case manager will review your eligibility and, if approved, authorize funding
                 directly to Elevate for Humanity.
@@ -82,7 +82,7 @@ export async function sendWorkOneHoldEmail(params: WorkOneHoldEmailParams) {
             <div style="background:#f0fdf4;border-left:4px solid #22c55e;border-radius:6px;padding:16px 20px;margin:0 0 24px">
               <p style="margin:0 0 8px;font-weight:700;color:#14532d;font-size:14px">What to tell them:</p>
               <p style="margin:0;color:#14532d;font-size:13px;line-height:1.6">
-                "I applied to Elevate for Humanity's <strong>${programName}</strong> program and I`d like
+                "I applied to Elevate for Humanity's <strong>${programName}</strong> program and I'd like
                 to apply for WIOA Title I Adult or Dislocated Worker funding to cover my training costs."
               </p>
             </div>
@@ -131,7 +131,7 @@ export async function sendWorkOneHoldEmail(params: WorkOneHoldEmailParams) {
   const text = `Hi ${firstName} ${lastName},
 
 Thank you for applying to ${programName} at ${PLATFORM_DEFAULTS.orgName}.
-${referenceNumber ? `Reference number: ${referenceNumber}\n` : ``}
+${referenceNumber ? `Reference number: ${referenceNumber}\n` : ''}
 Based on your application, you may qualify for WorkOne / WIOA funding, which can cover your training costs.
 
 NEXT STEP: Visit your nearest WorkOne center.
@@ -144,7 +144,7 @@ WHAT TO BRING:
 - This email or your reference number
 
 WHAT TO SAY:
-"I applied to ${PLATFORM_DEFAULTS.orgName}`s ${programName} program and I`d like to apply for WIOA Title I Adult or Dislocated Worker funding."
+"I applied to ${PLATFORM_DEFAULTS.orgName}'s ${programName} program and I'd like to apply for WIOA Title I Adult or Dislocated Worker funding."
 
 FIND WORKONE: https://www.in.gov/dwd/workone/
 Indianapolis: WorkOne Indy, 2955 N. Meridian St., Indianapolis, IN 46208

@@ -91,13 +91,13 @@ export default function LegalEntityStructurePage() {
                 desc: `Training provider listings use ${PLATFORM_DEFAULTS.orgName} and ETPL-approved program titles.`,
               },
               {
-                title: `Insurance COI certificate holder`,
+                title: 'Insurance COI certificate holder',
                 desc: `Often listed as ${PLATFORM_DEFAULTS.orgName} or ${RAPIDS_CONFIG.programBrand} — confirm on your MOU checklist.`,
               },
             ],
           },
           cta: {
-            heading: `Questions about entity or sponsorship?`
+            heading: 'Questions about entity or sponsorship?',
             subtitle: 'Our compliance team can confirm the correct legal name for your document.',
             primaryLabel: 'Contact compliance',
             primaryHref: '/contact?topic=legal-entity',

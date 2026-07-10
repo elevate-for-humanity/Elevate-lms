@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: `WIOA ETPL Compliance Forms | Admin | ${PLATFORM_DEFAULTS.orgName}`,
   description:
-    `Initial Eligibility Aggregate Performance (new programs) and Section 188 Equal Opportunity checklists per program.',
+    'Initial Eligibility Aggregate Performance (new programs) and Section 188 Equal Opportunity checklists per program.',
 };
 
 export default async function WioaEtplCompliancePage() {

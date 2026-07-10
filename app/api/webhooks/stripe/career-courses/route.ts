@@ -124,7 +124,7 @@ async function _POST(req: Request) {
             }),
           });
         } catch (emailError) {
-          logger.error(`Error sending confirmation email:` emailError);
+          logger.error('Error sending confirmation email:', emailError);
         }
       }
 

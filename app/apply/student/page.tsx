@@ -331,13 +331,13 @@ export default async function StudentApplicationPage({
             </h2>
             <p className="text-slate-600 text-sm max-w-xl leading-relaxed">
               Takes about 5 minutes. We will follow up within one business day to schedule your
-              orientation. Call us at{' `}
+              orientation. Call us at{' '}
               <a
                 href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
                 className="text-brand-red-600 font-semibold hover:underline"
               >
                 {PLATFORM_DEFAULTS.supportPhone}
-              </a>{` '}
+              </a>{' '}
               if you have questions.
             </p>
           </div>

@@ -10,7 +10,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = {
   title: `Compliance & Disclosure Framework | Governance | ${PLATFORM_DEFAULTS.orgName}`,
   description:
-    `How legal, financial, and eligibility disclosures are presented and how compliance alignment is maintained across the platform.',
+    'How legal, financial, and eligibility disclosures are presented and how compliance alignment is maintained across the platform.',
   robots: {
     index: false,
     follow: false,

@@ -56,7 +56,7 @@ function confirmationEmailHtml(name: string, startTime: string, examQuestion: st
   const time = date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
-    timeZone: 'America/Indiana/Indianapolis`,
+    timeZone: 'America/Indiana/Indianapolis',
   });
 
   return `
@@ -82,7 +82,7 @@ function confirmationEmailHtml(name: string, startTime: string, examQuestion: st
       </tr>
       <tr style="background: #f8fafc;">
         <td style="padding: 10px 12px; font-weight: bold;">Exam</td>
-        <td style="padding: 10px 12px;">${examQuestion || `See confirmation'}</td>
+        <td style="padding: 10px 12px;">${examQuestion || 'See confirmation'}</td>
       </tr>
       <tr>
         <td style="padding: 10px 12px; font-weight: bold;">Location</td>
@@ -245,7 +245,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
           subject: `Your Testing Appointment is Confirmed - ${PLATFORM_DEFAULTS.orgName}`,
           html: confirmationEmailHtml(inviteeName, startTime, examAnswer),
         })
-        .catch((err) => logger.error(`Confirmation email failed` err));
+        .catch((err) => logger.error('Confirmation email failed', err));
     }
 
     // 4. Confirmation SMS to invitee
@@ -324,7 +324,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }
           subject: `Testing Appointment Canceled - ${PLATFORM_DEFAULTS.orgName}`,
           html: cancellationEmailHtml(inviteeName, startTime),
         })
-        .catch((err) => logger.error(`Cancellation email failed` err));
+        .catch((err) => logger.error('Cancellation email failed', err));
     }
 
     // Cancellation SMS

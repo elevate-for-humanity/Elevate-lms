@@ -83,7 +83,7 @@ async function _POST(req: NextRequest) {
     // Strict domain whitelist — hardcoded, not config-driven
     const allowedOrigins = new Set([
       PLATFORM_DEFAULTS.siteUrl,
-      'https://elevateforhumanity.org`,
+      'https://elevateforhumanity.org',
     ]);
     const urlsToCheck = audioUrl ? [audioUrl] : audioUrls;
     for (const url of urlsToCheck) {

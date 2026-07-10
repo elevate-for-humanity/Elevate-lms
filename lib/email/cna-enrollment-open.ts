@@ -77,7 +77,7 @@ export function buildCnaEnrollmentOpenAdminRosterEmail(
     <tr>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(c.firstName)} ${escapeHtml(c.lastName)}</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0"><a href="mailto:${escapeHtml(c.email)}">${escapeHtml(c.email)}</a></td>
-      <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(c.phone || `—')}</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(c.phone || '—')}</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0">${escapeHtml(c.source)}</td>
     </tr>`).join('');
 

@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: Promise<{ category: string }>;
 }): Promise<Metadata> {
   const { category: categorySlug } = await params;
-  const category = categorySlug.replace(/-/g, ' `);
+  const category = categorySlug.replace(/-/g, ' ');
   return {
     title: `${category} | Blog | Elevate For Humanity`,
     description: `Browse ${category} articles from Elevate For Humanity`,

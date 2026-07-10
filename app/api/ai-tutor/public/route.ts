@@ -135,7 +135,7 @@ async function _POST(req: NextRequest) {
   // Use the unified AI service (auto-selects Gemini or OpenAI)
   let aiAvailable = false;
   try {
-    const { isAIAvailable } = await import('@/lib/ai/ai-service`);
+    const { isAIAvailable } = await import('@/lib/ai/ai-service');
     aiAvailable = isAIAvailable();
   } catch {
     /* AI service not available */
@@ -143,7 +143,7 @@ async function _POST(req: NextRequest) {
 
   if (!aiAvailable) {
     const fallback = `The ${program.name} program is available at ${PLATFORM_DEFAULTS.orgName}. Apply at ${PLATFORM_DEFAULTS.canonicalDomain}${program.applyUrl} or contact us for details.`;
-    await logRequest(fallback.length, `no_ai_provider');
+    await logRequest(fallback.length, 'no_ai_provider');
     return NextResponse.json({ message: fallback, fallback: true }, { headers });
   }
 

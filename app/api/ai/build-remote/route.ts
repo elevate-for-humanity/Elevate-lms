@@ -11,7 +11,7 @@ import { PLATFORM_DEFAULTS } from "@/lib/config/platform-config";
 
 export const dynamic = "force-dynamic";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity.org`;
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity.org';
 
 function generateEmbedScript(siteId: string, apiKey: string, features: string[]): string {
   return `<!-- ${PLATFORM_DEFAULTS.orgName} LMS Integration -->
@@ -28,11 +28,11 @@ function generateEmbedScript(siteId: string, apiKey: string, features: string[])
 
 function generateSetupSteps(platform: string): string[] {
   const base = [
-    `Copy the embed script above',
+    'Copy the embed script above',
     'Paste it before the closing </body> tag on your site',
     'Add a container element where you want the LMS to appear: <div id="elevate-lms"></div>',
     'Save and publish your changes',
-    'Contact us at ' + PLATFORM_DEFAULTS.supportPhone + ' to activate your integration`,
+    `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate your integration`,
   ];
 
   const platformSteps: Record<string, string[]> = {
@@ -44,25 +44,25 @@ function generateSetupSteps(platform: string): string[] {
       `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate`,
     ],
     wix: [
-      "In Wix Editor, click Add > Embed > Custom Code",
-      `Paste the script and set placement to "Body - end"',
-      "Add an HTML iframe element where you want the LMS",
-      "Publish your site",
-      "Contact us at " + PLATFORM_DEFAULTS.supportPhone + " to activate",
+      'In Wix Editor, click Add > Embed > Custom Code',
+      'Paste the script and set placement to "Body - end"',
+      'Add an HTML iframe element where you want the LMS',
+      'Publish your site',
+      `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate`,
     ],
     squarespace: [
-      "In Squarespace, go to Settings → Advanced → Code Injection",
-      "Paste the script in the Footer section",
-      "Add a Code Block where you want the LMS to appear",
-      "Save and publish",
-      "Contact us at " + PLATFORM_DEFAULTS.supportPhone + " to activate",
+      'In Squarespace, go to Settings → Advanced → Code Injection',
+      'Paste the script in the Footer section',
+      'Add a Code Block where you want the LMS to appear',
+      'Save and publish',
+      `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate`,
     ],
     shopify: [
-      "In Shopify Admin, go to Online Store → Themes → Edit Code",
-      "Open theme.liquid and paste before </body>",
-      "Add a custom section for the LMS widget",
-      "Save the theme",
-      "Contact us at " + PLATFORM_DEFAULTS.supportPhone + " to activate",
+      'In Shopify Admin, go to Online Store → Themes → Edit Code',
+      'Open theme.liquid and paste before </body>',
+      'Add a custom section for the LMS widget',
+      'Save the theme',
+      `Contact us at ${PLATFORM_DEFAULTS.supportPhone} to activate`,
     ],
   };
 

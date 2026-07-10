@@ -28,6 +28,7 @@ import { NRF_RISEUP_PRICING } from '@/lib/testing/providers/nrf-riseup';
 import { WORKKEYS_PRICING } from '@/lib/testing/providers/workkeys-pricing';
 import { CAREERSAFE_PRICING } from '@/lib/testing/providers/careersafe-pricing';
 import { calculatePrice } from '@/lib/testing/pricing-engine';
+import { PricingConfigurator } from './PricingConfigurator';
 
 // Provider data - prices pulled from centralized pricing engine
 const PROVIDERS = [
@@ -399,6 +400,37 @@ function ExamPreparation() {
   );
 }
 
+// Interactive Package Builder Demo Section
+function PackageBuilderDemo() {
+  const demoExams = [
+    { id: 'cma', name: 'Certified Medical Assistant (CMA)', price: 249, duration: '2.5 hours' },
+    { id: 'cpt', name: 'Phlebotomy Technician (CPT)', price: 149, duration: '2 hours' },
+    { id: 'cet', name: 'EKG Technician (CET)', price: 149, duration: '2 hours' },
+  ];
+
+  const demoBundles = [
+    {
+      id: 'healthcare-bundle',
+      name: 'Healthcare Career Bundle',
+      description: 'Complete preparation for healthcare certification',
+      items: ['CMA Exam', 'Study Guide', 'Practice Test', 'CPR Cert'],
+      originalPrice: 497,
+      bundlePrice: 399,
+      savings: 98,
+    },
+  ];
+
+  return (
+    <div id="build-package" className="max-w-6xl mx-auto">
+      <PricingConfigurator
+        provider="demo"
+        exams={demoExams}
+        bundles={demoBundles}
+      />
+    </div>
+  );
+}
+
 // Provider Card Component
 function ProviderCard({ provider }: { provider: typeof PROVIDERS[0] }) {
   return (
@@ -448,16 +480,16 @@ function ProviderCard({ provider }: { provider: typeof PROVIDERS[0] }) {
         
         <div className="flex gap-2">
           <Link
-            href={`/testing/${provider.id}`}
+            href={`/testing/${provider.id}#build-package`}
             className={`flex-1 text-center py-3 bg-gradient-to-r ${provider.accent} text-white font-bold rounded-lg hover:opacity-90 transition-opacity`}
           >
-            Book Exam
+            Build Package
           </Link>
           <Link
             href={`/testing/${provider.id}`}
             className="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition-colors"
           >
-            Learn More
+            Details
           </Link>
         </div>
       </div>
@@ -815,6 +847,27 @@ export function PremiumTestingCenter() {
               View Exam Prep Courses
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* ===== INTERACTIVE PACKAGE BUILDER ===== */}
+      <section id="build-package" className="py-20 bg-slate-100 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-8"
+          >
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+              Build Your Exam Package
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Choose your exam and customize with add-ons. See real-time pricing with bundle savings and funding options.
+            </p>
+          </motion.div>
+          
+          <PackageBuilderDemo />
         </div>
       </section>
 

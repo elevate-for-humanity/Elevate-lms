@@ -8,7 +8,7 @@ export async function register() {
     const { initializeNativeModules } = await import('./lib/native-modules');
     try {
       const initResult = await initializeNativeModules();
-      console.log('[NativeModules] Initialization:', initResult);
+      console.info('[NativeModules] Initialization:', initResult);
       if (!initResult.success) {
         console.warn('[NativeModules] Some modules failed to initialize:', initResult.error);
       }

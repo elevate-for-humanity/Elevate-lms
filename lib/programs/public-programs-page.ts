@@ -111,3 +111,8 @@ export async function buildProgramsListingMetadata(): Promise<Metadata> {
     path: '/programs',
   });
 }
+
+/** Format program count for display: 1 → "1 program", 25 → "25 programs" */
+export function formatPublicProgramsDisplay(count: number): string {
+  return count === 1 ? '1 program' : `${count} programs`;
+}

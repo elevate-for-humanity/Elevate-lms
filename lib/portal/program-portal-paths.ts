@@ -37,6 +37,15 @@ export function apprenticeshipLmsCoursePath(programSlug: string): string | null 
   return courseId ? `/lms/courses/${courseId}` : null;
 }
 
+export function apprenticeshipWorkbookHref(programSlug: string): string {
+  return `/apprentice/${programSlug}/workbook`;
+}
+
+export function apprenticeshipRtiLabel(programSlug: string, short = false): string | null {
+  const courseId = APPRENTICESHIP_LMS_COURSE_IDS[programSlug];
+  return courseId ? `/lms/courses/${courseId}` : null;
+}
+
 export function isWorkoneChecklistEligibleApplication(app: {
   program_slug?: string | null;
   funding_type?: string | null;

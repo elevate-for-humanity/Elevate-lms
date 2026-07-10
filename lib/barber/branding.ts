@@ -8,3 +8,6 @@ export const PRESTIGE_ELEVATION_BARBER_CURRICULUM =
 
 /** Short label for nav tabs and compact UI */
 export const PRESTIGE_ELEVATION_BARBER_CURRICULUM_SHORT = 'Barber Curriculum';
+
+/** Workbook label for apprenticeship portal */
+export const PRESTIGE_ELEVATION_BARBER_WORKBOOK_LABEL = 'Prestige Elevation Barber Workbook';

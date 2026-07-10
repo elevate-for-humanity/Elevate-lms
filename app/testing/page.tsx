@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 
 import { Metadata } from 'next';
-import { TestingCenter } from '@/components/testing/TestingCenter';
+import { PremiumTestingCenter as TestingCenter } from '@/components/testing/TestingCenter';
 
 export const metadata: Metadata = {
   title: 'Testing & Credential Exams',

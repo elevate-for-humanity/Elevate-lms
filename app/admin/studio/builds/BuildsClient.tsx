@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Build, Play, RefreshCw, CheckCircle, XCircle, Clock, FileText } from 'lucide-react';
+import { Build as BuildIcon, Play, RefreshCw, CheckCircle, XCircle, Clock, FileText } from 'lucide-react';
 
 interface Build {
   id: string;
@@ -58,7 +58,7 @@ export default function BuildsClient() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold flex items-center gap-2"><Build className="w-6 h-6" /> Build History</h1>
+        <h1 className="text-2xl font-bold flex items-center gap-2"><BuildIcon className="w-6 h-6" /> Build History</h1>
         <button onClick={fetchBuilds} disabled={loading} className="px-4 py-2 bg-slate-100 rounded-lg flex items-center gap-2">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </button>

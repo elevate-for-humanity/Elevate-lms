@@ -56,3 +56,17 @@ export const INSTRUCTOR_ROLES: ReadonlyArray<string> = [
 export function isInstructorRole(role: string | null | undefined): boolean {
   return INSTRUCTOR_ROLES.includes(role ?? '');
 }
+
+/** Normalize a post-auth destination URL to a safe internal path */
+export function normalizePostAuthDestination(url: string, defaultRole: string): string {
+  let path = url;
+  try {
+    const parsed = new URL(url);
+    path = parsed.pathname + parsed.search;
+  } catch {
+    // Already a path
+  }
+  if (!path.startsWith('/')) path = '/' + path;
+  if (path.startsWith('http')) return getDashboardForRole(defaultRole);
+  return path;
+}

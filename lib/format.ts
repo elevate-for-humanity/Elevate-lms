@@ -45,3 +45,10 @@ export function fmtNumber(value: number): string {
 export function fmtUsd(value: number): string {
   return '$' + value.toLocaleString('en-US');
 }
+
+/** Format currency in compact form: 1234567 → "$1.2M", 12345 → "$12K" */
+export function formatCurrencyCompact(value: number): string {
+  if (value >= 1000000) return '$' + (value / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (value >= 1000) return '$' + (value / 1000).toFixed(0) + 'K';
+  return '$' + value.toLocaleString('en-US');
+}

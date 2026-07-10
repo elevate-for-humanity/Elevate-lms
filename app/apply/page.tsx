@@ -7,6 +7,7 @@ import ApplyPathGuide from '@/components/apply/ApplyPathGuide';
 import { normalizeProgramInterest } from '@/lib/intake/normalize-program-interest';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { getStaticProgram, STATIC_PROGRAM_MAP } from '@/data/programs/index';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 // No static revalidation; use the admin client when it is available so all
 // published programs are returned, but keep the intake page usable in CI/local
@@ -136,6 +137,9 @@ export default async function ApplyPage({
           <IntakeFormInner programs={programs} />
         </div>
       </section>
+
+      {/* PARIS AI Assistant */}
+      <ParisFloatingWrapper />
     </div>
   );
 }

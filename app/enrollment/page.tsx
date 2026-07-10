@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FileText, CheckCircle2, Clock, DollarSign, ArrowRight, Phone } from 'lucide-react';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 export const metadata: Metadata = {
   title: 'Enrollment | Elevate for Humanity',
@@ -113,6 +114,9 @@ export default function EnrollmentPage() {
           </div>
         </div>
       </section>
+
+      {/* PARIS AI Assistant */}
+      <ParisFloatingWrapper />
     </div>
   );
 }

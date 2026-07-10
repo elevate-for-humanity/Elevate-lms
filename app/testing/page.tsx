@@ -2,6 +2,7 @@ export const revalidate = 3600;
 
 import { Metadata } from 'next';
 import { PremiumTestingCenter as TestingCenter } from '@/components/testing/TestingCenter';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 export const metadata: Metadata = {
   title: 'Testing & Credential Exams',
@@ -13,5 +14,10 @@ export const metadata: Metadata = {
 };
 
 export default function TestingPage() {
-  return <TestingCenter />;
+  return (
+    <>
+      <TestingCenter />
+      <ParisFloatingWrapper />
+    </>
+  );
 }

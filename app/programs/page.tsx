@@ -156,7 +156,7 @@ export default async function ProgramsPage() {
   
   // Log data source for debugging
   if (process.env.NODE_ENV === 'development') {
-    console.log(`[ProgramsPage] Data source: ${catalogSource} (${programs.length} programs)`);
+    console.debug(`[ProgramsPage] Data source: ${catalogSource} (${programs.length} programs)`);
   }
 
   const grouped:Record<string,Prog[]>={};

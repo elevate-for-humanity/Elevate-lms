@@ -164,7 +164,7 @@ export default function ApplicationActions({
           disabled={loading !== null}
           className="w-full py-3 text-sm font-bold rounded-xl bg-brand-green-600 hover:bg-brand-green-700 text-white transition-colors disabled:opacity-50"
         >
-          {loading === `enroll' ? 'Enrolling…' : 'Enroll'}
+          {loading === 'enroll' ? 'Enrolling…' : 'Enroll'}
         </button>
         <p className="text-xs text-slate-400 mt-1 text-center">
           Creates student account, enrollment, and sends approval email

@@ -22,7 +22,14 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-// Provider data
+// Import pricing from the centralized pricing engine
+import { CERTIPORT_FEES } from '@/lib/testing/providers/certiport-pricing';
+import { NRF_RISEUP_PRICING } from '@/lib/testing/providers/nrf-riseup';
+import { WORKKEYS_PRICING } from '@/lib/testing/providers/workkeys-pricing';
+import { CAREERSAFE_PRICING } from '@/lib/testing/providers/careersafe-pricing';
+import { calculatePrice } from '@/lib/testing/pricing-engine';
+
+// Provider data - prices pulled from centralized pricing engine
 const PROVIDERS = [
   {
     id: 'nha',
@@ -37,7 +44,7 @@ const PROVIDERS = [
       { name: 'Certified Pharmacy Technician (CPhT)', career: 'Pharmacy Tech', salary: '$33,000-$45,000/yr' },
     ],
     accent: 'from-blue-600 to-cyan-600',
-    examFee: '$117 - $180',
+    examFee: '$117 - $180', // NHA pricing varies by exam
     color: 'blue',
   },
   {
@@ -53,7 +60,7 @@ const PROVIDERS = [
       { name: 'IT Specialist', career: 'IT Support', salary: '$40,000-$60,000/yr' },
     ],
     accent: 'from-red-600 to-orange-600',
-    examFee: '$100 - $150',
+    examFee: `$${CERTIPORT_FEES[0].amount} - $${CERTIPORT_FEES[2].amount}`, // Dynamic pricing
     color: 'red',
   },
   {
@@ -69,7 +76,7 @@ const PROVIDERS = [
       { name: 'Platinum Certificate', career: 'Highly Skilled', salary: '+35-40% Earnings' },
     ],
     accent: 'from-emerald-600 to-teal-600',
-    examFee: '$55 - $100',
+    examFee: WORKKEYS_PRICING ? `$${WORKKEYS_PRICING.appliedTech.price} - $${WORKKEYS_PRICING.graphicHiring.price}` : '$55 - $100',
     color: 'green',
   },
   {
@@ -85,7 +92,7 @@ const PROVIDERS = [
       { name: 'Type III (Low Pressure)', career: 'Refrigeration', salary: '$40,000-$55,000/yr' },
     ],
     accent: 'from-amber-600 to-orange-600',
-    examFee: '$70 - $120',
+    examFee: '$70 - $120', // EPA 608 pricing varies by type
     color: 'amber',
   },
   {
@@ -101,7 +108,7 @@ const PROVIDERS = [
       { name: 'Loss Prevention', career: 'LP Specialist', salary: '$35,000-$50,000/yr' },
     ],
     accent: 'from-purple-600 to-pink-600',
-    examFee: '$45 - $90',
+    examFee: NRF_RISEUP_PRICING ? `$${NRF_RISEUP_PRICING.retailFundamentals.price} - $${NRF_RISEUP_PRICING.customerServiceSales.price}` : '$45 - $90',
     color: 'purple',
   },
   {
@@ -117,7 +124,7 @@ const PROVIDERS = [
       { name: 'Forklift Certification', career: 'Warehouse/Logistics', salary: '$38,000-$52,000/yr' },
     ],
     accent: 'from-orange-600 to-red-600',
-    examFee: '$40 - $80',
+    examFee: CAREERSAFE_PRICING ? `$${CAREERSAFE_PRICING.osha10.price} - $${CAREERSAFE_PRICING.osha30.price}` : '$40 - $80',
     color: 'orange',
   },
 ];
@@ -834,7 +841,7 @@ export function PremiumTestingCenter() {
           <div className="space-y-4">
             {[
               { q: 'How do I schedule an exam?', a: 'You can book your exam online through our scheduling system, by calling our testing center, or through our AI assistant. We offer multiple dates and times to fit your schedule.' },
-              { q: 'How much do exams cost?', a: 'Exam fees vary by provider and certification. Most exams range from $40-$180. We offer BNPL options and funding assistance for eligible participants.' },
+              { q: 'How much do exams cost?', a: 'Exam fees vary by provider and certification. We use dynamic pricing based on provider costs, proctoring, and overhead. Contact us for a custom quote or use our pricing configurator to build your package.' },
               { q: 'How long are exams?', a: 'Exam length varies by certification. Most exams range from 1-3 hours. We\'ll provide a time estimate when you book.' },
               { q: 'When will I receive my results?', a: 'Results are typically available immediately after completing your exam. Your digital credential will be issued within 24-48 hours of passing.' },
               { q: 'Can I retake an exam?', a: 'Retake policies vary by provider. Most allow retakes after a waiting period. We can help you schedule a retake if needed.' },

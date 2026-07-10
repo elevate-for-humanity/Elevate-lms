@@ -18,6 +18,7 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import ProgramApplyForm from '@/components/programs/ProgramApplyForm';
 import { PayNowButton } from '@/components/programs/PayNowButton';
+import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
 import heroBanners, { type HeroBannerConfig } from '@/content/heroBanners';
 import {
   BookOpen,
@@ -659,6 +660,13 @@ export default function ProgramDetailPage({
                       cost={enrollmentTracks.selfPay.cost}
                       stripeCheckoutHref={p.cta.stripeCheckoutHref}
                     />
+                    {/* Payment Plan Calculator */}
+                    <div className="mt-4">
+                      <PaymentPlanCalculator
+                        programSlug={p.slug}
+                        stripeDepositUrl={p.cta.stripeCheckoutHref}
+                      />
+                    </div>
                   </div>
                 )}
 

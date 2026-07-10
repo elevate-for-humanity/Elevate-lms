@@ -30,6 +30,16 @@ import { CAREERSAFE_PRICING } from '@/lib/testing/providers/careersafe-pricing';
 import { calculatePrice } from '@/lib/testing/pricing-engine';
 import { PricingConfigurator } from './PricingConfigurator';
 
+// Provider hero images - consolidated to match dynamic provider pages
+const PROVIDER_HERO_IMAGES: Record<string, string> = {
+  nha: '/images/pages/medical-assistant.webp',
+  certiport: '/images/pages/programs-it-hero.webp',
+  workkeys: '/images/pages/career-services-page-4.webp',
+  esco: '/images/pages/hvac-technician.webp',
+  nrf: '/images/pages/apply-employer-hero.webp',
+  careersafe: '/images/pages/apprenticeships-hero.webp',
+};
+
 // Provider data - prices pulled from centralized pricing engine
 const PROVIDERS = [
   {
@@ -37,7 +47,7 @@ const PROVIDERS = [
     name: 'NHA',
     fullName: 'National Healthcareer Association',
     logo: '/images/partners/nha-logo.webp',
-    heroImage: '/images/healthcare/ma-hero.webp',
+    heroImage: PROVIDER_HERO_IMAGES.nha,
     certifications: [
       { name: 'Certified Medical Assistant (CMA)', career: 'Medical Assistant', salary: '$35,000-$45,000/yr' },
       { name: 'Phlebotomy Technician (CPT)', career: 'Phlebotomist', salary: '$32,000-$40,000/yr' },
@@ -53,7 +63,7 @@ const PROVIDERS = [
     name: 'Certiport',
     fullName: 'Certiport (Pearson VUE)',
     logo: '/images/partners/certiport-logo.webp',
-    heroImage: '/images/business/business-training.webp',
+    heroImage: PROVIDER_HERO_IMAGES.certiport,
     certifications: [
       { name: 'Microsoft Office Specialist (MOS)', career: 'Office Administration', salary: '$35,000-$50,000/yr' },
       { name: 'Adobe Certified Professional', career: 'Graphic Design', salary: '$40,000-$60,000/yr' },
@@ -69,7 +79,7 @@ const PROVIDERS = [
     name: 'ACT WorkKeys',
     fullName: 'ACT WorkKeys / NCRC',
     logo: '/images/partners/workkeys-logo.webp',
-    heroImage: '/images/pages/career-services-hero.webp',
+    heroImage: PROVIDER_HERO_IMAGES.workkeys,
     certifications: [
       { name: 'Bronze Certificate', career: 'Foundation Level', salary: 'Entry Positions' },
       { name: 'Silver Certificate', career: 'Skilled Positions', salary: '+15-20% Earnings' },
@@ -85,7 +95,7 @@ const PROVIDERS = [
     name: 'EPA 608',
     fullName: 'EPA Section 608 Technician Certification',
     logo: '/images/partners/epa-logo.webp',
-    heroImage: '/images/trades/hvac-hero.webp',
+    heroImage: PROVIDER_HERO_IMAGES.esco,
     certifications: [
       { name: 'Universal Certification', career: 'HVAC/R Technician', salary: '$45,000-$70,000/yr' },
       { name: 'Type I (Small Appliances)', career: 'Maintenance', salary: '$35,000-$50,000/yr' },
@@ -101,7 +111,7 @@ const PROVIDERS = [
     name: 'NRF',
     fullName: 'NRF Foundation / RISE UP',
     logo: '/images/partners/nrf-logo.webp',
-    heroImage: '/images/business/retail-training.webp',
+    heroImage: PROVIDER_HERO_IMAGES.nrf,
     certifications: [
       { name: 'Customer Service', career: 'Retail Associate', salary: '$28,000-$38,000/yr' },
       { name: 'Sales Associate', career: 'Sales Professional', salary: '$30,000-$45,000/yr' },
@@ -117,7 +127,7 @@ const PROVIDERS = [
     name: 'CareerSafe',
     fullName: 'CareerSafe OSHA Safety',
     logo: '/images/partners/careersafe-logo.webp',
-    heroImage: '/images/safety/safety-training.webp',
+    heroImage: PROVIDER_HERO_IMAGES.careersafe,
     certifications: [
       { name: 'OSHA 10-Hour General Industry', career: 'Safety Entry', salary: '$35,000-$50,000/yr' },
       { name: 'OSHA 30-Hour Construction', career: 'Safety Professional', salary: '$50,000-$75,000/yr' },

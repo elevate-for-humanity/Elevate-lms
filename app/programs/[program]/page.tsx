@@ -69,14 +69,14 @@ export async function generateMetadata({
   const ogBase = {
     images: [{ url: ogImage, width: 1200, height: 630, alt: `${program.replace(/-/g, ' ')} training program at ${PLATFORM_DEFAULTS.orgName}` }],
     siteName: PLATFORM_DEFAULTS.orgName,
-    type: `website` as const,
+    type: 'website' as const,
   };
 
   // Static ProgramSchema — preferred source for metadata
   const sp = getStaticProgram(program);
   if (sp) {
     const title = sp.metaTitle || `${sp.title} | ${PLATFORM_DEFAULTS.orgName}`;
-    const description = sp.metaDescription || sp.subtitle || ''
+    const description = sp.metaDescription || sp.subtitle || '';
     const img = sp.heroImage || ogImage;
     return {
       title,
@@ -111,7 +111,7 @@ export async function generateMetadata({
       .maybeSingle();
     if (data) {
       const title = `${data.title} | ${PLATFORM_DEFAULTS.orgName}`;
-      const description = data.short_description || data.description || ''
+      const description = data.short_description || data.description || '';
       return {
         title,
         description,

@@ -73,7 +73,7 @@ export default function OrientationScheduleClient() {
         return;
       }
 
-      const meetingUrl = data.meetingUrl || ''
+      const meetingUrl = data.meetingUrl || '';
       setZoomUrl(meetingUrl);
 
       // Open Google Calendar invite

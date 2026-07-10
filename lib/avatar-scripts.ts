@@ -203,12 +203,12 @@ export const PAGE_SCRIPTS: Record<
 
   '/employer': {
     opening: `Employer portal for hiring trained candidates. Post positions, review profiles, track outcomes. Candidates have verified training.`,
-    nextAction: `Click 'Post Position' or 'Browse Candidates'.`,
+    nextAction: `Click 'Post Position' or 'Browse Candidates'.',
   },
 
   '/employer/dashboard': {
     opening: `Partner with us: hire graduates, sponsor training, or host apprentices. Multiple partnership options available.`,
-    nextAction: `Click 'Partner With Us' or 'Post a Job'.`,
+    nextAction: `Click 'Partner With Us' or 'Post a Job'.',
   },
 
   '/partner': {

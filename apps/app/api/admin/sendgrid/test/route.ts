@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   const result = await sendEmail({
     to,
     from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
-    replyTo: 'elevate4humanityedu@gmail.com`,
+    replyTo: 'elevate4humanityedu@gmail.com',
     subject,
     html: `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a;">

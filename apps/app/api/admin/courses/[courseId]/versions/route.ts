@@ -56,7 +56,7 @@ export async function POST(
 
   if (course && course.review_status !== 'approved') {
     return safeError(
-      `Course must be approved before publishing. Current status: '${course.review_status}'.`,
+      `Course must be approved before publishing. Current status: '${course.review_status}'.',
       409,
     );
   }

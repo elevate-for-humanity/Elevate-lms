@@ -245,7 +245,7 @@ export async function runCosmetologyPostPayment(
     const adminUrl = `${siteUrl}/admin/applications`;
 
     await sendEmail({
-      to: 'elevate4humanityedu@gmail.com`,
+      to: 'elevate4humanityedu@gmail.com',
       from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
       replyTo: 'elevate4humanityedu@gmail.com',
       subject: `New Enrollment: ${studentName} — Cosmetology Apprenticeship`,

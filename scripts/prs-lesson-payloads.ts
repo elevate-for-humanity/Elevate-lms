@@ -431,7 +431,7 @@ Warning signs of burnout: emotional exhaustion, cynicism toward clients, reduced
 
 Prevention strategies: regular supervision, peer consultation, clear work-life boundaries, physical activity, spiritual practice, social connection outside of work, and honest self-assessment.
 
-Your recovery is not a credential you earned once. It requires ongoing maintenance. If your own wellness is deteriorating, you cannot effectively support someone else's.`,
+Your recovery is not a credential you earned once. It requires ongoing maintenance. If your own wellness is deteriorating, you cannot effectively support someone else's.',
   },
   {
     lesson_slug: 'peer-mod-3-peer-3-4',

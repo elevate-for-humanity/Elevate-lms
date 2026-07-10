@@ -385,7 +385,7 @@ function toMarkdown(findings) {
     rows.slice(0, 20).forEach((r, i) => {
       lines.push(`#### ${i + 1}. \`${r.file}\` — \`${r.function}\` — line ${r.line}`);
       lines.push('');
-      lines.push('```text');
+      lines.push('``'text');
       lines.push(r.snippet);
       lines.push('```');
       lines.push('');

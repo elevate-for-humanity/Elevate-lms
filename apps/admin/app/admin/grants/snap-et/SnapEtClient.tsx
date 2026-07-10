@@ -18,7 +18,7 @@ const DEFAULTS: FormState = {
   rep_name: 'Elizabeth Greene',
   rep_title: 'Founder & Chief Executive Officer',
   rep_phone: PLATFORM_DEFAULTS.supportPhone,
-  rep_email: 'elevate4humanityedu@gmail.com`,
+  rep_email: 'elevate4humanityedu@gmail.com',
   program_name: `${PLATFORM_DEFAULTS.orgName} SNAP E&T Multi-Track Credential Program`,
   program_type: `Vocational training',
   delivery_mode: 'Hybrid',

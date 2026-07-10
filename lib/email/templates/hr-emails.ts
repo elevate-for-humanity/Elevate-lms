@@ -24,7 +24,7 @@ const BRAND = {
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
 const FROM = 'Elevate for Humanity HR <hr@elevateforhumanity.org>';
-const REPLY_TO = 'hr@elevateforhumanity.org`;
+const REPLY_TO = 'hr@elevateforhumanity.org';
 
 function layout(body: string) {
   return `<!DOCTYPE html>

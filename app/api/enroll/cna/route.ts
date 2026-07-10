@@ -87,7 +87,7 @@ async function _POST(request: NextRequest) {
         })
         .select()
         .maybeSingle() as unknown as Promise<{ data: { id: string; email: string } | null; error: unknown }>,
-      'Failed to create enrollment record. Please try again or call ' + PLATFORM_DEFAULTS.supportPhone + '.`,
+      'Failed to create enrollment record. Please try again or call ' + PLATFORM_DEFAULTS.supportPhone + '.',
     );
 
     // Send confirmation email — fire-and-forget, never block the response

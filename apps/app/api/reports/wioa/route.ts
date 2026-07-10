@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (new Date(from) > new Date(to)) {
-    return safeError('Invalid date range. `from` must be before `to'.', 400);
+    return safeError('Invalid date range. `from` must be before 'to'.', 400);
   }
 
   const requestedFormat = searchParams.get('format') ?? 'json';

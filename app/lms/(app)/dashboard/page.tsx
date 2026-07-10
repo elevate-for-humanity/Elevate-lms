@@ -36,6 +36,7 @@ import { NotificationBell } from '@/components/lms/NotificationBell';
 import { GlobalSearch } from '@/components/lms/GlobalSearch';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 export const dynamic = 'force-dynamic';
 
@@ -1037,6 +1038,9 @@ export default async function StudentDashboard() {
           </div>
         </div>
       </div>
+
+      {/* PARIS AI Assistant */}
+      <ParisFloatingWrapper />
     </div>
   );
 }

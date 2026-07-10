@@ -15,6 +15,7 @@ import { HomeSegmentedCTA } from '@/components/home/HomeSegmentedCTA';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
 
 // Revalidate every 5 minutes — allows live enrollment stats to refresh
 // without a full rebuild.
@@ -158,6 +159,10 @@ export default async function HomePage() {
       {/* "From where you are to where you want to be."
           Apply Now + Check Eligibility + phone number. */}
       <HomeFinalCTA />
+
+      {/* ── PARIS AI Assistant ─────────────────────────────────────────── */}
+      {/* Floating chat button + chat window */}
+      <ParisFloatingButton />
     </>
   );
 }

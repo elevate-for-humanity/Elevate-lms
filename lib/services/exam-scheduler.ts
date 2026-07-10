@@ -89,12 +89,12 @@ function buildInstruction(
     case 'external_url':
       return (
         'Schedule your ${credentialName} exam directly through ${providerName}. ` +
-        `Click the link below to access the scheduling portal.'
+        'Click the link below to access the scheduling portal.'
       );
     case 'state_portal':
       return (
         'Schedule your ${credentialName} exam through the ${providerName} portal. ` +
-        `You will need your program completion documentation.'
+        'You will need your program completion documentation.'
       );
     case 'manual':
       return (

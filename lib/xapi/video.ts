@@ -36,7 +36,7 @@ export async function sendVideoStatement(input: VideoStatementInput) {
         objectType: 'Activity' as const,
         definition: {
           name: { 'en-US': input.title },
-          description: { 'en-US': 'Video in course ${input.courseId}` },
+          description: { 'en-US': `Video in course ${input.courseId}` },
           type: 'https://w3id.org/xapi/video/activity-type/video',
         },
       },

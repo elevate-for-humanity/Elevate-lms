@@ -71,10 +71,10 @@ export async function generateWelcomePacket(data: WelcomePacketData): Promise<{
     },
     {
       id: 'program-workbook',
-      title: '${data.programName} Workbook',
+      title: `${data.programName} Workbook`,
       description: 'Program-specific learning materials',
       type: 'document',
-      url: '/workbooks/${data.programId}`,
+      url: `/workbooks/${data.programId}`,
       required: true,
     },
     {
@@ -82,7 +82,7 @@ export async function generateWelcomePacket(data: WelcomePacketData): Promise<{
       title: 'Enrollment Agreement',
       description: 'Review and acknowledge your enrollment terms',
       type: 'form',
-      url: '/lms/enrollment-agreement/${data.enrollmentId}`,
+      url: `/lms/enrollment-agreement/${data.enrollmentId}`,
       required: true,
     },
     {

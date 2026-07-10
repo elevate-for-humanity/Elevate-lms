@@ -21,7 +21,7 @@ export function watermarkContent(content: string, data: WatermarkData): string {
     }),
   ).toString('base64');
   // Add invisible HTML comment
-  const invisibleWatermark = '<!-- wm:${watermark} -->`;
+  const invisibleWatermark = `<!-- wm:${watermark} -->`;
   return content + invisibleWatermark;
 }
 /**

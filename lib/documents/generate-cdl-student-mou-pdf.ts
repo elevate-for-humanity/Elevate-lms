@@ -200,7 +200,7 @@ export async function generateCDLStudentMOUPdf(data: CDLStudentMOUData): Promise
   body(
     `This MOU outlines the goals, objectives, structure, costs, and expectations of the C1 CDL Training Program. ` +
     `The intent is to clearly define the responsibilities of both the training provider, the student, and the ` +
-    'student's employer, agency, or sponsor in pursuit of either a Class A or Class B Commercial Driver's License (CDL).`
+    'student's employer, agency, or sponsor in pursuit of either a Class A or Class B Commercial Driver's License (CDL).'
   );
   ruleGap();
 

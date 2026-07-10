@@ -61,7 +61,7 @@ export class XAPIClient {
       const response = await fetch(`${this.endpoint}/statements`, {
         method: 'POST',
         headers: {
-          Authorization: `Basic ${this.auth}',
+          Authorization: `Basic ${this.auth}`,
           'Content-Type': 'application/json',
           'X-Experience-API-Version': '1.0.3',
         },

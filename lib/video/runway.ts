@@ -25,7 +25,7 @@ function headers() {
   const key = process.env.RUNWAY_API_KEY;
   if (!key) throw new Error('RUNWAY_API_KEY is not set');
   return {
-    Authorization: `Bearer ${key}',
+    Authorization: `Bearer ${key}`,
     'X-Runway-Version': API_VERSION,
     'Content-Type': 'application/json',
   };

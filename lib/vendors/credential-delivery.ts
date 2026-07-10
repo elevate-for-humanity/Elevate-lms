@@ -294,7 +294,7 @@ async function sendCredentialEmail(
         `,
       }),
     });
-    logger.info(`[credential-delivery] Email sent', { studentEmail: request.studentEmail });
+    logger.info(`[credential-delivery] Email sent`, { studentEmail: request.studentEmail });
   } catch (emailErr) {
     // Non-fatal: enrollment succeeds even if email fails
     logger.error(

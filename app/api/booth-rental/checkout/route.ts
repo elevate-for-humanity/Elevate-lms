@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       : null;
 
     if (!weeklyPriceId) {
-      logger.error('[booth-rental/checkout] Missing Stripe price ID`, {
+      logger.error('[booth-rental/checkout] Missing Stripe price ID', {
         discipline,
         key: tier.stripePriceKey,
       });

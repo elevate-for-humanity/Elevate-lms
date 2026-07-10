@@ -97,7 +97,7 @@ export async function generateMetadata({
       description,
       alternates: { canonical: `${SITE_URL}/programs/${program}` },
       openGraph: { ...ogBase, title, description, images: [{ url: ogImage, width: 1200, height: 630, alt: cfp.title }] },
-      twitter: { card: `summary_large_image', title, description, images: [ogImage] },
+      twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
     };
   }
 
@@ -502,7 +502,7 @@ function ProgramPage({
             </Link>
           </div>
           <p className="mt-8 text-red-100 text-xs">
-            Questions? Call or text{' `}
+            Questions? Call or text{' '}
             <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-white font-bold underline">
               {PLATFORM_DEFAULTS.supportPhone}
             </a>
@@ -518,7 +518,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
   // Use Premium Beauty Apprenticeship Page for beauty programs
   if (BEAUTY_APPRENTICESHIP_SLUGS.has(program)) {
-    const programType = program.replace('-apprenticeship', '') as 'barber' | 'cosmetology' | 'esthetics' | 'manicurist';
+    const programType = program.replace('-apprenticeship', '') as 'barber' | 'cosmetology' | 'esthetics' | 'nail-technician';
     return <BeautyApprenticeshipPage program={programType} />;
   }
 

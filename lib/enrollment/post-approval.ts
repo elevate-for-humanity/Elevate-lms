@@ -193,7 +193,7 @@ export async function runPostApprovalActions(input: PostApprovalInput): Promise<
 </div>`,
     });
 
-    logger.info(`[post-approval] Enrollment email sent', { to: studentEmail, program: programTitle });
+    logger.info(`[post-approval] Enrollment email sent`, { to: studentEmail, program: programTitle });
   } catch (err) {
     logger.error('[post-approval] Enrollment email failed (non-fatal)', err);
   }

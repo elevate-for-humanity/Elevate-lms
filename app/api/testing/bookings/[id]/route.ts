@@ -146,7 +146,7 @@ async function _PATCH(req: NextRequest, { params }: { params: Promise<{ id: stri
       from: FROM,
       subject: `Exam Confirmed — ${fmtDate(confirmedDate ?? booking.preferred_date)} at ${confirmedTime ?? booking.preferred_time} | Elevate Testing Center`,
       html,
-    }).catch((e) => logger.error(`[Testing] Confirm email failed:', e));
+    }).catch((e) => logger.error(`[Testing] Confirm email failed:` e));
   }
 
   return NextResponse.json({ success: true, booking });

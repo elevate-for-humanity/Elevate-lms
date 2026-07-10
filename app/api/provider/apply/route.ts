@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
         )
         .then(
           () => {},
-          (err) => logger.warn('[provider/apply] doc metadata save failed`, err)
+          (err) => logger.warn('[provider/apply] doc metadata save failed', err)
         );
     }
 

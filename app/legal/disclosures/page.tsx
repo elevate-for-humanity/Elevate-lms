@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 
 const ADVICE_LIST = [
-  { label: `Legal advice', note: 'Consult a licensed attorney' },
+  { label: 'Legal advice', note: 'Consult a licensed attorney' },
   { label: 'Financial advice', note: 'Consult a licensed financial advisor' },
   { label: 'Tax advice', note: 'Consult a licensed tax professional' },
   { label: 'Compliance advice', note: 'Consult qualified compliance professionals' },

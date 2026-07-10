@@ -125,7 +125,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  logger.info('[testing-lead-followup] Done`, { sent1, sent2, errors });
+  logger.info('[testing-lead-followup] Done', { sent1, sent2, errors });
   return NextResponse.json({ success: true, sent1, sent2, errors });
 }
 

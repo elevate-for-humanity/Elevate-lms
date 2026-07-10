@@ -324,7 +324,7 @@ async function sendAdminEnrollmentNotification(
 
     logger.info(`Admin notification sent for new enrollment: ${studentName}`);
   } catch (error) {
-    logger.error(`Failed to send admin notification:', error);
+    logger.error('Failed to send admin notification', error);
   }
 }
 
@@ -708,7 +708,7 @@ async function sendPaymentConfirmationEmail(
       <p>- ${PLATFORM_DEFAULTS.orgName}</p>
     `,
     })
-    .catch((err) => logger.error(`Failed to send payment confirmation:', err));
+    .catch((err) => logger.error('Failed to send payment confirmation', err));
 }
 
 /**
@@ -747,7 +747,7 @@ async function sendPaymentCompletionEmail(studentId: string, programId: string):
       <p>- ${PLATFORM_DEFAULTS.orgName}</p>
     `,
     })
-    .catch((err) => logger.error(`Failed to send completion email:', err));
+    .catch((err) => logger.error('Failed to send completion email', err));
 }
 
 /**

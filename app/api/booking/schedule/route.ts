@@ -121,7 +121,7 @@ async function _POST(req: Request) {
           to: process.env.ADMIN_SMS_GATEWAY,
           subject: `Meeting`,
           html: `${data.name}\n${data.meetingType}\n${dateStr} ${data.time}`,
-        }).catch((err) => logger.warn(`[booking] SMS alert failed:', err));
+        }).catch((err) => logger.warn(`[booking] SMS alert failed:`, err));
       }
     } catch (emailErr) {
       logger.error('Failed to send meeting notification email:', emailErr);

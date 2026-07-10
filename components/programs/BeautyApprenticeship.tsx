@@ -22,7 +22,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // Program types
-type BeautyProgram = 'barber' | 'cosmetology' | 'esthetics' | 'manicurist';
+type BeautyProgram = 'barber' | 'cosmetology' | 'esthetics' | 'nail-technician';
 
 interface BeautyApprenticeshipPageProps {
   program: BeautyProgram;
@@ -162,7 +162,7 @@ const PROGRAM_DATA = {
     hours: '700 hours + apprenticeship',
     duration: '12-18 months',
   },
-  manicurist: {
+  'nail-technician': {
     title: 'Nail Technician Apprenticeship',
     tagline: 'Turn Creativity Into a Career',
     subtitle: 'Master nail artistry, gel, acrylics, and spa pedicures through professional salon apprenticeships.',

@@ -131,7 +131,7 @@ async function sendProgramHolderFullWelcomeEmail(opts: {
 }) {
   const sgKey = process.env.SENDGRID_API_KEY;
   if (!sgKey) {
-    logger.warn('[onboarding-complete] SENDGRID_API_KEY not set — skipping welcome email`);
+    logger.warn('[onboarding-complete] SENDGRID_API_KEY not set — skipping welcome email');
     return;
   }
 

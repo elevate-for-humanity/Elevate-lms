@@ -372,7 +372,7 @@ export default async function LearnerOnboardingPage({
           name: firstName,
           programName: resolvedProgramName,
           dashboardUrl: `${siteUrlInner}/learner/dashboard`,
-        }).catch((err: Error) => logger.warn('[onboarding] Welcome email failed (non-fatal)`, err));
+        }).catch((err: Error) => logger.warn('[onboarding] Welcome email failed (non-fatal)', err));
       }
 
       // Notify admin of new completed onboarding

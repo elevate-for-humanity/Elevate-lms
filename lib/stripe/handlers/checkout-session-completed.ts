@@ -349,7 +349,7 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
   }
 
   // ── UNRECOGNISED KIND — log and no-op ─────────────────────────────────────
-  logger.info('[webhook/checkout] Unrecognised session kind — no-op`, {
+  logger.info('[webhook/checkout] Unrecognised session kind — no-op', {
     sessionId: session.id,
     kind,
     mode: session.mode,

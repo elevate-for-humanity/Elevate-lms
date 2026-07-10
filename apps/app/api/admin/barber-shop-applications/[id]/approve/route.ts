@@ -205,7 +205,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
   } catch (emailErr) {
     // Non-fatal — approval is recorded, email can be sent manually
-    logger.warn(`Approval notification email failed (non-fatal)', { id, error: String(emailErr) });
+    logger.warn(`Approval notification email failed (non-fatal)`, { id, error: String(emailErr) });
   }
 
   logger.info('Barbershop application approved', { id, approvedBy: user.id });

@@ -30,7 +30,7 @@ export async function sendMOUSignedConfirmation(data: MOUSignedNotificationData)
     });
     return true;
   } catch (error) {
-    logger.error(`MOU confirmation email failed', error as Error, { to: data.contactEmail });
+    logger.error(`MOU confirmation email failed`, error as Error, { to: data.contactEmail });
     return false;
   }
 }

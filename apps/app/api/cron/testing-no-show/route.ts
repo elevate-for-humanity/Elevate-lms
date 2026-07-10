@@ -124,7 +124,7 @@ export async function GET(req: NextRequest) {
   <p><a href="${SITE_URL}/testing/book" style="background:#dc2626;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block">Pay Fee &amp; Rebook →</a></p>
   <p style="color:#64748b;font-size:13px">If you believe this is an error, call <strong>${PLATFORM_DEFAULTS.supportPhone}</strong> within 48 hours.</p>
 </body></html>`,
-    }).catch((err) => logger.warn(`[cron/no-show] Email failed', { email: booking.email, err }));
+    }).catch((err) => logger.warn(`[cron/no-show] Email failed`, { email: booking.email, err }));
 
     processed++;
   }

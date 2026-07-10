@@ -120,7 +120,7 @@ async function _POST(req: NextRequest) {
       }),
     });
   } catch (emailErr) {
-    logger.error(`License upload admin notification failed', emailErr);
+    logger.error(`License upload admin notification failed` emailErr);
   }
 
   return NextResponse.json({ success: true, path });

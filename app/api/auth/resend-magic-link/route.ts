@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     const actionLink = data?.properties?.action_link;
     if (!actionLink) {
-      logger.warn('[resend-magic-link] No action_link in response`, { email });
+      logger.warn('[resend-magic-link] No action_link in response', { email });
       return NextResponse.json({ ok: true });
     }
 
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
         </div>`,
     });
 
-    logger.info(`[resend-magic-link] Sent', { email });
+    logger.info(`[resend-magic-link] Sent`, { email });
     return NextResponse.json({ ok: true });
   } catch (err) {
     logger.error('[resend-magic-link] Unexpected error', err);

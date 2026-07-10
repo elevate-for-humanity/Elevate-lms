@@ -287,7 +287,7 @@ async function sendGuardrailNotifications(
         html: `<pre style="font-family:sans-serif;white-space:pre-wrap">${body}</pre>`,
         text: body,
       }).catch((err) =>
-        logger.error('[guardrail-engine] failed to notify program holder`, err as Error, {
+        logger.error('[guardrail-engine] failed to notify program holder', err as Error, {
           policyId: policy.id,
           holderEmail,
         }),
@@ -304,7 +304,7 @@ async function sendGuardrailNotifications(
         html: `<pre style="font-family:sans-serif;white-space:pre-wrap">${body}</pre>`,
         text: body,
       }).catch((err) =>
-        logger.error(`[guardrail-engine] failed to notify admin', err as Error, { policyId: policy.id }),
+        logger.error(`[guardrail-engine] failed to notify admin`, err as Error, { policyId: policy.id }),
       ),
     );
   }

@@ -223,7 +223,7 @@ export async function POST(req: NextRequest) {
       }
     } catch (emailErr) {
       // Email failure must not roll back the status change
-      logger.error(`[transition] email send failed', emailErr as Error, {
+      logger.error('[transition] email send failed', emailErr as Error, {
         application_id,
         next_status,
       });

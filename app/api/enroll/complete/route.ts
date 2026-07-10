@@ -142,7 +142,7 @@ async function _POST(req: Request) {
           });
         }
       } catch (err) {
-        logger.warn(`Password setup email failed', err);
+        logger.warn('Password setup email failed', err);
       }
     }
 

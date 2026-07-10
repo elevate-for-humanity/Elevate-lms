@@ -108,7 +108,7 @@ async function _POST(request: Request) {
           .eq('id', application_id)
           .eq('status', 'submitted'); // only advance if still at submitted — don't regress
         if (transitionErr) {
-          logger.warn('[Schedule] Failed to advance application status`, transitionErr.message);
+          logger.warn('[Schedule] Failed to advance application status', transitionErr.message);
         }
       }
     }

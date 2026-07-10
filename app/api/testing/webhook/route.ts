@@ -305,7 +305,7 @@ export const POST = withRuntime({ secrets: [...ENV.STRIPE_TESTING_WEBHOOK] }, as
   <p><a href="${SITE_URL}/testing/book" style="background:#1E3A5F;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block">Book Your Exam →</a></p>
   <p style="color:#64748b;font-size:13px">Questions? Call ${TESTING_CENTER.phone} or reply to this email.</p>
 </body></html>`,
-      }).catch((err) => logger.warn(`[testing/webhook] Email send failed', { err }));
+      }).catch((err) => logger.warn(`[testing/webhook] Email send failed`, { err }));
     }
 
     return NextResponse.json({ received: true });

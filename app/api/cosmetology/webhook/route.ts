@@ -295,7 +295,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
           break;
         }
 
-        logger.warn(`[cosmetology/webhook] Unknown checkout_type — skipping', { checkoutType });
+        logger.warn(`[cosmetology/webhook] Unknown checkout_type — skipping`, { checkoutType });
         break;
       }
 
@@ -426,7 +426,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
           } catch { /* non-fatal */ }
         }
 
-        logger.warn(`[cosmetology/webhook] Payment failed', { failedCustomerId, isFirstFailure });
+        logger.warn(`[cosmetology/webhook] Payment failed`, { failedCustomerId, isFirstFailure });
         break;
       }
 

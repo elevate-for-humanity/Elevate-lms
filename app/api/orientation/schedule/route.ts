@@ -128,7 +128,7 @@ ${meeting.id ? `<span style="color:#6b7280;font-size:12px">Meeting ID: ${meeting
 <p style="color:#6b7280;font-size:12px">${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute &middot; Indianapolis, IN</p>
 </div>`,
     }).catch((err) => {
-      logger.error(`[Orientation] Student email failed:', err instanceof Error ? err.message : err);
+      logger.error(`[Orientation] Student email failed:` err instanceof Error ? err.message : err);
     });
 
     // Notify admin

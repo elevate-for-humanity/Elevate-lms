@@ -105,7 +105,7 @@ async function _POST(request: NextRequest) {
 
         sentCount++;
       } catch (error) {
-        logger.error(`Unhandled error', error instanceof Error ? error : undefined);
+        logger.error(`Unhandled error` error instanceof Error ? error : undefined);
       }
     }
 

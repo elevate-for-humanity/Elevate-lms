@@ -23,7 +23,7 @@ async function sendWelcomeEmail(
 ) {
   const sendgridKey = process.env.SENDGRID_API_KEY;
   if (!sendgridKey) {
-    logger.warn('SENDGRID_API_KEY not configured, skipping welcome email`);
+    logger.warn('SENDGRID_API_KEY not configured, skipping welcome email');
     return;
   }
 

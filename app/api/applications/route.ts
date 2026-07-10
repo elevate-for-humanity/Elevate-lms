@@ -471,7 +471,7 @@ async function _POST(req: Request) {
     }
 
     if (error || !data) {
-      logger.error('[api/applications] All insert tiers failed`, {
+      logger.error('[api/applications] All insert tiers failed', {
         code: (error as any)?.code,
         message: (error as any)?.message,
         details: (error as any)?.details,
@@ -708,7 +708,7 @@ async function _POST(req: Request) {
       });
 
       if (staffEmailResult.success) {
-        logger.info(`[Applications] Staff email sent');
+        logger.info('[Applications] Staff email sent');
       } else {
         logger.error('[Applications] Staff email FAILED', undefined, { error: (staffEmailResult as any).error });
       }

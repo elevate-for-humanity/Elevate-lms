@@ -411,7 +411,7 @@ ${!fullyPaid ? `<p><strong>Payment plan:</strong> Weekly invoices will arrive ev
               `,
             });
           } catch (emailErr) {
-            logger.error(`Failed to send welcome email:', emailErr);
+            logger.error(`Failed to send welcome email`, emailErr);
           }
 
           // Admin notification — action required to grant LMS access
@@ -661,7 +661,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
               `,
             });
           } catch (lmsEmailErr) {
-            logger.error(`[barber/webhook] LMS access email failed (non-fatal):', lmsEmailErr);
+            logger.error(`[barber/webhook] LMS access email failed (non-fatal):`, lmsEmailErr);
           }
           } // end if (!applicationId) — legacy path
 
@@ -1005,7 +1005,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 </div>`,
             });
           } catch (emailErr) {
-            logger.error(`[Barber Webhook] Failed to send payment-failed email', emailErr instanceof Error ? emailErr : new Error(String(emailErr)), { studentEmail });
+            logger.error(`[Barber Webhook] Failed to send payment-failed email`, emailErr instanceof Error ? emailErr : new Error(String(emailErr)), { studentEmail });
           }
         }
 
@@ -1147,7 +1147,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
                 });
               }
             } catch (cancelErr) {
-              logger.error(`Failed to auto-cancel subscription:', cancelErr);
+              logger.error(`Failed to auto-cancel subscription:` cancelErr);
             }
           }
         }

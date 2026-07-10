@@ -76,7 +76,7 @@ function CheckoutContent() {
       }
 
       // Self-pay or unresolved → Stripe checkout
-      const res = await fetch(`/api/credentials/exam-checkout', {
+      const res = await fetch('/api/credentials/exam-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ attemptId }),

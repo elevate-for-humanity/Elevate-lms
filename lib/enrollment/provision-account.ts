@@ -80,7 +80,7 @@ export async function provisionAccount(
         }),
       });
     } catch (err) {
-      logger.warn(`[provision-account] Enrollment confirmation email failed (non-fatal)', err);
+      logger.warn(`[provision-account] Enrollment confirmation email failed (non-fatal)`, err);
     }
     return { userId: existing.id, isNewUser: false, passwordSetupLink: null };
   }

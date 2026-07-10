@@ -123,7 +123,7 @@ View full details: ${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteU
 This is an automated alert from ${PLATFORM_DEFAULTS.orgName} Security System.
   `;
 
-  logger.info(`[EMAIL ALERT]', { emailContent });
+  logger.info('[EMAIL ALERT]', { emailContent });
 
   // Email sending via SendGrid when configured
   // Set SENDGRID_API_KEY and ALERT_EMAIL in environment variables

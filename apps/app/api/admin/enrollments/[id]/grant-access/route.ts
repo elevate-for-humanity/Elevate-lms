@@ -134,7 +134,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             </p>
           </div>
         </div>`,
-    }).catch((e) => logger.warn(`[grant-access] Email failed', e));
+    }).catch((e) => logger.warn(`[grant-access] Email failed`, e));
   }
 
   logger.info('[grant-access] Access granted', {

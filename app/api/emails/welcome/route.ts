@@ -73,7 +73,7 @@ async function _POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error(`Error sending welcome email:', error);
+    logger.error(`Error sending welcome email:` error);
     return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
   }
 }

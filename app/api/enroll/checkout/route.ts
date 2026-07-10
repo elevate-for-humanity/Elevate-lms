@@ -152,7 +152,7 @@ async function _POST(req: Request) {
     const siteUrl = ((process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl);
 
     if (!stripe) {
-      logger.error('Stripe not configured — STRIPE_SECRET_KEY missing`);
+      logger.error('Stripe not configured — STRIPE_SECRET_KEY missing');
       return NextResponse.json(
         {
           error:

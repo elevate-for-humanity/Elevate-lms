@@ -58,7 +58,7 @@ export async function sendRecoveryEmail(
 
     const actionLink = data?.properties?.action_link;
     if (!actionLink) {
-      logger.error('[Recovery] No action link returned`);
+      logger.error('[Recovery] No action link returned');
       return { success: true };
     }
 

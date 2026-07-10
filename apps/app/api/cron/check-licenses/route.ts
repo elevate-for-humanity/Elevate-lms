@@ -159,7 +159,7 @@ async function sendExpirationEmail(email: string, companyName: string): Promise<
       `,
     });
   } catch (error) {
-    logger.error(`Failed to send expiration email:', error);
+    logger.error(`Failed to send expiration email`, error);
   }
 }
 
@@ -182,7 +182,7 @@ async function sendExpiryWarningEmail(
       `,
     });
   } catch (error) {
-    logger.error(`Failed to send expiry warning email:', error);
+    logger.error('Failed to send expiry warning email', error);
   }
 }
 export const GET = withRuntime(withApiAudit('/api/cron/check-licenses', _GET));

@@ -775,7 +775,7 @@ async function insertApplication(payload: {
          <p>Please follow up manually.</p>`,
       ),
     ),
-  ).catch((err) => logger.warn('[Apply] Failed to send DB failure alert email`, err));
+  ).catch((err) => logger.warn('[Apply] Failed to send DB failure alert email', err));
 
   return {
     success: false,

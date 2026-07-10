@@ -366,7 +366,7 @@ Elevate for Humanity Career & Technical Institute
   });
 
   if (providerResult.success) {
-    logger.info(`[DMCA] Takedown notice sent to:', { abuseEmail });
+    logger.info('[DMCA] Takedown notice sent to', { abuseEmail });
   } else {
     logger.error('[DMCA] Failed to send takedown to:', new Error(String(providerResult.error)), { abuseEmail });
   }

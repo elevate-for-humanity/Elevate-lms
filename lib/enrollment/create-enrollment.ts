@@ -337,7 +337,7 @@ async function sendEnrollmentWelcomeEmail(params: {
       }),
     });
 
-    logger.info(`[Enrollment] Welcome email sent', { email, programId });
+    logger.info(`[Enrollment] Welcome email sent`, { email, programId });
   } catch (error) {
     logger.error('[Enrollment] Failed to send welcome email', error);
   }

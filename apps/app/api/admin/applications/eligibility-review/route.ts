@@ -145,7 +145,7 @@ export async function PATCH(req: NextRequest) {
       });
     }
   } catch (emailErr) {
-    logger.error(`Eligibility decision email failed', emailErr);
+    logger.error('Eligibility decision email failed', emailErr);
   }
 
   return NextResponse.json({ success: true, reviewer_decision });

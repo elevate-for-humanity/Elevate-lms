@@ -245,7 +245,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: `api' }
           subject: `Your Testing Appointment is Confirmed - ${PLATFORM_DEFAULTS.orgName}`,
           html: confirmationEmailHtml(inviteeName, startTime, examAnswer),
         })
-        .catch((err) => logger.error(`Confirmation email failed', err));
+        .catch((err) => logger.error(`Confirmation email failed` err));
     }
 
     // 4. Confirmation SMS to invitee
@@ -324,7 +324,7 @@ export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: `api' }
           subject: `Testing Appointment Canceled - ${PLATFORM_DEFAULTS.orgName}`,
           html: cancellationEmailHtml(inviteeName, startTime),
         })
-        .catch((err) => logger.error(`Cancellation email failed', err));
+        .catch((err) => logger.error(`Cancellation email failed` err));
     }
 
     // Cancellation SMS

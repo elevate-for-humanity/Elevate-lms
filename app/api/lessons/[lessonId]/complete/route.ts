@@ -183,7 +183,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
     // HVAC curriculum_lessons rows where lesson_type may not be set.
     // Blocking with 422 here prevents all lesson completion for affected lessons.
     if (!lessonDetail.content_type) {
-      logger.warn(`Missing content_type for lessonId=${lessonId} — defaulting to 'reading'');
+      logger.warn(`Missing content_type for lessonId=${lessonId} — defaulting to 'reading'`);
     }
 
     const contentType = lessonDetail.content_type || 'reading';

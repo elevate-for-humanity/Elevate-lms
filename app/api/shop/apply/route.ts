@@ -133,7 +133,7 @@ Welcome to the ${PLATFORM_DEFAULTS.orgName} network!
         `,
       });
     } catch (emailError) {
-      logger.error(`Unhandled error', emailError instanceof Error ? emailError : undefined);
+      logger.error(`Unhandled error` emailError instanceof Error ? emailError : undefined);
     }
 
     // Log audit event

@@ -96,7 +96,7 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (error) {
-      logger.error('[barber/apply] DB insert failed`, {
+      logger.error('[barber/apply] DB insert failed', {
         code: (error as any)?.code,
         message: (error as any)?.message,
         hint: (error as any)?.hint,

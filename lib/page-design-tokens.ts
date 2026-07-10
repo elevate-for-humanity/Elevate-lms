@@ -69,6 +69,8 @@ export const card = {
   base: 'bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all',
   /** Card image container — 16:9 */
   image16x9: 'relative aspect-[16/9] overflow-hidden',
+  /** Card image container — 16:9 desktop optimized */
+  image16x9Desktop: 'relative aspect-[16/9] overflow-hidden sm:aspect-video',
   /** Card image container — 4:3 */
   image4x3: 'relative aspect-[4/3] overflow-hidden',
   /** Card body padding */
@@ -77,6 +79,10 @@ export const card = {
   info: 'bg-white rounded-xl border border-slate-200 p-5',
   /** Dark stat card */
   stat: 'bg-slate-800 rounded-xl p-5 text-center',
+  /** Pathway step image container — standardized 800×600 (4:3) */
+  programImage: 'relative aspect-[4/3] overflow-hidden bg-slate-800',
+  /** Pathway step image fill */
+  programImageFill: 'object-cover object-center w-full h-full',
 } as const;
 
 // ─── Buttons / CTAs ──────────────────────────────────────────────────────────

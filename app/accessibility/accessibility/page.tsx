@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/accessibility',
   },
-  title: 'Accessibility Statement`,
+  title: 'Accessibility Statement',
   description: `Accessibility commitment and support for ${PLATFORM_DEFAULTS.orgName} services.`,
 };
 
@@ -21,7 +21,7 @@ export default function AccessibilityPage() {
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: `Accessibility' }]} />
+          <Breadcrumbs items={[{ label: 'Accessibility' }]} />
         </div>
       </div>
 

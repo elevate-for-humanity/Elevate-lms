@@ -141,8 +141,8 @@ export async function POST(req: NextRequest) {
         <img src="${SITE_URL}/images/elevate-logo-white.png" alt="${PLATFORM_DEFAULTS.orgName}" height="36" />
       </div>
       <div style="padding:32px">
-        <h1 style="font-size:22px;font-weight:700;margin:0 0 8px">You`re enrolled, ${firstName}!</h1>
-        <p style="color:#444;margin:0 0 24px">Your payment for <strong>${course.title}</strong> was received. Here`s how to access your course.</p>
+        <h1 style="font-size:22px;font-weight:700;margin:0 0 8px">You're enrolled, ${firstName}!</h1>
+        <p style="color:#444;margin:0 0 24px">Your payment for <strong>${course.title}</strong> was received. Here's how to access your course.</p>
 
         <div style="background:#f8f8f8;border-radius:12px;padding:24px;margin-bottom:24px">
           <p style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#666;margin:0 0 12px">Your Course Access</p>

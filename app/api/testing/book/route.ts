@@ -189,7 +189,7 @@ export const POST = withRuntime({ rateLimit: 'contact' }, async (req) => {
   <div style="padding:32px;color:#1E293B;font-size:15px;line-height:1.7">
     <h2 style="color:#1E3A5F;margin-top:0">Exam Booking Received</h2>
     <p>Hi ${firstName},</p>
-    <p>We`ve received your exam booking request. Our testing coordinator will confirm your seat within <strong>1 business day</strong> and send you a final confirmation with your exact date, time, and check-in instructions.</p>
+    <p>We've received your exam booking request. Our testing coordinator will confirm your seat within <strong>1 business day</strong> and send you a final confirmation with your exact date, time, and check-in instructions.</p>
     <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:20px;margin:20px 0">
       <table style="width:100%;border-collapse:collapse;font-size:14px">
         <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 0;color:#64748b;width:140px">Confirmation Code</td><td style="padding:8px 0;font-weight:800;font-size:18px;letter-spacing:2px;color:#1E3A5F">${confirmationCode}</td></tr>
@@ -251,7 +251,7 @@ export const POST = withRuntime({ rateLimit: 'contact' }, async (req) => {
   <div style="padding:32px;color:#1E293B;font-size:15px;line-height:1.7">
     <h2 style="color:#1E3A5F;margin-top:0">Your Prep Materials Are Ready</h2>
     <p>Hi ${firstName},</p>
-    <p>You added the <strong>Certification Success Package</strong> to your exam booking. Here`s what's included and how to access it:</p>
+    <p>You added the <strong>Certification Success Package</strong> to your exam booking. Here's what's included and how to access it:</p>
     <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:20px;margin:20px 0">
       <table style="width:100%;border-collapse:collapse;font-size:14px">
         <tr style="border-bottom:1px solid #fef3c7"><td style="padding:8px 0;color:#92400e;width:200px">Full-length practice test</td><td style="padding:8px 0"><a href="${BASE_URL}/lms" style="color:#1E3A5F;font-weight:600">Access in your LMS account →</a></td></tr>

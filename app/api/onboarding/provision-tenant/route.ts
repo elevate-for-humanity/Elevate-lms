@@ -306,7 +306,7 @@ function generateWelcomeEmail(data: any): string {
         <li><strong>Start enrolling students</strong></li>
       </ol>
 
-      <p>You`ll receive a detailed setup guide in 5 minutes with step-by-step instructions.</p>
+      <p>You'll receive a detailed setup guide in 5 minutes with step-by-step instructions.</p>
 
       <h3>📞 Need Help?</h3>
       <p>
@@ -357,7 +357,7 @@ function generateSetupGuideEmail(data: any): string {
     <div class="content">
       <p>Hi ${data.contactName},</p>
 
-      <p>Here`s your step-by-step guide to launching ${data.organizationName}`s training platform:</p>
+      <p>Here's your step-by-step guide to launching ${data.organizationName}`s training platform:</p>
 
       <div class="step">
         <h3>Step 1: Customize Your Branding (5 min)</h3>
@@ -412,7 +412,7 @@ function generateSetupGuideEmail(data: any): string {
       </ul>
 
       <h3>📞 Need Help?</h3>
-      <p>We`re here for you:</p>
+      <p>We're here for you:</p>
       <ul>
         <li><strong>Live Chat:</strong> Click the chat icon in your dashboard</li>
         <li><strong>Email:</strong> ${PLATFORM_DEFAULTS.supportEmail}</li>

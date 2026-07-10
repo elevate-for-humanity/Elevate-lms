@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: 'Institutional Governance & Compliance`,
   description:
     `Governance framework, legal structure, and compliance posture of 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute.`,
-  alternates: { canonical: `https://www.elevateforhumanity.org/institutional-governance' },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/institutional-governance' },
 };
 
 export default function InstitutionalGovernancePage() {

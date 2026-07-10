@@ -13,7 +13,7 @@ export default function StudentHandbookPage() {
   return (
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Legal', href: '/legal' }, { label: 'Student Handbook` }]} />
+        <Breadcrumbs items={[{ label: 'Legal', href: '/legal' }, { label: 'Student Handbook' }]} />
       </div>
       <DocumentPage
         documentType="Student Handbook Acknowledgment"
@@ -114,7 +114,7 @@ export default function StudentHandbookPage() {
               explicit consent.
             </li>
             <li>
-              <strong>Dress appropriately</strong> per your program`s dress code. Your coordinator
+              <strong>Dress appropriately</strong> per your program's dress code. Your coordinator
               will provide specifics at orientation.
             </li>
             <li>

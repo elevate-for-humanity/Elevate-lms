@@ -9,7 +9,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: 'Policies',
   description: `Academic, enrollment, refund, conduct, and privacy policies for ${PLATFORM_DEFAULTS.orgName} programs.`,
-  alternates: { canonical: `https://www.elevateforhumanity.org/policies' },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/policies' },
 };
 
 const POLICIES = [

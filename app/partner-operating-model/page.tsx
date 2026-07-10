@@ -7,9 +7,9 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Partner Operating Model`,
+  title: 'Partner Operating Model',
   description: `How ${PLATFORM_DEFAULTS.orgName} partners with training providers, employers, workforce agencies, and government entities. Roles, responsibilities, and compliance requirements.`,
-  alternates: { canonical: `https://www.elevateforhumanity.org/partner-operating-model' },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/partner-operating-model' },
 };
 
 const partnerTypes = [

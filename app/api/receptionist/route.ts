@@ -34,7 +34,7 @@ If asked about:
 - Applying → Direct to /start or /apply
 - Funding → Mention WRG/WIOA, say most programs are free
 - Speaking to someone → Offer to schedule a call or provide contact info
-- Hours/Location → Say we`re online 24/7, training sites across Indiana
+- Hours/Location → Say we're online 24/7, training sites across Indiana
 - Specific questions → Answer briefly, offer to connect with specialist`;
 
 async function _POST(req: Request) {

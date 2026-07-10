@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
       ${priorExperience ? `<tr style="background:#f8fafc"><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Prior Experience</td><td style="padding:10px 12px;border:1px solid #e2e8f0">${priorExperience}</td></tr>` : ''}
       ${notes ? `<tr><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Notes</td><td style="padding:10px 12px;border:1px solid #e2e8f0">${notes}</td></tr>` : ''}
       <tr style="background:#f8fafc"><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Application ID</td><td style="padding:10px 12px;border:1px solid #e2e8f0;font-family:monospace;font-size:12px">${application.id}</td></tr>
-      <tr><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Submitted</td><td style="padding:10px 12px;border:1px solid #e2e8f0">${new Date().toLocaleString('en-US', { timeZone: 'America/New_York` })} ET</td></tr>
+      <tr><td style="padding:10px 12px;border:1px solid #e2e8f0;font-weight:600">Submitted</td><td style="padding:10px 12px;border:1px solid #e2e8f0">${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} ET</td></tr>
     </table>
 
     <div style="text-align:center;margin-bottom:24px">
@@ -224,7 +224,7 @@ export async function POST(request: NextRequest) {
 </body>
 </html>`;
 
-    // Fire both emails — don`t let email failure block the response
+    // Fire both emails — don't let email failure block the response
     await Promise.allSettled([
       sendEmail({
         to: email.toLowerCase().trim(),

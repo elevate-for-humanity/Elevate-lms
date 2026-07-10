@@ -34,13 +34,13 @@ async function _POST(req: Request) {
     const instructor = instructorId ? getInstructorById(instructorId) : getInstructorByProgramId(programId);
 
     if (!program || !instructor) {
-      return NextResponse.json({ message: 'Program or instructor not found.` }, { status: 404 });
+      return NextResponse.json({ message: 'Program or instructor not found.' }, { status: 404 });
     }
 
     const systemPrompt = `You are ${instructor.name}, an AI instructor for the ${program.title} program at ${PLATFORM_DEFAULTS.orgName}.
 
 Your tone is: ${instructor.tone}
-Your specialties: ${instructor.specialties.join(`, ')}
+Your specialties: ${instructor.specialties.join(', ')}
 Primary standards you align to: ${instructor.primaryStandards.join(', ')}
 Partner sources you reference: ${instructor.partnerSources.join(', ')}
 

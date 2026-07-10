@@ -24,7 +24,7 @@ export default function CommunityServicesPage() {
           subtitle: 'VITA tax preparation, financial literacy, consumer education, reentry support, and workforce navigation — all free for qualifying residents.',
         },
         intro: {
-          heading: 'Beyond Training`,
+          heading: 'Beyond Training',
           paragraphs: [
             `${PLATFORM_DEFAULTS.orgName} provides free community services that address the barriers keeping Indiana residents from economic stability. Training is one piece — but stable housing, accurate tax filing, and financial literacy are equally critical.`,
             `Our community services are available to all Indiana residents, not just enrolled students. No referral required.',
@@ -54,7 +54,7 @@ export default function CommunityServicesPage() {
           ],
         },
         cta: {
-          heading: 'Get Help Today`,
+          heading: 'Get Help Today',
           subtitle: `Free community services for all Indiana residents. No referral required. Call ${PLATFORM_DEFAULTS.supportPhone}.`,
           primaryLabel: `Contact Us',
           primaryHref: '/contact',

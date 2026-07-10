@@ -92,7 +92,7 @@ export default function TrainingDeliveryDisclosure() {
           <Breadcrumbs items={[
             { label: 'Home', href: '/' },
             { label: 'Disclosures', href: '/legal/disclosures' },
-            { label: 'Training Delivery Model` },
+            { label: 'Training Delivery Model' },
           ]} />
         </div>
       </div>

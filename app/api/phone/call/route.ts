@@ -116,7 +116,7 @@ async function handleVoicemail(phoneNumber: string, message: string) {
   return NextResponse.json({
     success: true,
     method: 'voicemail',
-    message: "Message saved! We`ll respond within 24 hours.",
+    message: "Message saved! We'll respond within 24 hours.",
   });
 }
 

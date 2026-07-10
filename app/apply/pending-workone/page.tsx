@@ -76,7 +76,7 @@ const WORKONE_STEPS = [
 ];
 
 const BRING_LIST = [
-  "Government-issued photo ID (driver`s license, state ID, or passport)",
+  "Government-issued photo ID (license, state ID, or passport)",
   'Proof of Indiana residency (utility bill, lease, or bank statement)',
   'Proof of income or unemployment (pay stubs, tax return, or termination letter)',
   'Social Security card or number`,

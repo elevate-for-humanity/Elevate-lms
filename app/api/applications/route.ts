@@ -673,7 +673,7 @@ async function _POST(req: Request) {
         `,
       });
 
-      // Send staff email in parallel (don`t wait for it to finish before responding)
+      // Send staff email in parallel (don't wait for it to finish before responding)
       const staffSubject = needsICC
         ? `! Pending Funding [${referenceNumber}]: ${body.firstName} ${body.lastName} - Needs ICC First`
         : isFunded

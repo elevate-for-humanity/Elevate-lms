@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: 'Apply — Esthetician Apprenticeship`,
   description:
     `Apply to the ${PLATFORM_DEFAULTS.orgName} DOL-registered esthetician apprenticeship — as an apprentice or as a partner spa/salon.`,
-  alternates: { canonical: `https://www.elevateforhumanity.org/programs/esthetician-apprenticeship/apply' },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/programs/esthetician-apprenticeship/apply' },
 };
 
 export default function EstheticianApplyIndexPage() {

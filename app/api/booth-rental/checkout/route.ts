@@ -132,14 +132,14 @@ export async function POST(request: NextRequest) {
       // Deposit as one-time line item
       lineItems.push({ price: depositPriceId, quantity: 1 });
     } else if (tier.depositDollars === 0) {
-      // First week`s rent collected upfront as one-time charge
+      // First week's rent collected upfront as one-time charge
       lineItems.push({
         price_data: {
           currency: 'usd',
           unit_amount: tier.weeklyRateCents,
           product_data: {
             name: `${tier.label} ${tier.spaceType} — First Week`,
-            description: `First week`s rent at ${PLATFORM_DEFAULTS.orgName}`,
+            description: `First week's rent at ${PLATFORM_DEFAULTS.orgName}`,
           },
         },
         quantity: 1,

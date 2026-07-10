@@ -52,7 +52,7 @@ async function _POST(request: Request) {
       ? `Barbershop walk-through / site visit for ${safeName} (${safeEmail}). Covers apprenticeship hosting requirements, OJT structure, and next steps.`
       : `Virtual orientation session for ${safeName} (${safeEmail}). Covers programs, funding, enrollment process, and Q&A.`;
 
-    // Zoom is optional — fall back to Calendly if credentials aren`t configured
+    // Zoom is optional — fall back to Calendly if credentials aren't configured
     const CALENDLY_FALLBACK = process.env.NEXT_PUBLIC_CALENDLY_30MIN || 'https://calendly.com/elevate4humanityedu';
     let meetingJoinUrl = CALENDLY_FALLBACK;
     let meetingId = '';

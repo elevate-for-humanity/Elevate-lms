@@ -122,7 +122,7 @@ Emergency procedures:
   },
   {
     id: 'grievance',
-    title: 'Grievance Procedures`,
+    title: 'Grievance Procedures',
     content: `If you have a concern, complaint, or believe you have been treated unfairly, you have the right to file a grievance. You will not face retaliation for filing a complaint.
 
 Step 1 — Informal Resolution:
@@ -139,7 +139,7 @@ Step 3 — Program Director Review:
 The program director will review your grievance and respond in writing within five (5) business days. The director may request a meeting with all parties involved.
 
 Step 4 — Appeal:
-If you are not satisfied with the program director`s response, you may appeal in writing to the executive director within ten (10) business days. The executive director's decision is final.
+If you are not satisfied with the program director's response, you may appeal in writing to the executive director within ten (10) business days. The executive director's decision is final.
 
 External complaints:
 If your grievance involves discrimination, you may also file a complaint with:

@@ -29,14 +29,14 @@ type SignMethod = 'checkbox' | 'typed' | 'drawn';
 const MOU_SECTIONS = [
   {
     id: 'parties',
-    title: '1. Parties`,
+    title: '1. Parties',
     content: `This Memorandum of Understanding ("Agreement") is entered into between 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute ("Operating Company") and the collaborating organization identified at execution ("Collaborating Party").
 
 Elevate is the sole Program Owner and primary training provider. The Collaborating Party is a delivery-site collaborator operating under one of the participation tiers defined in Section 5. This Agreement does not create a partnership, joint venture, or shared ownership of any kind.`,
   },
   {
     id: `not-a-partnership',
-    title: '2. What This Agreement Is Not`,
+    title: '2. What This Agreement Is Not',
     content: `A "partnership" is a business relationship in which two or more parties jointly own and operate a business, share governance authority, and share profits, losses, and decision-making control. That is not this relationship.
 
 This Agreement does not create a partnership, joint venture, franchise, co-ownership arrangement, employment relationship, or shared governance structure. The Collaborating Party does not obtain ownership rights, governance authority, or decision-making authority over the training program, its curriculum, its credentials, its tuition structure, or its brand.
@@ -54,7 +54,7 @@ All programs delivered under this Agreement must comply with federal nondiscrimi
   },
   {
     id: 'authority',
-    title: '4. Program Owner Authority`,
+    title: '4. Program Owner Authority',
     content: `Elevate retains sole and exclusive authority over:
 
 • Curriculum design, content, and updates
@@ -93,7 +93,7 @@ Net revenue = gross tuition minus operational costs (credential exam fees, LMS, 
   },
   {
     id: 'ip',
-    title: '6. Intellectual Property and Non-Replication`,
+    title: '6. Intellectual Property and Non-Replication',
     content: `All curriculum materials, instructional content, LMS systems, operational procedures, branding, credential alignments, and program methodologies are proprietary intellectual property owned exclusively by ${PLATFORM_DEFAULTS.orgName}.
 
 The Collaborating Party receives limited, non-transferable authorization to support delivery of program components solely for approved cohorts under this Agreement. This authorization terminates automatically upon expiration or termination of this Agreement.
@@ -102,7 +102,7 @@ During the term of this Agreement and for three (3) years following termination,
 
 • Replicate, reproduce, or develop a substantially similar training program using materials, systems, or methods provided through this collaboration
 • Solicit or redirect enrolled students, instructors, credential partners, or employers into a competing program derived from the Elevate training model
-• Use Elevate`s program structure or credential relationships to apply independently for ETPL status or workforce funding for a competing program`,
+• Use Elevate's program structure or credential relationships to apply independently for ETPL status or workforce funding for a competing program`,
   },
   {
     id: 'students',

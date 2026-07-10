@@ -15,7 +15,7 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const program = await fetchProgramForWioaPublic(slug);
-  if (!program) return { title: 'Program not found` };
+  if (!program) return { title: 'Program not found' };
   const path = WIOA_COMPLIANCE.programSection188(slug);
   return {
     title: `${program.title} — Section 188 Equal Opportunity Checklist`,

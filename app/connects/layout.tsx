@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Elevate Connects | Dashboards & Portals`,
+  title: 'Elevate Connects | Dashboards & Portals',
   description:
     `Access your personalized dashboard. Student, employer, partner, staff, and admin portals for the ${PLATFORM_DEFAULTS.orgName} platform.`,
-  alternates: { canonical: `https://www.elevateconnects.org' },
+  alternates: { canonical: 'https://www.elevateconnects.org' },
   icons: {
     icon: [
       { url: '/favicon.png', type: 'image/png', sizes: '192x192' },

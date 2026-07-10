@@ -1133,7 +1133,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>`,
 
 <p>You have successfully completed all tuition payments for your Barber Apprenticeship program.</p>
 
-<p><strong>What`s next:</strong></p>
+<p><strong>What's next:</strong></p>
 <p>• Continue logging your apprenticeship hours<br>
 • Complete your coursework in the Elevate LMS<br>
 • Prepare for your state board exam</p>

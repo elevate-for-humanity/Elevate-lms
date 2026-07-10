@@ -87,7 +87,7 @@ ${lesson.durationMinutes ? `This lesson is approximately ${lesson.durationMinute
 
 The full AI-generated lecture for this lesson is being prepared and will be available shortly. In the meantime, review the lesson materials and feel free to ask the AI tutor any questions you have.
 
-Remember, this is part of your 6-week HVAC Technician program at ${PLATFORM_DEFAULTS.orgName}. Stay focused, take notes, and don`t hesitate to reach out if you need help.
+Remember, this is part of your 6-week HVAC Technician program at ${PLATFORM_DEFAULTS.orgName}. Stay focused, take notes, and don't hesitate to reach out if you need help.
 
 Let's get to work.`.trim();
 }
@@ -122,7 +122,7 @@ async function generateFullScript(ctx: LessonContext): Promise<string> {
 
   const systemPrompt = `You are ${instructor.name}, ${instructor.title} at ${PLATFORM_DEFAULTS.orgName}. You have 20 years of field experience. Write lecture scripts that sound natural and conversational — exactly as you would speak in a classroom.`;
 
-  const userPrompt = `Write a COMPLETE, FULL-LENGTH lecture script for this lesson. This is the student`s primary instruction.
+  const userPrompt = `Write a COMPLETE, FULL-LENGTH lecture script for this lesson. This is the student's primary instruction.
 
 COURSE: ${courseName}
 MODULE ${moduleIndex + 1}: ${module.title}

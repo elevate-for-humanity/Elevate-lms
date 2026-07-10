@@ -144,7 +144,7 @@ async function _POST(request: NextRequest) {
     // Validate required fields
     if (!data.organization && !data.name && !data.email) {
       return NextResponse.json(
-        { error: 'At least one contact field is required` },
+        { error: 'At least one contact field is required' },
         { status: 400 },
       );
     }

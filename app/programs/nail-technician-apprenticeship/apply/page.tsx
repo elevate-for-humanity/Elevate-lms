@@ -8,10 +8,10 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Apply — Nail Technician Apprenticeship`,
+  title: 'Apply — Nail Technician Apprenticeship',
   description:
     `Apply to the ${PLATFORM_DEFAULTS.orgName} DOL-registered nail technician apprenticeship — as an apprentice or as a partner nail salon.`,
-  alternates: { canonical: `https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship/apply' },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship/apply' },
 };
 
 export default function NailApplyIndexPage() {

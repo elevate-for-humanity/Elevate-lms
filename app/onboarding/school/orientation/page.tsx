@@ -35,7 +35,7 @@ const SECTIONS = [
     body: 'Your MOU defines the specific terms of your partnership including program offerings, site requirements, and reporting obligations. You must sign the MOU before any students can be enrolled at your site. The MOU is reviewed annually and updated when program terms change.',
   },
   {
-    title: 'Getting help`,
+    title: 'Getting help',
     body: `Your Elevate program coordinator is your primary contact for operational questions. For portal or technical issues, use the help desk at /program-holder/support. For compliance questions, email compliance@elevateforhumanity.org. For urgent student safety concerns, call ${PLATFORM_DEFAULTS.supportPhone}.`,
   },
 ];

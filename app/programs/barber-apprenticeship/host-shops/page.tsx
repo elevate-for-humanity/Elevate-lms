@@ -10,7 +10,7 @@ import HostShopSyllabusRequirement from '@/components/programs/beauty/HostShopSy
 import { getApprovedShops, PROGRAM_LABELS } from '@/lib/programs/host-shops';
 
 export const metadata: Metadata = {
-  title: 'Become a Host Barbershop | Barber Apprenticeship`,
+  title: 'Become a Host Barbershop | Barber Apprenticeship',
   description: `Partner with ${PLATFORM_DEFAULTS.orgName} as a host barbershop for our USDOL Registered Barber Apprenticeship program. Train the next generation of barbers.`,
   alternates: {
     canonical: `https://www.elevateforhumanity.org/programs/barber-apprenticeship/host-shops',

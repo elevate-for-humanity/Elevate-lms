@@ -48,7 +48,7 @@ export default async function OrientationPage() {
               <div>
                 <h3 className="font-bold text-brand-green-900 mb-1">Orientation Completed</h3>
                 <p className="text-sm text-brand-green-700">
-                  You`ve completed your orientation. You can now proceed to verify your eligibility
+                  You've completed your orientation. You can now proceed to verify your eligibility
                   and enroll in programs.
                 </p>
               </div>

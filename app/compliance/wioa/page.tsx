@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${PLATFORM_DEFAULTS.siteUrl}${WIOA_COMPLIANCE.hub}` },
   openGraph: {
     title: `WIOA & INTraining ETPL Compliance',
-    description: 'Per-program IEAP and Section 188 compliance forms for Indiana workforce training.`,
+    description: 'Per-program IEAP and Section 188 compliance forms for Indiana workforce training.',
     url: `${PLATFORM_DEFAULTS.siteUrl}${WIOA_COMPLIANCE.hub}`,
   },
 };

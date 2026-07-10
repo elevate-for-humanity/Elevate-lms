@@ -14,7 +14,7 @@ export default function ParticipationAgreementPage() {
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Legal', href: '/legal' }, { label: 'Participation Agreement` }]}
+          items={[{ label: 'Legal', href: '/legal' }, { label: 'Participation Agreement' }]}
         />
       </div>
       <DocumentPage

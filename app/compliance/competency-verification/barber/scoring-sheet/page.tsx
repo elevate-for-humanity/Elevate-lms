@@ -131,8 +131,8 @@ export default function BarberScoringSheetPage() {
             {[
               { role: 'RTI Instructor (Credential Partner)', scope: 'Sections 1–3, 5 — Technical & theoretical competencies' },
               { role: 'Employer Barbershop Supervisor', scope: 'Sections 4–6 — OJT performance & workplace readiness' },
-              { role: 'Program Holder (RTI Coordinator)', scope: 'Rubric completion verification & LMS documentation` },
-              { role: `${PLATFORM_DEFAULTS.orgName} (Sponsor)`, scope: `Final completion validation & apprenticeship documentation' },
+              { role: 'Program Holder (RTI Coordinator)', scope: 'Rubric completion verification & LMS documentation' },
+              { role: `${PLATFORM_DEFAULTS.orgName} (Sponsor)`, scope: 'Final completion validation & apprenticeship documentation' },
             ].map((signer, i) => (
               <div key={i} className="border rounded-lg p-4 print:p-2 print:border-slate-400">
                 <p className="font-semibold text-sm print:text-[10px]">{signer.role}</p>

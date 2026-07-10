@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: 'DOL Registered Apprenticeship Programs`,
   description:
     `U.S. Department of Labor Registered Apprenticeship programs at ${PLATFORM_DEFAULTS.orgName}. Earn while you learn with paid on-the-job training and industry certifications.`,
-  alternates: { canonical: `https://www.elevateforhumanity.org/funding/dol' },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/funding/dol' },
 };
 
 const benefits = [

@@ -151,7 +151,7 @@ export default function IndustryPortalPage({
               Welcome to {industryLabel}
             </h2>
             <p className="text-slate-500 text-sm mb-6 max-w-md mx-auto">
-              You`re enrolled in the {industryLabel} portal. Browse available programs below
+              You're enrolled in the {industryLabel} portal. Browse available programs below
               or continue your coursework.
             </p>
             <Link

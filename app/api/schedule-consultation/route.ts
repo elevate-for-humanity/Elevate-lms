@@ -142,7 +142,7 @@ ${
 }
 <h3 style="color:#111827">Before Your Meeting</h3>
 <ol style="line-height:1.8">
-<li>Register at <a href="https://indianacareerconnect.com" style="color:#dc2626">indianacareerconnect.com</a> if you haven`t already</li>
+<li>Register at <a href="https://indianacareerconnect.com" style="color:#dc2626">indianacareerconnect.com</a> if you haven't already</li>
 <li>Browse programs at <a href="${PLATFORM_DEFAULTS.siteUrl}/programs" style="color:#dc2626">${PLATFORM_DEFAULTS.canonicalDomain}/programs</a></li>
 <li>Have your ID and any prior training records ready</li>
 </ol>

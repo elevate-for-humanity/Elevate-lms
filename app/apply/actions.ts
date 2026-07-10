@@ -503,7 +503,7 @@ async function insertApplication(payload: {
 
         `<h2 style="font-weight:normal;font-size:22px;margin:0 0 20px;color:#1a1a1a">Hi ${payload.firstName},</h2>`,
 
-        `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">Thank you for your interest in <strong>${programLabel}</strong> at ${PLATFORM_DEFAULTS.orgName}. We received your inquiry and we`d love to help you take the next step.</p>`,
+        `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">Thank you for your interest in <strong>${programLabel}</strong> at ${PLATFORM_DEFAULTS.orgName}. We received your inquiry and we'd love to help you take the next step.</p>`,
 
         `<p style="font-size:15px;line-height:1.7;margin:0 0 16px">We've created your account. You can log in using the email and password you provided on the application form.</p>`,
 
@@ -554,8 +554,8 @@ async function insertApplication(payload: {
         `<ol style="margin:0 0 16px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
         `<li>Visit <a href="https://www.indianacareerconnect.com" style="color:#1a1a1a;font-weight:bold">www.indianacareerconnect.com</a> and create an account</li>`,
         `<li>Schedule an appointment with your local WorkOne office</li>`,
-        `<li>Let them know you`d like to enroll in <strong>${programLabel}</strong> at ${PLATFORM_DEFAULTS.orgName}</li>`,
-        `<li> They`ll confirm your eligibility and issue a training voucher</li>`,
+        `<li>Let them know you'd like to enroll in <strong>${programLabel}</strong> at ${PLATFORM_DEFAULTS.orgName}</li>`,
+        `<li> They'll confirm your eligibility and issue a training voucher</li>`,
         `</ol>`,
 
         // Divider
@@ -573,7 +573,7 @@ async function insertApplication(payload: {
 
         // Self-pay
         `<h3 style="font-size:17px;font-weight:bold;margin:0 0 12px;color:#1a1a1a">Don't Want to Wait? Start Now</h3>`,
-        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">If you'd rather not wait for funding approval - or if your program isn`t on the ETPL yet - you can begin classes right away with one of these options:</p>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 12px">If you'd rather not wait for funding approval - or if your program isn't on the ETPL yet - you can begin classes right away with one of these options:</p>`,
         `<ul style="margin:0 0 16px;padding-left:20px;font-size:14px;color:#333;font-family:Arial,sans-serif;line-height:1.9">`,
         `<li><strong>Self-Pay</strong> - pay tuition upfront and start immediately</li>`,
         `<li><strong>Buy Now, Pay Later</strong> - split your tuition into monthly payments</li>`,
@@ -583,7 +583,7 @@ async function insertApplication(payload: {
 
         // Closing
         `<div style="border-top:1px solid #e0e0e0;margin:28px 0"></div>`,
-        `<p style="font-size:14px;line-height:1.7;margin:0 0 8px">If you have any questions at all, just reply to this email or give us a call at <strong>${PLATFORM_DEFAULTS.supportPhone}</strong>. We`re here to help.</p>`,
+        `<p style="font-size:14px;line-height:1.7;margin:0 0 8px">If you have any questions at all, just reply to this email or give us a call at <strong>${PLATFORM_DEFAULTS.supportPhone}</strong>. We're here to help.</p>`,
         `<p style="font-size:14px;line-height:1.7;margin:0 0 4px">Looking forward to working with you,</p>`,
         `<p style="font-size:14px;margin:0 0 4px"><strong>The ${PLATFORM_DEFAULTS.orgName} Team</strong></p>`,
         `<p style="font-size:12px;color:#999;font-family:Arial,sans-serif;margin:16px 0 0">Ref: ${referenceNumber}</p>`,

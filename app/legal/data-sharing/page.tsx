@@ -14,7 +14,7 @@ export default function DataSharingPage() {
     <>
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Legal', href: '/legal' }, { label: 'Data Sharing Consent` }]}
+          items={[{ label: 'Legal', href: '/legal' }, { label: 'Data Sharing Consent' }]}
         />
       </div>
       <DocumentPage

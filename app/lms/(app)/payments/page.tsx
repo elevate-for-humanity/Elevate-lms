@@ -202,10 +202,10 @@ export default async function PaymentsPage() {
       )}
 
       <p className="mt-6 text-xs text-slate-400 text-center">
-        Questions about a charge?{' `}
+        Questions about a charge?{' '}
         <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-brand-blue-600 hover:underline">
           Call {PLATFORM_DEFAULTS.supportPhone}
-        </a>{` '}
+        </a>{' '}
         or{' '}
         <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">
           email us

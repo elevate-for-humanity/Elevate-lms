@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: 'Press & Media`,
   description:
     `Press coverage, media resources, and contact information for journalists covering ${PLATFORM_DEFAULTS.orgName} workforce development programs.`,
-  alternates: { canonical: `https://www.elevateforhumanity.org/press' },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/press' },
 };
 
 export default async function PressPage() {

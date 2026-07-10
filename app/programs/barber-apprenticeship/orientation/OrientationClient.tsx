@@ -89,7 +89,7 @@ const HANDBOOK_SLIDES = [
   {
     id: `conduct',
     icon: AlertTriangle,
-    title: 'Conduct & Termination`,
+    title: 'Conduct & Termination',
     content: [
       `You represent ${PLATFORM_DEFAULTS.orgName} at your host shop. Professional conduct is required at all times.`,
       `Violations that may result in immediate termination: GPS fraud, harassment, theft, or falsifying hours.',

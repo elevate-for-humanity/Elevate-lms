@@ -427,7 +427,7 @@ export default async function DownloadsPage() {
             <div className="bg-blue-50 rounded-lg p-8 text-center">
               <h2 className="text-2xl font-bold mb-4">Need Help?</h2>
               <p className="text-slate-600 mb-6">
-                Can`t find what you're looking for? Our student services team is here to help.
+                Can't find what you're looking for? Our student services team is here to help.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link

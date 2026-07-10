@@ -51,7 +51,7 @@ const PROVIDER_ACCENT: Record<string, string> = {
 const CAPABILITY_LABEL: Record<string, { label: string; icon: typeof MapPin }> = {
   IN_PERSON_ONLY: { label: 'In-person proctored only', icon: MapPin },
   IN_PERSON_OR_PROVIDER_REMOTE: { label: 'In-person or remote (provider system)', icon: Monitor },
-  CENTER_REMOTE_ALLOWED: { label: 'In-person or live online proctoring`, icon: Monitor },
+  CENTER_REMOTE_ALLOWED: { label: 'In-person or live online proctoring', icon: Monitor },
 };
 
 interface Props {

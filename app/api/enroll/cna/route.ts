@@ -101,7 +101,7 @@ async function _POST(request: NextRequest) {
           </div>
           <div style="padding:32px">
             <h2 style="margin-top:0">We received your CNA application, ${firstName}!</h2>
-            <p>Your application has been submitted and is under review. Here`s a summary:</p>
+            <p>Your application has been submitted and is under review. Here's a summary:</p>
             <table style="width:100%;border-collapse:collapse;margin:16px 0">
               <tr><td style="padding:8px 0;color:#64748b;width:40%">Program</td><td style="padding:8px 0;font-weight:600">Certified Nursing Assistant (CNA)</td></tr>
               <tr><td style="padding:8px 0;color:#64748b">Name</td><td style="padding:8px 0">${firstName} ${lastName}</td></tr>

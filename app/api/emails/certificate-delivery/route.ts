@@ -110,7 +110,7 @@ async function _POST(req: NextRequest) {
               </div>
 
               <p style="color: #1f2937; font-size: 16px; line-height: 1.6; margin: 30px 0 20px 0;">
-                We`re incredibly proud of your achievement and dedication. This certificate represents your hard work and commitment to professional development.
+                We're incredibly proud of your achievement and dedication. This certificate represents your hard work and commitment to professional development.
               </p>
 
               <p style="color: #1f2937; font-size: 16px; line-height: 1.6; margin: 0;">

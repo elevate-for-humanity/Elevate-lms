@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     /* Error handled silently */
     logger.error('Error processing scraper alert:', error);
-    return NextResponse.json({ error: 'Failed to process alert` }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to process alert' }, { status: 500 });
   }
 }
 

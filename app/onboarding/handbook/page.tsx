@@ -19,7 +19,7 @@ const HANDBOOK_VERSION = '2025.1';
 const SECTIONS = [
   {
     id: 'overview',
-    title: 'Partnership Overview`,
+    title: 'Partnership Overview',
     content: `As an Elevate program-holder partner you are responsible for hosting training programs at your site, supporting enrolled students, and maintaining compliance with WIOA, DOL, and Indiana workforce development requirements.
 
 ${PLATFORM_DEFAULTS.orgName} provides curriculum, instructors, LMS access, and compliance reporting tools. You provide the training site, student recruitment support, and local coordination.
@@ -41,7 +41,7 @@ You are not responsible for delivering curriculum or grading — Elevate instruc
   },
   {
     id: 'compliance',
-    title: 'WIOA and DOL Compliance`,
+    title: 'WIOA and DOL Compliance',
     content: `All Elevate programs are ETPL-listed and subject to WIOA Title I performance reporting. As a program holder you must:
 
 • Maintain accurate attendance records using the Elevate partner portal

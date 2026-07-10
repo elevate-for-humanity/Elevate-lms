@@ -284,7 +284,7 @@ export default function CheckEligibilityPage() {
       {/* Hero */}
       <section
         className="relative overflow-hidden"
-        style={{ minHeight: `clamp(320px, 40vw, 460px)' }}
+        style={{ minHeight: 'clamp(320px, 40vw, 460px)' }}
       >
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
@@ -298,7 +298,7 @@ export default function CheckEligibilityPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/85 via-brand-blue-800/60 to-transparent" />
         <div
           className="relative z-10 h-full flex flex-col justify-between px-4 sm:px-6 py-5"
-          style={{ minHeight: 'clamp(320px, 40vw, 460px)` }}
+          style={{ minHeight: 'clamp(320px, 40vw, 460px)' }}
         >
           <div className="flex items-center justify-between">
             <Link
@@ -323,7 +323,7 @@ export default function CheckEligibilityPage() {
               Check If You Qualify for Funded Training
             </h1>
             <p className="text-white/75 text-base max-w-md">
-              3 questions. 30 seconds. We`ll match you with WIOA, Workforce Ready Grant, or JRI
+              3 questions. 30 seconds. We'll match you with WIOA, Workforce Ready Grant, or JRI
               funding.
             </p>
           </div>

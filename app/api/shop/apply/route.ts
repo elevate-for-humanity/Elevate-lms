@@ -117,7 +117,7 @@ Hello ${owner_name},
 
 Thank you for applying to become a shop partner with ${PLATFORM_DEFAULTS.orgName}!
 
-We`ve received your application for ${shop_name} and will review it within 2-3 business days.
+We've received your application for ${shop_name} and will review it within 2-3 business days.
 
 What happens next:
 • Our team will review your application and credentials
@@ -125,7 +125,7 @@ What happens next:
 • You'll receive an email with next steps for onboarding
 • Once approved, you can begin the document upload process
 
-If you have any questions, please don`t hesitate to reach out.
+If you have any questions, please don't hesitate to reach out.
 
 Welcome to the ${PLATFORM_DEFAULTS.orgName} network!
 

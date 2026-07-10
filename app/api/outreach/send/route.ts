@@ -166,7 +166,7 @@ async function sendViaSendGrid(to: string[], subject: string, html: string, text
         method: 'POST',
         headers: {
           Authorization: `Bearer ${SENDGRID_KEY}`,
-          'Content-Type': 'application/json`,
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           personalizations: [{ to: [{ email }] }],

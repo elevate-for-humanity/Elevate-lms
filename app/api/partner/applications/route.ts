@@ -127,7 +127,7 @@ async function _POST(request: NextRequest) {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
       await internalFetch(`${siteUrl}/api/email/send`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: email,
           subject: `Partner Shop Application Received - ${PLATFORM_DEFAULTS.orgName}`,
@@ -148,7 +148,7 @@ async function _POST(request: NextRequest) {
               <ol>
                 <li>Our team will review your application within 1-3 business days</li>
                 <li>You'll receive an email with your approval status</li>
-                <li>Once approved, you`ll get a link to access your Partner Dashboard</li>
+                <li>Once approved, you'll get a link to access your Partner Dashboard</li>
               </ol>
               
               <p>Questions? Call us at <a href="tel:${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a></p>

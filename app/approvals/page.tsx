@@ -138,7 +138,7 @@ export default function ApprovalsPage() {
                     Workforce Ready Grant (WRG) Training Provider
                   </h3>
                   <p className="text-lg text-black">
-                    Selected programs available at no cost to eligible adults through Indiana`s
+                    Selected programs available at no cost to eligible adults through Indiana's
                     Workforce Ready Grant
                   </p>
                 </div>

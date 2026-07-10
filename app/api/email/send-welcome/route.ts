@@ -40,7 +40,7 @@ async function _POST(request: NextRequest) {
     <div class="content">
       <h2>Hi ${name},</h2>
 
-      <p><strong>Congratulations!</strong> You`ve completed onboarding and your LMS access is now active.</p>
+      <p><strong>Congratulations!</strong> You've completed onboarding and your LMS access is now active.</p>
 
       <div class="info-box">
         <h3>📚 Your Access Links:</h3>
@@ -52,7 +52,7 @@ async function _POST(request: NextRequest) {
 
       <a href="${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/hub" class="button">Go to Your Hub →</a>
 
-      <h3>What`s Next?</h3>
+      <h3>What's Next?</h3>
       <ul>
         <li>✅ Log in to your Hub (Command Center)</li>
         <li>✅ Access your courses in the Classroom</li>
@@ -69,7 +69,7 @@ async function _POST(request: NextRequest) {
 
       <p><strong>Important:</strong> This is a WIOA/WRG/Job Ready Indy-funded program. Your training is Funded. There is no cost to you.</p>
 
-      <p>We`re excited to have you in our program!</p>
+      <p>We're excited to have you in our program!</p>
 
       <p>Best regards,<br>
       <strong>${PLATFORM_DEFAULTS.orgName} Team</strong></p>

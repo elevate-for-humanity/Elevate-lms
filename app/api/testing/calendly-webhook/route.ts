@@ -135,7 +135,7 @@ function cancellationEmailHtml(name: string, startTime: string): string {
 
 // ------ Handler ------------------------------------------------------------------------------------------------------------------------------------
 
-export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: `api' }, async (req) => {
+export const POST = withRuntime({ secrets: [...ENV.CALENDLY], rateLimit: 'api' }, async (req) => {
   const rawBody = await req.text();
   const signature = req.headers.get('calendly-webhook-signature');
 

@@ -101,7 +101,7 @@ export default function SamGrantAutoFillPanel() {
     try {
       const res = await fetch('/api/admin/grants/sam/prefill', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           grant: selected,
           organization: {

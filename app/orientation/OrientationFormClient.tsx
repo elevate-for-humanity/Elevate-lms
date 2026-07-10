@@ -28,7 +28,7 @@ export default function OrientationFormClient() {
           // Create a real Zoom meeting via API
           const res = await fetch('/api/orientation/schedule', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json` },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, date, time }),
           });
 

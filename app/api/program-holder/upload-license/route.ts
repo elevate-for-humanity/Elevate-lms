@@ -109,7 +109,7 @@ async function _POST(req: NextRequest) {
               <tr><td style="padding:8px; border:1px solid #e2e8f0; font-weight:600;">Contact</td><td style="padding:8px; border:1px solid #e2e8f0;">${holder?.contact_name}</td></tr>
               <tr><td style="padding:8px; border:1px solid #e2e8f0; font-weight:600;">Email</td><td style="padding:8px; border:1px solid #e2e8f0;">${holder?.contact_email}</td></tr>
               <tr><td style="padding:8px; border:1px solid #e2e8f0; font-weight:600;">File</td><td style="padding:8px; border:1px solid #e2e8f0;">${path}</td></tr>
-              <tr><td style="padding:8px; border:1px solid #e2e8f0; font-weight:600;">Uploaded</td><td style="padding:8px; border:1px solid #e2e8f0;">${new Date().toLocaleString('en-US', { timeZone: 'America/New_York` })} ET</td></tr>
+              <tr><td style="padding:8px; border:1px solid #e2e8f0; font-weight:600;">Uploaded</td><td style="padding:8px; border:1px solid #e2e8f0;">${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })} ET</td></tr>
             </table>
             <div style="text-align:center; margin:24px 0;">
               <a href="https://${PLATFORM_DEFAULTS.canonicalDomain}/admin/program-holders/${phId}" style="background-color:#2563eb; color:white; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:bold;">Review in Admin Dashboard</a>

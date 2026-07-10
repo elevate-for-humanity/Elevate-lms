@@ -100,7 +100,7 @@ export default async function ParentPortalPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Parent & Guardian Portal` }]} />
+        <Breadcrumbs items={[{ label: 'Parent & Guardian Portal' }]} />
       </div>
 
       {/* Hero — image only, title below */}

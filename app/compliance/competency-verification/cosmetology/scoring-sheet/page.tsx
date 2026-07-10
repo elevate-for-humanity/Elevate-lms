@@ -23,7 +23,7 @@ export default function CosmetologyScoringSheetPage() {
         <Breadcrumbs items={[
           { label: 'Compliance', href: '/compliance' },
           { label: 'Cosmetology', href: '/compliance/competency-verification/cosmetology' },
-          { label: 'Scoring Sheet` },
+          { label: 'Scoring Sheet' },
         ]} />
       </div>
       <div className="max-w-5xl mx-auto px-4 pb-4 print:hidden flex justify-between">

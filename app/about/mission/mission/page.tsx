@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: 'Our Mission',
   description:
     `${PLATFORM_DEFAULTS.orgName} creates accessible career pathways, credential-bearing workforce training, and community support for underserved populations across Indiana and the Midwest.`,
-  alternates: { canonical: `https://www.elevateforhumanity.org/about/mission' },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/about/mission' },
   openGraph: {
     title: 'Our Mission',
     description:
@@ -97,7 +97,7 @@ export default function MissionPage() {
           <div>
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Why We Exist</h2>
             <p className="text-slate-600 mb-4 leading-relaxed">
-              {PLATFORM_DEFAULTS.orgName} was founded on the belief that a person`s zip code, background,
+              {PLATFORM_DEFAULTS.orgName} was founded on the belief that a person's zip code, background,
               or past should not determine their future. Too many adults in our communities are
               locked out of stable, well-paying careers — not because they lack ability, but because
               they lack access.

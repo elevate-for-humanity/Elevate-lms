@@ -20,7 +20,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { region: slug } = await params;
   const region = getWorkOneRegion(slug);
-  if (!region) return { title: 'WorkOne Region` };
+  if (!region) return { title: 'WorkOne Region' };
 
   return {
     title: `${region.name} WorkOne Centers | Indiana Workforce Funding`,

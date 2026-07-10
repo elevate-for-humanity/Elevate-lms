@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = {
-  title: 'Legal Creator Agreement`,
+  title: 'Legal Creator Agreement',
   description: `Terms governing creators who sell digital products on the ${PLATFORM_DEFAULTS.orgName} marketplace, including eligibility, content standards, and revenue sharing.`,
 };
 

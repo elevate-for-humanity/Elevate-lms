@@ -7,9 +7,9 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'CNA Waitlist`,
+  title: 'CNA Waitlist',
   description: `Join the waitlist for the Certified Nursing Assistant program at ${PLATFORM_DEFAULTS.orgName}. Limited seats available. WIOA and WRG funding accepted.`,
-  alternates: { canonical: `https://www.elevateforhumanity.org/cna-waitlist' },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/cna-waitlist' },
 };
 
 export default function CnaWaitlistPage() {

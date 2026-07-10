@@ -48,7 +48,7 @@ async function sendEnrollmentConfirmationEmail({
 
   await sendEmail({
     to,
-    subject: `You`re enrolled in ${programName} — ${PLATFORM_DEFAULTS.orgName}`,
+    subject: `You're enrolled in ${programName} — ${PLATFORM_DEFAULTS.orgName}`,
     html: `
       <div style="max-width:600px;margin:0 auto;font-family:Georgia,serif;color:#1a1a1a;background:#ffffff">
         <div style="text-align:center;padding:32px 24px 24px">
@@ -56,7 +56,7 @@ async function sendEnrollmentConfirmationEmail({
           <img src="${logoUrl}" alt="${PLATFORM_DEFAULTS.orgName}" width="160" style="max-width:160px;height:auto" />
         </div>
         <div style="padding:0 32px 32px">
-          <h2 style="font-weight:normal;font-size:22px;margin:0 0 20px;color:#1a1a1a">Hi ${firstName}, you`re enrolled!</h2>
+          <h2 style="font-weight:normal;font-size:22px;margin:0 0 20px;color:#1a1a1a">Hi ${firstName}, you're enrolled!</h2>
           <p style="font-size:15px;line-height:1.7;margin:0 0 16px">
             You've completed onboarding and your enrollment in <strong>${programName}</strong> is now active.
             Your courses are unlocked and ready to start.
@@ -80,7 +80,7 @@ async function sendEnrollmentConfirmationEmail({
             </a>
           </div>
           <div style="border-top:1px solid #e0e0e0;margin-top:12px;padding-top:16px;font-family:Arial,sans-serif;font-size:13px;color:#555">
-            <p style="margin:0 0 8px">Questions? We`re here to help:</p>
+            <p style="margin:0 0 8px">Questions? We're here to help:</p>
             <p style="margin:0 0 4px">📞 <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color:#555">${PLATFORM_DEFAULTS.supportPhone}</a></p>
             <p style="margin:0">✉️ <a href="mailto:elevate4humanityedu@gmail.com" style="color:#555">elevate4humanityedu@gmail.com</a></p>
           </div>

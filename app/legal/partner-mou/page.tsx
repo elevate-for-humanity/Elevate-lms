@@ -16,7 +16,7 @@ export default function PartnerMOUPage() {
         <Breadcrumbs
           items={[
             { label: 'Legal', href: '/legal' },
-            { label: 'Training Network Partner Agreement` },
+            { label: 'Training Network Partner Agreement' },
           ]}
         />
       </div>

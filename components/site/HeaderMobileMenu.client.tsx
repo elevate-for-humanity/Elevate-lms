@@ -129,12 +129,12 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
       ? createPortal(
           <>
             <div
-              className="fixed inset-0 bg-black/50 z-[9998] lg:hidden"
+              className="fixed inset-0 bg-black/50 z-[10000] lg:hidden"
               onClick={closeMenu}
               aria-hidden="true"
             />
             <div
-              className="fixed top-[60px] right-0 bottom-0 w-[min(100vw,26rem)] bg-white z-[9999] overflow-y-auto shadow-2xl lg:hidden"
+              className="fixed top-[60px] right-0 bottom-0 w-[min(100vw,26rem)] bg-white z-[10001] overflow-y-auto shadow-2xl lg:hidden"
               role="dialog"
               aria-modal="true"
               aria-label="Main menu"

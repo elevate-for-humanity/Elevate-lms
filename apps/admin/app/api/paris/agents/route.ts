@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Build-safe: lazily create the admin client at runtime.
+// This prevents 'supabaseKey is required' errors during Next.js static build.
+let _supabase: ReturnType<typeof createClient> | null = null;
+function getSupabaseAdmin() {
+  if (!_supabase) {
+    hydrateProcessEnv();
+    _supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+  }
+  return _supabase;
+}
 
 // Agent Templates
 const AGENT_TEMPLATES = {
@@ -73,7 +83,7 @@ Always cite sources and follow grant guidelines exactly.`,
 export async function GET() {
   try {
     // List all agents
-    const { data: agents, error } = await supabase
+    const { data: agents, error } = await getSupabaseAdmin()
       .from('ai_agents')
       .select('*')
       .order('created_at', { ascending: false });
@@ -112,7 +122,7 @@ export async function POST(request: NextRequest) {
       const agentId = `agent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
       // Create agent
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseAdmin()
         .from('ai_agents')
         .insert({
           id: agentId,
@@ -149,7 +159,7 @@ export async function POST(request: NextRequest) {
     if (action === 'update') {
       const { agentId, updates } = body;
       
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseAdmin()
         .from('ai_agents')
         .update(updates)
         .eq('id', agentId)
@@ -164,7 +174,7 @@ export async function POST(request: NextRequest) {
     if (action === 'delete') {
       const { agentId } = body;
       
-      const { error } = await supabase
+      const { error } = await getSupabaseAdmin()
         .from('ai_agents')
         .delete()
         .eq('id', agentId);
@@ -178,7 +188,7 @@ export async function POST(request: NextRequest) {
       const { agentId, newOwnerId, name } = body;
       
       // Get original
-      const { data: original, error: fetchError } = await supabase
+      const { data: original, error: fetchError } = await getSupabaseAdmin()
         .from('ai_agents')
         .select('*')
         .eq('id', agentId)
@@ -192,7 +202,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Create clone
-      const { data: clone, error: cloneError } = await supabase
+      const { data: clone, error: cloneError } = await getSupabaseAdmin()
         .from('ai_agents')
         .insert({
           id: `agent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

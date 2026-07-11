@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/require-admin";
-import { requireAdminClient } from "@/lib/supabase/admin";
+import { getAdminClient } from "@/lib/supabase/admin";
 import { safeError, safeDbError } from "@/lib/api/safe-error";
 
 export async function POST(request: NextRequest) {
   const auth = await requireAdmin(request);
   if (auth.error) return auth.error;
-  const db = await requireAdminClient();
+  const db = await getAdminClient();
+  if (!db) return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
   const body = await request.json();
   const { plan_id, feature_id } = body;
   if (!plan_id || !feature_id) return safeError("Missing required fields: plan_id, feature_id", 400);
@@ -18,7 +19,8 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const auth = await requireAdmin(request);
   if (auth.error) return auth.error;
-  const db = await requireAdminClient();
+  const db = await getAdminClient();
+  if (!db) return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
   const body = await request.json();
   const { plan_id, feature_id } = body;
   if (!plan_id || !feature_id) return safeError("Missing required fields: plan_id, feature_id", 400);

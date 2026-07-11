@@ -348,6 +348,9 @@ export default function StorePage() {
             <Link href="/store/testing" className="px-4 py-2 bg-red-100 border border-red-200 rounded-lg text-sm font-medium text-red-700 hover:border-red-400 transition-colors">
               Testing Center
             </Link>
+            <Link href="/store/workflow-studio" className="px-4 py-2 bg-orange-100 border border-orange-200 rounded-lg text-sm font-medium text-orange-700 hover:border-orange-400 transition-colors">
+              Workflow Studio
+            </Link>
             <Link href="/store/courses" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
               Certification Courses
             </Link>

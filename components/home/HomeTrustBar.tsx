@@ -49,7 +49,7 @@ const TRUST_ITEMS = [
 ];
 
 const PARTNER_LOGOS = [
-  { src: '/images/pages/federal-compliance-hero.webp', alt: 'US Department of Labor', href: '/federal-compliance' },
+      { src: '/images/pages/about-hero.webp', alt: 'US Department of Labor', href: '/federal-compliance' },
   { src: '/images/pages/workforce-board.webp', alt: 'Indiana Department of Workforce Development', href: '/partners/workforce' },
   { src: '/images/pages/workone-partners.webp', alt: 'WorkOne Indiana', href: '/partners/workforce' },
   { src: '/images/pages/credential-partners-hero.webp', alt: 'Next Level Jobs', href: '/eligibility' },

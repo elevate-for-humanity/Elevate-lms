@@ -64,7 +64,7 @@ export const HERO_IMAGES = {
 
   // Beauty/Apprenticeship family
   apprenticeship: {
-    barber: '/images/pages/barber-hero-main.jpg',
+    barber: '/images/pages/barber-hero-main.webp',
     cosmetology: '/images/pages/barber-styling-hair.webp',
     esthetician: '/images/pages/barber-apprentice-learning.webp',
     nailTech: '/images/pages/barber-apprenticeship.webp',
@@ -79,7 +79,7 @@ export const HERO_IMAGES = {
 
   // Business family
   business: {
-    taxPrep: '/images/pages/tax-preparation.webp',
+    taxPrep: '/images/pages/business-sector.webp',
     entrepreneurship: '/images/pages/business-sector.webp',
     businessAdmin: '/images/pages/admin-business-hero.webp',
   },
@@ -177,7 +177,7 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
     subtitle:
       'Become a licensed barber through our USDOL-registered apprenticeship. Earn while you learn.',
     videoSrc: VIDEO_HEROES.barberApprenticeship,
-    videoPoster: '/images/pages/barber-hero-main.jpg',
+    videoPoster: '/images/pages/barber-hero-main.webp',
     variant: 'video',
     height: 'medium',
     badge: 'USDOL Registered',

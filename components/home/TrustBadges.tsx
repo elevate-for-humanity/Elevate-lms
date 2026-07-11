@@ -18,7 +18,7 @@ interface TrustBadgesProps {
 
 const BADGES: TrustBadge[] = [
   {
-    img: '/images/pages/federal-compliance-hero.webp',
+    img: '/images/pages/about-hero.webp',
     imgAlt: 'Department of Labor Registered Apprenticeship Sponsor Badge',
     label: 'DOL Registered',
     sublabel: 'Apprenticeship Sponsor',

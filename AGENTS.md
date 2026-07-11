@@ -1,6 +1,6 @@
 # OpenHands Agent Memory - Elevate LMS
 
-**📋 MASTER DOCUMENTATION:** `BLUEPRINT/INDEX.md` - This is the comprehensive source of truth for the entire Elevate for Humanity platform. All development must reference this document.
+**📋 MASTER DOCUMENTATION:** `ENTERPRISE-PRD.md` (4,079 lines) - This is the comprehensive source of truth for the entire Elevate for Humanity platform. All development must reference this document.
 
 ---
 
@@ -30,22 +30,24 @@
 
 ---
 
-## 📚 MASTER DOCUMENT: BLUEPRINT/INDEX.md
+## 📚 MASTER DOCUMENT: ENTERPRISE-PRD.md
 
-The comprehensive Enterprise Product Blueprint is in `BLUEPRINT/INDEX.md` with **Appendices covering**:
+The comprehensive Enterprise PRD covers **32 chapters** with full implementation specs:
 
-| System | Location |
-|--------|----------|
-| PARIS AI (18 agents) | Appendix A |
-| Vertical Engines | Appendix B |
-| RAPIDS Apprenticeship | Appendix C |
-| Testing Center | Appendix D |
-| Government Compliance | Appendix E |
-| AI Builders | Appendix F |
-| White-Label Licensing | Appendix G |
-| Existing Documentation | Appendix H |
+| Chapter | System |
+|---------|--------|
+| 1 | Executive Vision |
+| 2 | Enterprise Architecture |
+| 3 | PARIS AI Operating System (18 agents) |
+| 4 | Dev Studio |
+| 5-10 | AI Builders (Website, Business, Mobile, Workflow, Media, Clone) |
+| 11-12 | Course Factory, Credential Intelligence |
+| 13 | Vertical Engines (HVAC, Medical, Barber, CDL, Peer Recovery) |
+| 14-15 | Apprenticeship Platform, Testing Center |
+| 16-24 | All Platforms & Portals |
+| 25-32 | Business Systems, Security, Infrastructure |
 
-**Full reference:** See `BLUEPRINT/INDEX.md` for complete specifications
+**Full reference:** See `ENTERPRISE-PRD.md` for complete specifications
 
 ---
 
@@ -75,7 +77,7 @@ The comprehensive Enterprise Product Blueprint is in `BLUEPRINT/INDEX.md` with *
 ## 🔧 DEVELOPMENT WORKFLOW
 
 ### Before Starting Any Task
-1. Read the relevant section in `BLUEPRINT/INDEX.md`
+1. Read the relevant chapter in `ENTERPRISE-PRD.md`
 2. Check existing implementations in `/lib/`
 3. Verify database migrations in `/supabase/migrations/`
 4. Review API routes in `/app/api/`
@@ -203,12 +205,13 @@ Every character matters. A misplaced `#` or wrong version number can cause hours
 
 | Document | Path | Purpose |
 |----------|------|---------|
-| Master Blueprint | `BLUEPRINT/INDEX.md` | Complete specification with appendices |
+| **ENTERPRISE-PRD.md** | Root | Complete 4,079-line master specification (32 chapters) |
 | Architecture | `ARCHITECTURE_DOCUMENTATION.md` | System architecture |
 | Dashboard Truth | `TRUE-DASHBOARD-ARCHITECTURE.md` | Portal routing |
 | Database Audit | `DATABASE-AUDIT.md` | Table status |
 | Automation Engine | `INTELLIGENT-AUTOMATION-ENGINE.md` | Lead-to-enrollment |
 | Production Setup | `PRODUCTION-SETUP.md` | Deployment guide |
+| Blueprint | `BLUEPRINT/INDEX.md` | Page specifications |
 
 ---
 

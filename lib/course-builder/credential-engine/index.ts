@@ -13,12 +13,100 @@
  * This is the "brain" of the Course Builder.
  */
 
-import {
+// Re-export everything for easy importing
+export {
+  // Course types
   detectCourseType,
+  COURSE_TYPES,
   type CourseType,
   type GenerationMode,
-  COURSE_TYPES,
 } from './course-types';
+
+export {
+  // Universal credential registry
+  UNIVERSAL_CREDENTIAL_REGISTRY,
+  getCredential,
+  getAvailableCredentials,
+  searchCredentials,
+  getCredentialsByCategory,
+  getCredentialsByType,
+  type CredentialDefinition,
+  type CredentialCategory,
+  type CredentialType,
+} from './credential-registry-universal';
+
+export {
+  // Legacy EPA 608 specific registry
+  CREDENTIAL_REGISTRY,
+  type CredentialBlueprint,
+} from './credential-registry';
+
+export {
+  // Exam blueprints
+  getBlueprint,
+  type ExamBlueprint,
+  topicToPrompt,
+} from './exam-blueprints';
+
+export {
+  // Prompt selector
+  getPrompts,
+  getContentSystemPrompt,
+  getInstructorSystemPrompt,
+  type ContentPrompts,
+} from './prompt-selector';
+
+export {
+  // RAG engine
+  loadRagContext,
+  enhanceWithRag,
+  buildRagPromptContext,
+  type RagContext,
+} from './rag-engine';
+
+export {
+  // Quality validator
+  validateCourse,
+  generateQualityReport,
+  type ValidationResult,
+  type QualityScore,
+} from './quality-validator';
+
+export {
+  // Universal platform
+  initializeCourseBuild,
+  monitorCredentialBlueprints,
+  type CourseBuild,
+  type ModuleBuild,
+  type LessonBuild,
+  type ExamBuild,
+  type InstructorBuild,
+  type MediaBuild,
+  type LabBuild,
+  type ComplianceBuild,
+} from './universal-platform';
+
+export {
+  // Config-based credential loader
+  loadCredentialConfigs,
+  getCredentialFromConfig,
+  searchCredentialsInConfig,
+  getCredentialsByCategoryInConfig,
+  CREDENTIAL_TEMPLATE,
+  type CredentialConfig,
+  type ExamSectionConfig,
+  type BlueprintConfig,
+} from './registry-loader';
+
+export {
+  // Blueprint monitoring
+  monitorAllBlueprints,
+  monitorCredential,
+  recommendUpdates,
+  type BlueprintChange,
+  type BlueprintStatus,
+  type MonitorResult,
+} from './blueprint-monitor';
 
 // Universal registry (includes all credentials)
 export {

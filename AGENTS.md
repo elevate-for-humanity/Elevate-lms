@@ -9,19 +9,24 @@
 ### System Status
 | Component | Status | Notes |
 |-----------|--------|-------|
-| **PARIS AI Operating System** | ✅ Active | 18 AI agents |
-| **Student LMS** | ✅ Active | /lms/dashboard |
-| **Admin Dashboard** | ✅ Active | /admin/dashboard |
-| **Testing Center** | ✅ Active | ACT WorkKeys, Certiport, PSI |
-| **Apprenticeship (RAPIDS)** | ✅ Active | Barber, Cosmetology |
-| **Stripe Payments** | ✅ Active | Webhooks configured |
-| **Email (Resend/SendGrid)** | ✅ Active | Transactional emails |
-| **Database (Supabase)** | ✅ Active | 200+ tables |
-| **Northflank Deployment** | ✅ Active | Docker containers |
+| **PARIS AI Operating System** | ✅ Code Ready | 18 AI agents |
+| **Student LMS** | ✅ Code Ready | /lms/dashboard |
+| **Admin Dashboard** | ✅ Code Ready | /admin/dashboard |
+| **Testing Center** | ✅ Code Ready | ACT WorkKeys, Certiport, PSI |
+| **Apprenticeship (RAPIDS)** | ✅ Code Ready | Barber, Cosmetology |
+| **Stripe Payments** | ✅ Code Ready | Webhooks configured |
+| **Email (Resend/SendGrid)** | ✅ Code Ready | Transactional emails |
+| **Database (Supabase)** | ✅ Code Ready | 200+ tables |
+| **Northflank Deployment** | ⚠️ Pending | Needs secrets + build |
 
-### Production URLs
-- **Main Site**: https://work-1-xlhyjyadwhfndgof.prod-runtime.all-hands.dev/ (port 12000)
-- **Admin**: https://work-2-xlhyjyadwhfndgof.prod-runtime.all-hands.dev/ (port 12001)
+### Production URLs (Pending Deployment)
+- **Main Site**: `work-1-{project}.prod-runtime.all-hands.dev`
+- **Admin**: `work-2-{project}.prod-runtime.all-hands.dev`
+
+**⚠️ NOT DEPLOYED YET** - Code committed to GitHub, need to:
+1. Set NORTHFLANK_API_TOKEN environment variable
+2. Configure secrets in Northflank dashboard
+3. Trigger build from new commit
 
 ---
 

@@ -91,22 +91,90 @@ export default function EnterpriseDemoPage() {
         </div>
       </section>
 
-      {/* Demo Video Placeholder */}
+      {/* Interactive Demo Preview */}
       <section className="py-12 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="aspect-video bg-slate-900 rounded-2xl flex items-center justify-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-700/20 to-slate-900/80" />
-            <div className="relative text-center">
-              <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 cursor-pointer hover:bg-white/20 transition-colors">
-                <Play className="w-8 h-8 text-white ml-1" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+            {/* Browser chrome */}
+            <div className="bg-slate-100 px-4 py-3 flex items-center gap-2 border-b border-slate-200">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                <div className="w-3 h-3 rounded-full bg-green-400"></div>
               </div>
-              <p className="text-white font-semibold">Watch Enterprise Infrastructure Demo</p>
-              <p className="text-slate-400 text-sm mt-1">10–12 minutes</p>
+              <div className="flex-1 text-center">
+                <span className="text-xs text-slate-500">workforce-board.elevateforhumanity.org</span>
+              </div>
+            </div>
+            
+            {/* Analytics Dashboard Mockup */}
+            <div className="p-6 bg-slate-50">
+              <div className="grid grid-cols-4 gap-4 mb-6">
+                {[
+                  { label: 'WIOA Enrolled', value: '1,247', change: 'This quarter' },
+                  { label: 'ITA Issued', value: '$2.4M', change: 'Allocated' },
+                  { label: 'Credentials Earned', value: '892', change: '+18% YoY' },
+                  { label: 'Placement Rate', value: '87%', change: 'Above target' },
+                ].map((stat) => (
+                  <div key={stat.label} className="bg-white rounded-lg p-4 border border-slate-200">
+                    <p className="text-xs text-slate-500 font-medium">{stat.label}</p>
+                    <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
+                    <p className="text-xs text-emerald-600 mt-1">{stat.change}</p>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white rounded-lg border border-slate-200 p-4">
+                  <h4 className="font-semibold text-slate-900 mb-4">Provider Performance</h4>
+                  <div className="space-y-3">
+                    {[
+                      { name: 'Elevate for Humanity', enrolled: 342, placed: 298, rate: '87%' },
+                      { name: 'Workforce Partners LLC', enrolled: 215, placed: 178, rate: '83%' },
+                    ].map((p) => (
+                      <div key={p.name} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                        <div>
+                          <p className="font-medium text-sm text-slate-900">{p.name}</p>
+                          <p className="text-xs text-slate-500">{p.enrolled} enrolled</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-emerald-600">{p.rate}</p>
+                          <p className="text-xs text-slate-500">{p.placed} placed</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="bg-white rounded-lg border border-slate-200 p-4">
+                  <h4 className="font-semibold text-slate-900 mb-4">PIRL Reporting Status</h4>
+                  <div className="space-y-3">
+                    {['Q1 2026', 'Q4 2025', 'Q3 2025'].map((q, i) => (
+                      <div key={q} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                        <span className="text-sm text-slate-900">{q}</span>
+                        <span className={`text-xs px-2 py-1 rounded-full ${i === 0 ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                          {i === 0 ? 'In Progress' : 'Submitted'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <p className="text-center text-sm text-slate-500 mt-4">
-            This demo reflects the live production system.
-          </p>
+          
+          <div className="text-center mt-6">
+            <p className="text-sm text-slate-500 mb-4">
+              This is a preview of the live workforce board analytics dashboard
+            </p>
+            <Link
+              href="/store/demo/admin"
+              className="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-800 text-white font-bold px-6 py-3 rounded-lg transition-colors"
+            >
+              <Play className="w-5 h-5" />
+              Open Interactive Demo
+            </Link>
+          </div>
         </div>
       </section>
 

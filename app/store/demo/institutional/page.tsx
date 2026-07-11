@@ -84,22 +84,86 @@ export default function InstitutionalDemoPage() {
         </div>
       </section>
 
-      {/* Demo Video Placeholder */}
+      {/* Interactive Demo Preview */}
       <section className="py-12 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="aspect-video bg-slate-900 rounded-2xl flex items-center justify-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-slate-900/80" />
-            <div className="relative text-center">
-              <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 cursor-pointer hover:bg-white/20 transition-colors">
-                <Play className="w-8 h-8 text-white ml-1" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+            {/* Browser chrome */}
+            <div className="bg-slate-100 px-4 py-3 flex items-center gap-2 border-b border-slate-200">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                <div className="w-3 h-3 rounded-full bg-green-400"></div>
               </div>
-              <p className="text-white font-semibold">Watch Institutional Operator Demo</p>
-              <p className="text-slate-400 text-sm mt-1">8–10 minutes</p>
+              <div className="flex-1 text-center">
+                <span className="text-xs text-slate-500">admin.elevateforhumanity.org</span>
+              </div>
+            </div>
+            
+            {/* Dashboard Mockup */}
+            <div className="p-6 bg-slate-50">
+              <div className="grid grid-cols-4 gap-4 mb-6">
+                {[
+                  { label: 'Active Students', value: '247', change: '+12%' },
+                  { label: 'Applications', value: '38', change: '3 pending' },
+                  { label: 'Revenue MTD', value: '$12,450', change: '+8%' },
+                  { label: 'Credentials', value: '89', change: 'This month' },
+                ].map((stat) => (
+                  <div key={stat.label} className="bg-white rounded-lg p-4 border border-slate-200">
+                    <p className="text-xs text-slate-500 font-medium">{stat.label}</p>
+                    <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
+                    <p className="text-xs text-emerald-600 mt-1">{stat.change}</p>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="bg-white rounded-lg border border-slate-200 p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-slate-900">Recent Applications</h4>
+                  <span className="text-xs text-slate-500">Last 7 days</span>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { name: 'Marcus Johnson', program: 'CDL Training', status: 'Under Review' },
+                    { name: 'Sarah Williams', program: 'HVAC Technician', status: 'Approved' },
+                    { name: 'James Brown', program: 'Medical Assistant', status: 'Pending Docs' },
+                  ].map((app) => (
+                    <div key={app.name} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center text-brand-blue-700 font-semibold text-xs">
+                          {app.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm text-slate-900">{app.name}</p>
+                          <p className="text-xs text-slate-500">{app.program}</p>
+                        </div>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        app.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' :
+                        app.status === 'Pending Docs' ? 'bg-amber-100 text-amber-700' :
+                        'bg-slate-100 text-slate-700'
+                      }`}>
+                        {app.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-          <p className="text-center text-sm text-slate-500 mt-4">
-            This demo reflects the live production system.
-          </p>
+          
+          <div className="text-center mt-6">
+            <p className="text-sm text-slate-500 mb-4">
+              This is a preview of the live admin dashboard
+            </p>
+            <Link
+              href="/store/demo/admin"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors"
+            >
+              <Play className="w-5 h-5" />
+              Open Interactive Demo
+            </Link>
+          </div>
         </div>
       </section>
 

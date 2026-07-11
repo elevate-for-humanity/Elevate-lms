@@ -67,6 +67,8 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  // Initialize Stripe
+  const stripe = getStripe();
   if (!stripe) {
     logger.error('Application fee checkout: Stripe not configured');
     return NextResponse.json({ error: 'Payment not configured' }, { status: 503 });
@@ -82,11 +84,7 @@ export async function POST(request: NextRequest) {
     ? '/partners/barber-host-shop/apply?cancelled=true' 
     : `/programs/${programSlug}/apply?cancelled=true`;
 
-  	try {
-    const stripe = getStripe();
-    if (!stripe) {
-      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
-    }
+  try {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],

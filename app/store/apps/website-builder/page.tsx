@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import CanonicalVideo from '@/components/video/CanonicalVideo';
-import { Play, Star, Layout, Palette, Globe, Zap, Shield, BarChart } from 'lucide-react';
+import { Play, Star, Layout, Palette, Globe, Zap, Shield, BarChart, ArrowRight, Monitor, MousePointer, Eye } from 'lucide-react';
 import { IndividualAppPlansSection } from '@/components/store/IndividualAppPlansSection';
 import { INDIVIDUAL_APP_CATALOG } from '@/lib/apps/individual-app-plans';
 
@@ -144,6 +144,95 @@ export default function WebsiteBuilderAppPage() {
               poster="/images/pages/store-hero.webp"
               className="absolute inset-0 w-full h-full object-cover"
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Live Interactive Demo */}
+      <section className="py-20 px-4 bg-white border-t border-slate-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-sm font-bold text-brand-red-600 uppercase tracking-wider mb-3">Interactive Demo</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">
+              Try It Before You Buy
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Build a page in real-time with our drag-and-drop editor. No account required for preview.
+            </p>
+          </div>
+          
+          <div className="grid lg:grid-cols-2 gap-8 items-start">
+            {/* Builder Preview */}
+            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                {/* Browser chrome */}
+                <div className="bg-slate-100 px-4 py-3 flex items-center gap-2 border-b border-slate-200">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                  </div>
+                  <div className="flex-1 text-center">
+                    <span className="text-xs text-slate-500">elevatetraining.org/demo</span>
+                  </div>
+                </div>
+                {/* Page preview mock */}
+                <div className="p-6">
+                  <div className="bg-brand-blue-600 rounded-lg p-4 mb-4 text-white text-center">
+                    <p className="font-bold">Workforce Training Center</p>
+                    <p className="text-sm text-blue-100">Start your career today</p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <div className="bg-slate-200 rounded h-16"></div>
+                    <div className="bg-slate-200 rounded h-16"></div>
+                    <div className="bg-slate-200 rounded h-16"></div>
+                  </div>
+                  <div className="bg-slate-100 rounded p-3 text-sm text-slate-600">
+                    Enrollment form will appear here
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Features */}
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 mb-6">What You Can Build</h3>
+              <div className="space-y-4">
+                {[
+                  { icon: MousePointer, title: 'Drag & Drop Blocks', desc: 'Add videos, forms, testimonials, and more with one click' },
+                  { icon: Monitor, title: 'Live Preview', desc: 'See changes instantly as you build' },
+                  { icon: Palette, title: 'Industry Templates', desc: 'Healthcare, trades, beauty, technology — pre-styled for you' },
+                  { icon: Eye, title: 'LMS Integration', desc: 'Connect enrollment forms directly to Elevate LMS' },
+                ].map((item, i) => (
+                  <div key={i} className="flex gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <item.icon className="w-5 h-5 text-brand-blue-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900">{item.title}</h4>
+                      <p className="text-sm text-slate-600">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                <Link
+                  href="/store/demo/website-builder"
+                  className="flex-1 flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
+                >
+                  <Monitor className="w-5 h-5" />
+                  Open Live Demo
+                </Link>
+                <Link
+                  href="/apps/website-builder/start-trial"
+                  className="flex-1 flex items-center justify-center gap-2 border-2 border-slate-300 hover:border-brand-blue-500 hover:bg-brand-blue-50 text-slate-700 font-bold py-3 px-6 rounded-xl transition-colors"
+                >
+                  Start 14-Day Trial
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>

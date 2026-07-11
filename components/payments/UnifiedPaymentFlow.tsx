@@ -12,6 +12,9 @@ import {
   Loader2,
   Info,
   CheckCircle,
+  Tag,
+  X,
+  Gift,
 } from 'lucide-react';
 
 interface PaymentMethod {
@@ -45,8 +48,48 @@ export default function UnifiedPaymentFlow({
   const [selectedMethod, setSelectedMethod] = useState<string>('card');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [couponError, setCouponError] = useState('');
 
   const monthlyPayment = Math.ceil(price / 4);
+  
+  // Calculate discounted price if coupon applied
+  const discountAmount = appliedCoupon ? Math.round(price * (appliedCoupon.discount / 100)) : 0;
+  const discountedPrice = price - discountAmount;
+  const discountedMonthlyPayment = Math.ceil(discountedPrice / 4);
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    setCouponError('');
+    
+    try {
+      const res = await fetch('/api/store/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: couponCode, amount: discountedPrice * 100 }),
+      });
+      const data = await res.json();
+      
+      if (data.valid) {
+        setAppliedCoupon({ code: couponCode.toUpperCase(), discount: data.coupon.discount_value });
+        setCouponCode('');
+      } else {
+        setCouponError(data.error || 'Invalid coupon code');
+      }
+    } catch {
+      setCouponError('Failed to validate coupon');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+  };
 
   // BNPL options derived from bnpl-config — no provider names hardcoded here
   const bnplMethods: PaymentMethod[] = getProvidersForAmount(price).map((p) => ({
@@ -91,6 +134,7 @@ export default function UnifiedPaymentFlow({
           programId,
           paymentType,
           preferredMethod: selectedMethod,
+          couponCode: appliedCoupon?.code,
         }),
       });
 
@@ -263,11 +307,76 @@ export default function UnifiedPaymentFlow({
                 {paymentType === 'full' ? 'Total Due Today' : 'First Payment'}
               </span>
               <span className="text-2xl font-bold text-brand-blue-600">
-                ${(paymentType === 'full' ? price : monthlyPayment).toLocaleString('en-US')}
+                ${(paymentType === 'full' ? discountedPrice : discountedMonthlyPayment).toLocaleString('en-US')}
               </span>
             </div>
+            {appliedCoupon && (
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-sm text-brand-green-600 font-medium">
+                  <Gift className="w-4 h-4 inline mr-1" />
+                  {appliedCoupon.discount}% discount applied
+                </span>
+                <span className="text-sm text-brand-green-600 font-medium">
+                  -${discountAmount.toLocaleString('en-US')}
+                </span>
+              </div>
+            )}
           </div>
         </div>
+      </div>
+
+      {/* Coupon Code Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+        <h2 className="text-lg font-bold text-black mb-4 flex items-center gap-2">
+          <Tag className="w-5 h-5 text-brand-red-500" />
+          Have a Promo Code?
+        </h2>
+        
+        {!appliedCoupon ? (
+          <div>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                placeholder="Enter promo code"
+                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg font-mono uppercase focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+                disabled={couponLoading}
+              />
+              <button
+                onClick={applyCoupon}
+                disabled={!couponCode.trim() || couponLoading}
+                className="px-6 py-3 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
+              >
+                {couponLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  'Apply'
+                )}
+              </button>
+            </div>
+            {couponError && (
+              <p className="text-sm text-brand-red-600 mt-2">{couponError}</p>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center justify-between bg-brand-green-50 border border-brand-green-200 rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="w-5 h-5 text-brand-green-600" />
+              <div>
+                <p className="font-bold text-brand-green-700">{appliedCoupon.code}</p>
+                <p className="text-sm text-brand-green-600">{appliedCoupon.discount}% discount applied</p>
+              </div>
+            </div>
+            <button
+              onClick={removeCoupon}
+              className="p-2 text-brand-green-600 hover:text-brand-green-800 hover:bg-brand-green-100 rounded-lg transition-colors"
+              aria-label="Remove coupon"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Security Notice */}

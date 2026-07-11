@@ -60,6 +60,7 @@ async function handler(req: Request) {
     const contentType = req.headers.get('content-type') || '';
     let productId: string | null = null;
     let customerEmail: string | null = null;
+    let couponCode: string | null = null;
 
     // Support both form POST and JSON
     if (
@@ -69,10 +70,12 @@ async function handler(req: Request) {
       const form = await req.formData();
       productId = String(form.get('productId') || '');
       customerEmail = form.get('customerEmail') ? String(form.get('customerEmail')) : null;
+      couponCode = form.get('couponCode') ? String(form.get('couponCode')) : null;
     } else {
       const body = await req.json().catch(() => ({}));
       productId = body?.productId ?? null;
       customerEmail = body?.customerEmail ?? null;
+      couponCode = body?.couponCode ?? null;
     }
 
     if (!productId) {
@@ -112,7 +115,7 @@ async function handler(req: Request) {
     const planName = planNameMap[productId] || 'starter';
 
     // Create Stripe Checkout session
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: Parameters<typeof stripe.checkout.sessions.create>[0] = {
       mode: product.billingType === 'subscription' ? 'subscription' : 'payment',
       // Let Stripe automatically handle payment methods (includes cards + BNPL)
       // DO NOT set payment_method_types - this enables Klarna, Afterpay, Zip, etc.
@@ -135,12 +138,20 @@ async function handler(req: Request) {
         tenant_id: tenantId || '',
         plan_name: planName,
         stripe_price_id: priceId,
+        coupon_code: couponCode || '',
       },
       // Enable automatic tax calculation if configured
       automatic_tax: {
         enabled: true, // Set to true after configuring Stripe Tax
       },
-    });
+    };
+
+    // Apply coupon if provided
+    if (couponCode) {
+      sessionParams.discounts = [{ coupon: couponCode }];
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     if (!session.url) {
       return NextResponse.redirect(new URL(`${productUrl}?error=checkout-failed`, req.url), 303);

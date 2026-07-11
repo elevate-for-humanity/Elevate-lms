@@ -5,7 +5,9 @@
  * - Import Engine: Connect external codebases, APIs, and services
  * - AI Workforce: Specialized AI agents with roles and permissions
  * - Marketing Studio: AI-powered content generation and publishing
+ * - Media Studio: AI image search, generation, and management
  * - Voice Commands: Natural language interface
+ * - Live Canvas: Real-time collaborative development
  * 
  * Usage:
  * 
@@ -29,6 +31,7 @@ export * from './voice-commands';
 export * from './import-engine';
 export * from './workforce';
 export * from './marketing';
+export * from './media-studio';
 
 // Types
 export type { ParsedCommand, CommandIntent } from './dev-studio';
@@ -59,6 +62,14 @@ export const PARIS_QUICK_START = {
       'Generate a video reel',
       'Create a marketing campaign',
       'Schedule social posts',
+    ],
+  },
+  media: {
+    description: 'Search and generate images',
+    examples: [
+      'Find a hero image',
+      'Generate a promotional graphic',
+      'Create brand assets',
     ],
   },
   voice: {

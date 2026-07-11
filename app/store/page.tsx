@@ -10,6 +10,8 @@ import StoreDemoVideo from './StoreDemoVideo';
 import StoreFAQ from './StoreFAQ';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
+import { ROICalculator } from '@/components/store/ROICalculator';
+import { AnimatedSection, AnimatedCard } from '@/components/ui/AnimatedSection';
 
 export const metadata: Metadata = {
   title: 'License the Elevate Platform | White-Label Workforce LMS',
@@ -76,12 +78,14 @@ export default function StorePage() {
               { icon: Building2, title: 'Employer Portal', desc: 'Partners browse pre-screened candidates, track apprenticeship hours, manage OJT reimbursements, and sign MOUs.' },
               { icon: BarChart3, title: 'Automated Reporting', desc: 'WIOA performance, grant utilization, enrollment trends, outcome data. Generated on demand. No manual assembly.' },
               { icon: Zap, title: 'Your Brand, Your Domain', desc: 'Your logo, colors, and URL. Students and employers see your organization. The platform is invisible.' },
-            ].map((item) => (
-              <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-5">
-                <item.icon className="w-5 h-5 text-brand-red-600 mb-3" />
-                <h3 className="font-bold text-slate-900 mb-1.5 text-sm">{item.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
-              </div>
+            ].map((item, index) => (
+              <AnimatedCard key={item.title} index={index}>
+                <div className="bg-white rounded-xl border border-slate-200 p-5 h-full">
+                  <item.icon className="w-5 h-5 text-brand-red-600 mb-3" />
+                  <h3 className="font-bold text-slate-900 mb-1.5 text-sm">{item.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                </div>
+              </AnimatedCard>
             ))}
           </div>
         </div>
@@ -335,6 +339,12 @@ export default function StorePage() {
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Also in the Store</h2>
           <div className="flex flex-wrap gap-3">
+            <Link href="/store/dev-studio" className="px-4 py-2 bg-purple-100 border border-purple-200 rounded-lg text-sm font-medium text-purple-700 hover:border-purple-400 transition-colors">
+              Dev Studio
+            </Link>
+            <Link href="/store/course-builder" className="px-4 py-2 bg-emerald-100 border border-emerald-200 rounded-lg text-sm font-medium text-emerald-700 hover:border-emerald-400 transition-colors">
+              Course Builder
+            </Link>
             <Link href="/store/courses" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
               Certification Courses
             </Link>
@@ -357,6 +367,19 @@ export default function StorePage() {
               All Products
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* ============ ROI CALCULATOR ============ */}
+      <section className="py-20 px-4 bg-slate-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Calculate Your ROI</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              See how much you can save by automating enrollment, compliance, and reporting
+            </p>
+          </div>
+          <ROICalculator />
         </div>
       </section>
 

@@ -429,7 +429,7 @@ Enterprise
 
 ## 13. SUBSCRIPTION CONFIGURATION STUDIO
 
-### Status: ❌ NOT IMPLEMENTED
+### Status: 🟡 IN DEV STUDIO (Not Built)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
@@ -439,6 +439,18 @@ Enterprise
 | Stripe mapping UI | ❌ | **MISSING** |
 | Onboarding editor | ❌ | **MISSING** |
 | Test customer view | ❌ | **MISSING** |
+| Dev Studio exists | ✅ | `/admin/dev-studio` |
+| Dev Studio modules | ✅ | 10 workspaces |
+
+### Dev Studio Components:
+```
+✅ /admin/dev-studio/containers
+✅ /admin/dev-studio/database
+✅ /admin/dev-studio/deployments
+✅ /admin/dev-studio/services
+✅ /admin/dev-studio/performance
+❌ /admin/dev-studio/subscriptions (NOT BUILT)
+```
 
 ---
 
@@ -463,22 +475,24 @@ Enterprise
 
 ## FEATURE STATUS SUMMARY
 
-### ✅ Complete (10)
-- Feature Registry
+### ✅ Complete (12)
+- Feature Registry (25 features)
 - Plan-to-Feature Mapping
 - Stripe Configuration
-- Automatic Provisioning
-- Feature Middleware
-- Limit Enforcement
+- Automatic Provisioning (via webhook)
+- Feature Middleware (requireFeatureForAuth)
+- Limit Enforcement (seats, storage, AI)
 - Subscription APIs
-- Database Tables
+- Database Tables (subscription_plans, features, plan_features)
 - Billing History
 - Invoice Generation
+- Host Shop Subscriptions (separate tier)
+- Trial Management (14-day)
 
 ### 🟡 Partially Implemented (3)
-- Onboarding Templates (basic)
-- Admin Dashboard (limited)
-- Plan Configuration (database only)
+- Onboarding Templates (basic checklists)
+- Admin Dashboard (read-mostly)
+- Plan Configuration (database, not UI)
 
 ### ❌ Missing (2)
 - Subscription Configuration Studio
@@ -489,45 +503,48 @@ Enterprise
 ## FINAL CHECKLIST
 
 ### ✅ Confirmed Working
-- [x] Central Feature Registry
-- [x] Subscription Configuration table
-- [x] Plan-to-Feature mapping
-- [x] Stripe auto-assigns plan
-- [x] Middleware enforces permissions
-- [x] Onboarding varies by plan
+- [x] Central Feature Registry (25 features in DB)
+- [x] Subscription Configuration table (subscription_plans, features, plan_features)
+- [x] Plan-to-Feature mapping (DB + code fallback)
+- [x] Stripe auto-assigns plan (webhook handler)
+- [x] Middleware enforces permissions (requireFeatureForAuth)
+- [x] Onboarding varies by plan (trial flow)
 - [x] Plans editable in database
 - [x] Upgrades/downgrades work
 - [x] Seat limits enforced
 - [x] Storage limits enforced
 - [x] AI limits enforced
 - [x] Admin can view subscriptions
+- [x] Host Shop subscription tiers (starter/pro/enterprise)
+- [x] 14-day trial management
 
 ### ❌ Need to Build
-- [ ] Subscription Configuration Studio
+- [ ] Subscription Configuration Studio in Dev Studio
 - [ ] Visual plan builder UI
-- [ ] Feature drag-drop
-- [ ] Plan preview
+- [ ] Feature drag-drop assignment
+- [ ] Plan preview as customer
 - [ ] Onboarding flow editor
 - [ ] Test customer view
+- [ ] Admin UI for plan CRUD
 
 ---
 
 ## RECOMMENDED ACTIONS
 
 ### P1 - High Priority
-1. **Build Subscription Configuration Studio** in Dev Studio
-2. **Add visual plan builder** - Drag-drop features
-3. **Add plan preview** - See as customer
-4. **Add onboarding editor** - Customize flows
+1. **Build Subscription Configuration Studio** at `/admin/dev-studio/subscriptions`
+2. **Add visual plan builder** - CRUD for subscription_plans table
+3. **Add feature assignment UI** - Checkbox grid for plan_features
+4. **Add Stripe product mapping** - Link to stripe_product_id/stripe_price_id
 
 ### P2 - Medium
-5. **Add Stripe product mapping UI**
-6. **Add promotional plan builder**
-7. **Add A/B testing for plans**
-8. **Add plan analytics**
+5. **Add plan preview** - Show as customer would see
+6. **Add onboarding editor** - Customize trial checklists
+7. **Add promotional plan builder** - Limited-time offers
+8. **Add plan analytics** - Conversion tracking
 
 ### P3 - Nice to Have
-9. **Add plan comparison API**
-10. **Add customer self-service upgrades**
-11. **Add grace period for limits**
-12. **Add plan migration wizard**
+9. **Add plan comparison API** - For upgrades page
+10. **Add customer self-service upgrades** - Portal UI
+11. **Add grace period for limits** - Warning before cutoff
+12. **Add plan migration wizard** - Guide upgrades

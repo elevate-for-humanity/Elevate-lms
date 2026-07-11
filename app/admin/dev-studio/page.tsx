@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Monitor, Database, Zap, Code, GitBranch, Box, Terminal, Layers } from 'lucide-react';
+import { Monitor, Database, Zap, Code, GitBranch, Box, Terminal, Layers, CreditCard } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Dev Studio | Elevate for Humanity Admin',
@@ -60,6 +60,13 @@ export default function DevStudioPage() {
             <h3 className="text-xl font-bold mb-2">Services</h3>
             <p className="text-slate-400 text-sm mb-4">View running services status</p>
             <Link href="/admin/dev-studio/services" className="text-teal-400 hover:underline text-sm">Open →</Link>
+          </div>
+
+          <div className="bg-slate-800 rounded-xl p-6 hover:bg-slate-700 transition-colors border-2 border-brand-red-500/50">
+            <CreditCard className="w-10 h-10 text-brand-red-400 mb-4" />
+            <h3 className="text-xl font-bold mb-2">Subscription Config</h3>
+            <p className="text-slate-400 text-sm mb-4">Manage plans, features, and billing</p>
+            <Link href="/admin/dev-studio/subscriptions" className="text-brand-red-400 hover:underline text-sm">Open →</Link>
           </div>
         </div>
 

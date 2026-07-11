@@ -345,6 +345,9 @@ export default function StorePage() {
             <Link href="/store/course-builder" className="px-4 py-2 bg-emerald-100 border border-emerald-200 rounded-lg text-sm font-medium text-emerald-700 hover:border-emerald-400 transition-colors">
               Course Builder
             </Link>
+            <Link href="/store/testing" className="px-4 py-2 bg-red-100 border border-red-200 rounded-lg text-sm font-medium text-red-700 hover:border-red-400 transition-colors">
+              Testing Center
+            </Link>
             <Link href="/store/courses" className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-brand-red-300 hover:text-brand-red-700 transition-colors">
               Certification Courses
             </Link>

@@ -31,6 +31,7 @@ import {
   User,
   Globe,
 } from 'lucide-react';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 export const metadata: Metadata = {
   title: 'Apprentice Portal | Indiana Barber Apprenticeship',
@@ -482,6 +483,9 @@ export default async function ApprenticePortalPage() {
           <HelpCircle className="w-6 h-6" />
         </button>
       </div>
+
+      {/* PARIS AI Coach */}
+      <ParisFloatingWrapper />
     </div>
   );
 }

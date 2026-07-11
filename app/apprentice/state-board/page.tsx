@@ -15,6 +15,7 @@ import {
 import { IPLA_EXAM_INFO, IPLA_EXAM_FEES } from '@/lib/payment-config';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import {
   APPRENTICESHIP_REQUIRED_HOURS,
   getApprenticeshipRequiredHours,
@@ -391,6 +392,7 @@ export default async function StateBoardExamPage() {
           </div>
         </div>
       </div>
+      <ParisFloatingWrapper />
     </div>
   );
 }

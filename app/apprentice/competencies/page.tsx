@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { resolveApprenticeProgram } from '@/lib/compliance/apprenticeship';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 export const metadata: Metadata = {
   title: 'Competency Progress | Apprentice Portal',
@@ -412,6 +413,7 @@ export default async function ApprenticeCompetenciesPage() {
           </div>
         )}
       </div>
+      <ParisFloatingWrapper />
     </div>
   );
 }

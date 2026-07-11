@@ -6,6 +6,7 @@ import { Clock, Plus, Calendar, TrendingUp, Target } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 export const metadata: Metadata = {
   title: 'Apprentice Hours',
@@ -244,6 +245,7 @@ export default async function ApprenticeHoursPage() {
           </div>
         )}
       </div>
+      <ParisFloatingWrapper />
     </div>
   );
 }

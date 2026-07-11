@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 export const metadata: Metadata = {
   title: 'Orientation | Elevate for Humanity',
@@ -20,6 +21,7 @@ export default function Page() {
           <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
         </div>
       </section>
+      <ParisFloatingWrapper />
     </div>
   );
 }

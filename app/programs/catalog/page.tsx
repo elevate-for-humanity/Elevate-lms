@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { BookOpen, MapPin, Clock, Award } from 'lucide-react';
 import CatalogFilters from './CatalogFilters';
 import { PayNowButton } from '@/components/programs/PayNowButton';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 export const revalidate = 0;
 
@@ -211,6 +212,7 @@ export default async function ProgramCatalogPage({
           </div>
         </div>
       </div>
+      <ParisFloatingWrapper />
     </div>
   );
 }

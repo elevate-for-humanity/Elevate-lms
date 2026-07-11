@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 export const revalidate = 3600;
 
@@ -253,6 +254,7 @@ export default function EmployerPage() {
           </div>
         </div>
       </section>
+      <ParisFloatingWrapper />
     </div>
   );
 }

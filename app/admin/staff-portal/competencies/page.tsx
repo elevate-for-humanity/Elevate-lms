@@ -8,7 +8,7 @@ import {
   Clock,
   Check,
   XCircle,
-  Image,
+  Camera,
   Video,
   FileText,
   ChevronRight,
@@ -145,7 +145,7 @@ export default function StaffCompetenciesPage() {
                       </span>
                       <span className="flex items-center gap-1">
                         {signoff.evidence === 'photo' ? (
-                          <><Image className="w-4 h-4" /> Photo</>
+                          <><Camera className="w-4 h-4" /> Photo</>
                         ) : (
                           <><Video className="w-4 h-4" /> Video</>
                         )}

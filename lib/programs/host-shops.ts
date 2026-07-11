@@ -35,6 +35,11 @@ export const PROGRAM_SLUGS = {
 
 export type ProgramKey = keyof typeof PROGRAM_SLUGS;
 
+export const PROGRAM_LABELS: Record<ProgramKey, string> = {
+  barber: 'Barber Apprenticeship',
+  cosmetology: 'Cosmetology Apprenticeship',
+};
+
 function parseAddress(raw: string): { address: string; city: string; state: string; zip: string } {
   // Expected format: "123 Main St, City, ST 12345"
   const parts = raw.split(',').map((p) => p.trim());

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Build as BuildIcon, Play, RefreshCw, CheckCircle, XCircle, Clock, FileText } from 'lucide-react';
+import { Hammer as BuildIcon, Play, RefreshCw, CheckCircle, XCircle, Clock, FileText } from 'lucide-react';
 
 interface Build {
   id: string;

@@ -31,3 +31,14 @@ export const statLabel = {
   employers: SITE_STATS.employerPartnersDisplay,
   funding: SITE_STATS.fundingSecuredDisplay,
 } as const;
+
+/**
+ * Format programs display for careers page
+ */
+export function formatProgramsDisplay(programs: Array<{ title: string }>): string {
+  if (!programs || programs.length === 0) return 'various programs';
+  const names = programs.map((p) => p.title);
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return names.join(' and ');
+  return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
+}

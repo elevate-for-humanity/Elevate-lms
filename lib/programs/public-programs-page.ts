@@ -14,6 +14,11 @@ import {
 } from '@/lib/programs/load-program-catalog';
 
 /** Slugs hidden from the public /programs grid (legacy duplicates, drafts). */
+// Aliases for backward compatibility
+export const buildProgramsCatalogMetadata = buildProgramsListingMetadata;
+export const getPublicProgramsCatalogPage = getPublicProgramsPageData;
+export type PublicCatalogProgram = ProgramsPageRow;
+
 export const PROGRAMS_PAGE_SUPPRESSED_SLUGS = new Set([
   'cna-training',
   'hvac',

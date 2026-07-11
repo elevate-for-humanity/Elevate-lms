@@ -13,7 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/store/stripe';
+import { getStripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
 import { 
   APPLICATION_FEE_PRICE_ID, 
@@ -82,7 +82,11 @@ export async function POST(request: NextRequest) {
     ? '/partners/barber-host-shop/apply?cancelled=true' 
     : `/programs/${programSlug}/apply?cancelled=true`;
 
-  try {
+  	try {
+    const stripe = getStripe();
+    if (!stripe) {
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
+    }
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],

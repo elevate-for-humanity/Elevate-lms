@@ -2,17 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth/require-admin';
 import { createClient } from '@supabase/supabase-js';
 
-// Admin client for server-side operations
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy admin client for server-side operations
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error('Missing Supabase configuration');
+  }
+  return createClient(url, key);
+}
 
 // GET /api/admin/subscriptions/plans - List all plans with features
 export async function GET(request: NextRequest) {
   try {
     const auth = await requireAdmin(request);
     if (auth.error) return auth.error;
+
+    const supabaseAdmin = getSupabaseAdmin();
 
     // Fetch all plans with their features
     const { data: plans, error: plansError } = await supabaseAdmin

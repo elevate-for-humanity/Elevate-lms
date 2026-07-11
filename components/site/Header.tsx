@@ -19,7 +19,7 @@ const PROGRAM_APPLY_LINKS = Object.fromEntries(
 export default function Header() {
   return (
     <header
-      className="fixed top-0 left-0 right-0 h-[60px] bg-white z-[9999] shadow-sm border-b border-slate-100"
+      className="fixed top-0 left-0 right-0 h-[60px] bg-white/95 backdrop-blur-md z-[9999] shadow-sm border-b border-slate-100 transition-all duration-200"
       role="banner"
     >
       <div className="max-w-screen-2xl mx-auto w-full h-full px-4 lg:px-8 grid grid-cols-[auto_1fr_auto] items-center gap-2 lg:gap-4">

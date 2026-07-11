@@ -87,7 +87,7 @@ const PROVIDERS = [
       { name: 'Platinum Certificate', career: 'Highly Skilled', salary: '+35-40% Earnings' },
     ],
     accent: 'from-emerald-600 to-teal-600',
-    examFee: WORKKEYS_PRICING ? `$${WORKKEYS_PRICING.appliedTech.price} - $${WORKKEYS_PRICING.graphicHiring.price}` : '$55 - $100',
+    examFee: WORKKEYS_PRICING ? `$${WORKKEYS_PRICING.individual.price} - $${WORKKEYS_PRICING.ncrc.price}` : '$55 - $100',
     color: 'green',
   },
   {

@@ -132,7 +132,7 @@ async function publishNow(
   const postId = `${platform}_${Date.now()}`;
   const publishedUrl = `https://${platform}.com/post/${postId}`;
 
-  console.log(`[${platform}] Publishing:`, {
+  console.info(`[${platform}] Publishing:`, {
     text: content.text.substring(0, 100),
     media: mediaUrls,
   });
@@ -528,7 +528,7 @@ function getNextOccurrence(day: string, time: string): string {
   const now = new Date();
   const [hours, minutes] = time.replace(/[APM\s]/g, '').split(':').map(Number);
   
-  let targetDate = new Date(now);
+  const targetDate = new Date(now);
   const currentDay = now.getDay();
   
   // Find next occurrence of target day

@@ -4,18 +4,27 @@ import { logger } from '@/lib/logger';
  * Check user access to store features based on subscription status
  */
 
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+// Build-safe: lazily create the Supabase admin client at runtime
+let _supabaseAdmin: SupabaseClient<any> | null = null;
 
-// Server-side client with service role
-const supabaseAdmin = await requireAdminClient();
+async function getSupabaseAdmin(): Promise<SupabaseClient<any>> {
+  if (!_supabaseAdmin) {
+    _supabaseAdmin = await getAdminClient();
+    if (!_supabaseAdmin) {
+      throw new Error('Failed to create Supabase admin client');
+    }
+  }
+  return _supabaseAdmin;
+}
 
 /**
  * Check if user has a specific entitlement
  */
 export async function hasEntitlement(userId: string, entitlementKey: string): Promise<boolean> {
+  const supabaseAdmin = await getSupabaseAdmin();
   const { data, error }: any = await supabaseAdmin.rpc('has_entitlement', {
     p_user_id: userId,
     p_entitlement_key: entitlementKey,
@@ -33,6 +42,7 @@ export async function hasEntitlement(userId: string, entitlementKey: string): Pr
  * Get all active entitlements for a user
  */
 export async function getUserEntitlements(userId: string): Promise<string[]> {
+  const supabaseAdmin = await getSupabaseAdmin();
   const { data, error }: any = await supabaseAdmin
     .from('store_entitlements')
     .select('entitlement_key')
@@ -52,6 +62,7 @@ export async function getUserEntitlements(userId: string): Promise<string[]> {
  * Get user's active subscription
  */
 export async function getActiveSubscription(userId: string) {
+  const supabaseAdmin = await getSupabaseAdmin();
   const { data, error }: any = await supabaseAdmin
     .from('store_subscriptions')
     .select('*, store_products(*), store_prices(*)')
@@ -157,6 +168,7 @@ export async function getSubscriptionStatus(userId: string) {
  * Check if user has access to a digital product download
  */
 export async function hasDigitalProductAccess(userId: string, productId: string): Promise<boolean> {
+  const supabaseAdmin = await getSupabaseAdmin();
   const { data, error }: any = await supabaseAdmin
     .from('user_entitlements')
     .select('id')
@@ -176,6 +188,7 @@ export async function hasDigitalProductAccess(userId: string, productId: string)
  * Get all digital products user has access to
  */
 export async function getUserDigitalProducts(userId: string): Promise<string[]> {
+  const supabaseAdmin = await getSupabaseAdmin();
   const { data, error }: any = await supabaseAdmin
     .from('user_entitlements')
     .select('product_id')

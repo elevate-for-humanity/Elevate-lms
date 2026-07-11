@@ -15,10 +15,20 @@ import { createClient } from '@supabase/supabase-js';
 import { ModelRouter, callModel, type TaskType } from './model-router';
 import { logger } from '@/lib/logger';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Build-safe: lazily create the Supabase client at runtime
+let _supabase: ReturnType<typeof createClient> | null = null;
+
+function getSupabase() {
+  if (!_supabase) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase environment variables');
+    }
+    _supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  return _supabase;
+}
 
 const modelRouter = new ModelRouter();
 
@@ -115,6 +125,7 @@ async function updateJobProgress(
   step: string,
   progress: number
 ) {
+  const supabase = getSupabase();
   await supabase
     .from('course_generation_jobs')
     .update({
@@ -279,6 +290,7 @@ Delivery Mode: ${job.delivery_mode || 'online'}`;
 
 export async function processCourseGenerationJob(jobId: string): Promise<void> {
   console.info(`Processing course generation job: ${jobId}`);
+  const supabase = getSupabase();
 
   // Fetch job details
   const { data: job, error: jobError } = await supabase
@@ -453,6 +465,7 @@ export async function startCourseGenerationWorker() {
   // Poll for queued jobs every 10 seconds
   setInterval(async () => {
     try {
+      const supabase = getSupabase();
       const { data: jobs } = await supabase
         .from('course_generation_jobs')
         .select('id')

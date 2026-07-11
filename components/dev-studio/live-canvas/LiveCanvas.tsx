@@ -152,11 +152,11 @@ export function LiveCanvas({ isOpen = true, onClose, initialProject }: LiveCanva
   }, []);
 
   const handleApprove = useCallback((id: string, value?: string) => {
-    console.log('Approved:', id, value);
+    console.info('Approved:', id, value);
   }, []);
 
   const handleReject = useCallback((id: string, reason?: string) => {
-    console.log('Rejected:', id, reason);
+    console.info('Rejected:', id, reason);
   }, []);
 
   const handleDeviceChange = useCallback((device: DeviceView) => {

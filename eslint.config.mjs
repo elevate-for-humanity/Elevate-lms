@@ -18,6 +18,7 @@ export default tseslint.config(
         ...globals.node,
         ...globals.es2021,
       },
+      parser: tseslint.parser,
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',

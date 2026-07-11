@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireAdmin } from '@/lib/auth';
 import Link from 'next/link';

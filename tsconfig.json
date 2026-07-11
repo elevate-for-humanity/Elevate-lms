@@ -76,6 +76,7 @@
     "workers",
     "deployment-ready",
     "supabase/functions",
+    "server",
     ".archive",
     "_archived",
     "backend",

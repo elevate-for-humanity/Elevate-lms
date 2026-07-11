@@ -15,6 +15,8 @@ export async function issueCertificate(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) redirect('/login');
+
   const { data: profile } = await db
     .from('profiles')
     .select('role')
@@ -73,7 +75,7 @@ export async function issueCertificate(formData: FormData) {
       details: { recipientName, email, certNumber, courseId: courseId || null },
     })
     .then(() => {})
-    .catch((err) => console.error('[audit] certificate_issued failed:', err));
+    .catch((err: unknown) => console.error('[audit] certificate_issued failed:', err));
 
   redirect('/admin/certificates?success=issued&cert=' + certNumber);
 }
@@ -86,6 +88,8 @@ export async function revokeCertificate(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) redirect('/login');
 
   const certId = formData.get('certId') as string;
   const reason = formData.get('reason') as string;
@@ -119,7 +123,7 @@ export async function revokeCertificate(formData: FormData) {
       details: { reason },
     })
     .then(() => {})
-    .catch((err) => console.error('[audit] certificate_revoked failed:', err));
+    .catch((err: unknown) => console.error('[audit] certificate_revoked failed:', err));
 
   redirect('/admin/certificates?success=revoked');
 }

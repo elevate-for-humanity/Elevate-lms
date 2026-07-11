@@ -16,12 +16,12 @@ export default async function ApprenticeshipsPage() {
   const [
     { count: totalEnrollments },
     { count: activeEnrollments },
-    { count: pendingHours },
+    pendingHoursResult,
     { data: enrollments },
   ] = await Promise.all([
     db.from('apprenticeship_enrollments').select('*', { count: 'exact', head: true }),
     db.from('apprenticeship_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-    db.from('progress_entries').select('*', { count: 'exact', head: true }).eq('status', 'pending').catch(() => ({ count: 0 })),
+    db.from('progress_entries').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     db.from('apprenticeship_enrollments')
       .select(`
         id, status, start_date, total_hours_required, total_hours_completed, created_at,
@@ -31,6 +31,8 @@ export default async function ApprenticeshipsPage() {
       .order('created_at', { ascending: false })
       .limit(50),
   ]);
+
+  const pendingHours = pendingHoursResult.count ?? 0;
 
   const stats = [
     { label: 'Total Enrollments', value: totalEnrollments ?? 0, icon: Users, color: 'text-brand-blue-600', bg: 'bg-brand-blue-50' },

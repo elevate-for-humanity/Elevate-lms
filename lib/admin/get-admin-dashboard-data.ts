@@ -125,7 +125,12 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const { data: { user }, error: authError } = authRes;
   // Log but never throw — page-level requireAdmin() already enforces auth.
   // A transient getUser() failure should degrade gracefully, not crash the dashboard.
-  if (authError) logger.warn('[dashboard] getUser failed — continuing with null user', { message: authError.message });
+  // Use debug level for "Auth session missing!" as this is expected on login/unauthorized pages
+  if (authError && !authError.message?.includes('Auth session missing')) {
+    logger.warn('[dashboard] getUser failed', { message: authError.message });
+  } else if (authError) {
+    logger.debug('[dashboard] getUser continuing without user session');
+  }
 
   // ── All DB queries in a single Promise.all — one round-trip to Supabase ──
   const [

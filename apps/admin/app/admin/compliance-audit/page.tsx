@@ -18,7 +18,7 @@ export default async function ComplianceAuditPage() {
     { count: totalAudits },
     { count: recent },
     { data: audits },
-    { data: events },
+    eventsResult,
   ] = await Promise.all([
     db.from('compliance_audits').select('*', { count: 'exact', head: true }),
     db.from('compliance_audits').select('*', { count: 'exact', head: true }).gte('created_at', cutoff30d),
@@ -30,9 +30,10 @@ export default async function ComplianceAuditPage() {
     db.from('compliance_events')
       .select('id, action, created_at, profiles:user_id(full_name, email)')
       .order('created_at', { ascending: false })
-      .limit(20)
-      .catch(() => ({ data: [] })),
+      .limit(20),
   ]);
+
+  const events = eventsResult.data ?? [];
 
   const stats = [
     { label: 'Total Audit Records', value: totalAudits ?? 0, icon: Shield, color: 'text-brand-blue-600', bg: 'bg-brand-blue-50' },

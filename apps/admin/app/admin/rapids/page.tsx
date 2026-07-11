@@ -15,18 +15,21 @@ export default async function RapidsPage() {
 
   const [
     { count: pendingReg },
-    { count: pendingProgress },
-    { count: pendingCompletion },
+    pendingProgressResult,
+    pendingCompletionResult,
     { data: recentSubmissions },
   ] = await Promise.all([
     db.from('rapids_registrations').select('*', { count: 'exact', head: true }).is('submitted_at', null),
-    db.from('rapids_progress_updates').select('*', { count: 'exact', head: true }).is('submitted_at', null).catch(() => ({ count: 0 })),
-    db.from('rapids_registrations').select('*', { count: 'exact', head: true }).eq('status', 'completed').is('submitted_at', null).catch(() => ({ count: 0 })),
+    db.from('rapids_progress_updates').select('*', { count: 'exact', head: true }).is('submitted_at', null),
+    db.from('rapids_registrations').select('*', { count: 'exact', head: true }).eq('status', 'completed').is('submitted_at', null),
     db.from('rapids_submissions')
       .select('id, submission_type, submission_date, record_count, status, submitted_by')
       .order('submission_date', { ascending: false })
       .limit(10),
   ]);
+
+  const pendingProgress = pendingProgressResult.count ?? 0;
+  const pendingCompletion = pendingCompletionResult.count ?? 0;
 
   const stats = [
     { label: 'Pending Registrations', value: pendingReg ?? 0, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },

@@ -213,7 +213,7 @@ export function VoiceCommandButton({
       
       {transcript && (
         <p className="text-xs text-slate-500 max-w-[200px] truncate">
-          &quot;{transcript}&quot;
+          "{transcript}"
         </p>
       )}
     </div>
@@ -260,7 +260,7 @@ export function VoiceCommandChat() {
         {transcript && (
           <div className="bg-slate-100 rounded-lg p-3">
             <p className="text-sm font-medium text-slate-600">You said:</p>
-            <p className=&quot;text-slate-900&quot;>&quot;{transcript}&quot;</p>
+            <p className="text-slate-900">"{transcript}"</p>
           </div>
         )}
         
@@ -269,31 +269,31 @@ export function VoiceCommandChat() {
             <p className={`text-sm font-medium ${lastResult.success ? 'text-emerald-600' : 'text-red-600'}`}>
               {lastResult.success ? 'Success' : 'Error'}
             </p>
-            <p className=&quot;text-slate-900&quot;>
+            <p className="text-slate-900">
               {lastResult.result && typeof lastResult.result === 'object' 
                 ? (lastResult.result as any).message || JSON.stringify(lastResult.result)
                 : lastResult.error}
             </p>
             {lastResult.followUp && (
-              <p className=&quot;text-sm text-slate-600 mt-2&quot;>{lastResult.followUp}</p>
+              <p className="text-sm text-slate-600 mt-2">{lastResult.followUp}</p>
             )}
           </div>
         )}
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className=&quot;p-4 border-t&quot;>
-        <div className=&quot;flex gap-2&quot;>
+      <form onSubmit={handleSubmit} className="p-4 border-t">
+        <div className="flex gap-2">
           <input
-            type=&quot;text&quot;
+            type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder=&quot;Type a command or tap the mic...&quot;
-            className=&quot;flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red-600&quot;
+            placeholder="Type a command or tap the mic..."
+            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red-600"
           />
           <button
-            type=&quot;submit&quot;
-            className=&quot;px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700&quot;
+            type="submit"
+            className="px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700"
           >
             Send
           </button>

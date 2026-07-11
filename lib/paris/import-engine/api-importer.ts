@@ -25,6 +25,7 @@ export async function fetchOpenAPISpec(url: string): Promise<Record<string, unkn
   }
 
   // If it's a GitHub URL, convert to raw
+  // eslint-disable-next-line no-useless-escape
   const githubMatch = url.match(/github\.com\/([^\/]+)\/([^\/]+)\/blob\/(.+)/);
   if (githubMatch) {
     const [, owner, repo, path] = githubMatch;

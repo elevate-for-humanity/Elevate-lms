@@ -579,7 +579,7 @@ async function sendApprovalNotification(workflow: ApprovalWorkflow): Promise<voi
   
   // Would integrate with notification system
   // For now, just log
-  console.log(`[Approval Notification] New approval request:
+  console.info(`[Approval Notification] New approval request:
     Type: ${config?.label || workflow.type}
     Description: ${workflow.description}
     From: ${workflow.agentId}

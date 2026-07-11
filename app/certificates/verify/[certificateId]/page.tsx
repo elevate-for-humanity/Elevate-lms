@@ -2,10 +2,11 @@ import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
-import { CheckCircle, XCircle, Download, Share2 } from 'lucide-react';
+import { CheckCircle, XCircle, Download } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { ShareButton } from '@/components/ui/ShareButton';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -394,16 +395,7 @@ export default async function VerifyCertificatePage({
                   Download Certificate
                 </a>
               )}
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  alert('Verification link copied to clipboard!');
-                }}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-slate-600 text-white font-semibold rounded-lg hover:bg-slate-700"
-              >
-                <Share2 className="w-5 h-5" />
-                Share Verification Link
-              </button>
+              <ShareButton />
             </div>
           </div>
         )}

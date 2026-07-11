@@ -9,6 +9,8 @@ export async function createContactAction(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) redirect('/login');
+
   const first_name = (formData.get('first_name') as string)?.trim();
   const last_name = (formData.get('last_name') as string)?.trim();
   const email = (formData.get('email') as string)?.trim();

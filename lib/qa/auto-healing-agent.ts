@@ -12,10 +12,21 @@ import { join } from 'path';
 import { logger } from '@/lib/logger';
 
 const execAsync = promisify(exec);
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+
+// Build-safe: lazily create the Supabase client at runtime
+let _supabase: ReturnType<typeof createClient> | null = null;
+
+function getSupabase() {
+  if (!_supabase) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase environment variables');
+    }
+    _supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  return _supabase;
+}
 
 export interface QAIssue {
   issue_type: string;
@@ -168,6 +179,7 @@ async function checkEnvironmentVariables(): Promise<QAIssue[]> {
 
 // Run all scanners
 export async function runFullScan(scanId: string, tenantId: string): Promise<ScanResult> {
+  const supabase = getSupabase();
   const startTime = Date.now();
   const allIssues: QAIssue[] = [];
   logger.info(`Starting QA scan: ${scanId}`);
@@ -208,6 +220,7 @@ export async function runFullScan(scanId: string, tenantId: string): Promise<Sca
     return { total_issues: allIssues.length, ...counts, issues: allIssues, duration_ms: Date.now() - startTime };
   } catch (error) {
     logger.error(`QA scan ${scanId} failed:`, error);
+    const supabase = getSupabase();
     await supabase.from('qa_scans').update({ status: 'failed', completed_at: new Date().toISOString() }).eq('id', scanId);
     throw error;
   }
@@ -215,6 +228,7 @@ export async function runFullScan(scanId: string, tenantId: string): Promise<Sca
 
 // Auto-fix common issues
 export async function autoFixIssue(issueId: string): Promise<{ success: boolean; message: string }> {
+  const supabase = getSupabase();
   const { data: issue } = await supabase.from('qa_issues').select('*').eq('id', issueId).single();
   if (!issue) return { success: false, message: 'Issue not found' };
   if (!issue.auto_fixable) return { success: false, message: 'Issue is not auto-fixable' };
@@ -232,6 +246,7 @@ export async function autoFixIssue(issueId: string): Promise<{ success: boolean;
 
 // Verification run
 export async function runVerification(scanId: string): Promise<Record<string, boolean>> {
+  const supabase = getSupabase();
   const results: Record<string, boolean> = {};
   const checks = [
     { name: 'typecheck', cmd: 'npx tsc --noEmit' },

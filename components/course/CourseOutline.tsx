@@ -1,3 +1,5 @@
+'use client';
+
 import type { Course, Lesson } from '@/lms-data/courses';
 import clsx from 'clsx';
 

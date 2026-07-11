@@ -9,10 +9,20 @@
 import { createClient } from '@supabase/supabase-js';
 import { ModelRouter, callModel } from './model-router';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Build-safe: lazily create the Supabase client at runtime
+let _supabase: ReturnType<typeof createClient> | null = null;
+
+function getSupabase() {
+  if (!_supabase) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase environment variables');
+    }
+    _supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  return _supabase;
+}
 
 const modelRouter = new ModelRouter();
 
@@ -190,6 +200,7 @@ async function getCurrentPrograms(): Promise<Map<string, {
   soc_code: string;
   category: string;
 }>> {
+  const supabase = getSupabase();
   const { data: programs } = await supabase
     .from('programs')
     .select('id, title, soc_code, category')
@@ -206,6 +217,7 @@ async function getCurrentPrograms(): Promise<Map<string, {
 
 // Calculate completion score for a program
 async function calculateCompletionScore(programId: string, programTitle: string): Promise<CompletionScore> {
+  const supabase = getSupabase();
   // Get course
   const { data: course } = await supabase
     .from('career_courses')
@@ -445,6 +457,7 @@ async function discoverNewOpportunities(): Promise<WorkforceGap[]> {
 
 // Main workforce scan function
 export async function runWorkforceGapScan(): Promise<WorkforceScanResult> {
+  const supabase = getSupabase();
   console.info('Starting workforce gap scan...');
 
   // Get completion scores for all current programs
@@ -506,6 +519,7 @@ export async function runWorkforceGapScan(): Promise<WorkforceScanResult> {
 
 // Create automatic generation job for a new program
 export async function autoGenerateNewProgram(gap: WorkforceGap): Promise<string> {
+  const supabase = getSupabase();
   const { data: job, error } = await supabase
     .from('course_generation_jobs')
     .insert({
@@ -544,6 +558,7 @@ export async function autoGenerateNewProgram(gap: WorkforceGap): Promise<string>
 
 // Save scan results for history
 export async function saveScanResults(result: WorkforceScanResult): Promise<void> {
+  const supabase = getSupabase();
   await supabase.from('workforce_scan_history').insert({
     scanned_at: result.scanned_at,
     total_occupations: result.total_occupations_analyzed,

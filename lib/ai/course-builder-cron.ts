@@ -14,10 +14,20 @@ import { runWorkforceGapScan, autoGenerateNewProgram, saveScanResults } from './
 import { processCourseGenerationJob } from './course-generation-worker';
 import { logger } from '@/lib/logger';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Build-safe: lazily create the Supabase client at runtime
+let _supabase: ReturnType<typeof createClient> | null = null;
+
+function getSupabase() {
+  if (!_supabase) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase environment variables');
+    }
+    _supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  return _supabase;
+}
 
 // Maximum jobs to process per cron run
 const MAX_JOBS_PER_RUN = 5;
@@ -31,6 +41,7 @@ export async function processPendingJobs(): Promise<{
   failed: number;
   errors: string[];
 }> {
+  const supabase = getSupabase();
   let processed = 0;
   let failed = 0;
   const errors: string[] = [];
@@ -82,6 +93,7 @@ export async function runNightlyGapScan(): Promise<{
   workforceScan?: Awaited<ReturnType<typeof runWorkforceGapScan>>;
   error?: string;
 }> {
+  const supabase = getSupabase();
   logger.info('Starting nightly gap scan...');
 
   try {
@@ -129,6 +141,7 @@ export async function runNightlyGapScan(): Promise<{
  * On-demand gap scan for a specific program
  */
 export async function scanProgramGaps(programId: string): Promise<void> {
+  const supabase = getSupabase();
   logger.info(`Scanning gaps for program: ${programId}`);
 
   try {
@@ -179,6 +192,7 @@ export async function scanProgramGaps(programId: string): Promise<void> {
  * Triggered when a new program is created
  */
 export async function onProgramCreated(programId: string): Promise<void> {
+  const supabase = getSupabase();
   logger.info(`New program created: ${programId}`);
   
   // Create initial course generation job
@@ -217,6 +231,7 @@ export async function onProgramCreated(programId: string): Promise<void> {
  * Triggered when a credential is updated
  */
 export async function onCredentialUpdated(credentialId: string): Promise<void> {
+  const supabase = getSupabase();
   logger.info(`Credential updated: ${credentialId}`);
   
   // Re-scan programs using this credential
@@ -234,6 +249,7 @@ export async function onCredentialUpdated(credentialId: string): Promise<void> {
  * Triggered when a SOC code is added/updated
  */
 export async function onSocCodeUpdated(programId: string): Promise<void> {
+  const supabase = getSupabase();
   logger.info(`SOC code updated for program: ${programId}`);
   
   // Fetch O*NET data and enrich program
@@ -257,6 +273,7 @@ export async function onCourseChanged(
   courseId: string, 
   action: 'created' | 'updated' | 'deleted'
 ): Promise<void> {
+  const supabase = getSupabase();
   logger.info(`Course ${action}: ${courseId}`);
   
   const { data: course } = await supabase
@@ -282,6 +299,7 @@ export async function onCourseChanged(
  * Keeps last 90 days of scans
  */
 export async function cleanupScanHistory(): Promise<number> {
+  const supabase = getSupabase();
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
@@ -307,6 +325,7 @@ export async function getScanStatus(): Promise<{
   pending_jobs: number;
   active_jobs: number;
 }> {
+  const supabase = getSupabase();
   const { data: settings } = await supabase
     .from('system_settings')
     .select('value')

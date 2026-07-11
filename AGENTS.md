@@ -1,6 +1,6 @@
 # OpenHands Agent Memory - Elevate LMS
 
-**📋 MASTER DOCUMENTATION:** `ENTERPRISE-PRD.md` - This is the comprehensive source of truth for the entire Elevate for Humanity platform. All development must reference this document.
+**📋 MASTER DOCUMENTATION:** `BLUEPRINT/INDEX.md` - This is the comprehensive source of truth for the entire Elevate for Humanity platform. All development must reference this document.
 
 ---
 
@@ -30,53 +30,22 @@
 
 ---
 
-## 📚 MASTER DOCUMENT: ENTERPRISE-PRD.md
+## 📚 MASTER DOCUMENT: BLUEPRINT/INDEX.md
 
-The comprehensive Enterprise Product Requirements Document covers **32 major chapters**:
+The comprehensive Enterprise Product Blueprint is in `BLUEPRINT/INDEX.md` with **Appendices covering**:
 
-### AI & Intelligence
-1. **PARIS AI Operating System** - 18 AI agents (Phone, Receptionist, Admissions, Recruiter, Sales, Compliance, Grant Writer, Proposal Builder, Contract Builder, Policy Builder, SOP Builder, Forms Builder, Document Builder, Digital Binder, Accreditation Binder, Grant Manager, Nonprofit Manager, Government Contractor)
-2. **Dev Studio** - Visual development environment
-3. **AI Website Builder** - No-code website creation
-4. **AI Business Builder** - Business plan/document generation
-5. **AI Mobile App Builder** - Cross-platform mobile apps
-6. **AI Workflow Builder** - Business automation
-7. **AI Media Studio** - Video creation with HeyGen
-8. **AI Clone Marketplace** - Buy/sell AI agents
-9. **Course Factory** - AI-powered course generation
-10. **Credential Intelligence** - Certification lifecycle
+| System | Location |
+|--------|----------|
+| PARIS AI (18 agents) | Appendix A |
+| Vertical Engines | Appendix B |
+| RAPIDS Apprenticeship | Appendix C |
+| Testing Center | Appendix D |
+| Government Compliance | Appendix E |
+| AI Builders | Appendix F |
+| White-Label Licensing | Appendix G |
+| Existing Documentation | Appendix H |
 
-### Vertical Industry Engines
-11. **HVAC Engine** - EPA 608, NATE certifications
-12. **Medical Engine** - NHA certifications (CCMA, CPT, CET)
-13. **Barber & Beauty Engine** - State licensing, RAPIDS apprenticeship
-14. **CDL Engine** - Class A/B CDL training
-15. **Peer Recovery Engine** - Peer support certifications
-
-### Platforms & Portals
-16. **Apprenticeship Platform** - RAPIDS/DOL integration, OJL, RTI
-17. **Testing Center** - ACT WorkKeys, Certiport, PSI, NHA
-18. **Student Platform** - LMS, progress, digital binder
-19. **Instructor Platform** - Teaching, grading, attendance
-20. **Employer Platform** - Hiring, job posting, candidate matching
-21. **Recruiter Platform** - Sourcing, Adzuna integration
-22. **Partner Platform** - WIOA, VR, workforce boards
-23. **Workforce Platform** - Regional workforce development
-24. **Government Platform** - ETPL, HSI compliance
-
-### Business Systems
-25. **CRM System** - Lead management, pipeline automation
-26. **Digital Binder** - Student document collection
-27. **Marketing Platform** - AI content, campaigns
-28. **E-Commerce & Licensing** - Store, white-label licensing
-29. **Marketplace** - Multi-vendor platform
-30. **Analytics & BI** - Reporting, dashboards
-31. **Security Architecture** - FERPA, HIPAA, PCI-DSS
-32. **Infrastructure & DevOps** - Northflank, CI/CD
-
-### Quality & Operations
-33. **Performance Engineering** - Core Web Vitals
-34. **Production Acceptance Criteria** - Deployment checklist
+**Full reference:** See `BLUEPRINT/INDEX.md` for complete specifications
 
 ---
 
@@ -90,23 +59,23 @@ The comprehensive Enterprise Product Requirements Document covers **32 major cha
 
 ### Quick Reference by Feature
 
-| Feature | Location in PRD | Implementation Status |
-|---------|----------------|----------------------|
-| AI Phone Agent | Chapter 3.2.1 | `/lib/ai/paris-phone-agent.ts` |
-| AI Admissions | Chapter 3.2.3 | `/lib/ai/paris-admissions.ts` |
-| RAPIDS Integration | Chapter 14.2 | `/lib/rapids/` |
-| WIOA Reporting | Chapter 20.3 | `/lib/wioa/` |
-| ACT WorkKeys | Chapter 15.4 | `/lib/testing/workkeys.ts` |
-| Employer Matching | Chapter 18.4 | `/lib/matching/` |
-| Digital Binder | Chapter 24 | `/lib/binder/` |
-| White-Label | Chapter 26.3 | `/lib/tenant/` |
+| Feature | Implementation Path |
+|---------|-------------------|
+| AI Phone Agent | `/lib/ai/paris-phone-agent.ts` |
+| AI Admissions | `/lib/ai/paris-admissions.ts` |
+| RAPIDS Integration | `/lib/rapids/` |
+| WIOA Reporting | `/lib/wioa/` |
+| ACT WorkKeys | `/lib/testing/workkeys.ts` |
+| Employer Matching | `/lib/matching/` |
+| Digital Binder | `/lib/binder/` |
+| White-Label | `/lib/tenant/` |
 
 ---
 
 ## 🔧 DEVELOPMENT WORKFLOW
 
 ### Before Starting Any Task
-1. Read the relevant chapter in `ENTERPRISE-PRD.md`
+1. Read the relevant section in `BLUEPRINT/INDEX.md`
 2. Check existing implementations in `/lib/`
 3. Verify database migrations in `/supabase/migrations/`
 4. Review API routes in `/app/api/`
@@ -234,13 +203,12 @@ Every character matters. A misplaced `#` or wrong version number can cause hours
 
 | Document | Path | Purpose |
 |----------|------|---------|
-| Master PRD | `ENTERPRISE-PRD.md` | Complete specification |
+| Master Blueprint | `BLUEPRINT/INDEX.md` | Complete specification with appendices |
 | Architecture | `ARCHITECTURE_DOCUMENTATION.md` | System architecture |
 | Dashboard Truth | `TRUE-DASHBOARD-ARCHITECTURE.md` | Portal routing |
 | Database Audit | `DATABASE-AUDIT.md` | Table status |
 | Automation Engine | `INTELLIGENT-AUTOMATION-ENGINE.md` | Lead-to-enrollment |
 | Production Setup | `PRODUCTION-SETUP.md` | Deployment guide |
-| Blueprint | `BLUEPRINT/INDEX.md` | Page specifications |
 
 ---
 

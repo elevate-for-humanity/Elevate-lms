@@ -407,3 +407,210 @@ Any changes to this blueprint must:
 *This blueprint is the authoritative specification for Elevate for Humanity.*
 *All development must conform to this document.*
 *No exceptions.*
+
+---
+
+# APPENDIX A: PARIS AI OPERATING SYSTEM
+
+## AI Employee Roles
+
+| Agent | Purpose | Capabilities |
+|-------|---------|-------------|
+| **AI Phone Agent** | 24/7 phone intake | Voice response, appointment scheduling, lead capture |
+| **AI Receptionist** | Virtual front desk | Visitor check-in, document collection, queue management |
+| **AI Admissions Agent** | Application processing | Interview, eligibility, funding guidance, enrollment |
+| **AI Recruiter** | Candidate sourcing | Resume parsing, job matching, placement tracking |
+| **AI Sales Agent** | Lead conversion | Follow-up, objection handling, contract generation |
+| **AI Compliance Officer** | Regulatory adherence | Policy monitoring, audit trails, violation detection |
+| **AI Grant Writer** | Grant applications | Research, drafting, budget development |
+| **AI Proposal Builder** | RFP responses | Requirement analysis, solution design, pricing |
+| **AI Contract Builder** | Legal documents | Templating, e-signature, version control |
+| **AI Policy Builder** | Compliance policies | Drafting, regulatory mapping, acknowledgment |
+| **AI SOP Builder** | Procedures | Documentation, flowchart generation, training |
+| **AI Forms Builder** | Data collection | Form generation, validation, submission |
+| **AI Document Builder** | Printable docs | Template selection, PDF generation |
+| **AI Digital Binder** | Student documents | Checklist, OCR, status tracking |
+| **AI Accreditation Binder** | Accreditation docs | Requirement tracking, gap analysis |
+| **AI Grant Manager** | Grant oversight | Budget tracking, milestone monitoring |
+| **AI Nonprofit Manager** | Nonprofit ops | Board management, donation tracking |
+| **AI Government Contractor** | Gov contracts | Compliance, reporting, invoice generation |
+
+---
+
+# APPENDIX B: VERTICAL INDUSTRY ENGINES
+
+## HVAC Engine
+| Program | Duration | Credentials | Price |
+|---------|----------|-------------|-------|
+| HVAC Technician | 6 months | EPA 608, NATE | $8,500 |
+| HVAC Installation | 4 months | EPA 608 | $6,500 |
+| HVAC Service | 8 months | EPA 608, NATE, R-410A | $10,500 |
+| Refrigeration | 4 months | EPA 608 Universal | $7,000 |
+
+## Medical Engine
+| Program | Duration | Credentials | Price |
+|---------|----------|-------------|-------|
+| Medical Assistant | 6 months | CCMA (NHA) | $9,500 |
+| Phlebotomy | 3 months | CPT (NHA) | $4,500 |
+| EKG Technician | 3 months | CET (NHA) | $4,000 |
+| Pharmacy Tech | 6 months | CPhT (PTCB) | $8,500 |
+| Patient Care Tech | 4 months | CPCT/A (NHA) | $5,500 |
+
+## Barber & Beauty Engine
+| Program | Duration | Credentials | Price |
+|---------|----------|-------------|-------|
+| Barbering (Traditional) | 12 months | State Board | $12,000 |
+| Barbering (Apprenticeship) | 12 months | State Board + RAPIDS | $0 |
+| Cosmetology | 12 months | State Board | $12,000 |
+| Esthetics | 6 months | State Board | $6,500 |
+| Manicurist | 3 months | State Board | $3,500 |
+
+## CDL Engine
+| Program | Duration | Credentials | Price |
+|---------|----------|-------------|-------|
+| Class A CDL | 8 weeks | CDL Class A | $7,500 |
+| Class B CDL | 6 weeks | CDL Class B | $6,500 |
+| CDL Refresher | 2 weeks | Recertification | $3,000 |
+
+## Peer Recovery Engine
+| Program | Duration | Credentials | Price |
+|---------|----------|-------------|-------|
+| Peer Support Specialist | 3 months | State Certification | $2,500 |
+| Recovery Coach | 2 months | CCAR Certification | $2,000 |
+| Addiction Counseling | 6 months | CADC | $6,000 |
+
+---
+
+# APPENDIX C: RAPIDS APPRENTICESHIP AUTOMATION
+
+## Barber Apprenticeship (RAPIDS/DOL)
+```
+RTI: 1,500 hours (online/in-person)
+OJL: 2,000 hours (host shop)
+Competencies: 42 total
+Tracking: Geofence clock in/out
+Approval: Host shop supervisor sign-off
+```
+
+## Host Shop Requirements
+- Licensed barbershop/salon
+- 1:3 mentor ratio
+- General liability insurance
+- Workers comp
+- MOU signed with Elevate
+
+---
+
+# APPENDIX D: TESTING CENTER
+
+## Testing Vendors
+| Vendor | Certifications | Integration |
+|--------|---------------|-------------|
+| **ACT WorkKeys** | Applied Math, Graphic Literacy, Workplace Doc, NCRC | Full |
+| **Certiport** | IC3, MOS, Autodesk | Exam delivery |
+| **CareerSafe** | OSHA 10/30 | Online proctoring |
+| **PSI** | State board exams | Live proctoring |
+| **NHA** | CCMA, CPT, CET, CPCT | Voucher system |
+| **EPA** | 608 Universal | In-house |
+
+## ACT WorkKeys NCRC Levels
+| Level | Score | Badge |
+|-------|-------|-------|
+| Bronze | 3+ each | Bronze |
+| Silver | 4+ each | Silver |
+| Gold | 5+ each | Gold |
+| Platinum | 5+ all 4 | Platinum |
+
+---
+
+# APPENDIX E: GOVERNMENT COMPLIANCE
+
+## WIOA Integration
+- Participant referrals from WorkOne
+- Individualized Service Plan (ISP)
+- Training completion tracking
+- Employment outcomes (Q2, Q4)
+- PIRL reporting
+
+## ETPL (Eligible Training Provider List)
+- Performance standards compliance
+- Completion rate > 50%
+- Employment rate > 50%
+- Credential attainment > 40%
+
+## HSI (Hispanic-Serving Institution)
+- Hispanic enrollment tracking
+- Low-income student support
+- Bilingual education
+- Faculty development
+
+---
+
+# APPENDIX F: AI BUILDERS
+
+## AI Website Builder
+- Natural language website generation
+- 100+ templates
+- 500+ components
+- SEO optimization
+- Mobile responsive
+
+## AI Business Builder
+- Business plan generation
+- Financial modeling
+- Contract templates
+- Workflow automation
+
+## AI Mobile App Builder
+- Cross-platform (iOS, Android, PWA)
+- Drag-and-drop UI
+- Push notifications
+- Offline support
+
+## AI Workflow Builder
+- Visual flow designer
+- Conditional logic
+- Integration connectors
+- Error handling
+
+## AI Media Studio
+- Video recording/editing
+- AI avatars (HeyGen)
+- Auto subtitles
+- Multi-language
+
+## AI Clone Marketplace
+- Industry clones (Healthcare, Legal, Finance, Trades)
+- Role clones (Recruiter, Sales, Support)
+- Custom training data
+- Marketplace listing
+
+---
+
+# APPENDIX G: WHITE-LABEL LICENSING
+
+## License Tiers
+| Feature | Starter | Pro | Enterprise |
+|---------|---------|-----|------------|
+| Custom Domain | ✅ | ✅ | ✅ |
+| Users | 100 | 1,000 | Unlimited |
+| Courses | 10 | 100 | Unlimited |
+| AI Tools | ❌ | ✅ | ✅ |
+| API Access | ❌ | ✅ | ✅ |
+| Dedicated Support | ❌ | ❌ | ✅ |
+| SLA | 99% | 99.9% | 99.99% |
+
+---
+
+# APPENDIX H: EXISTING DOCUMENTATION
+
+## Referenced Files
+| Document | Location | Purpose |
+|---------|----------|---------|
+| ARCHITECTURE_DOCUMENTATION.md | Root | System architecture |
+| TRUE-DASHBOARD-ARCHITECTURE.md | Root | Portal routing |
+| DATABASE-AUDIT.md | Root | Table status |
+| INTELLIGENT-AUTOMATION-ENGINE.md | Root | Lead-to-enrollment |
+| PRODUCTION-SETUP.md | Root | Deployment guide |
+| BLUEPRINT-SPECIFICATION.md | Root | Detailed specs |
+| SENIOR_DEV_PROMPT.md | Root | Developer guidance |

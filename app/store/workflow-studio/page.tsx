@@ -3,6 +3,7 @@ export const dynamic = 'force-static';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Workflow, ArrowRight, Play, CheckCircle, Zap, Users, Database, Bell, FileText, Settings } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -46,16 +47,23 @@ export default function WorkflowStudioPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-orange-900 via-orange-800 to-slate-900">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-orange-500 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-yellow-500 rounded-full blur-3xl animate-pulse delay-1000" />
+      <section className="relative overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image 
+            src="/images/pages/admin-automation-qa-hero.webp" 
+            alt="Workflow Automation" 
+            fill 
+            className="object-cover object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-orange-900/95 via-orange-900/80 to-orange-900/60" />
         </div>
         
-        <div className="relative max-w-6xl mx-auto px-4 py-20">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-full text-sm font-bold mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-full text-sm font-bold mb-6 backdrop-blur-sm">
                 <Workflow className="w-4 h-4" />
                 Workflow Studio
               </div>

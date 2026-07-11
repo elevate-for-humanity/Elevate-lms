@@ -348,6 +348,127 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
     return;
   }
 
+  // ── LICENSE PURCHASE (PLATFORM SUBSCRIPTION) ────────────────────────────────
+  // Creates tenant + license + admin user after successful payment
+  if (kind === 'license_purchase') {
+    try {
+      const tenantId = session.metadata?.tenant_id;
+      const licenseType = session.metadata?.licenseType || 'starter';
+      const planName = session.metadata?.plan_name || 'starter';
+      const productId = session.metadata?.productId;
+      const appsIncluded = session.metadata?.appsIncluded 
+        ? JSON.parse(session.metadata.appsIncluded) 
+        : [];
+      const customerEmail = session.customer_email ?? session.customer_details?.email;
+      const customerId = session.customer;
+      const stripeSubscriptionId = typeof session.subscription === 'string' 
+        ? session.subscription 
+        : session.subscription?.id;
+
+      logger.info('[webhook/checkout] Processing license_purchase', {
+        sessionId: session.id,
+        tenantId,
+        licenseType,
+        planName,
+        customerEmail,
+      });
+
+      // Create or update tenant if not exists
+      if (tenantId) {
+        const { error: tenantError } = await supabase
+          .from('tenants')
+          .update({ status: 'active' })
+          .eq('id', tenantId);
+        
+        if (tenantError) {
+          logger.error('[webhook/checkout] Failed to activate tenant', tenantError);
+        }
+      }
+
+      // Create license record
+      const validUntil = new Date();
+      validUntil.setFullYear(validUntil.getFullYear() + 1);
+
+      const tierMap: Record<string, string> = {
+        single: 'starter',
+        starter: 'starter',
+        professional: 'professional',
+        enterprise: 'enterprise',
+      };
+      const tier = tierMap[planName] || 'starter';
+
+      const features = getLicenseFeatures(tier);
+      const maxUsers = getLicenseMaxUsers(tier);
+
+      const { data: license, error: licenseError } = await supabase
+        .from('licenses')
+        .insert({
+          license_key: `pending_${session.id}`, // Will be updated by subscription handler
+          domain: session.metadata?.domain || 'pending-setup',
+          customer_email: customerEmail || '',
+          tenant_id: tenantId || null,
+          tier,
+          status: 'active',
+          max_users: maxUsers,
+          features,
+          valid_until: validUntil.toISOString(),
+          stripe_subscription_id: stripeSubscriptionId || null,
+          stripe_customer_id: typeof customerId === 'string' ? customerId : null,
+          metadata: {
+            productId,
+            appsIncluded,
+            checkoutSessionId: session.id,
+          },
+        })
+        .select('id')
+        .maybeSingle();
+
+      if (licenseError) {
+        logger.error('[webhook/checkout] Failed to create license', licenseError);
+        Sentry.captureException(licenseError, { tags: { subsystem: 'stripe_webhook', kind } });
+      } else {
+        logger.info('[webhook/checkout] License created successfully', {
+          licenseId: license?.id,
+          tier,
+          customerEmail,
+        });
+
+        // Log license event
+        await supabase.from('license_events').insert({
+          license_id: license?.id,
+          event_type: 'activated',
+          description: `License activated via checkout: ${planName} plan`,
+          metadata: { sessionId: session.id, tier },
+        });
+      }
+
+      // Send welcome email with license info
+      if (customerEmail) {
+        try {
+          const { sendLicenseWelcomeEmail } = await import('@/lib/email/license-welcome');
+          await sendLicenseWelcomeEmail({
+            email: customerEmail,
+            planName: planName,
+            tenantId,
+            dashboardUrl: `${PLATFORM_DEFAULTS.siteUrl}/dashboard`,
+          });
+        } catch (emailErr) {
+          logger.error('[webhook/checkout] Failed to send license welcome email', emailErr);
+        }
+      }
+
+      logger.info('[webhook/checkout] license_purchase processing complete', {
+        sessionId: session.id,
+        licenseId: license?.id,
+        tenantId,
+      });
+    } catch (err) {
+      Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook', kind } });
+      logger.error('[webhook/checkout] Error processing license_purchase:', err);
+    }
+    return;
+  }
+
   // ── UNRECOGNISED KIND — log and no-op ─────────────────────────────────────
   logger.info('[webhook/checkout] Unrecognised session kind — no-op', {
     sessionId: session.id,
@@ -355,6 +476,60 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
     mode: session.mode,
   });
 };
+
+// License tier configurations
+function getLicenseFeatures(tier: string): string[] {
+  const baseFeatures = ['core-lms', 'course-creation', 'student-enrollment'];
+  
+  const tierFeatures: Record<string, string[]> = {
+    starter: [
+      ...baseFeatures,
+      'basic-reporting',
+      'certifications',
+      'email-support',
+    ],
+    professional: [
+      ...baseFeatures,
+      'basic-reporting',
+      'certifications',
+      'email-support',
+      'ai-features-basic',
+      'apprenticeship-management',
+      'wioa-tracking',
+      'employer-portal',
+      'custom-branding',
+      'priority-support',
+    ],
+    enterprise: [
+      ...baseFeatures,
+      'basic-reporting',
+      'certifications',
+      'email-support',
+      'ai-features-basic',
+      'apprenticeship-management',
+      'wioa-tracking',
+      'employer-portal',
+      'custom-branding',
+      'priority-support',
+      'host-shop-portal',
+      'api-access',
+      'sso-saml',
+      'dedicated-support',
+      'custom-integrations',
+    ],
+  };
+  
+  return tierFeatures[tier] || tierFeatures.starter;
+}
+
+function getLicenseMaxUsers(tier: string): number {
+  const maxUsers: Record<string, number> = {
+    starter: 25,
+    professional: 500,
+    enterprise: 999999,
+  };
+  return maxUsers[tier] || 25;
+}
 
 // ── Email template ─────────────────────────────────────────────────────────
 

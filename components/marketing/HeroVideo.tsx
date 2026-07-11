@@ -203,7 +203,7 @@ export default function HeroVideo({
       <section
         className="relative w-full overflow-hidden"
         style={{
-          height: 'clamp(280px, 42vw, 560px)',
+          height: 'clamp(320px, 50vw, 640px)',
           ...(posterImage ? {
             backgroundImage: `url(${posterImage})`,
             backgroundSize: 'cover',
@@ -217,7 +217,7 @@ export default function HeroVideo({
         <CanonicalVideo
           src={videoSrc}
           poster={posterImage}
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          className="absolute inset-0 w-full h-full object-cover object-center z-10"
           autoPlayOnMount
           loop
           preloadFull
@@ -250,7 +250,7 @@ export default function HeroVideo({
 
         {/* Micro-label — bottom-left, 2–4 words max */}
         {microLabel && (
-          <div className="absolute bottom-4 left-4 z-10">
+          <div className="absolute bottom-4 left-4 z-20">
             <span className="text-white text-xs font-semibold tracking-widest uppercase">
               {microLabel}
             </span>
@@ -259,7 +259,7 @@ export default function HeroVideo({
 
         {/* Sound toggle — bottom-right, shown when narration is available */}
         {hasVoiceNarration && (
-          <div className="absolute bottom-4 right-4 z-10">
+          <div className="absolute bottom-4 right-4 z-20">
             <button
               onClick={toggleMute}
               aria-label={muted ? 'Unmute narration' : 'Mute narration'}

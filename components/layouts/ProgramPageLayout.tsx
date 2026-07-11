@@ -62,15 +62,15 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
       </section>
 
       {/* HERO */}
-      <section className="relative h-[38vh] min-h-[220px] max-h-[420px] w-full overflow-hidden">
+      <section className="relative h-[32vh] min-h-[200px] max-h-[400px] w-full overflow-hidden">
         <Image
           src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-layout-hero.webp"
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, 1200px"
-          className="object-cover"
+          className="object-cover object-top"
           priority
-          quality={90}
+          quality={85}
         />
 
         <div className="relative h-full flex items-center">

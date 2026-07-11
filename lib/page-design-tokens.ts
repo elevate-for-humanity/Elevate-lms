@@ -57,7 +57,7 @@ export const hero = {
    * No gradient overlay. No text on top of image.
    * Content goes in a white panel BELOW the image.
    */
-  imageWrap: 'relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden',
+  imageWrap: 'relative h-[32vh] min-h-[200px] max-h-[420px] w-full overflow-hidden',
   /** Content panel that sits below the hero image — white background */
   contentPanel: 'bg-white border-b border-slate-100',
 } as const;

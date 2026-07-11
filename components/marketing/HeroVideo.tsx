@@ -203,7 +203,7 @@ export default function HeroVideo({
       <section
         className="relative w-full overflow-hidden"
         style={{
-          height: 'clamp(320px, 56vw, 640px)',
+          height: 'clamp(280px, 42vw, 560px)',
           ...(posterImage ? {
             backgroundImage: `url(${posterImage})`,
             backgroundSize: 'cover',

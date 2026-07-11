@@ -429,18 +429,16 @@ Enterprise
 
 ## 13. SUBSCRIPTION CONFIGURATION STUDIO
 
-### Status: 🟡 IN DEV STUDIO (Not Built)
+### Status: ✅ BUILT
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Visual plan builder | ❌ | **MISSING** |
-| Feature drag-drop | ❌ | **MISSING** |
-| Plan preview | ❌ | **MISSING** |
-| Stripe mapping UI | ❌ | **MISSING** |
-| Onboarding editor | ❌ | **MISSING** |
-| Test customer view | ❌ | **MISSING** |
-| Dev Studio exists | ✅ | `/admin/dev-studio` |
-| Dev Studio modules | ✅ | 10 workspaces |
+| Visual plan builder | ✅ | Plans tab with CRUD |
+| Feature assignment grid | ✅ | Toggle features per plan |
+| Plan preview | ✅ | Preview tab |
+| Stripe mapping UI | 🟡 | Partial (needs Stripe API) |
+| Onboarding editor | 🟡 | Checklist not editable |
+| Test customer view | ✅ | Preview shows customer view |
 
 ### Dev Studio Components:
 ```
@@ -449,7 +447,15 @@ Enterprise
 ✅ /admin/dev-studio/deployments
 ✅ /admin/dev-studio/services
 ✅ /admin/dev-studio/performance
-❌ /admin/dev-studio/subscriptions (NOT BUILT)
+✅ /admin/dev-studio/subscriptions (BUILT)
+```
+
+### Subscription Studio Pages:
+```
+✅ /admin/dev-studio/subscriptions (Plans, Features, Limits, Preview tabs)
+✅ /api/admin/subscriptions/plans
+✅ /api/admin/subscriptions/features
+✅ /api/admin/subscriptions/plans/features
 ```
 
 ---
@@ -475,7 +481,7 @@ Enterprise
 
 ## FEATURE STATUS SUMMARY
 
-### ✅ Complete (12)
+### ✅ Complete (15)
 - Feature Registry (25 features)
 - Plan-to-Feature Mapping
 - Stripe Configuration
@@ -488,15 +494,16 @@ Enterprise
 - Invoice Generation
 - Host Shop Subscriptions (separate tier)
 - Trial Management (14-day)
+- **Subscription Configuration Studio (NEW)**
+- **Plan CRUD UI (NEW)**
+- **Feature Assignment Grid (NEW)**
 
-### 🟡 Partially Implemented (3)
+### 🟡 Partially Implemented (2)
 - Onboarding Templates (basic checklists)
-- Admin Dashboard (read-mostly)
-- Plan Configuration (database, not UI)
+- Stripe Mapping UI (needs Stripe API integration)
 
-### ❌ Missing (2)
-- Subscription Configuration Studio
-- Visual Plan Builder
+### ❌ Missing (1)
+- Onboarding flow editor
 
 ---
 
@@ -517,29 +524,27 @@ Enterprise
 - [x] Admin can view subscriptions
 - [x] Host Shop subscription tiers (starter/pro/enterprise)
 - [x] 14-day trial management
+- [x] **Subscription Config Studio built**
+- [x] **Plan CRUD UI built**
+- [x] **Feature assignment grid built**
+- [x] **Plan preview built**
 
 ### ❌ Need to Build
-- [ ] Subscription Configuration Studio in Dev Studio
-- [ ] Visual plan builder UI
-- [ ] Feature drag-drop assignment
-- [ ] Plan preview as customer
 - [ ] Onboarding flow editor
-- [ ] Test customer view
-- [ ] Admin UI for plan CRUD
 
 ---
 
 ## RECOMMENDED ACTIONS
 
-### P1 - High Priority
-1. **Build Subscription Configuration Studio** at `/admin/dev-studio/subscriptions`
-2. **Add visual plan builder** - CRUD for subscription_plans table
-3. **Add feature assignment UI** - Checkbox grid for plan_features
-4. **Add Stripe product mapping** - Link to stripe_product_id/stripe_price_id
+### P1 - Completed ✅
+1. ✅ **Build Subscription Configuration Studio** at `/admin/dev-studio/subscriptions`
+2. ✅ **Add visual plan builder** - CRUD for subscription_plans table
+3. ✅ **Add feature assignment UI** - Checkbox grid for plan_features
+4. ✅ **Add Plan preview** - See as customer
 
 ### P2 - Medium
-5. **Add plan preview** - Show as customer would see
-6. **Add onboarding editor** - Customize trial checklists
+5. **Add onboarding editor** - Customize trial checklists
+6. **Add Stripe product mapping UI** - Link to Stripe products
 7. **Add promotional plan builder** - Limited-time offers
 8. **Add plan analytics** - Conversion tracking
 

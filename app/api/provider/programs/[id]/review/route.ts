@@ -1,4 +1,3 @@
-import { db } from '@/lib/db';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';

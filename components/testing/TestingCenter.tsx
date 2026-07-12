@@ -71,7 +71,9 @@ const PROVIDERS = [
       { name: 'IT Specialist', career: 'IT Support', salary: '$40,000-$60,000/yr' },
     ],
     accent: 'from-red-600 to-orange-600',
-    examFee: `$${CERTIPORT_FEES[0].amount} - $${CERTIPORT_FEES[2].amount}`, // Dynamic pricing
+    examFee: CERTIPORT_FEES?.[0]?.amount && CERTIPORT_FEES?.[2]?.amount 
+      ? `$${CERTIPORT_FEES[0].amount} - $${CERTIPORT_FEES[2].amount}` 
+      : '$80 - $200', // Dynamic pricing fallback
     color: 'red',
   },
   {
@@ -87,7 +89,9 @@ const PROVIDERS = [
       { name: 'Platinum Certificate', career: 'Highly Skilled', salary: '+35-40% Earnings' },
     ],
     accent: 'from-emerald-600 to-teal-600',
-    examFee: WORKKEYS_PRICING ? `$${WORKKEYS_PRICING.individual.price} - $${WORKKEYS_PRICING.ncrc.price}` : '$55 - $100',
+    examFee: WORKKEYS_PRICING?.individual?.price && WORKKEYS_PRICING?.ncrc?.price 
+      ? `$${WORKKEYS_PRICING.individual.price} - $${WORKKEYS_PRICING.ncrc.price}` 
+      : '$55 - $100',
     color: 'green',
   },
   {
@@ -119,7 +123,9 @@ const PROVIDERS = [
       { name: 'Loss Prevention', career: 'LP Specialist', salary: '$35,000-$50,000/yr' },
     ],
     accent: 'from-purple-600 to-pink-600',
-    examFee: NRF_RISEUP_PRICING ? `$${NRF_RISEUP_PRICING.retailFundamentals.price} - $${NRF_RISEUP_PRICING.customerServiceSales.price}` : '$45 - $90',
+    examFee: NRF_RISEUP_PRICING?.retailFundamentals?.price && NRF_RISEUP_PRICING?.customerServiceSales?.price
+      ? `$${NRF_RISEUP_PRICING.retailFundamentals.price} - $${NRF_RISEUP_PRICING.customerServiceSales.price}` 
+      : '$45 - $90',
     color: 'purple',
   },
   {

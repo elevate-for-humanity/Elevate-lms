@@ -469,6 +469,86 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
     return;
   }
 
+  // ── TRIAL CONVERSION ────────────────────────────────────────────────────────
+  // Handles trial signups being converted to paid subscriptions
+  if (kind === 'trial_conversion' || session.metadata?.trial_id) {
+    try {
+      const trialId = session.metadata?.trial_id;
+      const plan = session.metadata?.plan || session.metadata?.licenseType;
+      const interval = session.metadata?.interval || 'month';
+      const organizationId = session.metadata?.organization_id;
+      const customerId = session.customer;
+      const stripeSubscriptionId = typeof session.subscription === 'string'
+        ? session.subscription
+        : session.subscription?.id;
+
+      logger.info('[webhook/checkout] Processing trial_conversion', {
+        sessionId: session.id,
+        trialId,
+        plan,
+        interval,
+      });
+
+      // Convert the trial signup
+      if (trialId) {
+        const { error: trialError } = await supabase
+          .from('trial_signups')
+          .update({
+            status: 'converted',
+            converted_at: new Date().toISOString(),
+            stripe_subscription_id: stripeSubscriptionId,
+            stripe_customer_id: customerId as string,
+          })
+          .eq('id', trialId)
+          .eq('status', 'pending');
+
+        if (trialError) {
+          logger.error('[webhook/checkout] Failed to convert trial', trialError);
+        } else {
+          logger.info('[webhook/checkout] Trial converted successfully', { trialId });
+        }
+      }
+
+      // Create subscription record
+      if (organizationId && stripeSubscriptionId) {
+        const { data: existingSub } = await supabase
+          .from('organization_subscriptions')
+          .select('id')
+          .eq('stripe_subscription_id', stripeSubscriptionId)
+          .maybeSingle();
+
+        if (!existingSub) {
+          const currentPeriodEnd = new Date();
+          currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + (interval === 'year' ? 12 : 1));
+
+          await supabase
+            .from('organization_subscriptions')
+            .insert({
+              organization_id: organizationId,
+              plan_id: plan,
+              billing_interval: interval,
+              status: 'active',
+              stripe_subscription_id: stripeSubscriptionId,
+              stripe_customer_id: customerId as string,
+              current_period_start: new Date().toISOString(),
+              current_period_end: currentPeriodEnd.toISOString(),
+              trial_converted: true,
+            });
+        }
+      }
+
+      logger.info('[webhook/checkout] trial_conversion processing complete', {
+        sessionId: session.id,
+        trialId,
+        plan,
+      });
+    } catch (err) {
+      Sentry.captureException(err, { tags: { subsystem: 'stripe_webhook', kind: 'trial_conversion' } });
+      logger.error('[webhook/checkout] Error processing trial_conversion:', err);
+    }
+    return;
+  }
+
   // ── UNRECOGNISED KIND — log and no-op ─────────────────────────────────────
   logger.info('[webhook/checkout] Unrecognised session kind — no-op', {
     sessionId: session.id,

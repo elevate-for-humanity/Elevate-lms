@@ -189,10 +189,12 @@ async function execAiAction(config: Record<string, unknown>, ctx: RunContext) {
   const resolvedPrompt = String(interpolate(prompt, ctx.triggerPayload));
   logger.info('[workflow/ai_action] calling aiChat', { run_id: ctx.runId, prompt_length: resolvedPrompt.length });
   try {
-    const response = await aiChat([
-      { role: 'system', content: 'You are an operational AI assistant for Elevate for Humanity. Respond concisely and factually.' },
-      { role: 'user', content: resolvedPrompt },
-    ]);
+    const response = await aiChat({
+      messages: [
+        { role: 'system', content: 'You are an operational AI assistant for Elevate for Humanity. Respond concisely and factually.' },
+        { role: 'user', content: resolvedPrompt },
+      ],
+    });
     const persistTable = config.persist_table as string | undefined;
     const persistMatch = config.persist_match as Record<string, unknown> | string | undefined;
     const persistField = config.persist_field as string | undefined;
@@ -253,7 +255,10 @@ async function execStepWithRetry(
     error: (lastResult.output.error as string) ?? 'Step failed after max retries',
     attempts,
     created_at: new Date().toISOString(),
-  }).catch((err: unknown) => logger.error('[workflow/engine] dead-letter write failed', { run_id: ctx.runId, error: String(err) }));
+  }).then(
+    () => {},
+    (err: unknown) => logger.error('[workflow/engine] dead-letter write failed', err instanceof Error ? err : new Error(String(err)), { run_id: ctx.runId }),
+  );
   logger.error('[workflow/engine] step exhausted retries → dead-letter', {
     run_id: ctx.runId, step_id: step.id, action_type: step.action_type, attempts,
   });
@@ -284,7 +289,7 @@ export async function executeWorkflow(
     .order('step_order', { ascending: true });
 
   if (stepsErr) {
-    logger.error('[WORKFLOW FAILED] could not load steps', { workflowId, error: stepsErr.message, trace_id: trace });
+    logger.error('[WORKFLOW FAILED] could not load steps', stepsErr, { workflowId, trace_id: trace });
     return { runId: '', status: 'failed', stepsRun: 0, error: stepsErr.message };
   }
 
@@ -306,7 +311,8 @@ export async function executeWorkflow(
     .single();
 
   if (runErr || !run) {
-    logger.error('[WORKFLOW FAILED] could not create run record', { workflowId, error: runErr?.message, trace_id: trace });
+    const err = runErr ? new Error(runErr.message) : new Error('Failed to create run record');
+    logger.error('[WORKFLOW FAILED] could not create run record', err, { workflowId, trace_id: trace });
     return { runId: '', status: 'failed', stepsRun: 0, error: runErr?.message };
   }
 
@@ -356,9 +362,12 @@ export async function executeWorkflow(
       run_id: runId, step_id: step.id, step_order: step.step_order,
       action_type: step.action_type, status: stepStatus, output,
       error_message: stepError ?? null, duration_ms: stepDuration, attempts,
-    }).catch((e: unknown) => logger.warn('[workflow/engine] step log write failed', { run_id: runId, error: String(e) }));
+    }).then(
+      () => {},
+      (e: unknown) => logger.warn('[workflow/engine] step log write failed', e instanceof Error ? e : new Error(String(e)), { run_id: runId }),
+    );
 
-    await db.from('workflow_runs').update({ steps_done: stepsDone }).eq('id', runId).catch(() => {});
+    await db.from('workflow_runs').update({ steps_done: stepsDone }).eq('id', runId).then(() => {}, () => {});
 
     if (finalStatus === 'failed') break;
   }
@@ -376,7 +385,8 @@ export async function executeWorkflow(
   if (finalStatus === 'success') {
     logger.info('[WORKFLOW SUCCESS]', { workflowId, runId, stepsRun: stepsDone, duration_ms: totalDuration, trace_id: trace });
   } else {
-    logger.error('[WORKFLOW FAILED]', { workflowId, runId, stepsRun: stepsDone, duration_ms: totalDuration, error: errorMessage, trace_id: trace });
+    const err = errorMessage ? new Error(errorMessage) : new Error('Workflow failed');
+    logger.error('[WORKFLOW FAILED]', err, { workflowId, runId, stepsRun: stepsDone, duration_ms: totalDuration, trace_id: trace });
   }
 
   return { runId, status: finalStatus, stepsRun: stepsDone, error: errorMessage };

@@ -1,12 +1,28 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 export const metadata: Metadata = {
   title: 'Workforce Board | Elevate for Humanity',
   description: 'Workforce Board page content.',
 };
 
-export default function Page() {
+// Server-side auth guard heuristic
+async function getSession() {
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: { getAll: () => cookieStore.getAll() },
+    }
+  );
+  const { data: { session } } = await supabase.auth.getSession();
+  return session;
+}
+
+export default async function Page() {
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">

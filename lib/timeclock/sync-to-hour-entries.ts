@@ -52,7 +52,7 @@ export async function syncProgressEntryToHourEntries(
     .maybeSingle();
 
   if (entryErr || !entry) {
-    logger.error('[sync-to-hour-entries] progress_entry not found', { entryId, error: entryErr });
+    logger.error('[sync-to-hour-entries] progress_entry not found', entryErr, { entryId });
     return null;
   }
 
@@ -75,7 +75,7 @@ export async function syncProgressEntryToHourEntries(
     .maybeSingle();
 
   if (!apprentice?.user_id) {
-    logger.error('[sync-to-hour-entries] apprentice or user_id not found', { entryId, apprentice_id: entry.apprentice_id });
+    logger.error('[sync-to-hour-entries] apprentice or user_id not found', undefined, { entryId, apprentice_id: entry.apprentice_id });
     return null;
   }
 
@@ -151,7 +151,7 @@ export async function syncProgressEntryToHourEntries(
       .eq('id', existing.id);
 
     if (updateErr) {
-      logger.error('[sync-to-hour-entries] update failed', { entryId, error: updateErr });
+      logger.error('[sync-to-hour-entries] update failed', updateErr, { entryId });
       return null;
     }
     hourEntryId = existing.id;
@@ -163,7 +163,7 @@ export async function syncProgressEntryToHourEntries(
       .single();
 
     if (insertErr || !inserted) {
-      logger.error('[sync-to-hour-entries] insert failed', { entryId, error: insertErr });
+      logger.error('[sync-to-hour-entries] insert failed', insertErr, { entryId });
       return null;
     }
     hourEntryId = inserted.id;

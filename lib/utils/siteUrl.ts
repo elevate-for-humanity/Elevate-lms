@@ -39,7 +39,10 @@ export function getAdminUrl(): string {
     }
     return `${parsed.protocol}//${parsed.host}`;
   } catch (e) {
-    throw new Error(`Invalid NEXT_PUBLIC_ADMIN_URL: ${e instanceof Error ? e.message : e}`, { cause: e });
+    const message = `Invalid NEXT_PUBLIC_ADMIN_URL: ${e instanceof Error ? e.message : String(e)}`;
+    const err = new Error(message);
+    (err as Error & { cause: unknown }).cause = e;
+    throw err;
   }
 }
 

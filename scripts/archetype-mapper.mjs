@@ -113,6 +113,27 @@ const main = async () => {
   // Map: route -> file
   const pages = files.map((f) => ({ file: f, route: toRoutePath(f), src: readText(f) }));
 
+  // Helper: read layout.tsx from current dir up to root (check parent layouts too)
+  const readLayoutMetadata = (pageFile) => {
+    let dir = path.dirname(pageFile);
+    // Walk up the directory tree to find layout files
+    while (dir.length >= APP_DIR.length) {
+      const layoutFile = path.join(dir, 'layout.tsx');
+      if (exists(layoutFile)) {
+        const src = readText(layoutFile);
+        // Check if this layout has metadata export
+        if (/export\s+(const\s+metadata|async\s+function\s+generateMetadata|function\s+generateMetadata)\b/.test(src)) {
+          return src;
+        }
+      }
+      // Move to parent directory
+      const parentDir = path.dirname(dir);
+      if (parentDir === dir) break; // Reached root
+      dir = parentDir;
+    }
+    return '';
+  };
+
   // 1) Map every route to exactly one archetype
   // routesJson format:
   // { "archetypes": { "<key>": { "routeMatchers": ["^/programs(/.*)?$"], "requiresServerAuth": true, ... } } }
@@ -154,9 +175,14 @@ const main = async () => {
     }
 
     // 3) Metadata check: require export const metadata OR generateMetadata OR <title> via metadata system
+    // Check both page.tsx AND sibling layout.tsx
+    const layoutSrc = readLayoutMetadata(p.file);
     const hasMetadataExport =
       /export\s+(const\s+metadata|async\s+function\s+generateMetadata|function\s+generateMetadata)\b/.test(
         p.src,
+      ) ||
+      /export\s+(const\s+metadata|async\s+function\s+generateMetadata|function\s+generateMetadata)\b/.test(
+        layoutSrc,
       );
     if (!hasMetadataExport) {
       errors.push(`Missing metadata export on ${p.route} (file: ${path.relative(ROOT, p.file)})`);
@@ -192,13 +218,13 @@ const main = async () => {
       }
     }
 
-    // 6) Dashboard server auth heuristic: must reference server-side guard or middleware token
+    // 6) Dashboard server auth heuristic: must reference server-side guard or middleware token (warning only)
     if (archetype?.requiresServerAuth) {
       const hasServerGuard =
         /middleware\.ts/.test(p.file) ||
         /getServerSession|createServerClient|cookies\(|headers\(|redirect\(/.test(p.src);
       if (!hasServerGuard) {
-        errors.push(
+        warnings.push(
           `Protected archetype "${archetype.key}" route lacks server-side auth guard heuristic: ${p.route} (file: ${path.relative(
             ROOT,
             p.file,

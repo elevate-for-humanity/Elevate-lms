@@ -8,8 +8,8 @@ import * as path from 'path';
 
 const { Client } = pg;
 
-// Supabase PostgreSQL connection - direct connection
-const DB_URL = process.env.DATABASE_URL || 'postgresql://postgres:kingGreene08$$$@db.cuxzzpsyufcewtmicszk.supabase.co:5432/postgres';
+// Supabase PostgreSQL connection
+const DB_URL = 'postgresql://postgres:kingGreene08$$$@db.cuxzzpsyufcewtmicszk.supabase.co:5432/postgres';
 
 async function runMigration() {
   console.log('🚀 Running Curriculum Licensing Migration...\n');

@@ -264,7 +264,9 @@
         "^/verify(/.*)?$",
         "^/verify-credential$",
         "^/verifycertificate$",
-        "^/verifyemail$"
+        "^/verifyemail$",
+        "^/error$",
+        "^/payment-error$"
       ],
       "requiresServerAuth": false,
       "requiresRoleGate": false

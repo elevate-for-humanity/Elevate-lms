@@ -1,10 +1,6 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Log | Elevate for Humanity',
-  description: 'Log page content.',
-};
+import Link from 'next/link';
 
 async function resolveClientProgramId(
   supabase: ReturnType<typeof createClient>,

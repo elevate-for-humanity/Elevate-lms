@@ -2,12 +2,12 @@ import { Metadata } from 'next';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
-import { AlertTriangle, Clock, ChevronRight, ArrowRight } from 'lucide-react';
+import { AlertTriangle, Clock, ChevronRight, ArrowRight, Brain, BookOpen, Phone, Mail, MessageSquare, TrendingDown, Users, Zap } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 export const metadata: Metadata = {
-  title: 'At-Risk Students | Admin',
+  title: 'Student Success | Admin',
 };
 
 const RISK_STYLES: Record<string, string> = {
@@ -15,6 +15,22 @@ const RISK_STYLES: Record<string, string> = {
   medium: 'bg-amber-100 text-amber-800',
   low: 'bg-slate-100 text-slate-600',
 };
+
+// Coaching intervention types
+const INTERVENTIONS = [
+  { id: 'tutor', label: 'Schedule Tutoring', icon: BookOpen, color: 'blue' },
+  { id: 'call', label: 'Phone Outreach', icon: Phone, color: 'green' },
+  { id: 'email', label: 'Send Email', icon: Mail, color: 'purple' },
+  { id: 'sms', label: 'SMS Reminder', icon: MessageSquare, color: 'amber' },
+  { id: 'coach', label: 'AI Coaching', icon: Brain, color: 'indigo' },
+];
+
+// RTI Tiers
+const RTI_TIERS = [
+  { tier: 1, label: 'Universal', color: 'bg-green-100 text-green-800', intervention: 'Core instruction + progress monitoring' },
+  { tier: 2, label: 'Targeted', color: 'bg-amber-100 text-amber-800', intervention: 'Small group intervention + weekly check-ins' },
+  { tier: 3, label: 'Intensive', color: 'bg-red-100 text-red-800', intervention: 'Individual intervention + daily support' },
+];
 
 export default async function AtRiskPage() {
   await requireRole(['admin', 'staff']);
@@ -66,59 +82,92 @@ export default async function AtRiskPage() {
     (inactiveProfiles ?? []).map((p: any) => [p.id, p]),
   );
 
+  // Calculate RTI stats
+  const criticalCount = flagged.filter((f: any) => f.risk_level === 'high').length;
+  const mediumCount = flagged.filter((f: any) => f.risk_level === 'medium').length;
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-50">
       <div className="bg-white border-b border-slate-200 px-6 py-5">
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
           <Link href="/admin/dashboard" className="hover:text-slate-700">
             Admin
           </Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-slate-900 font-medium">At-Risk</span>
+          <span className="text-slate-900 font-medium">Student Success</span>
         </nav>
-        <h1 className="text-2xl font-bold text-slate-900">At-Risk Students</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Student Success & RTI</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Students flagged for intervention or enrolled 14+ days with no recent activity
+          Response to Intervention (RTI) tracking, coaching workflows, and AI-powered student support
         </p>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        <div className="grid grid-cols-2 gap-4">
+        {/* Quick Intervention Actions */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6">
+          <h2 className="font-semibold text-slate-900 text-sm mb-4 flex items-center gap-2">
+            <Zap className="w-4 h-4 text-amber-500" />
+            Quick Intervention Actions
+          </h2>
+          <div className="grid grid-cols-5 gap-3">
+            {INTERVENTIONS.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Link
+                  key={action.id}
+                  href={`/admin/email-marketing/campaigns/new?tool=${action.id}`}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-200 hover:border-${action.color}-300 hover:bg-${action.color}-50 transition-all text-center`}
+                >
+                  <Icon className={`w-6 h-6 text-${action.color}-600`} />
+                  <span className="text-xs font-medium text-slate-700">{action.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* RTI Tiers Overview */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6">
+          <h2 className="font-semibold text-slate-900 text-sm mb-4 flex items-center gap-2">
+            <TrendingDown className="w-4 h-4 text-slate-600" />
+            Response to Intervention (RTI) Tiers
+          </h2>
+          <div className="grid grid-cols-3 gap-4">
+            {RTI_TIERS.map((tier) => (
+              <div key={tier.tier} className={`rounded-xl p-4 ${tier.color}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-bold">Tier {tier.tier}</span>
+                  <span className="text-xs font-semibold">{tier.label}</span>
+                </div>
+                <p className="text-xs opacity-80">{tier.intervention}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-4 gap-4">
           {[
-            {
-              label: 'Flagged for Intervention',
-              value: flaggedCount,
-              icon: AlertTriangle,
-              urgent: flaggedCount > 0,
-              color: 'text-rose-600',
-              bg: 'bg-rose-50',
-            },
-            {
-              label: 'Enrolled 14+ Days',
-              value: inactiveCount,
-              icon: Clock,
-              urgent: inactiveCount > 0,
-              color: 'text-amber-600',
-              bg: 'bg-amber-50',
-            },
+            { label: 'Critical Risk', value: criticalCount, icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50' },
+            { label: 'Medium Risk', value: mediumCount, icon: AlertTriangle, color: 'text-amber-600', bg: 'bg-amber-50' },
+            { label: 'Inactive (14d+)', value: inactiveCount, icon: Clock, color: 'text-slate-600', bg: 'bg-slate-50' },
+            { label: 'Total Flagged', value: flaggedCount, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
           ].map((s) => {
             const Icon = s.icon;
             return (
-              <div
-                key={s.label}
-                className={`bg-white rounded-2xl border shadow-sm p-5 ${s.urgent ? 'border-rose-300 ring-1 ring-rose-200' : 'border-slate-200'}`}
-              >
+              <div key={s.label} className="bg-white rounded-2xl border border-slate-200 p-5">
                 <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-3`}>
                   <Icon className={`w-4 h-4 ${s.color}`} />
                 </div>
-                <p className="text-2xl font-bold text-slate-900 tabular-nums">{s.value}</p>
-                <p className="text-xs text-slate-500 mt-1 font-medium">{s.label}</p>
+                <p className="text-2xl font-bold text-slate-900">{s.value}</p>
+                <p className="text-xs text-slate-500 mt-1">{s.label}</p>
               </div>
             );
           })}
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        {/* Student Tables */}
+        <div className="grid grid-cols-1 gap-6">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 className="font-semibold text-slate-900 text-sm">Flagged for Intervention</h2>
             <span className="text-xs text-slate-400">{flaggedCount} students</span>

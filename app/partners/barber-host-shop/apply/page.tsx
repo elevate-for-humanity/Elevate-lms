@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { STATIC_PROGRAM_MAP, getStaticProgram } from '@/data/programs/index';
 import { normalizeProgramInterest } from '@/lib/intake/normalize-program-interest';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 export const metadata: Metadata = {
   title: 'Apply | Elevate for Humanity',

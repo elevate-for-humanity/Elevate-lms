@@ -1,25 +1,11 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: 'Nail Host Shop | Elevate for Humanity',
-  description: 'Nail Host Shop page content.',
+export const metadata = {
+  title: 'Nail Technician Host Shop | Elevate for Humanity',
+  description: 'Host a nail technician apprenticeship. Partner with us to train the next generation of nail care professionals.',
+  robots: { index: true, follow: true },
 };
 
-export default function Page() {
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl font-bold">Nail Host Shop</h1>
-          <p className="text-blue-200">Workforce development resources.</p>
-        </div>
-      </section>
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
-        </div>
-      </section>
-    </div>
-  );
+export default function NailHostShopPage() {
+  redirect('/partners/nail-host-shop');
 }

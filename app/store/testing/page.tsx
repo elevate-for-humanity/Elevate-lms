@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Shield, Clock, Award, CheckCircle, Calendar, Users, CreditCard, ArrowRight, ShoppingCart, TrendingUp } from 'lucide-react';
 import { SimpleAddToCartButton } from '@/components/store/SimpleAddToCartButton';
+import { StudentQuickNav } from '@/components/store/StudentQuickNav';
 import { CERTIPORT_EXAMS } from '@/lib/testing/providers/certiport-pricing';
 import { WORKKEYS_PRICING } from '@/lib/testing/providers/workkeys-pricing';
 import { EPA608_PRICING } from '@/lib/testing/providers/epa608-pricing';
@@ -64,83 +65,90 @@ export default function TestingCenterPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Testing Center" }]} />
       </div>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
+      {/* Hero - Bright with Image */}
+      <section className="relative min-h-[70vh] flex items-end overflow-hidden bg-slate-100">
+        {/* Full-Width Real Image */}
+        <div className="absolute inset-0">
           <Image 
             src="/images/pages/testing-page-1.webp" 
             alt="Testing Center" 
             fill 
-            className="object-cover object-center"
+            className="object-cover object-top"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-red-900/95 via-red-900/80 to-red-900/60" />
         </div>
-        
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-full text-sm font-bold mb-6 backdrop-blur-sm">
-                <Shield className="w-4 h-4" />
-                Testing Center
-              </div>
-              
-              <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
-                Certification Testing <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">Made Simple</span>
-              </h1>
-              
-              <p className="text-xl text-slate-200 mb-8">
-                Schedule exams, manage proctors, track scores, and issue credentials. 
-                Everything you need for a professional testing center.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/admin/testing" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-brand-red-700 transition-all hover:-translate-y-0.5">
-                  Open Testing Dashboard
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link href="#exams" className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-white font-bold px-8 py-4 rounded-xl border border-white/20 hover:bg-white/20 transition-all">
-                  View Exam Options
-                </Link>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-2xl shadow-2xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-                  <Award className="w-5 h-5 text-emerald-600" />
+
+        {/* White Content Box at Bottom */}
+        <div className="relative z-10 w-full bg-white">
+          <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
+            <div className="grid lg:grid-cols-2 gap-8 items-end">
+              {/* Left - Content */}
+              <div>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-bold mb-4">
+                  <Shield className="w-4 h-4" />
+                  Testing Center
+                </span>
+                
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-4">
+                  Certification Testing <span className="text-brand-red-600">Made Simple</span>
+                </h1>
+                
+                <p className="text-lg text-slate-600 mb-6 max-w-xl">
+                  Schedule exams, manage proctors, track scores, and issue credentials. 
+                  Everything you need for a professional testing center.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link href="/admin/testing" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-red-700 transition-colors text-center">
+                    Open Testing Dashboard
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                  <Link href="#exams" className="inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-lg transition-colors text-center">
+                    View Exam Options
+                  </Link>
                 </div>
-                <span className="font-bold text-slate-900">Live Testing Dashboard</span>
               </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-5 h-5 text-slate-400" />
-                    <span className="text-sm text-slate-700">Today Exams</span>
+
+              {/* Right - Stats Card */}
+              <div className="bg-slate-50 rounded-2xl shadow-lg p-6 border border-slate-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                    <Award className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <span className="font-bold text-slate-900">12</span>
+                  <span className="font-bold text-slate-900">Live Testing Dashboard</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <Users className="w-5 h-5 text-slate-400" />
-                    <span className="text-sm text-slate-700">Scheduled</span>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center gap-3">
+                      <Clock className="w-5 h-5 text-slate-400" />
+                      <span className="text-sm text-slate-700">Today Exams</span>
+                    </div>
+                    <span className="font-bold text-slate-900">12</span>
                   </div>
-                  <span className="font-bold text-slate-900">47</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-emerald-500" />
-                    <span className="text-sm text-slate-700">Passed Today</span>
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center gap-3">
+                      <Users className="w-5 h-5 text-slate-400" />
+                      <span className="text-sm text-slate-700">Scheduled</span>
+                    </div>
+                    <span className="font-bold text-slate-900">47</span>
                   </div>
-                  <span className="font-bold text-emerald-600">9</span>
+                  <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="w-5 h-5 text-emerald-500" />
+                      <span className="text-sm text-slate-700">Passed Today</span>
+                    </div>
+                    <span className="font-bold text-emerald-600">9</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Student Quick Nav */}
+      <StudentQuickNav />
 
       {/* Features */}
       <section className="py-16 px-4">

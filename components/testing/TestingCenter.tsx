@@ -38,6 +38,7 @@ const PROVIDER_HERO_IMAGES: Record<string, string> = {
   esco: '/images/pages/hvac-technician.webp',
   nrf: '/images/pages/apply-employer-hero.webp',
   careersafe: '/images/pages/apprenticeships-hero.webp',
+  ase: '/images/pages/hvac-technician.webp',
 };
 
 // Provider data - prices pulled from centralized pricing engine
@@ -144,6 +145,23 @@ const PROVIDERS = [
     examFee: CAREERSAFE_PRICING ? `$${CAREERSAFE_PRICING.osha10.price} - $${CAREERSAFE_PRICING.osha30.price}` : '$40 - $80',
     color: 'orange',
   },
+  {
+    id: 'ase',
+    name: 'ASE',
+    fullName: 'ASE Certification (NISE)',
+    logo: '/images/partners/ase-logo.png',
+    heroImage: '/images/pages/hvac-technician.webp',
+    certifications: [
+      { name: 'A1 - Engine Repair', career: 'Auto Technician', salary: '$35,000-$55,000/yr' },
+      { name: 'A4 - Suspension & Steering', career: 'Auto Technician', salary: '$35,000-$55,000/yr' },
+      { name: 'A5 - Brakes', career: 'Brake Specialist', salary: '$32,000-$50,000/yr' },
+      { name: 'A6 - Electrical/Electronic', career: 'Auto Electrician', salary: '$38,000-$58,000/yr' },
+      { name: 'A8 - Engine Performance', career: 'Diagnostic Technician', salary: '$40,000-$60,000/yr' },
+    ],
+    accent: 'from-slate-600 to-blue-600',
+    examFee: '$49',
+    color: 'slate',
+  },
 ];
 
 // Career paths for exam finder
@@ -157,8 +175,8 @@ const CAREER_PATHS = [
   { 
     name: 'Skilled Trades', 
     icon: '🔧',
-    careers: ['HVAC', 'Electrician', 'Plumber', 'Welder', 'Construction'],
-    providers: ['esco'],
+    careers: ['HVAC', 'Electrician', 'Plumber', 'Welder', 'Construction', 'Automotive'],
+    providers: ['esco', 'ase'],
   },
   { 
     name: 'Business & Technology', 

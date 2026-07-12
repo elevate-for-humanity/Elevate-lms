@@ -161,14 +161,7 @@ export function SEO({
       <meta property="og:locale" content="en_US" />
       <meta property="og:updated_time" content={new Date().toISOString()} />
 
-      {/* Twitter/X Card */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content="@elevateforhumanity" />
-      <meta name="twitter:creator" content="@elevateforhumanity" />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={fullOgImage} />
-      <meta name="twitter:image:alt" content={title} />
+      {/* Twitter/X Card - REMOVED per user request */}
 
       {/* Additional SEO */}
       <meta name="viewport" content="width=device-width, initial-scale=1" />

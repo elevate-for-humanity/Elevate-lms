@@ -45,7 +45,6 @@ export const siteConfig = {
     instagram: 'https://instagram.com/elevateforhumanity',
     linkedin: 'https://linkedin.com/company/elevate-for-humanity',
     youtube: 'https://youtube.com/@elevateforhumanity',
-    twitter: 'https://twitter.com/elevate4humanity',
   },
 
   // Business hours

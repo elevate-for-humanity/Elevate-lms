@@ -11,6 +11,8 @@ import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeOutcomes } from '@/components/home/HomeOutcomes';
 import { HomePlatformPreview } from '@/components/home/HomePlatformPreview';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
+import { WorkforceOSArchitecture } from '@/components/home/WorkforceOSArchitecture';
+import { HomeAIPlatform } from '@/components/home/HomeAIPlatform';
 import { HomeSegmentedCTA } from '@/components/home/HomeSegmentedCTA';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -56,13 +58,6 @@ export const metadata: Metadata = {
       },
     ],
     type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training & Apprenticeships`,
-    description:
-      'Funded training, DOL-registered apprenticeships, and job placement — often at no cost.',
-    images: ['/images/pages/comp-home-hero.webp'],
   },
 };
 
@@ -146,6 +141,15 @@ export default async function HomePage() {
 
       {/* ── 8b. EMPLOYER STRIP ──────────────────────────────────────────── */}
       <HomeEmployerStrip />
+
+      {/* ── 8c. WORKFORCE OS ARCHITECTURE ──────────────────────────────── */}
+      {/* AI Workforce Operating System - 13 sovereign portals serving 
+          every stakeholder in the workforce pipeline */}
+      <WorkforceOSArchitecture />
+
+      {/* ── 8d. AI PLATFORM OVERVIEW ───────────────────────────────────── */}
+      {/* PARIS AI, Course Factory, Credential Engine, Dev Studio */}
+      <HomeAIPlatform />
 
       {/* ── 9. SEGMENTED CTA ────────────────────────────────────────────── */}
       {/* Separate entry funnels: Learners / Employers / Workforce Agencies /

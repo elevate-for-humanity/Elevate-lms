@@ -250,18 +250,18 @@ export default function StoreDemosPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-gradient-to-br from-brand-blue-900 to-slate-900 text-white">
+      <section className="py-16 px-4 bg-slate-50">
         <div className="max-w-4xl mx-auto text-center">
-          <Zap className="w-12 h-12 text-yellow-400 mx-auto mb-6" />
-          <h2 className="text-3xl font-bold mb-4">Want a Personalized Demo?</h2>
-          <p className="text-xl text-slate-300 mb-8">
+          <Zap className="w-12 h-12 text-brand-red-600 mx-auto mb-4" />
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">Want a Personalized Demo?</h2>
+          <p className="text-lg text-slate-600 mb-8">
             Book 30 minutes with our team. We'll walk through the features that matter most for your organization.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/contact?subject=Demo" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-all hover:-translate-y-0.5">
+            <Link href="/contact?subject=Demo" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition-all hover:shadow-lg">
               Schedule Demo <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/store/trial" className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-white font-bold px-8 py-4 rounded-xl border border-white/20 hover:bg-white/20 transition-all">
+            <Link href="/store/trial" className="inline-flex items-center justify-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-8 py-4 rounded-lg transition-all">
               Start Free Trial
             </Link>
           </div>

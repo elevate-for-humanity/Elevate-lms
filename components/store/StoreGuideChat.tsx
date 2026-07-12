@@ -18,11 +18,11 @@ interface StoreGuideChatProps {
 
 // Image mapping for choices
 const choiceImages: Record<string, string> = {
-  shop: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/shop-hero.webp',
-  courses: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/shop-hero.webp',
-  workbooks: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
-  licensing: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/shop-hero.webp',
-  'not-sure': 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp',
+  shop: '/images/pages/shop-hero.webp',
+  courses: '/images/pages/shop-hero.webp',
+  workbooks: '/images/pages/training-classroom.webp',
+  licensing: '/images/pages/shop-hero.webp',
+  'not-sure': '/images/pages/store-recommendations.webp',
 };
 
 // Simple speech hook
@@ -186,7 +186,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
         aria-label="Open store guide"
       >
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-guide-1.webp"
+          src="/images/pages/store-guide-1.webp"
           alt="Guide"
           width={24}
           height={24}
@@ -216,7 +216,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
                 className={`w-14 h-14 rounded-full overflow-hidden border-2 flex-shrink-0 ${isSpeaking ? 'border-brand-red-500 animate-pulse' : 'border-slate-200'}`}
               >
                 <Image sizes="100vw"
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-guide-1.webp"
+                  src="/images/pages/store-guide-1.webp"
                   alt="Store Guide"
                   width={56}
                   height={56}
@@ -266,7 +266,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
                       {/* Choice Image */}
                       <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
                         <Image sizes="100vw"
-                          src={choiceImages[choice.id] || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp'}
+                          src={choiceImages[choice.id] || '/images/pages/store-recommendations.webp'}
                           alt={choice.label}
                           width={56}
                           height={56}
@@ -299,7 +299,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
                   <Image sizes="100vw"
                     src={
                       choiceImages[selectedChoice?.id || ''] ||
-                      'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/store-recommendations.webp'
+                      '/images/pages/store-recommendations.webp'
                     }
                     alt={selectedChoice?.label || ''}
                     width={80}

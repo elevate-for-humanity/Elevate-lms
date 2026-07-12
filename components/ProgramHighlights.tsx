@@ -15,33 +15,33 @@ const defaultHighlights: Highlight[] = [
     title: 'No-Cost Training Available',
     description:
       'No tuition for eligible participants. Funded through WIOA, WRG, and JRI programs.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cna-clinical.jpg',
+    image: '/images/pages/cna-clinical.jpg',
   },
   {
     title: 'Earn While You Learn',
     description: 'Get paid during training through work-study programs and apprenticeships.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-technician.webp',
+    image: '/images/pages/hvac-technician.webp',
   },
   {
     title: 'Industry Certification',
     description: 'Earn recognized certifications that employers value and actively seek.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/admin-dashboard-hero.webp',
   },
   {
     title: 'Job Placement Support',
     description:
       'We connect you with employers hiring in your field. Resume and interview prep included.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/it-helpdesk-desk.webp',
+    image: '/images/pages/it-helpdesk-desk.webp',
   },
   {
     title: 'Hands-On Experience',
     description: 'Real-world training with actual equipment and industry-standard tools.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cdl-truck-highway.webp',
+    image: '/images/pages/cdl-truck-highway.webp',
   },
   {
     title: 'Support Services',
     description: 'Childcare, transportation, and career counseling to keep you on track.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-hero-main.webp',
+    image: '/images/pages/barber-hero-main.webp',
   },
 ];
 
@@ -89,7 +89,7 @@ export default function ProgramHighlights({
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/electrical-wiring.jpg"
+                  src="/images/pages/electrical-wiring.jpg"
                   alt="Small class sizes"
                   fill
                   className="object-cover"
@@ -102,7 +102,7 @@ export default function ProgramHighlights({
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-highlights-team.jpg"
+                  src="/images/pages/comp-highlights-team.jpg"
                   alt="Expert instructors"
                   fill
                   className="object-cover"
@@ -115,7 +115,7 @@ export default function ProgramHighlights({
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/welding-sparks.webp"
+                  src="/images/pages/welding-sparks.webp"
                   alt="Modern equipment"
                   fill
                   className="object-cover"
@@ -128,7 +128,7 @@ export default function ProgramHighlights({
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-grad.jpg"
+                  src="/images/pages/healthcare-grad.jpg"
                   alt="Job placement"
                   fill
                   className="object-cover"

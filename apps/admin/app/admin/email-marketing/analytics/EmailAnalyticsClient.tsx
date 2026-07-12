@@ -113,7 +113,7 @@ export default function AnalyticsPage() {
         {/* Hero Section */}
         <section className="relative h-48 md:h-64 overflow-hidden">
           <Image
-            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-email-analytics-detail.webp"
+            src="/images/pages/admin-email-analytics-detail.webp"
             alt="Analytics"
             fill
             className="object-cover"

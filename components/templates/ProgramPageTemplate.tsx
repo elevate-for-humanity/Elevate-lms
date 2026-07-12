@@ -101,7 +101,7 @@ export function ProgramPageTemplate({
         {heroVideo ? (
           <CanonicalVideo
             src={heroVideo}
-            poster={heroImage || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-default.jpg'}
+            poster={heroImage || '/images/og-default.jpg'}
             className="w-full h-full object-cover"
           />
         ) : (

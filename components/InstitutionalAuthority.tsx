@@ -34,7 +34,7 @@ const AUTHORITIES = [
     title: 'EPA 608 Certification',
     abbr: 'EPA 608',
     desc: 'EPA Section 608 Universal Certification prep and exam — required for HVAC refrigerant handling.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/graduation-ceremony.webp',
+    image: '/images/pages/graduation-ceremony.webp',
     color: 'text-brand-green-700',
     bg: 'bg-brand-green-50',
     border: 'border-brand-green-200',

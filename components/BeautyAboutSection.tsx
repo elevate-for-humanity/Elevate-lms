@@ -119,7 +119,7 @@ export default function BeautyAboutSection() {
             <div className="relative">
               <div className="aspect-square rounded-2xl overflow-hidden">
                 <Image sizes="100vw"
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-shop-interior.webp"
+                  src="/images/pages/barber-shop-interior.webp"
                   alt="Diverse team of beauty professionals"
                   fill
                   className="object-cover"

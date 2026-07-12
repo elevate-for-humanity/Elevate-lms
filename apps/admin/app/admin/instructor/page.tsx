@@ -37,7 +37,7 @@ export default async function InstructorPortalLanding() {
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image
-            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/instructor-hero.webp"
+            src="/images/pages/instructor-hero.webp"
             alt="Instructor Portal"
             fill
             className="object-cover"
@@ -65,7 +65,7 @@ export default async function InstructorPortalLanding() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/instructor-page-2.webp"
+                  src="/images/pages/instructor-page-2.webp"
                   alt="Course Management"
                   fill
                   sizes="100vw"
@@ -82,7 +82,7 @@ export default async function InstructorPortalLanding() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/instructor-page-3.webp"
+                  src="/images/pages/instructor-page-3.webp"
                   alt="Student Roster"
                   fill
                   sizes="100vw"
@@ -97,7 +97,7 @@ export default async function InstructorPortalLanding() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/instructor-page-4.webp"
+                  src="/images/pages/instructor-page-4.webp"
                   alt="Progress Tracking"
                   fill
                   sizes="100vw"
@@ -112,7 +112,7 @@ export default async function InstructorPortalLanding() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/instructor-grading.webp"
+                  src="/images/pages/instructor-grading.webp"
                   alt="Grading"
                   fill
                   sizes="100vw"
@@ -127,7 +127,7 @@ export default async function InstructorPortalLanding() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/instructor-page-5.webp"
+                  src="/images/pages/instructor-page-5.webp"
                   alt="Communication"
                   fill
                   sizes="100vw"
@@ -142,7 +142,7 @@ export default async function InstructorPortalLanding() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32 overflow-hidden">
                 <Image
-                  src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/certifications-page-1.webp"
+                  src="/images/pages/certifications-page-1.webp"
                   alt="Certifications"
                   fill
                   sizes="100vw"

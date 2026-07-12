@@ -41,7 +41,7 @@ export default function EmailMarketingPage({ stats }: EmailMarketingPageProps) {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-email-marketing-d1.jpg"
+          src="/images/pages/admin-email-marketing-d1.jpg"
           alt="Email Marketing"
           fill
           className="object-cover"
@@ -338,7 +338,7 @@ export default function EmailMarketingPage({ stats }: EmailMarketingPageProps) {
                 </div>
                 <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-email-marketing-d2.webp"
+                    src="/images/pages/admin-email-marketing-d2.webp"
                     alt="Students learning"
                     fill
                     className="object-cover"

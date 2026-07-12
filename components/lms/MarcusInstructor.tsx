@@ -119,7 +119,7 @@ export default function MarcusInstructor({ lessonNumber, lessonTitle }: Props) {
           <div className="relative flex-shrink-0">
             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
               <Image sizes="100vw"
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/instructors/instructor-trades.jpg"
+                src="/images/team/instructors/instructor-trades.jpg"
                 alt="Marcus Johnson"
                 width={48}
                 height={48}
@@ -150,7 +150,7 @@ export default function MarcusInstructor({ lessonNumber, lessonTitle }: Props) {
         <div className="relative flex-shrink-0">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-slate-200">
             <Image sizes="100vw"
-              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/instructors/instructor-trades.jpg"
+              src="/images/team/instructors/instructor-trades.jpg"
               alt="Marcus Johnson"
               width={40}
               height={40}
@@ -202,7 +202,7 @@ export default function MarcusInstructor({ lessonNumber, lessonTitle }: Props) {
                   {msg.role === 'assistant' ? (
                     <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 mt-0.5">
                       <Image sizes="100vw"
-                        src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/instructors/instructor-trades.jpg"
+                        src="/images/team/instructors/instructor-trades.jpg"
                         alt="Marcus"
                         width={28}
                         height={28}
@@ -233,7 +233,7 @@ export default function MarcusInstructor({ lessonNumber, lessonTitle }: Props) {
                 <div className="flex gap-3">
                   <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0">
                     <Image sizes="100vw"
-                      src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/instructors/instructor-trades.jpg"
+                      src="/images/team/instructors/instructor-trades.jpg"
                       alt="Marcus"
                       width={28}
                       height={28}

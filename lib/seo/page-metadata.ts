@@ -30,7 +30,6 @@ export const DEFAULT_METADATA: Metadata = {
     siteName: SITE_NAME,
     locale: 'en_US',
   },
-  twitter: {
     card: 'summary_large_image',
   },
   robots: {
@@ -202,7 +201,6 @@ export function generatePageMetadata(pageKey: keyof typeof PAGE_METADATA): Metad
       siteName: SITE_NAME,
       type: 'website',
     },
-    twitter: {
       card: 'summary_large_image',
       title: page.title,
       description: page.description,
@@ -232,7 +230,6 @@ export function generateCustomMetadata(options: {
       siteName: SITE_NAME,
       type: 'website',
     },
-    twitter: {
       card: 'summary_large_image',
       title: options.title,
       description: options.description,

@@ -52,7 +52,7 @@ export function RealTimeCollaboration({ roomId, currentUser }: RealTimeCollabora
       const users: CollaborationUser[] = presence.map((p) => ({
         id: p.user_id,
         name: p.user_name,
-        avatar: p.avatar_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+        avatar: p.avatar_url || '/images/heroes/hero-homepage.webp',
         status: 'online',
         currentPage: p.current_page,
       }));

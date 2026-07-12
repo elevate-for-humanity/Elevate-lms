@@ -59,7 +59,7 @@ export default function DeploymentsClient() {
     <div className="min-h-screen bg-white">
       <div className="relative h-[280px] w-full overflow-hidden">
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dev-studio-detail.webp"
+          src="/images/pages/admin-dev-studio-detail.webp"
           alt="Deployments"
           fill
           className="object-cover"

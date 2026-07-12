@@ -41,7 +41,7 @@ export default async function PayrollCardsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-payroll-cards-detail.webp"
+          src="/images/pages/admin-payroll-cards-detail.webp"
           alt="Payroll Cards"
           fill
           className="object-cover"

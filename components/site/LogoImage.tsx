@@ -16,5 +16,5 @@ export default function LogoImage({
   style,
   ...props
 }: LogoImageProps) {
-  return <Image src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/logo.png" alt={alt} quality={quality} style={{ width: 'auto', ...style }} {...props} />;
+  return <Image src="/images/logo.png" alt={alt} quality={quality} style={{ width: 'auto', ...style }} {...props} />;
 }

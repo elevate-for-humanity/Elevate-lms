@@ -65,7 +65,7 @@ export default function BuildsClient() {
     <div className="min-h-screen bg-white">
       <div className="relative h-[280px] w-full overflow-hidden">
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dev-hero.jpg"
+          src="/images/pages/admin-dev-hero.jpg"
           alt="Builds & Deploy"
           fill
           className="object-cover"

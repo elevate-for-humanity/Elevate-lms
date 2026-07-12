@@ -8,7 +8,7 @@ import { ArrowRight, Clock, DollarSign, Award, Users, CheckCircle, Play } from '
 
 // Video hero banner
 const HOME_HERO = {
-  video: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/hero-home-fast.mp4',
+  video: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4',
   microLabel: 'DOL Registered Apprenticeship Sponsor',
   headline: 'Start Your Career Today',
   subheadline: 'Earn while you learn with paid apprenticeships in healthcare, trades, and beauty industries.',

@@ -182,17 +182,17 @@ const CAREER_PATHS = [
 
 // Icons
 const ICONS = {
-  check: '/images/icons/check-circle.webp',
-  checkWhite: '/images/icons/check-white.webp',
-  calendar: '/images/icons/calendar.webp',
-  clock: '/images/icons/clock.webp',
-  dollar: '/images/icons/dollar.webp',
-  shield: '/images/icons/shield.webp',
-  users: '/images/icons/users.webp',
-  book: '/images/icons/book.webp',
-  phone: '/images/icons/phone.webp',
-  location: '/images/icons/location.webp',
-  certificate: '/images/icons/certificate.webp',
+  check: '/images/icons/check-circle.svg',
+  checkWhite: '/images/icons/check-white.svg',
+  calendar: '/images/icons/calendar.svg',
+  clock: '/images/icons/clock.svg',
+  dollar: '/images/icons/dollar.svg',
+  shield: '/images/icons/shield.svg',
+  users: '/images/icons/users.svg',
+  book: '/images/icons/book.svg',
+  phone: '/images/icons/phone.svg',
+  location: '/images/icons/location.svg',
+  certificate: '/images/icons/certificate.svg',
 };
 
 // Interactive Exam Finder
@@ -678,7 +678,7 @@ export function PremiumTestingCenter() {
             className="w-full h-full object-cover"
             poster="/images/pages/testing-center-hero.webp"
           >
-            <source src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/testing-hero.mp4" type="video/mp4" />
+            <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/testing-hero.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-900/50" />
         </div>

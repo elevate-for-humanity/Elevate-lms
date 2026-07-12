@@ -25,7 +25,7 @@ export const organizationSchema = {
   sameAs: [
     'https://www.facebook.com/share/1BUqvUAnCo/',
     'https://www.linkedin.com/company/elevate-for-humanity',
-    'https://twitter.com/elevate4humanity',
+    '',
   ],
 };
 

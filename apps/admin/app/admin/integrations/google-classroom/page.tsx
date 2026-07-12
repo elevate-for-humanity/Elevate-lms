@@ -37,7 +37,7 @@ export default async function GoogleClassroomPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-integrations-gc-detail.webp"
+          src="/images/pages/admin-integrations-gc-detail.webp"
           alt="Google Classroom"
           fill
           className="object-cover"

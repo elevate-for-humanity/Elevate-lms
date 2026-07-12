@@ -47,7 +47,7 @@ export function PeerReview({ assignmentId, studentName }: PeerReviewProps) {
         const formatted: Review[] = data.map((r) => ({
           id: r.id,
           reviewer: r.profiles?.full_name || 'Anonymous',
-          reviewerAvatar: r.profiles?.avatar_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+          reviewerAvatar: r.profiles?.avatar_url || '/images/heroes/hero-homepage.webp',
           rating: r.rating,
           comment: r.comment,
           helpful: r.helpful_count || 0,
@@ -62,7 +62,7 @@ export function PeerReview({ assignmentId, studentName }: PeerReviewProps) {
         {
           id: '1',
           reviewer: 'Sarah Johnson',
-          reviewerAvatar: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+          reviewerAvatar: '/images/heroes/hero-homepage.webp',
           rating: 5,
           comment: 'Excellent work!',
           helpful: 12,
@@ -115,7 +115,7 @@ export function PeerReview({ assignmentId, studentName }: PeerReviewProps) {
     const review: Review = {
       id: Date.now().toString(),
       reviewer: 'You',
-      reviewerAvatar: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/hero-homepage.webp',
+      reviewerAvatar: '/images/heroes/hero-homepage.webp',
       rating: newReview.rating,
       comment: newReview.comment,
       helpful: 0,

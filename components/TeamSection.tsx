@@ -6,32 +6,32 @@ const teamMembers = [
   {
     name: 'Elizabeth Greene',
     title: 'Founder & Chief Executive Officer',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/team/elizabeth-greene-headshot.webp',
+    image: '/images/team/elizabeth-greene-headshot.webp',
     bio: `U.S. Army veteran, federally authorized tax professional, and EPA 608 certified proctor. Elizabeth founded ${PLATFORM_DEFAULTS.orgName} to connect people to funded workforce training. She also leads Elevate tax operations and Selfish Inc., a 501(c)(3) nonprofit supporting VITA free tax preparation and community services. Elevate operates as a DOL Registered Apprenticeship Sponsor with state and local workforce partnerships across Indiana.`,
   },
   {
     name: 'Jozanna George',
     title:
       'Director of Enrollment & Beauty Industry Programs | Site Coordinator, Textures Institute of Cosmetology',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/jozanna-george.jpg',
+    image: '/images/jozanna-george.jpg',
     bio: `Jozanna is a multi-licensed beauty professional holding Nail Technician, Nail Instructor, and Esthetician licenses. She oversees the nail program at Textures Institute of Cosmetology and manages enrollment operations for ${PLATFORM_DEFAULTS.orgName}.`,
   },
   {
     name: 'Dr. Carlina Wilkes',
     title: 'Executive Director of Financial Operations & Organizational Compliance',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/carlina-wilkes.jpg',
+    image: '/images/carlina-wilkes.jpg',
     bio: `Dr. Wilkes brings 24+ years of federal experience with DFAS, holding DoD Financial Management Certification Level II. She oversees financial operations and compliance at ${PLATFORM_DEFAULTS.orgName}.`,
   },
   {
     name: 'Leslie Wafford',
     title: 'Director of Community Services',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/leslie-wafford.webp',
+    image: '/images/leslie-wafford.webp',
     bio: "Leslie promotes low-barrier housing access and eviction prevention, helping families navigate housing challenges with her 'reach one, teach one' philosophy.",
   },
   {
     name: 'Delores Reynolds',
     title: 'Social Media & Digital Engagement Coordinator',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/delores-reynolds.jpg',
+    image: '/images/delores-reynolds.jpg',
     bio: 'Delores manages digital communications, sharing student success stories and promoting program offerings to reach those who can benefit from free training.',
   },
 ];

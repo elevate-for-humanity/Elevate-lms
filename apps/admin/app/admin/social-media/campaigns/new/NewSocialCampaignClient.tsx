@@ -108,7 +108,7 @@ export default function NewSocialCampaignPage({ programs = [] }: { programs?: Pr
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-social-campaigns-new-hero.jpg"
+          src="/images/pages/admin-social-campaigns-new-hero.jpg"
           alt="New"
           fill
           className="object-cover"

@@ -6,6 +6,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Shield, Clock, Award, CheckCircle, Calendar, Users, CreditCard, ArrowRight, ShoppingCart, TrendingUp } from 'lucide-react';
 import { SimpleAddToCartButton } from '@/components/store/SimpleAddToCartButton';
+import { CERTIPORT_EXAMS } from '@/lib/testing/providers/certiport-pricing';
+import { WORKKEYS_PRICING } from '@/lib/testing/providers/workkeys-pricing';
+import { EPA608_PRICING } from '@/lib/testing/providers/epa608-pricing';
+import { CAREERSAFE_PRICING } from '@/lib/testing/providers/careersafe-pricing';
+import { NRF_RISEUP_PRICING } from '@/lib/testing/providers/nrf-riseup';
 
 export const metadata: Metadata = {
   title: 'Testing Center | Elevate Store',
@@ -16,11 +21,11 @@ export const metadata: Metadata = {
 };
 
 const exams = [
-  { id: 'certiport-mos', name: 'Microsoft Office Specialist (MOS)', desc: 'Word, Excel, PowerPoint, Outlook certification', price: 149, originalPrice: 199, provider: 'Certiport', color: 'red', examCount: 5 },
-  { id: 'workkeys-ncrc', name: 'ACT WorkKeys NCRC', desc: 'Applied Math, Graphic Literacy, Workplace Documents', price: 85, originalPrice: 110, provider: 'ACT WorkKeys', color: 'emerald', examCount: 3 },
-  { id: 'epa608-universal', name: 'EPA 608 Universal', desc: 'Core, Type I, II, III certification', price: 129, originalPrice: 165, provider: 'EPA/ESCO', color: 'amber', examCount: 4 },
-  { id: 'careersafe-osha10', name: 'OSHA 10-Hour Safety', desc: 'General Industry safety certification', price: 89, originalPrice: 119, provider: 'CareerSafe', color: 'orange', examCount: 1 },
-  { id: 'nrf-riseup', name: 'NRF Rise Up Retail', desc: 'Customer Service & Sales certification', price: 79, originalPrice: 99, provider: 'NRF Foundation', color: 'purple', examCount: 3 },
+  { id: 'certiport-mos', name: 'Microsoft Office Specialist (MOS)', desc: 'Word, Excel, PowerPoint, Outlook certification', price: CERTIPORT_EXAMS.mos.price, originalPrice: Math.round(CERTIPORT_EXAMS.mos.price * 1.3), provider: 'Certiport', color: 'red', examCount: CERTIPORT_EXAMS.mos.exams.length },
+  { id: 'workkeys-ncrc', name: 'ACT WorkKeys NCRC', desc: 'Applied Math, Graphic Literacy, Workplace Documents', price: WORKKEYS_PRICING.ncrc.price, originalPrice: Math.round(WORKKEYS_PRICING.ncrc.price * 1.3), provider: 'ACT WorkKeys', color: 'emerald', examCount: 3 },
+  { id: 'epa608-universal', name: 'EPA 608 Universal', desc: 'Core, Type I, II, III certification', price: EPA608_PRICING.universal.price, originalPrice: Math.round(EPA608_PRICING.universal.price * 1.3), provider: 'EPA/ESCO', color: 'amber', examCount: 4 },
+  { id: 'careersafe-osha10', name: 'OSHA 10-Hour Safety', desc: 'General Industry safety certification', price: CAREERSAFE_PRICING.osha10.price, originalPrice: Math.round(CAREERSAFE_PRICING.osha10.price * 1.3), provider: 'CareerSafe', color: 'orange', examCount: 1 },
+  { id: 'nrf-riseup', name: 'NRF Rise Up Retail', desc: 'Customer Service & Sales certification', price: NRF_RISEUP_PRICING.customerServiceSales.price, originalPrice: Math.round(NRF_RISEUP_PRICING.customerServiceSales.price * 1.3), provider: 'NRF Foundation', color: 'purple', examCount: 3 },
   { id: 'cna-exam', name: 'CNA State Exam Prep', desc: 'Practice tests + skills prep', price: 139, originalPrice: 179, provider: 'CNA Prep', color: 'blue', examCount: 2 },
 ];
 

@@ -75,62 +75,70 @@ export default function CourseBuilderPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Course Builder" }]} />
       </div>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-blue-900 via-brand-blue-800 to-brand-blue-900" />
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-10 right-10 w-72 h-72 bg-pink-500 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-10 left-10 w-96 h-96 bg-brand-blue-400 rounded-full blur-3xl animate-pulse delay-1000" />
+      {/* Hero - Bright & Clean */}
+      <section className="relative min-h-[70vh] flex items-end overflow-hidden bg-slate-100">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <Image 
+            src="/images/pages/course-builder-hero.webp" 
+            alt="Course Builder" 
+            fill 
+            className="object-cover object-top"
+            priority
+          />
         </div>
-        
-        <div className="relative max-w-6xl mx-auto px-4 py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-bold mb-6">
-                <Sparkles className="w-4 h-4 text-yellow-400" />
-                AI-Powered Creation
-              </div>
-              
-              <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
-                Course Builder
-                <span className="block text-brand-blue-200">
-                  Create Courses in Minutes
+
+        {/* White Content Box */}
+        <div className="relative z-10 w-full bg-white">
+          <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
+            <div className="grid lg:grid-cols-2 gap-8 items-end">
+              {/* Left - Content */}
+              <div>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold mb-4">
+                  <Sparkles className="w-4 h-4 text-yellow-500" />
+                  AI-Powered Creation
                 </span>
-              </h1>
-              
-              <p className="text-xl text-blue-100 mb-8">
-                Build professional training courses with drag-and-drop lessons, video hosting, 
-                quizzes, and certificates. AI generates content from your descriptions.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/admin/courses/new"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-900 font-bold px-8 py-4 rounded-xl hover:bg-blue-50 transition-colors"
-                >
-                  Create Your First Course
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link
-                  href="/store/course-builder#preview"
-                  className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-white font-bold px-8 py-4 rounded-xl border border-white/20 hover:bg-white/20 transition-colors"
-                >
-                  <Play className="w-5 h-5" />
-                  Preview Builder
-                </Link>
-              </div>
-            </div>
-            
-            {/* Course Builder Preview */}
-            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-              <div className="bg-slate-100 px-4 py-3 flex items-center gap-2 border-b border-slate-200">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-4">
+                  Course Builder
+                  <span className="block text-brand-red-600">
+                    Create Courses in Minutes
+                  </span>
+                </h1>
+                
+                <p className="text-lg text-slate-600 mb-6 max-w-xl">
+                  Build professional training courses with drag-and-drop lessons, video hosting, 
+                  quizzes, and certificates. AI generates content from your descriptions.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link
+                    href="/admin/courses/new"
+                    className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-red-700 transition-colors text-center"
+                  >
+                    Create Your First Course
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                  <Link
+                    href="/store/course-builder#preview"
+                    className="inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-lg transition-colors text-center"
+                  >
+                    <Play className="w-5 h-5" />
+                    Preview Builder
+                  </Link>
                 </div>
-                <span className="text-xs text-slate-500 ml-2">Course Builder</span>
               </div>
+
+              {/* Right - Course Builder Preview */}
+              <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+                <div className="bg-slate-100 px-4 py-3 flex items-center gap-2 border-b border-slate-200">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                  </div>
+                  <span className="text-xs text-slate-500 ml-2">Course Builder</span>
+                </div>
               
               <div className="flex">
                 {/* Sidebar */}

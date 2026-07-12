@@ -36,10 +36,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon.ico', type: 'image/x-icon', sizes: '32x32' },
-      { url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/favicon.png', type: 'image/png', sizes: '192x192' },
+      { url: '/images/favicon.png', type: 'image/png', sizes: '192x192' },
     ],
     shortcut: '/favicon.ico',
-    apple: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/apple-touch-icon.png',
+    apple: '/images/apple-touch-icon.png',
   },
 };
 

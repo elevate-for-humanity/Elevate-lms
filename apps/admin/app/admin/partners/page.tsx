@@ -45,7 +45,7 @@ export default async function PartnersPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-partners-detail.jpg"
+          src="/images/pages/admin-partners-detail.jpg"
           alt="Partners"
           fill
           className="object-cover"

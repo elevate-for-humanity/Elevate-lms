@@ -207,7 +207,7 @@ export default async function ReviewApplicationPage({
       {/* HERO */}
       <div className="relative w-full h-[220px] sm:h-[280px]">
         <Image sizes="100vw"
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-applicants-detail.webp"
+          src="/images/pages/admin-applicants-detail.webp"
           alt="Review Application"
           fill
           priority

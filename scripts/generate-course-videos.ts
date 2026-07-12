@@ -49,17 +49,17 @@ const COURSES: Record<string, CourseConfig> = {
     storageBucket: 'course-videos',
     storagePrefix: 'barber',
   },
-  // ── ADD NEW COURSES HERE ──────────────────────────────────────────────────
-  // hvac: {
-  //   id:            '<course_id>',
-  //   label:         'HVAC EPA 608',
-  //   table:         'curriculum_lessons',
-  //   idColumn:      'course_id',
-  //   orderColumn:   'module_order',
-  //   outDir:        path.join(process.cwd(), 'public/videos/hvac-lessons'),
-  //   storageBucket: 'course-videos',
-  //   storagePrefix: 'hvac',
-  // },
+  // ── HVAC EPA 608 ──────────────────────────────────────────────────────────
+  hvac: {
+    id: 'f0593164-55be-5867-98e7-8a86770a8dd0',
+    label: 'HVAC EPA 608 Technician',
+    table: 'curriculum_lessons',
+    idColumn: 'course_id',
+    orderColumn: 'module_order',
+    outDir: path.join(process.cwd(), 'public/videos/hvac-lessons'),
+    storageBucket: 'course-videos',
+    storagePrefix: 'hvac',
+  },
 };
 
 // ─── CLI args ─────────────────────────────────────────────────────────────────

@@ -43,25 +43,25 @@ export default function GrantContractSuitePage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-violet-950 to-slate-900 text-white py-20 px-4">
+      <section className="bg-slate-50 py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-violet-800/50 text-violet-200 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+          <span className="inline-flex items-center gap-2 bg-violet-100 text-violet-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
             <Briefcase className="w-3.5 h-3.5" /> Operations & Compliance Automation
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
+          </span>
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 leading-tight">
             Grant & Contract<br />Automation Suite
           </h1>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-10">
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
             Upload any state agency contract or grant form. Extract fields. Prefill from your verified org profile.
             Review, sign, and export — all in one audited pipeline.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/admin/compliance/automation"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-violet-500 hover:bg-violet-400 text-white font-semibold rounded-xl transition-colors">
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Open in Admin <ArrowRight className="w-4 h-4" />
             </Link>
             <Link href="/store/demo/admin"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-slate-900 font-semibold rounded-xl transition-colors">
+              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
               Try Demo
             </Link>
           </div>

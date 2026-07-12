@@ -87,32 +87,27 @@ export default function StoreDemosPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Demos" }]} />
       </div>
 
-      {/* Enhanced Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-brand-blue-500 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-brand-red-500 rounded-full blur-3xl animate-pulse delay-1000" />
-        </div>
-        
-        <div className="relative max-w-6xl mx-auto px-4 py-20 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-bold mb-6">
+      {/* Hero - Bright & Clean */}
+      <section className="bg-slate-50 py-16 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-brand-red-100 text-brand-red-700 rounded-full text-sm font-bold mb-4">
             <Play className="w-4 h-4" />
             Interactive Demos - No Signup Required
-          </div>
-          
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
+          </span>
+
+          <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
             Experience the Platform
           </h1>
-          
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-10">
+
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-8">
             Click through live demos of every module. See the complete workforce development operating system.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/store/demo/admin" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-lg">
+            <Link href="/store/demo/admin" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition-all hover:shadow-lg">
               Start Full Platform Tour <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="#videos" className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-white font-bold px-8 py-4 rounded-xl border border-white/20 hover:bg-white/20 transition-all">
+            <Link href="#videos" className="inline-flex items-center justify-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-8 py-4 rounded-lg transition-all">
               <Video className="w-5 h-5" /> Watch Videos
             </Link>
           </div>

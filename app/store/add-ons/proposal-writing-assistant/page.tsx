@@ -31,19 +31,19 @@ export default function ProposalWritingPage() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Add-ons', href: '/store/add-ons' }, { label: 'Proposal Writing Assistant' }]} />
       </div>
-      <section className="bg-gradient-to-br from-emerald-950 to-slate-900 text-white py-20 px-4">
+      <section className="bg-slate-50 py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-emerald-800/50 text-emerald-200 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+          <span className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
             <Sparkles className="w-3.5 h-3.5" /> Operations & Compliance Automation
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black mb-6">Proposal Writing Assistant</h1>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-10">
+          </span>
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Proposal Writing Assistant</h1>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
             AI-assisted grant narrative writing grounded in your verified org data.
             Sounds like a real operator wrote it — not generic AI.
             Missing facts are flagged, never invented.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/admin/grants/applications/new" className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold rounded-xl transition-colors">
+            <Link href="/admin/grants/applications/new" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Start an Application <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

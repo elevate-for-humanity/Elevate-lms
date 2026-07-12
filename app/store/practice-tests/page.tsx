@@ -68,43 +68,53 @@ export default function PracticeTestsPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Practice Tests" }]} />
       </div>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#fff_1px,transparent_1px)] [background-size:24px_24px]" />
+      {/* Hero - Bright & Clean */}
+      <section className="relative min-h-[70vh] flex items-end overflow-hidden bg-slate-100">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <Image 
+            src="/images/pages/practice-tests-hero.webp" 
+            alt="Practice Tests" 
+            fill 
+            className="object-cover object-top"
+            priority
+          />
         </div>
-        
-        <div className="relative max-w-6xl mx-auto px-4 py-20">
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400/20 text-yellow-300 rounded-full text-sm font-bold mb-6">
-              <BookOpen className="w-4 h-4" />
-              Practice Tests & Exam Prep
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
-              Pass Your Exam{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400">
-                The First Time
-              </span>
-            </h1>
-            
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-10">
-              Comprehensive practice tests with real exam questions, detailed explanations, 
-              and performance tracking to boost your pass rate.
-            </p>
 
-            <div className="flex flex-wrap justify-center gap-6 text-white/80">
-              <div className="flex items-center gap-2">
-                <Award className="w-5 h-5 text-yellow-400" />
-                <span>94% Pass Rate</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-yellow-400" />
-                <span>50+ Practice Tests</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-yellow-400" />
-                <span>Instant Access</span>
+        {/* White Content Box */}
+        <div className="relative z-10 w-full bg-white">
+          <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
+            <div className="text-center">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-full text-sm font-bold mb-4">
+                <BookOpen className="w-4 h-4" />
+                Practice Tests & Exam Prep
+              </span>
+
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-4">
+                Pass Your Exam{' '}
+                <span className="text-brand-red-600">
+                  The First Time
+                </span>
+              </h1>
+
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
+                Comprehensive practice tests with real exam questions, detailed explanations,
+                and performance tracking to boost your pass rate.
+              </p>
+
+              <div className="flex flex-wrap justify-center gap-6 text-slate-600">
+                <div className="flex items-center gap-2">
+                  <Award className="w-5 h-5 text-brand-red-600" />
+                  <span>94% Pass Rate</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-brand-red-600" />
+                  <span>50+ Practice Tests</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-brand-red-600" />
+                  <span>Instant Access</span>
+                </div>
               </div>
             </div>
           </div>

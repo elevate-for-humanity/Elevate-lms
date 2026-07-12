@@ -34,13 +34,13 @@ export default async function DeploymentPage() {
     .select('*');
   return (
     <div className="min-h-screen bg-white">
-      <section className="bg-gradient-to-br from-purple-600 to-blue-600 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <Rocket className="w-16 h-16 mx-auto mb-6" />
-          <h1 className="text-5xl font-black mb-6">
+      <section className="bg-slate-50 py-16 px-4">
+        <div className="max-w-7xl mx-auto text-center">
+          <Rocket className="w-16 h-16 mx-auto mb-6 text-brand-red-600" />
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
             Deploy Your Platform in Minutes
           </h1>
-          <p className="text-xl text-purple-100 max-w-3xl mx-auto">
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
             One-click deployment to your infrastructure. Full white-label customization. Production-ready in under 30 minutes.
           </p>
         </div>

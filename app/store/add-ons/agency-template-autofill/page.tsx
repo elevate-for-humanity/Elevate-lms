@@ -26,21 +26,21 @@ export default function AgencyAutofillPage() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Add-ons', href: '/store/add-ons' }, { label: 'Agency Template Autofill' }]} />
       </div>
-      <section className="bg-gradient-to-br from-blue-950 to-slate-900 text-white py-20 px-4">
+      <section className="bg-slate-50 py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-blue-800/50 text-blue-200 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+          <span className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
             <Zap className="w-3.5 h-3.5" /> Operations & Compliance Automation
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black mb-6">Agency Template Autofill</h1>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-10">
+          </span>
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Agency Template Autofill</h1>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
             Stop re-entering your EIN, UEI, CAGE code, and address on every form.
             Upload any agency template and fields map to your verified org profile automatically.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/admin/contracts" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-400 text-white font-semibold rounded-xl transition-colors">
+            <Link href="/admin/contracts" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Open Contracts <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/admin/settings/organization-profile" className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-slate-900 font-semibold rounded-xl transition-colors">
+            <Link href="/admin/settings/organization-profile" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
               Set Up Org Profile
             </Link>
           </div>

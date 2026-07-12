@@ -37,21 +37,21 @@ export default function WorkforceGrantHubPage() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Add-ons', href: '/store/add-ons' }, { label: 'Workforce Grant Operations Hub' }]} />
       </div>
-      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-20 px-4">
+      <section className="bg-slate-50 py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+          <span className="inline-flex items-center gap-2 bg-violet-100 text-violet-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
             <Briefcase className="w-3.5 h-3.5" /> Operations & Compliance Automation
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black mb-6">Workforce Grant Operations Hub</h1>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-10">
+          </span>
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Workforce Grant Operations Hub</h1>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
             Everything a workforce development organization needs to run a professional grant operation.
             Search, apply, track, and report — all connected to your verified org profile.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/admin/grants" className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors">
+            <Link href="/admin/grants" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Open Grants Dashboard <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/admin/grants/opportunities" className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-slate-900 font-semibold rounded-xl transition-colors">
+            <Link href="/admin/grants/opportunities" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
               Search Opportunities
             </Link>
           </div>

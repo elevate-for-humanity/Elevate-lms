@@ -4,7 +4,8 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Shield, Clock, Award, CheckCircle, Calendar, Users, CreditCard, ArrowRight } from 'lucide-react';
+import { Shield, Clock, Award, CheckCircle, Calendar, Users, CreditCard, ArrowRight, ShoppingCart, TrendingUp } from 'lucide-react';
+import { SimpleAddToCartButton } from '@/components/store/SimpleAddToCartButton';
 
 export const metadata: Metadata = {
   title: 'Testing Center | Elevate Store',
@@ -15,12 +16,12 @@ export const metadata: Metadata = {
 };
 
 const exams = [
-  { name: 'ACT WorkKeys', desc: 'NCRC assessments for workforce readiness', price: '$40', providers: ['ACT'] },
-  { name: 'Certiport', desc: 'Microsoft, Adobe, Autodesk certifications', price: '$120', providers: ['Certiport'] },
-  { name: 'EPA 608', desc: 'HVAC refrigerant handling certification', price: '$75', providers: ['EPA'] },
-  { name: 'NHA Certifications', desc: 'CPhT, CCMA, Phlebotomy technician', price: '$145', providers: ['NHA'] },
-  { name: 'CPR/AED', desc: 'American Heart Association certification', price: '$60', providers: ['AHA'] },
-  { name: 'CareerSafe', desc: 'OSHA-10 and OSHA-30 safety training', price: '$80', providers: ['OSHA'] },
+  { id: 'certiport-mos', name: 'Microsoft Office Specialist (MOS)', desc: 'Word, Excel, PowerPoint, Outlook certification', price: 149, originalPrice: 199, provider: 'Certiport', color: 'red', examCount: 5 },
+  { id: 'workkeys-ncrc', name: 'ACT WorkKeys NCRC', desc: 'Applied Math, Graphic Literacy, Workplace Documents', price: 85, originalPrice: 110, provider: 'ACT WorkKeys', color: 'emerald', examCount: 3 },
+  { id: 'epa608-universal', name: 'EPA 608 Universal', desc: 'Core, Type I, II, III certification', price: 129, originalPrice: 165, provider: 'EPA/ESCO', color: 'amber', examCount: 4 },
+  { id: 'careersafe-osha10', name: 'OSHA 10-Hour Safety', desc: 'General Industry safety certification', price: 89, originalPrice: 119, provider: 'CareerSafe', color: 'orange', examCount: 1 },
+  { id: 'nrf-riseup', name: 'NRF Rise Up Retail', desc: 'Customer Service & Sales certification', price: 79, originalPrice: 99, provider: 'NRF Foundation', color: 'purple', examCount: 3 },
+  { id: 'cna-exam', name: 'CNA State Exam Prep', desc: 'Practice tests + skills prep', price: 139, originalPrice: 179, provider: 'CNA Prep', color: 'blue', examCount: 2 },
 ];
 
 const features = [
@@ -31,6 +32,25 @@ const features = [
   { icon: CreditCard, title: 'Integrated Payments', desc: 'Stripe checkout included' },
   { icon: CheckCircle, title: 'Score Tracking', desc: 'Real-time results dashboard' },
 ];
+
+const practiceTests = [
+  { name: 'MOS Word Practice Test', price: 29, savings: 20 },
+  { name: 'MOS Excel Practice Test', price: 29, savings: 20 },
+  { name: 'WorkKeys Math Practice', price: 19, savings: 15 },
+  { name: 'EPA 608 Practice Exam', price: 39, savings: 25 },
+];
+
+const getColorClasses = (color: string) => {
+  switch (color) {
+    case 'red': return 'from-red-500 to-orange-500';
+    case 'emerald': return 'from-emerald-500 to-teal-500';
+    case 'amber': return 'from-amber-500 to-orange-500';
+    case 'orange': return 'from-orange-500 to-red-500';
+    case 'purple': return 'from-purple-500 to-pink-500';
+    case 'blue': return 'from-blue-500 to-cyan-500';
+    default: return 'from-slate-500 to-slate-600';
+  }
+};
 
 export default function TestingCenterPage() {
   return (
@@ -140,34 +160,106 @@ export default function TestingCenterPage() {
         </div>
       </section>
 
-      {/* Exams */}
-      <section id="exams" className="py-16 px-4 bg-slate-50">
+      {/* Exams with Pricing */}
+      <section id="exams" className="py-16 px-4 bg-gradient-to-b from-slate-50 to-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Supported Exams</h2>
-            <p className="text-lg text-slate-600">Multiple certification providers in one place</p>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Certification Exams</h2>
+            <p className="text-lg text-slate-600">Dynamic pricing with BNPL options available</p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {exams.map(exam => (
-              <div key={exam.name} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-lg transition-shadow">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-brand-red-600" />
-                  </div>
-                  <span className="text-lg font-bold text-slate-900">{exam.price}</span>
+              <div key={exam.id} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-xl transition-all hover:-translate-y-1">
+                {/* Header with color gradient */}
+                <div className={`w-full h-28 rounded-lg mb-4 bg-gradient-to-br ${getColorClasses(exam.color)} flex items-center justify-center`}>
+                  <Shield className="w-12 h-12 text-white/80" />
                 </div>
-                <h3 className="font-bold text-lg text-slate-900 mb-2">{exam.name}</h3>
+                
+                {/* Provider badge */}
+                <span className="inline-block px-2 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded mb-2">
+                  {exam.provider}
+                </span>
+
+                <h3 className="font-bold text-lg text-slate-900 mb-1">{exam.name}</h3>
                 <p className="text-slate-600 text-sm mb-4">{exam.desc}</p>
-                <div className="flex flex-wrap gap-2">
-                  {exam.providers.map(p => (
-                    <span key={p} className="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded">
-                      {p}
-                    </span>
-                  ))}
+
+                {/* Pricing breakdown */}
+                <div className="bg-slate-50 rounded-lg p-3 mb-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-slate-500">Exam Fee:</span>
+                    <span className="text-sm text-slate-900 font-medium">${exam.originalPrice}</span>
+                  </div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-slate-500">BNPL from:</span>
+                    <span className="text-sm text-brand-blue-600 font-semibold">${Math.round(exam.price / 3)}/mo</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-emerald-600">You Save:</span>
+                    <span className="text-sm font-bold text-emerald-600">${exam.originalPrice - exam.price}</span>
+                  </div>
+                </div>
+
+                {/* Price and CTA */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-2xl font-bold text-slate-900">${exam.price}</span>
+                    <span className="text-sm text-slate-400 line-through ml-1">${exam.originalPrice}</span>
+                  </div>
+                  <SimpleAddToCartButton
+                    productId={exam.id}
+                    productName={exam.name}
+                    price={exam.price}
+                    className="px-4 py-2 bg-brand-red-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-red-700 transition-colors"
+                  />
+                </div>
+
+                {/* Exam count */}
+                <p className="text-xs text-slate-400 mt-3">{exam.examCount} exam{exam.examCount > 1 ? 's' : ''} included</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Practice Tests Upsell */}
+      <section className="py-16 px-4 bg-gradient-to-b from-slate-900 to-slate-800">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-slate-900" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white">Practice Tests</h2>
+              <p className="text-slate-400">Boost your pass rate with our exam prep bundles</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {practiceTests.map(test => (
+              <div key={test.name} className="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-colors">
+                <h4 className="font-semibold text-white text-sm mb-2">{test.name}</h4>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-lg font-bold text-white">${test.price}</span>
+                    <span className="text-xs text-emerald-400 ml-1">Save ${test.savings}</span>
+                  </div>
+                  <SimpleAddToCartButton
+                    productId={`practice-${test.name.toLowerCase().replace(/\s+/g, '-')}`}
+                    productName={test.name}
+                    price={test.price}
+                    className="px-3 py-1.5 bg-white/10 text-white text-xs font-semibold rounded-lg hover:bg-white/20 transition-colors"
+                  />
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link href="/store/practice-tests" className="inline-flex items-center gap-2 text-white font-semibold hover:text-yellow-400 transition-colors">
+              View All Practice Tests
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>

@@ -16,6 +16,7 @@ import { BNPL_PROVIDER_NAMES, ACTIVE_BNPL_PROVIDERS } from '@/lib/bnpl-config';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
+import BarberChatAssistant from './BarberChatAssistant';
 
 interface Props { program: ProgramSchema; heroBanner: HeroBannerConfig | null; enrollmentCount?: number; }
 
@@ -360,6 +361,9 @@ export default function BarberApprenticeshipClient({ program: p, heroBanner: b, 
       </section>
 
 
+
+      {/* ═══ AI CHAT ASSISTANT ═══ */}
+      <BarberChatAssistant />
 
       {/* ═══ INSTITUTIONAL FOOTER ═══ */}
       <section className="border-t py-8">

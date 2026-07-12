@@ -20,6 +20,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { AIAdvisorWidget } from '@/components/home/AIAdvisorWidget';
 
 // Program types
 type BeautyProgram = 'barber' | 'cosmetology' | 'esthetics' | 'manicurist';
@@ -1501,6 +1502,9 @@ export function BeautyApprenticeship({ program: programType }: BeautyApprentices
           </motion.div>
         </div>
       </section>
+
+      {/* ═══ AI ADVISOR CHAT ═══ */}
+      <AIAdvisorWidget variant="floating" />
 
     </main>
   );

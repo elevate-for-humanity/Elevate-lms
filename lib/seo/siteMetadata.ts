@@ -6,6 +6,7 @@ export const SITE = {
   domain: PLATFORM_DEFAULTS.canonicalDomain,
   url: PLATFORM_DEFAULTS.siteUrl,
   ogImage: '/images/og-default.jpg',
+  twitter: '@elevatehumanity',
 };
 
 type SiteMetadataInput = {
@@ -47,6 +48,7 @@ export function siteMetadata(input: SiteMetadataInput): Metadata {
       images: [{ url: image, width: 1200, height: 630, alt: input.title }],
       locale: 'en_US',
     },
+    twitter: {
       card: 'summary_large_image',
       title: input.title,
       description: input.description,

@@ -198,7 +198,10 @@ const main = async () => {
       /<section[^>]*\bhero\b/i.test(p.src) ||
       /<h1[^>]*>/.test(p.src) ||
       /className="[^"]*hero[^"]*"/.test(p.src);
-    if (!hasHero) {
+    
+    // Only warn about missing heroes if archetype requires them
+    const archetypeForHero = compiled.find((a) => a.key === mapping.get(p.route));
+    if (!hasHero && archetypeForHero?.requiresHero !== false) {
       warnings.push(
         `Missing hero implementation on ${p.route} (file: ${path.relative(ROOT, p.file)})`,
       );

@@ -9,7 +9,8 @@
       ],
       "requiresServerAuth": false,
       "requiresRoleGate": false,
-      "mustIncludeTokens": []
+      "mustIncludeTokens": [],
+      "requiresHero": false
     },
     "application_enrollment_flow": {
       "routeMatchers": [
@@ -25,7 +26,8 @@
       ],
       "requiresServerAuth": false,
       "requiresRoleGate": false,
-      "mustIncludeTokens": []
+      "mustIncludeTokens": [],
+      "requiresHero": false
     },
     "dashboard_portal": {
       "routeMatchers": [
@@ -65,7 +67,8 @@
       ],
       "requiresServerAuth": true,
       "requiresRoleGate": true,
-      "mustIncludeTokens": []
+      "mustIncludeTokens": [],
+      "requiresHero": false
     },
     "directory_listing_search": {
       "routeMatchers": [
@@ -76,7 +79,8 @@
       ],
       "requiresServerAuth": false,
       "requiresRoleGate": false,
-      "mustIncludeTokens": []
+      "mustIncludeTokens": [],
+      "requiresHero": false
     },
     "policy_compliance_legal": {
       "routeMatchers": [
@@ -98,7 +102,8 @@
       ],
       "requiresServerAuth": false,
       "requiresRoleGate": false,
-      "mustIncludeTokens": []
+      "mustIncludeTokens": [],
+      "requiresHero": false
     },
     "partner_employer_agency": {
       "routeMatchers": [
@@ -110,7 +115,8 @@
       ],
       "requiresServerAuth": false,
       "requiresRoleGate": false,
-      "mustIncludeTokens": []
+      "mustIncludeTokens": [],
+      "requiresHero": false
     },
     "auth_account_profile": {
       "routeMatchers": [
@@ -127,7 +133,8 @@
         "^/update-password$"
       ],
       "requiresServerAuth": false,
-      "requiresRoleGate": false
+      "requiresRoleGate": false,
+      "requiresHero": false
     },
     "reporting_admin_ops": {
       "routeMatchers": [
@@ -137,7 +144,8 @@
       ],
       "requiresServerAuth": true,
       "requiresRoleGate": true,
-      "mustIncludeTokens": []
+      "mustIncludeTokens": [],
+      "requiresHero": false
     },
     "marketing_informational": {
       "routeMatchers": [
@@ -401,7 +409,8 @@
         "^/pay/pay$"
       ],
       "requiresServerAuth": false,
-      "requiresRoleGate": false
+      "requiresRoleGate": false,
+      "requiresHero": false
     },
     "system_utility_error": {
       "routeMatchers": [
@@ -435,7 +444,8 @@
         "^/payment-error$"
       ],
       "requiresServerAuth": false,
-      "requiresRoleGate": false
+      "requiresRoleGate": false,
+      "requiresHero": false
     }
   }
 }

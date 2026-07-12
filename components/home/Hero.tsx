@@ -9,7 +9,7 @@ export function Hero() {
       {/* FULL-WIDTH HERO BANNER AT TOP */}
       <div className="relative w-full h-[350px] sm:h-[450px] lg:h-[500px]">
         <Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp"
+          src="/images/pages/admin-dashboard-hero.webp"
           alt="Elevate For Humanity - Career Training and Partnerships"
           fill
           priority
@@ -108,7 +108,7 @@ export function Hero() {
           {/* RIGHT – IMAGE */}
           <div className="relative h-56 sm:h-72 lg:h-80 rounded-3xl overflow-hidden shadow-md">
             <Image
-              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp"
+              src="/images/pages/admin-dashboard-hero.webp"
               alt="Elevate For Humanity - Healthcare Programs"
               fill
               priority

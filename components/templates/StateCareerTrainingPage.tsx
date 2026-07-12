@@ -31,7 +31,7 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
       <section className="relative w-full">
         <HeroVideo
           videoSrcDesktop="/videos/training-providers-hero.mp4"
-          posterImage="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/comp-state-career-hero.webp"
+          posterImage="/images/pages/comp-state-career-hero.webp"
           analyticsName={`state-career-${state.name}`}
         />
         <div className="bg-white py-10 border-t">

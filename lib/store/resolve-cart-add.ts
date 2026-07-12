@@ -19,7 +19,7 @@ function individualAppProduct(appSlug: IndividualAppSlug, planId: IndividualPlan
     category: 'template',
     price: plan.priceMonthly,
     description: plan.features.join(' · '),
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/technology-sector.webp',
+    image: '/images/pages/technology-sector.webp',
     inStock: true,
     featured: Boolean(plan.popular),
     digital: true,

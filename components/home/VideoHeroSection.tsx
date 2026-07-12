@@ -58,7 +58,7 @@ export default function VideoHeroSection() {
       {/* Fallback Image - always present for mobile */}
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
       <Image sizes="100vw"
-        src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/efh-cna-hero.jpg"
+        src="/images/programs/efh-cna-hero.jpg"
         alt="Career Training"
         fill
         className="object-cover"

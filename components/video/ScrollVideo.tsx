@@ -18,7 +18,7 @@ interface ScrollVideoProps {
 
 export function ScrollVideo({
   src,
-  poster = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/og-default.jpg',
+  poster = '/images/og-default.jpg',
   className,
   threshold = 0.3,
 }: ScrollVideoProps) {

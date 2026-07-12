@@ -14,7 +14,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 const EMPLOYER_PATHS = [
   {
     accent: 'border-t-4 border-brand-green-500',
-    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/employer-page-1.webp',
+    img: '/images/pages/employer-page-1.webp',
     imgAlt: 'Employer reviewing pre-credentialed graduate candidates',
     title: 'Hire Pre-Credentialed Graduates',
     desc: 'Candidates complete training, earn credentials, and pass background checks before you interview them. No recruiting fees. WOTC tax credits up to $9,600 per eligible hire.',
@@ -28,7 +28,7 @@ const EMPLOYER_PATHS = [
   },
   {
     accent: 'border-t-4 border-blue-500',
-    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/apprenticeships-page-1.webp',
+    img: '/images/pages/apprenticeships-page-1.webp',
     imgAlt: 'Apprentice working on-site with employer supervisor',
     title: 'Sponsor a DOL Apprentice',
     desc: 'Earn-and-learn from day one. Apprentices work in your business while completing structured training. OJT wage reimbursement up to 50%. RAPIDS-tracked.',
@@ -42,7 +42,7 @@ const EMPLOYER_PATHS = [
   },
   {
     accent: 'border-t-4 border-purple-500',
-    img: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-cohort.webp',
+    img: '/images/pages/training-cohort.webp',
     imgAlt: 'Custom training cohort in session',
     title: 'Co-Design a Training Cohort',
     desc: 'Work with Elevate to design a custom training cohort aligned to your job requirements. We handle curriculum, compliance, credentialing, and WIOA funding.',
@@ -99,7 +99,7 @@ export function HomeEmployerStrip() {
 
           <div className="relative h-40 sm:h-48 lg:h-52 rounded-2xl overflow-hidden">
             <Image
-              src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/for-employers-page-1.webp"
+              src="/images/pages/for-employers-page-1.webp"
               alt={`Employer partner meeting with ${PLATFORM_DEFAULTS.orgName} team`}
               fill
               className="object-cover object-top"

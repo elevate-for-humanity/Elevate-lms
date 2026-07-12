@@ -11,7 +11,7 @@
 import Image, { ImageProps } from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 
-const DEFAULT_FALLBACK = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/prog-hero-main-2.webp';
+const DEFAULT_FALLBACK = '/images/pages/prog-hero-main-2.webp';
 
 interface LazyImageProps extends Omit<ImageProps, 'onLoad'> {
   fallback?: string;

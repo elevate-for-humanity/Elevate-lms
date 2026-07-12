@@ -17,7 +17,7 @@ const PROGRAMS: Program[] = [
       'Become a Certified Nursing Assistant or Home Health Aide. Get real clinical experience and start helping people right away.',
     hours: '4–8 weeks',
     certs: ['CNA', 'HHA', 'CPR/AED'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+    image: '/images/programs/cna-hero.webp',
   },
   {
     slug: 'welding-aws',
@@ -27,7 +27,7 @@ const PROGRAMS: Program[] = [
       'Learn professional welding in our hands-on lab. Earn your AWS SENSE certification and start a high-paying career.',
     hours: '6–10 weeks',
     certs: ['AWS SENSE'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+    image: '/images/programs/cna-hero.webp',
   },
   {
     slug: 'nail-tech',
@@ -37,7 +37,7 @@ const PROGRAMS: Program[] = [
       'Master nail art, sanitation, and salon skills. Get ready for your state board exam and start your own business or work in top salons.',
     hours: '8–12 weeks',
     certs: ['State Board Prep'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/barber-hero.webp',
+    image: '/images/programs/barber-hero.webp',
   },
   {
     slug: 'cdl',
@@ -47,7 +47,7 @@ const PROGRAMS: Program[] = [
       "Get your Commercial Driver's License and access high-demand trucking jobs. Includes permit prep and simulator training.",
     hours: '3–6 weeks',
     certs: ['CDL A/B Prep'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cdl-hero.webp',
+    image: '/images/programs/cdl-hero.webp',
   },
   {
     slug: 'office-tech',
@@ -57,7 +57,7 @@ const PROGRAMS: Program[] = [
       'Learn modern office software, AI tools, and digital workflows. Perfect for administrative and remote work careers.',
     hours: '4–6 weeks',
     certs: ['Certiport (optional)'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/training-provider-1.webp',
+    image: '/images/heroes/training-provider-1.webp',
   },
   {
     slug: 'osha10',
@@ -67,7 +67,7 @@ const PROGRAMS: Program[] = [
       'Get essential safety certifications for construction work. Learn life-saving CPR/AED skills and workplace safety basics.',
     hours: '1–2 weeks',
     certs: ['OSHA-10', 'CPR/AED'],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/programs/cna-hero.webp',
+    image: '/images/programs/cna-hero.webp',
   },
 ];
 

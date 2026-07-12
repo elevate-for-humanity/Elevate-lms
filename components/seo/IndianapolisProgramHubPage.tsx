@@ -21,7 +21,7 @@ export function indianapolisHubMetadata(config: IndianapolisProgramHubConfig): M
       siteName: PLATFORM_DEFAULTS.orgName,
       images: [
         {
-          url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/og-default.webp',
+          url: '/images/og-default.webp',
           width: 1200,
           height: 630,
           alt: config.breadcrumbLabel,

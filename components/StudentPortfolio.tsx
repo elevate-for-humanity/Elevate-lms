@@ -110,7 +110,7 @@ export function StudentPortfolio() {
               title: p.title,
               description: p.description,
               category: p.category || 'web',
-              imageUrl: p.image_url || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/heroes/student-catalog.webp',
+              imageUrl: p.image_url || '/images/heroes/student-catalog.webp',
               technologies: p.technologies || [],
               completedDate: p.completed_date,
               githubUrl: p.github_url,
@@ -169,7 +169,7 @@ export function StudentPortfolio() {
       description:
         'Full-featured online shopping platform with payment integration, inventory management, and admin dashboard.',
       category: 'Web Development',
-      imageUrl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+      imageUrl: '/images/pages/admin-dashboard-hero.webp',
       technologies: ['React', 'Node.js', 'MongoDB', 'Stripe', 'Tailwind CSS'],
       completedDate: '2024-01',
       githubUrl: 'https://github.com/example/ecommerce',
@@ -186,7 +186,7 @@ export function StudentPortfolio() {
       description:
         'Collaborative project management tool with real-time updates, team chat, and analytics.',
       category: 'Web Development',
-      imageUrl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+      imageUrl: '/images/pages/admin-dashboard-hero.webp',
       technologies: ['Next.js', 'TypeScript', 'PostgreSQL', 'Socket.io', 'Prisma'],
       completedDate: '2023-11',
       githubUrl: 'https://github.com/example/taskmanager',
@@ -199,7 +199,7 @@ export function StudentPortfolio() {
       description:
         'Interactive weather application with 7-day forecasts, maps, and severe weather alerts.',
       category: 'Mobile Development',
-      imageUrl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+      imageUrl: '/images/pages/admin-dashboard-hero.webp',
       technologies: ['React Native', 'OpenWeather API', 'Redux', 'Expo'],
       completedDate: '2023-09',
       githubUrl: 'https://github.com/example/weather',
@@ -211,7 +211,7 @@ export function StudentPortfolio() {
       description:
         'Intelligent chatbot using natural language processing for customer support automation.',
       category: 'AI/ML',
-      imageUrl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+      imageUrl: '/images/pages/admin-dashboard-hero.webp',
       technologies: ['Python', 'TensorFlow', 'Flask', 'OpenAI API', 'Docker'],
       completedDate: '2023-12',
       githubUrl: 'https://github.com/example/chatbot',
@@ -223,7 +223,7 @@ export function StudentPortfolio() {
       description:
         'Drag-and-drop website builder for creating professional portfolios without coding.',
       category: 'Web Development',
-      imageUrl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+      imageUrl: '/images/pages/admin-dashboard-hero.webp',
       technologies: ['Vue.js', 'Firebase', 'Vuetify', 'Netlify'],
       completedDate: '2023-08',
       liveUrl: `https://www.${PLATFORM_DEFAULTS.canonicalDomain}/demo/portfolio`,
@@ -235,7 +235,7 @@ export function StudentPortfolio() {
       description:
         'Mobile app for tracking workouts, nutrition, and health metrics with social features.',
       category: 'Mobile Development',
-      imageUrl: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp',
+      imageUrl: '/images/pages/admin-dashboard-hero.webp',
       technologies: ['Flutter', 'Dart', 'Firebase', 'HealthKit'],
       completedDate: '2023-10',
       githubUrl: 'https://github.com/example/fitness',

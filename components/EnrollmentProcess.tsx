@@ -12,7 +12,7 @@ const steps = [
       href: 'https://www.indianacareerconnect.com',
       external: true,
     },
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/it-helpdesk-desk.webp',
+    image: '/images/pages/it-helpdesk-desk.webp',
     alt: 'Indiana Career Connect registration process',
   },
   {
@@ -20,7 +20,7 @@ const steps = [
     title: 'Complete Your Profile',
     desc: 'Fill out your profile with your work history, education, and career goals. This helps match you with the right training program and funding.',
     note: 'What you\u2019ll need: Social Security Number, proof of residency, income documentation (if applicable), and high school diploma or GED.',
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/training-classroom.webp',
+    image: '/images/pages/training-classroom.webp',
     alt: 'Student completing enrollment profile',
   },
   {
@@ -31,7 +31,7 @@ const steps = [
       { icon: '\uD83D\uDCCD', label: 'In-Person', sub: 'Visit a WorkOne center near you' },
       { icon: '\uD83D\uDCBB', label: 'Virtual', sub: 'Schedule a video call appointment' },
     ],
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/career-counseling.webp',
+    image: '/images/pages/career-counseling.webp',
     alt: 'Career advisor meeting with student',
   },
   {
@@ -39,7 +39,7 @@ const steps = [
     title: 'Meet with Your Advisor',
     desc: `Your career advisor will verify your eligibility, explain funding options, and help you select ${PLATFORM_DEFAULTS.orgName} as your training provider. They can also discuss supportive services like transportation and childcare assistance.`,
     note: `Mention you want to train with ${PLATFORM_DEFAULTS.orgName}. We\u2019re an approved WIOA provider in Marion County.`,
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/wioa-meeting.webp',
+    image: '/images/pages/wioa-meeting.webp',
     alt: 'Workforce advisor reviewing training options',
   },
   {
@@ -47,7 +47,7 @@ const steps = [
     title: 'Get Approved & Enroll',
     desc: `Once approved for WIOA funding, your advisor will issue a training voucher. Bring this to ${PLATFORM_DEFAULTS.orgName} to complete your enrollment. We handle all the paperwork and get you started.`,
     cta: { label: 'Contact Us for Help', href: '/contact', external: false },
-    image: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/healthcare-grad.jpg',
+    image: '/images/pages/healthcare-grad.jpg',
     alt: 'Student celebrating enrollment approval',
   },
 ];

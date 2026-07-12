@@ -12,6 +12,7 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
 import { ROICalculator } from '@/components/store/ROICalculator';
 import { AnimatedSection, AnimatedCard } from '@/components/ui/AnimatedSection';
+import { StudentQuickNav } from '@/components/store/StudentQuickNav';
 
 export const metadata: Metadata = {
   title: 'License the Elevate Platform | White-Label Workforce LMS',
@@ -30,7 +31,7 @@ export default function StorePage() {
         videoSrcDesktop={hero.videoSrcDesktop}
         videoSrcMobile={hero.videoSrcMobile}
         posterImage={hero.posterImage}
-        voiceoverSrc={hero.voiceoverSrc}
+        voiceoverSrc="" // Disabled - sounds robotic
         microLabel={hero.microLabel}
         transcript={hero.transcript}
         analyticsName={hero.analyticsName}
@@ -43,6 +44,9 @@ export default function StorePage() {
         ]}
         trustIndicators={hero.trustIndicators}
       />
+
+      {/* ============ STUDENT QUICK NAV ============ */}
+      <StudentQuickNav />
 
       {/* ============ TRUST METRICS ============ */}
       <section className="py-8 border-y border-slate-200">

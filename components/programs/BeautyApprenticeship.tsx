@@ -821,79 +821,82 @@ export function BeautyApprenticeship({ program: programType }: BeautyApprentices
   return (
     <main className="bg-white">
       
-      {/* ===== CINEMATIC HERO ===== */}
-      <section className={`relative min-h-[100vh] flex items-center justify-center overflow-hidden bg-gradient-to-br ${program.accentColor}`}>
-        {/* Video Background */}
+      {/* ===== CLEAN HERO - REAL IMAGE, NO OVERLAY ===== */}
+      <section className="relative min-h-[85vh] flex items-end overflow-hidden bg-white">
+        {/* Full-Width Real Image */}
         <div className="absolute inset-0">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover"
-            poster={program.heroImage}
-          >
-            <source src={program.heroVideo} type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+          <Image
+            src={program.heroImage}
+            alt={program.title}
+            fill
+            className="object-cover object-top"
+            priority
+          />
         </div>
-        
-        {/* Content */}
-        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center text-white">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-          >
-            <span className="inline-block px-4 py-1 bg-white/20 backdrop-blur-sm text-white text-sm font-semibold rounded-full mb-6">
-              DOL Registered Apprenticeship
-            </span>
-            
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
-              {program.tagline}
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
-              {program.subtitle}
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Link
-                href={`/programs/${programType}-apprenticeship/apply`}
-                className="px-10 py-4 bg-white text-slate-900 font-bold rounded-lg text-lg hover:bg-slate-100 transition-colors"
-              >
-                Apply Now
-              </Link>
-              <Link
-                href="/contact"
-                className="px-10 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold rounded-lg text-lg border border-white/30 transition-colors"
-              >
-                Tour the Shop
-              </Link>
-              <Link
-                href="/check-eligibility"
-                className="px-10 py-4 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold rounded-lg text-lg transition-colors"
-              >
-                Explore Funding
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-        
-        {/* Scroll Indicator */}
-        <motion.div
-          animate={{ y: [0, 15, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <div className="w-8 h-14 border-2 border-white/50 rounded-full flex justify-center">
+
+        {/* White Content Box at Bottom */}
+        <div className="relative z-10 w-full bg-white">
+          <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
             <motion.div
-              animate={{ y: [0, 12, 0] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="w-1.5 h-3 bg-white/50 rounded-full mt-2"
-            />
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              {/* DOL Badge */}
+              <span className="inline-block px-4 py-1 bg-emerald-100 text-emerald-700 text-sm font-bold rounded-full mb-4">
+                DOL Registered Apprenticeship
+              </span>
+
+              {/* Title */}
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-4 leading-tight">
+                {program.tagline}
+              </h1>
+
+              {/* Subtitle */}
+              <p className="text-lg md:text-xl text-slate-600 mb-6 max-w-2xl">
+                {program.subtitle}
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-8">
+                <Link
+                  href={`/programs/${programType}-apprenticeship/apply`}
+                  className="px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg text-lg hover:bg-brand-red-700 transition-colors text-center"
+                >
+                  Apply Now
+                </Link>
+                <Link
+                  href="/contact"
+                  className="px-8 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-lg transition-colors text-center"
+                >
+                  Tour the Shop
+                </Link>
+                <Link
+                  href="/check-eligibility"
+                  className="px-8 py-4 bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold rounded-lg text-lg transition-colors text-center"
+                >
+                  Explore Funding
+                </Link>
+              </div>
+
+              {/* Stats */}
+              <div className="flex flex-wrap gap-4">
+                <div className="bg-slate-50 rounded-xl px-6 py-4 text-center min-w-[140px]">
+                  <div className="text-2xl font-black text-slate-900">{program.hours}</div>
+                  <div className="text-xs text-slate-500 uppercase tracking-wider">Training Hours</div>
+                </div>
+                <div className="bg-slate-50 rounded-xl px-6 py-4 text-center min-w-[140px]">
+                  <div className="text-2xl font-black text-slate-900">{program.duration}</div>
+                  <div className="text-xs text-slate-500 uppercase tracking-wider">Program Length</div>
+                </div>
+                <div className="bg-emerald-50 rounded-xl px-6 py-4 text-center min-w-[140px]">
+                  <div className="text-2xl font-black text-emerald-600">$0</div>
+                  <div className="text-xs text-emerald-600 uppercase tracking-wider">with Funding</div>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* ===== IMAGINE YOURSELF ===== */}

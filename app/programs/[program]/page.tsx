@@ -518,7 +518,14 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
   // Use Premium Beauty Apprenticeship Page for beauty programs
   if (BEAUTY_APPRENTICESHIP_SLUGS.has(program)) {
-    const programType = program.replace('-apprenticeship', '') as 'barber' | 'cosmetology' | 'esthetics' | 'manicurist';
+    // Map URL slugs to PROGRAM_DATA keys
+    const slugToKey: Record<string, 'barber' | 'cosmetology' | 'esthetics' | 'manicurist'> = {
+      'barber-apprenticeship': 'barber',
+      'cosmetology-apprenticeship': 'cosmetology',
+      'esthetician-apprenticeship': 'esthetics', // Note: key is 'esthetics', not 'esthetician'
+      'nail-technician-apprenticeship': 'manicurist',
+    };
+    const programType = slugToKey[program] || 'barber';
     return <BeautyApprenticeship program={programType} />;
   }
 

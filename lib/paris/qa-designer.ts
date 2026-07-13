@@ -330,7 +330,7 @@ function assessAssessmentQuality(params: {
   const issues: ReadinessIssue[] = [];
   
   let score = 100;
-  let details = 'All lessons have assessments';
+  const details = 'All lessons have assessments';
 
   // Check for quizzes
   const lessonsWithQuizzes = params.lessons.filter(l => l.quizQuestions?.length > 0);

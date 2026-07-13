@@ -103,7 +103,7 @@ export function loadCredentialConfigs(): CredentialConfig[] {
   
   if (!fs.existsSync(configDir)) {
     fs.mkdirSync(configDir, { recursive: true });
-    console.log('Created credentials directory:', configDir);
+    console.info('Created credentials directory:', configDir);
     return [];
   }
 

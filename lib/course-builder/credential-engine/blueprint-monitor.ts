@@ -365,7 +365,7 @@ export async function notifyAdmins(recommendation: UpdateRecommendation): Promis
   // Send notification to admin dashboard
   // Email, Slack, etc.
   
-  console.log('Blueprint update notification:', {
+  console.info('Blueprint update notification:', {
     credential: recommendation.credentialSlug,
     changes: recommendation.changes.length,
     action: recommendation.recommendedAction,

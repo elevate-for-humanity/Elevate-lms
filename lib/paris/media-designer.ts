@@ -323,7 +323,7 @@ async function generateNarrationAsset(params: {
  * Convert lesson content to narration
  */
 function contentToNarration(content: string): string {
-  let narration = content
+  const narration = content
     // Convert markdown headers to pauses
     .replace(/^##\s+(.+)$/gm, '\n$1.\n')
     // Convert lists to sequences

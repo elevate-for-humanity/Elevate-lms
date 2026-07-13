@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { getAdminClient } from '@/lib/supabase/admin';
+import { getStripe } from '@/lib/stripe/client';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-// Initialize Stripe - will use test key if live not available
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
-  apiVersion: '2025-02-24.acacia',
-});
 
 interface TrialCheckoutRequest {
   trialId: string;
@@ -62,6 +57,11 @@ export async function POST(request: NextRequest) {
 
     if (!selectedPlan) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
+    }
+
+    const stripe = getStripe();
+    if (!stripe) {
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
     }
 
     // Create or get Stripe customer

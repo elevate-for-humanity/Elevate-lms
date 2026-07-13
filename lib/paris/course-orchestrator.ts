@@ -365,7 +365,7 @@ async function improveCourse(
   for (const issue of validation.issues) {
     if (issue.severity === 'critical') {
       // Find the module/lesson and regenerate
-      console.log(`Regenerating due to: ${issue.description}`);
+      console.info(`Regenerating due to: ${issue.description}`);
     }
   }
 }

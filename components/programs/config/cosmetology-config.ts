@@ -5,7 +5,7 @@ export const cosmetologyConfig: ProgramConfig = {
   title: 'Transform Hair Into Art',
   tagline: 'DOL Registered Apprenticeship',
   subtitle: 'Master hair coloring, cutting, styling, and client services through paid apprenticeship in professional salons.',
-  heroVideo: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cosmetology-hero.mp4',
+  heroVideo: undefined, // TODO: Add video when available
   heroImage: '/images/beauty/cosmetology-hero.webp',
   primaryCta: { label: 'Apply Now', href: '/programs/cosmetology-apprenticeship/apply' },
   secondaryCta: { label: 'Schedule a Tour', href: '/contact' },

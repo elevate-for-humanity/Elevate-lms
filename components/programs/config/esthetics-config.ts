@@ -5,7 +5,7 @@ export const estheticsConfig: ProgramConfig = {
   title: 'Transform Skin, Transform Lives',
   tagline: 'DOL Registered Apprenticeship',
   subtitle: 'Learn advanced skincare treatments, facials, chemical peels, and spa services through luxury spa apprenticeships.',
-  heroVideo: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/esthetics-hero.mp4',
+  heroVideo: undefined, // TODO: Add video when available
   heroImage: '/images/beauty/esthetics-hero.webp',
   primaryCta: { label: 'Apply Now', href: '/programs/esthetician-apprenticeship/apply' },
   secondaryCta: { label: 'Schedule a Tour', href: '/contact' },

@@ -5,7 +5,7 @@ export const nailConfig: ProgramConfig = {
   title: 'Turn Creativity Into a Career',
   tagline: 'DOL Registered Apprenticeship',
   subtitle: 'Master nail artistry, gel, acrylics, and spa pedicures through professional salon apprenticeships.',
-  heroVideo: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/nail-technician-hero.mp4',
+  heroVideo: undefined, // TODO: Add video when available
   heroImage: '/images/beauty/nails-hero.webp',
   primaryCta: { label: 'Apply Now', href: '/programs/nail-technician-apprenticeship/apply' },
   secondaryCta: { label: 'Schedule a Tour', href: '/contact' },

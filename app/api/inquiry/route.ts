@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { scoreLead, updateLeadScore } from '@/lib/crm/lead-scoring';
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
@@ -44,6 +45,7 @@ async function _POST(req: Request) {
     }
 
     // Save inquiry to database
+    let leadScore = null;
     try {
       const supabase = await createClient();
       await supabase.from('inquiries').insert({
@@ -56,6 +58,29 @@ async function _POST(req: Request) {
         source: 'website',
         created_at: new Date().toISOString(),
       });
+
+      // Score and store lead
+      const nameParts = (name || '').split(' ');
+      leadScore = await scoreLead({
+        email,
+        firstName: nameParts[0] || undefined,
+        lastName: nameParts.slice(1).join(' ') || undefined,
+        phone,
+        programInterest: program,
+        hasFunding: !!funding,
+      });
+
+      // Update lead in CRM
+      await updateLeadScore(supabase, email, {
+        email,
+        firstName: nameParts[0],
+        lastName: nameParts.slice(1).join(' '),
+        phone,
+        programInterest: program,
+        hasFunding: !!funding,
+      }).catch(() => {}); // Non-blocking
+
+      logger.info('[inquiry] Lead scored', { email, score: leadScore.total, grade: leadScore.grade });
     } catch (dbError) {
       logger.error('Failed to save inquiry to database:', dbError);
       // Continue with email even if DB fails

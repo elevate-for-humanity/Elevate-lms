@@ -18,6 +18,7 @@ import { logger } from '@/lib/logger';
 
 import type { SupabaseClient } from '@/lib/supabase';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { ensureDigitalBinder } from '@/lib/enrollment/ensure-digital-binder';
 
 export type EnrollmentInput = {
   userId: string;
@@ -149,6 +150,23 @@ export async function createOrUpdateEnrollment(
     logger.info(
       `[enrollment-service] ${action}: ${enrollment.id} (program ${programId} for user ${userId})`,
     );
+
+    // Create digital binder for new enrollments
+    if (action === 'created' && userId) {
+      try {
+        const { binderId, created } = await ensureDigitalBinder({
+          db: supabase,
+          userId,
+          enrollmentId: enrollment.id,
+        });
+        if (created) {
+          logger.info('[enrollment-service] Digital binder created', { binderId, enrollmentId: enrollment.id });
+        }
+      } catch (binderError) {
+        // Non-fatal: log but don't fail enrollment
+        logger.warn('[enrollment-service] Digital binder creation failed', binderError);
+      }
+    }
 
     // Notify program holder when a new HVAC student enrolls
     const HVAC_PROGRAM_ID = '4226f7f6-fbc1-44b5-83e8-b12ea149e4c7';

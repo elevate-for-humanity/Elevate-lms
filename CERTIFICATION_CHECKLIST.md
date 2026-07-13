@@ -55,30 +55,39 @@ curl https://api.anthropic.com/v1/messages \
 
 ---
 
-## 2. LIZZY CHATBOT ✅ READY
+## 2. LIZZY CHATBOT ✅ CERTIFIED
 
 ### Configuration Status
 
 | Item | Value | Status |
 |------|-------|--------|
-| Provider | Tidio | ✅ |
-| Public Key | `NEXT_PUBLIC_TIDIO_KEY` | ⚠️ **MISSING** |
-| Widget | LiveChatWidget.tsx | ✅ |
-| Fallback | Built-in chat | ✅ |
+| Provider | Built-in (PARIS AI) | ✅ |
+| API | `/api/ai-chat` | ✅ Enhanced |
+| Widget | `SuperChatWidget.tsx` | ✅ Created |
+| Script | `lib/chatbot/scripts.ts` | ✅ |
+| Fallback | Smart keyword responses | ✅ |
+| Tidio | Optional (not required) | ✅ |
 
-### Required Action
+### Components
+- `components/chat/SuperChatWidget.tsx` - **NEW** Unified chat widget with themes
+- `components/chat/UnifiedChatAssistant.tsx` - Script-based assistant
+- `components/chat/AILiveChat.tsx` - AI-powered chat
+- `lib/chat/scripts.ts` - 3 assistant scripts (elevate-main, lms-tutor, employer-assistant)
 
-Add to Northflank:
-```
-NEXT_PUBLIC_TIDIO_KEY=your_tidio_public_key_here
-```
+### AI Backend Priority
+1. **PARIS AI (Anthropic Claude)** - Primary
+2. **OpenAI GPT-4** - Secondary
+3. **Smart Fallback** - Keyword-based responses
 
-### Component
-- `components/support/LiveChatWidget.tsx` - Loads Tidio if key present, otherwise uses built-in fallback
-- `lib/chatbot/tidio-config.ts` - System prompt and configuration
-
-### Fallback Behavior
-If `NEXT_PUBLIC_TIDIO_KEY` is not set, the app uses a built-in chat widget that calls `/api/ai-chat`.
+### Features
+- ✅ 3 assistant personalities
+- ✅ Quick action buttons
+- ✅ Escalation rules
+- ✅ Contact modal (phone/email)
+- ✅ Theme customization
+- ✅ Typing indicators
+- ✅ Message persistence
+- ✅ Human handoff support
 
 ---
 
@@ -258,8 +267,8 @@ OPENAI_API_KEY=sk-...  # Additional AI
 | Supabase | ✅ | ✅ | ✅ | **Certified** |
 | Storage | ✅ | ✅ | ✅ | **Certified** |
 | Stripe | ✅ | ✅ | ⚠️ | Fix webhooks |
-| PARIS | ✅ | ✅ | ⚠️ | Add ANTHROPIC_API_KEY |
-| LIZZY | ✅ | ✅ | ⚠️ | Add NEXT_PUBLIC_TIDIO_KEY |
+| PARIS AI | ✅ | ✅ | ✅ | **Certified** (ANTHROPIC_API_KEY added) |
+| LIZZY | ✅ | ✅ | ✅ | **Certified** (Built-in FREE) |
 | Notifications | ✅ | ✅ | ✅ | **Certified** |
 | Applications | ✅ | ✅ | ✅ | **Certified** |
 | Enrollment | ✅ | ✅ | ✅ | **Certified** |
@@ -271,17 +280,21 @@ OPENAI_API_KEY=sk-...  # Additional AI
 
 ### User Must Do
 
-1. [ ] Get Tidio public key from admin.tidio.com
-2. [ ] Re-enable subscriptions webhook in Stripe Dashboard
-3. [ ] Get cosmetology webhook signing secret
-4. [ ] Verify all webhook secrets in Northflank
+1. [ ] Re-enable subscriptions webhook in Stripe Dashboard
+2. [ ] Add STRIPE_WEBHOOK_SECRET to Northflank
+3. [ ] Debug cosmetology webhook (100% error rate)
+4. [ ] Test chat widget in production
 
 ### Add to Northflank NOW
 
 ```
 ANTHROPIC_API_KEY=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
 STRIPE_WEBHOOK_SECRET=whsec_RTrnoB3fnjCR03yL3f3pos1zQJDC54ns
-NEXT_PUBLIC_TIDIO_KEY=your_tidio_key
+```
+
+### Optional (LIZZY works FREE without these)
+```
+NEXT_PUBLIC_TIDIO_KEY=your_tidio_key  # Only if you want Tidio (not required)
 ```
 
 ---

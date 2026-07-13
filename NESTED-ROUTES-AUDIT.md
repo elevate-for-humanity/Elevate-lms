@@ -270,11 +270,13 @@ Before deleting orphans, verify:
 | /blog/blog | 200 | YES | Active | /blog | NO - Different articles |
 | /careers/careers | 200 | ERROR | Broken | /careers | NO - Different content |
 | /about/team/team | 200 | YES | Active | /about/team | NO - More detailed |
+| /ai/ai | 200 | YES | Active | /ai | NO - Different (student AI tools) |
 
 **Findings:**
 - /blog/blog: Different articles (May 2025 vs Jan 2024) - Intentional separate page
 - /careers/careers: **ERROR** - Server Component crash (circuit breaker) - FIXED
 - /about/team/team: More detailed individual bios - Intentional separate page
+- /ai/ai: Student AI tools hub - Different from enterprise /ai platform - Intentional
 
 **Conclusion:** These are NOT duplicates. They're intentionally different pages serving different purposes.
 

@@ -676,12 +676,13 @@ function FundingWizard() {
 }
 
 // Business Calculator
-function BusinessCalculator({ program }: { program: typeof PROGRAM_DATA.barber }) {
+function BusinessCalculator({ program, programType }: { program: typeof PROGRAM_DATA.barber, programType: string }) {
   const [model, setModel] = useState<'employee' | 'booth' | 'suite' | 'mobile' | 'owner'>('employee');
   
+  const isBarber = programType === 'barber';
   const models = {
     employee: {
-      title: 'Salon Employee',
+      title: isBarber ? 'Barbershop Employee' : 'Salon Employee',
       baseSalary: 32000,
       commission: 40,
       tips: 8000,
@@ -695,7 +696,7 @@ function BusinessCalculator({ program }: { program: typeof PROGRAM_DATA.barber }
       expenses: 500,
     },
     suite: {
-      title: 'Salon Suite',
+      title: isBarber ? 'Barbershop Suite' : 'Salon Suite',
       baseSalary: 0,
       commission: 100,
       tips: 15000,
@@ -709,7 +710,7 @@ function BusinessCalculator({ program }: { program: typeof PROGRAM_DATA.barber }
       expenses: 800,
     },
     owner: {
-      title: 'Salon Owner',
+      title: isBarber ? 'Barbershop Owner' : 'Salon Owner',
       baseSalary: 40000,
       commission: 0,
       tips: 0,
@@ -725,7 +726,7 @@ function BusinessCalculator({ program }: { program: typeof PROGRAM_DATA.barber }
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
-      <h3 className="text-2xl font-bold text-slate-900 mb-6">Beauty Business Calculator</h3>
+      <h3 className="text-2xl font-bold text-slate-900 mb-6">{isBarber ? 'Barber Business Calculator' : 'Beauty Business Calculator'}</h3>
       <p className="text-sm text-slate-600 mb-6">See your potential as an employee vs. business owner</p>
       
       <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-6">
@@ -1108,7 +1109,7 @@ export function BeautyApprenticeship({ program: programType }: BeautyApprentices
             <TimelineCalculator program={program} />
             <FundingWizard />
             <div className="lg:col-span-2">
-              <BusinessCalculator program={program} />
+              <BusinessCalculator program={program} programType={programType} />
             </div>
           </div>
         </div>

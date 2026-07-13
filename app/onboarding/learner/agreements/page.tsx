@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -108,7 +108,7 @@ export default function AgreementsPage() {
         className="relative w-full overflow-hidden"
         style={{ height: '60vh', minHeight: 320, maxHeight: 560 }}
       >
-        <CanonicalVideo
+        <UltraVideoPlayer
           src="/videos/elevate-overview-with-narration.mp4"
           poster="/images/pages/enrollment-agreement-page-1.webp"
           className="absolute inset-0 w-full h-full object-cover"

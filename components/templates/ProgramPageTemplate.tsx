@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 import {
   XCircle,
   Clock,
@@ -99,7 +99,7 @@ export function ProgramPageTemplate({
       {/* Hero Image — clean, no overlays */}
       <section className="relative w-full h-[clamp(220px,34vw,390px)] overflow-hidden">
         {heroVideo ? (
-          <CanonicalVideo
+          <UltraVideoPlayer
             src={heroVideo}
             poster={heroImage || '/images/og-default.jpg'}
             className="w-full h-full object-cover"

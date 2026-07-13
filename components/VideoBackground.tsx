@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 
 interface VideoBackgroundProps {
   videoUrl: string;
@@ -18,7 +18,7 @@ export function VideoBackground({
 }: VideoBackgroundProps) {
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      <CanonicalVideo
+      <UltraVideoPlayer
         src={videoUrl}
         poster={poster}
         className="absolute inset-0 w-full h-full object-cover"

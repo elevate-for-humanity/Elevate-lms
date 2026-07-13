@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 
 const POSTER = '/images/pages/workone-partner-packet-page-1.webp';
 // External signed URL — treated as optional enhancement; poster renders on error
@@ -26,7 +26,7 @@ export default function WorkOneHeroVideo() {
       ref={wrapperRef}
       className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden bg-slate-900"
     >
-      <CanonicalVideo
+      <UltraVideoPlayer
         src={VIDEO_SRC}
         poster={POSTER}
         className="absolute inset-0 w-full h-full object-cover"

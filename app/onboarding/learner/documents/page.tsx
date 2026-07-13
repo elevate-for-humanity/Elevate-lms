@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -167,7 +167,7 @@ export default function DocumentsPage() {
         className="relative w-full overflow-hidden"
         style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}
       >
-        <CanonicalVideo
+        <UltraVideoPlayer
           src="/videos/elevate-overview-with-narration.mp4"
           poster="/images/pages/docs-page-1.webp"
           className="absolute inset-0 w-full h-full object-cover"

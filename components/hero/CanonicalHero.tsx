@@ -9,7 +9,7 @@
  *
  * Usage:
  *   <CanonicalHero
- *     media={<HeroMediaFrame><CanonicalVideo src="..." poster="..." className="aspect-video w-full object-cover" /></HeroMediaFrame>}
+ *     media={<HeroMediaFrame><UltraVideoPlayer src="..." poster="..." className="aspect-video w-full object-cover" /></HeroMediaFrame>}
  *     title="Page Title"
  *     body="Supporting copy goes here."
  *     actions={<><Link href="/apply">Apply Now</Link></>}

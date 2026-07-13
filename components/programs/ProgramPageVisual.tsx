@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Clock, DollarSign, TrendingUp, ArrowRight, Briefcase } from 'lucide-react';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 
 export interface VisualProgramData {
   title: string;
@@ -43,7 +43,7 @@ export function ProgramPageVisual({ program }: Props) {
       {/* HERO - Full width, visual-first */}
       <section className="relative h-[70vh] min-h-[500px] flex items-end">
         {program.heroVideo ? (
-          <CanonicalVideo
+          <UltraVideoPlayer
             src={program.heroVideo}
             poster={program.heroImage || '/images/og-default.jpg'}
             className="absolute inset-0 w-full h-full object-cover"

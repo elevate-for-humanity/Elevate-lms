@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 
 interface StatCard {
   image: string;
@@ -46,7 +46,7 @@ export function PortalPageLayout({
     <div className="min-h-screen bg-white">
       {/* Hero — video frame only */}
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden">
-        <CanonicalVideo
+        <UltraVideoPlayer
           src={videoSrc}
           poster={posterSrc}
           className="absolute inset-0 w-full h-full object-cover"

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 import CanonicalHero from '@/components/hero/CanonicalHero';
 import HeroMediaFrame from '@/components/hero/HeroMediaFrame';
 import {
@@ -34,7 +34,7 @@ export default function ApprenticeshipPage() {
       <CanonicalHero
         media={
           <HeroMediaFrame heightClass="h-[clamp(220px,34vw,390px)]">
-            <CanonicalVideo
+            <UltraVideoPlayer
               src="/videos/barber-hero-final.mp4"
               poster="/images/pages/barber-apprenticeship.webp"
               className="absolute inset-0 w-full h-full object-cover"

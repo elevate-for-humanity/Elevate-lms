@@ -19,7 +19,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
@@ -424,7 +424,7 @@ export default async function LearnerOnboardingPage({
         className="relative w-full overflow-hidden"
         style={{ height: '55vh', minHeight: 280, maxHeight: 500 }}
       >
-        <CanonicalVideo
+        <UltraVideoPlayer
           src="/videos/getting-started-hero.mp4"
           poster="/images/pages/onboarding-page-2.webp"
           className="absolute inset-0 w-full h-full object-cover"

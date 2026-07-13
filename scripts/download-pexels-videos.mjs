@@ -18,43 +18,87 @@ const rootDir = path.join(__dirname, '..');
 // Your Pexels API key
 const PEXELS_API_KEY = 'IJJFHHBQ7lP0Dmn9vDvPWjLrfQTZhmVyWWYou0UD1fnXgkAdXrzdEZpw';
 
-// Program video searches
+// Program video searches - remaining programs
 const PROGRAM_VIDEOS = [
   {
-    id: 'barber',
-    searches: ['barber shop scissors cutting hair', 'men hair cutting salon', 'barber training styling'],
+    id: 'business-administration',
+    searches: ['business meeting office work', 'professional business team', 'office work typing'],
   },
   {
-    id: 'cosmetology',
-    searches: ['hair salon coloring styling', 'makeup artist beauty', 'hairdresser cutting'],
+    id: 'bookkeeping',
+    searches: ['accounting office work', 'bookkeeping finance computer', 'office accounting'],
   },
   {
-    id: 'esthetics',
-    searches: ['spa facial treatment skincare', 'beauty salon facial', 'skincare aesthetician'],
+    id: 'technology',
+    searches: ['computer programming coding', 'software developer working', 'tech work laptop'],
   },
   {
-    id: 'nails',
-    searches: ['nail salon manicure beauty', 'nail art design', 'pedicure spa'],
+    id: 'cybersecurity',
+    searches: ['cybersecurity computer work', 'network security monitoring', 'tech security analyst'],
   },
   {
-    id: 'cna',
-    searches: ['hospital nurse healthcare', 'medical nursing care', 'healthcare worker patient'],
+    id: 'network-administration',
+    searches: ['network administrator IT', 'computer networking server', 'IT infrastructure work'],
   },
   {
-    id: 'hvac',
-    searches: ['hvac technician air conditioning', 'heating cooling system', 'hvac repair'],
+    id: 'web-development',
+    searches: ['web developer coding', 'programming computer screen', 'software development'],
   },
   {
-    id: 'cdl',
-    searches: ['truck driving highway', 'semi truck transport', 'cdl trucker driving'],
+    id: 'software-development',
+    searches: ['software engineer coding', 'programming code screen', 'developer working'],
   },
   {
-    id: 'medical-assistant',
-    searches: ['medical assistant healthcare', 'doctor office nurse', 'clinical medical'],
+    id: 'graphic-design',
+    searches: ['graphic designer creative', 'design work computer', 'creative designer art'],
   },
   {
-    id: 'phlebotomy',
-    searches: ['blood draw medical lab', 'phlebotomist healthcare', 'medical laboratory'],
+    id: 'cad-drafting',
+    searches: ['CAD drafting design', 'engineering blueprint', 'technical drawing work'],
+  },
+  {
+    id: 'project-management',
+    searches: ['project manager planning', 'business meeting team', 'project planning work'],
+  },
+  {
+    id: 'culinary',
+    searches: ['chef cooking kitchen', 'culinary arts cooking', 'professional kitchen food'],
+  },
+  {
+    id: 'welding',
+    searches: ['welding torch industrial', 'welder metal work', 'fabrication welding'],
+  },
+  {
+    id: 'plumbing',
+    searches: ['plumber plumbing work', 'pipe fitting repair', 'construction plumbing'],
+  },
+  {
+    id: 'electrical',
+    searches: ['electrician electrical work', 'wiring construction', 'electrical technician'],
+  },
+  {
+    id: 'diesel',
+    searches: ['diesel mechanic repair', 'truck mechanic workshop', 'diesel engine repair'],
+  },
+  {
+    id: 'forklift',
+    searches: ['warehouse forklift driving', 'forklift operator warehouse', 'warehouse logistics'],
+  },
+  {
+    id: 'pharmacy-technician',
+    searches: ['pharmacy technician work', 'pharmacist dispensing', 'medical pharmacy'],
+  },
+  {
+    id: 'home-health-aide',
+    searches: ['home health aide care', 'elderly care assistance', 'caregiver home care'],
+  },
+  {
+    id: 'emergency-health-safety',
+    searches: ['emergency medical responder', 'first aid emergency care', 'EMT paramedic'],
+  },
+  {
+    id: 'graduation',
+    searches: ['graduation ceremony students', 'college graduation cap', 'graduates success'],
   },
 ];
 

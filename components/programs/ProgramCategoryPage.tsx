@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import HeroAvatarGuide from '@/components/HeroAvatarGuide';
@@ -88,7 +88,7 @@ export default function ProgramCategoryPage({
     <div className="min-h-screen bg-white">
       {/* Hero — video frame only, no text overlay */}
       <section className="relative w-full h-[45vh] sm:h-[50vh] min-h-[280px] overflow-hidden">
-        <CanonicalVideo
+        <UltraVideoPlayer
           src={heroVideoSrc}
           poster={heroPosterImage}
           className="absolute inset-0 w-full h-full object-cover"

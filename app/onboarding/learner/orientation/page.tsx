@@ -4,7 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 import {
   BookOpen,
   ArrowLeft,
@@ -328,7 +328,7 @@ export default async function OrientationPage() {
         className="relative w-full overflow-hidden"
         style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}
       >
-        <CanonicalVideo
+        <UltraVideoPlayer
           src="/videos/getting-started-hero.mp4"
           poster="/images/pages/orientation-page-1.webp"
           className="absolute inset-0 w-full h-full object-cover"

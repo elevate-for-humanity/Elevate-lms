@@ -4,7 +4,7 @@ export const dynamic = 'force-static';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 import { Play, Star, Layout, Palette, Globe, Zap, Shield, BarChart, ArrowRight, Monitor, MousePointer, Eye } from 'lucide-react';
 import { IndividualAppPlansSection } from '@/components/store/IndividualAppPlansSection';
 import { INDIVIDUAL_APP_CATALOG } from '@/lib/apps/individual-app-plans';
@@ -89,7 +89,7 @@ export default function WebsiteBuilderAppPage() {
             <div className="relative">
               <div className="bg-white rounded-2xl shadow-2xl p-4">
                 <div className="aspect-video bg-white rounded-lg overflow-hidden relative">
-                  <CanonicalVideo
+                  <UltraVideoPlayer
                     src="/videos/training-providers-video-with-narration.mp4"
                     poster="/images/pages/store-hero.webp"
                     className="absolute inset-0 w-full h-full object-cover"
@@ -139,7 +139,7 @@ export default function WebsiteBuilderAppPage() {
           <h2 className="text-3xl font-bold mb-6">Build Your Site in Minutes</h2>
           <p className="text-slate-700 mb-8">Watch how easy it is to create a professional training provider website</p>
           <div className="aspect-video bg-white rounded-2xl overflow-hidden relative">
-            <CanonicalVideo
+            <UltraVideoPlayer
               src="/videos/training-providers-video-with-narration.mp4"
               poster="/images/pages/store-hero.webp"
               className="absolute inset-0 w-full h-full object-cover"

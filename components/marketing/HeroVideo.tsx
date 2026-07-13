@@ -13,7 +13,7 @@
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 /* ------------------------------------------------------------------ */
@@ -214,7 +214,7 @@ export default function HeroVideo({
       >
         {/* autoPlayOnMount — hero is always above the fold; start immediately.
             loop — prevents the poster fading back in when the video ends. */}
-        <CanonicalVideo
+        <UltraVideoPlayer
           src={videoSrc}
           poster={posterImage}
           className="absolute inset-0 w-full h-full object-cover object-center z-10"

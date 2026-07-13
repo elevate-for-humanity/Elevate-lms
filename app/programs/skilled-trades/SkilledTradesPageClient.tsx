@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import type { Program } from '@/lib/lms/types';
@@ -30,7 +30,7 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative w-full h-[clamp(220px,34vw,390px)] flex items-center overflow-hidden bg-slate-900">
-        <CanonicalVideo
+        <UltraVideoPlayer
           src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/hvac-hero-final.mp4"
           className="absolute inset-0 w-full h-full object-cover brightness-110"
           autoPlayOnMount

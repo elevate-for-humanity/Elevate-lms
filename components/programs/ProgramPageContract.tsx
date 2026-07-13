@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DollarSign, Award, Users, BookOpen, ArrowRight } from 'lucide-react';
 import { ReactNode } from 'react';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 
 /**
  * Program types determine the primary CTA
@@ -148,7 +148,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       {/* HERO */}
       <section className="relative min-h-[70vh] flex items-center">
         {config.heroVideo ? (
-          <CanonicalVideo
+          <UltraVideoPlayer
             src={config.heroVideo}
             poster={config.heroPoster || config.heroImage || '/images/og-default.jpg'}
             className="absolute inset-0 w-full h-full object-cover"

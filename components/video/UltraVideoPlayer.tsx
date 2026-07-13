@@ -38,6 +38,7 @@ export interface UltraVideoPlayerProps {
   
   // Playback
   autoPlay?: boolean;
+  autoPlayOnMount?: boolean;
   muted?: boolean;
   loop?: boolean;
   startTime?: number;
@@ -146,7 +147,7 @@ export function UltraVideoPlayer({
   const [duration, setDuration] = useState(0);
   const [buffered, setBuffered] = useState(0);
   const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(muted);
+  const [isMuted, setIsMuted] = useState(autoPlayOnMount ? true : muted);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControlsOverlay, setShowControlsOverlay] = useState(true);
@@ -177,7 +178,12 @@ export function UltraVideoPlayer({
     if (startTime > 0) {
       video.currentTime = startTime;
     }
-  }, [resolvedSrc, lessonId, enableResume, startTime]);
+
+    // Auto-play on mount (for hero/ambient videos)
+    if (autoPlayOnMount) {
+      video.play().catch(() => {});
+    }
+  }, [resolvedSrc, lessonId, enableResume, startTime, autoPlayOnMount]);
 
   // Progress tracking
   useEffect(() => {

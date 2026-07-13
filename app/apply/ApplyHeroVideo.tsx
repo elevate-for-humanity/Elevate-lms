@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 import { VIDEO_HEROES } from '@/lib/hero-config';
 
 export default function ApplyHeroVideo() {
@@ -19,7 +19,7 @@ export default function ApplyHeroVideo() {
 
   return (
     <div ref={wrapperRef} className="absolute inset-0 w-full h-full">
-      <CanonicalVideo
+      <UltraVideoPlayer
         src={VIDEO_HEROES.homepage}
         poster="/images/pages/apply-hero.webp"
         className="absolute inset-0 w-full h-full object-cover"

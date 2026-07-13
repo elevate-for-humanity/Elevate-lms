@@ -7,7 +7,7 @@ import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 import { ProgramAppointmentBanner } from '@/components/programs/ProgramAppointmentBanner';
 import ProgramHowItWorks from '@/components/program/ProgramHowItWorks';
 import ProgramFAQ from '@/components/program/ProgramFAQ';
-import CanonicalVideo from '@/components/video/CanonicalVideo';
+import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
 
 export function ProgramDetails({ program }: { program: Program }) {
   const isBarberProgram = program.slug === 'barber-apprenticeship';
@@ -304,7 +304,7 @@ export function ProgramDetails({ program }: { program: Program }) {
       <section className="w-full py-16 border-t">
         <div className="mx-auto max-w-5xl px-4">
           <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-            <CanonicalVideo
+            <UltraVideoPlayer
               src="/videos/hero-home.mp4"
               poster="/images/pages/training-cohort.webp"
               className="absolute inset-0 w-full h-full object-cover"

@@ -17,9 +17,9 @@ import LiveJobPostings from '@/components/careers/LiveJobPostings';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { BeautyApprenticeship } from '@/components/programs/BeautyApprenticeship';
 
-// Premium beauty apprenticeship programs - barber has its own dedicated page now
+// Premium beauty apprenticeship programs
 const BEAUTY_APPRENTICESHIP_SLUGS = new Set([
-  // 'barber-apprenticeship', // Now has dedicated /programs/barber-apprenticeship/page.tsx
+  'barber-apprenticeship',
   'cosmetology-apprenticeship',
   'esthetician-apprenticeship',
   'nail-technician-apprenticeship',

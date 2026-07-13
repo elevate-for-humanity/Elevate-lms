@@ -15,21 +15,23 @@ import HeroPicture from '@/components/marketing/HeroPicture';
 import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import LiveJobPostings from '@/components/careers/LiveJobPostings';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { BeautyApprenticeship } from '@/components/programs/BeautyApprenticeship';
 import ProgramLanding from '@/components/programs/ProgramLanding';
+
+// Program configurations (configuration-driven architecture)
 import { barberConfig } from '@/components/programs/config/barber-config';
+import { cosmetologyConfig } from '@/components/programs/config/cosmetology-config';
+import { estheticsConfig } from '@/components/programs/config/esthetics-config';
+import { nailConfig } from '@/components/programs/config/nail-config';
 
-// Configuration-driven apprenticeship programs (using new architecture)
-const PROGRAM_CONFIGS: Record<string, { config: typeof barberConfig }> = {
-  'barber-apprenticeship': { config: barberConfig },
+import type { ProgramConfig } from '@/components/programs/ProgramLanding';
+
+// Registry of all apprenticeship programs using new architecture
+const APPRENTICESHIP_CONFIGS: Record<string, ProgramConfig> = {
+  'barber-apprenticeship': barberConfig,
+  'cosmetology-apprenticeship': cosmetologyConfig,
+  'esthetician-apprenticeship': estheticsConfig,
+  'nail-technician-apprenticeship': nailConfig,
 };
-
-// Programs still using BeautyApprenticeship (legacy, to be migrated)
-const BEAUTY_APPRENTICESHIP_SLUGS = new Set([
-  'cosmetology-apprenticeship',
-  'esthetician-apprenticeship',
-  'nail-technician-apprenticeship',
-]);
 
 export const dynamic = 'force-dynamic';
 
@@ -522,22 +524,9 @@ function ProgramPage({
 export default async function ProgramDetailPage({ params }: { params: Promise<{ program: string }> }) {
   const { program } = await params;
 
-  // Configuration-driven programs (new architecture)
-  if (PROGRAM_CONFIGS[program]) {
-    return <ProgramLanding config={PROGRAM_CONFIGS[program].config} />;
-  }
-
-  // Use Premium Beauty Apprenticeship Page for legacy beauty programs
-  if (BEAUTY_APPRENTICESHIP_SLUGS.has(program)) {
-    // Map URL slugs to PROGRAM_DATA keys
-    const slugToKey: Record<string, 'barber' | 'cosmetology' | 'esthetics' | 'manicurist'> = {
-      'barber-apprenticeship': 'barber',
-      'cosmetology-apprenticeship': 'cosmetology',
-      'esthetician-apprenticeship': 'esthetics', // Note: key is 'esthetics', not 'esthetician'
-      'nail-technician-apprenticeship': 'manicurist',
-    };
-    const programType = slugToKey[program] || 'barber';
-    return <BeautyApprenticeship program={programType} />;
+  // Configuration-driven apprenticeship programs (new architecture)
+  if (APPRENTICESHIP_CONFIGS[program]) {
+    return <ProgramLanding config={APPRENTICESHIP_CONFIGS[program]} />;
   }
 
   // Static ProgramSchema — richest renderer, always preferred when available.

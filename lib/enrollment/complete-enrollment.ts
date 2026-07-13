@@ -3,6 +3,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { setAuditContext } from '@/lib/audit-context';
+import { ensureDigitalBinder } from './ensure-digital-binder';
 
 export interface EnrollmentData {
   userId: string;
@@ -119,7 +120,22 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
       return { success: false, error: 'Failed to create enrollment' };
     }
 
-    // Step 6: Audit log (fire-and-forget)
+    // Step 7: Create Digital Binder for the student
+    try {
+      const { binderId, created } = await ensureDigitalBinder({
+        db: supabase,
+        userId: data.userId,
+        enrollmentId: enrollment.id,
+      });
+      if (created) {
+        logger.info('[completeEnrollment] Digital binder created', { binderId, enrollmentId: enrollment.id });
+      }
+    } catch (binderError) {
+      // Non-fatal: log but don't fail enrollment
+      logger.warn('[completeEnrollment] Digital binder creation failed', binderError);
+    }
+
+    // Step 8: Audit log (fire-and-forget)
     supabase
       .from('audit_logs')
       .insert({

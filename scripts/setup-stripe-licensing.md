@@ -56,7 +56,7 @@ Add these to Netlify:
 ```
 STRIPE_PRICE_MONTHLY=price_xxxxx
 STRIPE_PRICE_ANNUAL=price_xxxxx
-STRIPE_WEBHOOK_SECRET=whsec_xxxxx
+STRIPE_WEBHOOK_SECRET=<STRIPE_WEBHOOK_SECRET>
 ```
 
 ## Step 6: Test

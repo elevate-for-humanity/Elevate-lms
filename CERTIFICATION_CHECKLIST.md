@@ -33,7 +33,7 @@
 
 Add to Northflank:
 ```
-ANTHROPIC_API_KEY=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
+ANTHROPIC_API_KEY=<ANTHROPIC_API_KEY>
 ```
 
 ### Usage Locations
@@ -47,7 +47,7 @@ ANTHROPIC_API_KEY=sk-ant-api03-VfJG0LH_IJPER6NhH_8e1B4KjhadDn9XLQoKuWkOVGJft6gs1
 ### Verification Command
 ```bash
 curl https://api.anthropic.com/v1/messages \
-  --header "x-api-key: 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" \
+  --header "x-api-key: <ANTHROPIC_API_KEY>" \
   --header "anthropic-version: 2023-06-01" \
   --header "content-type: application/json" \
   --data '{"model": "claude-sonnet-4-6", "max_tokens": 1024, "messages": [{"role": "user", "content": "Hello"}]}'
@@ -109,7 +109,7 @@ curl https://api.anthropic.com/v1/messages \
 
 2. **Add to Northflank:**
    ```
-   STRIPE_WEBHOOK_SECRET=whsec_RTrnoB3fnjCR03yL3f3pos1zQJDC54ns
+   STRIPE_WEBHOOK_SECRET=<STRIPE_WEBHOOK_SECRET>
    ```
 
 3. **Test endpoint:**
@@ -120,12 +120,12 @@ curl https://api.anthropic.com/v1/messages \
 ### All Webhook Secrets to Configure
 
 ```bash
-STRIPE_WEBHOOK_SECRET=whsec_RTrnoB3fnjCR03yL3f3pos1zQJDC54ns
-STRIPE_WEBHOOK_SECRET_STORE=whsec_3Xr50E0UHiCGlak5TP3VLnic9Vht2ZTx
-STRIPE_WEBHOOK_SECRET_BARBER=whsec_HIaJAeyPAjAullAwGhZdYR5tjh7uqRmK
-STRIPE_WEBHOOK_SECRET_LICENSE=whsec_nqp8Bxypw9WeCBKxaRkoDRukOR3KYrrC
-STRIPE_WEBHOOK_SECRET_DONATIONS=whsec_kJOzN8dKE7ibPZaMILRfkxCnTkNTwGrU
-STRIPE_WEBHOOK_SECRET_SUPERSONIC=whsec_dcXAG4u5tfJ9teSmItuvVONsweC9A8Uz
+STRIPE_WEBHOOK_SECRET=<STRIPE_WEBHOOK_SECRET>
+STRIPE_WEBHOOK_SECRET_STORE=<STRIPE_WEBHOOK_SECRET_STORE>
+STRIPE_WEBHOOK_SECRET_BARBER=<STRIPE_WEBHOOK_SECRET_BARBER>
+STRIPE_WEBHOOK_SECRET_LICENSE=<STRIPE_WEBHOOK_SECRET_LICENSE>
+STRIPE_WEBHOOK_SECRET_DONATIONS=<STRIPE_WEBHOOK_SECRET_DONATIONS>
+STRIPE_WEBHOOK_SECRET_SUPERSONIC=<STRIPE_WEBHOOK_SECRET_SUPERSONIC>
 ```
 
 ---
@@ -229,19 +229,19 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 # ========================
 # STRIPE (Required)
 # ========================
-STRIPE_SECRET_KEY=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
+STRIPE_SECRET_KEY=<STRIPE_SECRET_KEY>
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_51OKSVyH4a2yrVOt5vMzAwR0TjvMKgzZeTzqXPjEq8AjZ4UP9tkFkPobctLFk1PM4Gun45J20Kyiy5n0Wtq7p3HFn006LgyFvPP
-STRIPE_WEBHOOK_SECRET=whsec_RTrnoB3fnjCR03yL3f3pos1zQJDC54ns
-STRIPE_WEBHOOK_SECRET_STORE=whsec_3Xr50E0UHiCGlak5TP3VLnic9Vht2ZTx
-STRIPE_WEBHOOK_SECRET_BARBER=whsec_HIaJAeyPAjAullAwGhZdYR5tjh7uqRmK
-STRIPE_WEBHOOK_SECRET_LICENSE=whsec_nqp8Bxypw9WeCBKxaRkoDRukOR3KYrrC
-STRIPE_WEBHOOK_SECRET_DONATIONS=whsec_kJOzN8dKE7ibPZaMILRfkxCnTkNTwGrU
-STRIPE_WEBHOOK_SECRET_SUPERSONIC=whsec_dcXAG4u5tfJ9teSmItuvVONsweC9A8Uz
+STRIPE_WEBHOOK_SECRET=<STRIPE_WEBHOOK_SECRET>
+STRIPE_WEBHOOK_SECRET_STORE=<STRIPE_WEBHOOK_SECRET_STORE>
+STRIPE_WEBHOOK_SECRET_BARBER=<STRIPE_WEBHOOK_SECRET_BARBER>
+STRIPE_WEBHOOK_SECRET_LICENSE=<STRIPE_WEBHOOK_SECRET_LICENSE>
+STRIPE_WEBHOOK_SECRET_DONATIONS=<STRIPE_WEBHOOK_SECRET_DONATIONS>
+STRIPE_WEBHOOK_SECRET_SUPERSONIC=<STRIPE_WEBHOOK_SECRET_SUPERSONIC>
 
 # ========================
 # AI - PARIS (Required)
 # ========================
-ANTHROPIC_API_KEY=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
+ANTHROPIC_API_KEY=<ANTHROPIC_API_KEY>
 
 # ========================
 # CHATBOT - LIZZY (Required)
@@ -288,14 +288,15 @@ OPENAI_API_KEY=sk-...  # Additional AI
 ### Add to Northflank NOW
 
 ```
-ANTHROPIC_API_KEY=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
-STRIPE_WEBHOOK_SECRET=whsec_RTrnoB3fnjCR03yL3f3pos1zQJDC54ns
+ANTHROPIC_API_KEY=<your-anthropic-api-key>
+STRIPE_WEBHOOK_SECRET=<your-stripe-webhook-secret>
+STRIPE_WEBHOOK_SECRET_STORE=<your-store-webhook-secret>
+STRIPE_WEBHOOK_SECRET_BARBER=<your-barber-webhook-secret>
 ```
 
-### Optional (LIZZY works FREE without these)
-```
-NEXT_PUBLIC_TIDIO_KEY=your_tidio_key  # Only if you want Tidio (not required)
-```
+⚠️ **SECURITY**: Replace `<your-...>` with actual keys from:
+- ANTHROPIC_API_KEY: https://console.anthropic.com/
+- STRIPE_WEBHOOK_SECRET: Stripe Dashboard → Developers → Webhooks
 
 ---
 

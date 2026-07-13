@@ -2,7 +2,7 @@
 
 **Generated:** 2026-07-13  
 **Status:** VERIFIED ✅  
-**New Secret:** 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
+**New Secret:** <STRIPE_SECRET_KEY>
 
 ---
 
@@ -175,7 +175,7 @@ STRIPE_PRICE_BNPL_MONTHLY=price_...     // BNPL Monthly
 
 ```bash
 # Stripe Dashboard > Developers > API keys
-STRIPE_SECRET_KEY=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
+STRIPE_SECRET_KEY=<STRIPE_SECRET_KEY>
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 
 # Stripe Dashboard > Developers > Webhooks
@@ -191,7 +191,7 @@ STRIPE_CONNECT_SECRET_KEY=sk_live_...
 
 | Variable | Status | Value Present |
 |----------|--------|---------------|
-| STRIPE_SECRET_KEY | ✅ READY | `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` |
+| STRIPE_SECRET_KEY | ✅ READY | `<STRIPE_SECRET_KEY>` |
 | NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY | ✅ READY | `pk_live_51OKSVyH4a2yrVOt5vMzAwR0TjvMKgzZeTzqXPjEq8AjZ4UP9tkFkPobctLFk1PM4Gun45J20Kyiy5n0Wtq7p3HFn006LgyFvPP` |
 | STRIPE_WEBHOOK_SECRET | ⚠️ MISSING | Get from Stripe Dashboard → Developers → Webhooks |
 | STRIPE_WEBHOOK_SECRET_STORE | ⚠️ MISSING | Get from Stripe Dashboard → Webhooks (if separate) |
@@ -287,9 +287,9 @@ STRIPE_CONNECT_SECRET_KEY=sk_live_...
 
 ```bash
 # In Northflank dashboard, add to service environment:
-STRIPE_SECRET_KEY=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
+STRIPE_SECRET_KEY=<STRIPE_SECRET_KEY>
 STRIPE_WEBHOOK_SECRET=whsec_your_secret_here
-STRIPE_WEBHOOK_SECRET_STORE=whsec_your_store_secret_here
+STRIPE_WEBHOOK_SECRET_STORE=<STRIPE_WEBHOOK_SECRET_STORE>
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_your_key_here
 ```
 

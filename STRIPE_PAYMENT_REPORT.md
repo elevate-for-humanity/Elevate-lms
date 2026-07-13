@@ -129,12 +129,12 @@ Active links (should be assigned to programs):
 The Northflank deployment needs to be configured to receive Stripe webhooks:
 
 1. Get webhook signing secret from Stripe dashboard
-2. Add to Northflank: `STRIPE_WEBHOOK_SECRET=whsec_xxx`
+2. Add to Northflank: `STRIPE_WEBHOOK_SECRET=<STRIPE_WEBHOOK_SECRET>`
 3. Configure endpoint: `https://your-northflank-url/api/webhooks/stripe`
 
 ### Environment Variables Needed in Northflank
 ```
-STRIPE_SECRET_KEY=sk_live_xxx
-STRIPE_WEBHOOK_SECRET=whsec_xxx
+STRIPE_SECRET_KEY=<STRIPE_SECRET_KEY>
+STRIPE_WEBHOOK_SECRET=<STRIPE_WEBHOOK_SECRET>
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxx
 ```

@@ -167,6 +167,7 @@ export default function DevStudioPage() {
             </div>
           </div>
         </div>
+        </div>
       </section>
 
       {/* Workflow Builder Demo */}

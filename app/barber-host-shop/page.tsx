@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const benefits = [
   { icon: DollarSign, title: 'OJT Wage Reimbursement', desc: 'Get reimbursed for on-the-job training hours.' },
   { icon: Users, title: 'Build Your Team', desc: 'Train apprentices to your standards and hire when ready.' },
-  { icon: Scissors, title: 'Instructor the Next Generation', desc: 'Give back to your community and grow the trade.' },
+  { icon: Scissors, title: 'Mentor the Next Generation', desc: 'Give back to your community and grow the trade.' },
 ];
 
 const requirements = [

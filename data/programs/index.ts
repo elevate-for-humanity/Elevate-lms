@@ -45,8 +45,6 @@ import { PHLEBOTOMY } from './phlebotomy';
 import { HOSPITALITY } from './hospitality';
 import { TECHNOLOGY } from './technology';
 import { QMA } from './qma';
-import { BEAUTY_CAREER_EDUCATOR } from './beauty-career-educator';
-
 const STATIC_PROGRAMS: ProgramSchema[] = [
   // Programs with dedicated page.tsx - registered here for [slug] fallback and sitemap
   BARBER_APPRENTICESHIP,
@@ -88,7 +86,6 @@ const STATIC_PROGRAMS: ProgramSchema[] = [
   PROJECT_MANAGEMENT,
   SOFTWARE_DEV,
   WEB_DEVELOPMENT,
-  BEAUTY_CAREER_EDUCATOR,
 ];
 
 /** Slug-keyed map for O(1) lookup. */

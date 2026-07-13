@@ -33,22 +33,7 @@ export default function EmployerApplicationForm() {
       return;
     }
 
-    const data = {
-      firstName: formData.get('firstName') as string,
-      lastName: formData.get('lastName') as string,
-      email: formData.get('email') as string,
-      phone: formData.get('phone') as string,
-      password,
-      companyName: formData.get('companyName') as string,
-      industry: formData.get('industry') as string,
-      companySize: formData.get('companySize') as string,
-      website: formData.get('website') as string,
-      hiringNeeds: formData.get('hiringNeeds') as string,
-      positionsAvailable: formData.get('positionsAvailable') as string,
-      role: 'employer' as const,
-    };
-
-    const result = await submitEmployerApplication(data);
+    const result = await submitEmployerApplication(formData);
 
     if (result.success) {
       router.push(result.redirectTo!);

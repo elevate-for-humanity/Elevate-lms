@@ -51,8 +51,10 @@ export function BarberApprenticeshipDashboard({
   stats,
   lms,
 }: Props) {
-  const ojlPercent = Math.min((hours.ojl / REQUIRED_OJL) * 100, 100);
-  const rtiPercent = Math.min((hours.rti / REQUIRED_RTI) * 100, 100);
+  const totalOjl = hours.ojl + hours.transferredOjl;
+  const totalRti = hours.rti + hours.transferredRti;
+  const ojlPercent = Math.min((totalOjl / REQUIRED_OJL) * 100, 100);
+  const rtiPercent = Math.min((totalRti / REQUIRED_RTI) * 100, 100);
 
   const hasSubscription = !!enrollment?.stripe_subscription_id;
   const subStatus = enrollment?.stripe_subscription_status ?? null;
@@ -338,7 +340,7 @@ export function BarberApprenticeshipDashboard({
               <div className="flex justify-between text-sm mb-1">
                 <span className="font-medium text-slate-700">On-the-job (OJT)</span>
                 <span className="font-bold">
-                  {hours.ojl.toLocaleString()} / {REQUIRED_OJL.toLocaleString()}
+                  {totalOjl.toLocaleString()} / {REQUIRED_OJL.toLocaleString()}
                 </span>
               </div>
               <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
@@ -349,7 +351,7 @@ export function BarberApprenticeshipDashboard({
               <div className="flex justify-between text-sm mb-1">
                 <span className="font-medium text-slate-700">Related instruction (RTI)</span>
                 <span className="font-bold">
-                  {hours.rti.toLocaleString()} / {REQUIRED_RTI.toLocaleString()}
+                  {totalRti.toLocaleString()} / {REQUIRED_RTI.toLocaleString()}
                 </span>
               </div>
               <div className="h-3 bg-slate-100 rounded-full overflow-hidden">

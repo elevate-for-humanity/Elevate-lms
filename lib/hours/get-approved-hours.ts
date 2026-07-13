@@ -7,6 +7,7 @@ import type { SupabaseClient } from '@/lib/supabase';
  * OJL bucket: ojl, host_shop, timeclock, manual (all on-the-job work)
  * RTI bucket: rti, in_state_barber_school, continuing_education (classroom/theory)
  * Transfer:   out_of_state_school, out_of_state_license (categorized per entry)
+ * Also includes approved hour_transfer_requests
  */
 
 // Which source_types count as OJL (On-the-Job Learning)
@@ -18,6 +19,8 @@ const RTI_SOURCE_TYPES = new Set(['rti', 'in_state_barber_school', 'continuing_e
 export interface ApprovedHours {
   ojl: number;
   rti: number;
+  transferredOjl: number;
+  transferredRti: number;
 }
 
 /**
@@ -25,8 +28,10 @@ export interface ApprovedHours {
  * Uses accepted_hours when available (employer may adjust), falls back to hours_claimed.
  * Only counts status = 'approved' or 'locked'.
  *
- * Transfer entries (out_of_state_school, out_of_state_license) are classified
- * by their `category` field if present, otherwise default to OJL.
+ * Also includes approved transfer requests from hour_transfer_requests table.
+ * Transfer hours are classified by source_type:
+ * - in_state_barber_school -> RTI
+ * - out_of_state_school, out_of_state_license -> defaults to OJL unless specified
  */
 export async function getApprovedHoursByType(
   db: SupabaseClient,
@@ -49,7 +54,7 @@ export async function getApprovedHoursByType(
   const { data, error } = await query;
 
   if (error || !data) {
-    return { ojl: 0, rti: 0 };
+    return { ojl: 0, rti: 0, transferredOjl: 0, transferredRti: 0 };
   }
 
   let ojl = 0;
@@ -74,7 +79,44 @@ export async function getApprovedHoursByType(
     }
   }
 
-  return { ojl, rti };
+  // Query approved transfer requests
+  // First get the apprentice_id for this user
+  const { data: apprenticeData } = await db
+    .from('apprentices')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .maybeSingle();
+
+  let transferredOjl = 0;
+  let transferredRti = 0;
+
+  if (apprenticeData?.id) {
+    // Get approved/evaluated transfer requests
+    const { data: transferData } = await db
+      .from('hour_transfer_requests')
+      .select('hours_accepted, source_type, status')
+      .eq('apprentice_id', apprenticeData.id)
+      .in('status', ['approved', 'partial', 'evaluated']);
+
+    if (transferData) {
+      for (const transfer of transferData) {
+        // Use hours_accepted if available, otherwise skip
+        const hrs = Number(transfer.hours_accepted) || 0;
+        if (hrs <= 0) continue;
+
+        // Classify based on source_type
+        if (transfer.source_type === 'in_state_barber_school') {
+          transferredRti += hrs;
+        } else {
+          // out_of_state_school, out_of_state_license, etc. -> OJL by default
+          transferredOjl += hrs;
+        }
+      }
+    }
+  }
+
+  return { ojl, rti, transferredOjl, transferredRti };
 }
 
 export interface EligibilityResult {

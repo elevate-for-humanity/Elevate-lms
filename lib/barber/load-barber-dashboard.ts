@@ -47,7 +47,7 @@ export type BarberDashboardData = {
     stripe_subscription_status: string | null;
     progress_percent: number | null;
   } | null;
-  hours: { ojl: number; rti: number };
+  hours: { ojl: number; rti: number; transferredOjl: number; transferredRti: number };
   docs: { document_type: string; status: string; verification_status: string }[];
   nextAction: { label: string; href: string; description: string };
   stats: {
@@ -123,7 +123,10 @@ export async function loadBarberDashboardData(): Promise<BarberDashboardData> {
   const firstName = profileRes.data?.full_name?.split(' ')[0] ?? 'Apprentice';
   const fullName = profileRes.data?.full_name ?? 'Apprentice';
 
-  const totalHours = hours.ojl + hours.rti;
+  // Include transferred hours in totals
+  const totalOjl = hours.ojl + hours.transferredOjl;
+  const totalRti = hours.rti + hours.transferredRti;
+  const totalHours = totalOjl + totalRti;
   const totalRequired = REQUIRED_OJL + REQUIRED_RTI;
   const overallProgressPercent =
     totalRequired > 0 ? Math.min(100, Math.round((totalHours / totalRequired) * 100)) : 0;

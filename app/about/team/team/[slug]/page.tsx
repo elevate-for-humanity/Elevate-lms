@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
-import { teamMembers } from '@/content/cf-team';
-import { findBySlug, staticParamsFromSlugs } from '@/lib/content-helpers';
+import { getTeamMembers } from '@/lib/content';
 import { buildMetadata } from '@/lib/cf-seo';
 import { siteConfig } from '@/content/cf-site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -9,7 +8,8 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const member = findBySlug(teamMembers, slug);
+  const teamMembers = await getTeamMembers();
+  const member = teamMembers.find((m) => m.id === slug);
   if (!member) return {};
   return buildMetadata({
     title: member.name,
@@ -20,7 +20,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function TeamMemberPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const member = findBySlug(teamMembers, slug);
+  const teamMembers = await getTeamMembers();
+  const member = teamMembers.find((m) => m.id === slug);
   if (!member) return notFound();
 
   return (

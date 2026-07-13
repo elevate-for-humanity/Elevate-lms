@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation';
 
-export const revalidate = 3600;
+export const metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default function AccessibilityPage() {
-  // Redirect to canonical nested route to avoid duplicate content
   redirect('/accessibility/accessibility');
 }

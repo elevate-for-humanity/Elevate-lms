@@ -51,6 +51,63 @@ The comprehensive Enterprise PRD covers **32 chapters** with full implementation
 
 ---
 
+## 🏗️ Program Page Architecture
+
+### Unified ProgramLanding System
+
+All apprenticeship programs use a **configuration-driven architecture**:
+
+```
+components/programs/
+├── ProgramLanding.tsx          # Master page renderer
+├── config/
+│   ├── barber-config.ts        # Barber Apprenticeship
+│   ├── cosmetology-config.ts   # Cosmetology Apprenticeship
+│   ├── esthetics-config.ts     # Esthetician Apprenticeship
+│   └── nail-config.ts          # Nail Technician Apprenticeship
+└── sections/                   # Reusable section components
+    ├── HeroSection.tsx
+    ├── ImagineSection.tsx
+    ├── ComparisonSection.tsx
+    ├── JourneySection.tsx
+    ├── SkillsSection.tsx
+    ├── CareerOutcomesSection.tsx  # Salary + Calculator + Jobs (UNIFIED)
+    ├── BusinessSection.tsx
+    ├── MentorsSection.tsx
+    ├── TestimonialsSection.tsx
+    ├── FundingSection.tsx
+    ├── FAQSection.tsx
+    └── CTASection.tsx
+```
+
+### Adding a New Program
+
+1. Create a config file in `components/programs/config/{program}-config.ts`
+2. Export a `ProgramConfig` object with all content
+3. Add to registry in `app/programs/[program]/page.tsx`:
+
+```ts
+const APPRENTICESHIP_CONFIGS: Record<string, ProgramConfig> = {
+  'barber-apprenticeship': barberConfig,
+  'cosmetology-apprenticeship': cosmetologyConfig,
+  // Add new program here
+};
+```
+
+### Page Flow (Single Narrative)
+
+```
+Hero → Imagine → Comparison → Journey → Skills → Career Outcomes → Business → Mentors → Testimonials → Funding → FAQ → CTA
+```
+
+### Legacy Components (Pending Cleanup)
+
+- `BeautyApprenticeship.tsx` - Old 1500-line monolith, can be deleted after migration
+- `BarberApprenticeshipClient.tsx` - Legacy component, superseded by ProgramLanding
+- `sections/` in `app/programs/barber-apprenticeship/` - Orphaned, can be deleted
+
+---
+
 ## 🎯 DEVELOPMENT PRIORITIES
 
 ### Current Sprint Focus

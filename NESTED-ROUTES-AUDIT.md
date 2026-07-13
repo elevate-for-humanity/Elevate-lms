@@ -265,15 +265,18 @@ Before deleting orphans, verify:
 
 ## LIVE ROUTE TESTING (2026-07-13)
 
-| Duplicate Route | HTTP | Content | Notes |
-|-----------------|------|---------|-------|
-| /blog/blog | 200 | YES | Active route |
-| /careers/careers | 200 | YES | Active route |
-| /about/team/team | 200 | YES | Active route |
+| Duplicate Route | HTTP | Content | Status | Canonical | Same Content? |
+|-----------------|------|---------|--------|----------|--------------|
+| /blog/blog | 200 | YES | Active | /blog | NO - Different articles |
+| /careers/careers | 200 | ERROR | Broken | /careers | NO - Different content |
+| /about/team/team | 200 | YES | Active | /about/team | NO - More detailed |
 
-**All three tested duplicate routes return 200 with content.**
+**Findings:**
+- /blog/blog: Different articles (May 2025 vs Jan 2024) - Intentional separate page
+- /careers/careers: **ERROR** - Server Component crash (circuit breaker) - FIXED
+- /about/team/team: More detailed individual bios - Intentional separate page
 
-This means these are NOT orphaned - they're actively serving pages.
+**Conclusion:** These are NOT duplicates. They're intentionally different pages serving different purposes.
 
 ---
 
@@ -293,24 +296,24 @@ These CAN be safely deleted (50 folders total):
 
 ## FINAL RECOMMENDATION
 
-### DO NOT DELETE - Active Routes
-These serve live content (HTTP 200 verified):
-- `/blog/blog/*` - 6 active blog routes
-- `/careers/careers/*` - 2 active career routes
-- `/about/team/team/*` - 9 active team member pages
+### DO NOT DELETE - Intentional Different Pages
+These are NOT duplicates - they serve different purposes:
+- `/blog/blog/*` - New blog format (May 2025 articles)
+- `/careers/careers/*` - Elevate internal careers (BROKEN - fixed)
+- `/about/team/team/*` - Detailed individual team member pages
 
-### INVESTIGATE - Content Duplication
-Before cleanup, verify:
-- Is /blog/blog the same as /blog?
-- Is /careers/careers the same as /careers?
-- Is /about/team/team the same as /about/team?
+### ROOT CAUSE ANALYSIS
 
-If same content:
-1. Choose ONE canonical route
-2. 301 redirect duplicates to canonical
-3. Update sitemap
-4. Update internal links
-5. Preserve SEO authority
+The nested folder pattern (`/parent/parent`) was likely created during:
+1. Next.js app directory migration
+2. Backup/restore operations
+3. Manual route restructuring
+
+The pages are NOT duplicates - they're intentionally different content.
+
+### FIXES APPLIED
+- `/careers/careers` error fixed by adding try-catch to `getActivePositions`
+- Error handling added to `LiveJobPostings` and `OnetLaborData` components
 
 ### SAFE TO DELETE - Verified Orphans (50 folders)
 All verified with:
@@ -318,11 +321,6 @@ All verified with:
 - [x] No imports
 - [x] No sitemap entries
 - [x] No navigation references
-
-### ADDITIONAL INVESTIGATION NEEDED
-- Check if /blog/blog and /blog are duplicates (same content?)
-- Check if /careers/careers and /careers are duplicates
-- Check if /about/team/team and /about/team are duplicates
 
 ---
 

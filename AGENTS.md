@@ -108,6 +108,78 @@ Hero → Imagine → Comparison → Journey → Skills → Career Outcomes → B
 
 ---
 
+## 🔧 Critical Integrations (Wired July 13, 2026)
+
+### Digital Binder Flow
+```typescript
+// completeEnrollment() now creates binder automatically
+const { binderId, created } = await ensureDigitalBinder({
+  db: supabase,
+  userId: data.userId,
+  enrollmentId: enrollment.id,
+});
+```
+
+### Paris AI Chat API
+- **Endpoint:** `/api/zora/route.ts`
+- **Uses:** Groq (Llama) with fallback
+- **Session:** Stores in `ai_conversations` table
+- **System:** PARIS career guidance prompts
+
+### Enrollment Notifications
+```typescript
+// Send notification on status change
+import { onEnrollmentStatusChange } from '@/lib/notifications/enrollment-notifications';
+await onEnrollmentStatusChange({ email, status: 'active', ... });
+```
+
+### Tidio/Lizzy Config
+- **File:** `lib/chatbot/tidio-config.ts`
+- **Setup:** Set `NEXT_PUBLIC_TIDIO_KEY` env var
+
+---
+
+## 📋 Required Secrets (Northflank)
+
+| Secret | Purpose | Status |
+|-------|---------|--------|
+| NEXT_PUBLIC_SUPABASE_URL | Database | ⚠️ Configure |
+| NEXT_PUBLIC_SUPABASE_ANON_KEY | Client auth | ⚠️ Configure |
+| SUPABASE_SERVICE_ROLE_KEY | Server auth | ⚠️ Configure |
+| ANTHROPIC_API_KEY | Paris AI (optional) | Optional |
+| NEXT_PUBLIC_TIDIO_KEY | Lizzy chatbot | ⚠️ Configure |
+| GROQ_API_KEY | Zora chat | Optional |
+
+---
+
+## 🗄️ Database Migrations
+
+**Pending migration:** `supabase/migrations/pending/20260713000001_critical_tables.sql`
+
+Tables created:
+- ai_conversations
+- digital_binders
+- binder_documents
+- certifications
+- credentials
+- licenses
+- grades
+- communications
+- leads
+- conversations
+- announcements
+- blog_posts
+- campaigns
+- events
+- coupons
+- cohort_sessions
+- notification_outbox
+- enrollment_status_history
+
+Run in Supabase Dashboard SQL Editor before deploying.
+
+---
+
 ## 🎯 DEVELOPMENT PRIORITIES
 
 ### Current Sprint Focus

@@ -322,7 +322,7 @@ export async function sendEnrollmentNotification(
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   
   // Build message with placeholders
-  let message = statusConfig.message
+  const message = statusConfig.message
     .replace(/\{\{firstName\}\}/g, firstName || 'there')
     .replace(/\{\{programName\}\}/g, programName)
     .replace(/\{\{orgName\}\}/g, PLATFORM_DEFAULTS.orgName)

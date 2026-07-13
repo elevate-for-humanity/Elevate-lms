@@ -30,25 +30,31 @@ export interface JobPosition {
  * Get all active job positions
  */
 export async function getActivePositions(): Promise<JobPosition[]> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data, error }: any = await supabase
-    .from('positions')
-    .select(
-      `
-      *,
-      department:departments(name)
-    `,
-    )
-    .eq('is_active', true)
-    .order('created_at', { ascending: false });
+    const { data, error }: any = await supabase
+      .from('positions')
+      .select(
+        `
+        *,
+        department:departments(name)
+      `,
+      )
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
 
-  if (error) {
-    logger.error('Error fetching positions:', error);
+    if (error) {
+      logger.error('Error fetching positions:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    // Circuit breaker or connection error - return empty gracefully
+    logger.warn('[getActivePositions] Failed to fetch positions', { error });
     return [];
   }
-
-  return data || [];
 }
 
 /**

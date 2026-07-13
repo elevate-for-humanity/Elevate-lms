@@ -5,7 +5,7 @@ export const barberConfig: ProgramConfig = {
   title: 'Master the Art of Barbering',
   tagline: 'DOL Registered Apprenticeship',
   subtitle: 'Learn precision cutting, straight razor shaves, beard design, and shop management through our DOL-registered apprenticeship.',
-  heroVideo: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4',
+  heroVideo: '/videos/programs/barber-hero.mp4',
   heroImage: '/images/beauty/barber-hero.webp',
   primaryCta: { label: 'Apply Now', href: '/programs/barber-apprenticeship/apply' },
   secondaryCta: { label: 'Tour the Shop', href: '/programs/barber-apprenticeship/orientation' },

@@ -13,6 +13,7 @@
 import { getOnetSnapshot } from '@/lib/onet/client';
 import { getSocCode } from '@/lib/onet/soc-map';
 import { TrendingUp, Briefcase, BookOpen, Wrench, Star, ExternalLink } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface Props {
   slug: string;
@@ -21,11 +22,12 @@ interface Props {
 }
 
 export async function OnetLaborData({ slug, socCode }: Props) {
-  const soc = socCode ?? getSocCode(slug);
-  if (!soc) return null;
+  try {
+    const soc = socCode ?? getSocCode(slug);
+    if (!soc) return null;
 
-  const data = await getOnetSnapshot(soc);
-  if (!data) return null;
+    const data = await getOnetSnapshot(soc);
+    if (!data) return null;
 
   return (
     <section className="py-12 bg-slate-50 border-t border-slate-100">
@@ -214,4 +216,9 @@ export async function OnetLaborData({ slug, socCode }: Props) {
       </div>
     </section>
   );
+  } catch (error) {
+    // Circuit breaker or connection error - render nothing gracefully
+    logger.warn('[OnetLaborData] Failed to fetch O*NET data', { slug, error });
+    return null;
+  }
 }

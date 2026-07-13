@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getActiveJobs, formatSalary, jobTypeLabel } from '@/lib/data/jobs';
+import { logger } from '@/lib/logger';
 
 interface LiveJobPostingsProps {
   limit?: number;
@@ -13,7 +14,14 @@ export default async function LiveJobPostings({
   heading = 'Open Positions',
   className = '',
 }: LiveJobPostingsProps) {
-  const jobs = await getActiveJobs({ limit });
+  let jobs: Awaited<ReturnType<typeof getActiveJobs>> = [];
+  
+  try {
+    jobs = await getActiveJobs({ limit });
+  } catch (error) {
+    // Circuit breaker or connection error - return empty array gracefully
+    logger.warn('[LiveJobPostings] Failed to fetch jobs, showing empty state', { error });
+  }
 
   return (
     <section className={`py-12 px-4 bg-slate-50 ${className}`.trim()}>

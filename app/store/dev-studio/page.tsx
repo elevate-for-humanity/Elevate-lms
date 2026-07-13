@@ -138,13 +138,7 @@ export default function DevStudioPage() {
                   </div>
                   <span className="text-xs text-slate-400 ml-2">Dev Studio — AI Assistant</span>
                 </div>
-                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                </div>
-                <span className="text-xs text-slate-400 ml-2">Dev Studio — AI Assistant</span>
-              </div>
-              <div className="p-4 font-mono text-sm">
+                <div className="p-4 font-mono text-sm">
                 <div className="flex items-start gap-3 mb-4">
                   <Bot className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
                   <div className="text-slate-300">

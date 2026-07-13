@@ -139,6 +139,7 @@ export default function CourseBuilderPage() {
                   </div>
                   <span className="text-xs text-slate-500 ml-2">Course Builder</span>
                 </div>
+              </div>
               
               <div className="flex">
                 {/* Sidebar */}

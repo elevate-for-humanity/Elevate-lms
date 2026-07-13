@@ -51,7 +51,6 @@ const PROGRAM_QUERIES = {
   'beauty':                        'beauty salon hair styling cosmetology',
   'esthetician':                   'esthetician facial skincare spa',
   'esthetician-apprenticeship':    'esthetician skincare beauty treatment',
-  'beauty-career-educator':        'cosmetology beauty school instructor',
   'culinary-apprenticeship':       'culinary chef cooking kitchen',
   // Skilled trades
   'welding':                       'welding sparks metal fabrication',

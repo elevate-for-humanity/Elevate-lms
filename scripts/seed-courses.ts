@@ -701,7 +701,6 @@ const programToTemplate: Record<string, string> = {
   "barber-apprenticeship-wrg": "barber_beauty",
   "barber-apprenticeship-full": "barber_beauty",
   "professional-esthetician": "barber_beauty",
-  "beauty-career-educator": "barber_beauty",
   "cosmetology-pathway": "barber_beauty",
 
   // Business/Admin programs

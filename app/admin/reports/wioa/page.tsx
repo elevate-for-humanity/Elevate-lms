@@ -43,7 +43,6 @@ const SELF_PAY_SLUGS = [
   'esthetician', 'esthetician-apprenticeship',
   'nail-technician', 'nail-technician-apprenticeship', 'nail-tech-apprenticeship',
   'hair-stylist-nail-tech-apprenticeship', 'hair-stylist-esthetician-apprenticeship',
-  'beauty-career-educator',
 ] as const;
 
 interface ParticipantRow {

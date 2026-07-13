@@ -72,7 +72,6 @@ class EnhancedFundingSystem {
         costTransparency: 'CONDITIONAL_DISPLAY',
       },
       {
-        id: 'beauty-career-educator',
         name: 'Beauty & Career Educator Training Program',
         baseTuition: 3500,
         additionalFees: {

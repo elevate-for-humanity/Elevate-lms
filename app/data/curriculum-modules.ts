@@ -564,7 +564,6 @@ export const programCurriculums: ProgramCurriculum[] = [
     ],
   },
   {
-    programSlug: 'beauty-career-educator',
     totalHours: 1000,
     modules: [
       {

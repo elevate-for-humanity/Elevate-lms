@@ -51,7 +51,7 @@ async function _GET(request: NextRequest) {
   const db = await requireAdminClient();
 
   // Beauty/barbershop/nail/esthetician programs are self-pay — never WIOA/WRG eligible.
-  const SELF_PAY_SLUGS = '(barber,barber-2024,barber-apprenticeship,cosmetology,cosmetology-apprenticeship,esthetician,esthetician-apprenticeship,nail-technician,nail-technician-apprenticeship,nail-tech-apprenticeship,hair-stylist-nail-tech-apprenticeship,hair-stylist-esthetician-apprenticeship,beauty-career-educator)';
+  const SELF_PAY_SLUGS = '(barber,barber-2024,barber-apprenticeship,cosmetology,cosmetology-apprenticeship,esthetician,esthetician-apprenticeship,nail-technician,nail-technician-apprenticeship,nail-tech-apprenticeship,hair-stylist-nail-tech-apprenticeship,hair-stylist-esthetician-apprenticeship';
 
   try {
     // ── Summary metrics (single RPC call) ──────────────────────────────────

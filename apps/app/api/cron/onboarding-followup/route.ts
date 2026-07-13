@@ -103,7 +103,6 @@ function formatProgramName(slug: string): string {
     electrical: 'Electrical Technician',
     'peer-recovery-specialist-jri': 'Peer Recovery Specialist',
     bookkeeping: 'Bookkeeping',
-    'beauty-career-educator': 'Beauty Career Educator',
     'home-health-aide': 'Home Health Aide',
   };
   if (map[slug]) return map[slug];

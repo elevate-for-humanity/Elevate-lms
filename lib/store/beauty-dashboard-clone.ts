@@ -9,7 +9,6 @@ export const BEAUTY_PROGRAM_SLUGS = [
   'esthetician-apprenticeship',
   'esthetician',
   'nail-technician-apprenticeship',
-  'beauty-career-educator',
 ] as const;
 
 export type BeautyProgramSlug = (typeof BEAUTY_PROGRAM_SLUGS)[number];
@@ -53,9 +52,7 @@ export const BEAUTY_PROGRAM_CARDS: BeautyProgramCard[] = [
     summary: 'Salon partners, hour logs, and board-aligned lesson structure.',
   },
   {
-    slug: 'beauty-career-educator',
     name: 'Beauty Career Educator',
-    href: '/programs/beauty-career-educator',
     summary: 'Train-the-trainer track for schools expanding instructor capacity.',
   },
 ];

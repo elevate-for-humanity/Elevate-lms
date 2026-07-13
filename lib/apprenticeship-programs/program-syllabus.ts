@@ -21,7 +21,6 @@ export const APPRENTICESHIP_PROGRAM_SYLLABI: Record<ApprenticeshipProgramSlug, P
   'cosmetology-apprenticeship': {
     slug: 'cosmetology-apprenticeship',
     title: 'Cosmetology Apprenticeship',
-    syllabusPath: '/docs/syllabi/beauty-career-educator.md',
     rtiLabel: 'Elevate LMS Cosmetology Theory',
     hostRequirement:
       'Host salons must follow the cosmetology apprenticeship syllabus module schedule and align floor coaching with the apprentice’s daily LMS theory unit.',

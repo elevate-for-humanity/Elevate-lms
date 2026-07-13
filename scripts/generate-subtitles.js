@@ -14,7 +14,6 @@ const videos = [
   { file: 'home-health-aide-10002413.mp4', title: 'Home Health Aide Training' },
   { file: 'cpr-aed-first-aid-10002448.mp4', title: 'CPR AED First Aid Certification' },
   { file: 'emergency-health-safety-technician-10002408.mp4', title: 'Emergency Health Safety' },
-  { file: 'beauty-career-educator-10002424.mp4', title: 'Beauty Career Educator' },
   { file: 'esthetician-client-services-10002415.mp4', title: 'Esthetician Client Services' },
   { file: 'business-startup-marketing-10002422.mp4', title: 'Business Startup Marketing' },
   { file: 'public-safety-reentry-specialist-10002439.mp4', title: 'Public Safety Reentry' },

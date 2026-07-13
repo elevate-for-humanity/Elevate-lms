@@ -86,7 +86,6 @@ const courses = [
     thumbnail_url: '/images/courses/it-support.jpg',
   },
   {
-    slug: 'beauty-career-educator',
     title: 'Beauty & Career Educator Training',
     subtitle: 'Train the next generation',
     description:

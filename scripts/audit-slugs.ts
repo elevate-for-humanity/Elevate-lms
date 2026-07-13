@@ -130,7 +130,6 @@ const ACTIVE_SLUGS = [
   'bookkeeping',
   'peer-recovery-specialist',
   'barber-apprenticeship',
-  'beauty-career-educator',
   'business-administration',
   'cpr-first-aid',
   'emergency-health-safety',

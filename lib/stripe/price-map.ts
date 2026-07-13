@@ -127,7 +127,6 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   'cosmetology-apprenticeship-program': 'price_1TL78oH4a2yrVOt55kVJPUm4', // $6,000
   'esthetician-apprenticeship-program': 'price_1TL78nH4a2yrVOt5nF6hrDxl', // $6,000
   'nail-technician-apprenticeship-program': 'price_1TL78mH4a2yrVOt5V1FmZlrB', // $5,000
-  'beauty-career-educator-program': 'price_1TM737H4a2yrVOt5isaWBbHM', // $4,575
 
   // Technology Programs
   'it-support-specialist-program': 'price_1TM737H4a2yrVOt5LeCDx7pS', // $4,499

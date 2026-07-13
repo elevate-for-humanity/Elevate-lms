@@ -61,7 +61,6 @@ const PROGRAM_IMAGES: Record<string, string> = {
   'cosmetology-apprenticeship':'/images/pages/cosmetology-apprenticeship-hero.webp',
   'esthetician-apprenticeship':'/images/beauty/esthetician.webp',
   'nail-technician-apprenticeship':'/images/pages/nail-tech-hero.webp',
-  'beauty-career-educator':'/images/beauty/program-beauty-training.webp',
   'culinary-apprenticeship':'/images/pages/healthcare-classroom.webp',
   'youth-culinary-apprenticeship':'/images/pages/healthcare-classroom.webp',
   'emt-apprenticeship':'/images/pages/healthcare-hero.webp',

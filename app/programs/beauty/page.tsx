@@ -16,7 +16,6 @@ const BEAUTY_SLUGS = [
   'cosmetology-apprenticeship',
   'esthetician-apprenticeship',
   'nail-technician-apprenticeship',
-  'beauty-career-educator',
   'culinary-apprenticeship',
 ];
 

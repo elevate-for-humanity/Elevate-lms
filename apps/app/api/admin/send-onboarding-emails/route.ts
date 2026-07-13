@@ -17,7 +17,6 @@ const BARBER_PROGRAMS = [
   'barber-apprenticeship',
   'barber apprenticeship',
   'nail-technician',
-  'beauty-career-educator',
   'cosmetology',
 ];
 
@@ -56,7 +55,6 @@ function formatProgramName(slug: string): string {
     electrical: 'Electrical Technician',
     'peer-recovery-specialist-jri': 'Peer Recovery Specialist',
     bookkeeping: 'Bookkeeping',
-    'beauty-career-educator': 'Beauty Career Educator',
     'Home Health Aide': 'Home Health Aide',
     'home-health-aide': 'Home Health Aide',
     Accounting: 'Accounting',

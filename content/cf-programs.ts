@@ -246,7 +246,6 @@ export const programs: MarketingProgram[] = [
     ],
   },
   {
-    slug: 'beauty-career-educator',
     title: 'Beauty & Career Educator Training',
     summary: '12-week hybrid program for salon professionals moving into education.',
     description: 'Combining salon services, peer teaching, entrepreneurship, and workforce readiness.',

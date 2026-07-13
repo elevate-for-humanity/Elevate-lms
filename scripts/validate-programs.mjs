@@ -223,7 +223,6 @@ const SECTOR_GROUPS = {
   trades: ['hvac-technician','welding','electrical','plumbing','diesel-mechanic',
     'construction-trades-certification','forklift','cad-drafting'],
   beauty: ['barber-apprenticeship','cosmetology-apprenticeship','nail-technician-apprenticeship',
-    'esthetician-apprenticeship','esthetician','beauty-career-educator','culinary-apprenticeship'],
   technology: ['it-help-desk','cybersecurity-analyst','network-administration',
     'network-support-technician','software-development','web-development','graphic-design',
     'technology','data-analytics'],

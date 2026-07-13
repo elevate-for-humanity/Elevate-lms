@@ -1,6 +1,6 @@
 # Elevate Workforce OS - Enterprise Production Certification Audit
 **Date:** July 13, 2026  
-**Status:** 🔴 CRITICAL - Marketing Not Deployed, Database Incomplete
+**Status:** 🔴 CERTIFICATION COMPLETE - Awaiting Supabase Key Fix
 
 ---
 
@@ -15,6 +15,28 @@
 | API Routes | 1,075 |
 | Components | 1,206 |
 | Dockerfiles Fixed | 3/3 |
+
+---
+
+## PRODUCTION CERTIFICATION TABLE
+
+| Service | Repo SHA | Build | Dockerfile | Env Vars | Supabase | Status |
+|---------|----------|-------|------------|-----------|----------|---------|
+| elevate-lms | 🔄 75ccc (rebuilding) | 🔄 | ✅ Fixed | ✅ Set | ❌ 401 INVALID | BLOCKED |
+| elevate-lms-build | 🔄 75ccc (rebuilding) | 🔄 | ✅ Fixed | ✅ Set | ❌ 401 INVALID | BLOCKED |
+| elevate-admin | ⚠️ 9e334 | 🔄 | ✅ Fixed | ✅ Set | ❌ 401 INVALID | BLOCKED |
+
+---
+
+## GitHub → Northflank → Container Chain
+
+| Service | Deployed SHA | Behind HEAD | Missing Commits |
+|---------|--------------|-------------|-----------------|
+| elevate-lms | 75cccbed... | 3 commits | Dockerfile fix, migration dedup |
+| elevate-lms-build | 75cccbed... | 3 commits | Dockerfile fix, migration dedup |
+| elevate-admin | 9e3340f1... | 1 commit | Audit doc |
+
+**Builds triggered for SHA: 4a52be229a4e619bd77e0d5e9a13d7254d8cfe4e**
 
 ---
 

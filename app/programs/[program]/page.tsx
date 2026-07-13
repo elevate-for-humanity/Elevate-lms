@@ -16,10 +16,16 @@ import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from '
 import LiveJobPostings from '@/components/careers/LiveJobPostings';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { BeautyApprenticeship } from '@/components/programs/BeautyApprenticeship';
+import ProgramLanding from '@/components/programs/ProgramLanding';
+import { barberConfig } from '@/components/programs/config/barber-config';
 
-// Premium beauty apprenticeship programs
+// Configuration-driven apprenticeship programs (using new architecture)
+const PROGRAM_CONFIGS: Record<string, { config: typeof barberConfig }> = {
+  'barber-apprenticeship': { config: barberConfig },
+};
+
+// Programs still using BeautyApprenticeship (legacy, to be migrated)
 const BEAUTY_APPRENTICESHIP_SLUGS = new Set([
-  'barber-apprenticeship',
   'cosmetology-apprenticeship',
   'esthetician-apprenticeship',
   'nail-technician-apprenticeship',
@@ -516,7 +522,12 @@ function ProgramPage({
 export default async function ProgramDetailPage({ params }: { params: Promise<{ program: string }> }) {
   const { program } = await params;
 
-  // Use Premium Beauty Apprenticeship Page for beauty programs
+  // Configuration-driven programs (new architecture)
+  if (PROGRAM_CONFIGS[program]) {
+    return <ProgramLanding config={PROGRAM_CONFIGS[program].config} />;
+  }
+
+  // Use Premium Beauty Apprenticeship Page for legacy beauty programs
   if (BEAUTY_APPRENTICESHIP_SLUGS.has(program)) {
     // Map URL slugs to PROGRAM_DATA keys
     const slugToKey: Record<string, 'barber' | 'cosmetology' | 'esthetics' | 'manicurist'> = {

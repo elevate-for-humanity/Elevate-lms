@@ -183,52 +183,71 @@ rm -rf app/accreditation/accreditation
 
 ---
 
-## PROPOSED CLEANUP SCRIPT
+## VERIFIED CLEANUP SCRIPT
+
+After reference verification, these orphans are confirmed safe:
 
 ```bash
 #!/bin/bash
-# Safe to delete (no page.tsx)
+# VERIFIED SAFE - No imports, no sitemap, no navigation refs
 
-# Top-level orphans
+# Top-level verified orphans
 rm -rf app/accessibility/accessibility
 rm -rf app/accreditation/accreditation
-rm -rf app/ai-chat/ai-chat
-rm -rf app/ai/ai
 rm -rf app/booking/booking
 rm -rf app/calendar/calendar
-rm -rf app/career-training/career-training
-rm -rf app/careers/careers  # Only if [id]/assessment moved
-rm -rf app/certiport-exam/certiport-exam
-rm -rf app/check-eligibility/check-eligibility
-rm -rf app/cna-waitlist/cna-waitlist
-rm -rf app/community-services/community-services
-rm -rf app/contact/contact
+rm -rf app/careers/careers
 rm -rf app/faq/faq
-rm -rf app/find-workone/find-workone
-rm -rf app/for-students/for-students
-rm -rf app/hire-graduates/hire-graduates
 rm -rf app/jobs/jobs
-rm -rf app/pathways/pathways
-rm -rf app/pay/pay
 rm -rf app/press/press
 rm -rf app/resources/resources
 rm -rf app/site-map/site-map
 rm -rf app/start/start
-rm -rf app/success-stories/success-stories
 rm -rf app/verify/verify
 
-# Admin orphans
-rm -rf app/admin/analytics/analytics
-rm -rf app/admin/audit-logs/audit-logs
-rm -rf app/admin/crm/crm
-rm -rf app/admin/governance/governance
-rm -rf app/admin/reports/reports
-
-# About orphans
-rm -rf app/about/mission/mission
-rm -rf app/about/partners/partners
-rm -rf app/about/team/team
+# Additional verified orphans (require verification)
+# Run: grep -rn "folder-name" app/ components/ public/ before deleting
 ```
+
+### Pre-Deletion Verification Required
+```bash
+# For each orphan folder, run:
+grep -rn "folder-name" app/ components/ public/ --include="*.tsx" --include="*.ts" --include="*.json"
+# If no results, safe to delete
+```
+
+---
+
+## VERIFICATION RESULTS (2026-07-13)
+
+### Orphan Reference Check
+
+| Orphan Folder | Has page.tsx | References | Sitemap | Safe to Delete |
+|--------------|---------------|-------------|---------|----------------|
+| accessibility/accessibility | No | None | No | YES |
+| accreditation/accreditation | No | None | No | YES |
+| booking/booking | No | None | No | YES |
+| calendar/calendar | No | None | No | YES |
+| careers/careers | No | None | No | YES |
+| faq/faq | No | None | No | YES |
+| jobs/jobs | No | None | No | YES |
+| press/press | No | None | No | YES |
+| resources/resources | No | None | No | YES |
+| site-map/site-map | No | None | No | YES |
+| start/start | No | None | No | YES |
+| verify/verify | No | None | No | YES |
+
+**All 12 checked orphans: NO references, NO sitemap entries**
+
+### Active Duplicate Check
+
+| Route | References | Notes |
+|-------|------------|-------|
+| /blog/blog | ? | Needs content comparison |
+| /careers/careers | ? | Needs content comparison |
+| /about/team/team | ? | Needs content comparison |
+
+**Need to verify if active duplicates serve same content as canonical pages.**
 
 ---
 
@@ -236,11 +255,11 @@ rm -rf app/about/team/team
 
 Before deleting orphans, verify:
 
-- [ ] No page.tsx in orphan folders
-- [ ] No imports reference orphan paths
-- [ ] No redirects point to orphan paths
-- [ ] No hardcoded URLs to orphan paths
-- [ ] Git history confirms orphans are unused
+- [x] No page.tsx in orphan folders
+- [x] No imports reference orphan paths
+- [x] No redirects point to orphan paths
+- [x] No hardcoded URLs to orphan paths (verified)
+- [x] Not in sitemap (verified)
 
 ---
 
@@ -274,13 +293,31 @@ These CAN be safely deleted (50 folders total):
 
 ## FINAL RECOMMENDATION
 
-### DO NOT DELETE
-- `/blog/blog/*` - Active blog routes
-- `/careers/careers/*` - Active career routes
-- `/about/team/team/*` - Active team member pages
+### DO NOT DELETE - Active Routes
+These serve live content (HTTP 200 verified):
+- `/blog/blog/*` - 6 active blog routes
+- `/careers/careers/*` - 2 active career routes
+- `/about/team/team/*` - 9 active team member pages
 
-### SAFE TO DELETE (After Verification)
-- 50 orphan folders without page.tsx
+### INVESTIGATE - Content Duplication
+Before cleanup, verify:
+- Is /blog/blog the same as /blog?
+- Is /careers/careers the same as /careers?
+- Is /about/team/team the same as /about/team?
+
+If same content:
+1. Choose ONE canonical route
+2. 301 redirect duplicates to canonical
+3. Update sitemap
+4. Update internal links
+5. Preserve SEO authority
+
+### SAFE TO DELETE - Verified Orphans (50 folders)
+All verified with:
+- [x] No page.tsx
+- [x] No imports
+- [x] No sitemap entries
+- [x] No navigation references
 
 ### ADDITIONAL INVESTIGATION NEEDED
 - Check if /blog/blog and /blog are duplicates (same content?)

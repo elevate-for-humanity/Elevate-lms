@@ -287,6 +287,7 @@ const nextConfig = {
       { source: '/admin/course-builder', destination: '/admin/studio', permanent: true },
       { source: '/studio(.*)', destination: '/admin/studio$1', permanent: false },
       { source: '/admin-dashboard', destination: '/admin/dashboard', permanent: true },
+      { source: '/host-shops', destination: '/partners/host-shops', permanent: true },
       {
         source: '/store/codebase-clone',
         destination: '/store/licenses#clone',

@@ -723,11 +723,6 @@
       "source": "/programs/workforce-ready-grant",
       "destination": "/programs",
       "permanent": false
-    },
-    {
-      "source": "/host-shops",
-      "destination": "/partners/host-shops",
-      "permanent": true
     }
   ],
   "externalOrAppHostedAllowlist": [

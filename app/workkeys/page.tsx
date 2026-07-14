@@ -6,5 +6,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Redirect to the canonical testing provider route
-redirect('/testing/workkeys');
+export default function Page() {
+  redirect('/testing/workkeys');
+}

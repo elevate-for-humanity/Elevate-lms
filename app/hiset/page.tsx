@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// HiSET testing is available through our main testing center
-redirect('/testing');
+export default function Page() {
+  redirect('/testing');
+}
+
 

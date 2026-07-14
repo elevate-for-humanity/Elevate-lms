@@ -6,5 +6,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Redirect to the canonical NHA testing route
-redirect('/testing/nha');
+export default function Page() {
+  redirect('/testing/nha');
+}
+

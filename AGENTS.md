@@ -30,6 +30,39 @@
 
 ---
 
+## 🏗️ PARIS Operations Kernel (NEW)
+
+### Components Implemented (July 14, 2026)
+
+| Component | Location | Status |
+|-----------|----------|--------|
+| **Authoritative Data Layer** | `lib/operations/` | ✅ Implemented |
+| **Program Registry** | `lib/registry/`, `data/programs/` | ✅ Implemented |
+| **Workflow Engine** | `lib/workflows/engine.ts` | ✅ Implemented |
+| **State Machine** | `lib/orchestration/state-machine.ts` | ✅ Implemented |
+| **Notification System** | `lib/notifications/` | ✅ Implemented |
+| **Claims Verification** | `lib/automation/evidence-processor.ts` | ✅ Implemented |
+| **Dashboard Completion** | `lib/dashboard/completion-tracker.ts` | ✅ Implemented |
+| **Production Gate** | `scripts/production-readiness-gate.sh` | ✅ Enhanced |
+
+### Authoritative Data Layer Tables
+Created in `supabase/migrations/pending/20260714000001_authoritative_data_layer.sql`:
+
+- `organizations` - Single organization record
+- `program_registry` - Canonical program definitions
+- `funding_rules` - Verified funding sources
+- `verified_claims` - Evidence-backed public claims
+- `workflow_instances` - State machine tracking
+- `workflow_events` - Audit trail
+- `notification_outbox` - Reliable delivery queue
+
+### Key Services
+- `lib/operations/service.ts` - OperationsService with all CRUD operations
+- `lib/operations/types.ts` - TypeScript types for authoritative data
+- `lib/dashboard/completion-tracker.ts` - Role-based completion tracking
+
+---
+
 ## 📚 MASTER DOCUMENT: ENTERPRISE-PRD.md
 
 The comprehensive Enterprise PRD covers **32 chapters** with full implementation specs:

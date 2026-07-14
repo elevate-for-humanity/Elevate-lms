@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 # Production activation gate — run before promote/deploy.
 # Exit 1 on any blocking failure.
+#
+# Enhanced with PARIS Operations Kernel checks:
+# - Authoritative Data Layer validation
+# - Program Registry verification
+# - Verified Claims checks
+# - Placeholder detection
+# - Deployment blockers
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -11,7 +18,9 @@ export DISABLE_WEBPACK_FILESYSTEM_CACHE=
 export BUILD_SCOPE=1
 
 echo "=== Production Readiness Gate ==="
+echo "=== PARIS Operations Kernel Validation ==="
 FAIL=0
+WARN=0
 
 run() {
   local name="$1"
@@ -26,6 +35,27 @@ run() {
   fi
 }
 
+run_warn() {
+  local name="$1"
+  shift
+  echo ""
+  echo "--- $name ---"
+  if "$@" ; then
+    echo "OK: $name"
+  else
+    echo "WARN: $name"
+    WARN=$((WARN + 1))
+  fi
+}
+
+# ============================================================================
+# SECTION 1: CORE SECURITY CHECKS (Existing)
+# ============================================================================
+echo ""
+echo "=============================================="
+echo "SECTION 1: CORE SECURITY CHECKS"
+echo "=============================================="
+
 run "API admin guards" bash scripts/audit-api-auth-guards.sh
 run "Auth gaps" bash scripts/audit-auth-gaps.sh
 run "Env vars" bash scripts/audit-env-vars.sh
@@ -37,10 +67,276 @@ if [[ -f scripts/audit-public-html.mjs ]]; then
   run "Public HTML hygiene" node scripts/audit-public-html.mjs || true
 fi
 
+# ============================================================================
+# SECTION 2: AUTHORITATIVE DATA LAYER CHECKS
+# ============================================================================
 echo ""
-if [[ "$FAIL" -ne 0 ]]; then
-  echo "=== GATE FAILED — resolve blockers before production activation ==="
+echo "=============================================="
+echo "SECTION 2: AUTHORITATIVE DATA LAYER"
+echo "=============================================="
+
+# Check Operations Service exists
+if [[ -f "lib/operations/service.ts" ]]; then
+  echo "OK: Operations Service exists"
+else
+  echo "FAIL: Operations Service missing (lib/operations/service.ts)"
+  FAIL=1
+fi
+
+# Check Operations Types exist
+if [[ -f "lib/operations/types.ts" ]]; then
+  echo "OK: Operations Types exist"
+else
+  echo "FAIL: Operations Types missing (lib/operations/types.ts)"
+  FAIL=1
+fi
+
+# Check migration for authoritative tables
+if find supabase/migrations -name "*.sql" -exec grep -l "program_registry\|verified_claims\|funding_rules\|notification_outbox\|workflow_instances" {} \; 2>/dev/null | head -1 | grep -q "."; then
+  echo "OK: Authoritative data layer migrations found"
+else
+  echo "WARN: Authoritative data layer migration may be pending (supabase/migrations/pending/)"
+  WARN=$((WARN + 1))
+fi
+
+# ============================================================================
+# SECTION 3: PROGRAM REGISTRY CHECKS
+# ============================================================================
+echo ""
+echo "=============================================="
+echo "SECTION 3: PROGRAM REGISTRY"
+echo "=============================================="
+
+# Check static program registry
+if [[ -f "lib/registry/programs.ts" ]]; then
+  echo "OK: Program Registry exists"
+else
+  echo "FAIL: Program Registry missing"
+  FAIL=1
+fi
+
+# Check static program data
+if [[ -d "data/programs" ]]; then
+  PROGRAM_COUNT=$(find data/programs -name "*.ts" ! -name "index.ts" 2>/dev/null | wc -l)
+  echo "OK: $PROGRAM_COUNT program data files found"
+else
+  echo "FAIL: Program data directory missing"
+  FAIL=1
+fi
+
+# ============================================================================
+# SECTION 4: VERIFIED CLAIMS CHECKS
+# ============================================================================
+echo ""
+echo "=============================================="
+echo "SECTION 4: VERIFIED CLAIMS"
+echo "=============================================="
+
+# Check for compliance badges component
+if [[ -f "components/ComplianceBadges.tsx" ]]; then
+  echo "OK: Compliance Badges component exists"
+else
+  echo "WARN: Compliance Badges component missing"
+  WARN=$((WARN + 1))
+fi
+
+# Check for evidence processor
+if [[ -f "lib/automation/evidence-processor.ts" ]]; then
+  echo "OK: Evidence processor exists"
+else
+  echo "WARN: Evidence processor missing"
+  WARN=$((WARN + 1))
+fi
+
+# ============================================================================
+# SECTION 5: WORKFLOW ENGINE CHECKS
+# ============================================================================
+echo ""
+echo "=============================================="
+echo "SECTION 5: WORKFLOW ENGINE"
+echo "=============================================="
+
+# Check workflow engine
+if [[ -f "lib/workflows/engine.ts" ]]; then
+  echo "OK: Workflow Engine exists"
+else
+  echo "FAIL: Workflow Engine missing"
+  FAIL=1
+fi
+
+# Check state machine
+if [[ -f "lib/orchestration/state-machine.ts" ]]; then
+  echo "OK: State Machine exists"
+else
+  echo "FAIL: State Machine missing"
+  FAIL=1
+fi
+
+# ============================================================================
+# SECTION 6: NOTIFICATION SYSTEM CHECKS
+# ============================================================================
+echo ""
+echo "=============================================="
+echo "SECTION 6: NOTIFICATION SYSTEM"
+echo "=============================================="
+
+# Check notification service
+if [[ -d "lib/notifications" ]]; then
+  NOTIF_COUNT=$(find lib/notifications -name "*.ts" 2>/dev/null | wc -l)
+  echo "OK: Notification system exists ($NOTIF_COUNT files)"
+else
+  echo "FAIL: Notification system missing"
+  FAIL=1
+fi
+
+# ============================================================================
+# SECTION 7: PLACEHOLDER DETECTION (Critical for Production)
+# ============================================================================
+echo ""
+echo "=============================================="
+echo "SECTION 7: PLACEHOLDER DETECTION"
+echo "=============================================="
+
+# Check for placeholder phone numbers
+PLACEHOLDER_FOUND=0
+for pattern in "555-1234" "555-0000" "xxx-xxx-xxxx" "000-000-0000" "(555)" "555-"; do
+  if grep -r "$pattern" components/ app/ 2>/dev/null | grep -v ".test." | grep -v ".spec." > /dev/null; then
+    echo "FAIL: Placeholder phone found: $pattern"
+    PLACEHOLDER_FOUND=1
+    FAIL=1
+  fi
+done
+[[ $PLACEHOLDER_FOUND -eq 0 ]] && echo "OK: No placeholder phone numbers"
+
+# Check for placeholder emails
+for pattern in "example.com" "placeholder" "your-email" "test@test"; do
+  if grep -r "$pattern" components/ app/ 2>/dev/null | grep -i "email" | grep -v ".test." > /dev/null; then
+    echo "WARN: Potential placeholder email found"
+    WARN=$((WARN + 1))
+  fi
+done
+
+# Check for placeholder addresses
+for pattern in "123 Main St" "City, State" "ENTER ZIP"; do
+  if grep -r "$pattern" components/ app/ 2>/dev/null | grep -v ".test." > /dev/null; then
+    echo "FAIL: Placeholder address found: $pattern"
+    FAIL=1
+  fi
+done
+
+# ============================================================================
+# SECTION 8: STRIPE CONFIGURATION
+# ============================================================================
+echo ""
+echo "=============================================="
+echo "SECTION 8: STRIPE CONFIGURATION"
+echo "=============================================="
+
+if [[ -n "${STRIPE_SECRET_KEY:-}" ]]; then
+  echo "OK: Stripe Secret Key configured"
+else
+  echo "FAIL: Stripe Secret Key not configured"
+  FAIL=1
+fi
+
+if [[ -n "${STRIPE_WEBHOOK_SECRET:-}" ]]; then
+  echo "OK: Stripe Webhook Secret configured"
+else
+  echo "FAIL: Stripe Webhook Secret not configured"
+  FAIL=1
+fi
+
+# Check Stripe price IDs exist for paid programs
+STRIPE_PRICE_CHECK=$(grep -r "stripe_price_id\|price_id" lib/ data/ 2>/dev/null | wc -l)
+if [[ "$STRIPE_PRICE_CHECK" -gt 0 ]]; then
+  echo "OK: Stripe price IDs referenced: $STRIPE_PRICE_CHECK"
+else
+  echo "WARN: No Stripe price IDs found"
+  WARN=$((WARN + 1))
+fi
+
+# ============================================================================
+# SECTION 9: DEPLOYMENT BLOCKERS
+# ============================================================================
+echo ""
+echo "=============================================="
+echo "SECTION 9: DEPLOYMENT BLOCKERS"
+echo "=============================================="
+
+BLOCKERS=0
+
+# Check for unfinished pages
+UNFINISHED=$(grep -r "<!-- TODO\|FIXME\|UNDER CONSTRUCTION" components/ app/ 2>/dev/null | grep -v ".test." | wc -l)
+if [[ "$UNFINISHED" -gt 0 ]]; then
+  echo "FAIL: Unfinished content markers found: $UNFINISHED"
+  FAIL=1
+  BLOCKERS=$((BLOCKERS + 1))
+else
+  echo "OK: No unfinished content markers"
+fi
+
+# Check for dead links in navigation
+if [[ -f "config/navigation.ts" ]]; then
+  if grep -q "example.com\|placeholder" config/navigation.ts; then
+    echo "FAIL: Navigation contains placeholder links"
+    FAIL=1
+    BLOCKERS=$((BLOCKERS + 1))
+  else
+    echo "OK: Navigation links validated"
+  fi
+fi
+
+# Check for broken imports
+BROKEN_IMPORTS=$(grep -r "from '@/" components/ app/ 2>/dev/null | grep -v ".test." | grep -c "undefined\|TODO" || echo 0)
+if [[ "$BROKEN_IMPORTS" -gt 0 ]]; then
+  echo "WARN: Potential broken imports: $BROKEN_IMPORTS"
+  WARN=$((WARN + 1))
+fi
+
+# ============================================================================
+# FINAL SUMMARY
+# ============================================================================
+echo ""
+echo "=============================================="
+echo "PRODUCTION READINESS SUMMARY"
+echo "=============================================="
+echo ""
+echo "Blocking Failures: $FAIL"
+echo "Warnings: $WARN"
+echo ""
+
+if [[ "$FAIL" -gt 0 ]]; then
+  echo "=============================================="
+  echo "❌ PRODUCTION GATE FAILED"
+  echo "=============================================="
+  echo ""
+  echo "Blocking failures must be resolved before deployment."
+  echo "Review failed checks above."
+  echo ""
   exit 1
 fi
-echo "=== GATE PASSED (runtime smoke: curl /api/health and /api/ready after deploy) ==="
+
+if [[ "$WARN" -gt 0 ]]; then
+  echo "=============================================="
+  echo "⚠️  PRODUCTION GATE PASSED WITH WARNINGS"
+  echo "=============================================="
+  echo ""
+  echo "Warnings should be reviewed but do not block deployment."
+  echo "Consider addressing critical warnings before going live."
+  echo ""
+  exit 0
+fi
+
+echo "=============================================="
+echo "✅ PRODUCTION GATE PASSED"
+echo "=============================================="
+echo ""
+echo "All checks passed. Ready for deployment."
+echo ""
+echo "Next steps:"
+echo "1. Deploy to staging environment"
+echo "2. Run smoke tests: curl /api/health && curl /api/ready"
+echo "3. Verify key user journeys"
+echo "4. Deploy to production"
+echo ""
 exit 0

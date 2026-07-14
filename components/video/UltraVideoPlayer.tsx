@@ -110,6 +110,7 @@ export function UltraVideoPlayer({
   lessonName,
   userId,
   autoPlay = false,
+  autoPlayOnMount = false,
   muted = false,
   loop = false,
   startTime = 0,

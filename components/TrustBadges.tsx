@@ -60,7 +60,7 @@ export function TrustBadges() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
             <div className="h-14 flex items-center justify-center">
               <Image
-                src="/images/partners/workone.webp"
+                src="/images/heroes/hero-homepage.webp"
                 alt="WorkOne Indiana"
                 width={120}
                 height={48}
@@ -69,7 +69,7 @@ export function TrustBadges() {
             </div>
             <div className="h-14 flex items-center justify-center">
               <Image
-                src="/images/partners/dwd.webp"
+                src="/images/heroes/hero-homepage.webp"
                 alt="Indiana Department of Workforce Development"
                 width={120}
                 height={48}
@@ -78,7 +78,7 @@ export function TrustBadges() {
             </div>
             <div className="h-14 flex items-center justify-center">
               <Image
-                src="/images/partners/usdol.webp"
+                src="/images/heroes/hero-homepage.webp"
                 alt="U.S. Department of Labor"
                 width={120}
                 height={48}
@@ -87,7 +87,7 @@ export function TrustBadges() {
             </div>
             <div className="h-14 flex items-center justify-center">
               <Image
-                src="/images/partners/nextleveljobs.webp"
+                src="/images/heroes/hero-homepage.webp"
                 alt="Next Level Jobs Indiana"
                 width={120}
                 height={48}

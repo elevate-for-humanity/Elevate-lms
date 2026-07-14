@@ -38,7 +38,7 @@ const successStories = [
     name: 'Marcus Thompson',
     age: 34,
     program: 'Public Safety & Reentry Specialist',
-    image: '/images/learners/reentry-coaching.webp',
+    image: '/images/pages/about-career-training.webp',
     beforeJob: 'Unemployed after 8 years incarceration',
     afterJob: 'Reentry Specialist at Marion County Corrections',
     salary: '$45,000/year',
@@ -173,7 +173,7 @@ const successStories = [
     name: 'Angela Davis',
     age: 45,
     program: 'CNA',
-    image: '/images/artlist/cropped/hero-training-2-wide.webp',
+    image: '/images/pages/about-partners-hero.webp',
     beforeJob: 'Unemployed after divorce',
     afterJob: 'CNA at Hospital, pursuing LPN',
     salary: '$34,000/year',
@@ -220,7 +220,7 @@ export default async function SuccessStoriesPage() {
         accentText="Stories"
         subheadline="Lives transformed through training and opportunity"
         description="Real people who transformed their lives through education, determination, and the right support at the right time."
-        imageSrc="/images/learners/reentry-coaching.webp"
+        imageSrc="/images/pages/about-career-training.webp"
         imageAlt="Success Stories"
         primaryCTA={{ text: 'Read Stories', href: '#stories' }}
         secondaryCTA={{ text: 'Start Your Journey', href: '/apply' }}

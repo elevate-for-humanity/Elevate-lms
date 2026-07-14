@@ -82,10 +82,10 @@ export default function InfrastructureAuthority() {
                 </p>
                 <div className="flex items-center gap-8 flex-wrap">
                   {[
-                    { src: '/images/partners/usdol.webp', alt: 'U.S. Department of Labor' },
-                    { src: '/images/partners/dwd.webp', alt: 'Indiana DWD' },
-                    { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana' },
-                    { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs' },
+                    { src: '/images/heroes/hero-homepage.webp', alt: 'U.S. Department of Labor' },
+                    { src: '/images/heroes/hero-homepage.webp', alt: 'Indiana DWD' },
+                    { src: '/images/heroes/hero-homepage.webp', alt: 'WorkOne Indiana' },
+                    { src: '/images/heroes/hero-homepage.webp', alt: 'Next Level Jobs' },
                   ].map((logo) => (
                     <Image
                       key={logo.alt}

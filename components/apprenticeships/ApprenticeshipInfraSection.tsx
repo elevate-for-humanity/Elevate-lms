@@ -72,7 +72,7 @@ export function ApprenticeshipInfraSection({
           >
             <div className={card.image16x9Desktop}>
               <Image
-                src="/images/learners/coaching-session.webp"
+                src="/images/pages/about-supportive-services.webp"
                 alt="Learner in apprenticeship training session"
                 fill
                 className="object-cover object-center"

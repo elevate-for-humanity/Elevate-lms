@@ -31,11 +31,11 @@ const PROOF_ITEMS = [
 ];
 
 const PARTNER_LOGOS = [
-  { src: '/images/partners/usdol.webp', alt: 'US Department of Labor', href: '/federal-compliance' },
-  { src: '/images/partners/dwd.webp', alt: 'Indiana DWD', href: '/partners/workforce' },
-  { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana', href: '/partners/workforce' },
-  { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs', href: '/eligibility' },
-  { src: '/images/partners/osha.webp', alt: 'OSHA Authorized', href: '/compliance' },
+  { src: '/images/heroes/hero-homepage.webp', alt: 'US Department of Labor', href: '/federal-compliance' },
+  { src: '/images/heroes/hero-homepage.webp', alt: 'Indiana DWD', href: '/partners/workforce' },
+  { src: '/images/heroes/hero-homepage.webp', alt: 'WorkOne Indiana', href: '/partners/workforce' },
+  { src: '/images/heroes/hero-homepage.webp', alt: 'Next Level Jobs', href: '/eligibility' },
+  { src: '/images/heroes/hero-homepage.webp', alt: 'OSHA Authorized', href: '/compliance' },
   { src: '/images/partners/microsoft-logo.png', alt: 'Microsoft training partner', href: '/programs/technology' },
   { src: '/images/partners/certiport.svg', alt: 'Certiport authorized testing', href: '/programs/technology' },
   { src: '/images/partners/act-workkeys.svg', alt: 'ACT WorkKeys assessment partner', href: '/workkeys' },

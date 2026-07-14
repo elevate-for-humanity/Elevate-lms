@@ -15,7 +15,7 @@ export default function PartnerLogos() {
           <div className="flex items-center justify-center h-16 w-32">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
             <Image sizes="100vw"
-              src="/images/partners/dwd.webp"
+              src="/images/heroes/hero-homepage.webp"
               alt="Indiana Department of Workforce Development"
               width={120}
               height={60}
@@ -24,7 +24,7 @@ export default function PartnerLogos() {
           </div>
           <div className="flex items-center justify-center h-16 w-32">
             <Image sizes="100vw"
-              src="/images/partners/workone.webp"
+              src="/images/heroes/hero-homepage.webp"
               alt="WorkOne Indiana"
               width={120}
               height={60}
@@ -33,7 +33,7 @@ export default function PartnerLogos() {
           </div>
           <div className="flex items-center justify-center h-16 w-32">
             <Image sizes="100vw"
-              src="/images/partners/usdol.webp"
+              src="/images/heroes/hero-homepage.webp"
               alt="US Department of Labor"
               width={120}
               height={60}
@@ -42,7 +42,7 @@ export default function PartnerLogos() {
           </div>
           <div className="flex items-center justify-center h-16 w-32">
             <Image sizes="100vw"
-              src="/images/partners/osha.webp"
+              src="/images/heroes/hero-homepage.webp"
               alt="OSHA Authorized"
               width={120}
               height={60}
@@ -51,7 +51,7 @@ export default function PartnerLogos() {
           </div>
           <div className="flex items-center justify-center h-16 w-32">
             <Image sizes="100vw"
-              src="/images/partners/nextleveljobs.webp"
+              src="/images/heroes/hero-homepage.webp"
               alt="Next Level Jobs"
               width={120}
               height={60}

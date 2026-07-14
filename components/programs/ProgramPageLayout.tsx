@@ -936,10 +936,10 @@ export default function ProgramPageLayout({
           </p>
           <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 mb-4">
             {[
-              { src: '/images/partners/usdol.webp', alt: 'U.S. Department of Labor' },
-              { src: '/images/partners/dwd.webp', alt: 'Indiana DWD' },
-              { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana' },
-              { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs' },
+              { src: '/images/heroes/hero-homepage.webp', alt: 'U.S. Department of Labor' },
+              { src: '/images/heroes/hero-homepage.webp', alt: 'Indiana DWD' },
+              { src: '/images/heroes/hero-homepage.webp', alt: 'WorkOne Indiana' },
+              { src: '/images/heroes/hero-homepage.webp', alt: 'Next Level Jobs' },
             ].map((logo) => (
               <Image sizes="100vw"
                 key={logo.alt}

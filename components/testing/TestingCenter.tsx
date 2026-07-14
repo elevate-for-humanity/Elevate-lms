@@ -47,7 +47,7 @@ const PROVIDERS = [
     id: 'nha',
     name: 'NHA',
     fullName: 'National Healthcareer Association',
-    logo: '/images/partners/nha-logo.webp',
+    logo: '/images/heroes/hero-homepage.webp',
     heroImage: PROVIDER_HERO_IMAGES.nha,
     certifications: [
       { name: 'Certified Medical Assistant (CMA)', career: 'Medical Assistant', salary: '$35,000-$45,000/yr' },
@@ -63,7 +63,7 @@ const PROVIDERS = [
     id: 'certiport',
     name: 'Certiport',
     fullName: 'Certiport (Pearson VUE)',
-    logo: '/images/partners/certiport-logo.webp',
+    logo: '/images/heroes/hero-homepage.webp',
     heroImage: PROVIDER_HERO_IMAGES.certiport,
     certifications: [
       { name: 'Microsoft Office Specialist (MOS)', career: 'Office Administration', salary: '$35,000-$50,000/yr' },
@@ -81,7 +81,7 @@ const PROVIDERS = [
     id: 'workkeys',
     name: 'ACT WorkKeys',
     fullName: 'ACT WorkKeys / NCRC',
-    logo: '/images/partners/workkeys-logo.webp',
+    logo: '/images/heroes/hero-homepage.webp',
     heroImage: PROVIDER_HERO_IMAGES.workkeys,
     certifications: [
       { name: 'Bronze Certificate', career: 'Foundation Level', salary: 'Entry Positions' },
@@ -99,7 +99,7 @@ const PROVIDERS = [
     id: 'esco',
     name: 'EPA 608',
     fullName: 'EPA Section 608 Technician Certification',
-    logo: '/images/partners/epa-logo.webp',
+    logo: '/images/heroes/hero-homepage.webp',
     heroImage: PROVIDER_HERO_IMAGES.esco,
     certifications: [
       { name: 'Universal Certification', career: 'HVAC/R Technician', salary: '$45,000-$70,000/yr' },
@@ -115,7 +115,7 @@ const PROVIDERS = [
     id: 'nrf',
     name: 'NRF',
     fullName: 'NRF Foundation / RISE UP',
-    logo: '/images/partners/nrf-logo.webp',
+    logo: '/images/heroes/hero-homepage.webp',
     heroImage: PROVIDER_HERO_IMAGES.nrf,
     certifications: [
       { name: 'Customer Service', career: 'Retail Associate', salary: '$28,000-$38,000/yr' },
@@ -133,7 +133,7 @@ const PROVIDERS = [
     id: 'careersafe',
     name: 'CareerSafe',
     fullName: 'CareerSafe OSHA Safety',
-    logo: '/images/partners/careersafe-logo.webp',
+    logo: '/images/heroes/hero-homepage.webp',
     heroImage: PROVIDER_HERO_IMAGES.careersafe,
     certifications: [
       { name: 'OSHA 10-Hour General Industry', career: 'Safety Entry', salary: '$35,000-$50,000/yr' },

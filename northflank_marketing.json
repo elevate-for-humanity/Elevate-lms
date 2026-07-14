@@ -16,10 +16,18 @@
   "buildSecrets": {
     "NEXT_PUBLIC_SUPABASE_URL": "",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY": "",
-    "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org"
+    "SUPABASE_SERVICE_ROLE_KEY": "",
+    "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org",
+    "NEXT_PUBLIC_ADMIN_URL": "https://admin.elevateforhumanity.org",
+    "STRIPE_SECRET_KEY": "",
+    "STRIPE_WEBHOOK_SECRET": "",
+    "SENDGRID_API_KEY": "",
+    "RESEND_API_KEY": "",
+    "ADMIN_API_KEY": ""
   },
   "buildArgs": {
-    "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org"
+    "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org",
+    "NEXT_PUBLIC_ADMIN_URL": "https://admin.elevateforhumanity.org"
   },
   "deployment": {
     "healthCheck": {

@@ -99,9 +99,9 @@ export async function POST(request: NextRequest) {
     }
     
     // Sync mode - generate immediately
-    console.log(`\n🎬 Generating videos for course: ${course.title}`);
-    console.log(`   Lessons: ${lessons.length}`);
-    console.log(`   Category: ${category}`);
+    console.info(`\n🎬 Generating videos for course: ${course.title}`);
+    console.info(`   Lessons: ${lessons.length}`);
+    console.info(`   Category: ${category}`);
     
     const result = await generateCourseVideos(
       courseId,

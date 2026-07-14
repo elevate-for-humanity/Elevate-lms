@@ -171,8 +171,8 @@ export async function generateDemoVideos(request: DemoVideoRequest): Promise<Dem
   // Get plan config
   const config = PLAN_VIDEO_MAPPING[planSlug] || PLAN_VIDEO_MAPPING['default'];
   
-  console.log(`🎬 Generating demo videos for: ${planSlug}`);
-  console.log(`   Sections: ${sections.join(', ')}`);
+  console.info(`🎬 Generating demo videos for: ${planSlug}`);
+  console.info(`   Sections: ${sections.join(', ')}`);
   
   const videos: DemoVideoResult['videos'] = [];
   let totalDuration = 0;
@@ -192,9 +192,9 @@ export async function generateDemoVideos(request: DemoVideoRequest): Promise<Dem
       });
       totalDuration += video.duration;
       
-      console.log(`   ✅ ${section}: ${video.url.substring(0, 50)}...`);
+      console.info(`   ✅ ${section}: ${video.url.substring(0, 50)}...`);
     } else {
-      console.log(`   ⚠️ ${section}: No video found for "${searchTerm}"`);
+      console.warn(`   ⚠️ ${section}: No video found for "${searchTerm}"`);
     }
   }
   

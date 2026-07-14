@@ -120,7 +120,7 @@ function generateLessonScript(lesson: { title: string; content: string; moduleNa
 export async function generateLessonVideo(request: LessonVideoRequest): Promise<LessonVideoResult> {
   const { lessonId, lessonTitle, lessonContent, courseCategory, moduleName, lessonNumber } = request;
   
-  console.log(`📹 Generating video for lesson: ${lessonTitle}`);
+  console.info(`📹 Generating video for lesson: ${lessonTitle}`);
   
   try {
     // 1. Get search terms for category
@@ -183,9 +183,9 @@ export async function generateCourseVideos(
   }>,
   courseCategory: string
 ): Promise<CourseVideoResult> {
-  console.log(`\n🎬 Starting video generation for course: ${courseId}`);
-  console.log(`   Total lessons: ${lessons.length}`);
-  console.log(`   Category: ${courseCategory}`);
+  console.info(`\n🎬 Starting video generation for course: ${courseId}`);
+  console.info(`   Total lessons: ${lessons.length}`);
+  console.info(`   Category: ${courseCategory}`);
   
   const results: LessonVideoResult[] = [];
   
@@ -211,13 +211,13 @@ export async function generateCourseVideos(
     
     results.push(...batchResults);
     
-    console.log(`   Processed ${Math.min(i + BATCH_SIZE, lessons.length)}/${lessons.length} lessons`);
+    console.info(`   Processed ${Math.min(i + BATCH_SIZE, lessons.length)}/${lessons.length} lessons`);
   }
   
   const successful = results.filter(r => r.status === 'success').length;
   const failed = results.filter(r => r.status === 'failed').length;
   
-  console.log(`\n✅ Course video generation complete: ${successful} successful, ${failed} failed`);
+  console.info(`\n✅ Course video generation complete: ${successful} successful, ${failed} failed`);
   
   return {
     courseId,

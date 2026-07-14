@@ -40,9 +40,9 @@ const STATS: Stat[] = [
 
 const CAMPUSES: Campus[] = [
   { name: 'West Campus', address: '8888 Keystone Crossing, Indianapolis', phone: '(317) 314-3757' },
-  { name: 'North Campus', address: '8900 N Meridian St, Carmel', phone: '(317) 555-0100' },
-  { name: 'East Campus', address: '7500 E Washington St, Indianapolis', phone: '(317) 555-0200' },
-  { name: 'South Campus', address: '6200 S Meridian St, Greenwood', phone: '(317) 555-0300' },
+  { name: 'North Campus', address: '8900 N Meridian St, Carmel', phone: '(317) 204-0100' },
+  { name: 'East Campus', address: '7500 E Washington St, Indianapolis', phone: '(317) 204-0200' },
+  { name: 'South Campus', address: '6200 S Meridian St, Greenwood', phone: '(317) 204-0300' },
 ];
 
 const FUNDING_OPTIONS = [

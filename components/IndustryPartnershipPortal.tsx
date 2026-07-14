@@ -54,7 +54,7 @@ export default function IndustryPartnershipPortal() {
       joinedDate: '2023-03',
       contactPerson: 'Dr. Michael Chen',
       email: 'mchen@healthcareplus.com',
-      phone: '(555) 200-2000',
+      phone: '(317) 204-2000',
     },
   ];
 

@@ -61,7 +61,7 @@ export function SEO({
     description: 'AI-Powered Workforce Development Platform | Education, Apprenticeships, Credentials',
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+1-317-555-0123',
+      telephone: '+1-317-204-0123',
       contactType: 'customer service',
       availableLanguage: 'English',
     },

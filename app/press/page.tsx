@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const metadata: Metadata = {
   title: 'Press | Elevate for Humanity',

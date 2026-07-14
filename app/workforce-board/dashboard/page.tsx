@@ -1,3 +1,4 @@
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createServerClient } from '@supabase/ssr';

@@ -101,7 +101,7 @@ export function SuccessMetrics() {
               )}
             </motion.div>
           ))}
-        ))}
+        </div>
       </div>
 
       {/* Top Credentials Table */}

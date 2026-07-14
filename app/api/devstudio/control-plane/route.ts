@@ -1,3 +1,4 @@
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 /**

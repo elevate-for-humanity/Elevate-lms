@@ -159,7 +159,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   <ul style="margin:16px 0">
     ${critical.map((a) => `<li style="margin-bottom:8px"><strong>${a.type}</strong>: ${a.message}</li>`).join('')}
   </ul>
-  <p><a href="https://admin.elevateforhumanity.org/admin/operations">View Operations Dashboard →</a></p>
+  <p><a href="/admin/operations">View Operations Dashboard →</a></p>
 </div>
       `.trim(),
     }).catch((err) =>

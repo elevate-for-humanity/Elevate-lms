@@ -334,7 +334,7 @@ export const SEARCH_INDEX: SearchItem[] = [
     id: 'instructor-dashboard',
     title: 'Instructor Dashboard',
     description: 'Manage courses, grade assignments, and track student progress.',
-    href: 'https://admin.elevateforhumanity.org/admin/instructor/dashboard',
+    href: '/admin/instructor/dashboard',
     category: 'dashboard',
     audiences: ['instructors'],
     keywords: ['instructor', 'teacher', 'dashboard', 'grading', 'courses'],

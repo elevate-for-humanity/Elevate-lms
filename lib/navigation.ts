@@ -303,7 +303,7 @@ export const NAV_ITEMS: NavItem[] = [
       { name: '— Staff & Instructors —', href: '/apply/staff', isHeader: true },
       { name: 'Staff Application', href: '/apply/staff' },
       { name: 'Instructor Application', href: '/onboarding/instructor' },
-      { name: 'Instructor Credentials', href: 'https://admin.elevateforhumanity.org/admin/instructor-credentials' },
+      { name: 'Instructor Credentials', href: '/admin/instructor-credentials' },
 
       // Agencies & Partners
       { name: '— Agencies & Partners —', href: '/partners/apply', isHeader: true },

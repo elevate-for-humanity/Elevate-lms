@@ -441,7 +441,7 @@ export const DASHBOARD_GUIDES: Record<string, PageGuide> = {
         type: 'tip',
         message:
           "The 'At Risk' section shows students who might be struggling. Reaching out early makes a big difference in completion rates.",
-        action: { label: 'View At-Risk Students', href: 'https://admin.elevateforhumanity.org/admin/instructor/at-risk' },
+        action: { label: 'View At-Risk Students', href: '/admin/instructor/at-risk' },
       },
     ],
     quickTips: [

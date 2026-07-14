@@ -60,13 +60,15 @@ interface Selection {
 
 type FundingType = 'self-pay' | 'wioa' | 'employer' | 'vr' | 'scholarship' | 'other';
 
-const FUNDING_OPTIONS: { value: FundingType; label: string; discount: number }[] = [
+// Funding sources - agency-funded options require valid authorization
+// Automatic discounts removed - contact us for agency pricing agreements
+const FUNDING_OPTIONS: { value: FundingType; label: string; discount: number; note?: string }[] = [
   { value: 'self-pay', label: 'Self-Pay', discount: 0 },
-  { value: 'wioa', label: 'WIOA Funded', discount: 0.1 },
-  { value: 'employer', label: 'Employer Paid', discount: 0.15 },
-  { value: 'vr', label: 'Vocational Rehab', discount: 0.1 },
-  { value: 'scholarship', label: 'Scholarship', discount: 0.2 },
-  { value: 'other', label: 'Other/Grant', discount: 0 },
+  { value: 'wioa', label: 'WIOA Funded', discount: 0, note: 'Requires agency authorization' },
+  { value: 'employer', label: 'Employer Paid', discount: 0, note: 'Requires purchase order or authorization' },
+  { value: 'vr', label: 'Vocational Rehab', discount: 0, note: 'Requires agency authorization' },
+  { value: 'scholarship', label: 'Scholarship', discount: 0, note: 'Requires award documentation' },
+  { value: 'other', label: 'Other/Grant', discount: 0, note: 'Requires funding documentation' },
 ];
 
 const DEFAULT_ADD_ONS: AddOn[] = [
@@ -78,9 +80,6 @@ const DEFAULT_ADD_ONS: AddOn[] = [
   { id: 'resume', name: 'Resume Writing', price: 79, category: 'career' },
   { id: 'interview', name: 'Interview Coaching', price: 49, category: 'career' },
   { id: 'career-placement', name: 'Career Placement Support', price: 199, category: 'career' },
-  { id: 'retake-protection', name: 'Exam Retake Protection', price: 29, category: 'protection' },
-  { id: 'digital-badge', name: 'Digital Badge', price: 25, category: 'protection' },
-  { id: 'printed-cert', name: 'Printed Certificate', price: 20, category: 'protection' },
 ];
 
 function formatCurrency(amount: number): string {

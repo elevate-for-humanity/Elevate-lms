@@ -308,7 +308,7 @@ export default async function ProviderPage({ params }: Props) {
                 if (!bnpl.length) return null;
                 return (
                   <div className="pt-3 border-t border-slate-100">
-                    <p className="text-xs text-slate-500 mb-2">Split your payment — accepted at checkout</p>
+                    <p className="text-xs text-slate-500 mb-2">Payment plans available at checkout</p>
                     <div className="flex flex-wrap gap-1.5">
                       {bnpl.map((p) => (
                         <span

@@ -50,10 +50,10 @@ const PROVIDERS = [
     logo: '/images/heroes/hero-homepage.webp',
     heroImage: PROVIDER_HERO_IMAGES.nha,
     certifications: [
-      { name: 'Certified Medical Assistant (CMA)', career: 'Medical Assistant', salary: '$35,000-$45,000/yr' },
-      { name: 'Phlebotomy Technician (CPT)', career: 'Phlebotomist', salary: '$32,000-$40,000/yr' },
-      { name: 'EKG Technician (CET)', career: 'EKG Technician', salary: '$35,000-$48,000/yr' },
-      { name: 'Certified Pharmacy Technician (CPhT)', career: 'Pharmacy Tech', salary: '$33,000-$45,000/yr' },
+      { name: 'CCMA - Certified Clinical Medical Assistant', career: 'Medical Assistant', salary: '$35,000-$45,000/yr' },
+      { name: 'CPT - Certified Phlebotomy Technician', career: 'Phlebotomist', salary: '$32,000-$40,000/yr' },
+      { name: 'CET - Certified EKG Technician', career: 'EKG Technician', salary: '$35,000-$48,000/yr' },
+      { name: 'ExCPT - Certified Pharmacy Technician', career: 'Pharmacy Tech', salary: '$33,000-$45,000/yr' },
     ],
     accent: 'from-blue-600 to-cyan-600',
     examFee: '$117 - $180', // NHA pricing varies by exam
@@ -612,9 +612,9 @@ function TrustIndicators() {
     { icon: ICONS.shield, title: 'Secure Environment', desc: 'Proctored exams with identity verification' },
     { icon: ICONS.certificate, title: 'Official Credentials', desc: 'Nationally recognized certifications' },
     { icon: ICONS.calendar, title: 'Flexible Scheduling', desc: 'Multiple test dates and times' },
-    { icon: ICONS.dollar, title: 'Payment Options', desc: 'BNPL and funding available' },
-    { icon: ICONS.users, title: 'Expert Proctors', desc: 'Trained certification proctors' },
-    { icon: ICONS.book, title: 'Career Support', desc: 'Job placement assistance included' },
+    { icon: ICONS.dollar, title: 'Payment Options', desc: 'Multiple payment methods available' },
+    { icon: ICONS.users, title: 'Trained Proctors', desc: 'Authorized exam administration' },
+    { icon: ICONS.book, title: 'Career Resources', desc: 'Resume and interview support available' },
   ];
 
   return (
@@ -927,12 +927,12 @@ export function PremiumTestingCenter() {
           
           <div className="space-y-4">
             {[
-              { q: 'How do I schedule an exam?', a: 'You can book your exam online through our scheduling system, by calling our testing center, or through our AI assistant. We offer multiple dates and times to fit your schedule.' },
+              { q: 'How do I schedule an exam?', a: 'You can book your exam online through our scheduling system, by calling our testing center, or through our AI assistant. We offer multiple dates and times to fit your schedule. All exams are by appointment only.' },
               { q: 'How much do exams cost?', a: 'Exam fees vary by provider and certification. We use dynamic pricing based on provider costs, proctoring, and overhead. Contact us for a custom quote or use our pricing configurator to build your package.' },
               { q: 'How long are exams?', a: 'Exam length varies by certification. Most exams range from 1-3 hours. We\'ll provide a time estimate when you book.' },
-              { q: 'When will I receive my results?', a: 'Results are typically available immediately after completing your exam. Your digital credential will be issued within 24-48 hours of passing.' },
+              { q: 'When will I receive my results?', a: 'Results availability varies by provider. Many computer-based exams provide immediate scores. Credential issuance timelines depend on the certification body. We will provide specific timelines during booking.' },
               { q: 'Can I retake an exam?', a: 'Retake policies vary by provider. Most allow retakes after a waiting period. We can help you schedule a retake if needed.' },
-              { q: 'What if I need accommodations?', a: 'We provide testing accommodations for candidates with disabilities. Contact us in advance to arrange accommodations.' },
+              { q: 'What if I need accommodations?', a: 'We provide testing accommodations for candidates with disabilities. Contact us in advance to arrange accommodations. Note that provider approval may be required for some accommodations.' },
             ].map((faq, i) => (
               <details key={i} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                 <summary className="p-5 font-semibold text-slate-900 cursor-pointer hover:bg-slate-50">

@@ -20,6 +20,14 @@ interface Notification {
   read: boolean;
 }
 
+// Supabase notification payload
+interface NotificationPayload {
+  id?: string;
+  type?: string;
+  title?: string;
+  message?: string;
+}
+
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -60,14 +68,13 @@ export function NotificationBell() {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }): void => {
       if (!user) return;
-      const unsubscribe = subscribeToNotifications(user.id, (payload) => {
-        const newNotif = payload as any;
+      const unsubscribe = subscribeToNotifications(user.id, (payload: NotificationPayload) => {
         setNotifications((prev) => [
           {
-            id: newNotif.id,
-            type: newNotif.type || 'system',
-            title: newNotif.title || 'New notification',
-            message: newNotif.message || '',
+            id: payload.id || `notif-${Date.now()}`,
+            type: (payload.type as Notification['type']) || 'system',
+            title: payload.title || 'New notification',
+            message: payload.message || '',
             time: 'Just now',
             read: false,
           },

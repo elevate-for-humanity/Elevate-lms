@@ -164,7 +164,7 @@ export default function SupportPage() {
               </div>
             </Link>
 
-            <Link href="tel:+13175550123" className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 hover:shadow-lg transition-shadow flex items-start gap-4">
+            <Link href="tel:+13173140123" className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 hover:shadow-lg transition-shadow flex items-start gap-4">
               <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Phone className="w-6 h-6 text-amber-600" />
               </div>
@@ -172,7 +172,7 @@ export default function SupportPage() {
                 <h3 className="font-bold text-slate-900 mb-1">Call Support</h3>
                 <p className="text-slate-600 text-sm">Speak with our team directly</p>
                 <p className="text-amber-600 text-sm font-medium mt-2 flex items-center gap-1">
-                  (317) 555-0123 <ChevronRight className="w-4 h-4" />
+                  (317) 314-3757 <ChevronRight className="w-4 h-4" />
                 </p>
               </div>
             </Link>

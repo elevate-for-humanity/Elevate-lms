@@ -24,7 +24,23 @@ interface AnnouncementsSystemProps {
   courseId: string;
   announcements?: Announcement[];
   canCreate?: boolean;
-  onCreateAnnouncement?: (data: any) => void;
+  onCreateAnnouncement?: (data: Record<string, unknown>) => void;
+}
+
+// Supabase announcement with profile relation
+interface AnnouncementWithProfile {
+  id: string;
+  title: string;
+  content: string;
+  is_pinned: boolean;
+  view_count: number;
+  send_email: boolean;
+  send_push: boolean;
+  created_at: string;
+  profiles?: {
+    full_name?: string;
+    avatar_url?: string;
+  };
 }
 
 export function AnnouncementsSystem({
@@ -55,12 +71,12 @@ export function AnnouncementsSystem({
       .order('created_at', { ascending: false });
 
     if (data) {
-      const formatted: Announcement[] = data.map((a) => ({
+      const formatted: Announcement[] = data.map((a: AnnouncementWithProfile) => ({
         id: a.id,
         title: a.title,
         content: a.content,
-        authorName: (a.profiles as any)?.full_name || 'Admin',
-        authorAvatar: (a.profiles as any)?.avatar_url,
+        authorName: a.profiles?.full_name || 'Admin',
+        authorAvatar: a.profiles?.avatar_url,
         publishedAt: new Date(a.created_at),
         isPinned: a.is_pinned || false,
         isRead: false,

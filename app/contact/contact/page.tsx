@@ -488,8 +488,8 @@ function ContactPageInner() {
             {/* Campus Info */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="font-semibold text-slate-900 mb-2">{PLATFORM_DEFAULTS.orgName}</h3>
-              <p className="text-black">8888 Keystone Crossing, Suite 1300</p>
-              <p className="text-black">Indianapolis, IN 46240</p>
+              <p className="text-black">6331 N Keystone Ave, Suite D, Indianapolis, IN 46220</p>
+              <p className="text-black">Indianapolis, IN 46220</p>
               <p className="text-black mt-3 text-sm font-medium text-amber-700">
                 ⚠️ By appointment only — this is a hybrid training institute, not a walk-in
                 location. Schedule below before visiting.
@@ -513,7 +513,7 @@ function ContactPageInner() {
             },
             {
               q: 'Can I visit your office in person?',
-              a: 'Elevate is a hybrid training institute — not a walk-in location. Our address is 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. All visits are by appointment only. Use the calendar above to schedule.',
+              a: 'Elevate is a hybrid training institute — not a walk-in location. Our address is 6331 N Keystone Ave, Suite D, Indianapolis, IN 46220, Indianapolis, IN 46220. All visits are by appointment only. Use the calendar above to schedule.',
             },
             {
               q: 'Who should I contact about enrollment?',

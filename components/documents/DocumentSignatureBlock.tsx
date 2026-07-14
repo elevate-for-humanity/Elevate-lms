@@ -17,6 +17,9 @@ interface Props {
 
 type Method = 'checkbox' | 'typed' | 'drawn';
 
+// Valid agreement types
+type AgreementType = 'handbook' | 'enrollment' | 'background_check' | 'payment_plan' | 'funding_agreement' | 'clinical_agreement' | 'worksite_agreement' | 'oha' | 'iep';
+
 export function DocumentSignatureBlock({
   agreementType,
   agreementVersion = '1.0',
@@ -112,7 +115,7 @@ export function DocumentSignatureBlock({
       // Use a Server Action — avoids the Gitpod preview proxy's 403 block
       // on browser fetch requests to /api/* routes with an Origin header.
       const result = await signAgreement({
-        agreementType: agreementType as any,
+        agreementType: agreementType as AgreementType,
         signerName: signerName.trim(),
         signerEmail,
         signatureMethod: method,

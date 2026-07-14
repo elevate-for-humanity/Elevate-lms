@@ -38,6 +38,17 @@ interface Certificate {
   credentialUrl: string;
 }
 
+// Supabase certificate with training program relation
+interface CertificateWithProgram {
+  id: string;
+  program_name?: string;
+  issued_at?: string;
+  verification_url?: string;
+  training_programs?: {
+    name?: string;
+  };
+}
+
 export function StudentPortfolio() {
   const [activeTab, setActiveTab] = useState<'projects' | 'skills' | 'certificates' | 'about'>(
     'projects',
@@ -144,9 +155,9 @@ export function StudentPortfolio() {
 
         if (certData) {
           setCertificates(
-            certData.map((c) => ({
+            certData.map((c: CertificateWithProgram) => ({
               id: c.id,
-              title: (c.training_programs as any)?.name || c.program_name || 'Certificate',
+              title: c.training_programs?.name || c.program_name || 'Certificate',
               issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
               date: c.issued_at?.split('T')[0] || '',
               credentialUrl: c.verification_url || `/verify/${c.id}`,

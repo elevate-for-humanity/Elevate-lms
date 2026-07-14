@@ -450,7 +450,7 @@ export function UltraVideoPlayer({
   return (
     <div
       ref={containerRef}
-      className={`relative group bg-black rounded-xl overflow-hidden ${ASPECT_RATIOS[aspectRatio]} ${className}`}
+      className={`${className?.includes('absolute') || className?.includes('fixed') ? '' : 'relative group'} bg-black rounded-xl overflow-hidden ${ASPECT_RATIOS[aspectRatio]} ${className}`}
     >
       {/* Video Element */}
       <video

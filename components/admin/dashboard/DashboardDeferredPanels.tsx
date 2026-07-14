@@ -2,9 +2,52 @@
 
 /**
  * Below-the-fold dashboard panels — lazy-loaded to improve initial dashboard paint.
+ * Includes error boundaries to prevent ChunkLoadError from breaking the entire page.
  */
 
 import dynamic from 'next/dynamic';
+import { Component, type ReactNode } from 'react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class PanelErrorBoundary extends Component<{ children: ReactNode; name: string }, ErrorBoundaryState> {
+  constructor(props: { children: ReactNode; name: string }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-6 mb-6">
+          <div className="flex items-center gap-2 text-red-700 font-semibold mb-2">
+            <AlertTriangle className="w-5 h-5" />
+            Failed to load {this.props.name}
+          </div>
+          <p className="text-sm text-red-600 mb-4">
+            {this.state.error?.message || 'An error occurred while loading this panel.'}
+          </p>
+          <button
+            onClick={() => this.setState({ hasError: false, error: null })}
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Retry
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const panelSkeleton = (
   <div className="rounded-xl border border-slate-200 bg-white p-6 mb-6 animate-pulse">
@@ -16,27 +59,43 @@ const panelSkeleton = (
 // Handle both default and named exports
 const withFallback = (m: any) => m.default || m;
 
+// Wrapper with error boundary for each lazy panel
 export const PublishWebsitePanelLazy = dynamic(
   () => import('./PublishWebsitePanel').then(withFallback),
-  { loading: () => panelSkeleton, ssr: false },
+  { 
+    loading: () => panelSkeleton, 
+    ssr: false,
+  },
 );
 
 export const ProgramIntegrityPanelLazy = dynamic(
   () => import('./ProgramIntegrityPanel').then(withFallback),
-  { loading: () => panelSkeleton, ssr: false },
+  { 
+    loading: () => panelSkeleton, 
+    ssr: false,
+  },
 );
 
 export const JobBoardPanelLazy = dynamic(
   () => import('./JobBoardPanel').then(withFallback),
-  { loading: () => panelSkeleton, ssr: false },
+  { 
+    loading: () => panelSkeleton, 
+    ssr: false,
+  },
 );
 
 export const SitePreviewPanelWrapperLazy = dynamic(
   () => import('./SitePreviewPanelWrapper').then(withFallback),
-  { loading: () => panelSkeleton, ssr: false },
+  { 
+    loading: () => panelSkeleton, 
+    ssr: false,
+  },
 );
 
 export const LizzyContainerWrapperLazy = dynamic(
   () => import('./LizzyContainerWrapper').then(withFallback),
-  { loading: () => panelSkeleton, ssr: false },
+  { 
+    loading: () => panelSkeleton, 
+    ssr: false,
+  },
 );

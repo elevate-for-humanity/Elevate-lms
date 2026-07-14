@@ -718,7 +718,7 @@ export default function PrivacyPage() {
             </div>
             <div className="flex items-center justify-center gap-3">
               <Phone className="w-6 h-6" />
-              <span>(317) 555-0123</span>
+              <span>(317) 314-3757</span>
             </div>
           </div>
           <div className="mt-8">

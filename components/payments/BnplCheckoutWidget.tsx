@@ -29,6 +29,7 @@ import {
   getProvidersForAmount,
   type BnplProvider,
 } from '@/lib/bnpl-config';
+import type { AffirmWindow } from '@/lib/types/external-sdks';
 
 // Stripe-native provider IDs — derived from bnpl-config (stripeMethodId !== null)
 const STRIPE_NATIVE_IDS = new Set(
@@ -170,9 +171,10 @@ export function BnplCheckoutWidget({
         const script = document.createElement('script');
         script.src = data.affirmJsUrl ?? 'https://cdn1.affirm.com/js/v2/affirm.js';
         script.onload = () => {
-          (window as any)._affirm_config = { public_api_key: data.publicKey };
-          (window as any).affirm?.checkout(data.checkoutConfig);
-          (window as any).affirm?.checkout.open();
+          const win = window as unknown as AffirmWindow;
+          win._affirm_config = { public_api_key: data.publicKey };
+          win.affirm?.checkout(data.checkoutConfig);
+          win.affirm?.checkout.open();
         };
         document.head.appendChild(script);
       } else if (selectedId === 'sezzle') {

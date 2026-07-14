@@ -177,7 +177,7 @@ export default function CohortView({
         <div className="relative">
           <select
             value={groupBy}
-            onChange={(e) => setGroupBy(e.target.value as any)}
+            onChange={(e) => setGroupBy(e.target.value as 'program' | 'funding' | 'start_date')}
             className="appearance-none bg-slate-100 border-0 rounded-lg px-3 py-1.5 pr-8 text-sm font-medium text-slate-700 cursor-pointer focus:ring-2 focus:ring-brand-blue-500"
           >
             <option value="program">By Program</option>

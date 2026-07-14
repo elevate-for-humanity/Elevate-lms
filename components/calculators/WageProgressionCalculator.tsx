@@ -103,7 +103,7 @@ export function WageProgressionCalculator({
               <label className="block text-xs text-blue-200 mb-1">Employment Status</label>
               <select
                 value={employmentStatus}
-                onChange={(e) => setEmploymentStatus(e.target.value as any)}
+                onChange={(e) => setEmploymentStatus(e.target.value as 'unemployed' | 'part_time' | 'full_time')}
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-white/30"
               >
                 <option value="unemployed" className="text-gray-900">Unemployed</option>

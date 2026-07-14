@@ -16,12 +16,20 @@ interface Placement {
   };
 }
 
+interface PreviousReport {
+  id: string;
+  week_start: string;
+  week_end: string;
+  hours_total: number;
+  submitted_at: string;
+}
+
 export function ShopReportForm({ placements: initialPlacements }: { placements: Placement[] }) {
   const router = useRouter();
   const supabase = createClient();
   const [placements, setPlacements] = useState<Placement[]>(initialPlacements || []);
   const [placementId, setPlacementId] = useState(initialPlacements?.[0]?.id || '');
-  const [previousReports, setPreviousReports] = useState<any[]>([]);
+  const [previousReports, setPreviousReports] = useState<PreviousReport[]>([]);
 
   // Load placements and previous reports from DB
   useEffect(() => {
@@ -39,7 +47,7 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
         .eq('status', 'active');
 
       if (placementData && placementData.length > 0) {
-        setPlacements(placementData as any);
+        setPlacements(placementData);
         setPlacementId(placementData[0].id);
       }
 

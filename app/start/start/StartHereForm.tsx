@@ -96,7 +96,7 @@ export default function StartHereForm() {
           <input
             name="phone"
             type="tel"
-            placeholder="(317) 555-0100"
+            placeholder="(317) 314-3757"
             className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
           />
         </div>

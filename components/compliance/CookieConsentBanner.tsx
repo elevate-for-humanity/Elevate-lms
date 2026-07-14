@@ -8,6 +8,13 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { Cookie, X, Settings, Shield } from 'lucide-react';
 import Link from 'next/link';
+import type { Gtag, FacebookPixel } from '@/lib/types/external-sdks';
+
+// Window extension for analytics SDKs
+interface AnalyticsWindow {
+  gtag?: Gtag.Gtag;
+  fbq?: FacebookPixel.fbq;
+}
 
 interface CookiePreferences {
   necessary: boolean;
@@ -46,17 +53,20 @@ export default function CookieConsentBanner() {
 
   const applyCookiePreferences = async (prefs: CookiePreferences) => {
     // Apply Google Analytics
-    if (prefs.analytics && typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('consent', 'update', {
-        analytics_storage: 'granted',
-      });
+    if (prefs.analytics && typeof window !== 'undefined') {
+      const win = window as unknown as AnalyticsWindow;
+      if (win.gtag) {
+        win.gtag('consent', 'update', {
+          analytics_storage: 'granted',
+        });
+      }
     }
 
     // Apply marketing cookies
     if (prefs.marketing && typeof window !== 'undefined') {
-      // Enable Facebook Pixel, etc.
-      if ((window as any).fbq) {
-        (window as any).fbq('consent', 'grant');
+      const win = window as unknown as AnalyticsWindow;
+      if (win.fbq) {
+        win.fbq('consent', 'grant');
       }
     }
 

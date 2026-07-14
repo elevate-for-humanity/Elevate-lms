@@ -21,10 +21,22 @@ interface AutomationEvent {
   description: string;
   status: 'success' | 'pending' | 'failed';
   created_at: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
-const eventIcons: Record<string, any> = {
+// Supabase enrollment with relations
+interface EnrollmentWithRelations {
+  id: string;
+  created_at: string;
+  profiles?: {
+    full_name?: string;
+  };
+  programs?: {
+    name?: string;
+  };
+}
+
+const eventIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   enrollment: UserPlus,
   notification: Bell,
   email: Mail,
@@ -108,9 +120,9 @@ export default function AutomationFeed({ limit = 20 }: { limit?: number }) {
       .limit(10);
 
     if (enrollments) {
-      for (const e of enrollments) {
-        const profile = e.profiles as any;
-        const program = e.programs as any;
+      for (const e of enrollments as EnrollmentWithRelations[]) {
+        const profile = e.profiles;
+        const program = e.programs;
         allEvents.push({
           id: `enroll-${e.id}`,
           type: 'enrollment',

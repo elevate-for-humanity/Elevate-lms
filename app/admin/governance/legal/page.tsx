@@ -263,7 +263,7 @@ export default async function LegalGovernancePage() {
               <MapPin className="w-4 h-4 text-slate-500" />
               <div>
                 <p className="text-sm text-slate-500">Mailing Address</p>
-                <p className="text-slate-900">Indianapolis, IN 46240</p>
+                <p className="text-slate-900">Indianapolis, IN 46220</p>
               </div>
             </div>
           </div>

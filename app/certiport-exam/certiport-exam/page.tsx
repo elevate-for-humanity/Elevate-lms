@@ -154,9 +154,9 @@ function CertiportExamContent() {
               <p className="text-brand-blue-800 text-sm">
                 ${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
                 <br />
-                8888 Keystone Crossing, Suite 1300
+                6331 N Keystone Ave, Suite D, Indianapolis, IN 46220
                 <br />
-                Indianapolis, IN 46240
+                Indianapolis, IN 46220
               </p>
             </div>
 

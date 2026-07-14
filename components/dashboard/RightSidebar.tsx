@@ -123,10 +123,10 @@ export function RightSidebar() {
     if (logs) {
       const formattedActivity: Activity[] = logs.map((log) => ({
         id: log.id,
-        type: log.activity_type as any,
-        title: log.metadata?.title || 'Activity',
+        type: log.activity_type as Activity['type'],
+        title: (log.metadata as { title?: string })?.title || 'Activity',
         timestamp: new Date(log.created_at),
-        link: log.metadata?.link,
+        link: (log.metadata as { link?: string })?.link,
       }));
       setActivities(formattedActivity);
     }

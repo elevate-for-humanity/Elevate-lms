@@ -69,7 +69,7 @@ export default function VoiceoverWithMusic({
       capture: true,
       passive: true,
       once: true,
-    } as any);
+    } as AddEventListenerOptions);
 
     return () => {
       window.removeEventListener('scroll', onScroll, true);

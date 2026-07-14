@@ -100,7 +100,7 @@ export default function SettingsForm({
           placeholder: 'support@example.org',
         })}
         {field('Website', 'website', { type: 'url', placeholder: 'https://example.org' })}
-        {field('Phone', 'phone', { type: 'tel', placeholder: '(317) 555-0100' })}
+        {field('Phone', 'phone', { type: 'tel', placeholder: '(317) 314-3757' })}
         {field('Logo URL', 'logoUrl', { type: 'url', placeholder: 'https://…/logo.png' })}
       </div>
 

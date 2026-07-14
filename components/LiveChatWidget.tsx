@@ -18,9 +18,35 @@ interface Props {
   forceShow?: boolean;
 }
 
+// User metadata type
+interface UserMetadata {
+  full_name?: string;
+  [key: string]: unknown;
+}
+
+interface AuthUser {
+  id: string;
+  email?: string;
+  user_metadata?: UserMetadata;
+}
+
+// Chat widget SDK types
+interface TawkAPI {
+  onLoad?: () => void;
+  setAttributes: (data: Record<string, string>, callback: (error: string | null) => void) => void;
+}
+
+interface IntercomWindow {
+  Intercom?: (cmd: string, data?: Record<string, unknown>) => void;
+}
+
+interface CrispWindow {
+  $crisp?: unknown[];
+}
+
 export function LiveChatWidget({ forceShow = false }: Props) {
   const [config, setConfig] = useState<ChatConfig | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [shouldShow, setShouldShow] = useState(false);
 
@@ -96,16 +122,17 @@ export function LiveChatWidget({ forceShow = false }: Props) {
 
     // Set user info for Tawk.to
     if (config?.provider === 'tawk' && typeof window !== 'undefined') {
-      const Tawk_API = (window as any).Tawk_API;
+      const win = window as unknown as { Tawk_API?: TawkAPI };
+      const Tawk_API = win.Tawk_API;
       if (Tawk_API) {
         Tawk_API.onLoad = function () {
           Tawk_API.setAttributes(
             {
-              name: user.user_metadata?.full_name || user.email?.split('@')[0],
-              email: user.email,
+              name: user.user_metadata?.full_name || user.email?.split('@')[0] || '',
+              email: user.email || '',
               userId: user.id,
             },
-            function (error: any) {
+            function (error) {
               if (error) logger.error('Tawk setAttributes error:', error);
             },
           );
@@ -115,7 +142,8 @@ export function LiveChatWidget({ forceShow = false }: Props) {
 
     // Set user info for Intercom
     if (config?.provider === 'intercom' && typeof window !== 'undefined') {
-      const Intercom = (window as any).Intercom;
+      const win = window as unknown as IntercomWindow;
+      const Intercom = win.Intercom;
       if (Intercom) {
         Intercom('update', {
           name: user.user_metadata?.full_name || user.email?.split('@')[0],
@@ -127,8 +155,9 @@ export function LiveChatWidget({ forceShow = false }: Props) {
 
     // Set user info for Crisp
     if (config?.provider === 'crisp' && typeof window !== 'undefined') {
-      const $crisp = (window as any).$crisp;
-      if ($crisp) {
+      const win = window as unknown as CrispWindow;
+      const $crisp = win.$crisp;
+      if ($crisp && Array.isArray($crisp)) {
         $crisp.push(['set', 'user:email', user.email]);
         $crisp.push([
           'set',
@@ -140,7 +169,7 @@ export function LiveChatWidget({ forceShow = false }: Props) {
   }, [loaded, user, config]);
 
   // Log chat interactions
-  const logChatEvent = async (eventType: string, metadata?: any) => {
+  const logChatEvent = async (eventType: string, metadata?: Record<string, unknown>) => {
     if (!user) return;
 
     const supabase = createClient();

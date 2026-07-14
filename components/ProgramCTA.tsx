@@ -292,11 +292,11 @@ export default function ProgramCTA({ programName = 'this program' }: ProgramCTAP
               <MapPin className="w-8 h-8 mb-3 text-brand-red-500"/>
               <h3 className="font-bold mb-2 text-white">Visit Us</h3>
               <p className="text-white/90 text-sm">
-                8888 Keystone Crossing
+                6331 N Keystone Ave
                 <br />
-                Suite 1300
+                Suite D
                 <br />
-                Indianapolis, IN 46240
+                Indianapolis, IN 46220
               </p>
             </div>
           </div>

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Mic, MicOff, Loader2, Volume2, AlertCircle } from 'lucide-react';
+import type { SpeechRecognitionConstructor } from '@/lib/types/external-sdks';
 
 interface VoiceControlProps {
   onTranscript: (text: string) => void;
@@ -11,6 +12,32 @@ interface VoiceControlProps {
 }
 
 type VoiceState = 'idle' | 'listening' | 'processing' | 'error';
+
+// Window extension for speech recognition
+interface SpeechWindow {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  _currentRecognition?: {
+    stop: () => void;
+  };
+}
+
+// Speech recognition result interface
+interface SpeechRecognitionResultList {
+  [index: number]: {
+    [index: number]: {
+      transcript: string;
+    };
+    isFinal: boolean;
+    length: number;
+  };
+  length: number;
+}
+
+// Speech recognition event interface
+interface SpeechRecognitionEvent {
+  results: SpeechRecognitionResultList;
+}
 
 export default function VoiceControl({
   onTranscript,
@@ -39,7 +66,8 @@ export default function VoiceControl({
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const win = window as unknown as SpeechWindow;
+      const SpeechRecognition = win.SpeechRecognition || win.webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
       
       recognition.continuous = false;
@@ -51,20 +79,20 @@ export default function VoiceControl({
         setError(null);
       };
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: { results: Array<Array<{ transcript: string; isFinal: boolean }>> }) => {
         const transcript = Array.from(event.results)
-          .map((result: any) => result[0].transcript)
+          .map((result) => result[0].transcript)
           .join('');
         
         setLastTranscript(transcript);
         
-        if (event.results[0].isFinal) {
+        if (event.results[0][0].isFinal) {
           setState('processing');
           onTranscript(transcript);
         }
       };
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = (event: { error: string }) => {
         console.error('Speech recognition error:', event.error);
         setError(event.error === 'not-allowed' ? 'Microphone access denied' : 'Speech recognition error');
         setState('error');
@@ -79,9 +107,6 @@ export default function VoiceControl({
       recognition.start();
       mediaRecorderRef.current = null;
 
-      // Store recognition for cleanup
-      (window as any)._currentRecognition = recognition;
-
     } catch (err) {
       console.error('Error accessing microphone:', err);
       setError('Could not access microphone');
@@ -90,7 +115,8 @@ export default function VoiceControl({
   }, [speechSupported, disabled, onTranscript, state]);
 
   const stopListening = useCallback(() => {
-    const recognition = (window as any)._currentRecognition;
+    const win = window as unknown as SpeechWindow;
+    const recognition = win._currentRecognition;
     if (recognition) {
       recognition.stop();
     }
@@ -121,7 +147,8 @@ export default function VoiceControl({
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      const recognition = (window as any)._currentRecognition;
+      const win = window as unknown as SpeechWindow;
+      const recognition = win._currentRecognition;
       if (recognition) {
         recognition.abort();
       }
@@ -225,23 +252,24 @@ export default function VoiceControl({
 export function useVoiceControl(onTranscript: (text: string) => void) {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionConstructor | null>(null);
 
   const startListening = useCallback(() => {
     if (typeof window === 'undefined') return;
     
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
+    const win = window as unknown as SpeechWindow;
+    const SpeechRecognitionClass = win.SpeechRecognition || win.webkitSpeechRecognition;
+    if (!SpeechRecognitionClass) return;
 
-    const recognition = new SpeechRecognition();
+    const recognition = new SpeechRecognitionClass();
     recognition.continuous = false;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
 
     recognition.onstart = () => setIsListening(true);
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
       const text = Array.from(event.results)
-        .map((result: any) => result[0].transcript)
+        .map((result) => result[0].transcript)
         .join('');
       setTranscript(text);
       if (event.results[0].isFinal) {

@@ -2,19 +2,26 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import type { Gtag } from '@/lib/types/external-sdks';
 
 interface PageTrackerProps {
   pageName: string;
   pageCategory?: string;
 }
 
+// Type-safe gtag helper
+function safeGtag(): Gtag.Gtag | undefined {
+  if (typeof window === 'undefined') return undefined;
+  return (window as unknown as { gtag?: Gtag.Gtag }).gtag;
+}
+
 export function PageTracker({ pageName, pageCategory }: PageTrackerProps) {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Track page view
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'page_view', {
+    const gtag = safeGtag();
+    if (gtag) {
+      gtag('event', 'page_view', {
         page_title: pageName,
         page_location: window.location.href,
         page_path: pathname,
@@ -28,8 +35,9 @@ export function PageTracker({ pageName, pageCategory }: PageTrackerProps) {
 
 // Track CTA clicks
 export function trackCTAClick(ctaName: string, destination?: string) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', 'cta_click', {
+  const gtag = safeGtag();
+  if (gtag) {
+    gtag('event', 'cta_click', {
       event_category: 'engagement',
       event_label: ctaName,
       destination: destination,
@@ -39,8 +47,9 @@ export function trackCTAClick(ctaName: string, destination?: string) {
 
 // Track search
 export function trackSearch(query: string, category?: string) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', 'search', {
+  const gtag = safeGtag();
+  if (gtag) {
+    gtag('event', 'search', {
       search_term: query,
       search_category: category,
     });
@@ -54,8 +63,9 @@ export function trackProductView(
   category: string,
   price: number,
 ) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', 'view_item', {
+  const gtag = safeGtag();
+  if (gtag) {
+    gtag('event', 'view_item', {
       currency: 'USD',
       value: price,
       items: [
@@ -77,8 +87,9 @@ export function trackCourseView(
   category: string,
   price?: number,
 ) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', 'view_item', {
+  const gtag = safeGtag();
+  if (gtag) {
+    gtag('event', 'view_item', {
       currency: 'USD',
       value: price || 0,
       items: [
@@ -100,8 +111,9 @@ export function trackAddToCart(
   category: string,
   price: number,
 ) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', 'add_to_cart', {
+  const gtag = safeGtag();
+  if (gtag) {
+    gtag('event', 'add_to_cart', {
       currency: 'USD',
       value: price,
       items: [
@@ -119,8 +131,9 @@ export function trackAddToCart(
 
 // Track form submission
 export function trackFormSubmit(formName: string, success: boolean) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', success ? 'form_submit_success' : 'form_submit_error', {
+  const gtag = safeGtag();
+  if (gtag) {
+    gtag('event', success ? 'form_submit_success' : 'form_submit_error', {
       event_category: 'form',
       event_label: formName,
     });
@@ -129,8 +142,9 @@ export function trackFormSubmit(formName: string, success: boolean) {
 
 // Track help article view
 export function trackArticleView(articleId: string, articleTitle: string, category: string) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', 'article_view', {
+  const gtag = safeGtag();
+  if (gtag) {
+    gtag('event', 'article_view', {
       event_category: 'content',
       article_id: articleId,
       article_title: articleTitle,

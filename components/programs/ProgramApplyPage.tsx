@@ -20,6 +20,13 @@ import FundingEligibilityFlow, {
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { ACTIVE_BNPL_PROVIDERS, BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import type { Affirm } from '@/lib/types/external-sdks';
+
+// Affirm SDK window extension
+interface AffirmWindow {
+  _affirm_config?: Affirm.AffirmConfig;
+  affirm?: Affirm.AffirmInstance;
+}
 
 interface Props {
   program: ProgramSchema;
@@ -225,8 +232,9 @@ export default function ProgramApplyPage({ program }: Props) {
           return;
         }
         try {
-          (window as any)._affirm_config = { public_api_key: data.publicKey, script: data.affirmJsUrl };
-          if (!(window as any).affirm) {
+          const win = window as unknown as AffirmWindow;
+          win._affirm_config = { public_api_key: data.publicKey, script: data.affirmJsUrl };
+          if (!win.affirm) {
             await new Promise<void>((resolve, reject) => {
               const s = document.createElement('script');
               s.src = data.affirmJsUrl;
@@ -236,7 +244,7 @@ export default function ProgramApplyPage({ program }: Props) {
               document.head.appendChild(s);
             });
           }
-          const sdk = (window as any).affirm;
+          const sdk = win.affirm;
           sdk?.checkout?.(data.checkoutConfig);
           sdk?.checkout?.open();
         } catch {
@@ -507,7 +515,7 @@ export default function ProgramApplyPage({ program }: Props) {
                   value={formData.phone}
                   onChange={(e) => updateField('phone', e.target.value)}
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:outline-none"
-                  placeholder="(317) 555-0100"
+                  placeholder="(317) 314-3757"
                 />
               </div>
 

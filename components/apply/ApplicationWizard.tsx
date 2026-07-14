@@ -303,7 +303,7 @@ function ContactStep({ data, onUpdate, errors }: { data: FormData; onUpdate: (d:
             className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-red-500 ${
               errors.phone ? 'border-red-500' : 'border-slate-200'
             }`}
-            placeholder="(317) 555-0123"
+            placeholder="(317) 314-3757"
           />
           {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
           <p className="text-xs text-slate-500 mt-1">We'll call or text to discuss your application.</p>

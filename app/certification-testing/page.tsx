@@ -312,9 +312,9 @@ export default function CertificationTestingPage() {
             <div className="flex items-start gap-2">
               <MapPin className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
               <span>
-                8888 Keystone Crossing, Suite 1300
+                6331 N Keystone Ave, Suite D, Indianapolis, IN 46220
                 <br />
-                Indianapolis, IN 46240
+                Indianapolis, IN 46220
               </span>
             </div>
             <div className="flex items-center gap-2">

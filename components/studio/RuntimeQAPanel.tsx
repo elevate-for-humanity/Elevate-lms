@@ -298,7 +298,7 @@ export default function RuntimeQAPanel() {
             <Filter className="h-4 w-4 text-slate-400" />
             <select
               value={filter}
-              onChange={(e) => setFilter(e.target.value as any)}
+              onChange={(e) => setFilter(e.target.value as 'all' | ErrorLevel)}
               className="text-xs border rounded px-2 py-1"
             >
               <option value="all">All ({qaResult.errors.length})</option>

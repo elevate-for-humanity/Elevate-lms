@@ -26,10 +26,10 @@ interface FAQ {
 }
 
 const DEFAULT_CAMPUSES: Campus[] = [
-  { name: 'West Campus', address: '8888 Keystone Crossing', city: 'Indianapolis', state: 'IN', zip: '46240', phone: '(317) 314-3757' },
-  { name: 'North Campus', address: '8900 North Meridian', city: 'Carmel', state: 'IN', zip: '46260', phone: '(317) 555-0100' },
-  { name: 'East Campus', address: '7500 East Washington', city: 'Indianapolis', state: 'IN', zip: '46219', phone: '(317) 555-0200' },
-  { name: 'South Campus', address: '6200 South Meridian', city: 'Greenwood', state: 'IN', zip: '46143', phone: '(317) 555-0300' },
+  { name: 'West Campus', address: '6331 N Keystone Ave', city: 'Indianapolis', state: 'IN', zip: '46240', phone: '(317) 314-3757' },
+  { name: 'North Campus', address: '8900 North Meridian', city: 'Carmel', state: 'IN', zip: '46260', phone: '(317) 314-3757' },
+  { name: 'East Campus', address: '7500 East Washington', city: 'Indianapolis', state: 'IN', zip: '46219', phone: '(317) 314-3757' },
+  { name: 'South Campus', address: '6200 South Meridian', city: 'Greenwood', state: 'IN', zip: '46143', phone: '(317) 314-3757' },
 ];
 
 export default function BeautyProgramPage({ program, campuses = DEFAULT_CAMPUSES }: BeautyProgramPageProps) {
@@ -350,7 +350,7 @@ export default function BeautyProgramPage({ program, campuses = DEFAULT_CAMPUSES
               <p>Elevate for Humanity Career & Technical Institute</p>
             </div>
             <div className="footer-contact">
-              <p>8888 Keystone Crossing, Suite 1300<br />Indianapolis, IN 46240<br />(317) 314-3757</p>
+              <p>6331 N Keystone Ave, Suite D, Indianapolis, IN 46220<br />Indianapolis, IN 46220<br />(317) 314-3757</p>
             </div>
             <div className="footer-links">
               <Link href="/about">About</Link>

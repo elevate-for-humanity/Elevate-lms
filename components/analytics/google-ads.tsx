@@ -40,7 +40,7 @@ export function trackAdsConversion(
   currency: string = 'USD',
 ) {
   if (typeof window === 'undefined') return;
-  const gtag = (window as any).gtag;
+  const gtag = (window as unknown as { gtag?: Gtag.Gtag }).gtag;
   if (typeof gtag !== 'function') return;
 
   gtag('event', 'conversion', {

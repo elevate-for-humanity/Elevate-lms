@@ -30,6 +30,29 @@ interface Props {
   onDownload?: () => void;
 }
 
+// Certificate metadata type
+interface CertificateMetadata {
+  student_name?: string;
+  course_name?: string;
+  completion_date?: string;
+  [key: string]: unknown;
+}
+
+// Supabase certificate with relations
+interface CertificateWithProfile {
+  id: string;
+  program_name?: string;
+  course_title?: string;
+  certificate_number?: string;
+  verification_code?: string;
+  issued_date?: string;
+  hours_completed?: number;
+  metadata?: CertificateMetadata;
+  profiles?: {
+    full_name?: string;
+  };
+}
+
 export default function CertificateDownload({
   certificateId,
   student,
@@ -88,21 +111,22 @@ export default function CertificateDownload({
 
         if (fetchError) throw fetchError;
 
-        const meta = (data.metadata as any) || {};
+        const certData = data as CertificateWithProfile;
+        const meta = certData.metadata || {};
         setCertificate({
-          id: data.id,
-          student_name: (data.profiles as any)?.full_name || meta.student_name || 'Student',
-          program_name: data.program_name || data.course_title || meta.course_name || 'Program',
-          course_name: data.course_title || meta.course_name,
-          issue_date: data.issued_date || meta.completion_date || new Date().toISOString(),
+          id: certData.id,
+          student_name: certData.profiles?.full_name || meta.student_name || 'Student',
+          program_name: certData.program_name || certData.course_title || meta.course_name || 'Program',
+          course_name: certData.course_title || meta.course_name,
+          issue_date: certData.issued_date || meta.completion_date || new Date().toISOString(),
           expiry_date: undefined,
-          certificate_number: data.certificate_number,
+          certificate_number: certData.certificate_number || '',
           verification_code:
-            data.verification_code || data.certificate_number?.split('-').pop() || '',
+            certData.verification_code || certData.certificate_number?.split('-').pop() || '',
           credential_type: 'Certificate of Completion',
           issuer_name: 'Program Director',
           issuer_title: 'Director of Training',
-          hours_completed: data.hours_completed,
+          hours_completed: certData.hours_completed,
           grade: undefined,
         });
       } catch (err: any) {

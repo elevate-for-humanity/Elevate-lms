@@ -1,14 +1,12 @@
 'use client';
 
 import React from 'react';
-// components/support/IntercomWidget.tsx
 
 import { useEffect } from 'react';
 
-declare global {
-  interface Window {
-    Intercom?: any;
-  }
+// Intercom window type
+interface IntercomWindow {
+  Intercom?: (...args: unknown[]) => void;
 }
 
 export function IntercomWidget({ user }: { user?: { id: string; email: string; name?: string } }) {
@@ -18,18 +16,18 @@ export function IntercomWidget({ user }: { user?: { id: string; email: string; n
     const appId = process.env.NEXT_PUBLIC_INTERCOM_APP_ID;
 
     (function () {
-      const w = window as any;
+      const w = window as unknown as IntercomWindow;
       const ic = w.Intercom;
       if (typeof ic === 'function') {
         ic('reattach_activator');
         ic('update', {});
       } else {
         const d = document;
-        const i = function (...args: any[]) {
+        const i = function (...args: unknown[]) {
           i.c(args);
-        } as any;
+        };
         i.q = [];
-        i.c = function (data: any) {
+        i.c = function (args: unknown[]) {
           i.q.push(args);
         };
         w.Intercom = i;

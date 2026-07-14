@@ -441,7 +441,7 @@ function IntakeForm({ programs = [] }: { programs?: Program[] }) {
                       name="phone"
                       type="tel"
                       autoComplete="tel"
-                      placeholder="(317) 555-0100"
+                      placeholder="(317) 314-3757"
                       value={phone}
                       onChange={e => setPhone(formatPhone(e.target.value))}
                       className={`w-full border bg-white text-slate-900 p-3 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500 ${fieldErrors.phone ? 'border-red-500' : 'border-slate-300'}`}

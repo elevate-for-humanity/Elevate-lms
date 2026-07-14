@@ -4,6 +4,7 @@ import React from 'react';
 import { useState } from 'react';
 import { ShoppingCart, Check } from 'lucide-react';
 import { addToCart } from '@/lib/store/cart';
+import { StoreProduct } from '@/lib/store/products';
 
 interface SimpleAddToCartButtonProps {
   productId: string;
@@ -27,17 +28,17 @@ export function SimpleAddToCartButton({
     setIsAdding(true);
     
     // Create a minimal product object for the cart
-    const product = {
+    const product: StoreProduct = {
       id: productId,
       name: productName,
       slug: productId,
       price: price,
       inStock: true,
       digital: true,
-      category: 'certification-prep' as const,
+      category: 'certification-prep',
     };
 
-    addToCart(product as any, 1);
+    addToCart(product, 1);
     
     setTimeout(() => {
       setIsAdding(false);

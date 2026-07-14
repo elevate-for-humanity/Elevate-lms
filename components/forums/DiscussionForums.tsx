@@ -37,6 +37,15 @@ interface ForumCategory {
   post_count: number;
 }
 
+// Supabase thread/post with category_id
+interface ThreadWithCategoryId {
+  category_id: string;
+}
+
+interface PostWithCategoryId {
+  category_id: string;
+}
+
 interface ForumThread {
   id: string;
   category_id: string;
@@ -132,16 +141,18 @@ export default function DiscussionForums() {
         const threadsByCategory: Record<string, number> = {};
         const postsByCategory: Record<string, number> = {};
         for (const t of threadsRes.data ?? []) {
-          const id = (t as any).category_id;
+          const thread = t as ThreadWithCategoryId;
+          const id = thread.category_id;
           threadsByCategory[id] = (threadsByCategory[id] ?? 0) + 1;
         }
         for (const p of postsRes.data ?? []) {
-          const id = (p as any).category_id;
+          const post = p as PostWithCategoryId;
+          const id = post.category_id;
           postsByCategory[id] = (postsByCategory[id] ?? 0) + 1;
         }
 
         setCategories(
-          data.map((cat: any) => ({
+          data.map((cat: ForumCategory) => ({
             ...cat,
             thread_count: threadsByCategory[cat.id] ?? 0,
             post_count: postsByCategory[cat.id] ?? 0,

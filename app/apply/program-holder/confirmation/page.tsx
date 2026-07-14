@@ -119,7 +119,7 @@ export default function ProgramHolderConfirmationPage() {
         </div>
 
         <p className="text-center text-xs text-slate-900 mt-6">
-          {PLATFORM_DEFAULTS.orgName} · 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240
+          {PLATFORM_DEFAULTS.orgName} · 6331 N Keystone Ave Suite D, Indianapolis, IN 46220
         </p>
       </div>
     </div>

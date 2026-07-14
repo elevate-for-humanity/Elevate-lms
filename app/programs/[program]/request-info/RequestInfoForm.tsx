@@ -137,7 +137,7 @@ export default function RequestInfoForm({ slug, programTitle, applyHref }: Props
           name="phone"
           type="tel"
           autoComplete="tel"
-          placeholder="(317) 555-0100"
+          placeholder="(317) 314-3757"
           className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
         />
       </div>

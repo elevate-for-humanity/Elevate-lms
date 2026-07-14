@@ -34,13 +34,25 @@ interface EnrollmentData {
   days_inactive?: number;
 }
 
+// Supabase enrollment with relations
+interface EnrollmentWithRelations {
+  id: string;
+  status?: string;
+  program_id?: string;
+  progress?: number;
+  created_at?: string;
+  programs?: {
+    name?: string;
+  };
+}
+
 const statusConfig: Record<
   EnrollmentStatus,
   {
     label: string;
     color: string;
     bgColor: string;
-    icon: any;
+    icon: React.ComponentType<{ className?: string }>;
   }
 > = {
   applied: {
@@ -144,8 +156,8 @@ export default function EnrollmentState({ userId }: { userId?: string }) {
         .eq('user_id', targetUserId);
 
       if (enrollmentData) {
-        const processed: EnrollmentData[] = enrollmentData.map((e: any) => {
-          const program = e.programs as any;
+        const processed: EnrollmentData[] = enrollmentData.map((e: EnrollmentWithRelations) => {
+          const program = e.programs;
           const progress = e.progress || 0;
 
           // Determine status based on progress and enrollment status

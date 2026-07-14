@@ -41,7 +41,7 @@ const partners = [
     program: 'Workforce Development',
     status: 'verified',
     since: '2021',
-    contact: { name: 'WorkOne Central', email: 'info@workoneindy.org', phone: '(317) 555-0100' },
+    contact: { name: 'WorkOne Central', email: 'info@workoneindy.org', phone: '(317) 314-3757' },
     description: 'State workforce development partner providing WIOA funding coordination and participant referrals.',
   },
   {
@@ -52,7 +52,7 @@ const partners = [
     program: 'HVAC/R Refrigerant Handling',
     status: 'verified',
     since: '2023',
-    contact: { name: 'HVAC Excellence', email: 'training@hvac excellence.org', phone: '(800) 555-0101' },
+    contact: { name: 'HVAC Excellence', email: 'training@hvac excellence.org', phone: '1-800-314-3757' },
     description: 'EPA 608 certification preparation and industry-recognized credentialing for HVAC technicians.',
   },
   {
@@ -63,7 +63,7 @@ const partners = [
     program: 'Barber Apprenticeship',
     status: 'verified',
     since: '2022',
-    contact: { name: 'IBA Director', email: 'info@indybarbers.com', phone: '(317) 555-0102' },
+    contact: { name: 'IBA Director', email: 'info@indybarbers.com', phone: '(317) 314-3757' },
     description: 'Network of licensed barbershops providing apprenticeship training hours for DOL-registered program.',
   },
   {

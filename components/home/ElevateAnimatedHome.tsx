@@ -446,7 +446,7 @@ export default function ElevateAnimatedHome() {
             </div>
             <div>
               <h4 className="font-bold mb-4">Contact</h4>
-              <p className="text-slate-400">8888 Keystone Crossing<br />Indianapolis, IN 46240<br /><span className="text-[#dc2626]">(317) 314-3757</span></p>
+              <p className="text-slate-400">6331 N Keystone Ave, Suite D<br />Indianapolis, IN 46220<br /><span className="text-[#dc2626]">(317) 314-3757</span></p>
             </div>
           </div>
           <div className="border-t border-slate-800 pt-8 text-center text-slate-500 text-sm">© {new Date().getFullYear()} Elevate for Humanity. All rights reserved.</div>

@@ -318,7 +318,7 @@ export default function EnrollmentBookingPage({ programs = [] }: { programs?: Pr
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-                  placeholder="(555) 555-5555"
+                  placeholder="314-3757"
                 />
               </div>
 

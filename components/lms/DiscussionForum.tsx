@@ -22,6 +22,18 @@ interface DiscussionForumProps {
   initialComments?: Comment[];
 }
 
+// Supabase comment with profile relation
+interface CommentWithProfile {
+  id: string;
+  content: string;
+  likes_count: number;
+  created_at: string;
+  profiles?: {
+    full_name?: string;
+    avatar_url?: string;
+  };
+}
+
 export function DiscussionForum({ lessonId, initialComments = [] }: DiscussionForumProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [newComment, setNewComment] = useState('');
@@ -40,10 +52,10 @@ export function DiscussionForum({ lessonId, initialComments = [] }: DiscussionFo
         .order('created_at', { ascending: false });
 
       if (data) {
-        const formatted: Comment[] = data.map((c) => ({
+        const formatted: Comment[] = data.map((c: CommentWithProfile) => ({
           id: c.id,
-          author: (c.profiles as any)?.full_name || 'Anonymous',
-          avatar: (c.profiles as any)?.avatar_url || 'AU',
+          author: c.profiles?.full_name || 'Anonymous',
+          avatar: c.profiles?.avatar_url || 'AU',
           content: c.content,
           timestamp: new Date(c.created_at).toLocaleDateString('en-US', { timeZone: 'UTC' }),
           likes: c.likes_count || 0,

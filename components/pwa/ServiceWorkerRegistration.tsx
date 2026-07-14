@@ -79,7 +79,8 @@ export function useServiceWorker() {
   const requestSync = (tag: string) => {
     if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
       navigator.serviceWorker.ready.then((registration) => {
-        (registration as any).sync.register(tag);
+        const swRegistration = registration as unknown as { sync?: { register: (tag: string) => Promise<void> } };
+        swRegistration.sync?.register(tag);
       });
     }
   };

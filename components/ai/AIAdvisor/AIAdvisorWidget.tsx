@@ -106,7 +106,7 @@ export function AIAdvisorWidget() {
     }
     
     if (q.includes('help') || q.includes('advisor') || q.includes('talk') || q.includes('human')) {
-      return "I'd love to connect you with a human advisor! You can text us at (317) 555-BARB, call us, or schedule a free consultation. Our admissions team can answer any question and help you find the best path for your situation. Would you like me to show you how to reach us?";
+      return "I'd love to connect you with a human advisor! You can text us at (317) 314-3757, call us, or schedule a free consultation. Our admissions team can answer any question and help you find the best path for your situation. Would you like me to show you how to reach us?";
     }
     
     return "That's a great question! Based on what you've told me, I think our Barbering Registered Apprenticeship might be a perfect fit - you can earn $14-18/hour while you train, and most students pay nothing upfront. Would you like to learn more about this program, or do you have other questions I can help with?";

@@ -60,8 +60,8 @@ export function GoogleAnalytics() {
 
 // Track page views
 export function trackPageView(url: string) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('config', GA_MEASUREMENT_ID, {
+  if (typeof window !== 'undefined' && (window as unknown as { gtag?: Gtag.Gtag }).gtag) {
+    (window as unknown as { gtag?: Gtag.Gtag }).gtag('config', GA_MEASUREMENT_ID, {
       page_path: url,
     });
   }
@@ -69,8 +69,8 @@ export function trackPageView(url: string) {
 
 // Track custom events
 export function trackEvent(action: string, category: string, label?: string, value?: number) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', action, {
+  if (typeof window !== 'undefined' && (window as unknown as { gtag?: Gtag.Gtag }).gtag) {
+    (window as unknown as { gtag?: Gtag.Gtag }).gtag('event', action, {
       event_category: category,
       event_label: label,
       value: value,
@@ -80,8 +80,8 @@ export function trackEvent(action: string, category: string, label?: string, val
 
 // Track conversions
 export function trackConversion(conversionId: string, value?: number) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', 'conversion', {
+  if (typeof window !== 'undefined' && (window as unknown as { gtag?: Gtag.Gtag }).gtag) {
+    (window as unknown as { gtag?: Gtag.Gtag }).gtag('event', 'conversion', {
       send_to: conversionId,
       value: value,
     });
@@ -90,8 +90,8 @@ export function trackConversion(conversionId: string, value?: number) {
 
 // Update consent
 export function updateConsent(analyticsAllowed: boolean, adsAllowed: boolean = false) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('consent', 'update', {
+  if (typeof window !== 'undefined' && (window as unknown as { gtag?: Gtag.Gtag }).gtag) {
+    (window as unknown as { gtag?: Gtag.Gtag }).gtag('consent', 'update', {
       analytics_storage: analyticsAllowed ? 'granted' : 'denied',
       ad_storage: adsAllowed ? 'granted' : 'denied',
     });

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import type { IdleWindow } from '@/lib/types/external-sdks';
 
 // Injected at build time — unique per deploy, no manual bumping needed.
 const DEPLOY_VERSION = process.env.NEXT_PUBLIC_BUILD_ID ?? 'dev';
@@ -37,7 +38,8 @@ export default function PWAManager() {
 
     // Use requestIdleCallback when available, otherwise defer 4s after load
     if ('requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(register, { timeout: 5000 });
+      const win = window as unknown as IdleWindow;
+      win.requestIdleCallback?.(register, { timeout: 5000 });
     } else {
       setTimeout(register, 4000);
     }

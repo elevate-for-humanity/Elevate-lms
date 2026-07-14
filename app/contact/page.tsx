@@ -155,7 +155,7 @@ export default function ContactPage() {
               <div className="bg-white rounded-2xl shadow-lg p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Contact</h3>
                 <div className="space-y-4">
-                  <a href="tel:+13175550199" className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
+                  <a href="tel:+13173140199" className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
                     <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                       <Phone className="w-5 h-5 text-brand-blue-700" />
                     </div>

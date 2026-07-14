@@ -40,7 +40,7 @@ const SECTIONS = [
     { key: 'funding_approvals', label: 'Funding Approvals', placeholder: 'WRG, WIOA, and JRI approved' },
   ]},
   { id: 'contact', label: 'Contact & Address', icon: MapPin, fields: [
-    { key: 'address_line_1', label: 'Address', placeholder: '8888 Keystone Crossing, Suite 1300' },
+    { key: 'address_line_1', label: 'Address', placeholder: '6331 N Keystone Ave, Suite D, Indianapolis, IN 46220' },
     { key: 'city', label: 'City', placeholder: 'Indianapolis' },
     { key: 'state', label: 'State', placeholder: 'IN' },
     { key: 'zip', label: 'ZIP', placeholder: '46240' },

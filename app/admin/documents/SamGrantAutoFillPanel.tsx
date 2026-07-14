@@ -108,7 +108,7 @@ export default function SamGrantAutoFillPanel() {
             legalName: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
             contactEmail: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
             contactPhone: PLATFORM_DEFAULTS.supportPhone,
-            address: '8888 Keystone Crossing, Suite 1300',
+            address: '6331 N Keystone Ave, Suite D, Indianapolis, IN 46220',
             city: 'Indianapolis',
             state: 'IN',
             zip: '46240',

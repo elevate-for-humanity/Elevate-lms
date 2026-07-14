@@ -26,7 +26,7 @@ export default function ProfilePage() {
     licenseExpiry: '2027-03-15',
     ownerName: 'John Smith',
     ownerEmail: 'john@elevatebarbershop.com',
-    ownerPhone: '(317) 555-0123',
+    ownerPhone: '(317) 314-3757',
     addressLine1: '123 Main Street',
     addressLine2: 'Suite 100',
     city: 'Indianapolis',

@@ -71,7 +71,7 @@ export default function FERPATrainingDashboard({
         )
         .order('completed_at', { ascending: false });
 
-      if (records) setTrainingRecords(records as any);
+      if (records) setTrainingRecords(records);
 
       // Fetch users without training
       const { data: allUsers } = await supabase
@@ -80,7 +80,7 @@ export default function FERPATrainingDashboard({
         .in('role', ['admin', 'instructor', 'staff']);
 
       if (allUsers && records) {
-        const trainedUserIds = records.map((r: any) => r.user_id);
+        const trainedUserIds = records.map((r) => r.user_id);
         const pending = allUsers.filter((u) => !trainedUserIds.includes(u.id));
         setPendingUsers(pending);
       }

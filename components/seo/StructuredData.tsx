@@ -128,7 +128,7 @@ export function ProgramStructuredData({
       sameAs: SITE_URL,
       address: {
         '@type': 'PostalAddress',
-        streetAddress: '8888 Keystone Crossing, Suite 1300',
+        streetAddress: '6331 N Keystone Ave, Suite D, Indianapolis, IN 46220',
         addressLocality: 'Indianapolis',
         addressRegion: 'IN',
         postalCode: '46240',
@@ -189,7 +189,7 @@ export function OrganizationStructuredData() {
       'Nonprofit workforce development institute in Indianapolis providing career training at no cost to eligible Indiana residents through WIOA and state funding. Programs in healthcare, skilled trades, technology, barbering, and business.',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: '8888 Keystone Crossing, Suite 1300',
+      streetAddress: '6331 N Keystone Ave, Suite D, Indianapolis, IN 46220',
       addressLocality: 'Indianapolis',
       addressRegion: 'IN',
       postalCode: '46240',
@@ -380,7 +380,7 @@ export function ServiceStructuredData({
       url: SITE_URL,
       address: {
         '@type': 'PostalAddress',
-        streetAddress: '8888 Keystone Crossing, Suite 1300',
+        streetAddress: '6331 N Keystone Ave, Suite D, Indianapolis, IN 46220',
         addressLocality: 'Indianapolis',
         addressRegion: 'IN',
         postalCode: '46240',

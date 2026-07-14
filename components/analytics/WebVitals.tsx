@@ -104,7 +104,7 @@ export function usePerformanceObserver() {
       for (const entry of list.getEntries()) {
         if (entry.duration > 50) {
           if (process.env.NODE_ENV === 'development')
-            (console as any).debug?.('[Performance] Long task:', entry.duration.toFixed(2), 'ms'); // ci-ignore
+            console.debug('[Performance] Long task:', entry.duration.toFixed(2), 'ms'); // ci-ignore
         }
       }
     });

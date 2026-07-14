@@ -2,6 +2,9 @@ import { Clock, MapPin, Monitor, Users, DollarSign, ArrowRight } from 'lucide-re
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 
+// Valid funding option types for Badge component
+type FundingOptionType = 'wioa' | 'workforce_ready' | 'fssa_impact' | 'self_pay' | 'employer_sponsored' | ' Pell Grant' | 'other';
+
 interface ProgramGlanceProps {
   duration: string;
   location: string;
@@ -69,7 +72,7 @@ export function ProgramGlance({
             <div className="font-semibold text-black">Funding Options</div>
             <div className="flex flex-wrap gap-2 mt-1">
               {fundingOptions.map((option) => (
-                <Badge key={option} type={option as any} size="sm" />
+                <Badge key={option} type={option as FundingOptionType} size="sm" />
               ))}
             </div>
           </div>

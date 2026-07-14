@@ -4,6 +4,12 @@ import dynamicImport from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import SpeechCanceller from '@/components/ui/SpeechCanceller';
+import type { IdleRequestCallback, IdleRequestOptions } from '@/lib/types/external-sdks';
+
+// Extended window for requestIdleCallback
+interface IdleWindow {
+  requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+}
 
 // Loading placeholder to prevent null component errors
 const LoadingDiv = () => <div className="hidden" />;
@@ -39,8 +45,9 @@ export default function RootWidgets() {
   const [idle, setIdle] = useState(false);
 
   useEffect((): void => {
-    if ('requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(() => setIdle(true), { timeout: 4000 });
+    const win = window as unknown as IdleWindow;
+    if (win.requestIdleCallback) {
+      win.requestIdleCallback(() => setIdle(true), { timeout: 4000 });
     } else {
       const t = setTimeout(() => setIdle(true), 3000);
       return () => clearTimeout(t);

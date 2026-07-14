@@ -169,8 +169,8 @@ export default function CareerServicesPage() {
             <Link href="/contact" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
               Contact Us <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
-            <a href="tel:+13175551234" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-              <Phone className="mr-2 w-5 h-5" /> Call (317) 555-1234
+            <a href="tel:+13173141234" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Phone className="mr-2 w-5 h-5" /> Call (317) 314-3757
             </a>
           </div>
         </div>

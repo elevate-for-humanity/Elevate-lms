@@ -107,7 +107,7 @@ export function TourBookingWidget() {
           to confirm your {tourType === 'virtual' ? 'virtual' : 'in-person'} tour on {selectedDate} at {selectedTime}.
         </p>
         <p className="text-sm text-gray-500">
-          Questions? Call us at (317) 555-BARB
+          Questions? Call us at (317) 314-3757
         </p>
       </Card>
     );
@@ -246,7 +246,7 @@ export function TourBookingWidget() {
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="(317) 555-1234"
+            placeholder="(317) 314-3757"
           />
         </div>
 
@@ -273,7 +273,7 @@ export function TourBookingWidget() {
         </Button>
 
         <p className="text-center text-xs text-gray-500">
-          Or call us directly at (317) 555-BARB
+          Or call us directly at (317) 314-3757
         </p>
       </div>
     </Card>

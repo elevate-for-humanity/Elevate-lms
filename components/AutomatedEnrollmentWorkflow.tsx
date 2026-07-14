@@ -31,6 +31,20 @@ interface EnrollmentData {
   course?: { title: string };
 }
 
+// Supabase enrollment with relations
+interface EnrollmentWithRelations {
+  id: string;
+  user_id: string;
+  program_id?: string;
+  course_id?: string;
+  status: string;
+  created_at: string;
+  updated_at?: string;
+  profiles?: { full_name: string; email: string };
+  training_programs?: { name: string };
+  courses?: { title: string };
+}
+
 interface EnrollmentStats {
   enrollmentsToday: number;
   enrollmentsYesterday: number;
@@ -216,11 +230,18 @@ export default function AutomatedEnrollmentWorkflow({
 
       if (enrollmentError) throw enrollmentError;
 
+      const data = enrollmentData as EnrollmentWithRelations;
       const formattedEnrollment: EnrollmentData = {
-        ...enrollmentData,
-        student: enrollmentData.profiles as any,
-        program: enrollmentData.training_programs as any,
-        course: enrollmentData.courses as any,
+        id: data.id,
+        user_id: data.user_id,
+        program_id: data.program_id,
+        course_id: data.course_id,
+        status: data.status,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        student: data.profiles,
+        program: data.training_programs,
+        course: data.courses,
       };
       setEnrollment(formattedEnrollment);
 
@@ -364,11 +385,13 @@ export default function AutomatedEnrollmentWorkflow({
           table: 'enrollments',
           filter: `id=eq.${enrollmentId}`,
         },
-        (payload) => {
+        (payload: { new?: { status?: string } }) => {
           if (payload.new) {
-            const newStatus = (payload.new as any).status;
-            const derivedWorkflow = deriveWorkflowFromStatus(newStatus);
-            setWorkflow(derivedWorkflow);
+            const newStatus = payload.new.status;
+            if (newStatus) {
+              const derivedWorkflow = deriveWorkflowFromStatus(newStatus);
+              setWorkflow(derivedWorkflow);
+            }
           }
         },
       )

@@ -298,7 +298,7 @@ export default function PayrollSetupForm({ user, profile, rateConfigs, existingP
                   <input
                     value={banking.bankName}
                     onChange={(e) => setBanking((b) => ({ ...b, bankName: e.target.value }))}
-                    placeholder="email@example.com or (555) 555-5555"
+                    placeholder="email@example.com or 314-3757"
                     className="w-full border rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:outline-none"
                   />
                   <p className="text-xs text-slate-400 mt-1">

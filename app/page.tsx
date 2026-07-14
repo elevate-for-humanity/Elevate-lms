@@ -15,6 +15,8 @@ import { WorkforceOSArchitecture } from '@/components/home/WorkforceOSArchitectu
 import { HomeAIPlatform } from '@/components/home/HomeAIPlatform';
 import { HomeSegmentedCTA } from '@/components/home/HomeSegmentedCTA';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
+import { HomeAIDemo } from '@/components/home/HomeAIDemo';
+import { SuccessMetrics } from '@/components/home/SuccessMetrics';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
@@ -150,6 +152,14 @@ export default async function HomePage() {
       {/* ── 8d. AI PLATFORM OVERVIEW ───────────────────────────────────── */}
       {/* PARIS AI, Course Factory, Credential Engine, Dev Studio */}
       <HomeAIPlatform />
+
+      {/* ── 8e. AI DEMONSTRATION ─────────────────────────────────────── */}
+      {/* Interactive AI demo for government procurement review */}
+      <HomeAIDemo />
+
+      {/* ── 8f. SUCCESS METRICS ───────────────────────────────────────── */}
+      {/* Verified outcome statistics with methodology documentation */}
+      <SuccessMetrics />
 
       {/* ── 9. SEGMENTED CTA ────────────────────────────────────────────── */}
       {/* Separate entry funnels: Learners / Employers / Workforce Agencies /

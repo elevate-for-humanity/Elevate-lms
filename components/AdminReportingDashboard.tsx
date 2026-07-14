@@ -49,6 +49,13 @@ interface Activity {
   created_at: string;
 }
 
+// Supabase program with enrollments relation
+interface ProgramWithEnrollments {
+  id: string;
+  name: string;
+  enrollments?: { count: number }[];
+}
+
 export function AdminReportingDashboard() {
   const [dateRange, setDateRange] = useState('30days');
   const [loading, setLoading] = useState(true);
@@ -162,10 +169,10 @@ export function AdminReportingDashboard() {
 
       // Format program performance
       if (programs) {
-        const formattedPrograms: ProgramPerformance[] = programs.map((p) => ({
+        const formattedPrograms: ProgramPerformance[] = programs.map((p: ProgramWithEnrollments) => ({
           id: p.id,
           name: p.name,
-          students: (p.enrollments as any)?.[0]?.count || 0,
+          students: p.enrollments?.[0]?.count || 0,
           completion: 0,
           revenue: 0,
           placement: 0,

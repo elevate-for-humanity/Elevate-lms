@@ -18,6 +18,13 @@ interface ProgressData {
   }>;
 }
 
+// Supabase enrollment with relations
+interface EnrollmentWithProgram {
+  programs?: {
+    required_hours?: number;
+  };
+}
+
 export default function ProgressCompliance({ userId }: { userId?: string }) {
   const [data, setData] = useState<ProgressData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +74,8 @@ export default function ProgressCompliance({ userId }: { userId?: string }) {
         .eq('status', 'approved');
 
       const totalHours = hourLogs?.reduce((sum, log) => sum + (log.hours || 0), 0) || 0;
-      const requiredHours = (enrollments?.programs as any)?.required_hours || 0;
+      const enrollmentWithProgram = enrollments as EnrollmentWithProgram | null;
+      const requiredHours = enrollmentWithProgram?.programs?.required_hours || 0;
 
       // Determine compliance status
       let complianceStatus: 'compliant' | 'at_risk' | 'non_compliant' = 'compliant';

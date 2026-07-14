@@ -398,11 +398,11 @@ export function FundingExperience({ className = '' }: FundingExperienceProps) {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="tel:1-800-204-0123"
+              href="tel:1-800-314-0123"
               className="inline-flex items-center gap-2 text-brand-red-600 font-semibold hover:text-brand-red-700"
             >
               <Phone className="w-5 h-5" />
-              1-800-204-0123
+              1-800-314-0123
             </a>
             <a
               href="mailto:funding@elevateforhumanity.org"

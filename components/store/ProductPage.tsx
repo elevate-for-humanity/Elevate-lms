@@ -482,7 +482,7 @@ export function ProductPage({ product }: ProductPageProps) {
                 <h2 className="text-2xl font-black text-slate-900">Reviews</h2>
                 <select
                   value={reviewFilter}
-                  onChange={(e) => setReviewFilter(e.target.value as any)}
+                  onChange={(e) => setReviewFilter(e.target.value as 'all' | '5' | '4' | '3' | '2' | '1')}
                   className="border rounded-lg px-4 py-2"
                 >
                   <option value="all">All Reviews</option>

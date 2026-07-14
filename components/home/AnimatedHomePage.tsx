@@ -39,10 +39,7 @@ const STATS: Stat[] = [
 ];
 
 const CAMPUSES: Campus[] = [
-  { name: 'West Campus', address: '8888 Keystone Crossing, Indianapolis', phone: '(317) 314-3757' },
-  { name: 'North Campus', address: '8900 N Meridian St, Carmel', phone: '(317) 204-0100' },
-  { name: 'East Campus', address: '7500 E Washington St, Indianapolis', phone: '(317) 204-0200' },
-  { name: 'South Campus', address: '6200 S Meridian St, Greenwood', phone: '(317) 204-0300' },
+  { name: 'Main Campus', address: '6331 N Keystone Ave, Indianapolis, IN 46220', phone: '(317) 314-3757' },
 ];
 
 const FUNDING_OPTIONS = [
@@ -545,8 +542,8 @@ export default function AnimatedHomePage() {
             <div>
               <h4 className="font-bold mb-4">Contact</h4>
               <div className="space-y-2 text-slate-400">
-                <p>8888 Keystone Crossing, Suite 1300</p>
-                <p>Indianapolis, IN 46240</p>
+                <p>6331 N Keystone Ave, Suite D, Indianapolis, IN 46220</p>
+                <p>Indianapolis, IN 46220</p>
                 <p className="text-brand-red-400">(317) 314-3757</p>
               </div>
             </div>

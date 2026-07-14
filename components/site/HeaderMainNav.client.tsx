@@ -72,30 +72,17 @@ function DropdownLinks({
       );
     }
     if (!sub.href) return null;
-    const programSlug = item.id === 'programs' ? getProgramSlugFromHref(sub.href) : null;
-    const applyHref = programSlug ? programApplyLinks[programSlug] : undefined;
     return (
-      <div key={sub.name + sub.href}>
-        <Link
-          href={sub.href}
-          prefetch={false}
-          onClick={onNavigate}
-          {...(isExternal(sub.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-          className="block text-sm text-slate-700 hover:text-brand-blue-600 hover:bg-slate-50 rounded-lg px-2 py-1.5"
-        >
-          {sub.name}
-        </Link>
-        {applyHref && (
-          <Link
-            href={applyHref}
-            prefetch={false}
-            onClick={onNavigate}
-            className="block text-xs text-brand-blue-700 px-2 py-1 pl-4"
-          >
-            Apply · {sub.name}
-          </Link>
-        )}
-      </div>
+      <Link
+        key={sub.name + sub.href}
+        href={sub.href}
+        prefetch={false}
+        onClick={onNavigate}
+        {...(isExternal(sub.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        className="block text-sm text-slate-700 hover:text-brand-blue-600 hover:bg-slate-50 rounded-lg px-2 py-1.5"
+      >
+        {sub.name}
+      </Link>
     );
   };
 

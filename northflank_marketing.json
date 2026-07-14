@@ -13,6 +13,14 @@
     "dockerFilePath": "/Dockerfile.marketing",
     "dockerWorkDir": "/"
   },
+  "buildSecrets": {
+    "NEXT_PUBLIC_SUPABASE_URL": "",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "",
+    "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org"
+  },
+  "buildArgs": {
+    "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org"
+  },
   "deployment": {
     "healthCheck": {
       "enabled": true,

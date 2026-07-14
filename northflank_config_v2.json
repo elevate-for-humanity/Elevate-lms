@@ -12,5 +12,14 @@
     "projectBranch": "main",
     "dockerFilePath": "/Dockerfile.northflank-lms",
     "dockerWorkDir": "/"
+  },
+  "buildSecrets": {
+    "NEXT_PUBLIC_SUPABASE_URL": "",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "",
+    "SUPABASE_SERVICE_ROLE_KEY": "",
+    "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org"
+  },
+  "buildArgs": {
+    "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org"
   }
 }

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
-import PageVideoHero from '@/components/ui/PageVideoHero';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
@@ -17,20 +16,6 @@ export const metadata: Metadata = {
 export default function JobReadyIndyPage() {
   return (
     <div className="min-h-screen bg-white">
-      <PageVideoHero
-        videoSrc="/videos/training-providers-hero.mp4"
-        posterSrc="/images/pages/admin-wioa-hero.webp"
-        posterAlt="Funding Job Ready Indy — {PLATFORM_DEFAULTS.orgName}"
-        size="marketing"
-      />
-      <div className="bg-slate-50 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs
-            items={[{ label: 'Funding', href: '/funding' }, { label: 'Job Ready Indy' }]}
-          />
-        </div>
-      </div>
-
       {/* Hero */}
       <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}

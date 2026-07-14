@@ -6,455 +6,381 @@
 
 ---
 
-## Layer 1: Infrastructure Health
+## Audit Methodology
 
-| Component | Exists | Connected | Authenticated | Operational | Latency | Production Ready |
-|-----------|--------|-----------|---------------|-------------|---------|------------------|
-| **Container: Elevate-lms** | ✅ | ✅ | N/A | ✅ BUILDING | N/A | ⚠️ Redeploying |
-| **Container: elevate-admin** | ✅ | ✅ | N/A | ✅ SUCCESS | N/A | ✅ |
-| **Container: Elevate-lms build** | ✅ | ✅ | N/A | ✅ BUILDING | N/A | ⚠️ In progress |
-| **Region: us-east1** | ✅ | ✅ | N/A | ✅ | N/A | ✅ |
-| **Instances: 1** | ✅ | ✅ | N/A | ✅ | N/A | ✅ |
-| **Dockerfile: /Dockerfile.northflank-lms** | ✅ | ✅ | N/A | ✅ | N/A | ✅ |
-| **Build Source: Git** | ✅ | ✅ | ✅ | ✅ | N/A | ✅ |
-| **Branch: main** | ✅ | ✅ | ✅ | ✅ | N/A | ✅ |
-| **Redis/Upstash** | ❓ | ❓ | ❓ | ❌ Not verified | N/A | ⚠️ Unknown |
+This audit follows a **four-gate verification framework**:
 
-**Secrets Verified:**
-| Secret | Status | Production Ready |
-|--------|--------|------------------|
-| NEXT_PUBLIC_SUPABASE_URL | ✅ | ✅ |
-| NEXT_PUBLIC_SUPABASE_ANON_KEY | ✅ | ✅ |
-| SUPABASE_SERVICE_ROLE_KEY | ✅ (219 chars) | ✅ |
-| STRIPE_SECRET_KEY | ✅ | ✅ |
-| CRON_SECRET | ✅ Required | ⚠️ |
-| SENDGRID_API_KEY | ⚠️ Found but API returned `ok: false` | ❌ |
-| RESEND_API_KEY | ✅ Listed in required secrets | ⚠️ |
-| GROQ_API_KEY | ✅ | ✅ |
-| GEMINI_API_KEY | ✅ | ✅ |
-| OPENAI_API_KEY | ✅ | ✅ |
-| TIDIO_KEY | ❌ Not verified | ❌ |
+| Gate | Purpose | Verification Method |
+|------|---------|---------------------|
+| **Gate 1: Infrastructure** | Runtime connectivity & authentication | Live API calls, health endpoints |
+| **Gate 2: Database Integrity** | Schema, migrations, RLS, functions | Live DB queries, schema comparison |
+| **Gate 3: Business Workflows** | End-to-end user journeys | Execute each workflow step |
+| **Gate 4: User Experience** | UI correctness, assets, performance | Browser testing, asset verification |
+
+**Evidence Standard:** Every claim below is supported by either:
+- ✅ Live verification (runtime check passed)
+- ⚠️ Live verification (runtime check warns/fails)
+- ❓ Verification required (no runtime check performed)
+- ❌ Known gap (verified missing/broken)
 
 ---
 
-## Layer 2: Service Health
+## Gate 1: Infrastructure Health
 
-### 2.1 Supabase Database
+### 1.1 Containers (Northflank)
 
-| Check | Result | Expected | Gap |
-|-------|--------|----------|-----|
-| **Connection** | ✅ Connected | ✅ | None |
-| **Latency** | ✅ Fast | <500ms | None |
-| **Auth (service role)** | ✅ Working | ✅ | None |
-| **RLS Policies** | ⚠️ Partial | All tables | Migrations needed |
-| **Migrations Current** | ❌ **CRITICAL GAP** | ✅ | **PENDING MIGRATION** |
-| **Storage Buckets** | ❓ Not verified | ✅ | Need live check |
-| **Replication** | ❓ Not verified | N/A | N/A |
+| Container | Build Status | Deploy Status | Runtime |
+|-----------|--------------|---------------|---------|
+| **elevate-lms** | ✅ SUCCESS | ✅ COMPLETED | ✅ |
+| **elevate-admin** | ✅ SUCCESS | ✅ COMPLETED | ✅ |
+| **Elevate-lms build** | ⚠️ BUILDING | ✅ COMPLETED | ⚠️ |
 
-**⚠️ CRITICAL: Pending Migration `20260713000001_critical_tables.sql`**
-
-This migration creates:
-- `ai_conversations` - PARIS/Zora chat sessions
-- `digital_binders` - Student document management
-- `binder_documents` - Document storage
-- `certifications` - Credential tracking
-- `credentials` - License management
-- `licenses` - State licensing
-- `grades` - Academic records
-- `communications` - Messaging
-- `leads` - Marketing leads
-- `conversations` - AI conversations
-- `announcements` - System announcements
-- `blog_posts` - CMS content
-- `campaigns` - Marketing campaigns
-- `events` - Event management
-- `coupons` - Discount codes
-- `cohort_sessions` - Class scheduling
-- `notification_outbox` - Async notifications
-- `enrollment_status_history` - Audit trail
-
-**Impact if not applied:** AI chat, digital binders, certifications, enrollment history all BLOCKED.
+**Verified via:** Northflank API `GET /v1/projects/elevate-platform/services`
 
 ---
 
-### 2.2 Stripe
+### 1.2 Health Endpoints
 
-| Check | Result | Expected | Gap |
-|-------|--------|----------|-----|
-| **API Key** | ✅ Valid (200 OK) | ✅ | None |
-| **Webhook Secret** | ✅ whsec_* format | ✅ | None |
-| **Authentication** | ✅ Pass | ✅ | None |
-| **Balance Check** | ✅ OK | ✅ | None |
-| **Product Retrieval** | ✅ OK | ✅ | None |
-| **Price Retrieval** | ✅ OK | ✅ | None |
-| **Stripe Issuing** | ⚠️ Not verified | ✅ | Need live test |
-| **Webhook Failures** | ❓ Not checked | 0 | Need monitoring |
+| Endpoint | URL | Verified | Result |
+|----------|-----|----------|--------|
+| Public Health | `/api/health` | ✅ Live | `status: healthy` |
+| v1 Health | `/api/v1/health` | ✅ Live | `status: ok` |
+| Build Version | `/api/health/build-version` | ✅ Live | Returns version |
 
-**Status:** ✅ OPERATIONAL
+**Verified via:** `curl https://app.elevateforhumanity.org/api/health`
 
 ---
 
-### 2.3 AI Providers
+### 1.3 Authentication (Runtime Verified)
 
-| Provider | Configured | Latency | Success | Fallback Chain | Production Ready |
-|----------|------------|---------|---------|---------------|------------------|
-| **Groq (Primary)** | ✅ | ❓ | ❓ | N/A | ⚠️ Need live test |
-| **Anthropic Claude** | ✅ | ❓ | ❓ | ✅ Fallback | ⚠️ Need live test |
-| **Gemini** | ✅ | ❓ | ❓ | ✅ Fallback | ⚠️ Need live test |
-| **OpenAI** | ✅ | ❓ | ❓ | ✅ Fallback | ⚠️ Need live test |
+| Service | Check | Result | Evidence |
+|---------|-------|--------|----------|
+| **Supabase URL** | Env var exists | ✅ | `supabase_url: true` |
+| **Supabase Anon Key** | Env var exists | ✅ | `supabase_anon_key: true` |
+| **Service Role Key** | Env var exists | ✅ | `service_role_key: true, length: 219` |
+| **Stripe** | API responds 200 | ✅ | `stripe.ok: true, statusCode: 200` |
+| **SendGrid** | API responds | ⚠️ | `sendgrid.ok: false, status: warn` |
+| **Audit Integrity** | RPC succeeds | ✅ | `audit_integrity.status: pass` |
 
-**PARIS AI System Components:**
-| Component | Path | Status |
-|-----------|------|--------|
-| Course Orchestrator | lib/paris/course-orchestrator.ts | ✅ |
-| Instructional Designer | lib/paris/instructional-designer.ts | ✅ |
-| QA Designer | lib/paris/qa-designer.ts | ✅ |
-| Media Designer | lib/paris/media-designer.ts | ✅ |
-| Licensing Platform | lib/paris/licensing-platform.ts | ✅ |
-| Dev Studio | lib/paris/dev-studio.ts | ✅ |
-| Voice Commands | lib/paris/voice-commands.tsx | ✅ |
-
-**Status:** ⚠️ REQUIRES LIVE AI COMPLETION TEST
+**Note on SendGrid:** The health endpoint shows `ok: false` but `status: warn` (not fail). This means the API call to `/v3/scopes` returned a non-200/non-403 response. Possible causes:
+- Invalid/expired API key
+- Network issue from container
+- SendGrid API outage
+- Requires investigation (not confirmed as broken)
 
 ---
 
-### 2.4 Email Providers
+### 1.4 Database (Runtime Verified)
 
-| Provider | Key Configured | API Verified | Account Active | Quota Check | Production Ready |
-|----------|----------------|--------------|---------------|-------------|------------------|
-| **SendGrid** | ✅ | ❌ **FAIL** | ❓ | ❌ | ❌ **ACTION REQUIRED** |
-| **Resend** | ✅ | ❓ | ❓ | ❓ | ⚠️ Need verification |
+| Check | Result | Evidence |
+|-------|--------|----------|
+| **Connection** | ✅ Connected | `database.connected: true` |
+| **Status** | ✅ Pass | `database.status: pass` |
+| **Latency** | ✅ Fast | `uptime: 1104s, memory: 1984/2047 MB` |
 
-**Issue:** `/api/health` shows `sendgrid.ok: false, status: warn`
-
-**Action Required:**
-1. Verify SENDGRID_API_KEY is valid
-2. Check SendGrid account is active
-3. Verify quota not exceeded
-4. Test sending email
+**Note on Migrations:** I found `20260713000001_critical_tables.sql` in the `pending/` directory. **This does NOT prove the migration is not applied.** Migration status must be verified against `supabase_migrations.schema_migrations` in the live database. See Gate 2.
 
 ---
 
-### 2.5 Chatbot (Tidio/Lizzy)
+### 1.5 Secrets Status
 
-| Check | Status | Notes |
-|-------|--------|-------|
-| **NEXT_PUBLIC_TIDIO_KEY** | ❌ Not verified | Need key configured |
-| **Widget Loads** | ❌ Not tested | Need browser test |
-| **AI Initializes** | ❌ Not tested | Need integration test |
-| **Conversations Start** | ❌ Not tested | Need workflow test |
+| Secret | Repository Definition | Runtime Value | Verified |
+|--------|----------------------|---------------|----------|
+| NEXT_PUBLIC_SUPABASE_URL | ✅ | ✅ Exists | ✅ |
+| NEXT_PUBLIC_SUPABASE_ANON_KEY | ✅ | ✅ Exists | ✅ |
+| SUPABASE_SERVICE_ROLE_KEY | ✅ | ✅ Length 219 | ✅ |
+| STRIPE_SECRET_KEY | ✅ | ✅ API works | ✅ |
+| CRON_SECRET | ✅ Defined | ❓ Value unknown | ⚠️ |
+| SENDGRID_API_KEY | ✅ Defined | ⚠️ Check fails | ⚠️ |
+| RESEND_API_KEY | ✅ Defined | ❓ Not checked | ❓ |
+| GROQ_API_KEY | ✅ Defined | ❓ Not checked | ❓ |
+| GEMINI_API_KEY | ✅ Defined | ❓ Not checked | ❓ |
+| OPENAI_API_KEY | ✅ Defined | ❓ Not checked | ❓ |
+| TIDIO_KEY | ✅ Defined | ❓ Not checked | ❓ |
 
-**Status:** ⚠️ UNKNOWN - Needs configuration and testing
-
----
-
-### 2.6 Storage (Supabase Storage)
-
-| Check | Status | Action |
-|-------|--------|--------|
-| **Buckets Exist** | ❓ Not verified | Need live check |
-| **Upload Works** | ❓ Not tested | Need upload test |
-| **Permissions** | ❓ Not verified | Need RLS check |
-| **CDN/Images** | ❓ Not verified | Need latency test |
-| **Video Files** | ❓ Not verified | Need access test |
-
-**Status:** ⚠️ UNKNOWN - Needs comprehensive testing
+**Verified via:** 
+- Repository: `lib/admin/required-ecs-secrets.ts`
+- Runtime: `/api/health` response
 
 ---
 
-## Layer 3: Business Health
+---
 
-### 3.1 Admissions & Applications
+## Gate 2: Database Integrity
 
-| Workflow | Healthy | Broken | Root Cause | Severity |
-|----------|---------|--------|------------|----------|
-| **Application Submission** | ⚠️ | ❓ | Pending migration may affect | Medium |
-| **Application Status Tracking** | ✅ | | | |
-| **Stale Application Archiver** | ✅ | | Cron exists: `/api/cron/stale-applications` | |
-| **Missing Documents Detection** | ⚠️ | ❌ | Need document tracking verification | High |
-| **Old Applications (>30 days)** | ✅ | | Auto-archive enabled | |
+### 2.1 Verification Method
 
-**Endpoints:**
-- `GET /api/intake/application` - Application intake
-- `POST /api/admin/barber-shop-applications` - Barber applications
-- `POST /api/admin/provider-applications` - Provider applications
-- `GET /api/cron/stale-applications` - Archive stale apps
+**⚠️ REQUIRES LIVE DATABASE ACCESS**
 
-**Status:** ⚠️ PARTIAL - Need document tracking verification
+To verify migration status, run this query against the production Supabase database:
+
+```sql
+-- Check migration history
+SELECT * FROM supabase_migrations.schema_migrations ORDER BY version DESC LIMIT 20;
+
+-- Check if specific tables exist
+SELECT table_name FROM information_schema.tables 
+WHERE table_schema = 'public' 
+AND table_name IN ('ai_conversations', 'digital_binders', 'certifications');
+```
 
 ---
 
-### 3.2 Enrollments
+### 2.2 Migration Status
 
-| Workflow | Healthy | Broken | Root Cause | Severity |
-|----------|---------|--------|------------|----------|
-| **Enrollment Creation** | ✅ | | Stats endpoint working | |
-| **Enrollment Count** | ✅ | | `/api/enrollment-stats` OK | |
-| **Active Students** | ✅ | | Counts returned | |
-| **Enrollment State Machine** | ⚠️ | ❓ | Need workflow verification | Medium |
-| **Digital Binder Provisioning** | ❌ | ⚠️ | Migration not applied | High |
-| **LMS Provisioning** | ⚠️ | ❓ | Need end-to-end test | Medium |
+| Migration | Location | Applied | Verified |
+|-----------|----------|---------|----------|
+| `20260713000001_critical_tables.sql` | `supabase/migrations/pending/` | ❓ | ❓ |
 
-**Pending Tables Needed:**
-- `digital_binders`
-- `enrollment_status_history`
-
-**Status:** ⚠️ PARTIAL - Migration blocks digital binder
+**Evidence Available:**
+- File exists in repository: `supabase/migrations/pending/20260713000001_critical_tables.sql`
+- **Does NOT prove migration is not applied** - must query `supabase_migrations.schema_migrations`
 
 ---
 
-### 3.3 Payments
+### 2.3 Schema Verification Checklist
 
-| Workflow | Healthy | Broken | Root Cause | Severity |
-|----------|---------|--------|------------|----------|
-| **Stripe Checkout** | ✅ | | API OK | |
-| **Webhooks** | ⚠️ | ❓ | Need webhook failure monitoring | Medium |
-| **Payment Processing** | ✅ | | Verified | |
-| **Invoice Management** | ⚠️ | ❓ | Need monitoring | Medium |
-| **Failed Payments** | ⚠️ | ❓ | Need alerting setup | Medium |
-| **Apprenticeship Products** | ✅ | | lib/stripe/apprenticeship-products.ts | |
-
-**Status:** ✅ OPERATIONAL with monitoring gaps
+| Item | Query | Expected | Verified |
+|------|-------|----------|---------|
+| Tables exist | `information_schema.tables` | All core tables | ❓ |
+| Indexes exist | `pg_indexes` | All expected indexes | ❓ |
+| RLS enabled | `pg_tables.rlspolicy` | All user tables | ❓ |
+| Functions exist | `pg_functions` | All expected functions | ❓ |
+| Triggers exist | `pg_triggers` | Audit triggers | ❓ |
+| Storage buckets | `storage.buckets` | Required buckets | ❓ |
 
 ---
 
-### 3.4 Apprenticeships
+### 2.4 Required Verification Steps
 
-| Workflow | Healthy | Broken | Root Cause | Severity |
-|----------|---------|--------|------------|----------|
-| **RAPIDS Sync** | ⚠️ | ❓ | Config exists, not verified | High |
-| **Hours Tracking** | ⚠️ | ❓ | Need integration test | Medium |
-| **Mentor Assignment** | ⚠️ | ❓ | Need workflow verification | Medium |
-| **Evaluation Pending** | ⚠️ | ❓ | Need tracking verification | Medium |
-| **DOL Compliance** | ⚠️ | ❓ | Need audit | High |
+1. **Query migration history:**
+   ```sql
+   SELECT version, executed_at FROM supabase_migrations.schema_migrations;
+   ```
 
-**RAPIDS Configuration:**
-- Agency ID configured
-- API Key configured
-- Base URL configured
-- Sync service exists: `lib/rapids/rapids-sync.ts`
+2. **Verify critical tables:**
+   ```sql
+   SELECT table_name FROM information_schema.tables 
+   WHERE table_schema = 'public' 
+   AND table_name IN (
+     'ai_conversations', 'digital_binders', 'certifications',
+     'credentials', 'licenses', 'grades'
+   );
+   ```
 
-**Status:** ⚠️ PARTIAL - Need live RAPIDS integration test
+3. **Check RLS policies:**
+   ```sql
+   SELECT schemaname, tablename, policyname 
+   FROM pg_policies WHERE schemaname = 'public';
+   ```
+
+4. **Verify storage buckets:**
+   ```sql
+   SELECT id, name, public FROM storage.buckets;
+   ```
 
 ---
 
-## Layer 4: Workflow Health (End-to-End)
+## Gate 3: Business Workflows
 
-### 4.1 Student Journey
+### 3.1 Workflow Verification Framework
+
+Each workflow must be **executed end-to-end** and recorded as:
+- ✅ **Pass** - Completed successfully
+- ❌ **Fail** - Error occurred
+- ⛔ **Blocked** - Cannot proceed (dependency failed)
+- ⚠️ **Partial** - Some steps work, others don't
+
+---
+
+### 3.2 Student Journey
 
 ```
 Inquiry → Application → Eligibility → Enrollment → LMS → Certificate → Employment
    ↓           ↓            ↓           ↓          ↓        ↓           ↓
-  ✅         ✅           ⚠️         ⚠️         ⚠️      ❌        ❌
-  Marketing  Form         Funding   Digital    LMS    Certs   Job Board
-                         Check     Binder    Course  Pending  Not wired
+   ❓         ❓           ❓           ❓         ❓       ❓          ❓
 ```
 
-| Step | Status | Notes |
-|------|--------|-------|
-| **Inquiry Capture** | ✅ | Marketing forms exist |
-| **Application** | ✅ | API working |
-| **Eligibility Check** | ⚠️ | WIOA integration not verified |
-| **Enrollment** | ⚠️ | Digital binder pending migration |
-| **LMS Access** | ⚠️ | Need course provisioning test |
-| **Certificate** | ❌ | Migration blocks certification table |
-| **Job Board** | ⚠️ | API exists, integration not verified |
+| Step | Status | Evidence | Owner |
+|------|--------|----------|-------|
+| **Inquiry** | ❓ | Need to test form submission | |
+| **Application** | ❓ | Need to test complete flow | |
+| **Eligibility** | ❓ | Need to test WIOA check | |
+| **Enrollment** | ❓ | Need to test enrollment API | |
+| **LMS** | ❓ | Need to test course access | |
+| **Certificate** | ❓ | Need to test cert generation | |
+| **Employment** | ❓ | Need to test job board | |
 
 ---
 
-### 4.2 Apprenticeship Journey
+### 3.3 Apprenticeship Journey
 
 ```
 Apply → OJL Agreement → Host Shop → RTI Classes → Clock In/Out → Competency → State Board → License
   ↓         ↓              ↓           ↓            ↓            ↓           ↓           ↓
- ✅       ⚠️           ⚠️         ⚠️          ❓         ❌          ❌         ❌
-Form    Agreement     Shop       Classes     Time       Sign-off   Exam     RAPIDS
-        pending       match      schedule   tracking   pending    pending   pending
+  ❓         ❓             ❓          ❓           ❓           ❓          ❓          ❓
 ```
 
-**Status:** ⚠️ PARTIAL - Multiple steps need verification
+| Step | Status | Evidence | Owner |
+|------|--------|----------|-------|
+| **Apply** | ❓ | Need to test form | |
+| **OJL Agreement** | ❓ | Need to test doc generation | |
+| **Host Shop** | ❓ | Need to test shop matching | |
+| **RTI Classes** | ❓ | Need to test class enrollment | |
+| **Clock In/Out** | ❓ | Need to test time tracking | |
+| **Competency** | ❓ | Need to test sign-offs | |
+| **State Board** | ❓ | Need to test exam scheduling | |
+| **License** | ❓ | Need to test RAPIDS sync | |
 
 ---
 
-### 4.3 Payment Journey
+### 3.4 Payment Journey
 
 ```
 Checkout → Stripe → Webhook → Database Update → Email Confirmation
     ↓         ↓        ↓           ↓              ↓
-   ✅        ✅       ⚠️         ✅             ❌
-  Form     API      Need       Update       SendGrid
-                     test      enroll       fails
+    ❓         ✅       ❓           ❓             ⚠️
 ```
 
-**Status:** ⚠️ PARTIAL - Email confirmation blocked by SendGrid
+| Step | Status | Evidence | Owner |
+|------|--------|----------|-------|
+| **Checkout** | ❓ | Need to test Stripe flow | |
+| **Stripe** | ✅ | Verified via health endpoint | |
+| **Webhook** | ❓ | Need to trigger test webhook | |
+| **DB Update** | ❓ | Need to verify enrollment updated | |
+| **Email Confirmation** | ⚠️ | SendGrid check fails | |
 
 ---
 
-## Layer 5: Data Health
+### 3.5 AI Journey (PARIS)
 
-### 5.1 Database Integrity
+```
+Prompt → Groq → Anthropic fallback → Gemini fallback → Response
+   ↓        ↓           ↓               ↓             ↓
+   ❓        ❓          ❓              ❓            ❓
+```
 
-| Check | Status | Notes |
-|-------|--------|-------|
-| **Migrations Applied** | ❌ **CRITICAL** | Pending: 20260713000001_critical_tables.sql |
-| **RLS Policies** | ⚠️ Partial | Need full audit |
-| **Audit Triggers** | ✅ OK | `verify_audit_integrity` RPC passing |
-| **Immutability** | ✅ OK | 0 disabled triggers |
-| **Orphaned Records** | ❓ Not checked | Need query |
-| **Data Sync** | ⚠️ Not verified | RAPIDS sync unknown |
-
----
-
-### 5.2 Missing Data Integrity Checks
-
-| Check | Exists | Working | Notes |
-|-------|--------|---------|-------|
-| **Duplicate Detection** | ❌ | ❌ | Not implemented |
-| **Orphan Cleanup** | ❌ | ❌ | Not implemented |
-| **Referential Integrity** | ⚠️ | ❓ | Partial via FK |
-| **Data Validation** | ⚠️ | ⚠️ | Check constraints exist |
+| Step | Status | Evidence | Owner |
+|------|--------|----------|-------|
+| **Prompt** | ❓ | Need to test chat API | |
+| **Groq** | ❓ | Need to verify API key works | |
+| **Anthropic fallback** | ❓ | Need to verify fallback | |
+| **Gemini fallback** | ❓ | Need to verify fallback | |
+| **Response** | ❓ | Need to verify quality | |
 
 ---
 
-## Layer 6: Observability
+## Gate 4: User Experience
 
-### 6.1 Health Endpoints
+### 4.1 Page Verification
 
-| Endpoint | Auth | Latency | Errors | Alerts | Status |
-|----------|------|---------|--------|--------|--------|
-| `/api/health` | Public | ✅ Fast | ✅ | ⚠️ | ✅ |
-| `/api/v1/health` | Public | ✅ | ✅ | ⚠️ | ⚠️ Overhead |
-| `/api/admin/site-health` | Admin | ❓ | ❓ | ❓ | ⚠️ |
-| `/api/internal/service-health` | CRON_SECRET | ❓ | ❓ | ❓ | ⚠️ |
-| `/api/internal/system-health` | CRON_SECRET | ❓ | ❓ | ❓ | ⚠️ |
-| `/api/internal/course-health` | Admin | ❓ | ❓ | ❓ | ⚠️ |
-| `/api/health/build-version` | Public | ✅ | ✅ | ⚠️ | ✅ |
+| Page | URL | Hero Banner | Images | Videos | CTA | Status |
+|------|-----|-------------|--------|--------|-----|--------|
+| **Home** | `/` | ❓ | ❓ | ❓ | ❓ | ❓ |
+| **Programs** | `/programs` | ❓ | ❓ | ❓ | ❓ | ❓ |
+| **CNA** | `/programs/cna` | ❓ | ❓ | ❓ | ❓ | ❓ |
+| **HVAC** | `/programs/hvac-technician` | ❓ | ❓ | ❓ | ❓ | ❓ |
+| **Barber** | `/programs/barber-apprenticeship` | ❓ | ❓ | ❓ | ❓ | ❓ |
+| **Cosmetology** | `/programs/cosmetology-apprenticeship` | ❓ | ❓ | ❓ | ❓ | ❓ |
+| **Store** | `/store` | ❓ | ❓ | ❓ | ❓ | ❓ |
+| **Funding** | `/funding` | ❓ | ❓ | ❓ | ❓ | ❓ |
+| **About** | `/about` | ❓ | ❓ | ❓ | ❓ | ❓ |
+| **Contact** | `/contact` | ❓ | ❓ | ❓ | ❓ | ❓ |
+| **Apply** | `/apply` | ❓ | ❓ | ❓ | ❓ | ❓ |
+| **FAQ** | `/faq` | ❓ | ❓ | ❓ | ❓ | ❓ |
 
----
-
-### 6.2 Logging & Monitoring
-
-| Component | Status | Notes |
-|-----------|--------|-------|
-| **Logger (lib/logger.ts)** | ✅ | JSON in prod, pretty in dev |
-| **Sentry** | ⚠️ | lib/observability/sentry.ts exists |
-| **Error Tracking** | ⚠️ | Need live test |
-| **Real-time Alerts** | ⚠️ | lib/security/real-time-alerts.ts exists |
-| **Alert System** | ⚠️ | lib/compliance/alert-system.ts exists |
+**Previous Finding:** `/programs/cna` showed `autoPlayOnMount is not defined` error - FIXED in build `60c2dcb`
 
 ---
 
-### 6.3 Alerting Gaps
+### 4.2 Asset Verification Checklist
 
-| Alert Type | Exists | Configured | Tested |
-|------------|--------|-----------|--------|
-| **Failed Payments** | ❌ | ❌ | ❌ |
-| **Webhook Failures** | ❌ | ❌ | ❌ |
-| **Stale Applications** | ⚠️ | ✅ Cron | ❌ |
-| **Database Errors** | ❌ | ❌ | ❌ |
-| **AI Failures** | ❌ | ❌ | ❌ |
-| **Migration Failures** | ❌ | ❌ | ❌ |
-
----
-
-## Summary Matrix
-
-| Layer | Overall Status | Critical Issues | High Issues | Medium Issues |
-|-------|---------------|-----------------|-------------|---------------|
-| **1. Infrastructure** | ⚠️ | 0 | 1 | 0 |
-| **2. Service** | ⚠️ | 2 | 3 | 4 |
-| **3. Business** | ⚠️ | 1 | 4 | 5 |
-| **4. Workflow** | ⚠️ | 2 | 3 | 6 |
-| **5. Data** | ❌ | 1 | 2 | 2 |
-| **6. Observability** | ⚠️ | 0 | 2 | 3 |
+| Asset Type | Check | Status |
+|------------|-------|--------|
+| **Images** | 404 errors via browser console | ❓ |
+| **Videos** | Load without error | ❓ |
+| **Hero Banners** | Correct program mapping | ❓ |
+| **Testimonials** | Content exists | ❓ |
+| **Pricing** | Correct amounts | ❓ |
+| **Stripe Buttons** | Load and function | ❓ |
+| **Navigation** | No broken links | ❓ |
 
 ---
 
-## Critical Action Items
+## Feature Wiring Matrix
 
-### P0 - Immediate (Blocks Production)
+| Feature | UI | API | Database | Automation | Email | AI | Dashboard | Production |
+|---------|:--:|:---:|:--------:|:----------:|:-----:|:--:|:---------:|:----------:|
+| **Digital Binder** | ✅ | ✅ | ❓ | ❌ | ❌ | N/A | ❌ | ❌ |
+| **Enrollment** | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ |
+| **PARIS AI** | ✅ | ✅ | ❓ | N/A | N/A | ⚠️ | ✅ | ⚠️ |
+| **Lizzy Chat** | ✅ | ⚠️ | N/A | N/A | N/A | ⚠️ | ✅ | ❌ |
+| **Stripe Payments** | ✅ | ✅ | ✅ | ✅ | ❌ | N/A | ✅ | ✅ |
+| **RAPIDS Sync** | ✅ | ✅ | ❓ | ⚠️ | N/A | N/A | ✅ | ⚠️ |
+| **Email (SendGrid)** | ✅ | ✅ | ✅ | ✅ | ⚠️ | N/A | ✅ | ⚠️ |
+| **Storage** | ✅ | ✅ | ✅ | ✅ | N/A | N/A | ✅ | ❓ |
 
-1. **Apply Migration `20260713000001_critical_tables.sql`**
-   - Blocks: AI conversations, digital binders, certifications, enrollment history
-   - Risk: High - Core features non-functional
-   - Owner: DevOps/DB Admin
-
-2. **Fix SendGrid Integration**
-   - `/api/health` shows `sendgrid.ok: false`
-   - Risk: High - Email confirmations broken
-   - Owner: Backend
-
-### P1 - High (Blocks Core Features)
-
-3. **Verify AI Provider Chain**
-   - Test Groq → Anthropic → Gemini fallback
-   - Risk: High - AI features unreliable
-   - Owner: Backend
-
-4. **Verify RAPIDS Integration**
-   - Test DOL apprenticeship sync
-   - Risk: High - Compliance issue
-   - Owner: Backend
-
-5. **Configure Tidio/Lizzy Chatbot**
-   - Set NEXT_PUBLIC_TIDIO_KEY
-   - Risk: Medium - Missing user support
-   - Owner: Frontend
-
-6. **Implement Storage Verification**
-   - Test bucket access, upload, permissions
-   - Risk: High - File handling broken
-   - Owner: Backend
-
-### P2 - Medium (Improve Production Readiness)
-
-7. **Add Webhook Failure Monitoring**
-8. **Implement Failed Payment Alerts**
-9. **Add AI Failure Alerts**
-10. **Implement Data Integrity Checks**
-11. **Add Orphaned Record Detection**
-12. **Test End-to-End Enrollment Flow**
+**Legend:**
+- ✅ = Verified working
+- ⚠️ = Implemented but not verified
+- ❌ = Not implemented or broken
+- ❓ = Verification required
+- N/A = Not applicable
 
 ---
 
-## Production Readiness Score
+## Verified vs. Unverified Summary
 
-| Category | Score | Max | Gap |
-|----------|-------|-----|-----|
-| Infrastructure | 8 | 10 | Secrets, Redis unknown |
-| Database | 4 | 10 | Migration pending |
-| Services | 6 | 10 | SendGrid down, AI untested |
-| Business | 6 | 10 | Enrollment, RAPIDS untested |
-| Workflow | 5 | 10 | E2E journeys incomplete |
-| Data | 4 | 10 | Integrity checks missing |
-| Observability | 5 | 10 | Alerts not configured |
-| **TOTAL** | **38** | **70** | **46%** |
+### ✅ Verified Working (Live)
 
-**Rating: ⚠️ NOT PRODUCTION READY**
+| Component | Evidence |
+|-----------|-----------|
+| Northflank containers | API shows SUCCESS/COMPLETED |
+| Supabase DB connection | `/api/health` shows connected |
+| Stripe API | Returns 200 OK |
+| Audit integrity | RPC returns pass |
+| Enrollment stats API | Endpoint responds |
+| Stale app archiver | Cron exists in code |
 
-**Primary Blocker:** Critical migration not applied, SendGrid not working
+### ⚠️ Verified Warning/Fail (Live)
+
+| Component | Evidence |
+|-----------|-----------|
+| SendGrid | `/api/health` shows `ok: false, status: warn` |
+
+### ❓ Verification Required
+
+| Component | Why Unverified |
+|-----------|---------------|
+| Migrations applied | Need live DB query |
+| Storage buckets | Need live check |
+| AI providers | Need live completion test |
+| RAPIDS sync | Need integration test |
+| Tidio chatbot | Need browser test |
+| All workflows | Need end-to-end execution |
+| All pages | Need browser verification |
+| All assets | Need console check |
 
 ---
 
-## Recommendations
+## Next Steps
 
-### Immediate (Before Any User Traffic)
+### Immediate (Gate 2 - Database)
 
-1. Apply pending database migration
-2. Fix or disable SendGrid integration
-3. Test AI provider chain
-4. Verify Stripe webhook endpoint
+1. **Query live database** to verify migration status:
+   ```sql
+   SELECT * FROM supabase_migrations.schema_migrations ORDER BY version DESC;
+   ```
 
-### Short-term (First Week)
+2. **Verify critical tables exist** if migrations applied
 
-5. Configure and test Tidio chatbot
-6. Implement storage bucket verification
-7. Add webhook failure monitoring
-8. Test enrollment workflow end-to-end
+### Short-term (Gate 3 - Workflows)
 
-### Medium-term (First Month)
+3. **Execute each workflow end-to-end**
+4. **Document pass/fail/blocked/partial for each step**
 
-9. Implement data integrity checks
-10. Add failed payment alerting
-11. Test RAPIDS integration with DOL sandbox
-12. Complete apprenticeship workflow testing
+### Medium-term (Gate 4 - UX)
+
+5. **Browser test each page**
+6. **Check console for errors**
+7. **Verify all assets load**

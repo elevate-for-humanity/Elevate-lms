@@ -2,17 +2,24 @@
  * /api/devstudio/programs
  *
  * Returns all programs for Dev Studio course builder.
- * Open endpoint — Dev Studio is already admin-gated.
+ * REQUIRES admin authentication - does NOT rely on page-level gating.
  */
 
 import { NextResponse } from 'next/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function GET() {
   try {
+    // Verify admin authorization
+    const authResult = await apiRequireAdmin();
+    if (authResult.error) {
+      return authResult.error;
+    }
+
+    const { requireAdminClient } = await import('@/lib/supabase/admin');
     const db = await requireAdminClient();
     
     // Get all programs with enrollment counts

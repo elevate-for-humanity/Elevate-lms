@@ -294,6 +294,77 @@ if [[ "$BROKEN_IMPORTS" -gt 0 ]]; then
 fi
 
 # ============================================================================
+# SECTION 10: DEV STUDIO INTEGRATION GATE
+# ============================================================================
+echo ""
+echo "=============================================="
+echo "SECTION 10: DEV STUDIO INTEGRATION"
+echo "=============================================="
+
+# Run Dev Studio integration gate
+if [[ -f "scripts/dev-studio-integration-gate.sh" ]]; then
+  if bash scripts/dev-studio-integration-gate.sh > /tmp/devstudio-gate.log 2>&1; then
+    echo "OK: Dev Studio Integration Gate passed"
+  else
+    DEV_STUDIO_FAILS=$(grep -c "\[FAIL\]" /tmp/devstudio-gate.log 2>/dev/null || echo 0)
+    if [[ "$DEV_STUDIO_FAILS" -gt 0 ]]; then
+      echo "FAIL: Dev Studio Integration Gate failed"
+      cat /tmp/devstudio-gate.log
+      FAIL=$((FAIL + DEV_STUDIO_FAILS))
+    else
+      echo "WARN: Dev Studio Integration Gate passed with warnings"
+      WARN=$((WARN + 1))
+    fi
+  fi
+else
+  echo "WARN: Dev Studio Integration Gate not found (scripts/dev-studio-integration-gate.sh)"
+  WARN=$((WARN + 1))
+fi
+
+# Check command allowlist exists
+if [[ -f "lib/studio/command-allowlist.ts" ]]; then
+  echo "OK: Command allowlist exists"
+else
+  echo "WARN: Command allowlist not found (lib/studio/command-allowlist.ts)"
+  WARN=$((WARN + 1))
+fi
+
+# ============================================================================
+# SECTION 11: UNIFIED CONTAINER CHECKS
+# ============================================================================
+echo ""
+echo "=============================================="
+echo "SECTION 11: UNIFIED CONTAINER"
+echo "=============================================="
+
+# Check unified Dockerfile exists
+if [[ -f "Dockerfile.production" ]]; then
+  echo "OK: Unified Dockerfile exists"
+else
+  echo "WARN: Unified Dockerfile not found (Dockerfile.production)"
+  WARN=$((WARN + 1))
+fi
+
+# Check unified middleware
+if [[ -f "middleware.ts" ]]; then
+  if grep -q "DOMAIN-BASED ROUTING\|configuredAdminHost\|configuredAppHost" middleware.ts; then
+    echo "OK: Unified middleware has domain routing"
+  else
+    echo "WARN: Unified middleware may need domain routing enhancement"
+    WARN=$((WARN + 1))
+  fi
+fi
+
+# Check for duplicate API trees (apps/ directory should be minimal)
+DUPLICATE_API_COUNT=$(find apps -path "*/api/route.ts" 2>/dev/null | wc -l)
+if [[ "$DUPLICATE_API_COUNT" -gt 0 ]]; then
+  echo "WARN: $DUPLICATE_API_COUNT API routes found in apps/ directory (consider consolidation)"
+  WARN=$((WARN + 1))
+else
+  echo "OK: No duplicate API routes found in apps/ directory"
+fi
+
+# ============================================================================
 # FINAL SUMMARY
 # ============================================================================
 echo ""

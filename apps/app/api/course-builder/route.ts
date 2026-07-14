@@ -1,11 +1,19 @@
 /**
  * Course Builder Data Sources
  * All external data feeds for AI-powered course generation
+ * REQUIRES admin authentication
  */
 
 import { NextResponse } from 'next/server';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 
 export async function GET() {
+  // Verify admin authorization
+  const authResult = await apiRequireAdmin();
+  if (authResult.error) {
+    return authResult.error;
+  }
+
   return NextResponse.json({
     status: 'ready',
     sources: {

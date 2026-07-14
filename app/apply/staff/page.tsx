@@ -30,7 +30,7 @@ export default async function StaffApplicationPage() {
       <div className="relative h-[200px] sm:h-[260px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/pages/apply-page-3.webp"
+          src="/images/pages/apply-hero.webp"
           alt="Join our team"
           fill
           sizes="100vw"

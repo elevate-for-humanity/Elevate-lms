@@ -74,7 +74,7 @@ export default async function VerifyCertificatePage({
         <section className="relative h-[38vh] min-h-[220px] max-h-[420px] w-full flex items-center justify-center text-white overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
-            src="/images/artlist/hero-training-3.webp"
+            src="/images/heroes/hero-homepage.webp"
             alt="[certificateId]"
             fill
             className="object-cover"
@@ -222,7 +222,7 @@ export default async function VerifyCertificatePage({
                   </div>
                   <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                     <Image
-                      src="/images/artlist/hero-training-3.webp"
+                      src="/images/heroes/hero-homepage.webp"
                       alt="Students learning"
                       fill
                       className="object-cover"

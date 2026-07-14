@@ -540,7 +540,7 @@ export default function PathwaysPage() {
             <div className="flex gap-4 items-start">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                 <Image
-                  src="/images/pages/instructor support-page-3.webp"
+                  src="/images/pages/admin-analytics-hero.webp"
                   alt="Ongoing support"
                   fill
                   sizes="80px"

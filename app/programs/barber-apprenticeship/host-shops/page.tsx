@@ -105,7 +105,7 @@ export default async function HostShopsPage() {
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl order-1 md:order-2">
               <Image sizes="100vw"
-                src="/images/pages/barber-gallery-2.webp"
+                src="/images/pages/barber-apprentice-learning.webp"
                 alt="Professional barbershop"
                 fill
                 className="object-cover" placeholder="empty"
@@ -117,7 +117,7 @@ export default async function HostShopsPage() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl">
               <Image sizes="100vw"
-                src="/images/pages/barber-gallery-3.webp"
+                src="/images/pages/barber-apprenticeship.webp"
                 alt="Barber with client"
                 fill
                 className="object-cover" placeholder="empty"

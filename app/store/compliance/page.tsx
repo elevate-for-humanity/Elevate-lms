@@ -30,7 +30,7 @@ export default async function CompliancePage() {
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image src="/images/pages/store-compliance-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority placeholder="empty" />
+        <Image src="/images/pages/admin-compliance-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority placeholder="empty" />
       </section>
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Compliance" }]} />
@@ -163,7 +163,7 @@ export default async function CompliancePage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
               <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
-                <Image src="/images/pages/admin-grants-hero.webp" alt="Grant reporting and compliance documentation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
+                <Image src="/images/pages/admin-compliance-hero.webp" alt="Grant reporting and compliance documentation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-4">Grant Reporting</h3>

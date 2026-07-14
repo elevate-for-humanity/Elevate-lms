@@ -73,7 +73,7 @@ export default function PracticeTestsPage() {
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image 
-            src="/images/pages/practice-tests-hero.webp" 
+            src="/images/pages/admin-analytics-hero.webp" 
             alt="Practice Tests" 
             fill 
             className="object-cover object-top"

@@ -47,7 +47,7 @@ export default function SourceUseLicensePage() {
               <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden shadow-2xl border border-slate-200">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
                 <Image
-                  src="/images/demos/lms-overview-thumb.webp"
+                  src="/images/heroes/lms-analytics.webp"
                   alt="Elevate platform overview"
                   fill
                   className="object-cover"

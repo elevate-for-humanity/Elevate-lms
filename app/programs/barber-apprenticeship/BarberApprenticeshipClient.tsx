@@ -172,7 +172,7 @@ export default function BarberApprenticeshipClient({ program: p, heroBanner: b, 
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-72 rounded-xl overflow-hidden shadow-lg order-2 md:order-1">
-              <Image src="/images/pages/barber-straight-razor.webp" alt="Barber performing a straight razor shave" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
+              <Image src="/images/pages/barber-fade.webp" alt="Barber performing a straight razor shave" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
             </div>
             <div className="order-1 md:order-2">
               <p className="text-xs font-bold uppercase tracking-widest text-brand-red-600 mb-2">Measurable Outcomes</p>

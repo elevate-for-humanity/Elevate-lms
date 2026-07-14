@@ -80,7 +80,7 @@ export default function CourseBuilderPage() {
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image 
-            src="/images/pages/course-builder-hero.webp" 
+            src="/images/pages/admin-dashboard-hero.webp" 
             alt="Course Builder" 
             fill 
             className="object-cover object-top"

@@ -19,7 +19,7 @@ export default async function OfflinePage() {
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/artlist/hero-training-1.webp"
+          src="/images/pages/about-hero.webp"
           alt="Offline"
           fill
           className="object-cover"
@@ -114,7 +114,7 @@ export default async function OfflinePage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/artlist/hero-training-2.webp"
+                  src="/images/pages/about-partners-hero.webp"
                   alt="Offline"
                   fill
                   className="object-cover"

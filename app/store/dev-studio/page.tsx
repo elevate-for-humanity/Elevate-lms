@@ -79,7 +79,7 @@ export default function DevStudioPage() {
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image 
-            src="/images/pages/dev-studio-hero.webp" 
+            src="/images/pages/admin-dashboard-hero.webp" 
             alt="Dev Studio" 
             fill 
             className="object-cover object-top"

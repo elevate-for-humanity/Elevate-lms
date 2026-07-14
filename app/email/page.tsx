@@ -24,7 +24,7 @@ export default async function EmailPage() {
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src="/images/learners/coaching-session.webp"
+          src="/images/pages/about-supportive-services.webp"
           alt="Email"
           fill
           className="object-cover"
@@ -117,7 +117,7 @@ export default async function EmailPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/learners/barrier-support.webp"
+                  src="/images/pages/about-career-training.webp"
                   alt="Email"
                   fill
                   className="object-cover"

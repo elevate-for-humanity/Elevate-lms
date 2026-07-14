@@ -112,16 +112,22 @@ This audit follows a **four-gate verification framework**:
 
 **⚠️ REQUIRES LIVE DATABASE ACCESS**
 
-To verify migration status, run this query against the production Supabase database:
+Run this query to verify migration status:
 
 ```sql
 -- Check migration history
 SELECT * FROM supabase_migrations.schema_migrations ORDER BY version DESC LIMIT 20;
 
--- Check if specific tables exist
+-- Check if critical tables exist
 SELECT table_name FROM information_schema.tables 
 WHERE table_schema = 'public' 
-AND table_name IN ('ai_conversations', 'digital_binders', 'certifications');
+AND table_name IN (
+  'ai_conversations', 'digital_binders', 'certifications',
+  'credentials', 'licenses', 'grades', 'communications',
+  'leads', 'conversations', 'announcements', 'blog_posts',
+  'campaigns', 'events', 'coupons', 'cohort_sessions',
+  'notification_outbox', 'enrollment_status_history'
+);
 ```
 
 ---
@@ -130,11 +136,11 @@ AND table_name IN ('ai_conversations', 'digital_binders', 'certifications');
 
 | Migration | Location | Applied | Verified |
 |-----------|----------|---------|----------|
-| `20260713000001_critical_tables.sql` | `supabase/migrations/pending/` | ❓ | ❓ |
+| `20260713000001_critical_tables.sql` | `supabase/migrations/pending/` | ⚠️ UNKNOWN | ❓ |
 
 **Evidence Available:**
 - File exists in repository: `supabase/migrations/pending/20260713000001_critical_tables.sql`
-- **Does NOT prove migration is not applied** - must query `supabase_migrations.schema_migrations`
+- **Must query live database to confirm status**
 
 ---
 
@@ -441,12 +447,17 @@ Based on live `/api/admin/site-health` response:
 
 | Service | Status | Evidence |
 |---------|--------|----------|
-| **Supabase Database** | ✅ VERIFIED PASS | `status: healthy, latencyMs: 82` |
+| **Supabase Database** | ✅ VERIFIED PASS | `status: healthy, latencyMs: 66-82` |
 | **Stripe** | ✅ VERIFIED PASS | `status: healthy, detail: API key valid` |
-| **Redis/Queue** | ✅ VERIFIED PASS | `status: healthy, latencyMs: 457` |
+| **Redis/Queue** | ✅ VERIFIED PASS | `status: healthy, latencyMs: 457-465` |
 | **Resend** | ✅ VERIFIED PASS | `detail: API key present` |
 | **AI (Groq)** | ✅ VERIFIED PASS | `detail: Groq (primary)` |
-| **SendGrid** | ⚠️ VERIFIED FAIL | `HTTP 401 - Invalid API key` |
+| **SendGrid** | ⚠️ VERIFIED FAIL | `HTTP 401 - Updated key deployed, verifying...` |
+
+**SendGrid Update (2026-07-14 04:41):**
+- New secret `sendgrid-api-key` created in Northflank
+- Services redeployed (elevate-lms, elevate-admin)
+- Health check still shows 401 - may need key rotation or SendGrid account verification
 
 ---
 

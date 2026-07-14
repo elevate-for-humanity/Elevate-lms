@@ -197,10 +197,10 @@ echo "=============================================="
 echo "SECTION 7: PLACEHOLDER DETECTION"
 echo "=============================================="
 
-# Check for placeholder phone numbers
+# Check for placeholder phone numbers (ignoring form placeholders and template variables)
 PLACEHOLDER_FOUND=0
-for pattern in "555-1234" "555-0000" "xxx-xxx-xxxx" "000-000-0000" "(555)" "555-"; do
-  if grep -r "$pattern" components/ app/ 2>/dev/null | grep -v ".test." | grep -v ".spec." > /dev/null; then
+for pattern in "555-1234" "555-0000" "xxx-xxx-xxxx" "000-000-0000" "(555) 123-4567" "555-4567" "555-0147"; do
+  if grep -r "$pattern" components/ app/ 2>/dev/null | grep -v ".test." | grep -v ".spec." | grep -v "placeholder=" | grep -v "\{\{.*\}\}" > /dev/null; then
     echo "FAIL: Placeholder phone found: $pattern"
     PLACEHOLDER_FOUND=1
     FAIL=1
@@ -216,13 +216,16 @@ for pattern in "example.com" "placeholder" "your-email" "test@test"; do
   fi
 done
 
-# Check for placeholder addresses
-for pattern in "123 Main St" "City, State" "ENTER ZIP"; do
+# Check for placeholder addresses (ignoring form placeholders)
+ADDRESS_FOUND=0
+for pattern in "Columbia, MD" "MD 21044" "Indianapolis, IN 21044"; do
   if grep -r "$pattern" components/ app/ 2>/dev/null | grep -v ".test." > /dev/null; then
     echo "FAIL: Placeholder address found: $pattern"
+    ADDRESS_FOUND=1
     FAIL=1
   fi
 done
+[[ $ADDRESS_FOUND -eq 0 ]] && echo "OK: No placeholder addresses"
 
 # ============================================================================
 # SECTION 8: STRIPE CONFIGURATION

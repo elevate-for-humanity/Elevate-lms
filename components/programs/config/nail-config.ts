@@ -100,7 +100,7 @@ export const nailConfig: ProgramConfig = {
     {
       name: 'Luna Park',
       role: 'Master Nail Artist',
-      photo: '/images/beauty/mentor-color-1.webp',
+      photo: '/images/beauty/cosmetology-hero.webp',
       bio: 'International nail artist with experience in editorial and bridal nail design.',
       credentials: ['Licensed Nail Technician', 'CND Education', 'OPI Certified'],
     },
@@ -112,7 +112,7 @@ export const nailConfig: ProgramConfig = {
       name: 'Emma R.',
       program: 'Nail Technology',
       quote: 'I started doing nails at home for friends. The apprenticeship helped me turn my hobby into a real career.',
-      photo: '/images/beauty/success-sophia.webp',
+      photo: '/images/pages/career-services-hero.webp',
       before: 'Working retail, no career direction',
       after: 'Mobile nail artist, $45K+ annually',
     },

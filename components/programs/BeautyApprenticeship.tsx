@@ -214,21 +214,21 @@ const MENTORS = [
   {
     name: 'Marcus Thompson',
     role: 'Master Barber Instructor',
-    photo: '/images/beauty/mentor-barber-1.webp',
+    photo: '/images/pages/barber-apprenticeship-hero.webp',
     bio: '15+ years experience in traditional and modern barbering. Specializes in precision cuts and straight razor techniques.',
     credentials: ['Licensed Barber', 'DOL Registered Instructor', 'Master Barber'],
   },
   {
     name: 'Keisha Williams',
     role: 'Color Specialist',
-    photo: '/images/beauty/mentor-color-1.webp',
+    photo: '/images/beauty/cosmetology-hero.webp',
     bio: 'Award-winning colorist specializing in balayage and color correction. Trained at Vidal Sassoon Academy.',
     credentials: ['Licensed Cosmetologist', 'Goldwell Color Certified', 'Pravana Elite Artist'],
   },
   {
     name: 'Jennifer Chen',
     role: 'Medical Esthetician',
-    photo: '/images/beauty/mentor-skin-1.webp',
+    photo: '/images/beauty/esthetician-hero.webp',
     bio: 'Former dermatology nurse now leading our esthetics program. Expert in clinical skincare treatments.',
     credentials: ['Licensed Esthetician', 'Certified Medical Esthetician', 'PCA Skin Certified'],
   },
@@ -242,7 +242,7 @@ const SUCCESS_STORIES = [
     before: 'Working fast food, no career direction',
     after: 'Owns her own barbershop, $85K+ annually',
     quote: 'I thought beauty school was out of reach. The apprenticeship let me earn while I learned. Now I\'m building my own empire.',
-    photo: '/images/beauty/success-destiny.webp',
+    photo: '/images/pages/about-supportive-services.webp',
     transformation: '/images/beauty/transformation-destiny.webp',
   },
   {
@@ -251,7 +251,7 @@ const SUCCESS_STORIES = [
     before: 'College dropout, unsure of career path',
     after: 'Senior stylist at luxury salon, $62K annually',
     quote: 'The mentorship made all the difference. I learned from the best and now I\'m the one teaching others.',
-    photo: '/images/beauty/success-marcus.webp',
+    photo: '/images/pages/career-coaching.webp',
     transformation: '/images/beauty/transformation-marcus.webp',
   },
   {
@@ -260,7 +260,7 @@ const SUCCESS_STORIES = [
     before: 'Stay-at-home mom returning to workforce',
     after: 'Medical spa esthetician, $55K annually + tips',
     quote: 'I was intimidated to start over. The flexible schedule and support system made it possible for me.',
-    photo: '/images/beauty/success-sophia.webp',
+    photo: '/images/pages/career-services-hero.webp',
     transformation: '/images/beauty/transformation-sophia.webp',
   },
 ];

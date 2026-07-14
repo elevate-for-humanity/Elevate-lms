@@ -105,7 +105,7 @@ const TESTIMONIALS = [
     quote: 'I thought beauty school was out of reach. The apprenticeship let me earn while I learned. Now I\'m building my own empire.',
     before: 'Working fast food, no career direction',
     after: 'Owns her own barbershop, $85K+ annually',
-    image: '/images/beauty/success-barber-1.webp',
+    image: '/images/heroes/hero-homepage.webp',
     rating: 5,
   },
   {
@@ -114,7 +114,7 @@ const TESTIMONIALS = [
     quote: 'The mentorship made all the difference. I learned from the best and now I\'m the one teaching others.',
     before: 'College dropout, unsure of career path',
     after: 'Senior stylist at luxury salon, $62K annually',
-    image: '/images/beauty/success-cosmetology-1.webp',
+    image: '/images/beauty/cosmetology-hero.webp',
     rating: 5,
   },
 ];

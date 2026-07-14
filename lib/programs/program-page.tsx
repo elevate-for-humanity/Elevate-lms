@@ -2,13 +2,14 @@ import type { Metadata } from 'next';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import heroBanners from '@/content/heroBanners';
+import { url } from '@/lib/utils/url-factory';
 
 export function buildProgramMetadata(program: ProgramSchema): Metadata {
   return {
     title: program.metaTitle,
     description: program.metaDescription,
     alternates: {
-      canonical: `https://www.elevateforhumanity.org/programs/${program.slug}`,
+      canonical: url(`/programs/${program.slug}`),
     },
   };
 }

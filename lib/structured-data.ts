@@ -1,4 +1,5 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { assets } from '@/lib/utils/url-factory';
 // Generate JSON-LD structured data for SEO
 
 export function generateOrganizationSchema() {
@@ -9,7 +10,7 @@ export function generateOrganizationSchema() {
     description:
       'WIOA, WRG, and JRI-funded workforce training programs in Marion County and Indianapolis, Indiana',
     url: PLATFORM_DEFAULTS.siteUrl,
-    logo: 'https://www.elevateforhumanity.org/logo.png',
+    logo: assets.logo,
     address: {
       '@type': 'PostalAddress',
       streetAddress: '8888 Keystone Crossing Suite 1300',

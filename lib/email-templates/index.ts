@@ -1,4 +1,5 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { assets } from '@/lib/utils/url-factory';
 // Elevate Institutional Email Template System
 // All outbound emails use the institutional header with logo,
 // professional typography, and consistent signature block.
@@ -8,7 +9,7 @@ const ORG_OPERATOR = '2Exclusive LLC-S';
 const ORG_WEBSITE = PLATFORM_DEFAULTS.canonicalDomain;
 const ORG_EMAIL = 'info@elevateforhumanity.org';
 const ORG_PHONE = PLATFORM_DEFAULTS.supportPhone;
-const ORG_LOGO = 'https://www.elevateforhumanity.org/images/logo.png';
+const ORG_LOGO = assets.logo;
 const ORG_TAGLINE = 'Workforce Development & Career Training';
 
 const baseStyles = `

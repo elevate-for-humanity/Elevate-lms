@@ -1,4 +1,5 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { assets } from '@/lib/utils/url-factory';
 /**
  * Elevate Master Document System
  *
@@ -21,7 +22,7 @@ export const ORG = {
   address: 'Indianapolis, IN',
   logoUrl: '/images/logo.png',
   // Absolute URL for emails (images must be absolute in email HTML)
-  logoAbsoluteUrl: 'https://www.elevateforhumanity.org/images/logo.png',
+  logoAbsoluteUrl: assets.logo,
   tagline: 'Workforce Development & Career Training',
 } as const;
 

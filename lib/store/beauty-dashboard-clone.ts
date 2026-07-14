@@ -2,6 +2,7 @@
  * Beauty & personal-services vertical — org dashboard clone (managed white-label).
  * Checkout reuses platform license slugs; trial uses /api/trial/start-managed.
  */
+import { url } from '@/lib/utils/url-factory';
 
 export const BEAUTY_PROGRAM_SLUGS = [
   'barber-apprenticeship',
@@ -135,5 +136,5 @@ export const BEAUTY_DASHBOARD_CLONE_META = {
   title: 'Beauty Program Dashboard Clone | Elevate Store',
   description:
     'License a white-label admin dashboard for outside beauty schools and training organizations. Barber, cosmetology, esthetician, and nail programs with 14-day managed trial.',
-  canonical: 'https://www.elevateforhumanity.org/store/beauty-programs',
+  canonical: url('/store/beauty-programs'),
 };

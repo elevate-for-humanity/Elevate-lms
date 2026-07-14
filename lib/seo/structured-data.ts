@@ -1,4 +1,5 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { assets, url } from '@/lib/utils/url-factory';
 // Structured Data (JSON-LD) for SEO
 
 export const organizationSchema = {
@@ -7,7 +8,7 @@ export const organizationSchema = {
   name: PLATFORM_DEFAULTS.orgName,
   alternateName: 'Elevate For Humanity Career & Technical Institute',
   url: PLATFORM_DEFAULTS.siteUrl,
-  logo: 'https://www.elevateforhumanity.org/images/logo.png',
+  logo: assets.logo,
   description:
     'Free career training in healthcare, skilled trades, and business. Get trained, get hired, get paid. No cost, no debt.',
   address: {
@@ -36,7 +37,7 @@ export const websiteSchema = {
   url: PLATFORM_DEFAULTS.siteUrl,
   potentialAction: {
     '@type': 'SearchAction',
-    target: 'https://www.elevateforhumanity.org/search?q={search_term_string}',
+    target: url('/search?q={search_term_string}'),
     'query-input': 'required name=search_term_string',
   },
 };

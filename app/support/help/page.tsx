@@ -45,7 +45,7 @@ export default function HelpPage() {
               <div className="text-center">
                 <Phone className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
                 <h3 className="font-bold">Phone</h3>
-                <p className="text-slate-600 text-sm">(317) 555-0199</p>
+                <p className="text-slate-600 text-sm">(317) 314-3757</p>
               </div>
               <div className="text-center">
                 <MessageCircle className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />

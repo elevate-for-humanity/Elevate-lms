@@ -161,7 +161,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Phone</p>
-                      <p className="font-semibold">(317) 555-0199</p>
+                      <p className="font-semibold">(317) 314-3757</p>
                     </div>
                   </a>
                   

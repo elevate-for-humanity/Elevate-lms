@@ -14,7 +14,7 @@ interface StickyMobileCTAProps {
 
 export function StickyMobileCTA({
   phoneNumber = '(317) 314-3757',
-  textNumber = '3175552427',
+  textNumber = '3143757',
   applyUrl = '/apply',
   hideOnPaths = ['/apply', '/checkout', '/admin', '/portals']
 }: StickyMobileCTAProps) {

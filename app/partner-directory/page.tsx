@@ -74,7 +74,7 @@ const partners = [
     program: 'Healthcare Pathways',
     status: 'verified',
     since: '2022',
-    contact: { name: 'HR Training', email: 'careers@franciscanhealth.org', phone: '(317) 555-0103' },
+    contact: { name: 'HR Training', email: 'careers@franciscanhealth.org', phone: '(317) 314-3757' },
     description: 'Healthcare system partner providing clinical externship opportunities and hire-back agreements.',
   },
   {
@@ -96,7 +96,7 @@ const partners = [
     program: 'Construction Trades',
     status: 'verified',
     since: '2021',
-    contact: { name: 'ABC Indiana', email: 'info@abcindiana.org', phone: '(317) 555-0104' },
+    contact: { name: 'ABC Indiana', email: 'info@abcindiana.org', phone: '(317) 314-3757' },
     description: 'Associated Builders and Contractors apprenticeship program for construction and skilled trades.',
   },
   {
@@ -118,7 +118,7 @@ const partners = [
     program: 'Cosmetology & Esthetics Apprenticeship',
     status: 'verified',
     since: '2022',
-    contact: { name: 'BIG HR', email: 'careers@beautyindustry.com', phone: '(317) 555-0105' },
+    contact: { name: 'BIG HR', email: 'careers@beautyindustry.com', phone: '(317) 314-3757' },
     description: 'Multi-location salon network offering cosmetology and esthetics apprenticeship hours.',
   },
   {
@@ -129,7 +129,7 @@ const partners = [
     program: 'Medical Assistant Pathways',
     status: 'verified',
     since: '2021',
-    contact: { name: 'CHN Education', email: 'education@ecommunity.com', phone: '(317) 555-0106' },
+    contact: { name: 'CHN Education', email: 'education@ecommunity.com', phone: '(317) 314-3757' },
     description: 'Major healthcare employer with student externship and hire-back program for medical assistants.',
   },
 ];

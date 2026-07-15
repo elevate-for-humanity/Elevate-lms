@@ -116,8 +116,10 @@ export async function middleware(request: NextRequest) {
   // DOMAIN-BASED ROUTING (Production)
   // =============================================================================
 
+  // FIX: Use EXPLICIT hosts - do NOT fall back to NEXT_PUBLIC_SITE_URL
+  // This prevents www from being treated as the app domain
   const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL; // No fallback - must be explicit
 
   // Extract configured hosts
   let configuredAdminHost: string | null = null;

@@ -96,7 +96,7 @@ export namespace Gtag {
     consent: (options: ConsentOptions) => void;
   }
 
-  export interface DataLayer extends Array<unknown[]> {}
+  export type DataLayer = unknown[][];
 
   export interface ConfigParams {
     [key: string]: string | number | boolean | undefined;

@@ -9,6 +9,5 @@ export { default as BusinessSection } from './BusinessSection';
 export { default as MentorsSection } from './MentorsSection';
 export { default as TestimonialsSection } from './TestimonialsSection';
 export { default as FundingSection } from './FundingSection';
-export { default as PaymentCalculatorSection } from './PaymentCalculatorSection';
 export { default as FAQSection } from './FAQSection';
 export { default as CTASection } from './CTASection';

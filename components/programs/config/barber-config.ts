@@ -2,6 +2,7 @@ import type { ProgramConfig } from '../ProgramLanding';
 
 export const barberConfig: ProgramConfig = {
   // Hero
+  programName: 'Barber Apprenticeship Program',
   title: 'Master the Art of Barbering',
   tagline: 'DOL Registered Apprenticeship',
   subtitle: 'Learn precision cutting, straight razor shaves, beard design, and shop management through our DOL-registered apprenticeship.',

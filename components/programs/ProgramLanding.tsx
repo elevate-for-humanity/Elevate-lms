@@ -11,10 +11,10 @@ import {
   MentorsSection,
   TestimonialsSection,
   FundingSection,
-  PaymentCalculatorSection,
   FAQSection,
   CTASection,
 } from './sections';
+import FlatFeePaymentCalculator from '@/components/payments/FlatFeePaymentCalculator';
 
 // Program configuration types
 export interface ProgramConfig {
@@ -50,6 +50,7 @@ export interface ProgramConfig {
   }>;
   careers: Array<{ title: string; icon?: string; image?: string }>;
   tuition: number;
+  programName?: string;
   
   // Business
   businessItems: string[];
@@ -155,7 +156,20 @@ export default function ProgramLanding({ config, showCalculator = true }: Progra
       <FundingSection options={config.fundingOptions} />
 
       {/* Payment Calculator */}
-      <PaymentCalculatorSection tuition={config.tuition} />
+      <section className="py-20 bg-slate-50 px-4">
+        <div className="max-w-2xl mx-auto">
+          <FlatFeePaymentCalculator
+            programName={config.programName || config.title}
+            programFee={config.tuition}
+            minDownPayment={100}
+            onSelectPlan={(plan) => {
+              console.log('Selected payment plan:', plan);
+              // Navigate to payment page
+              window.location.href = '/programs/barber-apprenticeship/payment/bnpl';
+            }}
+          />
+        </div>
+      </section>
 
       {/* FAQ */}
       <FAQSection faqs={config.faqs} />

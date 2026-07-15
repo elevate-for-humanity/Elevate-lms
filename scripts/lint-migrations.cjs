@@ -114,6 +114,8 @@ for (const file of files) {
       }
       if (j === i) continue;
       if (depth === 0 && trimmed.startsWith(')')) break;
+      // Skip lines inside string literals (e.g., multi-line DEFAULT JSON values)
+      if (inStr) continue;
       if (
         depthBefore === 1 &&
         trimmed &&
@@ -187,7 +189,8 @@ for (const file of files) {
       // comma, the column is correctly terminated — skip the MISSING_COMMA check.
       const isMultiLine = endIdx > startIdx;
 
-      if (!isLast && !hasComma) {
+      // Skip MISSING_COMMA for multi-line columns that have their comma on the end line
+      if (!isLast && !hasComma && !(isMultiLine && endLine.trim().endsWith(','))) {
         issues.push({
           type: 'MISSING_COMMA',
           file,

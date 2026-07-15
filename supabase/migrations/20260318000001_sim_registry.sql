@@ -2,7 +2,7 @@
 -- Simulations are credential-linked assessments, not just practice content.
 -- sim_key matches the JSON filename key (sim-01 … sim-10).
 
-CREATE TABLE training_simulations (
+CREATE TABLE IF NOT EXISTS training_simulations (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   sim_key         TEXT NOT NULL UNIQUE,
   title           TEXT NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE training_simulations (
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE sim_attempts (
+CREATE TABLE IF NOT EXISTS sim_attempts (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   simulation_id UUID NOT NULL REFERENCES training_simulations(id) ON DELETE CASCADE,
   learner_id    UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,

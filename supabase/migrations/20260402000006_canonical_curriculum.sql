@@ -17,7 +17,7 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DROP VIEW IF EXISTS public.courses CASCADE;
 
-CREATE TABLE public.courses (
+CREATE TABLE IF NOT EXISTS public.courses (
   id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   program_id        UUID        REFERENCES public.programs(id) ON DELETE CASCADE,
   legacy_course_id  UUID,

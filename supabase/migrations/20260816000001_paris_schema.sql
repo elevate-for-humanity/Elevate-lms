@@ -21,18 +21,7 @@ CREATE TABLE IF NOT EXISTS ai_agents (
     tools TEXT[] DEFAULT '{}',
     
     -- Metrics
-    metrics JSONB NOT NULL DEFAULT '{
-        "totalTasks": 0,
-        "completedTasks": 0,
-        "failedTasks": 0,
-        "averageResponseTime": 0,
-        "averageResolutionTime": 0,
-        "escalationRate": 0,
-        "firstContactResolution": 0,
-        "activeHours": 0,
-        "tasksByCategory": {},
-        "recentErrors": []
-    }',
+    metrics JSONB NOT NULL DEFAULT '{"totalTasks":0,"completedTasks":0,"failedTasks":0,"averageResponseTime":0,"averageResolutionTime":0,"escalationRate":0,"firstContactResolution":0,"activeHours":0,"tasksByCategory":{},"recentErrors":[]}'::JSONB,
     
     -- Metadata
     owner_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,

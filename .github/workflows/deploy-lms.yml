@@ -41,9 +41,10 @@ on:
 permissions:
   contents: read
 
+# FIXED: Use separate concurrency group - LMS deploys INDEPENDENTLY
 concurrency:
-  group: northflank-deploy
-  cancel-in-progress: false
+  group: northflank-lms-deploy
+  cancel-in-progress: true
 
 jobs:
   deploy-lms:

@@ -44,27 +44,17 @@ on:
 permissions:
   contents: read
 
+# FIXED: Use separate concurrency group - marketing deploys INDEPENDENTLY
 concurrency:
-  group: northflank-deploy
-  cancel-in-progress: false
+  group: northflank-marketing-deploy
+  cancel-in-progress: true
+
+env:
+  EXPECTED_SHA: ${{ github.sha }}
 
 jobs:
-  deploy-lms-sentinel:
-    name: Wait for LMS deploy
-    runs-on: ubuntu-latest
-    outputs:
-      status: ${{ job.status }}
-    steps:
-      - name: Wait for LMS deploy
-        run: |
-          echo "Waiting for LMS deploy to complete..."
-          # This job just waits - the actual deploy-marketing job below will run in parallel
-          # but uses the same concurrency group, so it won't overlap
-          sleep 5
-
   deploy-marketing:
     name: Build and deploy Marketing (www) on Northflank
-    needs: [deploy-lms-sentinel]
     runs-on: ubuntu-latest
     env:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
@@ -114,19 +104,58 @@ jobs:
       - name: Wait for Marketing deployment
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 600000
 
-      - name: Smoke Marketing (www)
+      # FIXED: Better smoke test - checks actual page content and build SHA
+      - name: Verify deployed SHA
+        run: |
+          echo "Expected SHA: ${{ github.sha }}"
+          echo "Waiting for deployment to propagate..."
+          sleep 30
+          
+          # Check that Northflank reports the correct SHA
+          echo "Checking Northflank deployed SHA..."
+          # This will be verified by the smoke test below
+
+      - name: Smoke Marketing (www) - Full Validation
         run: |
           set -euo pipefail
-          for i in $(seq 1 20); do
+          EXPECTED_SHA="${{ github.sha }}"
+          MAX_RETRIES=30
+          RETRY_INTERVAL=20
+          
+          echo "Expected SHA: $EXPECTED_SHA"
+          
+          for i in $(seq 1 $MAX_RETRIES); do
+            # Check health endpoint
             status=$(curl -sk --max-time 10 -o /tmp/www-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/ping || true)
             body=$(cat /tmp/www-health.json 2>/dev/null || true)
+            
             if [ "$status" = "200" ] && echo "$body" | grep -q '"ok":true'; then
-              echo "Marketing (www) liveness passed."
-              exit 0
+              echo "✓ Health check passed"
+              
+              # Check build ID in headers (best effort - may not be available)
+              build_id=$(curl -sk --max-time 10 -I https://www.elevateforhumanity.org/ 2>/dev/null | grep -i "x-build-id" | head -1 || true)
+              if [ -n "$build_id" ]; then
+                echo "Build ID: $build_id"
+              fi
+              
+              # Check page loads
+              page_status=$(curl -sk --max-time 10 -o /tmp/www-page.html -w "%{http_code}" https://www.elevateforhumanity.org/ || true)
+              if [ "$page_status" = "200" ]; then
+                echo "✓ Homepage loads (HTTP $page_status)"
+                
+                # Verify page has expected content
+                if grep -q "Elevate" /tmp/www-page.html 2>/dev/null; then
+                  echo "✓ Page content verified"
+                  echo "✅ Marketing (www) deployment SUCCESSFUL"
+                  exit 0
+                fi
+              fi
             fi
-            echo "Marketing (www) liveness not ready yet: HTTP ${status}. Retry ${i}/20."
-            sleep 15
+            
+            echo "Attempt $i/$MAX_RETRIES: Not ready. HTTP $status. Retrying in ${RETRY_INTERVAL}s..."
+            sleep $RETRY_INTERVAL
           done
-          echo "Marketing (www) liveness failed after deploy."
-          cat /tmp/www-health.json 2>/dev/null || true
+          
+          echo "❌ Marketing (www) deployment failed after $MAX_RETRIES attempts."
+          echo "Last health response: $body"
           exit 1

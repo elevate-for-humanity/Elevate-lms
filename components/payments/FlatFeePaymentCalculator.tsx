@@ -23,7 +23,6 @@ interface PaymentPlan {
 interface FlatFeePaymentCalculatorProps {
   programName: string;
   programFee: number;
-  minDownPayment?: number;
   onSelectPlan: (plan: {
     downPayment: number;
     planMonths: number;
@@ -35,10 +34,9 @@ interface FlatFeePaymentCalculatorProps {
 export function FlatFeePaymentCalculator({
   programName,
   programFee = 4980,
-  minDownPayment = 600,
   onSelectPlan,
 }: FlatFeePaymentCalculatorProps) {
-  const [downPayment, setDownPayment] = useState<string>('600');
+  const [downPayment, setDownPayment] = useState<string>('0');
   const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
 
   const downPaymentNum = parseFloat(downPayment) || 0;
@@ -48,13 +46,11 @@ export function FlatFeePaymentCalculator({
     if (balance <= 0) return [];
 
     return [
-      { months: 2, monthlyAmount: Math.ceil((balance / 2) * 100) / 100, label: '2 Months' },
-      { months: 3, monthlyAmount: Math.ceil((balance / 3) * 100) / 100, label: '3 Months' },
-      { months: 4, monthlyAmount: Math.ceil((balance / 4) * 100) / 100, label: '4 Months' },
-      { months: 6, monthlyAmount: Math.ceil((balance / 6) * 100) / 100, label: '6 Months' },
-      { months: 9, monthlyAmount: Math.ceil((balance / 9) * 100) / 100, label: '9 Months' },
-      { months: 12, monthlyAmount: Math.ceil((balance / 12) * 100) / 100, label: '12 Months' },
-    ].filter((p) => p.monthlyAmount >= 50);
+      { months: 12, monthlyAmount: Math.ceil((balance / 12) * 100) / 100, label: '12 Weeks' },
+      { months: 24, monthlyAmount: Math.ceil((balance / 24) * 100) / 100, label: '24 Weeks' },
+      { months: 36, monthlyAmount: Math.ceil((balance / 36) * 100) / 100, label: '36 Weeks' },
+      { months: 52, monthlyAmount: Math.ceil((balance / 52) * 100) / 100, label: '52 Weeks' },
+    ].filter((p) => p.monthlyAmount >= 25);
   }, [balance]);
 
   const handleDownPaymentChange = (value: string) => {
@@ -125,7 +121,7 @@ export function FlatFeePaymentCalculator({
     }
   };
 
-  const isValid = downPaymentNum >= minDownPayment && (balance <= 0 || selectedPlan !== null);
+  const isValid = balance <= 0 || selectedPlan !== null;
 
   return (
     <div className="bg-white rounded-xl border-2 border-slate-200 shadow-lg overflow-hidden">
@@ -176,28 +172,24 @@ export function FlatFeePaymentCalculator({
               placeholder="0.00"
             />
           </div>
-          {downPaymentNum > 0 && downPaymentNum < minDownPayment && (
-            <p className="text-brand-red-600 text-sm mt-1">Minimum payment is ${minDownPayment}</p>
-          )}
-
           <div className="flex flex-wrap gap-2 mt-3">
             <button
-              onClick={() => handleQuickAmount(600)}
+              onClick={() => handleQuickAmount(0)}
               className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition"
             >
-              $600 (Min)
+              $0
+            </button>
+            <button
+              onClick={() => handleQuickAmount(500)}
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition"
+            >
+              $500
             </button>
             <button
               onClick={() => handleQuickAmount(1000)}
               className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition"
             >
               $1,000
-            </button>
-            <button
-              onClick={() => handleQuickAmount(2000)}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition"
-            >
-              $2,000
             </button>
             <button
               onClick={() => handleQuickAmount(programFee)}

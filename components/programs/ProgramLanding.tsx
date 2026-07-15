@@ -161,10 +161,8 @@ export default function ProgramLanding({ config, showCalculator = true }: Progra
           <FlatFeePaymentCalculator
             programName={config.programName || config.title}
             programFee={config.tuition}
-            minDownPayment={600}
             onSelectPlan={(plan) => {
               console.log('Selected payment plan:', plan);
-              // Navigate to payment page
               window.location.href = '/programs/barber-apprenticeship/payment/bnpl';
             }}
           />

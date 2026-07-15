@@ -6,6 +6,7 @@ interface JourneyStep {
   icon: string;
   title: string;
   description: string;
+  image?: string; // Optional real image path
 }
 
 interface JourneySectionProps {
@@ -71,8 +72,16 @@ export function JourneySection({
                 >
                   {/* Node */}
                   <div className="relative z-10 flex-shrink-0">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-red-500 to-brand-red-600 shadow-lg shadow-brand-red-500/30 flex items-center justify-center ring-4 ring-white">
-                      <span className="text-2xl">{step.icon}</span>
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-red-500 to-brand-red-600 shadow-lg shadow-brand-red-500/30 flex items-center justify-center ring-4 ring-white overflow-hidden">
+                      {step.image ? (
+                        <img 
+                          src={step.image} 
+                          alt={step.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-2xl">{step.icon}</span>
+                      )}
                     </div>
                     {/* Step number badge */}
                     <div className="absolute -top-1 -right-1 w-6 h-6 bg-slate-900 rounded-full flex items-center justify-center">

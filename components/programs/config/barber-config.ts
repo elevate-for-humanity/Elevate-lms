@@ -43,27 +43,92 @@ export const barberConfig: ProgramConfig = {
 
   // Journey
   journeySteps: [
-    { icon: '📝', title: 'Apply', description: 'Complete our simple application online' },
-    { icon: '🤝', title: 'Meet Advisor', description: 'One-on-one consultation to discuss your goals' },
-    { icon: '💰', title: 'Funding Review', description: 'Explore funding options and payment plans' },
-    { icon: '🏪', title: 'Salon Match', description: 'Get matched with a host shop partner' },
-    { icon: '🎓', title: 'Orientation', description: 'Learn the program, meet your mentor' },
-    { icon: '✂️', title: 'Training Begins', description: 'Start your apprenticeship journey' },
-    { icon: '🎉', title: 'Graduation', description: 'Complete hours, pass state exam, get licensed' },
+    { 
+      icon: '📝', 
+      title: 'Apply', 
+      description: 'Complete our simple application online',
+      image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=100&h=100&fit=crop&crop=face'
+    },
+    { 
+      icon: '🤝', 
+      title: 'Meet Advisor', 
+      description: 'One-on-one consultation to discuss your goals and career path',
+      image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=100&h=100&fit=crop&crop=face'
+    },
+    { 
+      icon: '💰', 
+      title: 'Funding Review', 
+      description: 'Explore funding options including WIOA, grants, and payment plans',
+      image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=100&h=100&fit=crop'
+    },
+    { 
+      icon: '🏪', 
+      title: 'Salon Match', 
+      description: 'Get matched with a host barbershop partner in your area',
+      image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=100&h=100&fit=crop'
+    },
+    { 
+      icon: '🎓', 
+      title: 'Orientation', 
+      description: 'Learn the program, meet your mentor, and get set up for success',
+      image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=100&h=100&fit=crop'
+    },
+    { 
+      icon: '✂️', 
+      title: 'Training Begins', 
+      description: 'Start your apprenticeship with hands-on work at your host shop',
+      image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=100&h=100&fit=crop'
+    },
+    { 
+      icon: '🎉', 
+      title: 'Graduate & License', 
+      description: 'Complete 2,000 hours, pass the state exam, and earn your Barber License',
+      image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=100&h=100&fit=crop'
+    },
   ],
 
   // Skills
   skills: [
-    { name: 'Precision Haircutting', icon: '✂️' },
-    { name: 'Beard Sculpting', icon: '🧔' },
-    { name: 'Straight Razor', icon: '🪒' },
-    { name: 'Hot Towel Treatments', icon: '🧴' },
-    { name: 'Shop Management', icon: '📊' },
-    { name: 'Client Consultation', icon: '💬' },
-    { name: 'Sanitation & Safety', icon: '✅' },
-    { name: 'Product Knowledge', icon: '🧴' },
-    { name: 'Business & Marketing', icon: '📈' },
-    { name: 'Portfolio Development', icon: '📁' },
+    { 
+      name: 'Precision Haircutting', 
+      image: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=100&h=100&fit=crop'
+    },
+    { 
+      name: 'Beard Sculpting', 
+      image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=100&h=100&fit=crop'
+    },
+    { 
+      name: 'Straight Razor Shaves', 
+      image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=100&h=100&fit=crop'
+    },
+    { 
+      name: 'Hot Towel Treatments', 
+      image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=100&h=100&fit=crop'
+    },
+    { 
+      name: 'Shop Management', 
+      image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=100&h=100&fit=crop'
+    },
+    { 
+      name: 'Client Consultation', 
+      image: 'https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=100&h=100&fit=crop'
+    },
+    { 
+      name: 'Sanitation & Safety', 
+      image: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=100&h=100&fit=crop'
+    },
+    { 
+      name: 'Product Knowledge', 
+      image: 'https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=100&h=100&fit=crop'
+    },
+    { 
+      name: 'Business & Marketing', 
+      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&h=100&fit=crop'
+    },
+    { 
+      name: 'Portfolio Building', 
+      image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=100&h=100&fit=crop'
+    },
   ],
 
   // Career Outcomes
@@ -73,14 +138,14 @@ export const barberConfig: ProgramConfig = {
     { title: 'Booth/Suite Rental', range: '$60K - $100K+', description: 'potential annual' },
   ],
   careers: [
-    { title: 'Traditional Barbershop', icon: '🏪' },
-    { title: 'Modern Grooming Lounge', icon: '✨' },
-    { title: 'Luxury Spa', icon: '💆' },
-    { title: 'Men\'s Salon', icon: '💇' },
-    { title: 'Film & Television', icon: '🎬' },
-    { title: 'Platform Artist', icon: '⭐' },
-    { title: 'Barber Educator', icon: '👨‍🏫' },
-    { title: 'Shop Owner', icon: '🏢' },
+    { title: 'Traditional Barbershop', image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=100&h=100&fit=crop' },
+    { title: 'Modern Grooming Lounge', image: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=100&h=100&fit=crop' },
+    { title: 'Luxury Hotel Spa', image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=100&h=100&fit=crop' },
+    { title: 'Men\'s Grooming Brand', image: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=100&h=100&fit=crop' },
+    { title: 'Film & TV Production', image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=100&h=100&fit=crop' },
+    { title: 'Social Media Influencer', image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&h=100&fit=crop' },
+    { title: 'Barber Instructor', image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=100&h=100&fit=crop' },
+    { title: 'Shop Owner/Entrepreneur', image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=100&h=100&fit=crop' },
   ],
   tuition: 4980,
 

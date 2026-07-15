@@ -35,10 +35,10 @@ export interface ProgramConfig {
   apprenticeshipItems: Array<{ text: string }>;
   
   // Journey
-  journeySteps: Array<{ icon: string; title: string; description: string }>;
+  journeySteps: Array<{ icon: string; title: string; description: string; image?: string }>;
   
   // Skills
-  skills: Array<{ name: string; icon?: string }>;
+  skills: Array<{ name: string; icon?: string; image?: string }>;
   
   // Career Outcomes
   salaries: Array<{
@@ -47,7 +47,7 @@ export interface ProgramConfig {
     description?: string;
     popular?: boolean;
   }>;
-  careers: Array<{ title: string; icon?: string }>;
+  careers: Array<{ title: string; icon?: string; image?: string }>;
   tuition: number;
   
   // Business

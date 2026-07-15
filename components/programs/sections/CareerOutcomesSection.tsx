@@ -14,6 +14,7 @@ interface SalaryTier {
 interface CareerPath {
   title: string;
   icon?: string;
+  image?: string; // Optional real image path
 }
 
 interface CareerOutcomesSectionProps {
@@ -255,14 +256,31 @@ export function CareerOutcomesSection({
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.05 }}
-                  className="group flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl px-4 py-3 transition-all cursor-default"
+                  className="group flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl px-4 py-3 transition-all cursor-default overflow-hidden"
                 >
-                  {career.icon && (
-                    <span className="text-xl group-hover:scale-110 transition-transform">{career.icon}</span>
+                  {career.image ? (
+                    <>
+                      <img 
+                        src={career.image} 
+                        alt={career.title}
+                        className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                      />
+                      <span className="text-white text-sm font-medium group-hover:text-brand-red-300 transition-colors">
+                        {career.title}
+                      </span>
+                    </>
+                  ) : career.icon ? (
+                    <>
+                      <span className="text-xl group-hover:scale-110 transition-transform">{career.icon}</span>
+                      <span className="text-white text-sm font-medium group-hover:text-brand-red-300 transition-colors">
+                        {career.title}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-white text-sm font-medium group-hover:text-brand-red-300 transition-colors">
+                      {career.title}
+                    </span>
                   )}
-                  <span className="text-white text-sm font-medium group-hover:text-brand-red-300 transition-colors">
-                    {career.title}
-                  </span>
                 </motion.div>
               ))}
             </div>

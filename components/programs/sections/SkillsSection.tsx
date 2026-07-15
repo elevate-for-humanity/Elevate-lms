@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 interface Skill {
   name: string;
   icon?: string;
+  image?: string; // Optional real image path
   description?: string;
 }
 
@@ -60,8 +61,14 @@ export function SkillsSection({
             >
               <div className="relative bg-white rounded-2xl p-5 border border-slate-100 hover:border-brand-red-200 transition-all duration-300 hover:shadow-xl hover:shadow-brand-red-500/5 hover:-translate-y-1">
                 {/* Skill icon */}
-                <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center group-hover:from-brand-red-50 group-hover:to-brand-red-100/50 transition-all duration-300">
-                  {skill.icon ? (
+                <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center group-hover:from-brand-red-50 group-hover:to-brand-red-100/50 transition-all duration-300 overflow-hidden">
+                  {skill.image ? (
+                    <img 
+                      src={skill.image} 
+                      alt={skill.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                  ) : skill.icon ? (
                     <span className="text-3xl group-hover:scale-110 transition-transform duration-300">{skill.icon}</span>
                   ) : (
                     <div className="w-8 h-8 rounded-lg bg-brand-red-100 flex items-center justify-center">

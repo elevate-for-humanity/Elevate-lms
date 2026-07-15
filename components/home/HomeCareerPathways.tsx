@@ -18,14 +18,11 @@ import { getProgramPaymentPlan } from '@/lib/payments/payment-plan';
 
 // Featured programs shown on homepage - ordered by demand/visibility
 const FEATURED_SLUGS = [
-  'cdl-training',
-  'hvac-technician',
-  'cna',
   'barber-apprenticeship',
+  'hvac-technician',
   'medical-assistant',
-  'it-help-desk',
-  'electrical',
-  'welding',
+  'cdl-training',
+  'qma',
 ];
 
 const SECTOR_COLORS: Record<string, string> = {
@@ -197,12 +194,10 @@ export async function HomeCareerPathways() {
         {/* Sector quick-links */}
         <div className="mt-8 flex flex-wrap gap-2 justify-center">
           {[
-            { label: 'Healthcare', href: '/programs?category=healthcare' },
-            { label: 'Skilled Trades', href: '/programs?category=skilled-trades' },
-            { label: 'Transportation', href: '/programs?category=transportation' },
-            { label: 'Technology', href: '/programs?category=technology' },
-            { label: 'Personal Services', href: '/programs?category=personal-services' },
-            { label: 'Business', href: '/programs?category=business' },
+            { label: 'Healthcare', href: '/programs/healthcare' },
+            { label: 'Skilled Trades', href: '/programs/skilled-trades' },
+            { label: 'Transportation', href: '/programs/cdl-training' },
+            { label: 'Personal Services', href: '/programs/barber-apprenticeship' },
           ].map((s) => (
             <Link
               key={s.label}

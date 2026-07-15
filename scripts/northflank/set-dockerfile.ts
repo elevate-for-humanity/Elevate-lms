@@ -3,7 +3,7 @@
  * Set the Dockerfile path for a Northflank service.
  *
  * Usage:
- *   npx tsx scripts/northflank/set-dockerfile.ts elevate-lms-build /Dockerfile.marketing
+ *   npx tsx scripts/northflank/set-dockerfile.ts elevate-marketing /Dockerfile.marketing
  */
 
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
@@ -16,7 +16,7 @@ async function main() {
     console.error(
       'Usage: npx tsx scripts/northflank/set-dockerfile.ts <service-id> <dockerfile-path>',
     );
-    console.error('Example: npx tsx scripts/northflank/set-dockerfile.ts elevate-lms-build /Dockerfile.marketing');
+    console.error('Example: npx tsx scripts/northflank/set-dockerfile.ts elevate-marketing /Dockerfile.marketing');
     process.exit(1);
   }
 

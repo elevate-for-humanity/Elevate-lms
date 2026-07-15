@@ -1,7 +1,7 @@
 import { nfFetch, projectApiPath } from './lib';
 
 const projectId = 'elevate-platform';
-const serviceIds = ['elevate-lms', 'elevate-admin', 'elevate-lms-build'];
+const serviceIds = ['elevate-lms', 'elevate-admin', 'elevate-marketing'];
 
 async function main() {
   for (const serviceId of serviceIds) {

@@ -4,9 +4,9 @@
  * This prevents old builds from being served due to caching or deployment issues.
  *
  * Usage:
- *   npx tsx scripts/northflank/verify-sha.ts elevate-lms-build
- *   npx tsx scripts/northflank/verify-sha.ts elevate-lms-build --sha abc123
- *   npx tsx scripts/northflank/verify-sha.ts elevate-lms-build --url https://www.example.com
+ *   npx tsx scripts/northflank/verify-sha.ts elevate-marketing
+ *   npx tsx scripts/northflank/verify-sha.ts elevate-marketing --sha abc123
+ *   npx tsx scripts/northflank/verify-sha.ts elevate-marketing --url https://www.example.com
  */
 
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';

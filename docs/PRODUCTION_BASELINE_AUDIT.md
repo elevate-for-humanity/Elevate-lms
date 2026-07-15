@@ -90,7 +90,7 @@ pnpm next build
 |---------|------------|------------|
 | LMS | elevate-lms | Dockerfile.northflank-lms |
 | Admin | elevate-admin | Dockerfile.northflank-admin |
-| Marketing | elevate-lms-build | Dockerfile.marketing |
+| Marketing | elevate-marketing | Dockerfile.marketing |
 
 ## TODO
 

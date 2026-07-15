@@ -1,7 +1,7 @@
 import { nfFetch, projectApiPath } from './lib';
 
 const projectId = 'elevate-platform';
-const serviceId = 'elevate-lms-build';
+const serviceId = 'elevate-marketing';
 
 async function main() {
   console.log(`Deep-patching configuration for ${serviceId}...`);

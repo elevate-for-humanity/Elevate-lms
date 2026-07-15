@@ -3,7 +3,7 @@ import { nfFetch, projectApiPath } from './lib';
 const projectId = 'elevate-platform';
 
 const mapping = [
-  { id: 'elevate-lms-build', name: 'Elevate Marketing', file: '/Dockerfile.marketing' },
+  { id: 'elevate-marketing', name: 'Elevate Marketing', file: '/Dockerfile.marketing' },
   { id: 'elevate-admin', name: 'Elevate Admin', file: '/Dockerfile.northflank-admin' },
   { id: 'elevate-lms', name: 'Elevate LMS', file: '/Dockerfile.northflank-lms' },
   { id: 'elevate-lms-production', name: 'Elevate Assets', file: '/Dockerfile.assets' }

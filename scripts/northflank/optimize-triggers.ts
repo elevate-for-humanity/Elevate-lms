@@ -10,7 +10,7 @@ const projectId = 'elevate-platform';
 
 const mapping = [
   { 
-    id: 'elevate-lms-build', 
+    id: 'elevate-marketing', 
     name: 'Elevate Marketing', 
     file: '/Dockerfile.marketing',
     domain: 'www.elevateforhumanity.org',

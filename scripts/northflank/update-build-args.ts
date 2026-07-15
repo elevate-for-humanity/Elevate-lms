@@ -1,7 +1,7 @@
 import { nfFetch, projectApiPath } from './lib';
 
 const projectId = 'elevate-platform';
-const services = ['elevate-lms', 'elevate-admin', 'elevate-lms-production', 'elevate-lms-build'];
+const services = ['elevate-lms', 'elevate-admin', 'elevate-lms-production', 'elevate-marketing'];
 
 const buildArgs = {
   NEXT_PUBLIC_SUPABASE_URL: 'https://cuxzzpsyufcewtmicszk.supabase.co',

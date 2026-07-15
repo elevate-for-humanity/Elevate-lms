@@ -188,7 +188,7 @@ class OperationsServiceImpl implements OperationsService {
   // ===========================================================================
 
   async getActiveClaims(location?: string): Promise<ClaimDisplay[]> {
-    let query = this.supabase
+    const query = this.supabase
       .from('verified_claims')
       .select('claim_key, claim_value, badge_name, badge_color, display_locations')
       .eq('is_active', true)

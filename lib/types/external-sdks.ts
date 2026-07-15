@@ -158,9 +158,11 @@ export namespace Gtag {
 
 export namespace Affirm {
   export interface AffirmInstance {
-    checkout: (config: CheckoutConfig) => void;
-    checkout.open: (options?: CheckoutOptions) => void;
-    checkout.close: () => void;
+    checkout: {
+      (config: CheckoutConfig): void;
+      open: (options?: CheckoutOptions) => void;
+      close: () => void;
+    };
     promotional: (config: PromoConfig) => {
       contains: (amount: number) => boolean;
     };

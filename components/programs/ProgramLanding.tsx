@@ -162,7 +162,6 @@ export default function ProgramLanding({ config, showCalculator = true }: Progra
             programName={config.programName || config.title}
             programFee={config.tuition}
             onSelectPlan={(plan) => {
-              console.log('Selected payment plan:', plan);
               window.location.href = '/programs/barber-apprenticeship/payment/bnpl';
             }}
           />

@@ -80,16 +80,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          # FIX #3: Cache pnpm store for faster builds
           cache: pnpm
-
-      # FIX #3: Cache node_modules for faster builds
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile

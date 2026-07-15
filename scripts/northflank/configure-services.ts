@@ -53,7 +53,7 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
     },
   },
   {
-    id: process.env.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing',
+    id: process.env.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-lms-build',
     dockerfile: '/Dockerfile.marketing',
     runtimeEnvironment: {
       SERVICE_ROLE: 'marketing',

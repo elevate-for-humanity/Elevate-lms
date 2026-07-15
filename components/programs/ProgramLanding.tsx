@@ -11,6 +11,7 @@ import {
   MentorsSection,
   TestimonialsSection,
   FundingSection,
+  PaymentCalculatorSection,
   FAQSection,
   CTASection,
 } from './sections';
@@ -152,6 +153,9 @@ export default function ProgramLanding({ config, showCalculator = true }: Progra
 
       {/* Funding */}
       <FundingSection options={config.fundingOptions} />
+
+      {/* Payment Calculator */}
+      <PaymentCalculatorSection tuition={config.tuition} />
 
       {/* FAQ */}
       <FAQSection faqs={config.faqs} />

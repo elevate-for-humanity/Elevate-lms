@@ -44,7 +44,7 @@ on:
 permissions:
   contents: read
 
-# FIXED: Use separate concurrency group - marketing deploys INDEPENDENTLY
+# FIX #1: Use separate concurrency group - marketing deploys INDEPENDENTLY
 concurrency:
   group: northflank-marketing-deploy
   cancel-in-progress: true
@@ -82,6 +82,15 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      # FIX #3: Cache node_modules for faster builds
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
@@ -104,17 +113,22 @@ jobs:
       - name: Wait for Marketing deployment
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 600000
 
-      # FIXED: Better smoke test - checks actual page content and build SHA
-      - name: Verify deployed SHA
+      # FIX #5: Verify deployed SHA matches expected
+      - name: Verify Deployed SHA
         run: |
+          echo "=========================================="
+          echo "SHA VERIFICATION"
+          echo "=========================================="
           echo "Expected SHA: ${{ github.sha }}"
           echo "Waiting for deployment to propagate..."
           sleep 30
           
-          # Check that Northflank reports the correct SHA
-          echo "Checking Northflank deployed SHA..."
-          # This will be verified by the smoke test below
+          # Use the verify-sha script to check Northflank API
+          pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ github.sha }}"
+          
+          echo "SHA verification from Northflank API passed!"
 
+      # FIX #4: Better smoke test - checks actual page content
       - name: Smoke Marketing (www) - Full Validation
         run: |
           set -euo pipefail
@@ -122,6 +136,9 @@ jobs:
           MAX_RETRIES=30
           RETRY_INTERVAL=20
           
+          echo "=========================================="
+          echo "SMOKE TEST"
+          echo "=========================================="
           echo "Expected SHA: $EXPECTED_SHA"
           
           for i in $(seq 1 $MAX_RETRIES); do
@@ -130,12 +147,17 @@ jobs:
             body=$(cat /tmp/www-health.json 2>/dev/null || true)
             
             if [ "$status" = "200" ] && echo "$body" | grep -q '"ok":true'; then
-              echo "✓ Health check passed"
+              echo "✓ Health check passed (HTTP $status)"
               
               # Check build ID in headers (best effort - may not be available)
               build_id=$(curl -sk --max-time 10 -I https://www.elevateforhumanity.org/ 2>/dev/null | grep -i "x-build-id" | head -1 || true)
               if [ -n "$build_id" ]; then
                 echo "Build ID: $build_id"
+                # Check for dev build
+                if echo "$build_id" | grep -qi "dev"; then
+                  echo "❌ ERROR: Site is still showing DEV build!"
+                  exit 1
+                fi
               fi
               
               # Check page loads
@@ -146,8 +168,13 @@ jobs:
                 # Verify page has expected content
                 if grep -q "Elevate" /tmp/www-page.html 2>/dev/null; then
                   echo "✓ Page content verified"
-                  echo "✅ Marketing (www) deployment SUCCESSFUL"
+                  echo ""
+                  echo "=========================================="
+                  echo "✅ MARKETING (WWW) DEPLOYMENT SUCCESSFUL"
+                  echo "=========================================="
                   exit 0
+                else
+                  echo "⚠️  Page loaded but content doesn't match expected"
                 fi
               fi
             fi
@@ -156,6 +183,14 @@ jobs:
             sleep $RETRY_INTERVAL
           done
           
-          echo "❌ Marketing (www) deployment failed after $MAX_RETRIES attempts."
+          echo ""
+          echo "=========================================="
+          echo "❌ DEPLOYMENT FAILED"
+          echo "=========================================="
           echo "Last health response: $body"
+          echo ""
+          echo "Possible causes:"
+          echo "  1. Northflank is returning OLD/dev build"
+          echo "  2. DNS/proxy is caching old responses"
+          echo "  3. Health check endpoint is not configured"
           exit 1

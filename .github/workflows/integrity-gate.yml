@@ -77,6 +77,9 @@ jobs:
 
       - name: Production readiness gate
         run: SKIP_BUILD_GATE=1 bash scripts/production-readiness-gate.sh
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
 
       - name: PLATFORM_DEFAULTS leak audit
         run: bash scripts/audit-platform-defaults-leaks.sh

@@ -198,6 +198,60 @@ export default function EducationWorkflowPage() {
             ))}
           </div>
         </div>
+        ) : (
+        <div className="col-span-2 space-y-6">
+          <div className="bg-white rounded-lg shadow p-4">
+            <h2 className="font-semibold mb-3">Student Enrollment</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Select Program</label>
+                <select value={selectedProgram} onChange={e => setSelectedProgram(e.target.value)} className="w-full border rounded px-3 py-2">
+                  <option value="">Select a program...</option>
+                  {programs.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Student User ID</label>
+                <input type="text" value={testUserId} onChange={e => setTestUserId(e.target.value)} placeholder="Enter user UUID..." className="w-full border rounded px-3 py-2" />
+              </div>
+            </div>
+            <button onClick={enrollStudent} disabled={!selectedProgram || !testUserId} className="mt-3 px-4 py-2 bg-green-600 text-white rounded disabled:bg-gray-300">Enroll Student</button>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-4">
+            <h2 className="font-semibold mb-3">Lesson Progress</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Select Lesson</label>
+                <select value={selectedLesson} onChange={e => setSelectedLesson(e.target.value)} className="w-full border rounded px-3 py-2">
+                  <option value="">Select a lesson...</option>
+                  {lessons.map(l => <option key={l.id} value={l.id}>{l.title}</option>)}
+                </select>
+              </div>
+              <div className="flex items-end gap-2">
+                <button onClick={markLessonComplete} disabled={!selectedLesson || !testUserId} className="px-4 py-2 bg-amber-600 text-white rounded disabled:bg-gray-300">Mark Complete</button>
+                <button onClick={checkProgress} disabled={!testUserId} className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-gray-300">Check Progress</button>
+              </div>
+            </div>
+          </div>
+
+          {studentProgress && (
+          <div className="bg-white rounded-lg shadow p-4">
+            <h2 className="font-semibold mb-3">Student Progress</h2>
+            <div className="mb-4">
+              <div className="flex justify-between text-sm mb-1"><span>Overall Progress</span><span>{studentProgress.percentage}%</span></div>
+              <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-green-500 h-2 rounded-full" style={{ width: `${studentProgress.percentage}%` }} /></div>
+            </div>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="bg-gray-50 p-3 rounded"><div className="text-2xl font-bold">{studentProgress.completedCount}</div><div className="text-xs text-gray-500">Completed</div></div>
+              <div className="bg-gray-50 p-3 rounded"><div className="text-2xl font-bold">{studentProgress.totalLessons}</div><div className="text-xs text-gray-500">Total Lessons</div></div>
+              <div className="bg-gray-50 p-3 rounded"><div className="text-2xl font-bold">{studentProgress.totalLessons - studentProgress.completedCount}</div><div className="text-xs text-gray-500">Remaining</div></div>
+            </div>
+            <button onClick={getTranscript} className="mt-4 w-full px-4 py-2 bg-cyan-600 text-white rounded">Generate Transcript</button>
+          </div>
+          )}
+        </div>
+        )}
 
         <div className="space-y-6">
           <div className="bg-white rounded-lg shadow p-4">

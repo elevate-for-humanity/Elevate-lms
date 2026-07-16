@@ -28,11 +28,11 @@ const styles = StyleSheet.create({
 });
 
 interface PDFDocumentProps {
-  package: CurriculumPackage;
+  pkg: CurriculumPackage;
   approval: ApprovalPacket;
 }
 
-function CurriculumPackagePDF({ package: pkg, approval }: PDFDocumentProps) {
+function CurriculumPackagePDF({ pkg, approval }: PDFDocumentProps) {
   const { checklist, summary } = approval.validationResult;
   
   return (

@@ -35,6 +35,9 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
       NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
       NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
       NEXT_PUBLIC_LMS_URL: 'https://www.elevateforhumanity.org/lms',
+      // Stripe - set via Northflank secrets
+      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
+      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || '',
     },
   },
   {
@@ -50,6 +53,9 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
       NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
       NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
       NEXT_PUBLIC_LMS_URL: 'https://www.elevateforhumanity.org/lms',
+      // Stripe - set via Northflank secrets
+      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
+      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || '',
     },
   },
   {
@@ -65,6 +71,9 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
       NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
       NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
       NEXT_PUBLIC_LMS_URL: 'https://www.elevateforhumanity.org/lms',
+      // Stripe - set via Northflank secrets
+      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
+      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || '',
     },
   },
 ];

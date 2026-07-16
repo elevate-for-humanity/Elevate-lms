@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const supabase = createPublicClient()supabaseUrl, supabaseServiceKey);
+    const supabase = createPublicClient();
     
     // Get course info
     const { data: course, error: courseError } = await supabase

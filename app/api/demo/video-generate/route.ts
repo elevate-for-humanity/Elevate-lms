@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     let description: string | undefined;
     
     if (planId) {
-      const supabase = createPublicClient()supabaseUrl, supabaseServiceKey);
+      const supabase = createPublicClient();
       const { data: plan } = await supabase
         .from('subscription_plans')
         .select('name, description, slug')

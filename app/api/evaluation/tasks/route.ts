@@ -8,10 +8,7 @@ import { createPublicClient } from '@/lib/supabase/server';
 import { evaluationTaskService, validateTaskDefinition } from '@/lib/evaluation/service';
 import type { PaginationParams, FilterParams } from '@/lib/evaluation/types';
 
-const supabase = createPublicClient()
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = createPublicClient();
 
 // ============================================================================
 // GET /api/evaluation/tasks - List tasks

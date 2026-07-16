@@ -31,6 +31,7 @@ const PUBLIC_PATHS = [
   '/signup',
   '/verify-email',
   '/update-password',
+  '/accessibility/accessibility', // Legacy route - redirect to canonical
 ];
 
 const ADMIN_PATHS = [
@@ -114,6 +115,18 @@ export async function middleware(request: NextRequest) {
   }
 
   // =============================================================================
+  // LEGACY ROUTE REDIRECTS
+  // =============================================================================
+  
+  // Redirect /accessibility/accessibility to /accessibility
+  if (pathname === '/accessibility/accessibility') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/accessibility';
+    url.search = '';
+    return NextResponse.redirect(url);
+  }
+
+  // =============================================================================
   // NON-WWW TO WWW REDIRECT (Preserve full path and query)
   // =============================================================================
   
@@ -131,6 +144,14 @@ export async function middleware(request: NextRequest) {
       isWwwConfigured) {
     const url = request.nextUrl.clone();
     url.host = `www.${host}`;
+    url.protocol = 'https:';
+    return NextResponse.redirect(url);
+  }
+  
+  // Force non-www to www for main domain (always, unless localhost)
+  if (!isLocal && host === 'elevateforhumanity.org') {
+    const url = request.nextUrl.clone();
+    url.host = 'www.elevateforhumanity.org';
     url.protocol = 'https:';
     return NextResponse.redirect(url);
   }

@@ -69,7 +69,7 @@ export function HeroSection({
             <div className="flex flex-wrap gap-4">
               <Link
                 href={primaryCta.href}
-                className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-colors"
+                className="hidden md:inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-colors"
               >
                 {primaryCta.label}
                 <ArrowRight className="w-5 h-5" />

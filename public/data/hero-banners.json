@@ -100,9 +100,9 @@
   },
   "healthcare": {
     "pageKey": "healthcare",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
-    "posterImage": "/images/pages/cna-hero.jpg",
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "posterImage": "/images/pages/healthcare-hero.webp",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "Healthcare Programs",
     "belowHeroHeadline": "Healthcare training that leads to certification.",
@@ -541,8 +541,8 @@
   },
   "cna": {
     "pageKey": "cna",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
+    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
     "posterImage": "/images/pages/cna-hero.jpg",
     "voiceoverSrc": "/audio/heroes/cna.mp3",
     "microLabel": "Indiana CNA Certification",

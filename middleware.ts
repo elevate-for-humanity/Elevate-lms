@@ -20,6 +20,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const PUBLIC_PATHS = [
   '/api/health',
+  '/api/version',
   '/api/ping',
   '/api/ready',
   '/auth/confirm',
@@ -110,6 +111,28 @@ export async function middleware(request: NextRequest) {
   // Always allow public paths and static files
   if (isPublicPath(pathname)) {
     return addSecurityHeaders(NextResponse.next());
+  }
+
+  // =============================================================================
+  // NON-WWW TO WWW REDIRECT (Preserve full path and query)
+  // =============================================================================
+  
+  const wwwHost = process.env.NEXT_PUBLIC_WWW_URL || 'www.elevateforhumanity.org';
+  const isWwwConfigured = wwwHost.includes('www.');
+  
+  // Only redirect if:
+  // 1. Not localhost
+  // 2. Not already www
+  // 3. Not an API route (APIs should not redirect)
+  // 4. www host is configured
+  if (!isLocal && 
+      !host.startsWith('www.') && 
+      !pathname.startsWith('/api/') &&
+      isWwwConfigured) {
+    const url = request.nextUrl.clone();
+    url.host = `www.${host}`;
+    url.protocol = 'https:';
+    return NextResponse.redirect(url);
   }
 
   // =============================================================================

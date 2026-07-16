@@ -70,6 +70,31 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          clean: true
+
+      - name: Verify source commit SHA
+        run: |
+          set -euo pipefail
+          ACTUAL_SHA="$(git rev-parse HEAD)"
+          EXPECTED_SHA="${{ github.sha }}"
+          echo "Expected SHA: $EXPECTED_SHA"
+          echo "Actual SHA:   $ACTUAL_SHA"
+          test "$ACTUAL_SHA" = "$EXPECTED_SHA"
+          test "$(git status --porcelain)" = ""
+          echo "SHA verification passed"
+
+      - name: Generate version file
+        run: |
+          cat > public/version.json <<EOF
+          {
+            "service": "marketing",
+            "commit": "${{ github.sha }}",
+            "builtAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4

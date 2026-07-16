@@ -3,7 +3,7 @@
  * Handles all CRUD operations and business logic for evaluations
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createPublicClient } from '@/lib/supabase/server';
 import type {
   EvaluationTaskDefinition,
   EvaluationChecker,
@@ -24,10 +24,7 @@ import type {
   BatchEvaluationResponse,
 } from './types';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = createPublicClient();
 
 // ============================================================================
 // TASK DEFINITION SERVICE

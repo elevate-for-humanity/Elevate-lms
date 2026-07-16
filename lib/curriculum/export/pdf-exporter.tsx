@@ -147,7 +147,7 @@ export async function generatePackagePDF(pkg: CurriculumPackage, approval: Appro
     return buffer;
   } catch (error) {
     console.error('[PDFExporter] Generation failed:', error);
-    throw new Error('PDF generation failed');
+    throw new Error('PDF generation failed', { cause: error });
   }
 }
 

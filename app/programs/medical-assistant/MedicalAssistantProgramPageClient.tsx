@@ -201,7 +201,7 @@ export function MedicalAssistantProgramPageClient({
       {b && (
         <HeroVideo
           videoSrcDesktop={b.videoSrcDesktop}
-          posterImage={b.posterImage}
+          
           voiceoverSrc={b.voiceoverSrc}
           microLabel={b.microLabel}
           belowHeroHeadline={b.belowHeroHeadline}

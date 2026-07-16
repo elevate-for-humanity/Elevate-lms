@@ -19,7 +19,7 @@ export default function EstheticianEligibilityPage() {
     <div className="min-h-screen bg-white">
       <HeroVideo
         videoSrcDesktop={b?.videoSrcDesktop ?? 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/graduation-success.mp4'}
-        posterImage={b?.posterImage ?? '/images/barber-hero-new.webp'}
+        
         microLabel="Esthetician Apprenticeship"
         analyticsName="esthetician-eligibility"
         belowHeroHeadline="Funding & Enrollment"

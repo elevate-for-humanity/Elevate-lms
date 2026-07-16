@@ -224,7 +224,7 @@ function ProgramPage({
         banner.videoSrcDesktop ? (
           <HeroVideo
             videoSrcDesktop={banner.videoSrcDesktop}
-            posterImage={banner.posterImage}
+            
             voiceoverSrc={banner.voiceoverSrc}
             microLabel={banner.microLabel}
             analyticsName={banner.analyticsName}

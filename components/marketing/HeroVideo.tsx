@@ -31,8 +31,6 @@ export interface HeroVideoProps {
   videoSrcDesktop: string;
   /** Mobile video source — falls back to desktop if omitted */
   videoSrcMobile?: string;
-  /** Poster image shown while video loads — optional */
-  posterImage?: string;
   /** Voiceover audio track — starts on first user interaction */
   voiceoverSrc?: string;
   /** 2–4 word micro-label rendered in bottom-left corner of video */
@@ -64,7 +62,6 @@ export interface HeroVideoProps {
 export default function HeroVideo({
   videoSrcDesktop,
   videoSrcMobile,
-  posterImage,
   voiceoverSrc,
   microLabel,
   showBrandBug = false,
@@ -196,27 +193,15 @@ export default function HeroVideo({
     <div ref={wrapperRef} className={`w-full ${className}`}>
       {/* VIDEO FRAME */}
       {/* Height is intentionally restrained so the first viewport includes the message below the video. */}
-      {/* posterImage is set as CSS backgroundImage so the poster renders from
-          SSR immediately — no bg-slate-900 dark flash before client hydration.
-          CanonicalVideo then renders its own poster <img> (z:1) and video (z:2)
-          on top. Both show the same image so the transition is seamless. */}
       <section
-        className="relative w-full overflow-hidden"
-        style={{
-          height: 'clamp(320px, 50vw, 640px)',
-          ...(posterImage ? {
-            backgroundImage: `url(${posterImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          } : {}),
-        }}
+        className="relative w-full overflow-hidden bg-slate-900"
+        style={{ height: 'clamp(320px, 50vw, 640px)' }}
         aria-label={analyticsName ? `${analyticsName} hero video` : 'Hero video'}
       >
         {/* autoPlayOnMount — hero is always above the fold; start immediately.
-            loop — prevents the poster fading back in when the video ends. */}
+            loop — prevents the video from stopping. */}
         <UltraVideoPlayer
           src={videoSrc}
-          poster={posterImage}
           className="absolute inset-0 w-full h-full object-cover object-center z-10"
           autoPlayOnMount
           loop

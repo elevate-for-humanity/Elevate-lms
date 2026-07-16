@@ -39,7 +39,7 @@ export default async function BeautyEligibilityPage({ params }: Props) {
           (b as any)?.videoSrcDesktop ??
           'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/barber-hero.mp4'
         }
-        posterImage={(b as any)?.posterImage ?? '/images/pages/programs-hero.webp'}
+        
         microLabel={cfg.title}
         analyticsName={`${cfg.slug}-eligibility`}
         belowHeroHeadline="Funding & Enrollment"

@@ -174,7 +174,7 @@ export function ElectricalProgramPageClient({ enrollmentCount = 0, heroBanner: b
       {b && (
         <HeroVideo
           videoSrcDesktop={b.videoSrcDesktop}
-          posterImage={b.posterImage}
+          
           voiceoverSrc={b.voiceoverSrc}
           microLabel={b.microLabel}
           belowHeroHeadline={b.belowHeroHeadline}

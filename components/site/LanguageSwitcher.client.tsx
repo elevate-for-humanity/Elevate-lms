@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { locales, localeNames, localeFlags, type Locale, defaultLocale } from '@/i18n/config';
 
 function getCurrentLocale(): Locale {
@@ -19,7 +18,6 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState<Locale>(defaultLocale);
   const ref = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   // Read current locale from cookie on mount
   useEffect((): void => {
@@ -53,7 +51,8 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
     document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
     setCurrent(locale);
     setOpen(false);
-    router.refresh();
+    // Force full page reload to pick up the new locale
+    window.location.reload();
   }
 
   return (

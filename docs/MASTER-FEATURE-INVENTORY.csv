@@ -1,0 +1,78 @@
+Feature ID,Service,Route,Page,Feature,Stale Version,New Version,Backend Present,Database Present,External Service,Keep,Merge,Rebuild,Remove,Tested,Test Result,Blocker,Final Decision
+F001,Marketing,/,Homepage,Hero Video,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F002,Marketing,/,Homepage,Hero Text,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F003,Marketing,/,Homepage,Mega Navigation,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F004,Marketing,/,Homepage,Pathway Section,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F005,Marketing,/,Homepage,Program Cards,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F006,Marketing,/,Homepage,Apprenticeship Section,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F007,Marketing,/,Homepage,Funding Section,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F008,Marketing,/,Homepage,Success Stories,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F009,Marketing,/,Homepage,Platform Section,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F010,Marketing,/,Homepage,PARIS AI Section,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F011,Marketing,/,Homepage,Live Metrics,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F012,Marketing,/,Homepage,Footer,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F013,Marketing,/,Homepage,Cookie Banner,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F014,Marketing,/,Homepage,Language Selector,Present,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,Pass,None,Keep New
+F015,Marketing,/programs/barber-apprenticeship,Barber Page,Hero Section,Present,BROKEN,Yes,Yes,No,New,N/A,Fix Bug,N/A,Yes,FAIL,Bug Found,Keep New (Fix Bug)
+F016,Marketing,/programs/barber-apprenticeship,Barber Page,Payment Calculator,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS (after fix),None,Keep New
+F017,Marketing,/programs/barber-apprenticeship,Barber Page,Funding Section,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F018,Marketing,/programs/barber-apprenticeship,Barber Page,FAQ Section,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F019,Marketing,/programs/barber-apprenticeship,Barber Page,CTA Section,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F020,Marketing,/programs/barber-apprenticeship/apply,Apply Page,Payment Options,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F021,Marketing,/programs/barber-apprenticeship/apply,Apply Page,Two Paths,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F022,Marketing,/programs/barber-apprenticeship/host-shops,Host Shops,Benefits Section,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F023,Marketing,/programs/barber-apprenticeship/host-shops,Host Shops,Qualifications,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F024,Marketing,/programs/barber-apprenticeship/host-shops,Host Shops,Responsibilities,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F025,Marketing,/programs/barber-apprenticeship/host-shops,Host Shops,Approval Process,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F026,Marketing,/testing,Testing Center,Hero Video,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F027,Marketing,/testing,Testing Center,Why Test Section,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F028,Marketing,/testing,Testing Center,Exam Finder,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F029,Marketing,/testing,Testing Center,Provider Listings,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F030,Marketing,/testing,Testing Center,How It Works,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F031,Marketing,/testing,Testing Center,Pricing Calculator,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F032,Marketing,/testing,Testing Center,Employer Partnerships,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F033,Marketing,/testing,Testing Center,FAQ,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F034,Marketing,/funding,Funding Page,Eligibility Checker,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F035,Marketing,/funding,Funding Page,WIOA Info,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F036,Marketing,/funding,Funding Page,WRG Info,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F037,Marketing,/funding,Funding Page,JRI Info,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F038,Marketing,/funding,Funding Page,Self-Pay Options,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F039,Marketing,/funding,Funding Page,Indiana Career Connect,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F040,Marketing,/store,Store Page,Video Hero,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F041,Marketing,/store,Store Page,Live Demo Section,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F042,Marketing,/store,Store Page,Pricing Display,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F043,Marketing,/store,Store Page,ROI Calculator,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F044,Marketing,/store,Store Page,FAQ,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F045,Marketing,/apply,Apply Page,Tab Navigation,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F046,Marketing,/apply,Apply Page,Personal Info Form,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F047,Marketing,/apply,Apply Page,Program Selection,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F048,Marketing,/apply,Apply Page,Funding Eligibility,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F049,Marketing,/apply,Apply Page,Document Upload,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F050,Marketing,/apply,Apply Page,Submit Button,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F051,API,/api/intake,Intake API,POST Endpoint,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F052,API,/api/version,Version API,GET Endpoint,Missing,Present,Yes,N/A,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F053,API,/api/barber/apply,Barber Apply API,POST Endpoint,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,PENDING,None,Keep New
+F054,Auth,/login,Login Page,Email/Password Form,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F055,Auth,/login,Login Page,Quick Access Links,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F056,Auth,/login,Login Page,Forgot Password,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,Yes,PASS,None,Keep New
+F057,Marketing,/programs/cosmetology-apprenticeship,Cosmetology Page,Program Landing,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F058,Marketing,/programs/esthetician-apprenticeship,Esthetician Page,Program Landing,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F059,Marketing,/programs/nail-technician-apprenticeship,Nail Tech Page,Program Landing,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F060,Marketing,/about,About Page,Content,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F061,Marketing,/contact,Contact Page,Content,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F062,Marketing,/blog,Blog Page,Content,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F063,Marketing,/careers,Careers Page,Content,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F064,Marketing,/partners,Partners Page,Content,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F065,Marketing,/employers,Employers Page,Content,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F066,LMS,/lms/dashboard,Student Dashboard,Overview,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F067,LMS,/lms/courses,Student Courses,Course List,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F068,LMS,/lms/attendance,Attendance,Check In/Out,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F069,LMS,/lms/credentials,Credentials,Credential List,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F070,Admin,/admin/dashboard,Admin Dashboard,Overview,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F071,Admin,/admin/students,Students Page,Student List,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F072,Admin,/admin/enrollments,Enrollments Page,Enrollment List,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F073,Admin,/admin/applications,Applications Page,Application Queue,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F074,Admin,/admin/reports,Reports Page,Report Generation,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F075,Employer,/employer/dashboard,Employer Dashboard,Overview,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F076,Employer,/employer/apprentices,Apprentices Page,Apprentice List,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New
+F077,Employer,/employer/hours,Hours Tracking,OJT Logging,Present,Present,Yes,Yes,No,New,N/A,N/A,N/A,No,NOT TESTED,None,Keep New

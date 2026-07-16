@@ -101,7 +101,6 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       <video
         ref={videoRef}
         src={videoSrc}
-        poster={banner.posterImage}
         autoPlay
         loop
         muted={isMuted}
@@ -109,15 +108,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
         className="absolute inset-0 w-full h-full object-cover"
       />
       
-      {/* Fallback gradient if no poster */}
-      {!banner.posterImage && (
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-brand-red-900/30 to-slate-900" />
-      )}
-      
       <audio ref={voiceoverRef} src={banner.voiceoverSrc} preload="none" />
-
-      {/* Overlay gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
 
       {/* Content */}
       <div className="absolute inset-0 flex items-center">

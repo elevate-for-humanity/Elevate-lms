@@ -1,0 +1,58 @@
+Route,Stale Version,New Version,Best Version,Missing Content,Broken Functionality,Merge Decision,Final Canonical Route
+/ (Homepage),Complete,Complete,New,None identified,None,Keep New,/index
+/programs,Complete,Complete,New,None,None,Keep New,/programs
+/programs/barber-apprenticeship,Complete (legacy),Complete (ProgramLanding),New,None,None,Keep ProgramLanding,/programs/barber-apprenticeship
+/programs/cosmetology-apprenticeship,Unknown,Complete (ProgramLanding),New,Verify legacy content,None,Keep ProgramLanding,/programs/cosmetology-apprenticeship
+/programs/esthetician-apprenticeship,Unknown,Complete (ProgramLanding),New,Verify legacy content,None,Keep ProgramLanding,/programs/esthetician-apprenticeship
+/programs/nail-technician-apprenticeship,Unknown,Complete (ProgramLanding),New,Verify legacy content,None,Keep ProgramLanding,/programs/nail-technician-apprenticeship
+/programs/barber-apprenticeship/apply,Complete,Complete,New,None,None,Keep New,/programs/barber-apprenticeship/apply
+/programs/barber-apprenticeship/host-shops,Complete,Complete,New,None,None,Keep New,/programs/barber-apprenticeship/host-shops
+/programs/barber-apprenticeship/host-shops/apply,Complete,Complete,New,None,None,Keep New,/programs/barber-apprenticeship/host-shops/apply
+/programs/barber-apprenticeship/eligibility,Complete,Complete,New,None,None,Keep New,/programs/barber-apprenticeship/eligibility
+/programs/barber-apprenticeship/orientation,Complete,Complete,New,None,None,Keep New,/programs/barber-apprenticeship/orientation
+/programs/barber-apprenticeship/payment-setup,Complete,Complete,New,None,None,Keep New,/programs/barber-apprenticeship/payment-setup
+/programs/barber-apprenticeship/documents,Complete,Complete,New,None,None,Keep New,/programs/barber-apprenticeship/documents
+/programs/healthcare,Complete,Complete,New,None,None,Keep New,/programs/healthcare
+/programs/skilled-trades,Complete,Complete,New,None,None,Keep New,/programs/skilled-trades
+/programs/technology,Complete,Complete,New,None,None,Keep New,/programs/technology
+/programs/beauty,Complete,Complete,New,None,None,Keep New,/programs/beauty
+/programs/catalog,Complete,Complete,New,None,None,Keep New,/programs/catalog
+/funding,Complete,Complete,New,None,None,Keep New,/funding
+/funding/wioa,Complete,Complete,New,None,None,Keep New,/funding/wioa
+/funding/wrg,Complete,Complete,New,None,None,Keep New,/funding/wrg
+/funding/jri,Complete,Complete,New,None,None,Keep New,/funding/jri
+/funding/federal-programs,Complete,Complete,New,None,None,Keep New,/funding/federal-programs
+/funding/grant-programs,Complete,Complete,New,None,None,Keep New,/funding/grant-programs
+/testing,Complete,Complete,New,None,None,Keep New,/testing
+/testing/book,Complete,Complete,New,None,None,Keep New,/testing/book
+/testing/accommodations,Complete,Complete,New,None,None,Keep New,/testing/accommodations
+/apply,Complete,Complete,New,None,None,Keep New,/apply
+/apply/student,Complete,Complete,New,None,None,Keep New,/apply/student
+/apply/employer,Complete,Complete,New,None,None,Keep New,/apply/employer
+/apply/fssa,Complete,Complete,New,None,None,Keep New,/apply/fssa
+/apply/intake,Complete,Complete,New,None,None,Keep New,/apply/intake
+/apply/track,Complete,Complete,New,None,None,Keep New,/apply/track
+/employers,Complete,Complete,New,None,None,Keep New,/employers
+/employers/directory,Complete,Complete,New,None,None,Keep New,/employers/directory
+/employers/post-job,Complete,Complete,New,None,None,Keep New,/employers/post-job
+/hire-graduates,Complete,Complete,New,None,None,Keep New,/hire-graduates
+/apprenticeship-sponsor,Complete,Complete,New,None,None,Keep New,/apprenticeship-sponsor
+/about,Complete,Complete,New,None,None,Keep New,/about
+/contact,Complete,Complete,New,None,None,Keep New,/contact
+/blog,Complete,Complete,New,None,None,Keep New,/blog
+/careers,Complete,Complete,New,None,None,Keep New,/careers
+/compliance,Complete,Complete,New,None,None,Keep New,/compliance
+/compliance/competency-verification/barber,Complete,Complete,New,None,None,Keep New,/compliance/competency-verification/barber
+/compliance/competency-verification/barber/apprenticeship-agreement,Complete,Complete,New,None,None,Keep New,/compliance/competency-verification/barber/apprenticeship-agreement
+/compliance/competency-verification/barber/ojt-hours-log,Complete,Complete,New,None,None,Keep New,/compliance/competency-verification/barber/ojt-hours-log
+/compliance/competency-verification/barber/scoring-sheet,Complete,Complete,New,None,None,Keep New,/compliance/competency-verification/barber/scoring-sheet
+/compliance/competency-verification/barber/monthly-ojt-evaluation,Complete,Complete,New,None,None,Keep New,/compliance/competency-verification/barber/monthly-ojt-evaluation
+/compliance/competency-verification/barber/final-signoff,Complete,Complete,New,None,None,Keep New,/compliance/competency-verification/barber/final-signoff
+/compliance/competency-verification/barber/supervisor-verification,Complete,Complete,New,None,None,Keep New,/compliance/competency-verification/barber/supervisor-verification
+/portal/barber,Requires Auth,Requires Auth,New,None,None,Keep New,/portal/barber
+/partners,Complete,Complete,New,None,None,Keep New,/partners
+/partners/barber-host-shop,Complete,Complete,New,None,None,Keep New,/partners/barber-host-shop
+/partners/barbershop-apprenticeship,Complete,Complete,New,None,None,Keep New,/partners/barbershop-apprenticeship
+/login,Complete,Complete,New,None,None,Keep New,/login
+/store,Complete,Complete,New,None,None,Keep New,/store
+/store/checkout,Complete,Complete,New,None,None,Keep New,/store/checkout

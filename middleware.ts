@@ -107,6 +107,17 @@ export async function middleware(request: NextRequest) {
   const host = getHost(request);
   const isLocal = isLocalhost(host);
 
+  // =============================================================================
+  // NON-WWW TO WWW REDIRECT (Preserve full path and query string)
+  // =============================================================================
+  
+  if (!isLocal && host === 'elevateforhumanity.org') {
+    const url = request.nextUrl.clone();
+    url.hostname = 'www.elevateforhumanity.org';
+    // 308 preserves method (POST bodies, etc.)
+    return NextResponse.redirect(url, 308);
+  }
+
   // Always allow public paths and static files
   if (isPublicPath(pathname)) {
     return addSecurityHeaders(NextResponse.next());

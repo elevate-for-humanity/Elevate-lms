@@ -49,7 +49,7 @@ export default function WebsiteBuilderAppPage() {
 
   return (
     <div className="min-h-screen bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-4">
+             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Website Builder" }]} />
       </div>
 {/* Hero */}
@@ -218,7 +218,7 @@ export default function WebsiteBuilderAppPage() {
               
               <div className="mt-6 flex flex-col sm:flex-row gap-3">
                 <Link
-                  href="/store/demo/website-builder"
+                  href="/store/demos"
                   className="flex-1 flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-3 px-6 rounded-xl transition-colors"
                 >
                   <Monitor className="w-5 h-5" />

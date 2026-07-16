@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-// Canonical terms page lives at /terms — redirect permanently.
+// Legacy route /terms-of-service redirects to canonical /legal
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -11,5 +11,6 @@ export const metadata: Metadata = {
 };
 
 export default function TermsOfServiceRedirect() {
-  redirect('/terms');
+  // Redirect legacy /terms-of-service to canonical /legal
+  redirect('/legal');
 }

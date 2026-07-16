@@ -67,10 +67,10 @@
 | # | Step | Required | Implemented | Tested | Location |
 |---|------|----------|-------------|--------|----------|
 | 5.1 | JSON export available | ✅ | ✅ | ❌ | API returns JSON |
-| 5.2 | PDF export generated | ✅ | ❌ | ❌ | **MISSING** |
-| 5.3 | DOCX export generated | ✅ | ❌ | ❌ | **MISSING** |
-| 5.4 | ZIP package created | ✅ | ❌ | ❌ | **MISSING** |
-| 5.5 | Documents previewable | ✅ | ❌ | ❌ | **MISSING** |
+| 5.2 | PDF export generated | ✅ | ✅ | ❌ | `lib/curriculum/export/pdf-exporter.ts` |
+| 5.3 | DOCX export generated | ✅ | ✅ | ❌ | `lib/curriculum/export/docx-exporter.ts` |
+| 5.4 | ZIP package created | ✅ | ✅ | ❌ | `lib/curriculum/export/zip-exporter.ts` |
+| 5.5 | Documents previewable | ✅ | ❌ | ❌ | Future work |
 
 ---
 
@@ -81,8 +81,8 @@
 | 6.1 | Approval packet assembled | ✅ | ✅ | ❌ | `generateApprovalPacketSummary()` |
 | 6.2 | Checklist itemized | ✅ | ✅ | ❌ | 15-item checklist |
 | 6.3 | Missing items flagged | ✅ | ✅ | ❌ | Validation issues |
-| 6.4 | Human review triggered | ✅ | ❌ | ❌ | **MISSING** |
-| 6.5 | Revision workflow started | ✅ | ❌ | ❌ | **MISSING** |
+| 6.4 | Human review triggered | ✅ | ✅ | ❌ | `lib/curriculum/approval-workflow.ts` |
+| 6.5 | Revision workflow started | ✅ | ✅ | ❌ | `lib/curriculum/approval-workflow.ts` |
 
 ---
 
@@ -106,7 +106,7 @@
 | 8.2 | Lessons accessible | ✅ | ✅ | ❌ | LMS delivery |
 | 8.3 | Progress tracked | ✅ | ✅ | ❌ | `lesson_progress` |
 | 8.4 | Competencies assessed | ✅ | ✅ | ❌ | Quiz completion |
-| 8.5 | Skills verified | ✅ | ❌ | ❌ | **MISSING** |
+| 8.5 | Skills verified | ✅ | ✅ | ❌ | `lib/curriculum/skills-verification.ts` |
 | 8.6 | Certificate issued | ✅ | ✅ | ❌ | Certificate tables |
 
 ---
@@ -115,9 +115,9 @@
 
 | # | Step | Required | Implemented | Tested | Location |
 |---|------|----------|-------------|--------|----------|
-| 9.1 | Version history tracked | ✅ | ❌ | ❌ | **MISSING** |
-| 9.2 | Revisions compared | ✅ | ❌ | ❌ | **MISSING** |
-| 9.3 | Rollback available | ✅ | ❌ | ❌ | **MISSING** |
+| 9.1 | Version history tracked | ✅ | ✅ | ❌ | `lib/curriculum/version-history.ts` |
+| 9.2 | Revisions compared | ✅ | ✅ | ❌ | `diffPackages()` |
+| 9.3 | Rollback available | ✅ | ✅ | ❌ | `rollbackToVersion()` |
 | 9.4 | Audit trail maintained | ✅ | ✅ | ❌ | `audit_logs` table |
 
 ---
@@ -130,22 +130,30 @@
 | Phase 2: Layer 1 - Course | 9 | 9 | 0 |
 | Phase 3: Layer 2 - Package | 11 | 11 | 0 |
 | Phase 4: Layer 3 - Validation | 6 | 6 | 0 |
-| Phase 5: Document Export | 5 | 1 | **4** |
-| Phase 6: Approval Submission | 5 | 3 | **2** |
+| Phase 5: Document Export | 5 | 4 | **1** |
+| Phase 6: Approval Submission | 5 | 5 | 0 |
 | Phase 7: Publishing | 5 | 5 | 0 |
-| Phase 8: Student Lifecycle | 6 | 5 | **1** |
-| Phase 9: Version Control | 4 | 1 | **3** |
+| Phase 8: Student Lifecycle | 6 | 6 | 0 |
+| Phase 9: Version Control | 4 | 4 | 0 |
 
-**Total: 55 steps required, 44 implemented (80%), 11 missing (20%)**
+**Total: 55 steps required, 54 implemented (98%), 1 missing (2%)**
 
 ---
 
-## Gaps to Fill
+## Gaps Filled (July 15, 2026)
 
-1. **PDF Export** - Generate PDF from package content
-2. **DOCX Export** - Generate Word documents
-3. **ZIP Package** - Bundle all documents
-4. **Human Review Trigger** - Start approval workflow
-5. **Revision Workflow** - Handle feedback and edits
-6. **Skills Verification** - Instructor sign-off UI
-7. **Version History** - Track changes over time
+| Gap | Status | Location |
+|-----|--------|----------|
+| PDF Export | ✅ FILLED | `lib/curriculum/export/pdf-exporter.ts` |
+| DOCX Export | ✅ FILLED | `lib/curriculum/export/docx-exporter.ts` |
+| ZIP Package | ✅ FILLED | `lib/curriculum/export/zip-exporter.ts` |
+| Human Review Trigger | ✅ FILLED | `lib/curriculum/approval-workflow.ts` |
+| Revision Workflow | ✅ FILLED | `lib/curriculum/approval-workflow.ts` |
+| Skills Verification | ✅ FILLED | `lib/curriculum/skills-verification.ts` |
+| Version History | ✅ FILLED | `lib/curriculum/version-history.ts` |
+
+---
+
+## Remaining (2%)
+
+1. **Document Preview** - Preview generated documents before export

@@ -50,6 +50,7 @@ export interface ProgramConfig {
   }>;
   careers: Array<{ title: string; icon?: string; image?: string }>;
   tuition: number;
+  minDownPayment?: number;
   programName?: string;
   
   // Business
@@ -161,6 +162,7 @@ export default function ProgramLanding({ config, showCalculator = true }: Progra
           <FlatFeePaymentCalculator
             programName={config.programName || config.title}
             programFee={config.tuition}
+            minDownPayment={config.minDownPayment || 0}
             onSelectPlan={(plan) => {
               window.location.href = '/programs/barber-apprenticeship/payment/bnpl';
             }}

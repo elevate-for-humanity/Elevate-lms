@@ -23,6 +23,7 @@ interface PaymentPlan {
 interface FlatFeePaymentCalculatorProps {
   programName: string;
   programFee: number;
+  minDownPayment?: number;
   onSelectPlan: (plan: {
     downPayment: number;
     planMonths: number;
@@ -34,6 +35,7 @@ interface FlatFeePaymentCalculatorProps {
 export function FlatFeePaymentCalculator({
   programName,
   programFee = 4980,
+  minDownPayment = 0,
   onSelectPlan,
 }: FlatFeePaymentCalculatorProps) {
   const [downPayment, setDownPayment] = useState<string>('0');

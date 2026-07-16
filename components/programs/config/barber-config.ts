@@ -149,6 +149,7 @@ export const barberConfig: ProgramConfig = {
     { title: 'Shop Owner/Entrepreneur', image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=100&h=100&fit=crop' },
   ],
   tuition: 4980,
+  minDownPayment: 1000,
 
   // Business
   businessItems: [

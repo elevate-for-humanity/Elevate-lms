@@ -106,10 +106,10 @@ export default async function PartnersPage() {
       <div className="max-w-7xl mx-auto px-4 pb-2">
         <p className="text-sm text-slate-600 font-medium">Part of the <Link href="/platform" className="text-brand-red-600 hover:underline">Elevate Workforce Operating System</Link></p>
       </div>
-<header className="relative min-h-[400px] flex items-center">
+      <header className="relative min-h-[400px] flex items-center">
         <Image
           src="/images/team-vibrant.jpg"
-          alt="Partner with {PLATFORM_DEFAULTS.orgName}"
+          alt={`Partner with ${PLATFORM_DEFAULTS.orgName}`}
           fill
           className="object-cover"
           priority

@@ -1,12 +1,12 @@
 /**
- * lib/curriculum/export/pdf-exporter.ts
- * 
+ * lib/curriculum/export/pdf-exporter.tsx
+ *
  * PDF Export for Curriculum Package
  * Uses @react-pdf/renderer for PDF generation
  */
 
 import React from 'react';
-import { renderToBuffer, Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import { renderToBuffer, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import type { CurriculumPackage, ApprovalPacket } from '@/lib/curriculum/package/types';
 
 const styles = StyleSheet.create({
@@ -23,7 +23,6 @@ const styles = StyleSheet.create({
   tableRow: { flexDirection: 'row', borderBottom: '1 solid #e2e8f0', padding: 5 },
   tableCell: { flex: 1, fontSize: 9 },
   tableHeader: { backgroundColor: '#f7fafc', fontWeight: 'bold' },
-  checkbox: { width: 10, height: 10, marginRight: 5 },
   footer: { position: 'absolute', bottom: 30, left: 40, right: 40, textAlign: 'center', fontSize: 9, color: '#718096' },
 });
 
@@ -34,18 +33,16 @@ interface PDFDocumentProps {
 
 function CurriculumPackagePDF({ pkg, approval }: PDFDocumentProps) {
   const { checklist, summary } = approval.validationResult;
-  
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Header */}
         <Text style={styles.header}>{pkg.programTitle}</Text>
         <Text style={styles.subheader}>
           Curriculum Package - {pkg.credentialCode} | {pkg.state}
         </Text>
         <Text style={styles.text}>Generated: {new Date(pkg.generatedAt).toLocaleDateString()}</Text>
-        
-        {/* Clock Hours */}
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Clock Hour Summary</Text>
           <View style={styles.table}>
@@ -67,39 +64,35 @@ function CurriculumPackagePDF({ pkg, approval }: PDFDocumentProps) {
             ))}
           </View>
         </View>
-        
-        {/* Approval Checklist */}
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Approval Checklist ({summary.passed}/{summary.total})</Text>
           {checklist.map((item, i) => (
             <View key={i} style={styles.list}>
               <Text style={styles.listItem}>
-                [{item.status === 'pass' ? '✓' : item.status === 'fail' ? '✗' : '○'}] {item.item}
+                [{item.status === 'pass' ? 'PASS' : item.status === 'fail' ? 'FAIL' : 'PENDING'}] {item.item}
               </Text>
             </View>
           ))}
         </View>
-        
+
         <Text style={styles.footer}>Elevate for Humanity | Curriculum Package Export</Text>
       </Page>
-      
-      {/* Skills Checklists */}
-      {pkg.skillsChecklists.map((checklist, i) => (
+
+      {pkg.skillsChecklists.map((cl, i) => (
         <Page key={`checklist-${i}`} size="A4" style={styles.page}>
-          <Text style={styles.sectionTitle}>Skills Checklist: {checklist.moduleTitle}</Text>
-          <Text style={styles.text}>Total Tasks: {checklist.totalTasks} | Required: {checklist.requiredTasks}</Text>
+          <Text style={styles.sectionTitle}>Skills Checklist: {cl.moduleTitle}</Text>
+          <Text style={styles.text}>Total Tasks: {cl.totalTasks} | Required: {cl.requiredTasks}</Text>
           <View style={styles.table}>
             <View style={[styles.tableRow, styles.tableHeader]}>
               <Text style={[styles.tableCell, { flex: 0.5 }]}>#</Text>
               <Text style={[styles.tableCell, { flex: 3 }]}>Task</Text>
-              <Text style={styles.tableCell}>Criteria</Text>
               <Text style={styles.tableCell}>Method</Text>
             </View>
-            {checklist.checklistItems.map((item, j) => (
+            {cl.checklistItems.map((item, j) => (
               <View key={j} style={styles.tableRow}>
                 <Text style={[styles.tableCell, { flex: 0.5 }]}>{item.stepNumber}</Text>
                 <Text style={[styles.tableCell, { flex: 3 }]}>{item.task}</Text>
-                <Text style={styles.tableCell}>{item.observationCriteria.substring(0, 30)}...</Text>
                 <Text style={styles.tableCell}>{item.method}</Text>
               </View>
             ))}
@@ -107,8 +100,7 @@ function CurriculumPackagePDF({ pkg, approval }: PDFDocumentProps) {
           <Text style={styles.footer}>Elevate for Humanity | Skills Checklist</Text>
         </Page>
       ))}
-      
-      {/* Rubrics */}
+
       {pkg.practicalRubrics.map((rubric, i) => (
         <Page key={`rubric-${i}`} size="A4" style={styles.page}>
           <Text style={styles.sectionTitle}>Practical Rubric: {rubric.rubricTitle}</Text>
@@ -125,17 +117,17 @@ function CurriculumPackagePDF({ pkg, approval }: PDFDocumentProps) {
                 <View style={styles.tableRow}>
                   <Text style={styles.tableCell}>Excellent</Text>
                   <Text style={styles.tableCell}>{crit.levels.excellent.score}</Text>
-                  <Text style={styles.tableCell}>{crit.levels.excellent.description.substring(0, 100)}...</Text>
+                  <Text style={styles.tableCell}>{crit.levels.excellent.description.substring(0, 100)}</Text>
                 </View>
                 <View style={styles.tableRow}>
                   <Text style={styles.tableCell}>Satisfactory</Text>
                   <Text style={styles.tableCell}>{crit.levels.satisfactory.score}</Text>
-                  <Text style={styles.tableCell}>{crit.levels.satisfactory.description.substring(0, 100)}...</Text>
+                  <Text style={styles.tableCell}>{crit.levels.satisfactory.description.substring(0, 100)}</Text>
                 </View>
                 <View style={styles.tableRow}>
                   <Text style={styles.tableCell}>Needs Improvement</Text>
                   <Text style={styles.tableCell}>{crit.levels.needsImprovement.score}</Text>
-                  <Text style={styles.tableCell}>{crit.levels.needsImprovement.description.substring(0, 100)}...</Text>
+                  <Text style={styles.tableCell}>{crit.levels.needsImprovement.description.substring(0, 100)}</Text>
                 </View>
               </View>
             </View>
@@ -147,13 +139,10 @@ function CurriculumPackagePDF({ pkg, approval }: PDFDocumentProps) {
   );
 }
 
-/**
- * Generate PDF buffer from curriculum package
- */
 export async function generatePackagePDF(pkg: CurriculumPackage, approval: ApprovalPacket): Promise<Buffer> {
   try {
     const buffer = await renderToBuffer(
-      React.createElement(CurriculumPackagePDF, { package: pkg, approval })
+      React.createElement(CurriculumPackagePDF, { pkg, approval })
     );
     return buffer;
   } catch (error) {
@@ -162,47 +151,48 @@ export async function generatePackagePDF(pkg: CurriculumPackage, approval: Appro
   }
 }
 
-/**
- * Generate PDF for instructor guide
- */
 export async function generateInstructorGuidePDF(
   guide: CurriculumPackage['instructorGuides']
 ): Promise<Buffer | null> {
   if (!guide) return null;
-  
-  // Simple text-based PDF for instructor guide
-  const content = `
-${guide.programTitle}
-Instructor Guide v${guide.version}
 
-Total Lecture Hours: ${guide.totalLectureHours}
-Total Lab Hours: ${guide.totalLabHours}
-Total Clinical Hours: ${guide.totalClinicalHours}
+  const lines: string[] = [];
+  lines.push(guide.programTitle);
+  lines.push('Instructor Guide v' + guide.version);
+  lines.push('');
+  lines.push('Total Lecture Hours: ' + guide.totalLectureHours);
+  lines.push('Total Lab Hours: ' + guide.totalLabHours);
+  lines.push('Total Clinical Hours: ' + guide.totalClinicalHours);
+  lines.push('');
 
-${guide.modules.map(mod => `
-MODULE: ${mod.moduleTitle}
-========================
-Overview: ${mod.moduleOverview}
+  for (const mod of guide.modules) {
+    lines.push('MODULE: ' + mod.moduleTitle);
+    lines.push('========================');
+    lines.push('Overview: ' + mod.moduleOverview);
+    lines.push('');
+    lines.push('Learning Objectives:');
+    for (const o of mod.learningObjectives) {
+      lines.push('- ' + o);
+    }
+    lines.push('');
+    lines.push('Preparation Steps:');
+    for (const s of mod.preparationSteps) {
+      lines.push('- ' + s);
+    }
+    lines.push('');
+    lines.push('Equipment Needed:');
+    for (const e of mod.equipmentNeeded) {
+      lines.push('- ' + e);
+    }
+    lines.push('');
+    lines.push('Lecture Outline:');
+    for (const l of mod.lectureOutline) {
+      lines.push('  ' + l.topic + ' (' + l.duration + ' min)');
+      lines.push('  Teaching Notes: ' + l.teachingNotes);
+      lines.push('  Discussion: ' + l.discussionQuestions.join(', '));
+    }
+    lines.push('');
+  }
 
-Learning Objectives:
-${mod.learningObjectives.map(o => `- ${o}`).join('\n')}
-
-Preparation Steps:
-${mod.preparationSteps.map(s => `- ${s}`).join('\n')}
-
-Equipment Needed:
-${mod.equipmentNeeded.map(e => `- ${e}`).join('\n')}
-
-Lecture Outline:
-${mod.lectureOutline.map(l => `
-  ${l.topic} (${l.duration} min)
-  Teaching Notes: ${l.teachingNotes}
-  Discussion: ${l.discussionQuestions.join(', ')}
-`).join('\n')}
-`).join('\n')}
-`).join('\n')}
-`;
-
-  // Convert to buffer (simplified - in production use proper PDF generation)
-  return Buffer.from(content, 'utf-8');
+  return Buffer.from(lines.join('\n'), 'utf-8');
 }

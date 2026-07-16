@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createPublicClient } from '@/lib/supabase/server';
 import { generateCourseVideos, queueCourseVideoGeneration } from '@/lib/video/auto-video-generator';
 
 // Supabase client for server
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createPublicClient()supabaseUrl, supabaseServiceKey);
     
     // Get course info
     const { data: course, error: courseError } = await supabase

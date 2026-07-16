@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createPublicClient } from '@/lib/supabase/server';
 import { generateDemoVideos, getDemoVideoConfigs, getPexelsVideosForPlan } from '@/lib/video/demo-video-generator';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     let description: string | undefined;
     
     if (planId) {
-      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      const supabase = createPublicClient()supabaseUrl, supabaseServiceKey);
       const { data: plan } = await supabase
         .from('subscription_plans')
         .select('name, description, slug')

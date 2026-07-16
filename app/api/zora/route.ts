@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { createPublicClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -256,7 +255,7 @@ async function _POST(req: NextRequest) {
     // Get user context if authenticated
     let userContext = '';
     if (userId || sessionId) {
-      const supabase = await createClient();
+      const supabase = await createPublicClient();
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -281,7 +280,7 @@ async function _POST(req: NextRequest) {
     // Store conversation in database if session exists
     if (sessionId) {
       try {
-        const supabase = await createClient();
+        const supabase = await createPublicClient();
         await supabase.from('ai_conversations').insert({
           session_id: sessionId,
           user_id: userId || null,
@@ -328,7 +327,7 @@ async function _GET(req: NextRequest) {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = await createPublicClient();
     const { data: messages } = await supabase
       .from('ai_conversations')
       .select('role, content, created_at')

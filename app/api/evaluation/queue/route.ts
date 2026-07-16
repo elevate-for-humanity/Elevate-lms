@@ -4,10 +4,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createPublicClient } from '@/lib/supabase/server';
 import { reviewQueueService } from '@/lib/evaluation/service';
 
-const supabase = createClient(
+const supabase = createPublicClient()
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );

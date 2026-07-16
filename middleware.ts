@@ -31,7 +31,6 @@ const PUBLIC_PATHS = [
   '/signup',
   '/verify-email',
   '/update-password',
-  '/accessibility/accessibility', // Legacy route - redirect to canonical
 ];
 
 const ADMIN_PATHS = [
@@ -109,13 +108,8 @@ export async function middleware(request: NextRequest) {
   const host = getHost(request);
   const isLocal = isLocalhost(host);
 
-  // Always allow public paths and static files
-  if (isPublicPath(pathname)) {
-    return addSecurityHeaders(NextResponse.next());
-  }
-
   // =============================================================================
-  // LEGACY ROUTE REDIRECTS
+  // LEGACY ROUTE REDIRECTS (MUST CHECK FIRST - before public paths)
   // =============================================================================
   
   // Redirect /accessibility/accessibility to /accessibility
@@ -123,7 +117,12 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = '/accessibility';
     url.search = '';
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(url, 308);
+  }
+
+  // Always allow public paths and static files
+  if (isPublicPath(pathname)) {
+    return addSecurityHeaders(NextResponse.next());
   }
 
   // =============================================================================

@@ -246,3 +246,18 @@ export function getXAPIClient(): XAPIClient {
   }
   return xapiClient;
 }
+
+
+/**
+ * Track lesson progress - convenience wrapper
+ */
+export async function trackLessonProgress(
+  userId: string,
+  courseId: string,
+  lessonId: string,
+  lessonName: string,
+  percent: number
+): Promise<void> {
+  const client = getXAPIClient();
+  return client.trackLessonCompletion(userId, courseId, lessonId, lessonName, percent >= 100);
+}

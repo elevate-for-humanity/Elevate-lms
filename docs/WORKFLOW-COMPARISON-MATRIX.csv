@@ -1,0 +1,16 @@
+Workflow ID,Workflow Name,Steps,Old Version Status,New Version Status,Missing in Both,Canonical Implementation,Test Required,Test Status,Notes
+WF001,Inquiry,Visitor→Form→Lead→Confirmation,Unknown,Unknown,Confirmation email verification,New Version,Yes,PENDING,Need to verify lead creation
+WF002,Application,Form→Documents→DB Record→Confirmation,Working,Working,Status tracking page,New Version,Yes,PENDING,Verify database write and redirect
+WF003,Enrollment,Approved→Payment→Enrollment→Account→LMS Access,Unknown,Unknown,Digital binder creation,New Version,Yes,PENDING,Need end-to-end test
+WF004,Apprenticeship,Host Assignment→Clock In→OJL Hours→RTI→Sign-off→RAPIDS,Unknown,Unknown,RAPIDS sync verification,New Version,Yes,PENDING,Need to test time tracking
+WF005,Testing,Exam Selection→Schedule→Payment→Confirmation→Proctor→Result→Credential,Unknown,Unknown,Credential issuance,New Version,Yes,PENDING,Need to verify credential
+WF006,Commerce,Product→Coupon→Checkout→Webhook→Entitlement→Receipt,Unknown,Unknown,Receipt delivery,New Version,Yes,PENDING,Need Stripe webhook test
+WF007,Barber Apply,Program Page→Apply→Payment→Form→Submit→Success,Broken (Step 1),Working (Step 2+),Email notification,New Version,Yes,PENDING,Fix deployed, need to verify
+WF008,Funding,Eligibility Check→WorkOne→Approval→Enrollment,Working,Working,Indiana Career Connect integration,New Version,Yes,PENDING,Verify ICW integration
+WF009,Host Shop,Inquiry→Application→Verification→Agreement→Approval,Working,Working,License verification API,New Version,Yes,PENDING,Verify license check
+WF010,Login,Email/Password→Session→Dashboard,Working,Working,SSO integration,New Version,Yes,PENDING,Verify role-based access
+WF011,Password Reset,Forgot→Email→Reset→Login,Working,Working,Email delivery,New Version,Yes,PENDING,Verify email template
+WF012,Notification,Trigger→Queue→Email/SMS→Delivery,Unknown,Unknown,Delivery confirmation,New Version,Yes,PENDING,Verify Resend integration
+WF013,Compliance,RAPIDS Export→DOL Submission→Confirmation,Unknown,Unknown,Confirmation from DOL,New Version,Yes,PENDING,Verify API integration
+WF014,Credential Verify,Public Link→Verify→Display,Working,Working,Blockchain anchor,New Version,Yes,PENDING,Verify verification page
+WF015,Document Upload,Select File→Upload→Store→Link,Working,Working,Virus scan,New Version,Yes,PENDING,Verify storage integration

@@ -1,7 +1,17 @@
 'use client';
 
+/**
+ * HomeHeroVideo — full-width hero video for marketing pages.
+ *
+ * Rules (non-negotiable):
+ * - No gradient overlays on the video frame.
+ * - No headline, subheadline, paragraph, or CTA on top of the video.
+ * - All primary messaging renders in the below-video content slot.
+ * - Only allowed on-video elements: sound control, micro-label (2-4 words max).
+ */
+
 import { useEffect, useRef, useState } from 'react';
-import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 
 export interface HeroBanner {
   pageKey: string;
@@ -67,114 +77,160 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
 
   if (!videoSrc) {
     return (
-      <section className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px] overflow-hidden bg-gradient-to-br from-slate-900 via-brand-red-900/20 to-slate-900">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white max-w-4xl px-4">
-            <p className="text-sm uppercase tracking-wider text-brand-red-400 mb-4">{banner.microLabel}</p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">{banner.belowHeroHeadline}</h1>
-            <p className="text-xl sm:text-2xl mb-8 max-w-2xl mx-auto">{banner.belowHeroSubheadline}</p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href={banner.primaryCta.href}
-                className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition"
-              >
-                {banner.primaryCta.label}
-              </a>
-              {banner.secondaryCta && (
-                <a
-                  href={banner.secondaryCta.href}
-                  className="inline-block border-2 border-white text-white font-bold px-8 py-4 rounded-lg hover:bg-white hover:text-slate-900 transition"
-                >
-                  {banner.secondaryCta.label}
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
+      <section className="w-full bg-slate-900">
+        {/* Video frame — dark fallback, no gradient */}
+        <div className="w-full overflow-hidden" style={{ height: 'clamp(320px, 50vw, 640px)' }} />
 
-  return (
-    <section className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px] overflow-hidden bg-slate-900">
-      {/* Video */}
-      <video
-        ref={videoRef}
-        src={videoSrc}
-        autoPlay
-        loop
-        muted={isMuted}
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-      
-      <audio ref={voiceoverRef} src={banner.voiceoverSrc} preload="none" />
-
-      {/* Content */}
-      <div className="absolute inset-0 flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="max-w-3xl">
+        {/* Below-video content — all messaging here, never on the video */}
+        <section className="border-b border-slate-100 py-8 sm:py-14">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
             {banner.microLabel && (
               <p className="text-sm uppercase tracking-wider text-brand-red-400 font-semibold mb-4">
                 {banner.microLabel}
               </p>
             )}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-3 sm:mb-4">
               {banner.belowHeroHeadline}
             </h1>
-            <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-2xl">
+            <p className="text-slate-700 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 max-w-2xl">
               {banner.belowHeroSubheadline}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3">
               <a
                 href={banner.primaryCta.href}
-                className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-lg transition shadow-lg shadow-brand-red-900/50"
+                className="text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3.5 rounded-lg transition-colors text-sm"
               >
                 {banner.primaryCta.label}
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
               </a>
               {banner.secondaryCta && (
                 <a
                   href={banner.secondaryCta.href}
-                  className="inline-flex items-center justify-center gap-2 border-2 border-white/50 text-white font-bold px-8 py-4 rounded-lg hover:bg-white hover:text-slate-900 transition"
+                  className="text-center border border-slate-300 text-slate-700 font-bold px-7 py-3.5 rounded-lg hover:bg-slate-50 transition-colors text-sm"
                 >
                   {banner.secondaryCta.label}
                 </a>
               )}
             </div>
-            {banner.trustIndicators && (
-              <div className="flex flex-wrap gap-4 mt-6">
+            {banner.trustIndicators && banner.trustIndicators.length > 0 && (
+              <ul className="flex flex-wrap gap-x-6 gap-y-1.5 mt-4">
                 {banner.trustIndicators.map((indicator) => (
-                  <span key={indicator} className="text-sm text-white/70 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-brand-red-400" />
+                  <li key={indicator} className="flex items-center gap-1.5 text-slate-900 text-sm font-medium">
+                    <span className="w-1 h-1 rounded-full bg-brand-red-400 flex-shrink-0" />
                     {indicator}
-                  </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
           </div>
-        </div>
-      </div>
+        </section>
+      </section>
+    );
+  }
 
-      {/* Controls */}
-      <div className="absolute bottom-6 right-6 flex items-center gap-3">
-        <button
-          onClick={togglePlay}
-          className="p-3 rounded-full bg-black/40 hover:bg-black/60 text-white transition backdrop-blur-sm"
-          aria-label={isPlaying ? 'Pause' : 'Play'}
-        >
-          {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-        </button>
-        <button
-          onClick={toggleMute}
-          className="p-3 rounded-full bg-black/40 hover:bg-black/60 text-white transition backdrop-blur-sm"
-          aria-label={isMuted ? 'Unmute' : 'Mute'}
-        >
-          {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-        </button>
-      </div>
-    </section>
+  return (
+    <div className="w-full">
+      {/* VIDEO FRAME — no text, no CTAs, no gradient overlay */}
+      <section
+        className="relative w-full overflow-hidden bg-slate-900"
+        style={{ height: 'clamp(320px, 50vw, 640px)' }}
+        aria-label={banner.analyticsName ? `${banner.analyticsName} hero video` : 'Hero video'}
+      >
+        <video
+          ref={videoRef}
+          src={videoSrc}
+          autoPlay
+          loop
+          muted={isMuted}
+          playsInline
+          preload="metadata"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+
+        <audio ref={voiceoverRef} src={banner.voiceoverSrc} preload="none" />
+
+        {/* ON-VIDEO ELEMENTS (only sound controls + micro-label are allowed) */}
+
+        {/* Micro-label — bottom-left, 2–4 words max */}
+        {banner.microLabel && (
+          <div className="absolute bottom-4 left-4 z-20">
+            <span className="text-white text-xs font-semibold tracking-widest uppercase">
+              {banner.microLabel}
+            </span>
+          </div>
+        )}
+
+        {/* Sound toggle — bottom-right */}
+        <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
+          {isPlaying && (
+            <button
+              onClick={togglePlay}
+              className="p-2 rounded-full bg-black/40 hover:bg-black/60 text-white transition backdrop-blur-sm"
+              aria-label="Pause video"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <rect x="6" y="4" width="4" height="16" />
+                <rect x="14" y="4" width="4" height="16" />
+              </svg>
+            </button>
+          )}
+          {!isPlaying && (
+            <button
+              onClick={togglePlay}
+              className="p-2 rounded-full bg-black/40 hover:bg-black/60 text-white transition backdrop-blur-sm"
+              aria-label="Play video"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <polygon points="5,3 19,12 5,21" />
+              </svg>
+            </button>
+          )}
+          <button
+            onClick={toggleMute}
+            className="p-2 rounded-full bg-black/40 hover:bg-black/60 text-white transition backdrop-blur-sm"
+            aria-label={isMuted ? 'Unmute narration' : 'Mute narration'}
+          >
+            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+          </button>
+        </div>
+      </section>
+
+      {/* BELOW-VIDEO CONTENT — all primary messaging lives here */}
+      <section className="border-b border-slate-100 py-8 sm:py-14">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-3 sm:mb-4">
+            {banner.belowHeroHeadline}
+          </h1>
+          <p className="text-slate-700 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 max-w-2xl">
+            {banner.belowHeroSubheadline}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a
+              href={banner.primaryCta.href}
+              className="text-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3.5 rounded-lg transition-colors text-sm"
+            >
+              {banner.primaryCta.label}
+            </a>
+            {banner.secondaryCta && (
+              <a
+                href={banner.secondaryCta.href}
+                className="text-center border border-slate-300 text-slate-700 font-bold px-7 py-3.5 rounded-lg hover:bg-slate-50 transition-colors text-sm"
+              >
+                {banner.secondaryCta.label}
+              </a>
+            )}
+          </div>
+          {banner.trustIndicators && banner.trustIndicators.length > 0 && (
+            <ul className="flex flex-wrap gap-x-6 gap-y-1.5 mt-4">
+              {banner.trustIndicators.map((indicator) => (
+                <li key={indicator} className="flex items-center gap-1.5 text-slate-900 text-sm font-medium">
+                  <span className="w-1 h-1 rounded-full bg-brand-red-400 flex-shrink-0" />
+                  {indicator}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+    </div>
   );
 }

@@ -10,7 +10,6 @@ import JobCard from '@/components/jobs/JobCard';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  robots: { index: false, follow: false },
   title: 'Job Placement | Career Services | Elevate LMS',
   description:
     'Career placement support, job opportunities, and employer connections for Elevate graduates.',

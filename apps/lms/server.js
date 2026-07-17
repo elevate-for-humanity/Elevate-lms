@@ -15,6 +15,6 @@ app.prepare().then(() => {
     handle(req, res, parsedUrl);
   }).listen(port, hostname, (err) => {
     if (err) throw err;
-    console.info(`> LMS ready on http://${hostname}:${port}`);
+    console.log(`> LMS ready on http://${hostname}:${port}`);
   });
 });

@@ -10,4 +10,5 @@ export default function TermsRedirect() {
 export const metadata = {
   title: 'Terms of Service',
   description: 'Elevate for Humanity Terms of Service',
+  robots: { index: false, follow: false },
 };

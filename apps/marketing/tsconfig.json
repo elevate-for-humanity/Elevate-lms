@@ -5,16 +5,7 @@
       {
         "name": "next"
       }
-    ],
-    "paths": {
-      "@/*": [
-        "./apps/marketing/*",
-        "../../*"
-      ],
-      "@/app/*": [
-        "../../app-legacy/app/*"
-      ]
-    }
+    ]
   },
   "include": [
     "../../**/*.ts",

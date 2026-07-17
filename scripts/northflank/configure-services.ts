@@ -3,7 +3,7 @@
  * Configure Northflank services (separate elevate-lms and elevate-admin).
  *
  * Applies per service:
- *   - Dockerfile path, BuildKit cache, runtime env, health probes on /api/ping:8080
+ *   - Dockerfile path, BuildKit cache, runtime env, health probes on /api/version:8080
  *
  * Usage:
  *   npx tsx scripts/northflank/configure-services.ts elevate-lms --dry-run
@@ -24,7 +24,7 @@ import { resolveTargetServiceIds } from './service-targets';
 export const NORTHFLANK_SERVICE_CONFIGS = [
   {
     id: process.env.NORTHFLANK_LMS_SERVICE_ID || resolveLmsServiceId() || 'elevate-lms',
-    dockerfile: '/Dockerfile.northflank-lms',
+    dockerfile: '/Dockerfile.lms',
     runtimeEnvironment: {
       SERVICE_ROLE: 'lms',
       PORT: '8080',
@@ -140,7 +140,7 @@ const healthChecks = [
   {
     protocol: 'HTTP',
     type: 'startupProbe',
-    path: '/api/ping',
+    path: '/api/version',
     port: 8080,
     initialDelaySeconds: 90,
     periodSeconds: 10,
@@ -150,7 +150,7 @@ const healthChecks = [
   {
     protocol: 'HTTP',
     type: 'readinessProbe',
-    path: '/api/ping',
+    path: '/api/version',
     port: 8080,
     initialDelaySeconds: 30,
     periodSeconds: 10,
@@ -183,7 +183,7 @@ async function main() {
 
   for (const service of services) {
     console.log(
-      `${dryRun ? '[dry-run]' : '[patch]'} ${service.id} -> ${service.dockerfile}, build ${billing.buildPlan}, runtime ${billing.deploymentPlan}, ephemeral ${requestedEphemeralMb}MB (with allowance fallback), health /api/ping`,
+      `${dryRun ? '[dry-run]' : '[patch]'} ${service.id} -> ${service.dockerfile}, build ${billing.buildPlan}, runtime ${billing.deploymentPlan}, ephemeral ${requestedEphemeralMb}MB (with allowance fallback), health /api/version`,
     );
 
     if (!dryRun) {

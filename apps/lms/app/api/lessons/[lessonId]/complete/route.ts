@@ -1,0 +1,521 @@
+import { logger } from '@/lib/logger';
+import { resolveHvacCourseId } from '@/lib/courses/resolvers';
+import { checkEligibilityAndAuthorize } from '@/lib/services/exam-eligibility';
+
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { getCurrentUser } from '@/lib/auth';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+import {
+  recordStepCompletion,
+  recordStepUncompletion,
+  enforceCheckpointGate,
+} from '@/lib/lms/engine';
+import type { CheckpointGateError } from '@/lib/lms/engine';
+import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
+import { checkCompetencyGate } from '@/lib/lms/competency-gate';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
+
+async function _POST(request: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
+  try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { lessonId } = await params;
+
+    // Server-side module gating — must pass before any lesson data is read
+    try {
+      await assertLessonAccess(user.id, lessonId);
+    } catch (e) {
+      const { status, body } = accessErrorResponse(e);
+      return NextResponse.json(body, { status });
+    }
+    const body = await request.json().catch(() => ({}));
+    // Clamp seat time: minimum 1s, maximum 4 hours per lesson
+    const MAX_LESSON_SECONDS = 4 * 60 * 60;
+    const timeSpentSeconds = Math.min(
+      Math.max(1, Number(body.timeSpentSeconds) || 1),
+      MAX_LESSON_SECONDS,
+    );
+
+    // Admin client required — bypasses RLS recursion in lms_lessons view.
+    // await requireAdminClient() throws if SUPABASE_SERVICE_ROLE_KEY is missing.
+    const db = await requireAdminClient();
+
+    // Get lesson to find course_id.
+    // lms_lessons is a view: curriculum_lessons (priority) UNION training_lessons (fallback).
+    const { data: lesson, error: lessonError } = await db
+      .from('lms_lessons')
+      .select('id, course_id, title')
+      .eq('id', lessonId)
+      .maybeSingle();
+
+    if (lessonError || !lesson) {
+      return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+    }
+
+    // Check enrollment — canonical path only: program_enrollments.
+    // Match by course_id directly (canonical), or by program_id (program-level enrollment).
+    let enrollment: { id: string; status: string; program_id: string | null } | null = null;
+
+    // 1. Direct course enrollment (canonical — course_id set on program_enrollments)
+    const { data: directEnrollment } = await db
+      .from('program_enrollments')
+      .select('id, status, program_id')
+      .eq('user_id', user.id)
+      .eq('course_id', lesson.course_id)
+      .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'confirmed'])
+      .maybeSingle();
+
+    if (directEnrollment) {
+      enrollment = directEnrollment;
+    } else {
+      // 2. Program-level enrollment — resolve program_id from courses table
+      const { data: courseRow } = await db
+        .from('courses')
+        .select('program_id')
+        .eq('id', lesson.course_id)
+        .maybeSingle();
+
+      if (courseRow?.program_id) {
+        const { data: programEnrollment } = await db
+          .from('program_enrollments')
+          .select('id, status, program_id')
+          .eq('user_id', user.id)
+          .eq('program_id', courseRow.program_id)
+          .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'confirmed'])
+          .maybeSingle();
+
+        if (programEnrollment) {
+          enrollment = programEnrollment;
+        }
+      }
+    }
+
+    if (!enrollment) {
+      return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
+    }
+
+    if (enrollment.status === 'pending_funding_verification') {
+      return NextResponse.json(
+        {
+          error:
+            'Enrollment pending funding verification. Complete your payment or funding approval to continue.',
+        },
+        { status: 403 },
+      );
+    }
+
+    if (enrollment.status === 'pending_approval') {
+      return NextResponse.json({ error: 'Enrollment pending approval' }, { status: 403 });
+    }
+
+    // Checkpoint gate: block completion if the prior module's checkpoint
+    // has not been passed. Enforced server-side — client gating alone is
+    // insufficient because it can be bypassed via direct API calls.
+    try {
+      await enforceCheckpointGate(user.id, lessonId, lesson.course_id);
+    } catch (gateErr) {
+      const e = gateErr as CheckpointGateError;
+      if (e.code === 'CHECKPOINT_NOT_PASSED') {
+        return NextResponse.json(
+          {
+            error: e.message,
+            code: 'CHECKPOINT_NOT_PASSED',
+            checkpointLessonId: e.checkpointLessonId,
+            requiredScore: e.requiredScore,
+          },
+          { status: 403 },
+        );
+      }
+      throw gateErr; // unexpected — re-throw to 500 handler
+    }
+
+    // OJT gate: lab lessons cannot be completed until required shop reps are verified
+    const { canCompleteLesson } = await import('@/lib/ojt/canCompleteLesson');
+    const ojtAllowed = await canCompleteLesson(user.id, lessonId);
+    if (!ojtAllowed) {
+      return NextResponse.json(
+        {
+          error: 'Complete required shop work before finishing this lesson',
+          code: 'OJT_INCOMPLETE',
+        },
+        { status: 403 },
+      );
+    }
+
+    // Competency gate: practical lessons require all instructor sign-offs before completion.
+    const gate = await checkCompetencyGate(db, { userId: user.id, lessonId });
+    if (!gate.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Instructor sign-off required before this lesson can be marked complete.',
+          code: 'COMPETENCY_SIGNOFF_REQUIRED',
+          pendingChecks: gate.missingKeys,
+          message: `${gate.missingKeys.length} competency check(s) require instructor approval: ${gate.missingKeys.join(', ')}`,
+        },
+        { status: 403 },
+      );
+    }
+
+    // Fetch lesson details for type-specific enforcement
+    const { data: lessonDetail, error: detailError } = await db
+      .from('lms_lessons')
+      .select('content_type, duration_minutes')
+      .eq('id', lessonId)
+      .maybeSingle();
+
+    if (detailError || !lessonDetail) {
+      return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+    }
+
+    // Fallback to 'reading' if content_type is missing — this happens for
+    // HVAC curriculum_lessons rows where lesson_type may not be set.
+    // Blocking with 422 here prevents all lesson completion for affected lessons.
+    if (!lessonDetail.content_type) {
+      logger.warn(`Missing content_type for lessonId=${lessonId} — defaulting to 'reading'`);
+    }
+
+    const contentType = lessonDetail.content_type || 'reading';
+
+    // Quiz lessons require a passing attempt before they can be marked complete.
+    // HVAC quizzes use a local question bank (not the quizzes table), so
+    // quiz_attempts rows are never written for them. The client enforces the
+    // 80% pass threshold before calling this endpoint, so we skip the DB gate
+    // when no passing attempt exists but the lesson belongs to the HVAC course.
+    if (contentType === 'quiz') {
+      const { data: passingAttempt } = await db
+        .from('quiz_attempts')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('quiz_id', lessonId)
+        .eq('passed', true)
+        .limit(1)
+        .maybeSingle();
+
+      if (!passingAttempt) {
+        // Allow completion if this is an HVAC course lesson (local quiz bank,
+        // no quiz_attempts rows). Client already enforced pass score.
+        const hvacCourseId = await resolveHvacCourseId();
+        if (lesson.course_id !== hvacCourseId) {
+          return NextResponse.json(
+            { error: 'Quiz must be passed before marking complete' },
+            { status: 403 },
+          );
+        }
+      }
+    }
+
+    // Per-lesson-type minimum seat time (seconds)
+    // Prevents instant click-through completion
+    const MINIMUM_SEAT_TIME: Record<string, number> = {
+      reading: 90, // 1.5 min minimum for reading lessons
+      video: 120, // 2 min minimum for video lessons (real enforcement is 90% watched client-side)
+      quiz: 30, // 30s minimum for quiz lessons (real enforcement is pass score)
+      lab: 60, // 1 min minimum for lab/assignment lessons
+      assignment: 60,
+    };
+
+    const minTime = MINIMUM_SEAT_TIME[contentType] || 30;
+    if (timeSpentSeconds < minTime) {
+      return NextResponse.json(
+        {
+          error: 'Minimum time requirement not met',
+          required: minTime,
+          actual: timeSpentSeconds,
+          message: `This lesson requires at least ${Math.ceil(minTime / 60)} minute(s) of engagement before it can be marked complete.`,
+        },
+        { status: 403 },
+      );
+    }
+
+    // lesson_progress is written by recordStepCompletion() below via the engine.
+    // Writing it here as well would fire the DB checkpoint-gate trigger twice and
+    // overwrite completed_at with a slightly later timestamp on the second write.
+    // The completion timestamp used in the response is derived from the engine result.
+    const completedAt = new Date().toISOString();
+
+    logger.info('Lesson completing', {
+      userId: user.id,
+      lessonId,
+      courseId: lesson.course_id,
+      lessonTitle: lesson.title,
+    });
+
+    // Update competency progress — non-fatal, runs after lesson_progress is written.
+    // Increments touchpoints for every competency linked to this lesson.
+    // Marks competency as mastered when touchpoints >= minimum_touchpoints.
+    try {
+      const { data: linkedCompetencies } = await db
+        .from('lesson_competencies')
+        .select('competency_id')
+        .eq('lesson_id', lessonId);
+
+      if (linkedCompetencies && linkedCompetencies.length > 0) {
+        const programId = enrollment.program_id ?? null;
+
+        for (const { competency_id } of linkedCompetencies) {
+          // Fetch minimum_touchpoints threshold for this competency
+          const { data: comp } = await db
+            .from('competencies')
+            .select('minimum_touchpoints')
+            .eq('id', competency_id)
+            .maybeSingle();
+
+          const minTouchpoints = comp?.minimum_touchpoints ?? 1;
+
+          // Upsert progress row, incrementing touchpoints
+          const { data: existing } = await db
+            .from('student_competency_progress')
+            .select('id, touchpoints')
+            .eq('user_id', user.id)
+            .eq('competency_id', competency_id)
+            .maybeSingle();
+
+          const newTouchpoints = (existing?.touchpoints ?? 0) + 1;
+          const isMastered = newTouchpoints >= minTouchpoints;
+
+          await db.from('student_competency_progress').upsert(
+            {
+              user_id: user.id,
+              competency_id,
+              program_id: programId,
+              touchpoints: newTouchpoints,
+              is_mastered: isMastered,
+              mastered_at: isMastered && !existing ? new Date().toISOString() : undefined,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: 'user_id,competency_id' },
+          );
+        }
+      }
+    } catch (compErr) {
+      // Non-fatal — competency tracking failure must not block lesson completion
+      logger.warn('Competency progress update failed (non-fatal):', compErr);
+    }
+
+    // Delegate progress recalculation, enrollment % update, and certificate
+    // issuance to the engine. This is the single path for all three concerns.
+    const completionResult = await recordStepCompletion(
+      user.id,
+      lessonId,
+      lesson.course_id,
+      enrollment.id,
+      timeSpentSeconds,
+    );
+
+    const { progressPercent, courseCompleted, certificateNumber } = completionResult;
+
+    // When a course completes, check if it satisfies all required courses
+    // for any program the learner is enrolled in.
+    if (courseCompleted) {
+      try {
+        const { checkProgramCompletion, completeProgramEnrollment } =
+          await import('@/lib/lms/completion-evaluator');
+        const completedPrograms = await checkProgramCompletion(user.id, lesson.course_id);
+        for (const prog of completedPrograms) {
+          await completeProgramEnrollment(
+            prog.program_enrollment_id,
+            prog.user_id,
+            prog.program_id,
+          );
+          logger.info('[program-completion] Program completed via course', {
+            userId: user.id,
+            courseId: lesson.course_id,
+            programId: prog.program_id,
+            programEnrollmentId: prog.program_enrollment_id,
+          });
+        }
+      } catch (progErr) {
+        logger.error(
+          '[program-completion] Check failed (non-fatal):',
+          progErr instanceof Error ? progErr : new Error(String(progErr)),
+        );
+      }
+    }
+
+    // HVAC workflow: advance credential sequence when all lessons complete
+    const hvacCourseIdForWorkflow = await resolveHvacCourseId();
+    if (courseCompleted && lesson.course_id === hvacCourseIdForWorkflow) {
+      try {
+        const { advanceHvacWorkflow } = await import('@/lib/courses/hvac-completion-workflow');
+        const wfResult = await advanceHvacWorkflow(user.id);
+        logger.info('[hvac-workflow] Auto-advanced on course completion', {
+          userId: user.id,
+          ...wfResult,
+        });
+      } catch (wfErr) {
+        logger.error(
+          '[hvac-workflow] Auto-advance failed (non-fatal):',
+          wfErr instanceof Error ? wfErr : new Error(String(wfErr)),
+        );
+      }
+    }
+
+    // Credential eligibility check: fires on every lesson completion.
+    // Only creates an exam_funding_authorization when the learner has met all
+    // domain coverage and completion rules. Non-fatal — lesson completion is
+    // already recorded above and must not be rolled back on eligibility errors.
+    let eligibilityResult: Awaited<ReturnType<typeof checkEligibilityAndAuthorize>> | null = null;
+    if (enrollment.program_id) {
+      // Resolve the primary credential for this program, then check eligibility.
+      // We do this here rather than inside the service to avoid an extra DB round-trip
+      // when the enrollment has no program_id (legacy enrollments without program linkage).
+      try {
+        const { data: primaryCredential } = await db
+          .from('program_credentials')
+          .select('credential_id')
+          .eq('program_id', enrollment.program_id)
+          .eq('is_primary', true)
+          .maybeSingle();
+
+        if (primaryCredential?.credential_id) {
+          eligibilityResult = await checkEligibilityAndAuthorize(
+            user.id,
+            primaryCredential.credential_id,
+            enrollment.program_id,
+          );
+
+          if (eligibilityResult.authorizationCreated) {
+            logger.info(
+              '[credential-pipeline] Exam funding authorization created on lesson completion',
+              {
+                userId: user.id,
+                lessonId,
+                programId: enrollment.program_id,
+                credentialId: primaryCredential.credential_id,
+              },
+            );
+          }
+        }
+      } catch (eligErr) {
+        logger.error(
+          '[credential-pipeline] Eligibility check failed (non-fatal):',
+          eligErr instanceof Error ? eligErr : new Error(String(eligErr)),
+        );
+      }
+    }
+
+    // Fire xAPI "completed" statement — non-fatal, best-effort
+    try {
+      const xapiEndpoint = process.env.XAPI_LRS_ENDPOINT;
+      if (xapiEndpoint) {
+        // Internal server-to-server call to /api/xapi/statement
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+        fetch(`${siteUrl}/api/xapi/statement`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            actor: { objectType: 'Agent', account: { homePage: siteUrl, name: user.id } },
+            verb: { id: 'http://adlnet.gov/expapi/verbs/completed', display: { 'en-US': 'completed' } },
+            object: {
+              objectType: 'Activity',
+              id: `${siteUrl}/lms/lessons/${lessonId}`,
+              definition: { name: { 'en-US': lesson.title }, type: 'http://adlnet.gov/expapi/activities/lesson' },
+            },
+            result: { completion: true, success: true },
+            timestamp: completedAt,
+          }),
+        }).then(() => {}, () => {}); // fire-and-forget
+      }
+    } catch {
+      // xAPI is optional — never block lesson completion
+    }
+
+    return NextResponse.json({
+      success: true,
+      lessonId,
+      lessonTitle: lesson.title,
+      completed: true,
+      completedAt,
+      courseProgress: {
+        progressPercent,
+        courseCompleted,
+        certificateNumber: certificateNumber ?? null,
+      },
+      credentialEligibility: eligibilityResult
+        ? {
+            isEligible: eligibilityResult.isEligible,
+            blockingReason: eligibilityResult.blockingReason,
+            authorizationCreated: eligibilityResult.authorizationCreated,
+          }
+        : null,
+    });
+  } catch (error) {
+    logger.error(
+      'Lesson complete API error:',
+      error instanceof Error ? error : new Error(String(error)),
+    );
+    return NextResponse.json({ error: 'Failed to complete lesson' }, { status: 500 });
+  }
+}
+
+async function _DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ lessonId: string }> },
+) {
+  try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { lessonId } = await params;
+    const db = await requireAdminClient();
+
+    // Resolve course_id for progress recalculation
+    const { data: lessonRow } = await db
+      .from('lms_lessons')
+      .select('course_id')
+      .eq('id', lessonId)
+      .maybeSingle();
+
+    if (!lessonRow?.course_id) {
+      return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
+    }
+
+    // Delegate uncomplete + progress recalc to engine
+    try {
+      await recordStepUncompletion(user.id, lessonId, lessonRow.course_id);
+    } catch (err) {
+      logger.error(
+        'recordStepUncompletion failed:',
+        err instanceof Error ? err : new Error(String(err)),
+      );
+      return NextResponse.json({ error: 'Failed to mark lesson incomplete' }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      lessonId,
+      completed: false,
+    });
+  } catch (error) {
+    logger.error(
+      'Lesson uncomplete API error:',
+      error instanceof Error ? error : new Error(String(error)),
+    );
+    return NextResponse.json({ error: 'Failed to uncomplete lesson' }, { status: 500 });
+  }
+}
+export const POST = withApiAudit(
+  '/api/lessons/[lessonId]/complete',
+  _POST as unknown as (req: Request, ...args: any[]) => Promise<Response>,
+);
+export const DELETE = withApiAudit(
+  '/api/lessons/[lessonId]/complete',
+  _DELETE as unknown as (req: Request, ...args: any[]) => Promise<Response>,
+);

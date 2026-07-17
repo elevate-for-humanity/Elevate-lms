@@ -1,0 +1,319 @@
+import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import {
+  buildProgramsCatalogMetadata,
+  getPublicProgramsCatalogPage,
+  type PublicCatalogProgram,
+} from '@/lib/programs/public-programs-page';
+import { getAdminClient } from '@/lib/supabase/admin';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import Image from 'next/image';
+import Link from 'next/link';
+import { BookOpen, MapPin, Clock, Award } from 'lucide-react';
+import CatalogFilters from './CatalogFilters';
+import { PayNowButton } from '@/components/programs/PayNowButton';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
+
+export const revalidate = 0;
+
+export async function generateMetadata(): Promise<Metadata> {
+  return buildProgramsCatalogMetadata();
+}
+
+const CATEGORIES = [
+  'HVAC / Refrigeration', 'Electrical', 'Plumbing', 'Welding',
+  'CDL / Commercial Driving', 'Carpentry / Construction',
+  'Healthcare / CNA', 'Medical Assistant', 'Phlebotomy',
+  'Barbering / Cosmetology', 'IT Support / Cybersecurity',
+  'Business / Office Administration', 'Tax Preparation',
+];
+
+type SearchParams = {
+  q?: string;
+  category?: string;
+  wioa?: string;
+  page?: string;
+  /** @deprecated Provider filter removed — stripped on redirect */
+  provider?: string;
+};
+
+export default async function ProgramCatalogPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
+
+  // Legacy ?provider= links (multi-provider catalog) — filter no longer exists
+  if (params.provider) {
+    const sp = new URLSearchParams();
+    if (params.q) sp.set('q', params.q);
+    if (params.category) sp.set('category', params.category);
+    if (params.wioa === 'true') sp.set('wioa', 'true');
+    if (params.page && params.page !== '1') sp.set('page', params.page);
+    const qs = sp.toString();
+    redirect(`/programs/catalog${qs ? `?${qs}` : ''}`);
+  }
+
+  const q = params.q ?? '';
+  const category = params.category ?? '';
+  const wioaOnly = params.wioa === 'true';
+  const page = Math.max(1, parseInt(params.page ?? '1', 10));
+  const perPage = 18;
+
+  const catalog = await getPublicProgramsCatalogPage({
+    q: q || undefined,
+    category: category || undefined,
+    wioaOnly,
+    page,
+    perPage,
+  });
+
+  const programs = catalog.programs;
+  const count = catalog.total;
+
+  // Fetch partner_courses stripe data for any slugs in the result set
+  // so catalog cards can show a "Pay & Enroll" button when a price is configured.
+  const slugs = (programs ?? []).map(p => p.slug).filter(Boolean) as string[];
+  const stripeBySlug: Record<string, { stripe_price_id: string | null; payment_link: string | null; retail_price_cents: number | null }> = {};
+  if (slugs.length > 0) {
+    const admin = await getAdminClient();
+    if (admin) {
+      const { data: partnerRows } = await admin
+        .from('partner_courses')
+        .select('course_key, stripe_price_id, payment_link, retail_price_cents')
+        .in('course_key', slugs);
+      for (const row of partnerRows ?? []) {
+        stripeBySlug[row.course_key] = {
+          stripe_price_id: row.stripe_price_id,
+          payment_link: row.payment_link,
+          retail_price_cents: row.retail_price_cents,
+        };
+      }
+    }
+  }
+
+  const totalPages = catalog.totalPages;
+
+  // URL helpers for server-rendered pagination links (not passed to client components)
+  function pageUrl(p: number) {
+    const sp = new URLSearchParams();
+    if (q) sp.set('q', q);
+    if (category) sp.set('category', category);
+    if (wioaOnly) sp.set('wioa', 'true');
+    if (p > 1) sp.set('page', String(p));
+    const qs = sp.toString();
+    return `/programs/catalog${qs ? `?${qs}` : ''}`;
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[
+          { label: 'Programs', href: '/programs' },
+          { label: 'Catalog' },
+        ]} />
+      </div>
+
+      <div className="border-t bg-white">
+        <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden bg-slate-100">
+          <Image
+            src="/images/heroes/student-catalog.webp"
+            alt="Students reviewing workforce training program options"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+            
+          />
+        </div>
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Program Catalog</h1>
+          <p className="text-slate-600 text-sm">
+            {count ?? 0} program{(count ?? 0) !== 1 ? 's' : ''} from approved providers
+            {wioaOnly ? ' · WIOA eligible' : ''}
+            {category ? ` · ${category}` : ''}
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/apply"
+              className="inline-flex items-center justify-center rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-red-700"
+            >
+              Apply Now
+            </Link>
+            <Link
+              href="/contact?topic=program-inquiry"
+              className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              Request Information
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filters sidebar */}
+          <aside className="lg:w-56 flex-shrink-0">
+            <CatalogFilters
+              categories={CATEGORIES}
+              current={{ q, category, wioa: wioaOnly }}
+            />
+          </aside>
+
+          {/* Results */}
+          <div className="flex-1 min-w-0">
+            {(programs ?? []).length === 0 ? (
+              <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+                <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-500 text-sm">No programs match your filters.</p>
+                <Link href="/programs/catalog" className="mt-3 inline-block text-sm text-brand-blue-600 hover:underline">
+                  Clear filters
+                </Link>
+              </div>
+            ) : (
+              <>
+                <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
+                  {(programs ?? []).map(prog => (
+                    <CatalogProgramCard
+                      key={prog.program_id}
+                      prog={prog}
+                      stripeData={stripeBySlug[prog.slug ?? ''] ?? null}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2">
+                    {page > 1 && (
+                      <Link
+                        href={pageUrl(page - 1)}
+                        className="px-4 py-2 text-sm font-medium border border-slate-300 rounded-lg text-slate-700 hover:bg-white transition"
+                      >
+                        Previous
+                      </Link>
+                    )}
+                    <span className="text-sm text-slate-500">
+                      Page {page} of {totalPages}
+                    </span>
+                    {page < totalPages && (
+                      <Link
+                        href={pageUrl(page + 1)}
+                        className="px-4 py-2 text-sm font-medium border border-slate-300 rounded-lg text-slate-700 hover:bg-white transition"
+                      >
+                        Next
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      <ParisFloatingWrapper />
+    </div>
+  );
+}
+
+type ProgramRow = PublicCatalogProgram;
+
+type StripeData = {
+  stripe_price_id: string | null;
+  payment_link: string | null;
+  retail_price_cents: number | null;
+} | null;
+
+function CatalogProgramCard({ prog, stripeData }: { prog: ProgramRow; stripeData: StripeData }) {
+  const slug = prog.slug ?? prog.program_id;
+  const detailHref = `/programs/${slug}`;
+  const applyHref = `/apply?program=${slug}`;
+
+  // Resolve checkout href: prefer direct payment link, then API session
+  const checkoutHref = stripeData?.payment_link ?? (stripeData?.stripe_price_id ? `/api/checkout/program` : null);
+  const retailPrice = stripeData?.retail_price_cents
+    ? `$${(stripeData.retail_price_cents / 100).toLocaleString()}`
+    : null;
+
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 flex flex-col hover:shadow-md transition">
+      <div className="p-4 flex-1">
+        {/* Provider */}
+        <div className="text-xs text-slate-400 mb-1.5 truncate">{prog.provider_name}</div>
+
+        {/* Title */}
+        <h3 className="font-bold text-slate-900 text-sm leading-snug mb-2">{prog.title}</h3>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-1 mb-3">
+          {prog.wioa_eligible && (
+            <span className="text-xs bg-brand-blue-50 text-brand-blue-700 border border-brand-blue-200 px-2 py-0.5 rounded-full font-medium">WIOA</span>
+          )}
+          {(prog.funding_tags ?? []).filter(t => t !== 'wioa').slice(0, 2).map(tag => (
+            <span key={tag} className="text-xs bg-brand-blue-50 text-brand-blue-700 px-2 py-0.5 rounded-full">{tag}</span>
+          ))}
+          {prog.category && (
+            <span className="text-xs bg-white text-slate-600 px-2 py-0.5 rounded-full">{prog.category}</span>
+          )}
+        </div>
+
+        {/* Details */}
+        <div className="space-y-1 text-xs text-slate-500">
+          {prog.credential_name && (
+            <div className="flex items-center gap-1.5">
+              <Award aria-label="award" className="w-3 h-3 flex-shrink-0" />
+              <span className="truncate">{prog.credential_name}</span>
+            </div>
+          )}
+          {prog.duration_weeks && (
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3 h-3 flex-shrink-0" />
+              {prog.duration_weeks} weeks
+            </div>
+          )}
+          {(prog.city || prog.state) && (
+            <div className="flex items-center gap-1.5">
+              <MapPin className="w-3 h-3 flex-shrink-0" />
+              {[prog.city, prog.state].filter(Boolean).join(', ')}
+              {prog.delivery_mode === 'online' && ' · Online'}
+              {prog.delivery_mode === 'hybrid' && ' · Hybrid'}
+            </div>
+          )}
+          {prog.next_start_date && (
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 flex-shrink-0 text-center">▸</span>
+              Starts {new Date(prog.next_start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </div>
+          )}
+          {prog.seats_available != null && prog.seats_available <= 5 && (
+            <div className="text-yellow-600 font-medium">
+              {prog.seats_available === 0 ? 'Waitlist only' : `${prog.seats_available} seats left`}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="px-4 pb-4 flex flex-col gap-2">
+        {/* Self-pay checkout — shown when a Stripe price is configured */}
+        {checkoutHref && retailPrice && (
+          <PayNowButton
+            slug={slug}
+            cost={retailPrice}
+            stripeCheckoutHref={stripeData?.payment_link ?? undefined}
+            label={`Pay & Enroll — ${retailPrice}`}
+            className="py-2 text-xs rounded-lg"
+          />
+        )}
+
+        {/* View details / apply */}
+        <Link
+          href={checkoutHref ? detailHref : applyHref}
+          className="block w-full text-center text-sm font-semibold border border-brand-blue-300 text-brand-blue-700 py-2 rounded-lg hover:bg-brand-blue-50 transition"
+        >
+          {checkoutHref ? 'View Details' : 'Apply Now'}
+        </Link>
+      </div>
+    </div>
+  );
+}

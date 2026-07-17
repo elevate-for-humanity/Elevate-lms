@@ -7,26 +7,29 @@ on:
       - 'fix/**'
       - 'chore/**'
     paths:
-      - 'apps/marketing/**'
-      - 'apps/lms/**'
-      - 'apps/admin/**'
-      - 'packages/**'
+      - 'app/**'
+      - '!app/admin/**'
+      - '!app/apprentice/**'
+      - '!app/instructor/**'
+      - '!app/partner/**'
+      - '!app/student-portal/**'
+      - 'components/**'
+      - 'lib/**'
       - 'public/**'
+      - 'packages/**'
       - 'styles/**'
       - 'data/**'
       - 'types/**'
-      - 'lib/**'
       - 'hooks/**'
       - 'contexts/**'
       - 'config/**'
       - 'content/**'
       - 'utils/**'
+      - 'proxy.ts'
       - 'next.config.mjs'
       - 'tailwind.config.js'
       - 'tsconfig.json'
       - 'Dockerfile.marketing'
-      - 'Dockerfile.lms'
-      - 'Dockerfile.northflank-admin'
       - 'scripts/northflank/**'
       - 'pnpm-lock.yaml'
       - 'package.json'
@@ -57,7 +60,7 @@ jobs:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
-      NORTHFLANK_MARKETING_SERVICE_ID: ${{ secrets.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing' }}
+      NORTHFLANK_MARKETING_SERVICE_ID: ${{ secrets.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-lms-build' }}
       DEPLOY_BRANCH: main
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -157,7 +160,7 @@ jobs:
           
           for i in $(seq 1 $MAX_RETRIES); do
             # Check health endpoint
-            status=$(curl -sk --max-time 10 -o /tmp/www-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/version || true)
+            status=$(curl -sk --max-time 10 -o /tmp/www-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/ping || true)
             body=$(cat /tmp/www-health.json 2>/dev/null || true)
             
             if [ "$status" = "200" ] && echo "$body" | grep -q '"ok":true'; then

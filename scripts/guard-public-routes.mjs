@@ -35,7 +35,13 @@ import { join, dirname, relative } from 'node:path';
 
 const REPORT_ONLY = process.argv.includes('--report');
 const ROOT = process.cwd();
-const APP_DIR = join(ROOT, 'app');
+// app/ renamed to app-legacy/ — update guard script for three-service architecture
+const APP_DIR = join(ROOT, 'app-legacy');
+const WORKSPACE_APPS = [
+  join(ROOT, 'apps/marketing/app'),
+  join(ROOT, 'apps/lms/app'),
+  join(ROOT, 'apps/admin/app'),
+];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -52,6 +58,7 @@ function hasNoindex(content) {
 
 /** Walk a directory, yielding all file paths matching a predicate. */
 function* walk(dir, predicate) {
+  if (!existsSync(dir)) return;
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
@@ -62,20 +69,32 @@ function* walk(dir, predicate) {
   }
 }
 
+/** Walk all three-service architecture app directories. */
+function* walkAllApps() {
+  for (const dir of [APP_DIR, ...WORKSPACE_APPS]) {
+    yield* walk(dir, n => n === 'page.tsx');
+  }
+}
+
 /**
  * Check if a page.tsx is covered by noindex — either in the file itself
  * or in a layout.tsx ancestor within the app/ subtree.
+ * Updated for three-service architecture: checks app-legacy/ and workspace apps.
  */
 function isCoveredByNoindex(pageFile) {
   if (hasNoindex(readFile(pageFile))) return true;
 
   // Walk up the directory tree looking for a layout.tsx with noindex
+  // Check all app roots: app-legacy/ and workspace apps
+  const allAppRoots = [APP_DIR, ...WORKSPACE_APPS];
   let dir = dirname(pageFile);
-  while (dir.startsWith(APP_DIR)) {
+  while (true) {
     const layout = join(dir, 'layout.tsx');
     if (existsSync(layout) && hasNoindex(readFile(layout))) return true;
     const parent = dirname(dir);
     if (parent === dir) break;
+    // Stop if we've walked past all app roots
+    if (!allAppRoots.some(root => parent.startsWith(root))) break;
     dir = parent;
   }
   return false;
@@ -176,7 +195,7 @@ const PORTAL_AUTH_GUARD = /\b(requireAdmin|apiRequireAdmin|withAdmin|getServerSe
 
 const PORTAL_PATTERNS = PORTAL_COMPONENT_IMPORT; // component imports are always portal signals
 
-for (const pageFile of walk(APP_DIR, n => n === 'page.tsx')) {
+for (const pageFile of walkAllApps()) {
   // Skip protected routes
   if (PROTECTED_PREFIXES.some(p => pageFile.startsWith(p))) continue;
   // Skip demo prefixes (already checked)

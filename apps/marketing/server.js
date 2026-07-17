@@ -15,6 +15,6 @@ app.prepare().then(() => {
     handle(req, res, parsedUrl);
   }).listen(port, hostname, (err) => {
     if (err) throw err;
-    console.log(`> Marketing ready on http://${hostname}:${port}`);
+    console.info(`> Marketing ready on http://${hostname}:${port}`);
   });
 });

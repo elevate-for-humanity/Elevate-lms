@@ -110,15 +110,60 @@ export async function middleware(request: NextRequest) {
 
   // =============================================================================
   // LEGACY ROUTE REDIRECTS (MUST CHECK FIRST - before public paths)
+  // All redirects are permanent (308) to preserve SEO equity.
   // =============================================================================
-  
-  // Redirect /accessibility/accessibility to /accessibility
-  if (pathname === '/accessibility/accessibility') {
-    const url = request.nextUrl.clone();
-    url.pathname = '/accessibility';
-    url.search = '';
-    return NextResponse.redirect(url, 308);
+
+  // ── Reflexive URL redirects (/foo/foo → /foo) ──────────────────────────────
+  const REFLEXIVE_REDIRECTS: Array<[from: string, to: string]> = [
+    // Admin CRM mirror tree (app/admin/crm/crm/ was identical to app/admin/crm/)
+    ['/admin/crm/crm', '/admin/crm'],
+    // Admin governance mirror
+    ['/admin/governance/governance', '/admin/governance'],
+    // Public reflexive routes
+    ['/accessibility/accessibility', '/accessibility'],
+    ['/ai-chat/ai-chat', '/ai-chat'],
+    ['/ai/ai', '/ai'],
+    ['/calendar/calendar', '/calendar'],
+    ['/pay/pay', '/pay'],
+    ['/press/press', '/press'],
+    ['/resources/resources', '/resources'],
+    ['/verify/verify', '/verify'],
+    ['/pathways/pathways', '/pathways'],
+    ['/success-stories/success-stories', '/success-stories'],
+  ];
+
+  for (const [from, to] of REFLEXIVE_REDIRECTS) {
+    if (pathname === from || pathname.startsWith(`${from}/`)) {
+      const url = request.nextUrl.clone();
+      url.pathname = to + pathname.slice(from.length);
+      url.search = '';
+      return NextResponse.redirect(url, 308);
+    }
   }
+
+  // ── Legacy URL redirects ──────────────────────────────────────────────────
+  const LEGACY_REDIRECTS: Array<[from: string, to: string]> = [
+    // Legal canonical
+    ['/terms', '/legal'],
+    ['/terms-of-service', '/legal'],
+    ['/privacy-policy', '/legal/privacy'],
+    // Legacy Indiana-specific routes → canonical
+    ['/career-training-indiana', '/programs'],
+    ['/skilled-trades-training-indiana', '/programs/skilled-trades'],
+    ['/healthcare-training-indianapolis', '/programs/healthcare'],
+    ['/hiset', '/testing'],
+    ['/certification-testing', '/testing/nha'],
+  ];
+
+  for (const [from, to] of LEGACY_REDIRECTS) {
+    if (pathname === from) {
+      const url = request.nextUrl.clone();
+      url.pathname = to;
+      url.search = '';
+      return NextResponse.redirect(url, 308);
+    }
+  }
+
 
   // Always allow public paths and static files
   if (isPublicPath(pathname)) {

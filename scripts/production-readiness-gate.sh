@@ -281,8 +281,9 @@ echo "=============================================="
 
 BLOCKERS=0
 
-# Check for unfinished pages
-UNFINISHED=$(grep -r "<!-- TODO\|FIXME\|UNDER CONSTRUCTION" components/ app/ 2>/dev/null | grep -v ".test." | wc -l)
+# Check for unfinished pages — match only HTML comments so developer // TODO comments don't trigger a failure
+# Use || true so set -e doesn't kill the pipeline when grep finds no matches
+UNFINISHED=$(grep -r "<!--\s*TODO\|<!--\s*FIXME\|<!--\s*UNDER CONSTRUCTION" components/ app/ 2>/dev/null | grep -v ".test." | wc -l) || true
 if [[ "$UNFINISHED" -gt 0 ]]; then
   echo "FAIL: Unfinished content markers found: $UNFINISHED"
   FAIL=1

@@ -137,7 +137,7 @@ async function _POST(req: Request) {
   });
 
   if (insertError) {
-    logger.error('Error creating transfer request:', insertError);
+    logger.error('Error creating transfer request:', new Error(insertError.message));
     return NextResponse.json({ error: 'Failed to submit transfer request' }, { status: 500 });
   }
 

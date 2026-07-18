@@ -101,6 +101,10 @@ COPY --from=builder /app/apps/marketing/.next/standalone ./
 COPY --from=builder /app/apps/marketing/.next/static ./apps/marketing/.next/static
 COPY --from=builder /app/apps/marketing/.next/server ./apps/marketing/.next/server
 COPY --from=builder /app/apps/marketing/public ./public
+
+# Copy custom server.js (matches LMS pattern)
+COPY --from=builder /app/apps/marketing/server.js ./apps/marketing/server.js
+
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000

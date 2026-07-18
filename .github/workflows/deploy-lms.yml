@@ -9,7 +9,9 @@ on:
     paths:
       - 'app/**'
       - '!app/admin/**'
+      - 'apps/admin/**'
       - 'apps/lms/**'
+      - 'Dockerfile.lms'
       - 'components/**'
       - 'lib/**'
       - 'public/**'

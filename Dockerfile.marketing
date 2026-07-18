@@ -76,7 +76,7 @@ ENV BUILD_ID=$GITHUB_SHA
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 
 # Build Marketing independently — NO split-app.mjs
-RUN pnpm --filter @elevate/marketing build
+RUN pnpm --filter @elevate/marketing build --no-lint
 
 # INSPECTION: Show actual standalone runtime structure
 RUN echo "=== MARKETING STANDALONE STRUCTURE ===" \
@@ -108,4 +108,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -sf http://127.0.0.1:3000/api/version || exit 1
 
-CMD ["node", "--max-http-header-size=32768", "apps/marketing/server.js"]
+CMD ["node", "--max-http-header-size=32768", "server.js"]

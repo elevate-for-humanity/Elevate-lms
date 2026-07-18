@@ -66,7 +66,7 @@ async function _GET(req: NextRequest) {
 
   if (!pdfResponse.ok) {
     const detail = await pdfResponse.text();
-    logger.error('cert-pdf generation error', { serial, status: pdfResponse.status, detail });
+    logger.error('cert-pdf generation error', new Error(detail), { serial, status: pdfResponse.status });
     return NextResponse.json({ error: 'PDF generation failed' }, { status: 500 });
   }
 

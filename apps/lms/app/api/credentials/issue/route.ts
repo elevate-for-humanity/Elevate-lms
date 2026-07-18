@@ -81,7 +81,7 @@ async function _POST(req: NextRequest) {
       .maybeSingle();
 
     if (error) {
-      logger.error('Failed to issue credential', { error, data });
+      logger.error('Failed to issue credential', new Error(error.message), { data });
       return NextResponse.json({ error: 'Failed to issue credential' }, { status: 500 });
     }
 
@@ -114,7 +114,7 @@ async function _POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Credential issuance error', { error });
+    logger.error('Credential issuance error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

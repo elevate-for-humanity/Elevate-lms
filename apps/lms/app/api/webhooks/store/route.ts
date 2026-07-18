@@ -335,7 +335,7 @@ async function _POST(req: NextRequest) {
                 outcome: 'duplicate_skipped',
                 metadata: { source: 'store_webhook' },
               });
-          } catch (_) { logger.error('Error:', _); }
+          } catch (_) { logger.error('Error:', _ instanceof Error ? _ : new Error(String(_))); }
           return NextResponse.json({ received: true, duplicate: true });
         }
         logger.error('FAIL-CLOSED: Cannot record store refund event, skipping mutations', idemErr instanceof Error ? idemErr : new Error(String(idemErr)));
@@ -349,7 +349,7 @@ async function _POST(req: NextRequest) {
               outcome: 'record_failed',
               metadata: { source: 'store_webhook' },
             });
-        } catch (_) { logger.error('Error:', _); }
+        } catch (_) { logger.error('Error:', _ instanceof Error ? _ : new Error(String(_))); }
         return NextResponse.json({ received: true, skipped: true, reason: 'event_record_failed' });
       }
     } catch (idemCatchErr) {
@@ -367,7 +367,7 @@ async function _POST(req: NextRequest) {
               outcome: 'idempotency_failed',
               metadata: { source: 'store_webhook' },
             });
-      } catch (_) { logger.error('Error:', _); }
+      } catch (_) { logger.error('Error:', _ instanceof Error ? _ : new Error(String(_))); }
       return NextResponse.json({
         received: true,
         skipped: true,

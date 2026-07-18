@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
   });
 
   if (error || !data.url) {
-    logger.error('[azure/callback] OAuth initiation failed', { error: error?.message });
+    logger.error('[azure/callback] OAuth initiation failed', new Error(error?.message));
     return NextResponse.redirect(new URL('/login?error=azure_oauth_failed', req.url));
   }
 
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
     const email: string = payload.email ?? payload.preferred_username ?? payload.upn;
 
     if (!email || !email.includes('@')) {
-      logger.error('[azure/callback] No email in Azure id_token', { payload });
+      logger.error('[azure/callback] No email in Azure id_token', undefined, { payload });
       return NextResponse.redirect(`${loginUrl}?error=azure_no_email`);
     }
 
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (linkErr || !link?.properties?.action_link) {
-      logger.error('[azure/callback] Failed to generate session link', { error: linkErr?.message });
+      logger.error('[azure/callback] Failed to generate session link', new Error(linkErr?.message));
       return NextResponse.redirect(`${loginUrl}?error=azure_session_failed`);
     }
 
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
 
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    logger.error('[azure/callback] id_token processing failed', { error: msg });
+          logger.error('[azure/callback] id_token processing failed', new Error(msg));
     return NextResponse.redirect(`${loginUrl}?error=azure_invalid`);
   }
 }

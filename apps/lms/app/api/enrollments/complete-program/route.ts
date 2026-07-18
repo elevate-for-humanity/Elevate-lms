@@ -71,7 +71,7 @@ async function _POST(req: NextRequest) {
       .maybeSingle();
 
     if (enrollmentError || !enrollment) {
-      logger.error('Enrollment not found', { enrollment_id, error: enrollmentError });
+      logger.error('Enrollment not found', new Error(enrollmentError?.message ?? 'Not found'), { enrollment_id });
       return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 });
     }
 
@@ -139,7 +139,7 @@ async function _POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Program completion error', { error });
+    logger.error('Program completion error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

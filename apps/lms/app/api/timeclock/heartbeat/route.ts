@@ -175,7 +175,7 @@ async function _POST(request: NextRequest) {
     if (updatedEntry?.auto_clocked_out && updatedEntry?.clock_out_at) {
       requireAdminClient().then((adminDb) =>
         syncProgressEntryToHourEntries(adminDb, progress_entry_id).catch((err) =>
-          logger.error('[Heartbeat] hour_entries sync failed', { progress_entry_id, err }),
+          logger.error('[Heartbeat] hour_entries sync failed', err instanceof Error ? err : new Error(String(err)), { progress_entry_id }),
         ),
       );
     }

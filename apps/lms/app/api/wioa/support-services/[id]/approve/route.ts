@@ -50,7 +50,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
     });
 
     if (error) {
-      logger.error('[wioa/support-services] DB mutation failed', { code: error.code });
+      logger.error('[wioa/support-services] DB mutation failed', new Error(error.message), { code: error.code });
       return NextResponse.json({ error: 'DB_MUTATION_FAILED' }, { status: 500 });
     }
 

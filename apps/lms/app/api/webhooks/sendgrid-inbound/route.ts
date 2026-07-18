@@ -51,9 +51,7 @@ async function _POST(request: NextRequest) {
     }
 
     if (!confident) {
-      logger.error('[SendGrid Inbound] Cannot verify idempotency — rejecting for retry', {
-        eventId,
-      });
+      logger.error('[SendGrid Inbound] Cannot verify idempotency — rejecting for retry', undefined, { eventId });
       return NextResponse.json({ error: 'Temporary processing error' }, { status: 503 });
     }
 

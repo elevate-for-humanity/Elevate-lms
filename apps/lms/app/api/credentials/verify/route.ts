@@ -138,7 +138,7 @@ async function _POST(req: NextRequest) {
       });
     }
   } catch (error) {
-    logger.error('Credential verification error', { error });
+    logger.error('Credential verification error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Verification failed' }, { status: 500 });
   }
 }

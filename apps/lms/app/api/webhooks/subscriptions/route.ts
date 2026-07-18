@@ -34,7 +34,7 @@ async function _POST(request: NextRequest) {
     event = constructWebhookEvent(stripe, payload, sig);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    logger.error('Subscriptions webhook: signature verification failed', undefined, { error: msg });
+    logger.error('Subscriptions webhook: signature verification failed', new Error(msg));
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -109,7 +109,7 @@ async function _POST(request: NextRequest) {
             paid_at: new Date().toISOString(),
             invoice_url: invoiceData.hosted_invoice_url,
           });
-          if (insertError) logger.error('Failed to insert subscription invoice', { error: insertError });
+          if (insertError) logger.error('Failed to insert subscription invoice', new Error(insertError?.message));
         }
         break;
       }
@@ -129,7 +129,7 @@ async function _POST(request: NextRequest) {
             failure_message: invoiceData.last_payment_error?.message,
             attempt_count: invoiceData.attempt_count,
           });
-          if (insertError) logger.error('Failed to insert failed invoice', { error: insertError });
+          if (insertError) logger.error('Failed to insert failed invoice', new Error(insertError?.message));
         }
         break;
       }

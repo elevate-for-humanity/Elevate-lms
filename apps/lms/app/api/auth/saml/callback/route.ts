@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
         user_metadata: { sso_provider: 'saml', saml_name_id: profile?.nameID },
       });
       if (createErr || !created?.user) {
-        logger.error('[saml/callback] Failed to create user', undefined, { error: createErr?.message });
+        logger.error('[saml/callback] Failed to create user', new Error(createErr?.message));
         return NextResponse.redirect(`${loginUrl}?error=saml_user_create_failed`);
       }
       userId = created.user.id;
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (linkErr || !link?.properties?.action_link) {
-      logger.error('[saml/callback] Failed to generate session link', undefined, { error: linkErr?.message });
+      logger.error('[saml/callback] Failed to generate session link', new Error(linkErr?.message));
       return NextResponse.redirect(`${loginUrl}?error=saml_session_failed`);
     }
 
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
 
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    logger.error('[saml/callback] SAML validation failed', undefined, { error: msg });
+    logger.error('[saml/callback] SAML validation failed', new Error(msg));
     return NextResponse.redirect(`${loginUrl}?error=saml_invalid`);
   }
 }

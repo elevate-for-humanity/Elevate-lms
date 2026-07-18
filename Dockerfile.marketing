@@ -1,10 +1,16 @@
 # Dockerfile.marketing - Independent Marketing Next.js build
 # Builds ONLY apps/marketing/ (not the monolith)
 # Serves www.elevateforhumanity.org
+#
+# Northflank Configuration:
+#   - Build type: Dockerfile
+#   - Dockerfile path: /Dockerfile.marketing
+#   - Build context: /
+#   - Internal port: 3000
 
 FROM node:22-bookworm AS builder
 
-RUN echo "nf-cache-invalidate-mkt-ind"
+RUN echo "nf-cache-invalidate-mkt-3000"
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
@@ -12,7 +18,7 @@ ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /app
 
-# Copy manifests
+# Copy manifests - needs root-level monorepo files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/marketing/package.json apps/marketing/package.json
 COPY apps/lms/package.json apps/lms/package.json
@@ -72,7 +78,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
-ENV PORT=8080
+ENV PORT=3000
 
 WORKDIR /app
 
@@ -82,9 +88,9 @@ COPY --from=builder /app/apps/marketing/.next/server ./.next/server
 COPY --from=builder /app/apps/marketing/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 
-EXPOSE 8080
+EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -sf http://127.0.0.1:8080/api/version || exit 1
+  CMD curl -sf http://127.0.0.1:3000/api/version || exit 1
 
 CMD ["node", "--max-http-header-size=32768", "apps/marketing/server.js"]

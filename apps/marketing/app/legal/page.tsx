@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FileText, Shield, Scale, Lock } from 'lucide-react';
-import { TermsAcceptBanner } from '@/app/terms/TermsAcceptBanner';
+import { TermsAcceptBanner } from '@/apps/marketing/app/terms/TermsAcceptBanner';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const revalidate = 3600;

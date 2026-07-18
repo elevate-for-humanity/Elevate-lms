@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signAgreement } from '@/app/actions/sign-agreement';
+import { signAgreement } from '@/apps/marketing/app/actions/sign-agreement';
 import SignatureCanvas from 'signature_pad';
 import { Check, Loader2, Pen, Type, CheckSquare, Lock, AlertCircle } from 'lucide-react';
 

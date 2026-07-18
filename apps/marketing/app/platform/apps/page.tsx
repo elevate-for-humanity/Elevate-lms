@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
-import { PLATFORM_APPS } from '@/app/data/store-products';
+import { PLATFORM_APPS } from '@/apps/marketing/app/data/store-products';
 import { Check, Zap } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 

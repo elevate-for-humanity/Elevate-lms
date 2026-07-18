@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { submitStudentApplication } from '@/app/apply/actions';
+import { submitStudentApplication } from '@/apps/marketing/app/apply/actions';
 
 interface Props {
   programSlug: string;

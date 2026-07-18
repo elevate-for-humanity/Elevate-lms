@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Award, Clock, Check, ArrowRight, BookOpen, Shield } from 'lucide-react';
-import { COURSES as courses } from '@/app/data/courses';
+import { COURSES as courses } from '@/apps/marketing/app/data/courses';
 
 export const metadata: Metadata = {
   title: 'Certification Courses | Elevate Store',

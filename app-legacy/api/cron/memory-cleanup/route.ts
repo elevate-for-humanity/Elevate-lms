@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -25,7 +26,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .lt('created_at', memoryCutoff);
 
   if (memErr) {
-    logger.error('[cron/memory-cleanup] Failed to purge conversation memory', { error: memErr.message });
+    logger.error('[cron/memory-cleanup] Failed to purge conversation memory', normalizeError(memErr, 'Failed to purge conversation memory'), getErrorContext(memErr));
   }
 
   // Delete orphaned knowledge embeddings (no parent document)
@@ -36,7 +37,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .is('document_id', null);
 
   if (embErr) {
-    logger.error('[cron/memory-cleanup] Failed to purge orphaned embeddings', { error: embErr.message });
+    logger.error('[cron/memory-cleanup] Failed to purge orphaned embeddings', normalizeError(embErr, 'Failed to purge orphaned embeddings'), getErrorContext(embErr));
   }
 
   const result = { memoryDeleted: memDeleted ?? 0, embeddingsDeleted: embDeleted ?? 0 };

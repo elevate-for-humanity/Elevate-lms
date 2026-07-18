@@ -1,5 +1,6 @@
 // PUBLIC ROUTE: barber apprenticeship application form
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -96,11 +97,12 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (error) {
-      logger.error('[barber/apply] DB insert failed', {
+      logger.error('[barber/apply] DB insert failed', normalizeError(error, 'DB insert failed'), {
         code: (error as any)?.code,
         message: (error as any)?.message,
         hint: (error as any)?.hint,
         email: validated.email,
+        ...getErrorContext(error),
       });
       return NextResponse.json(
         { error: `Failed to submit application. Please call ${PLATFORM_DEFAULTS.supportPhone}.` },

@@ -14,6 +14,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -77,7 +78,7 @@ export async function POST(
     });
 
   if (uploadErr) {
-    logger.error('[external-pathways/complete] Storage upload failed', { uploadErr });
+    logger.error('[external-pathways/complete] Storage upload failed', normalizeError(uploadErr, 'Storage upload failed'), getErrorContext(uploadErr));
     return safeError('File upload failed', 500);
   }
 
@@ -99,7 +100,7 @@ export async function POST(
     );
 
   if (upsertErr) {
-    logger.error('[external-pathways/complete] Upsert failed', { upsertErr });
+    logger.error('[external-pathways/complete] Upsert failed', normalizeError(upsertErr, 'Upsert failed'), getErrorContext(upsertErr));
     return safeDbError(upsertErr, 'Could not record completion');
   }
 

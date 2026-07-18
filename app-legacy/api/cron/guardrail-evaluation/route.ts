@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,7 +24,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    logger.error('[cron/guardrail-evaluation] DB error', { error: error.message });
+    logger.error('[cron/guardrail-evaluation] DB error', normalizeError(error, 'DB error'), getErrorContext(error));
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
@@ -47,7 +48,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       message: `${total} AI guardrail violations in the last 24h across ${uniqueUsers} user(s).`,
       metadata: { total, uniqueUsers, byType, since },
     }).then(undefined, (err) =>
-      logger.error('[cron/guardrail-evaluation] Failed to insert admin alert', { error: String(err) }),
+      logger.error('[cron/guardrail-evaluation] Failed to insert admin alert', normalizeError(err, 'Failed to insert admin alert'), getErrorContext(err)),
     );
   }
 

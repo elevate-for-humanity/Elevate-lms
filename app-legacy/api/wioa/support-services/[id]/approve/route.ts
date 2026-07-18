@@ -7,6 +7,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { auditedMutation } from '@/lib/audit/transactional';
 import { logger } from '@/lib/logger';
+import { normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -50,7 +51,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
     });
 
     if (error) {
-      logger.error('[wioa/support-services] DB mutation failed', { code: error.code });
+      logger.error('[wioa/support-services] DB mutation failed', normalizeError(error, 'DB mutation failed'), { code: error.code });
       return NextResponse.json({ error: 'DB_MUTATION_FAILED' }, { status: 500 });
     }
 

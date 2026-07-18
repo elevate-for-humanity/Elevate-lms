@@ -12,6 +12,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { normalizeProgramInterest } from '@/lib/intake/normalize-program-interest';
 import { resolveZip } from '@/lib/intake/normalize-zip';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 // Auto-tag funding eligibility based on intake answers.
 // Priority: JRI > self-pay > WIOA categorical > WIOA income > WIOA workforce > pending-review
@@ -201,7 +202,7 @@ async function _POST(req: Request) {
     //   42501 — insufficient privilege (RLS blocking INSERT — apply 20260628000003)
     //   23502 — not-null violation (required column missing from insert)
     //   23505 — unique violation (duplicate email+program)
-    logger.error('[Intake API] Mirror to applications failed', {
+    logger.error('[Intake API] Mirror to applications failed', normalizeError(appError, '[Intake API] Mirror to applications failed'), {
       pg_code:  appError.code,
       pg_msg:   appError.message,
       pg_hint:  appError.hint,
@@ -213,6 +214,7 @@ async function _POST(req: Request) {
         : appError.code === '42703'
         ? 'Schema drift — column in code does not exist in DB'
         : 'Check Supabase logs for full error',
+      ...getErrorContext(appError),
     });
   } else if (!appRow) {
     // Insert succeeded (no error) but returned no row — RLS blocked the SELECT
@@ -312,9 +314,7 @@ async function _POST(req: Request) {
     .then((results) => {
       results.forEach((r) => {
         if (r.status === 'rejected') {
-          logger.error('[Intake API] Side-effect threw unexpectedly', {
-            error: r.reason instanceof Error ? r.reason.message : String(r.reason),
-          });
+          logger.error('[Intake API] Side-effect threw unexpectedly', normalizeError(r.reason, '[Intake API] Side-effect threw unexpectedly'), getErrorContext(r.reason));
         }
       });
     });
@@ -367,7 +367,8 @@ async function _POST(req: Request) {
     // Log but don't fail the intake submission
     logger.error(
       '[Intake API] Email notification failed',
-      emailError instanceof Error ? emailError.message : 'Unknown error',
+      normalizeError(emailError, '[Intake API] Email notification failed'),
+      getErrorContext(emailError),
     );
   }
 

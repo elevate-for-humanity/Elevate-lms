@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
@@ -52,7 +53,7 @@ export default async function NotificationsPage() {
       unreadCount = notifications.filter((n) => !n.read_at).length;
     }
   } catch (error) {
-    logger.error('Error:', error);
+    logger.error('Error', normalizeError(error, 'Failed to load notifications'), getErrorContext(error));
   }
 
   const getIcon = (type: string) => {

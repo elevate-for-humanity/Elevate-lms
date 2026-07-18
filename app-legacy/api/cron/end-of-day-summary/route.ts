@@ -7,6 +7,7 @@ import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/service';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -49,7 +50,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
   <p style="margin-top:24px"><a href="https://www.elevateforhumanity.org/admin">Open Admin Dashboard →</a></p>
 </div>
     `.trim(),
-  }).catch((err) => logger.error('[cron/end-of-day-summary] Failed to send summary email', { error: String(err) }));
+  }).catch((err) => logger.error('[cron/end-of-day-summary] Failed to send summary email', normalizeError(err, 'Failed to send summary email'), getErrorContext(err)));
 
   logger.info('[cron/end-of-day-summary] sent', { enrollCount, completeCount, paymentCount, alertCount });
   return NextResponse.json({ ok: true, enrollCount, completeCount, paymentCount, alertCount });

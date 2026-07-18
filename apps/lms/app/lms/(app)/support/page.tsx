@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
@@ -108,7 +109,7 @@ export default async function SupportPage() {
       tickets = ticketData;
     }
   } catch (error) {
-    logger.error('Error:', error);
+    logger.error('Error', normalizeError(error, 'Failed to load support'), getErrorContext(error));
   }
 
   return (

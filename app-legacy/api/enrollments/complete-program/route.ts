@@ -14,6 +14,7 @@ import { logger } from '@/lib/logger';
 import { issueCertificate } from '@/lib/certificates/issue-certificate';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -71,7 +72,7 @@ async function _POST(req: NextRequest) {
       .maybeSingle();
 
     if (enrollmentError || !enrollment) {
-      logger.error('Enrollment not found', { enrollment_id, error: enrollmentError });
+      logger.error('Enrollment not found', normalizeError(enrollmentError, 'Enrollment not found'), { enrollment_id, ...getErrorContext(enrollmentError) });
       return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 });
     }
 
@@ -139,7 +140,7 @@ async function _POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Program completion error', { error });
+    logger.error('Program completion error', normalizeError(error, 'Program completion error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

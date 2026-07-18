@@ -1,7 +1,8 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { apiRequireAdmin } from '@/lib/admin/guards';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import {
   createWebhook,
   getWebhooks,
@@ -57,7 +58,7 @@ async function _GET(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
   } catch (error) {
-    logger.error('Webhooks GET error:', error);
+    logger.error('Webhooks GET error', normalizeError(error, 'Webhooks GET error'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to fetch webhook data' }, { status: 500 });
   }
 }
@@ -127,7 +128,7 @@ async function _POST(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
   } catch (error) {
-    logger.error('Webhooks POST error:', error);
+    logger.error('Webhooks POST error', normalizeError(error, 'Webhooks POST error'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to process webhook action' }, { status: 500 });
   }
 }

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { CalendarWidget } from '@/components/CalendarWidget';
 import { CalendarIntegration } from '@/components/CalendarIntegration';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -118,10 +119,7 @@ export default async function CalendarPage() {
   } catch (error) {
     // Non-fatal — calendar renders empty if data unavailable
     // Log so we know when this happens in production
-    logger.error(
-      '[calendar] data load error:',
-      error instanceof Error ? error : new Error(String(error)),
-    );
+    logger.error('[calendar] data load error', normalizeError(error, 'Calendar data load error'), getErrorContext(error));
   }
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);

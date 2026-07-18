@@ -16,6 +16,7 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 
 async function _GET(request: NextRequest) {
@@ -65,7 +66,7 @@ async function _GET(request: NextRequest) {
       .eq('order_id', orderId)
       .eq('provider', 'affirm');
 
-    logger.error('Affirm capture missing checkout_token', { orderId });
+    logger.error('Affirm capture missing checkout_token', undefined, { orderId });
     return NextResponse.redirect(`${siteUrl}${fallbackPath}?canceled=true&provider=affirm`);
   }
 
@@ -89,7 +90,7 @@ async function _GET(request: NextRequest) {
     .maybeSingle();
 
   if (contextError || !context) {
-    logger.error('Checkout context not found or already used', { orderId, error: contextError });
+    logger.error('Checkout context not found or already used', normalizeError(contextError, 'Checkout context not found'), { orderId, ...getErrorContext(contextError) });
     return NextResponse.redirect(`${siteUrl}${fallbackPath}?error=invalid_session`);
   }
 
@@ -99,7 +100,7 @@ async function _GET(request: NextRequest) {
 
   // Check expiration
   if (new Date(context.expires_at) < new Date()) {
-    logger.error('Checkout context expired', { orderId, expiresAt: context.expires_at });
+    logger.error('Checkout context expired', undefined, { orderId, expiresAt: context.expires_at });
     await supabase.from('checkout_contexts').update({ status: 'expired' }).eq('id', context.id);
     return NextResponse.redirect(`${siteUrl}${programPath}?error=session_expired`);
   }
@@ -134,7 +135,7 @@ async function _GET(request: NextRequest) {
 
     return NextResponse.redirect(successUrl.toString());
   } catch (error) {
-    logger.error('Affirm authorization failed:', error);
+    logger.error('Affirm authorization failed', normalizeError(error, 'Affirm authorization failed'), getErrorContext(error));
 
     // Mark context as failed
     await supabase.from('checkout_contexts').update({ status: 'failed' }).eq('id', context.id);

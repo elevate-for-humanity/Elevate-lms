@@ -4,6 +4,7 @@ import { logger } from '@/lib/logger';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -67,7 +68,7 @@ async function _POST(req: NextRequest) {
 
     if (!openAiResponse.ok) {
       const text = await openAiResponse.text();
-      logger.error('OpenAI error', { details: text });
+      logger.error('OpenAI error', normalizeError(new Error(text), 'OpenAI error'), { details: text });
       return NextResponse.json({ error: 'AI service error', details: text }, { status: 502 });
     }
 
@@ -82,7 +83,7 @@ async function _POST(req: NextRequest) {
       answer,
     });
   } catch (err) {
-    logger.error('AI tutor route error', err);
+    logger.error('AI tutor route error', normalizeError(err, 'AI tutor route error'), getErrorContext(err));
     return NextResponse.json({ error: 'Unexpected server error' }, { status: 500 });
   }
 }

@@ -1,4 +1,4 @@
-import { BlogCardSkeleton, Skeleton } from '@/components/ui/skeleton';
+import { BlogCardSkeleton, Skeleton } from '@/components/ui/Skeleton';
 
 export default function Loading() {
   return (

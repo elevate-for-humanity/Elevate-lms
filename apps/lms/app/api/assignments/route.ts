@@ -1,7 +1,8 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createServerSupabaseClient, getCurrentUser } from '@/lib/auth';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -56,13 +57,13 @@ async function _GET(request: Request) {
     const { data: assignments, error } = await query;
 
     if (error) {
-      logger.error('Error fetching assignments:', error);
+      logger.error('Error fetching assignments', normalizeError(error, 'Failed to fetch assignments'), getErrorContext(error));
       return NextResponse.json({ error: 'Failed to fetch assignments' }, { status: 500 });
     }
 
     return NextResponse.json({ assignments });
   } catch (error) {
-    logger.error('Error in GET /api/assignments:', error);
+    logger.error('Error in GET /api/assignments', normalizeError(error, 'Failed to fetch assignments'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -106,13 +107,13 @@ async function _POST(request: Request) {
       .maybeSingle();
 
     if (error) {
-      logger.error('Error creating assignment:', error);
+      logger.error('Error creating assignment', normalizeError(error, 'Failed to create assignment'), getErrorContext(error));
       return NextResponse.json({ error: 'Failed to create assignment' }, { status: 500 });
     }
 
     return NextResponse.json({ assignment }, { status: 201 });
   } catch (error) {
-    logger.error('Error in POST /api/assignments:', error);
+    logger.error('Error in POST /api/assignments', normalizeError(error, 'Failed to create assignment'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

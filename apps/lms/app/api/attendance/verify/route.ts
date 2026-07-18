@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -21,7 +22,7 @@ async function _POST(req: Request) {
     } = await supabase.auth.getUser();
 
     if (authError) {
-      logger.error('Authentication error in attendance verify', authError);
+      logger.error('Authentication error in attendance verify', normalizeError(authError, 'Authentication failed'), getErrorContext(authError));
       return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
     }
 
@@ -153,7 +154,7 @@ async function _POST(req: Request) {
       timestamp: now.toISOString(),
     });
   } catch (error) {
-    logger.error('Unexpected error in attendance verify', error as Error);
+    logger.error('Unexpected error in attendance verify', normalizeError(error, 'Attendance verify error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

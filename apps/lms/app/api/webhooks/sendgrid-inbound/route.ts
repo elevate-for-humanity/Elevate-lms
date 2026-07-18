@@ -1,7 +1,8 @@
+import { logger } from '@/lib/logger';
 // PUBLIC ROUTE: SendGrid inbound webhook
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/sendgrid';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
 import { parseInboundEmail, resolveForwardTarget } from '@/lib/email/sendgrid-inbound';
@@ -83,7 +84,7 @@ async function _POST(request: NextRequest) {
     logger.info('[SendGrid Inbound] Forwarded successfully', { forwardTo, subject });
     return NextResponse.json({ ok: true });
   } catch (err) {
-    logger.error('[SendGrid Inbound] Webhook error:', err);
+    logger.error('[SendGrid Inbound] Webhook error', normalizeError(err, 'SendGrid webhook error'), getErrorContext(err));
     return NextResponse.json({ ok: false, error: 'Internal error' }, { status: 500 });
   }
 }

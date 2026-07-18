@@ -1,7 +1,8 @@
+import { logger } from '@/lib/logger';
 // Creates a Stripe Checkout Session for program enrollment.
 // Called by ProgramEnrollment.tsx for paid programs.
 // Returns { sessionId } which the client passes to stripe.redirectToCheckout().
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
@@ -78,7 +79,7 @@ async function _POST(req: NextRequest) {
 
     return NextResponse.json({ sessionId: session.id });
   } catch (err) {
-    logger.error('create-session error:', err);
+    logger.error('create-session error', normalizeError(err, 'Create session failed'), getErrorContext(err));
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

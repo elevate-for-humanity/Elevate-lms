@@ -1,8 +1,9 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
@@ -36,7 +37,7 @@ async function _GET(_req: NextRequest, { params }: { params: Promise<{ lessonId:
     .order('created_at', { ascending: false });
 
   if (error) {
-    logger.error('notes GET error', error);
+    logger.error('notes GET error', normalizeError(error, 'Failed to fetch notes'), getErrorContext(error));
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 
@@ -80,7 +81,7 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ lessonId:
   });
 
   if (error) {
-    logger.error('notes POST error', error);
+    logger.error('notes POST error', normalizeError(error, 'Failed to create note'), getErrorContext(error));
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 

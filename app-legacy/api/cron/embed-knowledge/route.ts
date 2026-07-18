@@ -8,6 +8,7 @@ import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { emitEvent } from '@/lib/platform/events';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -26,7 +27,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .limit(BATCH_SIZE);
 
   if (error) {
-    logger.error('[cron/embed-knowledge] DB error', { error: error.message });
+    logger.error('[cron/embed-knowledge] DB error', normalizeError(error, 'DB error'), getErrorContext(error));
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
@@ -38,7 +39,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       document_id: doc.id,
       content_hash: doc.content_hash,
     }).catch((err) =>
-      logger.error('[cron/embed-knowledge] Failed to emit embed event', { docId: doc.id, error: String(err) }),
+      logger.error('[cron/embed-knowledge] Failed to emit embed event', normalizeError(err, 'Failed to emit embed event'), { docId: doc.id, ...getErrorContext(err) }),
     );
     queued++;
   }

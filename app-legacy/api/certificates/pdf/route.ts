@@ -6,6 +6,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 // Use Node.js runtime
 export const runtime = 'nodejs';
@@ -66,7 +67,7 @@ async function _GET(req: NextRequest) {
 
   if (!pdfResponse.ok) {
     const detail = await pdfResponse.text();
-    logger.error('cert-pdf generation error', { serial, status: pdfResponse.status, detail });
+    logger.error('cert-pdf generation error', normalizeError(detail, 'PDF generation failed'), { serial, status: pdfResponse.status, detail });
     return NextResponse.json({ error: 'PDF generation failed' }, { status: 500 });
   }
 

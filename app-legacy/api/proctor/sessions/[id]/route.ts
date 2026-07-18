@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { appendSessionEvent } from '@/lib/proctor/session-events';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -146,7 +147,7 @@ async function _PATCH(req: NextRequest, { params }: { params: Promise<{ id: stri
       .single();
 
     if (error) {
-      logger.error('[Proctor] Failed to update session:', error.message);
+      logger.error('[Proctor] Failed to update session', normalizeError(error, 'Failed to update session'));
       return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
     }
 
@@ -235,11 +236,11 @@ async function _PATCH(req: NextRequest, { params }: { params: Promise<{ id: stri
               link: '/lms/courses',
               read: false,
             }).then(undefined, (err) =>
-              logger.error('[Proctor] Failed to create exam fail notification', { sessionId: id, error: String(err) }),
+              logger.error('[Proctor] Failed to create exam fail notification', normalizeError(err, 'Failed to create exam fail notification'), { sessionId: id }),
             );
           }
         } catch (holdErr) {
-          logger.error('[Proctor] Retake hold creation failed (non-blocking)', holdErr as Error);
+          logger.error('[Proctor] Retake hold creation failed (non-blocking)', normalizeError(holdErr, 'Retake hold creation failed'));
         }
       }
     }

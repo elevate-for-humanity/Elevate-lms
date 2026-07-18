@@ -9,6 +9,7 @@ import { createServerSupabaseClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -138,7 +139,7 @@ async function _POST(req: NextRequest) {
       });
     }
   } catch (error) {
-    logger.error('Credential verification error', { error });
+    logger.error('Credential verification error', normalizeError(error, 'Credential verification error'), getErrorContext(error));
     return NextResponse.json({ error: 'Verification failed' }, { status: 500 });
   }
 }

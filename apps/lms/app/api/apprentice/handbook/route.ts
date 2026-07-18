@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -58,7 +59,7 @@ async function _GET(request: NextRequest) {
       signedAt: agreement?.accepted_at || null,
     });
   } catch (error) {
-    logger.error('[Handbook API] Error:', error);
+    logger.error('[Handbook API] Error', normalizeError(error, 'Handbook API error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -98,7 +99,7 @@ async function _POST(request: NextRequest) {
       });
 
       if (error) {
-        logger.error('[Handbook API] Acknowledge error:', error);
+        logger.error('[Handbook API] Acknowledge error', normalizeError(error, 'Acknowledge failed'), getErrorContext(error));
         return NextResponse.json({ error: 'Failed to acknowledge handbook' }, { status: 500 });
       }
 
@@ -119,7 +120,7 @@ async function _POST(request: NextRequest) {
       });
 
       if (error) {
-        logger.error('[Handbook API] Sign error:', error);
+        logger.error('[Handbook API] Sign error', normalizeError(error, 'Sign failed'), getErrorContext(error));
         return NextResponse.json({ error: 'Failed to sign agreement' }, { status: 500 });
       }
 
@@ -128,7 +129,7 @@ async function _POST(request: NextRequest) {
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (error) {
-    logger.error('[Handbook API] Error:', error);
+    logger.error('[Handbook API] Error', normalizeError(error, 'Handbook API error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

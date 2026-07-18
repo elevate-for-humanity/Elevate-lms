@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -114,7 +115,7 @@ async function _POST(request: NextRequest) {
       applicationId: application.id,
     });
   } catch (error) {
-    logger.error('Apprentice enrollment error:', error);
+    logger.error('Apprentice enrollment error', normalizeError(error, 'Apprentice enrollment failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

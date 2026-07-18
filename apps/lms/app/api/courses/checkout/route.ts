@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
 import { apiAuthGuard } from '@/lib/admin/guards';
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: session.url });
   } catch (error: any) {
-    logger.error('Course checkout error:', error);
+    logger.error('Course checkout error', normalizeError(error, 'Course checkout error'), getErrorContext(error));
     return NextResponse.json(
       { error: 'Failed to create checkout session' },
       { status: 500 },

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 
@@ -128,7 +129,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (e: unknown) {
-    logger.error('cert-pdf generation failed', { error: e });
+    logger.error('cert-pdf generation failed', normalizeError(e, 'cert-pdf generation failed'), getErrorContext(e));
     return NextResponse.json({ error: 'PDF generation failed' }, { status: 500 });
   }
 }

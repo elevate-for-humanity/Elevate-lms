@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -238,7 +239,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ cours
         : null,
     });
   } catch (error) {
-    logger.error('Course complete API error:', error);
+    logger.error('Course complete API error', normalizeError(error, 'Course complete error'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to complete course' }, { status: 500 });
   }
 }
@@ -296,7 +297,7 @@ async function _GET(request: NextRequest, { params }: { params: Promise<{ course
       certificate: certificate || null,
     });
   } catch (error) {
-    logger.error('Course completion status error:', error);
+    logger.error('Course completion status error', normalizeError(error, 'Completion status error'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to get completion status' }, { status: 500 });
   }
 }

@@ -24,6 +24,7 @@ import { sendEmail } from '@/lib/email/service';
 import { emitEvent } from '@/lib/events/emit';
 import { logger } from '@/lib/logger';
 import { withRuntime } from '@/lib/api/withRuntime';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -71,7 +72,7 @@ export const POST = withRuntime({ cron: true }, async () => {
     .limit(100);
 
   if (error) {
-    logger.error('[missed-clockout] DB query failed', error);
+    logger.error('[missed-clockout] DB query failed', normalizeError(error, '[missed-clockout] DB query failed'), getErrorContext(error));
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 
@@ -108,7 +109,7 @@ export const POST = withRuntime({ cron: true }, async () => {
         .eq('id', shift.id);
 
       if (updateError) {
-        logger.error('[missed-clockout] Failed to close shift', { id: shift.id, updateError });
+        logger.error('[missed-clockout] Failed to close shift', normalizeError(updateError, '[missed-clockout] Failed to close shift'), { id: shift.id, ...getErrorContext(updateError) });
         failed.push(shift.id);
         continue;
       }

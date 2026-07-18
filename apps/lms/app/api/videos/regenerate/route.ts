@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * POST /api/videos/regenerate
  *
@@ -19,7 +20,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
 import { resetJob, markRendering, markComplete, markFailed } from '@/lib/video/job-queue';
 import { renderLessonVideo, inferDomainKey } from '@/lib/video/remotion-render';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { readFile, unlink } from 'fs/promises';
 import path from 'path';
 
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
     adminDb,
   }).catch((err) => {
     // audit-safe: err goes to logger only, not HTTP response
-    logger.error('[VideoRegenerate] Background render threw', err);
+    logger.error('[VideoRegenerate] Background render threw', normalizeError(err, 'Video regeneration error'), getErrorContext(err));
   });
 
   return NextResponse.json(

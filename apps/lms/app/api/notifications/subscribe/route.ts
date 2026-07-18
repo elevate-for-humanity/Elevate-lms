@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -41,7 +42,7 @@ async function _POST(request: NextRequest) {
     );
 
     if (error) {
-      logger.error('[Notifications] Failed to store push subscription:', error);
+      logger.error('[Notifications] Failed to store push subscription', normalizeError(error, 'Failed to store push subscription'), getErrorContext(error));
       return NextResponse.json(
         { success: false, error: 'Failed to save subscription' },
         { status: 500 },
@@ -50,7 +51,7 @@ async function _POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Subscription saved' });
   } catch (error) {
-    logger.error('[Notifications] Subscribe error:', error);
+    logger.error('[Notifications] Subscribe error', normalizeError(error, 'Subscribe error'), getErrorContext(error));
     return NextResponse.json(
       { success: false, error: 'Failed to save subscription' },
       { status: 500 },

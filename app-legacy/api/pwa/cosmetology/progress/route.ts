@@ -14,6 +14,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { validateProgressResponse, type ApprenticeProgressResponse } from '@/lib/api/apprentice-progress-contract';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -184,7 +185,7 @@ export async function GET(request: NextRequest) {
     const contractViolation = validateProgressResponse(payload);
     if (contractViolation) {
       // This is a server-side bug — log it loudly and return 500
-      logger.error('[cosmetology/progress] contract violation', { violation: contractViolation, payload });
+      logger.error('[cosmetology/progress] contract violation', undefined, { violation: contractViolation, payload });
       return safeError(`Progress API contract violation: ${contractViolation}`, 500);
     }
 

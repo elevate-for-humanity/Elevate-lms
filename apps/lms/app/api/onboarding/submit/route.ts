@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import {
@@ -11,7 +12,7 @@ import {
   generateOnboardingSummary,
 } from '@/lib/onboarding-complete-digital';
 import { generateNDAText } from '@/lib/onboarding-nda-template';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -253,7 +254,7 @@ async function _GET(request: NextRequest) {
 
     if (error && error.code !== 'PGRST116') {
       // PGRST116 = no rows returned
-      logger.error('Error fetching onboarding:', error);
+      logger.error('Error fetching onboarding', normalizeError(error, 'Failed to fetch onboarding'), getErrorContext(error));
       return NextResponse.json({ error: 'Failed to fetch onboarding data' }, { status: 500 });
     }
 

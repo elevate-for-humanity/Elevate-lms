@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DollarSign, ArrowLeft, FileText, ExternalLink } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { normalizeError } from '@/lib/errors/normalize-error';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
@@ -34,7 +35,7 @@ async function confirmFunding(formData: FormData) {
     .eq('id', user.id);
 
   if (error) {
-    logger.error('Funding confirm failed:', error.message);
+    logger.error('Funding confirm failed', normalizeError(error, 'Funding confirm failed'));
     redirect('/funding/confirm?error=save-failed');
   }
 

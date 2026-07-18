@@ -2,6 +2,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -139,7 +140,7 @@ export async function POST(req: Request) {
     if (program) dest.searchParams.set('program', program);
     return NextResponse.redirect(dest, { status: 303 });
   } catch (error) {
-    logger.error('Apply compatibility route error', { error: error instanceof Error ? error.message : String(error) });
+    logger.error('Apply compatibility route error', normalizeError(error, 'Apply compatibility route error'), getErrorContext(error));
     return NextResponse.json(
       { error: 'Submission failed. Please call 317-314-3757.' },
       { status: 500 },

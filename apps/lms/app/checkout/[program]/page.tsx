@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { loadStripe } from '@stripe/stripe-js';
 import { Calendar, CheckCircle, CreditCard, Lightbulb } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 // Minimal Affirm type — full SDK types not published
 declare global {
@@ -185,7 +186,7 @@ function CheckoutPageInner() {
 
       window.affirm.checkout.open({
         onFail: (error: unknown) => {
-          logger.error('Affirm checkout failed:', error);
+          logger.error('Affirm checkout failed', normalizeError(error, 'Affirm checkout failed'), getErrorContext(error));
           setError('Affirm checkout failed. Please try again or use Stripe.');
           setLoading(false);
         },
@@ -203,7 +204,7 @@ function CheckoutPageInner() {
         },
       });
     } catch (err) {
-      logger.error('Affirm error:', err);
+      logger.error('Affirm error', normalizeError(err, 'Affirm error'), getErrorContext(err));
       setError('An error occurred with Affirm. Please try Stripe instead.');
       setLoading(false);
     }

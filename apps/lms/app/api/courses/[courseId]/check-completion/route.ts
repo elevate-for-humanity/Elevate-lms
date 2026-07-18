@@ -1,7 +1,8 @@
+import { logger } from '@/lib/logger';
 // app/api/courses/[courseId]/check-completion/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -58,7 +59,7 @@ async function _POST(req: NextRequest, { params }: Params) {
   });
 
   if (extError) {
-    logger.error('Extraction error', extError);
+    logger.error('Extraction error', normalizeError(extError, 'Extraction error'), getErrorContext(extError));
     return NextResponse.json({ error: 'Error checking external modules' }, { status: 500 });
   }
 

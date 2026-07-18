@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
@@ -126,7 +127,7 @@ async function _POST(request: NextRequest) {
 
         if (partnerRecord?.id) {
           checkPartnerApproval(partnerRecord.id).catch((err) => {
-            logger.error('Partner approval check error (non-blocking):', err);
+            logger.error('Partner approval check error (non-blocking)', normalizeError(err, 'Partner approval check failed'), getErrorContext(err));
           });
         }
       }

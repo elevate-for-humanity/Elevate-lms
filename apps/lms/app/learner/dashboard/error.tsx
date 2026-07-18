@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertCircle, RefreshCw, BookOpen, Home } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export default function LearnerDashboardError({
   error,
@@ -13,7 +14,7 @@ export default function LearnerDashboardError({
   reset: () => void;
 }) {
   useEffect(() => {
-    logger.error('Learner dashboard error', error);
+    logger.error('Learner dashboard error', normalizeError(error, 'Learner dashboard error'), getErrorContext(error));
   }, [error]);
 
   return (

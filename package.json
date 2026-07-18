@@ -361,7 +361,9 @@
     "typecheck:full": "npx cross-env NODE_OPTIONS=--max-old-space-size=8192 tsc --noEmit",
     "git:promote-main": "node scripts/github-promote-local-head.mjs --target=main",
     "audit:git-egress": "node scripts/audit-and-fix-git-egress.mjs --fix-git",
-    "build:marketing": "pnpm --filter @elevate/marketing build --no-lint"
+    "build:marketing": "pnpm --filter @elevate/marketing build --no-lint",
+    "audit:logger": "node scripts/audit-logger-errors.mjs",
+    "audit:casing": "node scripts/check-path-casing.mjs"
   },
   "overrides": {
     "inflight": "npm:lru-cache@^10.0.0"

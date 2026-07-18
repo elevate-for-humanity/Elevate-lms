@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -76,7 +77,7 @@ async function _POST(req: Request) {
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      logger.error('HubSpot submission failed', { data });
+      logger.error('HubSpot submission failed', undefined, { data });
       return NextResponse.json(
         {
           ok: false,
@@ -89,7 +90,7 @@ async function _POST(req: Request) {
 
     return NextResponse.json({ ok: true, data });
   } catch (err: any) {
-    logger.error('HubSpot API err', err as Error);
+    logger.error('HubSpot API err', normalizeError(err, 'HubSpot API err'), getErrorContext(err));
     return NextResponse.json(
       {
         ok: false,

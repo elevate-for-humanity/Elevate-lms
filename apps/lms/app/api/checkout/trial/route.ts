@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
@@ -90,7 +91,7 @@ async function _GET(request: NextRequest) {
 
     return NextResponse.redirect(new URL('/store/licenses', request.url));
   } catch (error) {
-    logger.error('Stripe checkout error:', error);
+    logger.error('Stripe checkout error', normalizeError(error, 'Stripe checkout failed'), getErrorContext(error));
     return NextResponse.redirect(new URL('/store/licenses?error=checkout_failed', request.url));
   }
 }

@@ -22,6 +22,7 @@ import { getApprovedHoursByType } from '@/lib/hours/get-approved-hours';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 import { withRuntime } from '@/lib/api/withRuntime';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -52,7 +53,7 @@ export const GET = withRuntime({ cron: true }, async () => {
     .not('enrolled_at', 'is', null);
 
   if (error) {
-    logger.error('[low-hours-pace] query failed', { error });
+    logger.error('[low-hours-pace] query failed', normalizeError(error, 'Query failed'), getErrorContext(error));
     return NextResponse.json({ error: 'query failed' }, { status: 500 });
   }
 

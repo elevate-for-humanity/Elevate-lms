@@ -6,6 +6,7 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -45,10 +46,7 @@ async function _POST(req: Request) {
       .maybeSingle();
 
     if (profileError || !profile?.email) {
-      logger.error('Student profile not found', {
-        studentId,
-        error: profileError,
-      });
+      logger.error('Student profile not found', normalizeError(profileError, 'Student profile not found'), { studentId, ...getErrorContext(profileError) });
       return NextResponse.json({ error: 'Student profile/email not found' }, { status: 400 });
     }
 
@@ -129,7 +127,7 @@ async function _POST(req: Request) {
       sessionId: session.id,
     });
   } catch (err: any) {
-    logger.error('Funding checkout creation error', err);
+    logger.error('Funding checkout creation error', normalizeError(err, 'Funding checkout creation error'), getErrorContext(err));
     return NextResponse.json(
       { error: toErrorMessage(err) || 'Internal server error' },
       { status: 500 },

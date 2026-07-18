@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
@@ -78,7 +79,7 @@ async function _PATCH(req: NextRequest, { params }: { params: Promise<{ id: stri
     .single();
 
   if (error) {
-    logger.error('[Testing] Failed to update booking:', error.message);
+    logger.error('[Testing] Failed to update booking', normalizeError(error, 'Failed to update booking'));
     return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
   }
 

@@ -23,6 +23,7 @@ import { resolvePaymentAmount } from '@/lib/payments/resolve-amount';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 
 async function _POST(request: NextRequest) {
@@ -40,7 +41,7 @@ async function _POST(request: NextRequest) {
     affirm.tryLateConfig();
 
     if (!affirm.isConfigured()) {
-      logger.error('[Affirm] Checkout attempted but client not configured', {
+      logger.error('[Affirm] Checkout attempted but client not configured', undefined, {
         hasPubKey: !!process.env.AFFIRM_PUBLIC_KEY,
         hasNextPubKey: !!process.env.NEXT_PUBLIC_AFFIRM_PUBLIC_KEY,
         hasPrivKey: !!(process.env.AFFIRM_PRIVATE_KEY || process.env.AFFIRM_PRIVATE_API_KEY),
@@ -131,7 +132,7 @@ async function _POST(request: NextRequest) {
       .maybeSingle();
 
     if (contextError) {
-      logger.error('Failed to create checkout context:', contextError);
+      logger.error('Failed to create checkout context', normalizeError(contextError, 'Failed to create checkout context'), getErrorContext(contextError));
       return NextResponse.json({ error: 'Failed to initialize checkout' }, { status: 500 });
     }
 
@@ -169,7 +170,7 @@ async function _POST(request: NextRequest) {
       affirmJsUrl: 'https://cdn1.affirm.com/js/v2/affirm.js',
     });
   } catch (error) {
-    logger.error('Affirm checkout config error:', error);
+    logger.error('Affirm checkout config error', normalizeError(error, 'Affirm checkout config error'), getErrorContext(error));
     const message = 'Internal server error';
     return NextResponse.json({ error: message }, { status: 500 });
   }

@@ -17,7 +17,7 @@ import { HomeSegmentedCTA } from '@/components/home/HomeSegmentedCTA';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { HomeAIDemo } from '@/components/home/HomeAIDemo';
 import { SuccessMetrics } from '@/components/home/SuccessMetrics';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
 

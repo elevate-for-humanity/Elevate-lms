@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { apiRequireAdmin } from '@/lib/admin/guards';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -62,7 +63,7 @@ async function _POST(request: Request) {
       .select('*');
 
     if (entitiesError || !entities) {
-      logger.error('Entities error', entitiesError);
+      logger.error('Entities error', normalizeError(entitiesError, 'Entities error'), getErrorContext(entitiesError));
       return NextResponse.json({ error: 'Failed to fetch entities' }, { status: 500 });
     }
 
@@ -72,7 +73,7 @@ async function _POST(request: Request) {
       .gte('due_date', new Date().toISOString().slice(0, 10));
 
     if (grantsError || !grants) {
-      logger.error('Grants error', grantsError);
+      logger.error('Grants error', normalizeError(grantsError, 'Grants error'), getErrorContext(grantsError));
       return NextResponse.json({ error: 'Failed to fetch grants' }, { status: 500 });
     }
 
@@ -102,14 +103,14 @@ async function _POST(request: Request) {
         );
 
         if (error) {
-          logger.error('Error upserting grant_match', { grantId: grant.id, entityId: entity.id }, error as Error);
+          logger.error('Error upserting grant_match', normalizeError(error, 'Error upserting grant_match'), { grantId: grant.id, entityId: entity.id, ...getErrorContext(error) });
         }
       }
     }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    logger.error(err);
+    logger.error('Unexpected error during grant matching', normalizeError(err, 'Unexpected error during grant matching'), getErrorContext(err));
     return NextResponse.json({ error: 'Unexpected error during grant matching' }, { status: 500 });
   }
 }

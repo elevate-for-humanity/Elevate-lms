@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserEnrollments } from '@/lib/enrollments/getUserEnrollments';
@@ -28,7 +29,7 @@ async function _GET(request: Request) {
 
     return NextResponse.json({ enrollments: result.enrollments });
   } catch (error) {
-    logger.error('Error fetching enrollments:', error);
+    logger.error('Error fetching enrollments', normalizeError(error, 'Failed to fetch enrollments'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

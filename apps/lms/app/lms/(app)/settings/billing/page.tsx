@@ -17,6 +17,7 @@ import {
 import { createClient } from '@/lib/supabase/client';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 
 interface PaymentMethod {
@@ -65,7 +66,7 @@ export default function BillingSettingsPage() {
         .order('is_default', { ascending: false });
 
       if (methodsError && methodsError.code !== 'PGRST116') {
-        logger.error('Error fetching payment methods:', methodsError);
+        logger.error('Error fetching payment methods', normalizeError(methodsError, 'Failed to fetch payment methods'), getErrorContext(methodsError));
       }
 
       // Fetch invoices from database
@@ -77,7 +78,7 @@ export default function BillingSettingsPage() {
         .limit(10);
 
       if (invoicesError && invoicesError.code !== 'PGRST116') {
-        logger.error('Error fetching invoices:', invoicesError);
+        logger.error('Error fetching invoices', normalizeError(invoicesError, 'Failed to fetch invoices'), getErrorContext(invoicesError));
       }
 
       // Fetch balance from profile
@@ -91,7 +92,7 @@ export default function BillingSettingsPage() {
       setInvoices(invoiceData || []);
       setBalance(profile?.account_balance || 0);
     } catch (err) {
-      logger.error('Error loading billing data:', err);
+      logger.error('Error loading billing data', normalizeError(err, 'Failed to load billing data'), getErrorContext(err));
       setError('Failed to load billing information');
     } finally {
       setLoading(false);
@@ -112,7 +113,7 @@ export default function BillingSettingsPage() {
         window.location.href = data.url;
       }
     } catch (err) {
-      logger.error('Error opening billing portal:', err);
+      logger.error('Error opening billing portal', normalizeError(err, 'Failed to open billing portal'), getErrorContext(err));
       alert('Failed to open billing portal');
     }
   };

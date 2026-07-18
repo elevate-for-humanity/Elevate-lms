@@ -1,7 +1,8 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
@@ -223,7 +224,7 @@ async function _POST(request: NextRequest) {
       checks,
     });
   } catch (error) {
-    logger.error('[ValidateDocument] Unexpected error', error);
+    logger.error('[ValidateDocument] Unexpected error', normalizeError(error, 'Document validation failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Validation failed' }, { status: 500 });
   }
 }

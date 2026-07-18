@@ -7,6 +7,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,7 +24,7 @@ async function forwardToCanonical(request: NextRequest): Promise<NextResponse> {
     const rb = await res.arrayBuffer();
     return new NextResponse(rb, { status: res.status, headers: res.headers });
   } catch (err) {
-    logger.error('[stripe/webhook] Forward failed', err as Error);
+    logger.error('[stripe/webhook] Forward failed', normalizeError(err, 'Webhook forwarding failed'), getErrorContext(err));
     return NextResponse.json({ error: 'Webhook forwarding failed' }, { status: 500 });
   }
 }

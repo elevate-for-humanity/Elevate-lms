@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { normalizeError } from '@/lib/errors/normalize-error';
 import { getStripe } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { NextResponse } from 'next/server';
@@ -35,7 +36,7 @@ async function _POST(req: Request) {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err: any) {
     Sentry.captureException(err, { tags: { subsystem: 'webhook' } });
-    logger.error('Webhook signature verification failed:', err.message);
+    logger.error('Webhook signature verification failed', normalizeError(err, 'Webhook signature verification failed'));
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 

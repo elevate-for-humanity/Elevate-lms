@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -72,7 +73,7 @@ async function _POST(request: NextRequest) {
       .maybeSingle();
 
     if (appError) {
-      logger.error('Error inserting host shop application:', appError);
+      logger.error('Error inserting host shop application', normalizeError(appError, 'Failed to insert host shop application'), getErrorContext(appError));
       return NextResponse.json({ error: 'Failed to submit application' }, { status: 500 });
     }
 
@@ -89,7 +90,7 @@ async function _POST(request: NextRequest) {
     });
 
     if (agreementError) {
-      logger.error('Error inserting agreement acceptance:', agreementError);
+      logger.error('Error inserting agreement acceptance', normalizeError(agreementError, 'Failed to insert agreement acceptance'), getErrorContext(agreementError));
       // Don't fail the whole request, application is already saved
     }
 
@@ -126,7 +127,7 @@ async function _POST(request: NextRequest) {
       applicationId: application.id,
     });
   } catch (error) {
-    logger.error('Host shop enrollment error:', error);
+    logger.error('Host shop enrollment error', normalizeError(error, 'Host shop enrollment failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

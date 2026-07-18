@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 
@@ -51,7 +52,7 @@ async function _POST(request: NextRequest) {
         .upload(filePath, file, { cacheControl: '3600', upsert: false });
 
       if (uploadError) {
-        logger.error('Content library upload error:', { file: file.name, error: uploadError });
+        logger.error('Content library upload error', normalizeError(uploadError, 'Content library upload error'), { file: file.name, ...getErrorContext(uploadError) });
         continue;
       }
 
@@ -80,7 +81,7 @@ async function _POST(request: NextRequest) {
         .maybeSingle();
 
       if (dbError) {
-        logger.error('Content item insert error:', dbError);
+        logger.error('Content item insert error', normalizeError(dbError, 'Content item insert error'), getErrorContext(dbError));
         continue;
       }
 
@@ -89,7 +90,7 @@ async function _POST(request: NextRequest) {
 
     return NextResponse.json({ uploaded });
   } catch (err) {
-    logger.error('Content library upload handler error:', err);
+    logger.error('Content library upload handler error', normalizeError(err, 'Content library upload handler error'), getErrorContext(err));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

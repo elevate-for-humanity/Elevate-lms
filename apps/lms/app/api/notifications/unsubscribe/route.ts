@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -33,7 +34,7 @@ async function _POST(request: NextRequest) {
       .eq('endpoint', endpoint);
 
     if (error) {
-      logger.error('[Notifications] Failed to remove push subscription:', error);
+      logger.error('[Notifications] Failed to remove push subscription', normalizeError(error, 'Failed to remove subscription'), getErrorContext(error));
       return NextResponse.json(
         { success: false, error: 'Failed to remove subscription' },
         { status: 500 },
@@ -42,7 +43,7 @@ async function _POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Subscription removed' });
   } catch (error) {
-    logger.error('[Notifications] Unsubscribe error:', error);
+    logger.error('[Notifications] Unsubscribe error', normalizeError(error, 'Unsubscribe error'), getErrorContext(error));
     return NextResponse.json(
       { success: false, error: 'Failed to remove subscription' },
       { status: 500 },

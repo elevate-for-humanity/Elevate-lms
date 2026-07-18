@@ -6,6 +6,7 @@ import { approveApplication } from '@/lib/enrollment/approve';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -138,7 +139,7 @@ async function _POST(request: NextRequest) {
 
     if (profileResult.error) {
       // error.message goes to server log only — response body uses a static string.
-      logger.error('[onboarding/complete] Failed to fetch profile', {
+      logger.error('[onboarding/complete] Failed to fetch profile', undefined, {
         userId,
         errorCode: profileResult.error.code,
       });

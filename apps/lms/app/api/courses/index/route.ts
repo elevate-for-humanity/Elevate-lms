@@ -1,9 +1,10 @@
+import { logger } from '@/lib/logger';
 import { safeInternalError } from '@/lib/api/safe-error';
 // PUBLIC ROUTE: public course index for catalog browsing
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -25,7 +26,7 @@ async function _GET(req: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      logger.error('Supabase error:', error);
+      logger.error('Supabase error', normalizeError(error, 'Supabase error'), getErrorContext(error));
       return safeInternalError(error as Error, 'Bad request');
     }
 

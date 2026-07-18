@@ -16,6 +16,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient, requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { createEnrollmentFromPayment } from '@/lib/enrollment/create-enrollment';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
 import { flagCertificatesOnRefund } from '@/lib/certificates/flag-on-refund';
@@ -155,9 +156,7 @@ async function _POST(request: NextRequest) {
 
     // Fail-closed: if deduplication check is not authoritative, reject for retry
     if (!confident) {
-      logger.error('[Sezzle Webhook] Cannot verify idempotency — rejecting for retry', {
-        eventId: sezzleEventId,
-      });
+      logger.error('[Sezzle Webhook] Cannot verify idempotency — rejecting for retry', undefined, { eventId: sezzleEventId });
       return NextResponse.json({ error: 'Temporary processing error' }, { status: 503 });
     }
 
@@ -384,10 +383,7 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
           .eq('provider_order_id', order_uuid);
       }
     } else {
-      logger.error('Sezzle enrollment creation failed', {
-        orderUuid: order_uuid,
-        error: result.error,
-      });
+      logger.error('Sezzle enrollment creation failed', normalizeError(result.error, 'Sezzle enrollment creation failed'), { orderUuid: order_uuid });
     }
   } else {
     // No program info - just update application status

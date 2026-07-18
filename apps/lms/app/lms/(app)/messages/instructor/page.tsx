@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { MessageSquare, Send, User, ChevronLeft } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const metadata: Metadata = {
   title: 'Instructor Messages | LMS',
@@ -41,7 +42,7 @@ export default async function InstructorMessagesPage() {
     .limit(50);
 
   if (error) {
-    logger.error('Error fetching messages:', error.message);
+    logger.error('Error fetching messages', normalizeError(error, 'Failed to fetch messages'), getErrorContext(error));
   }
 
   const messageList = messages || [];

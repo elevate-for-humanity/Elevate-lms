@@ -18,6 +18,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (error) {
-      logger.error('[testing/leads] Upsert failed', { error });
+      logger.error('[testing/leads] Upsert failed', normalizeError(error, 'Upsert failed'));
       return safeInternalError(error, 'Failed to save lead');
     }
 
@@ -117,7 +118,7 @@ export async function PATCH(req: NextRequest) {
     .eq('exam_type', examType);
 
   if (error) {
-    logger.error('[testing/leads] Convert update failed', { error });
+    logger.error('[testing/leads] Convert update failed', normalizeError(error, 'Convert update failed'));
     return safeInternalError(error, 'Failed to mark lead converted');
   }
 

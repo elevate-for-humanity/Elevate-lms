@@ -1,8 +1,9 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
@@ -35,7 +36,7 @@ async function _GET(_req: NextRequest, { params }: { params: Promise<{ lessonId:
     .order('created_at', { ascending: false });
 
   if (error) {
-    logger.error('lesson_questions GET error', error);
+    logger.error('lesson_questions GET error', normalizeError(error, 'Failed to fetch questions'), getErrorContext(error));
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 
@@ -89,7 +90,7 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ lessonId:
       .maybeSingle();
 
     if (error) {
-      logger.error('lesson_questions POST error', error);
+      logger.error('lesson_questions POST error', normalizeError(error, 'Failed to post question'), getErrorContext(error));
       return NextResponse.json({ error: 'DB error' }, { status: 500 });
     }
 
@@ -112,7 +113,7 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ lessonId:
     .maybeSingle();
 
   if (error) {
-    logger.error('lesson_answers POST error', error);
+    logger.error('lesson_answers POST error', normalizeError(error, 'Failed to post answer'), getErrorContext(error));
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 

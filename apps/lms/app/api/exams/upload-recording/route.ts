@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -65,7 +66,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true, path, publicUrl });
   } catch (error) {
-    logger.error('POST /api/exams/upload-recording failed', error);
+    logger.error('POST /api/exams/upload-recording failed', normalizeError(error, 'Upload recording failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

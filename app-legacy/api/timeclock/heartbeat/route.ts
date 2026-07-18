@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -175,7 +176,7 @@ async function _POST(request: NextRequest) {
     if (updatedEntry?.auto_clocked_out && updatedEntry?.clock_out_at) {
       requireAdminClient().then((adminDb) =>
         syncProgressEntryToHourEntries(adminDb, progress_entry_id).catch((err) =>
-          logger.error('[Heartbeat] hour_entries sync failed', { progress_entry_id, err }),
+          logger.error('[Heartbeat] hour_entries sync failed', normalizeError(err, 'hour_entries sync failed'), { progress_entry_id }),
         ),
       );
     }

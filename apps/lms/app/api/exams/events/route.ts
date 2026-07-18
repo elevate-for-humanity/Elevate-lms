@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -38,13 +39,13 @@ export async function POST(req: Request) {
     });
 
     if (error) {
-      logger.error('Request failed', error instanceof Error ? error : undefined);
+      logger.error('Request failed', normalizeError(error, 'Exam event insert failed'), getErrorContext(error));
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    logger.error('POST /api/exams/events failed', error);
+    logger.error('POST /api/exams/events failed', normalizeError(error, 'Events failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

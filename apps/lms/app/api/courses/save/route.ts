@@ -1,7 +1,8 @@
+import { logger } from '@/lib/logger';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -58,7 +59,7 @@ async function _POST(req: NextRequest) {
       .single();
 
     if (error) {
-      logger.error('Supabase error:', error);
+      logger.error('Supabase error', normalizeError(error, 'Supabase error'), getErrorContext(error));
       return safeInternalError(error as Error, 'Bad request');
     }
 

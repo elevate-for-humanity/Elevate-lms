@@ -8,6 +8,7 @@ import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/service';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -29,7 +30,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .limit(100);
 
   if (error) {
-    logger.error('[cron/testing-lead-followup] DB error', { error: error.message });
+    logger.error('[cron/testing-lead-followup] DB error', normalizeError(error, 'DB error'), getErrorContext(error));
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
@@ -55,7 +56,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 </div>
       `.trim(),
     }).catch((err) =>
-      logger.error('[cron/testing-lead-followup] Failed to send followup email', { leadId: lead.id, error: String(err) }),
+      logger.error('[cron/testing-lead-followup] Failed to send followup email', normalizeError(err, 'Failed to send followup email'), { leadId: lead.id, ...getErrorContext(err) }),
     );
 
     // Update last_followup_at
@@ -64,7 +65,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       .update({ last_followup_at: today, status: 'contacted' })
       .eq('id', lead.id)
       .then(undefined, (err) =>
-        logger.error('[cron/testing-lead-followup] Failed to update lead', { leadId: lead.id, error: String(err) }),
+        logger.error('[cron/testing-lead-followup] Failed to update lead', normalizeError(err, 'Failed to update lead'), { leadId: lead.id, ...getErrorContext(err) }),
       );
 
     followed++;

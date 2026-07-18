@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // app/api/webhooks/partners/[partner]/route.ts
@@ -12,7 +13,7 @@ interface WebhookPayload {
   timestamp?: string;
   data?: Record<string, unknown>;
 }
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { toErrorMessage } from '@/lib/safe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -105,7 +106,7 @@ async function handleEnrollmentCreated(
     .eq('external_enrollment_id', data.enrollmentId);
 
   if (error) {
-    logger.error('[Webhook] Failed to update enrollment:', error);
+    logger.error('[Webhook] Failed to update enrollment', normalizeError(error, 'Update enrollment error'), getErrorContext(error));
   }
 }
 
@@ -129,7 +130,7 @@ async function handleProgressUpdated(
     .eq('external_enrollment_id', data.enrollmentId);
 
   if (error) {
-    logger.error('[Webhook] Failed to update progress:', error);
+    logger.error('[Webhook] Failed to update progress', normalizeError(error, 'Update progress error'), getErrorContext(error));
   }
 }
 
@@ -177,7 +178,7 @@ async function handleCourseCompleted(
     .eq('external_enrollment_id', data.enrollmentId);
 
   if (error) {
-    logger.error('[Webhook] Failed to update completion:', error);
+    logger.error('[Webhook] Failed to update completion', normalizeError(error, 'Update completion error'), getErrorContext(error));
   }
 
   // If there's a next step, auto-enroll
@@ -252,7 +253,7 @@ async function handleCertificateIssued(
     .eq('external_enrollment_id', data.enrollmentId);
 
   if (error) {
-    logger.error('[Webhook] Failed to update certificate:', error);
+    logger.error('[Webhook] Failed to update certificate', normalizeError(error, 'Update certificate error'), getErrorContext(error));
   }
 }
 export const POST = withApiAudit('/api/webhooks/partners/[partner]', _POST, {

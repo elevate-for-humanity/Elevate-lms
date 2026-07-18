@@ -7,6 +7,7 @@
 import { Metadata } from 'next';
 import { createServerSupabaseClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import CredentialShareClient from './CredentialShareClient';
 
 export const dynamic = 'force-dynamic';
@@ -102,7 +103,7 @@ async function validateToken(token: string): Promise<ValidationResult> {
       credential,
     };
   } catch (err) {
-    logger.error('Token validation error', { token, error: err });
+    logger.error('Token validation error', normalizeError(err, 'Token validation error'), getErrorContext(err));
     return {
       status: 'invalid',
       errorMessage: 'An error occurred while validating this credential link.',

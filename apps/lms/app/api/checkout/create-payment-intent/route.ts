@@ -1,7 +1,8 @@
+import { logger } from '@/lib/logger';
 // Creates a Stripe PaymentIntent for the Stripe Elements checkout flow.
 // Called by CheckoutFlow.tsx before confirming a card payment client-side.
 // Returns { clientSecret } which the client passes to stripe.confirmCardPayment().
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
@@ -61,7 +62,7 @@ async function _POST(req: NextRequest) {
 
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
-    logger.error('create-payment-intent error:', err);
+    logger.error('create-payment-intent error', normalizeError(err, 'Create payment intent failed'), getErrorContext(err));
     return NextResponse.json({ error: 'Failed to create payment intent' }, { status: 500 });
   }
 }

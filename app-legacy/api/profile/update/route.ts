@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -42,7 +43,7 @@ async function _POST(request: NextRequest) {
       .eq('id', user.id);
 
     if (error) {
-      logger.error('[Profile] Update failed:', error.message);
+      logger.error('[Profile] Update failed', normalizeError(error, 'Profile update failed'));
       return NextResponse.json({ success: false, error: 'Profile update failed' }, { status: 500 });
     }
 

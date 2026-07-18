@@ -1,9 +1,10 @@
+import { logger } from '@/lib/logger';
 import { safeInternalError } from '@/lib/api/safe-error';
 // PUBLIC ROUTE: public course list for catalog browsing
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -61,7 +62,7 @@ async function _GET(request: NextRequest) {
     const { data: courses, error } = await query;
 
     if (error) {
-      logger.error('Courses fetch error:', error);
+      logger.error('Courses fetch error', normalizeError(error, 'Courses fetch error'), getErrorContext(error));
       return safeInternalError(error as Error, 'Bad request');
     }
 

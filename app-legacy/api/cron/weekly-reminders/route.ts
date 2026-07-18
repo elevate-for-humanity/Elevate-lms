@@ -8,6 +8,7 @@ import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/service';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -27,7 +28,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .limit(300);
 
   if (error) {
-    logger.error('[cron/weekly-reminders] DB error', { error: error.message });
+    logger.error('[cron/weekly-reminders] DB error', normalizeError(error, 'DB error'), getErrorContext(error));
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
@@ -55,7 +56,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 </div>
       `.trim(),
     }).catch((err) =>
-      logger.error('[cron/weekly-reminders] Failed to send reminder', { userId: row.user_id, error: String(err) }),
+      logger.error('[cron/weekly-reminders] Failed to send reminder', normalizeError(err, 'Failed to send reminder'), { userId: row.user_id, ...getErrorContext(err) }),
     );
     sent++;
   }

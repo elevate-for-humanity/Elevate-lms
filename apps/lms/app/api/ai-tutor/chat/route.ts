@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { toErrorMessage } from '@/lib/safe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -77,7 +78,7 @@ async function callGemini(
     // Other errors — don't retry
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      logger.error(`Gemini ${model} error:`, err);
+      logger.error(`Gemini ${model} error`, normalizeError(err, 'Gemini chat error'), getErrorContext(err));
       break;
     }
   }

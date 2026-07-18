@@ -14,6 +14,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -125,7 +126,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       },
     });
   } catch (err) {
-    logger.error('[program-proof] unexpected error', { slug, err });
+    logger.error('[program-proof] unexpected error', normalizeError(err, '[program-proof] unexpected error'), { slug, ...getErrorContext(err) });
     return NextResponse.json(
       {
         error: 'Internal server error',

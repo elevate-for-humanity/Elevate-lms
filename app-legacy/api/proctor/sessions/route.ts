@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { appendSessionEvent } from '@/lib/proctor/session-events';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -62,7 +63,7 @@ async function _GET(req: NextRequest) {
 
     const { data, error } = await query;
     if (error) {
-      logger.error('[Proctor] Failed to fetch sessions:', error.message);
+      logger.error('[Proctor] Failed to fetch sessions', normalizeError(error, 'Failed to fetch sessions'));
       return NextResponse.json({ error: 'Failed to fetch sessions' }, { status: 500 });
     }
 
@@ -190,7 +191,7 @@ async function _POST(req: NextRequest) {
       .maybeSingle();
 
     if (error) {
-      logger.error('[Proctor] Failed to create session:', error.message);
+      logger.error('[Proctor] Failed to create session', normalizeError(error, 'Failed to create session'));
       return NextResponse.json({ error: 'Failed to create session' }, { status: 500 });
     }
 

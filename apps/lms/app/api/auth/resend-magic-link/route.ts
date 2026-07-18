@@ -18,6 +18,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
     logger.info('[resend-magic-link] Sent', { email });
     return NextResponse.json({ ok: true });
   } catch (err) {
-    logger.error('[resend-magic-link] Unexpected error', err);
+    logger.error('[resend-magic-link] Unexpected error', normalizeError(err, 'Failed to resend magic link'), getErrorContext(err));
     return NextResponse.json({ ok: true }); // Never reveal internal errors
   }
 }

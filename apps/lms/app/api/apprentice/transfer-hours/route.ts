@@ -4,6 +4,10 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { auditedMutation } from '@/lib/audit/transactional';
+import {
+  getErrorContext,
+  normalizeError,
+} from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -137,8 +141,22 @@ async function _POST(req: Request) {
   });
 
   if (insertError) {
-    logger.error('Error creating transfer request:', new Error(insertError.message));
-    return NextResponse.json({ error: 'Failed to submit transfer request' }, { status: 500 });
+    const error = normalizeError(
+      insertError,
+      'Failed to create transfer request'
+    );
+    error.name = 'TransferRequestInsertError';
+
+    logger.error(
+      'Error creating transfer request',
+      error,
+      getErrorContext(insertError)
+    );
+
+    return NextResponse.json(
+      { error: 'Failed to submit transfer request' },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({

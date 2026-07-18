@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Canonical Stripe Webhook Handler
  *
@@ -34,7 +35,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { createEnrollmentCase, submitCaseForSignatures } from '@/lib/workflow/case-management';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
@@ -154,7 +155,7 @@ async function flagCertificatesForRefund(
 
     await flagCertRows(db, certs, chargeId, paymentIntentId);
   } catch (err) {
-    logger.error('[webhook] Error flagging certificates for refund:', err);
+    logger.error('[webhook] Error flagging certificates for refund', normalizeError(err, 'Flag certificates error'), getErrorContext(err));
   }
 }
 
@@ -264,7 +265,7 @@ async function _POST(request: NextRequest) {
   try {
     event = constructStripeEventWithAnySecret(stripeClient, body, signature, webhookSecrets);
   } catch (err) {
-    logger.error('[webhook] Signature verification failed (tried all configured secrets):', err);
+    logger.error('[webhook] Signature verification failed (tried all configured secrets)', normalizeError(err, 'Signature verification failed'), getErrorContext(err));
     Sentry.captureException(err, {
       tags: {
         subsystem: 'stripe_webhook',
@@ -461,7 +462,7 @@ async function _POST(request: NextRequest) {
             Sentry.captureException(err, {
               tags: { subsystem: 'stripe_webhook', event_type: 'checkout.session.completed' },
             });
-            logger.error('[webhook] checkout.session.completed handler error:', err);
+            logger.error('[webhook] checkout.session.completed handler error', normalizeError(err, 'Checkout completed error'), getErrorContext(err));
           }
           break;
         }
@@ -571,7 +572,7 @@ async function _POST(request: NextRequest) {
               });
 
               if (error) {
-                logger.error('Error handling payment failure:', error);
+                logger.error('Error handling payment failure', normalizeError(error, 'Payment failure error'), getErrorContext(error));
               } else {
                 logger.info(`✅ Enrollment payment failure handled: ${enrollmentId}`);
               }
@@ -673,7 +674,7 @@ async function _POST(request: NextRequest) {
               });
 
               if (error) {
-                logger.error('Error upserting subscription:', error);
+                logger.error('Error upserting subscription', normalizeError(error, 'Upsert subscription error'), getErrorContext(error));
               } else {
                 logger.info(`✅ Store subscription ${event.type}: ${subscription.id}`);
               }
@@ -735,7 +736,7 @@ async function _POST(request: NextRequest) {
               });
 
               if (error) {
-                logger.error('Error canceling subscription:', error);
+                logger.error('Error canceling subscription', normalizeError(error, 'Cancel subscription error'), getErrorContext(error));
               } else {
                 logger.info(`✅ Store subscription canceled: ${subscription.id}`);
               }
@@ -772,7 +773,7 @@ async function _POST(request: NextRequest) {
               const { enforceSubscriptionStatus } = await import('@/lib/licensing/provisioning');
               await enforceSubscriptionStatus((invoice as any).subscription);
             } catch (err) {
-              logger.error('Error enforcing subscription status:', err);
+              logger.error('Error enforcing subscription status', normalizeError(err, 'Enforce subscription error'), getErrorContext(err));
             }
           }
 
@@ -853,7 +854,7 @@ async function _POST(request: NextRequest) {
                 });
               }
             } catch (err) {
-              logger.error('[webhook] Error handling apprenticeship payment failure:', err);
+              logger.error('[webhook] Error handling apprenticeship payment failure', normalizeError(err, 'Apprenticeship payment failure'), getErrorContext(err));
             }
           }
           break;
@@ -1040,7 +1041,7 @@ async function _POST(request: NextRequest) {
               },
             });
           } catch (err) {
-            logger.error('[webhook] Error processing refund:', err);
+            logger.error('[webhook] Error processing refund', normalizeError(err, 'Refund processing error'), getErrorContext(err));
           }
           break;
         }

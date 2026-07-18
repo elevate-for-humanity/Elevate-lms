@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -181,7 +182,7 @@ async function _GET(req: Request) {
 
     return NextResponse.json({ summary });
   } catch (error: any) {
-    logger.error('Error in hours-summary:', error);
+    logger.error('Error in hours-summary', normalizeError(error, 'Hours summary error'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to fetch hour summary' }, { status: 500 });
   }
 }

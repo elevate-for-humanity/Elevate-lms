@@ -18,6 +18,7 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -153,7 +154,7 @@ async function _POST_ARCHIVED(req: NextRequest) {
       .eq('id', data.leadId);
 
     if (updateError) {
-      logger.error('Failed to submit application', { error: updateError, leadId: data.leadId });
+      logger.error('Failed to submit application', normalizeError(updateError, 'Failed to submit application'), { leadId: data.leadId, ...getErrorContext(updateError) });
       return NextResponse.json({ error: 'Failed to submit application' }, { status: 500 });
     }
 
@@ -189,11 +190,7 @@ async function _POST_ARCHIVED(req: NextRequest) {
       .maybeSingle();
 
     if (appMirrorErr) {
-      logger.error('Intake: failed to mirror to applications table', {
-        code: (appMirrorErr as any)?.code,
-        message: (appMirrorErr as any)?.message,
-        leadId: data.leadId,
-      });
+      logger.error('Intake: failed to mirror to applications table', normalizeError(appMirrorErr, 'Intake: failed to mirror to applications table'), { code: (appMirrorErr as any)?.code, message: (appMirrorErr as any)?.message, leadId: data.leadId, ...getErrorContext(appMirrorErr) });
     }
 
     // Log event
@@ -224,7 +221,7 @@ async function _POST_ARCHIVED(req: NextRequest) {
       ...(appRow?.id ? { applicationId: appRow.id, referenceNumber: intakeRef } : {}),
     });
   } catch (error) {
-    logger.error('Application submission error', { error });
+    logger.error('Application submission error', normalizeError(error, 'Application submission error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

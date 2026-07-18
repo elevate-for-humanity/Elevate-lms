@@ -1,6 +1,7 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { checkApprenticeshipEligibility } from '@/lib/hours/get-approved-hours';
@@ -31,7 +32,7 @@ async function _POST(request: Request) {
     }
 
     const body = await request.json().catch((err) => {
-      logger.error('Failed to parse request body:', err);
+      logger.error('Failed to parse request body', normalizeError(err, 'Request body parse failed'), getErrorContext(err));
       return {};
     });
     const {
@@ -439,7 +440,7 @@ async function _POST(request: Request) {
       message: 'Certificate generated successfully',
     });
   } catch (error) {
-    logger.error('Error in /api/certificates/generate:', error);
+    logger.error('Error in /api/certificates/generate', normalizeError(error, 'Certificate generation failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

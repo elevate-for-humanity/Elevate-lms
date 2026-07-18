@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 /**
  * Scraper Alert Endpoint
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
       request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
-    logger.error('🚨 SCRAPING ATTEMPT DETECTED:', {
+    logger.error('🚨 SCRAPING ATTEMPT DETECTED', undefined, {
       type,
       url,
       ip,
@@ -77,14 +78,14 @@ export async function POST(request: NextRequest) {
           }).then(() => {}, () => {});
         }
       } catch (error) {
-        logger.error('Background alert processing failed:', error);
+        logger.error('Background alert processing failed', normalizeError(error, 'Background alert processing failed'), getErrorContext(error));
       }
     });
 
     return responsePromise;
   } catch (error) {
     /* Error handled silently */
-    logger.error('Error processing scraper alert:', error);
+    logger.error('Error processing scraper alert', normalizeError(error, 'Error processing scraper alert'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to process alert' }, { status: 500 });
   }
 }
@@ -141,7 +142,7 @@ This is an automated alert from ${PLATFORM_DEFAULTS.orgName} Security System.
         html: emailContent.replace(/\n/g, '<br>')
       });
     } catch (error) {
-      logger.error('Failed to send email:', error);
+      logger.error('Failed to send email', normalizeError(error, 'Failed to send email'), getErrorContext(error));
     }
   }
   */
@@ -191,7 +192,7 @@ async function sendSlackAlert(data: Record<string, any>) {
     });
   } catch (error) {
     /* Error handled silently */
-    logger.error('Failed to send Slack alert:', error);
+    logger.error('Failed to send Slack alert', normalizeError(error, 'Failed to send Slack alert'), getErrorContext(error));
   }
 }
 

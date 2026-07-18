@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -30,13 +31,13 @@ async function _GET(request: NextRequest) {
       .limit(50);
 
     if (error) {
-      logger.error('[Notifications] Error:', error);
+      logger.error('[Notifications] Error', normalizeError(error, 'Notifications error'), getErrorContext(error));
       return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 });
     }
 
     return NextResponse.json({ notifications: notifications || [] });
   } catch (error) {
-    logger.error('[Notifications] Error:', error);
+    logger.error('[Notifications] Error', normalizeError(error, 'Notifications error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

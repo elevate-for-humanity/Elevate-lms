@@ -12,6 +12,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { headers } from 'next/headers';
 import { generateLicenseWelcomeEmail } from '@/lib/email-templates/license-welcome';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { isEventProcessed, markEventProcessed } from '@/lib/store/idempotency';
 import { logProvisioningStep } from '@/lib/store/audit';
 import { provisionLicense } from '@/lib/store/provisioning';
@@ -168,7 +169,7 @@ export async function POST(request: NextRequest) {
               logger.error('Failed to send license welcome email', emailError as Error);
             }
           } else {
-            logger.error('Provisioning failed', { error: result.error, paymentIntentId: paymentIntent.id });
+            logger.error('Provisioning failed', normalizeError(result.error, 'Provisioning failed'), { paymentIntentId: paymentIntent.id });
           }
         }
 

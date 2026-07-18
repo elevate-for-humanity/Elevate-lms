@@ -1,7 +1,8 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createServerSupabaseClient, getCurrentUser } from '@/lib/auth';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -76,13 +77,13 @@ async function _POST(request: Request, { params }: { params: Promise<{ id: strin
     }
 
     if (error) {
-      logger.error('Error submitting assignment:', error);
+      logger.error('Error submitting assignment', normalizeError(error, 'Failed to submit assignment'), getErrorContext(error));
       return NextResponse.json({ error: 'Failed to submit assignment' }, { status: 500 });
     }
 
     return NextResponse.json({ submission }, { status: 201 });
   } catch (error) {
-    logger.error('Error in POST /api/assignments/[id]/submit:', error);
+    logger.error('Error in POST /api/assignments/[id]/submit', normalizeError(error, 'Failed to submit assignment'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

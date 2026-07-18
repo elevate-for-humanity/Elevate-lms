@@ -15,6 +15,7 @@ import {
 import { PLANS, LicenseStatus, PlanId } from '@/lib/license/types';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 interface LicenseData {
   status: LicenseStatus;
@@ -54,7 +55,7 @@ export default function BillingPage() {
         .maybeSingle();
 
       if (profileError && profileError.code !== 'PGRST116') {
-        logger.error('Error fetching profile:', profileError);
+        logger.error('Error fetching profile', normalizeError(profileError, 'Failed to fetch profile'), getErrorContext(profileError));
       }
 
       if (profile) {
@@ -99,7 +100,7 @@ export default function BillingPage() {
         alert('Failed to open billing portal');
       }
     } catch (error) {
-      logger.error('Portal error:', error);
+      logger.error('Portal error', normalizeError(error, 'Portal error'), getErrorContext(error));
       alert('Failed to open billing portal');
     } finally {
       setIsLoading(false);

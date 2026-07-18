@@ -1,7 +1,8 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -22,7 +23,7 @@ async function _GET(_req: NextRequest, { params }: { params: Promise<{ courseId:
     .order('created_at', { ascending: false });
 
   if (error) {
-    logger.error('announcements GET error', error);
+    logger.error('announcements GET error', normalizeError(error, 'Announcements GET error'), getErrorContext(error));
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 

@@ -8,6 +8,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -40,7 +41,7 @@ async function _POST(request: NextRequest) {
         user_agent: request.headers.get('user-agent') || 'unknown',
       });
       if (error) {
-        logger.error('[Compliance] Handbook acknowledgment failed', { error: error.message });
+        logger.error('[Compliance] Handbook acknowledgment failed', normalizeError(error, 'Handbook acknowledgment failed'), getErrorContext(error));
         return NextResponse.json(
           { success: false, error: 'Failed to record acknowledgment' },
           { status: 500 },
@@ -88,7 +89,7 @@ async function _POST(request: NextRequest) {
         .single();
 
       if (error) {
-        logger.error('[Compliance] Agreement acceptance failed', { message: error.message, code: error.code });
+        logger.error('[Compliance] Agreement acceptance failed', normalizeError(error, 'Agreement acceptance failed'), getErrorContext(error));
         // Race condition — another request inserted between our check and insert
         if (error.code === '23505') {
           const { data: race } = await db
@@ -116,7 +117,7 @@ async function _POST(request: NextRequest) {
         })
         .eq('id', user.id);
       if (error) {
-        logger.error('[Compliance] Onboarding update failed:', error.message);
+        logger.error('[Compliance] Onboarding update failed', normalizeError(error, 'Onboarding update failed'), getErrorContext(error));
         return NextResponse.json({ success: false, error: 'Failed to update' }, { status: 500 });
       }
       return NextResponse.json({ success: true });
@@ -124,7 +125,7 @@ async function _POST(request: NextRequest) {
 
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
   } catch (err) {
-    logger.error('[Compliance] API error:', err instanceof Error ? err.message : err);
+    logger.error('[Compliance] API error', normalizeError(err, 'API error'), getErrorContext(err));
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
@@ -181,7 +182,7 @@ async function _GET(request: NextRequest) {
       agreements: agreements.data || [],
     });
   } catch (err) {
-    logger.error('[Compliance] GET error:', err instanceof Error ? err.message : err);
+    logger.error('[Compliance] GET error', normalizeError(err, 'GET error'), getErrorContext(err));
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

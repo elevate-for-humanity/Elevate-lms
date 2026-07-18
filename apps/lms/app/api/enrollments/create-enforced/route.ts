@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { emitEvent } from '@/lib/events/emit';
 import {
   validateEnrollmentEligibility,
@@ -121,7 +122,7 @@ async function _POST(request: NextRequest) {
       .single();
 
     if (enrollError) {
-      logger.error('Enrollment creation error:', enrollError);
+      logger.error('Enrollment creation error', normalizeError(enrollError, 'Failed to create enrollment'), getErrorContext(enrollError));
       return NextResponse.json({ error: 'Failed to create enrollment' }, { status: 500 });
     }
 
@@ -218,7 +219,7 @@ async function _POST(request: NextRequest) {
             : 'Enrollment created. Complete down payment to activate access.',
     });
   } catch (error) {
-    logger.error('Enforced enrollment API error:', error);
+    logger.error('Enforced enrollment API error', normalizeError(error, 'Enforced enrollment failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

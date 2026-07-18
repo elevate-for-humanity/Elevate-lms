@@ -18,6 +18,7 @@ import { syncProgressEntryToHourEntries } from '@/lib/timeclock/sync-to-hour-ent
 import { sendEmail } from '@/lib/email/service';
 import { logger } from '@/lib/logger';
 import { withRuntime } from '@/lib/api/withRuntime';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -37,7 +38,7 @@ export const GET = withRuntime({ cron: true }, async () => {
     .eq('auto_clocked_out', false);
 
   if (error) {
-    logger.error('[missed-checkins] query failed', { error });
+    logger.error('[missed-checkins] query failed', normalizeError(error, 'Query failed'), getErrorContext(error));
     return NextResponse.json({ error: 'query failed' }, { status: 500 });
   }
 
@@ -90,12 +91,12 @@ export const GET = withRuntime({ cron: true }, async () => {
         .eq('id', shift.id);
 
       if (updateErr) {
-        logger.error('[missed-checkins] auto-close failed', { shiftId: shift.id, error: updateErr });
+        logger.error('[missed-checkins] auto-close failed', normalizeError(updateErr, 'Auto-close failed'), { shiftId: shift.id, ...getErrorContext(updateErr) });
         continue;
       }
 
       await syncProgressEntryToHourEntries(db, shift.id).catch((err) =>
-        logger.error('[missed-checkins] sync failed', { shiftId: shift.id, err }),
+        logger.error('[missed-checkins] sync failed', normalizeError(err, 'Sync failed'), { shiftId: shift.id, ...getErrorContext(err) }),
       );
 
       const apprentice = apprenticeMap[shift.apprentice_id];
@@ -149,7 +150,7 @@ export const GET = withRuntime({ cron: true }, async () => {
       processed++;
       results.push({ shiftId: shift.id, apprenticeId: shift.apprentice_id, autoClockOut: autoClockOutIso });
     } catch (err) {
-      logger.error('[missed-checkins] shift processing failed', { shiftId: shift.id, err });
+      logger.error('[missed-checkins] shift processing failed', normalizeError(err, 'Shift processing failed'), { shiftId: shift.id, ...getErrorContext(err) });
     }
   }
 

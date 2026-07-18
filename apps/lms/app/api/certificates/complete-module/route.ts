@@ -1,6 +1,7 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { isCheckpointGateError, checkpointGateResponse } from '@/lib/lms/engine/gate';
@@ -55,7 +56,7 @@ async function _POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, completed: true });
   } catch (error) {
-    logger.error('Module completion error', error as Error);
+    logger.error('Module completion error', normalizeError(error, 'Module completion failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

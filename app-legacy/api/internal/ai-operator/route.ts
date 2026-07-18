@@ -20,6 +20,7 @@ import { aiChat } from '@/lib/ai/ai-service';
 import { emitEvent } from '@/lib/platform/events';
 import { logger } from '@/lib/logger';
 import { withRuntime } from '@/lib/api/withRuntime';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -45,7 +46,7 @@ export const POST = withRuntime({ cron: true }, async () => {
     .limit(BATCH_SIZE);
 
   if (error) {
-    logger.error('[ai-operator] Failed to load platform_events', error);
+    logger.error('[ai-operator] Failed to load platform_events', normalizeError(error, '[ai-operator] Failed to load platform_events'), getErrorContext(error));
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 
@@ -156,7 +157,7 @@ Respond with ONLY valid JSON, no markdown.`;
       message: `AI operator __triaged ${events.length} event${events.length !== 1 ? 's' : ''}: ${summary.slice(0, 100)}`,
     }).then(() => {}, () => {});
   } catch (err) {
-    logger.error('[ai-operator] AI triage failed', { error: err instanceof Error ? err.message : String(err) });
+    logger.error('[ai-operator] AI triage failed', normalizeError(err, '[ai-operator] AI triage failed'), getErrorContext(err));
     return NextResponse.json({ error: 'AI triage failed' }, { status: 500 });
   }
 

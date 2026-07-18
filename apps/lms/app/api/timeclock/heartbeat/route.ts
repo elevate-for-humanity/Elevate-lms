@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -188,7 +189,7 @@ async function _POST(request: NextRequest) {
       auto_clock_out_reason: updatedEntry?.auto_clock_out_reason || null,
     });
   } catch (error) {
-    logger.error('[Heartbeat] Unexpected error:', error);
+    logger.error('[Heartbeat] Unexpected error', normalizeError(error, 'Heartbeat unexpected error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

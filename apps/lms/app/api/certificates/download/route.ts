@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -80,7 +81,7 @@ async function _GET(request: NextRequest) {
         : 'Use client-side PDF generation with the certificate data',
     });
   } catch (error) {
-    logger.error('Certificate download error:', error);
+    logger.error('Certificate download error', normalizeError(error, 'Certificate download failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to fetch certificate' }, { status: 500 });
   }
 }
@@ -119,7 +120,7 @@ async function _POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Certificate PDF URL saved' });
   } catch (error) {
-    logger.error('Certificate update error:', error);
+    logger.error('Certificate update error', normalizeError(error, 'Certificate update failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to update certificate' }, { status: 500 });
   }
 }

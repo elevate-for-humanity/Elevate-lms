@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import webpush from 'web-push';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -94,7 +95,7 @@ async function _POST(req: Request) {
               sent_at: new Date().toISOString(),
             });
           } catch (error) {
-            logger.error(`Error sending to subscription ${subscription.id}:`, error);
+            logger.error(`Error sending to subscription ${subscription.id}`, normalizeError(error, `Failed to send to subscription ${subscription.id}`), getErrorContext(error));
             failed++;
 
             // If subscription is invalid (410 Gone), mark as inactive
@@ -117,10 +118,7 @@ async function _POST(req: Request) {
           }
         }
       } catch (error) {
-        logger.error(
-          `Error processing user ${user.id}:`,
-          error instanceof Error ? error : new Error(String(error)),
-        );
+        logger.error(`Error processing user ${user.id}`, normalizeError(error, 'Failed to process user'), getErrorContext(error));
         failed++;
       }
     }
@@ -134,10 +132,7 @@ async function _POST(req: Request) {
       },
     });
   } catch (error) {
-    logger.error(
-      'Broadcast notification error:',
-      error instanceof Error ? error : new Error(String(error)),
-    );
+    logger.error('Broadcast notification error', normalizeError(error, 'Broadcast notification error'), getErrorContext(error));
     return safeInternalError(error as Error, 'Internal server error');
   }
 }
@@ -202,7 +197,7 @@ async function getTargetUsers(supabase: any, targetAudience: string) {
   const { data, error } = await query;
 
   if (error) {
-    logger.error('Error fetching users:', error);
+    logger.error('Error fetching users', normalizeError(error, 'Failed to fetch users'), getErrorContext(error));
     return [];
   }
 

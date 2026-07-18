@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -57,7 +58,7 @@ async function _GET(request: NextRequest) {
       uploadedDocuments: uploadedDocuments || [],
     });
   } catch (error) {
-    logger.error('[Documents API] Error:', error);
+    logger.error('[Documents API] Error', normalizeError(error, 'Documents API error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -199,7 +200,7 @@ async function _POST(request: NextRequest) {
                 programSlug,
               )
               .catch((err: Error) => {
-                logger.error('[Documents API] Staff notification failed:', err);
+                logger.error('[Documents API] Staff notification failed', normalizeError(err, 'Staff notification failed'), getErrorContext(err));
               });
           }
         }
@@ -215,7 +216,7 @@ async function _POST(request: NextRequest) {
       document: docRecord,
     });
   } catch (error) {
-    logger.error('[Documents API] Error:', error);
+    logger.error('[Documents API] Error', normalizeError(error, 'Documents API error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -276,7 +277,7 @@ async function _DELETE(request: NextRequest) {
     const { error } = await supabase.from('documents').delete().eq('id', docId);
 
     if (error) {
-      logger.error('[Documents API] Delete error:', error);
+      logger.error('[Documents API] Delete error', normalizeError(error, 'Delete error'), getErrorContext(error));
       return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 });
     }
 
@@ -295,7 +296,7 @@ async function _DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('[Documents API] Error:', error);
+    logger.error('[Documents API] Error', normalizeError(error, 'Documents API error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

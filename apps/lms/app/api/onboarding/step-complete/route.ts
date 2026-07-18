@@ -1,7 +1,8 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { sendEmail } from '@/lib/email';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -95,7 +96,7 @@ async function _POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Onboarding step notification failed', error as Error);
+    logger.error('Onboarding step notification failed', normalizeError(error, 'Step notification failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to send notification' }, { status: 500 });
   }
 }

@@ -16,6 +16,7 @@ import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/service';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -141,7 +142,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       message: anomaly.message,
       metadata: { value: anomaly.value, threshold: anomaly.threshold, detected_at: now.toISOString() },
     }).then(undefined, (err) =>
-      logger.error('[cron/anomaly-detection] Failed to insert alert', { type: anomaly.type, error: String(err) }),
+      logger.error('[cron/anomaly-detection] Failed to insert alert', normalizeError(err, 'Failed to insert admin alert'), { type: anomaly.type, ...getErrorContext(err) }),
     );
     fired++;
   }
@@ -163,7 +164,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
 </div>
       `.trim(),
     }).catch((err) =>
-      logger.error('[cron/anomaly-detection] Failed to send critical alert email', { error: String(err) }),
+      logger.error('[cron/anomaly-detection] Failed to send critical alert email', normalizeError(err, 'Failed to send critical alert email'), getErrorContext(err)),
     );
   }
 

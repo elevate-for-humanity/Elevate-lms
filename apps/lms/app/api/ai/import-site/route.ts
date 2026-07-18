@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
 import * as cheerio from 'cheerio';
@@ -78,7 +79,7 @@ async function _POST(request: NextRequest) {
       previewUrl: `/preview/${previewId}`,
     });
   } catch (error) {
-    logger.error('Import error:', error);
+    logger.error('Import error', normalizeError(error, 'Import failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to import site' }, { status: 500 });
   }
 }

@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { normalizeError } from '@/lib/errors/normalize-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { constructWebhookEvent } from '@/lib/stripe/construct-webhook-event';
 import type Stripe from 'stripe';
@@ -109,7 +110,7 @@ async function _POST(request: NextRequest) {
             paid_at: new Date().toISOString(),
             invoice_url: invoiceData.hosted_invoice_url,
           });
-          if (insertError) logger.error('Failed to insert subscription invoice', { error: insertError });
+          if (insertError) logger.error('Failed to insert subscription invoice', normalizeError(insertError, 'Failed to insert subscription invoice'));
         }
         break;
       }
@@ -129,7 +130,7 @@ async function _POST(request: NextRequest) {
             failure_message: invoiceData.last_payment_error?.message,
             attempt_count: invoiceData.attempt_count,
           });
-          if (insertError) logger.error('Failed to insert failed invoice', { error: insertError });
+          if (insertError) logger.error('Failed to insert failed invoice', normalizeError(insertError, 'Failed to insert failed invoice'));
         }
         break;
       }

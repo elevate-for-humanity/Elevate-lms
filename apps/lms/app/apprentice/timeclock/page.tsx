@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 const HEARTBEAT_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
 const LOCATION_TIMEOUT_MS = 10000;
@@ -245,7 +246,7 @@ export default function TimeclockPage() {
         });
       }
     } catch (err) {
-      logger.error('Heartbeat failed:', err);
+      logger.error('Heartbeat failed', normalizeError(err, 'Heartbeat failed'), getErrorContext(err));
     }
   }, [shift.entryId, getLocation]);
 

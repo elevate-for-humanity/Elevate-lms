@@ -5,6 +5,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { success, failure } from '@/lib/api/safe-handler';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 async function _POST(req: Request) {
   try {
@@ -68,13 +69,7 @@ async function _POST(req: Request) {
       .eq('user_id', user.id); // ownership re-check on write
 
     if (error) {
-      logger.error('Error updating enrollment:', {
-        code: error.code,
-        message: error.message,
-        userId: user.id,
-        enrollmentId: targetId,
-        route: '/api/enrollment/submit-documents',
-      });
+      logger.error('Error updating enrollment', normalizeError(error, 'Enrollment update failed'), { code: error.code, message: error.message, userId: user.id, enrollmentId: targetId, route: '/api/enrollment/submit-documents' });
       return failure(
         'Failed to record document submission. Please try again or call ' + PLATFORM_DEFAULTS.supportPhone + '.',
       );
@@ -88,7 +83,7 @@ async function _POST(req: Request) {
 
     return success({ program, enrollmentId: targetId });
   } catch (err: unknown) {
-    logger.error('Document submission error:', err);
+    logger.error('Document submission error', normalizeError(err, 'Document submission error'), getErrorContext(err));
     return failure('Failed to process document submission.');
   }
 }

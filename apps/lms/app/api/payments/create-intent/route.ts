@@ -1,7 +1,8 @@
+import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -60,7 +61,7 @@ async function _POST(request: NextRequest) {
       intentId: paymentIntent.id,
     });
   } catch (error: any) {
-    logger.error('[Payment Intent] Error:', error);
+    logger.error('[Payment Intent] Error', normalizeError(error, 'Payment intent error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

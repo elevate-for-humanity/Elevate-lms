@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -237,7 +238,7 @@ async function _GET(request: NextRequest) {
       activeShift,
     });
   } catch (error) {
-    logger.error('Timeclock context error:', error);
+    logger.error('Timeclock context error', normalizeError(error, 'Timeclock context error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

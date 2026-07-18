@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import webpush from 'web-push';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -52,7 +53,7 @@ async function _POST(request: NextRequest) {
         })
         .then(()=>{}, ()=>{});
     } catch (err) {
-      logger.error('Unhandled error', err instanceof Error ? err : undefined);
+      logger.error('Unhandled error', normalizeError(err, 'Failed to log push notification'), getErrorContext(err));
     }
 
     return NextResponse.json({
@@ -60,7 +61,7 @@ async function _POST(request: NextRequest) {
       message: 'Notification sent',
     });
   } catch (error) {
-    logger.error('[Notifications] Send error:', error);
+    logger.error('[Notifications] Send error', normalizeError(error, 'Send error'), getErrorContext(error));
     return NextResponse.json(
       { success: false, error: 'Failed to send notification' },
       { status: 500 },

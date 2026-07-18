@@ -1,6 +1,7 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { aiInstructors } from '@/lms-data/aiInstructors';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -82,7 +83,7 @@ async function _POST(req: NextRequest) {
       answer,
     });
   } catch (err) {
-    logger.error('AI tutor route error', err);
+    logger.error('AI tutor route error', normalizeError(err, 'AI tutor failed'), getErrorContext(err));
     return NextResponse.json({ error: 'Unexpected server error' }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
 import { getRecommendedTemplate } from '@/lib/templates/designs';
@@ -189,7 +190,7 @@ Return ONLY valid JSON, no markdown.`;
       previewUrl: `/preview/${previewId}`,
     });
   } catch (error) {
-    logger.error('AI generation error:', error);
+    logger.error('AI generation error', normalizeError(error, 'AI generation failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to generate site configuration' }, { status: 500 });
   }
 }

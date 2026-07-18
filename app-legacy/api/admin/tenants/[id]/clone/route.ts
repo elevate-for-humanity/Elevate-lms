@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -97,7 +98,7 @@ export async function POST(
     .single();
 
   if (createErr || !newTenant) {
-    logger.error('[tenant-clone] Failed to create tenant', { error: createErr?.message, trace_id: traceId });
+    logger.error('[tenant-clone] Failed to create tenant', normalizeError(createErr, 'Failed to create tenant'), { trace_id: traceId, ...getErrorContext(createErr) });
     return NextResponse.json({ error: 'Failed to create tenant clone' }, { status: 500 });
   }
 

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * HVAC AI Instructor endpoint — Marcus Johnson
  *
@@ -8,7 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import {
   buildLessonContext,
   buildMarcusSystemPrompt,
@@ -60,7 +61,7 @@ async function callGemini(messages: ChatMessage[], systemPrompt: string): Promis
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (text) return text.trim();
     } catch (err) {
-      logger.error(`Gemini ${model} exception`, err as Error);
+      logger.error(`Gemini ${model} exception`, normalizeError(err, 'Gemini HVAC error'), getErrorContext(err));
     }
   }
   return null;
@@ -132,7 +133,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: reply });
   } catch (err) {
-    logger.error('HVAC instructor route error', err as Error);
+    logger.error('HVAC instructor route error', normalizeError(err, 'HVAC instructor error'), getErrorContext(err));
     return NextResponse.json({ error: 'Instructor unavailable' }, { status: 500 });
   }
 }

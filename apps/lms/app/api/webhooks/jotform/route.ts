@@ -4,6 +4,7 @@ import { timingSafeEqual } from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
   if (insertErr) {
     // Table may not exist yet — log and continue; don't fail the webhook
     // response so JotForm does not retry indefinitely.
-    logger.error('[jotform-webhook] Failed to persist submission (non-fatal):', insertErr.message);
+    logger.error('[jotform-webhook] Failed to persist submission (non-fatal)', normalizeError(insertErr, 'Failed to persist submission'));
   }
 
   logger.info('[jotform-webhook] Received submission', { formID, submissionID });

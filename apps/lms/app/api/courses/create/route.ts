@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -74,7 +75,7 @@ async function _POST(request: NextRequest) {
       .maybeSingle();
 
     if (courseError) {
-      logger.error('Course creation error:', courseError);
+      logger.error('Course creation error', normalizeError(courseError, 'Failed to create course'), getErrorContext(courseError));
       return NextResponse.json({ error: 'Course operation failed' }, { status: 400 });
     }
 
@@ -98,7 +99,7 @@ async function _POST(request: NextRequest) {
         });
 
         if (lessonError) {
-          logger.error('Lesson creation error:', lessonError);
+          logger.error('Lesson creation error', normalizeError(lessonError, 'Failed to create lesson'), getErrorContext(lessonError));
         }
       }
     }

@@ -7,6 +7,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -89,11 +90,7 @@ async function _POST(req: Request) {
       .single();
 
     if (error) {
-      logger.error('Supabase insert error', {
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-      });
+      logger.error('Supabase insert error', normalizeError(error, 'Supabase insert error'), { code: error.code, details: error.details, hint: error.hint, ...getErrorContext(error) });
       return NextResponse.json({ error: 'Failed to save inquiry' }, { status: 500 });
     }
 
@@ -154,7 +151,7 @@ async function _POST(req: Request) {
         },
       );
     } catch (emailError) {
-      logger.error('Unhandled error', emailError instanceof Error ? emailError : undefined);
+      logger.error('Unhandled error', normalizeError(emailError, 'Unhandled error'), getErrorContext(emailError));
     }
 
     return NextResponse.json(

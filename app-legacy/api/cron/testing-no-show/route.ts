@@ -8,6 +8,7 @@ import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/service';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,7 +31,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .lte('scheduled_at', yesterdayEnd.toISOString());
 
   if (error) {
-    logger.error('[cron/testing-no-show] DB error', { error: error.message });
+    logger.error('[cron/testing-no-show] DB error', normalizeError(error, 'DB error'), getErrorContext(error));
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
@@ -44,7 +45,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       .update({ status: 'no_show', updated_at: new Date().toISOString() })
       .eq('id', session.id)
       .then(undefined, (err) =>
-        logger.error('[cron/testing-no-show] Failed to update session status', { sessionId: session.id, error: String(err) }),
+        logger.error('[cron/testing-no-show] Failed to update session status', normalizeError(err, 'Failed to update session status'), { sessionId: session.id, ...getErrorContext(err) }),
       );
 
     // Admin alert
@@ -54,7 +55,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       message: `No-show: ${session.student_name} did not appear for ${session.exam_name} (${session.provider}).`,
       metadata: { session_id: session.id, student_email: session.student_email, scheduled_at: session.scheduled_at },
     }).then(undefined, (err) =>
-      logger.error('[cron/testing-no-show] Failed to insert admin alert', { error: String(err) }),
+      logger.error('[cron/testing-no-show] Failed to insert admin alert', normalizeError(err, 'Failed to insert admin alert'), getErrorContext(err)),
     );
 
     // Notify student if email on file
@@ -64,7 +65,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
         subject: `Missed Exam Appointment — ${session.exam_name}`,
         html: `<p>Hi ${session.student_name},</p><p>We noticed you missed your scheduled exam appointment for <strong>${session.exam_name}</strong>. Please contact your instructor to reschedule.</p><p>— Elevate for Humanity</p>`,
       }).catch((err) =>
-        logger.error('[cron/testing-no-show] Failed to send no-show email', { sessionId: session.id, error: String(err) }),
+        logger.error('[cron/testing-no-show] Failed to send no-show email', normalizeError(err, 'Failed to send no-show email'), { sessionId: session.id, ...getErrorContext(err) }),
       );
     }
 

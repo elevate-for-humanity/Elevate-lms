@@ -19,6 +19,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { getCourseById } from '@/lib/partners/link-based-integration';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
 
   const course = getCourseById(courseId);
   if (!course) {
-    logger.error('[micro-classes/webhook] Unknown course_id', { courseId, sessionId: session.id });
+    logger.error('[micro-classes/webhook] Unknown course_id', undefined, { courseId, sessionId: session.id });
     return NextResponse.json({ received: true });
   }
 
@@ -104,7 +105,7 @@ export async function POST(req: NextRequest) {
   const priceId = fullSession.line_items?.data?.[0]?.price?.id ?? course.stripePriceId;
 
   if (!customerEmail) {
-    logger.error('[micro-classes/webhook] No customer email', { sessionId: session.id });
+    logger.error('[micro-classes/webhook] No customer email', undefined, { sessionId: session.id });
     return NextResponse.json({ received: true });
   }
 
@@ -124,10 +125,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (insertError) {
-    logger.error('[micro-classes/webhook] Insert failed', {
-      error: insertError,
-      sessionId: session.id,
-    });
+    logger.error('[micro-classes/webhook] Insert failed', normalizeError(insertError, 'Insert failed'), { sessionId: session.id, ...getErrorContext(insertError) });
     return NextResponse.json({ error: 'DB insert failed' }, { status: 500 });
   }
 

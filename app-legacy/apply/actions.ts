@@ -5,6 +5,7 @@ import { randomBytes } from 'crypto';
 import { revalidatePath } from 'next/cache';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { normalizeError } from '@/lib/errors/normalize-error';
 
 import { sendWorkOneHoldEmail } from '@/lib/email/workone-hold';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -164,7 +165,7 @@ async function createStudentAccount(
     }
 
     if (!userId) {
-      logger.error('Account creation failed - could not create user', { email: normalizedEmail });
+      logger.error('Account creation failed - could not create user', undefined, { email: normalizedEmail });
       return { accountCreated: false };
     }
 
@@ -1095,7 +1096,7 @@ async function ensureProgramHolderAccount(
   }
 
   if (!userId) {
-    logger.error('[Apply] Unable to provision program holder auth account', {
+    logger.error('[Apply] Unable to provision program holder auth account', undefined, {
       email: normalizedEmail,
       organizationName,
     });

@@ -11,6 +11,7 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -67,7 +68,7 @@ async function _POST(req: NextRequest) {
         .maybeSingle();
 
       if (error) {
-        logger.error('Failed to update lead', { error, email: data.email });
+        logger.error('Failed to update lead', normalizeError(error, 'Failed to update lead'), { email: data.email, ...getErrorContext(error) });
         return NextResponse.json({ error: 'Failed to update interest' }, { status: 500 });
       }
 
@@ -97,7 +98,7 @@ async function _POST(req: NextRequest) {
       .maybeSingle();
 
     if (error) {
-      logger.error('Failed to create lead', { error, data });
+      logger.error('Failed to create lead', normalizeError(error, 'Failed to create lead'), { data, ...getErrorContext(error) });
       return NextResponse.json({ error: 'Failed to save interest' }, { status: 500 });
     }
 
@@ -123,7 +124,7 @@ async function _POST(req: NextRequest) {
       message: "Thank you for your interest! Next, let's check your eligibility.",
     });
   } catch (error) {
-    logger.error('Interest intake error', { error });
+    logger.error('Interest intake error', normalizeError(error, 'Interest intake error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

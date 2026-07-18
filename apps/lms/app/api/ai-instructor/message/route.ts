@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * @deprecated Route to lib/ai/orchestrator.ts for new callers.
  * This endpoint is preserved for backwards compatibility.
@@ -5,7 +6,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -37,7 +38,7 @@ async function callGemini(systemPrompt: string, userPrompt: string): Promise<str
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (text) return text;
     } catch (err) {
-      logger.error(`Gemini ${model} error:`, err as Error);
+      logger.error(`Gemini ${model} error`, normalizeError(err, 'Gemini message error'), getErrorContext(err));
     }
   }
   return null;

@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
 
     if (!tokenRes.ok) {
       const err = await tokenRes.text();
-      logger.error('[QB callback] token exchange failed', { error: err });
+      logger.error('[QB callback] token exchange failed', normalizeError(err, 'token exchange failed'), getErrorContext(err));
       return redirect('error=token_failed');
     }
 
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
       `${adminBase}/admin/integrations/quickbooks?success=connected&company=${realm}`,
     );
   } catch (err) {
-    logger.error('[QB callback] unexpected error:', err);
+    logger.error('[QB callback] unexpected error', normalizeError(err, 'Unexpected error'), getErrorContext(err));
     return redirect('error=unexpected');
   }
 }
@@ -101,6 +102,6 @@ async function persistToSupabase(params: Record<string, string>) {
       ),
     );
   } catch (err) {
-    logger.error('[QB callback] Supabase persist failed:', err);
+    logger.error('[QB callback] Supabase persist failed', normalizeError(err, 'Supabase persist failed'), getErrorContext(err));
   }
 }

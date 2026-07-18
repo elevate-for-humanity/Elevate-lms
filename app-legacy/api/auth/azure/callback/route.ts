@@ -26,6 +26,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 
@@ -53,7 +54,7 @@ export async function GET(req: NextRequest) {
   });
 
   if (error || !data.url) {
-    logger.error('[azure/callback] OAuth initiation failed', { error: error?.message });
+    logger.error('[azure/callback] OAuth initiation failed', normalizeError(error, 'OAuth initiation failed'), getErrorContext(error));
     return NextResponse.redirect(new URL('/login?error=azure_oauth_failed', req.url));
   }
 
@@ -102,7 +103,7 @@ export async function POST(req: NextRequest) {
     const email: string = payload.email ?? payload.preferred_username ?? payload.upn;
 
     if (!email || !email.includes('@')) {
-      logger.error('[azure/callback] No email in Azure id_token', { payload });
+      logger.error('[azure/callback] No email in Azure id_token', undefined, { payload });
       return NextResponse.redirect(`${loginUrl}?error=azure_no_email`);
     }
 
@@ -127,7 +128,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (linkErr || !link?.properties?.action_link) {
-      logger.error('[azure/callback] Failed to generate session link', { error: linkErr?.message });
+      logger.error('[azure/callback] Failed to generate session link', normalizeError(linkErr, 'Failed to generate session link'), getErrorContext(linkErr));
       return NextResponse.redirect(`${loginUrl}?error=azure_session_failed`);
     }
 
@@ -135,8 +136,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(link.properties.action_link);
 
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    logger.error('[azure/callback] id_token processing failed', { error: msg });
+    logger.error('[azure/callback] id_token processing failed', normalizeError(err, 'id_token processing failed'), getErrorContext(err));
     return NextResponse.redirect(`${loginUrl}?error=azure_invalid`);
   }
 }

@@ -1,8 +1,9 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
@@ -36,7 +37,7 @@ async function _GET(_req: NextRequest, { params }: { params: Promise<{ lessonId:
     .order('position_seconds', { ascending: true });
 
   if (error) {
-    logger.error('bookmarks GET error', error);
+    logger.error('bookmarks GET error', normalizeError(error, 'Failed to fetch bookmarks'), getErrorContext(error));
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 
@@ -78,7 +79,7 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ lessonId:
   });
 
   if (error) {
-    logger.error('bookmarks POST error', error);
+    logger.error('bookmarks POST error', normalizeError(error, 'Failed to create bookmark'), getErrorContext(error));
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Subscriptions Webhook Handler
  * Central handler for subscription-related Stripe events.
@@ -6,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { constructWebhookEvent } from '@/lib/stripe/construct-webhook-event';
 import type Stripe from 'stripe';
@@ -141,7 +142,7 @@ async function _POST(request: NextRequest) {
         logger.debug('Unhandled subscription event type', { type: event.type });
     }
   } catch (err) {
-    logger.error('Error processing subscription webhook', err as Error);
+    logger.error('Error processing subscription webhook', normalizeError(err, 'Subscription webhook error'), getErrorContext(err));
     return NextResponse.json({ error: 'Processing failed' }, { status: 500 });
   }
 

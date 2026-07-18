@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * POST /api/videos/generate
  *
@@ -22,7 +23,7 @@ import { createClient } from '@/lib/supabase/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { createJob, markRendering, markComplete, markFailed } from '@/lib/video/job-queue';
 import { renderLessonVideo, inferDomainKey } from '@/lib/video/remotion-render';
 
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
     durationSecs: lesson.duration_seconds ?? undefined,
   }).catch((err) => {
     // audit-safe: err goes to logger only, not HTTP response
-    logger.error('[VideoGenerate] Background render threw', err);
+    logger.error('[VideoGenerate] Background render threw', normalizeError(err, 'Video generation error'), getErrorContext(err));
   });
 
   return NextResponse.json(

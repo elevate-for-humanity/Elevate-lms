@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -5,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // Stripe is loaded lazily via getStripeServer() inside each handler.
 import { parseBody } from '@/lib/api-helpers';
 import { apiAuthGuard } from '@/lib/admin/guards';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { createClient } from '@/lib/supabase/server';
 import {
   createCoursePaymentIntent,
@@ -131,7 +132,7 @@ async function _GET(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
   } catch (error) {
-    logger.error('Payments GET error:', error);
+    logger.error('Payments GET error', normalizeError(error, 'Payments GET error'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to fetch payment data' }, { status: 500 });
   }
 }
@@ -303,7 +304,7 @@ async function _POST(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
   } catch (error) {
-    logger.error('Payments POST error:', error);
+    logger.error('Payments POST error', normalizeError(error, 'Payments POST error'), getErrorContext(error));
     return NextResponse.json(
       {
         error: 'Internal server error',

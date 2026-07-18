@@ -1,5 +1,6 @@
-// PUBLIC ROUTE: public career course checkout
 import { logger } from '@/lib/logger';
+// PUBLIC ROUTE: public career course checkout
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -139,7 +140,7 @@ async function _POST(req: Request) {
       url: session.url,
     });
   } catch (error: any) {
-    logger.error('Checkout error:', error);
+    logger.error('Checkout error', normalizeError(error, 'Checkout failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

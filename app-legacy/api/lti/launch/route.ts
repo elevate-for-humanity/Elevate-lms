@@ -8,6 +8,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 const LTI_STATE_COOKIE = 'lti_state';
 
@@ -49,7 +50,7 @@ async function _POST(request: Request) {
   const [cookieState, cookieNonce] = stateCookieValue.split('.');
 
   if (!cookieState || cookieState !== stateParam) {
-    logger.error('[LTI launch] State mismatch — possible CSRF', { stateParam, cookieState });
+    logger.error('[LTI launch] State mismatch — possible CSRF', undefined, { stateParam, cookieState });
     return NextResponse.json(
       { error: 'Invalid state — launch request may have been tampered with' },
       { status: 403 },
@@ -107,7 +108,7 @@ async function _POST(request: Request) {
 
   // ── Step 3b: Validate nonce claim matches cookie nonce ────────────────────
   if (cookieNonce && decoded.nonce && decoded.nonce !== cookieNonce) {
-    logger.error('[LTI launch] Nonce mismatch', { jwtNonce: decoded.nonce, cookieNonce });
+    logger.error('[LTI launch] Nonce mismatch', undefined, { jwtNonce: decoded.nonce, cookieNonce });
     return NextResponse.json({ error: 'Nonce mismatch — replay attack detected' }, { status: 403 });
   }
 

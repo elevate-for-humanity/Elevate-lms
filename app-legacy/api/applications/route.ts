@@ -13,6 +13,7 @@ import { provisionAccount } from '@/lib/enrollment/provision-account';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 // approveApplication is called by /api/admin/applications/[id]/approve - not here
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -471,13 +472,14 @@ async function _POST(req: Request) {
     }
 
     if (error || !data) {
-      logger.error('[api/applications] All insert tiers failed', {
+      logger.error('[api/applications] All insert tiers failed', normalizeError(error, 'All insert tiers failed'), {
         code: (error as any)?.code,
         message: (error as any)?.message,
         details: (error as any)?.details,
         hint: (error as any)?.hint,
         program,
         email: body.email,
+        ...getErrorContext(error),
       });
       return NextResponse.json(
         {

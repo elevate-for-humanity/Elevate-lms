@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
+import { normalizeError } from '@/lib/errors/normalize-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
 import { parseInboundEmail, resolveForwardTarget } from '@/lib/email/sendgrid-inbound';
@@ -51,7 +52,7 @@ async function _POST(request: NextRequest) {
     }
 
     if (!confident) {
-      logger.error('[SendGrid Inbound] Cannot verify idempotency — rejecting for retry', {
+      logger.error('[SendGrid Inbound] Cannot verify idempotency — rejecting for retry', undefined, {
         eventId,
       });
       return NextResponse.json({ error: 'Temporary processing error' }, { status: 503 });

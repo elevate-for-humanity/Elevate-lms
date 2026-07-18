@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getStripe, stripe } from '@/lib/stripe/client';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { injectFailureRedirect } from '@/lib/api/failure-injection';
 
@@ -142,9 +143,7 @@ async function _POST(req: Request) {
     });
 
     if (!session.url) {
-      logger.error('Cart checkout: Stripe session created but no URL returned', {
-        userId: user.id,
-      });
+      logger.error('Cart checkout: Stripe session created but no URL returned', undefined, { userId: user.id });
       return NextResponse.redirect(`${baseUrl}/store/cart?error=checkout-failed`);
     }
 

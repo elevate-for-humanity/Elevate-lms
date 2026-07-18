@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 import { Clock, Plus, Calendar, TrendingUp, Target } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
+import { normalizeError } from '@/lib/errors/normalize-error';
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
 import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
@@ -44,7 +45,7 @@ export default async function ApprenticeHoursPage() {
     .limit(20);
 
   if (error) {
-    logger.error('Error fetching hours:', error.message);
+    logger.error('Error fetching hours', normalizeError(error, 'Error fetching hours'));
   }
 
   const logs = hoursData || [];

@@ -13,6 +13,7 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -81,7 +82,7 @@ async function _POST(req: NextRequest) {
       .maybeSingle();
 
     if (error) {
-      logger.error('Failed to issue credential', { error, data });
+      logger.error('Failed to issue credential', normalizeError(error, 'Failed to issue credential'), { data, ...getErrorContext(error) });
       return NextResponse.json({ error: 'Failed to issue credential' }, { status: 500 });
     }
 
@@ -114,7 +115,7 @@ async function _POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Credential issuance error', { error });
+    logger.error('Credential issuance error', normalizeError(error, 'Credential issuance error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

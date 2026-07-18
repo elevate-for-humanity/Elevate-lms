@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -45,13 +46,13 @@ async function _GET(req: NextRequest) {
     const { data: courses, error } = await query;
 
     if (error) {
-      logger.error('Error fetching courses:', error);
+      logger.error('Error fetching courses', normalizeError(error, 'Failed to fetch courses'), getErrorContext(error));
       return NextResponse.json({ error: 'Failed to fetch courses' }, { status: 500 });
     }
 
     return NextResponse.json({ courses: courses || [] });
   } catch (error) {
-    logger.error('[Course Authoring Error]:', error);
+    logger.error('[Course Authoring Error]', normalizeError(error, 'Course authoring failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -108,7 +109,7 @@ async function _POST(req: NextRequest) {
       .maybeSingle();
 
     if (courseError) {
-      logger.error('Error creating course:', courseError);
+      logger.error('Error creating course', normalizeError(courseError, 'Failed to create course'), getErrorContext(courseError));
       return NextResponse.json({ error: 'Failed to create course' }, { status: 500 });
     }
 
@@ -124,7 +125,7 @@ async function _POST(req: NextRequest) {
       const { error: modulesError } = await supabase.from('course_modules').insert(moduleInserts);
 
       if (modulesError) {
-        logger.error('Error creating modules:', modulesError);
+        logger.error('Error creating modules', normalizeError(modulesError, 'Failed to create modules'), getErrorContext(modulesError));
         // Don't fail the whole request, course is still created
       }
     }
@@ -135,7 +136,7 @@ async function _POST(req: NextRequest) {
       course,
     });
   } catch (error) {
-    logger.error('[Course Creation Error]:', error);
+    logger.error('[Course Creation Error]', normalizeError(error, 'Course creation failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

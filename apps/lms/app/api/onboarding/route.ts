@@ -1,6 +1,7 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth, APIAuthError } from '@/lib/auth';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import {
   startOnboarding,
@@ -49,7 +50,7 @@ async function _GET(request: NextRequest) {
     if (error instanceof APIAuthError) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 401 });
     }
-    logger.error('Onboarding GET error:', error);
+    logger.error('Onboarding GET error', normalizeError(error, 'Failed to fetch onboarding'), getErrorContext(error));
     return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }
@@ -103,7 +104,7 @@ async function _POST(request: NextRequest) {
     if (error instanceof APIAuthError) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 401 });
     }
-    logger.error('Onboarding POST error:', error);
+    logger.error('Onboarding POST error', normalizeError(error, 'Failed to save onboarding'), getErrorContext(error));
     return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

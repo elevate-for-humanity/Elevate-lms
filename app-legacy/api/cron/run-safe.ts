@@ -7,6 +7,7 @@
  *   - Re-throws on failure so the HTTP handler can return 500
  */
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export async function runSafe(
   name: string,
@@ -21,7 +22,7 @@ export async function runSafe(
     return { duration_ms, ...result };
   } catch (error) {
     const duration_ms = Date.now() - start;
-    logger.error(`[CRON FAILED] ${name}`, { duration_ms, error: error instanceof Error ? error.message : String(error) });
+    logger.error(`[CRON FAILED] ${name}`, normalizeError(error, `${name} failed`), { duration_ms, ...getErrorContext(error) });
     throw error;
   }
 }

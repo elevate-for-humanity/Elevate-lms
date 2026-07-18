@@ -24,3 +24,15 @@ if [ -n "$STAGED_FILES" ]; then
   echo "🔍 Running quality gates..."
   ./scripts/quality-gates.sh || exit 1
 fi
+
+# Logger error signature audit — catches object literals, error.message misuse
+echo "🔍 Running logger.error audit..."
+pnpm audit:logger || exit 1
+
+# Case-sensitivity audit — catches skeleton.tsx vs Skeleton.tsx collisions
+echo "🔍 Running path-casing audit..."
+pnpm audit:casing || exit 1
+
+# TypeScript type check on LMS workspace
+echo "🔍 Running TypeScript check..."
+pnpm --filter @elevate/lms exec tsc --noEmit || exit 1

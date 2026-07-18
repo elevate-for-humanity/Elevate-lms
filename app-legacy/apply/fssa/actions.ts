@@ -3,6 +3,7 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { normalizeError, getErrorContext } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { headers } from 'next/headers';
 
@@ -122,7 +123,7 @@ export async function submitFssaApplication(
       .single();
 
     if (error) {
-      logger.error('[fssa-apply] DB error', { message: error.message, code: error.code });
+      logger.error('[fssa-apply] DB error', normalizeError(error, 'DB error'), { code: error.code });
       return { success: false, error: 'Submission failed. Please try again or call us.' };
     }
 
@@ -145,7 +146,7 @@ Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/Indiana/Ind
       subject: `New FSSA IMPACT Application — ${data.firstName} ${data.lastName}`,
       html: `<pre style="font-family:monospace;font-size:14px">${applicationDetails}</pre><br><a href="https://www.elevateforhumanity.org/admin/applications">Review in Admin →</a>`,
       text: `${applicationDetails}\n\nReview at: https://www.elevateforhumanity.org/admin/applications`,
-    }).catch((err) => logger.error('[fssa-apply] Failed to send admin notification email', { error: String(err) }));
+    }).catch((err) => logger.error('[fssa-apply] Failed to send admin notification email', normalizeError(err, 'Failed to send admin notification email')));
 
     // FSSA/DFR IMPACT 50 mailbox notification — archived 2026-07
     // Direct email to IMPACT50@fssa.IN.gov is no longer sent.
@@ -172,12 +173,12 @@ Submitted: ${new Date().toLocaleString('en-US', { timeZone: 'America/Indiana/Ind
 </div>
         `.trim(),
         text: `Hi ${data.firstName},\n\nWe received your FSSA IMPACT application. Here's what happens next:\n\n1. Eligibility review — Our team will review your application and verify your SNAP/TANF status.\n2. Case manager coordination — If you have an IMPACT case manager, we will contact them to confirm funding authorization.\n3. Enrollment decision — You will hear from us within 1–2 business days by phone or email.\n\nQuestions? Call (317) 559-4999 or email enroll@elevateforhumanity.org.\n\nThis application does not guarantee enrollment.\n\n— Elevate for Humanity`,
-      }).catch((err) => logger.error('[fssa-apply] Failed to send applicant confirmation email', { email: data.email, error: String(err) }));
+      }).catch((err) => logger.error('[fssa-apply] Failed to send applicant confirmation email', normalizeError(err, 'Failed to send applicant confirmation email'), { email: data.email }));
     }
 
     return { success: true, applicationId: inserted.id };
   } catch (err) {
-    logger.error('[fssa-apply] Unexpected error', { error: String(err) });
+    logger.error('[fssa-apply] Unexpected error', normalizeError(err, 'Unexpected error'));
     return { success: false, error: 'An unexpected error occurred. Please call us at (317) 559-4999.' };
   }
 }

@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { createZoomMeeting } from '@/lib/integrations/zoom';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -97,7 +98,7 @@ async function _POST(request: Request) {
         zoom_meeting_id: zoomId || null,
       });
       if (dbError) {
-        logger.error('[Schedule] DB insert failed:', dbError.message);
+        logger.error('[Schedule] DB insert failed', normalizeError(dbError, 'DB insert failed'));
       }
 
       // Advance application status from submitted → scheduled so the pipeline reflects the booking

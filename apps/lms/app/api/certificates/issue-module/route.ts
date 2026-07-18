@@ -1,6 +1,7 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -78,7 +79,7 @@ async function _POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, certificate: cert });
   } catch (error) {
-    logger.error('Module certificate error', error as Error);
+    logger.error('Module certificate error', normalizeError(error, 'Module certificate failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

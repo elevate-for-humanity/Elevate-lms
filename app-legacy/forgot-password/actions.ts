@@ -3,6 +3,7 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
+import { normalizeError } from '@/lib/errors/normalize-error';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // Always use the canonical www domain for password reset links.
@@ -52,7 +53,7 @@ export async function sendRecoveryEmail(
 
     if (error) {
       // Don't reveal whether the email exists
-      logger.error('[Recovery] generateLink error:', error.message);
+      logger.error('[Recovery] generateLink error', normalizeError(error, 'generateLink error'));
       return { success: true };
     }
 

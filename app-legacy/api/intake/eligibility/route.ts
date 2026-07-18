@@ -11,6 +11,7 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -163,10 +164,7 @@ async function _POST(req: NextRequest) {
       .eq('id', data.leadId);
 
     if (updateError) {
-      logger.error('Failed to update lead eligibility', {
-        error: updateError,
-        leadId: data.leadId,
-      });
+      logger.error('Failed to update lead eligibility', normalizeError(updateError, 'Failed to update lead eligibility'), { leadId: data.leadId, ...getErrorContext(updateError) });
       return NextResponse.json({ error: 'Failed to update eligibility' }, { status: 500 });
     }
 
@@ -207,7 +205,7 @@ async function _POST(req: NextRequest) {
       });
     }
   } catch (error) {
-    logger.error('Eligibility check error', { error });
+    logger.error('Eligibility check error', normalizeError(error, 'Eligibility check error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

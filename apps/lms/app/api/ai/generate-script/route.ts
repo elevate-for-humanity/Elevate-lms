@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -50,7 +51,7 @@ Write the complete script now:`;
 
     return NextResponse.json({ script: completion.content || '' });
   } catch (error: any) {
-    logger.error('Script generation error:', error);
+    logger.error('Script generation error', normalizeError(error, 'Script generation failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

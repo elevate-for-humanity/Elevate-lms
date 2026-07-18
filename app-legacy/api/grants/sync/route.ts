@@ -14,6 +14,7 @@ import {
   type GrantsGovOpportunity,
 } from '@/lib/integrations/grants-gov';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -50,7 +51,7 @@ async function _POST(request: Request) {
       .maybeSingle();
 
     if (sourceError || !source) {
-      logger.error('Failed to ensure grant source:', sourceError);
+      logger.error('Failed to ensure grant source', normalizeError(sourceError, 'Failed to ensure grant source'), getErrorContext(sourceError));
       return NextResponse.json({ error: 'Failed to ensure grant source' }, { status: 500 });
     }
 
@@ -101,7 +102,7 @@ async function _POST(request: Request) {
       );
 
       if (error) {
-        logger.error('Error upserting grant', { grantId: grant.id, error });
+        logger.error('Error upserting grant', normalizeError(error, 'Error upserting grant'), { grantId: grant.id, ...getErrorContext(error) });
         errors++;
       } else {
         imported++;
@@ -122,7 +123,7 @@ async function _POST(request: Request) {
       },
     });
   } catch (err) {
-    logger.error('Unexpected error during grant sync:', err);
+    logger.error('Unexpected error during grant sync', normalizeError(err, 'Unexpected error during grant sync'), getErrorContext(err));
     return NextResponse.json({ error: 'Unexpected error during grant sync' }, { status: 500 });
   }
 }
@@ -155,7 +156,7 @@ async function _GET(request: Request) {
       upcomingDeadlines: upcomingDeadlines || [],
     });
   } catch (err) {
-    logger.error('Error getting sync status:', err);
+    logger.error('Error getting sync status', normalizeError(err, 'Error getting sync status'), getErrorContext(err));
     return NextResponse.json({ error: 'Failed to get sync status' }, { status: 500 });
   }
 }

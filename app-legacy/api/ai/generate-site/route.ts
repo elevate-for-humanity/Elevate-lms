@@ -7,6 +7,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { saveWebsiteConfig } from '@/lib/websites/save-site-config';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 /**
  * POST /api/ai/generate-site
@@ -88,7 +89,7 @@ Return ONLY valid JSON, no markdown.`;
       const jsonStr = responseText.replace(/```json\n?|\n?```/g, '').trim();
       siteConfig = JSON.parse(jsonStr);
     } catch (parseError) {
-      logger.error('Failed to parse AI response', { responseText });
+      logger.error('Failed to parse AI response', normalizeError(parseError, 'Failed to parse AI response'), { responseText, ...getErrorContext(parseError) });
       // Return default config if parsing fails
       siteConfig = getDefaultConfig(organizationName, organizationType);
     }
@@ -189,7 +190,7 @@ Return ONLY valid JSON, no markdown.`;
       previewUrl: `/preview/${previewId}`,
     });
   } catch (error) {
-    logger.error('AI generation error:', error);
+    logger.error('AI generation error', normalizeError(error, 'AI generation error'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to generate site configuration' }, { status: 500 });
   }
 }

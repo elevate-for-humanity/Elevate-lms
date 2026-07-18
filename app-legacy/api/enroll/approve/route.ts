@@ -7,6 +7,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -65,7 +66,7 @@ async function _POST(req: NextRequest) {
       .maybeSingle();
 
     if (enrollmentError || !enrollment) {
-      logger.error('Enrollment not found', { enrollment_id, enrollmentError });
+      logger.error('Enrollment not found', normalizeError(enrollmentError, 'Enrollment not found'), { enrollment_id, ...getErrorContext(enrollmentError) });
       return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 });
     }
 
@@ -130,7 +131,7 @@ async function _POST(req: NextRequest) {
       .eq('id', enrollment_id);
 
     if (updateEnrollmentError) {
-      logger.error('Failed to activate enrollment', updateEnrollmentError);
+      logger.error('Failed to activate enrollment', normalizeError(updateEnrollmentError, 'Failed to activate enrollment'), getErrorContext(updateEnrollmentError));
       return NextResponse.json({ error: 'Failed to activate enrollment' }, { status: 500 });
     }
 
@@ -146,7 +147,7 @@ async function _POST(req: NextRequest) {
       .eq('id', enrollment.user_id);
 
     if (updateProfileError) {
-      logger.error('Failed to activate profile enrollment_status', updateProfileError);
+      logger.error('Failed to activate profile enrollment_status', normalizeError(updateProfileError, 'Failed to activate profile enrollment_status'), getErrorContext(updateProfileError));
       // Continue - enrollment is already active
     } else {
       logger.info('Profile enrollment_status activated', {
@@ -214,7 +215,7 @@ async function _POST(req: NextRequest) {
       });
 
       if (apprenticeError) {
-        logger.error('Failed to create apprentice record', apprenticeError);
+        logger.error('Failed to create apprentice record', normalizeError(apprenticeError, 'Failed to create apprentice record'), getErrorContext(apprenticeError));
         // Non-fatal - continue with enrollment
       } else {
         logger.info('Apprentice record created', {
@@ -231,10 +232,7 @@ async function _POST(req: NextRequest) {
     );
 
     if (stepsError) {
-      logger.error('Failed to generate enrollment steps', {
-        enrollment_id,
-        error: stepsError,
-      });
+      logger.error('Failed to generate enrollment steps', normalizeError(stepsError, 'Failed to generate enrollment steps'), { enrollment_id, ...getErrorContext(stepsError) });
       // Continue - enrollment is active, steps can be generated manually
     } else {
       logger.info('Enrollment steps generated', {
@@ -381,7 +379,7 @@ async function _POST(req: NextRequest) {
       message: 'Enrollment approved and activated successfully',
     });
   } catch (err: any) {
-    logger.error('Enrollment approval error', err);
+    logger.error('Enrollment approval error', normalizeError(err, 'Enrollment approval error'), getErrorContext(err));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

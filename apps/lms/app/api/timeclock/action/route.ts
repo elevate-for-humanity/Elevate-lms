@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -75,7 +76,7 @@ async function raiseAdminAlert(
       created_at: new Date().toISOString(),
     });
   } catch (error) {
-    logger.error('[Timeclock] Failed to raise admin alert:', error);
+    logger.error('[Timeclock] Failed to raise admin alert', normalizeError(error, 'Admin alert error'), getErrorContext(error));
   }
 
   // Send escalation emails for lunch compliance violations.
@@ -739,7 +740,7 @@ async function _POST(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
   } catch (error) {
-    logger.error('[Timeclock] Unexpected error:', error);
+    logger.error('[Timeclock] Unexpected error', normalizeError(error, 'Timeclock unexpected error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

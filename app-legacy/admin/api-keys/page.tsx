@@ -3,6 +3,8 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { ApiKeysClient, type ApiKey } from './ApiKeysClient';
+import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -16,19 +18,25 @@ export default async function AdminApiKeysPage() {
   await requireRole(['admin', 'super_admin', 'staff']);
   const supabase = await createClient();
 
-  const { data: apiKeys } = await supabase
+  const { data: apiKeys, error } = await supabase
     .from('api_keys')
-    .select('id, name, key_preview, is_active, created_at, last_used_at')
-    .order('created_at', { ascending: false }) as { data: ApiKey[] | null };
+    .select(`
+      id,
+      name,
+      key_preview,
+      is_active,
+      created_at,
+      last_used_at
+    `)
+    .order('created_at', { ascending: false }) as { data: ApiKey[] | null; error: unknown };
 
-  const { count: totalKeys } = await supabase
-    .from('api_keys')
-    .select('*', { count: 'exact', head: true });
-
-  const { count: activeKeys } = await supabase
-    .from('api_keys')
-    .select('*', { count: 'exact', head: true })
-    .eq('is_active', true);
+  if (error) {
+    logger.error(
+      'Failed to load API keys',
+      normalizeError(error, 'Failed to load API keys'),
+      getErrorContext(error)
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -36,9 +44,7 @@ export default async function AdminApiKeysPage() {
         <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'API Keys' }]} />
       </div>
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <ApiKeysClient
-          initialKeys={apiKeys ?? []}
-        />
+        <ApiKeysClient initialKeys={apiKeys ?? []} />
       </div>
     </div>
   );

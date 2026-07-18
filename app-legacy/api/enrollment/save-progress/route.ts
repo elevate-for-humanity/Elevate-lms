@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 async function _POST(req: Request) {
   try {
@@ -59,17 +60,12 @@ async function _POST(req: Request) {
 
     if (error) {
       // Non-fatal — wizard continues even if auto-save fails
-      logger.error('save-progress upsert error:', {
-        code: error.code,
-        message: error.message,
-        userId: user.id,
-        programId,
-      });
+      logger.error('save-progress upsert error', normalizeError(error, 'save-progress upsert error'), { code: error.code, message: error.message, userId: user.id, programId });
     }
 
     return NextResponse.json({ saved: !error });
   } catch (error) {
-    logger.error('save-progress error:', error);
+    logger.error('save-progress error', normalizeError(error, 'save-progress error'), getErrorContext(error));
     // Return 200 so the wizard doesn't surface an error to the user
     return NextResponse.json({ saved: false });
   }

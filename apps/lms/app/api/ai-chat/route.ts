@@ -1,6 +1,7 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -187,7 +188,7 @@ async function _POST(req: NextRequest) {
 
     return NextResponse.json({ reply: fallbackReply, provider: 'demo' });
   } catch (error) {
-    logger.error('Chat API error:', error);
+    logger.error('Chat API error', normalizeError(error, 'Chat API failed'), getErrorContext(error));
     const fallbackReply = `I'm having technical difficulties. Please call ${PLATFORM_DEFAULTS.supportPhone} or visit ${PLATFORM_DEFAULTS.canonicalDomain}/apply to get started!`;
     return NextResponse.json({ reply: fallbackReply, provider: 'demo' });
   }

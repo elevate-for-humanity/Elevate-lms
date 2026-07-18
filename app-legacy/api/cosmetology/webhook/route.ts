@@ -16,6 +16,7 @@ import { createWeeklySubscriptionAfterCheckout } from '@/lib/enrollment/create-w
 import { createOrUpdateEnrollment, linkOrphanedEnrollments } from '@/lib/enrollment-service';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 const LMS_URL =
   (process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl) + '/lms/courses';
@@ -82,7 +83,7 @@ async function _POST(request: NextRequest) {
   try {
     event = constructStripeEventWithAnySecret(stripe, body, signature, webhookSecrets);
   } catch (err) {
-    logger.error('[cosmetology/webhook] Signature verification failed:', err);
+    logger.error('[cosmetology/webhook] Signature verification failed', normalizeError(err, 'Signature verification failed'), getErrorContext(err));
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -137,7 +138,7 @@ async function _POST(request: NextRequest) {
             created_at: new Date().toISOString(),
           });
           if (subRecordError) {
-            logger.error('[cosmetology/webhook] cosmetology_subscriptions insert error:', subRecordError);
+            logger.error('[cosmetology/webhook] cosmetology_subscriptions insert error', normalizeError(subRecordError, 'cosmetology_subscriptions insert error'), getErrorContext(subRecordError));
           }
 
           if (!fullyPaidEnrollment && weeklyPaymentCents > 0 && weeksRemaining > 0) {
@@ -209,7 +210,7 @@ async function _POST(request: NextRequest) {
           });
 
           if (enrollResult.error) {
-            logger.error('[cosmetology/webhook] program_enrollments write failed', { error: enrollResult.error });
+            logger.error('[cosmetology/webhook] program_enrollments write failed', normalizeError(enrollResult.error, 'program_enrollments write failed'), getErrorContext(enrollResult.error));
           } else {
             logger.info(`[cosmetology/webhook] program_enrollments ${enrollResult.action}: ${enrollResult.id}`);
           }
@@ -436,7 +437,7 @@ Amount paid: $${(amountPaidCents / 100).toFixed(2)}</p>
   } catch (err) {
     // Return 200 so Stripe does not disable the endpoint. Event is logged and
     // can be replayed from the Stripe dashboard once the bug is fixed.
-    logger.error('[cosmetology/webhook] Handler error:', err);
+    logger.error('[cosmetology/webhook] Handler error', normalizeError(err, 'Handler error'), getErrorContext(err));
     return NextResponse.json({ received: true, warning: 'handler_error' }, { status: 200 });
   }
 

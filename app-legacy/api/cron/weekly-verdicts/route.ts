@@ -9,6 +9,7 @@ import { withRuntime } from '@/lib/api/withRuntime';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/service';
 import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,7 +31,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
     .limit(100);
 
   if (error) {
-    logger.error('[cron/weekly-verdicts] DB error', { error: error.message });
+    logger.error('[cron/weekly-verdicts] DB error', normalizeError(error, 'DB error'), getErrorContext(error));
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
 
@@ -45,7 +46,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       message: `Submission for ${sub.step_type} (lesson ${sub.lesson_id}) by ${(sub as any).profiles?.full_name ?? sub.user_id} has been pending for ${STALE_DAYS}+ days.`,
       metadata: { submission_id: sub.id, user_id: sub.user_id, lesson_id: sub.lesson_id, submitted_at: sub.submitted_at },
     }).then(undefined, (err) =>
-      logger.error('[cron/weekly-verdicts] Failed to insert admin alert', { submissionId: sub.id, error: String(err) }),
+      logger.error('[cron/weekly-verdicts] Failed to insert admin alert', normalizeError(err, 'Failed to insert admin alert'), { submissionId: sub.id, ...getErrorContext(err) }),
     );
     escalated++;
   }
@@ -57,7 +58,7 @@ export const GET = withRuntime({ cron: 'bearer' }, async () => {
       subject: `${escalated} Submission(s) Awaiting Instructor Review`,
       html: `<p>${escalated} lab/assignment submission(s) have been pending instructor sign-off for ${STALE_DAYS}+ days.</p><p><a href="https://www.elevateforhumanity.org/admin/instructor/submissions">Review Submissions →</a></p>`,
     }).catch((err) =>
-      logger.error('[cron/weekly-verdicts] Failed to send escalation email', { error: String(err) }),
+      logger.error('[cron/weekly-verdicts] Failed to send escalation email', normalizeError(err, 'Failed to send escalation email'), getErrorContext(err)),
     );
   }
 

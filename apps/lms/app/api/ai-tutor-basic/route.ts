@@ -67,7 +67,7 @@ async function _POST(req: NextRequest) {
 
     if (!openAiResponse.ok) {
       const text = await openAiResponse.text();
-      logger.error('OpenAI error', { details: text });
+      logger.error('OpenAI error', new Error(text));
       return NextResponse.json({ error: 'AI service error', details: text }, { status: 502 });
     }
 

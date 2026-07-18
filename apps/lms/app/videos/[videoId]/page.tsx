@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { videos, getVideoById } from '../../../lms-data/videos';
+import { videos, getVideoById } from '../../lms-data/videos';
 import { ArrowLeft } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 

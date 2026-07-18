@@ -22,7 +22,7 @@ const _GET = withErrorHandling(async (request: NextRequest) => {
   } = await supabase.auth.getUser();
 
   if (error) {
-    throw APIErrors.external('Supabase Auth');
+    throw APIErrors.database('Supabase Auth: ' + error.message);
   }
 
   if (!user) {

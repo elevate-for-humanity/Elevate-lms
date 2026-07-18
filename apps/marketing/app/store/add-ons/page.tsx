@@ -10,7 +10,7 @@ import {
   Trophy, 
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import StoreProductVideo from '@/app/store/StoreProductVideo';
+import StoreProductVideo from '@/apps/marketing/app/store/StoreProductVideo';
 
 import { createBrowserClient } from '@supabase/ssr';
 const addOns = [

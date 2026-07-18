@@ -35,7 +35,7 @@ ENV CI=true
 ENV SERVICE_ROLE=lms
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 
-RUN pnpm install --no-frozen-lockfile --strict-peer-dependencies=false
+RUN pnpm install --no-frozen-lockfile
 
 # Build arguments
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org

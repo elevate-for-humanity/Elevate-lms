@@ -28,8 +28,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function CheckoutPage({ searchParams }: { searchParams: { plan?: string } }) {
-  const plan = searchParams.plan as PlanKey;
+export default async function CheckoutPage({ searchParams }: { searchParams: Promise<{ plan?: string }> }) {
+  const { plan: planKey } = await searchParams;
+  const plan = planKey as PlanKey;
 
   // Validate plan
   if (!plan || !PLANS[plan]) {

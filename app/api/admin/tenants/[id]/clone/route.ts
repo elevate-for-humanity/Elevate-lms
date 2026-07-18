@@ -75,7 +75,7 @@ export async function POST(
     sourceName: source.name,
     newName: name,
     subdomain,
-    clonedBy: auth.profile?.id,
+    clonedBy: auth.id,
     trace_id: traceId,
   });
 

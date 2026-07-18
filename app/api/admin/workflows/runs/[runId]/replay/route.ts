@@ -63,7 +63,7 @@ export async function POST(
     runId,
     workflowId: run.workflow_id,
     originalStatus: run.status,
-    replayedBy: auth.profile?.id,
+    replayedBy: auth.id,
     trace_id: traceId,
   });
 
@@ -72,7 +72,7 @@ export async function POST(
   const result = await executeWorkflow(
     run.workflow_id,
     'manual',
-    { ...payload, replayed_from: runId, replayed_by: auth.profile?.id },
+    { ...payload, replayed_from: runId, replayed_by: auth.id },
     undefined,
     traceId,
   );

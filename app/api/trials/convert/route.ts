@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getAdminClient();
+    const supabase = await getAdminClient();
 
     // 1. Get the trial signup
     const { data: trial, error: trialError } = await supabase
@@ -227,7 +227,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const supabase = getAdminClient();
+  const supabase = await getAdminClient();
 
   let query = supabase.from('trial_signups').select('*');
   

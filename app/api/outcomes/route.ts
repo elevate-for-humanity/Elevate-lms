@@ -148,6 +148,6 @@ async function _PATCH(req: NextRequest) {
   return NextResponse.json({ success: true });
 }
 
-export const GET   = withApiAudit(_GET,   { action: 'api:get:/api/outcomes' });
-export const POST  = withApiAudit(_POST,  { action: 'api:post:/api/outcomes' });
-export const PATCH = withApiAudit(_PATCH, { action: 'api:patch:/api/outcomes' });
+export const GET   = withApiAudit('/api/outcomes', _GET,   { action: 'api:get:/api/outcomes' });
+export const POST  = withApiAudit('/api/outcomes', _POST,  { action: 'api:post:/api/outcomes' });
+export const PATCH = withApiAudit('/api/outcomes', _PATCH, { action: 'api:patch:/api/outcomes' });

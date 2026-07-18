@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'sessionId is required' }, { status: 400 });
   }
 
-  const userId = auth.user.id;
+  const userId = auth.id;
 
   // Load conversation history
   const history = await loadHistory(sessionId);

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 async function getPricingData() {
   try {
-    const supabase = getAdminClient();
+    const supabase = await getAdminClient();
     
     const [programsRes, licenseTiersRes, storeProductsRes] = await Promise.all([
       supabase

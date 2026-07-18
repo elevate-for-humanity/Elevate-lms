@@ -259,7 +259,7 @@ export async function generateSF424(
   projectDates: { start: string; end: string },
   funding: SF424Data['funding'],
 ): Promise<SF424Data> {
-  const { data: entity, error: entityError } = await getDb()
+  const { data: entity, error: entityError } = await (await getDb())
     .from('entities')
     .select('*')
     .eq('id', entityId)
@@ -269,7 +269,7 @@ export async function generateSF424(
     throw new Error('Entity not found');
   }
 
-  const { data: grant, error: grantError } = await getDb()
+  const { data: grant, error: grantError } = await (await getDb())
     .from('grant_opportunities')
     .select('*')
     .eq('id', grantId)
@@ -340,7 +340,7 @@ export async function generateSF424A(
   grantId: string,
   budgetData: SF424AData['sections']['budgetCategories'],
 ): Promise<SF424AData> {
-  const { data: grant } = await getDb()
+  const { data: grant } = await (await getDb())
     .from('grant_opportunities')
     .select('*')
     .eq('id', grantId)
@@ -395,13 +395,13 @@ export async function generateSF424A(
  * Generate SF-LLL Lobbying Disclosure form
  */
 export async function generateSFLLL(entityId: string, grantId: string): Promise<SFLLLData> {
-  const { data: entity } = await getDb()
+  const { data: entity } = await (await getDb())
     .from('entities')
     .select('*')
     .eq('id', entityId)
     .maybeSingle();
 
-  const { data: grant } = await getDb()
+  const { data: grant } = await (await getDb())
     .from('grant_opportunities')
     .select('*')
     .eq('id', grantId)

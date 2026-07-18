@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getAdminClient();
+    const supabase = await getAdminClient();
 
     // Get trial to verify it exists and isn't already converted
     const { data: trial, error: trialError } = await supabase

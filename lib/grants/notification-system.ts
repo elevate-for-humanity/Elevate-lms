@@ -185,7 +185,7 @@ async function sendSMSNotification(
  * Get notification recipients
  */
 async function getNotificationRecipients(): Promise<NotificationRecipient[]> {
-  const { data: users } = await getDb()
+  const { data: users } = await (await getDb())
     .from('users')
     .select('id, email, phone, full_name, role')
     .in('role', ['founder', 'admin', 'grant_admin']);
@@ -268,7 +268,7 @@ export async function sendGrantNotification(
  * Notify when draft is generated
  */
 export async function notifyDraftGenerated(applicationId: string): Promise<void> {
-  const { data: app } = await getDb()
+  const { data: app } = await (await getDb())
     .from('grant_applications')
     .select('*, grant:grant_opportunities(title), entity:entities(name)')
     .eq('id', applicationId)
@@ -295,7 +295,7 @@ export async function notifyDraftGenerated(applicationId: string): Promise<void>
  * Notify when package is ready
  */
 export async function notifyPackageReady(applicationId: string): Promise<void> {
-  const { data: app } = await getDb()
+  const { data: app } = await (await getDb())
     .from('grant_applications')
     .select('*, grant:grant_opportunities(title, due_date), entity:entities(name)')
     .eq('id', applicationId)
@@ -327,7 +327,7 @@ export async function notifyGrantSubmitted(
   submittedBy: string,
   confirmationNumber?: string,
 ): Promise<void> {
-  const { data: app } = await getDb()
+  const { data: app } = await (await getDb())
     .from('grant_applications')
     .select('*, grant:grant_opportunities(title), entity:entities(name)')
     .eq('id', applicationId)
@@ -363,7 +363,7 @@ export async function notifyDeadlineApproaching(
   grantId: string,
   daysRemaining: number,
 ): Promise<void> {
-  const { data: grant } = await getDb()
+  const { data: grant } = await (await getDb())
     .from('grant_opportunities')
     .select('*, applications:grant_applications(id, entity:entities(name))')
     .eq('id', grantId)

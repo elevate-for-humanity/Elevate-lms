@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
   if (!db) return safeError('Service unavailable', 503);
 
   const { error } = await db.from('attendance_log').insert({
-    user_id: auth.user.id,
+    user_id: auth.id,
     action: 'checkin',
     details: {
       program: 'cosmetology',

@@ -6,9 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-const supabase = createClient();
-
 export async function GET(request: NextRequest) {
+  const supabase = await createClient();
   const { searchParams } = new URL(request.url);
   const programId = searchParams.get('program_id');
   const includeRelations = searchParams.get('include')?.split(',') || ['modules', 'courses', 'lessons', 'competencies', 'assessments'];
@@ -67,6 +66,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const supabase = await createClient();
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -27,7 +27,7 @@ async function _POST(request: NextRequest) {
       return safeError('prompt is required', 400);
     }
 
-    const tenantId = await resolveTenantIdForUser(auth.user.id);
+    const tenantId = await resolveTenantIdForUser(auth.id);
     const db = await requireAdminClient();
 
     let workspaceId: string | null = body.workspaceId ?? null;
@@ -53,7 +53,7 @@ async function _POST(request: NextRequest) {
 
     const result = await runCustomerOperator({
       prompt,
-      userId: auth.user.id,
+      userId: auth.id,
       workspaceId,
       organizationId,
     });

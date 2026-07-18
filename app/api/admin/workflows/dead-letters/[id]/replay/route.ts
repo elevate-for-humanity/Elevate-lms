@@ -65,7 +65,7 @@ export async function POST(
     workflowId: dl.workflow_id,
     actionType: dl.action_type,
     originalAttempts: dl.attempts,
-    replayedBy: auth.profile?.id,
+    replayedBy: auth.id,
     trace_id: traceId,
   });
 
@@ -74,7 +74,7 @@ export async function POST(
   const result = await executeWorkflow(
     dl.workflow_id,
     'manual',
-    { ...payload, dead_letter_replay: true, dead_letter_id: id, replayed_by: auth.profile?.id },
+    { ...payload, dead_letter_replay: true, dead_letter_id: id, replayed_by: auth.id },
     undefined,
     traceId,
   );
@@ -82,7 +82,7 @@ export async function POST(
   // Mark dead letter as replayed
   await db
     .from('workflow_dead_letters')
-    .update({ replayed_at: new Date().toISOString(), replayed_by: auth.profile?.id } as any)
+    .update({ replayed_at: new Date().toISOString(), replayed_by: auth.id } as any)
     .eq('id', id)
     .then(undefined, (err) =>
       logger.warn('[dead-letter-replay] Failed to mark dead letter as replayed', { id, error: String(err) }),

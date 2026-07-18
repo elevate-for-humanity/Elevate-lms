@@ -46,14 +46,14 @@ export async function POST(request: NextRequest) {
       toolName as StudioToolName,
       args,
       courseId,
-      auth.user.id,
+      auth.id,
       db,
     );
 
     logger.info('[studio/tool-execute]', {
       toolName,
       courseId,
-      userId: auth.user.id,
+      userId: auth.id,
       ok: result.ok,
     });
 

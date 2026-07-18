@@ -187,7 +187,7 @@ export async function recordEmailSubmission(
     attachments: string[];
   },
 ): Promise<SubmissionRecord> {
-  const { data: app } = await getDb()
+  const { data: app } = await (await getDb())
     .from('grant_applications')
     .select('grant_id, entity_id')
     .eq('id', applicationId)
@@ -222,7 +222,7 @@ export async function recordPortalSubmission(
     confirmationReceipt?: string;
   },
 ): Promise<SubmissionRecord> {
-  const { data: app } = await getDb()
+  const { data: app } = await (await getDb())
     .from('grant_applications')
     .select('grant_id, entity_id')
     .eq('id', applicationId)
@@ -252,7 +252,7 @@ export async function recordPortalSubmission(
 export async function getSubmissionHistory(
   applicationId: string,
 ): Promise<SubmissionRecord | null> {
-  const { data, error }: any = await getDb()
+  const { data, error }: any = await (await getDb())
     .from('grant_submissions')
     .select('*')
     .eq('application_id', applicationId)
@@ -284,7 +284,7 @@ export async function getSubmissionHistory(
  * Get all submissions
  */
 export async function getAllSubmissions(): Promise<SubmissionRecord[]> {
-  const { data, error }: any = await getDb()
+  const { data, error }: any = await (await getDb())
     .from('grant_submissions')
     .select('*')
     .order('submitted_at', { ascending: false });
@@ -333,7 +333,7 @@ export async function checkDeadlinesAndNotify(): Promise<void> {
     const endOfDay = new Date(targetDate);
     endOfDay.setHours(23, 59, 59, 999);
 
-    const { data: grants } = await getDb()
+    const { data: grants } = await (await getDb())
       .from('grant_opportunities')
       .select('id, title, due_date')
       .gte('due_date', startOfDay.toISOString())

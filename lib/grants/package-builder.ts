@@ -45,7 +45,7 @@ export interface PackageAttachment {
  * Generate Word document from grant narrative
  */
 export async function generateNarrativeDocx(applicationId: string): Promise<Buffer> {
-  const { data: app, error } = await getDb()
+  const { data: app, error } = await (await getDb())
     .from('grant_applications')
     .select('*, grant:grant_opportunities(*), entity:entities(*)')
     .eq('id', applicationId)
@@ -113,7 +113,7 @@ export async function generateNarrativeDocx(applicationId: string): Promise<Buff
  * Generate PDF from narrative (using HTML to PDF conversion)
  */
 export async function generateNarrativePdf(applicationId: string): Promise<Buffer> {
-  const { data: app, error } = await getDb()
+  const { data: app, error } = await (await getDb())
     .from('grant_applications')
     .select('*, grant:grant_opportunities(*), entity:entities(*)')
     .eq('id', applicationId)
@@ -213,7 +213,7 @@ function convertMarkdownToHtml(markdown: string): string {
  * Generate capability statement PDF
  */
 export async function generateCapabilityStatement(entityId: string): Promise<Buffer> {
-  const { data: entity, error } = await getDb()
+  const { data: entity, error } = await (await getDb())
     .from('entities')
     .select('*')
     .eq('id', entityId)
@@ -326,7 +326,7 @@ export async function generateCapabilityStatement(entityId: string): Promise<Buf
  * Generate budget spreadsheet (simplified Excel format)
  */
 export async function generateBudgetSpreadsheet(applicationId: string): Promise<Buffer> {
-  const { data: app, error } = await getDb()
+  const { data: app, error } = await (await getDb())
     .from('grant_applications')
     .select('*')
     .eq('id', applicationId)

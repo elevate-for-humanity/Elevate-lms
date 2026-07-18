@@ -38,9 +38,9 @@ async function main() {
     process.exit(1);
   }
 
-  // Get current SHA
+  // Get current SHA and pass as build argument
   const currentSha = process.env.GITHUB_SHA || process.env.VERCEL_GIT_COMMIT_SHA || '';
-  
+
   // Check for existing build with same SHA
   if (currentSha) {
     const recentBuilds = await getRecentBuilds(projectId, serviceId, currentSha);
@@ -66,7 +66,14 @@ async function main() {
     concluded?: boolean;
   }>(projectApiPath(projectId, `/services/${serviceId}/build`), {
     method: 'POST',
-    body: JSON.stringify({}),
+    body: JSON.stringify({
+      sha: currentSha,
+      buildArgs: currentSha ? {
+        GITHUB_SHA: currentSha,
+        NEXT_PUBLIC_GIT_SHA: currentSha,
+        NEXT_PUBLIC_BUILD_VERSION: currentSha,
+      } : undefined,
+    }),
   });
   console.log(`Triggered build for ${serviceId}:`, build);
 

@@ -9,12 +9,11 @@
  * This is the zero-cost fallback when Synthesia / D-ID / Sora are unavailable.
  */
 
+import 'server-only';
+
 import path from 'path';
 import os from 'os';
 import { mkdir, writeFile, unlink } from 'fs/promises';
-import { bundle } from '@remotion/bundler';
-import { renderMedia, selectComposition } from '@remotion/renderer';
-import { registerUsageEvent } from '@remotion/licensing';
 import { generateEdgeTTS, buildLessonScript, EDGE_TTS_VOICES, type EdgeTTSVoice } from './edge-tts';
 import { getPexelsImage } from './pexels';
 import { logger } from '@/lib/logger';
@@ -180,6 +179,8 @@ async function getBundleUrl(): Promise<string> {
   logger.info('[RemotionRender] Bundling Remotion composition...');
   const entryPoint = path.join(process.cwd(), 'remotion-src', 'index.ts');
 
+  // Dynamic import — keeps Remotion out of the Next.js webpack bundle
+  const { bundle } = await import('@remotion/bundler');
   _bundleUrl = await bundle({
     entryPoint,
     // Webpack override: mark Node-only modules as external so they don't
@@ -263,6 +264,10 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     logger.info(`[RemotionRender] Rendering MP4 (${totalFrames} frames @ 30fps = ${duration}s)`);
 
     const bundleUrl = await getBundleUrl();
+
+    // Dynamic imports — keep Remotion renderer out of Next.js webpack bundle
+    const { renderMedia, selectComposition } = await import('@remotion/renderer');
+    const { registerUsageEvent } = await import('@remotion/licensing');
 
     const composition = await selectComposition({
       serveUrl: bundleUrl,

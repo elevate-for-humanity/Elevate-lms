@@ -68,11 +68,12 @@ async function main() {
     method: 'POST',
     body: JSON.stringify({
       sha: currentSha,
-      buildArgs: currentSha ? {
-        GITHUB_SHA: currentSha,
-        NEXT_PUBLIC_GIT_SHA: currentSha,
-        NEXT_PUBLIC_BUILD_VERSION: currentSha,
-      } : undefined,
+      buildArgs: {
+        GITHUB_SHA: currentSha || 'unknown',
+        NEXT_PUBLIC_GIT_SHA: currentSha || 'unknown',
+        NEXT_PUBLIC_BUILD_VERSION: currentSha || 'unknown',
+        BUILD_TIMESTAMP: new Date().toISOString(),
+      },
     }),
   });
   console.log(`Triggered build for ${serviceId}:`, build);

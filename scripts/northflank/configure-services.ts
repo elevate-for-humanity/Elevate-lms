@@ -35,6 +35,10 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
       NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
       NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
       NEXT_PUBLIC_LMS_URL: 'https://www.elevateforhumanity.org/lms',
+      // Supabase credentials
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
       // Stripe - set via Northflank secrets
       STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
       STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || '',
@@ -53,6 +57,10 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
       NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
       NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
       NEXT_PUBLIC_LMS_URL: 'https://www.elevateforhumanity.org/lms',
+      // Supabase credentials
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
       // Stripe - set via Northflank secrets
       STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
       STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || '',
@@ -71,6 +79,10 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
       NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
       NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
       NEXT_PUBLIC_LMS_URL: 'https://www.elevateforhumanity.org/lms',
+      // Supabase credentials
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
       // Stripe - set via Northflank secrets
       STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
       STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || '',

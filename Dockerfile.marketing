@@ -1,22 +1,21 @@
-# Dockerfile.marketing - Independent Marketing Next.js build
-# Builds ONLY apps/marketing/ (not the monolith)
-# Serves www.elevateforhumanity.org
-#
-# Northflank Configuration:
-#   - Build type: Dockerfile
-#   - Dockerfile path: /Dockerfile.marketing
-#   - Build context: /
-#   - Internal port: 3000
+# Dockerfile.marketing
+# Specialized for Public Pages / (marketing) / store
 
 FROM node:22-bookworm AS builder
 
-RUN echo "nf-cache-invalidate-mkt-3000"
+# Cache invalidation marker
+RUN echo "nf-cache-invalidate-ae9cfbf-mkt"
 
-# Native deps for sharp, canvas, pdf, etc.
+# System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 build-essential ca-certificates \
-    libcairo2-dev libpango1.0-dev libjpeg-dev \
-    libgif-dev librsvg2-dev gnupg \
+    python3 \
+    build-essential \
+    ca-certificates \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libjpeg-dev \
+    libgif-dev \
+    librsvg2-dev \
     && rm -rf /var/lib/apt/lists/*
 
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
@@ -26,10 +25,8 @@ ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /app
 
-# Copy manifests - needs root-level monorepo files
+# Copy manifests and source
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/marketing/package.json apps/marketing/package.json
-COPY apps/lms/package.json apps/lms/package.json
 COPY apps/admin/package.json apps/admin/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
@@ -38,14 +35,16 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS=--max-old-space-size=12288
+ENV NODE_OPTIONS=--max-old-space-size=8192
+ENV NEXT_STANDALONE_OUTPUT=1
+ENV BUILD_SCOPE=MARKETING
 ENV CI=true
-ENV SERVICE_ROLE=marketing
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 
+# Install dependencies
 RUN pnpm install --no-frozen-lockfile
 
-# Build arguments
+# Build Marketing
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
 ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
 ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
@@ -56,9 +55,8 @@ ARG STRIPE_SECRET_KEY
 ARG STRIPE_WEBHOOK_SECRET
 ARG SENDGRID_API_KEY
 ARG RESEND_API_KEY
+ARG ADMIN_API_KEY
 ARG GITHUB_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
-
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
@@ -69,47 +67,42 @@ ENV STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY
 ENV STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET
 ENV SENDGRID_API_KEY=$SENDGRID_API_KEY
 ENV RESEND_API_KEY=$RESEND_API_KEY
+ENV ADMIN_API_KEY=$ADMIN_API_KEY
 ENV GITHUB_SHA=$GITHUB_SHA
 ENV NEXT_PUBLIC_GIT_SHA=$GITHUB_SHA
 ENV NEXT_PUBLIC_BUILD_ID=$GITHUB_SHA
 ENV BUILD_ID=$GITHUB_SHA
-ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 
-# Build Marketing independently — NO split-app.mjs
-RUN pnpm --filter @elevate/marketing build --no-lint
-
-# INSPECTION: Show actual standalone runtime structure
-RUN echo "=== MARKETING STANDALONE STRUCTURE ===" \
- && find /app/apps/marketing/.next/standalone -maxdepth 5 -type f 2>/dev/null | sort \
- || echo "No marketing standalone directory found"
+RUN pnpm exec cross-env BUILD_SCOPE=MARKETING next build
 
 # --- runtime stage ---
 FROM node:22-bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl fonts-liberation \
+    ca-certificates \
+    curl \
+    fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
-ENV PORT=3000
+ENV PORT=8080
 
 WORKDIR /app
 
-COPY --from=builder /app/apps/marketing/.next/standalone ./
-COPY --from=builder /app/apps/marketing/.next/static ./apps/marketing/.next/static
-COPY --from=builder /app/apps/marketing/.next/server ./apps/marketing/.next/server
-COPY --from=builder /app/apps/marketing/public ./public
+# Copy standalone build
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/.next/server ./.next/server
+COPY --from=builder /app/public ./public
 
-# Copy custom server.js (matches LMS pattern)
-COPY --from=builder /app/apps/marketing/server.js ./apps/marketing/server.js
-
+# Copy full node_modules from builder (preserves pnpm symlinks)
 COPY --from=builder /app/node_modules ./node_modules
 
-EXPOSE 3000
+EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -sf http://127.0.0.1:3000/api/version || exit 1
+  CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
 
-CMD ["node", "--max-http-header-size=32768", "apps/marketing/server.js"]
+CMD ["node", "--max-http-header-size=32768", "server.js"]

@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { DollarSign, Phone, XCircle } from 'lucide-react';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Payment Cancelled',
   description: 'Your payment was cancelled. You can try again anytime.',

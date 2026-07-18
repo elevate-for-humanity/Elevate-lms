@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import './layout.css';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: { default: 'Elevate LMS', template: '%s | Elevate LMS' },
   description: 'Learning management system for vocational education',

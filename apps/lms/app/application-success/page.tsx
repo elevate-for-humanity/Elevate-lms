@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { generateMetadata } from '@/lib/seo/metadata';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = generateMetadata({
   title: 'Application-Success',
   description:

@@ -6,7 +6,7 @@ import { getAllLiveVideos, getAllCategories } from '@/lib/video/registry';
 import { Play } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Training Videos',
   description:

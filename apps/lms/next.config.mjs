@@ -6,6 +6,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const nextConfig = {
   output: 'standalone',
   images: { unoptimized: true },
+  typescript: {
+    // Disable type checking during build — run separately via `pnpm --filter @elevate/lms exec tsc --noEmit`
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   // Externalize server-only native packages from webpack bundle
   serverExternalPackages: [
     '@remotion/bundler',

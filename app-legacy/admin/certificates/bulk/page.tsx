@@ -124,14 +124,10 @@ export default async function BulkCertificatesPage({
         {activeTab === 'issue' ? (
           <BulkIssueForm
             templates={templates ?? []}
-            eligibleParticipants={eligibleParticipants}
-            eligibleCount={eligibleCount ?? 0}
           />
         ) : (
           <BulkCertificationsClient
-            pendingCertifications={pendingCertifications}
-            certificationTypes={certificationTypes ?? []}
-            pendingCount={pendingCount ?? 0}
+            certificates={pendingCertifications}
           />
         )}
       </div>

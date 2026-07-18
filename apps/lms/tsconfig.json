@@ -8,16 +8,30 @@
     ]
   },
   "include": [
-    "../../**/*.ts",
-    "../../**/*.tsx",
-    "../../**/*.js",
-    "../../**/*.mjs",
+    "app/**/*.ts",
+    "app/**/*.tsx",
     "./**/*.ts",
     "./**/*.tsx",
     "./**/*.js",
-    "./**/*.mjs"
+    "./**/*.mjs",
+    "../../lib/**/*.ts",
+    "../../lib/**/*.tsx",
+    "../../components/**/*.ts",
+    "../../components/**/*.tsx",
+    "../../packages/db/**/*.ts",
+    "../../packages/db/**/*.tsx",
+    "../../packages/shared/**/*.ts",
+    "../../packages/shared/**/*.tsx",
+    "../../lms-data/**/*.ts",
+    "../../lms-data/**/*.tsx",
+    "../../data/**/*.ts",
+    "../../data/**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "../../app-legacy",
+    "../../apps/admin",
+    "../../apps/marketing",
+    "../../packages/ui"
   ]
 }

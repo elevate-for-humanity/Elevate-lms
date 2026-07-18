@@ -1,10 +1,16 @@
 ﻿# Dockerfile.northflank-lms
-# Fresh rewrite for Elevate LMS (root Next.js app)
+# Builds and serves the LMS application (apps/lms/)
+# Serves app.elevateforhumanity.org
+#
+# Northflank Configuration:
+#   - Build type: Dockerfile
+#   - Dockerfile path: /Dockerfile.northflank-lms
+#   - Build context: /
 
 FROM node:22-bookworm AS builder
 
-# Cache invalidation marker - updated for memory/native module fix
-RUN echo "nf-cache-invalidate-2026-07-08-v1-memory-fix"
+# Cache invalidation marker - fixed standalone paths
+RUN echo "nf-cache-invalidate-lms-fix-copy-paths-2026-07-18"
 
 # Install system deps for native modules (sharp, canvas, pdf)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -47,7 +53,7 @@ ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 # Install dependencies with strict peer checking disabled for compatibility
 RUN pnpm install --no-frozen-lockfile --strict-peer-dependencies=false
 
-# Build Next.js
+# Build Next.js LMS app
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
 ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
 ARG NEXT_PUBLIC_SUPABASE_URL
@@ -91,11 +97,11 @@ ENV NODE_OPTIONS=--max-old-space-size=8192 --gc-interval=100
 
 WORKDIR /app
 
-# Copy standalone build
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/.next/server ./.next/server
-COPY --from=builder /app/public ./public
+# Copy standalone build - ALL paths must reference apps/lms/.next/
+COPY --from=builder /app/apps/lms/.next/standalone ./
+COPY --from=builder /app/apps/lms/.next/static ./.next/static
+COPY --from=builder /app/apps/lms/.next/server ./.next/server
+COPY --from=builder /app/apps/lms/public ./public
 
 # Copy full node_modules from builder (preserves pnpm symlinks)
 COPY --from=builder /app/node_modules ./node_modules

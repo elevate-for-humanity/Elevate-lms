@@ -1,10 +1,15 @@
 # Dockerfile.northflank-admin
 # Optimized for Admin routes ONLY
+#
+# Northflank Configuration:
+#   - Build type: Dockerfile
+#   - Dockerfile path: /Dockerfile.northflank-admin
+#   - Build context: /
 
 FROM node:22-bookworm AS builder
 
 # Cache invalidation marker — fixed standalone paths and health check
-RUN echo "nf-cache-invalidate-admin-fix-paths"
+RUN echo "nf-cache-invalidate-admin-fix-copy-paths-2026-07-18"
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -81,11 +86,11 @@ ENV PORT=8080
 
 WORKDIR /app
 
-# Copy standalone build (monorepo root = /app)
+# Copy standalone build - ALL paths must reference apps/admin/.next/
 COPY --from=builder /app/apps/admin/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/.next/server ./.next/server
-COPY --from=builder /app/public ./public
+COPY --from=builder /app/apps/admin/.next/static ./.next/static
+COPY --from=builder /app/apps/admin/.next/server ./.next/server
+COPY --from=builder /app/apps/admin/public ./public
 
 # Copy full node_modules from builder (preserves pnpm symlinks)
 COPY --from=builder /app/node_modules ./node_modules

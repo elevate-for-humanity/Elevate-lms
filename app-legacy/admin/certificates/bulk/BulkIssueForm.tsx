@@ -9,7 +9,24 @@ type Template = {
   description: string;
 };
 
-export default function BulkIssueForm({ templates }: { templates: Template[] }) {
+interface Participant {
+  id: string;
+  user_id: string;
+  course_id: string;
+  completed_at: string | null;
+  profiles: { full_name: string; email: string } | null;
+  courses: { title: string } | null;
+}
+
+export default function BulkIssueForm({
+  templates,
+  eligibleParticipants = [],
+  eligibleCount = 0,
+}: {
+  templates: Template[];
+  eligibleParticipants?: Participant[];
+  eligibleCount?: number;
+}) {
   const [templateId, setTemplateId] = useState('');
   const [csvData, setCsvData] = useState('');
   const [loading, setLoading] = useState(false);

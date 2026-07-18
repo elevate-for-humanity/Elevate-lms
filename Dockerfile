@@ -1,0 +1,86 @@
+# Dockerfile.marketing - Independent Marketing Next.js build
+# Builds ONLY apps/marketing/ (not the monolith)
+# Serves www.elevateforhumanity.org
+
+FROM node:22-bookworm AS builder
+
+RUN echo "nf-cache-invalidate-mkt-v8-debug"
+
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+
+ENV PNPM_HOME="/app/.pnpm-home"
+ENV PATH="$PNPM_HOME:$PATH"
+WORKDIR /app
+
+# Copy manifests
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/marketing/package.json apps/marketing/package.json
+COPY apps/lms/package.json apps/lms/package.json
+COPY apps/admin/package.json apps/admin/package.json
+COPY packages/db/package.json packages/db/package.json
+COPY packages/shared/package.json packages/shared/package.json
+COPY packages/ui/package.json packages/ui/package.json
+COPY . .
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS=--max-old-space-size=8192
+ENV CI=true
+
+RUN pnpm install --no-frozen-lockfile
+
+# Build arguments
+ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
+ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
+ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG GITHUB_SHA=unknown
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV GITHUB_SHA=$GITHUB_SHA
+ENV NEXT_PUBLIC_GIT_SHA=$GITHUB_SHA
+ENV NEXT_PUBLIC_BUILD_ID=$GITHUB_SHA
+ENV BUILD_ID=$GITHUB_SHA
+
+# DEBUG: Show workspace packages
+RUN echo "=== WORKSPACE PACKAGES ===" && cat package.json | grep -A20 '"packages"' || echo "No packages section"
+
+# Build Marketing independently
+RUN echo "=== STARTING BUILD ===" && pnpm --filter @elevate/marketing build --no-lint 2>&1 || { echo "=== BUILD FAILED ===" && find /app -name "*.log" -type f 2>/dev/null | head -10; exit 1; }
+
+# DEBUG: Inspect standalone output
+RUN echo "=== STANDALONE OUTPUT ===" && find /app/apps/marketing/.next/standalone -maxdepth 5 -type f 2>/dev/null | sort | head -50
+
+# --- runtime stage ---
+FROM node:22-bookworm-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl fonts-liberation \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV HOSTNAME=0.0.0.0
+ENV PORT=8080
+
+WORKDIR /app
+
+COPY --from=builder /app/apps/marketing/.next/standalone ./
+COPY --from=builder /app/apps/marketing/.next/static ./.next/static
+COPY --from=builder /app/apps/marketing/.next/server ./.next/server
+COPY --from=builder /app/apps/marketing/public ./public
+
+# Copy full node_modules from builder
+COPY --from=builder /app/node_modules ./node_modules
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+  CMD curl -sf http://127.0.0.1:8080/api/version || exit 1
+
+CMD ["node", "--max-http-header-size=32768", "server.js"]

@@ -11,7 +11,8 @@ export const dynamic = 'force-dynamic';
 
 const ADMIN_ROLES = new Set(['admin', 'admin', 'staff', 'org_admin']);
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   const auth = await apiAuthGuard(request);
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   try {
     const db = await requireAdminClient();
     if (!db) return safeError('Service unavailable', 503);
-    let query = db.from('program_enrollments').select('*').eq('id', params.id);
+    let query = db.from('program_enrollments').select('*').eq('id', id);
     if (!ADMIN_ROLES.has(auth.role ?? '')) query = query.eq('user_id', auth.id);
     const { data, error } = await query.maybeSingle();
     if (error) return safeDbError(error, 'Enrollment lookup failed');

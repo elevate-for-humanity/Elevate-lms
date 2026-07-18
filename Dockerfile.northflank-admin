@@ -8,8 +8,8 @@
 
 FROM node:22-bookworm AS builder
 
-# Cache invalidation marker — fixed standalone paths and health check
-RUN echo "nf-cache-invalidate-admin-fix-copy-paths-2026-07-18"
+# Cache invalidation marker
+RUN echo "nf-cache-invalidate-admin-2026-07-18-v2"
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -86,11 +86,14 @@ ENV PORT=8080
 
 WORKDIR /app
 
-# Copy standalone build - ALL paths must reference apps/admin/.next/
+# Copy standalone build artifacts
 COPY --from=builder /app/apps/admin/.next/standalone ./
 COPY --from=builder /app/apps/admin/.next/static ./.next/static
 COPY --from=builder /app/apps/admin/.next/server ./.next/server
 COPY --from=builder /app/apps/admin/public ./public
+
+# Copy custom server.js with monitoring and recovery logic
+COPY --from=builder /app/apps/admin/server.js ./apps/admin/server.js
 
 # Copy full node_modules from builder (preserves pnpm symlinks)
 COPY --from=builder /app/node_modules ./node_modules
@@ -101,4 +104,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -sf http://127.0.0.1:8080/api/ping || curl -sf http://127.0.0.1:8080/ || exit 1
 
-CMD ["node", "--max-http-header-size=32768", "server.js"]
+# Use custom server.js with monitoring and recovery
+CMD ["node", "--max-http-header-size=32768", "apps/admin/server.js"]

@@ -97,11 +97,14 @@ ENV NODE_OPTIONS=--max-old-space-size=8192 --gc-interval=100
 
 WORKDIR /app
 
-# Copy standalone build - ALL paths must reference apps/lms/.next/
+# Copy standalone build artifacts
 COPY --from=builder /app/apps/lms/.next/standalone ./
 COPY --from=builder /app/apps/lms/.next/static ./.next/static
 COPY --from=builder /app/apps/lms/.next/server ./.next/server
 COPY --from=builder /app/apps/lms/public ./public
+
+# Copy custom server.js
+COPY --from=builder /app/apps/lms/server.js ./apps/lms/server.js
 
 # Copy full node_modules from builder (preserves pnpm symlinks)
 COPY --from=builder /app/node_modules ./node_modules
@@ -111,4 +114,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
 
-CMD ["node", "--max-http-header-size=32768", "server.js"]
+# Use custom server.js
+CMD ["node", "--max-http-header-size=32768", "apps/lms/server.js"]

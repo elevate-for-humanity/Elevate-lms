@@ -88,8 +88,8 @@ ENV PORT=3000
 WORKDIR /app
 
 COPY --from=builder /app/apps/marketing/.next/standalone ./
-COPY --from=builder /app/apps/marketing/.next/static ./.next/static
-COPY --from=builder /app/apps/marketing/.next/server ./.next/server
+COPY --from=builder /app/apps/marketing/.next/static ./apps/marketing/.next/static
+COPY --from=builder /app/apps/marketing/.next/server ./apps/marketing/.next/server
 COPY --from=builder /app/apps/marketing/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 

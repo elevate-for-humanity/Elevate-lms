@@ -101,7 +101,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Build Marketing
-        run: pnpm exec cross-env BUILD_SCOPE=MARKETING next build
+        run: pnpm run build:marketing
         env:
           NODE_OPTIONS: --max-old-space-size=6144
           BUILD_SCOPE: MARKETING

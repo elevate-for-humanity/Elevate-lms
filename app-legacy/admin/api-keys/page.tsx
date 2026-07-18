@@ -37,9 +37,7 @@ export default async function AdminApiKeysPage() {
       </div>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <ApiKeysClient
-          apiKeys={apiKeys ?? []}
-          totalKeys={totalKeys ?? 0}
-          activeKeys={activeKeys ?? 0}
+          initialKeys={apiKeys ?? []}
         />
       </div>
     </div>

@@ -2,7 +2,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { ApiKeysClient } from './ApiKeysClient';
+import { ApiKeysClient, type ApiKey } from './ApiKeysClient';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -18,8 +18,8 @@ export default async function AdminApiKeysPage() {
 
   const { data: apiKeys } = await supabase
     .from('api_keys')
-    .select('id, name, is_active, created_at, last_used_at')
-    .order('created_at', { ascending: false });
+    .select('id, name, key_preview, is_active, created_at, last_used_at')
+    .order('created_at', { ascending: false }) as { data: ApiKey[] | null };
 
   const { count: totalKeys } = await supabase
     .from('api_keys')

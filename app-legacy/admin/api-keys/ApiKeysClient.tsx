@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Loader2, Plus, Trash2, Copy, CheckCircle } from 'lucide-react';
 
-type ApiKey = {
+export type ApiKey = {
   id: string;
   name: string;
   key_preview: string;

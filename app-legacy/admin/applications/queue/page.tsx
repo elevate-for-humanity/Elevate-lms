@@ -40,7 +40,7 @@ const PRIORITY_STYLES: Record<number, { label: string; color: string; bg: string
 };
 
 // Failure reason icons
-const REASON_ICONS: Record<string, React.ElementType> = {
+const REASON_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   'fee': CreditCard,
   'payment': CreditCard,
   'document': FileText,
@@ -50,12 +50,12 @@ const REASON_ICONS: Record<string, React.ElementType> = {
   'account': User,
 };
 
-function getReasonIcon(reason: string): React.ElementType {
+function getReasonIcon(reason: string): React.ComponentType<{ className?: string }> {
   const lower = reason.toLowerCase();
   for (const [key, Icon] of Object.entries(REASON_ICONS)) {
     if (lower.includes(key)) return Icon;
   }
-  return AlertTriangle;
+  return AlertTriangle as React.ComponentType<{ className?: string }>;
 }
 
 function getDaysInQueue(queueEnteredAt: string | null): number {

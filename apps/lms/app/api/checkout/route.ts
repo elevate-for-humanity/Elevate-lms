@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { billingConfigs } from '../../lms-data/billingConfig';
+import { billingConfigs } from '@/lms-data/billingConfig';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';

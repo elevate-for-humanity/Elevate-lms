@@ -245,6 +245,14 @@ export interface SecurityRisk {
   recommendation: string;
 }
 
+export interface SecurityFlag {
+  type: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  location: string;
+  description: string;
+  recommendation: string;
+}
+
 export interface LicensingConcern {
   license: string;
   implications: string;

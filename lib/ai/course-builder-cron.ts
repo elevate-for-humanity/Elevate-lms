@@ -8,16 +8,16 @@
  * - On course edit/delete: Impact assessment
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { scanAllGaps } from './course-gap-detection';
 import { runWorkforceGapScan, autoGenerateNewProgram, saveScanResults } from './workforce-gap-scanner';
 import { processCourseGenerationJob } from './course-generation-worker';
 import { logger } from '@/lib/logger';
 
 // Build-safe: lazily create the Supabase client at runtime
-let _supabase: ReturnType<typeof createClient> | null = null;
+let _supabase: SupabaseClient | null = null;
 
-function getSupabase() {
+function getSupabase(): SupabaseClient {
   if (!_supabase) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -61,7 +61,7 @@ export async function processPendingJobs(): Promise<{
         if ((job.retry_count || 0) >= (job.max_retries || 3)) {
           await supabase
             .from('course_generation_jobs')
-            .update({ status: 'failed', error_message: 'Max retries exceeded' })
+            .update({ status: 'failed' })
             .eq('id', job.id);
           failed++;
           continue;
@@ -70,13 +70,13 @@ export async function processPendingJobs(): Promise<{
         await processCourseGenerationJob(job.id);
         processed++;
       } catch (error) {
-        logger.error(`Error processing job ${job.id}:`, error);
+        logger.error(`Error processing job ${job.id}:`, error instanceof Error ? error : new Error(String(error)));
         errors.push(`Job ${job.id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         failed++;
       }
     }
   } catch (error) {
-    logger.error('Error in processPendingJobs:', error);
+    logger.error('Error in processPendingJobs:', error instanceof Error ? error : new Error(String(error)));
     errors.push(`Process error: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 
@@ -309,11 +309,11 @@ export async function cleanupScanHistory(): Promise<number> {
     .lt('scanned_at', ninetyDaysAgo.toISOString());
 
   if (error) {
-    logger.error('Error cleaning up scan history:', error);
+    logger.error('Error cleaning up scan history:', error instanceof Error ? error : new Error(String(error)));
     return 0;
   }
 
-  return data?.length || 0;
+  return (data as unknown as {length: number})?.length ?? 0;
 }
 
 /**

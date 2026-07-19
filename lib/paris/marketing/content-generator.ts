@@ -4,15 +4,17 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import {
+  PLATFORM_LIMITS,
+  PLATFORM_BEST_PRACTICES,
+  CONTENT_TEMPLATES,
+} from './types';
 import type {
   BrandGuidelines,
   ContentTemplate,
   GeneratedContent,
   SocialPlatform,
   ContentType,
-  PLATFORM_LIMITS,
-  PLATFORM_BEST_PRACTICES,
-  CONTENT_TEMPLATES,
 } from './types';
 
 const supabase = createClient(
@@ -431,7 +433,7 @@ function shortenContent(text: string, platform: SocialPlatform): string {
  * Add emoji to content
  */
 function addEmoji(text: string): string {
-  const emojiMap: Record<string, string> = {
+  const emojiMap: Record<string, string[]> = {
     '🚀': ['launch', 'new', 'start', 'announce'],
     '✨': ['success', 'achievement', 'great'],
     '📢': ['announce', 'news', 'update'],

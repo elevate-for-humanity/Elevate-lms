@@ -82,7 +82,7 @@ const MAPPING_PATTERNS = {
   stripe: ['elevate_stripe', 'payment_gateway'],
   paypal: ['payment_gateway'],
   checkout: ['elevate_checkout'],
-  subscription: ['enrollment_payment', 'program_payment'],
+  enrollment_payment: ['enrollment_payment', 'program_payment'],
   invoice: ['billing', 'payment_schedule'],
   price: ['program_cost', 'tuition'],
   
@@ -146,7 +146,7 @@ const MAPPING_PATTERNS = {
 /**
  * Find best mapping for a concept
  */
-function findMapping(concept: string, category: keyof typeof MAPPING_PATTERNS): string[] {
+function findMapping(concept: string, _category: string): string[] {
   const lowerConcept = concept.toLowerCase();
   const mappings: string[] = [];
   
@@ -203,7 +203,7 @@ function detectCategory(
   }
   
   // Check integrations
-  const integrationCategories: Record<string, typeof MAPPINGS[number]['category']> = {
+  const integrationCategories: Record<string, 'payments' | 'notifications' | 'database' | 'files' | 'analytics' | 'users' | 'authentication' | 'api' | 'custom'> = {
     stripe: 'payments',
     paypal: 'payments',
     sendgrid: 'notifications',
@@ -285,25 +285,25 @@ function mapRoutes(
   const mappings: ConceptMapping[] = [];
   
   // Route path patterns to Elevate pages
-  const routePatterns: Record<string, { page: string; description: string }> = {
-    '/': 'homepage',
-    '/about': 'about',
-    '/contact': 'contact',
-    '/blog': 'blog',
-    '/pricing': 'store',
-    '/checkout': 'checkout',
-    '/dashboard': 'student_dashboard',
-    '/admin': 'admin_dashboard',
-    '/settings': 'account_settings',
-    '/profile': 'student_profile',
-    '/courses': 'programs',
-    '/programs': 'programs',
-    '/enroll': 'apply',
-    '/login': 'login',
-    '/signup': 'apply',
-    '/register': 'apply',
-    '/api/': 'api_endpoint',
-    '/webhook': 'webhook_handler',
+  const routePatterns: Record<string, { targetConcept: string; description: string }> = {
+    '/': { targetConcept: 'homepage', description: 'Home page' },
+    '/about': { targetConcept: 'about', description: 'About page' },
+    '/contact': { targetConcept: 'contact', description: 'Contact page' },
+    '/blog': { targetConcept: 'blog', description: 'Blog page' },
+    '/pricing': { targetConcept: 'store', description: 'Store/Pricing page' },
+    '/checkout': { targetConcept: 'checkout', description: 'Checkout page' },
+    '/dashboard': { targetConcept: 'student_dashboard', description: 'Student dashboard' },
+    '/admin': { targetConcept: 'admin_dashboard', description: 'Admin dashboard' },
+    '/settings': { targetConcept: 'account_settings', description: 'Account settings' },
+    '/profile': { targetConcept: 'student_profile', description: 'Student profile' },
+    '/courses': { targetConcept: 'programs', description: 'Programs listing' },
+    '/programs': { targetConcept: 'programs', description: 'Programs listing' },
+    '/enroll': { targetConcept: 'apply', description: 'Enrollment/Apply' },
+    '/login': { targetConcept: 'login', description: 'Login page' },
+    '/signup': { targetConcept: 'apply', description: 'Signup/Apply' },
+    '/register': { targetConcept: 'apply', description: 'Registration/Apply' },
+    '/api/': { targetConcept: 'api_endpoint', description: 'API endpoint' },
+    '/webhook': { targetConcept: 'webhook_handler', description: 'Webhook handler' },
   };
   
   for (const route of routes) {
@@ -311,7 +311,7 @@ function mapRoutes(
       if (route.path.includes(pattern) || pattern.includes(route.path)) {
         mappings.push({
           sourceConcept: `Route: ${route.path}`,
-          targetConcept: info.page,
+          targetConcept: info.targetConcept,
           confidence: 80,
           requiresReview: false,
         });

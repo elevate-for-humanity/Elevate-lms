@@ -11,14 +11,14 @@
  * 6. Mark course as ready for review
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { ModelRouter, callModel, type TaskType } from './model-router';
 import { logger } from '@/lib/logger';
 
 // Build-safe: lazily create the Supabase client at runtime
-let _supabase: ReturnType<typeof createClient> | null = null;
+let _supabase: SupabaseClient | null = null;
 
-function getSupabase() {
+function getSupabase(): SupabaseClient {
   if (!_supabase) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -28,6 +28,27 @@ function getSupabase() {
     _supabase = createClient(supabaseUrl, supabaseKey);
   }
   return _supabase;
+}
+
+// Type for course_generation_jobs table
+interface CourseJobRecord {
+  id: string;
+  status: string | null;
+  course_title: string | null;
+  course_description: string | null;
+  user_id: string | null;
+  tenant_id: string | null;
+  generated_course_id: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  // Extended fields that may be stored in metadata or added later
+  occupation?: string;
+  soc_code?: string;
+  credential_type?: string;
+  target_hours?: number;
+  delivery_mode?: string;
+  target_audience?: string;
+  retry_count?: number;
 }
 
 const modelRouter = new ModelRouter();
@@ -101,18 +122,6 @@ async function fetchCareerOneStopData(keyword: string) {
   return null;
 }
 
-interface CourseJob {
-  id: string;
-  title: string;
-  occupation: string;
-  soc_code: string;
-  credential_type: string;
-  target_hours: number;
-  delivery_mode: string;
-  target_audience: string;
-  settings: Record<string, unknown>;
-}
-
 interface GenerationProgress {
   totalSteps: number;
   currentStep: number;
@@ -121,7 +130,7 @@ interface GenerationProgress {
 
 async function updateJobProgress(
   jobId: string,
-  status: string,
+  jobStatus: string,
   step: string,
   progress: number
 ) {
@@ -129,16 +138,14 @@ async function updateJobProgress(
   await supabase
     .from('course_generation_jobs')
     .update({
-      status,
-      current_step: step,
-      progress_percent: progress,
+      status: jobStatus,
       updated_at: new Date().toISOString(),
     })
     .eq('id', jobId);
 }
 
 async function generateCourseOutline(
-  job: CourseJob,
+  job: CourseJobRecord,
   onetData: unknown,
   blsData: unknown,
   cosData: unknown
@@ -173,7 +180,7 @@ Return ONLY valid JSON with this structure:
 }
 The course should cover ${job.target_hours || 40} hours of training.`;
 
-  const userPrompt = `Generate a comprehensive course outline for: ${job.title}
+  const userPrompt = `Generate a comprehensive course outline for: ${job.course_title || 'Untitled Course'}
 Occupation: ${job.occupation}
 SOC Code: ${job.soc_code}
 Credential Type: ${job.credential_type}
@@ -200,14 +207,15 @@ ${cosData ? `CareerOneStop Data: ${JSON.stringify(cosData, null, 2)}` : ''}`;
       try {
         return JSON.parse(jsonMatch[0]);
       } catch (parseError) {
-        logger.error('[course-generation-worker] JSON parse error in generateCourseOutline', {
-          raw: jsonMatch[0].slice(0, 200),
-          error: parseError instanceof Error ? parseError.message : String(parseError)
+        const err = parseError instanceof Error ? parseError : new Error(String(parseError));
+        logger.error('[course-generation-worker] JSON parse error in generateCourseOutline', err, {
+          raw: jsonMatch[0].slice(0, 200)
         });
       }
     }
   } catch (error) {
-    logger.error('[course-generation-worker] Error generating outline', error);
+    const err = error instanceof Error ? error : new Error(String(error));
+    logger.error('[course-generation-worker] Error generating outline', err);
     throw error;
   }
 
@@ -215,7 +223,7 @@ ${cosData ? `CareerOneStop Data: ${JSON.stringify(cosData, null, 2)}` : ''}`;
 }
 
 async function generateLessonContent(
-  job: CourseJob,
+  job: CourseJobRecord,
   lessonTitle: string,
   lessonNumber: number,
   moduleTitle: string
@@ -274,14 +282,15 @@ Delivery Mode: ${job.delivery_mode || 'online'}`;
       try {
         return JSON.parse(jsonMatch[0]);
       } catch (parseError) {
-        logger.error('[course-generation-worker] JSON parse error in generateLessonContent', {
-          raw: jsonMatch[0].slice(0, 200),
-          error: parseError instanceof Error ? parseError.message : String(parseError)
+        const err = parseError instanceof Error ? parseError : new Error(String(parseError));
+        logger.error('[course-generation-worker] JSON parse error in generateLessonContent', err, {
+          raw: jsonMatch[0].slice(0, 200)
         });
       }
     }
   } catch (error) {
-    logger.error('[course-generation-worker] Error generating lesson', error);
+    const err = error instanceof Error ? error : new Error(String(error));
+    logger.error('[course-generation-worker] Error generating lesson', err);
     throw error;
   }
 
@@ -304,7 +313,9 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
     return;
   }
 
-  if (job.status !== 'queued') {
+  const typedJob = job as CourseJobRecord;
+
+  if (typedJob.status !== 'queued') {
     console.info(`Job ${jobId} is not queued, skipping`);
     return;
   }
@@ -315,29 +326,29 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
 
     // Fetch external data (O*NET, BLS, CareerOneStop)
     const [onetData, blsData, cosData] = await Promise.all([
-      job.soc_code ? fetchONetData(job.soc_code) : Promise.resolve(null),
-      job.soc_code ? fetchBLSData(job.soc_code) : Promise.resolve(null),
-      job.occupation ? fetchCareerOneStopData(job.occupation) : Promise.resolve(null),
+      typedJob.soc_code ? fetchONetData(typedJob.soc_code) : Promise.resolve(null),
+      typedJob.soc_code ? fetchBLSData(typedJob.soc_code) : Promise.resolve(null),
+      typedJob.occupation ? fetchCareerOneStopData(typedJob.occupation) : Promise.resolve(null),
     ]);
 
     // Generate course outline
     await updateJobProgress(jobId, 'generating', 'Generating course outline', 10);
-    const outline = await generateCourseOutline(job, onetData, blsData, cosData);
+    const outline = await generateCourseOutline(typedJob, onetData, blsData, cosData);
 
     // Create generated course record
     const { data: course, error: courseError } = await supabase
       .from('generated_courses')
       .insert({
         job_id: jobId,
-        title: outline.title || job.title,
+        title: outline.title || typedJob.course_title || 'Untitled Course',
         subtitle: outline.subtitle,
-        description: outline.description,
-        occupation: job.occupation,
-        soc_code: job.soc_code,
-        credential_type: job.credential_type,
-        target_hours: job.target_hours,
-        delivery_mode: job.delivery_mode,
-        target_audience: job.target_audience,
+        description: outline.description || typedJob.course_description,
+        occupation: typedJob.occupation,
+        soc_code: typedJob.soc_code,
+        credential_type: typedJob.credential_type,
+        target_hours: typedJob.target_hours,
+        delivery_mode: typedJob.delivery_mode,
+        target_audience: typedJob.target_audience,
         status: 'draft',
         metadata: { onetData, blsData, cosData },
       })
@@ -345,6 +356,7 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
       .single();
 
     if (courseError) throw courseError;
+    if (!course) throw new Error('Failed to create course record');
 
     // Calculate total steps for progress
     const totalModules = outline.modules?.length || 5;
@@ -369,12 +381,13 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
           title: module.title,
           description: module.description,
           objectives: module.objectives || [],
-          estimated_hours: Math.ceil((job.target_hours || 40) / totalModules),
+          estimated_hours: Math.ceil((typedJob.target_hours || 40) / totalModules),
         })
         .select()
         .single();
 
       if (moduleError) throw moduleError;
+      if (!moduleRecord) throw new Error('Failed to create module record');
 
       // Generate lessons for this module
       for (let lessonNum = 1; lessonNum <= (module.lessons || lessonsPerModule); lessonNum++) {
@@ -385,7 +398,7 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
 
         // Generate lesson content
         const lessonContent = await generateLessonContent(
-          job,
+          typedJob,
           lessonTitle,
           lessonNum,
           module.title
@@ -412,6 +425,7 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
           .single();
 
         if (lessonError) throw lessonError;
+        if (!lessonRecord) throw new Error('Failed to create lesson record');
 
         // Save quiz if questions generated
         if (lessonContent.quizQuestions?.length > 0) {
@@ -436,7 +450,6 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
       .from('course_generation_jobs')
       .update({
         status: 'reviewing',
-        progress_percent: 100,
         completed_at: new Date().toISOString(),
       })
       .eq('id', jobId);
@@ -451,8 +464,6 @@ export async function processCourseGenerationJob(jobId: string): Promise<void> {
       .from('course_generation_jobs')
       .update({
         status: 'failed',
-        error_message: error instanceof Error ? error.message : 'Unknown error',
-        retry_count: (job.retry_count || 0) + 1,
       })
       .eq('id', jobId);
   }

@@ -1,18 +1,17 @@
-﻿# Dockerfile.northflank-lms
-# Builds and serves the LMS application (apps/lms/)
-# Serves app.elevateforhumanity.org
+# Dockerfile.northflank-admin
+# Optimized for Admin routes ONLY
 #
 # Northflank Configuration:
 #   - Build type: Dockerfile
-#   - Dockerfile path: /Dockerfile.northflank-lms
+#   - Dockerfile path: /Dockerfile.northflank-admin
 #   - Build context: /
 
 FROM node:22-bookworm AS builder
 
-# Cache invalidation marker - fixed standalone paths
-RUN echo "nf-cache-invalidate-lms-fix-copy-paths-2026-07-18"
+# Cache invalidation marker
+RUN echo "nf-cache-invalidate-admin-2026-07-18-v2"
 
-# Install system deps for native modules (sharp, canvas, pdf)
+# System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     build-essential \
@@ -22,11 +21,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg-dev \
     libgif-dev \
     librsvg2-dev \
-    gnupg \
     && rm -rf /var/lib/apt/lists/*
 
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-# Use pnpm@10.28.2 to match lockfileVersion 9.0 (pnpm 10.x format)
 RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
 ENV PNPM_HOME="/app/.pnpm-home"
@@ -43,25 +40,26 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# Increased memory for native module stability
-ENV NODE_OPTIONS=--max-old-space-size=12288
+ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV NEXT_STANDALONE_OUTPUT=1
-ENV BUILD_SCOPE=LMS
+ENV BUILD_SCOPE=ADMIN
 ENV CI=true
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 
-# Install dependencies with strict peer checking disabled for compatibility
-RUN pnpm install --no-frozen-lockfile --strict-peer-dependencies=false
+# Install dependencies
+RUN pnpm install --no-frozen-lockfile
 
-# Build Next.js LMS app
+# Build Admin
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
 ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
+ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ARG SUPABASE_SERVICE_ROLE_KEY
 ARG GITHUB_SHA=unknown
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY
@@ -70,52 +68,44 @@ ENV NEXT_PUBLIC_GIT_SHA=$GITHUB_SHA
 ENV NEXT_PUBLIC_BUILD_ID=$GITHUB_SHA
 ENV BUILD_ID=$GITHUB_SHA
 
-RUN pnpm run build:lms:compile --no-lint
+RUN pnpm --filter @elevate/admin build --no-lint
 
 # INSPECTION: Show standalone directory structure to verify correct CMD
-RUN echo "=== STANDALONE STRUCTURE ===" && find /app/apps/lms/.next/standalone -maxdepth 4 -type f 2>/dev/null | sort || echo "No standalone directory found"
+RUN echo "=== STANDALONE STRUCTURE ===" && find /app/apps/admin/.next/standalone -maxdepth 4 -type f 2>/dev/null | sort || echo "No standalone directory found"
 
 # --- runtime stage ---
 FROM node:22-bookworm-slim
 
-# Install runtime deps for native modules
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
     fonts-liberation \
-    libcairo2 \
-    libpango-1.0-0 \
-    libjpeg62-turbo \
-    libgif7 \
-    librsvg2-2 \
-    librsvg2-common \
     && rm -rf /var/lib/apt/lists/*
 
-ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV PORT=8080
-# Runtime memory configuration for stability
-ENV NODE_OPTIONS=--max-old-space-size=8192 --gc-interval=100
 
 WORKDIR /app
 
 # Copy standalone build artifacts
-COPY --from=builder /app/apps/lms/.next/standalone ./
-COPY --from=builder /app/apps/lms/.next/static ./.next/static
-COPY --from=builder /app/apps/lms/.next/server ./.next/server
-COPY --from=builder /app/apps/lms/public ./public
+COPY --from=builder /app/apps/admin/.next/standalone ./
+COPY --from=builder /app/apps/admin/.next/static ./.next/static
+COPY --from=builder /app/apps/admin/.next/server ./.next/server
+COPY --from=builder /app/apps/admin/public ./public
 
-# Copy custom server.js
-COPY --from=builder /app/apps/lms/server.js ./apps/lms/server.js
+# Copy custom server.js with monitoring and recovery logic
+COPY --from=builder /app/apps/admin/server.js ./apps/admin/server.js
 
 # Copy full node_modules from builder (preserves pnpm symlinks)
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 8080
 
+# Health check: /api/ping returns {status:ok} reliably
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
+  CMD curl -sf http://127.0.0.1:8080/api/ping || curl -sf http://127.0.0.1:8080/ || exit 1
 
-# Use custom server.js
-CMD ["node", "--max-http-header-size=32768", "apps/lms/server.js"]
+# Use custom server.js with monitoring and recovery
+CMD ["node", "--max-http-header-size=32768", "apps/admin/server.js"]

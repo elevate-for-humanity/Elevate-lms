@@ -70,4 +70,4 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 8080
-CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "server.js"]
+CMD ["node", "apps/marketing/server.js"]

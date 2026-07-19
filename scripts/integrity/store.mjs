@@ -42,9 +42,15 @@ function containsPlaceholder(text) {
 }
 
 // Check if post-purchase route exists
+// After monorepo split, success pages are in apps/marketing and apps/lms
 function checkPostPurchaseRoute() {
-  const successPage = path.join(rootDir, 'app', 'checkout', 'success', 'page.tsx');
-  return fs.existsSync(successPage);
+  const candidates = [
+    path.join(rootDir, 'app', 'checkout', 'success', 'page.tsx'),           // legacy monorepo
+    path.join(rootDir, 'apps', 'marketing', 'app', 'store', 'checkout', 'success', 'page.tsx'),
+    path.join(rootDir, 'apps', 'marketing', 'app', 'checkout', 'success', 'page.tsx'),
+    path.join(rootDir, 'apps', 'lms', 'app', 'checkout', 'success', 'page.tsx'),
+  ];
+  return candidates.some((p) => fs.existsSync(p));
 }
 
 // Load products from various sources
@@ -52,8 +58,10 @@ async function loadProducts() {
   const products = [];
 
   // Check pricing page for product definitions
+  // After monorepo split, pricing page is in apps/marketing
   const pricingFiles = [
-    path.join(rootDir, 'app', 'pricing', 'page.tsx'),
+    path.join(rootDir, 'app', 'pricing', 'page.tsx'),            // legacy monorepo
+    path.join(rootDir, 'apps', 'marketing', 'app', 'pricing', 'page.tsx'),
     path.join(rootDir, 'lms-data', 'paymentPlans.ts'),
   ];
 
@@ -83,8 +91,13 @@ async function loadProducts() {
 
   // If no products found from files, create a baseline check
   if (products.length === 0) {
-    // Check if checkout flow exists
-    const checkoutExists = fs.existsSync(path.join(rootDir, 'app', 'checkout', 'page.tsx'));
+    // Check if checkout flow exists (check all possible locations)
+    const checkoutPaths = [
+      path.join(rootDir, 'app', 'checkout', 'page.tsx'),
+      path.join(rootDir, 'apps', 'lms', 'app', 'checkout', 'page.tsx'),
+      path.join(rootDir, 'apps', 'marketing', 'app', 'store', 'checkout', 'page.tsx'),
+    ];
+    const checkoutExists = checkoutPaths.some((p) => fs.existsSync(p));
     if (checkoutExists) {
       products.push({
         id: 'checkout-flow',

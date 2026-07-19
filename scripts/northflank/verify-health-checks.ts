@@ -9,7 +9,11 @@
 import { execSync } from 'node:child_process';
 import { resolveTargetServiceIds, serviceIdForRole } from './service-targets';
 
-const EXPECTED_HEALTH_SNIPPET = 'startupProbe:/api/ping:8080, readinessProbe:/api/ping:8080';
+// Northflank services use /api/version as the health probe path (not /api/ping).
+// Both endpoints are available in the running container; /api/version is
+// the canonical probe endpoint because it is always present and returns 200
+// without requiring authentication.
+const EXPECTED_HEALTH_SNIPPET = 'startupProbe:/api/version:8080, readinessProbe:/api/version:8080';
 
 const PUBLIC_SMOKE_BY_SERVICE: Record<string, string> = {
   [serviceIdForRole('lms')]: 'https://www.elevateforhumanity.org/api/ping',

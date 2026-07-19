@@ -203,13 +203,13 @@ export async function listCourseAssets(
   assetType?: string
 ): Promise<string[]> {
   const supabase = await requireAdminClient();
-  const prefix = assetType 
-    ? `${courseSlug}/${assetType}/` 
-    : `${courseSlug}/`;
+  const searchPath = assetType 
+    ? `${courseSlug}/${assetType}` 
+    : courseSlug;
 
   const { data, error } = await supabase.storage
     .from(BUCKETS.COURSE_ASSETS)
-    .list(courseSlug, { prefix: assetType ? `${assetType}/` : undefined });
+    .list(searchPath);
 
   if (error) return [];
 

@@ -105,7 +105,7 @@ export default function LessonPlayer({
   // Media event listeners
   React.useEffect(() => {
     const v = getMedia();
-    if (!v) return;
+    if (!v) return undefined;
 
     const onPlay = () => {
       setIsPlaying(true);
@@ -198,7 +198,7 @@ export default function LessonPlayer({
 
   const play = async () => {
     const v = getMedia();
-    if (!v) return;
+    if (!v) return undefined;
     setIsLoading(true);
     setHasStarted(true);
     try {
@@ -211,14 +211,14 @@ export default function LessonPlayer({
 
   const togglePlay = async () => {
     const v = getMedia();
-    if (!v) return;
+    if (!v) return undefined;
     if (v.paused) await play();
     else v.pause();
   };
 
   const restart = async () => {
     const v = getMedia();
-    if (!v) return;
+    if (!v) return undefined;
     v.currentTime = 0;
     setEnded(false);
     await play();
@@ -226,7 +226,7 @@ export default function LessonPlayer({
 
   const toggleMute = () => {
     const v = getMedia();
-    if (!v) return;
+    if (!v) return undefined;
     v.muted = !muted;
     setMuted(!muted);
   };
@@ -240,7 +240,7 @@ export default function LessonPlayer({
 
   const skip = (seconds: number) => {
     const v = getMedia();
-    if (!v) return;
+    if (!v) return undefined;
     const target = v.currentTime + seconds;
     v.currentTime = Math.max(0, Math.min(maxWatchedRef.current + 2, target));
   };

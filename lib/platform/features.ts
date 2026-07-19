@@ -29,6 +29,7 @@ export const PlatformFeature = {
   EMPLOYER_PORTAL: 'employer_portal',
   TESTING_CENTER: 'testing_center',
   WHITE_LABEL_MOBILE: 'white_label_mobile',
+  API_ACCESS: 'api_access',
 } as const;
 
 export type PlatformFeatureKey = (typeof PlatformFeature)[keyof typeof PlatformFeature];

@@ -6,7 +6,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { caseGenerator } from '@/lib/cfd/service';
 import { evaluationEngine } from '@/lib/evaluation/service';
-import type { UnifiedTask, EvidenceRecord, ConfidenceScore, OrchestrationWorkflow, OrchestrationStep } from './types';
+import type { UnifiedTask, EvidenceRecord, ConfidenceScore, OrchestrationWorkflow, OrchestrationStep, StudioType } from './types';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -96,7 +96,7 @@ export class StudioOrchestrator {
     if (task.input.caseType) {
       const caseData = caseGenerator.generateCaseStructure(
         task.input.name as string || 'generated_case',
-        task.input.caseType as string,
+        task.input.caseType as 'steady' | 'transient' | 'compressible' | 'les' | 'dns',
         task.input.solver as string,
         task.input.turbulence as string
       );

@@ -144,3 +144,9 @@ export function createBrowserClient(): SupabaseClient<any> {
 
 // Legacy export for backwards compatibility
 export const createClient = createBrowserClient;
+
+// No-op cache reset for dynamic config updates (called from public-config.ts)
+export function resetSupabaseBrowserClientCache(): void {
+  // Client is recreated on each call, no cache to reset
+  // This function exists for API compatibility
+}

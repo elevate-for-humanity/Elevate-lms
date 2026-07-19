@@ -23,7 +23,7 @@ function registryToArray(): ProgramSchema[] {
  * Returns the registry filtered by category for dynamic navigation.
  */
 export function getProgramsByCategory(category: string) {
-  return registryToArray().filter(p => p.category === category || p.tags?.includes(category));
+  return registryToArray().filter(p => p.category === category);
 }
 
 export function getProgramBySlug(slug: string) {

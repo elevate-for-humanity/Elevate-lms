@@ -253,11 +253,12 @@ export function getXAPIClient(): XAPIClient {
  */
 export async function trackLessonProgress(
   userId: string,
-  courseId: string,
+  userName: string,
   lessonId: string,
   lessonName: string,
   percent: number
 ): Promise<void> {
   const client = getXAPIClient();
-  return client.trackLessonCompleted(userId, courseId, lessonId, lessonName, percent >= 100);
+  const score = percent >= 100 ? 100 : percent;
+  return client.trackLessonCompleted(userId, userName, lessonId, lessonName, score);
 }

@@ -283,7 +283,7 @@ BLOCKERS=0
 
 # Check for unfinished pages — match only HTML comments so developer // TODO comments don't trigger a failure
 # Use || true so set -e doesn't kill the pipeline when grep finds no matches
-UNFINISHED=$(grep -r "<!--\s*TODO\|<!--\s*FIXME\|<!--\s*UNDER CONSTRUCTION" components/ app/ 2>/dev/null | grep -v ".test." | wc -l) || true
+UNFINISHED=$(grep -r "<!--\s*TODO\|<!--\s*FIXME\|<!--\s*UNDER CONSTRUCTION" components/ apps/ app-legacy/ 2>/dev/null | grep -v ".test." | wc -l) || true
 if [[ "$UNFINISHED" -gt 0 ]]; then
   echo "FAIL: Unfinished content markers found: $UNFINISHED"
   FAIL=1
@@ -304,7 +304,7 @@ if [[ -f "config/navigation.ts" ]]; then
 fi
 
 # Check for broken imports
-BROKEN_IMPORTS=$(grep -r "from '@/" components/ app/ 2>/dev/null | grep -v ".test." | grep -c "undefined\|TODO" || echo 0)
+BROKEN_IMPORTS=$(grep -r "from '@/" components/ apps/ app-legacy/ 2>/dev/null | grep -v ".test." | grep -c "undefined\|TODO" || true)
 if [[ "$BROKEN_IMPORTS" -gt 0 ]]; then
   echo "WARN: Potential broken imports: $BROKEN_IMPORTS"
   WARN=$((WARN + 1))

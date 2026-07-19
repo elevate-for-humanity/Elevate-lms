@@ -44,7 +44,7 @@ export default function Confetti({
 
   useEffect(() => {
     if (!active) {
-      return;
+      return undefined;
     }
     // Generate confetti pieces
     const newPieces: ConfettiPiece[] = Array.from({ length: pieceCount }, (_, i) => ({
@@ -114,13 +114,12 @@ export function ConfettiCannon({
   const [isActive, setIsActive] = useState(active);
 
   useEffect(() => {
-    if (active) {
-      setIsActive(true);
-      const timer = setTimeout(() => {
-        setIsActive(false);
-      }, duration);
-      return () => clearTimeout(timer);
-    }
+    if (!active) return undefined;
+    setIsActive(true);
+    const timer = setTimeout(() => {
+      setIsActive(false);
+    }, duration);
+    return () => clearTimeout(timer);
   }, [active, duration]);
 
   if (!isActive) return null;
@@ -223,13 +222,12 @@ export function ConfettiBurst({ active = true, duration = 2000, pieceCount = 40 
   const [isActive, setIsActive] = useState(active);
 
   useEffect(() => {
-    if (active) {
-      setIsActive(true);
-      const timer = setTimeout(() => {
-        setIsActive(false);
-      }, duration);
-      return () => clearTimeout(timer);
-    }
+    if (!active) return undefined;
+    setIsActive(true);
+    const timer = setTimeout(() => {
+      setIsActive(false);
+    }, duration);
+    return () => clearTimeout(timer);
   }, [active, duration]);
 
   if (!isActive) return null;

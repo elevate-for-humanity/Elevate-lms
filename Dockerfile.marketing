@@ -38,8 +38,8 @@ RUN node scripts/split-app.mjs
 # Stable PNPM (matching lockfileVersion 9.0)
 RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
-# 1. Install ALL dependencies
-RUN pnpm install --no-frozen-lockfile
+# 1. Install ALL dependencies (reproducible build)
+RUN pnpm install --frozen-lockfile
 
 # 2. Build with 6GB Limit (MARKETING scope)
 ENV NODE_OPTIONS=--max-old-space-size=6144

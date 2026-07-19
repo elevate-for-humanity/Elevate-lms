@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 // PUBLIC ROUTE: program detail pages are public marketing content — no auth required
 export default function ProgramLayout({
   children,

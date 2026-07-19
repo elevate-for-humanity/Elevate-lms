@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';

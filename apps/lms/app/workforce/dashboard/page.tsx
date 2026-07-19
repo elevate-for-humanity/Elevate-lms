@@ -7,7 +7,7 @@ import {
   Users, CheckCircle, Award, Briefcase, TrendingUp, AlertTriangle,
   Clock, FileText, Shield, HeartHandshake, Search, ChevronRight,
 } from 'lucide-react';
-import { StudentSearchPanel } from '@/app/case-manager/StudentSearchPanel';
+import { StudentSearchPanel } from '@/app-legacy/case-manager/StudentSearchPanel';
 
 export const metadata: Metadata = {
   title: 'Dashboard | Workforce Portal',

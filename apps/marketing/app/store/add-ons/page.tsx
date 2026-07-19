@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -10,7 +11,7 @@ import {
   Trophy, 
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import StoreProductVideo from '@/apps/marketing/app/store/StoreProductVideo';
+import StoreProductVideo from '../StoreProductVideo';
 
 import { createBrowserClient } from '@supabase/ssr';
 const addOns = [

@@ -2,7 +2,7 @@
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
-import React from 'react';
+import React, { useRef } from 'react';
 
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
@@ -52,10 +52,16 @@ interface ActiveSubscription {
 function SubscriptionsContent() {
   const router = useRouter();
   const searchParams = useSafeSearchParams();
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabaseRef = useRef<ReturnType<typeof createBrowserClient> | null>(null);
+  const supabase = supabaseRef.current ?? (() => {
+    if (typeof window === 'undefined') return null as any;
+    const client = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    supabaseRef.current = client;
+    return client;
+  })();
 
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -82,6 +88,7 @@ function SubscriptionsContent() {
   }, [searchParams]);
 
   async function loadUser() {
+    if (!supabase) return;
     const {
       data: { user },
     } = await supabase.auth.getUser();

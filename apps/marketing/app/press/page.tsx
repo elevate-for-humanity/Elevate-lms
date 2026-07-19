@@ -1,45 +1,28 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Press | Elevate for Humanity',
-  description: 'Press page content.',
+  title: `Press & Media | ${PLATFORM_DEFAULTS.orgName}`,
+  description: `Press releases, media coverage, and news about ${PLATFORM_DEFAULTS.orgName}.`,
 };
 
-export default async function PressPage() {
-  const db = await requireAdminClient();
-
-  // Press-specific posts (category = 'press' or 'media')
-  const { data: pressItems } = await db
-    .from('blog_posts')
-    .select('id, title, slug, excerpt, featured_image, published_at, category')
-    .eq('published', true)
-    .in('category', ['press', 'media', 'Press', 'Media'])
-    .order('published_at', { ascending: false })
-    .limit(12);
-
-  // Recent news as fallback if no press-tagged posts
-  const { data: recentNews } = await db
-    .from('blog_posts')
-    .select('id, title, slug, excerpt, featured_image, published_at, category')
-    .eq('published', true)
-    .order('published_at', { ascending: false })
-    .limit(6);
-
-  const posts = pressItems && pressItems.length > 0 ? pressItems : (recentNews ?? []);
-
+export default function PressPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl font-bold">Press</h1>
-          <p className="text-blue-200">Workforce development resources.</p>
+    <div className="min-h-screen bg-white">
+      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Press & Media</h1>
+          <p className="text-xl text-slate-300">
+            News, announcements, and media resources from {PLATFORM_DEFAULTS.orgName}.
+          </p>
         </div>
       </section>
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <div className="text-center py-16">
+          <p className="text-slate-600 text-lg">
+            Media inquiries: <a href={`mailto:${PLATFORM_DEFAULTS.orgEmail}`} className="text-blue-600 underline">{PLATFORM_DEFAULTS.orgEmail}</a>
+          </p>
         </div>
       </section>
     </div>

@@ -1,2 +1,7 @@
-export { metadata } from '@/app/store/licenses/checkout/[slug]/layout';
-export { default } from '@/app/store/licenses/checkout/[slug]/layout';
+export default function LicensingCheckoutLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <>{children}</>;
+}

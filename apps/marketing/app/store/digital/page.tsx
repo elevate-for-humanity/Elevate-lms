@@ -5,7 +5,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import LazyVideo from '@/components/ui/LazyVideo';
-import StoreProductVideo from '@/app/store/StoreProductVideo';
+import StoreProductVideo from '../StoreProductVideo';
 import { 
   Download, FileText, Video, BookOpen, Check, ArrowRight, Zap, 
   Shield, MessageCircle, Play, Sparkles, Users, Building2, DollarSign 

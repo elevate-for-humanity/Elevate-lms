@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { Metadata } from 'next';
 import Link from 'next/link';

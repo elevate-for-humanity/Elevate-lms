@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { use, useState } from 'react';

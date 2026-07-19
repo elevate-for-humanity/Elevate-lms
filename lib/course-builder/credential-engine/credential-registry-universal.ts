@@ -90,6 +90,7 @@ export interface CredentialDefinition {
   // Integration
   availableOnElevate: boolean;
   courseSlug?: string;
+  referenceDocuments?: string[];
   blueprintSlug?: string;
   
   // Related credentials

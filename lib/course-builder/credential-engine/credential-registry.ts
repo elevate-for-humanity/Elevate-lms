@@ -36,7 +36,7 @@ export interface CredentialBlueprint {
   examFormat: string;
   retakePolicy: string;
   renewalRequirements?: string;
-  referenceDocuments: string[];
+  referenceDocuments?: string[];
   sosCodes?: string[];  // O*NET SOC codes
   relatedCredentials?: string[];
 }

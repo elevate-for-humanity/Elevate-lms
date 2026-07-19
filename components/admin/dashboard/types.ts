@@ -217,7 +217,7 @@ export interface AdminDashboardData {
   noOutcomeEnrollments: Record<string, unknown>[];
   /** Active enrollments missing a funding source */
   missingFundingEnrollments: Record<string, unknown>[];
-  profile: { full_name: string | null } | null;
+  profile: { full_name: string | null; role?: string } | null;
   generatedAt: string;
   sitePreviewTargets: SitePreviewTarget[];
   /** Non-empty when one or more non-critical sections failed to load. */

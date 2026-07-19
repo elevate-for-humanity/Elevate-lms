@@ -14,6 +14,26 @@
  */
 
 // Re-export everything for easy importing
+
+// Import types for internal use
+import type {
+  CourseType,
+  GenerationMode,
+} from './course-types';
+import { detectCourseType, COURSE_TYPES } from './course-types';
+import type { CredentialBlueprint } from './credential-registry';
+import type { ExamBlueprint } from './exam-blueprints';
+import { getBlueprint, topicToPrompt } from './exam-blueprints';
+import type { RagContext } from './rag-engine';
+import { loadRagContext } from './rag-engine';
+import type { ContentPrompts } from './prompt-selector';
+import { getPrompts, getContentSystemPrompt, getInstructorSystemPrompt } from './prompt-selector';
+import { buildRagPromptContext } from './rag-engine';
+import type { ValidationResult } from './quality-validator';
+import { getCredential, searchCredentials, type CredentialDefinition } from './credential-registry-universal';
+import { validateCourse, generateQualityReport } from './quality-validator';
+import { CREDENTIAL_REGISTRY } from './credential-registry';
+
 export {
   // Course types
   detectCourseType,
@@ -108,66 +128,6 @@ export {
   type MonitorResult,
 } from './blueprint-monitor';
 
-// Universal registry (includes all credentials)
-export {
-  UNIVERSAL_CREDENTIAL_REGISTRY,
-  getCredential,
-  getAvailableCredentials,
-  searchCredentials,
-  getCredentialsByCategory,
-  getCredentialsByType,
-  type CredentialDefinition,
-  type CredentialCategory,
-  type CredentialType,
-} from './credential-registry-universal';
-
-// Legacy import (EPA 608 specific)
-import {
-  CREDENTIAL_REGISTRY,
-  getCredential as getLegacyCredential,
-  searchCredentials as searchLegacyCredentials,
-  type CredentialBlueprint,
-} from './credential-registry';
-
-export { CREDENTIAL_REGISTRY, type CredentialBlueprint } from './credential-registry';
-
-import {
-  getBlueprint,
-  type ExamBlueprint,
-  topicToPrompt,
-} from './exam-blueprints';
-import {
-  getPrompts,
-  getContentSystemPrompt,
-  getInstructorSystemPrompt,
-  type ContentPrompts,
-} from './prompt-selector';
-import {
-  loadRagContext,
-  enhanceWithRag,
-  buildRagPromptContext,
-  type RagContext,
-} from './rag-engine';
-import {
-  validateCourse,
-  generateQualityReport,
-  type ValidationResult,
-} from './quality-validator';
-
-// Universal platform exports
-export {
-  initializeCourseBuild,
-  monitorCredentialBlueprints,
-  type CourseBuild,
-  type ModuleBuild,
-  type LessonBuild,
-  type ExamBuild,
-  type InstructorBuild,
-  type MediaBuild,
-  type LabBuild,
-  type ComplianceBuild,
-} from './universal-platform';
-
 export interface CourseGenerationRequest {
   // What the user requested
   userRequest: string;
@@ -186,7 +146,7 @@ export interface CourseGenerationContext {
   // Identified configuration
   courseType: CourseType;
   generationMode: GenerationMode;
-  credential?: CredentialBlueprint;
+  credential?: CredentialDefinition;
   blueprint?: ExamBlueprint;
   ragContext: RagContext;
   
@@ -215,6 +175,7 @@ export interface GeneratedModule {
   quizQuestions: QuizQuestion[];
   flashcards: Flashcard[];
   procedures?: Procedure[];
+  hasPracticeExam?: boolean;
 }
 
 export interface QuizQuestion {
@@ -245,7 +206,7 @@ export function buildGenerationContext(request: CourseGenerationRequest): Course
   const generationMode = COURSE_TYPES[courseType].generationMode;
   
   // Step 2: Find credential
-  let credential: CredentialBlueprint | undefined;
+  let credential: CredentialDefinition | undefined;
   let blueprint: ExamBlueprint | undefined;
   
   if (request.credentialSlug) {
@@ -447,7 +408,7 @@ export function validateGeneratedCourse(
     };
   }
   
-  return validateCourse(modules, context.blueprint, context.credential);
+  return validateCourse(modules as any, context.blueprint, context.credential as any);
 }
 
 /**
@@ -460,20 +421,20 @@ export function generateReport(result: ValidationResult): string {
 /**
  * Get all supported credentials
  */
-export function getSupportedCredentials(): CredentialBlueprint[] {
-  return Object.values(CREDENTIAL_REGISTRY);
+export function getSupportedCredentials(): CredentialDefinition[] {
+  return Object.values(CREDENTIAL_REGISTRY) as CredentialDefinition[];
 }
 
 /**
  * Search for credentials
  */
-export function searchForCredentials(query: string): CredentialBlueprint[] {
+export function searchForCredentials(query: string): CredentialDefinition[] {
   return searchCredentials(query);
 }
 
 /**
  * Get credential by slug
  */
-export function getCredentialInfo(slug: string): CredentialBlueprint | undefined {
+export function getCredentialInfo(slug: string): CredentialDefinition | undefined {
   return getCredential(slug);
 }

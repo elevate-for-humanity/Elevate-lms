@@ -7,11 +7,12 @@
 
 import { type CourseType, type GenerationMode } from './course-types';
 import { type CredentialBlueprint } from './credential-registry';
+import { type CredentialDefinition } from './credential-registry-universal';
 import { type ExamBlueprint, topicToPrompt } from './exam-blueprints';
 
 export interface PromptConfig {
   courseType: CourseType;
-  credential?: CredentialBlueprint;
+  credential?: CredentialBlueprint | CredentialDefinition;
   blueprint?: ExamBlueprint;
   generationMode: GenerationMode;
 }

@@ -200,6 +200,9 @@ importers:
       '@tiptap/starter-kit':
         specifier: ^3.22.5
         version: 3.28.0
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
       '@types/pdfkit':
         specifier: ^0.17.6
         version: 0.17.6
@@ -314,6 +317,9 @@ importers:
       jose:
         specifier: ^6.2.3
         version: 6.2.3
+      js-yaml:
+        specifier: ^5.2.1
+        version: 5.2.1
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3
@@ -4343,6 +4349,9 @@ packages:
   '@types/jest@30.0.0':
     resolution: {integrity: sha512-XTYugzhuwqWjws0CVz8QpM36+T+Dz5mTEBKhNs/esGLnCIlGdRy+Dq78NRjd7ls7r8BC8ZRMOrKlkO1hU0JOwA==}
 
+  '@types/js-yaml@4.0.9':
+    resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
+
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -6875,6 +6884,10 @@ packages:
 
   js-yaml@4.3.0:
     resolution: {integrity: sha512-1td788aAnnZ5qs7V2QIRl1owjtYpbKt749Y3xauqQgwIIGF/xXWz1wMTEBx5O3LK3lXLVuqXPdPxj2BoFHaW9Q==}
+    hasBin: true
+
+  js-yaml@5.2.1:
+    resolution: {integrity: sha512-zfLtNfQqxVqq3uaTqSkh4x4hZw3KHobGUA0fJUj4wawW8bsQLTVqpHdXSIzidh7o+4lEW36tANuAGdaFx6Zgnw==}
     hasBin: true
 
   jsdom@28.1.0:
@@ -10833,7 +10846,7 @@ snapshots:
   '@jonny/eslint-config@2.1.252(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)':
     dependencies:
       '@typescript-eslint/eslint-plugin': 4.33.0(@typescript-eslint/parser@4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5))(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)
-      '@typescript-eslint/parser': 4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)
+      '@typescript-eslint/parser': 4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3)
       eslint-config-prettier: 8.10.2(eslint@10.5.0(jiti@1.21.7))
       eslint-config-xo: 0.39.0(eslint@10.5.0(jiti@1.21.7))
       eslint-config-xo-react: 0.25.0(eslint-plugin-react-hooks@4.2.1-alpha-930c9e7ee-20211015(eslint@10.5.0(jiti@1.21.7)))(eslint-plugin-react@7.37.5(eslint@10.5.0(jiti@1.21.7)))(eslint@10.5.0(jiti@1.21.7))
@@ -13619,6 +13632,8 @@ snapshots:
       expect: 30.4.1
       pretty-format: 30.4.1
 
+  '@types/js-yaml@4.0.9': {}
+
   '@types/json-schema@7.0.15': {}
 
   '@types/mdast@4.0.4':
@@ -13816,7 +13831,7 @@ snapshots:
   '@typescript-eslint/eslint-plugin@4.33.0(@typescript-eslint/parser@4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5))(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)':
     dependencies:
       '@typescript-eslint/experimental-utils': 4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)
-      '@typescript-eslint/parser': 4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)
+      '@typescript-eslint/parser': 4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3)
       '@typescript-eslint/scope-manager': 4.33.0
       debug: 4.4.3
       eslint: 10.5.0(jiti@1.21.7)
@@ -13859,7 +13874,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@typescript-eslint/parser@4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)':
+  '@typescript-eslint/parser@4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 4.33.0
       '@typescript-eslint/types': 4.33.0
@@ -13867,7 +13882,7 @@ snapshots:
       debug: 4.4.3
       eslint: 10.5.0(jiti@1.21.7)
     optionalDependencies:
-      typescript: 4.9.5
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
@@ -16512,6 +16527,10 @@ snapshots:
   js-tokens@4.0.0: {}
 
   js-yaml@4.3.0:
+    dependencies:
+      argparse: 2.0.1
+
+  js-yaml@5.2.1:
     dependencies:
       argparse: 2.0.1
 

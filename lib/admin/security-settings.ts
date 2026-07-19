@@ -42,8 +42,8 @@ async function fetchFromDb(): Promise<SecuritySettings> {
   try {
     // Dynamic import — avoids pulling Supabase into the middleware bundle
     // on cold start before the cache is warm.
-    const { createClient } = await import('@/lib/supabase/admin');
-    const db = createClient();
+    const { createAdminClient } = await import('@/lib/supabase/admin');
+    const db = createAdminClient();
     const { data: rows } = await db
       .from('platform_settings')
       .select('key, value')

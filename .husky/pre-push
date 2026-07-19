@@ -1,6 +1,6 @@
 #!/bin/sh
-# Pre-push gate: enforces compile integrity and orphan JSX detection before any push.
-# Catches errors locally before pushing to CI.
+# Pre-push gate: fast compile-integrity checks before any push.
+# Full builds run in CI, not here.
 
 echo "🔒 Pre-push checks running..."
 
@@ -24,33 +24,7 @@ pnpm audit:casing || {
   exit 1
 }
 
-# 3. Clean build artifact
-echo "  → Removing stale .next cache..."
-rm -rf apps/lms/.next
-
-# 4. Full LMS build — catches module resolution, prerender, and bundler errors
-echo "  → Running LMS build..."
-pnpm --filter @elevate/lms build || {
-  echo "❌ LMS build failed. Fix build errors before pushing."
-  exit 1
-}
-
-# 5. Redirect conflict + public route guards
-echo "  → Checking redirect conflicts and public route guards..."
-pnpm run build:lms:checks || {
-  echo "❌ build:lms:checks failed. Fix conflicts before pushing."
-  exit 1
-}
-
-# 6. TypeScript compile check
-echo "  → TypeScript type check (baseline-aware)..."
-if ! NODE_OPTIONS=--max-old-space-size=4096 node scripts/typecheck-baseline.mjs; then
-  echo "❌ TypeScript: new errors detected. Fix before pushing."
-  exit 1
-fi
-echo "  ✅ TypeScript: no new errors against baseline"
-
-# 7. Orphan JSX detector — catch incomplete redirect stub conversions
+# 3. Orphan JSX detector — catch incomplete redirect stub conversions
 echo "  → Checking for orphaned JSX in redirect stubs..."
 DIRTY_FILES=$(python3 - << 'PYEOF'
 import re, os, sys
@@ -90,7 +64,7 @@ if [ -n "$DIRTY_FILES" ]; then
 fi
 echo "  ✅ Orphan JSX: clean"
 
-# 8. ESLint — run only on files changed since the last pushed commit.
+# 4. ESLint — run only on files changed since the last pushed commit.
 echo "  → ESLint (changed files only)..."
 
 REMOTE_REF=$(git rev-parse --verify origin/main 2>/dev/null || echo "")

@@ -27,7 +27,13 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const API_DIR = path.join(ROOT, 'app', 'api');
+// Scan all three app directories for API routes (monorepo split)
+const API_DIRS = [
+  path.join(ROOT, 'apps', 'marketing', 'app', 'api'),
+  path.join(ROOT, 'apps', 'lms', 'app', 'api'),
+  path.join(ROOT, 'apps', 'admin', 'app', 'api'),
+];
+const API_DIR = API_DIRS[0]; // legacy fallback
 const REGISTRY_FILE = path.join(ROOT, 'lib', 'pre-auth-tables.ts');
 const REPORT_DIR = path.join(ROOT, 'reports');
 
@@ -78,8 +84,9 @@ const EXEMPT_RE = /\/\/\s*pre-auth-registry:\s*exempt/i;
 const INSERT_RE = /\.from\s*\(\s*['"]([^'"]+)['"]\s*\)[\s\S]{0,300}?\.(insert|upsert)\s*\(/g;
 const IDENTITY_COLS = /user_id|student_id|customer_email|recipient_id/;
 
-// 3. Walk app/api
+// 3. Walk all app/api directories
 function walkDir(dir, results = []) {
+  if (!fs.existsSync(dir)) return results;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) walkDir(full, results);
@@ -87,7 +94,7 @@ function walkDir(dir, results = []) {
   }
   return results;
 }
-const routeFiles = walkDir(API_DIR);
+const routeFiles = API_DIRS.flatMap(d => walkDir(d));
 
 // 4. Scan
 const issues = [];

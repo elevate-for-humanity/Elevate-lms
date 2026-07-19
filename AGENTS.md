@@ -1,295 +1,421 @@
 # OpenHands Agent Memory - Elevate LMS
 
-**📋 MASTER DOCUMENTATION:** `ENTERPRISE-PRD.md` (4,079 lines) - This is the comprehensive source of truth for the entire Elevate for Humanity platform. All development must reference this document.
+## MASTER PROJECT PROMPT: ELEVATE FOR HUMANITY OPERATING SYSTEM — FINAL PRODUCTION COMPLETION
+
+### ROLE
+Act as:
+- Senior Full Stack Engineer
+- Senior UI/UX Website Designer
+- DevOps Engineer
+- QA Engineer
+- Database Architect
+- Workforce Technology Architect
+
+### MAIN OBJECTIVE
+**Restore the original Elevate premium website experience while keeping the new engineering improvements.**
+
+The issue:
+- Too many pages
+- Too text heavy
+- Too generic LMS template
+- Missing visual storytelling
+- Missing pictures
+- Missing emotional connection
+
+The goal: Combine the BEST of original Elevate design + New engineering improvements
+
+Create:
+- Premium workforce institution feel
+- Modern university feel
+- Fortune 500 learning platform feel
+
+**NOT a generic course catalog.**
 
 ---
 
-## 🚀 PRODUCTION STATUS
+## CRITICAL WEBSITE DESIGN RULE
 
-### System Status
-| Component | Status | Notes |
-|-----------|--------|-------|
-| **PARIS AI Operating System** | ✅ Code Ready | 18 AI agents |
-| **Student LMS** | ✅ Code Ready | /lms/dashboard |
-| **Admin Dashboard** | ✅ Code Ready | /admin/dashboard |
-| **Testing Center** | ✅ Code Ready | ACT WorkKeys, Certiport, PSI |
-| **Apprenticeship (RAPIDS)** | ✅ Code Ready | Barber, Cosmetology |
-| **Stripe Payments** | ✅ Code Ready | Webhooks configured |
-| **Email (Resend/SendGrid)** | ✅ Code Ready | Transactional emails |
-| **Database (Supabase)** | ✅ Code Ready | 200+ tables |
-| **Northflank Deployment** | ⚠️ Pending | Needs secrets + build |
+Do NOT replace the website with a template. Keep original structure. Enhance it.
 
-### Production URLs (Pending Deployment)
-- **Main Site**: `work-1-{project}.prod-runtime.all-hands.dev`
-- **Admin**: `work-2-{project}.prod-runtime.all-hands.dev`
+Every public page must answer:
+1. What is this?
+2. Why should I care?
+3. Why trust Elevate?
+4. What do I do next?
 
-**⚠️ NOT DEPLOYED YET** - Code committed to GitHub, need to:
-1. Set NORTHFLANK_API_TOKEN environment variable
-2. Configure secrets in Northflank dashboard
-3. Trigger build from new commit
-
----
-
-## 🏗️ PARIS Operations Kernel (NEW)
-
-### Components Implemented (July 14, 2026)
-
-| Component | Location | Status |
-|-----------|----------|--------|
-| **Authoritative Data Layer** | `lib/operations/` | ✅ Implemented |
-| **Program Registry** | `lib/registry/`, `data/programs/` | ✅ Implemented |
-| **Workflow Engine** | `lib/workflows/engine.ts` | ✅ Implemented |
-| **State Machine** | `lib/orchestration/state-machine.ts` | ✅ Implemented |
-| **Notification System** | `lib/notifications/` | ✅ Implemented |
-| **Claims Verification** | `lib/automation/evidence-processor.ts` | ✅ Implemented |
-| **Dashboard Completion** | `lib/dashboard/completion-tracker.ts` | ✅ Implemented |
-| **Production Gate** | `scripts/production-readiness-gate.sh` | ✅ Enhanced |
-
-### Authoritative Data Layer Tables
-Created in `supabase/migrations/pending/20260714000001_authoritative_data_layer.sql`:
-
-- `organizations` - Single organization record
-- `program_registry` - Canonical program definitions
-- `funding_rules` - Verified funding sources
-- `verified_claims` - Evidence-backed public claims
-- `workflow_instances` - State machine tracking
-- `workflow_events` - Audit trail
-- `notification_outbox` - Reliable delivery queue
-
-### Key Services
-- `lib/operations/service.ts` - OperationsService with all CRUD operations
-- `lib/operations/types.ts` - TypeScript types for authoritative data
-- `lib/dashboard/completion-tracker.ts` - Role-based completion tracking
+Every page requires:
+- ✓ Premium hero banner
+- ✓ Real photography
+- ✓ Visual storytelling
+- ✓ Clear CTA buttons
+- ✓ Pricing where applicable
+- ✓ BNPL/payment calculator where applicable
+- ✓ Application buttons
+- ✓ Enrollment flow
+- ✓ Mobile optimization
+- ✓ SEO metadata
+- ✓ No placeholder text
+- ✓ No generic icon-only sections
 
 ---
 
-## 📚 MASTER DOCUMENT: ENTERPRISE-PRD.md
+## VISUAL EXPERIENCE REQUIREMENTS
 
-The comprehensive Enterprise PRD covers **32 chapters** with full implementation specs:
+Replace text-heavy layouts. Use:
+- Large career pathway cards
+- Real student/training images
+- Program photos
+- Certification graphics
+- Process timelines
+- Before/after outcomes
+- Success stories
+- Employer proof
+- Funding badges
 
-| Chapter | System |
-|---------|--------|
-| 1 | Executive Vision |
-| 2 | Enterprise Architecture |
-| 3 | PARIS AI Operating System (18 agents) |
-| 4 | Dev Studio |
-| 5-10 | AI Builders (Website, Business, Mobile, Workflow, Media, Clone) |
-| 11-12 | Course Factory, Credential Intelligence |
-| 13 | Vertical Engines (HVAC, Medical, Barber, CDL, Peer Recovery) |
-| 14-15 | Apprenticeship Platform, Testing Center |
-| 16-24 | All Platforms & Portals |
-| 25-32 | Business Systems, Security, Infrastructure |
-
-**Full reference:** See `ENTERPRISE-PRD.md` for complete specifications
+Create Netflix-style scrolling: Each section visually different. Users should naturally continue scrolling.
 
 ---
 
-## 🏗️ Program Page Architecture
+## HOMEPAGE FLOW
+Hero → Proof → Career Pathways → How It Works → Funding → Success Stories → Employers → Apply
 
-### Unified ProgramLanding System
+Preserve original homepage identity. Do NOT remove:
+- Hero experience
+- Animations
+- Brand personality
+- Career pathways
+- Funding sections
+- Employer trust
+- Student journey
 
-All apprenticeship programs use a **configuration-driven architecture**:
-
-```
-components/programs/
-├── ProgramLanding.tsx          # Master page renderer
-├── config/
-│   ├── barber-config.ts        # Barber Apprenticeship
-│   ├── cosmetology-config.ts   # Cosmetology Apprenticeship
-│   ├── esthetics-config.ts     # Esthetician Apprenticeship
-│   └── nail-config.ts          # Nail Technician Apprenticeship
-└── sections/                   # Reusable section components
-    ├── HeroSection.tsx
-    ├── ImagineSection.tsx
-    ├── ComparisonSection.tsx
-    ├── JourneySection.tsx
-    ├── SkillsSection.tsx
-    ├── CareerOutcomesSection.tsx  # Salary + Calculator + Jobs (UNIFIED)
-    ├── BusinessSection.tsx
-    ├── MentorsSection.tsx
-    ├── TestimonialsSection.tsx
-    ├── FundingSection.tsx
-    ├── FAQSection.tsx
-    └── CTASection.tsx
-```
-
-### Adding a New Program
-
-1. Create a config file in `components/programs/config/{program}-config.ts`
-2. Export a `ProgramConfig` object with all content
-3. Add to registry in `app/programs/[program]/page.tsx`:
-
-```ts
-const APPRENTICESHIP_CONFIGS: Record<string, ProgramConfig> = {
-  'barber-apprenticeship': barberConfig,
-  'cosmetology-apprenticeship': cosmetologyConfig,
-  // Add new program here
-};
-```
-
-### Page Flow (Single Narrative)
-
-```
-Hero → Imagine → Comparison → Journey → Skills → Career Outcomes → Business → Mentors → Testimonials → Funding → FAQ → CTA
-```
-
-### Legacy Components (Pending Cleanup)
-
-- `BeautyApprenticeship.tsx` - Old 1500-line monolith, can be deleted after migration
-- `BarberApprenticeshipClient.tsx` - Legacy component, superseded by ProgramLanding
-- `sections/` in `app/programs/barber-apprenticeship/` - Orphaned, can be deleted
+Enhance: Images, Motion, Cards, Spacing, Conversion flow
 
 ---
 
-## 🔧 Critical Integrations (Wired July 13, 2026)
+## PROGRAM PAGES (Must be complete sales/enrollment pages)
 
-### Digital Binder Flow
-```typescript
-// completeEnrollment() now creates binder automatically
-const { binderId, created } = await ensureDigitalBinder({
-  db: supabase,
-  userId: data.userId,
-  enrollmentId: enrollment.id,
-});
-```
+Each program needs:
+- Hero image
+- Program overview
+- Career outcome
+- Average pay
+- Duration
+- Credential earned
+- Funding options
+- Price
+- Deposit
+- Weekly payment calculator
+- BNPL option
+- Apply button
+- Book appointment
+- Student dashboard connection
+- LMS connection
 
-### Paris AI Chat API
-- **Endpoint:** `/api/zora/route.ts`
-- **Uses:** Groq (Llama) with fallback
-- **Session:** Stores in `ai_conversations` table
-- **System:** PARIS career guidance prompts
-
-### Enrollment Notifications
-```typescript
-// Send notification on status change
-import { onEnrollmentStatusChange } from '@/lib/notifications/enrollment-notifications';
-await onEnrollmentStatusChange({ email, status: 'active', ... });
-```
-
-### Tidio/Lizzy Config
-- **File:** `lib/chatbot/tidio-config.ts`
-- **Setup:** Set `NEXT_PUBLIC_TIDIO_KEY` env var
+**Programs include:**
+- Healthcare: Medical Assistant, Phlebotomy, EKG, Pharmacy Tech, Billing Coding, Patient Care Tech, Medical Admin, EHR
+- Trades: HVAC, EPA 608, Building Technician, CDL partners, Welding if active
+- Beauty Apprenticeship: Barber, Cosmetology, Esthetics, Manicurist
+- Testing: ACT WorkKeys, Certiport, CareerSafe, CPR, EPA
 
 ---
 
-## 📋 Required Secrets (Northflank)
+## STRIPE PAYMENT SYSTEM AUDIT
 
-| Secret | Purpose | Status |
-|-------|---------|--------|
-| NEXT_PUBLIC_SUPABASE_URL | Database | ⚠️ Configure |
-| NEXT_PUBLIC_SUPABASE_ANON_KEY | Client auth | ⚠️ Configure |
-| SUPABASE_SERVICE_ROLE_KEY | Server auth | ⚠️ Configure |
-| ANTHROPIC_API_KEY | Paris AI (optional) | Optional |
-| NEXT_PUBLIC_TIDIO_KEY | Lizzy chatbot | ⚠️ Configure |
-| GROQ_API_KEY | Zora chat | Optional |
+Every program, testing product, course, bundle, store product must have:
+- Database product
+- Stripe product
+- Payment link/checkout
+- Dashboard connection
 
----
+Verify endpoints:
+- /api/stripe/create-checkout-session
+- /api/stripe/create-payment-link
+- /api/stripe/webhook
+- /api/payments/status
 
-## 🗄️ Database Migrations
+Webhook handles: payment success, payment failure, checkout complete
 
-**Pending migration:** `supabase/migrations/pending/20260713000001_critical_tables.sql`
-
-Tables created:
-- ai_conversations
-- digital_binders
-- binder_documents
-- certifications
-- credentials
-- licenses
-- grades
-- communications
-- leads
-- conversations
-- announcements
-- blog_posts
-- campaigns
-- events
-- coupons
-- cohort_sessions
-- notification_outbox
-- enrollment_status_history
-
-Run in Supabase Dashboard SQL Editor before deploying.
+After payment: Update dashboard, enrollment, binder, CRM
 
 ---
 
-## 🎯 DEVELOPMENT PRIORITIES
+## NO AUTOMATIC STUDENT PAYMENTS
 
-### Current Sprint Focus
-1. **PARIS AI Commands** - Natural language automation
-2. **RAPIDS Sync** - Department of Labor integration
-3. **Testing Center** - ACT WorkKeys full integration
-4. **White-Label Licensing** - Multi-tenant platform
+Use:
+- Stripe payment links
+- Invoices
+- Manual payment schedules
 
-### Quick Reference by Feature
-
-| Feature | Implementation Path |
-|---------|-------------------|
-| AI Phone Agent | `/lib/ai/paris-phone-agent.ts` |
-| AI Admissions | `/lib/ai/paris-admissions.ts` |
-| RAPIDS Integration | `/lib/rapids/` |
-| WIOA Reporting | `/lib/wioa/` |
-| ACT WorkKeys | `/lib/testing/workkeys.ts` |
-| Employer Matching | `/lib/matching/` |
-| Digital Binder | `/lib/binder/` |
-| White-Label | `/lib/tenant/` |
+Dashboard highlights:
+- PAY NOW
+- NEXT PAYMENT
+- PAST DUE
+- PAID
 
 ---
 
-## 🔧 DEVELOPMENT WORKFLOW
+## BNPL CALCULATOR
 
-### Before Starting Any Task
-1. Read the relevant chapter in `ENTERPRISE-PRD.md`
-2. Check existing implementations in `/lib/`
-3. Verify database migrations in `/supabase/migrations/`
-4. Review API routes in `/app/api/`
-
-### Code Standards
-- TypeScript strict mode
-- Server actions for mutations
-- RLS policies for data access
-- Audit logging for compliance
-- Error boundaries for resilience
-
-### Issue Resolution Outcomes
-
-| Outcome | Definition |
-|---------|------------|
-| **Fixed** | Code change implemented in repository |
-| **Verified** | Confirmed working in production |
-| **Blocked** | Cannot proceed (external dependency) |
-| **Failed** | Engineering work still required |
-
-**Important**: Changes are **Fixed** (in GitHub) until they're **Verified** (in production). Always distinguish between repository state and production state.
-
-### Testing Requirements
-- Unit tests: 80% coverage minimum
-- Integration tests: All API routes
-- E2E tests: Critical user flows
-- Accessibility: WCAG 2.1 AA
+Every self-pay program needs:
+- Full price
+- Deposit
+- Remaining balance
+- Weekly estimate
+- Payment button
+- Funding option
 
 ---
 
-## 📊 AUDIT CHECKLIST
+## APPLICATION FLOW
 
-### Line-by-Line Audit Rules
+Website visitor → Paris AI Interview → Application → Account created → Digital binder created → Documents uploaded → Handbook signed → Payment/funding verified → LMS unlocked → Training starts → Credential earned → Career placement
+
+**Paris AI must:**
+- Interview applicants
+- Determine needs
+- Recommend program
+- Collect information
+- Create application
+- Create binder checklist
+- Schedule appointments
+- Send follow-ups
+
+Connect: Calendar, CRM, Email, SMS, Dashboard
+
+---
+
+## ADMIN DASHBOARD
+
+Must manage:
+- Students
+- Applications
+- Courses
+- Programs
+- Payments
+- Testing
+- Employees
+- CRM
+- SOPs
+- Apprenticeships
+- Host Shops
+- Employers
+- Reports
+- Store
+- Trials
+
+**No fake data. Database connected only.**
+
+---
+
+## DEV STUDIO
+
+Must include:
+- Website builder
+- Course builder
+- Program builder
+- Store builder
+- SOP builder
+- Workflow builder
+- AI tools
+- Preview mode
+- Build logs
+- Deployment health
+- Environment checks
+
+Support: Draft, Preview, Publish
+
+---
+
+## TESTING CENTER
+
+Manages:
+- Registration
+- Payments
+- Scheduling
+- Rooms
+- Computers
+- Proctors
+- Scores
+- Credentials
+
+Testing products: ACT WorkKeys, EPA, CPR, Certiport, CareerSafe, NHA where approved
+
+---
+
+## HOST SHOP PORTAL
+
+Apprenticeship system connects host shops:
+- Login
+- See apprentices
+- View syllabus
+- Monitor RTI
+- Track OJL
+- Approve hours
+- Sign competencies
+
+Geofence: Student clocks in → Host approves → Admin sees
+
+---
+
+## STORE SYSTEM
+
+Must show:
+- Enterprise
+- Small Business
+- Single Use
+
+Each product: Demo, Video, 14 day trial, Checkout, Dashboard access
+
+---
+
+## ADZUNA CAREER ENGINE
+
+Integrate Adzuna as workforce placement (secure backend only).
+
+Environment:
+- ADZUNA_APP_ID
+- ADZUNA_APP_KEY
+- ADZUNA_COUNTRY=us
+
+Endpoint: https://api.adzuna.com/v1/api/jobs/us/search/1
+
+Connect: Student credentials, Career goals, Resume, Job matching, Applications, Outcomes reporting
+
+---
+
+## DATABASE + MIGRATIONS
+
+Audit migrations. Run all. Verify:
+- Tables exist
+- Columns exist
+- Indexes exist
+- Seed data active
+- No drift
+
+Do not skip migration errors. Fix them.
+
+---
+
+## NORTHFLANK PRODUCTION AUDIT
+
+Enter Northflank and audit:
+- Build logs
+- Docker logs
+- Runtime logs
+- Health checks
+- Container startup
+- Memory errors
+- Warnings
+- Failed routes
+- Environment variables
+
+Fix:
+- TypeScript errors
+- Imports
+- Route conflicts
+- Docker failures
+- Runtime crashes
+- Warnings that affect production
+
+---
+
+## BUILD REQUIREMENTS
+
+Trigger all builds: Marketing, Admin, LMS
+
+Run:
+- pnpm typecheck
+- pnpm lint
+- pnpm build
+
+If scoped: build:marketing, build:admin, build:lms
+
+**ALL MUST BE GREEN.**
+
+---
+
+## FINAL REPORT REQUIRED
+
+Return:
+1. Pages audited
+2. Pages fixed
+3. UI improvements
+4. Images restored
+5. Stripe status
+6. Database migrations
+7. Dashboard connections
+8. LMS connections
+9. Northflank errors fixed
+10. Runtime status
+11. Build results
+12. Remaining credential-only issues
+
+**SUCCESS MEANS:**
+- Premium website restored
+- Backend power remains
+- No dead pages
+- No broken checkout
+- No disconnected dashboards
+- No fake data
+- No build errors
+- No runtime failures
+- Production ready
+
+---
+
+## WEBSITE PAGE AUDIT CHECKLIST
+
+Audit EVERY:
+- Header page
+- Footer page
+- Program page
+- Testing page
+- Landing page
+
+Find and fix:
+- ❌ Stub pages
+- ❌ Missing hero images
+- ❌ Missing CTAs
+- ❌ Broken buttons
+- ❌ Fake content
+- ❌ Generic icons
+- ❌ Missing pricing
+- ❌ Missing application links
+- ❌ Missing checkout
+
+No page should say: "Coming soon", "Back home only", "Placeholder", "Lorem ipsum"
+
+---
+
+## AUDIT SYSTEM FOR ERRORS
+
+### ⚠️ CRITICAL RULE: Always do LINE-BY-LINE audits when investigating issues
+
+---
+
+### FULL AUDIT PROMPT (Use This Every Time)
+
 ```
 AUDIT LINE BY LINE - Side by side comparison of [FILE_A] and [FILE_B]
 
 RULES:
-1. Use `diff -y` or `paste` to show BOTH files side by side
-2. For EVERY line that differs, report:
+1. Use `diff -y` or `paste` to show BOTH files side by side, line by line
+2. For EVERY line that differs (EVEN comments), report:
    - Exact line numbers in each file
    - Exact content of both lines  
    - Flag as ⚠️ ISSUE if different
-   - Flag as ✅ EXPECTED if intentionally different
-3. Do NOT skip ANY differences
-4. Provide a FIXED summary table
+   - Flag as ✅ EXPECTED if intentionally different (e.g., different app names, URLs, paths)
+3. Do NOT skip ANY differences - even 1 character matters
+4. After showing all differences, provide a FIXED summary table
 5. Ask before making any fixes
-6. RE-AUDIT after each fix
+6. ITERATIVE FIXING: After each fix, RE-AUDIT to verify fixed and check for MORE issues
+7. Keep auditing until system is as expected (all fixed, all matching, all working)
 ```
 
-### Build Verification
+---
+
+### BUILD FAILURE CHECKLIST
+
 ```bash
 # 1. Lockfile version vs pnpm version
 grep "lockfileVersion" pnpm-lock.yaml
@@ -308,7 +434,10 @@ grep -E "PORT|EXPOSE|8080|3000" Dockerfile.*
 grep "max-old-space-size" Dockerfile.*
 ```
 
-### Version Matching
+---
+
+### VERSION MATCHING RULES
+
 | Lockfile | pnpm Version |
 |----------|--------------|
 | lockfileVersion: '6.0' | pnpm@9.x |
@@ -318,75 +447,31 @@ grep "max-old-space-size" Dockerfile.*
 
 ---
 
-## 🎓 KEY TRAINEE JOURNEYS
+### COMMON BUILD ISSUES & ROOT CAUSES
 
-### Student Journey
-```
-Website → Lead → Application → PARiS Interview → Funding → Enrollment → LMS → Certificate → Placement
-```
-
-### Barber Apprentice Journey
-```
-Website → Apply → OJL Agreement → Host Shop → RTI Classes → Clock In/Out → Competency Sign-off → State Board → License → RAPIDS Certificate
-```
-
-### WIOA Participant Journey
-```
-WorkOne Referral → Intake → ACT WorkKeys → Program Enrollment → Training → Credential → Job Placement → 6-Month Follow-up
-```
+| Issue | Check | Fix |
+|-------|-------|-----|
+| Memory spike | NODE_OPTIONS vs requirements | Match memory to app size |
+| Lockfile error | pnpm version vs lockfileVersion | Match versions |
+| Module not found | @ alias in standalone | Inline dependencies |
+| Cache miss | Cache invalidation marker | Add RUN echo after FROM |
+| Build timeout | Single worker vs parallel | CI=true, single worker |
 
 ---
 
-## 🔗 INTEGRATION POINTS
+### FILES TO ALWAYS CHECK FOR SYNC
 
-| Service | Integration Type | API/SDK |
-|---------|----------------|---------|
-| **Stripe** | Payments, Subscriptions | stripe-node |
-| **Twilio** | SMS, Voice | twilio-node |
-| **Resend** | Transactional Email | @resend/node-resend |
-| **SendGrid** | Email (backup) | @sendgrid/mail |
-| **Anthropic** | AI (Claude) | @anthropic-ai/sdk |
-| **Adzuna** | Job Search | REST API |
-| **HeyGen** | Video Generation | REST API |
-| **Pexels** | Stock Photos | REST API |
-| **Supabase** | Database, Auth, Storage | @supabase/supabase-js |
-| **Northflank** | Hosting, Containers | northflank-api |
-
----
-
-## ⚠️ CRITICAL REMINDERS
-
-**You are too fast. Slow down and audit line by line.**
-
-Every character matters. A misplaced `#` or wrong version number can cause hours of debugging.
-
-**Always check:**
-1. Database migrations before adding columns
-2. Existing code before creating new files
-3. PRD for requirements before implementing
-4. Build errors before deploying
-
-**Files to always check for sync:**
 - Dockerfile.northflank-lms
 - Dockerfile.northflank-admin
 - package.json (workspace structure)
 - pnpm-lock.yaml
+- apps/admin/server.js
+- apps/server.js
 
 ---
 
-## 📁 KEY FILE LOCATIONS
+### REMEMBER
 
-| Document | Path | Purpose |
-|----------|------|---------|
-| **ENTERPRISE-PRD.md** | Root | Complete 4,079-line master specification (32 chapters) |
-| Architecture | `ARCHITECTURE_DOCUMENTATION.md` | System architecture |
-| Dashboard Truth | `TRUE-DASHBOARD-ARCHITECTURE.md` | Portal routing |
-| Database Audit | `DATABASE-AUDIT.md` | Table status |
-| Automation Engine | `INTELLIGENT-AUTOMATION-ENGINE.md` | Lead-to-enrollment |
-| Production Setup | `PRODUCTION-SETUP.md` | Deployment guide |
-| Blueprint | `BLUEPRINT/INDEX.md` | Page specifications |
+**You are too fast. Slow down and audit line by line.**
 
----
-
-**Last Updated:** July 11, 2026  
-**Document Owner:** Elevate for Humanity Engineering Team
+Every character matters. A misplaced `#` or wrong version number can cause hours of debugging.

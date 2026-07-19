@@ -22,7 +22,7 @@ const TESTIMONIALS = [
   {
     name: 'James T.',
     program: 'HVAC Technician',
-    quote: 'The WIOA funding covered everything — tuition, books, even my certification exam. I went from unemployed to working in HVAC in just 3 months.',
+    quote: "The WIOA funding covered everything — tuition, books, even my certification exam. I went from unemployed to working in HVAC in just 3 months.",
     image: '/images/testimonials/james-t.webp',
     outcome: 'Employed in 3 months',
     location: 'Carmel, IN',

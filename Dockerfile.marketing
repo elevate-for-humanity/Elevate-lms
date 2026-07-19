@@ -1,85 +1,73 @@
-# Dockerfile - Independent Marketing Next.js build
-# Serves www.elevateforhumanity.org
+# Dockerfile.marketing
+# Specialized for Public Pages / (marketing) / store
+# Fixed: Added build args for commit SHA and build time
 
 FROM node:22-bookworm AS builder
 
-ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+# Cache invalidation
+RUN echo "nf-cache-invalidate-20260719-marketing-v5"
 
-ENV PNPM_HOME="/app/.pnpm-home"
-ENV PATH="$PNPM_HOME:$PATH"
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS="--max-old-space-size=8192"
-ENV CI=true
+# Build arguments for version tracking
+ARG COMMIT_SHA=unknown
+ARG BUILD_TIME=unknown
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 build-essential ca-certificates libcairo2-dev libpango1.0-dev \
+    libjpeg-dev libgif-dev librsvg2-dev && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-
-# Dependency manifests first for caching
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/marketing/package.json ./apps/marketing/package.json
-COPY packages/db/package.json ./packages/db/package.json
-COPY packages/shared/package.json ./packages/shared/package.json
-COPY packages/ui/package.json ./packages/ui/package.json
-
-RUN pnpm install --frozen-lockfile
-
-# Application source
+COPY apps/admin/package.json apps/admin/package.json
+COPY packages/db/package.json packages/db/package.json
+COPY packages/shared/package.json packages/shared/package.json
+COPY packages/ui/package.json packages/ui/package.json
 COPY . .
 
-ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
-ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
-ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
-ARG NEXT_PUBLIC_SUPABASE_URL
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG GITHUB_SHA=unknown
+# Set build identity - available to both server and client
+ENV COMMIT_SHA=${COMMIT_SHA}
+ENV BUILD_TIME=${BUILD_TIME}
+ENV NEXT_PUBLIC_COMMIT_SHA=${COMMIT_SHA}
+ENV NEXT_PUBLIC_BUILD_TIME=${BUILD_TIME}
 
-ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
-ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
-ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
-ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
-ENV GITHUB_SHA=$GITHUB_SHA
-ENV NEXT_PUBLIC_GIT_SHA=$GITHUB_SHA
-ENV NEXT_PUBLIC_BUILD_ID=$GITHUB_SHA
-ENV BUILD_ID=$GITHUB_SHA
+# Run the splitter
+ENV BUILD_SCOPE=MARKETING
+ENV CI=true
+ENV SPLIT_LIVE_MODE=true
+RUN node scripts/split-app.mjs
 
-RUN pnpm --filter @elevate/marketing build
+# Stable PNPM (matching lockfileVersion 9.0)
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
-RUN echo "=== STANDALONE SERVER LOCATION ===" && \
-    find /app/apps/marketing/.next/standalone \
-      -type f \
-      -name "server.js" \
-      -print
+# 1. Install ALL dependencies (reproducible build)
+RUN pnpm install --frozen-lockfile
 
+# 2. Build with 6GB Limit (MARKETING scope)
+ENV NODE_OPTIONS=--max-old-space-size=6144
+ENV NEXT_STANDALONE_OUTPUT=1
+RUN pnpm exec cross-env BUILD_SCOPE=MARKETING NODE_OPTIONS='--max-old-space-size=6144' next build
+
+# --- Runner Stage ---
 FROM node:22-bookworm-slim AS runner
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    fonts-liberation \
-    && rm -rf /var/lib/apt/lists/*
-
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV HOSTNAME=0.0.0.0
-ENV PORT=8080
-
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl fonts-liberation && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
+ENV PORT=8080
+ENV HOSTNAME=0.0.0.0
+ENV NODE_ENV=production
 
-# Copy standalone build artifacts
-COPY --from=builder /app/apps/marketing/.next/standalone ./
+# Pass build identity to runtime
+ARG COMMIT_SHA=unknown
+ARG BUILD_TIME=unknown
+ENV COMMIT_SHA=${COMMIT_SHA}
+ENV BUILD_TIME=${BUILD_TIME}
+ENV NEXT_PUBLIC_COMMIT_SHA=${COMMIT_SHA}
+ENV NEXT_PUBLIC_BUILD_TIME=${BUILD_TIME}
 
-# Copy static and public
-COPY --from=builder /app/apps/marketing/.next/static ./apps/marketing/.next/static
-COPY --from=builder /app/apps/marketing/public ./apps/marketing/public
-
-# Copy custom server.js if it exists
-COPY --from=builder /app/apps/marketing/server.js ./apps/marketing/server.js 2>/dev/null || true
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/.next/server ./.next/server
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 8080
-
-HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -fsS http://127.0.0.1:8080/api/version || exit 1
-
-# Start from the standalone server.js (at root after COPY)
-CMD ["node", "--max-http-header-size=32768", "server.js"]
+CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "server.js"]

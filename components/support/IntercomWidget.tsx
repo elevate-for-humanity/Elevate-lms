@@ -65,3 +65,8 @@ export function IntercomWidget({ user }: { user?: { id: string; email: string; n
 
   return null;
 }
+declare global {
+  interface Window {
+    Intercom?: (...args: unknown[]) => void;
+  }
+}

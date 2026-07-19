@@ -8,6 +8,7 @@
  */
 
 import { notFound } from 'next/navigation';
+import { UserRole } from '@/lib/rbac/role-matrix';
 
 export type AdminRole = 'admin' | 'super_admin' | 'staff';
 

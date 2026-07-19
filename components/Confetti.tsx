@@ -43,9 +43,11 @@ export default function Confetti({
   const [isActive, setIsActive] = useState(active);
 
   useEffect(() => {
-    if (active) {
-      // Generate confetti pieces
-      const newPieces: ConfettiPiece[] = Array.from({ length: pieceCount }, (_, i) => ({
+    if (!active) {
+      return;
+    }
+    // Generate confetti pieces
+    const newPieces: ConfettiPiece[] = Array.from({ length: pieceCount }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
         y: -10,
@@ -64,7 +66,6 @@ export default function Confetti({
       }, duration);
 
       return () => clearTimeout(timer);
-    }
   }, [active, duration, pieceCount]);
 
   if (!isActive) return null;

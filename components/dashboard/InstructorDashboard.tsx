@@ -18,7 +18,7 @@ import {
   Search,
   Settings,
   Star,
-  Students,
+  Users,
   TrendingUp,
   UserCheck,
   Users,

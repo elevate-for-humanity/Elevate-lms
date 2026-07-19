@@ -6,7 +6,7 @@ import {
   SkipBack, SkipForward, Settings, Loader2, RotateCcw,
   PictureInPicture2, Languages, Captions, Subtitles,
   ChevronDown, Check, X, ExternalLink, Download,
-  Monitor, SmartPhone, RotateCw
+  Monitor, Smartphone, RotateCw
 } from 'lucide-react';
 import { trackLessonProgress } from '@/lib/xapi/xapi-client';
 
@@ -28,6 +28,8 @@ export interface UltraVideoPlayerProps {
   // Source
   src?: string;
   poster?: string;
+  /** @deprecated Use poster instead */
+  posterImage?: string;
   title?: string;
   
   // Course/Lesson tracking
@@ -39,6 +41,8 @@ export interface UltraVideoPlayerProps {
   // Playback
   autoPlay?: boolean;
   autoPlayOnMount?: boolean;
+  /** Preload entire video on mount */
+  preloadFull?: boolean;
   muted?: boolean;
   loop?: boolean;
   startTime?: number;

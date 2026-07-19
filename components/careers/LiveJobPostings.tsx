@@ -6,6 +6,7 @@ interface LiveJobPostingsProps {
   limit?: number;
   heading?: string;
   className?: string;
+  programSlug?: string;
 }
 
 /** Live employer postings from `job_postings` — not the legacy empty `jobs` table. */
@@ -13,6 +14,7 @@ export default async function LiveJobPostings({
   limit = 6,
   heading = 'Open Positions',
   className = '',
+  programSlug,
 }: LiveJobPostingsProps) {
   let jobs: Awaited<ReturnType<typeof getActiveJobs>> = [];
   

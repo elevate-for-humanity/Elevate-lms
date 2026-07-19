@@ -1,6 +1,0 @@
-import { redirect } from 'next/navigation';
-
-export default function ProgramHolderDashboard() {
-  // Combined with partner dashboard
-  redirect('/partner/dashboard');
-}

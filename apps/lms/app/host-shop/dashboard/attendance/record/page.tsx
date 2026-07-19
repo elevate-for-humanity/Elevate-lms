@@ -10,6 +10,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Record Attendance | Partner Portal',
+  robots: { index: false, follow: false },
 };
 
 export const dynamic = 'force-dynamic';

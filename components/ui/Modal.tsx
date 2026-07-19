@@ -20,7 +20,7 @@ export const Modal: React.FC<ModalProps> = ({
   size = 'md',
   showCloseButton = true,
 }) => {
-  useEffect((): void => {
+  useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
 

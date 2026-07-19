@@ -32,7 +32,7 @@ type MobileNavProps = {
  */
 export function MobileNavWrapper({ open, onClose, children }: MobileNavProps) {
   // Lock/unlock body scroll properly (and ALWAYS restore on unmount)
-  useEffect((): void => {
+  useEffect(() => {
     if (!open) return;
 
     const scrollY = window.scrollY;
@@ -63,7 +63,7 @@ export function MobileNavWrapper({ open, onClose, children }: MobileNavProps) {
   }, [open]);
 
   // ESC close
-  useEffect((): void => {
+  useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();

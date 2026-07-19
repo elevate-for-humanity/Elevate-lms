@@ -30,7 +30,7 @@ export function NumberTicker({
   });
   const isInView = useInView(ref, { once: true, margin: '0px' });
 
-  useEffect((): void => {
+  useEffect(() => {
     if (isInView) {
       const timer = setTimeout(() => {
         motionValue.set(direction === 'down' ? startValue : value);

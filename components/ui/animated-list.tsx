@@ -30,7 +30,7 @@ export const AnimatedList = React.memo(
     const [index, setIndex] = useState(0);
     const childrenArray = useMemo(() => React.Children.toArray(children), [children]);
 
-    useEffect((): void => {
+    useEffect(() => {
       if (index < childrenArray.length - 1) {
         const timeout = setTimeout(() => {
           setIndex((prevIndex) => (prevIndex + 1) % childrenArray.length);

@@ -28,6 +28,7 @@ import {
   MessageSquare,
   Download,
   Lock,
+  MessageCircle,
 } from 'lucide-react';
 import type { ActivityId, ActivityDef } from '@/lib/lms/activity-map';
 import { getCheckpointGates } from '@/lib/lms/activity-map';
@@ -42,6 +43,7 @@ const ACTIVITY_ICONS: Record<ActivityId, React.ElementType> = {
   checkpoint: Shield,
   notes: MessageSquare,
   resources: Download,
+  ask: MessageCircle,
 };
 
 const ACTIVITY_COLORS: Record<ActivityId, string> = {
@@ -54,6 +56,7 @@ const ACTIVITY_COLORS: Record<ActivityId, string> = {
   checkpoint: 'text-red-600',
   notes: 'text-slate-500',
   resources: 'text-slate-500',
+  ask: 'text-brand-blue-600',
 };
 
 interface Props {
@@ -115,7 +118,7 @@ export default function LessonActivityMenu({
         className="flex gap-0.5 overflow-x-auto pb-0 scrollbar-hide"
       >
         {activities.map((act) => {
-          const Icon = ACTIVITY_ICONS[act.id] ?? FileText;
+          const Icon = (ACTIVITY_ICONS[act.id] ?? FileText) as React.ComponentType<{className?: string}>;
           const color = ACTIVITY_COLORS[act.id] ?? 'text-slate-600';
           const active = activeId === act.id;
           const locked = isLocked(act);

@@ -98,17 +98,17 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
 
   const closeMenu = () => setIsOpen(false);
 
-  useEffect((): void => {
+  useEffect(() => {
     setMounted(true);
   }, []);
 
-  useEffect((): void => {
+  useEffect(() => {
     setIsOpen(false);
     setExpandedSection(firstItemKey);
     setExpandedCategory(null);
   }, [pathname, firstItemKey]);
 
-  useEffect((): void => {
+  useEffect(() => {
     if (!isOpen) {
       document.body.style.overflow = '';
       return;
@@ -144,7 +144,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                   const sectionKey = item.id ?? item.name;
                   const hasSubItems = Boolean(item.subItems?.length);
                   const sectionOpen = expandedSection === sectionKey;
-                  const columns = hasSubItems ? groupNavSubItemsByHeader(item.subItems!) : [];
+                  const columns = hasSubItems ? Object.values(groupNavSubItemsByHeader(item.subItems!)) : [];
                   const useCategoryAccordions = columns.length > 1;
 
                   return (

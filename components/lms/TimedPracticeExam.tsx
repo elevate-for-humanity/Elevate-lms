@@ -77,7 +77,7 @@ export default function TimedPracticeExam({
   );
 
   // Countdown timer
-  useEffect((): void => {
+  useEffect(() => {
     if (state !== 'active') return;
     timerRef.current = setInterval(() => {
       setTimeLeft((t) => {
@@ -94,7 +94,7 @@ export default function TimedPracticeExam({
   }, [state, finish]);
 
   // Save missed questions to localStorage for spaced repetition
-  useEffect((): void => {
+  useEffect(() => {
     if (state !== 'results') return;
     const missed = exam.filter((_, i) => answers[i] !== exam[i].answer);
     if (!missed.length) return;

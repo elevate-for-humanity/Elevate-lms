@@ -69,16 +69,17 @@ function Section({
   children,
   id,
 }: {
-  icon: React.ElementType;
+  icon: React.ComponentType<{className?: string}>;
   title: string;
   children: React.ReactNode;
   id?: string;
 }) {
+  const IconComponent = Icon as React.ComponentType<{className?: string}>;
   return (
     <div id={id} className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 bg-brand-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-          <Icon className="w-5 h-5 text-brand-blue-600" />
+          <IconComponent className="w-5 h-5 text-brand-blue-600" />
         </div>
         <h3 className="text-lg font-bold text-slate-900">{title}</h3>
       </div>

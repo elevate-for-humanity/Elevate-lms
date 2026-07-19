@@ -21,7 +21,7 @@ export function AnimatedCounter({
   const [count, setCount] = useState(0);
   const [started, setStarted] = useState(false);
 
-  useEffect((): void => {
+  useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
@@ -39,7 +39,7 @@ export function AnimatedCounter({
     return () => observer.disconnect();
   }, [started]);
 
-  useEffect((): void => {
+  useEffect(() => {
     if (!started) return;
 
     const startTime = performance.now();

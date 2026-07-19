@@ -21,7 +21,6 @@ import {
   Users,
   TrendingUp,
   UserCheck,
-  Users,
   AlertCircle,
   Plus,
   Filter,

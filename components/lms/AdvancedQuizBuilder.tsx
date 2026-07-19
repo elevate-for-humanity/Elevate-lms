@@ -72,7 +72,7 @@ export default function AdvancedQuizBuilder() {
   const questionTypes: {
     type: QuestionType;
     label: string;
-    icon: React.ComponentType<any> | React.ReactElement;
+    icon: React.ComponentType<{className?: string}>;
   }[] = [
     { type: 'multiple_choice', label: 'Multiple Choice', icon: CheckCircle },
     { type: 'true_false', label: 'True/False', icon: Circle },

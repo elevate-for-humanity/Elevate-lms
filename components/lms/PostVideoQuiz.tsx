@@ -382,7 +382,7 @@ export function PostVideoQuiz({
 
   // ── INITIAL REVIEW (after first submit) ──
   if (submitted) {
-    const { correct, total, percent } = computeScore(selected);
+    const { correct, total, percent } = computeScoreForQuestions(selected, questions);
     const isPassed = bestScore >= passingScore;
     const missedCount = questions.length - correct;
 

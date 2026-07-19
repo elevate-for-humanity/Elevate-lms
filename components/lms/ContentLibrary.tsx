@@ -182,7 +182,10 @@ export default function ContentLibrary() {
                 multiple
                 onChange={(
                   e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-                ) => e.target.files && handleUpload(e.target.files)}
+                ) => {
+                  const target = e.target as HTMLInputElement;
+                  target.files && handleUpload(target.files);
+                }}
                 className="hidden"
               />
             </label>

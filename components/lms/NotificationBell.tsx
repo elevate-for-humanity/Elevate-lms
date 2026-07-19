@@ -61,7 +61,7 @@ export function NotificationBell() {
     }
   }, []);
 
-  useEffect((): void => {
+  useEffect(() => {
     void fetchNotifications();
 
     // Subscribe to realtime notifications

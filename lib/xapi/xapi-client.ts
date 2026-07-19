@@ -259,5 +259,5 @@ export async function trackLessonProgress(
   percent: number
 ): Promise<void> {
   const client = getXAPIClient();
-  return client.trackLessonCompletion(userId, courseId, lessonId, lessonName, percent >= 100);
+  return client.trackLessonCompleted(userId, courseId, lessonId, lessonName, percent >= 100);
 }

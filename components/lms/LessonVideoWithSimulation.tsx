@@ -38,14 +38,14 @@ export default function LessonVideoWithSimulation({
   const teaching = simulation.teaching;
   const minimumReached = watchedSeconds >= minimumTimeSeconds;
 
-  useEffect((): void => {
+  useEffect(() => {
     if (minimumReached && !minimumReported) {
       setMinimumReported(true);
       onMinimumTimeReached?.();
     }
   }, [minimumReached, minimumReported, onMinimumTimeReached]);
 
-  useEffect((): void => {
+  useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 

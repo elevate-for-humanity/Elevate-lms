@@ -183,7 +183,7 @@ export function ApprenticePortalShell({
   hoursRemainingDisplay,
   rti = null,
 }: Props) {
-  const ProgramIcon = config.icon;
+  const ProgramIcon = config.icon as React.ComponentType<{className?: string}>;
 
   const requiredOjl = config.requiredOjl;
   const requiredRti = config.requiredRti;

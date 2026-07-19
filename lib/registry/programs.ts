@@ -1,4 +1,5 @@
 import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
+import type { ProgramSchema } from '@/lib/programs/program-schema';
 
 /**
  * One Canonical Program Registry
@@ -13,13 +14,18 @@ import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
 
 export const PROGRAM_REGISTRY = STATIC_PROGRAM_MAP;
 
+/** Convert the registry Map to an array for filtering/finding */
+function registryToArray(): ProgramSchema[] {
+  return [...PROGRAM_REGISTRY.values()];
+}
+
 /** 
  * Returns the registry filtered by category for dynamic navigation.
  */
 export function getProgramsByCategory(category: string) {
-  return PROGRAM_REGISTRY.filter(p => p.category === category || p.tags?.includes(category));
+  return registryToArray().filter(p => p.category === category || p.tags?.includes(category));
 }
 
 export function getProgramBySlug(slug: string) {
-  return PROGRAM_REGISTRY.find(p => p.slug === slug);
+  return PROGRAM_REGISTRY.get(slug);
 }

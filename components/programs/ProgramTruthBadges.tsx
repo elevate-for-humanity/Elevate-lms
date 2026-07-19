@@ -36,7 +36,7 @@ interface DeliveryBadgeProps {
 }
 
 export function DeliveryBadge({ model }: DeliveryBadgeProps) {
-  const Icon = DELIVERY_ICONS[model];
+  const Icon = DELIVERY_ICONS[model] as React.ComponentType<{className?: string; 'aria-hidden'?: boolean}>;
   const label = DELIVERY_LABELS[model];
   const color = DELIVERY_COLORS[model];
 

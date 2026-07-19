@@ -10,7 +10,7 @@ interface IntercomWindow {
 }
 
 export function IntercomWidget({ user }: { user?: { id: string; email: string; name?: string } }) {
-  useEffect((): void => {
+  useEffect(() => {
     if (!process.env.NEXT_PUBLIC_INTERCOM_APP_ID) return;
 
     const appId = process.env.NEXT_PUBLIC_INTERCOM_APP_ID;

@@ -8,7 +8,7 @@ const STORAGE_KEY = 'efh_funding_toast_dismissed';
 export default function FundingToast() {
   const [visible, setVisible] = useState(false);
 
-  useEffect((): void => {
+  useEffect(() => {
     if (typeof window === 'undefined') return;
     const dismissed = window.localStorage.getItem(STORAGE_KEY);
     if (!dismissed) {

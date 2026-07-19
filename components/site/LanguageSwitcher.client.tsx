@@ -20,12 +20,12 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
   const ref = useRef<HTMLDivElement>(null);
 
   // Read current locale from cookie on mount
-  useEffect((): void => {
+  useEffect(() => {
     setCurrent(getCurrentLocale());
   }, []);
 
   // Close on outside click
-  useEffect((): void => {
+  useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -37,7 +37,7 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
   }, [open]);
 
   // Close on Escape
-  useEffect((): void => {
+  useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false);

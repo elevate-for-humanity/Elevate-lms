@@ -326,7 +326,9 @@ export function findDuplicateNavHrefs(navItems: NavItem[]): Array<{ href: string
     .map(([href, items]) => ({ href, items }));
 }
 
-export function groupNavSubItemsByHeader(navItems: NavItem[]): Record<string, NavItem[]> {
+export function groupNavSubItemsByHeader(navItems: NavItem[]): Record<string, NavItem[]>;
+export function groupNavSubItemsByHeader(navItems: NavSubItem[]): Record<string, NavSubItem[]>;
+export function groupNavSubItemsByHeader(navItems: NavItem[] | NavSubItem[]): Record<string, NavItem[]> | Record<string, NavSubItem[]> {
   const groups: Record<string, NavItem[]> = {};
   for (const item of navItems) {
     const header = item.isHeader ? item.name : 'Default';

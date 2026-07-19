@@ -16,11 +16,13 @@ import {
   Shield,
   Clock,
   ChevronRight,
+  Download,
+  MessageCircle,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────
 
-type ActivityType = 'video' | 'reading' | 'flashcards' | 'lab' | 'practice' | 'checkpoint';
+type ActivityType = 'video' | 'reading' | 'flashcards' | 'lab' | 'scenario' | 'practice' | 'checkpoint' | 'notes' | 'resources' | 'ask';
 
 interface Activity {
   type: ActivityType;
@@ -66,8 +68,12 @@ const ACTIVITY_ICON: Record<ActivityType, React.ElementType> = {
   reading: FileText,
   flashcards: Brain,
   lab: FlaskConical,
+  scenario: FlaskConical,
   practice: Zap,
   checkpoint: Shield,
+  notes: FileText,
+  resources: Download,
+  ask: MessageCircle,
 };
 
 const ACTIVITY_COLOR: Record<ActivityType, string> = {
@@ -75,8 +81,12 @@ const ACTIVITY_COLOR: Record<ActivityType, string> = {
   reading: 'text-slate-500',
   flashcards: 'text-purple-600',
   lab: 'text-brand-green-600',
+  scenario: 'text-teal-600',
   practice: 'text-amber-600',
   checkpoint: 'text-brand-red-600',
+  notes: 'text-slate-400',
+  resources: 'text-slate-400',
+  ask: 'text-brand-blue-600',
 };
 
 // Default activities when a lesson has none stored (legacy rows)
@@ -274,7 +284,7 @@ function LessonRow({
         <div className="bg-slate-50 border-t border-slate-100 px-5 py-3 space-y-1">
           {activities.map((activity, actIdx) => {
             const activityType = activity.type as ActivityType;
-            const Icon = ACTIVITY_ICON[activityType] ?? Play;
+            const Icon = (ACTIVITY_ICON[activityType] ?? Play) as React.ComponentType<{className?: string}>;
             const color = ACTIVITY_COLOR[activityType] ?? 'text-slate-500';
             // Gate the checkpoint activity on prior required activities being
             // done — NOT on isCompleted. Gating on isCompleted is circular:

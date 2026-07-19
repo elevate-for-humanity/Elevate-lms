@@ -51,6 +51,17 @@ export const TestingSessionMeta = z.object({
 });
 export type TestingSessionMeta = z.infer<typeof TestingSessionMeta>;
 
+/**
+ * Metadata for testing enforcement fee checkout.
+ * Required for unlocking enforcement records after payment.
+ */
+export const TestingEnforcementMeta = z.object({
+  payment_type: z.literal('testing_enforcement'),
+  enforcement_id: metaStr,
+  email: metaStrOpt,
+});
+export type TestingEnforcementMeta = z.infer<typeof TestingEnforcementMeta>;
+
 // ── Barber apprenticeship ─────────────────────────────────────────────────────
 
 /**

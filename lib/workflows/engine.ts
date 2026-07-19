@@ -259,7 +259,7 @@ async function execStepWithRetry(
     () => {},
     (err: unknown) => logger.error('[workflow/engine] dead-letter write failed', err instanceof Error ? err : new Error(String(err)), { run_id: ctx.runId }),
   );
-  logger.error('[workflow/engine] step exhausted retries → dead-letter', {
+  logger.error('[workflow/engine] step exhausted retries → dead-letter', new Error('Step exhausted max retries'), {
     run_id: ctx.runId, step_id: step.id, action_type: step.action_type, attempts,
   });
   return { ...lastResult, attempts };
@@ -364,7 +364,10 @@ export async function executeWorkflow(
       error_message: stepError ?? null, duration_ms: stepDuration, attempts,
     }).then(
       () => {},
-      (e: unknown) => logger.warn('[workflow/engine] step log write failed', e instanceof Error ? e : new Error(String(e)), { run_id: runId }),
+      (e: unknown) => logger.warn('[workflow/engine] step log write failed', { 
+        run_id: runId, 
+        error: e instanceof Error ? e.message : String(e) 
+      }),
     );
 
     await db.from('workflow_runs').update({ steps_done: stepsDone }).eq('id', runId).then(() => {}, () => {});

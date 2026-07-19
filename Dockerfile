@@ -66,9 +66,12 @@ ENV PORT=8080
 
 WORKDIR /app
 
+# Copy standalone (preserves monorepo workspace layout)
 COPY --from=builder /app/apps/marketing/.next/standalone ./
-COPY --from=builder /app/apps/marketing/.next/static ./.next/static
-COPY --from=builder /app/apps/marketing/public ./public
+
+# Copy static and public to the correct monorepo-relative location
+COPY --from=builder /app/apps/marketing/.next/static ./apps/marketing/.next/static
+COPY --from=builder /app/apps/marketing/public ./apps/marketing/public
 
 EXPOSE 8080
 

@@ -1,26 +1,47 @@
 #!/usr/bin/env node
 /**
  * Critical route guard: enforces hard rules on the highest-risk API routes.
+ * Updated for monorepo split: scans apps/{marketing,lms,admin}/app/api/*
  *
  * Run: node scripts/guard-critical-routes.mjs
  * Exits 1 on any violation.
  */
 import fs from 'fs';
+import path from 'path';
+
+const ROOT = path.resolve(import.meta.dirname, '..');
+
+// App dirs to scan (includes app-legacy for backward compatibility)
+const APP_DIRS = [
+  path.join(ROOT, 'app-legacy'),
+  path.join(ROOT, 'apps', 'marketing', 'app'),
+  path.join(ROOT, 'apps', 'lms', 'app'),
+  path.join(ROOT, 'apps', 'admin', 'app'),
+];
+
+// Find a route file in any app directory
+function findRoute(relativePath) {
+  for (const dir of APP_DIRS) {
+    const full = path.join(dir, relativePath);
+    if (fs.existsSync(full)) return full;
+  }
+  return null;
+}
 
 // Routes that must never contain fake-success patterns
 const PERSISTENCE_REQUIRED_ROUTES = [
-  'app/api/booking/enrollment/route.ts',
-  'app/api/advising-request/route.ts',
-  'app/api/enrollment/submit-documents/route.ts',
-  'app/api/enroll/cna/route.ts',
-  'app/api/booking/schedule/route.ts',
+  'api/booking/enrollment/route.ts',
+  'api/advising-request/route.ts',
+  'api/enrollment/submit-documents/route.ts',
+  'api/enroll/cna/route.ts',
+  'api/booking/schedule/route.ts',
 ];
 
 // Routes that must redirect (not return JSON) on all error paths
 const REDIRECT_REQUIRED_ROUTES = [
-  'app/api/auth/signout/route.ts',
-  'app/api/stripe/checkout/route.ts',
-  'app/api/store/cart-checkout/route.ts',
+  'api/auth/signout/route.ts',
+  'api/stripe/checkout/route.ts',
+  'api/store/cart-checkout/route.ts',
 ];
 
 const BANNED_IN_PERSISTENCE_ROUTES = [
@@ -39,9 +60,10 @@ const BANNED_IN_PERSISTENCE_ROUTES = [
 
 const findings = [];
 
-for (const file of PERSISTENCE_REQUIRED_ROUTES) {
-  if (!fs.existsSync(file)) {
-    findings.push(`MISSING: ${file} — required critical route does not exist`);
+for (const relPath of PERSISTENCE_REQUIRED_ROUTES) {
+  const file = findRoute(relPath);
+  if (!file) {
+    findings.push(`MISSING: ${relPath} — required critical route does not exist in any app`);
     continue;
   }
 
@@ -50,27 +72,28 @@ for (const file of PERSISTENCE_REQUIRED_ROUTES) {
   for (const { pattern, label } of BANNED_IN_PERSISTENCE_ROUTES) {
     pattern.lastIndex = 0;
     if (pattern.test(content)) {
-      findings.push(`${file}: contains banned pattern [${label}]`);
+      findings.push(`${relPath}: contains banned pattern [${label}]`);
     }
   }
 
   // Must use requireDbWrite, throw, or explicit failure() — no silent fallthrough.
   // booking/schedule is exempt: it intentionally degrades (DB non-fatal, email primary)
   // and returns dbSaved:false so the client can show a soft confirmation.
-  const isIntentionalDegradation = file.includes('booking/schedule');
+  const isIntentionalDegradation = relPath.includes('booking/schedule');
   if (!isIntentionalDegradation) {
     const hasHardFailure = /requireDbWrite\(|throw new Error|return failure\(/.test(content);
     if (!hasHardFailure) {
       findings.push(
-        `${file}: no hard-failure pattern found (requireDbWrite / throw / failure()). DB errors must not fall through.`,
+        `${relPath}: no hard-failure pattern found (requireDbWrite / throw / failure()). DB errors must not fall through.`,
       );
     }
   }
 }
 
-for (const file of REDIRECT_REQUIRED_ROUTES) {
-  if (!fs.existsSync(file)) {
-    findings.push(`MISSING: ${file} — required critical route does not exist`);
+for (const relPath of REDIRECT_REQUIRED_ROUTES) {
+  const file = findRoute(relPath);
+  if (!file) {
+    findings.push(`MISSING: ${relPath} — required critical route does not exist in any app`);
     continue;
   }
 
@@ -78,7 +101,7 @@ for (const file of REDIRECT_REQUIRED_ROUTES) {
 
   if (!/NextResponse\.redirect\(/.test(content)) {
     findings.push(
-      `${file}: must use NextResponse.redirect() on error paths — raw JSON responses strand users on native form POST flows`,
+      `${relPath}: must use NextResponse.redirect() on error paths — raw JSON responses strand users on native form POST flows`,
     );
   }
 }

@@ -27,8 +27,9 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-// Scan all three app directories for API routes (monorepo split)
+// Scan all app directories for API routes (monorepo split + app-legacy)
 const API_DIRS = [
+  path.join(ROOT, 'app-legacy', 'api'),
   path.join(ROOT, 'apps', 'marketing', 'app', 'api'),
   path.join(ROOT, 'apps', 'lms', 'app', 'api'),
   path.join(ROOT, 'apps', 'admin', 'app', 'api'),

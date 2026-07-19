@@ -9,12 +9,14 @@
 set -euo pipefail
 
 # Extract all process.env.VAR_NAME references from source
-grep -rh "process\.env\." app/ lib/ --include="*.ts" --include="*.tsx" 2>/dev/null \
+# Search apps/*/app, app-legacy, and lib (root app/ no longer exists after split)
+# grep -r with non-existent dir exits 2; suppress with subshell guard
+(grep -rh "process\.env\." apps/ app-legacy/ lib/ --include="*.ts" --include="*.tsx" 2>/dev/null \
   | grep -v "^\s*//" \
   | grep -oP "process\.env\.[A-Z][A-Z0-9_]+" \
   | sed 's/process\.env\.//' \
   | grep -vE "^NODE_ENV$|^NEXT_PUBLIC_|^NEXT_PHASE$|^NEXT_RUNTIME$" \
-  | sort -u > /tmp/_code_env.txt
+  | sort -u) > /tmp/_code_env.txt || true
 
 # Extract keys from the canonical env examples. Keep the small required-runtime
 # bundle separate so new server-only dependencies can be documented without

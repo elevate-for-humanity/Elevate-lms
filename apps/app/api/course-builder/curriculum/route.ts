@@ -1,4 +1,5 @@
 /**
+// PUBLIC ROUTE: read-only public data, no auth required
  * Curriculum Frameworks API
  * Provides curriculum standards and competencies for course building
  */

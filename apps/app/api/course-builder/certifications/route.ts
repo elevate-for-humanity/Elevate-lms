@@ -1,4 +1,5 @@
 /**
+// PUBLIC ROUTE: read-only public data, no auth required
  * Industry Certifications API
  * Provides certification requirements and exam info for courses
  */

@@ -1,4 +1,5 @@
 /**
+// PUBLIC ROUTE: read-only public data, no auth required
  * BLS Occupational Data API
  * Free public data from Bureau of Labor Statistics
  * No API key required

@@ -4,12 +4,17 @@
  * Endpoint that wires credential engine to existing AI services.
  */
 
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { NextRequest, NextResponse } from 'next/server';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { buildIntegratedCourse, listAllCredentials, searchAvailableCredentials, getCredentialBySlug } from '@/lib/course-builder/integration';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await apiRequireAdmin(request);
+    if (auth) return auth;
     const body = await request.json();
     const { userRequest, credentialSlug, options } = body;
 

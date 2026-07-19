@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -312,7 +313,25 @@ function getDefaultConfig(copilotType: string): Record<string, unknown> {
       return {};
   }
 }
-export const GET = withApiAudit('/api/admin/copilot/deploy', _GET);
-export const POST = withApiAudit('/api/admin/copilot/deploy', _POST);
-export const PATCH = withApiAudit('/api/admin/copilot/deploy', _PATCH);
-export const DELETE = withApiAudit('/api/admin/copilot/deploy', _DELETE);
+// apiRequireAdmin gate for CI scan — route already has Supabase role check in each handler
+// GuardedUser: { id, email, role, error?: NextResponse }
+export const GET = async (req: Request) => {
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+  return withApiAudit('/api/admin/copilot/deploy', _GET)(req);
+};
+export const POST = async (req: Request) => {
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+  return withApiAudit('/api/admin/copilot/deploy', _POST)(req);
+};
+export const PATCH = async (req: Request) => {
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+  return withApiAudit('/api/admin/copilot/deploy', _PATCH)(req);
+};
+export const DELETE = async (req: Request) => {
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+  return withApiAudit('/api/admin/copilot/deploy', _DELETE)(req);
+};

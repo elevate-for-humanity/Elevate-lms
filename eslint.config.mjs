@@ -99,6 +99,7 @@ export default tseslint.config(
       '*.config.ts',
       '_archived/**',
       '.archive/**',
+      'archive/**',
       '.next/**',
       'deployment-ready/**',
       'supabase/functions/**',

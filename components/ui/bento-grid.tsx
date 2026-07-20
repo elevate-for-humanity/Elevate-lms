@@ -1,4 +1,5 @@
-import { ComponentPropsWithoutRef, ReactNode } from 'react';
+import React from 'react';
+import { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
 import { ArrowRightIcon } from '@radix-ui/react-icons';
 
 import { cn } from '@/lib/utils';

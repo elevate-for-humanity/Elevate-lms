@@ -5,11 +5,6 @@
  * No manual commands - AI decides based on content analysis.
  */
 
-import { generateImage } from '@/lib/ai/image-generator';
-import { generateVideo } from '@/lib/ai/video-generator';
-import { generateNarration } from '@/lib/ai/voice-generator';
-import { generateSlides } from '@/lib/ai/slide-generator';
-import { generateWorkbook } from '@/lib/ai/workbook-generator';
 
 export interface MediaRequirements {
   lessonId: string;

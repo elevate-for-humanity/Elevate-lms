@@ -7,10 +7,11 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/database';
 import { ModelRouter, callModel } from './model-router';
 
 // Build-safe: lazily create the Supabase client at runtime
-let _supabase: ReturnType<typeof createClient> | null = null;
+let _supabase: ReturnType<typeof createClient<Database>> | null = null;
 
 function getSupabase() {
   if (!_supabase) {
@@ -19,7 +20,7 @@ function getSupabase() {
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Missing Supabase environment variables');
     }
-    _supabase = createClient(supabaseUrl, supabaseKey);
+    _supabase = createClient<Database>(supabaseUrl, supabaseKey);
   }
   return _supabase;
 }
@@ -549,8 +550,7 @@ export async function autoGenerateNewProgram(gap: WorkforceGap): Promise<string>
     type: 'workforce_gap_recommendation',
     title: 'New Program Recommended',
     message: `AI recommends adding "${gap.occupation}" based on workforce demand. Job created for review.`,
-    data: { job_id: job.id, gap },
-    priority: gap.recommendation_priority === 'high' ? 'high' : 'normal',
+    metadata: { job_id: job.id, gap, priority: gap.recommendation_priority === 'high' ? 'high' : 'normal' },
   });
 
   return job.id;

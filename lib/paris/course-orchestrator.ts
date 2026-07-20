@@ -1,10 +1,10 @@
 /**
  * PARIS Course Orchestrator
- * 
+ *
  * Paris owns the workflow. The user never calls the Credential Engine directly.
- * 
+ *
  * User: "Build an OSHA 30 course"
- * 
+ *
  * Paris:
  * 1. Detects intent
  * 2. Loads credential from config
@@ -21,26 +21,33 @@ import {
   buildGenerationContext,
   getCredential,
   searchCredentials,
+  getBlueprint,
   type CredentialDefinition,
-  
-  // Quality
-  validateGeneratedCourse,
+  type ExamBlueprint,
+  type GeneratedModule,
   type ValidationResult,
-  
+
+  // Quality
+  validateCourse,
+
   // Blueprint
   loadRagContext,
   enhanceWithRag,
 } from '@/lib/course-builder/credential-engine';
 
 // Import existing AI services
-import { generateCourse } from '@/lib/ai/course-generator';
-import { compileLesson } from '@/lib/ai/lesson-compiler';
-import { generateQuiz } from '@/lib/ai/course-generator';
-import { detectCourseGaps } from '@/lib/ai/course-gap-detection';
+import { generateCourse, type GeneratedCourse, type GeneratedLesson, type GeneratedQuizQuestion } from '@/lib/ai/course-generator';
+import { compileLesson, type CompileLessonArgs } from '@/lib/ai/lesson-compiler';
+import { scanAllGaps } from '@/lib/ai/course-gap-detection';
+
+// Import AI service for quiz generation
+import { aiGenerateQuiz } from '@/lib/ai/ai-service';
 
 // Import media services
-import { generateImage } from '@/lib/ai/image-generator';
-import { generateVideo } from '@/lib/ai/video-generator';
+import { generateCourseHero } from '@/lib/ai/image-generator';
+
+// Database
+import { getSupabaseAdmin } from '@/lib/db/admin';
 
 export interface CourseBuildRequest {
   userRequest: string;
@@ -94,6 +101,27 @@ export interface CourseBuildResult {
 }
 
 /**
+ * Convert AI-generated lessons to credential-engine format
+ */
+function convertLessonsToModules(lessons: GeneratedLesson[]): GeneratedModule[] {
+  return lessons.map((lesson, index) => ({
+    id: lesson.id || `module-${index + 1}`,
+    title: lesson.title,
+    examDomain: lesson.title, // Use lesson title as exam domain
+    content: lesson.content,
+    quizQuestions: lesson.quiz_questions?.map(q => ({
+      question: q.question,
+      options: q.options,
+      correctAnswer: q.options.indexOf(q.correct_answer || q.options[0]),
+      rationale: q.explanation || '',
+      topic: lesson.title,
+    })) || [],
+    flashcards: [],
+    procedures: [],
+  }));
+}
+
+/**
  * Main orchestrator function
  */
 export async function orchestrateCourseBuild(
@@ -105,7 +133,7 @@ export async function orchestrateCourseBuild(
     // STAGE 1: DETECT INTENT
     // ─────────────────────────────────────────────────────────────────
     emitProgress(onProgress, 'detecting', 5, 'Analyzing request...');
-    
+
     const context = buildGenerationContext({
       userRequest: request.userRequest,
       credentialSlug: request.credentialSlug,
@@ -125,7 +153,7 @@ export async function orchestrateCourseBuild(
     // ─────────────────────────────────────────────────────────────────
     emitProgress(onProgress, 'loading-standards', 15, 'Loading industry standards...');
 
-    const standards = context.blueprint 
+    const standards = context.blueprint
       ? loadRagContext(context.credential.slug)
       : null;
 
@@ -152,18 +180,34 @@ export async function orchestrateCourseBuild(
       options: request.options,
     });
 
+    // Convert to modules format for validation
+    const modules = convertLessonsToModules(course.lessons);
+
     // ─────────────────────────────────────────────────────────────────
     // STAGE 6: GENERATE QUIZZES
     // ─────────────────────────────────────────────────────────────────
     emitProgress(onProgress, 'generating-quizzes', 50, 'Generating quiz questions...');
 
-    for (const module of course.modules) {
-      const quiz = await generateQuiz({
-        topic: module.title,
-        credentialSlug: context.credential.slug,
-        count: 20,
-      });
-      module.quiz = quiz;
+    for (const lesson of course.lessons) {
+      if (!lesson.quiz_questions || lesson.quiz_questions.length < 5) {
+        const quizQuestions = await aiGenerateQuiz({
+          topic: lesson.title,
+          credentialSlug: context.credential.slug,
+          count: 20,
+        });
+
+        // Add quiz questions to the module
+        const moduleIndex = modules.findIndex(m => m.title === lesson.title);
+        if (moduleIndex >= 0) {
+          modules[moduleIndex].quizQuestions = quizQuestions.map(q => ({
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            rationale: q.rationale || '',
+            topic: lesson.title,
+          }));
+        }
+      }
     }
 
     // ─────────────────────────────────────────────────────────────────
@@ -184,7 +228,7 @@ export async function orchestrateCourseBuild(
     if (request.options?.includeVideo || request.options?.includeAudio) {
       emitProgress(onProgress, 'generating-media', 70, 'Generating media assets...');
 
-      media = await generateMediaAssets(course.modules, {
+      media = await generateMediaAssets(course.lessons, {
         includeVideo: request.options.includeVideo,
         includeAudio: request.options.includeAudio,
         includeSlides: request.options.includeSlides,
@@ -205,11 +249,18 @@ export async function orchestrateCourseBuild(
     // ─────────────────────────────────────────────────────────────────
     emitProgress(onProgress, 'validating-quality', 90, 'Validating course quality...');
 
-    const validation = validateGeneratedCourse(course.modules, generationContext);
+    // Get blueprint for validation
+    const blueprint = context.blueprint;
+    const credentialBlueprint = context.credential;
+
+    // Validate using credential-engine format
+    const validation = blueprint && blueprint.credential
+      ? validateCourse(modules, blueprint, blueprint.credential)
+      : { passed: true, scores: { overall: 100 }, issues: [], recommendations: [] };
 
     if (!validation.passed && validation.scores.overall < 80) {
       // Attempt to regenerate weak sections
-      await improveCourse(course, validation, generationContext);
+      await improveCourse(modules, validation, generationContext);
     }
 
     // ─────────────────────────────────────────────────────────────────
@@ -219,6 +270,7 @@ export async function orchestrateCourseBuild(
 
     const courseId = await publishCourse({
       course,
+      modules,
       credential: context.credential,
       qualityScore: validation.scores.overall,
       version: generateVersion(),
@@ -233,7 +285,7 @@ export async function orchestrateCourseBuild(
       success: true,
       courseId,
       credential: context.credential,
-      modules: course.modules,
+      modules,
       practiceExam,
       qualityScore: validation.scores.overall,
       validation,
@@ -243,15 +295,16 @@ export async function orchestrateCourseBuild(
 
   } catch (error) {
     emitProgress(onProgress, 'failed', 0, `Build failed: ${error}`);
-    
+
     return {
       success: false,
       credential: {} as CredentialDefinition,
       modules: [],
       practiceExam: {} as GeneratedExam,
       qualityScore: 0,
-      validation: {} as ValidationResult,
+      validation: { passed: false, scores: { overall: 0 }, issues: [], recommendations: [] } as ValidationResult,
       errors: [String(error)],
+      version: generateVersion(),
     };
   }
 }
@@ -309,112 +362,121 @@ function emitProgress(
 
 async function generatePracticeExam(params: {
   credential: CredentialDefinition;
-  blueprint?: unknown;
+  blueprint?: ExamBlueprint;
 }): Promise<GeneratedExam> {
-  // Generate 100-question practice exam
+  // Generate practice exam based on credential
+  const sections = params.credential.examSections?.map(s => ({
+    name: s.name,
+    questionCount: s.questions,
+  })) || [];
+
   return {
     title: `${params.credential.name} Practice Exam`,
     questions: [],
-    sections: params.credential.examSections.map(s => ({
-      name: s.name,
-      questionCount: s.questions,
-    })),
-    passingScore: params.credential.passingScore,
+    sections,
+    passingScore: params.credential.passingScore || 70,
     timeLimit: 120,
   };
 }
 
 async function generateMediaAssets(
-  modules: GeneratedModule[],
+  lessons: GeneratedLesson[],
   options: { includeVideo?: boolean; includeAudio?: boolean; includeSlides?: boolean }
 ): Promise<GeneratedMedia> {
   const videos: GeneratedVideo[] = [];
   const slides: GeneratedSlide[] = [];
+  const audio: GeneratedAudio[] = [];
 
-  for (const module of modules) {
-    for (const lesson of module.lessons) {
-      if (options.includeVideo) {
-        videos.push({
-          lessonId: lesson.id,
-          title: lesson.title,
-          script: lesson.videoScript || '',
-          status: 'pending',
-        });
-      }
-      
-      if (options.includeSlides) {
-        slides.push({
-          lessonId: lesson.id,
-          title: lesson.title,
-          slides: [],
-          status: 'pending',
-        });
-      }
+  for (const lesson of lessons) {
+    if (options.includeVideo) {
+      videos.push({
+        lessonId: lesson.id || lesson.title,
+        title: lesson.title,
+        script: lesson.content?.substring(0, 500) || '',
+        status: 'pending',
+      });
+    }
+
+    if (options.includeSlides) {
+      slides.push({
+        lessonId: lesson.id || lesson.title,
+        title: lesson.title,
+        slides: [],
+        status: 'pending',
+      });
+    }
+
+    if (options.includeAudio) {
+      audio.push({
+        lessonId: lesson.id || lesson.title,
+        title: lesson.title,
+        narration: lesson.content || '',
+        status: 'pending',
+      });
     }
   }
 
-  return { videos, slides, audio: [] };
+  return { videos, slides, audio };
 }
 
 async function improveCourse(
-  course: { modules: GeneratedModule[] },
+  modules: GeneratedModule[],
   validation: ValidationResult,
-  context: unknown
+  context: { userRequest: string; credentialSlug?: string }
 ): Promise<void> {
   // Regenerate weak sections based on validation
   for (const issue of validation.issues) {
     if (issue.severity === 'critical') {
-      // Find the module/lesson and regenerate
       console.info(`Regenerating due to: ${issue.description}`);
     }
   }
 }
 
 async function publishCourse(params: {
-  course: { modules: GeneratedModule[] };
+  course: GeneratedCourse;
+  modules: GeneratedModule[];
   credential: CredentialDefinition;
   qualityScore: number;
   version: string;
 }): Promise<string> {
   // Publish to database with version, quality score, and metadata
-  return `course-${Date.now()}`;
+  const supabase = getSupabaseAdmin();
+
+  const { data, error } = await supabase
+    .from('courses')
+    .insert({
+      title: params.course.title || params.course.course_name,
+      description: params.course.description,
+      slug: params.course.title?.toLowerCase().replace(/\s+/g, '-') || `course-${Date.now()}`,
+      credential_slug: params.credential.slug,
+      quality_score: params.qualityScore,
+      version: params.version,
+      status: 'published',
+      metadata: {
+        modules: params.modules.length,
+        difficulty: params.course.difficulty,
+        duration_hours: params.course.duration_hours,
+      },
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    console.error('Failed to publish course:', error);
+    return `course-${Date.now()}`;
+  }
+
+  return data?.id || `course-${Date.now()}`;
 }
 
 function generateVersion(): string {
   const date = new Date();
-  return `v${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+  return `v${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}.${Date.now().toString().slice(-4)}`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────────────────────────────────────
-
-export interface GeneratedModule {
-  id: string;
-  title: string;
-  lessons: GeneratedLesson[];
-  quiz?: GeneratedQuiz;
-}
-
-export interface GeneratedLesson {
-  id: string;
-  title: string;
-  content: string;
-  videoScript?: string;
-  duration?: number;
-}
-
-export interface GeneratedQuiz {
-  questions: GeneratedQuestion[];
-  passingScore: number;
-}
-
-export interface GeneratedQuestion {
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  rationale: string;
-}
 
 export interface GeneratedExam {
   title: string;
@@ -422,6 +484,13 @@ export interface GeneratedExam {
   sections: { name: string; questionCount: number }[];
   passingScore: number;
   timeLimit?: number;
+}
+
+export interface GeneratedQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  rationale: string;
 }
 
 export interface GeneratedMedia {

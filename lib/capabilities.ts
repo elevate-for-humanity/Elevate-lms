@@ -50,7 +50,24 @@ export const REQUIRES_HUMAN = [
  * Partner tier definitions
  * Explicit feature boundaries
  */
-export const PARTNER_TIERS = {
+type TierConfig = {
+  name: string;
+  price: number;
+  features: readonly string[];
+  limits: {
+    programs: number | 'unlimited';
+    students: number | 'unlimited';
+    support: string;
+  };
+};
+
+type PartnerTiers = {
+  BASIC: TierConfig;
+  PILOT: TierConfig;
+  FULL: TierConfig;
+};
+
+export const PARTNER_TIERS: PartnerTiers = {
   BASIC: {
     name: 'Basic',
     price: 0,
@@ -94,7 +111,7 @@ export const PARTNER_TIERS = {
       support: '24/7 dedicated',
     },
   },
-} as const;
+}
 
 /**
  * Explicitly NOT supported

@@ -3,15 +3,16 @@
  * Unifies all PARIS components into a cohesive development environment
  */
 
-export * from '../import-engine';
-export * from '../workforce';
-export * from '../marketing';
+export * from './import-engine';
+export * from './workforce';
+export * from './marketing';
 
-import { importSource, quickAnalyze } from '../import-engine';
-import { hireAgent, getAgentTeam, executeAgentTask } from '../workforce';
-import { createCampaign, generateWeeklyContent, generateVideoScript } from '../marketing';
-import type { AIAgent, AgentRole, SocialPlatform } from '../workforce/types';
-import type { GeneratedContent, VideoScript } from '../marketing/types';
+import { importSource, quickAnalyze } from './import-engine';
+import { hireAgent, getAgentTeam, executeAgentTask } from './workforce';
+import { createCampaign, generateWeeklyContent, generateVideoScript } from './marketing';
+import type { AIAgent, AgentRole } from './workforce/types';
+import type { SocialPlatform } from './marketing/types';
+import type { GeneratedContent, VideoScript } from './marketing/types';
 
 // Command intents
 export type CommandIntent =

@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient as createServerClient } from '@/lib/supabase/server';
 import integrations from '../config/integrations.json';
 
 export type ApiProviderType = 'supabase' | 'external-rest';

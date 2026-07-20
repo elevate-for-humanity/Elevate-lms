@@ -6,6 +6,23 @@ import type { GeneratedImage } from './types';
  * Uses the configured AI_IMAGE_PROVIDER (DALL-E, Stability AI, or Azure).
  */
 
+/**
+ * Generate an image based on a text prompt
+ */
+export async function generateImage(
+  prompt: string,
+  options?: {
+    size?: '1024x1024' | '1792x1024' | '1024x1792';
+    style?: 'natural' | 'vivid';
+  }
+): Promise<GeneratedImage[]> {
+  return aiGenerateImage({
+    prompt,
+    size: options?.size || '1024x1024',
+    style: options?.style || 'natural',
+  });
+}
+
 /** Generate a course hero/banner image */
 export async function generateCourseHero(
   courseName: string,

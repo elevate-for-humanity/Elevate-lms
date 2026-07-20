@@ -16310,10 +16310,16 @@ export type Database = {
           course_description: string | null
           course_title: string | null
           created_at: string | null
+          credential_type: string | null
           generated_course_id: string | null
           id: string
+          metadata: Json | null
+          occupation: string | null
+          soc_code: string | null
           status: string | null
+          target_hours: number | null
           tenant_id: string | null
+          title: string | null
           updated_at: string | null
           user_id: string | null
         }
@@ -16321,10 +16327,16 @@ export type Database = {
           course_description?: string | null
           course_title?: string | null
           created_at?: string | null
+          credential_type?: string | null
           generated_course_id?: string | null
           id?: string
+          metadata?: Json | null
+          occupation?: string | null
+          soc_code?: string | null
           status?: string | null
+          target_hours?: number | null
           tenant_id?: string | null
+          title?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -16332,10 +16344,16 @@ export type Database = {
           course_description?: string | null
           course_title?: string | null
           created_at?: string | null
+          credential_type?: string | null
           generated_course_id?: string | null
           id?: string
+          metadata?: Json | null
+          occupation?: string | null
+          soc_code?: string | null
           status?: string | null
+          target_hours?: number | null
           tenant_id?: string | null
+          title?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -84053,6 +84071,42 @@ export type Database = {
             referencedColumns: ["app_id_resolved"]
           },
         ]
+      }
+      workforce_scan_history: {
+        Row: {
+          created_at: string | null
+          high_priority_opportunities: number | null
+          id: string
+          new_opportunities: number | null
+          results: Json | null
+          scanned_at: string | null
+          tenant_id: string | null
+          total_occupations: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          high_priority_opportunities?: number | null
+          id?: string
+          new_opportunities?: number | null
+          results?: Json | null
+          scanned_at?: string | null
+          tenant_id?: string | null
+          total_occupations?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          high_priority_opportunities?: number | null
+          id?: string
+          new_opportunities?: number | null
+          results?: Json | null
+          scanned_at?: string | null
+          tenant_id?: string | null
+          total_occupations?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       workone_checklist: {
         Row: {

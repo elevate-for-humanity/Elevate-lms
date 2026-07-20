@@ -1,4 +1,5 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@supabase/supabase-js';
 import { createPublicClient } from '@/lib/supabase/public';
 import { logAuthFailure, logAdminAction } from '@/lib/monitoring';
 

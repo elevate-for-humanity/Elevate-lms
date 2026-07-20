@@ -16,7 +16,6 @@ import type {
   EnvironmentVariable,
   ThirdPartyIntegration,
   BuildProcess,
-  SecurityFlag,
   ImportResult,
 } from './types';
 

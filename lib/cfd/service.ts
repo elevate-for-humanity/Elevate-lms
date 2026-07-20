@@ -640,7 +640,7 @@ export class DictionaryValidator {
       return errors;
     }
 
-    const boundaryContent = boundaryMatch[1];
+    const boundaryContent: string = boundaryMatch[1];
     
     // Check for common issues
     const validTypes = ['fixedValue', 'zeroGradient', 'noSlip', 'slip', 'symmetry', 'calculated', 'fixedFluxPressure'];

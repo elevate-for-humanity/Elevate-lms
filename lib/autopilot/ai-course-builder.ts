@@ -7,11 +7,11 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-function getOpenAIClient() {
+function getOpenAIClientLocal() {
   if (!process.env.OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY is not set');
   }
-  return getOpenAIClient();
+  return getOpenAIClientLocal();
 }
 
 export async function buildCourse({ title, objectives }: { title: string; objectives: string[] }) {

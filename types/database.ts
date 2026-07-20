@@ -388,3 +388,6 @@ export interface AdminDashboardStats {
     employer_sponsored: number;
   };
 }
+
+// Re-export Database type from generated types for Supabase client
+export type { Database } from './database.generated';

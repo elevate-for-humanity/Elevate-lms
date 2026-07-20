@@ -4,7 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import type {
+import {
   AIAgent,
   AgentRole,
   AgentConfig,

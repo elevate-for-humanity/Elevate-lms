@@ -1,13 +1,12 @@
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-// Build-safe: lazily create the Supabase client at runtime, not at module load.
-// This prevents "supabaseKey is required" errors during Next.js static build.
+// Build-safe: use createPublicClient which is synchronous
 let _db: SupabaseClient<any> | null = null;
 
 export function getDb(): SupabaseClient<any> {
   if (!_db) {
-    _db = createClient();
+    _db = createPublicClient();
   }
   return _db;
 }

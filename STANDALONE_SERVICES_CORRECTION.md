@@ -362,6 +362,89 @@ livenessProbe:
 
 ---
 
+## SUPABASE CONFIGURATION
+
+### Side-by-Side Supabase Configuration
+
+| Setting | Marketing | LMS | Admin |
+|---------|-----------|-----|-------|
+| Project | Elevate Production | Elevate Production | Elevate Production |
+| Database | Shared PostgreSQL | Shared PostgreSQL | Shared PostgreSQL |
+| Auth | Shared | Shared | Shared |
+| Storage | Shared | Shared | Shared |
+| Realtime | Shared | Shared | Shared |
+| Edge Functions | Shared | Shared | Shared |
+| Service Name | elevate-marketing | elevate-lms | elevate-admin |
+
+### Public Environment Variables (All Three)
+
+These are safe to expose to the browser:
+
+| Variable | Marketing | LMS | Admin |
+|----------|-----------|-----|-------|
+| NEXT_PUBLIC_SUPABASE_URL | ✓ | ✓ | ✓ |
+| NEXT_PUBLIC_SUPABASE_ANON_KEY | ✓ | ✓ | ✓ |
+| NEXT_PUBLIC_APP_NAME | elevate-marketing | elevate-lms | elevate-admin |
+
+### Server-Only Secrets (All Three)
+
+**Never expose these as `NEXT_PUBLIC_*`:**
+
+| Variable | Purpose |
+|----------|---------|
+| SUPABASE_SERVICE_ROLE_KEY | Admin access to database |
+| SUPABASE_JWT_SECRET | JWT validation |
+| DATABASE_URL | PostgreSQL connection string |
+| SUPABASE_DB_PASSWORD | Database password |
+
+### Row Level Security
+
+| App | Access Pattern |
+|-----|----------------|
+| Marketing | Mostly public read; authenticated user profile only when needed |
+| LMS | Students, instructors, apprentices, employers access only their own permitted data |
+| Admin | Full administrative access using service role on trusted server-side code |
+
+### Health Checks
+
+| Endpoint | Checks Supabase? |
+|----------|-----------------|
+| `/api/ping` | ❌ No |
+| `/api/health` | ❌ No |
+| `/api/health/dependencies` | ✅ Yes |
+
+### Production Summary
+
+```
+Supabase Project (Shared)
+        │
+        ├──────────────┐
+        │              │
+        ▼              ▼
+Marketing        LMS
+        │              │
+        └──────┬───────┘
+               │
+               ▼
+            Admin
+
+Shared:
+✓ PostgreSQL
+✓ Auth
+✓ Storage
+✓ Realtime
+✓ Edge Functions
+
+Separate:
+✓ Dockerfile
+✓ Northflank Service
+✓ Domain
+✓ Health Checks
+✓ Runtime Environment
+```
+
+---
+
 ## Files Modified
 
 ```

@@ -27,7 +27,7 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
     dockerfile: '/Dockerfile.lms',
     runtimeEnvironment: {
       SERVICE_ROLE: 'lms',
-      PORT: '8080',
+      PORT: '3000',
       HOSTNAME: '0.0.0.0',
       NODE_ENV: 'production',
       NEXT_TELEMETRY_DISABLED: '1',
@@ -49,7 +49,7 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
     dockerfile: '/Dockerfile.northflank-admin',
     runtimeEnvironment: {
       SERVICE_ROLE: 'admin',
-      PORT: '8080',
+      PORT: '3000',
       HOSTNAME: '0.0.0.0',
       NODE_ENV: 'production',
       NEXT_TELEMETRY_DISABLED: '1',
@@ -71,7 +71,7 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
     dockerfile: '/Dockerfile.marketing',
     runtimeEnvironment: {
       SERVICE_ROLE: 'marketing',
-      PORT: '8080',
+      PORT: '3000',
       HOSTNAME: '0.0.0.0',
       NODE_ENV: 'production',
       NEXT_TELEMETRY_DISABLED: '1',

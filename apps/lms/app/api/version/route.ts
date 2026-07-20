@@ -1,30 +1,34 @@
 /**
- * LMS Version Endpoint
- * 
- * Dependency-free version endpoint for deployment verification.
- * Uses unified version utility for canonical SHA resolution.
+ * GET /api/version
+ *
+ * Exposes build metadata to confirm deployed version.
  */
 
 import { NextResponse } from 'next/server';
-import { getCanonicalSha, getBuildTimestamp, getBuildId } from '@/lib/version/getAppVersion';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
   return NextResponse.json(
     {
-      service: 'lms',
-      gitSha: getCanonicalSha(),
-      buildId: getBuildId(),
-      builtAt: getBuildTimestamp(),
-      environment: process.env.NODE_ENV || 'production',
+      service: process.env.SERVICE_NAME || 'lms',
+      gitSha:
+        process.env.GIT_SHA ||
+        process.env.COMMIT_SHA ||
+        process.env.NEXT_PUBLIC_GIT_SHA ||
+        'unknown',
+      buildId: process.env.BUILD_ID ?? 'unknown',
+      node: process.version,
+      environment: process.env.NODE_ENV,
       timestamp: new Date().toISOString(),
     },
     {
+      status: 200,
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate',
-        'Pragma': 'no-cache',
+        'Cache-Control': 'no-store',
       },
-    },
+    }
   );
 }

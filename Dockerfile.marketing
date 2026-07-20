@@ -75,7 +75,7 @@ ARG GIT_SHA
 ARG COMMIT_SHA
 ARG BUILD_TIMESTAMP
 ARG BUILD_ID
-ENV PORT=8080
+ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 ENV NODE_ENV=production
 ENV GITHUB_SHA=${GITHUB_SHA}
@@ -94,10 +94,10 @@ COPY --from=builder /app/.next/server ./.next/server
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 
-EXPOSE 8080
+EXPOSE 3000
 
 # Health check using /api/ping (no deps, instant response)
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -sf http://127.0.0.1:3000/api/ping || exit 1
 
 CMD ["node", "server.js"]

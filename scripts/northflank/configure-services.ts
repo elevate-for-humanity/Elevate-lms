@@ -180,8 +180,8 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(dryRun ? '=== DRY RUN ===' : '=== EXECUTE ===');
-  console.log(`Project: ${projectId}`);
+  console.info(dryRun ? '=== DRY RUN ===' : '=== EXECUTE ===');
+  console.info(`Project: ${projectId}`);
 
   const requestedEphemeralMb = resolveEphemeralStorageMb();
 
@@ -191,10 +191,10 @@ async function main() {
     console.error(`No services matched targets: ${[...targetIds].join(', ')}`);
     process.exit(1);
   }
-  console.log(`Targets: ${services.map((s) => s.id).join(', ')}`);
+  console.info(`Targets: ${services.map((s) => s.id).join(', ')}`);
 
   for (const service of services) {
-    console.log(
+    console.info(
       `${dryRun ? '[dry-run]' : '[patch]'} ${service.id} -> ${service.dockerfile}, build ${billing.buildPlan}, runtime ${billing.deploymentPlan}, ephemeral ${requestedEphemeralMb}MB (with allowance fallback), health /api/version`,
     );
 
@@ -275,7 +275,7 @@ async function main() {
           method: 'POST',
           body: JSON.stringify(buildOptionsBody),
         });
-        console.log(`[build-options-ok] ${service.id} ephemeral ${appliedEphemeralMb}MB`);
+        console.info(`[build-options-ok] ${service.id} ephemeral ${appliedEphemeralMb}MB`);
       } catch (e) {
         console.warn(
           `[build-options-warn] ${service.id}:`,
@@ -300,16 +300,16 @@ async function main() {
             `${p.type ?? '?'}:${p.path ?? '?'}:${p.port ?? '?'}`,
         )
         .join(', ');
-      console.log(
+      console.info(
         `[patch-ok] ${service.id} buildPlan=${appliedBuild} deploymentPlan=${appliedRuntime} buildEphemeralMB=${appliedStorage} health=[${probeSummary}]`,
       );
     }
   }
 
   if (dryRun) {
-    console.log('\nRe-run with --execute to apply.');
+    console.info('\nRe-run with --execute to apply.');
   } else {
-    console.log('\nNorthflank service configuration applied.');
+    console.info('\nNorthflank service configuration applied.');
   }
 }
 

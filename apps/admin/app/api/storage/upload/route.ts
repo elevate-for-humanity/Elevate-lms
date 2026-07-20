@@ -1,49 +1,29 @@
 /**
  * Storage Upload API - Admin
- * Uses service-role key for admin uploads
  */
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 export const dynamic = 'force-dynamic';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
+let supabaseClient: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
+  if (!supabaseClient) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !serviceRoleKey) throw new Error('Supabase config required');
+    supabaseClient = createClient(supabaseUrl, serviceRoleKey);
+  }
+  return supabaseClient;
+}
 export async function POST(request: Request) {
-  const formData = await request.formData();
-  const file = formData.get('file') as File;
-  const bucket = formData.get('bucket') as string ?? 'uploads';
-  const folder = formData.get('folder') as string ?? '';
-
-  if (!file) {
-    return NextResponse.json({ error: 'No file provided' }, { status: 400 });
-  }
-
-  const ext = file.name.split('.').pop();
-  const fileName = `${folder ? folder + '/' : ''}${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${ext}`;
-
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const { data, error } = await supabase.storage
-    .from(bucket)
-    .upload(fileName, buffer, {
-      contentType: file.type,
-      upsert: false,
-    });
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  const { data: { publicUrl } } = supabase.storage
-    .from(bucket)
-    .getPublicUrl(data.path);
-
-  return NextResponse.json({ 
-    url: publicUrl, 
-    path: data.path,
-    service: 'admin'
-  });
+  try {
+    const formData = await request.formData();
+    const file = formData.get('file') as File;
+    const bucket = formData.get('bucket') as string;
+    const path = formData.get('path') as string;
+    if (!file || !bucket || !path) return NextResponse.json({ error: 'file, bucket, path required' }, { status: 400 });
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const { data, error } = await getSupabase().storage.from(bucket).upload(`${path}/${file.name}`, buffer, { upsert: true });
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ path: data.path, service: 'admin' });
+  } catch (err) { return NextResponse.json({ error: (err as Error).message }, { status: 500 }); }
 }

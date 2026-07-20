@@ -64,7 +64,7 @@ export function useRealtimeMetrics(): RealtimeMetrics {
                   : 'unknown',
         aiQueue:  h.ai?.activeProvider ? 'ok' : 'degraded',
         failures: h.services?.email?.failedToday ?? 0,
-        updatedAt: new Date(),
+        updatedAt: h.timestamp ? new Date(h.timestamp) : new Date(),
       }));
     } catch {
       // non-fatal — keep last known state

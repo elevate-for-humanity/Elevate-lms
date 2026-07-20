@@ -270,6 +270,98 @@ Unhealthy Threshold: 3
 
 ---
 
+## KUBERNETES CONFIGURATION (Northflank Underlying Settings)
+
+### Side-by-Side Configuration
+
+| Kubernetes Setting | Marketing | LMS | Admin |
+|--------------------|-----------|-----|-------|
+| Namespace | production | production | production |
+| Workload | Deployment | Deployment | Deployment |
+| Replicas | 1 | 1 | 1 |
+| Strategy | RollingUpdate | RollingUpdate | RollingUpdate |
+| Max Surge | 1 | 1 | 1 |
+| Max Unavailable | 0 | 0 | 0 |
+| Container Port | 3000 | 3000 | 3000 |
+| Protocol | TCP | TCP | TCP |
+| Service Type | ClusterIP | ClusterIP | ClusterIP |
+| Service Port | 3000 | 3000 | 3000 |
+| Target Port | 3000 | 3000 | 3000 |
+| Ingress | www.elevateforhumanity.org | app.elevateforhumanity.org | admin.elevateforhumanity.org |
+| Readiness Probe | /api/health | /api/health | /api/health |
+| Liveness Probe | /api/ping | /api/ping | /api/ping |
+| Startup Probe | /api/ping | /api/ping | /api/ping |
+
+### Startup Probe (All Three)
+```yaml
+startupProbe:
+  httpGet:
+    path: /api/ping
+    port: 3000
+  failureThreshold: 30
+  periodSeconds: 5
+  timeoutSeconds: 5
+```
+
+### Readiness Probe (All Three)
+```yaml
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: 3000
+  initialDelaySeconds: 20
+  periodSeconds: 15
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 3
+```
+
+### Liveness Probe (All Three)
+```yaml
+livenessProbe:
+  httpGet:
+    path: /api/ping
+    port: 3000
+  initialDelaySeconds: 20
+  periodSeconds: 15
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 3
+```
+
+### Resource Limits
+
+| Resource | Marketing | LMS | Admin |
+|----------|-----------|-----|-------|
+| CPU Request | 500m | 500m | 500m |
+| CPU Limit | 4000m | 4000m | 4000m |
+| Memory Request | 512Mi | 512Mi | 512Mi |
+| Memory Limit | 8192Mi | 8192Mi | 8192Mi |
+
+### Environment Variables (Per Service)
+
+| Variable | Marketing | LMS | Admin |
+|----------|-----------|-----|-------|
+| NODE_ENV | production | production | production |
+| HOSTNAME | 0.0.0.0 | 0.0.0.0 | 0.0.0.0 |
+| PORT | 3000 | 3000 | 3000 |
+| NEXT_TELEMETRY_DISABLED | 1 | 1 | 1 |
+| SERVICE_NAME | marketing | lms | admin |
+
+### Healthy Pod Criteria
+
+| Check | Marketing | LMS | Admin |
+|-------|-----------|-----|-------|
+| Pod Running | ✅ | ✅ | ✅ |
+| Startup Probe | ✅ | ✅ | ✅ |
+| Readiness Probe | ✅ | ✅ | ✅ |
+| Liveness Probe | ✅ | ✅ | ✅ |
+| Service Endpoints | 1/1 | 1/1 | 1/1 |
+| Restart Count | 0 | 0 | 0 |
+| Ready | True | True | True |
+
+---
+
 ## Files Modified
 
 ```
@@ -288,7 +380,7 @@ apps/admin/app/api/health/route.ts          - Updated
 apps/admin/app/api/health/dependencies/route.ts - Created
 apps/admin/app/api/version/route.ts         - Updated
 
-Dockerfile.marketing                        - PORT=8080 → 3000
-Dockerfile.lms                              - PORT=8080 → 3000
-Dockerfile.northflank-admin                 - PORT=8080 → 3000
+Dockerfile.marketing                        - PORT=8080 → 3000, SERVICE_NAME=marketing
+Dockerfile.lms                              - PORT=8080 → 3000, SERVICE_NAME=lms
+Dockerfile.northflank-admin                 - PORT=8080 → 3000, SERVICE_NAME=admin
 ```

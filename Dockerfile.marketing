@@ -21,8 +21,8 @@ ENV PATH="${PNPM_HOME}:${PATH}"
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_STANDALONE_OUTPUT=1
 
-# Cache invalidation marker
-RUN echo "nf-cache-invalidate-marketing-2026-07-20-v2"
+# Cache invalidation marker - v3 fix for build failure
+RUN echo "nf-cache-invalidate-marketing-2026-07-20-v3"
 
 RUN corepack enable
 WORKDIR /app
@@ -65,16 +65,11 @@ RUN pnpm --filter @elevate/marketing build
 # =============================================================================
 # VERIFICATION: Builder stage
 # =============================================================================
-RUN echo "=== MARKETING BUILD VERIFICATION ===" && \
-    echo "Checking standalone directory..." && \
-    test -d /app/apps/marketing/.next/standalone && echo "✓ Standalone dir exists" || (echo "✗ Standalone dir MISSING!"; exit 1) && \
-    echo "Checking static directory..." && \
-    test -d /app/apps/marketing/.next/static && echo "✓ Static dir exists" || (echo "✗ Static dir MISSING!"; exit 1) && \
-    echo "Checking BUILD_ID..." && \
-    test -f /app/apps/marketing/.next/BUILD_ID && echo "✓ BUILD_ID exists" || (echo "✗ BUILD_ID MISSING!"; exit 1) && \
-    echo "Checking server.js location..." && \
-    find /app/apps/marketing/.next/standalone -name "server.js" -type f && echo "✓ server.js found" || (echo "✗ server.js MISSING!"; exit 1) && \
-    echo "=== BUILD VERIFICATION COMPLETE ==="
+RUN test -d /app/apps/marketing/.next/standalone && \
+    test -d /app/apps/marketing/.next/static && \
+    test -f /app/apps/marketing/.next/BUILD_ID && \
+    test -f /app/apps/marketing/.next/standalone/server.js && \
+    echo "Build verification passed"
 
 # =============================================================================
 # STAGE 3: Runtime
@@ -109,33 +104,10 @@ COPY --from=builder /app/node_modules ./node_modules
 # =============================================================================
 # VERIFICATION: Runtime stage
 # =============================================================================
-RUN echo "=== RUNTIME VERIFICATION ===" && \
-    echo "Current directory: $(pwd)" && \
-    echo "Contents of /app:" && \
-    ls -la /app/ && \
-    echo "" && \
-    if [ -f "/app/server.js" ]; then \
-        echo "✓ server.js found at /app/server.js"; \
-    else \
-        echo "✗ CRITICAL: server.js NOT found at /app/server.js"; \
-        echo "Searching for server.js:"; \
-        find /app -name "server.js" -type f 2>/dev/null; \
-        exit 1; \
-    fi && \
-    if [ -d "/app/.next/server" ]; then \
-        echo "✓ .next/server directory found"; \
-        ls /app/.next/server/; \
-    else \
-        echo "✗ CRITICAL: .next/server directory MISSING"; \
-        exit 1; \
-    fi && \
-    if [ -d "/app/.next/static" ]; then \
-        echo "✓ .next/static directory found"; \
-    else \
-        echo "✗ CRITICAL: .next/static directory MISSING"; \
-        exit 1; \
-    fi && \
-    echo "=== RUNTIME VERIFICATION PASSED ==="
+RUN test -f /app/server.js && \
+    test -d /app/.next/server && \
+    test -d /app/.next/static && \
+    echo "Runtime verification passed"
 
 USER nextjs
 

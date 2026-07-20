@@ -104,7 +104,7 @@ ARG BUILD_ID
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
-ENV PORT=8080
+ENV PORT=3000
 ENV GITHUB_SHA=${GITHUB_SHA}
 ENV GIT_SHA=${GIT_SHA:-${GITHUB_SHA}}
 ENV BUILD_ID=${BUILD_ID}
@@ -127,11 +127,11 @@ RUN test -f /app/server.js && echo "Standalone server.js found at /app/server.js
 # Copy full node_modules from builder (preserves pnpm symlinks)
 COPY --from=builder /app/node_modules ./node_modules
 
-EXPOSE 8080
+EXPOSE 3000
 
 # Health check: /api/ping returns {status:ok} reliably
-HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -sf http://127.0.0.1:8080/api/ping || curl -sf http://127.0.0.1:8080/ || exit 1
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -sf http://127.0.0.1:3000/api/ping || curl -sf http://127.0.0.1:3000/ || exit 1
 
 # Use standalone server.js from /app/ (NOT apps/admin/server.js which is custom dev server)
 # The standalone output contains a production-ready server that handles all Next.js routes

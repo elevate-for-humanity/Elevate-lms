@@ -1,5 +1,29 @@
+/**
+ * GET /api/ping
+ *
+ * Liveness probe - verifies the process is alive, node is running,
+ * and the container is alive. NO database checks.
+ */
+
 import { NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
-  return NextResponse.json({ status: 'ok', timestamp: new Date().toISOString() });
+  return NextResponse.json(
+    {
+      ok: true,
+      service: process.env.SERVICE_NAME || 'admin',
+      uptime: Math.floor(process.uptime()),
+      timestamp: new Date().toISOString(),
+    },
+    {
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store',
+      },
+    }
+  );
 }

@@ -1,8 +1,8 @@
 /**
- * GET /api/health
+ * GET /api/health/dependencies
  *
- * Readiness probe - verifies application is initialized
- * and ready to serve requests. Still NO external dependency checks.
+ * Diagnostics endpoint - reports on external services
+ * (Supabase, Redis, SendGrid, etc.). Does NOT affect readiness.
  */
 
 import { NextResponse } from 'next/server';
@@ -12,13 +12,18 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET() {
+  const checks = {
+    supabase: false,
+    redis: false,
+    sendgrid: false,
+  };
+
+  // TODO: Add actual dependency checks here
+
   return NextResponse.json(
     {
-      status: 'healthy',
-      ready: true,
-      service: process.env.SERVICE_NAME || 'marketing',
-      environment: process.env.NODE_ENV,
-      uptime: Math.floor(process.uptime()),
+      service: process.env.SERVICE_NAME || 'lms',
+      dependencies: checks,
       timestamp: new Date().toISOString(),
     },
     {

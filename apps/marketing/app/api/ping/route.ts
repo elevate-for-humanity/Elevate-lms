@@ -1,30 +1,28 @@
 /**
  * GET /api/ping
  *
- * Unauthenticated liveness probe used by Northflank health checks.
- * Returns 200 as soon as the Next.js runtime is accepting requests.
- * No auth, no DB - intentionally minimal.
- * 
- * REQUIRED for "no healthy upstream" fix.
+ * Liveness probe - verifies the process is alive, node is running,
+ * and the container is alive. NO database checks.
  */
 
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
   return NextResponse.json(
-    { 
-      ok: true, 
-      service: 'marketing',
-      timestamp: new Date().toISOString() 
+    {
+      ok: true,
+      service: process.env.SERVICE_NAME || 'marketing',
+      uptime: Math.floor(process.uptime()),
+      timestamp: new Date().toISOString(),
     },
     {
       status: 200,
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate',
-        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store',
       },
     }
   );

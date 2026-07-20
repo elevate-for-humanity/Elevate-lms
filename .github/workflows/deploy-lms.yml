@@ -46,7 +46,7 @@ permissions:
 # FIXED: Use separate concurrency group - LMS deploys INDEPENDENTLY
 concurrency:
   group: northflank-lms-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy-lms:
@@ -67,6 +67,10 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
+      NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+      NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
+      NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
+      NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
       ONET_API_KEY: ${{ secrets.ONET_API_KEY }}
       CAREERONESTOP_USER_ID: ${{ secrets.CAREERONESTOP_USER_ID }}
       CAREERONESTOP_TOKEN: ${{ secrets.CAREERONESTOP_TOKEN }}

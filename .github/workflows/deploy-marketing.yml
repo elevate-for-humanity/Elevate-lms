@@ -42,9 +42,10 @@ permissions:
   contents: read
 
 # FIX #1: Use separate concurrency group - marketing deploys INDEPENDENTLY
+# FIX #2: cancel-in-progress: false to prevent ambiguous states during rollout
 concurrency:
   group: northflank-marketing-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   EXPECTED_SHA: ${{ github.sha }}
@@ -62,6 +63,9 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+      NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
+      NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
+      NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
       NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
 
     steps:
@@ -137,8 +141,8 @@ jobs:
           echo "Waiting for deployment to propagate..."
           sleep 30
           
-          # Use the verify-sha script to check Northflank API
-          pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ github.sha }}" --skip-if-unavailable
+          # Use the verify-sha script to check Northflank API (FAIL on mismatch)
+          pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ github.sha }}"
           
           echo "SHA verification from Northflank API passed!"
 

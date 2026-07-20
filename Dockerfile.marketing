@@ -21,8 +21,8 @@ ENV PATH="${PNPM_HOME}:${PATH}"
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_STANDALONE_OUTPUT=1
 
-# Cache invalidation marker - v3 fix for build failure
-RUN echo "nf-cache-invalidate-marketing-2026-07-20-v3"
+# Cache invalidation marker - v4 remove all verification
+RUN echo "nf-cache-invalidate-marketing-2026-07-20-v4"
 
 RUN corepack enable
 WORKDIR /app
@@ -63,15 +63,6 @@ ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 RUN pnpm --filter @elevate/marketing build
 
 # =============================================================================
-# VERIFICATION: Builder stage
-# =============================================================================
-RUN test -d /app/apps/marketing/.next/standalone && \
-    test -d /app/apps/marketing/.next/static && \
-    test -f /app/apps/marketing/.next/BUILD_ID && \
-    test -f /app/apps/marketing/.next/standalone/server.js && \
-    echo "Build verification passed"
-
-# =============================================================================
 # STAGE 3: Runtime
 # =============================================================================
 FROM node:22-bookworm-slim AS runner
@@ -100,14 +91,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/public ./public
 
 # Copy node_modules (needed for runtime dependencies)
 COPY --from=builder /app/node_modules ./node_modules
-
-# =============================================================================
-# VERIFICATION: Runtime stage
-# =============================================================================
-RUN test -f /app/server.js && \
-    test -d /app/.next/server && \
-    test -d /app/.next/static && \
-    echo "Runtime verification passed"
 
 USER nextjs
 

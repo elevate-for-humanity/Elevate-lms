@@ -62,6 +62,7 @@ async function main() {
   const currentBranch = process.env.DEPLOY_BRANCH || 'main';
   
   // Trigger build from the current branch
+  // Pass GIT_SHA as the authoritative release identity
   const build = await nfFetch<{
     id: string;
     branch?: string;
@@ -73,9 +74,8 @@ async function main() {
     body: JSON.stringify({
       branch: currentBranch,
       buildArgs: {
-        GITHUB_SHA: currentSha || 'unknown',
+        GIT_SHA: currentSha || 'unknown',
         NEXT_PUBLIC_GIT_SHA: currentSha || 'unknown',
-        NEXT_PUBLIC_BUILD_VERSION: currentSha || 'unknown',
         BUILD_TIMESTAMP: new Date().toISOString(),
       },
     }),

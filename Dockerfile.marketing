@@ -83,6 +83,12 @@ RUN groupadd --system --gid 1001 nodejs && \
 # Copy standalone build to /app/ root (server.js expects paths from /app/)
 COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/standalone ./
 
+# DEBUG: Check what we have
+RUN echo "=== DEBUG: Contents of standalone directory ===" && \
+    ls -la /app/apps/marketing/.next/standalone/ 2>/dev/null || echo "standalone dir not found" && \
+    find /app/apps/marketing/.next/standalone -name "server.js" 2>/dev/null && \
+    echo "=== END DEBUG ==="
+
 # Copy ALL required Next.js build artifacts to correct locations
 # CRITICAL: Need .next/server for route manifests and build metadata
 COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/static ./.next/static
@@ -91,6 +97,12 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/public ./public
 
 # Copy node_modules (needed for runtime dependencies)
 COPY --from=builder /app/node_modules ./node_modules
+
+# DEBUG: Check what we have after copy
+RUN echo "=== DEBUG: Contents of /app after copy ===" && \
+    ls -la /app/ && \
+    test -f /app/server.js && echo "server.js FOUND" || echo "server.js NOT FOUND" && \
+    echo "=== END DEBUG ==="
 
 USER nextjs
 

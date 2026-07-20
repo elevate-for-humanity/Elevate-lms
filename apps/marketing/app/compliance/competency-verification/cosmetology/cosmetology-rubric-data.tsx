@@ -1,47 +1,113 @@
+export interface CosmetologyItem {
+  id: string;
+  competency: string;
+  assessmentMethod: string;
+  assessmentCriteria: string;
+  rtiHours: number;
+  ojtHours: number;
+}
+
 export interface CosmetologySection {
   id: string;
   name: string;
-  items: {
-    id: string;
-    name: string;
-    rtiHours: number;
-    ojtHours: number;
-  }[];
+  items: CosmetologyItem[];
 }
 
 export const COSMETOLOGY_SECTIONS: CosmetologySection[] = [
   {
-    id: 'basic',
-    name: 'Basic Training',
-    items: [
-      { id: 'b1', name: 'Sanitation & Sterilization', rtiHours: 20, ojtHours: 40 },
-      { id: 'b2', name: 'Anatomy & Physiology', rtiHours: 30, ojtHours: 20 },
-      { id: 'b3', name: 'State Laws & Regulations', rtiHours: 15, ojtHours: 0 },
-    ],
-  },
-  {
     id: 'hair',
-    name: 'Hair Care',
+    name: 'Hair Care Services',
     items: [
-      { id: 'h1', name: 'Haircutting Techniques', rtiHours: 40, ojtHours: 100 },
-      { id: 'h2', name: 'Coloring & Bleaching', rtiHours: 30, ojtHours: 80 },
-      { id: 'h3', name: 'Texturizing & Perms', rtiHours: 25, ojtHours: 60 },
+      {
+        id: 'H1',
+        competency: 'Haircutting fundamentals',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Clean cuts, proper tools',
+        rtiHours: 40,
+        ojtHours: 100,
+      },
+      {
+        id: 'H2',
+        competency: 'Hair coloring and lightening',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Color theory, application techniques',
+        rtiHours: 50,
+        ojtHours: 120,
+      },
+      {
+        id: 'H3',
+        competency: 'Chemical texturizing (perms, relaxers)',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Proper mixing, application, timing',
+        rtiHours: 35,
+        ojtHours: 80,
+      },
     ],
   },
   {
     id: 'skin',
-    name: 'Skin Care',
+    name: 'Skin Care Services',
     items: [
-      { id: 's1', name: 'Facial Treatments', rtiHours: 25, ojtHours: 50 },
-      { id: 's2', name: 'Hair Removal', rtiHours: 15, ojtHours: 30 },
+      {
+        id: 'SK1',
+        competency: 'Facial treatments',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Cleansing, exfoliation, massage',
+        rtiHours: 30,
+        ojtHours: 60,
+      },
+      {
+        id: 'SK2',
+        competency: 'Hair removal techniques',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Waxing, tweezing, safety',
+        rtiHours: 20,
+        ojtHours: 40,
+      },
     ],
   },
   {
     id: 'nails',
-    name: 'Nail Care',
+    name: 'Nail Care Services',
     items: [
-      { id: 'n1', name: 'Manicuring & Pedicuring', rtiHours: 20, ojtHours: 40 },
-      { id: 'n2', name: 'Nail Art & Extensions', rtiHours: 15, ojtHours: 30 },
+      {
+        id: 'N1',
+        competency: 'Manicuring and pedicuring',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Proper techniques, sanitation',
+        rtiHours: 25,
+        ojtHours: 50,
+      },
+      {
+        id: 'N2',
+        competency: 'Nail extensions and art',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Application, maintenance',
+        rtiHours: 15,
+        ojtHours: 30,
+      },
+    ],
+  },
+  {
+    id: 'business',
+    name: 'Business & Professionalism',
+    items: [
+      {
+        id: 'B1',
+        competency: 'Client consultation',
+        assessmentMethod: 'Observation',
+        assessmentCriteria: 'Needs assessment, recommendations',
+        rtiHours: 10,
+        ojtHours: 20,
+      },
+      {
+        id: 'B2',
+        competency: 'Sanitation and safety',
+        assessmentMethod: 'Written & Practical Test',
+        assessmentCriteria: 'State board requirements',
+        rtiHours: 15,
+        ojtHours: 10,
+      },
     ],
   },
 ];

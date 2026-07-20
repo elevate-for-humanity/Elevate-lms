@@ -1,10 +1,17 @@
-export interface BarberSection {
+export interface RubricItem {
   id: string;
-  name: string;
-  description: string;
-  competencies: number;
+  competency: string;
+  assessmentMethod: string;
+  assessmentCriteria: string;
   rtiHours: number;
   ojtHours: number;
+  notes?: string;
+}
+
+export interface RubricSection {
+  id: string;
+  name: string;
+  items: RubricItem[];
 }
 
 export interface BarberStats {
@@ -14,52 +21,130 @@ export interface BarberStats {
   totalOJTHours: number;
 }
 
-export const BARBER_SECTIONS: BarberSection[] = [
+export const BARBER_SECTIONS: RubricSection[] = [
   {
-    id: 'foundations',
-    name: 'Foundations',
-    description: 'Basic barbering fundamentals',
-    competencies: 15,
-    rtiHours: 100,
-    ojtHours: 150,
+    id: 'sanitation',
+    name: 'Sanitation & Safety',
+    items: [
+      {
+        id: 'S1',
+        competency: 'Demonstrate proper sanitation and sterilization procedures',
+        assessmentMethod: 'Observation & Practical Test',
+        assessmentCriteria: 'Follows OSHA guidelines, maintains clean station',
+        rtiHours: 10,
+        ojtHours: 20,
+      },
+      {
+        id: 'S2',
+        competency: 'Safety protocols and emergency procedures',
+        assessmentMethod: 'Written Test & Observation',
+        assessmentCriteria: 'Knows emergency exits, first aid location',
+        rtiHours: 5,
+        ojtHours: 5,
+      },
+    ],
   },
   {
-    id: 'haircutting',
-    name: 'Haircutting',
-    description: 'Precision cutting techniques',
-    competencies: 25,
-    rtiHours: 150,
-    ojtHours: 300,
+    id: 'cutting',
+    name: 'Haircutting Techniques',
+    items: [
+      {
+        id: 'C1',
+        competency: 'Basic haircuts (scissors, clippers)',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Clean lines, even length, client satisfaction',
+        rtiHours: 30,
+        ojtHours: 80,
+      },
+      {
+        id: 'C2',
+        competency: 'Clipper cutting techniques',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Proper guard usage, fade techniques',
+        rtiHours: 20,
+        ojtHours: 60,
+      },
+      {
+        id: 'C3',
+        competency: 'Razor cutting',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Proper razor angle, texture techniques',
+        rtiHours: 15,
+        ojtHours: 40,
+      },
+    ],
   },
   {
     id: 'shaving',
-    name: 'Shaving & Facials',
-    description: 'Traditional and modern shaving techniques',
-    competencies: 20,
-    rtiHours: 100,
-    ojtHours: 200,
+    name: 'Shaving & Facial Services',
+    items: [
+      {
+        id: 'SH1',
+        competency: 'Traditional straight razor shave',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Proper prep, shave, and aftercare',
+        rtiHours: 25,
+        ojtHours: 60,
+      },
+      {
+        id: 'SH2',
+        competency: 'Facial massage and treatments',
+        assessmentMethod: 'Observation',
+        assessmentCriteria: 'Proper technique, client comfort',
+        rtiHours: 10,
+        ojtHours: 20,
+      },
+    ],
   },
   {
-    id: 'chemical',
+    id: 'services',
     name: 'Chemical Services',
-    description: 'Coloring, relaxing, and texturizing',
-    competencies: 18,
-    rtiHours: 80,
-    ojtHours: 150,
+    items: [
+      {
+        id: 'CS1',
+        competency: 'Hair coloring basics',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Color mixing, application, timing',
+        rtiHours: 20,
+        ojtHours: 40,
+      },
+      {
+        id: 'CS2',
+        competency: 'Relaxers and texturizers',
+        assessmentMethod: 'Practical Demonstration',
+        assessmentCriteria: 'Proper application, timing, safety',
+        rtiHours: 15,
+        ojtHours: 30,
+      },
+    ],
   },
   {
     id: 'business',
-    name: 'Business & Safety',
-    description: 'Client consultation and business practices',
-    competencies: 12,
-    rtiHours: 70,
-    ojtHours: 50,
+    name: 'Business & Professionalism',
+    items: [
+      {
+        id: 'B1',
+        competency: 'Client consultation',
+        assessmentMethod: 'Observation',
+        assessmentCriteria: 'Professional communication, needs assessment',
+        rtiHours: 10,
+        ojtHours: 30,
+      },
+      {
+        id: 'B2',
+        competency: 'Inventory and retail',
+        assessmentMethod: 'Task Completion',
+        assessmentCriteria: 'Product knowledge, sales techniques',
+        rtiHours: 10,
+        ojtHours: 20,
+      },
+    ],
   },
 ];
 
 export const BARBER_STATS: BarberStats = {
-  totalCompetencies: 90,
+  totalCompetencies: 14,
   sections: 5,
-  totalRTIHours: 500,
-  totalOJTHours: 850,
+  totalRTIHours: 145,
+  totalOJTHours: 335,
 };

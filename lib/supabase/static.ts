@@ -2,6 +2,19 @@ import { timedFetch } from '@/lib/supabase/timed-fetch';
 import { logger } from '@/lib/logger';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
+function createMockQueryBuilder() {
+  return {
+    select: () => createMockQueryBuilder(),
+    eq: () => createMockQueryBuilder(),
+    order: () => ({
+      then: (resolve: any) => resolve({ data: [], error: null }),
+    }),
+    single: () => ({
+      then: (resolve: any) => resolve({ data: null, error: null }),
+    }),
+    then: (resolve: any) => resolve({ data: [], error: null }),
+  };
+}
 
 /**
  * Static Supabase client for build-time operations
@@ -17,20 +30,7 @@ export function createStaticClient() {
     }
     // Return a mock client that returns empty data for build-time
     return {
-      from: () => ({
-        select: () => ({
-          eq: () => ({
-            order: () => ({
-              then: (resolve: any) => resolve({ data: [], error: null }),
-            }),
-            single: () => ({
-              then: (resolve: any) => resolve({ data: null, error: null }),
-            }),
-            then: (resolve: any) => resolve({ data: [], error: null }),
-          }),
-          then: (resolve: any) => resolve({ data: [], error: null }),
-        }),
-      }),
+      from: () => createMockQueryBuilder(),
     } as any;
   }
 

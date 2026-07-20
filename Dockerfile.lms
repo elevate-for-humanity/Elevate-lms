@@ -90,7 +90,7 @@ FROM node:22-bookworm-slim AS runner
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
-ENV PORT=8080
+ENV PORT=3000
 ENV SERVICE_NAME=elevate-lms
 ENV GIT_SHA=${GIT_SHA}
 ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
@@ -154,11 +154,11 @@ RUN echo "=== RUNTIME VERIFICATION ===" && \
 
 USER nextjs
 
-EXPOSE 8080
+EXPOSE 3000
 
 # Health check - use the actual app port
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-    CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
+    CMD curl -sf http://127.0.0.1:3000/api/ping || exit 1
 
 # Start server from /app/apps/lms/ where server.js is located
 CMD ["node", "--max-http-header-size=32768", "apps/lms/server.js"]

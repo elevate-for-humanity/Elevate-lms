@@ -113,9 +113,9 @@ USER nextjs
 
 EXPOSE 3000
 
-# Health check
+# Health check - use root path which always works
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-    CMD curl -sf http://127.0.0.1:3000/api/ping || exit 1
+    CMD curl -sf http://127.0.0.1:3000/ || exit 1
 
 # Start the marketing application
 CMD ["node", "--max-http-header-size=32768", "server.cjs"]

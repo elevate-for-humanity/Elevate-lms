@@ -4,22 +4,27 @@
  */
 import { NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
+  const cookieStore = await cookies();
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
-          const cookieStore = require('cookie-store')();
           return cookieStore.getAll();
         },
-        setAll() {
-          const cookieStore = require('cookie-store')();
-          // handled by middleware
+        setAll(name, value, options) {
+          try {
+            cookieStore.set(name, value, options);
+          } catch {
+            // Ignore errors in read-only contexts
+          }
         },
       },
     }
@@ -31,7 +36,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ user: null, session: null }, { status: 401 });
   }
 
-  return NextResponse.json({ 
+  return NextResponse.json({
     user,
     session: { expires_at: user.app_metadata?.exp },
     service: process.env.SERVICE_NAME ?? 'admin'

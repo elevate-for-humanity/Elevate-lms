@@ -7,10 +7,14 @@
 #   - Dockerfile path: /Dockerfile.northflank-lms
 #   - Build context: /
 
+# Build args available across ALL stages (required for multi-stage ARG passthrough)
+ARG GITHUB_SHA=unknown
+ARG BUILD_TIMESTAMP=unknown
+
 FROM node:22-bookworm AS builder
 
 # Cache invalidation marker - fixed githubsha args matching trigger-build.ts
-RUN echo "nf-cache-invalidate-lms-2026-07-20-v4-fix-githubsha"
+RUN echo "nf-cache-invalidate-lms-2026-07-20-v5-arg-before-from"
 
 # Install system deps for native modules (sharp, canvas, pdf)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -52,10 +56,6 @@ ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 
 # Install dependencies with strict peer checking disabled for compatibility
 RUN pnpm install --no-frozen-lockfile --strict-peer-dependencies=false
-
-# Build identity - passed from trigger-build.ts via buildArgs
-ARG GITHUB_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
 
 # Build Next.js LMS app
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
@@ -101,10 +101,6 @@ ENV HOSTNAME=0.0.0.0
 ENV PORT=8080
 # Runtime memory configuration for stability
 ENV NODE_OPTIONS=--max-old-space-size=8192 --gc-interval=100
-
-# Build identity - passed from trigger-build.ts via buildArgs
-ARG GITHUB_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
 
 ENV GITHUB_SHA=$GITHUB_SHA
 ENV NEXT_PUBLIC_GIT_SHA=$GITHUB_SHA

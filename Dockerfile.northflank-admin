@@ -6,10 +6,14 @@
 #   - Dockerfile path: /Dockerfile.northflank-admin
 #   - Build context: /
 
+# Build args available across ALL stages (required for multi-stage ARG passthrough)
+ARG GITHUB_SHA=unknown
+ARG BUILD_TIMESTAMP=unknown
+
 FROM node:22-bookworm AS builder
 
 # Cache invalidation marker
-RUN echo "nf-cache-invalidate-admin-2026-07-20-v4-fix-githubsha"
+RUN echo "nf-cache-invalidate-admin-2026-07-20-v5-arg-before-from"
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -49,10 +53,6 @@ ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 # Install dependencies
 RUN pnpm install --no-frozen-lockfile
 
-# Build identity - passed from trigger-build.ts via buildArgs
-ARG GITHUB_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
-
 # Build Admin
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
 ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
@@ -89,10 +89,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV PORT=8080
-
-# Build identity - passed from trigger-build.ts via buildArgs
-ARG GITHUB_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
 
 ENV GITHUB_SHA=$GITHUB_SHA
 ENV NEXT_PUBLIC_GIT_SHA=$GITHUB_SHA

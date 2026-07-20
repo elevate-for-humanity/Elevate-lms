@@ -3,7 +3,7 @@
  * Configure Northflank services (separate elevate-lms and elevate-admin).
  *
  * Applies per service:
- *   - Dockerfile path, BuildKit cache, runtime env, health probes on /api/version:8080
+ *   - Dockerfile path, BuildKit cache, runtime env, health probes on /api/ping:3000
  *
  * Usage:
  *   npx tsx scripts/northflank/configure-services.ts elevate-lms --dry-run
@@ -153,7 +153,7 @@ const healthChecks = [
     protocol: 'HTTP',
     type: 'startupProbe',
     path: '/api/ping',
-    port: 8080,
+    port: 3000,
     initialDelaySeconds: 60,
     periodSeconds: 10,
     timeoutSeconds: 10,
@@ -163,7 +163,7 @@ const healthChecks = [
     protocol: 'HTTP',
     type: 'readinessProbe',
     path: '/api/health',
-    port: 8080,
+    port: 3000,
     initialDelaySeconds: 30,
     periodSeconds: 10,
     timeoutSeconds: 10,

@@ -125,7 +125,7 @@ jobs:
         run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_MARKETING_SERVICE_ID"
 
       - name: Wait for Marketing deployment
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 600000
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 1800000
 
       # FIX #5: Verify deployed SHA matches expected
       - name: Verify Deployed SHA

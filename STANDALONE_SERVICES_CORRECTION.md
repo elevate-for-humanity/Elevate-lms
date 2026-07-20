@@ -413,6 +413,74 @@ These are safe to expose to the browser:
 | `/api/health` | ❌ No |
 | `/api/health/dependencies` | ✅ Yes |
 
+### Supabase-Facing Endpoints
+
+| Endpoint | Marketing | LMS | Admin | Supabase Access |
+|----------|-----------|-----|-------|-----------------|
+| `/api/ping` | Yes | Yes | Yes | None |
+| `/api/health` | Yes | Yes | Yes | None |
+| `/api/health/dependencies` | Yes | Yes | Yes | Server-only diagnostic query |
+| `/api/version` | Yes | Yes | Yes | None |
+| `/auth/callback` | Yes | Yes | Yes | Anon key with user session |
+| `/api/auth/session` | Optional | Yes | Yes | Anon key with user session |
+| `/api/profile` | Optional | Yes | Yes | Authenticated user + RLS |
+| `/api/admin/users` | No | No | Yes | Service-role key, server only |
+| `/api/admin/roles` | No | No | Yes | Service-role key, server only |
+| `/api/storage/upload` | Optional | Yes | Yes | Authenticated user or service role |
+| `/api/storage/signed-url` | Optional | Yes | Yes | Server-side Supabase client |
+| `/api/webhooks/supabase` | Optional | Optional | Yes | Webhook secret verification |
+
+### Route Locations
+
+```
+Marketing
+apps/marketing/app/api/ping/route.ts
+apps/marketing/app/api/health/route.ts
+apps/marketing/app/api/health/dependencies/route.ts
+apps/marketing/app/api/version/route.ts
+apps/marketing/app/auth/callback/route.ts
+
+LMS
+apps/lms/app/api/ping/route.ts
+apps/lms/app/api/health/route.ts
+apps/lms/app/api/health/dependencies/route.ts
+apps/lms/app/api/version/route.ts
+apps/lms/app/auth/callback/route.ts
+apps/lms/app/api/profile/route.ts
+apps/lms/app/api/storage/upload/route.ts
+apps/lms/app/api/storage/signed-url/route.ts
+
+Admin
+apps/admin/app/api/ping/route.ts
+apps/admin/app/api/health/route.ts
+apps/admin/app/api/health/dependencies/route.ts
+apps/admin/app/api/version/route.ts
+apps/admin/app/auth/callback/route.ts
+apps/admin/app/api/admin/users/route.ts
+apps/admin/app/api/admin/roles/route.ts
+apps/admin/app/api/storage/upload/route.ts
+apps/admin/app/api/storage/signed-url/route.ts
+```
+
+### Critical Security Rules
+
+```
+Browser endpoints → anon key + RLS
+Trusted server endpoints → service-role key
+Health probes → no Supabase dependency
+Dependency diagnostics → Supabase check, but always return diagnostic JSON
+```
+
+### Environment Variables by Service
+
+| Variable | Marketing | LMS | Admin |
+|----------|-----------|-----|-------|
+| NEXT_PUBLIC_SUPABASE_URL | Required | Required | Required |
+| NEXT_PUBLIC_SUPABASE_ANON_KEY | Required | Required | Required |
+| SUPABASE_SERVICE_ROLE_KEY | Only for trusted server routes | Only for trusted server routes | Required for admin routes |
+| DATABASE_URL | Usually not needed | Only for direct DB tooling | Only for migrations/server tooling |
+| SUPABASE_DB_PASSWORD | Never | Never | Never |
+
 ### Production Summary
 
 ```

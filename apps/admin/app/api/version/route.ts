@@ -1,24 +1,17 @@
 import { NextResponse } from 'next/server';
+import { getCanonicalSha, getBuildTimestamp, getBuildId } from '@/lib/version/getAppVersion';
 
 export const dynamic = 'force-dynamic';
-
-// IMPORTANT: GITHUB_SHA is primary (set by CI workflow)
-// COMMIT_SHA is NOT used as primary - Northflank may cache stale values
-const gitSha =
-  process.env.GITHUB_SHA ??
-  process.env.GIT_SHA ??
-  process.env.NEXT_PUBLIC_GIT_SHA ??
-  process.env.NEXT_PUBLIC_BUILD_VERSION ??
-  'unknown';
 
 export async function GET() {
   return NextResponse.json(
     {
       service: 'admin',
-      gitSha,
-      buildId: process.env.GITHUB_SHA ?? process.env.NEXT_PUBLIC_BUILD_VERSION ?? 'unknown',
-      builtAt: process.env.BUILD_TIMESTAMP ?? 'unknown',
+      gitSha: getCanonicalSha(),
+      buildId: getBuildId(),
+      builtAt: getBuildTimestamp(),
       version: '1.0.0',
+      environment: process.env.NODE_ENV || 'production',
       timestamp: new Date().toISOString(),
     },
     {

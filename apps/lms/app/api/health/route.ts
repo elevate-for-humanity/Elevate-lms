@@ -1,41 +1,40 @@
 /**
- * Dependency-free readiness probe for Marketing container.
+ * LMS Health Endpoint
  * 
- * This endpoint answers ONE question: "Can the container accept HTTP traffic?"
- * 
- * It does NOT check:
- * - Supabase connectivity
- * - Stripe connectivity
- * - Redis connectivity
- * - External network calls
- * - Authentication
- * 
- * Integration diagnostics belong in a separate observability endpoint.
+ * Returns health status with Supabase DB connectivity check.
+ * Uses unified version utility for canonical SHA resolution.
  */
 
+import { NextResponse } from 'next/server';
+import { getCanonicalSha, getBuildTimestamp } from '@/lib/version/getAppVersion';
+import { probeSupabaseDatabase } from '@/lib/supabase/db-probe';
+
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  return Response.json(
-    {
-      status: 'ok',
-      service: 'marketing',
-      commit:
-        process.env.COMMIT_SHA ??
-        process.env.GIT_SHA ??
-        process.env.NEXT_PUBLIC_COMMIT_SHA ??
-        'unknown',
-      buildTime:
-        process.env.BUILD_TIME ??
-        process.env.NEXT_PUBLIC_BUILD_TIME ??
-        'unknown',
-      timestamp: new Date().toISOString(),
+  const dbProbe = await probeSupabaseDatabase();
+  
+  const isHealthy = dbProbe.ok;
+  
+  const health = {
+    status: isHealthy ? 'healthy' : 'degraded',
+    service: 'lms',
+    gitSha: getCanonicalSha(),
+    buildTimestamp: getBuildTimestamp(),
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'production',
+    database: {
+      connected: dbProbe.ok,
+      error: dbProbe.error || null,
     },
-    {
-      status: 200,
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate',
-      },
+  };
+
+  return NextResponse.json(health, {
+    status: 200,
+    headers: {
+      'Cache-Control': 'no-store',
     },
-  );
+  });
 }

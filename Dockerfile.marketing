@@ -95,4 +95,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 8080
+
+# Health check using /api/ping (no deps, instant response)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
+
 CMD ["node", "server.js"]

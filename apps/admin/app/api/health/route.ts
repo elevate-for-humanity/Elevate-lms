@@ -1,5 +1,5 @@
 /**
- * Marketing Health Endpoint
+ * Admin Health Endpoint
  * 
  * Returns health status with Supabase DB connectivity check.
  * Uses unified version utility for canonical SHA resolution.
@@ -19,7 +19,7 @@ export async function GET() {
   
   const health = {
     status: isHealthy ? 'healthy' : 'degraded',
-    service: 'marketing',
+    service: 'admin',
     gitSha: getCanonicalSha(),
     buildTimestamp: getBuildTimestamp(),
     timestamp: new Date().toISOString(),

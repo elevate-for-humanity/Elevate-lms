@@ -25,7 +25,6 @@ import {
 
 import ProviderActions from './ProviderActions';
 
-export const metadata = { robots: { index: false } };
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -35,7 +34,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ tenantId: string }>;
 }): Promise<Metadata> {
-  return { title: 'Provider Detail | Admin' };
+  return { robots: { index: false }, title: 'Provider Detail | Admin' };
 }
 
 export default async function ProviderDetailPage({

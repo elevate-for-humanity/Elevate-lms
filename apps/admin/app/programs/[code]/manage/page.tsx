@@ -13,7 +13,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import ProgramManagerClient from './ProgramManagerClient';
 
-export const metadata = { robots: { index: false } };
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -24,7 +23,7 @@ export async function generateMetadata({
   params: Promise<{ code: string }>;
 }): Promise<Metadata> {
   const { code } = await params;
-  return {
+  return { robots: { index: false },
     title: `Manage Program · ${code} | Admin`,
   };
 }

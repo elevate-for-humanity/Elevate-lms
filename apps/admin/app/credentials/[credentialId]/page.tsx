@@ -11,7 +11,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import CredentialForm from '../CredentialForm';
 
-export const metadata = { robots: { index: false } };
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -28,7 +27,7 @@ export async function generateMetadata({
     .select('name')
     .eq('id', credentialId)
     .single();
-  return { title: data ? `${data.name} | Credential Registry` : 'Edit Credential | Admin' };
+  return { robots: { index: false }, title: data ? `${data.name} | Credential Registry` : 'Edit Credential | Admin' };
 }
 
 export default async function EditCredentialPage({

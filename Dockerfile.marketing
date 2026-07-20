@@ -80,18 +80,34 @@ WORKDIR /app
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs nextjs
 
-# Copy standalone build to /app/ root (server.js expects paths from /app/)
-# The standalone directory contains a self-contained Next.js server
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/standalone ./
-
-# Copy ALL required Next.js build artifacts to correct locations
-# CRITICAL: Need .next/server for route manifests and build metadata
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/server ./.next/server
+# Copy the entire Next.js build output to /app/
+COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next ./.next
 COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/public ./public
 
 # Copy node_modules (needed for runtime dependencies)
 COPY --from=builder /app/node_modules ./node_modules
+
+# Create a simple server that serves the Next.js app
+RUN echo 'const { createServer } = require("http"); \
+const { parse } = require("url"); \
+const next = require("next"); \
+\
+const dev = process.env.NODE_ENV !== "production"; \
+const hostname = process.env.HOSTNAME || "0.0.0.0"; \
+const port = parseInt(process.env.PORT || "3000", 10); \
+\
+const app = next({ dev, hostname, port }); \
+const handle = app.getRequestHandler(); \
+\
+app.prepare().then(() => { \
+  createServer((req, res) => { \
+    const parsedUrl = parse(req.url, true); \
+    handle(req, res, parsedUrl); \
+  }).listen(port, hostname, (err) => { \
+    if (err) throw err; \
+    console.info("> Marketing ready on http://" + hostname + ":" + port); \
+  }); \
+});' > ./server.cjs && chmod +x ./server.cjs
 
 USER nextjs
 
@@ -101,5 +117,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
     CMD curl -sf http://127.0.0.1:3000/api/ping || exit 1
 
-# Start server from /app/ where server.js is located
-CMD ["node", "--max-http-header-size=32768", "server.js"]
+# Start the marketing application
+CMD ["node", "--max-http-header-size=32768", "server.cjs"]

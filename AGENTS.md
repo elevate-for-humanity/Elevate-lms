@@ -363,6 +363,38 @@ Return:
 
 ---
 
+## VERIFIED PRODUCTION MARKETING DEPLOYMENT
+
+### Active Production Deployment
+| Field | Value |
+|-------|-------|
+| Service | elevate-marketing |
+| Deployment ID | 7757897c64 |
+| Git SHA | 36e59cc23c6e82a0713c8042b150d6e74f38c549 |
+| Source | GitHub Actions pipeline (CD) |
+| Health Verification | Pipeline verified |
+| Commit | fix: update health check to use root path |
+
+### Stale Deployments (TERMINATED)
+- elevate-marketing-6df5655d8d (manual/unknown source)
+- elevate-marketing-58c79d89c6
+- elevate-marketing-865d584596
+- elevate-marketing-7dfdf5c5c5
+
+### Deployment Rules
+1. ONLY trust deployments with Reason: "CD" (GitHub Actions pipeline)
+2. DO NOT use deployments with blank Reason (manual/unknown)
+3. DELETE stale/duplicate deployments to avoid conflicts
+4. Keep only ONE active deployment revision per service
+
+### Northflank API
+- Team ID: 6a1e9a33da6e472da6551c07
+- Project ID: 01j5e5b3e3v8z9z5z6q3t9a
+- Service: elevate-marketing
+- Domain: www.elevateforhumanity.org
+
+---
+
 ## WEBSITE PAGE AUDIT CHECKLIST
 
 Audit EVERY:

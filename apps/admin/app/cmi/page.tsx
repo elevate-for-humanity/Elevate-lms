@@ -8,6 +8,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 export const metadata: Metadata = {
+  robots: { index: false },
   title: 'CMI Program Dashboard | Admin',
   description:
     'Choice Medical Institute CNA program — enrollment, attendance, clinicals, and certificates.',

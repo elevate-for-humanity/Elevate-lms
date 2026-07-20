@@ -8,6 +8,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { IDVerificationForm } from '@/components/verification/IDVerificationForm';
 
 export const metadata: Metadata = {
+  robots: { index: false },
   title: 'Verify Your Identity | Student Onboarding',
 };
 

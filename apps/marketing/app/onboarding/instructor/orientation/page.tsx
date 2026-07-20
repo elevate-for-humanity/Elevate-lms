@@ -8,6 +8,7 @@ import InstructorOrientationClient from './InstructorOrientationClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
+  robots: { index: false },
   title: 'Instructor Orientation',
 };
 

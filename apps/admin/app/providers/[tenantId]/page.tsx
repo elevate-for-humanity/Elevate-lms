@@ -1,9 +1,23 @@
+export const metadata = { robots: { index: false } };
+
 import { Metadata } from 'next';
+export const metadata = { robots: { index: false } };
+
 import { redirect, notFound } from 'next/navigation';
+export const metadata = { robots: { index: false } };
+
 import { createClient } from '@/lib/supabase/server';
+export const metadata = { robots: { index: false } };
+
 import { requireAdminClient } from '@/lib/supabase/admin';
+export const metadata = { robots: { index: false } };
+
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+export const metadata = { robots: { index: false } };
+
 import Link from 'next/link';
+export const metadata = { robots: { index: false } };
+
 import {
   Building2,
   CheckCircle,
@@ -15,6 +29,8 @@ import {
   GraduationCap,
   ShieldCheck,
 } from 'lucide-react';
+export const metadata = { robots: { index: false } };
+
 import ProviderActions from './ProviderActions';
 
 export const dynamic = 'force-dynamic';

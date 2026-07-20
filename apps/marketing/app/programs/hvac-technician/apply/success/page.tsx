@@ -6,7 +6,7 @@ import { ArrowRight, Phone, Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Application Submitted | HVAC Technician',
-  robots: 'noindex',
+  robots: { index: false },
 };
 
 export default function HvacApplicationSuccessPage() {

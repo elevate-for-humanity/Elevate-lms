@@ -1,10 +1,22 @@
+export const metadata = { robots: { index: false } };
+
 import { redirect } from 'next/navigation';
+export const metadata = { robots: { index: false } };
+
 import { createClient } from '@/lib/supabase/server';
+export const metadata = { robots: { index: false } };
+
 import { requireAdminClient } from '@/lib/supabase/admin';
+export const metadata = { robots: { index: false } };
+
 import Link from 'next/link';
+export const metadata = { robots: { index: false } };
+
 import { Plus, BookOpen } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
+export const metadata = { robots: { index: false } };
+
 import type { Metadata } from 'next';
 
 

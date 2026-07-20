@@ -5,7 +5,8 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
-export const metadata: Metadata = { title: 'Exception Queue | Submissions OS | Admin' };
+export const metadata: Metadata = {
+  robots: { index: false }, title: 'Exception Queue | Submissions OS | Admin' };
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 

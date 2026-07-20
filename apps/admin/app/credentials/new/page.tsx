@@ -7,7 +7,8 @@ import CredentialForm from '../CredentialForm';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
-export const metadata: Metadata = { title: 'New Credential | Admin' };
+export const metadata: Metadata = {
+  robots: { index: false }, title: 'New Credential | Admin' };
 
 export default async function NewCredentialPage() {
   const supabase = await createClient();

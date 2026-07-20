@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
+  robots: { index: false },
   title: 'Admin Inbox | Elevate For Humanity',
   description: 'Elevate For Humanity - Career training and workforce development',
 };

@@ -5,7 +5,8 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, BookOpen, Plus, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 
-export const metadata: Metadata = { title: 'Content Library | Submissions OS | Admin' };
+export const metadata: Metadata = {
+  robots: { index: false }, title: 'Content Library | Submissions OS | Admin' };
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 

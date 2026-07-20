@@ -1,8 +1,20 @@
+export const metadata = { robots: { index: false } };
+
 import { Metadata } from 'next';
+export const metadata = { robots: { index: false } };
+
 import { redirect, notFound } from 'next/navigation';
+export const metadata = { robots: { index: false } };
+
 import { createClient } from '@/lib/supabase/server';
+export const metadata = { robots: { index: false } };
+
 import { requireAdminClient } from '@/lib/supabase/admin';
+export const metadata = { robots: { index: false } };
+
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+export const metadata = { robots: { index: false } };
+
 import CredentialForm from '../CredentialForm';
 
 export const dynamic = 'force-dynamic';

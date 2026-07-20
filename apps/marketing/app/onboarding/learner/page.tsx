@@ -25,6 +25,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
 
 export const metadata: Metadata = {
+  robots: { index: false },
   title: 'Student Onboarding',
   description: 'Complete your student onboarding to get started with your training program.',
 };

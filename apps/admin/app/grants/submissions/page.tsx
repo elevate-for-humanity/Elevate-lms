@@ -16,6 +16,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  robots: { index: false },
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/admin/grants/submissions',
   },

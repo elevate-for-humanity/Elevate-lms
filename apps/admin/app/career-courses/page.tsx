@@ -9,6 +9,7 @@ import { AdminPageShell, AdminCard, AdminEmptyState } from '@/components/admin/A
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 export const metadata: Metadata = {
+  robots: { index: false },
   title: 'Career Courses | Admin',
 };
 

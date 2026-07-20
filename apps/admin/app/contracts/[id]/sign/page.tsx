@@ -6,7 +6,8 @@ import SignatureClient from './SignatureClient';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
-export const metadata: Metadata = { title: 'Sign Contract | Admin' };
+export const metadata: Metadata = {
+  robots: { index: false }, title: 'Sign Contract | Admin' };
 
 export default async function SignPage({
   params,

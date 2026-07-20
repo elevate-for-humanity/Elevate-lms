@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  robots: { index: false },
   title: 'Webhook Health | Elevate For Humanity',
   description: 'Monitor webhook ingestion health across all providers.',
   alternates: {

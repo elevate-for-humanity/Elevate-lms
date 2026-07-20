@@ -13,7 +13,8 @@ import {
   Plus,
 } from 'lucide-react';
 
-export const metadata: Metadata = { title: 'Facts Vault | Submissions OS | Admin' };
+export const metadata: Metadata = {
+  robots: { index: false }, title: 'Facts Vault | Submissions OS | Admin' };
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 

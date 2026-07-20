@@ -14,7 +14,8 @@ import {
   XCircle,
 } from 'lucide-react';
 
-export const metadata: Metadata = { title: 'Attachment Library | Submissions OS | Admin' };
+export const metadata: Metadata = {
+  robots: { index: false }, title: 'Attachment Library | Submissions OS | Admin' };
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 

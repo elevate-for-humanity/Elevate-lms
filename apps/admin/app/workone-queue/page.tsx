@@ -9,6 +9,7 @@ import WorkOneApproveButton from './WorkOneApproveButton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
+  robots: { index: false },
   title: `WorkOne Queue | Admin | ${PLATFORM_DEFAULTS.orgName}`,
 };
 

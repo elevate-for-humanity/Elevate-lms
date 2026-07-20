@@ -8,6 +8,7 @@ import { hasPermission } from '@/lib/rbac/role-matrix';
 import type { UserRole } from '@/lib/rbac/role-matrix';
 
 export const metadata: Metadata = {
+  robots: { index: false },
   title: 'User Impersonation | Admin | Elevate',
 };
 

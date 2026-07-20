@@ -5,7 +5,8 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ShieldCheck, Plus, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 
-export const metadata: Metadata = { title: 'Compliance Records | Submissions OS | Admin' };
+export const metadata: Metadata = {
+  robots: { index: false }, title: 'Compliance Records | Submissions OS | Admin' };
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 

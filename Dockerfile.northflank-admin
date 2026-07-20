@@ -115,11 +115,11 @@ ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 WORKDIR /app
 
 # Copy standalone build artifacts
-# The Next.js standalone output creates server.js that handles all routes
+# The Next.js standalone output preserves workspace structure
 COPY --from=builder /app/apps/admin/.next/standalone ./
-COPY --from=builder /app/apps/admin/.next/static ./.next/static
-COPY --from=builder /app/apps/admin/.next/server ./.next/server
-COPY --from=builder /app/apps/admin/public ./public
+COPY --from=builder /app/apps/admin/.next/static ./apps/admin/.next/static
+COPY --from=builder /app/apps/admin/.next/server ./apps/admin/.next/server
+COPY --from=builder /app/apps/admin/public ./apps/admin/public
 
 # Verify standalone server.js exists at expected location
 RUN test -f /app/server.js && echo "Standalone server.js found at /app/server.js" || (echo "ERROR: server.js not found at /app/server.js" && exit 1)

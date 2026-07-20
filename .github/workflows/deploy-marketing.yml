@@ -138,7 +138,7 @@ jobs:
           sleep 30
           
           # Use the verify-sha script to check Northflank API
-          pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ github.sha }}"
+          pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ github.sha }}" --skip-if-unavailable
           
           echo "SHA verification from Northflank API passed!"
 

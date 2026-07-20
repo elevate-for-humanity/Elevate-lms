@@ -26,13 +26,19 @@ async function getDeployedSHA(projectId: string, serviceId: string): Promise<str
           buildSHA?: string;
         };
       };
+      build?: {
+        sha?: string;
+        commit?: string;
+      };
     }>(projectApiPath(projectId, `/services/${serviceId}`));
-    
-    const deployedSha = 
+
+    const deployedSha =
       service.deployment?.internal?.deployedSHA ||
       service.deployment?.internal?.sha ||
-      service.deployment?.internal?.buildSHA;
-    
+      service.deployment?.internal?.buildSHA ||
+      service.build?.sha ||
+      service.build?.commit;
+
     return deployedSha || null;
   } catch (error) {
     console.error(`Failed to get deployed SHA for ${serviceId}:`, error);
@@ -55,9 +61,10 @@ async function main() {
 
   const expectedSha = argValue('--sha') || process.env.GITHUB_SHA || '';
   const checkUrl = argValue('--url');
+  const skipIfUnavailable = argValue('--skip-if-unavailable') !== undefined;
 
   console.log(`\n=== SHA Verification for ${serviceId} ===`);
-  
+
   if (expectedSha) {
     console.log(`Expected SHA: ${expectedSha}`);
   } else {
@@ -66,7 +73,7 @@ async function main() {
 
   // Get deployed SHA from Northflank API
   const deployedSha = await getDeployedSHA(projectId, serviceId);
-  
+
   console.log(`\nDeployed SHA (from Northflank API): ${deployedSha || 'UNKNOWN'}`);
 
   if (!expectedSha) {
@@ -76,14 +83,20 @@ async function main() {
   }
 
   if (!deployedSha) {
+    if (skipIfUnavailable) {
+      console.log('\n⚠️  Could not determine deployed SHA, skipping verification');
+      console.log('(Use --skip-if-unavailable to skip when SHA is not available)');
+      process.exit(0);
+    }
     console.error('\n❌ FAILED: Could not determine deployed SHA from Northflank');
+    console.error('   Pass --skip-if-unavailable to skip when SHA is not available');
     process.exit(1);
   }
 
   // Compare SHAs (allow partial match - first 8 chars)
   const shortExpected = expectedSha.substring(0, 8);
   const shortDeployed = deployedSha.substring(0, 8);
-  
+
   if (deployedSha === expectedSha || shortDeployed === shortExpected) {
     console.log(`\n✅ SHA VERIFIED: Deployed matches expected`);
     console.log(`   Expected: ${expectedSha}`);

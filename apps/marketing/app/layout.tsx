@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://www.elevateforhumanity.org'),
 };
 
+// Force dynamic rendering to avoid static generation issues
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">

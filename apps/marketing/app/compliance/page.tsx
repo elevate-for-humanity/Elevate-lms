@@ -1,10 +1,10 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 
 import { createClient } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-
-export const revalidate = 3600;
 export const metadata: Metadata = {
   title: 'Compliance | Elevate for Humanity',
   description: 'Compliance page content.',

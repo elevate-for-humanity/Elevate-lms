@@ -1,3 +1,6 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -5,8 +8,6 @@ import { WioaCompliancePublicLayout } from '@/components/compliance/WioaComplian
 import { WIOA_COMPLIANCE } from '@/lib/compliance/wioa-etpl-routes';
 import { SECTION_188_PUBLIC_SUMMARY } from '@/lib/compliance/wioa-etpl-public-copy';
 import { FORM_LABELS } from '@/lib/compliance/wioa-etpl-forms';
-
-export const revalidate = 3600;
 
 const path = WIOA_COMPLIANCE.section188Template;
 

@@ -6,12 +6,12 @@ const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
   outputFileTracingRoot: path.join(__dirname, '../..'),
   images: { unoptimized: true },
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
   staticPageGenerationTimeout: 300,
+  skipTrailingSlashRedirect: true,
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', '@supabase/supabase-js'],
     optimizeCss: false,

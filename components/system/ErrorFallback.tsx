@@ -1,21 +1,14 @@
 'use client';
-import { logger } from '@/lib/logger';
 
-import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertCircle, Home, RefreshCw } from 'lucide-react';
 
-export default function ErrorFallback({
-  error,
-  reset,
-}: {
+interface ErrorFallbackProps {
   error: Error & { digest?: string };
   reset: () => void;
-}) {
-  useEffect(() => {
-    logger.error('Application error:', error);
-  }, [error]);
+}
 
+export default function ErrorFallback({ error, reset }: ErrorFallbackProps) {
   return (
     <div className="min-h-[60vh] flex items-center justify-center bg-slate-50">
       <div className="text-center px-4 max-w-lg">

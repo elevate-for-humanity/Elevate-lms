@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 
 export const metadata: Metadata = {

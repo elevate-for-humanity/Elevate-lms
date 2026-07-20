@@ -505,7 +505,7 @@ function ContactPageInner() {
           {[
             {
               q: 'What are your office hours?',
-              a: "Our team is available Monday-Friday, 9am-5pm EST. You can leave a message anytime and we'll respond within 1-2 business days.",
+              a: "Our team is available Monday–Friday, 8:00 a.m.–6:00 p.m. ET. You can leave a message anytime and we'll respond within 1-2 business days.",
             },
             {
               q: 'How quickly will I get a response?',
@@ -513,7 +513,7 @@ function ContactPageInner() {
             },
             {
               q: 'Can I visit your office in person?',
-              a: 'Elevate is a hybrid training institute — not a walk-in location. Our address is 6331 N Keystone Ave, Suite D, Indianapolis, IN 46220, Indianapolis, IN 46220. All visits are by appointment only. Use the calendar above to schedule.',
+              a: 'All visits are by appointment only. Our address is 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. Use the calendar above to schedule your appointment.',
             },
             {
               q: 'Who should I contact about enrollment?',

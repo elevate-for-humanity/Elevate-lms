@@ -13,8 +13,7 @@ import {
 } from 'lucide-react';
 import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 import { getProvidersForAmount } from '@/lib/bnpl-config';
-import { TestingCartProvider } from '@/components/testing/TestingCart';
-import { ProviderExamList } from '@/components/testing/ProviderExamList';
+import TestingCartWrapper from './TestingCartWrapper';
 
 export const dynamic = 'force-dynamic';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -184,7 +183,7 @@ export default async function ProviderPage({ params }: Props) {
           {/* Exams available */}
           <section>
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Exams Available</h2>
-            <ProviderExamList
+            <TestingCartWrapper
               providerKey={key}
               exams={provider.exams}
               isActive={isActive}

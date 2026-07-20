@@ -28,7 +28,6 @@ const apps = [
     icon: Layout,
     color: 'blue',
     rating: 4.9,
-    reviews: 156,
     price: 79,
     category: 'Website',
     demo: true,
@@ -40,7 +39,6 @@ const apps = [
     icon: DollarSign,
     color: 'green',
     rating: 4.8,
-    reviews: 89,
     price: 199,
     category: 'Funding',
     demo: true,
@@ -52,7 +50,6 @@ const apps = [
     icon: Building2,
     color: 'blue',
     rating: 4.9,
-    reviews: 127,
     price: 149,
     category: 'Government',
     demo: true,
@@ -64,7 +61,6 @@ const apps = [
     icon: DollarSign,
     color: 'purple',
     rating: 4.9,
-    reviews: 234,
     price: 299,
     category: 'AI Tools',
     demo: true,
@@ -76,7 +72,6 @@ const apps = [
     icon: DollarSign,
     color: 'purple',
     rating: 4.8,
-    reviews: 189,
     price: 199,
     category: 'AI Tools',
     demo: true,
@@ -88,7 +83,6 @@ const apps = [
     icon: DollarSign,
     color: 'green',
     rating: 4.7,
-    reviews: 67,
     price: 149,
     category: 'AI Tools',
     demo: true,
@@ -143,7 +137,7 @@ export default function AppsPage() {
                           <Star key={i} className={`w-4 h-4 ${i <= Math.floor(app.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-slate-700'}`} />
                         ))}
                       </div>
-                      <span className="text-sm text-slate-700">{app.rating} ({app.reviews} reviews)</span>
+                      <span className="text-sm text-slate-700">{app.rating} rating</span>
                     </div>
                     <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                       <div>

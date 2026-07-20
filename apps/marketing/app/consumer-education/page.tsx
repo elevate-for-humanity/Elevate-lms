@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+export const dynamic = 'force-dynamic';
 import PublicLandingPage from '@/components/marketing/PublicLandingPage';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 

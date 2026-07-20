@@ -59,7 +59,7 @@ export default function GrantsAppPage() {
                 <span className="bg-brand-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">FUNDING</span>
                 <div className="flex items-center gap-1">
                   {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
-                  <span className="text-sm ml-1">4.8 (89 reviews)</span>
+                  <span className="text-sm ml-1">4.8 rating</span>
                 </div>
               </div>
               <h1 className="text-4xl md:text-5xl font-bold mb-6">

@@ -1,5 +1,5 @@
 export const orgLocations: unknown[] = [];
 
 export function formatHeadquartersLine(): string {
-  return '123 Main St, Suite 200, Columbia, MD 21044';
+  return '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240';
 }

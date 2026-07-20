@@ -1,0 +1,5 @@
+archive/
+.venv/
+venv/
+*.lock
+pnpm-lock.yaml

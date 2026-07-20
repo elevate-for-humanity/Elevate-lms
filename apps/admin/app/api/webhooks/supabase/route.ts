@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
   try {
     const event = JSON.parse(body);
-    console.log('Supabase webhook event:', event.type);
+    console.error('Supabase webhook event:', event.type);
 
     switch (event.type) {
       case 'INSERT':
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
         // Handle delete
         break;
       default:
-        console.log('Unhandled event type:', event.type);
+        console.error('Unhandled event type:', event.type);
     }
 
     return NextResponse.json({ received: true, service: 'admin' });

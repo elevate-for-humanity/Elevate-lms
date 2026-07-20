@@ -58,6 +58,10 @@ async function main() {
     }
   }
 
+  // Get the current branch to build from
+  const currentBranch = process.env.DEPLOY_BRANCH || 'main';
+  
+  // Trigger build from the current branch
   const build = await nfFetch<{
     id: string;
     branch?: string;
@@ -67,7 +71,7 @@ async function main() {
   }>(projectApiPath(projectId, `/services/${serviceId}/build`), {
     method: 'POST',
     body: JSON.stringify({
-      sha: currentSha,
+      branch: currentBranch,
       buildArgs: {
         GITHUB_SHA: currentSha || 'unknown',
         NEXT_PUBLIC_GIT_SHA: currentSha || 'unknown',

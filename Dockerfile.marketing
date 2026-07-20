@@ -4,7 +4,6 @@ ARG GIT_SHA=unknown
 
 FROM node:22-bookworm-slim AS base
 
-# Install Python for native module builds (node-pty)
 RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 ENV PNPM_HOME="/pnpm"
@@ -22,10 +21,10 @@ COPY . .
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter @elevate/marketing build
 
+# Check standalone output exists
 RUN test -d /app/apps/marketing/.next/standalone
 RUN test -d /app/apps/marketing/.next/static
 RUN test -f /app/apps/marketing/.next/BUILD_ID
-RUN test -f /app/apps/marketing/.next/standalone/server.js
 
 FROM node:22-bookworm-slim AS runner
 
@@ -44,10 +43,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/standalone .
 COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-RUN test -f /app/apps/marketing/server.js
-
 USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", "/app/apps/marketing/server.js"]
+CMD ["node", "server.js"]

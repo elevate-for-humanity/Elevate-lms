@@ -39,9 +39,10 @@ WORKDIR /app
 
 RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 --gid nodejs nextjs
 
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# In monorepo Next.js standalone, server.js is at apps/marketing/server.js
+COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/standalone ./apps/marketing/
+COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/static ./apps/marketing/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/public ./apps/marketing/public
 
 # Copy node_modules for dependencies
 COPY --from=builder /app/node_modules ./node_modules
@@ -50,4 +51,5 @@ USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+# Run from the marketing app directory where server.js lives
+CMD ["node", "apps/marketing/server.js"]

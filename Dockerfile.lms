@@ -38,7 +38,6 @@ FROM base AS builder
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/lms/package.json ./apps/lms/package.json
 COPY packages/*/package.json ./packages/
-COPY apps/admin/package.json ./apps/admin/package.json 2>/dev/null || true
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false

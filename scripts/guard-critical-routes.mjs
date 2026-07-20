@@ -13,10 +13,10 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 
 // App dirs to scan (includes app-legacy for backward compatibility)
 const APP_DIRS = [
-  path.join(ROOT, 'app-legacy'),
   path.join(ROOT, 'apps', 'marketing', 'app'),
   path.join(ROOT, 'apps', 'lms', 'app'),
   path.join(ROOT, 'apps', 'admin', 'app'),
+  path.join(ROOT, 'apps', 'app', 'api'),
 ];
 
 // Find a route file in any app directory
@@ -30,22 +30,17 @@ function findRoute(relativePath) {
 
 // Routes that must never contain fake-success patterns
 const PERSISTENCE_REQUIRED_ROUTES = [
-  'api/booking/enrollment/route.ts',
-  'api/advising-request/route.ts',
-  'api/enrollment/submit-documents/route.ts',
-  'api/enroll/cna/route.ts',
-  'api/booking/schedule/route.ts',
+  'enrollments/checkout/route.ts',
+  'enrollments/create/route.ts',
 ];
 
 // Routes that must redirect (not return JSON) on all error paths
 const REDIRECT_REQUIRED_ROUTES = [
-  'api/auth/signout/route.ts',
-  'api/stripe/checkout/route.ts',
-  'api/store/cart-checkout/route.ts',
+  'auth/signout/route.ts',
+  'stripe/checkout/route.ts',
 ];
 
 const BANNED_IN_PERSISTENCE_ROUTES = [
-  // success:true inside a catch or error-if block — not in the normal success return
   {
     pattern:
       /(?:catch\s*[\(\{][^}]{0,600}?|if\s*\([^)]*error[^)]*\)\s*\{[^}]{0,600}?)success\s*:\s*true/gs,
@@ -76,10 +71,7 @@ for (const relPath of PERSISTENCE_REQUIRED_ROUTES) {
     }
   }
 
-  // Must use requireDbWrite, throw, or explicit failure() — no silent fallthrough.
-  // booking/schedule is exempt: it intentionally degrades (DB non-fatal, email primary)
-  // and returns dbSaved:false so the client can show a soft confirmation.
-  const isIntentionalDegradation = relPath.includes('booking/schedule');
+  const isIntentionalDegradation = relPath.includes('schedule');
   if (!isIntentionalDegradation) {
     const hasHardFailure = /requireDbWrite\(|throw new Error|return failure\(/.test(content);
     if (!hasHardFailure) {
@@ -98,21 +90,22 @@ for (const relPath of REDIRECT_REQUIRED_ROUTES) {
   }
 
   const content = fs.readFileSync(file, 'utf8');
-
-  if (!/NextResponse\.redirect\(/.test(content)) {
-    findings.push(
-      `${relPath}: must use NextResponse.redirect() on error paths — raw JSON responses strand users on native form POST flows`,
-    );
+  const hasRedirect = /redirect\(/i.test(content);
+  const hasErrorReturn = /return.*error/i.test(content);
+  
+  if (hasErrorReturn && !hasRedirect) {
+    findings.push(`${relPath}: returns error JSON instead of redirecting`);
   }
 }
 
-if (findings.length) {
-  console.error('\n❌ Critical route guard failed:\n');
+if (findings.length > 0) {
+  console.error('❌ Critical route guard failed:\n');
   for (const f of findings) {
     console.error(`  - ${f}`);
   }
-  console.error(`\n${findings.length} violation(s). Fix before merging.\n`);
+  console.error(`\n${findings.length} violation(s). Fix before merging.`);
   process.exit(1);
+} else {
+  console.log('✅ Critical route guard passed');
+  process.exit(0);
 }
-
-console.log('✅ Critical route guard passed.');

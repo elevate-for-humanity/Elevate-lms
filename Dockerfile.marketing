@@ -1,31 +1,84 @@
 # syntax=docker/dockerfile:1.7
+# Dockerfile.marketing - Northflank Marketing Service
+# Serves www.elevateforhumanity.org
+#
+# CRITICAL: This Dockerfile was fixed to resolve path mismatches.
 
 ARG GIT_SHA=unknown
+ARG BUILD_TIMESTAMP=unknown
 
+# =============================================================================
+# STAGE 1: Base
+# =============================================================================
 FROM node:22-bookworm-slim AS base
 
-RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ ca-certificates curl && \
+    rm -rf /var/lib/apt/lists/*
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"
 ENV NEXT_TELEMETRY_DISABLED=1
-
 ENV NEXT_STANDALONE_OUTPUT=1
+
+# Cache invalidation marker
+RUN echo "nf-cache-invalidate-marketing-2026-07-20-v2"
+
 RUN corepack enable
 WORKDIR /app
 
+# =============================================================================
+# STAGE 2: Builder
+# =============================================================================
 FROM base AS builder
 
+# Copy manifests first for layer caching
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/marketing/package.json ./apps/marketing/package.json
+COPY packages/*/package.json ./packages/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+# Copy source code
 COPY . .
 
-RUN pnpm install --frozen-lockfile
+# Build args
+ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG GIT_SHA
+ARG BUILD_TIMESTAMP
+
+ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+ENV CI=true
+ENV GIT_SHA=${GIT_SHA}
+ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
+
+# Build Marketing app
 RUN pnpm --filter @elevate/marketing build
 
-# Check standalone output exists
-RUN test -d /app/apps/marketing/.next/standalone
-RUN test -d /app/apps/marketing/.next/static
-RUN test -f /app/apps/marketing/.next/BUILD_ID
+# =============================================================================
+# VERIFICATION: Builder stage
+# =============================================================================
+RUN echo "=== MARKETING BUILD VERIFICATION ===" && \
+    echo "Checking standalone directory..." && \
+    test -d /app/apps/marketing/.next/standalone && echo "✓ Standalone dir exists" || (echo "✗ Standalone dir MISSING!"; exit 1) && \
+    echo "Checking static directory..." && \
+    test -d /app/apps/marketing/.next/static && echo "✓ Static dir exists" || (echo "✗ Static dir MISSING!"; exit 1) && \
+    echo "Checking BUILD_ID..." && \
+    test -f /app/apps/marketing/.next/BUILD_ID && echo "✓ BUILD_ID exists" || (echo "✗ BUILD_ID MISSING!"; exit 1) && \
+    echo "Checking server.js location..." && \
+    find /app/apps/marketing/.next/standalone -name "server.js" -type f && echo "✓ server.js found" || (echo "✗ server.js MISSING!"; exit 1) && \
+    echo "=== BUILD VERIFICATION COMPLETE ==="
 
+# =============================================================================
+# STAGE 3: Runtime
+# =============================================================================
 FROM node:22-bookworm-slim AS runner
 
 ENV NODE_ENV=production
@@ -34,22 +87,48 @@ ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 ENV SERVICE_NAME=elevate-marketing
 ENV GIT_SHA=${GIT_SHA}
+ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 
 WORKDIR /app
 
-RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 --gid nodejs nextjs
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs nextjs
 
-# In monorepo Next.js standalone, server.js is at apps/marketing/server.js
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/standalone ./apps/marketing/
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/static ./apps/marketing/.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/public ./apps/marketing/public
+# Copy standalone build to /app/ root (server.js expects paths from /app/)
+COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/standalone ./
 
-# Copy node_modules for dependencies
+# Copy static files to CORRECT locations
+COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/public ./public
+
+# Copy node_modules (needed for runtime dependencies)
 COPY --from=builder /app/node_modules ./node_modules
+
+# =============================================================================
+# VERIFICATION: Runtime stage
+# =============================================================================
+RUN echo "=== RUNTIME VERIFICATION ===" && \
+    echo "Current directory: $(pwd)" && \
+    echo "Contents of /app:" && \
+    ls -la /app/ && \
+    echo "" && \
+    if [ -f "/app/server.js" ]; then \
+        echo "✓ server.js found at /app/server.js"; \
+    else \
+        echo "✗ CRITICAL: server.js NOT found at /app/server.js"; \
+        echo "Searching for server.js:"; \
+        find /app -name "server.js" -type f 2>/dev/null; \
+        exit 1; \
+    fi && \
+    echo "=== RUNTIME VERIFICATION PASSED ==="
 
 USER nextjs
 
 EXPOSE 3000
 
-# Run from the marketing app directory where server.js lives
-CMD ["node", "apps/marketing/server.js"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+    CMD curl -sf http://127.0.0.1:3000/api/ping || exit 1
+
+# Start server from /app/ where server.js is located
+CMD ["node", "--max-http-header-size=32768", "server.js"]

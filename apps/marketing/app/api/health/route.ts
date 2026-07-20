@@ -4,7 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { probeSupabaseDatabase } from '@/lib/supabase/db-probe';
 
 import { toErrorMessage } from '@/lib/safe';
-import { getAppVersion } from '@/lib/version/getAppVersion';
+import { getAppVersion, getBuildTimestamp } from '@/lib/version/getAppVersion';
 import { getAuditTelemetry } from '@/lib/audit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -20,7 +20,8 @@ async function _GET(request: Request) {
   const checks: Record<string, any> = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    version: getAppVersion(),
+    commit: getAppVersion(),
+    builtAt: getBuildTimestamp(),
     environment: process.env.NODE_ENV || 'production',
     checks: {},
   };

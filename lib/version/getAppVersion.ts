@@ -1,8 +1,10 @@
 // Canonical resolution chain for build identity
+// IMPORTANT: GITHUB_SHA is the primary source (set by CI workflow)
+// GIT_SHA and NEXT_PUBLIC_GIT_SHA are fallbacks
+// COMMIT_SHA is NOT used as primary - Northflank may cache stale values
 const gitSha =
-  process.env.GIT_SHA ??
   process.env.GITHUB_SHA ??
-  process.env.COMMIT_SHA ??
+  process.env.GIT_SHA ??
   process.env.NEXT_PUBLIC_GIT_SHA ??
   process.env.NEXT_PUBLIC_BUILD_VERSION ??
   'unknown';

@@ -3,8 +3,12 @@
 # Fixed: Added build args for commit SHA and build time
 
 # Build args available across ALL stages (required for multi-stage ARG passthrough)
+# NOTE: Northflank combined-service may inject COMMIT_SHA - use both names
 ARG GITHUB_SHA=unknown
+ARG GIT_SHA=unknown
+ARG COMMIT_SHA=unknown
 ARG BUILD_TIMESTAMP=unknown
+ARG BUILD_ID=unknown
 
 FROM node:22-bookworm AS builder
 
@@ -24,14 +28,25 @@ COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
 COPY . .
 
-# Set build identity - matching trigger-build.ts buildArgs
+# Set build identity - declare ALL ARGs before use
 ARG GITHUB_SHA
+ARG GIT_SHA
+ARG COMMIT_SHA
 ARG BUILD_TIMESTAMP
+ARG BUILD_ID
+# Use GITHUB_SHA as primary; fall back to GIT_SHA or COMMIT_SHA
 ENV GITHUB_SHA=${GITHUB_SHA}
-ENV GIT_SHA=${GITHUB_SHA}
+ENV GIT_SHA=${GIT_SHA:-${GITHUB_SHA}}
+ENV COMMIT_SHA=${COMMIT_SHA}
+ENV BUILD_ID=${BUILD_ID}
 ENV NEXT_PUBLIC_GIT_SHA=${GITHUB_SHA}
 ENV NEXT_PUBLIC_BUILD_VERSION=${GITHUB_SHA}
 ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
+
+# Verify build args are set (fail build if SHA is unknown)
+RUN echo "Build SHA: ${GITHUB_SHA}" && \
+    echo "Build Timestamp: ${BUILD_TIMESTAMP}" && \
+    echo "Build ID: ${BUILD_ID}"
 
 # Run the splitter
 ENV BUILD_SCOPE=MARKETING
@@ -56,12 +71,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 
 # ARG declarations must come BEFORE ENV usage in each stage
 ARG GITHUB_SHA
+ARG GIT_SHA
+ARG COMMIT_SHA
 ARG BUILD_TIMESTAMP
+ARG BUILD_ID
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
 ENV NODE_ENV=production
 ENV GITHUB_SHA=${GITHUB_SHA}
-ENV GIT_SHA=${GITHUB_SHA}
+ENV GIT_SHA=${GIT_SHA:-${GITHUB_SHA}}
+ENV COMMIT_SHA=${COMMIT_SHA}
+ENV BUILD_ID=${BUILD_ID}
 ENV NEXT_PUBLIC_GIT_SHA=${GITHUB_SHA}
 ENV NEXT_PUBLIC_BUILD_VERSION=${GITHUB_SHA}
 ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}

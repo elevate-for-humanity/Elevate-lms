@@ -32,7 +32,7 @@ async function _GET(request: Request) {
     const { data, error } = await db.rpc('expire_stale_credentials');
 
     if (error) {
-      logger.error('expire_stale_credentials RPC failed', undefined, { error: error.message });
+      logger.error('expire_stale_credentials RPC failed', undefined, { error: 'Operation failed' });
       return NextResponse.json({ error: 'Expiration job failed' }, { status: 500 });
     }
 

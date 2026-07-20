@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     checks.push({
       name: 'db:school_applications',
       ok: !error,
-      detail: error ? error.message : 'reachable',
+      detail: error ? 'Database error' : 'reachable',
     });
   } catch (err) {
     checks.push({
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
     checks.push({
       name: 'db:school_application_followups',
       ok: !error,
-      detail: error ? error.message : 'reachable',
+      detail: error ? 'Database error' : 'reachable',
     });
   } catch (err) {
     checks.push({

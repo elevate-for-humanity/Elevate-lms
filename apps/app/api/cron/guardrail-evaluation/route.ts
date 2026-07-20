@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     logger.error('[cron/guardrail-evaluation] failed', error as Error);
     return NextResponse.json(
-      { ok: false, error: error instanceof Error ? error.message : 'Unknown error' },
+      { ok: false, error: 'Operation failed' },
       { status: 500 },
     );
   }

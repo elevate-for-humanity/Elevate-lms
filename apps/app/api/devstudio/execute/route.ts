@@ -3183,7 +3183,7 @@ async function executeAction(
         let q = sb.from('ai_operator_memory').select('memory_type, title, content, severity, tags, created_at').order('created_at', { ascending: false }).limit(30);
         if (memType !== 'all') q = q.eq('memory_type', memType) as typeof q;
         const { data, error } = await q;
-        if (error) { write(`\x1b[31m✗  ${error.message}\x1b[0m`); break; }
+        if (error) { write('\x1b[31m✗  Operation failed\x1b[0m'); break; }
         const filtered = search
           ? (data ?? []).filter(m => m.title.toLowerCase().includes(search) || m.content.toLowerCase().includes(search))
           : (data ?? []);
@@ -3208,7 +3208,7 @@ async function executeAction(
         const { createClient } = await import('@supabase/supabase-js');
         const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
         const { error } = await sb.from('ai_operator_memory').insert({ memory_type: memType, title, content, tags });
-        if (error) { write(`\x1b[31m✗  ${error.message}\x1b[0m`); break; }
+        if (error) { write('\x1b[31m✗  Operation failed\x1b[0m'); break; }
         write(`\x1b[32m✓  Memory saved: [${memType}] ${title}\x1b[0m`);
       } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Save failed'}\x1b[0m`); }
       break;
@@ -3316,7 +3316,7 @@ async function executeAction(
           .select('id,title,status,counterparty_name,expires_at,created_at')
           .order('created_at', { ascending: false })
           .limit(20);
-        if (error) { write(`\x1b[31m✗  DB error: ${error.message}\x1b[0m`); break; }
+        if (error) { write('\x1b[31m✗  Database error\x1b[0m'); break; }
         if (!data?.length) { write('No MOUs/contracts found.'); break; }
         data.forEach((c: Record<string, unknown>, i: number) => {
           const exp = c.expires_at ? new Date(c.expires_at as string).toLocaleDateString() : 'No expiry';
@@ -3336,7 +3336,7 @@ async function executeAction(
           .select('id,agency,status,due_date,draft,ready,submitted')
           .order('due_date', { ascending: true })
           .limit(20);
-        if (error) { write(`\x1b[31m✗  DB error: ${error.message}\x1b[0m`); break; }
+        if (error) { write('\x1b[31m✗  Database error\x1b[0m'); break; }
         if (!data?.length) { write('No grants found.'); break; }
         data.forEach((g: Record<string, unknown>, i: number) => {
           const due = g.due_date ? new Date(g.due_date as string).toLocaleDateString() : 'No due date';
@@ -3361,7 +3361,7 @@ async function executeAction(
           .select('id,name,document_type,status,uploaded_at')
           .order('uploaded_at', { ascending: false })
           .limit(20);
-        if (error) { write(`\x1b[31m✗  DB error: ${error.message}\x1b[0m`); break; }
+        if (error) { write('\x1b[31m✗  Database error\x1b[0m'); break; }
         if (!data?.length) { write('No documents found.'); break; }
         data.forEach((d: Record<string, unknown>, i: number) => {
           const date = d.uploaded_at ? new Date(d.uploaded_at as string).toLocaleDateString() : '--';
@@ -3406,7 +3406,7 @@ async function executeAction(
           .is('signed_at', null)
           .order('created_at', { ascending: false })
           .limit(20);
-        if (error) { write(`\x1b[31m✗  DB error: ${error.message}\x1b[0m`); break; }
+        if (error) { write('\x1b[31m✗  Database error\x1b[0m'); break; }
         if (!data?.length) { write('\x1b[32m✓  No pending signatures.\x1b[0m'); break; }
         write(`Pending signatures: ${data.length}`);
         data.forEach((s: Record<string, unknown>, i: number) =>
@@ -3426,7 +3426,7 @@ async function executeAction(
           .select('id,name,status,owner,updated_at')
           .order('updated_at', { ascending: false })
           .limit(20);
-        if (error) { write(`\x1b[31m✗  DB error: ${error.message}\x1b[0m`); break; }
+        if (error) { write('\x1b[31m✗  Database error\x1b[0m'); break; }
         if (!data?.length) { write('No workflows found.'); break; }
         data.forEach((w: Record<string, unknown>, i: number) =>
           write(`${i + 1}. ${String(w.name ?? '--')} | ${String(w.status ?? '--')} | Owner: ${String(w.owner ?? '--')}`)
@@ -3444,7 +3444,7 @@ async function executeAction(
           .from('org_profile')
           .select('*')
           .maybeSingle();
-        if (error) { write(`\x1b[31m✗  DB error: ${error.message}\x1b[0m`); break; }
+        if (error) { write('\x1b[31m✗  Database error\x1b[0m'); break; }
         if (!data) { write('No organization profile found. Set it up at /admin/settings/organization'); break; }
         const d = data as Record<string, unknown>;
         write(`Organization: ${String(d.legal_name ?? d.dba_name ?? '--')}`);

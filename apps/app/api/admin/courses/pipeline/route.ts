@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
         logger.error('[pipeline/route] Pipeline error', err);
         write({
           stage: 'error',
-          message: err instanceof Error ? err.message : 'Pipeline failed',
+          message: 'Pipeline failed',
         });
       } finally {
         controller.close();

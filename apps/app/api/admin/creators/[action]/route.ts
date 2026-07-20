@@ -35,6 +35,6 @@ export async function POST(
     .update({ status: STATUS_MAP[action], updated_at: new Date().toISOString() })
     .eq('id', id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
   return NextResponse.json({ ok: true, status: STATUS_MAP[action] });
 }

@@ -725,7 +725,7 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         .order('title');
       if (args.active_only) q = q.eq('is_active', true);
       const { data, error } = await q.limit(50);
-      if (error) return `Error: ${error.message}`;
+      if (error) return `Error: Database query failed`;
       return JSON.stringify(data, null, 2);
     }
 
@@ -739,7 +739,7 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         .limit(limit);
       if (args.status) q = (q as typeof q).eq('status', String(args.status));
       const { data, error } = await q;
-      if (error) return `Error: ${error.message}`;
+      if (error) return `Error: Database query failed`;
       return JSON.stringify(data, null, 2);
     }
 
@@ -780,7 +780,7 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         .limit(limit);
       if (args.status) q = (q as typeof q).eq('status', String(args.status));
       const { data, error } = await q;
-      if (error) return `Error: ${error.message}`;
+      if (error) return `Error: Database query failed`;
       return JSON.stringify(data, null, 2);
     }
 
@@ -1155,7 +1155,7 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         .update({ ...applicationUpdate, updated_at: new Date().toISOString() })
         .eq('id', applicationId);
 
-      if (error) return `Failed to update application: ${error.message}`;
+      if (error) return `Failed to update application`;
 
       // Mark document as applied
       await db.from('documents').update({

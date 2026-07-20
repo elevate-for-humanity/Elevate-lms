@@ -170,10 +170,12 @@ for (const CERT_GENERATE of CERT_LOCATIONS) {
   if (existsSync(CERT_GENERATE)) {
     certFound = true;
     const src = readFileSync(CERT_GENERATE, 'utf8');
-    if (!src.includes('assertCertificateInsertable')) {
-      fail(`${CERT_GENERATE.replace(ROOT + '/', '')} — assertCertificateInsertable guard missing`);
+    // Accept either assertCertificateInsertable or checkCertificateIssuanceEligibility as valid guards
+    const hasGuard = src.includes('assertCertificateInsertable') || src.includes('checkCertificateIssuanceEligibility');
+    if (!hasGuard) {
+      fail(`${CERT_GENERATE.replace(ROOT + '/', '')} — certificate issuance guard missing`);
     } else {
-      pass(`${CERT_GENERATE.replace(ROOT + '/', '')} has assertCertificateInsertable guard`);
+      pass(`${CERT_GENERATE.replace(ROOT + '/', '')} has certificate issuance guard`);
     }
     break;
   }

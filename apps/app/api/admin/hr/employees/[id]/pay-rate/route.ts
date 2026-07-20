@@ -18,7 +18,7 @@ export async function GET(
     .eq('id', params.id)
     .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
   return NextResponse.json(data);
 }
@@ -44,6 +44,6 @@ export async function POST(
     })
     .eq('id', params.id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

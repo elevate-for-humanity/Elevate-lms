@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     .order('created_at', { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
   }
 
   return NextResponse.json({
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json({ error: 'Operation failed' }, { status: 400 });
   }
 
   return NextResponse.json({ user: user.user }, { status: 201 });

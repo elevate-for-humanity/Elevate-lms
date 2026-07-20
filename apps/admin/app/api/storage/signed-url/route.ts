@@ -22,7 +22,7 @@ export async function GET(request: Request) {
   if (!bucket || !path) return NextResponse.json({ error: 'bucket and path required' }, { status: 400 });
   try {
     const { data, error } = await getSupabase().storage.from(bucket).createSignedUrl(path, expiresIn);
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
     return NextResponse.json({ signedUrl: data.signedUrl, service: 'admin' });
   } catch (err) { return NextResponse.json({ error: (err as Error).message }, { status: 500 }); }
 }

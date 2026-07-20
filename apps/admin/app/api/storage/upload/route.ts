@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     if (!file || !bucket || !path) return NextResponse.json({ error: 'file, bucket, path required' }, { status: 400 });
     const buffer = Buffer.from(await file.arrayBuffer());
     const { data, error } = await getSupabase().storage.from(bucket).upload(`${path}/${file.name}`, buffer, { upsert: true });
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
     return NextResponse.json({ path: data.path, service: 'admin' });
   } catch (err) { return NextResponse.json({ error: (err as Error).message }, { status: 500 }); }
 }

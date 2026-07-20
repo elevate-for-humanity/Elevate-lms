@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('[embed-knowledge] RAG re-embed failed', error as Error);
     return NextResponse.json(
-      { ok: false, error: error instanceof Error ? error.message : 'Unknown error' },
+      { ok: false, error: 'Operation failed' },
       { status: 500 },
     );
   }

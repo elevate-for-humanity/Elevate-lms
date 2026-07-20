@@ -34,7 +34,7 @@ async function _POST(request: Request) {
 
     if (error) {
       logger.error('[cron/memory-cleanup] RPC error', error);
-      return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: false, error: 'Cleanup failed' }, { status: 500 });
     }
 
     const deleted = (data as number) ?? 0;

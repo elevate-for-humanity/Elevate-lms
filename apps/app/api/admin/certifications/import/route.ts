@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     const { error } = await db.from('user_certifications').insert(record);
     if (error) {
-      errors.push(`Line ${lineNum}: ${error.message}`);
+      errors.push(`Line ${lineNum}: Import failed`);
       skipped++;
     } else {
       imported++;

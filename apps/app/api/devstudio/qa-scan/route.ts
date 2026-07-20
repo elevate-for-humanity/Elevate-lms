@@ -233,7 +233,7 @@ export async function GET(req: NextRequest) {
             const tables = ['programs', 'profiles', 'enrollments', 'applications', 'curriculum_lessons', 'courses', 'platform_secrets', 'ai_agents'];
             for (const table of tables) {
               const { count, error } = await supabase.from(table).select('id', { count: 'exact', head: true });
-              if (error) fail(`${table}: ${error.message}`);
+              if (error) fail(`${table}: Query failed`;
               else if ((count ?? 0) === 0) warn(`${table}: 0 rows`);
               else pass(`${table}: ${count} rows`);
             }

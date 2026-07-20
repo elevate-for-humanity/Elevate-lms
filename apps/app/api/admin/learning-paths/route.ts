@@ -38,7 +38,7 @@ async function _POST(req: NextRequest) {
     .select('id')
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
   return NextResponse.json({ id: data.id }, { status: 201 });
 }
 

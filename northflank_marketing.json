@@ -32,9 +32,13 @@
   "deployment": {
     "healthCheck": {
       "enabled": true,
-      "path": "/",
+      "path": "/api/health",
       "port": 8080,
-      "protocol": "HTTP"
+      "protocol": "HTTP",
+      "initialDelaySeconds": 60,
+      "periodSeconds": 30,
+      "timeoutSeconds": 10,
+      "failureThreshold": 3
     },
     "replicas": {
       "min": 1,

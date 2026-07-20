@@ -21,5 +21,17 @@
   },
   "buildArgs": {
     "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org"
+  },
+  "deployment": {
+    "healthCheck": {
+      "enabled": true,
+      "path": "/api/health",
+      "port": 8080,
+      "protocol": "HTTP",
+      "initialDelaySeconds": 60,
+      "periodSeconds": 30,
+      "timeoutSeconds": 10,
+      "failureThreshold": 3
+    }
   }
 }

@@ -102,13 +102,14 @@ RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs nextjs
 
 # Copy standalone build (contains server.js at root of standalone/)
-COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/standalone ./
+# Handle monorepo structure where standalone output preserves full path
+COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/standalone/* ./
 
 # Copy ALL required Next.js build artifacts to correct locations
 # CRITICAL: Need .next/server for route manifests and build metadata
-COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/server ./.next/server
-COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/static ./apps/lms/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/server ./apps/lms/.next/server
+COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/public ./apps/lms/public
 
 # Copy node_modules (needed for runtime dependencies)
 COPY --from=builder /app/node_modules ./node_modules
@@ -121,28 +122,28 @@ RUN echo "=== RUNTIME VERIFICATION ===" && \
     echo "Contents of /app:" && \
     ls -la /app/ && \
     echo "" && \
-    if [ -f "/app/server.js" ]; then \
-        echo "✓ server.js found at /app/server.js"; \
-        ls -la /app/server.js; \
+    if [ -f "/app/apps/lms/server.js" ]; then \
+        echo "✓ server.js found at /app/apps/lms/server.js"; \
+        ls -la /app/apps/lms/server.js; \
     else \
-        echo "✗ CRITICAL: server.js NOT found at /app/server.js"; \
+        echo "✗ CRITICAL: server.js NOT found at /app/apps/lms/server.js"; \
         echo "Searching for server.js in /app:"; \
         find /app -name "server.js" -type f 2>/dev/null || echo "Not found anywhere"; \
         exit 1; \
     fi && \
-    if [ -d "/app/.next/server" ]; then \
+    if [ -d "/app/apps/lms/.next/server" ]; then \
         echo "✓ .next/server directory found"; \
     else \
         echo "✗ CRITICAL: .next/server directory MISSING"; \
         exit 1; \
     fi && \
-    if [ -d "/app/.next/static" ]; then \
+    if [ -d "/app/apps/lms/.next/static" ]; then \
         echo "✓ .next/static found"; \
     else \
         echo "✗ CRITICAL: .next/static NOT found"; \
         exit 1; \
     fi && \
-    if [ -d "/app/public" ]; then \
+    if [ -d "/app/apps/lms/public" ]; then \
         echo "✓ public found"; \
     else \
         echo "✗ CRITICAL: public NOT found"; \
@@ -158,5 +159,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
     CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
 
-# Start server from /app/ where server.js is located
-CMD ["node", "--max-http-header-size=32768", "server.js"]
+# Start server from /app/apps/lms/ where server.js is located
+CMD ["node", "--max-http-header-size=32768", "apps/lms/server.js"]

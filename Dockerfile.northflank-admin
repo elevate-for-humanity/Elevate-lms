@@ -9,7 +9,7 @@
 FROM node:22-bookworm AS builder
 
 # Cache invalidation marker
-RUN echo "nf-cache-invalidate-admin-2026-07-20-v3"
+RUN echo "nf-cache-invalidate-admin-2026-07-20-v4-fix-githubsha"
 
 # System dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -49,11 +49,9 @@ ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 # Install dependencies
 RUN pnpm install --no-frozen-lockfile
 
-# Build identity arguments
-ARG GIT_SHA=unknown
-ARG BUILD_ID=unknown
-ARG BUILD_TIMESTAMP=unknown
+# Build identity - passed from trigger-build.ts via buildArgs
 ARG GITHUB_SHA=unknown
+ARG BUILD_TIMESTAMP=unknown
 
 # Build Admin
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
@@ -68,12 +66,10 @@ ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY
-ENV GITHUB_SHA=${GIT_SHA:-$GITHUB_SHA}
-ENV GIT_SHA=$GITHUB_SHA
-ENV BUILD_ID=${BUILD_ID:-$GITHUB_SHA}
-ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
+ENV GITHUB_SHA=$GITHUB_SHA
 ENV NEXT_PUBLIC_GIT_SHA=$GITHUB_SHA
-ENV NEXT_PUBLIC_BUILD_ID=$GITHUB_SHA
+ENV NEXT_PUBLIC_BUILD_VERSION=$GITHUB_SHA
+ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 
 RUN pnpm --filter @elevate/admin build --no-lint
 
@@ -94,18 +90,14 @@ ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV PORT=8080
 
-# Build identity - passed from builder via ARG
-ARG GIT_SHA=unknown
-ARG BUILD_ID=unknown
-ARG BUILD_TIMESTAMP=unknown
+# Build identity - passed from trigger-build.ts via buildArgs
 ARG GITHUB_SHA=unknown
+ARG BUILD_TIMESTAMP=unknown
 
-ENV GIT_SHA=${GIT_SHA:-$GITHUB_SHA}
-ENV GITHUB_SHA=$GIT_SHA
-ENV BUILD_ID=${BUILD_ID:-$GIT_SHA}
+ENV GITHUB_SHA=$GITHUB_SHA
+ENV NEXT_PUBLIC_GIT_SHA=$GITHUB_SHA
+ENV NEXT_PUBLIC_BUILD_VERSION=$GITHUB_SHA
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
-ENV NEXT_PUBLIC_GIT_SHA=$GIT_SHA
-ENV NEXT_PUBLIC_BUILD_ID=$GIT_SHA
 
 WORKDIR /app
 

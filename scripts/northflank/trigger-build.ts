@@ -57,9 +57,6 @@ async function main() {
       return;
     }
   }
-
-  // Get the current branch to build from
-  const currentBranch = process.env.DEPLOY_BRANCH || 'main';
   
   // Trigger build from the current branch
   // Pass GIT_SHA as the authoritative release identity
@@ -72,10 +69,10 @@ async function main() {
   }>(projectApiPath(projectId, `/services/${serviceId}/build`), {
     method: 'POST',
     body: JSON.stringify({
-      branch: currentBranch,
+      sha: currentSha,
       buildArgs: {
-        GIT_SHA: currentSha || 'unknown',
-        NEXT_PUBLIC_GIT_SHA: currentSha || 'unknown',
+        GIT_SHA: currentSha,
+        NEXT_PUBLIC_GIT_SHA: currentSha,
         BUILD_TIMESTAMP: new Date().toISOString(),
       },
     }),

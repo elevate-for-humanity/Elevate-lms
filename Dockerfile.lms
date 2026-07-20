@@ -1,141 +1,57 @@
-﻿# Dockerfile.lms - LMS Service (app.elevateforhumanity.org)
-# Builds and serves the LMS application (apps/lms/)
-#
-# Northflank Configuration:
-#   - Build type: Dockerfile
-#   - Dockerfile path: /Dockerfile.lms
-#   - Build context: /
+﻿# syntax=docker/dockerfile:1.7
 
-FROM node:22-bookworm AS builder
+FROM node:22-bookworm-slim AS base
 
-# Cache invalidation marker - fixed standalone CMD
-RUN echo "nf-cache-invalidate-lms-2026-07-20-cmd-fix"
+ENV PNPM_HOME="/pnpm"
+ENV PATH="${PNPM_HOME}:${PATH}"
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install system deps for native modules (sharp, canvas, pdf)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    build-essential \
-    ca-certificates \
-    libcairo2-dev \
-    libpango1.0-dev \
-    libjpeg-dev \
-    libgif-dev \
-    librsvg2-dev \
-    gnupg \
-    && rm -rf /var/lib/apt/lists/*
-
-ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-# Use pnpm@10.28.2 to match lockfileVersion 9.0 (pnpm 10.x format)
-RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
-
-ENV PNPM_HOME="/app/.pnpm-home"
-ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 WORKDIR /app
 
-# Copy manifests and source
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/admin/package.json apps/admin/package.json
-COPY packages/db/package.json packages/db/package.json
-COPY packages/shared/package.json packages/shared/package.json
-COPY packages/ui/package.json packages/ui/package.json
+FROM base AS builder
+
 COPY . .
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS=--max-old-space-size=12288
-ENV NEXT_STANDALONE_OUTPUT=1
-ENV BUILD_SCOPE=LMS
-ENV CI=true
-ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @elevate/lms build
 
-# Install dependencies with strict peer checking disabled for compatibility
-RUN pnpm install --no-frozen-lockfile --strict-peer-dependencies=false
+RUN test -d /app/apps/lms/.next/standalone
+RUN test -d /app/apps/lms/.next/static
+RUN test -f /app/apps/lms/.next/BUILD_ID
 
-# Build args - must be declared BEFORE ENV usage
-ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
-ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
-ARG NEXT_PUBLIC_SUPABASE_URL
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG SUPABASE_SERVICE_ROLE_KEY
-ARG GITHUB_SHA=unknown
-ARG GIT_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
-ARG BUILD_ID=unknown
+RUN find /app/apps/lms/.next/standalone \
+  -maxdepth 6 \
+  -type f \
+  -name "server.js" \
+  -print
 
-ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
-ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
-ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
-ENV SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY
-ENV GITHUB_SHA=${GITHUB_SHA}
-ENV GIT_SHA=${GIT_SHA:-${GITHUB_SHA}}
-ENV BUILD_ID=${BUILD_ID}
-ENV NEXT_PUBLIC_GIT_SHA=${GITHUB_SHA}
-ENV NEXT_PUBLIC_BUILD_VERSION=${GITHUB_SHA}
-ENV NEXT_PUBLIC_COMMIT_SHA=${GITHUB_SHA}
-ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
-
-RUN pnpm run build:lms:compile --no-lint
-
-# INSPECTION: Show standalone directory structure to verify correct CMD
-RUN echo "=== STANDALONE STRUCTURE ===" && find /app/apps/lms/.next/standalone -maxdepth 4 -type f 2>/dev/null | sort || echo "No standalone directory found"
-
-# --- runtime stage ---
-FROM node:22-bookworm-slim
-
-# Install runtime deps for native modules
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    fonts-liberation \
-    libcairo2 \
-    libpango-1.0-0 \
-    libjpeg62-turbo \
-    libgif7 \
-    librsvg2-2 \
-    librsvg2-common \
-    && rm -rf /var/lib/apt/lists/*
-
-# ARG declarations must come BEFORE ENV usage in each stage
-ARG GITHUB_SHA
-ARG GIT_SHA
-ARG BUILD_TIMESTAMP
-ARG BUILD_ID
+FROM node:22-bookworm-slim AS runner
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
-ENV NODE_OPTIONS=--max-old-space-size=8192 --gc-interval=100
-ENV GITHUB_SHA=${GITHUB_SHA}
-ENV GIT_SHA=${GIT_SHA:-${GITHUB_SHA}}
-ENV BUILD_ID=${BUILD_ID}
-ENV NEXT_PUBLIC_GIT_SHA=${GITHUB_SHA}
-ENV NEXT_PUBLIC_BUILD_VERSION=${GITHUB_SHA}
-ENV NEXT_PUBLIC_COMMIT_SHA=${GITHUB_SHA}
-ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
-ENV SERVICE_NAME=lms
+ENV SERVICE_NAME=elevate-lms
 
 WORKDIR /app
 
-# Copy standalone build artifacts
-# The Next.js standalone output preserves workspace structure
-COPY --from=builder /app/apps/lms/.next/standalone ./
-COPY --from=builder /app/apps/lms/.next/static ./apps/lms/.next/static
-COPY --from=builder /app/apps/lms/.next/server ./apps/lms/.next/server
-COPY --from=builder /app/apps/lms/public ./apps/lms/public
+RUN groupadd --system --gid 1001 nodejs \
+  && useradd --system --uid 1001 --gid nodejs nextjs
 
-# Verify standalone server.js exists at expected location
-RUN test -f /app/server.js && echo "Standalone server.js found at /app/server.js" || (echo "ERROR: server.js not found at /app/server.js" && exit 1)
+COPY --from=builder --chown=nextjs:nodejs \
+  /app/apps/lms/.next/standalone ./
 
-# Copy full node_modules from builder (preserves pnpm symlinks)
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs \
+  /app/apps/lms/.next/static ./apps/lms/.next/static
+
+COPY --from=builder --chown=nextjs:nodejs \
+  /app/apps/lms/public ./apps/lms/public
+
+RUN test -f /app/apps/lms/server.js || test -f /app/server.js
+
+USER nextjs
 
 EXPOSE 3000
 
-HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
-  CMD curl -sf http://127.0.0.1:3000/api/ping || exit 1
-
-# Use standalone server.js from /app/ (NOT apps/lms/server.js which is dev custom server)
-# The standalone output contains a production-ready server that handles all Next.js routes
-CMD ["node", "--max-http-header-size=32768", "server.js"]
+CMD ["sh", "-c", "if [ -f /app/apps/lms/server.js ]; then exec node /app/apps/lms/server.js; elif [ -f /app/server.js ]; then exec node /app/server.js; else echo 'LMS server.js missing'; exit 1; fi"]

@@ -73,8 +73,13 @@ jobs:
         run: pnpm run build:admin
         env:
           NODE_OPTIONS: --max-old-space-size=6144
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+          NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
+          NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
+          NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
 
   # ============================================
   # BUILD: Marketing (Public Pages)

@@ -127,13 +127,14 @@ ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 WORKDIR /app
 
 # Copy standalone build artifacts
+# The Next.js standalone output creates server.js that handles all routes
 COPY --from=builder /app/apps/lms/.next/standalone ./
 COPY --from=builder /app/apps/lms/.next/static ./.next/static
 COPY --from=builder /app/apps/lms/.next/server ./.next/server
 COPY --from=builder /app/apps/lms/public ./public
 
-# Copy custom server.js
-COPY --from=builder /app/apps/lms/server.js ./apps/lms/server.js
+# Verify standalone server.js exists at expected location
+RUN test -f /app/server.js && echo "Standalone server.js found at /app/server.js" || (echo "ERROR: server.js not found at /app/server.js" && exit 1)
 
 # Copy full node_modules from builder (preserves pnpm symlinks)
 COPY --from=builder /app/node_modules ./node_modules
@@ -143,5 +144,6 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -sf http://127.0.0.1:8080/api/ping || exit 1
 
-# Use custom server.js
-CMD ["node", "--max-http-header-size=32768", "apps/lms/server.js"]
+# Use standalone server.js from /app/ (NOT apps/lms/server.js which is dev custom server)
+# The standalone output contains a production-ready server that handles all Next.js routes
+CMD ["node", "--max-http-header-size=32768", "server.js"]

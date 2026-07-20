@@ -1,103 +1,46 @@
-# Dockerfile.marketing
-# Specialized for Public Pages / (marketing) / store
-# Fixed: Added build args for commit SHA and build time
+# syntax=docker/dockerfile:1.7
 
-# Build args available across ALL stages (required for multi-stage ARG passthrough)
-# NOTE: Northflank combined-service may inject COMMIT_SHA - use both names
-ARG GITHUB_SHA=unknown
-ARG GIT_SHA=unknown
-ARG COMMIT_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
-ARG BUILD_ID=unknown
+FROM node:22-bookworm-slim AS base
 
-FROM node:22-bookworm AS builder
+ENV PNPM_HOME="/pnpm"
+ENV PATH="${PNPM_HOME}:${PATH}"
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Cache invalidation
-RUN echo "nf-cache-invalidate-20260720-marketing-v8-arg-before-from"
-
-# System dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 build-essential ca-certificates libcairo2-dev libpango1.0-dev \
-    libjpeg-dev libgif-dev librsvg2-dev && rm -rf /var/lib/apt/lists/*
-
+RUN corepack enable
 WORKDIR /app
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/admin/package.json apps/admin/package.json
-COPY packages/db/package.json packages/db/package.json
-COPY packages/shared/package.json packages/shared/package.json
-COPY packages/ui/package.json packages/ui/package.json
+
+FROM base AS builder
+
 COPY . .
 
-# Set build identity - declare ALL ARGs before use
-ARG GITHUB_SHA
-ARG GIT_SHA
-ARG COMMIT_SHA
-ARG BUILD_TIMESTAMP
-ARG BUILD_ID
-# Use GITHUB_SHA as primary; fall back to GIT_SHA or COMMIT_SHA
-ENV GITHUB_SHA=${GITHUB_SHA}
-ENV GIT_SHA=${GIT_SHA:-${GITHUB_SHA}}
-ENV COMMIT_SHA=${COMMIT_SHA}
-ENV BUILD_ID=${BUILD_ID}
-ENV NEXT_PUBLIC_GIT_SHA=${GITHUB_SHA}
-ENV NEXT_PUBLIC_BUILD_VERSION=${GITHUB_SHA}
-ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
-
-# Verify build args are set (fail build if SHA is unknown)
-RUN echo "Build SHA: ${GITHUB_SHA}" && \
-    echo "Build Timestamp: ${BUILD_TIMESTAMP}" && \
-    echo "Build ID: ${BUILD_ID}"
-
-# Run the splitter
-ENV BUILD_SCOPE=MARKETING
-ENV CI=true
-ENV SPLIT_LIVE_MODE=true
-RUN node scripts/split-app.mjs
-
-# Stable PNPM (matching lockfileVersion 9.0)
-RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
-
-# 1. Install ALL dependencies (reproducible build)
 RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @elevate/marketing build
 
-# 2. Build with 6GB Limit (MARKETING scope)
-ENV NODE_OPTIONS=--max-old-space-size=6144
-ENV NEXT_STANDALONE_OUTPUT=1
-RUN pnpm exec cross-env BUILD_SCOPE=MARKETING NODE_OPTIONS='--max-old-space-size=6144' next build
+RUN test -d /app/.next/standalone
+RUN test -d /app/.next/static
+RUN test -f /app/.next/BUILD_ID
+RUN test -f /app/.next/standalone/server.js
 
-# --- Runner Stage ---
 FROM node:22-bookworm-slim AS runner
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl fonts-liberation && rm -rf /var/lib/apt/lists/*
 
-# ARG declarations must come BEFORE ENV usage in each stage
-ARG GITHUB_SHA
-ARG GIT_SHA
-ARG COMMIT_SHA
-ARG BUILD_TIMESTAMP
-ARG BUILD_ID
-ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
 ENV NODE_ENV=production
-ENV GITHUB_SHA=${GITHUB_SHA}
-ENV GIT_SHA=${GIT_SHA:-${GITHUB_SHA}}
-ENV COMMIT_SHA=${COMMIT_SHA}
-ENV BUILD_ID=${BUILD_ID}
-ENV NEXT_PUBLIC_GIT_SHA=${GITHUB_SHA}
-ENV NEXT_PUBLIC_BUILD_VERSION=${GITHUB_SHA}
-ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
+ENV SERVICE_NAME=elevate-marketing
 
 WORKDIR /app
 
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/.next/server ./.next/server
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules ./node_modules
+RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 --gid nodejs nextjs
+
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+RUN test -f /app/server.js
+
+USER nextjs
 
 EXPOSE 3000
 
-# Health check using /api/ping (no deps, instant response)
-HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
-  CMD curl -sf http://127.0.0.1:3000/api/ping || exit 1
-
-CMD ["node", "server.js"]
+CMD ["node", "/app/server.js"]

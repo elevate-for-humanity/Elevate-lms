@@ -6,6 +6,7 @@ const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   outputFileTracingRoot: path.join(__dirname, '../..'),
   images: { unoptimized: true },
   typescript: { ignoreBuildErrors: true },
@@ -15,7 +16,6 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', '@supabase/supabase-js'],
     optimizeCss: false,
-    // Reduce memory by disabling some features
     scrollRestoration: false,
   },
   webpack: (config, { isServer }) => {
@@ -24,7 +24,6 @@ const nextConfig = {
         ...config.optimization.splitChunks,
         cacheGroups: {
           ...config.optimization.splitChunks?.cacheGroups,
-          // More aggressive splitting
           vendor: {
             test: /[\\/]node_modules[\\/]/,
             name: 'vendors',

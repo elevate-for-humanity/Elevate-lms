@@ -1,6 +1,6 @@
 {
   "serviceType": "combined",
-  "name": "Elevate-lms build",
+  "name": "Elevate-lms",
   "billing": {
     "deploymentPlan": "nf-compute-400"
   },
@@ -10,7 +10,7 @@
   "vcsData": {
     "projectUrl": "https://github.com/elevate-for-humanity/Elevate-lms",
     "projectBranch": "main",
-    "dockerFilePath": "/Dockerfile.northflank-lms",
+    "dockerFilePath": "/Dockerfile.lms",
     "dockerWorkDir": "/"
   },
   "buildSecrets": {
@@ -25,12 +25,32 @@
   "deployment": {
     "healthCheck": {
       "enabled": true,
-      "path": "/api/health",
+      "path": "/api/ping",
       "port": 8080,
       "protocol": "HTTP",
       "initialDelaySeconds": 60,
-      "periodSeconds": 30,
-      "timeoutSeconds": 10,
+      "periodSeconds": 10,
+      "timeoutSeconds": 5,
+      "failureThreshold": 3
+    },
+    "startupProbe": {
+      "enabled": true,
+      "path": "/api/ping",
+      "port": 8080,
+      "protocol": "HTTP",
+      "initialDelaySeconds": 30,
+      "periodSeconds": 10,
+      "timeoutSeconds": 5,
+      "failureThreshold": 12
+    },
+    "readinessProbe": {
+      "enabled": true,
+      "path": "/api/health",
+      "port": 8080,
+      "protocol": "HTTP",
+      "initialDelaySeconds": 10,
+      "periodSeconds": 10,
+      "timeoutSeconds": 5,
       "failureThreshold": 3
     }
   }

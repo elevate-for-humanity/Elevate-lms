@@ -101,8 +101,10 @@ RUN groupadd --system --gid 1001 nodejs && \
 # Copy standalone build to /app/ root (server.js expects paths from /app/)
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/standalone ./
 
-# Copy static files to CORRECT locations
+# Copy ALL required Next.js build artifacts to correct locations
+# CRITICAL: Need .next/server for route manifests and build metadata
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/server ./.next/server
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./public
 
 # Copy node_modules (needed for runtime dependencies)
@@ -122,6 +124,12 @@ RUN echo "=== RUNTIME VERIFICATION ===" && \
         echo "✗ CRITICAL: server.js NOT found at /app/server.js"; \
         echo "Searching for server.js:"; \
         find /app -name "server.js" -type f 2>/dev/null; \
+        exit 1; \
+    fi && \
+    if [ -d "/app/.next/server" ]; then \
+        echo "✓ .next/server directory found"; \
+    else \
+        echo "✗ CRITICAL: .next/server directory MISSING"; \
         exit 1; \
     fi && \
     echo "=== RUNTIME VERIFICATION PASSED ==="

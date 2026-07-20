@@ -1,22 +1,17 @@
-export const metadata = { robots: { index: false } };
 
 import { redirect } from 'next/navigation';
-export const metadata = { robots: { index: false } };
 
 import { createClient } from '@/lib/supabase/server';
-export const metadata = { robots: { index: false } };
 
 import { requireAdminClient } from '@/lib/supabase/admin';
-export const metadata = { robots: { index: false } };
 
 import SettingsForm from './SettingsForm';
 
-export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false } };
 
+export const dynamic = 'force-dynamic';
+
 import type { Metadata } from 'next';
-
-
 
 export default async function ProviderSettingsPage() {
   const supabase = await createClient();

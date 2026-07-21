@@ -11,7 +11,7 @@ import Link from 'next/link';
 
 const TRUST_ITEMS = [
   {
-    img: '/images/pages/federal-compliance-hero.webp',
+    img: '/images/pages/about-hero.webp',
     label: 'DOL Registered',
     sub: 'Federal apprenticeship sponsor',
     href: '/compliance/apprenticeship-structure',

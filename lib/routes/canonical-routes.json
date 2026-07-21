@@ -591,8 +591,13 @@
     },
     {
       "source": "/programs/bookkeeping",
-      "destination": "/programs",
+      "destination": "/programs/bookkeeping",
       "permanent": false
+    },
+    {
+      "source": "/programs/finance-bookkeeping-accounting",
+      "destination": "/programs/bookkeeping",
+      "permanent": true
     },
     {
       "source": "/programs/business",

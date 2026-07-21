@@ -91,6 +91,8 @@ RUN groupadd --system --gid 1001 nodejs && \
 # Copy the entire Next.js build output to /app/
 COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next ./.next
 COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/public ./public
+# Copy root public folder for marketing assets (images, icons, etc.)
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Copy node_modules (needed for runtime dependencies)
 COPY --from=builder /app/node_modules ./node_modules

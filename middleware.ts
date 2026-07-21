@@ -153,6 +153,9 @@ export async function middleware(request: NextRequest) {
     ['/healthcare-training-indianapolis', '/programs/healthcare'],
     ['/hiset', '/testing'],
     ['/certification-testing', '/testing/nha'],
+    // Program slug redirects
+    ['/programs/finance-bookkeeping-accounting', '/programs/bookkeeping'],
+    ['/programs/hvac', '/programs/hvac-technician'],
   ];
 
   for (const [from, to] of LEGACY_REDIRECTS) {

@@ -181,8 +181,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Location</p>
-                      <p className="font-semibold">120 E Market St, Suite 930</p>
-                      <p className="font-semibold">Indianapolis, IN 46240</p>
+                      <p className="font-semibold">120 E Market St, Suite 120</p>
+                      <p className="font-semibold">Indianapolis, IN 46204</p>
                       <p className="text-sm">Serving all of Indiana</p>
                     </div>
                   </div>

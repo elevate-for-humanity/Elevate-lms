@@ -187,7 +187,7 @@ export async function runPostApprovalActions(input: PostApprovalInput): Promise<
   </div>
 
   <div style="padding:16px 32px;text-align:center;background:#f8fafc;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;">
-    <p style="margin:0;color:#94a3b8;font-size:11px;">${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute · 120 E Market St Suite 930, Indianapolis, IN 46240</p>
+    <p style="margin:0;color:#94a3b8;font-size:11px;">${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute · 120 E Market St Suite 120, Indianapolis, IN 46204</p>
   </div>
 
 </div>`,

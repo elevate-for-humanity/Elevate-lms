@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = {
-  title: 'Compliance | Elevate for Humanity',
-  description: 'Compliance page content.',
+  title: 'Compliance & Accreditation | Elevate for Humanity',
+  description: 'Learn about Elevate for Humanity\'s compliance standards, accreditation, and commitment to quality workforce development programs.',
 };
 
 export default async function CompliancePage() {

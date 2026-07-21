@@ -4,8 +4,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Wioa Eligibility | Elevate for Humanity',
-  description: 'Wioa Eligibility page content.',
+  title: 'WIOA Eligibility Requirements | Elevate for Humanity',
+  description: 'Find out if you qualify for WIOA-funded workforce training. Indiana residents may be eligible for free or subsidized career programs through WorkOne.',
 };
 
 export default function WIOAEligibilityPage() {

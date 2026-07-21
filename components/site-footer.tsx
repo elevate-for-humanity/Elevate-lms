@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { siteConfig } from '@/content/site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';

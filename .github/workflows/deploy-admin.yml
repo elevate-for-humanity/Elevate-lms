@@ -116,6 +116,9 @@ jobs:
         id: trigger_admin_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
+      - name: Wait for admin build to complete
+        run: pnpm tsx scripts/northflank/wait-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --timeout-ms 900000
+
       - name: Roll out latest admin image
         run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 

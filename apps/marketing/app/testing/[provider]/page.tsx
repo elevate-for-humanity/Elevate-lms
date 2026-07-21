@@ -109,7 +109,7 @@ export default async function ProviderPage({ params }: Props) {
   const isActive = provider.status === 'active';
 
   return (
-    <TestingCartProvider>
+    <TestingCartWrapper>
     <main className="min-h-screen bg-white">
       {/* HERO */}
       <section
@@ -408,6 +408,6 @@ export default async function ProviderPage({ params }: Props) {
         </div>
       </section>
     </main>
-    </TestingCartProvider>
+    </TestingCartWrapper>
   );
 }

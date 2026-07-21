@@ -1,6 +1,10 @@
 import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 
-// Canonical staff portal dashboard route - redirects to actual implementation
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
 export default function StaffPortalDashboardCanonical() {
   redirect('/staff-portal/dashboard');
 }

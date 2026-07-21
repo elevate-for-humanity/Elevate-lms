@@ -27,6 +27,17 @@ const walkthroughVideos = [
 
 const portalDemos = [
   {
+    id: 'vr-funding',
+    title: 'Workforce Demo',
+    icon: BarChart3,
+    image: '/images/pages/wioa-meeting.webp',
+    alt: 'Workforce development presentation',
+    href: '/store/demos/vr-funding',
+    description: 'Interactive demo for workforce agencies, VR, WIOA, TAA, and funding partners. Explains hybrid training model and partner network.',
+    highlights: ['All funding sources covered', 'Career pathways dashboard', '3rd party vendor partnerships', 'Compliance reporting'],
+    cta: 'View Demo',
+  },
+  {
     id: 'admin',
     title: 'Admin Dashboard',
     icon: Shield,

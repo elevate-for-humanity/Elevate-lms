@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
-export default function BarberTheoryRedirect() {
+export default function PwaBarberRedirect() {
   redirect('/programs/barber-apprenticeship');
 }

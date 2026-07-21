@@ -7,12 +7,16 @@ import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy initialization - create client inside request handlers, not at module scope
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export async function GET(request: Request) {
+  const supabase = getSupabaseAdmin();
   const url = new URL(request.url);
   const page = parseInt(url.searchParams.get('page') ?? '1');
   const limit = parseInt(url.searchParams.get('limit') ?? '20');
@@ -38,6 +42,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const supabase = getSupabaseAdmin();
   const body = await request.json();
 
   const { data: user, error } = await supabase.auth.admin.createUser({

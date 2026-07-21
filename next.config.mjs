@@ -333,6 +333,9 @@ const nextConfig = {
         destination: '/program-holder/:path*',
         permanent: true,
       },
+      { source: '/program-holder/portal/students', destination: '/program-holder/students', permanent: true },
+      { source: '/program-holder/portal/reports', destination: '/program-holder/dashboard', permanent: true },
+      { source: '/program-holder/portal/page', destination: '/program-holder/dashboard', permanent: false },
       { source: '/program-holders', destination: '/program-holder', permanent: true },
       {
         source: '/program-holders/portal',

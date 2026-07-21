@@ -4,7 +4,7 @@ export const dynamic = 'force-static';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Play, Shield, GraduationCap, Briefcase, BarChart3, ArrowRight, CheckCircle, Zap, Clock, Users, Video, BookOpen, Bot, Workflow } from 'lucide-react';
+import { Play, Shield, GraduationCap, Briefcase, BarChart3, ArrowRight, CheckCircle, Zap, Clock, Users, Video, BookOpen, Bot, Workflow, Globe } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import DemoTabs from './DemoTabs';
 
@@ -245,6 +245,88 @@ export default function StoreDemosPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* VR/Funding Demo */}
+      <section className="py-16 px-4 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full text-sm text-white/80 mb-4">
+              <Video className="w-4 h-4" />
+              <span>New Interactive Demo</span>
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-4">Workforce Development Demo</h2>
+            <p className="text-lg text-slate-300 max-w-2xl mx-auto">
+              Interactive demo for funding partners. Explore career pathways, hybrid training model, partner network, and funding options.
+            </p>
+          </div>
+          
+          <div className="bg-slate-800 rounded-2xl p-8 border border-slate-700">
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="w-full md:w-1/2">
+                <h3 className="text-xl font-bold text-white mb-4">Universal Demo for All Audiences</h3>
+                <ul className="space-y-3 text-slate-300">
+                  <li className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-purple-600/30 rounded-lg flex items-center justify-center">
+                      <GraduationCap className="w-4 h-4 text-purple-400" />
+                    </div>
+                    WIOA, VR, TAA, and Employer partners
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-green-600/30 rounded-lg flex items-center justify-center">
+                      <Briefcase className="w-4 h-4 text-green-400" />
+                    </div>
+                    Career pathways in Healthcare, Trades, Beauty
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-blue-600/30 rounded-lg flex items-center justify-center">
+                      <Globe className="w-4 h-4 text-blue-400" />
+                    </div>
+                    Hybrid model - no facilities needed
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-orange-600/30 rounded-lg flex items-center justify-center">
+                      <BarChart3 className="w-4 h-4 text-orange-400" />
+                    </div>
+                    Dashboard with real-time tracking
+                  </li>
+                </ul>
+                <Link 
+                  href="/store/demos/vr-funding" 
+                  className="mt-6 inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-xl font-semibold transition-all"
+                >
+                  <Play className="w-5 h-5" />
+                  View Interactive Demo
+                </Link>
+              </div>
+              <div className="w-full md:w-1/2">
+                <div className="bg-slate-700/50 rounded-xl p-6">
+                  <h4 className="font-bold text-white mb-4">Demo Sections</h4>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="bg-slate-800/50 rounded-lg p-3">
+                      <span className="text-slate-400">The Challenge</span>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-3">
+                      <span className="text-slate-400">Our Solution</span>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-3">
+                      <span className="text-slate-400">Career Pathways</span>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-3">
+                      <span className="text-slate-400">Partner Network</span>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-3">
+                      <span className="text-slate-400">The Dashboard</span>
+                    </div>
+                    <div className="bg-slate-800/50 rounded-lg p-3">
+                      <span className="text-slate-400">Funding Options</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

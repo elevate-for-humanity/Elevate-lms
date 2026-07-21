@@ -147,12 +147,6 @@ const FUNDING_SOURCES = [
     detail: 'Covers tuition for high-demand certification programs on the INDemand list.',
   },
   {
-    label: 'FSSA IMPACT',
-    tag: 'Indiana State',
-    detail:
-      'Pays for training at no cost to current SNAP or TANF recipients. Elevate is a participating provider.',
-  },
-  {
     label: 'Employer Sponsorship',
     tag: 'OJT / Apprenticeship',
     detail:

@@ -124,7 +124,7 @@ export default async function HomePage() {
       <HomeApprenticeshipInfra />
 
       {/* ── 6. FUNDING & ACCESSIBILITY ──────────────────────────────────── */}
-      {/* WIOA, Workforce Ready Grant, FSSA IMPACT, Job Ready Indy,
+      {/* WIOA, Workforce Ready Grant, Job Ready Indy,
           OJT reimbursement, payment plans. "Most learners pay $0." */}
       <HomeFunding />
 

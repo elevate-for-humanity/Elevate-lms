@@ -53,7 +53,6 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'HVAC Technician', href: canonicalRoutes.programs.hvacTechnician },
       { name: 'Building Services Technician', href: canonicalRoutes.programs.buildingServicesTechnician },
       { name: 'Electrical', href: '/programs/electrical' },
-      { name: 'Plumbing', href: '/programs/plumbing' },
       { name: 'CDL Training', href: '/programs/cdl-training' },
       { name: 'All Trades →', href: '/programs/skilled-trades', isSectionLink: true },
 
@@ -163,7 +162,6 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'WIOA / WorkOne', href: '/eligibility' },
       { name: 'ETPL Approved Provider', href: '/federal-compliance' },
       { name: 'Workforce Ready Grant (WRG)', href: '/funding/wrg' },
-      { name: 'FSSA IMPACT (SNAP / TANF)', href: '/fssa' },
       { name: 'Job Ready Indy (JRI)', href: '/partners/jri' },
       { name: 'JRI — Justice-Involved', href: '/partners/reentry' },
       { name: 'Grant Programs', href: '/funding/grant-programs' },
@@ -198,7 +196,6 @@ export const NAV_ITEMS: NavItem[] = [
       // Workforce Agencies
       { name: '— Workforce Agencies —', href: '/for-agencies', isHeader: true },
       { name: 'WIOA / WorkOne Referrals', href: '/for-agencies' },
-      { name: 'FSSA / SNAP E&T', href: '/fssa' },
       { name: 'Apprenticeship Sponsor', href: '/apprenticeship-sponsor' },
       { name: 'Workforce Boards', href: '/platform/workforce-boards' },
       // Referral Partners
@@ -277,7 +274,6 @@ export const NAV_ITEMS: NavItem[] = [
       { name: '— Students & Participants —', href: '/apply', isHeader: true },
       { name: 'Check Eligibility & Apply', href: '/apply' },
       { name: 'Student Application', href: '/apply/student' },
-      { name: 'FSSA / SNAP E&T Application', href: '/apply/fssa' },
       { name: 'Enroll in a Program', href: '/enrollment' },
       { name: 'Track My Application', href: '/apply/track' },
       { name: 'Check Application Status', href: '/apply/status' },

@@ -26,7 +26,6 @@ const WORKFORCE_FUNDING = [
   'impact',
   'dwd',
   'workforce',
-  'fssa',
 ];
 function needsCareerConnect(funding: string | null): boolean {
   if (!funding) return false;

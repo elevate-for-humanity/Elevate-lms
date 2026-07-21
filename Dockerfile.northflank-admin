@@ -62,6 +62,7 @@ ENV NODE_OPTIONS="--max-old-space-size=8192"
 ENV CI=true
 ENV GIT_SHA=${GIT_SHA}
 ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
+ENV NEXT_STANDALONE_OUTPUT=1
 
 # Build Admin app
 RUN pnpm --filter @elevate/admin build

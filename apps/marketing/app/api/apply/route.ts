@@ -12,10 +12,8 @@ const WORKFORCE_FUNDING_KEYS = [
   'workone',
   'workforce ready',
   'workforce_ready',
-  'fssa',
   'employindy',
   'employ_indy',
-  'impact',
   'dwd',
 ];
 

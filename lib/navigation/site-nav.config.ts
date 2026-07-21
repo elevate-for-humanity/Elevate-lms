@@ -685,7 +685,6 @@ export const footerNavigation = {
       { label: 'Culinary Apply', href: '/apply?program=culinary-apprenticeship' },
       { label: 'Electrical Apply', href: '/apply?program=electrical' },
       { label: 'Medical Assistant Apply', href: '/apply?program=medical-assistant' },
-      { label: 'Plumbing Apply', href: '/apply?program=plumbing' },
       { label: 'Sanitation Apply', href: '/apply?program=sanitation-infection-control' },
       { label: 'Welding Apply', href: '/apply?program=welding' },
     ],

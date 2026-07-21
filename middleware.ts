@@ -156,6 +156,12 @@ export async function middleware(request: NextRequest) {
     // Program slug redirects
     ['/programs/finance-bookkeeping-accounting', '/programs/bookkeeping'],
     ['/programs/hvac', '/programs/hvac-technician'],
+    // FSSA funding removed
+    ['/fssa', '/funding'],
+    ['/apply/fssa', '/apply'],
+    // Programs on waitlist
+    ['/programs/plumbing', '/programs'],
+    ['/programs/forklift', '/programs'],
   ];
 
   for (const [from, to] of LEGACY_REDIRECTS) {

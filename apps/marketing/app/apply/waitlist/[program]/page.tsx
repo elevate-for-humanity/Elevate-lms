@@ -271,7 +271,6 @@ export default function WaitlistPage() {
                 <option value="">Select an option</option>
                 <option value="self_pay">Self-pay / Out of pocket</option>
                 <option value="wioa">WIOA / WorkOne funding</option>
-                <option value="fssa">FSSA (Family &amp; Social Services Administration)</option>
                 <option value="employ_indy">EmployIndy (Marion County)</option>
                 <option value="workforce_ready">Workforce Ready Grant</option>
                 <option value="employer_sponsored">Employer sponsored</option>

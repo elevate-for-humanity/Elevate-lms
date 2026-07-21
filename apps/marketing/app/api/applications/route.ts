@@ -330,10 +330,10 @@ async function _POST(req: Request) {
     );
 
     // Determine application status based on funding type and eligibility.
-    // WIOA / WRG / FSSA applications require admin approval before enrollment.
+    // WIOA / WRG applications require admin approval before enrollment.
     // Students who have not yet been to Indiana Career Connect are saved as
     // 'pending_funding' - they must complete the ICC process and reapply.
-    const FUNDED_TYPES = ['wioa', 'wrg', 'fssa'];
+    const FUNDED_TYPES = ['wioa', 'wrg'];
     const fundingType = body.fundingType || body.fundingInterest || null;
     const eligibilityStatus = body.fundingEligibilityStatus || null;
     const isFunded = FUNDED_TYPES.includes(fundingType);
@@ -573,7 +573,6 @@ async function _POST(req: Request) {
       const fundingLabel: Record<string, string> = {
         wioa: 'WIOA (Workforce Innovation and Opportunity Act)',
         wrg: 'Workforce Ready Grant / Next Level Jobs',
-        fssa: 'FSSA IMPACT',
       };
       const fundingName = fundingType ? fundingLabel[fundingType] || fundingType : null;
 
@@ -587,7 +586,7 @@ async function _POST(req: Request) {
             <li>Go to <a href="https://www.indianacareerconnect.com" style="color: #ea580c; font-weight: bold;">IndianaCareerConnect.com</a> and create a free account</li>
             <li>Complete your profile and upload your resume</li>
             <li>Schedule an appointment at your nearest WorkOne center</li>
-            <li>Receive your funding approval letter (ITA, WRG approval, or FSSA authorization)</li>
+            <li>Receive your funding approval letter (ITA or WRG approval)</li>
             <li><strong>Come back and reapply</strong> - your application will be fast-tracked once you have your approval letter</li>
           </ol>
           <p style="margin-bottom: 12px; color: #78350f;"><strong>Need help?</strong> Our enrollment team can walk you through the process.</p>
@@ -604,7 +603,7 @@ async function _POST(req: Request) {
           <h4 style="color: #1e40af; margin-bottom: 8px;">What happens next:</h4>
           <ol style="color: #1e3a8a; padding-left: 20px; line-height: 1.8;">
             <li>Our enrollment team reviews your application (1–2 business days)</li>
-            <li>We verify your funding status with ${fundingType === 'wioa' ? 'WorkOne' : fundingType === 'wrg' ? 'Indiana Career Connect' : 'FSSA'}</li>
+            <li>We verify your funding status with ${fundingType === 'wioa' ? 'WorkOne' : 'Indiana Career Connect'}</li>
             <li>Once verified, we contact you to complete enrollment and schedule your start date</li>
             <li>You begin training - no tuition due until funding is confirmed</li>
           </ol>

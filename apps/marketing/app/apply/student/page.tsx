@@ -75,7 +75,7 @@ const STEPS = [
   {
     n: '3',
     title: 'Funding Determination',
-    desc: 'We connect you with WorkOne or FSSA to check WIOA, WRG, and other funding eligibility.',
+    desc: 'We connect you with WorkOne to check WIOA, WRG, and other funding eligibility.',
   },
   {
     n: '4',
@@ -109,10 +109,6 @@ const FUNDING = [
   {
     label: 'Workforce Ready Grant',
     desc: 'Indiana state grant for high-demand certificate programs. No repayment required.',
-  },
-  {
-    label: 'FSSA IMPACT',
-    desc: 'For SNAP and TANF recipients. Covers training and wraparound support services.',
   },
   {
     label: 'Job Ready Indy',
@@ -297,8 +293,7 @@ export default async function StudentApplicationPage({
                 eligible Indiana residents. Eligibility is determined through WorkOne — not Elevate.
               </p>
               <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                If you receive SNAP, TANF, or other FSSA benefits, you may qualify for FSSA IMPACT
-                funding. Justice-involved individuals may qualify for Job Ready Indy.
+                Justice-involved individuals may qualify for Job Ready Indy funding.
               </p>
               <Link
                 href="/funding"

@@ -13,53 +13,27 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
 
 // =============================================================================
 // CONFIGURATION
 // =============================================================================
 
-// Load canonical routes for redirects
-function loadCanonicalRedirects(): Array<[from: string, to: string]> {
-  try {
-    const canonicalRoutesPath = join(process.cwd(), 'lib/routes/canonical-routes.json');
-    if (existsSync(canonicalRoutesPath)) {
-      const config = JSON.parse(readFileSync(canonicalRoutesPath, 'utf8'));
-      return (config.legacyAliases || []).map((alias: { source: string; destination: string }) => [
-        alias.source,
-        alias.destination,
-      ]);
-    }
-  } catch (error) {
-    console.error('Failed to load canonical redirects:', error);
-  }
-  return [];
-}
+// Canonical route redirects - embedded directly to work in edge runtime
+// Source: lib/routes/canonical-routes.json
+const CANONICAL_REDIRECTS: Array<[from: string, to: string]> = [
+  ['/apply/barber', '/partners/barber-host-shop/apply'],
+  ['/partners/barbershop-apprenticeship', '/partners/barber-host-shop'],
+  ['/partners/barbershop-apprenticeship/:path*', '/partners/barber-host-shop/:path*'],
+  ['/programs/barber', '/programs/barber-apprenticeship'],
+  ['/ebook/barber-theory', '/programs/barber-apprenticeship'],
+  ['/pwa/barber', '/programs/barber-apprenticeship'],
+];
 
-// Load image redirects
-function loadImageRedirects(): Array<[from: string, to: string]> {
-  try {
-    const manifestPath = join(process.cwd(), 'scripts/.image-conversion-manifest.json');
-    if (existsSync(manifestPath)) {
-      const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-      const redirects: Array<[from: string, to: string]> = manifest.map((row: { origRel: string; webpRel: string }) => [
-        row.origRel,
-        row.webpRel,
-      ]);
-      // Add hero-images redirect
-      redirects.push(['/hero-images/how-it-works-hero.jpg', '/hero-images/how-it-works-hero.webp']);
-      return redirects;
-    }
-  } catch (error) {
-    console.error('Failed to load image redirects:', error);
-  }
-  return [];
-}
-
-// Load redirects at module initialization
-const CANONICAL_REDIRECTS = loadCanonicalRedirects();
-const IMAGE_REDIRECTS = loadImageRedirects();
+// Image .jpg → .webp redirects
+const IMAGE_REDIRECTS: Array<[from: string, to: string]> = [
+  ['/hero-images/how-it-works-hero.jpg', '/hero-images/how-it-works-hero.webp'],
+  ['/images/hero-images/about-hero.jpg', '/images/hero-images/about-hero.webp'],
+];
 
 const PUBLIC_PATHS = [
   '/api/health',

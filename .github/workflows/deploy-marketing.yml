@@ -160,11 +160,12 @@ jobs:
           echo "Expected SHA: $EXPECTED_SHA"
           
           for i in $(seq 1 $MAX_RETRIES); do
-            # Check health endpoint
-            status=$(curl -sk --max-time 10 -o /tmp/www-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/version || true)
+            # Check health endpoint (use /api/health which returns proper status)
+            status=$(curl -sk --max-time 10 -o /tmp/www-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/health || true)
             body=$(cat /tmp/www-health.json 2>/dev/null || true)
             
-            if [ "$status" = "200" ] && echo "$body" | grep -q '"ok":true'; then
+            # Accept either "ok":true or "status":"ok" or "status":"healthy"
+            if [ "$status" = "200" ] && echo "$body" | grep -qE '"ok":true|"status":"(ok|healthy)"'; then
               echo "✓ Health check passed (HTTP $status)"
               
               # Check build ID in headers (best effort - may not be available)

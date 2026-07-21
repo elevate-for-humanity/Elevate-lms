@@ -733,9 +733,9 @@ export const contactInfo = {
   phone: '1-800-ELEVATE (353-8283)',
   email: 'info@www.elevateforhumanity.org',
   address: {
-    street: '123 Main Street',
+    street: '120 E Market St Suite 930',
     city: 'Indianapolis',
     state: 'IN',
-    zip: '46204',
+    zip: '46240',
   },
 };

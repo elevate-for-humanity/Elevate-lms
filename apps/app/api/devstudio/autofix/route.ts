@@ -191,7 +191,7 @@ async function playbookStaleImage(dryRun: boolean, options: Record<string, unkno
         await triggerNorthflankBuild(projectId, svc);
         actions.push(ok('northflank-build', `${svc} build triggered`));
       } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
+        const msg = 'Unknown error';
         actions.push(error('northflank-build', `${svc} failed: ${msg.slice(0, 200)}`));
       }
     } else {

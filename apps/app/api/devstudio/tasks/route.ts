@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     return jsonOk({ task }, { status: 201 });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to create task';
+    const message = 'Failed to create task';
     if (message.includes('not found') && message.includes('ai_')) {
       return tableNotReadyResponse();
     }

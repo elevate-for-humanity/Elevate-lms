@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ saved: rows.length });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+    const message = 'Unknown error';
     if (message.startsWith('Invalid key format') || message.startsWith('Missing value')) {
       return safeError(message, 400);
     }

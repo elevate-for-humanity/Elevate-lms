@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       supabaseStatus.total_tables = 50; // Estimated total tables
     } catch (err) {
       supabaseStatus.status = 'error';
-      supabaseStatus.last_error = err instanceof Error ? err.message : 'Connection failed';
+      supabaseStatus.last_error = 'Connection failed';
     }
 
     // Stripe Status
@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error('Platform status error:', err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Status check failed' },
+      { error: 'Status check failed' },
       { status: 500 }
     );
   }

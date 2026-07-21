@@ -112,7 +112,7 @@ async function probe(url: string, reqHeaders: Record<string, string>): Promise<E
     if (err instanceof Error && err.name === 'AbortError') {
       return { embeddable: true, reason: 'GET timed out' };
     }
-    const msg = err instanceof Error ? err.message : 'network error';
+    const msg = 'Network error';
     return { embeddable: true, reason: `unreachable: ${msg}` };
   }
 }

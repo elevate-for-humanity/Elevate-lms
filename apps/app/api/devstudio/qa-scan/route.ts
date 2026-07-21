@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
             }
           }
           } catch (err) {
-            fail(`Route health scan error: ${err instanceof Error ? err.message : 'unknown'}`);
+            fail(`Route health scan error: ${'unknown error'}`);
           }
         }
 
@@ -197,7 +197,7 @@ export async function GET(req: NextRequest) {
             }
           }
           } catch (err) {
-            fail(`Auth coverage scan error: ${err instanceof Error ? err.message : 'unknown'}`);
+            fail(`Auth coverage scan error: ${'unknown error'}`);
           }
         }
 
@@ -220,7 +220,7 @@ export async function GET(req: NextRequest) {
               if (res.ok) pass(`${api} → ${res.status}`);
               else warn(`${api} → ${res.status}`);
             } catch (err) {
-              fail(`${api} → unreachable (${err instanceof Error ? err.message : 'timeout'})`);
+              fail(`${api} → unreachable (${'timeout'})`);
             }
           }
         }
@@ -238,7 +238,7 @@ export async function GET(req: NextRequest) {
               else pass(`${table}: ${count} rows`);
             }
           } catch (err) {
-            fail(`DB connection failed: ${err instanceof Error ? err.message : 'unknown'}`);
+            fail(`DB connection failed: ${'unknown error'}`);
           }
         }
 
@@ -268,7 +268,7 @@ export async function GET(req: NextRequest) {
               warn(`${unregistered.length} DB programs not in system registry: ${unregistered.slice(0, 5).map((p: { slug: string }) => p.slug).join(', ')}`);
             }
           } catch (err) {
-            fail(`Program check failed: ${err instanceof Error ? err.message : 'unknown'}`);
+            fail(`Program check failed: ${'unknown error'}`);
           }
         }
 
@@ -291,7 +291,7 @@ export async function GET(req: NextRequest) {
           if (missing === 0) pass(`All ${covered} programs have apply + checkout routes`);
           else warn(`${missing} programs missing apply or checkout routes`);
           } catch (err) {
-            fail(`Enrollment flow scan error: ${err instanceof Error ? err.message : 'unknown'}`);
+            fail(`Enrollment flow scan error: ${'unknown error'}`);
           }
         }
 
@@ -337,7 +337,7 @@ export async function GET(req: NextRequest) {
         });
 
       } catch (err) {
-        write(`\x1b[31m✗  QA scan error: ${err instanceof Error ? err.message : 'unknown'}\x1b[0m`);
+        write(`\x1b[31m✗  QA scan error: ${'unknown error'}\x1b[0m`);
       } finally {
         try { controller.enqueue(done()); } catch { /* closed */ }
         controller.close();

@@ -26,7 +26,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const { data: task } = await db.from('ai_tasks').select('*').eq('id', id).single();
     return jsonOk({ task, rolledBack: true });
   } catch (err) {
-    const message = err instanceof Error ? err.message : '';
+    const message = 'Operation failed';
     if (message.includes('not found')) return tableNotReadyResponse();
     return safeInternalError(err, 'Failed to rollback task');
   }

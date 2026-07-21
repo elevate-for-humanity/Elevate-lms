@@ -1286,7 +1286,7 @@ async function executeAction(
   try {
     sb = await requireAdminClient();
   } catch (err) {
-    write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Admin database unavailable'}\x1b[0m`);
+    write(`\x1b[31m✗  ${'Admin database unavailable'}\x1b[0m`);
     return;
   }
 
@@ -1350,7 +1350,7 @@ async function executeAction(
           if (data.details) write(`   ${data.details}`);
         }
       } catch (err) {
-        write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Network error'}\x1b[0m`);
+        write(`\x1b[31m✗  ${'Network error'}\x1b[0m`);
       }
       break;
     }
@@ -1382,7 +1382,7 @@ async function executeAction(
         write(`   Active programs:    ${activePrograms ?? 0}`);
         write(`   Full dashboard: /admin`);
       } catch (err) {
-        write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Report failed'}\x1b[0m`);
+        write(`\x1b[31m✗  ${'Report failed'}\x1b[0m`);
       }
       break;
     }
@@ -1446,7 +1446,7 @@ async function executeAction(
         if ((apps?.length ?? 0) > 15) write(`   ... and ${(apps?.length ?? 0) - 15} more`);
         write(`   Full list: /admin/applications`);
       } catch (err) {
-        write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Query failed'}\x1b[0m`);
+        write(`\x1b[31m✗  ${'Query failed'}\x1b[0m`);
       }
       break;
     }
@@ -1473,7 +1473,7 @@ async function executeAction(
         if ((apps?.length ?? 0) > 15) write(`   ... and ${(apps?.length ?? 0) - 15} more`);
         write(`   Full list: /admin/barber-shop-applications`);
       } catch (err) {
-        write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Query failed'}\x1b[0m`);
+        write(`\x1b[31m✗  ${'Query failed'}\x1b[0m`);
       }
       break;
     }
@@ -1498,7 +1498,7 @@ async function executeAction(
         if ((students?.length ?? 0) > 10) write(`   ... and ${(students?.length ?? 0) - 10} more`);
         write(`   Full list: /admin/students`);
       } catch (err) {
-        write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Query failed'}\x1b[0m`);
+        write(`\x1b[31m✗  ${'Query failed'}\x1b[0m`);
       }
       break;
     }
@@ -1533,7 +1533,7 @@ async function executeAction(
         if ((enrollments?.length ?? 0) > 10) write(`   ... and ${(enrollments?.length ?? 0) - 10} more`);
         write(`   Full list: /admin/enrollments`);
       } catch (err) {
-        write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Query failed'}\x1b[0m`);
+        write(`\x1b[31m✗  ${'Query failed'}\x1b[0m`);
       }
       break;
     }
@@ -1823,7 +1823,7 @@ async function executeAction(
         write('   \x1b[90m● published  ○ unpublished\x1b[0m');
         write('   Full list: /admin/programs');
       } catch (err) {
-        write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Query failed'}\x1b[0m`);
+        write(`\x1b[31m✗  ${'Query failed'}\x1b[0m`);
       }
       break;
     }
@@ -2174,7 +2174,7 @@ async function executeAction(
           write(`   • ${s.full_name ?? s.email ?? s.user_id} — ${s.program_slug ?? ''} — ${s.days_inactive ?? 0}d inactive (${s.risk_level ?? ''})`));
         if ((items?.length ?? 0) > 10) write(`   … and ${(items?.length ?? 0) - 10} more`);
         write(`   View at: /admin/at-risk`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Operation failed'}\x1b[0m`); }
       break;
     }
 
@@ -2193,7 +2193,7 @@ async function executeAction(
         (items ?? []).slice(0, 10).forEach((c: any) =>
           write(`   • user:${c.user_id?.slice(0,8)}… — program:${c.program_id?.slice(0,8)}… — ${c.issued_at?.slice(0,10)}`));
         write(`   View at: /admin/completions`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Operation failed'}\x1b[0m`); }
       break;
     }
 
@@ -2693,7 +2693,7 @@ async function executeAction(
           const dups = slugs.filter(s => { if (seen.has(s)) return true; seen.add(s); return false; });
           write(`\n   Duplicate slugs: ${[...new Set(dups)].join(', ') || 'none'}`);
         }
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Scan failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Scan failed'}\x1b[0m`); }
       break;
     }
 
@@ -2722,7 +2722,7 @@ async function executeAction(
           write(`   Routes leaking error.message:        33`);
           write(`   Run bash scripts/audit-auth-gaps.sh for live report`);
         }
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Audit failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Audit failed'}\x1b[0m`); }
       break;
     }
 
@@ -2784,7 +2784,7 @@ async function executeAction(
         unique.forEach(b => write(`   \x1b[31m✗\x1b[0m  ${b}`));
         if (unique.length === 0) write(`   No broken internal links detected`);
         if (broken.length > 30) write(`   … and ${broken.length - 30} more (dynamic routes may be false positives)`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Scan failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Scan failed'}\x1b[0m`); }
       break;
     }
 
@@ -2863,7 +2863,7 @@ async function executeAction(
           await emitMigrationEvent('applied', filename);
           write(`\x1b[32m✓  Migration applied: ${filename}\x1b[0m`);
         }
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Migration failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Migration failed'}\x1b[0m`); }
       break;
     }
 
@@ -2902,7 +2902,7 @@ async function executeAction(
         write(`   Total enrollments:   ${enrollCount ?? '?'}`);
         write(`   Stuck (>7d pending): ${stuckCount ?? '?'}`);
         if ((stuckCount ?? 0) > 0) write(`\x1b[33m   ⚠  ${stuckCount} applications stuck — review at /admin/applications\x1b[0m`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Audit failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Audit failed'}\x1b[0m`); }
       break;
     }
 
@@ -2937,7 +2937,7 @@ async function executeAction(
         const checkoutPath = join(process.cwd(), 'app', 'checkout', slug);
         write(`   Apply route:    ${existsSync(applyPath) ? '\x1b[32m✓ exists\x1b[0m' : '\x1b[90mfalls through to [program]\x1b[0m'}`);
         write(`   Checkout route: ${existsSync(checkoutPath) ? '\x1b[32m✓ exists\x1b[0m' : '\x1b[90mfalls through to [program]\x1b[0m'}`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Verify failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Verify failed'}\x1b[0m`); }
       break;
     }
 
@@ -2971,7 +2971,7 @@ async function executeAction(
         const { data: certs } = await sb.from('program_completion_certificates').select('id, program_id, issued_at').eq('user_id', uid!).limit(5);
         write(`   Certificates: ${certs?.length ?? 0}`);
         certs?.forEach(c => write(`   └ ${c.program_id} — issued ${c.issued_at}`));
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Inspect failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Inspect failed'}\x1b[0m`); }
       break;
     }
 
@@ -2993,7 +2993,7 @@ async function executeAction(
         if (state.debt?.top_issues?.length) {
           write(`   Top issues: ${state.debt.top_issues.join(', ')}`);
         }
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'State fetch failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'State fetch failed'}\x1b[0m`); }
       break;
     }
 
@@ -3036,7 +3036,7 @@ async function executeAction(
             }
           }
         }
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Lookup failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Lookup failed'}\x1b[0m`); }
       break;
     }
 
@@ -3098,7 +3098,7 @@ async function executeAction(
           write(`   Manual fallback: https://supabase.com/dashboard/project/cuxzzpsyufcewtmicszk/sql`);
         }
       } catch (err) {
-        write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Failed'}\x1b[0m`);
+        write(`\x1b[31m✗  ${'Operation failed'}\x1b[0m`);
       }
       break;
     }
@@ -3169,7 +3169,7 @@ async function executeAction(
         write('');
         write(`\x1b[32m✓  Applied: ${ok}  Failed/Skipped: ${fail}\x1b[0m`);
         if (fail > 0) write(`   Manual: https://supabase.com/dashboard/project/${projectRef ?? 'cuxzzpsyufcewtmicszk'}/sql`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Operation failed'}\x1b[0m`); }
       break;
     }
 
@@ -3193,7 +3193,7 @@ async function executeAction(
           write(`   ${sev}[${m.memory_type}]\x1b[0m ${m.title}`);
           write(`   ${m.content.slice(0, 120)}${m.content.length > 120 ? '…' : ''}`);
         });
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Recall failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Recall failed'}\x1b[0m`); }
       break;
     }
 
@@ -3210,7 +3210,7 @@ async function executeAction(
         const { error } = await sb.from('ai_operator_memory').insert({ memory_type: memType, title, content, tags });
         if (error) { write('\x1b[31m✗  Operation failed\x1b[0m'); break; }
         write(`\x1b[32m✓  Memory saved: [${memType}] ${title}\x1b[0m`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Save failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Save failed'}\x1b[0m`); }
       break;
     }
 
@@ -3239,7 +3239,7 @@ async function executeAction(
             try { const { text } = JSON.parse(payload); if (text) write(text); } catch { /* skip */ }
           }
         }
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'QA scan failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'QA scan failed'}\x1b[0m`); }
       break;
     }
 
@@ -3260,7 +3260,7 @@ async function executeAction(
         write(`\x1b[32m✓  Snapshot created: ${data.id}\x1b[0m`);
         write(`   Label: ${data.label}`);
         write(`   Created: ${data.created_at}`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Snapshot failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Snapshot failed'}\x1b[0m`); }
       break;
     }
 
@@ -3277,7 +3277,7 @@ async function executeAction(
         snaps.forEach((s: { snapshot_type: string; label: string; rolled_back: boolean; created_at: string }) =>
           write(`   [${s.snapshot_type}] ${s.label}${s.rolled_back ? ' \x1b[33m(rolled back)\x1b[0m' : ''} — ${s.created_at}`)
         );
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'List failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'List failed'}\x1b[0m`); }
       break;
     }
 
@@ -3303,7 +3303,7 @@ async function executeAction(
         write(`   Dedicated page:  ${prog.has_dedicated_page}`);
         write(`   LMS course:      ${prog.has_lms_course}`);
         write(`   Status:          ${prog.status}`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Lookup failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Lookup failed'}\x1b[0m`); }
       break;
     }
 
@@ -3323,7 +3323,7 @@ async function executeAction(
           write(`${i + 1}. ${String(c.title ?? '--')} | ${String(c.counterparty_name ?? '--')} | ${String(c.status ?? '--')} | Expires: ${exp}`);
         });
         write(`\nManage at: ${getAdminUrl()}/admin/mou`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Operation failed'}\x1b[0m`); }
       break;
     }
 
@@ -3348,7 +3348,7 @@ async function executeAction(
           write(`${i + 1}. ${String(g.agency ?? '--')} | Due: ${due} | Status: ${String(g.status ?? flags)}`);
         });
         write(`\nManage at: ${getAdminUrl()}/admin/grants`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Operation failed'}\x1b[0m`); }
       break;
     }
 
@@ -3368,7 +3368,7 @@ async function executeAction(
           write(`${i + 1}. ${String(d.name ?? '--')} | ${String(d.document_type ?? '--')} | ${String(d.status ?? '--')} | ${date}`);
         });
         write(`\nManage at: ${getAdminUrl()}/admin/document-center`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Operation failed'}\x1b[0m`); }
       break;
     }
 
@@ -3392,7 +3392,7 @@ async function executeAction(
           );
         }
         write(`\nManage at: ${getAdminUrl()}/admin/compliance`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Operation failed'}\x1b[0m`); }
       break;
     }
 
@@ -3413,7 +3413,7 @@ async function executeAction(
           write(`  ${i + 1}. ${String(s.document_type ?? '--')} (doc: ${String(s.document_id ?? '--')}) | Signer: ${String(s.signer_id ?? '--')}`)
         );
         write(`\nManage at: ${getAdminUrl()}/admin/signatures`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Operation failed'}\x1b[0m`); }
       break;
     }
 
@@ -3432,7 +3432,7 @@ async function executeAction(
           write(`${i + 1}. ${String(w.name ?? '--')} | ${String(w.status ?? '--')} | Owner: ${String(w.owner ?? '--')}`)
         );
         write(`\nManage at: ${getAdminUrl()}/admin/workflows`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Operation failed'}\x1b[0m`); }
       break;
     }
 
@@ -3454,7 +3454,7 @@ async function executeAction(
         write(`SAM: ${String(d.sam_registration ?? '--')}`);
         write(`Mission: ${String(d.mission ?? '--')}`);
         write(`\nManage at: ${getAdminUrl()}/admin/settings/organization`);
-      } catch (err) { write(`\x1b[31m✗  ${err instanceof Error ? err.message : 'Failed'}\x1b[0m`); }
+      } catch (err) { write(`\x1b[31m✗  ${'Operation failed'}\x1b[0m`); }
       break;
     }
 
@@ -3703,7 +3703,7 @@ ENGINEERING
         } catch { /* non-critical */ }
 
       } catch (err) {
-        const reason = err instanceof Error ? err.message : String(err);
+        const reason = 'Unknown error';
         logger.error('[devstudio/execute] unexpected error', undefined, { reason });
         write(`\x1b[31m✗  Unexpected error: ${reason}\x1b[0m`);
       } finally {

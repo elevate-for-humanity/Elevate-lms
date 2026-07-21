@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error('Runtime QA error:', err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'QA check failed' },
+      { error: 'QA check failed' },
       { status: 500 }
     );
   }

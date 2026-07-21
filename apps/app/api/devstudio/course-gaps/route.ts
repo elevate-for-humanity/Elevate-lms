@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error('Course gap detection error:', err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Detection failed' },
+      { error: 'Detection failed' },
       { status: 500 }
     );
   }
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error('Create gap jobs error:', err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Job creation failed' },
+      { error: 'Job creation failed' },
       { status: 500 }
     );
   }

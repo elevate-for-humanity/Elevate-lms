@@ -142,11 +142,11 @@ export async function POST(req: NextRequest) {
               write(`${PASS}  Step ${step.order} complete: ${step.title}`);
               write('');
 
-            } catch (err) {
+            } catch {
               step.status = 'failed';
-              step.error = err instanceof Error ? err.message : 'unknown';
+              step.error = 'Step execution failed';
               failedSteps++;
-              write(`${FAIL}  Step ${step.order} failed: ${step.title} — ${step.error}`);
+              write(`${FAIL}  Step ${step.order} failed: ${step.title}`);
               write('');
 
               // Mark dependent steps as skipped
@@ -179,8 +179,8 @@ export async function POST(req: NextRequest) {
           message: `AI planner completed: ${goal} (${doneCount}/${plan.steps.length} steps)`,
         });
 
-      } catch (err) {
-        write(`\x1b[31m✗  Planner error: ${err instanceof Error ? err.message : 'unknown'}\x1b[0m`);
+      } catch {
+        write('\x1b[31m✗  Planner error\x1b[0m');
       } finally {
         try { controller.enqueue(done()); } catch { /* closed */ }
         controller.close();

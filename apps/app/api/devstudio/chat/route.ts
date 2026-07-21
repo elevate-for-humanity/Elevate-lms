@@ -438,10 +438,8 @@ function runRipgrep(args: string[]): string {
       timeout: 10_000,
       maxBuffer: 512_000,
     }).slice(0, 12_000);
-  } catch (err) {
-    const maybe = err as { stdout?: string; message?: string };
-    if (maybe.stdout) return maybe.stdout.slice(0, 12_000);
-    return `No matches or search error: ${maybe.message ?? String(err)}`;
+  } catch {
+    return 'Search execution failed';
   }
 }
 
@@ -457,8 +455,8 @@ function sourceExcerpt(filePath: string, maxLines = 160): string {
       .slice(0, Math.min(Math.max(maxLines, 20), 220))
       .join('\n');
     return `FILE: ${safePath}\n${contents.slice(0, 16_000)}`;
-  } catch (err) {
-    return `Could not read ${safePath}: ${err instanceof Error ? err.message : String(err)}`;
+  } catch {
+    return `Could not read ${safePath}: File access error`;
   }
 }
 
@@ -807,11 +805,11 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
             .eq('program_id', program?.id ?? '00000000-0000-0000-0000-000000000000')
             .limit(10);
           live = {
-            program: programError ? { error: programError.message } : program,
-            courses: courseError ? { error: courseError.message } : courses,
+            program: programError ? { error: 'Database query failed' } : program,
+            courses: courseError ? { error: 'Database query failed' } : courses,
           };
-        } catch (err) {
-          live = { error: err instanceof Error ? err.message : String(err) };
+        } catch {
+          live = { error: 'Query execution failed' };
         }
       }
 
@@ -915,8 +913,8 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
           cwd: process.cwd(),
         });
         return out.slice(0, 4000);
-      } catch (err) {
-        return `Command error: ${err instanceof Error ? err.message : String(err)}`;
+      } catch {
+        return 'Command execution failed';
       }
     }
 
@@ -998,7 +996,7 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         .select('id')
         .single();
 
-      if (courseErr) return `Failed to save course: ${courseErr.message}`;
+      if (courseErr) return 'Failed to save course: Database error';
       const courseId = courseRow.id;
 
       // 2. Create modules + lessons
@@ -1073,8 +1071,8 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
           courseId,
           message: 'Video generation queued. Check /admin/courses/' + courseId + ' for progress.',
         });
-      } catch (err) {
-        return `Video generation error: ${err instanceof Error ? err.message : String(err)}`;
+      } catch {
+        return 'Video generation failed';
       }
     }
 

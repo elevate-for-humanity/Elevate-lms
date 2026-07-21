@@ -22,24 +22,43 @@ export default function Header() {
       className="fixed top-0 left-0 right-0 h-[60px] bg-white/95 backdrop-blur-md z-[9999] shadow-sm border-b border-slate-100 transition-all duration-200"
       role="banner"
     >
-      <div className="max-w-screen-2xl mx-auto w-full h-full px-4 lg:px-8 grid grid-cols-[auto_1fr_auto] items-center gap-2 lg:gap-4">
+      <div className="max-w-screen-2xl mx-auto w-full h-full px-4 xl:px-8 grid grid-cols-[auto_1fr_auto] items-center gap-2 xl:gap-4">
         <Link
           href="/"
           className="flex items-center gap-2 flex-shrink-0 min-w-0"
           aria-label={`${PLATFORM_DEFAULTS.orgName} home`}
         >
           <LogoImage alt="Elevate" width={40} height={60} className="w-auto h-9" priority />
-          <span className="font-bold text-[15px] text-slate-900 hidden sm:block tracking-tight truncate">
+          <span className="font-bold text-[15px] text-slate-900 hidden md:block tracking-tight truncate">
             Elevate
           </span>
         </Link>
 
-        <div className="hidden lg:flex justify-center min-w-0 overflow-visible">
+        {/* Desktop nav - show on xl screens (1280px+) */}
+        <div className="hidden xl:flex justify-center min-w-0 overflow-visible">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
-        <div className="flex flex-row flex-nowrap items-center justify-end gap-0.5 sm:gap-1 flex-shrink-0 min-w-0">
-          <HeaderMobileMenu items={NAV_ITEMS} programApplyLinks={PROGRAM_APPLY_LINKS} />
+        <div className="flex flex-row flex-nowrap items-center justify-end gap-0.5 md:gap-1 flex-shrink-0 min-w-0">
+          {/* Desktop search/signin - show on md screens and up */}
+          <div className="hidden md:flex items-center gap-2 mr-2">
+            <Link
+              href="/login"
+              className="text-sm text-slate-600 hover:text-slate-900 px-3 py-2"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/apply"
+              className="text-sm bg-brand-red-600 hover:bg-brand-red-700 text-white px-4 py-2 rounded-lg font-medium"
+            >
+              Apply
+            </Link>
+          </div>
+          {/* Mobile menu button - hide on xl */}
+          <span className="xl:hidden">
+            <HeaderMobileMenu items={NAV_ITEMS} programApplyLinks={PROGRAM_APPLY_LINKS} />
+          </span>
         </div>
       </div>
     </header>

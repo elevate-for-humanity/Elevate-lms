@@ -8,6 +8,13 @@ export const metadata: Metadata = {
   title: { default: 'Elevate for Humanity', template: '%s | Elevate for Humanity' },
   description: 'Vocational education and workforce development',
   metadataBase: new URL('https://www.elevateforhumanity.org'),
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.png', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 // Force dynamic rendering to avoid static generation issues

@@ -18,11 +18,11 @@ export const CONTACT_INFO = {
 
   // Address
   address: {
-    street: '120 E Market St Suite 120',
+    street: '120 E Market St Suite 930',
     city: 'Indianapolis',
     state: 'IN',
     zip: '46204',
-    full: '120 E Market St Suite 120, Indianapolis, IN 46204',
+    full: '120 E Market St Suite 930, Indianapolis, IN 46204',
   },
 
   // Hours

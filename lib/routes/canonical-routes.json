@@ -728,6 +728,21 @@
       "source": "/programs/workforce-ready-grant",
       "destination": "/programs",
       "permanent": false
+    },
+    {
+      "source": "/partners/barbershop-apprenticeship",
+      "destination": "/partners/barber-host-shop",
+      "permanent": true
+    },
+    {
+      "source": "/partners/barbershop-apprenticeship/:path*",
+      "destination": "/partners/barber-host-shop/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/apply/barber",
+      "destination": "/partners/barber-host-shop/apply",
+      "permanent": true
     }
   ],
   "externalOrAppHostedAllowlist": [

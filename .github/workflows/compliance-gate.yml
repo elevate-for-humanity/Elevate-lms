@@ -157,9 +157,9 @@ jobs:
       - name: Verify legal pages exist
         run: |
           echo "Checking legal pages..."
-          test -f app/legal/disclosures/page.tsx || { echo "Missing disclosures page"; exit 1; }
-          test -d app/terms || { echo "Missing terms"; exit 1; }
-          test -d app/legal/privacy || { echo "Missing privacy policy"; exit 1; }
+          test -f apps/marketing/app/legal/disclosures/page.tsx || { echo "Missing disclosures page"; exit 1; }
+          test -d apps/marketing/app/terms || { echo "Missing terms"; exit 1; }
+          test -d apps/marketing/app/legal/privacy || { echo "Missing privacy policy"; exit 1; }
           echo "✓ All legal pages present"
 
       - name: Verify audit packet exists

@@ -18,13 +18,13 @@ export type ProgramCategory =
  * Category default hero images
  */
 export const CATEGORY_HEROES: Record<ProgramCategory, string> = {
-  healthcare: '/hero-images/healthcare-hero.jpg',
-  'skilled-trades': '/hero-images/skilled-trades-hero.jpg',
-  technology: '/hero-images/technology-hero.jpg',
-  business: '/hero-images/business-hero.jpg',
-  beauty: '/hero-images/barber-beauty-cat-new.jpg',
-  transportation: '/hero-images/cdl-cat-new.jpg',
-  general: '/hero-images/programs-hero.jpg',
+  healthcare: '/images/pages/healthcare-hero.webp',
+  'skilled-trades': '/images/hero/hero-skilled-trades.webp',
+  technology: '/images/hero/hero-tech-careers.webp',
+  business: '/images/hero/hero-business.webp',
+  beauty: '/images/hero/hero-beauty-wellness.webp',
+  transportation: '/images/cdl-hero.webp',
+  general: '/images/programs-hero-new.webp',
 };
 
 /**
@@ -32,53 +32,53 @@ export const CATEGORY_HEROES: Record<ProgramCategory, string> = {
  */
 export const PROGRAM_HEROES: Record<string, string> = {
   // Beauty & Barber
-  'barber-apprenticeship': '/hero-images/barber-hero.jpg',
-  barber: '/hero-images/barber-hero.jpg',
-  'cosmetology-apprenticeship': '/hero-images/barber-beauty-cat-new.jpg',
-  'esthetician-apprenticeship': '/hero-images/barber-beauty-cat-new.jpg',
-  'nail-technician-apprenticeship': '/hero-images/barber-beauty-cat-new.jpg',
-  beauty: '/hero-images/barber-beauty-cat-new.jpg',
+  'barber-apprenticeship': '/images/barber-hero.webp',
+  barber: '/images/barber-hero.webp',
+  'cosmetology-apprenticeship': '/images/hero/hero-beauty-wellness.webp',
+  'esthetician-apprenticeship': '/images/hero/hero-beauty-wellness.webp',
+  'nail-technician-apprenticeship': '/images/hero/hero-beauty-wellness.webp',
+  beauty: '/images/hero/hero-beauty-wellness.webp',
 
   // Healthcare
-  'cna-certification': '/hero-images/healthcare-hero.jpg',
-  cna: '/hero-images/healthcare-hero.jpg',
-  phlebotomy: '/hero-images/healthcare-hero.jpg',
-  'medical-assistant': '/hero-images/healthcare-hero.jpg',
-  'direct-support-professional': '/hero-images/healthcare-hero.jpg',
-  'drug-collector': '/hero-images/healthcare-hero.jpg',
-  'cpr-first-aid-hsi': '/hero-images/healthcare-hero.jpg',
-  healthcare: '/hero-images/healthcare-hero.jpg',
+  'cna-certification': '/images/pages/healthcare-hero.webp',
+  cna: '/images/pages/healthcare-hero.webp',
+  phlebotomy: '/images/pages/healthcare-hero.webp',
+  'medical-assistant': '/images/pages/healthcare-hero.webp',
+  'direct-support-professional': '/images/pages/healthcare-hero.webp',
+  'drug-collector': '/images/pages/healthcare-hero.webp',
+  'cpr-first-aid-hsi': '/images/pages/healthcare-hero.webp',
+  healthcare: '/images/pages/healthcare-hero.webp',
 
   // Skilled Trades
-  'hvac-technician': '/images/pages/hvac-technician.webp',
-  hvac: '/images/pages/hvac-unit.webp',
-  electrical: '/images/pages/electrical.webp',
-  plumbing: '/images/pages/plumbing.jpg',
-  welding: '/images/pages/welding-sparks.webp',
-  'diesel-mechanic': '/images/pages/hvac-tools.webp',
-  'skilled-trades': '/hero-images/skilled-trades-hero.jpg',
+  'hvac-technician': '/images/hvac-hero.webp',
+  hvac: '/images/hvac-hero.webp',
+  electrical: '/images/pages/about-hero.webp',
+  plumbing: '/images/pages/about-hero.webp',
+  welding: '/images/pages/about-hero.webp',
+  'diesel-mechanic': '/images/cdl-hero.webp',
+  'skilled-trades': '/images/hero/hero-skilled-trades.webp',
 
   // Transportation
-  'cdl-training': '/images/pages/cdl-training.webp',
-  cdl: '/images/pages/cdl-truck-highway.webp',
-  'cdl-transportation': '/hero-images/cdl-cat-new.jpg',
+  'cdl-training': '/images/cdl-hero.webp',
+  cdl: '/images/cdl-hero.webp',
+  'cdl-transportation': '/images/cdl-hero.webp',
 
   // Technology
-  cybersecurity: '/hero-images/technology-hero.jpg',
-  'it-support': '/hero-images/technology-hero.jpg',
-  technology: '/hero-images/technology-hero.jpg',
+  cybersecurity: '/images/hero/hero-tech-careers.webp',
+  'it-support': '/images/hero/hero-tech-careers.webp',
+  technology: '/images/hero/hero-tech-careers.webp',
 
   // Business
-  'tax-preparation': '/hero-images/business-hero.jpg',
-  'tax-entrepreneurship': '/hero-images/business-hero.jpg',
-  business: '/hero-images/business-hero.jpg',
-  'business-financial': '/hero-images/business-hero.jpg',
+  'tax-preparation': '/images/hero/hero-business.webp',
+  'tax-entrepreneurship': '/images/hero/hero-business.webp',
+  business: '/images/hero/hero-business.webp',
+  'business-financial': '/images/hero/hero-business.webp',
 
   // Special Programs
-  jri: '/hero-images/programs-hero.jpg',
-  'federal-funded': '/hero-images/programs-hero.jpg',
-  apprenticeships: '/hero-images/apprenticeships-hero.jpg',
-  'micro-programs': '/hero-images/programs-hero.jpg',
+  jri: '/images/programs-hero-new.webp',
+  'federal-funded': '/images/programs-hero-new.webp',
+  apprenticeships: '/images/hero/hero-main-welcome.webp',
+  'micro-programs': '/images/programs-hero-new.webp',
 };
 
 /**

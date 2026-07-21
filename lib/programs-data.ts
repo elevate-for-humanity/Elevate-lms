@@ -196,7 +196,7 @@ export const PROGRAMS: ProgramData[] = [
       'OSHA-compliant forklift operator certification in 1-2 weeks. Covers powered industrial truck operation, safety standards, load handling, warehouse operations, and practical driving evaluation at employer partner site. 3-star Indiana Top Jobs demand rating. Immediate employability at distribution centers.',
     funding: 'WIOA • Workforce Grants',
     duration: '1–2 Weeks • 40 Hours',
-    image: '/images/programs-hq/skilled-trades-hero.webp',
+    image: '/images/hero/hero-skilled-trades.webp',
     etplApproved: true,
   },
   {

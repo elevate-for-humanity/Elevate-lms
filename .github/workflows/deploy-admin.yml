@@ -106,6 +106,7 @@ jobs:
       - name: Patch admin build ephemeral storage
         run: pnpm tsx scripts/northflank/patch-ephemeral-storage.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
 
+      - name: Verify admin health checks
         run: pnpm tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
       - name: Point admin service at main

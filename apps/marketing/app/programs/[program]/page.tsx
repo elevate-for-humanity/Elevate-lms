@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
@@ -31,6 +31,15 @@ const APPRENTICESHIP_CONFIGS: Record<string, ProgramConfig> = {
   'cosmetology-apprenticeship': cosmetologyConfig,
   'esthetician-apprenticeship': estheticsConfig,
   'nail-technician-apprenticeship': nailConfig,
+};
+
+// Legacy program slugs that should redirect to canonical URLs
+const LEGACY_PROGRAM_REDIRECTS: Record<string, string> = {
+  'barber': '/programs/barber-apprenticeship',
+  'cosmetology': '/programs/cosmetology-apprenticeship',
+  'hvac': '/programs/hvac-technician',
+  'finance-bookkeeping-accounting': '/programs/bookkeeping',
+  'bookkeeping': '/programs/bookkeeping',
 };
 
 export const dynamic = 'force-dynamic';
@@ -517,6 +526,11 @@ function ProgramPage({
 
 export default async function ProgramDetailPage({ params }: { params: Promise<{ program: string }> }) {
   const { program } = await params;
+
+  // Redirect legacy program slugs to canonical URLs
+  if (LEGACY_PROGRAM_REDIRECTS[program]) {
+    redirect(LEGACY_PROGRAM_REDIRECTS[program]);
+  }
 
   // Configuration-driven apprenticeship programs (new architecture)
   if (APPRENTICESHIP_CONFIGS[program]) {

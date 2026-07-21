@@ -13,10 +13,53 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
 // =============================================================================
 // CONFIGURATION
 // =============================================================================
+
+// Load canonical routes for redirects
+function loadCanonicalRedirects(): Array<[from: string, to: string]> {
+  try {
+    const canonicalRoutesPath = join(process.cwd(), 'lib/routes/canonical-routes.json');
+    if (existsSync(canonicalRoutesPath)) {
+      const config = JSON.parse(readFileSync(canonicalRoutesPath, 'utf8'));
+      return (config.legacyAliases || []).map((alias: { source: string; destination: string }) => [
+        alias.source,
+        alias.destination,
+      ]);
+    }
+  } catch (error) {
+    console.error('Failed to load canonical redirects:', error);
+  }
+  return [];
+}
+
+// Load image redirects
+function loadImageRedirects(): Array<[from: string, to: string]> {
+  try {
+    const manifestPath = join(process.cwd(), 'scripts/.image-conversion-manifest.json');
+    if (existsSync(manifestPath)) {
+      const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+      const redirects: Array<[from: string, to: string]> = manifest.map((row: { origRel: string; webpRel: string }) => [
+        row.origRel,
+        row.webpRel,
+      ]);
+      // Add hero-images redirect
+      redirects.push(['/hero-images/how-it-works-hero.jpg', '/hero-images/how-it-works-hero.webp']);
+      return redirects;
+    }
+  } catch (error) {
+    console.error('Failed to load image redirects:', error);
+  }
+  return [];
+}
+
+// Load redirects at module initialization
+const CANONICAL_REDIRECTS = loadCanonicalRedirects();
+const IMAGE_REDIRECTS = loadImageRedirects();
 
 const PUBLIC_PATHS = [
   '/api/health',
@@ -165,6 +208,26 @@ export async function middleware(request: NextRequest) {
   ];
 
   for (const [from, to] of LEGACY_REDIRECTS) {
+    if (pathname === from) {
+      const url = request.nextUrl.clone();
+      url.pathname = to;
+      url.search = '';
+      return NextResponse.redirect(url, 308);
+    }
+  }
+
+  // ── Canonical redirects from canonical-routes.json ──────────────────────────
+  for (const [from, to] of CANONICAL_REDIRECTS) {
+    if (pathname === from) {
+      const url = request.nextUrl.clone();
+      url.pathname = to;
+      url.search = '';
+      return NextResponse.redirect(url, 308);
+    }
+  }
+
+  // ── Image .jpg → .webp redirects ─────────────────────────────────────────
+  for (const [from, to] of IMAGE_REDIRECTS) {
     if (pathname === from) {
       const url = request.nextUrl.clone();
       url.pathname = to;

@@ -65,7 +65,7 @@ export const emailTemplates = {
                 Questions? Call us at <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color: #ea580c; text-decoration: none;">${PLATFORM_DEFAULTS.supportPhone}</a>
               </p>
               <p style="color: #64748b; font-size: 14px; margin: 0;">
-                8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
+                120 E Market St, Suite 930, Indianapolis, IN 46240
               </p>
             </td>
           </tr>
@@ -441,7 +441,7 @@ export const emailTemplates = {
           <tr>
             <td style="background-color: #ffffff; padding: 30px; text-align: center;">
               <p style="color: #64748b; font-size: 14px; margin: 0;">
-                ${PLATFORM_DEFAULTS.orgName} | 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
+                ${PLATFORM_DEFAULTS.orgName} | 120 E Market St, Suite 930, Indianapolis, IN 46240
               </p>
             </td>
           </tr>
@@ -610,7 +610,7 @@ export const emailTemplates = {
           <tr>
             <td style="background-color: #ffffff; padding: 30px; text-align: center;">
               <p style="color: #64748b; font-size: 14px; margin: 0;">
-                ${PLATFORM_DEFAULTS.orgName} | 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
+                ${PLATFORM_DEFAULTS.orgName} | 120 E Market St, Suite 930, Indianapolis, IN 46240
               </p>
             </td>
           </tr>

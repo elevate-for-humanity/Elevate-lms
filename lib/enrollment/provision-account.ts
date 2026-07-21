@@ -283,7 +283,7 @@ function buildWelcomeEmail(opts: {
     </p>
     <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
     <p style="color:#94a3b8;font-size:12px;text-align:center;margin:0;">
-      ${PLATFORM_DEFAULTS.orgName} · 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240
+      ${PLATFORM_DEFAULTS.orgName} · 120 E Market St Suite 930, Indianapolis, IN 46240
     </p>
   </div>
 </div>`;

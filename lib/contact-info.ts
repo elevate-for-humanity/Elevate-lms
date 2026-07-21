@@ -18,11 +18,11 @@ export const CONTACT_INFO = {
 
   // Address
   address: {
-    street: '8888 Keystone Crossing Suite 1300',
+    street: '120 E Market St Suite 930',
     city: 'Indianapolis',
     state: 'IN',
     zip: '46240',
-    full: '8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240',
+    full: '120 E Market St Suite 930, Indianapolis, IN 46240',
   },
 
   // Hours

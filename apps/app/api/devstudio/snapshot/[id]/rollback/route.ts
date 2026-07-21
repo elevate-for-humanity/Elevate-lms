@@ -59,7 +59,7 @@ export async function POST(
       }
 
       const { error: sqlErr } = await supabase.rpc('exec_sql', { sql: snapshot.rollback_sql });
-      if (sqlErr) return safeError(`Rollback SQL failed: ${sqlErr.message}`, 500);
+      if (sqlErr) return safeError("Rollback SQL failed", 500);
     }
 
     // Mark as rolled back

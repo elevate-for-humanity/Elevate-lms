@@ -2229,7 +2229,7 @@ async function executeAction(
         if (errs.length > 0) {
           write(`\x1b[33m   Recent errors (${errs.length}):\x1b[0m`);
           errs.slice(0, 5).forEach((e: Record<string, unknown>) =>
-            write(`   • ${e.message ?? JSON.stringify(e)}`));
+            write(`   • ${e.message || JSON.stringify(e)}`));
         } else write('   No recent errors');
         write(`   View at: /admin/monitoring`);
       } catch { write('\x1b[31m✗  Network error\x1b[0m'); }
@@ -2496,8 +2496,8 @@ async function executeAction(
             } catch { if (payload.trim()) write(payload); }
           }
         }
-      } catch (err) {
-        write(`\x1b[31m✗  Smoke test failed: ${(err as Error).message}\x1b[0m`);
+      } catch {
+        write('\x1b[31m✗  Smoke test failed\x1b[0m');
       }
       break;
     }
@@ -2848,7 +2848,7 @@ async function executeAction(
           const { error: rpcErr } = await sb.rpc('exec_sql', { sql }).single();
           if (rpcErr) {
             await emitMigrationEvent('failed', filename);
-            write(`\x1b[31m✗  ${rpcErr.message}\x1b[0m`);
+            write('\x1b[31m✗  Migration execution failed\x1b[0m');
             write(`   Apply manually: https://supabase.com/dashboard/project/${projectRef ?? 'cuxzzpsyufcewtmicszk'}/sql`);
             break;
           }
@@ -3048,7 +3048,7 @@ async function executeAction(
           .from('efh_migrations')
           .select('filename, executed_at')
           .order('filename', { ascending: true });
-        if (dbErr) throw new Error(dbErr.message);
+        if (dbErr) throw new Error('Database query failed');
         const appliedSet = new Set((applied ?? []).map((r: { filename: string }) => r.filename));
 
         // 2. Get migration files from GitHub repo
@@ -3635,7 +3635,7 @@ ENGINEERING
           try {
             aiResponse = await callAI(systemPrompt, userPrompt, TOOLS);
           } catch (aiErr) {
-            const reason = aiErr instanceof Error ? aiErr.message : String(aiErr);
+            const reason = aiErr instanceof Error ? "AI operation failed" : String(aiErr);
             logger.error('[devstudio/execute] AI call failed', undefined, { reason });
 
             const normalized = command.toLowerCase();

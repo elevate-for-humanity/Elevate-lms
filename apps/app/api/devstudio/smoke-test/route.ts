@@ -72,8 +72,8 @@ async function check(
   try {
     const detail = await fn();
     return { label, ok: true, detail: detail ?? undefined, ms: Date.now() - t0 };
-  } catch (err) {
-    return { label, ok: false, detail: (err as Error).message?.slice(0, 120), ms: Date.now() - t0 };
+  } catch {
+    return { label, ok: false, detail: 'Health check failed', ms: Date.now() - t0 };
   }
 }
 
@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
         const { count, error } = await db
           .from('programs')
           .select('id', { count: 'exact', head: true });
-        if (error) throw new Error(error.message);
+        if (error) throw new Error("Database query failed");
         return `${count ?? 0} programs`;
       }));
       write(fmt(results.at(-1)!));
@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
         const { count, error } = await db
           .from('profiles')
           .select('id', { count: 'exact', head: true });
-        if (error) throw new Error(error.message);
+        if (error) throw new Error("Database query failed");
         return `${count ?? 0} profiles`;
       }));
       write(fmt(results.at(-1)!));
@@ -157,7 +157,7 @@ export async function GET(request: NextRequest) {
         const { count, error } = await db
           .from('program_enrollments')
           .select('id', { count: 'exact', head: true });
-        if (error) throw new Error(error.message);
+        if (error) throw new Error("Database query failed");
         return `${count ?? 0} enrollments`;
       }));
       write(fmt(results.at(-1)!));
@@ -168,7 +168,7 @@ export async function GET(request: NextRequest) {
       results.push(await check('Supabase Storage (agreements)', async () => {
         const db = await requireAdminClient();
         const { data, error } = await db.storage.from('agreements').list('', { limit: 1 });
-        if (error) throw new Error(error.message);
+        if (error) throw new Error("Database query failed");
         return `${data?.length ?? 0} item(s) listed`;
       }));
       write(fmt(results.at(-1)!));
@@ -176,7 +176,7 @@ export async function GET(request: NextRequest) {
       results.push(await check('Supabase Storage (documents)', async () => {
         const db = await requireAdminClient();
         const { data, error } = await db.storage.from('documents').list('', { limit: 1 });
-        if (error) throw new Error(error.message);
+        if (error) throw new Error("Database query failed");
         return `${data?.length ?? 0} item(s) listed`;
       }));
       write(fmt(results.at(-1)!));

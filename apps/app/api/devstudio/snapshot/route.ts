@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     if (type) q = q.eq('snapshot_type', type) as typeof q;
 
     const { data, error } = await q;
-    if (error) return safeError(error.message, 500);
+    if (error) return safeError("Snapshot operation failed", 500);
 
     return NextResponse.json({ snapshots: data ?? [] });
   } catch (err) {
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
       .select('id, label, created_at')
       .single();
 
-    if (error) return safeError(error.message, 500);
+    if (error) return safeError("Snapshot operation failed", 500);
 
     await emitEvent('snapshot.created', 'system', {
       actor_id: auth.id,

@@ -135,8 +135,7 @@ async function triggerViaContentsApi(workflowFile: string): Promise<{ runUrl: st
   });
 
   if (!putRes.ok) {
-    const err = await putRes.json().catch(() => ({})) as { message?: string };
-    throw new Error(`Contents API PUT failed: ${err.message ?? putRes.status}`);
+    throw new Error(`Contents API PUT failed: ${putRes.status}`);
   }
 
   return { runUrl: `https://github.com/${repo()}/actions` };

@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
         .upload(storagePath, bytes, { contentType, upsert: false });
 
       if (uploadErr) {
-        return safeError(`Storage upload failed: ${uploadErr.message}`, 500);
+        return safeError('Storage upload failed', 500);
       }
 
       const { data: urlData } = db.storage

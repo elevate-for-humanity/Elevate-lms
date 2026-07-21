@@ -1,6 +1,7 @@
 name: Multi-Container Build
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -16,7 +17,8 @@ jobs:
   # ============================================
   build-lms:
     name: Build LMS
-    runs-on: ubuntu-latest
+    runs-on:
+  workflow_dispatch: ubuntu-latest
     timeout-minutes: 45
 
     steps:
@@ -26,12 +28,14 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
+          version:
+  workflow_dispatch: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version:
+  workflow_dispatch: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -48,7 +52,8 @@ jobs:
   # ============================================
   build-admin:
     name: Build Admin
-    runs-on: ubuntu-latest
+    runs-on:
+  workflow_dispatch: ubuntu-latest
     timeout-minutes: 30
 
     steps:
@@ -58,12 +63,14 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
+          version:
+  workflow_dispatch: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version:
+  workflow_dispatch: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -86,7 +93,8 @@ jobs:
   # ============================================
   build-marketing:
     name: Build Marketing
-    runs-on: ubuntu-latest
+    runs-on:
+  workflow_dispatch: ubuntu-latest
     timeout-minutes: 30
 
     steps:
@@ -96,12 +104,14 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
+          version:
+  workflow_dispatch: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version:
+  workflow_dispatch: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -118,7 +128,8 @@ jobs:
   # ============================================
   integrity:
     name: Integrity Checks
-    runs-on: ubuntu-latest
+    runs-on:
+  workflow_dispatch: ubuntu-latest
     timeout-minutes: 15
 
     steps:
@@ -128,12 +139,14 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
+          version:
+  workflow_dispatch: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version:
+  workflow_dispatch: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
       - name: Install dependencies

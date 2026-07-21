@@ -525,6 +525,12 @@ const nextConfig = {
 
       // Fix redirect chains
       { source: '/healthcare-training-indianapolis', destination: '/programs/healthcare', permanent: true },
+
+      // Include legacy aliases from canonical-routes.json
+      ...canonicalAliasRedirects,
+
+      // Include image .jpg -> .webp redirects
+      ...imageJpgRedirects,
     ];
   },
 

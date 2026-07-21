@@ -1419,7 +1419,7 @@ async function executeAction(
           .limit(limit);
         if (statusFilter !== 'all') q = q.eq('status', statusFilter);
         const { data: apps, error: appsErr } = await q;
-        if (appsErr) { write(`\x1b[31m✗  ${appsErr.message}\x1b[0m`); break; }
+        if (appsErr) { write(`\x1b[31m✗  Database error\x1b[0m`); break; }
 
         // Count by status for summary
         const byStatus: Record<string, number> = {};
@@ -1462,7 +1462,7 @@ async function executeAction(
           .limit(limit);
         if (statusFilter !== 'all') q = q.eq('status', statusFilter);
         const { data: apps, error: appsErr } = await q;
-        if (appsErr) { write(`\x1b[31m✗  ${appsErr.message}\x1b[0m`); break; }
+        if (appsErr) { write(`\x1b[31m✗  Database error\x1b[0m`); break; }
         write(`\x1b[32m✓  ${apps?.length ?? 0} barber partner shop application(s)\x1b[0m`);
         (apps ?? []).slice(0, 15).forEach((a: any) => {
           const shop = a.shop_dba_name || a.shop_legal_name || 'Unnamed shop';
@@ -1490,7 +1490,7 @@ async function executeAction(
           .limit(limit);
         if (search) q = q.ilike('full_name', `%${search}%`);
         const { data: students, error: studErr } = await q;
-        if (studErr) { write(`\x1b[31m✗  ${studErr.message}\x1b[0m`); break; }
+        if (studErr) { write(`\x1b[31m✗  Database error\x1b[0m`); break; }
         write(`\x1b[32m✓  ${students?.length ?? 0} student(s)\x1b[0m`);
         (students ?? []).slice(0, 10).forEach((s) => {
           write(`   ${s.full_name ?? ''} — ${s.email ?? ''}`);
@@ -1512,7 +1512,7 @@ async function executeAction(
           .select('id, user_id, program_id, program_slug, status, progress_percent, enrolled_at')
           .order('enrolled_at', { ascending: false })
           .limit(limit);
-        if (enrErr) { write(`\x1b[31m✗  ${enrErr.message}\x1b[0m`); break; }
+        if (enrErr) { write(`\x1b[31m✗  Database error\x1b[0m`); break; }
 
         // Hydrate student names
         const uids = [...new Set((enrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
@@ -1593,7 +1593,7 @@ async function executeAction(
           write(`\x1b[31m✗  Failed (HTTP ${res.status}): ${data.error || res.statusText}\x1b[0m`);
         }
       } catch (fetchErr) {
-        const reason = fetchErr instanceof Error ? fetchErr.message : String(fetchErr);
+        const reason = fetchErr instanceof Error ? "Unknown error" : String(fetchErr);
         logger.error('[devstudio/execute] check_system_health fetch error', undefined, { reason });
         write(`\x1b[31m✗  Could not reach /api/admin/webhook-health: ${reason}\x1b[0m`);
         write(`   baseUrl: ${baseUrl}`);
@@ -1795,7 +1795,7 @@ async function executeAction(
         else if (filterStatus !== 'all') q = q.eq('status', filterStatus);
 
         const { data: programs, error: pErr } = await q;
-        if (pErr) { write(`\x1b[31m✗  ${pErr.message}\x1b[0m`); break; }
+        if (pErr) { write(`\x1b[31m✗  Database error\x1b[0m`); break; }
 
         // Hydrate enrollment counts per program
         const slugs = (programs ?? []).map((p: any) => p.slug).filter(Boolean);
@@ -2022,7 +2022,7 @@ async function executeAction(
           if (data.runId)  write(`   Run ID: ${data.runId}`);
         }
       } catch (fetchErr) {
-        const reason = fetchErr instanceof Error ? fetchErr.message : String(fetchErr);
+        const reason = fetchErr instanceof Error ? "Unknown error" : String(fetchErr);
         logger.error('[devstudio/execute] build_courses dispatch error', undefined, { reason });
         write(`\x1b[31m✗  Could not reach /api/devstudio/shell: ${reason}\x1b[0m`);
       }
@@ -2080,7 +2080,7 @@ async function executeAction(
             if (data.runId)  write(`   Run ID: ${data.runId}`);
           }
         } catch (fetchErr) {
-          const reason = fetchErr instanceof Error ? fetchErr.message : String(fetchErr);
+          const reason = fetchErr instanceof Error ? "Unknown error" : String(fetchErr);
           logger.error('[devstudio/execute] deploy_autopilot dispatch error', undefined, { workflow, reason });
           write(`\x1b[31m✗  Could not reach /api/devstudio/shell for ${workflow}: ${reason}\x1b[0m`);
         }
@@ -2117,7 +2117,7 @@ async function executeAction(
           write('   Results will appear in GitHub Actions once the run completes.');
         }
       } catch (fetchErr) {
-        const reason = fetchErr instanceof Error ? fetchErr.message : String(fetchErr);
+        const reason = fetchErr instanceof Error ? "Unknown error" : String(fetchErr);
         logger.error('[devstudio/execute] run_tests dispatch error', undefined, { reason });
         write(`\x1b[31m✗  Could not reach /api/devstudio/shell: ${reason}\x1b[0m`);
       }
@@ -2151,7 +2151,7 @@ async function executeAction(
           if (data.checkout_url) write(`   Checkout: ${data.checkout_url}`);
         }
       } catch (fetchErr) {
-        const reason = fetchErr instanceof Error ? fetchErr.message : String(fetchErr);
+        const reason = fetchErr instanceof Error ? "Unknown error" : String(fetchErr);
         logger.error('[devstudio/execute] manage_app_trial fetch error', undefined, { reason });
         write(`\x1b[31m✗  Could not reach ${endpoint}: ${reason}\x1b[0m`);
         write(`   baseUrl: ${baseUrl}`);
@@ -2168,7 +2168,7 @@ async function executeAction(
           .select('user_id, full_name, email, program_slug, days_inactive, risk_level, progress_percent')
           .order('days_inactive', { ascending: false })
           .limit(20);
-        if (arErr) { write(`\x1b[31m✗  ${arErr.message}\x1b[0m`); break; }
+        if (arErr) { write(`\x1b[31m✗  Database error\x1b[0m`); break; }
         write(`\x1b[32m✓  ${items?.length ?? 0} at-risk learner(s)\x1b[0m`);
         (items ?? []).slice(0, 10).forEach((s) =>
           write(`   • ${s.full_name ?? s.email ?? s.user_id} — ${s.program_slug ?? ''} — ${s.days_inactive ?? 0}d inactive (${s.risk_level ?? ''})`));
@@ -2188,7 +2188,7 @@ async function executeAction(
           .select('id, user_id, program_id, issued_at')
           .order('issued_at', { ascending: false })
           .limit(limit);
-        if (compErr) { write(`\x1b[31m✗  ${compErr.message}\x1b[0m`); break; }
+        if (compErr) { write(`\x1b[31m✗  Database error\x1b[0m`); break; }
         write(`\x1b[32m✓  ${items?.length ?? 0} completion(s)\x1b[0m`);
         (items ?? []).slice(0, 10).forEach((c: any) =>
           write(`   • user:${c.user_id?.slice(0,8)}… — program:${c.program_id?.slice(0,8)}… — ${c.issued_at?.slice(0,10)}`));
@@ -2229,7 +2229,7 @@ async function executeAction(
         if (errs.length > 0) {
           write(`\x1b[33m   Recent errors (${errs.length}):\x1b[0m`);
           errs.slice(0, 5).forEach((e: Record<string, unknown>) =>
-            write(`   • ${e.message ?? e.error ?? JSON.stringify(e)}`));
+            write(`   • ${e.message ?? JSON.stringify(e)}`));
         } else write('   No recent errors');
         write(`   View at: /admin/monitoring`);
       } catch { write('\x1b[31m✗  Network error\x1b[0m'); }

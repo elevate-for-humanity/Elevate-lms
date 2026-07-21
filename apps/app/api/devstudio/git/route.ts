@@ -179,10 +179,10 @@ function redactToken(output: string, token: string): string {
 }
 
 function isNetworkBlockedError(err: unknown): boolean {
-  const text = err instanceof Error ? `${err.name} ${err.message} ${err.stack ?? ''}` : String(err);
-  return /CONNECT tunnel failed|response 403|Could not resolve host|getaddrinfo|EAI_AGAIN|ENOTFOUND|ECONNREFUSED|ETIMEDOUT|network timeout|fetch failed/i.test(
-    text,
-  );
+  if (!(err instanceof Error)) return false;
+  const errObj = err as Error & { code?: string };
+  const patterns = /CONNECT tunnel failed|response 403|Could not resolve host|getaddrinfo|EAI_AGAIN|ENOTFOUND|ECONNREFUSED|ETIMEDOUT|network timeout|fetch failed/i;
+  return patterns.test(errObj.message || '') || patterns.test(errObj.name || '') || patterns.test(errObj.stack || '');
 }
 
 function safeBranch(value: string, label: string): string | NextResponse {

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import './layout.css';
+import Header from '@/components/site/Header';
+import { SiteFooter } from '@/components/site-footer';
 
 export const metadata: Metadata = {
   title: { default: 'Elevate for Humanity', template: '%s | Elevate for Humanity' },
@@ -14,7 +16,11 @@ export const dynamic = 'force-dynamic';
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Header />
+        <main className="pt-[60px]">{children}</main>
+        <SiteFooter />
+      </body>
     </html>
   );
 }

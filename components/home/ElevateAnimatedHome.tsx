@@ -302,7 +302,7 @@ export default function ElevateAnimatedHome() {
                 <button onClick={() => setSelectedProgram(p)} className={`w-full text-left bg-white rounded-2xl overflow-hidden border-2 transition-all ${selectedProgram.slug === p.slug ? 'border-[#dc2626] shadow-xl' : 'border-slate-200 hover:border-[#dc2626]/50'}`}>
                   <div className="relative h-40 overflow-hidden">
                     <Image src={p.image} alt={p.title} fill className="object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t to-transparent to-transparent" />
                     <div className="absolute bottom-3 left-3">
                       <span className="text-white font-bold text-lg">{p.title}</span>
                     </div>
@@ -331,7 +331,7 @@ export default function ElevateAnimatedHome() {
               <motion.div key={i} className="relative" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
                 <div className="relative h-48 rounded-2xl overflow-hidden mb-4">
                   <Image src={step.image} alt={step.title} fill className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t to-transparent to-transparent" />
                   <div className="absolute bottom-4 left-4">
                     <span className="w-10 h-10 bg-[#dc2626] rounded-full flex items-center justify-center text-white font-bold">{step.num}</span>
                   </div>

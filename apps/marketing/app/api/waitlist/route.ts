@@ -12,19 +12,19 @@ const CDL_APPLY_SLUGS = new Set(['cdl-training', 'cdl']);
 // Programs that have a waitlist — all others are rejected
 const WAITLIST_PROGRAMS = new Set([
   'barber-apprenticeship',
-  'fssa',
   'cosmetology-apprenticeship',
   'welding',
   'electrical',
   'plumbing',
+  'forklift',
 ]);
 const PROGRAM_NAMES: Record<string, string> = {
   'barber-apprenticeship': 'Barber Apprenticeship',
-  'fssa': 'FSSA IMPACT — Workforce Training',
   'cosmetology-apprenticeship': 'Cosmetology Apprenticeship',
   'welding': 'Welding Technology',
   'electrical': 'Electrical Technician',
   'plumbing': 'Plumbing Technician',
+  'forklift': 'Forklift Operator',
 };
 
 export const runtime = 'nodejs';

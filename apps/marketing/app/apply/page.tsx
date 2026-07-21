@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Apply | Check Eligibility for Funded Training',
   description:
-    'Check eligibility for WIOA, WRG, and FSSA IMPACT-funded training in healthcare, trades, technology, and business. Many programs are no cost to eligible Indiana residents.',
+    'Check eligibility for WIOA and Workforce Ready Grant-funded training in healthcare, trades, technology, and business. Many programs are no cost to eligible Indiana residents.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/apply',
   },
@@ -113,7 +113,7 @@ export default async function ApplyPage({
               </h1>
             )}
             <p className="text-slate-700 text-base max-w-xl">
-              Takes 3–5 minutes. We screen for WIOA, Workforce Ready Grant, FSSA IMPACT, and Job Ready
+              Takes 3–5 minutes. We screen for WIOA, Workforce Ready Grant, and Job Ready
               Indy funding — most eligible Indiana residents pay $0.
             </p>
             <p className="mt-3 text-sm text-slate-600">

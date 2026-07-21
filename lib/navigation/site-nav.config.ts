@@ -685,7 +685,6 @@ export const footerNavigation = {
       { label: 'Culinary Apply', href: '/apply?program=culinary-apprenticeship' },
       { label: 'Electrical Apply', href: '/apply?program=electrical' },
       { label: 'Medical Assistant Apply', href: '/apply?program=medical-assistant' },
-      { label: 'Plumbing Apply', href: '/apply?program=plumbing' },
       { label: 'Sanitation Apply', href: '/apply?program=sanitation-infection-control' },
       { label: 'Welding Apply', href: '/apply?program=welding' },
     ],
@@ -733,9 +732,9 @@ export const contactInfo = {
   phone: '1-800-ELEVATE (353-8283)',
   email: 'info@www.elevateforhumanity.org',
   address: {
-    street: '120 E Market St Suite 930',
+    street: '120 E Market St Suite 120',
     city: 'Indianapolis',
     state: 'IN',
-    zip: '46240',
+    zip: '46204',
   },
 };

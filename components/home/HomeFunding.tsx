@@ -26,13 +26,6 @@ const FUNDING_SOURCES = [
     badgeColor: 'bg-amber-100 text-amber-700',
   },
   {
-    name: '',
-    full: 'Family & Social Services Administration',
-    desc: 'Training support for SNAP and TANF participants.',
-    badge: 'State',
-    badgeColor: 'bg-emerald-100 text-emerald-700',
-  },
-  {
     name: 'Job Ready Indy',
     full: 'Marion County Workforce Initiative',
     desc: 'Local funding for Indianapolis-area residents in priority sectors.',

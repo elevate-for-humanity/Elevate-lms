@@ -15,7 +15,7 @@ export default function StudentDemoPage() {
       lessons: 12,
       completed: 8,
       duration: '15 weeks',
-      image: '/hero-images/barber-hero.jpg',
+      image: '/images/barber-hero.webp',
     },
     {
       id: 'hvac-basics',
@@ -24,7 +24,7 @@ export default function StudentDemoPage() {
       lessons: 20,
       completed: 6,
       duration: '16 weeks',
-      image: '/hero-images/hvac-hero.jpg',
+      image: '/images/hvac-hero.webp',
     },
   ];
 

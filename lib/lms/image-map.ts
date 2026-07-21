@@ -24,17 +24,17 @@ export const LMS_HEROES = {
 // -- Dashboard section cards (state-aware sections) --
 export const LMS_SECTION_CARDS = {
   orientation: '/images/pages/training-classroom.webp',
-  eligibility: '/hero-images/apply-hero.jpg',
-  programs: '/hero-images/programs-hero.jpg',
-  programsView: '/hero-images/pathways-hero.jpg',
-  funding: '/hero-images/federal-funded-hero.jpg',
+  eligibility: '/images/pages/apply-employer-hero.webp',
+  programs: '/images/programs-hero-new.webp',
+  programsView: '/images/pages/programs-it-hero.webp',
+  funding: '/images/pages/funding-hero.webp',
   courses: '/images/pages/training-classroom.webp',
   progress: '/images/pages/hvac-technician.webp',
-  certificates: '/hero-images/apprenticeships-hero.jpg',
-  certification: '/hero-images/services-hero.jpg',
-  placement: '/hero-images/employer-new-hero.jpg',
-  support: '/hero-images/contact-hero.jpg',
-  alumni: '/hero-images/about-hero.jpg',
+  certificates: '/images/pages/certifications-hero.webp',
+  certification: '/images/pages/certificates-hero.webp',
+  placement: '/images/pages/career-services-hero.webp',
+  support: '/images/pages/contact-hero.webp',
+  alumni: '/images/pages/about-hero.webp',
 } as const;
 
 // -- Dashboard "My Learning Tools" sidebar cards --

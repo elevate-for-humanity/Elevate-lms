@@ -26,7 +26,7 @@ const testimonials: Testimonial[] = [
     name: 'Maria Rodriguez',
     role: 'Certified Nursing Assistant',
     program: 'Healthcare Training',
-    image: '/images/pexels/cna.webp',
+    image: '/images/pages/healthcare-hero.webp',
     quote:
       'This program changed my life. I went from minimum wage to a career I love with benefits and stability for my family.',
     rating: 5,

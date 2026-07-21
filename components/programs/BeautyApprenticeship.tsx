@@ -243,7 +243,7 @@ const SUCCESS_STORIES = [
     after: 'Owns her own barbershop, $85K+ annually',
     quote: 'I thought beauty school was out of reach. The apprenticeship let me earn while I learned. Now I\'m building my own empire.',
     photo: '/images/pages/about-supportive-services.webp',
-    transformation: '/images/beauty/transformation-destiny.webp',
+    transformation: '/images/beauty/barber-hero.webp',
   },
   {
     name: 'Marcus L.',
@@ -252,7 +252,7 @@ const SUCCESS_STORIES = [
     after: 'Senior stylist at luxury salon, $62K annually',
     quote: 'The mentorship made all the difference. I learned from the best and now I\'m the one teaching others.',
     photo: '/images/pages/career-coaching.webp',
-    transformation: '/images/beauty/transformation-marcus.webp',
+    transformation: '/images/beauty/cosmetology-hero.webp',
   },
   {
     name: 'Sophia K.',
@@ -261,7 +261,7 @@ const SUCCESS_STORIES = [
     after: 'Medical spa esthetician, $55K annually + tips',
     quote: 'I was intimidated to start over. The flexible schedule and support system made it possible for me.',
     photo: '/images/pages/career-services-hero.webp',
-    transformation: '/images/beauty/transformation-sophia.webp',
+    transformation: '/images/beauty/esthetics-hero.webp',
   },
 ];
 

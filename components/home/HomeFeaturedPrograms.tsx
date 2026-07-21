@@ -84,7 +84,7 @@ const FEATURED_PROGRAMS: FeaturedProgram[] = [
     slug: 'barber-apprenticeship',
     title: 'Barber Apprenticeship',
     subtitle: 'Earn while you learn. DOL-registered apprenticeship with 2,000 hours of training.',
-    image: '/images/beauty/barber-hero-new.webp',
+    image: '/images/beauty/barber-hero.webp',
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
     duration: '12-18 Months',

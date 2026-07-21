@@ -86,7 +86,7 @@ const PROGRAMS = [
     ],
     skills: ['Gel Extensions', 'Nail Art', 'Manicure/Pedicure', 'Sanitation'],
     credential: 'Indiana Nail Technology License',
-    image: '/images/beauty/nail-hero.webp',
+    image: '/images/beauty/nails-hero.webp',
     popular: false,
   },
 ];

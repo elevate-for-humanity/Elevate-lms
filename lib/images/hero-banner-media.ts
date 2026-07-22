@@ -1,7 +1,6 @@
 import type { HeroBannerConfig } from '@/content/heroBanners';
 import { getProgramCardImage, getProgramHeroImage } from '@/lib/images/programImages';
 import { getProgramOgImage } from '@/lib/programs/og-images';
-import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
 
 /** Default when no program-specific asset resolves. */
 export const DEFAULT_HERO_FALLBACK = '/images/pages/workforce-training.webp';
@@ -37,7 +36,7 @@ export function resolveHeroPosterSrc(
   candidates.push(DEFAULT_HERO_FALLBACK);
 
   for (const raw of candidates) {
-    const path = resolveSiteImagePath(raw.trim());
+    const path = raw.trim();
     if (path) return path;
   }
   return DEFAULT_HERO_FALLBACK;

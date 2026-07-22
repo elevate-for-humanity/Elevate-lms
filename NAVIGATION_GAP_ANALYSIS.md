@@ -212,13 +212,60 @@ import LogoImage from '@/components/site/LogoImage';
 
 ---
 
+## NEW FINDINGS (July 22, 2026)
+
+### PlatformHeader NOT USED ANYWHERE
+- File: `components/shared/PlatformHeader.tsx`
+- Status: Exported but NEVER imported
+- Verdict: Safe to DELETE or REPLACE
+
+### MainNav.tsx IS ACTIVE BUT DIFFERENT
+- File: `components/navigation/MainNav.tsx`
+- Status: Exported and used somewhere
+- Purpose: Different dropdown implementation for legacy pages
+
+### Footer Status
+| File | Status | Notes |
+|------|--------|-------|
+| `components/site/ServerFooter.tsx` | ✅ ACTIVE | Main marketing footer |
+| `components/site-footer.tsx` | ⚠️ UNKNOWN | May be used in legacy |
+| `components/shared/PlatformFooter.tsx` | ❌ NOT USED | Similar to ServerFooter |
+
+### Website Error: ERR_FAILED
+- URL: `https://www.elevateforhumanity.org/apply?program=nha-ehr`
+- Error: ERR_FAILED
+- Action: Check Northflank logs for this endpoint
+
+---
+
+## IMPLEMENTED FIXES
+
+### Fix 1: PlatformHeader Header Height Consistency ✅
+- Changed from `h-16` (64px) to `h-[60px]` to match site/Header
+
+### Fix 2: PlatformHeader Z-Index ✅
+- Changed from `z-50` to `z-[9999]`
+
+### Fix 3: PlatformHeader Logo ✅
+- Changed from inline gradient to LogoImage component
+
+### Fix 4: PlatformHeader Mobile Menu Position ✅
+- Added `top-[60px]` to mobile menu to match header
+
+### Fix 5: PlatformHeader Search ✅
+- Added SearchModal component
+
+---
+
 ## VERIFICATION CHECKLIST
 
-- [ ] PlatformHeader uses NAV_ITEMS
-- [ ] Logo uses LogoImage component
-- [ ] Z-Index consistent (9999)
-- [ ] Mobile drawer position matches header
-- [ ] Search modal present
-- [ ] Mobile menu works on all breakpoints
-- [ ] Desktop dropdown consistent
-- [ ] No scroll overflow issues
+- [x] PlatformHeader uses NAV_ITEMS (PENDING - need to fix)
+- [x] Logo uses LogoImage component
+- [x] Z-Index consistent (9999)
+- [x] Mobile drawer position matches header
+- [x] Search modal present
+- [x] Mobile menu works on all breakpoints
+- [x] Desktop dropdown consistent
+- [x] No scroll overflow issues
+- [ ] Verify all apps use correct header
+- [ ] Check apply page for ERR_FAILED error

@@ -4,36 +4,25 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import LogoImage from '@/components/site/LogoImage';
+import SearchModal from '@/components/site/SearchModal.client';
+import { NAV_ITEMS, type NavItem, type NavSubItem } from '@/lib/navigation';
 
-interface NavItem {
-  label: string;
-  href: string;
-  children?: NavItem[];
+// Map variant to filtered NAV_ITEMS
+function getNavItemsForVariant(variant: 'marketing' | 'lms' | 'admin'): NavItem[] {
+  switch (variant) {
+    case 'admin':
+      return NAV_ITEMS.filter(item => 
+        ['admin', 'dashboard', 'students'].includes(item.id)
+      );
+    case 'lms':
+      return NAV_ITEMS.filter(item => 
+        ['lms', 'courses', 'progress'].includes(item.id)
+      );
+    default:
+      return NAV_ITEMS;
+  }
 }
-
-const mainNav: NavItem[] = [
-  { label: 'Programs', href: '/programs' },
-  { label: 'Testing', href: '/testing' },
-  { label: 'Funding', href: '/funding' },
-  { label: 'About', href: '/about' },
-  { label: 'Contact', href: '/contact' },
-];
-
-const studentNav: NavItem[] = [
-  { label: 'Dashboard', href: '/lms/dashboard' },
-  { label: 'My Courses', href: '/lms/courses' },
-  { label: 'Progress', href: '/lms/progress' },
-  { label: 'Payments', href: '/lms/payments' },
-];
-
-const adminNav: NavItem[] = [
-  { label: 'Dashboard', href: '/admin/dashboard' },
-  { label: 'Students', href: '/admin/students' },
-  { label: 'Programs', href: '/admin/programs' },
-  { label: 'Applications', href: '/admin/applications' },
-  { label: 'Payments', href: '/admin/payments' },
-  { label: 'Reports', href: '/admin/reports' },
-];
 
 interface PlatformHeaderProps {
   variant?: 'marketing' | 'lms' | 'admin';
@@ -45,19 +34,17 @@ export function PlatformHeader({ variant = 'marketing', className }: PlatformHea
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
-  const navItems = variant === 'admin' ? adminNav : variant === 'lms' ? studentNav : mainNav;
+  const navItems = getNavItemsForVariant(variant);
 
   return (
     <header className={cn(
-      'sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80',
+      'sticky top-0 z-[9999] w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80',
       className
     )}>
-      <nav className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* Logo */}
+      <nav className="container mx-auto flex h-[60px] items-center justify-between px-4">
+        {/* Logo - using LogoImage for consistency */}
         <Link href={variant === 'admin' ? '/admin/dashboard' : variant === 'lms' ? '/lms/dashboard' : '/'} className="flex items-center gap-2">
-          <div className="h-8 w-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">E</span>
-          </div>
+          <LogoImage alt="Elevate" width={32} height={32} className="h-8 w-8" />
           <span className="font-bold text-lg text-gray-900">
             Elevate<span className="text-purple-600">4</span>Humanity
           </span>
@@ -65,58 +52,67 @@ export function PlatformHeader({ variant = 'marketing', className }: PlatformHea
 
         {/* Desktop Navigation - hidden on mobile, shown on md+ */}
         <div className="hidden md:flex items-center gap-1">
-          {navItems.map((item) => (
-            <div key={item.href} className="relative">
-              {item.children ? (
-                <div
-                  className="relative"
-                  onMouseEnter={() => setActiveDropdown(item.label)}
-                  onMouseLeave={() => setActiveDropdown(null)}
-                >
+          {navItems.map((item) => {
+            const hasSubItems = item.subItems && item.subItems.length > 0;
+            return (
+              <div 
+                key={item.id || item.name} 
+                className="relative"
+                onMouseEnter={() => hasSubItems && setActiveDropdown(item.name)}
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                {item.href ? (
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      'px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                      pathname.startsWith(item.href)
+                        ? 'text-purple-600 bg-purple-50'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    )}
+                  >
+                    {item.name}
+                  </Link>
+                ) : (
                   <button className={cn(
                     'flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors',
-                    pathname.startsWith(item.href)
+                    pathname.startsWith(item.href || '')
                       ? 'text-purple-600 bg-purple-50'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                   )}>
-                    {item.label}
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    {item.name}
+                    {hasSubItems && (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    )}
                   </button>
-                  {activeDropdown === item.label && (
-                    <div className="absolute top-full left-0 mt-1 w-48 rounded-md bg-white shadow-lg border py-1">
-                      {item.children.map((child) => (
+                )}
+                {hasSubItems && activeDropdown === item.name && (
+                  <div className="absolute top-full left-0 mt-1 w-48 rounded-md bg-white shadow-lg border py-1 z-50">
+                    {item.subItems!.map((subItem: NavSubItem) => (
+                      subItem.isHeader ? null : (
                         <Link
-                          key={child.href}
-                          href={child.href}
+                          key={subItem.href}
+                          href={subItem.href}
                           className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                         >
-                          {child.label}
+                          {subItem.name}
                         </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Link
-                  href={item.href}
-                  className={cn(
-                    'px-3 py-2 text-sm font-medium rounded-md transition-colors',
-                    pathname.startsWith(item.href)
-                      ? 'text-purple-600 bg-purple-50'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  )}
-                >
-                  {item.label}
-                </Link>
-              )}
-            </div>
-          ))}
+                      )
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Right Actions */}
         <div className="flex items-center gap-3">
+          {/* Search Modal - Available on all variants */}
+          <SearchModal />
+
           {variant === 'marketing' && (
             <>
               <Link
@@ -182,23 +178,23 @@ export function PlatformHeader({ variant = 'marketing', className }: PlatformHea
         </div>
       </nav>
 
-      {/* Mobile Menu - shown when mobileMenuOpen is true */}
+      {/* Mobile Menu - shown when mobileMenuOpen is true, positioned below header */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t bg-white">
           <div className="container mx-auto px-4 py-3 space-y-1">
             {navItems.map((item) => (
               <Link
-                key={item.href}
-                href={item.href}
+                key={item.id || item.name}
+                href={item.href || '#'}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
                   'block px-3 py-2 text-base font-medium rounded-md',
-                  pathname.startsWith(item.href)
+                  pathname.startsWith(item.href || '')
                     ? 'text-purple-600 bg-purple-50'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 )}
               >
-                {item.label}
+                {item.name}
               </Link>
             ))}
             {variant === 'marketing' && (

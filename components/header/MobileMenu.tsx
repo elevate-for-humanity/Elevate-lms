@@ -84,7 +84,7 @@ export function MobileMenu({ isOpen, onClose, items, user }: MobileMenuProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="md:hidden fixed inset-0 bg-black/20 z-[100000]"
+            className="md:hidden fixed inset-0 bg-black/20 z-[9998]"
             onClick={onClose}
             aria-hidden="true"
           />
@@ -94,7 +94,7 @@ export function MobileMenu({ isOpen, onClose, items, user }: MobileMenuProps) {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'tween', duration: 0.25 }}
-            className="md:hidden fixed right-0 top-0 bottom-0 w-72 bg-white z-[100001] overflow-y-auto shadow-xl focus:outline-none"
+            className="md:hidden fixed right-0 top-[60px] bottom-0 w-72 bg-white z-[9999] overflow-y-auto shadow-xl focus:outline-none"
             role="dialog"
             aria-modal="true"
             aria-label="Mobile navigation"

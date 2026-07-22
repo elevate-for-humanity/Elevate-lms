@@ -31,9 +31,9 @@ export default function UniversalNav({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav aria-label="Main navigation" className={`${bgColor} ${textColor} sticky top-0 z-50 shadow-lg`}>
+    <nav aria-label="Main navigation" className={`${bgColor} ${textColor} sticky top-0 z-[9999] shadow-lg`}>
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-[60px]">
           {/* Logo */}
           {logo && (
             <Link

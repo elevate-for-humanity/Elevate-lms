@@ -139,7 +139,9 @@ export async function generateMetadata({
     }
   }
 
-  return {};
+  return {
+    robots: { index: false, follow: false },
+  };
 }
 
 // Funding sources shown on every program page

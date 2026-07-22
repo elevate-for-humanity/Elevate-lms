@@ -21,12 +21,12 @@ const _GET = withErrorHandling(async (request: NextRequest) => {
     error,
   } = await supabase.auth.getUser();
 
-  if (error) {
-    throw APIErrors.internal('Supabase Auth: ' + error.message);
-  }
-
-  if (!user) {
-    throw APIErrors.unauthorized('Not authenticated');
+  if (error || !user) {
+    // Return 401 for unauthenticated requests (not 500)
+    return NextResponse.json(
+      { error: 'Not authenticated', code: 'UNAUTHORIZED' },
+      { status: 401 }
+    );
   }
 
   return NextResponse.json({

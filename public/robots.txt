@@ -12,8 +12,8 @@ Disallow: /dev/
 Disallow: /staging/
 Disallow: /preview/
 
-# Sitemap location
-Sitemap: https://www.elevateforhumanity.org/sitemap.xml
+# Sitemap location (Next.js route)
+Sitemap: https://www.elevateforhumanity.org/sitemap
 
 # Crawl delay for polite bots
 Crawl-delay: 1

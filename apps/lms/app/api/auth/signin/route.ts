@@ -20,8 +20,25 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
   const supabase = await createClient();
 
   // Parse and validate request body
-  const body = await request.json();
-  const validatedData = signInSchema.parse(body);
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: 'Invalid JSON in request body', code: 'BAD_REQUEST' },
+      { status: 400 }
+    );
+  }
+  
+  let validatedData;
+  try {
+    validatedData = signInSchema.parse(body);
+  } catch (err) {
+    return NextResponse.json(
+      { error: 'Invalid request data', code: 'VALIDATION_ERROR', details: (err as Error).message },
+      { status: 400 }
+    );
+  }
   const { email, password } = validatedData;
 
   // Sign in

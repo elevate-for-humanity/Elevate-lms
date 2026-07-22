@@ -10,7 +10,6 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   programType: 'workforce',
   heroImage: '/images/pexels/medical-assistant.webp',
   heroImageAlt: 'Medical assistant student in clinical training',
-  videoSrc: '/videos/healthcare-cna.mp4',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
   durationWeeks: 12,

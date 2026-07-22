@@ -9,7 +9,7 @@ export const barberConfig: ProgramConfig = {
   heroVideo: '/videos/programs/barber-hero.mp4',
   heroImage: '/images/beauty/barber-hero.webp',
   primaryCta: { label: 'Apply Now', href: '/programs/barber-apprenticeship/apply' },
-  secondaryCta: { label: 'Tour the Shop', href: '/programs/barber-apprenticeship/orientation' },
+  secondaryCta: { label: 'Learn More', href: '/apply' },
   stats: [
     { value: '2,000', label: 'Training Hours' },
     { value: '12-18', label: 'Months' },

@@ -43,6 +43,7 @@ import {
 import { DeliveryBadge, FundingSection } from './ProgramTruthBadges';
 import { ICC_URL, ICC_INSTRUCTION } from '@/lib/page-design-tokens';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
 
 interface Props {
   program: ProgramSchema;
@@ -95,6 +96,7 @@ export default function ProgramDetailPage({
     'nail-technician-apprenticeship',
   ]);
   const hasEligibilityPage = eligibilityPageSlugs.has(p.slug);
+  const heroPosterSrc = resolveHeroPosterSrc(p.slug, { heroImage: p.heroImage });
   const requestInfoHref = p.cta?.requestInfoHref || `/contact?program=${encodeURIComponent(p.slug)}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
   const pathwaySteps = [
@@ -125,7 +127,7 @@ export default function ProgramDetailPage({
               if (!banner.videoSrcDesktop) {
                 return (
                   <HeroPicture
-                    src={banner.posterImage ?? p.heroImage}
+                    src={resolveHeroPosterSrc(p.slug, { banner, heroImage: p.heroImage })}
                     alt={p.heroImageAlt ?? banner.microLabel ?? p.title}
                     microLabel={banner.microLabel}
                     analyticsName={banner.analyticsName}
@@ -157,7 +159,7 @@ export default function ProgramDetailPage({
               <div className="relative h-[45vh] min-h-[280px] max-h-[560px] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
                 <Image
-                  src={p.heroImage}
+                  src={heroPosterSrc}
                   alt={p.heroImageAlt}
                   fill
                   className="object-cover object-center"

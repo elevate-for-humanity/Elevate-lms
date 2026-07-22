@@ -79,7 +79,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     return (
       <section className="w-full bg-slate-900">
         {/* Video frame — dark fallback, no gradient */}
-        <div className="w-full overflow-hidden" style={{ height: 'clamp(320px, 50vw, 640px)' }} />
+        <div className="w-full overflow-hidden" style={{ height: 'clamp(300px, 38vw, 520px)' }} />
 
         {/* Below-video content — all messaging here, never on the video */}
         <section className="border-b border-slate-100 py-8 sm:py-14">
@@ -132,7 +132,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       {/* VIDEO FRAME — no text, no CTAs, no gradient overlay */}
       <section
         className="relative w-full overflow-hidden bg-slate-900"
-        style={{ height: 'clamp(320px, 50vw, 640px)' }}
+        style={{ height: 'clamp(300px, 38vw, 520px)' }}
         aria-label={banner.analyticsName ? `${banner.analyticsName} hero video` : 'Hero video'}
       >
         <video

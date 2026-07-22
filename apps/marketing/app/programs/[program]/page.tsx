@@ -12,6 +12,7 @@ import { getProgramOgImageUrl } from '@/lib/programs/og-images';
 import heroBanners from '@/content/heroBanners';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import HeroPicture from '@/components/marketing/HeroPicture';
+import { resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
 import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import LiveJobPostings from '@/components/careers/LiveJobPostings';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -221,37 +222,41 @@ function ProgramPage({
   const learnItems = sections?.find(
     (s) => s.heading.toLowerCase().includes('learn') || s.heading.toLowerCase().includes('module'),
   );
+  const heroPosterSrc = resolveHeroPosterSrc(slug, { banner });
+  const heroCtas = banner
+    ? [banner.primaryCta, ...(banner.secondaryCta ? [banner.secondaryCta] : [])]
+    : [
+        { label: 'Apply Now', href: getApplyHref(slug) },
+        { label: 'Check Eligibility', href: '/check-eligibility', variant: 'secondary' as const },
+      ];
 
   return (
     <main className="bg-white">
-      {/* HERO — video or image banner if available */}
-      {banner?.pageKey && (
-        banner.videoSrcDesktop ? (
+      {/* Every public program has video or a resolved real-photo fallback. */}
+      {banner?.pageKey && banner.videoSrcDesktop ? (
           <HeroVideo
             videoSrcDesktop={banner.videoSrcDesktop}
-            
             voiceoverSrc={banner.voiceoverSrc}
             microLabel={banner.microLabel}
             analyticsName={banner.analyticsName}
             belowHeroHeadline={banner.belowHeroHeadline}
             belowHeroSubheadline={banner.belowHeroSubheadline}
-            ctas={[banner.primaryCta, ...(banner.secondaryCta ? [banner.secondaryCta] : [])]}
+            ctas={heroCtas}
             trustIndicators={banner.trustIndicators}
             transcript={banner.transcript}
           />
         ) : (
-          <HeroPicture
-            src={banner.posterImage ?? ''}
-            alt={banner.microLabel ?? title}
-            microLabel={banner.microLabel}
-            analyticsName={banner.analyticsName}
-            belowHeroHeadline={banner.belowHeroHeadline}
-            belowHeroSubheadline={banner.belowHeroSubheadline}
-            ctas={[banner.primaryCta, ...(banner.secondaryCta ? [banner.secondaryCta] : [])]}
-            trustIndicators={banner.trustIndicators}
-            transcript={banner.transcript}
-          />
-        )
+        <HeroPicture
+          src={heroPosterSrc}
+          alt={banner?.microLabel ?? title}
+          microLabel={banner?.microLabel}
+          analyticsName={banner?.analyticsName ?? `${slug}-program`}
+          belowHeroHeadline={banner?.belowHeroHeadline ?? title}
+          belowHeroSubheadline={banner?.belowHeroSubheadline ?? summary || description}
+          ctas={heroCtas}
+          trustIndicators={banner?.trustIndicators}
+          transcript={banner?.transcript}
+        />
       )}
 
       {/* SECTION 1: OUTCOME FIRST */}

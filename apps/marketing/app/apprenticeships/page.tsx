@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, CheckCircle, Clock, DollarSign, GraduationCap, Shield, Users } from 'lucide-react';
+import HeroPicture from '@/components/marketing/HeroPicture';
 
 export const metadata: Metadata = {
   title: 'Registered Apprenticeships | Earn While You Learn | Elevate for Humanity',
@@ -14,9 +16,9 @@ export const metadata: Metadata = {
 };
 
 const APPRENTICESHIPS = [
-  { slug: 'barber-apprenticeship', title: 'Barber Apprenticeship', duration: '52 weeks', credential: 'Indiana Barber License', salary: '$35,000-$55,000/yr', highlight: 'Most Popular', description: 'Learn classic and modern cutting techniques while earning at partner barbershops.', features: ['Paid on-the-job training', 'No tuition upfront', 'State license prep', '1-on-1 instructor support'] },
-  { slug: 'cosmetology-apprenticeship', title: 'Cosmetology Apprenticeship', duration: '52 weeks', credential: 'Indiana Cosmetology License', salary: '$30,000-$50,000/yr', description: 'Master hair, makeup, and nail techniques at partner salons.', features: ['Paid training', 'Flexible schedule', 'Industry certifications', 'Job placement'] },
-  { slug: 'esthetician-apprenticeship', title: 'Esthetician Apprenticeship', duration: '36 weeks', credential: 'Indiana Esthetician License', salary: '$28,000-$45,000/yr', description: 'Learn skincare, facials, and advanced treatments at partner spas.', features: ['Hands-on training', 'Skincare expertise', 'Spa environment', 'Growing demand'] },
+  { slug: 'barber-apprenticeship', title: 'Barber Apprenticeship', image: '/images/pages/barber-apprenticeship-hero.jpg', duration: '52 weeks', credential: 'Indiana Barber License', salary: '$35,000-$55,000/yr', highlight: 'Most Popular', description: 'Learn classic and modern cutting techniques while earning at partner barbershops.', features: ['Paid on-the-job training', 'No tuition upfront', 'State license prep', '1-on-1 instructor support'] },
+  { slug: 'cosmetology-apprenticeship', title: 'Cosmetology Apprenticeship', image: '/images/pages/cosmetology-apprenticeship-hero.webp', duration: '52 weeks', credential: 'Indiana Cosmetology License', salary: '$30,000-$50,000/yr', description: 'Master hair, makeup, and nail techniques at partner salons.', features: ['Paid training', 'Flexible schedule', 'Industry certifications', 'Job placement'] },
+  { slug: 'esthetician-apprenticeship', title: 'Esthetician Apprenticeship', image: '/images/beauty/esthetician.webp', duration: '36 weeks', credential: 'Indiana Esthetician License', salary: '$28,000-$45,000/yr', description: 'Learn skincare, facials, and advanced treatments at partner spas.', features: ['Hands-on training', 'Skincare expertise', 'Spa environment', 'Growing demand'] },
 ];
 
 const BENEFITS = [
@@ -31,17 +33,22 @@ const BENEFITS = [
 export default function ApprenticeshipsPage() {
   return (
     <div className="min-h-screen bg-white">
-      <section className="bg-gradient-to-br from-brand-red-600 to-brand-red-700 text-white py-20">
+      <HeroPicture
+        src="/images/pages/barber-apprenticeship-hero.jpg"
+        alt="Barber apprentice providing a client service in a professional shop"
+        analyticsName="registered-apprenticeships"
+      />
+      <section className="bg-slate-950 text-white py-12 sm:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 border border-white/25 rounded-full text-sm font-medium mb-6">
               <Shield className="w-4 h-4" />
               DOL-Registered Apprenticeship Sponsor
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-6">Registered Apprenticeships</h1>
-            <p className="text-xl text-red-100 mb-8">Earn wages while you learn your trade. Our DOL-registered apprenticeship programs combine paid on-the-job training with classroom instruction—no tuition upfront for qualifying students.</p>
+            <p className="text-xl text-slate-300 mb-8">Earn wages while you learn your trade. Our DOL-registered apprenticeship programs combine paid on-the-job training with classroom instruction—no tuition upfront for qualifying students.</p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/apply" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-red-600 font-bold rounded-xl hover:bg-red-50 transition-colors">Apply Now - Free <ArrowRight className="w-5 h-5" /></Link>
+              <Link href="/apply" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-slate-950 font-bold rounded-xl hover:bg-slate-100 transition-colors">Apply Now - Free <ArrowRight className="w-5 h-5" /></Link>
               <Link href="/eligibility" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white/10 transition-colors">Check Funding Eligibility</Link>
             </div>
           </div>
@@ -92,6 +99,15 @@ export default function ApprenticeshipsPage() {
             {APPRENTICESHIPS.map((program) => (
               <div key={program.slug} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow">
                 {program.highlight && <div className="bg-brand-red-600 text-white text-center py-2 text-sm font-semibold">{program.highlight}</div>}
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <Image
+                    src={program.image}
+                    alt={`${program.title} training`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover"
+                  />
+                </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-slate-900 mb-2">{program.title}</h3>
                   <p className="text-slate-600 mb-4">{program.description}</p>

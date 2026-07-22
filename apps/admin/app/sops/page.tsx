@@ -1,241 +1,78 @@
-'use client';
-
-import { useState, useEffect, useCallback } from 'react';
+import { Metadata } from 'next';
+import { FileText, Plus, Edit, Eye } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
 
-const SOP_CATEGORIES = [
-  { value: 'admissions', label: 'Admissions' },
-  { value: 'enrollment', label: 'Enrollment' },
-  { value: 'testing', label: 'Testing' },
-  { value: 'instructor_duties', label: 'Instructor Duties' },
-  { value: 'apprenticeship', label: 'Apprenticeship' },
-  { value: 'workone', label: 'WorkOne' },
-  { value: 'voc_rehab', label: 'Voc Rehab' },
-  { value: 'grants', label: 'Grants' },
-  { value: 'billing', label: 'Billing' },
-  { value: 'compliance', label: 'Compliance' },
+export const metadata: Metadata = {
+  title: 'SOPs | Admin',
+  description: 'Standard Operating Procedures management',
+};
+
+const sampleSOPs = [
+  { id: 1, title: 'Student Enrollment Process', category: 'Enrollment', updated: '2026-07-15', status: 'Active' },
+  { id: 2, title: 'Apprenticeship Registration', category: 'Apprenticeship', updated: '2026-07-10', status: 'Active' },
+  { id: 3, title: 'Payment Processing', category: 'Billing', updated: '2026-07-08', status: 'Active' },
+  { id: 4, title: 'Document Verification', category: 'Compliance', updated: '2026-07-01', status: 'Draft' },
+  { id: 5, title: 'Testing Center Procedures', category: 'Testing', updated: '2026-06-28', status: 'Active' },
 ];
 
 export default function SOPsPage() {
-  const [sops, setSops] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newSOP, setNewSOP] = useState({ title: '', category: 'admissions', description: '' });
-  const router = useRouter();
-
-  const fetchSOPs = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const supabase = createClient();
-      let query = supabase
-        .from('sop_templates')
-        .select('*')
-        .order('updated_at', { ascending: false });
-
-      if (filterCategory !== 'all') {
-        query = query.eq('category', filterCategory);
-      }
-      if (filterStatus !== 'all') {
-        query = query.eq('status', filterStatus);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      setSops(data || []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load SOPs');
-    } finally {
-      setLoading(false);
-    }
-  }, [filterCategory, filterStatus]);
-
-  useEffect(() => {
-    fetchSOPs();
-  }, [fetchSOPs]);
-
-  async function createSOP() {
-    if (!newSOP.title.trim()) return;
-    try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const { data, error } = await supabase
-        .from('sop_templates')
-        .insert({
-          title: newSOP.title,
-          category: newSOP.category,
-          description: newSOP.description,
-          content: {
-            purpose: '',
-            scope: '',
-            required_documents: [],
-            steps: [],
-            responsibilities: [],
-            compliance_checklist: [],
-          },
-          created_by: user?.id,
-          status: 'draft',
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      
-      setShowCreateModal(false);
-      setNewSOP({ title: '', category: 'admissions', description: '' });
-      router.push(`/admin/sops/${data.id}`);
-    } catch (err: any) {
-      alert(err.message || 'Failed to create SOP');
-    }
-  }
-
-  async function archiveSOP(id: string) {
-    if (!confirm('Archive this SOP?')) return;
-    try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('sop_templates')
-        .update({ status: 'archived' })
-        .eq('id', id);
-      if (error) throw error;
-      fetchSOPs();
-    } catch (err: any) {
-      alert(err.message || 'Failed to archive SOP');
-    }
-  }
-
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">SOP Builder</h1>
-          <p className="text-gray-600">Standard Operating Procedures</p>
+    <div className="min-h-screen bg-white">
+      <div className="bg-slate-50 border-b">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'SOPs' }]} />
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
-          + Create SOP
-        </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-4 mb-6">
-        <select
-          value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value)}
-          className="border rounded-lg px-3 py-2"
-        >
-          <option value="all">All Categories</option>
-          {SOP_CATEGORIES.map((cat) => (
-            <option key={cat.value} value={cat.value}>{cat.label}</option>
-          ))}
-        </select>
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="border rounded-lg px-3 py-2"
-        >
-          <option value="all">All Status</option>
-          <option value="draft">Draft</option>
-          <option value="active">Active</option>
-          <option value="archived">Archived</option>
-        </select>
-      </div>
-
-      {/* Loading */}
-      {loading && (
-        <div className="text-center py-12">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading SOPs...</p>
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Standard Operating Procedures</h1>
+            <p className="text-slate-700 mt-1">Manage and view all SOPs</p>
+          </div>
+          <Link href="/admin/sops/new" className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2">
+            <Plus className="w-5 h-5" /> New SOP
+          </Link>
         </div>
-      )}
 
-      {/* Error */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-6">
-          {error}
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!loading && !error && sops.length === 0 && (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <p className="text-gray-600 mb-4">No SOPs found</p>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="text-blue-600 hover:underline"
-          >
-            Create your first SOP
-          </button>
-        </div>
-      )}
-
-      {/* SOP List */}
-      {!loading && !error && sops.length > 0 && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white rounded-xl border overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-slate-50 border-b">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Title</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Category</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Version</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Updated</th>
-                <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">Actions</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900">Title</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900">Category</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900">Last Updated</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900">Status</th>
+                <th className="text-left px-6 py-4 text-sm font-semibold text-slate-900">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
-              {sops.map((sop) => (
-                <tr key={sop.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <Link href={`/admin/sops/${sop.id}`} className="text-blue-600 hover:underline font-medium">
-                      {sop.title}
-                    </Link>
-                    {sop.description && (
-                      <p className="text-sm text-gray-500 truncate max-w-xs">{sop.description}</p>
-                    )}
+              {sampleSOPs.map((sop) => (
+                <tr key={sop.id} className="hover:bg-slate-50">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-slate-400" />
+                      <span className="font-medium text-slate-900">{sop.title}</span>
+                    </div>
                   </td>
-                  <td className="px-4 py-3">
-                    <span className="inline-block px-2 py-1 text-xs rounded-full bg-gray-100">
-                      {SOP_CATEGORIES.find(c => c.value === sop.category)?.label || sop.category}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                      sop.status === 'active' ? 'bg-green-100 text-green-700' :
-                      sop.status === 'draft' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-gray-100 text-gray-700'
+                  <td className="px-6 py-4 text-slate-600">{sop.category}</td>
+                  <td className="px-6 py-4 text-slate-600">{sop.updated}</td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      sop.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                     }`}>
                       {sop.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm">v{sop.version}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
-                    {new Date(sop.updated_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex justify-end gap-2">
-                      <Link
-                        href={`/admin/sops/${sop.id}`}
-                        className="text-blue-600 hover:underline text-sm"
-                      >
-                        Edit
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <Link href={`/admin/sops/${sop.id}`} className="p-2 hover:bg-slate-100 rounded-lg" title="View">
+                        <Eye className="w-4 h-4 text-slate-600" />
                       </Link>
-                      {sop.status !== 'archived' && (
-                        <button
-                          onClick={() => archiveSOP(sop.id)}
-                          className="text-red-600 hover:underline text-sm"
-                        >
-                          Archive
-                        </button>
-                      )}
+                      <Link href={`/admin/sops/${sop.id}/edit`} className="p-2 hover:bg-slate-100 rounded-lg" title="Edit">
+                        <Edit className="w-4 h-4 text-slate-600" />
+                      </Link>
                     </div>
                   </td>
                 </tr>
@@ -243,65 +80,7 @@ export default function SOPsPage() {
             </tbody>
           </table>
         </div>
-      )}
-
-      {/* Create Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Create New SOP</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Title</label>
-                <input
-                  type="text"
-                  value={newSOP.title}
-                  onChange={(e) => setNewSOP({ ...newSOP, title: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  placeholder="e.g., WorkOne Student Enrollment Process"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Category</label>
-                <select
-                  value={newSOP.category}
-                  onChange={(e) => setNewSOP({ ...newSOP, category: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                >
-                  {SOP_CATEGORIES.map((cat) => (
-                    <option key={cat.value} value={cat.value}>{cat.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Description</label>
-                <textarea
-                  value={newSOP.description}
-                  onChange={(e) => setNewSOP({ ...newSOP, description: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  rows={3}
-                  placeholder="Brief description of this SOP..."
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 border rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={createSOP}
-                disabled={!newSOP.title.trim()}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-              >
-                Create SOP
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

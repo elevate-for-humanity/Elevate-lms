@@ -40,6 +40,7 @@ const PUBLIC_PATHS = [
   '/api/version',
   '/api/ping',
   '/api/ready',
+  '/apply',
   '/auth/confirm',
   '/auth/reset-password',
   '/login',

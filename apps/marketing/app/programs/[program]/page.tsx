@@ -252,7 +252,7 @@ function ProgramPage({
           microLabel={banner?.microLabel}
           analyticsName={banner?.analyticsName ?? `${slug}-program`}
           belowHeroHeadline={banner?.belowHeroHeadline ?? title}
-          belowHeroSubheadline={banner?.belowHeroSubheadline ?? summary || description}
+          belowHeroSubheadline={banner?.belowHeroSubheadline ?? (summary || description)}
           ctas={heroCtas}
           trustIndicators={banner?.trustIndicators}
           transcript={banner?.transcript}

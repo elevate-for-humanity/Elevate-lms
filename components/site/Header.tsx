@@ -34,8 +34,8 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Desktop nav - show on xl screens (1280px+) */}
-        <div className="hidden xl:flex justify-center min-w-0 overflow-visible">
+        {/* Desktop nav - show on md screens (768px+) */}
+        <div className="hidden md:flex justify-center min-w-0 overflow-visible">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
@@ -55,8 +55,8 @@ export default function Header() {
               Apply
             </Link>
           </div>
-          {/* Mobile menu button - hide on xl */}
-          <span className="xl:hidden">
+          {/* Mobile menu button - hide on md */}
+          <span className="md:hidden">
             <HeaderMobileMenu items={NAV_ITEMS} programApplyLinks={PROGRAM_APPLY_LINKS} />
           </span>
         </div>

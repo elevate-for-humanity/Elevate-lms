@@ -129,12 +129,12 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
       ? createPortal(
           <>
             <div
-              className="fixed inset-0 bg-black/50 z-[10000] xl:hidden"
+              className="fixed inset-0 bg-black/50 z-[10000] md:hidden"
               onClick={closeMenu}
               aria-hidden="true"
             />
             <div
-              className="fixed top-[60px] right-0 bottom-0 w-[min(100vw,26rem)] bg-white z-[10001] overflow-y-auto shadow-2xl xl:hidden"
+              className="fixed top-[60px] right-0 bottom-0 w-[min(100vw,26rem)] bg-white z-[10001] overflow-y-auto shadow-2xl md:hidden"
               role="dialog"
               aria-modal="true"
               aria-label="Main menu"
@@ -309,11 +309,11 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
     <div className="flex flex-row flex-nowrap items-center justify-end gap-0.5 shrink-0">
       <SearchModal />
       <LanguageSwitcher compact={true} />
-      {/* Hamburger + side drawer are mobile/tablet only. On lg+ the horizontal
+      {/* Hamburger + side drawer are mobile/tablet only. On md+ the horizontal
           HeaderDesktopNav (with hover dropdowns) is the navigation. The wrapper
-          span carries xl:hidden so it doesn't collide with the button's own
+          span carries md:hidden so it doesn't collide with the button's own
           display:flex utility. */}
-      <span className="xl:hidden">
+      <span className="md:hidden">
         <button
           type="button"
           onClick={() => setIsOpen((open) => !open)}

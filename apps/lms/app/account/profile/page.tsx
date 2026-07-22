@@ -23,7 +23,7 @@ export default async function ProfilePage() {
 
   // Fetch user profile
   const { data: profile } = await supabase
-    .from('users')
+    .from('profiles')
     .select('*')
     .eq('id', user.id)
     .maybeSingle();

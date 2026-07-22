@@ -48,7 +48,7 @@ export default async function MessagesPage() {
   const participants: Record<string, any> = {};
   if (participantIds.size > 0) {
     const { data: users } = await supabase
-      .from('users')
+      .from('profiles')
       .select('id, full_name, avatar_url')
       .in('id', Array.from(participantIds));
 

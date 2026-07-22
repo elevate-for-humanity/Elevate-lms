@@ -47,7 +47,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
       if (authError) throw authError;
 
       // Update profile in database
-      const { error: profileError } = await supabase.from('users').upsert({
+      const { error: profileError } = await supabase.from('profiles').upsert({
         id: user.id,
         email: user.email,
         full_name: formData.full_name,

@@ -60,6 +60,8 @@ on:
           - barber-reinstate
           - testing-lead-followup
           - low-hours-pace
+          - ops-scan
+          - qa-scan
 
   # ── Daily jobs — 8 AM UTC ──────────────────────────────────────────────────
   schedule:
@@ -301,6 +303,18 @@ jobs:
             -H "Authorization: Bearer $CRON_SECRET" --max-time 60 \
             || echo "::warning::autopilot-tick failed"
 
+      - name: Ops Agent scan
+        run: |
+          curl -sf -X GET "$ADMIN_URL/api/cron/ops-scan" \
+            -H "Authorization: Bearer $CRON_SECRET" --max-time 120 \
+            || echo "::warning::ops-scan failed"
+
+      - name: QA Agent scan
+        run: |
+          curl -sf -X GET "$ADMIN_URL/api/cron/qa-scan" \
+            -H "Authorization: Bearer $CRON_SECRET" --max-time 120 \
+            || echo "::warning::qa-scan failed"
+
       - name: Barber billing
         run: |
           curl -sf -X GET "$ADMIN_URL/api/cron/barber-billing" \
@@ -374,6 +388,8 @@ jobs:
          || github.event.inputs.job == 'weekly-reminders'
          || github.event.inputs.job == 'weekly-verdicts'
          || github.event.inputs.job == 'low-hours-pace'
+         || github.event.inputs.job == 'ops-scan'
+         || github.event.inputs.job == 'qa-scan'
          || github.event.inputs.job == 'career-course-emails'
          || github.event.inputs.job == 'barber-reinstate'
          || github.event.inputs.job == 'payout-deadline-alert'

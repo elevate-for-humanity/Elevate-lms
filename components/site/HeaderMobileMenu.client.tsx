@@ -142,39 +142,17 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                 {items.map((item) => {
                   const sectionKey = item.id ?? item.name;
                   const hasSubItems = Boolean(item.subItems?.length);
-                  const sectionOpen = expandedSection === 'all' || expandedSection === sectionKey;
+                  // Always show all sections expanded when drawer is open
+                  const sectionOpen = true;
                   const columns = hasSubItems ? Object.values(groupNavSubItemsByHeader(item.subItems!)) : [];
                   const useCategoryAccordions = columns.length > 1;
 
                   return (
                     <section key={item.name} className="border-b border-slate-100 last:border-0">
                       {hasSubItems ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            // Don't collapse when 'all' is set, just toggle individual
-                            if (expandedSection === 'all') {
-                              return; // Keep all expanded
-                            }
-                            if (sectionOpen) {
-                              setExpandedSection(null);
-                              setExpandedCategory(null);
-                            } else {
-                              setExpandedSection(sectionKey);
-                              setExpandedCategory(null);
-                            }
-                          }}
-                          className="flex min-h-[48px] w-full items-center justify-between gap-3 py-3 text-left text-base font-semibold text-slate-900 hover:text-brand-blue-600"
-                          aria-expanded={sectionOpen}
-                        >
-                          <span>{item.name}</span>
-                          <ChevronDown
-                            className={`h-5 w-5 flex-none text-slate-400 transition-transform ${
-                              sectionOpen ? 'rotate-180' : ''
-                            }`}
-                            aria-hidden="true"
-                          />
-                        </button>
+                        <div className="py-3 text-base font-semibold text-slate-900">
+                          {item.name}
+                        </div>
                       ) : item.href ? (
                         <Link
                           href={item.href}

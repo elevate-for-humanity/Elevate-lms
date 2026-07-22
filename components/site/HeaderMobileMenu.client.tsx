@@ -150,9 +150,18 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                   return (
                     <section key={item.name} className="border-b border-slate-100 last:border-0">
                       {hasSubItems ? (
-                        <div className="py-3 text-base font-semibold text-slate-900">
-                          {item.name}
-                        </div>
+                        item.href ? (
+                          <Link
+                            href={item.href}
+                            prefetch={false}
+                            onClick={closeMenu}
+                            className="block py-3 text-base font-semibold text-slate-900 hover:text-brand-blue-600"
+                          >
+                            {item.name}
+                          </Link>
+                        ) : (
+                          <p className="py-3 text-base font-semibold text-slate-900">{item.name}</p>
+                        )
                       ) : item.href ? (
                         <Link
                           href={item.href}
@@ -187,22 +196,38 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
 
                                 return (
                                   <div key={categoryKey} className="mt-1">
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        setExpandedCategory(categoryOpen ? null : categoryKey)
-                                      }
-                                      className="flex min-h-[40px] w-full items-center justify-between gap-2 py-2 text-left text-xs font-extrabold uppercase tracking-wide text-brand-red-600"
-                                      aria-expanded={categoryOpen}
-                                    >
-                                      <span>{label}</span>
+                                    <div className="flex min-h-[40px] items-center gap-1">
+                                      {column[0]?.href ? (
+                                        <Link
+                                          href={column[0].href}
+                                          prefetch={false}
+                                          onClick={closeMenu}
+                                          className="min-w-0 flex-1 py-2 text-xs font-extrabold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
+                                        >
+                                          {label}
+                                        </Link>
+                                      ) : (
+                                        <span className="min-w-0 flex-1 py-2 text-xs font-extrabold uppercase tracking-wide text-brand-red-600">
+                                          {label}
+                                        </span>
+                                      )}
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setExpandedCategory(categoryOpen ? null : categoryKey)
+                                        }
+                                        className="flex h-10 w-10 flex-none items-center justify-center text-brand-red-600 hover:text-brand-red-700"
+                                        aria-label={`${categoryOpen ? 'Collapse' : 'Expand'} ${label}`}
+                                        aria-expanded={categoryOpen}
+                                      >
                                       <ChevronDown
                                         className={`h-4 w-4 flex-none text-brand-red-400 transition-transform ${
                                           categoryOpen ? 'rotate-180' : ''
                                         }`}
                                         aria-hidden="true"
                                       />
-                                    </button>
+                                      </button>
+                                    </div>
                                     {categoryOpen ? (
                                       <div className="pl-2 pb-2 border-l border-slate-200 ml-1">
                                         {column.map((subItem) => 

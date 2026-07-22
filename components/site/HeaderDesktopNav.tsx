@@ -2,6 +2,7 @@
 // Static desktop navigation links
 
 import Link from 'next/link';
+import { groupNavSubItemsByHeader } from '@/lib/navigation';
 
 interface SubItem {
   name: string;
@@ -20,11 +21,14 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
   const isExternal = (href: string) => href?.startsWith('http');
 
   return (
-    <nav className="flex items-center gap-1">
+    <nav aria-label="Main navigation" className="flex items-center gap-1">
       {items.map((item) => (
         <div key={item.name} className="relative group">
           {item.href ? (
-            <Link href={item.href} className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-brand-blue-600">
+            <Link
+              href={item.href}
+              className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-brand-blue-600"
+            >
               {item.name}
             </Link>
           ) : (
@@ -34,18 +38,42 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
           )}
 
           {item.subItems && item.subItems.length > 0 && (
-            <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-              <div className="bg-white rounded-lg shadow-lg border border-slate-200 p-2 min-w-[200px]">
-                {item.subItems.map((sub) => (
-                  <Link 
-                    key={(sub.href || '') + sub.name} 
-                    href={sub.href || '#'} 
-                    className="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 rounded-md"
-                    {...(isExternal(sub.href || '') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                  >
-                    {sub.name}
-                  </Link>
-                ))}
+            <div className="absolute top-full left-0 pt-2 z-50 invisible opacity-0 transition-all group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              <div
+                className={`max-h-[calc(100vh-5rem)] overflow-y-auto rounded-lg border border-slate-200 bg-white p-3 shadow-lg ${
+                  item.id === 'programs'
+                    ? 'grid w-[min(92vw,60rem)] grid-cols-3 gap-x-5 gap-y-3'
+                    : 'min-w-[15rem]'
+                }`}
+              >
+                {Object.values(groupNavSubItemsByHeader(item.subItems)).map((group) => {
+                  const heading = group.find((sub) => sub.isHeader);
+                  const links = group.filter((sub) => !sub.isHeader);
+
+                  return (
+                    <div key={heading?.name ?? group[0]?.name} className="min-w-0">
+                      {heading ? (
+                        <p className="px-3 pb-1 text-xs font-bold uppercase tracking-wide text-brand-red-600">
+                          {heading.name.replace(/—/g, '').trim()}
+                        </p>
+                      ) : null}
+                      {links.map((sub) => (
+                        <Link
+                          key={`${sub.href}-${sub.name}`}
+                          href={sub.href}
+                          className={`block rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-blue-600 ${
+                            sub.isSectionLink ? 'font-semibold text-brand-red-600' : ''
+                          }`}
+                          {...(isExternal(sub.href)
+                            ? { target: '_blank', rel: 'noopener noreferrer' }
+                            : {})}
+                        >
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

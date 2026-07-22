@@ -35,12 +35,10 @@ const PROGRAM_REGISTRY: Record<string, () => Promise<ProgramModuleShape>> = {
   'culinary-apprenticeship': () => import('@/data/programs/culinary-apprenticeship'),
   'cybersecurity-analyst': () => import('@/data/programs/cybersecurity-analyst'),
   'diesel-mechanic': () => import('@/data/programs/diesel-mechanic'),
-  electrical: () => import('@/data/programs/electrical'),
   'emergency-health-safety': () => import('@/data/programs/emergency-health-safety'),
   'health-safety': () => import('@/data/programs/emergency-health-safety'),
   entrepreneurship: () => import('@/data/programs/entrepreneurship'),
   esthetician: () => import('@/data/programs/esthetician'),
-  forklift: () => import('@/data/programs/forklift'),
   'graphic-design': () => import('@/data/programs/graphic-design'),
   'home-health-aide': () => import('@/data/programs/home-health-aide'),
   'it-help-desk': () => import('@/data/programs/it-help-desk'),
@@ -51,11 +49,9 @@ const PROGRAM_REGISTRY: Record<string, () => Promise<ProgramModuleShape>> = {
   'office-administration': () => import('@/data/programs/office-administration'),
   'pharmacy-technician': () => import('@/data/programs/pharmacy-technician'),
   phlebotomy: () => import('@/data/programs/phlebotomy'),
-  plumbing: () => import('@/data/programs/plumbing'),
   'project-management': () => import('@/data/programs/project-management'),
   'software-development': () => import('@/data/programs/software-development'),
   'web-development': () => import('@/data/programs/web-development'),
-  welding: () => import('@/data/programs/welding'),
 };
 
 export async function getProgramBySlug(slug: string): Promise<ProgramSchema | null> {

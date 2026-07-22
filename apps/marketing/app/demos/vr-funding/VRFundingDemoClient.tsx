@@ -1,189 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import {
-  Play,
-  Building2,
-  Briefcase,
-  GraduationCap,
-  CheckCircle,
-  ChevronRight,
-  Video,
-  Monitor,
-  Globe,
-  DollarSign,
-  Handshake,
-  Wrench,
-  Stethoscope,
-  Scissors,
-  Lightbulb,
-  ArrowRight,
-  Calendar,
-  Download,
-  Share2,
-  Volume2,
-  VolumeX,
-  Maximize,
-  SkipBack,
-  SkipForward,
-  Pause,
-  FileText,
-  Copy,
-  Check,
-} from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { Play, Building2, Briefcase, GraduationCap, CheckCircle, ChevronRight, Video, Monitor, Globe, DollarSign, Handshake, Wrench, Stethoscope, Scissors, Lightbulb, ArrowRight, Calendar, Download, Share2, FileText } from 'lucide-react';
 
-// Audience types
 type Audience = 'all' | 'wioa' | 'vr' | 'taa' | 'employer';
 
-// Video player component
-function VideoPlayer({ src, poster }: { src: string; poster?: string }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [showControls, setShowControls] = useState(true);
-
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-    }
-  };
-
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      const progress = (videoRef.current.currentTime / videoRef.current.duration) * 100;
-      setProgress(progress);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
-    }
-  };
-
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (videoRef.current) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const pos = (e.clientX - rect.left) / rect.width;
-      videoRef.current.currentTime = pos * videoRef.current.duration;
-    }
-  };
-
-  const skip = (seconds: number) => {
-    if (videoRef.current) {
-      videoRef.current.currentTime += seconds;
-    }
-  };
-
-  const toggleFullscreen = () => {
-    if (videoRef.current) {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        videoRef.current.requestFullscreen();
-      }
-    }
-  };
-
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
-
-  // Use the platform's demo video URL
-  const videoSrc = src || PLATFORM_DEFAULTS.demoVideos?.elevateOverview || '/videos/elevate-overview-with-narration.mp4';
-
-  return (
-    <div 
-      className="relative bg-slate-900 rounded-xl overflow-hidden group"
-      onMouseEnter={() => setShowControls(true)}
-      onMouseLeave={() => setShowControls(false)}
-    >
-      <video
-        ref={videoRef}
-        src={videoSrc}
-        poster={poster || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1280&h=720&fit=crop'}
-        className="w-full aspect-video"
-        muted={isMuted}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        playsInline
-      />
-      
-      {/* Play button overlay */}
-      {!isPlaying && (
-        <button
-          onClick={togglePlay}
-          className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40 transition-colors"
-        >
-          <div className="w-20 h-20 bg-brand-red-600 hover:bg-brand-red-700 rounded-full flex items-center justify-center transition-transform hover:scale-110">
-            <Play className="w-10 h-10 text-white ml-1" fill="white" />
-          </div>
-        </button>
-      )}
-      
-      {/* Controls */}
-      <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'}`}>
-        {/* Progress bar */}
-        <div 
-          className="h-1 bg-white/30 rounded-full mb-4 cursor-pointer group/progress"
-          onClick={handleSeek}
-        >
-          <div 
-            className="h-full bg-brand-red-600 rounded-full relative"
-            style={{ width: `${progress}%` }}
-          >
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover/progress:opacity-100 transition-opacity" />
-          </div>
-        </div>
-        
-        {/* Control buttons */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button onClick={togglePlay} className="text-white hover:text-brand-red-400 transition-colors">
-              {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
-            </button>
-            <button onClick={() => skip(-10)} className="text-white hover:text-brand-red-400 transition-colors">
-              <SkipBack className="w-5 h-5" />
-            </button>
-            <button onClick={() => skip(10)} className="text-white hover:text-brand-red-400 transition-colors">
-              <SkipForward className="w-5 h-5" />
-            </button>
-            <button onClick={toggleMute} className="text-white hover:text-brand-red-400 transition-colors">
-              {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-            </button>
-            <span className="text-white/80 text-sm font-mono">
-              {videoRef.current ? formatTime(videoRef.current.currentTime) : '0:00'} / {formatTime(duration)}
-            </span>
-          </div>
-          <button onClick={toggleFullscreen} className="text-white hover:text-brand-red-400 transition-colors">
-            <Maximize className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Section data
 const sections = [
   {
     id: 'overview',
@@ -223,30 +45,10 @@ const sections = [
     color: 'bg-green-600',
     audiences: ['all', 'wioa', 'vr', 'taa'] as Audience[],
     careers: [
-      { 
-        name: 'Healthcare', 
-        icon: Stethoscope, 
-        roles: ['Medical Assistant', 'Phlebotomy', 'EKG Tech', 'CNA'],
-        certs: ['NHA', 'BLS/CPR', 'State Board'],
-      },
-      { 
-        name: 'Trades', 
-        icon: Wrench, 
-        roles: ['HVAC Technician', 'Building Tech', 'CDL Driver', 'Welder'],
-        certs: ['EPA 608', 'CDL Class A/B', 'OSHA 10'],
-      },
-      { 
-        name: 'Beauty', 
-        icon: Scissors, 
-        roles: ['Barber', 'Cosmetologist', 'Esthetician', 'Nail Tech'],
-        certs: ['State Board', 'NHA'],
-      },
-      { 
-        name: 'Business', 
-        icon: Monitor, 
-        roles: ['Admin', 'Billing/Coding', 'EHR Specialist', 'Customer Service'],
-        certs: ['RHIT', 'MOS', 'CEHRS'],
-      },
+      { name: 'Healthcare', icon: Stethoscope, roles: ['Medical Assistant', 'Phlebotomy', 'EKG Tech', 'CNA'], certs: ['NHA', 'BLS/CPR', 'State Board'] },
+      { name: 'Trades', icon: Wrench, roles: ['HVAC Technician', 'Building Tech', 'CDL Driver', 'Welder'], certs: ['EPA 608', 'CDL Class A/B', 'OSHA 10'] },
+      { name: 'Beauty', icon: Scissors, roles: ['Barber', 'Cosmetologist', 'Esthetician', 'Nail Tech'], certs: ['State Board', 'NHA'] },
+      { name: 'Business', icon: Monitor, roles: ['Admin', 'Billing/Coding', 'EHR Specialist', 'Customer Service'], certs: ['RHIT', 'MOS', 'CEHRS'] },
     ],
   },
   {
@@ -312,25 +114,23 @@ const sections = [
   },
 ];
 
-// Demo video URL
-const DEMO_VIDEO_URL = PLATFORM_DEFAULTS.demoVideos?.elevateOverview || '/videos/platform-overview.mp4';
-
-export default function VRFundingDemo() {
+export default function VRFundingDemoClient() {
   const [activeSection, setActiveSection] = useState(0);
   const [audience, setAudience] = useState<Audience>('all');
   const [copied, setCopied] = useState(false);
-  const [showVideo, setShowVideo] = useState(true);
 
-  const filteredSections = sections.filter(s => 
+  const filteredSections = sections.filter(s =>
     audience === 'all' || s.audiences.includes(audience)
   );
   const safeActiveSection = Math.min(activeSection, filteredSections.length - 1);
   const currentSection = filteredSections[safeActiveSection] || filteredSections[0];
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const downloadDemoContent = () => {
@@ -382,7 +182,7 @@ HEALTHCARE
 • EKG Technician (NHA - CET)
 • Certified Nursing Assistant
 
-TRADES  
+TRADES
 • HVAC Technician (EPA 608 Universal)
 • CDL Driver (Class A/B)
 • Building Maintenance
@@ -422,7 +222,7 @@ BUSINESS
             </div>
             <div>
               <h1 className="font-bold text-lg">Elevate for Humanity</h1>
-              <p className="text-xs text-slate-400">Workforce Development Platform</p>
+              <p className="text-xs text-slate-400">VR Funding Demo</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -437,15 +237,9 @@ BUSINESS
               onClick={handleCopyLink}
               className="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
             >
-              {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+              {copied ? <CheckCircle className="w-4 h-4 text-green-400" /> : <Share2 className="w-4 h-4" />}
               {copied ? 'Copied!' : 'Share'}
             </button>
-            <Link
-              href="/store/demos"
-              className="text-sm text-slate-400 hover:text-white transition-colors"
-            >
-              All Demos
-            </Link>
             <a
               href="https://admin.elevateforhumanity.org"
               target="_blank"
@@ -460,38 +254,30 @@ BUSINESS
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-purple-900 via-slate-900 to-indigo-900 py-16 px-4">
+      <section className="bg-gradient-to-br from-purple-900 via-slate-900 to-indigo-900 py-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full text-sm mb-6">
             <Video className="w-4 h-4" />
-            <span>Interactive Demo • Universal Platform</span>
+            <span>Interactive Demo • 10 Minutes</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
             Workforce Training
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
               Without Boundaries
             </span>
           </h1>
           <p className="text-xl text-slate-300 mb-8 max-w-3xl mx-auto">
-            How Elevate prepares participants for careers in healthcare, trades, and business — 
-            <strong className="text-white"> without requiring massive facilities</strong>, 
+            How Elevate prepares participants for careers in healthcare, trades, and business —
+            <strong className="text-white"> without requiring massive facilities</strong>,
             by partnering with existing 3rd party vendors for hands-on training.
           </p>
-          
-          {/* Video Player */}
-          {showVideo && (
-            <div className="max-w-4xl mx-auto mb-8">
-              <VideoPlayer src={DEMO_VIDEO_URL} />
-            </div>
-          )}
-          
           <div className="flex flex-wrap justify-center gap-4">
             <button
               onClick={() => setActiveSection(0)}
               className="bg-brand-red-600 hover:bg-brand-red-700 px-8 py-4 rounded-xl text-lg font-semibold transition-all transform hover:scale-105 flex items-center gap-2"
             >
               <Play className="w-5 h-5" />
-              Start Interactive Demo
+              Start Demo
             </button>
             <a
               href="https://admin.elevateforhumanity.org"
@@ -500,7 +286,7 @@ BUSINESS
               className="bg-white/10 hover:bg-white/20 px-8 py-4 rounded-xl text-lg font-semibold transition-all flex items-center gap-2"
             >
               <Monitor className="w-5 h-5" />
-              Try Live Platform
+              Try Live Demo
             </a>
           </div>
         </div>
@@ -520,10 +306,7 @@ BUSINESS
             ].map(a => (
               <button
                 key={a.id}
-                onClick={() => {
-                  setAudience(a.id);
-                  setActiveSection(0);
-                }}
+                onClick={() => { setAudience(a.id); setActiveSection(0); }}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   audience === a.id
                     ? 'bg-purple-600 text-white'
@@ -570,7 +353,6 @@ BUSINESS
               }`}
             >
               <div className="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700">
-                {/* Section Header */}
                 <div className={`${section.color} p-8`}>
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center">
@@ -583,9 +365,7 @@ BUSINESS
                   </div>
                 </div>
 
-                {/* Section Content */}
                 <div className="p-8">
-                  {/* Challenge/Solution/Partners/Compliance */}
                   {section.points && (
                     <div className="grid md:grid-cols-2 gap-8">
                       <div className="space-y-4">
@@ -599,12 +379,8 @@ BUSINESS
                         ))}
                       </div>
                       <div className="bg-gradient-to-br from-purple-900/50 to-blue-900/50 rounded-xl p-6 border border-purple-500/30">
-                        <h4 className="font-bold text-lg mb-4 text-purple-300">
-                          💡 Key Innovation
-                        </h4>
-                        <p className="text-slate-300 mb-4">
-                          We flip the model: theory online, practice locally.
-                        </p>
+                        <h4 className="font-bold text-lg mb-4 text-purple-300">💡 Key Innovation</h4>
+                        <p className="text-slate-300 mb-4">We flip the model: theory online, practice locally.</p>
                         <div className="grid grid-cols-2 gap-4 text-center">
                           <div className="bg-slate-800/50 rounded-lg p-4">
                             <div className="text-3xl font-bold text-purple-400">85%</div>
@@ -619,11 +395,10 @@ BUSINESS
                     </div>
                   )}
 
-                  {/* Careers */}
                   {section.careers && (
                     <div>
                       <p className="text-slate-300 mb-8 text-lg">
-                        Participants can pursue careers in high-demand industries with 
+                        Participants can pursue careers in high-demand industries with
                         <strong className="text-white"> industry-recognized credentials</strong>.
                       </p>
                       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -657,11 +432,10 @@ BUSINESS
                     </div>
                   )}
 
-                  {/* Dashboard */}
                   {section.features && (
                     <div>
                       <p className="text-slate-300 mb-8 text-lg">
-                        A unified dashboard tracks everything — 
+                        A unified dashboard tracks everything —
                         <strong className="text-white"> from enrollment to employment</strong>.
                       </p>
                       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -679,9 +453,7 @@ BUSINESS
                       </div>
                       <div className="mt-8 bg-purple-900/30 border border-purple-600/30 rounded-xl p-6">
                         <h4 className="font-bold text-purple-400 mb-2">📊 Outcome Tracking</h4>
-                        <p className="text-slate-300 mb-4">
-                          Track placement rates, credential attainment, wage gains, and employment retention.
-                        </p>
+                        <p className="text-slate-300 mb-4">Track placement rates, credential attainment, wage gains, and employment retention.</p>
                         <div className="grid grid-cols-4 gap-4 text-center">
                           <div className="bg-slate-800 rounded-lg p-3">
                             <div className="text-2xl font-bold text-green-400">85%</div>
@@ -704,11 +476,10 @@ BUSINESS
                     </div>
                   )}
 
-                  {/* Funding */}
                   {section.fundingSources && (
                     <div>
                       <p className="text-slate-300 mb-8 text-lg">
-                        Multiple funding pathways make our programs 
+                        Multiple funding pathways make our programs
                         <strong className="text-white"> accessible to participants</strong>.
                       </p>
                       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -725,7 +496,6 @@ BUSINESS
                     </div>
                   )}
 
-                  {/* Navigation */}
                   <div className="mt-8 pt-8 border-t border-slate-700 flex justify-between">
                     {index > 0 && (
                       <button
@@ -757,12 +527,8 @@ BUSINESS
       {/* CTA Section */}
       <section className="bg-gradient-to-r from-purple-900 via-blue-900 to-purple-900 py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to See It In Action?
-          </h2>
-          <p className="text-xl text-slate-300 mb-8">
-            Try our live demo or schedule a personalized walkthrough for your team.
-          </p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to See It In Action?</h2>
+          <p className="text-xl text-slate-300 mb-8">Try our live demo or schedule a personalized walkthrough for your team.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
               href="https://admin.elevateforhumanity.org"
@@ -788,9 +554,7 @@ BUSINESS
       <footer className="bg-slate-800 border-t border-slate-700 py-8 px-4">
         <div className="max-w-7xl mx-auto text-center text-slate-400">
           <p>Elevate for Humanity • Workforce Development Platform</p>
-          <p className="text-sm mt-2">
-            Contact: support@elevateforhumanity.org • (317) 314-3757
-          </p>
+          <p className="text-sm mt-2">Contact: support@elevateforhumanity.org • (317) 314-3757</p>
         </div>
       </footer>
     </div>

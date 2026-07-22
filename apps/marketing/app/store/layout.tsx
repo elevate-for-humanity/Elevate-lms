@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://www.elevateforhumanity.org/og-store.png',
+        url: 'https://www.elevateforhumanity.org/images/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'Elevate Workforce Platform - Licensing Options',

@@ -1,5 +1,10 @@
 import { redirect } from 'next/navigation';
+import { Metadata } from 'next';
 
-export default function FinanceBookkeepingRedirect() {
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
+export default function FinanceRedirect() {
   redirect('/programs/bookkeeping');
 }

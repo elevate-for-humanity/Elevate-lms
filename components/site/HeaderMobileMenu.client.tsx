@@ -89,9 +89,8 @@ function MobileSubLink({
 }
 
 export default function HeaderMobileMenu({ items, programApplyLinks = {} }: HeaderMobileMenuProps) {
-  const firstItemKey = items[0]?.id ?? items[0]?.name ?? null;
   const [isOpen, setIsOpen] = useState(false);
-  const [expandedSection, setExpandedSection] = useState<string | null>(firstItemKey);
+  const [expandedSection, setExpandedSection] = useState<string | null>('all'); // Expand all by default
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
@@ -104,9 +103,9 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
 
   useEffect(() => {
     setIsOpen(false);
-    setExpandedSection(firstItemKey);
+    setExpandedSection('all'); // Keep all expanded
     setExpandedCategory(null);
-  }, [pathname, firstItemKey]);
+  }, [pathname]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -143,7 +142,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                 {items.map((item) => {
                   const sectionKey = item.id ?? item.name;
                   const hasSubItems = Boolean(item.subItems?.length);
-                  const sectionOpen = expandedSection === sectionKey;
+                  const sectionOpen = expandedSection === 'all' || expandedSection === sectionKey;
                   const columns = hasSubItems ? Object.values(groupNavSubItemsByHeader(item.subItems!)) : [];
                   const useCategoryAccordions = columns.length > 1;
 
@@ -153,6 +152,10 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                         <button
                           type="button"
                           onClick={() => {
+                            // Don't collapse when 'all' is set, just toggle individual
+                            if (expandedSection === 'all') {
+                              return; // Keep all expanded
+                            }
                             if (sectionOpen) {
                               setExpandedSection(null);
                               setExpandedCategory(null);

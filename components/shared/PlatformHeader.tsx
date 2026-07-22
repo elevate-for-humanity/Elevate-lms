@@ -63,7 +63,7 @@ export function PlatformHeader({ variant = 'marketing', className }: PlatformHea
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation - hidden on mobile, shown on md+ */}
         <div className="hidden md:flex items-center gap-1">
           {navItems.map((item) => (
             <div key={item.href} className="relative">
@@ -166,7 +166,7 @@ export function PlatformHeader({ variant = 'marketing', className }: PlatformHea
             </Link>
           )}
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - shown on mobile, hidden on md+ */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 text-gray-500 hover:text-gray-700"
@@ -182,7 +182,7 @@ export function PlatformHeader({ variant = 'marketing', className }: PlatformHea
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - shown when mobileMenuOpen is true */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t bg-white">
           <div className="container mx-auto px-4 py-3 space-y-1">

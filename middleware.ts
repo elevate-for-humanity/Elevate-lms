@@ -24,7 +24,6 @@ const CANONICAL_REDIRECTS: Array<[from: string, to: string]> = [
   ['/apply/barber', '/partners/barber-host-shop/apply'],
   ['/partners/barbershop-apprenticeship', '/partners/barber-host-shop'],
   ['/partners/barbershop-apprenticeship/:path*', '/partners/barber-host-shop/:path*'],
-  ['/programs/barber', '/programs/barber-apprenticeship'],
   ['/ebook/barber-theory', '/programs/barber-apprenticeship'],
   ['/pwa/barber', '/programs/barber-apprenticeship'],
 ];
@@ -127,6 +126,26 @@ export async function middleware(request: NextRequest) {
   const isLocal = isLocalhost(host);
 
   // =============================================================================
+  // HIGH-PRIORITY PROGRAM SLUG REDIRECTS
+  // These MUST run before any page resolution to ensure proper HTTP 307 redirects.
+  // Critical for SEO - prevents dynamic [program] route from catching these first.
+  // =============================================================================
+  const PROGRAM_SLUG_REDIRECTS: Array<[from: string, to: string]> = [
+    ['/programs/barber', '/programs/barber-apprenticeship'],
+    ['/programs/hvac', '/programs/hvac-technician'],
+    ['/programs/finance-bookkeeping-accounting', '/programs/bookkeeping'],
+  ];
+
+  for (const [from, to] of PROGRAM_SLUG_REDIRECTS) {
+    if (pathname === from) {
+      const url = request.nextUrl.clone();
+      url.pathname = to;
+      url.search = '';
+      return NextResponse.redirect(url, 308);
+    }
+  }
+
+  // =============================================================================
   // LEGACY ROUTE REDIRECTS (MUST CHECK FIRST - before public paths)
   // All redirects are permanent (308) to preserve SEO equity.
   // =============================================================================
@@ -171,9 +190,7 @@ export async function middleware(request: NextRequest) {
     ['/healthcare-training-indianapolis', '/programs/healthcare'],
     ['/hiset', '/testing'],
     ['/certification-testing', '/testing/nha'],
-    // Program slug redirects
-    ['/programs/finance-bookkeeping-accounting', '/programs/bookkeeping'],
-    ['/programs/hvac', '/programs/hvac-technician'],
+    // Program slug redirects (now in PROGRAM_SLUG_REDIRECTS for priority)
     // FSSA funding removed
     ['/fssa', '/funding'],
     ['/apply/fssa', '/apply'],

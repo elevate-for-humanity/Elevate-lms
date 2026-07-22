@@ -723,6 +723,28 @@ async function _POST(req: Request) {
       emailStatus = { student: 'exception', staff: 'exception' };
     }
 
+    // Queue automation jobs for post-submission processing (non-blocking)
+    try {
+      const adminDb = await getAdminClient();
+      if (adminDb) {
+        await adminDb.from("job_queue").insert({
+          type: "application_submitted",
+          payload: {
+            applicationId: data.id,
+            programSlug: body.program_slug || body.preferredProgramId || null,
+            email: body.email,
+            firstName: body.firstName,
+            lastName: body.lastName,
+            fundingType: body.fundingType || null,
+          },
+          run_after: new Date().toISOString(),
+        });
+        logger.info("[Applications] Automation job queued", { applicationId: data.id });
+      }
+    } catch (queueError) {
+      logger.warn("[Applications] Failed to queue automation job", queueError instanceof Error ? queueError.message : String(queueError));
+    }
+
     return NextResponse.json(
       {
         ok: true,

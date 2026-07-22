@@ -17,6 +17,7 @@ import { attachPartnerRouting } from '@/lib/enrollment/partner-routing';
 import { resolveCourseId } from '@/lib/course-builder/schema';
 import { cachePortalTypeForEnrollment } from '@/lib/portal/router';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { ensureDigitalBinder } from '@/lib/enrollment/ensure-digital-binder';
 
 export interface ApproveApplicationInput {
   applicationId: string;
@@ -319,6 +320,18 @@ export async function approveApplication(
   // Step 5: Update profile enrollment_status (students only)
   if (assignedRole === 'student') {
     await db.from('profiles').update({ enrollment_status: 'active' }).eq('id', userId);
+  }
+
+  // Step 5b: Create digital binder for the enrollment (idempotent)
+  if (userId && enrollmentId) {
+    const binderResult = await ensureDigitalBinder({
+      db,
+      userId,
+      enrollmentId,
+    });
+    if (binderResult.binderId) {
+      logger.info("[approve] Digital binder created", { enrollmentId, binderId: binderResult.binderId });
+    }
   }
 
   // ── Partner routing ──────────────────────────────────────────────────────

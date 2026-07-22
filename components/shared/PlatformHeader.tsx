@@ -152,7 +152,7 @@ export function PlatformHeader({ variant = 'marketing', className }: PlatformHea
                   <span className="text-purple-600 font-medium text-sm">ST</span>
                 </div>
               </Link>
-            </>
+            </div>
           )}
           {variant === 'admin' && (
             <Link

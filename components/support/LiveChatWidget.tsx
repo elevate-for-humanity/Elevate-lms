@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Minimize2, Bot, Loader2 } from 'lucide-react';
-import { TidioChatWidget } from './TidioChatWidget';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 interface Message {
   id: string;
@@ -224,27 +224,18 @@ function FallbackChatWidget() {
 }
 
 /**
- * LiveChatWidget - Uses Tidio if configured, otherwise falls back to built-in widget
- *
- * To enable Tidio:
- * 1. Set NEXT_PUBLIC_TIDIO_KEY in the runtime environment
- * 2. Configure the AI assistant in Tidio dashboard using lib/chatbot/config.ts
+ * LiveChatWidget - PARIS AI Chat for Marketing Site
+ * 
+ * Shows a floating chat button that opens a chat widget.
+ * Uses /api/ai-chat for AI-powered responses.
  */
 export function LiveChatWidget() {
-  const tidioKey = process.env.NEXT_PUBLIC_TIDIO_KEY;
-
-  // Use Tidio if configured
-  if (tidioKey) {
-    return <TidioChatWidget publicKey={tidioKey} autoOpen={false} />;
-  }
-
-  // Fall back to built-in widget
+  // Always use the built-in widget (PARIS AI)
   return <FallbackChatWidget />;
 }
 
 // Wrapper that hides chat on store pages (store has its own GuidedDemoChat)
 import { usePathname } from 'next/navigation';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export function ConditionalLiveChatWidget() {
   const pathname = usePathname();

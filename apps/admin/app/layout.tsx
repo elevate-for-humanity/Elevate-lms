@@ -5,6 +5,7 @@
 import { createClient, safeGetUser } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import BuildVersionSync from '@/components/BuildVersionSync';
+import { LiveChatWidget } from '@/components/support/LiveChatWidget';
 
 export default async function AdminGroupLayout({
   children,
@@ -36,6 +37,7 @@ export default async function AdminGroupLayout({
     <>
       <BuildVersionSync />
       {children}
+      <LiveChatWidget />
     </>
   );
 }

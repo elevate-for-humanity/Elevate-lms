@@ -56,6 +56,15 @@ const adminConfig = {
   // Canonical route redirects â€” legacy aliases forward to canonical paths
   async redirects() {
     return [
+      // Marketing pages -> main site
+      { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },
+      { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility', permanent: false },
+      { source: '/programs', destination: 'https://www.elevateforhumanity.org/programs', permanent: false },
+      { source: '/about', destination: 'https://www.elevateforhumanity.org/about', permanent: false },
+      { source: '/contact', destination: 'https://www.elevateforhumanity.org/contact', permanent: false },
+      { source: '/funding', destination: 'https://www.elevateforhumanity.org/funding', permanent: false },
+      { source: '/testing', destination: 'https://www.elevateforhumanity.org/testing', permanent: false },
+      { source: '/store', destination: 'https://www.elevateforhumanity.org/store', permanent: false },
       // â”€â”€ Lizzy control plane (retired dev-studio / ai-console admin routes) â”€â”€
       // Do NOT redirect /admin/dashboard â†’ itself (infinite loop).
       { source: '/admin/ai-console', destination: '/admin/dashboard', permanent: true },

@@ -13,6 +13,22 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Redirect marketing pages to main site
+  async redirects() {
+    return [
+      // Marketing pages -> main site
+      { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },
+      { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility', permanent: false },
+      { source: '/programs', destination: 'https://www.elevateforhumanity.org/programs', permanent: false },
+      { source: '/about', destination: 'https://www.elevateforhumanity.org/about', permanent: false },
+      { source: '/contact', destination: 'https://www.elevateforhumanity.org/contact', permanent: false },
+      { source: '/funding', destination: 'https://www.elevateforhumanity.org/funding', permanent: false },
+      { source: '/testing', destination: 'https://www.elevateforhumanity.org/testing', permanent: false },
+      { source: '/store', destination: 'https://www.elevateforhumanity.org/store', permanent: false },
+      // Admin -> admin site
+      { source: '/admin', destination: 'https://admin.elevateforhumanity.org/admin/dashboard', permanent: true },
+    ];
+  },
   // Externalize server-only native packages from webpack bundle
   serverExternalPackages: [
     '@remotion/bundler',

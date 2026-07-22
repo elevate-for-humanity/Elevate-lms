@@ -52,7 +52,6 @@ export const NAV_ITEMS: NavItem[] = [
       { name: '— Skilled Trades —', href: '/programs/skilled-trades', isHeader: true },
       { name: 'HVAC Technician', href: canonicalRoutes.programs.hvacTechnician },
       { name: 'Building Services Technician', href: canonicalRoutes.programs.buildingServicesTechnician },
-      { name: 'Electrical', href: '/programs/electrical' },
       { name: 'CDL Training', href: '/programs/cdl-training' },
       { name: 'All Trades →', href: '/programs/skilled-trades', isSectionLink: true },
 

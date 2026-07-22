@@ -16,7 +16,6 @@ import { CYBERSECURITY_ANALYST } from './cybersecurity-analyst';
 import { DIESEL_MECHANIC } from './diesel-mechanic';
 import { EMERGENCY_HEALTH_SAFETY } from './emergency-health-safety';
 import { ENTREPRENEURSHIP } from './entrepreneurship';
-import { FORKLIFT } from './forklift';
 import { GRAPHIC_DESIGN } from './graphic-design';
 import { HOME_HEALTH_AIDE } from './home-health-aide';
 import { IT_HELP_DESK } from './it-help-desk';
@@ -27,9 +26,6 @@ import { PHARMACY_TECHNICIAN } from './pharmacy-technician';
 import { PROJECT_MANAGEMENT } from './project-management';
 import { SOFTWARE_DEV } from './software-development';
 import { WEB_DEVELOPMENT } from './web-development';
-import { WELDING } from './welding';
-import { PLUMBING } from './plumbing';
-import { ELECTRICAL } from './electrical';
 import { CDL_TRAINING } from './cdl-training';
 import { MEDICAL_ASSISTANT } from './medical-assistant';
 import { COSMETOLOGY } from './cosmetology-apprenticeship';
@@ -50,9 +46,6 @@ const STATIC_PROGRAMS: ProgramSchema[] = [
   // Programs with dedicated page.tsx - registered here for [slug] fallback and sitemap
   BARBER_APPRENTICESHIP,
   HVAC_TECHNICIAN,
-  WELDING,
-  PLUMBING,
-  ELECTRICAL,
   CDL_TRAINING,
   MEDICAL_ASSISTANT,
   COSMETOLOGY,
@@ -76,7 +69,6 @@ const STATIC_PROGRAMS: ProgramSchema[] = [
   DIESEL_MECHANIC,
   EMERGENCY_HEALTH_SAFETY,
   ENTREPRENEURSHIP,
-  FORKLIFT,
   GRAPHIC_DESIGN,
   HOME_HEALTH_AIDE,
   IT_HELP_DESK,

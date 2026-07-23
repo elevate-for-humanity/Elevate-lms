@@ -8,12 +8,10 @@ import {
   formatPublicProgramsDisplay,
   getPublicProgramsPageData,
 } from '@/lib/programs/public-programs-page';
-import { PUBLIC_PROGRAM_DURATION_RANGE } from '@/lib/programs/marketing-duration';
 import { getProgramCardImage } from '@/lib/images/programImages';
 import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
 import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
 import { card } from '@/lib/page-design-tokens';
-import { HomePlatformPreview } from '@/components/home/HomePlatformPreview';
 import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
 
 export const revalidate = 0; // always fresh - catalog should prefer DB state when available
@@ -102,19 +100,28 @@ const CATEGORY_META: Record<string,{label:string;color:string;order:number}> = {
 };
 
 const SUPPRESSED = new Set([
-  // Only suppress truly duplicate or obsolete program slugs
+  // Duplicate slugs
   'hvac-2024', // duplicate of hvac
   'phlebotomy-technician-program', // duplicate of phlebotomy-technician
   'barber-program', // duplicate of barber
-  'micro-programs', // obsolete umbrella
-  'jri-introduction', // intro to JRI badge system
-  'jri', // parent umbrella for badge system
+  // Obsolete umbrellas
+  'micro-programs',
+  'jri-introduction',
+  'jri',
+  // Archived programs — no active content
+  'forklift',
+  'hospitality',
+  'culinary-apprenticeship',
+  'youth-culinary-apprenticeship',
+  // Suppress fragments that produce wrong category labels
+  'beauty-wellness',
+  'personal-services',
 ]);
 
 type Prog = {slug:string;title:string;description:string|null;category:string;duration:string|null;credential:string|null;funding_eligible:boolean};
 
 function normalizeCategory(category?: string | null, sector?: string | null, programType?: string | null): string {
-  const raw = (category ?? '').trim().toLowerCase();
+  const raw = (category ?? '').trim().toLowerCase().replace(/\s+/g, ' ').trim();
   const normalizedSector = (sector ?? '').trim().toLowerCase();
 
   if (raw.includes('health') || raw.includes('medical') || raw.includes('care') || normalizedSector === 'healthcare') return 'healthcare';
@@ -174,7 +181,7 @@ export default async function ProgramsPage() {
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-2">{PLATFORM_DEFAULTS.orgName}</p>
           <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight">Career Training Programs</h1>
           <p className="mt-3 text-slate-200 text-sm sm:text-base max-w-xl">
-            {formatPublicProgramsDisplay(programs.length)} credential-bearing programs · {PUBLIC_PROGRAM_DURATION_RANGE} · WIOA &amp; WRG funding available
+            {formatPublicProgramsDisplay(programs.length)} credential-bearing programs. Duration, funding eligibility, and enrollment availability vary by program.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link href="/orientation/schedule" className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-red-700 transition-colors">
@@ -204,12 +211,13 @@ export default async function ProgramsPage() {
       {/* Funding banner */}
       <div className="bg-brand-green-50 border-b border-brand-green-100">
         <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-brand-green-800">
-          <span className="font-semibold">Funding available:</span>
+          <span className="font-semibold">Funding may be available for eligible participants and approved programs.</span>
+          <span className="hidden sm:inline text-brand-green-300">·</span>
           <span>WIOA Individual Training Account</span>
           <span className="hidden sm:inline text-brand-green-300">·</span>
           <span>Workforce Ready Grant</span>
           <span className="hidden sm:inline text-brand-green-300">·</span>
-          <span>JRI / Reentry</span>
+          <span>FSSA IMPACT / JRI Reentry</span>
           <span className="hidden sm:inline text-brand-green-300">·</span>
           <span>Payment Plans</span>
           <Link href="/funding/how-it-works" className="ml-auto font-semibold underline hover:text-brand-green-900 whitespace-nowrap">Check eligibility →</Link>
@@ -264,7 +272,7 @@ export default async function ProgramsPage() {
       <section className="py-12 border-t border-slate-100 bg-slate-50">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-xl font-extrabold text-slate-900 mb-1">External Certification Pathways</h2>
-          <p className="text-slate-500 text-sm mb-6">Google and Microsoft certificates available through Coursera and LinkedIn Learning. Elevate advisors can help you access funding and enroll.</p>
+          	              <p className="text-slate-500 text-sm mb-6">Training delivered by Google, Microsoft, Coursera, and LinkedIn Learning. Elevate provides enrollment support and funding-navigation assistance — credential issuance is managed by the respective providers.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { slug: 'google-it-support', title: 'Google IT Support Certificate', issuer: 'Google / Coursera', weeks: '3-6 months' },
@@ -277,14 +285,12 @@ export default async function ProgramsPage() {
               <Link key={p.slug} href={`/apply?program=${p.slug}`} className="bg-white rounded-xl border border-slate-200 p-5 hover:border-brand-green-400 hover:shadow-sm transition-all group">
                 <p className="font-bold text-slate-900 text-sm group-hover:text-brand-green-700 leading-snug">{p.title}</p>
                 <p className="text-slate-500 text-xs mt-1">{p.issuer} · {p.weeks}</p>
-                <p className="text-brand-red-600 text-xs font-semibold mt-3">Apply for funding →</p>
+                <p className="text-brand-red-600 text-xs font-semibold mt-3">Explore programs →</p>
               </Link>
             ))}
           </div>
         </div>
       </section>
-
-      <HomePlatformPreview />
 
       {/* CTA */}
       <section className="bg-slate-900 text-white py-16">

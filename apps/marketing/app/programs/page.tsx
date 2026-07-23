@@ -108,9 +108,7 @@ const SUPPRESSED = new Set([
   'micro-programs',
   'jri-introduction',
   'jri',
-  // Archived programs — no active content
-  'forklift',
-  'hospitality',
+  // Apprenticeships not on ETPL
   'culinary-apprenticeship',
   'youth-culinary-apprenticeship',
   // Suppress fragments that produce wrong category labels

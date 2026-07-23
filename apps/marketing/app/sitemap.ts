@@ -45,6 +45,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { slug: 'programs/skilled-trades', priority: 0.8 },
     { slug: 'programs/building-services-technician', priority: 0.8 },
     { slug: 'programs/electrical', priority: 0.8 },
+    { slug: 'programs/plumbing', priority: 0.8 },
     { slug: 'programs/cdl-training', priority: 0.9 },
     { slug: 'programs/welding', priority: 0.8 },
     // Beauty

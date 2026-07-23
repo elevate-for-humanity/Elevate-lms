@@ -33,9 +33,6 @@ const nextConfig = {
       // Campaign aliases
       { source: '/intake', destination: '/apply', permanent: false },
       { source: '/snap', destination: '/snap/snap-et', permanent: false },
-      // LMS pages -> marketing equivalent
-      { source: '/apply', destination: '/apply', permanent: false },
-      { source: '/eligibility', destination: '/eligibility', permanent: false },
     ];
   },
   experimental: {

@@ -1,15 +1,17 @@
 /**
  * PARIS Enrollment Provisioning Service
- * 
+ *
  * Creates all required records when an application is enrolled.
- * Connects to existing: accounts, profiles, enrollments, LMS, 
+ * Connects to existing: accounts, profiles, enrollments, LMS,
  * onboarding, digital binder, apprenticeship, scheduling, and notifications.
- * 
+ *
  * This is the COMPLETE production implementation - no TODOs, no stubs.
  */
 
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { emailService } from '@/lib/notifications/email';
+import { sendWorkflowNotification } from '@/lib/integrations/notifications';
 
 // ============================================
 // TYPES
@@ -304,6 +306,7 @@ export async function provisionEnrollment(
     // 18. Send welcome notification
     await sendWelcomeNotification(supabase, {
       userId,
+      applicationId,
       email: application.email,
       firstName: application.first_name,
       dashboardId,
@@ -1049,24 +1052,52 @@ async function sendWelcomeNotification(
   supabase: ReturnType<typeof getServiceClient>,
   data: {
     userId: string;
+    applicationId: string;
     email: string;
     firstName: string;
     dashboardId: string;
   },
 ): Promise<void> {
-  await supabase
-    .from('notifications')
-    .insert({
-      user_id: data.userId,
-      type: 'enrollment_welcome',
-      title: 'Welcome to Elevate!',
-      body: `Hi ${data.firstName}, you're now enrolled! Complete your onboarding to get started.`,
-      data: {
-        dashboardUrl: `/learner/dashboard?id=${data.dashboardId}`,
-        action: 'view_dashboard',
-      },
-      created_at: new Date().toISOString(),
+  const now = new Date().toISOString();
+
+  // Insert in-app notification
+  await supabase.from('notifications').insert({
+    user_id: data.userId,
+    type: 'enrollment_welcome',
+    title: 'Welcome to Elevate!',
+    body: `Hi ${data.firstName}, you're now enrolled! Complete your onboarding to get started.`,
+    data: {
+      dashboardUrl: `/learner/dashboard?id=${data.dashboardId}`,
+      action: 'view_dashboard',
+    },
+    created_at: now,
+  });
+
+  // Send enrollment confirmation email via emailService
+  try {
+    await emailService.sendEnrollmentConfirmation(
+      data.email,
+      data.firstName,
+      'your program',
+    );
+  } catch (error) {
+    logger.warn('[provisioning] Enrollment email failed', {
+      error: error instanceof Error ? error.message : String(error),
+      applicationId: data.applicationId,
     });
+  }
+
+  // Queue ENROLLMENT_COMPLETE workflow notification
+  await sendWorkflowNotification({
+    template: 'ENROLLMENT_COMPLETE',
+    applicationId: data.applicationId,
+    recipient: data.email,
+    variables: {
+      firstName: data.firstName,
+      dashboardUrl: `/learner/dashboard?id=${data.dashboardId}`,
+    },
+    channels: ['email'],
+  });
 }
 
 async function provisionApprenticeRecords(

@@ -320,6 +320,7 @@ export async function provisionEnrollment(
         applicationId,
         programId: application.program_id,
         enrolledById,
+        application,
       });
       result.apprenticeRecordId = apprenticeResult.apprenticeRecordId;
       result.rapidsRecordId = apprenticeResult.rapidsRecordId;
@@ -331,8 +332,10 @@ export async function provisionEnrollment(
         enrollmentId,
         applicationId,
         programId: application.program_id,
+        application,
       });
       result.testingRecordId = testingResult.testingRecordId;
+      result.credentialId = testingResult.credentialId;
     }
     
     // Verify all required checks passed
@@ -1108,80 +1111,136 @@ async function provisionApprenticeRecords(
     applicationId: string;
     programId: string;
     enrolledById: string;
+    application: Record<string, unknown>;
   },
 ): Promise<{ apprenticeRecordId: string; rapidsRecordId: string }> {
-  // Create apprentice record
+  const now = new Date().toISOString();
+  const application = data.application as Record<string, unknown>;
+
+  // Look up program and occupation hour requirements
+  const { data: program } = await supabase
+    .from('programs')
+    .select('slug, name')
+    .eq('id', data.programId)
+    .single();
+
+  const programSlug = (application.program_slug as string) || program?.slug || '';
+  const { data: occupation } = await supabase
+    .from('apprenticeship_occupations')
+    .select('total_hours_required, related_instruction_hours_required')
+    .eq('occupation_code', programSlug.split('-')[0])
+    .maybeSingle();
+
+  const totalHours = occupation?.total_hours_required || 2000;
+  const rtiHours = occupation?.related_instruction_hours_required || 144;
+
+  // 1. Create apprentice record (matches actual schema)
   const { data: apprentice, error: apprenticeError } = await supabase
     .from('apprentices')
     .insert({
       user_id: data.userId,
-      enrollment_id: data.enrollmentId,
-      application_id: data.applicationId,
       program_id: data.programId,
       status: 'active',
-      ojl_hours: 0,
-      ojl_hours_required: 2000, // Default, should come from program
-      rti_hours: 0,
-      rti_hours_required: 144, // Default, should come from program
-      competencies_completed: 0,
-      competencies_required: 50, // Default, should come from program
-      created_at: new Date().toISOString(),
+      start_date: (application.desired_start_date as string) || now,
     })
     .select('id')
     .single();
-  
+
   if (apprenticeError) {
     logger.warn('Apprentice record creation failed', { error: apprenticeError.message });
+    return { apprenticeRecordId: '', rapidsRecordId: '' };
   }
-  
-  // Create RAPIDS preparation record
+
+  // 2. Create RAPIDS apprentice record (matches actual schema)
+  const rapidsInsert = {
+    user_id: data.userId,
+    enrollment_id: data.enrollmentId,
+    first_name: (application.first_name as string) || null,
+    last_name: (application.last_name as string) || null,
+    date_of_birth: (application.date_of_birth as string) || null,
+    program_id: data.programId,
+    occupation_code: programSlug.split('-')[0] || null,
+    occupation_title: program?.name || null,
+    total_hours_required: totalHours,
+    related_instruction_hours_required: rtiHours,
+    registration_status: 'pending',
+    created_at: now,
+  };
+
   const { data: rapids, error: rapidsError } = await supabase
     .from('rapids_apprentices')
-    .insert({
-      user_id: data.userId,
-      enrollment_id: data.enrollmentId,
-      application_id: data.applicationId,
-      program_id: data.programId,
-      status: 'preparation',
-      created_at: new Date().toISOString(),
-    })
+    .insert(rapidsInsert)
     .select('id')
     .single();
-  
+
   if (rapidsError) {
-    logger.warn('RAPIDS record creation failed', { error: rapidsError.message });
+    logger.warn('RAPIDS apprentice record creation failed', { error: rapidsError.message });
   }
-  
-  // Create competency checklist
-  // Get competencies for program
+
+  // 3. Create apprentice placement (pending host shop assignment)
+  await supabase.from('apprentice_placements').insert({
+    apprentice_id: apprentice?.id,
+    enrollment_id: data.enrollmentId,
+    status: 'pending',
+    start_date: (application.desired_start_date as string) || now,
+    created_at: now,
+  });
+
+  // 4. Seed competency checklist from program competencies
   const { data: competencies } = await supabase
     .from('apprentice_competencies')
-    .select('id')
+    .select('id, code, name')
     .eq('program_id', data.programId);
-  
+
   if (competencies && competencies.length > 0) {
     const checklist = competencies.map(comp => ({
       apprentice_id: apprentice?.id,
       competency_id: comp.id,
+      competency_code: comp.code,
+      competency_name: comp.name,
       status: 'not_started',
-      created_at: new Date().toISOString(),
+      created_at: now,
     }));
-    
+
     await supabase
       .from('apprentice_competency_records')
       .upsert(checklist, { onConflict: 'apprentice_id,competency_id' });
   }
-  
-  // Create time clock record
-  await supabase
-    .from('apprentice_time_records')
-    .insert({
-      apprentice_id: apprentice?.id,
-      enrollment_id: data.enrollmentId,
-      status: 'active',
-      created_at: new Date().toISOString(),
-    });
-  
+
+  // 5. Create hour entry for OJL tracking
+  await supabase.from('hour_entries').insert({
+    apprentice_id: apprentice?.id,
+    enrollment_id: data.enrollmentId,
+    week_start_date: now.split('T')[0],
+    week_number: 1,
+    ojt_hours: 0,
+    rti_hours: 0,
+    status: 'pending',
+    mentor_approval: false,
+    created_at: now,
+  });
+
+  // 6. Create apprentice time record (time-clock)
+  await supabase.from('apprentice_time_records').insert({
+    apprentice_id: apprentice?.id,
+    enrollment_id: data.enrollmentId,
+    status: 'active',
+    created_at: now,
+  });
+
+  // 7. Create initial RAPIDS progress update
+  await supabase.from('rapids_progress_updates').insert({
+    rapids_apprentice_id: rapids?.id,
+    enrollment_id: data.enrollmentId,
+    report_date: now,
+    quarter: `Q${Math.ceil((new Date(now).getMonth() + 1) / 3)}`,
+    ojt_hours_completed: 0,
+    rti_hours_completed: 0,
+    competencies_verified: 0,
+    status: 'in_progress',
+    created_at: now,
+  });
+
   return {
     apprenticeRecordId: apprentice?.id || '',
     rapidsRecordId: rapids?.id || '',
@@ -1195,31 +1254,81 @@ async function provisionTestingRecords(
     enrollmentId: string;
     applicationId: string;
     programId: string;
+    application: Record<string, unknown>;
   },
-): Promise<{ testingRecordId: string }> {
-  const { data: record, error } = await supabase
-    .from('testing_records')
+): Promise<{ testingRecordId: string; credentialId: string }> {
+  const now = new Date().toISOString();
+  let credentialId = '';
+
+  // 1. Learner exam eligibility record
+  const examType = (data.application.exam_type as string) || null;
+  const eligibilityResult = await supabase
+    .from('learner_exam_eligibility')
     .insert({
       user_id: data.userId,
       enrollment_id: data.enrollmentId,
-      application_id: data.applicationId,
-      program_id: data.programId,
-      status: 'registered',
-      created_at: new Date().toISOString(),
+      exam_type: examType,
+      eligibility_status: 'pending_verification',
+      created_at: now,
     })
     .select('id')
     .single();
-  
-  if (error) {
-    logger.warn('Testing record creation failed', { error: error.message });
+
+  if (eligibilityResult.error) {
+    logger.warn('Learner exam eligibility creation failed', {
+      error: eligibilityResult.error.message,
+    });
   }
-  
-  return { testingRecordId: record?.id || '' };
+
+  // 2. Exam booking (pending scheduling)
+  const bookingResult = await supabase
+    .from('exam_bookings')
+    .insert({
+      user_id: data.userId,
+      enrollment_id: data.enrollmentId,
+      booking_status: 'pending',
+      registration_status: 'registered',
+      created_at: now,
+    })
+    .select('id')
+    .single();
+
+  if (bookingResult.error) {
+    logger.warn('Exam booking creation failed', {
+      error: bookingResult.error.message,
+    });
+  }
+
+  // 3. Student credential record (pending certification)
+  const credentialResult = await supabase
+    .from('student_credentials')
+    .insert({
+      user_id: data.userId,
+      enrollment_id: data.enrollmentId,
+      credential_status: 'pending',
+      issue_date: null,
+      expiry_date: null,
+      created_at: now,
+    })
+    .select('id')
+    .single();
+
+  if (credentialResult.error) {
+    logger.warn('Student credential creation failed', {
+      error: credentialResult.error.message,
+    });
+  } else {
+    credentialId = credentialResult.data?.id || '';
+  }
+
+  return {
+    testingRecordId: eligibilityResult.data?.id || bookingResult.data?.id || '',
+    credentialId,
+  };
 }
 
 // ============================================
 // EXPORTS
 // ============================================
 
-export { provisionEnrollment };
 export type { ProvisioningInput, ProvisioningResult };

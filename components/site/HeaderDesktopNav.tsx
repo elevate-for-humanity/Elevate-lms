@@ -3,12 +3,14 @@
 
 import Link from 'next/link';
 import { groupNavSubItemsByHeader } from '@/lib/navigation';
+import { Lock } from 'lucide-react';
 
 interface SubItem {
   name: string;
   href: string;
   isHeader?: boolean;
   isSectionLink?: boolean;
+  isAuth?: boolean;
 }
 
 interface NavItem {
@@ -42,7 +44,7 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
               <div
                 className={`max-h-[calc(100vh-5rem)] overflow-y-auto rounded-lg border border-slate-200 bg-white p-3 shadow-lg ${
                   item.id === 'programs'
-                    ? 'grid w-[min(92vw,60rem)] grid-cols-3 gap-x-5 gap-y-3'
+                    ? 'grid w-[min(92vw,64rem)] grid-cols-4 gap-x-5 gap-y-3'
                     : 'min-w-[15rem]'
                 }`}
               >
@@ -61,13 +63,14 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
                         <Link
                           key={`${sub.href}-${sub.name}`}
                           href={sub.href}
-                          className={`block rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-blue-600 ${
+                          className={`flex items-center gap-1.5 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-blue-600 ${
                             sub.isSectionLink ? 'font-semibold text-brand-red-600' : ''
                           }`}
                           {...(isExternal(sub.href)
                             ? { target: '_blank', rel: 'noopener noreferrer' }
                             : {})}
                         >
+                          {sub.isAuth && <Lock className="h-3 w-3 flex-shrink-0 text-slate-400" aria-hidden="true" />}
                           {sub.name}
                         </Link>
                       ))}

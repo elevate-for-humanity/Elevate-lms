@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronDown, Menu, X } from 'lucide-react';
+import { ChevronDown, Menu, X, Lock, Phone } from 'lucide-react';
 import SearchModal from './SearchModal.client';
 import LanguageSwitcher from './LanguageSwitcher.client';
 import {
@@ -51,8 +51,9 @@ function MobileSubLink({
         prefetch={false}
         onClick={onNavigate}
         {...(isExternalHref(subItem.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-        className="block py-2 text-sm font-semibold text-brand-red-600 hover:text-brand-red-700"
+        className="flex items-center gap-1.5 py-2 text-sm font-semibold text-brand-red-600 hover:text-brand-red-700"
       >
+        {subItem.isAuth && <Lock className="h-3 w-3 flex-shrink-0" aria-hidden="true" />}
         {subItem.name}
       </Link>
     );
@@ -68,10 +69,11 @@ function MobileSubLink({
         prefetch={false}
         onClick={onNavigate}
         {...(isExternalHref(subItem.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-        className={`block py-2.5 text-sm text-slate-700 hover:text-brand-blue-600 ${
+        className={`flex items-center gap-1.5 py-2.5 text-sm text-slate-700 hover:text-brand-blue-600 ${
           nested ? 'pl-2 text-slate-600' : ''
         }`}
       >
+        {subItem.isAuth && <Lock className="h-3 w-3 flex-shrink-0 text-slate-400" aria-hidden="true" />}
         {subItem.name}
       </Link>
       {applyHref ? (
@@ -90,12 +92,14 @@ function MobileSubLink({
 
 export default function HeaderMobileMenu({ items, programApplyLinks = {} }: HeaderMobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [expandedSection, setExpandedSection] = useState<string | null>('all'); // Expand all by default
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
 
   const closeMenu = () => setIsOpen(false);
+  const toggleSection = (key: string) =>
+    setExpandedSection((prev) => (prev === key ? null : key));
 
   useEffect(() => {
     setMounted(true);
@@ -103,7 +107,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
 
   useEffect(() => {
     setIsOpen(false);
-    setExpandedSection('all'); // Keep all expanded
+    setExpandedSection(null);
     setExpandedCategory(null);
   }, [pathname]);
 
@@ -133,41 +137,46 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
               aria-hidden="true"
             />
             <div
-              className="fixed top-[60px] right-0 bottom-0 w-[min(100vw,26rem)] bg-white z-[10001] overflow-y-auto shadow-2xl md:hidden"
+              className="fixed top-[60px] right-0 bottom-0 w-[min(100vw,26rem)] bg-white z-[10001] flex flex-col shadow-2xl md:hidden"
               role="dialog"
               aria-modal="true"
               aria-label="Main menu"
             >
-              <nav className="flex flex-col p-4 pb-10" aria-label="Site menu">
+              {/* Scrollable nav content */}
+              <nav className="flex-1 overflow-y-auto p-4" aria-label="Site menu">
                 {items.map((item) => {
                   const sectionKey = item.id ?? item.name;
                   const hasSubItems = Boolean(item.subItems?.length);
-                  // Always show all sections expanded when drawer is open
-                  const sectionOpen = true;
-                  const columns = hasSubItems ? Object.values(groupNavSubItemsByHeader(item.subItems!)) : [];
+                  const sectionOpen = expandedSection === sectionKey;
+                  const columns = hasSubItems
+                    ? Object.values(groupNavSubItemsByHeader(item.subItems!))
+                    : [];
                   const useCategoryAccordions = columns.length > 1;
 
                   return (
                     <section key={item.name} className="border-b border-slate-100 last:border-0">
                       {hasSubItems ? (
-                        item.href ? (
-                          <Link
-                            href={item.href}
-                            prefetch={false}
-                            onClick={closeMenu}
-                            className="block py-3 text-base font-semibold text-slate-900 hover:text-brand-blue-600"
-                          >
-                            {item.name}
-                          </Link>
-                        ) : (
-                          <p className="py-3 text-base font-semibold text-slate-900">{item.name}</p>
-                        )
+                        <button
+                          type="button"
+                          onClick={() => toggleSection(sectionKey)}
+                          className="flex w-full items-center justify-between py-3 text-left text-base font-semibold text-slate-900 hover:text-brand-blue-600"
+                          aria-expanded={sectionOpen}
+                          aria-controls={`mobile-section-${sectionKey}`}
+                        >
+                          {item.name}
+                          <ChevronDown
+                            className={`h-4 w-4 flex-none text-slate-400 transition-transform ${
+                              sectionOpen ? 'rotate-180' : ''
+                            }`}
+                            aria-hidden="true"
+                          />
+                        </button>
                       ) : item.href ? (
                         <Link
                           href={item.href}
                           prefetch={false}
                           onClick={closeMenu}
-                          className="block py-3 text-base font-semibold text-slate-900 hover:text-brand-blue-600"
+                          className="flex py-3 text-base font-semibold text-slate-900 hover:text-brand-blue-600"
                         >
                           {item.name}
                         </Link>
@@ -176,7 +185,10 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                       )}
 
                       {hasSubItems && sectionOpen ? (
-                        <div className="flex flex-col pb-4 pl-3 border-l-2 border-brand-red-200">
+                        <div
+                          id={`mobile-section-${sectionKey}`}
+                          className="flex flex-col pb-4 pl-3 border-l-2 border-brand-red-200"
+                        >
                           {item.href ? (
                             <Link
                               href={item.href}
@@ -220,26 +232,27 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                                         aria-label={`${categoryOpen ? 'Collapse' : 'Expand'} ${label}`}
                                         aria-expanded={categoryOpen}
                                       >
-                                      <ChevronDown
-                                        className={`h-4 w-4 flex-none text-brand-red-400 transition-transform ${
-                                          categoryOpen ? 'rotate-180' : ''
-                                        }`}
-                                        aria-hidden="true"
-                                      />
+                                        <ChevronDown
+                                          className={`h-4 w-4 flex-none text-brand-red-400 transition-transform ${
+                                            categoryOpen ? 'rotate-180' : ''
+                                          }`}
+                                          aria-hidden="true"
+                                        />
                                       </button>
                                     </div>
                                     {categoryOpen ? (
                                       <div className="pl-2 pb-2 border-l border-slate-200 ml-1">
-                                        {column.map((subItem) => 
+                                        {column.map((subItem) =>
                                           !subItem ? null : (
-                                          <MobileSubLink
-                                            key={`${subItem.name}-${subItem.href}`}
-                                            subItem={subItem}
-                                            itemId={item.id}
-                                            programApplyLinks={programApplyLinks}
-                                            onNavigate={closeMenu}
-                                          />
-                                        ))}
+                                            <MobileSubLink
+                                              key={`${subItem.name}-${subItem.href}`}
+                                              subItem={subItem}
+                                              itemId={item.id}
+                                              programApplyLinks={programApplyLinks}
+                                              onNavigate={closeMenu}
+                                            />
+                                          ),
+                                        )}
                                       </div>
                                     ) : null}
                                   </div>
@@ -269,42 +282,37 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                     </section>
                   );
                 })}
+              </nav>
 
-                <div className="mt-6 flex flex-col gap-2">
+              {/* Sticky footer */}
+              <div className="border-t border-slate-200 p-4 bg-white">
+                <div className="flex gap-2 mb-3">
                   <Link
-                    href="/for-students"
+                    href="/apply"
                     prefetch={false}
                     onClick={closeMenu}
-                    className="block w-full text-center py-3 bg-brand-red-600 text-white rounded-lg font-semibold"
+                    className="flex-1 text-center py-3 bg-brand-red-600 text-white rounded-lg font-semibold text-sm hover:bg-brand-red-700"
                   >
-                    Get Started
-                  </Link>
-                  <Link
-                    href="/portals"
-                    prefetch={false}
-                    onClick={closeMenu}
-                    className="block w-full text-center py-3 border border-slate-300 text-slate-800 rounded-lg font-semibold hover:bg-slate-50"
-                  >
-                    Admin Dashboard
+                    Apply Now
                   </Link>
                   <Link
                     href="/login"
                     prefetch={false}
                     onClick={closeMenu}
-                    className="block w-full text-center py-2.5 text-slate-600 font-medium text-sm hover:underline"
+                    className="flex-1 text-center py-3 border border-slate-300 text-slate-800 rounded-lg font-semibold text-sm hover:bg-slate-50 flex items-center justify-center gap-1.5"
                   >
-                    Sign in (all roles)
-                  </Link>
-                  <Link
-                    href="/apply"
-                    prefetch={false}
-                    onClick={closeMenu}
-                    className="block w-full text-center py-2.5 text-brand-blue-600 font-medium text-sm hover:underline"
-                  >
-                    Check eligibility
+                    <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+                    Sign In
                   </Link>
                 </div>
-              </nav>
+                <a
+                  href="tel:+13173143757"
+                  className="flex items-center justify-center gap-1.5 text-sm text-slate-500 hover:text-brand-blue-600"
+                >
+                  <Phone className="h-3.5 w-3.5" aria-hidden="true" />
+                  (317) 314-3757
+                </a>
+              </div>
             </div>
           </>,
           document.body,
@@ -315,10 +323,6 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
     <div className="flex flex-row flex-nowrap items-center justify-end gap-0.5 shrink-0">
       <SearchModal />
       <LanguageSwitcher compact={true} />
-      {/* Hamburger + side drawer are mobile/tablet only. On md+ the horizontal
-          HeaderDesktopNav (with hover dropdowns) is the navigation. The wrapper
-          span carries md:hidden so it doesn't collide with the button's own
-          display:flex utility. */}
       <span className="md:hidden">
         <button
           type="button"

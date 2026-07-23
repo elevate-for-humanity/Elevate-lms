@@ -90,11 +90,14 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const firstFocusRef = useRef<HTMLButtonElement>(null);
 
-  const closeMenu = () => setIsOpen(false);
+  const closeMenu = () => {
+    setIsOpen(false);
+    setExpandedSection(null);
+    setExpandedCategory(null);
+  };
   // Reset category when switching sections to avoid stale accordion state
   const toggleSection = (key: string) =>
     setExpandedSection((prev) => {
@@ -103,9 +106,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
       return key;
     });
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+
 
   useEffect(() => {
     setIsOpen(false);
@@ -114,12 +115,12 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
   }, [pathname]);
 
   useEffect(() => {
-    if (isOpen && mounted) {
+    if (isOpen) {
       requestAnimationFrame(() => {
         firstFocusRef.current?.focus();
       });
     }
-  }, [isOpen, mounted]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -138,7 +139,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
   }, [isOpen]);
 
   const drawer =
-    mounted && isOpen
+    isOpen
       ? createPortal(
           <>
             {/* Backdrop — below header (z-9998) so hamburger button (z-9999) stays clickable */}

@@ -34,7 +34,7 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
                 type="button"
                 className="whitespace-nowrap px-2 xl:px-3 py-2 text-sm font-medium text-slate-700 hover:text-brand-blue-600 rounded-md"
                 aria-haspopup={hasSubItems ? 'menu' : undefined}
-                aria-expanded={hasSubItems ? undefined : undefined}
+                aria-expanded={false}
                 aria-controls={hasSubItems ? dropdownId : undefined}
               >
                 {item.name}

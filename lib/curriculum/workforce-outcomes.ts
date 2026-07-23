@@ -164,7 +164,7 @@ export async function getONETOccupation(socCode: string): Promise<any | null> {
       `https://services.onetcenter.org/ws/online/occupations/${socCode}`,
       {
         headers: {
-          'Authorization': `Basic ${Buffer.from(`${apiKey}:`).toString('base64')}`,
+          'X-API-Key': apiKey,
           'Accept': 'application/json',
         },
       },

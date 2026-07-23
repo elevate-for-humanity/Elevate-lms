@@ -29,7 +29,7 @@ export const PROGRAM_SOC_MAP: Record<string, string> = {
   'phlebotomy': '31-9097.00',            // Phlebotomists
   'pharmacy-technician': '29-2052.00',   // Pharmacy Technicians
   'home-health-aide': '31-1121.00',      // Home Health and Personal Care Aides
-  'peer-recovery-specialist': '21-1018.00', // Substance Abuse, Behavioral Disorder, and Mental Health Counselors
+  'peer-recovery-specialist': '21-1093.00', // Social and Human Service Assistants
   'sanitation-infection-control': '31-9099.00', // Healthcare Support Workers, All Other
   'emergency-health-safety': '29-2042.00',      // Emergency Medical Technicians
   'cpr-first-aid': '29-2042.00',

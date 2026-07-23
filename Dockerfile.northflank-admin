@@ -116,9 +116,8 @@ RUN if [ -f /app/apps/admin/server.js ]; then \
     rm -rf /app/apps
 
 # Copy ALL required Next.js build artifacts to correct locations
-# CRITICAL: Need .next/server for route manifests and build metadata
-COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/server ./.next/server
+# Copy FULL .next directory so the standalone server finds BUILD_ID and all root-level files
+COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next ./.next
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./public
 
 # Copy node_modules (needed for runtime dependencies)

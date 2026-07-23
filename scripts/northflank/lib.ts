@@ -79,12 +79,8 @@ export function resolveAdminServiceId(): string | undefined {
   return process.env.NORTHFLANK_ADMIN_SERVICE_ID;
 }
 
-/** Prefix path with team when NORTHFLANK_TEAM_ID is set. */
+/** Always use project-scoped path — works with both project tokens and team-scoped UI tokens. */
 export function projectApiPath(projectId: string, suffix: string): string {
-  const teamId = resolveTeamId();
-  if (teamId) {
-    return teamPath(teamId, `/${projectId}${suffix}`);
-  }
   return `/projects/${projectId}${suffix}`;
 }
 

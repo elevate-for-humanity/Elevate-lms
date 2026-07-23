@@ -16,32 +16,6 @@ import { resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
 import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import LiveJobPostings from '@/components/careers/LiveJobPostings';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import ProgramLanding from '@/components/programs/ProgramLanding';
-
-// Program configurations (configuration-driven architecture)
-import { barberConfig } from '@/components/programs/config/barber-config';
-import { cosmetologyConfig } from '@/components/programs/config/cosmetology-config';
-import { estheticsConfig } from '@/components/programs/config/esthetics-config';
-import { nailConfig } from '@/components/programs/config/nail-config';
-
-import type { ProgramConfig } from '@/components/programs/ProgramLanding';
-
-// Registry of all apprenticeship programs using new architecture
-const APPRENTICESHIP_CONFIGS: Record<string, ProgramConfig> = {
-  'barber-apprenticeship': barberConfig,
-  'cosmetology-apprenticeship': cosmetologyConfig,
-  'esthetician-apprenticeship': estheticsConfig,
-  'nail-technician-apprenticeship': nailConfig,
-};
-
-// Legacy program slugs that should redirect to canonical URLs
-const LEGACY_PROGRAM_REDIRECTS: Record<string, string> = {
-  'barber': '/programs/barber-apprenticeship',
-  'cosmetology': '/programs/cosmetology-apprenticeship',
-  'hvac': '/programs/hvac-technician',
-  'finance-bookkeeping-accounting': '/programs/bookkeeping',
-  'bookkeeping': '/programs/bookkeeping',
-};
 
 export const dynamic = 'force-dynamic';
 
@@ -533,16 +507,6 @@ function ProgramPage({
 
 export default async function ProgramDetailPage({ params }: { params: Promise<{ program: string }> }) {
   const { program } = await params;
-
-  // Redirect legacy program slugs to canonical URLs
-  if (LEGACY_PROGRAM_REDIRECTS[program]) {
-    redirect(LEGACY_PROGRAM_REDIRECTS[program]);
-  }
-
-  // Configuration-driven apprenticeship programs (new architecture)
-  if (APPRENTICESHIP_CONFIGS[program]) {
-    return <ProgramLanding config={APPRENTICESHIP_CONFIGS[program]} />;
-  }
 
   // Static ProgramSchema — richest renderer, always preferred when available.
   // Overlay DB title/description if the program also exists in the DB.

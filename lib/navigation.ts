@@ -1,310 +1,241 @@
-// Single source of truth for the public marketing site navigation.
-//
-// Rules:
-// - Top-level items cover every major audience and content area.
-// - Programs mega-menu: all canonical programs, grouped by industry.
-// - Apprenticeships: DOL-registered, separate from programs.
-// - Partners: employers, agencies, training providers, program holders, booth renters.
-// - About: mission, team, impact, blog, contact, advising.
-// - Funding: all streams + eligibility CTA.
-// - Apply: single funnel entry point.
-//
-// Consumed by:
-//   components/site/Header.tsx → HeaderDesktopNav + HeaderMobileMenu
+// lib/navigation.ts — Elevate for Humanity site-wide navigation config
+// Single source of truth for the public marketing site header navigation.
+// Consumed by HeaderDesktopNav and HeaderMobileMenu.
 
-import { canonicalRoutes } from '@/lib/routes/canonical-routes';
-
-export interface NavSubItem {
-  name: string;
-  href: string;
-  isHeader?: boolean;
-  isSectionLink?: boolean;
-  nested?: boolean;
-}
-
-export interface NavItem {
-  id: string;
-  name: string;
-  href?: string;
-  subItems?: NavSubItem[];
-}
+import { type NavItem } from '@/types/navigation';
 
 export const NAV_ITEMS: NavItem[] = [
-  // ── 1. Programs ─────────────────────────────────────────────────────────────
+  // ── 1. Programs — 4-column mega-menu ──────────────────────────────────────
   {
     id: 'programs',
     name: 'Programs',
     href: '/programs',
     subItems: [
-      // Healthcare
-      { name: '— Healthcare —', href: '/programs/healthcare', isHeader: true },
-      { name: 'CNA / Nursing Assistant', href: '/programs/cna' },
-      { name: 'QMA / Medication Aide', href: '/programs/qma' },
-      { name: 'Phlebotomy Technician', href: '/programs/phlebotomy' },
-      { name: 'Medical Assistant', href: '/programs/medical-assistant' },
-      { name: 'Peer Recovery Specialist', href: '/programs/peer-recovery-specialist' },
-      { name: 'Direct Support Professional', href: canonicalRoutes.programs.directSupportProfessional },
-      { name: 'Drug & Alcohol Collector', href: '/programs/drug-collector' },
-      { name: 'CPR / First Aid', href: '/programs/cpr-first-aid' },
-      { name: 'All Healthcare →', href: '/programs/healthcare', isSectionLink: true },
-
-      // Skilled Trades
-      { name: '— Skilled Trades —', href: '/programs/skilled-trades', isHeader: true },
-      { name: 'HVAC Technician', href: canonicalRoutes.programs.hvacTechnician },
-      { name: 'Building Services Technician', href: canonicalRoutes.programs.buildingServicesTechnician },
-      { name: 'CDL Training', href: '/programs/cdl-training' },
-      { name: 'All Trades →', href: '/programs/skilled-trades', isSectionLink: true },
-
-      // Beauty & Cosmetology
-      { name: '— Beauty & Cosmetology —', href: '/programs/beauty', isHeader: true },
-      { name: 'Barber Apprenticeship', href: canonicalRoutes.programs.barberApprenticeship },
-      { name: 'Cosmetology Apprenticeship', href: canonicalRoutes.programs.cosmetologyApprenticeship },
-      { name: 'Esthetician Apprenticeship', href: canonicalRoutes.programs.estheticianApprenticeship },
-      { name: 'Nail Technician Apprenticeship', href: '/programs/nail-technician-apprenticeship' },
-      { name: 'All Beauty →', href: '/apprenticeships', isSectionLink: true },
-
-      // Technology
-      { name: '— Technology —', href: '/programs/technology', isHeader: true },
-      { name: 'IT Help Desk', href: '/programs/it-help-desk' },
-      { name: 'Cybersecurity Analyst', href: '/programs/cybersecurity-analyst' },
-      { name: 'All Technology →', href: '/programs/technology', isSectionLink: true },
-
-      // Business & Finance
-      { name: '— Business & Finance —', href: '/programs/finance-bookkeeping-accounting', isHeader: true },
-      { name: 'Finance, Bookkeeping & Accounting', href: '/programs/finance-bookkeeping-accounting' },
-
-      // Short Courses (partner)
-      { name: '— Short Courses —', href: '/courses', isHeader: true },
-      { name: 'CPR / First Aid (HSI)', href: '/partners/hsi' },
-      { name: 'Food Handler (NRF)', href: '/partners/nrf' },
-      { name: 'All Short Courses →', href: '/courses', isSectionLink: true },
-
-      // Special Programs
-      { name: '— Special Programs —', href: '/programs', isHeader: true },
-      { name: 'Federal-Funded Programs', href: '/programs/federal-funded' },
-      { name: 'JRI — Justice-Involved', href: '/partners/jri' },
-      { name: 'All Programs →', href: '/programs', isSectionLink: true },
+      { name: 'Healthcare', isHeader: true, href: '/programs/healthcare' },
+      { name: 'CNA', href: '/programs/cna', isSectionLink: true },
+      { name: 'QMA', href: '/programs/qma', isSectionLink: true },
+      { name: 'Medical Assistant', href: '/programs/medical-assistant', isSectionLink: true },
+      { name: 'Phlebotomy', href: '/programs/phlebotomy', isSectionLink: true },
+      { name: 'Skilled Trades', isHeader: true, href: '/programs/skilled-trades' },
+      { name: 'HVAC', href: '/programs/hvac-technician', isSectionLink: true },
+      { name: 'Building Services', href: '/programs/building-technician', isSectionLink: true },
+      { name: 'CDL Training', href: '/programs/cdl-training', isSectionLink: true },
+      { name: 'Beauty', isHeader: true, href: '/programs/beauty-cosmetology' },
+      { name: 'Barber', href: '/programs/barber-apprenticeship', isSectionLink: true },
+      { name: 'Cosmetology', href: '/programs/cosmetology-apprenticeship', isSectionLink: true },
+      { name: 'Esthetics', href: '/programs/esthetician-apprenticeship', isSectionLink: true },
+      { name: 'Nail Technician', href: '/programs/nail-technician-apprenticeship', isSectionLink: true },
+      { name: 'Tech & Business', isHeader: true, href: '/programs/technology' },
+      { name: 'IT Help Desk', href: '/programs/it-helpdesk', isSectionLink: true },
+      { name: 'Cybersecurity', href: '/programs/cybersecurity', isSectionLink: true },
+      { name: 'Bookkeeping', href: '/programs/bookkeeping', isSectionLink: true },
+      { name: 'View All Programs', href: '/programs', isSectionLink: true },
     ],
   },
-
-  // ── 2. Apprenticeships ───────────────────────────────────────────────────────
+  // ── 2. Apprenticeships — Explore / Programs / Partner / Current Users ────────
   {
     id: 'apprenticeships',
     name: 'Apprenticeships',
-    href: '/apprenticeships',
     subItems: [
-      // DOL Registered programs
-      { name: '— DOL Registered —', href: '/apprenticeships', isHeader: true },
-      { name: 'All Apprenticeships', href: '/apprenticeships' },
-      { name: 'Barber Apprenticeship', href: canonicalRoutes.programs.barberApprenticeship },
-      { name: 'Cosmetology Apprenticeship', href: canonicalRoutes.programs.cosmetologyApprenticeship },
-      { name: 'Esthetician Apprenticeship', href: canonicalRoutes.programs.estheticianApprenticeship },
-      { name: 'Skilled Trades Apprenticeships', href: '/programs/skilled-trades' },
-      // Host a site
-      { name: '— Host a Site —', href: '/partners/barber-host-shop', isHeader: true },
-      { name: 'Host a Barbershop Apprenticeship', href: '/partners/barber-host-shop' },
-      { name: 'Host a Cosmetology Apprenticeship', href: '/partners/cosmetology-host-shop' },
-      { name: 'Apprenticeship Sponsorship', href: '/employer/apprenticeships' },
-      { name: 'How It Works →', href: '/apprenticeships', isSectionLink: true },
+      { name: 'Explore', isHeader: true },
+      { name: 'All Apprenticeships', href: '/apprenticeships', isSectionLink: true },
+      { name: 'How Apprenticeships Work', href: '/apprenticeships/how-it-works', isSectionLink: true },
+      { name: 'Earn While You Learn', href: '/apprenticeships/earn-while-you-learn', isSectionLink: true },
+      { name: 'Apprenticeship FAQs', href: '/apprenticeships/faq', isSectionLink: true },
+      { name: 'Programs', isHeader: true },
+      { name: 'Barber', href: '/programs/barber-apprenticeship', isSectionLink: true },
+      { name: 'Cosmetology', href: '/programs/cosmetology-apprenticeship', isSectionLink: true },
+      { name: 'Esthetics', href: '/programs/esthetician-apprenticeship', isSectionLink: true },
+      { name: 'Nail Technician', href: '/programs/nail-technician-apprenticeship', isSectionLink: true },
+      { name: 'Skilled Trades', href: '/programs/hvac-technician', isSectionLink: true },
+      { name: 'Become a Partner', isHeader: true },
+      { name: 'Become a Host Shop', href: '/apprenticeships/host-shop', isSectionLink: true },
+      { name: 'Employer Sponsorship', href: '/apprenticeships/sponsor', isSectionLink: true },
+      { name: 'Become a Mentor', href: '/apprenticeships/mentor', isSectionLink: true },
+      { name: 'Refer an Apprentice', href: '/apprenticeships/refer', isSectionLink: true },
+      { name: 'Current Users', isHeader: true },
+      { name: 'Apprentice Portal', href: '/portal/apprentice', isSectionLink: true, isAuth: true },
+      { name: 'Host Shop Portal', href: '/portal/host-shop', isSectionLink: true, isAuth: true },
+      { name: 'Employer Portal', href: '/portal/employer', isSectionLink: true, isAuth: true },
     ],
   },
-
-  // ── 3. Testing ────────────────────────────────────────────────────────────────
+  // ── 3. Testing — Exams / Candidates / Organizations ─────────────────────────
   {
     id: 'testing',
     name: 'Testing',
-    href: '/testing',
     subItems: [
-      { name: '— Certification Exams —', href: '/testing', isHeader: true },
-      { name: 'NHA Healthcare Exams', href: '/testing/nha' },
-      { name: 'EPA 608 (HVAC)', href: '/testing/esco' },
-      { name: 'Certiport (IT / Microsoft)', href: '/testing/certiport' },
-      { name: 'ACT WorkKeys', href: '/testing/workkeys' },
-      { name: 'All Testing Providers →', href: '/testing', isSectionLink: true },
-      { name: '— Schedule & Access —', href: '/testing/book', isHeader: true },
-      { name: 'Book a Testing Session', href: '/testing/book' },
-      { name: 'Testing Accommodations', href: '/testing/accommodations' },
-      { name: 'Verify a Credential', href: '/verify' },
+      { name: 'Exams', isHeader: true },
+      { name: 'NHA', href: '/testing/nha', isSectionLink: true },
+      { name: 'EPA 608', href: '/testing/epa-608', isSectionLink: true },
+      { name: 'Certiport', href: '/testing/certiport', isSectionLink: true },
+      { name: 'ACT WorkKeys', href: '/testing/act-workkeys', isSectionLink: true },
+      { name: 'All Testing Services', href: '/testing', isSectionLink: true },
+      { name: 'Candidates', isHeader: true },
+      { name: 'Book an Exam', href: '/testing/book', isSectionLink: true },
+      { name: 'Testing Requirements', href: '/testing/requirements', isSectionLink: true },
+      { name: 'Accommodations', href: '/testing/accommodations', isSectionLink: true },
+      { name: 'Retesting', href: '/testing/retest', isSectionLink: true },
+      { name: 'Candidate Portal', href: '/portal/testing', isSectionLink: true, isAuth: true },
+      { name: 'Organizations', isHeader: true },
+      { name: 'Become a Testing Partner', href: '/testing/partner', isSectionLink: true },
+      { name: 'Proctor Portal', href: '/portal/proctor', isSectionLink: true, isAuth: true },
+      { name: 'Testing Center Services', href: '/testing/services', isSectionLink: true },
+      { name: 'Verify a Credential', href: '/testing/verify', isSectionLink: true },
     ],
   },
-
-  // ── 3b. Store ────────────────────────────────────────────────────────────────
+  // ── 4. Platform — renamed from Store; distinct destinations ───────────────
   {
     id: 'store',
-    name: 'Store',
-    href: '/store',
+    name: 'Platform',
     subItems: [
-      { name: '— Platform Licenses —', href: '/store', isHeader: true },
-      { name: 'Core Platform', href: '/store' },
-      { name: 'School / Training Provider', href: '/store' },
-      { name: 'Enterprise Solution', href: '/store' },
-      { name: 'View All Plans →', href: '/store', isSectionLink: true },
-      { name: '— Digital Products —', href: '/store/guides', isHeader: true },
-      { name: 'Capital Readiness Guide', href: '/store/guides/capital-readiness' },
-      { name: 'Licensing Guide', href: '/store/guides/licensing' },
-      { name: 'All Guides →', href: '/store/guides', isSectionLink: true },
-      { name: '— Apps & Add-Ons —', href: '/apps', isHeader: true },
-      { name: 'Grants Discovery', href: '/apps/grants' },
-      { name: 'SAM.gov Assistant', href: '/apps/sam-gov' },
-      { name: 'Website Builder', href: '/apps/website-builder' },
-      { name: 'All Apps →', href: '/apps', isSectionLink: true },
+      { name: 'Platform', isHeader: true },
+      { name: 'Platform Overview', href: '/store', isSectionLink: true },
+      { name: 'Training Provider Solution', href: '/store/training-provider', isSectionLink: true },
+      { name: 'Employer Solution', href: '/store/employer', isSectionLink: true },
+      { name: 'Workforce Agency Solution', href: '/store/workforce-agency', isSectionLink: true },
+      { name: 'Enterprise', href: '/store/enterprise', isSectionLink: true },
+      { name: 'Tools', isHeader: true },
+      { name: 'Grant Discovery', href: '/store/grant-discovery', isSectionLink: true },
+      { name: 'SAM.gov Assistant', href: '/store/samgov', isSectionLink: true },
+      { name: 'Website Builder', href: '/store/website-builder', isSectionLink: true },
+      { name: 'Resources', isHeader: true },
+      { name: 'Capital Readiness Guide', href: '/store/capital-readiness', isSectionLink: true },
+      { name: 'Licensing Guide', href: '/store/licensing-guide', isSectionLink: true },
+      { name: 'All Guides', href: '/store/guides', isSectionLink: true },
+      { name: 'Pricing', isHeader: true },
+      { name: 'Plans', href: '/store/pricing', isSectionLink: true },
+      { name: 'Request Demo', href: '/store/demo', isSectionLink: true },
     ],
   },
-
-  // ── 4. Funding ──────────────────────────────────────────────────────────────
+  // ── 5. Funding — public options first ─────────────────────────────────────
   {
     id: 'funding',
     name: 'Funding',
-    href: '/funding',
     subItems: [
-      { name: '— Funding Streams —', href: '/funding', isHeader: true },
-      { name: 'WIOA / WorkOne', href: '/eligibility' },
-      { name: 'ETPL Approved Provider', href: '/federal-compliance' },
-      { name: 'Workforce Ready Grant (WRG)', href: '/funding/wrg' },
-      { name: 'Job Ready Indy (JRI)', href: '/partners/jri' },
-      { name: 'JRI — Justice-Involved', href: '/partners/reentry' },
-      { name: 'Grant Programs', href: '/funding/grant-programs' },
-      { name: 'Federal Programs', href: '/funding/federal-programs' },
-      { name: '— Compliance & Proof —', href: '/compliance', isHeader: true },
-      { name: 'RAPIDS / DOL Apprenticeship', href: '/compliance/apprenticeship-structure' },
-      { name: 'Federal Compliance', href: '/federal-compliance' },
-      { name: 'Workforce Partnerships', href: '/partners/workforce' },
-      { name: '— Payment Options —', href: '/financing', isHeader: true },
-      { name: 'Self-Pay & Payment Plans', href: '/financing' },
-      { name: 'OJT & Wage Reimbursement', href: '/ojt-and-funding' },
-      { name: 'Scholarships', href: '/scholarships' },
-      { name: 'Check Eligibility →', href: '/check-eligibility', isSectionLink: true },
+      { name: 'Funding Options', isHeader: true },
+      { name: 'WIOA / WorkOne', href: '/funding/wioa', isSectionLink: true },
+      { name: 'Workforce Ready Grant', href: '/funding/workforce-ready', isSectionLink: true },
+      { name: 'Job Ready Indy', href: '/funding/job-ready-indy', isSectionLink: true },
+      { name: 'Vocational Rehabilitation', href: '/funding/voc-rehab', isSectionLink: true },
+      { name: 'Employer-Sponsored Training', href: '/funding/employer-sponsored', isSectionLink: true },
+      { name: 'Payment Options', isHeader: true },
+      { name: 'Self-Pay', href: '/funding/self-pay', isSectionLink: true },
+      { name: 'Payment Plans', href: '/funding/payment-plans', isSectionLink: true },
+      { name: 'Scholarships', href: '/funding/scholarships', isSectionLink: true },
+      { name: 'For Employers', isHeader: true },
+      { name: 'OJT Wage Reimbursement', href: '/funding/ojt', isSectionLink: true },
+      { name: 'WOTC Tax Credits', href: '/funding/wotc', isSectionLink: true },
+      { name: 'Get Started', isHeader: true },
+      { name: 'Check Eligibility', href: '/funding/eligibility', isSectionLink: true },
+      { name: 'Funding FAQs', href: '/funding/faq', isSectionLink: true },
+      { name: 'Speak With an Advisor', href: '/contact', isSectionLink: true },
     ],
   },
-
-  // ── 5. Partners ─────────────────────────────────────────────────────────────
+  // ── 6. Partners — Employers / Workforce / Training / Beauty ───────────────
   {
     id: 'partners',
     name: 'Partners',
-    href: '/partners',
     subItems: [
-      // Employers
-      { name: '— Employers —', href: '/for-employers', isHeader: true },
-      { name: 'Hire Our Graduates', href: '/for-employers' },
-      { name: 'Employer Directory', href: '/employers/directory' },
-      { name: 'Job Board', href: '/jobs' },
-      { name: 'Post a Job / OJT', href: '/employer/post-job' },
-      { name: 'Apprenticeship Sponsorship', href: '/employer/apprenticeships' },
-      { name: 'WOTC Tax Credits', href: '/employer/wotc' },
-      { name: 'Employer Portal →', href: '/employer/dashboard', isSectionLink: true },
-      // Workforce Agencies
-      { name: '— Workforce Agencies —', href: '/for-agencies', isHeader: true },
-      { name: 'WIOA / WorkOne Referrals', href: '/for-agencies' },
-      { name: 'Apprenticeship Sponsor', href: '/apprenticeship-sponsor' },
-      { name: 'Workforce Boards', href: '/platform/workforce-boards' },
-      // Referral Partners
-      { name: '— Referral Partners —', href: '/partners/referral', isHeader: true },
-      { name: 'Referral Partner Program', href: '/partners/referral' },
-      { name: 'Submit a Referral', href: '/apply/intake' },
-      // Beauty Apprenticeship Partnerships
-      { name: '— Beauty Partnerships —', href: '/partners/barber-host-shop', isHeader: true },
-      { name: 'Barbershop Partnership', href: '/partners/barber-host-shop' },
-      { name: 'Cosmetology Partnership', href: '/partners/cosmetology-host-shop' },
-      // Training Providers & Program Holders
-      { name: '— Program Holders & Providers —', href: '/for-providers', isHeader: true },
-      { name: 'How It Works', href: '/for-providers' },
-      { name: 'Program Holder Portal', href: '/program-holder/dashboard' },
-      { name: 'Sponsors & Funders', href: '/platform/sponsors' },
-      { name: 'All Partner Applications →', href: '/apply', isSectionLink: true },
+      { name: 'Employers', isHeader: true },
+      { name: 'Hire Graduates', href: '/employers/hire', isSectionLink: true },
+      { name: 'Post a Job', href: '/employers/post-job', isSectionLink: true },
+      { name: 'Sponsor an Apprentice', href: '/employers/sponsor', isSectionLink: true },
+      { name: 'Employer Training', href: '/employers/training', isSectionLink: true },
+      { name: 'Employer Portal', href: '/portal/employer', isSectionLink: true, isAuth: true },
+      { name: 'Workforce Agencies', isHeader: true },
+      { name: 'Refer a Participant', href: '/workforce-agencies/refer', isSectionLink: true },
+      { name: 'Workforce Board Services', href: '/workforce-agencies/board-services', isSectionLink: true },
+      { name: 'WIOA Partnerships', href: '/workforce-agencies/wioa', isSectionLink: true },
+      { name: 'Agency Portal', href: '/portal/agency', isSectionLink: true, isAuth: true },
+      { name: 'Training Partners', isHeader: true },
+      { name: 'Program Holder Services', href: '/partners/program-holders', isSectionLink: true },
+      { name: 'Training Providers', href: '/partners/training-providers', isSectionLink: true },
+      { name: 'Referral Partners', href: '/partners/referral', isSectionLink: true },
+      { name: 'Sponsors and Funders', href: '/partners/sponsors', isSectionLink: true },
+      { name: 'Beauty Partners', isHeader: true },
+      { name: 'Become a Barber Host Shop', href: '/partners/barber-host', isSectionLink: true },
+      { name: 'Become a Cosmetology Host Shop', href: '/partners/cosmetology-host', isSectionLink: true },
+      { name: 'Host Shop Portal', href: '/portal/host-shop', isSectionLink: true, isAuth: true },
     ],
   },
-
-  // ── 5b. Portals (sign-in + workforce tools) ─────────────────────────────────
+  // ── 7. Portals — Learner / Apprenticeship / Partner / Staff ───────────────
   {
     id: 'portals',
     name: 'Portals',
-    href: '/portals',
     subItems: [
-      { name: '— Sign In —', href: '/portals', isHeader: true },
-      { name: 'Portal Hub', href: '/portals' },
-      { name: 'Student / Learner', href: '/login?redirect=/learner/dashboard' },
-      { name: 'Employer Portal', href: '/login?redirect=/employer/dashboard' },
-      { name: 'Staff Portal', href: '/login?redirect=/admin/staff-portal/dashboard' },
-      { name: 'Instructor Portal', href: '/login?redirect=/instructor/dashboard' },
-      { name: 'Partner Portal', href: '/login?redirect=/partner/dashboard' },
-      { name: 'Program Holder', href: '/login?redirect=/program-holder/dashboard' },
-      { name: '— Workforce Tools —', href: '/career-services', isHeader: true },
-      { name: 'Career Services', href: '/career-services' },
-      { name: 'Employment Support', href: '/employment-support' },
-      { name: 'Job Board', href: '/jobs' },
-      { name: 'How It Works', href: '/how-it-works' },
+      { name: 'Learner Access', isHeader: true },
+      { name: 'Student Portal', href: '/portal/student', isSectionLink: true, isAuth: true },
+      { name: 'LMS', href: '/lms', isSectionLink: true, isAuth: true },
+      { name: 'Digital Binder', href: '/portal/binder', isSectionLink: true, isAuth: true },
+      { name: 'Application Status', href: '/portal/application', isSectionLink: true, isAuth: true },
+      { name: 'Career Services', href: '/portal/career', isSectionLink: true, isAuth: true },
+      { name: 'Apprenticeship Access', isHeader: true },
+      { name: 'Apprentice Portal', href: '/portal/apprentice', isSectionLink: true, isAuth: true },
+      { name: 'Host Shop Portal', href: '/portal/host-shop', isSectionLink: true, isAuth: true },
+      { name: 'Mentor Portal', href: '/portal/mentor', isSectionLink: true, isAuth: true },
+      { name: 'Employer Portal', href: '/portal/employer', isSectionLink: true, isAuth: true },
+      { name: 'Partner Access', isHeader: true },
+      { name: 'Workforce Portal', href: '/portal/workforce', isSectionLink: true, isAuth: true },
+      { name: 'Program Holder Portal', href: '/portal/program-holder', isSectionLink: true, isAuth: true },
+      { name: 'Partner Portal', href: '/portal/partner', isSectionLink: true, isAuth: true },
+      { name: 'Testing Portal', href: '/portal/testing', isSectionLink: true, isAuth: true },
+      { name: 'Staff Access', isHeader: true },
+      { name: 'Instructor Portal', href: '/portal/instructor', isSectionLink: true, isAuth: true },
+      { name: 'Staff Portal', href: '/portal/staff', isSectionLink: true, isAuth: true },
+      { name: 'Admin Portal', href: '/portal/admin', isSectionLink: true, isAuth: true },
     ],
   },
-
-  // ── 6. About ────────────────────────────────────────────────────────────────
+  // ── 8. About — Organization / Trust & Compliance / Resources / Contact ─────
   {
     id: 'about',
     name: 'About',
-    href: '/about',
     subItems: [
-      { name: '— Organization —', href: '/about', isHeader: true },
-      { name: 'Our Mission', href: '/about/mission' },
-      { name: 'Our Team', href: '/about/team' },
-      { name: 'Our Partners', href: '/about/partners' },
-      { name: 'Impact & Outcomes', href: '/impact' },
-      { name: 'Live Metrics', href: '/metrics' },
-      { name: 'Accreditation', href: '/accreditation' },
-      { name: '— Resources —', href: '/blog', isHeader: true },
-      { name: 'Blog', href: '/blog' },
-      { name: 'FAQ', href: '/faq' },
-      { name: 'Events', href: '/events' },
-      { name: 'Success Stories', href: '/success-stories' },
-      { name: 'Press', href: '/press' },
-      { name: '— Contact —', href: '/contact', isHeader: true },
-      { name: 'Contact Us', href: '/contact' },
-      { name: 'Free Advising', href: '/advising' },
-      { name: 'Schedule a Consultation', href: '/schedule-consultation' },
-      { name: 'Donate', href: '/donate' },
+      { name: 'Organization', isHeader: true },
+      { name: 'Our Mission', href: '/about', isSectionLink: true },
+      { name: 'Leadership', href: '/about/team', isSectionLink: true },
+      { name: 'Locations', href: '/about/locations', isSectionLink: true },
+      { name: 'Impact', href: '/about/impact', isSectionLink: true },
+      { name: 'Success Stories', href: '/success-stories', isSectionLink: true },
+      { name: 'Trust & Compliance', isHeader: true },
+      { name: 'Approvals', href: '/about/approvals', isSectionLink: true },
+      { name: 'Accreditation', href: '/about/accreditation', isSectionLink: true },
+      { name: 'Policies', href: '/about/policies', isSectionLink: true },
+      { name: 'Nondiscrimination', href: '/about/nondiscrimination', isSectionLink: true },
+      { name: 'Accessibility', href: '/about/accessibility', isSectionLink: true },
+      { name: 'Resources', isHeader: true },
+      { name: 'Blog', href: '/blog', isSectionLink: true },
+      { name: 'FAQ', href: '/faq', isSectionLink: true },
+      { name: 'Events', href: '/events', isSectionLink: true },
+      { name: 'Press', href: '/about/press', isSectionLink: true },
+      { name: 'Contact', isHeader: true },
+      { name: 'Contact Us', href: '/contact', isSectionLink: true },
+      { name: 'Free Advising', href: '/contact/advising', isSectionLink: true },
+      { name: 'Schedule Consultation', href: '/contact/consultation', isSectionLink: true },
+      { name: 'Donate', href: '/donate', isSectionLink: true },
     ],
   },
-
-  // ── 7. Applications — full application funnel by audience ────────────────────
+  // ── 9. Apply — Students / Apprenticeships / Organizations / Careers ────────
   {
     id: 'apply',
-    name: 'Applications',
-    href: '/apply',
+    name: 'Apply',
     subItems: [
-      // Students / Participants
-      { name: '— Students & Participants —', href: '/apply', isHeader: true },
-      { name: 'Check Eligibility & Apply', href: '/apply' },
-      { name: 'Student Application', href: '/apply/student' },
-      { name: 'Enroll in a Program', href: '/enrollment' },
-      { name: 'Track My Application', href: '/apply/track' },
-      { name: 'Check Application Status', href: '/apply/status' },
-
-      // Employers
-      { name: '— Employers —', href: '/apply/employer', isHeader: true },
-      { name: 'Employer Application', href: '/apply/employer' },
-      { name: 'Employer Directory', href: '/employers/directory' },
-      { name: 'Job Board', href: '/jobs' },
-      { name: 'Post a Job / OJT', href: '/employer/post-job' },
-      { name: 'Apprenticeship Sponsorship', href: '/employer/apprenticeships' },
-      { name: 'Employer Onboarding →', href: '/onboarding/employer', isSectionLink: true },
-
-      // Training Providers & Program Holders
-      { name: '— Program Holders & Providers —', href: '/apply/program-holder', isHeader: true },
-      { name: 'Program Holder Application', href: '/apply/program-holder' },
-      { name: 'Barbershop Apprenticeship Host', href: '/partners/barber-host-shop/apply' },
-      { name: 'Cosmetology Partner Shop', href: '/partners/cosmetology-host-shop/apply' },
-      { name: 'Booth Rental Application', href: '/booth-rental/apply' },
-      { name: 'Create a Program', href: '/partners/create-program' },
-
-      // Staff & Instructors
-      { name: '— Staff & Instructors —', href: '/apply/staff', isHeader: true },
-      { name: 'Staff Application', href: '/apply/staff' },
-      { name: 'Instructor Application', href: '/onboarding/instructor' },
-      { name: 'Instructor Credentials', href: '/admin/instructor-credentials' },
-
-      // Agencies & Partners
-      { name: '— Agencies & Partners —', href: '/partners/apply', isHeader: true },
-      { name: 'Agency / Partner Application', href: '/partners/apply' },
-      { name: 'Apprenticeship Sponsor', href: '/apprenticeship-sponsor' },
-      { name: 'All Applications →', href: '/apply', isSectionLink: true },
+      { name: 'Students', isHeader: true },
+      { name: 'Check Eligibility', href: '/apply/eligibility', isSectionLink: true },
+      { name: 'Apply for Training', href: '/apply', isSectionLink: true },
+      { name: 'Track Application', href: '/apply/track', isSectionLink: true },
+      { name: 'Application Status', href: '/portal/application', isSectionLink: true, isAuth: true },
+      { name: 'Apprenticeships', isHeader: true },
+      { name: 'Become an Apprentice', href: '/apprenticeships/apply', isSectionLink: true },
+      { name: 'Become a Host Shop', href: '/apprenticeships/host-shop', isSectionLink: true },
+      { name: 'Apprenticeship Sponsor', href: '/apprenticeships/sponsor', isSectionLink: true },
+      { name: 'Organizations', isHeader: true },
+      { name: 'Employer Application', href: '/apply/employer', isSectionLink: true },
+      { name: 'Program Holder Application', href: '/apply/program-holder', isSectionLink: true },
+      { name: 'Agency / Partner Application', href: '/apply/agency', isSectionLink: true },
+      { name: 'Careers', isHeader: true },
+      { name: 'Instructor Application', href: '/apply/instructor', isSectionLink: true },
+      { name: 'Staff Application', href: '/apply/staff', isSectionLink: true },
+      { name: 'Sign In', href: '/login', isSectionLink: true },
     ],
   },
 ];
@@ -317,27 +248,23 @@ export function findDuplicateNavHrefs(navItems: NavItem[]): Array<{ href: string
     hrefMap.set(item.href, [...existing, item]);
   }
   return Array.from(hrefMap.entries())
-    .filter(([, items]) => items.length > 1)
-    .map(([href, items]) => ({ href, items }));
+    .filter(({ 1: items }) => items.length > 1)
+    .map(({ 0: href, 1: items }) => ({ href, items }));
 }
 
 export function groupNavSubItemsByHeader(navItems: NavItem[]): Record<string, NavItem[]>;
-export function groupNavSubItemsByHeader(navItems: NavSubItem[]): Record<string, NavSubItem[]>;
-export function groupNavSubItemsByHeader(navItems: NavItem[] | NavSubItem[]): Record<string, NavItem[]> | Record<string, NavSubItem[]> {
+export function groupNavSubItemsByHeader(navItems: import('@/types/navigation').NavSubItem[]): Record<string, import('@/types/navigation').NavSubItem[]>;
+export function groupNavSubItemsByHeader(navItems: NavItem[] | import('@/types/navigation').NavSubItem[]): Record<string, NavItem[]> | Record<string, import('@/types/navigation').NavSubItem[]> {
   const groups: Record<string, NavItem[]> = {};
   for (const item of navItems) {
-    const header = item.isHeader ? item.name : 'Default';
+    const header = item.isHeader ? item.name : '';
     if (!groups[header]) groups[header] = [];
     groups[header].push(item);
   }
   return groups;
 }
 
-export function getNavCategoryLabel(item: NavItem): string {
-  if (item.isHeader) return item.name;
-  if (item.isSectionLink) return 'Section Links';
-  if (item.isExternal) return 'External';
-  if (item.href?.startsWith('https://') || item.href?.startsWith('http://')) return 'External';
-  if (item.href?.startsWith('/admin')) return 'Admin';
-  return 'Navigation';
+export function getNavCategoryLabel(column: import('@/types/navigation').NavSubItem[]): string {
+  const header = column.find((item) => item.isHeader);
+  return header?.name.replace(/—/g, '').trim() ?? '';
 }

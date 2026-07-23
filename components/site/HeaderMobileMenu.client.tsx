@@ -95,8 +95,13 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
   const firstFocusRef = useRef<HTMLButtonElement>(null);
 
   const closeMenu = () => setIsOpen(false);
+  // Reset category when switching sections to avoid stale accordion state
   const toggleSection = (key: string) =>
-    setExpandedSection((prev) => (prev === key ? null : key));
+    setExpandedSection((prev) => {
+      if (prev === key) return null;
+      setExpandedCategory(null);
+      return key;
+    });
 
   useEffect(() => {
     setMounted(true);
@@ -136,19 +141,32 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
     mounted && isOpen
       ? createPortal(
           <>
-            {/* Backdrop */}
+            {/* Backdrop — below header (z-9998) so hamburger button (z-9999) stays clickable */}
             <div
-              className="fixed inset-0 bg-black/50 z-[10000] md:hidden"
+              className="fixed inset-0 bg-black/50 z-[9998]"
               onClick={closeMenu}
               aria-hidden="true"
             />
-            {/* Menu panel */}
+            {/* Menu panel — above header (z-10000) so close button is always accessible */}
             <div
-              className="fixed top-[60px] right-0 bottom-0 w-[min(100vw,26rem)] bg-white z-[10001] flex flex-col shadow-2xl md:hidden"
+              className="fixed inset-y-0 right-0 w-[min(100vw,26rem)] bg-white z-[10000] flex flex-col shadow-2xl pt-[env(safe-area-inset-top)]"
               role="dialog"
               aria-modal="true"
               aria-label="Main navigation"
             >
+              {/* Panel header with close button */}
+              <div className="flex h-16 items-center justify-between border-b border-slate-100 px-4 shrink-0">
+                <span className="font-semibold text-slate-900">Menu</span>
+                <button
+                  type="button"
+                  onClick={closeMenu}
+                  aria-label="Close navigation"
+                  className="flex h-11 w-11 items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg"
+                >
+                  <X aria-hidden="true" className="h-5 w-5" />
+                </button>
+              </div>
+
               {/* Scrollable nav */}
               <nav
                 className="flex-1 overflow-y-auto overscroll-contain p-4 pb-2"
@@ -226,38 +244,24 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
 
                                 return (
                                   <div key={categoryKey} className="mt-1">
-                                    <div className="flex min-h-[44px] items-center gap-1">
-                                      {categoryHref ? (
-                                        <Link
-                                          href={categoryHref}
-                                          prefetch={false}
-                                          onClick={closeMenu}
-                                          className="min-w-0 flex-1 py-2 text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700 break-words leading-tight"
-                                        >
-                                          {label}
-                                        </Link>
-                                      ) : (
-                                        <span className="min-w-0 flex-1 py-2 text-xs font-bold uppercase tracking-wide text-brand-red-600 break-words leading-tight">
-                                          {label}
-                                        </span>
-                                      )}
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          setExpandedCategory(categoryOpen ? null : categoryKey)
-                                        }
-                                        className="flex h-11 w-11 flex-none items-center justify-center text-brand-red-600 hover:text-brand-red-700"
-                                        aria-label={`${categoryOpen ? 'Collapse' : 'Expand'} ${label}`}
-                                        aria-expanded={categoryOpen}
-                                      >
-                                        <ChevronDown
-                                          className={`h-4 w-4 flex-none text-brand-red-400 transition-transform duration-200 ${
-                                            categoryOpen ? 'rotate-180' : ''
-                                          }`}
-                                          aria-hidden="true"
-                                        />
-                                      </button>
-                                    </div>
+                                    {/* Full-width accordion trigger */}
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setExpandedCategory(categoryOpen ? null : categoryKey)
+                                      }
+                                      className="flex w-full min-h-[44px] items-center justify-between py-2 text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
+                                      aria-label={`${categoryOpen ? 'Collapse' : 'Expand'} ${label}`}
+                                      aria-expanded={categoryOpen}
+                                    >
+                                      <span className="break-words leading-tight text-left">{label}</span>
+                                      <ChevronDown
+                                        className={`h-4 w-4 flex-none text-brand-red-400 transition-transform duration-200 ml-2 flex-shrink-0 ${
+                                          categoryOpen ? 'rotate-180' : ''
+                                        }`}
+                                        aria-hidden="true"
+                                      />
+                                    </button>
                                     {categoryOpen ? (
                                       <div className="pl-2 pb-2 border-l border-slate-200 ml-1">
                                         {column.map((subItem) =>
@@ -302,8 +306,8 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                 })}
               </nav>
 
-              {/* Sticky footer — always visible */}
-              <div className="border-t border-slate-200 p-4 bg-white flex-shrink-0">
+              {/* Sticky footer */}
+              <div className="border-t border-slate-200 p-4 bg-white shrink-0 pb-[env(safe-area-inset-bottom)]">
                 <div className="flex gap-2 mb-3">
                   <Link
                     href="/apply"
@@ -341,21 +345,19 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
     <div className="flex flex-row flex-nowrap items-center justify-end gap-0.5 shrink-0">
       <SearchModal />
       <LanguageSwitcher compact={true} />
-      <span className="md:hidden">
-        <button
-          type="button"
-          onClick={() => setIsOpen((open) => !open)}
-          className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
-          aria-label={isOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={isOpen}
-        >
-          {isOpen ? (
-            <X className="h-5 w-5" aria-hidden="true" />
-          ) : (
-            <Menu className="h-5 w-5" aria-hidden="true" />
-          )}
-        </button>
-      </span>
+      <button
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
+        aria-label={isOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={isOpen}
+      >
+        {isOpen ? (
+          <X className="h-5 w-5" aria-hidden="true" />
+        ) : (
+          <Menu className="h-5 w-5" aria-hidden="true" />
+        )}
+      </button>
       {drawer}
     </div>
   );

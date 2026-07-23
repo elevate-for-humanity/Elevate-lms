@@ -29,19 +29,19 @@ export default function Header() {
           aria-label={`${PLATFORM_DEFAULTS.orgName} home`}
         >
           <LogoImage alt="Elevate" width={40} height={60} className="w-auto h-9" priority />
-          <span className="font-bold text-[15px] text-slate-900 hidden md:block tracking-tight truncate">
+          <span className="font-bold text-[15px] text-slate-900 hidden xl:block tracking-tight truncate whitespace-nowrap">
             Elevate
           </span>
         </Link>
 
-        {/* Desktop nav - show on md screens (768px+) */}
-        <div className="hidden md:flex justify-center min-w-0 overflow-visible">
+        {/* Desktop nav - show on xl screens (1280px+) */}
+        <div className="hidden xl:flex justify-center min-w-0 overflow-visible">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
-        <div className="flex flex-row flex-nowrap items-center justify-end gap-0.5 md:gap-1 flex-shrink-0 min-w-0">
-          {/* Desktop search/signin - show on md screens and up */}
-          <div className="hidden md:flex items-center gap-2 mr-2">
+        <div className="flex flex-row flex-nowrap items-center justify-end gap-0.5 xl:gap-1 flex-shrink-0 min-w-0">
+          {/* Desktop search/signin - show on xl screens and up */}
+          <div className="hidden xl:flex items-center gap-2 mr-2">
             <Link
               href="/login"
               className="text-sm text-slate-600 hover:text-slate-900 px-3 py-2"
@@ -55,8 +55,8 @@ export default function Header() {
               Apply
             </Link>
           </div>
-          {/* Mobile menu button - hide on md */}
-          <span className="md:hidden">
+          {/* Mobile menu button - hide on xl (visible on mobile + tablet) */}
+          <span className="xl:hidden">
             <HeaderMobileMenu items={NAV_ITEMS} programApplyLinks={PROGRAM_APPLY_LINKS} />
           </span>
         </div>

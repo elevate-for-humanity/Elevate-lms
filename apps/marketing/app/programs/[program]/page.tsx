@@ -39,8 +39,8 @@ const LIVE_JOBS_PROGRAM_SLUGS = new Set([
   'hvac-technician',
   'medical-assistant',
   'cna',
-  'electrical',
-  'plumbing',
+  // 'electrical' — now has dedicated /programs/electrical/page.tsx
+  // 'plumbing' — now has dedicated /programs/plumbing/page.tsx
   'welding',
 ]);
 

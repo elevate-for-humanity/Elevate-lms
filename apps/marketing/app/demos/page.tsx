@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Monitor, User, Building2, GraduationCap, Users, Play, Shield, Clock, CheckCircle, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Request a Demo | Elevate for Humanity',
+  title: 'Request a Demo',
   description: 'See Elevate workforce development platform in action. Demo admin, student, employer, and host shop dashboards with sandbox data.',
   keywords: ['workforce demo', 'LMS demo', 'apprenticeship platform demo', 'training management system'],
   robots: { index: false, follow: false },

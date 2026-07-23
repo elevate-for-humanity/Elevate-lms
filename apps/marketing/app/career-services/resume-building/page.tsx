@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Resume Building | Elevate for Humanity',
+  title: 'Resume Building',
   keywords: ["services", "workforce development", "training programs"], description: 'Resume Building page content.',
 };
 

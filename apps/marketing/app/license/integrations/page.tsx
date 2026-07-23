@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Integrations | Elevate for Humanity',
+  title: 'Integrations',
   description: 'Integrations page content.',
 };
 

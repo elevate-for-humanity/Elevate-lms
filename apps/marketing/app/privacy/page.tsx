@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Elevate for Humanity',
+  title: 'Privacy Policy',
   keywords: ["privacy", "data protection", "FERPA", "student privacy", "data retention", "GDPR"],
   description: 'How we collect, use, and protect your data. Complete transparency on data handling, retention policies, and your rights.',
 };

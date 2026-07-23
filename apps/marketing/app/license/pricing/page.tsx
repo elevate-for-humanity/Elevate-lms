@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
-  title: 'Pricing | Elevate for Humanity',
+  title: 'Pricing',
   keywords: ["tuition", "pricing", "WIOA funding", "financial aid", "Indiana"], description: 'Pricing page content.',
 };
 

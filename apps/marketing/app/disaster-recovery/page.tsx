@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Disaster Recovery & Business Continuity | Elevate for Humanity',
+  title: 'Disaster Recovery & Business Continuity',
   keywords: ["disaster recovery", "business continuity", "backup", "data protection", "uptime", "SLA"],
   description: 'Learn about our disaster recovery and business continuity plans. Backup schedules, recovery procedures, and uptime guarantees.',
 };

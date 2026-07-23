@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Partner Directory | Elevate for Humanity',
+  title: 'Partner Directory',
   keywords: ["partners", "directory", "testing", "employers", "training", "host shops"],
   description: 'Our verified partner network includes testing centers, training providers, employers, and host shops.',
 };

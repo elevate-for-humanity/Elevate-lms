@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Job Placement | Elevate for Humanity',
+  title: 'Job Placement',
   keywords: ["services", "workforce development", "training programs"], description: 'Job Placement page content.',
 };
 

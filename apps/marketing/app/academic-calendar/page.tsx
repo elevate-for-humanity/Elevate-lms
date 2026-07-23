@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Academic Calendar | Elevate for Humanity',
+  title: 'Academic Calendar',
   keywords: ["calendar", "class schedule", "program dates", "Indiana"], description: 'Academic Calendar page content.',
 };
 

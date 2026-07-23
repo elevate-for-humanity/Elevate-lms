@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   description: 'PARIS AI - Zero Obstacles, Ready Advisors. Deploy specialized AI agents for admissions, recruiting, compliance, grants, and workforce management. Enterprise-grade AI for workforce development.',
   keywords: ['AI workforce', 'AI agents', 'admissions AI', 'recruiting AI', 'compliance automation', 'workforce development AI', 'enterprise AI'],
   openGraph: {
-    title: 'PARIS AI Operating System | Elevate for Humanity',
+    title: 'PARIS AI Operating System',
     description: 'Deploy specialized AI agents for workforce development. Admissions, recruiting, compliance, grants, and more.',
     type: 'website',
   },

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
-export const metadata: Metadata = { title: 'Donate | Elevate for Humanity', keywords: ["donate", "charity", "support", "workforce development", "Indiana"], description: 'Support workforce development.' };
+export const metadata: Metadata = { title: 'Donate', keywords: ["donate", "charity", "support", "workforce development", "Indiana"], description: 'Support workforce development.' };
 export default function DonatePage() {
   return (
     <div className="min-h-screen bg-slate-50">

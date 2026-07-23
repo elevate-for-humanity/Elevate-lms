@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   description: 'Dev Studio - Build, deploy, and manage workforce applications with AI assistance. Integrated development environment with container management, GitHub integration, and real-time monitoring.',
   keywords: ['development environment', 'AI coding', 'container management', 'GitHub integration', 'deployment automation', 'DevOps'],
   openGraph: {
-    title: 'Dev Studio | Elevate for Humanity',
+    title: 'Dev Studio',
     description: 'AI-powered development environment for workforce applications',
     type: 'website',
   },

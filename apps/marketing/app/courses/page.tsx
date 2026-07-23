@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { GraduationCap, Clock, DollarSign, CheckCircle2 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Courses | Elevate for Humanity',
+  title: 'Courses',
   description: 'Explore our training courses in healthcare, skilled trades, technology, and more. Short courses and certification prep programs.',
 };
 

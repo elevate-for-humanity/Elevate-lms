@@ -4,7 +4,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 export const metadata: Metadata = {
-  title: 'Employment | Elevate for Humanity',
+  title: 'Employment',
   description: 'Employment page content.',
 };
 

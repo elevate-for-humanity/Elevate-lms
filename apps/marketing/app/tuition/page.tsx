@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { DollarSign, Percent, CreditCard } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Tuition & Funding | Elevate for Humanity',
+  title: 'Tuition & Funding',
   description: 'Learn about tuition costs and funding options for workforce training programs.',
 };
 

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Hvac Technician | Elevate for Humanity',
+  title: 'Hvac Technician',
   description: 'Hvac Technician page content.',
 };
 

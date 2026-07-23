@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Tpp Survey | Elevate for Humanity',
+  title: 'Tpp Survey',
   description: 'Tpp Survey page content.',
 };
 

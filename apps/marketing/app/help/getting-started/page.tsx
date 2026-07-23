@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { HelpCircle, Book, Video } from 'lucide-react';
-export const metadata: Metadata = { title: 'Getting Started | Elevate for Humanity', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Learn how to get started with Elevate.' };
+export const metadata: Metadata = { title: 'Getting Started', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Learn how to get started with Elevate.' };
 export default function GettingStartedPage() {
   return (
     <div className="min-h-screen bg-slate-50">

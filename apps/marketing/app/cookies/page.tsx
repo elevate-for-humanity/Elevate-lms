@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Cookies | Elevate for Humanity',
+  title: 'Cookies',
   description: 'Cookies page content.',
 };
 

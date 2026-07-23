@@ -6,7 +6,7 @@ import { Check, ArrowRight, DollarSign, Building2, Users, GraduationCap, Zap, Sh
 import { getAdminClient } from '@/lib/supabase/admin';
 
 export const metadata: Metadata = {
-  title: 'Pricing | Elevate for Humanity',
+  title: 'Pricing',
   description: 'Workforce development pricing for individuals, businesses, and government agencies.',
   keywords: ['workforce training pricing', 'LMS pricing', 'apprenticeship platform cost', 'WIOA training'],
 };

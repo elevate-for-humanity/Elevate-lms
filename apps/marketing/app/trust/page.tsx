@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Trust & Transparency | Elevate for Humanity',
+  title: 'Trust & Transparency',
   keywords: ["trust", "transparency", "compliance", "certifications", "workforce development"],
   description: 'See why workforce agencies trust Elevate. Compliance certifications, transparency reports, and proven outcomes.',
 };

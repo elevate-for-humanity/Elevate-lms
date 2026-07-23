@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Implementation & Onboarding | Elevate for Humanity',
+  title: 'Implementation & Onboarding',
   keywords: ["implementation", "onboarding", "setup", "training", "support", "launch"],
   description: 'What happens after you purchase? Our implementation plan gets you up and running in weeks, not months.',
 };

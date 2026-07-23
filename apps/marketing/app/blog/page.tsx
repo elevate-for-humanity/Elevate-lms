@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { FileText, Clock, User } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Blog | Elevate for Humanity',
+  title: 'Blog',
   description: 'Workforce development insights, career tips, and stories from Elevate for Humanity.',
 };
 

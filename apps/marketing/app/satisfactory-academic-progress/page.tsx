@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Satisfactory Academic Progress | Elevate for Humanity',
+  title: 'Satisfactory Academic Progress',
   description: 'Satisfactory Academic Progress page content.',
 };
 

@@ -4,7 +4,7 @@ import { SEO } from '@/components/SEO';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'AI Workforce Platform | Elevate for Humanity',
+  title: 'AI Workforce Platform',
   description: 'AI-powered workforce technology platform. PARIS AI, Dev Studio, Course Factory, Credential Engine, and more.',
 };
 

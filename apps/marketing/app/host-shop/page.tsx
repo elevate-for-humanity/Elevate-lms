@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Users, Shield, Award, Building2, MapPin, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Become a Host Shop | Elevate for Humanity',
+  title: 'Become a Host Shop',
   description: 'Partner with Elevate for Humanity as a host shop. Train apprentices, get motivated help, and build your legacy.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/host-shop',

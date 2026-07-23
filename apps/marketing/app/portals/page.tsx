@@ -20,7 +20,7 @@ import {
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Portals | Elevate for Humanity',
+  title: 'Portals',
   description: 'Access your personalized portal based on your role.',
 };
 

@@ -5,11 +5,11 @@ import { ArrowRight, CheckCircle, Clock, DollarSign, GraduationCap, Shield, User
 import HeroPicture from '@/components/marketing/HeroPicture';
 
 export const metadata: Metadata = {
-  title: 'Registered Apprenticeships | Earn While You Learn | Elevate for Humanity',
+  title: 'Registered Apprenticeships | Earn While You Learn',
   description: 'DOL-registered apprenticeship programs in barbering, cosmetology, and esthetics. Earn wages while learning your trade with no tuition upfront.',
   keywords: ['registered apprenticeship', 'DOL apprenticeship', 'earn while you learn', 'barber apprenticeship', 'cosmetology apprenticeship', 'paid training'],
   openGraph: {
-    title: 'Registered Apprenticeships | Elevate for Humanity',
+    title: 'Registered Apprenticeships',
     description: 'Earn wages while learning your trade. DOL-registered apprenticeship programs with no tuition upfront.',
     type: 'website',
   },

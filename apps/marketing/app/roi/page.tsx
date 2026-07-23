@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'ROI & Value | Elevate for Humanity',
+  title: 'ROI & Value',
   keywords: ["ROI", "return on investment", "workforce development", "cost savings", "efficiency", "outcomes"],
   description: 'See the return on investment for workforce agencies, schools, and employers using Elevate. Measurable improvements in efficiency and outcomes.',
 };

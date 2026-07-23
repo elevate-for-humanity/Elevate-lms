@@ -224,6 +224,7 @@ body {
   html {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    scroll-padding-top: 60px; /* Prevent sticky header from covering anchor targets */
   }
 
   body {
@@ -643,10 +644,12 @@ html {
 }
 
 .elevate-hero-title {
-  font-size: 2.5rem;
+  font-size: clamp(1.75rem, 5vw, 3.5rem);
   font-weight: 800;
   margin-bottom: 1rem;
-  line-height: 1.2;
+  line-height: 1.05;
+  text-wrap: balance;
+  max-width: 18ch; /* Prevent excessive line length on wide screens */
 }
 
 .elevate-hero-subtitle {

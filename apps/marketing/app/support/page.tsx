@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Help Center | Elevate for Humanity',
+  title: 'Help Center',
   keywords: ["support", "help", "FAQ", "knowledge base", "tickets", "documentation"],
   description: 'Get help with Elevate. Browse our knowledge base, watch training videos, or submit a support ticket.',
 };

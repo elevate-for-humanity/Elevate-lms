@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Award, CheckCircle, Search } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Verify Credential | Elevate for Humanity',
+  title: 'Verify Credential',
   keywords: ["credential", "certification", "verify certificate", "graduates"], description: 'Verify credentials issued by Elevate for Humanity.',
 };
 

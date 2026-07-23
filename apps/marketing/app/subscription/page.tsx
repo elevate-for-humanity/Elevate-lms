@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { CreditCard, Check } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Subscription | Elevate for Humanity',
+  title: 'Subscription',
   keywords: ["subscription", "platform access", "workforce LMS"], description: 'Manage your Elevate platform subscription.',
 };
 

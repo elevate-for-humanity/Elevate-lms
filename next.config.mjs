@@ -427,13 +427,6 @@ const nextConfig = {
         destination: '/programs/barber-apprenticeship/apply',
         permanent: true,
       },
-      // REMOVED: This redirect was causing /apply to loop
-      // {
-      //   source: '/apply',
-      //   has: [{ type: 'query', key: 'program', value: 'barber-apprenticeship' }],
-      //   destination: '/programs/barber-apprenticeship/apply',
-      //   permanent: true,
-      // },
       {
         source: '/pwa/barber/enroll',
         destination: '/programs/barber-apprenticeship/apply',

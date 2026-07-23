@@ -432,8 +432,6 @@ const nextConfig = {
         destination: '/programs/barber-apprenticeship/apply',
         permanent: true,
       },
-      { source: '/apply/student', destination: '/apply', permanent: true },
-      { source: '/apply/quick', destination: '/apply', permanent: true },
       { source: '/career-uplift-services/:path*', destination: '/career-services', permanent: true },
       { source: '/lms/my-courses', destination: '/lms/courses', permanent: true },
       { source: '/student-portal', destination: '/learner/dashboard', permanent: true },

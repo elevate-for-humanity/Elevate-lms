@@ -1,14 +1,17 @@
 /**
  * GET /api/profile
  * Admin profile endpoint - can view any profile
+ * Requires admin authentication
  */
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { withAuth } from '@/lib/with-auth';
+import type { AuthHandler } from '@/types/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
-  const url = new URL(request.url);
+const handleGet: AuthHandler = async (req) => {
+  const url = new URL(req.url);
   const userId = url.searchParams.get('user_id');
 
   if (!userId) {
@@ -31,4 +34,7 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json({ profile, service: 'admin' });
-}
+};
+
+// Wrap handler with admin authentication
+export const GET = withAuth(handleGet, { roles: ['admin', 'super_admin', 'staff', 'case_manager'] });

@@ -1,9 +1,12 @@
 /**
  * Admin Users API
  * Server-only endpoint using service-role key
+ * Requires admin authentication
  */
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { withAuth } from '@/lib/with-auth';
+import type { AuthHandler } from '@/types/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,9 +18,9 @@ function getSupabaseAdmin() {
   );
 }
 
-export async function GET(request: Request) {
+const handleGet: AuthHandler = async (req) => {
   const supabase = getSupabaseAdmin();
-  const url = new URL(request.url);
+  const url = new URL(req.url);
   const page = parseInt(url.searchParams.get('page') ?? '1');
   const limit = parseInt(url.searchParams.get('limit') ?? '20');
   const offset = (page - 1) * limit;
@@ -39,11 +42,11 @@ export async function GET(request: Request) {
     limit,
     service: 'admin'
   });
-}
+};
 
-export async function POST(request: Request) {
+const handlePost: AuthHandler = async (req) => {
   const supabase = getSupabaseAdmin();
-  const body = await request.json();
+  const body = await req.json();
 
   const { data: user, error } = await supabase.auth.admin.createUser({
     email: body.email,
@@ -57,4 +60,8 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ user: user.user }, { status: 201 });
-}
+};
+
+// Wrap handlers with admin authentication
+export const GET = withAuth(handleGet, { roles: ['admin', 'super_admin'] });
+export const POST = withAuth(handlePost, { roles: ['admin', 'super_admin'] });

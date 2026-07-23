@@ -1,9 +1,12 @@
 /**
  * Storage Signed URL API - LMS
  * Generates signed URLs for private files
+ * Requires authentication
  */
 import { NextResponse } from 'next/server';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { withAuth } from '@/lib/with-auth';
+import type { AuthHandler } from '@/types/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,8 +30,8 @@ function getSupabase(): SupabaseClient {
   return supabaseClient;
 }
 
-export async function GET(request: Request) {
-  const url = new URL(request.url);
+const handleGet: AuthHandler = async (req) => {
+  const url = new URL(req.url);
   const bucket = url.searchParams.get('bucket');
   const path = url.searchParams.get('path');
   const expiresIn = parseInt(url.searchParams.get('expiresIn') ?? '3600');
@@ -55,4 +58,7 @@ export async function GET(request: Request) {
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
-}
+};
+
+// Wrap handler with authentication
+export const GET = withAuth(handleGet, { roles: ['admin', 'super_admin', 'instructor', 'staff', 'student'] });

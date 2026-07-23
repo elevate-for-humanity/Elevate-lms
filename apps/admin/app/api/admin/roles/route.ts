@@ -1,9 +1,12 @@
 /**
  * Admin Roles API
  * Server-only endpoint using service-role key
+ * Requires admin authentication
  */
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { withAuth } from '@/lib/with-auth';
+import type { AuthHandler } from '@/types/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +19,7 @@ function getSupabaseAdmin() {
   );
 }
 
-export async function GET() {
+const handleGet: AuthHandler = async () => {
   const supabase = getSupabaseAdmin();
   const { data: roles, error } = await supabase
     .from('roles')
@@ -28,11 +31,11 @@ export async function GET() {
   }
 
   return NextResponse.json({ roles, service: 'admin' });
-}
+};
 
-export async function POST(request: Request) {
+const handlePost: AuthHandler = async (req) => {
   const supabase = getSupabaseAdmin();
-  const body = await request.json();
+  const body = await req.json();
 
   const { data: role, error } = await supabase
     .from('roles')
@@ -45,11 +48,11 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({ role }, { status: 201 });
-}
+};
 
-export async function PUT(request: Request) {
+const handlePut: AuthHandler = async (req) => {
   const supabase = getSupabaseAdmin();
-  const body = await request.json();
+  const body = await req.json();
   const { id, ...updates } = body;
 
   const { data: role, error } = await supabase
@@ -64,4 +67,9 @@ export async function PUT(request: Request) {
   }
 
   return NextResponse.json({ role });
-}
+};
+
+// Wrap handlers with admin authentication
+export const GET = withAuth(handleGet, { roles: ['admin', 'super_admin'] });
+export const POST = withAuth(handlePost, { roles: ['admin', 'super_admin'] });
+export const PUT = withAuth(handlePut, { roles: ['admin', 'super_admin'] });

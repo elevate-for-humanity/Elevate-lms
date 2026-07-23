@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { withAuth } from '@/lib/with-auth';
+import type { AuthHandler } from '@/types/auth';
 
 // Build-safe: lazily create the admin client at runtime.
 // This prevents 'supabaseKey is required' errors during Next.js static build.
@@ -80,7 +82,7 @@ Always cite sources and follow grant guidelines exactly.`,
   },
 };
 
-export async function GET() {
+const handleGet: AuthHandler = async () => {
   try {
     // List all agents
     const { data: agents, error } = await getSupabaseAdmin()
@@ -102,11 +104,14 @@ export async function GET() {
       error: 'Failed to fetch agents' 
     }, { status: 500 });
   }
-}
+};
 
-export async function POST(request: NextRequest) {
+// Wrap handlers with admin authentication
+export const GET = withAuth(handleGet, { roles: ['admin', 'super_admin', 'staff'] });
+
+const handlePost: AuthHandler = async (req) => {
   try {
-    const body = await request.json();
+    const body = await req.json();
     const { action, role, name, ownerId, config } = body;
 
     if (action === 'create') {
@@ -242,4 +247,7 @@ export async function POST(request: NextRequest) {
       error: 'Internal server error' 
     }, { status: 500 });
   }
-}
+};
+
+// Wrap POST handler with admin authentication
+export const POST = withAuth(handlePost, { roles: ['admin', 'super_admin'] });

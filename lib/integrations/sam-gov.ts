@@ -1,3 +1,4 @@
+import 'server-only';
 import { logger } from '@/lib/logger';
 /**
  * SAM.gov API Integration

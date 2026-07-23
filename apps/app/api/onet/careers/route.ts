@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     switch (action) {
       case 'interests':
         const interestsRes = await fetch(`${ONET_WS_URL}/online/interest-profiler`, {
-          headers: { 'X-Api-Key': apiKey },
+          headers: { 'X-API-Key': apiKey },
         });
         return NextResponse.json({ 
           type: 'interests',
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         const keyword = searchParams.get('keyword') || 'nurse';
         const careersRes = await fetch(
           `${ONET_WS_URL}/online/occupations?keyword=${encodeURIComponent(keyword)}`,
-          { headers: { 'X-Api-Key': apiKey } }
+          { headers: { 'X-API-Key': apiKey } }
         );
         return NextResponse.json({
           type: 'careers',
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
         if (!code) return NextResponse.json({ error: 'Missing code param' }, { status: 400 });
         const res = await fetch(
           `${ONET_WS_URL}/online/occupations/${code}/${action}`,
-          { headers: { 'X-Api-Key': apiKey } }
+          { headers: { 'X-API-Key': apiKey } }
         );
         return NextResponse.json({
           type: action,
@@ -79,9 +79,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const [careerRes, skillsRes, tasksRes] = await Promise.all([
-      fetch(`${ONET_WS_URL}/online/occupations/${careerCode}`, { headers: { 'X-Api-Key': apiKey } }),
-      fetch(`${ONET_WS_URL}/online/occupations/${careerCode}/skills`, { headers: { 'X-Api-Key': apiKey } }),
-      fetch(`${ONET_WS_URL}/online/occupations/${careerCode}/tasks`, { headers: { 'X-Api-Key': apiKey } }),
+      fetch(`${ONET_WS_URL}/online/occupations/${careerCode}`, { headers: { 'X-API-Key': apiKey } }),
+      fetch(`${ONET_WS_URL}/online/occupations/${careerCode}/skills`, { headers: { 'X-API-Key': apiKey } }),
+      fetch(`${ONET_WS_URL}/online/occupations/${careerCode}/tasks`, { headers: { 'X-API-Key': apiKey } }),
     ]);
 
     const [career, skills, tasks] = await Promise.all([

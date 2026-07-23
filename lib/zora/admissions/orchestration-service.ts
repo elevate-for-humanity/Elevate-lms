@@ -318,7 +318,7 @@ async function handleAcceptedApplication(
 export async function runZoraOrchestration(
   event: ApplicationEvent,
 ): Promise<void> {
-  console.log('ZORA processing event:', event.type, {
+  console.warn('ZORA processing event:', event.type, {
     applicationId: 'applicationId' in event ? event.applicationId : 'unknown',
   });
   
@@ -500,7 +500,7 @@ export async function runZoraOrchestration(
       break;
   }
   
-  console.log('ZORA orchestration complete for:', event.type, { applicationId });
+  console.info('ZORA orchestration complete for:', event.type, { applicationId });
 }
 
 /**

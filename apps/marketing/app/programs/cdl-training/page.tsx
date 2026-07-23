@@ -1,5 +1,5 @@
 import { loadProgramForPage } from "@/lib/programs/load-program-page";
-import { ProgramDetailPageComponent } from "@/components/programs/public/ProgramDetailPageComponent";
+import ProgramDetailPage from "@/components/programs/ProgramDetailPage";
 import heroBanners from "@/content/heroBanners";
 import { notFound } from "next/navigation";
 
@@ -12,7 +12,7 @@ export default async function CdlTrainingPage() {
   const banner = heroBanners["cdl-training"] ?? null;
 
   return (
-    <ProgramDetailPageComponent program={p} banner={banner} />
+    <ProgramDetailPage program={p} banner={banner} />
   );
 }
 

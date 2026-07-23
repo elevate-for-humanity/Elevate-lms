@@ -1,0 +1,183 @@
+name: Fix /apply redirect loop
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (list paths only, do not delete)'
+        required: false
+        default: 'true'
+        type: boolean
+
+env:
+  NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+  NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+
+jobs:
+  audit-and-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Audit subdomain paths (direct paths)
+        id: audit
+        run: |
+          echo "=== Current subdomain paths for www.elevateforhumanity.org ==="
+          
+          PATHS_RESPONSE=$(curl -sS \
+            -H "Authorization: Bearer $NORTHFLANK_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.northflank.com/v1/domains/elevateforhumanity.org/subdomains/www/paths")
+          
+          echo "$PATHS_RESPONSE" | python3 -m json.tool
+          
+          # Save response for next steps
+          echo "$PATHS_RESPONSE" > paths-response.json
+          
+          # Check for /apply path
+          HAS_APPLY=$(echo "$PATHS_RESPONSE" | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+paths = data.get('paths', [])
+apply_paths = [p for p in paths if p.get('uri') == '/apply']
+print(len(apply_paths))
+print(json.dumps(apply_paths, indent=2) if apply_paths else 'none')
+")
+          
+          echo "apply_paths=$HAS_APPLY" >> "$GITHUB_OUTPUT"
+          echo "paths_json=$(echo '$PATHS_RESPONSE' | python3 -c 'import json,sys; print(json.dumps(json.load(sys.stdin)))')" >> "$GITHUB_OUTPUT"
+
+      - name: Audit subdomain path assignments
+        id: audit-assignments
+        run: |
+          echo "=== Current subdomain path ASSIGNMENTS for www.elevateforhumanity.org ==="
+          
+          # Check if there are path assignments (rewrite rules)
+          ASSIGN_RESPONSE=$(curl -sS \
+            -H "Authorization: Bearer $NORTHFLANK_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.northflank.com/v1/domains/elevateforhumanity.org/subdomains/www")
+          
+          echo "$ASSIGN_RESPONSE" | python3 -m json.tool 2>/dev/null || echo "$ASSIGN_RESPONSE"
+          
+          # Also check root path assignment
+          ROOT_RESPONSE=$(curl -sS \
+            -H "Authorization: Bearer $NORTHFLANK_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.northflank.com/v1/domains/elevateforhumanity.org/subdomains/www/paths/%2F")
+          
+          echo "=== Root path / assignment ==="
+          echo "$ROOT_RESPONSE" | python3 -m json.tool 2>/dev/null || echo "$ROOT_RESPONSE"
+
+      - name: Identify bad /apply path
+        id: identify
+        if: steps.audit.outputs.apply_paths != 'none'
+        run: |
+          echo "=== Found bad /apply path(s) ==="
+          echo "${{ steps.audit.outputs.apply_paths }}"
+          
+          # Extract path IDs for deletion
+          PATH_IDS=$(echo '${{ steps.audit.outputs.apply_paths }}' | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for p in data:
+    pid = p.get('id', 'unknown')
+    # URL-encode the path ID in case it contains special chars
+    import urllib.parse
+    print(urllib.parse.quote(str(pid)))
+")
+          echo "path_ids=$PATH_IDS" >> "$GITHUB_OUTPUT"
+          
+          # Also save full path objects for reference
+          echo '${{ steps.audit.outputs.apply_paths }}' > apply-paths.json
+
+      - name: Show found paths
+        if: steps.identify.outputs.path_ids == ''
+        run: |
+          echo "No exact /apply path found. Checking for prefix/rewrite rules..."
+          echo "paths_response=${{ steps.audit.outputs.paths_json }}"
+
+      - name: Delete bad /apply path (DRY RUN)
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          echo "=== DRY RUN: Would delete these path IDs ==="
+          echo '${{ steps.identify.outputs.path_ids }}'
+          echo ""
+          echo "To execute deletion, set dry_run to false"
+
+      - name: Delete bad /apply path (EXECUTE)
+        if: github.event.inputs.dry_run != 'true' && steps.identify.outputs.path_ids != ''
+        run: |
+          echo "=== EXECUTING: Deleting bad /apply path ==="
+          
+          for PATH_ID in ${{ steps.identify.outputs.path_ids }}; do
+            echo "Deleting path ID: $PATH_ID"
+            RESPONSE=$(curl -sS -w "\n%{http_code}" \
+              -H "Authorization: Bearer $NORTHFLANK_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              -X DELETE \
+              "https://api.northflank.com/v1/domains/elevateforhumanity.org/subdomains/www/paths/$PATH_ID")
+            
+            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+            BODY=$(echo "$RESPONSE" | head -n -1)
+            
+            echo "HTTP $HTTP_CODE: $BODY"
+            
+            if [ "$HTTP_CODE" != "200" ] && [ "$HTTP_CODE" != "204" ]; then
+              echo "FAILED to delete path $PATH_ID"
+              exit 1
+            fi
+          done
+          
+          echo "=== Deleted successfully ==="
+
+      - name: Check if /apply path was an assignment instead
+        if: github.event.inputs.dry_run != 'true' && steps.identify.outputs.path_ids == ''
+        run: |
+          echo "=== No standalone /apply path found ==="
+          echo "The bad path might be a rewrite rule attached to the root / path."
+          echo ""
+          echo "Checking root path configuration..."
+          
+          # List all paths again
+          curl -sS \
+            -H "Authorization: Bearer $NORTHFLANK_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.northflank.com/v1/domains/elevateforhumanity.org/subdomains/www/paths" \
+            | python3 -m json.tool
+          
+          echo ""
+          echo "Check if root / path has a rewrite rule to /apply"
+
+      - name: Verify /apply in production
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          sleep 5  # Wait for propagation
+          
+          echo "=== Verifying /apply response ==="
+          
+          RESPONSE=$(curl -sS -I "https://www.elevateforhumanity.org/apply")
+          echo "$RESPONSE"
+          
+          # Check for 200 or single redirect to /apply
+          HTTP_CODE=$(echo "$RESPONSE" | grep -i "^HTTP" | head -1 | awk '{print $2}')
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ /apply returns 200 — FIXED!"
+          elif echo "$RESPONSE" | grep -qi "307\|location: /apply"; then
+            echo "❌ Still redirecting — fix may need more investigation"
+            exit 1
+          else
+            echo "Response code: $HTTP_CODE"
+          fi

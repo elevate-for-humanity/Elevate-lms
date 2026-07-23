@@ -1,18 +1,27 @@
 /**
  * LMS Enrollment Adapter
- * 
- * Handles LMS enrollment after application acceptance.
- * Replace this with your existing LMS enrollment service.
+ *
+ * Connects to existing Elevate services:
+ * - program_enrollments (enrollment-service.ts)
+ * - student_enrollments
+ * - student_dashboards
+ * - profiles
  */
+
+import { createClient } from '@/lib/supabase/server';
+import { createOrUpdateEnrollment } from '@/lib/enrollment-service';
+import { logger } from '@/lib/logger';
 
 export interface LmsEnrollmentRequest {
   applicationId: string;
   applicantId: string;
   programId: string;
+  programSlug?: string;
   email: string;
   firstName: string;
   lastName: string;
   applicationType: 'STUDENT' | 'APPRENTICE' | 'TESTING_CANDIDATE';
+  fundingSource?: string;
   metadata?: Record<string, unknown>;
 }
 
@@ -23,130 +32,259 @@ export interface LmsEnrollmentResult {
   apprenticeRecordId?: string;
 }
 
-export interface Lms unenrollmentResult {
+export interface LmsUnenrollmentResult {
   success: boolean;
   message?: string;
 }
 
 /**
- * Create LMS enrollment
- * 
- * This function must be idempotent by applicationId.
- * If enrollment already exists, return existing enrollment.
- * 
- * Throws explicit errors so PARIS knows enrollment failed.
+ * Create LMS enrollment via the canonical enrollment service.
+ * Idempotent on (userId, programId).
  */
 export async function createLmsEnrollment(
   input: LmsEnrollmentRequest,
 ): Promise<LmsEnrollmentResult> {
-  // TODO: Replace with actual LMS API call
-  console.log('LMS enrollment requested:', {
-    applicationId: input.applicationId,
-    programId: input.programId,
-    email: input.email,
-  });
-  
-  // Check if already enrolled (idempotency)
-  const existingEnrollment = await checkExistingEnrollment(input.applicationId);
-  if (existingEnrollment) {
-    console.log('LMS enrollment already exists:', existingEnrollment);
-    return existingEnrollment;
+  const supabase = await createClient();
+
+  // 1. Verify the user exists
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', input.applicantId)
+    .single();
+
+  if (!profile) {
+    throw new Error(`User account not found: ${input.applicantId}`);
   }
-  
-  // TODO: Implement actual LMS enrollment
-  // Example implementation:
-  // const lmsClient = new LMSClient(process.env.LMS_API_URL, process.env.LMS_API_KEY);
-  // 
-  // // 1. Create or get LMS user
-  // const user = await lmsClient.users.upsert({
-  //   email: input.email,
-  //   firstName: input.firstName,
-  //   lastName: input.lastName,
-  //   externalId: input.applicantId,
-  // });
-  // 
-  // // 2. Enroll in program/courses
-  // const enrollment = await lmsClient.enrollments.create({
-  //   userId: user.id,
-  //   programId: input.programId,
-  //   type: input.applicationType,
-  // });
-  // 
-  // // 3. Create student dashboard
-  // const dashboard = await lmsClient.dashboards.create({
-  //   userId: user.id,
-  //   enrollmentId: enrollment.id,
-  // });
-  // 
-  // // 4. For apprenticeships, create apprentice record
-  // let apprenticeRecordId;
-  // if (input.applicationType === 'APPRENTICE') {
-  //   apprenticeRecordId = await lmsClient.apprentices.create({
-  //     enrollmentId: enrollment.id,
-  //     hostShopId: input.metadata?.hostShopId,
-  //     mentorId: input.metadata?.mentorId,
-  //   });
-  // }
-  
-  // Mock result for now
-  const result: LmsEnrollmentResult = {
-    enrollmentId: `enrollment_${Date.now()}`,
-    lmsUserId: `user_${input.applicantId}`,
-    dashboardId: `dashboard_${Date.now()}`,
-    apprenticeRecordId: input.applicationType === 'APPRENTICE'
-      ? `apprentice_${Date.now()}`
-      : undefined,
+
+  // 2. Create enrollment via canonical service
+  const enrollmentResult = await createOrUpdateEnrollment(supabase, {
+    userId: input.applicantId,
+    programId: input.programId,
+    programSlug: input.programSlug,
+    fundingSource: input.fundingSource,
+    email: input.email,
+    fullName: `${input.firstName} ${input.lastName}`,
+    status: 'active',
+    paymentStatus: 'pending',
+    enrollmentState: 'confirmed',
+    nextRequiredAction: 'ORIENTATION',
+  });
+
+  if (enrollmentResult.error || !enrollmentResult.id) {
+    throw new Error(`Enrollment failed: ${enrollmentResult.error || 'Unknown error'}`);
+  }
+
+  logger.info('[lms-adapter] Enrollment created', {
+    enrollmentId: enrollmentResult.id,
+    userId: input.applicantId,
+    programId: input.programId,
+  });
+
+  // 3. Get or create student dashboard
+  const dashboardId = await getOrCreateStudentDashboard(supabase, {
+    userId: input.applicantId,
+    enrollmentId: enrollmentResult.id,
+    firstName: input.firstName,
+    lastName: input.lastName,
+  });
+
+  // 4. For apprenticeships, ensure apprentice record exists
+  let apprenticeRecordId: string | undefined;
+  if (input.applicationType === 'APPRENTICE') {
+    apprenticeRecordId = await getOrCreateApprenticeRecord(supabase, {
+      userId: input.applicantId,
+      enrollmentId: enrollmentResult.id,
+      applicationId: input.applicationId,
+      programId: input.programId,
+      hostShopId: input.metadata?.hostShopId as string | undefined,
+    });
+  }
+
+  return {
+    enrollmentId: enrollmentResult.id,
+    lmsUserId: profile.id,
+    dashboardId,
+    apprenticeRecordId,
   };
-  
-  // Store enrollment record
-  await storeEnrollmentRecord(input.applicationId, result);
-  
-  return result;
 }
 
 /**
- * Check if enrollment already exists
+ * Get or create a student dashboard record.
  */
-async function checkExistingEnrollment(
+async function getOrCreateStudentDashboard(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  data: {
+    userId: string;
+    enrollmentId: string;
+    firstName: string;
+    lastName: string;
+  },
+): Promise<string> {
+  // Check for existing dashboard
+  const { data: existing } = await supabase
+    .from('student_dashboards')
+    .select('id')
+    .eq('user_id', data.userId)
+    .maybeSingle();
+
+  if (existing?.id) {
+    return existing.id;
+  }
+
+  // Create new dashboard
+  const { data: dashboard, error } = await supabase
+    .from('student_dashboards')
+    .insert({
+      user_id: data.userId,
+      enrollment_id: data.enrollmentId,
+      display_name: `${data.firstName} ${data.lastName}`,
+      status: 'active',
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    logger.warn('[lms-adapter] Dashboard creation failed', { error: error.message });
+    // Return a placeholder so enrollment can still succeed
+    return data.enrollmentId;
+  }
+
+  return dashboard?.id || data.enrollmentId;
+}
+
+/**
+ * Get or create an apprentice record for apprenticeship applications.
+ */
+async function getOrCreateApprenticeRecord(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  data: {
+    userId: string;
+    enrollmentId: string;
+    applicationId: string;
+    programId: string;
+    hostShopId?: string;
+  },
+): Promise<string> {
+  // Check for existing apprentice record
+  const { data: existing } = await supabase
+    .from('apprentices')
+    .select('id')
+    .eq('user_id', data.userId)
+    .eq('enrollment_id', data.enrollmentId)
+    .maybeSingle();
+
+  if (existing?.id) {
+    return existing.id;
+  }
+
+  // Get program requirements from apprenticeship_occupations
+  const { data: occupation } = await supabase
+    .from('apprenticeship_occupations')
+    .select('ojl_hours_required, rti_hours_required, competencies_required')
+    .eq('program_id', data.programId)
+    .maybeSingle();
+
+  const { data: apprentice, error } = await supabase
+    .from('apprentices')
+    .insert({
+      user_id: data.userId,
+      enrollment_id: data.enrollmentId,
+      application_id: data.applicationId,
+      program_id: data.programId,
+      host_shop_id: data.hostShopId || null,
+      status: 'active',
+      ojl_hours: 0,
+      ojl_hours_required: occupation?.ojl_hours_required || 2000,
+      rti_hours: 0,
+      rti_hours_required: occupation?.rti_hours_required || 144,
+      competencies_completed: 0,
+      competencies_required: occupation?.competencies_required || 50,
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    logger.warn('[lms-adapter] Apprentice record creation failed', { error: error.message });
+    return '';
+  }
+
+  // Seed competency checklist from program competencies
+  const { data: competencies } = await supabase
+    .from('apprentice_competencies')
+    .select('id')
+    .eq('program_id', data.programId);
+
+  if (competencies && competencies.length > 0 && apprentice?.id) {
+    const checklist = competencies.map((comp) => ({
+      apprentice_id: apprentice.id,
+      competency_id: comp.id,
+      status: 'not_started',
+    }));
+    await supabase
+      .from('apprentice_competency_records')
+      .upsert(checklist, { onConflict: 'apprentice_id,competency_id' });
+  }
+
+  return apprentice?.id || '';
+}
+
+/**
+ * Check if enrollment already exists (idempotency check).
+ */
+export async function checkExistingEnrollment(
   applicationId: string,
 ): Promise<LmsEnrollmentResult | null> {
-  // TODO: Query enrollment records
-  // const { data } = await supabase
-  //   .from('lms_enrollments')
-  //   .select('*')
-  //   .eq('application_id', applicationId)
-  //   .single();
-  // return data;
-  
-  return null;
+  const supabase = await createClient();
+
+  // Find enrollment via program_enrollments linked to this application
+  const { data: enrollment } = await supabase
+    .from('program_enrollments')
+    .select('id, user_id')
+    .eq('stripe_checkout_session_id', applicationId)
+    .maybeSingle();
+
+  if (!enrollment) {
+    return null;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', enrollment.user_id)
+    .single();
+
+  const { data: dashboard } = await supabase
+    .from('student_dashboards')
+    .select('id')
+    .eq('user_id', enrollment.user_id)
+    .maybeSingle();
+
+  return {
+    enrollmentId: enrollment.id,
+    lmsUserId: profile?.id || enrollment.user_id,
+    dashboardId: dashboard?.id || enrollment.id,
+  };
 }
 
 /**
- * Store enrollment record
+ * Store enrollment record metadata (called after enrollment creation).
  */
-async function storeEnrollmentRecord(
+export async function storeEnrollmentRecord(
   applicationId: string,
   result: LmsEnrollmentResult,
 ): Promise<void> {
-  // TODO: Store in database
-  // await supabase
-  //   .from('lms_enrollments')
-  //   .insert({
-  //     application_id: applicationId,
-  //     enrollment_id: result.enrollmentId,
-  //     lms_user_id: result.lmsUserId,
-  //     dashboard_id: result.dashboardId,
-  //     apprentice_record_id: result.apprenticeRecordId,
-  //   });
-  
-  console.log('LMS enrollment record stored:', {
-    applicationId,
-    result,
-  });
+  const supabase = await createClient();
+
+  // Link enrollment to application via checkout session field
+  await supabase
+    .from('program_enrollments')
+    .update({ stripe_checkout_session_id: applicationId })
+    .eq('id', result.enrollmentId);
 }
 
 /**
- * Get enrollment status
+ * Get enrollment status by application ID.
  */
 export async function getEnrollmentStatus(
   applicationId: string,
@@ -156,41 +294,77 @@ export async function getEnrollmentStatus(
   lmsUserId?: string;
   dashboardUrl?: string;
 } | null> {
-  // TODO: Query enrollment status
-  return null;
-}
+  const supabase = await createClient();
 
-/**
- * Unenroll from LMS
- * Used when application is withdrawn
- */
-export async function unenrollFromLms(
-  applicationId: string,
-): Promise<Lms unenrollmentResult> {
-  // TODO: Call LMS API to unenroll
-  console.log('LMS unenrollment requested:', { applicationId });
-  
+  const { data: enrollment } = await supabase
+    .from('program_enrollments')
+    .select('id, user_id')
+    .eq('stripe_checkout_session_id', applicationId)
+    .maybeSingle();
+
+  if (!enrollment) {
+    return null;
+  }
+
+  const { data: dashboard } = await supabase
+    .from('student_dashboards')
+    .select('id')
+    .eq('user_id', enrollment.user_id)
+    .maybeSingle();
+
   return {
-    success: true,
-    message: 'Unenrollment processed',
+    enrolled: true,
+    enrollmentId: enrollment.id,
+    lmsUserId: enrollment.user_id,
+    dashboardUrl: dashboard?.id
+      ? `/learner/dashboard?id=${dashboard.id}`
+      : `/learner/dashboard`,
   };
 }
 
 /**
- * Get student dashboard URL
+ * Unenroll from LMS — marks enrollment as cancelled.
+ */
+export async function unenrollFromLms(
+  applicationId: string,
+): Promise<LmsUnenrollmentResult> {
+  const supabase = await createClient();
+
+  const { data: enrollment } = await supabase
+    .from('program_enrollments')
+    .select('id')
+    .eq('stripe_checkout_session_id', applicationId)
+    .maybeSingle();
+
+  if (!enrollment) {
+    return { success: false, message: 'Enrollment not found' };
+  }
+
+  const { error } = await supabase
+    .from('program_enrollments')
+    .update({ status: 'cancelled', payment_status: 'refunded' })
+    .eq('id', enrollment.id);
+
+  if (error) {
+    logger.error('[lms-adapter] Unenrollment failed', { error: error.message });
+    return { success: false, message: error.message };
+  }
+
+  return { success: true, message: 'Unenrollment processed' };
+}
+
+/**
+ * Get student dashboard URL for an application.
  */
 export async function getStudentDashboardUrl(
   applicationId: string,
 ): Promise<string | null> {
   const status = await getEnrollmentStatus(applicationId);
-  if (!status?.dashboardUrl) return null;
-  
-  return status.dashboardUrl;
+  return status?.dashboardUrl ?? null;
 }
 
 /**
- * Get LMS user credentials for new student
- * Used to send login details after enrollment
+ * Get LMS user credentials — fetches from auth.users.
  */
 export async function getStudentCredentials(
   applicationId: string,
@@ -199,16 +373,37 @@ export async function getStudentCredentials(
   temporaryPassword: string;
   loginUrl: string;
 } | null> {
-  // TODO: Generate and return credentials
-  // This might involve calling LMS API to create credentials
-  // or generating a magic link
-  
-  return null;
+  const supabase = await createClient();
+
+  const { data: enrollment } = await supabase
+    .from('program_enrollments')
+    .select('user_id')
+    .eq('stripe_checkout_session_id', applicationId)
+    .maybeSingle();
+
+  if (!enrollment?.user_id) {
+    return null;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('email')
+    .eq('id', enrollment.user_id)
+    .single();
+
+  if (!profile?.email) {
+    return null;
+  }
+
+  return {
+    email: profile.email,
+    temporaryPassword: '', // Auth handled by Supabase magic links
+    loginUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/login`,
+  };
 }
 
 /**
- * Update LMS enrollment with additional data
- * Used to sync additional fields after enrollment
+ * Update LMS enrollment with additional data.
  */
 export async function updateLmsEnrollment(
   enrollmentId: string,
@@ -219,15 +414,24 @@ export async function updateLmsEnrollment(
     expectedEndDate?: Date;
   },
 ): Promise<void> {
-  // TODO: Call LMS API to update enrollment
-  console.log('LMS enrollment update requested:', {
-    enrollmentId,
-    updates,
-  });
+  const supabase = await createClient();
+
+  const updatePayload: Record<string, unknown> = {};
+  if (updates.hostShopId) updatePayload.host_shop_id = updates.hostShopId;
+  if (updates.startDate) updatePayload.start_date = updates.startDate.toISOString();
+  if (updates.expectedEndDate)
+    updatePayload.expected_end_date = updates.expectedEndDate.toISOString();
+
+  if (Object.keys(updatePayload).length > 0) {
+    await supabase
+      .from('program_enrollments')
+      .update(updatePayload)
+      .eq('id', enrollmentId);
+  }
 }
 
 /**
- * Get apprenticeship-specific records
+ * Get apprenticeship-specific records.
  */
 export async function getApprenticeshipRecords(
   apprenticeRecordId: string,
@@ -243,21 +447,51 @@ export async function getApprenticeshipRecords(
     notes: string;
   }>;
 } | null> {
-  // TODO: Query LMS for apprenticeship data
-  return null;
+  const supabase = await createClient();
+
+  const { data: apprentice } = await supabase
+    .from('apprentices')
+    .select('ojl_hours, rti_hours, ojl_hours_required, rti_hours_required, competencies_completed, competencies_required')
+    .eq('id', apprenticeRecordId)
+    .single();
+
+  if (!apprentice) return null;
+
+  const { data: evaluations } = await supabase
+    .from('apprentice_evaluations')
+    .select('id, evaluation_date, score, notes')
+    .eq('apprentice_id', apprenticeRecordId)
+    .order('evaluation_date', { ascending: false });
+
+  return {
+    ojlHours: apprentice.ojl_hours || 0,
+    rtiProgress:
+      apprentice.ojl_hours_required > 0
+        ? Math.round(
+            ((apprentice.ojl_hours || 0) / apprentice.ojl_hours_required) * 100,
+          )
+        : 0,
+    competenciesCompleted: apprentice.competencies_completed || 0,
+    totalCompetencies: apprentice.competencies_required || 0,
+    evaluations:
+      evaluations?.map((e) => ({
+        id: e.id,
+        date: e.evaluation_date || '',
+        score: e.score || 0,
+        notes: e.notes || '',
+      })) || [],
+  };
 }
 
 /**
- * Verify LMS connectivity (for health checks)
+ * Verify LMS connectivity by querying program_enrollments.
  */
 export async function verifyLmsConnection(): Promise<boolean> {
   try {
-    // TODO: Ping LMS API
-    // const lmsClient = new LMSClient(process.env.LMS_API_URL);
-    // await lmsClient.health.check();
-    return true;
-  } catch (error) {
-    console.error('LMS connection failed:', error);
+    const supabase = await createClient();
+    const { error } = await supabase.from('program_enrollments').select('id').limit(1);
+    return !error;
+  } catch {
     return false;
   }
 }

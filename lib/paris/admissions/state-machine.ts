@@ -120,6 +120,7 @@ export function assertTransition(
 ): void {
   if (!canTransition(current, next)) {
     throw new InvalidTransitionError(current, next);
+  }
 }
 
 /**

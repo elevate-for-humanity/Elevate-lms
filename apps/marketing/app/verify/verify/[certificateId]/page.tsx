@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -150,8 +151,9 @@ export default async function VerifyCertificatePage({
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/verify-page-1.webp"
           alt="Certificate verification"
           fill

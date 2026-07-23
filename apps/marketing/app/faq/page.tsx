@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { HelpCircle, ChevronDown } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'FAQ | Elevate for Humanity',
+  title: 'FAQ',
   description: 'Frequently asked questions about workforce training, apprenticeships, and funding.',
 };
 

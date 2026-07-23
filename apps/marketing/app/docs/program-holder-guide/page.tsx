@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Program Holder Guide | Elevate for Humanity',
+  title: 'Program Holder Guide',
   description: 'Program Holder Guide page content.',
 };
 

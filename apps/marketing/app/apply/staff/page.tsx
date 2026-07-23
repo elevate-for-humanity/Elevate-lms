@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 import StaffApplicationForm from './StaffApplicationForm';
@@ -28,14 +29,15 @@ export default async function StaffApplicationPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-[200px] sm:h-[260px] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/apply-hero.webp"
           alt="Join our team"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority
         />
         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
           <span className="text-sm font-bold text-slate-900">{PLATFORM_DEFAULTS.orgName}</span>

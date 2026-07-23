@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Attendance Policy | Elevate for Humanity',
+  title: 'Attendance Policy',
   description: 'Attendance Policy page content.',
 };
 

@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   description: 'Partner with Elevate to build your workforce. Hire certified graduates, sponsor apprenticeships, and access WIOA funding for training.',
   keywords: ['employer partnership', 'workforce development', 'apprenticeship', 'hiring', 'WIOA', 'talent pipeline'],
   openGraph: {
-    title: 'For Employers | Elevate for Humanity',
+    title: 'For Employers',
     description: 'Build your workforce pipeline with certified talent',
     type: 'website',
   },

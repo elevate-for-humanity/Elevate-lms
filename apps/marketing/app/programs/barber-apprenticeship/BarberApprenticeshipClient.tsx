@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { HeroBannerConfig } from '@/content/heroBanners';
@@ -161,8 +162,9 @@ export default function BarberApprenticeshipClient({ program: p, heroBanner: b, 
             </p>
           </div>
           <div className="relative h-72 rounded-xl overflow-hidden shadow-lg">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-            <Image src="/images/pages/barber-apprentice-learning.webp" alt="Barber apprentice learning clipper technique from an instructor" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src="/images/pages/barber-apprentice-learning.webp" alt="Barber apprentice learning clipper technique from an instructor" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
           </div>
         </div>
       </section>

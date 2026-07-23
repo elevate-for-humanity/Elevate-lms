@@ -1,6 +1,7 @@
 export const revalidate = 3600;
 
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -151,13 +152,14 @@ function CredentialCard({ credential }: { credential: VerifiableCredential }) {
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-            <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
               src={credential.image}
               alt={credential.name}
               fill
               sizes="48px"
-              className="object-cover" placeholder="empty"
+              className="object-cover"
             />
           </div>
           <div>

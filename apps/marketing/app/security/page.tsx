@@ -8,7 +8,7 @@ import {
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Security & Compliance | Elevate for Humanity',
+  title: 'Security & Compliance',
   keywords: ["security", "data protection", "privacy", "FERPA", "compliance", "encryption"],
   description: 'Security practices for workforce development. FERPA-compliant student data protection, role-based access controls, and incident response.',
 };

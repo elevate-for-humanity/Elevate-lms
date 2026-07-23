@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
@@ -138,8 +139,10 @@ export default function EmployerPage() {
                 className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col"
               >
                 <div className="relative h-40 flex-shrink-0">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                  {img && <Image src={img} alt={alt} fill sizes="400px" className="object-cover"  />}
+                  {img && <Image
+                    placeholder="blur"
+                    blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
+                     src={img} alt={alt} fill sizes="400px" className="object-cover"  />}
                 </div>
                 <div className="p-4 flex-1">
                   <h3 className="font-bold text-slate-900 text-sm leading-tight mb-1">{title}</h3>

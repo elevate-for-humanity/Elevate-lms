@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = {
-  title: 'Compliance & Accreditation | Elevate for Humanity',
+  title: 'Compliance & Accreditation',
   description: 'Learn about Elevate for Humanity\'s compliance standards, accreditation, and commitment to quality workforce development programs.',
 };
 

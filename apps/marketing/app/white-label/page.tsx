@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'White Label | Elevate for Humanity',
+  title: 'White Label',
   description: 'White Label page content.',
 };
 

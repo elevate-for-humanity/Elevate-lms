@@ -5,7 +5,7 @@ import { normalizeProgramInterest } from '@/lib/intake/normalize-program-interes
 import { getAdminClient } from '@/lib/supabase/admin';
 
 export const metadata: Metadata = {
-  title: 'Host Shop Application | Barber Apprenticeship | Elevate for Humanity',
+  title: 'Host Shop Application | Barber Apprenticeship',
   description: 'Apply to become a host shop for our barber apprenticeship program. Train the next generation of barbers while growing your business.',
 };
 

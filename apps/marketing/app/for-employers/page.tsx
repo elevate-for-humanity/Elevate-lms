@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Building2, Users, DollarSign, CheckCircle2, ArrowRight, Briefcase, GraduationCap, Shield, Truck } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'For Employers | Elevate for Humanity',
+  title: 'For Employers',
   description: 'Partner with Elevate for Humanity to build your talent pipeline, access apprenticeship programs, and earn tax credits.',
 };
 

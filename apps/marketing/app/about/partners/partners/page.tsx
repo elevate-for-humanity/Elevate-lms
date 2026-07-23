@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { Building2, Briefcase, GraduationCap, Handshake, Award } from 'lucide-react';
@@ -48,8 +49,9 @@ export default async function PartnersPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
             src="/images/pages/about-partners-hero.webp"
             alt="Partners background"
             fill

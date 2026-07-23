@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Building2, Users, GraduationCap, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Workforce Solutions | Elevate for Humanity',
+  title: 'Workforce Solutions',
   description: 'Workforce development solutions for employers, agencies, training providers, and educational institutions.',
 };
 

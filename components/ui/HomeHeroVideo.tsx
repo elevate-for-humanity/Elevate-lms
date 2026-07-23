@@ -20,6 +20,7 @@ export interface HeroBanner {
   posterImage?: string;
   voiceoverSrc?: string;
   microLabel?: string;
+  eyebrow?: string; // SEO eyebrow text displayed above the h1
   belowHeroHeadline: string;
   belowHeroSubheadline: string;
   primaryCta: { label: string; href: string; variant?: string };
@@ -84,12 +85,15 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
         {/* Below-video content — all messaging here, never on the video */}
         <section className="border-b border-slate-100 py-8 sm:py-14">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            {banner.microLabel && (
-              <p className="text-sm uppercase tracking-wider text-brand-red-400 font-semibold mb-4">
-                {banner.microLabel}
+            {banner.eyebrow && (
+              <p className="text-xs sm:text-sm uppercase tracking-widest text-brand-red-500 font-bold mb-3 opacity-90">
+                {banner.eyebrow}
               </p>
             )}
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-3 sm:mb-4">
+            <h1
+              className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-3 sm:mb-4"
+              style={{ textWrap: 'balance' }}
+            >
               {banner.belowHeroHeadline}
             </h1>
             <p className="text-slate-700 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 max-w-2xl">
@@ -197,7 +201,12 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       {/* BELOW-VIDEO CONTENT — all primary messaging lives here */}
       <section className="border-b border-slate-100 py-8 sm:py-14">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-3 sm:mb-4">
+          {banner.eyebrow && (
+            <p className="text-xs sm:text-sm uppercase tracking-widest text-brand-red-500 font-bold mb-3 opacity-90">
+              {banner.eyebrow}
+            </p>
+          )}
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-3 sm:mb-4" style={{ textWrap: 'balance' }}>
             {banner.belowHeroHeadline}
           </h1>
           <p className="text-slate-700 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 max-w-2xl">

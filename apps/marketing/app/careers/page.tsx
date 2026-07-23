@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Briefcase, Users, Award } from 'lucide-react';
 export const metadata: Metadata = { 
-  title: 'Career Training Programs | Elevate for Humanity',
+  title: 'Career Training Programs',
   description: 'Job-ready skills training programs with WIOA funding available. Healthcare, skilled trades, IT certifications. Start your career journey today.',
   keywords: ['career training', 'workforce development', 'job training', 'WIOA training', 'healthcare careers', 'skilled trades', 'employment'],
 };

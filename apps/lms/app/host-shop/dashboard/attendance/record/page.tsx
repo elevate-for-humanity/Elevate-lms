@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -80,8 +81,9 @@ export default async function RecordAttendancePage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/partner-page-3.jpg"
           alt="Record attendance"
           fill

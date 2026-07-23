@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Higher Education Solutions | Elevate for Humanity',
+  title: 'Higher Education Solutions',
   description: 'Partner with colleges and universities for credit articulation and degree completion pathways.',
 };
 

@@ -9,7 +9,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import DemoTabs from './DemoTabs';
 
 export const metadata: Metadata = {
-  title: 'Interactive Platform Demos | Elevate for Humanity',
+  title: 'Interactive Platform Demos',
   description: 'Experience the full Elevate workforce platform. Live demos of Admin, Student, Employer portals, AI assistants, and more.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/demos',

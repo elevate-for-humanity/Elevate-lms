@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -167,8 +168,9 @@ export default function PartnerHoursPendingPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/partner-page-6.webp"
           alt="Pending hours"
           fill

@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Ferpa | Elevate for Humanity',
+  title: 'Ferpa',
   description: 'Ferpa page content.',
 };
 

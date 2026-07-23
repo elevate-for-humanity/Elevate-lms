@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
@@ -205,8 +206,9 @@ export default function PathwaysPage() {
       </div>
       {/* ── Visual Hero (no text overlay) ── */}
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/pathways-page-2.webp"
           alt="Workforce training students in a classroom and lab setting"
           fill

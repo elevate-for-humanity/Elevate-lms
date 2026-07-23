@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Check, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
@@ -23,13 +24,14 @@ export default function SchoolLicensePage() {
 
       {/* Hero - Clean */}
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image sizes="100vw"
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" sizes="100vw"
           src="/images/pages/about-hero.webp"
           alt="School License Platform"
           fill
           className="object-cover"
-          priority placeholder="empty"
+          priority
         />
       </section>
 

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -69,13 +70,14 @@ export default async function VideosPage() {
                       className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition"
                     >
                       <div className="relative aspect-video bg-slate-200">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
                           src={video.thumbnail_url}
                           alt={video.title}
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          className="object-cover group-hover:scale-105 transition" placeholder="empty"
+                          className="object-cover group-hover:scale-105 transition"
                         />
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition">

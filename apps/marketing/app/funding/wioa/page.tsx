@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -44,15 +45,16 @@ export default async function WioaPage() {
 
       {/* Hero Section - Image Only */}
       <section className="relative h-[400px] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/funding-page-5.webp"
           alt="WIOA Success Story"
           fill
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
       </section>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -40,15 +41,16 @@ export default function GrantProgramsPage() {
 
       {/* Hero Section */}
       <section className="relative h-[400px] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/heroes/lms-analytics.webp"
           alt="Funded Training Programs"
           fill
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center text-white h-full flex flex-col justify-center drop-shadow-lg">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 drop-shadow-md">

@@ -60,19 +60,22 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
       - name: Start server
-        run: pnpm run start &
+        run: pnpm --filter @elevate/marketing run start &
         env:
+          NODE_ENV: production
+          PORT: 3000
+          HOSTNAME: 127.0.0.1
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
           NEXTAUTH_SECRET: ci-test-secret-do-not-use-in-production
-          NEXTAUTH_URL: http://localhost:3000
+          NEXTAUTH_URL: http://127.0.0.1:3000
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || '' }}
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY || '' }}
           TEST_MODE: "true"
 
       - name: Wait for server
-        run: npx wait-on http://localhost:3000 --timeout 120000
+        run: npx wait-on http://127.0.0.1:3000 --timeout 120000
 
       - name: Run E2E enrollment tests
         run: npx playwright test tests/e2e/full-enrollment-journey.spec.ts
@@ -111,19 +114,22 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
       - name: Start server
-        run: pnpm run start &
+        run: pnpm --filter @elevate/marketing run start &
         env:
+          NODE_ENV: production
+          PORT: 3000
+          HOSTNAME: 127.0.0.1
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
           NEXTAUTH_SECRET: ci-test-secret-do-not-use-in-production
-          NEXTAUTH_URL: http://localhost:3000
+          NEXTAUTH_URL: http://127.0.0.1:3000
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || '' }}
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY || '' }}
           TEST_MODE: "true"
 
       - name: Wait for server
-        run: npx wait-on http://localhost:3000 --timeout 120000
+        run: npx wait-on http://127.0.0.1:3000 --timeout 120000
 
       - name: Run accessibility tests
         run: npx playwright test tests/e2e/accessibility.spec.ts

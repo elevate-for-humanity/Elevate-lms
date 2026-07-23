@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Loader2, CreditCard, Info, Shield } from 'lucide-react';
@@ -327,15 +328,15 @@ export default function HvacApplyPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
-
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
             src="/images/pages/programs-hvac-apply-hero.webp"
             alt="HVAC technician working on an air conditioning unit"
             fill
             className="object-cover"
             priority
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         </div>
         <div className="bg-white py-10 border-t">

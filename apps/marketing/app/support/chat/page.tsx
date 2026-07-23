@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Chat | Elevate for Humanity',
+  title: 'Chat',
   description: 'Chat page content.',
 };
 

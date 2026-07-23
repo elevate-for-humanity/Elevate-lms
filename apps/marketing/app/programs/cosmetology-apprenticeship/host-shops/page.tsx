@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import type { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Shield, Users, Award, Building2 } from 'lucide-react';
@@ -29,14 +30,15 @@ export default function CosmetologyHostSalonsPage() {
 
       {/* Hero */}
       <section className="relative h-[38vh] min-h-[220px] max-h-[420px] w-full overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/cosmetology-hero.webp"
           alt="Professional salon interior with stylist stations"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority
         />
       </section>
 

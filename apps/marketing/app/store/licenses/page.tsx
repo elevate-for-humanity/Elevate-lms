@@ -1,5 +1,6 @@
 // useHeroVideo
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -50,14 +51,15 @@ export default async function LicensesPage() {
           <source src="/videos/training-providers-video-with-narration.mp4" type="video/mp4" />
         </video>
         {/* Fallback Image */}
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image sizes="100vw"
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" sizes="100vw"
           src="/images/pages/store-licensing-enterprise-hero.webp"
           alt="Workforce training platform"
           fill
           className="object-cover -z-10"
           priority
-          quality={90} placeholder="empty"
+          quality={90}
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-zinc-900/95 via-zinc-900/80 to-zinc-900/60" />

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -41,14 +42,15 @@ export default async function DOLFundingPage() {
       </div>
       {/* Hero */}
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/apprenticeship-hero.webp"
           alt="DOL Registered Apprenticeship"
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
       </section>
       {/* What Is It */}

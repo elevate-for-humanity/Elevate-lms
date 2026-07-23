@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Dmca | Elevate for Humanity',
+  title: 'Dmca',
   description: 'Dmca page content.',
 };
 

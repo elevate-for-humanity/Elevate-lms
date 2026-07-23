@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Users, DollarSign, Briefcase } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'SNAP E&T | Elevate for Humanity',
+  title: 'SNAP E&T',
   description: 'SNAP Employment and Training program for workforce development.',
 };
 

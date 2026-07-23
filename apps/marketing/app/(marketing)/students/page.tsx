@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   description: 'Your path from career exploration to job placement. Discover programs, get funded, train with AI, earn credentials, and launch your career.',
   keywords: ['student journey', 'career training', 'job placement', 'workforce development', 'student success'],
   openGraph: {
-    title: 'Student Journey | Elevate for Humanity',
+    title: 'Student Journey',
     description: 'From discovery to placement - your complete career training journey',
     type: 'website',
   },

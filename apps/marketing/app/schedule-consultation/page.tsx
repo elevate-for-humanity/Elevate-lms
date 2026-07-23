@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Schedule a Free Consultation | Elevate for Humanity',
+  title: 'Schedule a Free Consultation',
   description: 'Book a free 30-minute consultation to discuss your workforce training needs. Our advisors help individuals and employers find the right program.',
 };
 

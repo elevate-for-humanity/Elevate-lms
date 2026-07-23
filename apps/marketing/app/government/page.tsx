@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Building2, Users, FileCheck, Shield, BarChart3 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Government Partners | Elevate for Humanity',
+  title: 'Government Partners',
   description: 'Workforce development solutions for government agencies, workforce boards, and WIOA programs.',
 };
 

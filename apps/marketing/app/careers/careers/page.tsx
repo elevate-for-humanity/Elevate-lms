@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -166,8 +167,9 @@ export default async function CareersPage() {
                   className="bg-white text-center p-8 rounded-lg border-2 border-slate-200 hover:border-brand-blue-500 hover:shadow-lg transition"
                 >
                   <div className="relative w-full h-40 mb-4 overflow-hidden rounded-lg">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                    <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
                       src={benefit.image}
                       alt={benefit.title}
                       fill

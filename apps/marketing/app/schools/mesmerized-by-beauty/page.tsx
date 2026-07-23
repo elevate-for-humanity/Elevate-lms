@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Mesmerized By Beauty | Elevate for Humanity',
+  title: 'Mesmerized By Beauty',
   description: 'Mesmerized By Beauty page content.',
 };
 

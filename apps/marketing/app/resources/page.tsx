@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { GraduationCap, DollarSign, Shield, Briefcase, ExternalLink } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Resources | Elevate for Humanity',
+  title: 'Resources',
   description: 'Resources page content.',
 };
 

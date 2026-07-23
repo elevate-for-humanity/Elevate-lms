@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   description: 'Course Factory - Generate complete workforce training courses in hours, not months. AI-powered curriculum development with credential intelligence, video generation, and automated publishing.',
   keywords: ['course generation', 'AI curriculum', 'workforce training', 'credentialing', 'video courses', 'e-learning'],
   openGraph: {
-    title: 'Course Factory | Elevate for Humanity',
+    title: 'Course Factory',
     description: 'AI-powered course generation for workforce development',
     type: 'website',
   },

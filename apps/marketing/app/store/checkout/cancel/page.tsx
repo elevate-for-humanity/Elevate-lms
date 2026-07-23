@@ -1,6 +1,7 @@
 "use client";
 export const dynamic = 'force-dynamic';
 import Image from 'next/image';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 
 import { useState, useEffect } from 'react';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
@@ -18,8 +19,9 @@ function CancelContent() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image src="/images/pages/store-checkout-cancel-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority placeholder="empty" />
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src="/images/pages/store-checkout-cancel-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
       </section>
       <div className="max-w-lg w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 md:p-12">
         <div className="text-center">

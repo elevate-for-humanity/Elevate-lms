@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Briefcase, GraduationCap, DollarSign, Clock, ArrowRight, CheckCircle2, Users, Building2 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Career Programs & Training | Elevate for Humanity',
+  title: 'Career Programs & Training',
   description: 'Explore workforce training programs and apprenticeship opportunities. Earn while you learn with WIOA funding and employer partnerships in healthcare, skilled trades, and technology.',
 };
 

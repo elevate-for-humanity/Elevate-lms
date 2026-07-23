@@ -2,6 +2,7 @@ export const dynamic = 'force-static';
 
 
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
@@ -157,13 +158,14 @@ export default function CommunityHubPage() {
             {features.map((feature) => (
               <div key={feature.title} className="group bg-white rounded-xl overflow-hidden border hover:shadow-lg transition">
                 <div className="relative h-44 overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                  <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
                     src={feature.image}
                     alt={feature.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                   <div className="absolute bottom-3 left-4">
                     <h3 className="text-lg font-bold text-white">{feature.title}</h3>

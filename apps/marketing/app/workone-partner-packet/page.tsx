@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -161,14 +162,15 @@ export default function WorkOnePartnerPacketPage() {
             </div>
             <div className="space-y-6">
               <div className="relative h-64 rounded-2xl overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
                   src="/images/pages/workone-partner-packet-page-1.webp"
                   alt="Workforce partnership"
                   fill
                   quality={85}
                   className="object-cover"
-                  sizes="100vw" placeholder="empty"
+                  sizes="100vw"
                 />
               </div>
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">

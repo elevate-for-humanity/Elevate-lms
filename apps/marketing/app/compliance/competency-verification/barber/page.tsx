@@ -3,6 +3,7 @@ export const revalidate = 3600;
 
 
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -144,8 +145,9 @@ export default function BarberCompetencyRubricPage() {
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[300px] print:hidden overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/admin-compliance-agreements-hero.webp"
           alt="Barber apprentice training in a barbershop"
           fill

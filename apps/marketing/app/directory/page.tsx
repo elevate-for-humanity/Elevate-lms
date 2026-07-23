@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Search, Filter, MapPin, Phone, Mail, CheckCircle, Clock, AlertCircle, ExternalLink, Building2, GraduationCap, TestTube, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Partner Directory | Elevate for Humanity',
+  title: 'Partner Directory',
   description: 'Find verified workforce development partners, training providers, testing centers, and employers in our network.',
   keywords: ['workforce partners', 'training providers', 'testing centers', 'employer directory', 'apprenticeship partners'],
 };

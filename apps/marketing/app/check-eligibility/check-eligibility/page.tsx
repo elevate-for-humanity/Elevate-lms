@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -286,8 +287,9 @@ export default function CheckEligibilityPage() {
         className="relative overflow-hidden"
         style={{ minHeight: 'clamp(320px, 40vw, 460px)' }}
       >
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/funding-page-2.webp"
           alt="Check your eligibility for funded career training"
           fill

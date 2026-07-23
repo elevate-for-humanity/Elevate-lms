@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Distance Learning Solutions | Elevate for Humanity',
+  title: 'Distance Learning Solutions',
   description: 'Online and hybrid workforce training programs for remote learners.',
 };
 

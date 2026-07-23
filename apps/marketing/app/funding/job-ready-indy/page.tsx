@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -18,14 +19,15 @@ export default function JobReadyIndyPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/jri-hero.webp"
           alt="Job Ready Indy workforce training"
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
       </section>
       <div className="bg-white border-b border-slate-200 py-8 px-4">

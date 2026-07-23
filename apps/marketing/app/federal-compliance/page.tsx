@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Federal Compliance | Elevate for Humanity',
+  title: 'Federal Compliance',
   description: 'Federal Compliance page content.',
 };
 

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { useEffect, useState } from 'react';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import Link from 'next/link';
@@ -57,8 +58,9 @@ function CheckoutSuccessContent() {
 
       {/* Hero Image */}
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image src="/images/pages/admin-dashboard-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority placeholder="empty" />
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src="/images/pages/admin-dashboard-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
       </section>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green-600 mx-auto mb-4" />

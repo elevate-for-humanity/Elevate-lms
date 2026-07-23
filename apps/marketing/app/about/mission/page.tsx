@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Target, Heart, Users, Globe, Award, TrendingUp } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Our Mission | Elevate for Humanity',
+  title: 'Our Mission',
   description: 'Elevate for Humanity transforms lives through workforce development, connecting job seekers to careers and employers to talent.',
 };
 

@@ -2,6 +2,7 @@ export const dynamic = 'force-static';
 
 
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Zap, Users, FileCheck, Building2, GraduationCap, BarChart3, Shield, Check } from 'lucide-react';
@@ -177,8 +178,9 @@ export default function StorePage() {
             ].map((item) => (
               <div key={item.title} className="border border-slate-200 rounded-xl overflow-hidden flex flex-col md:flex-row">
                 <div className="relative w-full md:w-48 h-40 md:h-auto flex-shrink-0 overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                  <Image src={item.img} alt={item.title} fill quality={85} className="object-cover" sizes="(max-width: 768px) 100vw, 200px" placeholder="empty" />
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src={item.img} alt={item.title} fill quality={85} className="object-cover" sizes="(max-width: 768px) 100vw, 200px" />
                 </div>
                 <div className="p-6">
                   <h3 className="font-bold text-slate-900 text-lg mb-2">{item.title}</h3>

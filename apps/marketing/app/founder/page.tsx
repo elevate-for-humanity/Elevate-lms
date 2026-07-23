@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { User } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Founder | Elevate for Humanity',
+  title: 'Founder',
   keywords: ["founder", "leadership", "Elevate for Humanity"], description: 'Meet the founder of Elevate for Humanity.',
 };
 

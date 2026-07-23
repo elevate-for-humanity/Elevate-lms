@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Building2, Users, DollarSign, CheckCircle2, ArrowRight, Briefcase, GraduationCap, Shield, Clock } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Post a Job | Employer Partnerships | Elevate for Humanity',
+  title: 'Post a Job | Employer Partnerships',
   description: 'Post jobs and connect with trained talent from our workforce programs. Build your apprenticeship pipeline and access WIOA employer services.',
 };
 

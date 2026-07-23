@@ -2,6 +2,7 @@ export const dynamic = 'force-static';
 
 
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Home, ChevronRight, FileText, BarChart3, Calendar, Download } from 'lucide-react';
@@ -96,8 +97,9 @@ export default function GrantReportingPage() {
       {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image src="/images/pages/store-page-1.webp" alt="Grant Reporting" fill className="object-cover" priority sizes="100vw" placeholder="empty" />
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src="/images/pages/store-page-1.webp" alt="Grant Reporting" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

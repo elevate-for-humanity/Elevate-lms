@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'For Training Providers & Program Holders | Elevate for Humanity',
+  title: 'For Training Providers & Program Holders',
   description: 'Partner with Elevate to deliver workforce training. Become a host shop, training provider, or apprenticeship sponsor.',
 };
 

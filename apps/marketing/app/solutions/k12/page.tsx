@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'K-12 Workforce Solutions | Elevate for Humanity',
+  title: 'K-12 Workforce Solutions',
   description: 'Career and technical education (CTE) partnerships for high schools and school districts.',
 };
 

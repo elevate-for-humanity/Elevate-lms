@@ -1,6 +1,7 @@
 export const revalidate = 3600;
 
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Accessibility, Mail, Phone } from 'lucide-react';
@@ -27,8 +28,9 @@ export default function AccessibilityPage() {
 
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/accessibility-hero.jpg"
           alt="Accessibility Commitment"
           fill

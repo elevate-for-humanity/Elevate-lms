@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -126,13 +127,14 @@ export default function ManagedPlatformPage() {
             {/* Platform screenshot */}
             <div className="mt-12 max-w-4xl mx-auto">
               <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden shadow-2xl border border-slate-200">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
                   src="/images/pages/admin-dashboard-hero.webp"
                   alt="Elevate managed platform dashboard"
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 80vw" placeholder="empty"
+                  sizes="(max-width: 768px) 100vw, 80vw"
                 />
               </div>
             </div>

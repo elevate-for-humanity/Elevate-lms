@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Mobile App | Elevate for Humanity',
+  title: 'Mobile App',
   description: 'Mobile App page content.',
 };
 

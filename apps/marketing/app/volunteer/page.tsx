@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Heart, Users, Calendar } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Volunteer | Elevate for Humanity',
+  title: 'Volunteer',
   keywords: ["volunteer", "workforce training", "Indiana"], description: 'Volunteer opportunities to support workforce development.',
 };
 

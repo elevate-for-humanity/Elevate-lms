@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { CheckCircle2, DollarSign, Users, Building2, ArrowRight, Clock, GraduationCap, FileText, HelpCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Check Your Eligibility | WIOA & Workforce Funding | Elevate for Humanity',
+  title: 'Check Your Eligibility | WIOA & Workforce Funding',
   description: 'Find out if you qualify for free or subsidized workforce training. WIOA funding, state grants, and employer sponsorships available for eligible Indiana residents.',
 };
 

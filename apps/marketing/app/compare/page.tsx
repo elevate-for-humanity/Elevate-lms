@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Compare Plans | Elevate for Humanity',
+  title: 'Compare Plans',
   keywords: ["compare", "pricing", "plans", "features", "single user", "small business", "enterprise"],
   description: 'Compare Elevate plans: Single User, Small Business, and Enterprise. Find the perfect fit for your workforce development organization.',
 };

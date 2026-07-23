@@ -10,7 +10,14 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Pexels API configuration
-const PEXELS_API_KEY = process.env.PEXELS_API_KEY || 'IJJFHHBQ7lP0Dmn9vDvPWjLrfQTZhmVyWWYou0UD1fnXgkAdXrzdEZpw';
+const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
+
+if (!PEXELS_API_KEY) {
+  throw new Error(
+    "PEXELS_API_KEY is required. Configure it as a protected environment variable."
+  );
+}
+
 const PEXELS_VIDEO_BASE = 'https://videos.pexels.com/video-files';
 
 // Course category to Pexels search terms

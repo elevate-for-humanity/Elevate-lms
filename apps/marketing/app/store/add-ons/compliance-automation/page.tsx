@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -98,14 +99,15 @@ export default function ComplianceAutomationPage() {
 
       {/* Hero Section */}
       <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/store-addons-compliance-hero.webp"
           alt="Compliance Automation"
           fill
           className="object-cover"
           priority
-         sizes="100vw" placeholder="empty" />
+         sizes="100vw" />
         
       </section>
 

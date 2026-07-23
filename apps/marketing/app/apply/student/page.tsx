@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import ApplyPathGuide from '@/components/apply/ApplyPathGuide';
@@ -132,14 +133,15 @@ export default async function StudentApplicationPage({
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className={heroTokens.imageWrap}>
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/apply-page-4.jpg"
           alt={`Apply for career training — ${PLATFORM_DEFAULTS.orgName}`}
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority
         />
       </div>
 

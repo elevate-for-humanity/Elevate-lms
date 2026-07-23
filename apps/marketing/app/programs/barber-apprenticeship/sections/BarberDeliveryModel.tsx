@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { COMPETENCIES } from '../barber-program-data';
 
 export function BarberDeliveryModel() {
@@ -14,8 +15,9 @@ export function BarberDeliveryModel() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
               <div className="relative" style={{ aspectRatio: "3/2" }}>
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                <Image src="/images/pages/barber-apprenticeship.webp" alt="Barber classroom instruction" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src="/images/pages/barber-apprenticeship.webp" alt="Barber classroom instruction" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
               </div>
               <div className="p-6">
                 <h3 className="font-bold text-lg text-slate-900 mb-2">Related Technical Instruction (RTI)</h3>

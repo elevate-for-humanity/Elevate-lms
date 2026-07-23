@@ -1,6 +1,7 @@
 'use client';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import React from 'react';
 
@@ -65,8 +66,9 @@ export default function IPLAExamSignup() {
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
       <section className="relative h-[40vh] min-h-[280px] max-h-[400px]">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/apprenticeships-page-1.webp"
           alt="Barber apprentice preparing for licensing exam"
           fill

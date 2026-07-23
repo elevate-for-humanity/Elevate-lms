@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -67,8 +68,9 @@ export default function MissionPage() {
       {/* Hero */}
       <section className="relative bg-slate-900 overflow-hidden">
         <div className="absolute inset-0">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
             src="/images/pages/mission-hero.webp"
             alt={`${PLATFORM_DEFAULTS.orgName} mission`}
             fill

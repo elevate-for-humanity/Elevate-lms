@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
@@ -72,15 +73,16 @@ export default async function VerifyCertificatePage({
       <div className="min-h-screen bg-slate-50">
         {/* Hero Section */}
         <section className="relative h-[38vh] min-h-[220px] max-h-[420px] w-full flex items-center justify-center text-white overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
             src="/images/heroes/hero-homepage.webp"
             alt="[certificateId]"
             fill
             className="object-cover"
             quality={90}
             priority
-            sizes="100vw" placeholder="empty"
+            sizes="100vw"
           />
 
           <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">

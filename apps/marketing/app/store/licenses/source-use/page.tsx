@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -45,13 +46,14 @@ export default function SourceUseLicensePage() {
             {/* Platform screenshot */}
             <div className="max-w-3xl mx-auto">
               <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden shadow-2xl border border-slate-200">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
                   src="/images/heroes/lms-analytics.webp"
                   alt="Elevate platform overview"
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 70vw" placeholder="empty"
+                  sizes="(max-width: 768px) 100vw, 70vw"
                 />
               </div>
             </div>

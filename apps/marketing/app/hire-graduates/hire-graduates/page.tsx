@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 
@@ -71,8 +72,9 @@ export default async function HireGraduatesPage() {
               </ul>
             </div>
             <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-              <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
                 src="/images/pages/employers-page-1.webp"
                 alt="Certified graduates ready for employment"
                 fill

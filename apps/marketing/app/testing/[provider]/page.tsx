@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -116,13 +117,14 @@ export default async function ProviderPage({ params }: Props) {
         className="relative flex items-end overflow-hidden"
         style={{ minHeight: 'clamp(260px, 45vw, 520px)' }}
       >
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image sizes="100vw"
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" sizes="100vw"
           src={heroImg}
           alt={provider.name}
           fill
           className="object-cover object-center"
-          priority placeholder="empty"
+          priority
         />
         {/* gradient overlay — bottom only, no text on video rule doesn't apply to static images */}
         <div

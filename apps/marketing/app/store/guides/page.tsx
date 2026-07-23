@@ -1,6 +1,7 @@
 export const dynamic = 'force-static';
 
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, TrendingUp, Shield, Building2, Users } from 'lucide-react';
@@ -88,14 +89,15 @@ export default function GuidesPage() {
 
       {/* Hero */}
       <section className="relative h-56 md:h-72 overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/store-guides-hero.webp"
           alt="Workforce development guides and resources"
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
       </section>
 

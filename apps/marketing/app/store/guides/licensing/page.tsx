@@ -1,6 +1,7 @@
 export const dynamic = 'force-static';
 
 import Image from 'next/image';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
@@ -186,14 +187,15 @@ export default function LicensingGuidePage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative h-56 md:h-72 overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/admin-business-hero.webp"
           alt="Elevate platform licensing guide"
           fill
           className="object-cover"
           priority
-          sizes="100vw" placeholder="empty"
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-slate-900/55" />
         <div className="absolute inset-0 flex items-end">

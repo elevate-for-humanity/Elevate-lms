@@ -1,4 +1,5 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 
 import { Metadata } from 'next';
 
@@ -95,8 +96,9 @@ export default async function IntegrationsPage() {
       </div>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/lms-page-3.webp"
           alt="Integrations"
           fill

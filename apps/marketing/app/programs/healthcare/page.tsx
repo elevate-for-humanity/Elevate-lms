@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   },
 };
 
-// Healthcare category slugs
+// Healthcare category slugs — nha-* prefixed slugs are duplicates of real programs, excluded
 const HEALTHCARE_SLUGS = [
   'cna',
   'qma',
@@ -31,9 +31,6 @@ const HEALTHCARE_SLUGS = [
   'cpr-first-aid',
   'home-health-aide',
   'pharmacy-technician',
-  'nha-medical-assistant',
-  'nha-phlebotomy',
-  'nha-pharmacy-technician',
   'nha-billing-coding',
   'nha-patient-care-technician',
   'nha-medical-admin-assistant',

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
@@ -311,8 +312,9 @@ export default function BeautyCheckoutPage() {
             <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden sticky top-8">
               {/* Program Image */}
               <div className="relative h-48">
-// IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback)
-                <Image sizes="100vw"
+                <Image
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" sizes="100vw"
                   src={currentProgram.image}
                   alt={currentProgram.name}
                   fill

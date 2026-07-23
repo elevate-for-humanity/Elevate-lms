@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { BEAUTY_TRIAL_PROGRAMS_PREFILL } from '@/lib/store/beauty-dashboard-clone';
@@ -115,8 +116,9 @@ function TrialPageContent() {
     return (
       <div className="min-h-screen bg-white">
         <section className="relative h-[160px] sm:h-[220px] overflow-hidden">
-          {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image src="/images/heroes/lms-analytics.webp" alt="Elevate platform" fill sizes="100vw" className="object-cover" priority placeholder="empty" />
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src="/images/heroes/lms-analytics.webp" alt="Elevate platform" fill sizes="100vw" className="object-cover" priority />
         </section>
 
         <div className="bg-white border-b">

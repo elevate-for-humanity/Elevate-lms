@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -42,13 +43,14 @@ export default function JriPage() {
       {/* Hero Section */}
       <section className="relative min-h-[320px] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-          <Image sizes="100vw"
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" sizes="100vw"
             src="/images/pages/jri-hero.webp"
             alt="Second chance career training"
             fill
             className="object-cover"
-            priority placeholder="empty"
+            priority
           />
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/90 to-indigo-900/70" />
         </div>

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
@@ -91,14 +92,15 @@ export default async function StaffPortalLanding() {
 
       {/* Hero */}
       <section className="relative h-[220px] sm:h-[260px]">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/staff-portal-page-1.webp"
           alt="Staff Portal"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority
         />
         <div className="absolute inset-0 flex flex-col justify-end pb-8 px-6 max-w-6xl mx-auto w-full">
           <h1 className="text-3xl font-bold text-slate-900 mb-1">

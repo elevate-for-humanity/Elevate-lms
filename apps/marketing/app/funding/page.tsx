@@ -1,4 +1,5 @@
 import { hero as heroTokens } from '@/lib/page-design-tokens';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -189,14 +190,15 @@ export default function FundingPage() {
 
       {/* Hero — standard height, no text overlay */}
       <section className={`${heroTokens.imageWrap} w-full overflow-hidden`}>
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/funding-page-5.webp"
           alt="Workforce funding options for career training"
           fill
           sizes="100vw"
           className="object-cover"
-          priority placeholder="empty"
+          priority
         />
       </section>
 

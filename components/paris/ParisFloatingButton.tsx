@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { MessageCircle } from 'lucide-react';
 
@@ -14,8 +14,35 @@ const ParisChat = dynamic(() => import('./ParisChat'), {
   ),
 });
 
+const STORAGE_KEY = 'paris-chat-dismissed';
+
 export function ParisFloatingButton() {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Auto-open on first visit (once per session) — greet the user right away
+  useEffect(() => {
+    try {
+      const dismissed = sessionStorage.getItem(STORAGE_KEY);
+      if (!dismissed) {
+        // Small delay so the page finishes loading first
+        const timer = setTimeout(() => {
+          setIsOpen(true);
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+    } catch {
+      // sessionStorage unavailable — skip auto-open
+    }
+  }, []);
+
+  const handleClose = () => {
+    setIsOpen(false);
+    try {
+      sessionStorage.setItem(STORAGE_KEY, '1');
+    } catch {
+      // sessionStorage unavailable
+    }
+  };
 
   return (
     <>
@@ -33,11 +60,11 @@ export function ParisFloatingButton() {
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-end p-4 sm:p-6">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/20 backdrop-blur-sm"
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
           />
-          
+
           {/* Chat Window */}
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md h-[600px] max-h-[80vh] flex flex-col overflow-hidden">
             {/* Header */}
@@ -47,14 +74,14 @@ export function ParisFloatingButton() {
                 <p className="text-xs text-red-100">Your AI Career Assistant</p>
               </div>
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={handleClose}
                 className="text-white/80 hover:text-white text-2xl leading-none"
                 aria-label="Close chat"
               >
                 ×
               </button>
             </div>
-            
+
             {/* Chat Content */}
             <div className="flex-1 overflow-hidden">
               <ParisChat />

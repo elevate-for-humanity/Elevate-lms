@@ -154,10 +154,11 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
               role="dialog"
               aria-modal="true"
               aria-label="Main navigation"
+              aria-labelledby="mobile-nav-title"
             >
               {/* Panel header with close button */}
               <div className="flex h-16 items-center justify-between border-b border-slate-100 px-4 shrink-0">
-                <span className="font-semibold text-slate-900">Menu</span>
+                <h2 className="font-semibold text-slate-900 text-base" id="mobile-nav-title">Menu</h2>
                 <button
                   type="button"
                   onClick={closeMenu}

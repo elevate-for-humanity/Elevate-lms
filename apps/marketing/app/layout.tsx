@@ -3,7 +3,6 @@ import './globals.css';
 import './layout.css';
 import Header from '@/components/site/Header';
 import { SiteFooter } from '@/components/site-footer';
-import { LiveChatWidget } from '@/components/support/LiveChatWidget';
 
 export const metadata: Metadata = {
   title: { default: 'Elevate for Humanity', template: '%s | Elevate for Humanity' },
@@ -28,7 +27,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main className="pt-[60px]">{children}</main>
         <SiteFooter />
-        <LiveChatWidget />
       </body>
     </html>
   );

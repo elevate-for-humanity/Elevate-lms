@@ -234,14 +234,24 @@ export function LiveChatWidget() {
   return <FallbackChatWidget />;
 }
 
-// Wrapper that hides chat on store pages (store has its own GuidedDemoChat)
+// Wrapper that hides chat on pages that have their own chat widget
 import { usePathname } from 'next/navigation';
 
-export function ConditionalLiveChatWidget() {
-  const pathname = usePathname();
+const CHAT_WIDGET_PATHS = new Set([
+  '/store',          // has StoreGuideChat
+  '/',               // has ParisFloatingButton
+  '/contact',        // has ParisFloatingWrapper
+  '/testing',        // has ParisFloatingWrapper
+  '/employer',       // has ParisFloatingWrapper
+  '/programs/catalog', // has ParisFloatingWrapper
+  '/apply',          // has ParisFloatingWrapper
+]);
 
-  // Don't show on store pages - they have GuidedDemoChat
-  if (pathname?.startsWith('/store')) {
+export function ConditionalLiveChatWidget() {
+  const pathname = usePathname() ?? '';
+
+  // Don't show on pages that have their own dedicated chat widget
+  if (CHAT_WIDGET_PATHS.has(pathname)) {
     return null;
   }
 

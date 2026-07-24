@@ -23,8 +23,9 @@ export function buildSiteMetadata(input: SiteMetadataInput): Metadata {
   const org = PLATFORM_DEFAULTS.orgName;
   const fullTitle = input.title.includes('|') ? input.title : `${input.title} | ${org}`;
 
+  // Use { absolute: ... } to bypass root layout template — prevents doubled site name
   const metadata: Metadata = {
-    title: fullTitle,
+    title: { absolute: fullTitle },
     description: input.description,
     alternates: { canonical: url },
   };

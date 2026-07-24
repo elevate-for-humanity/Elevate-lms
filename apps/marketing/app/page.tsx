@@ -26,7 +26,7 @@ import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training, Apprenticeships & Funding — Indianapolis`,
+  title: { absolute: `${PLATFORM_DEFAULTS.orgName} | Workforce Training, Apprenticeships & Funding — Indianapolis` },
   description:
     'DOL-registered apprenticeship sponsor and WIOA-approved training provider. Funded training in healthcare, skilled trades, CDL, technology, and more — often at no cost. Apply today.',
   keywords: [

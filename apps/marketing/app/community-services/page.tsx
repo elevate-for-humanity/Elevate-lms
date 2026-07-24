@@ -3,7 +3,7 @@ import { Heart, Users, Globe, ArrowRight } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: `Community Services | ${PLATFORM_DEFAULTS.orgName}`,
+  title: { absolute: `Community Services | ${PLATFORM_DEFAULTS.orgName}` },
   keywords: ["services", "workforce development", "training programs"], description: 'Elevate for Humanity serves the community through workforce development and training.',
 };
 

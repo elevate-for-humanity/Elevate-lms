@@ -3,7 +3,7 @@ import { HowItWorksAndPlatform } from '@/components/marketing/HowItWorksAndPlatf
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: `How It Works | ${PLATFORM_DEFAULTS.orgName}`,
+  title: { absolute: `How It Works | ${PLATFORM_DEFAULTS.orgName}` },
   description: 'Learn how Elevate for Humanity connects you to workforce training, apprenticeships, and career pathways.',
 };
 

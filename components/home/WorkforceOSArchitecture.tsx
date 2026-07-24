@@ -56,7 +56,7 @@ export function WorkforceOSArchitecture() {
               </div>
               <h3 className="font-bold text-slate-900 mb-1">{titan.label}</h3>
               <p className="text-xs text-slate-500 flex items-center gap-1">
-                Total Data Live <ChevronRight className="w-3 h-3" />
+                Workforce Portal <ChevronRight className="w-3 h-3" />
               </p>
             </div>
           ))}

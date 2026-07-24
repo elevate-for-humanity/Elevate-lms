@@ -144,21 +144,6 @@ export default async function HomePage() {
       {/* ── 8b. EMPLOYER STRIP ──────────────────────────────────────────── */}
       <HomeEmployerStrip />
 
-      {/* ── 8c. WORKFORCE OS ARCHITECTURE ──────────────────────────────── */}
-      {/* AI Workforce Operating System - 13 sovereign portals serving 
-          every stakeholder in the workforce pipeline */}
-      <WorkforceOSArchitecture />
-
-      {/* ── 8d. AI PLATFORM OVERVIEW ───────────────────────────────────── */}
-      {/* PARIS AI, Course Factory, Credential Engine, Dev Studio */}
-      <HomeAIPlatform />
-
-      {/* ── 8e. AI DEMONSTRATION ─────────────────────────────────────── */}
-      {/* Interactive AI demo for government procurement review */}
-      <HomeAIDemo />
-
-      {/* ── 8f. SUCCESS METRICS ───────────────────────────────────────── */}
-      {/* Verified outcome statistics with methodology documentation */}
       <SuccessMetrics />
 
       {/* ── 9. SEGMENTED CTA ────────────────────────────────────────────── */}
@@ -173,6 +158,20 @@ export default async function HomePage() {
       {/* "From where you are to where you want to be."
           Apply Now + Check Eligibility + phone number. */}
       <HomeFinalCTA />
+
+      {/* AI Workforce Operating System - 13 sovereign portals serving
+          every stakeholder in the workforce pipeline */}
+      <WorkforceOSArchitecture />
+
+      {/* ── 8h. AI PLATFORM OVERVIEW ───────────────────────────────────── */}
+      {/* PARIS AI, Course Factory, Credential Engine, Dev Studio */}
+      <HomeAIPlatform />
+
+      {/* ── 8g. AI DEMONSTRATION ─────────────────────────────────────── */}
+      {/* Interactive AI demo for government procurement review */}
+      <HomeAIDemo />
+
+
 
       {/* ── PARIS AI Assistant ─────────────────────────────────────────── */}
       {/* Floating chat button + chat window */}

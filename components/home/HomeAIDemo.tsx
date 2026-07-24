@@ -109,7 +109,7 @@ export function HomeAIDemo() {
                     <h3 className={`font-semibold ${activeStep === index ? 'text-white' : 'text-slate-300'}`}>
                       {step.title}
                     </h3>
-                    <p className="text-sm text-slate-500">{step.description.slice(0, 50)}...</p>
+                    <p className="text-sm text-slate-500 line-clamp-2">{step.description}</p>
                   </div>
                 </div>
               </motion.button>

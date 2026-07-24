@@ -12,7 +12,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   heroImageAlt: 'Medical assistant student in clinical training',
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
-  durationWeeks: 12,
+  durationWeeks: 20,
   hoursPerWeekMin: 20,
   hoursPerWeekMax: 25,
   hoursBreakdown: { onlineInstruction: 60, handsOnLab: 120, examPrep: 30, careerPlacement: 30 },

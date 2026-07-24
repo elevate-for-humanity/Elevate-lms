@@ -20,7 +20,7 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
-  durationWeeks: 10,
+  durationWeeks: 16,
   hoursPerWeekMin: 18,
   hoursPerWeekMax: 22,
   hoursBreakdown: {

@@ -20,7 +20,7 @@ export const PHLEBOTOMY: ProgramSchema = {
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
-  durationWeeks: 4,
+  durationWeeks: 8,
   hoursPerWeekMin: 28,
   hoursPerWeekMax: 32,
   hoursBreakdown: {

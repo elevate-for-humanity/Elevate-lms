@@ -4,7 +4,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   slug: 'medical-assistant',
   title: 'Medical Assistant',
   subtitle:
-    'Prepare for the CCMA certification exam. Clinical and administrative medical assisting skills in 12 weeks.',
+    'Prepare for the CCMA certification exam. Clinical and administrative medical assisting skills in 20 weeks.',
   sector: 'healthcare',
   category: 'Medical Assisting',
   programType: 'workforce',

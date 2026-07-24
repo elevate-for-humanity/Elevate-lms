@@ -98,6 +98,12 @@ const CATEGORY_META: Record<string,{label:string;color:string;order:number}> = {
   hospitality:      {label:'Hospitality',          color:'bg-yellow-600',  order:7},
   'social services':{label:'Social Services',      color:'bg-teal-600',    order:8},
   special:          {label:'Workforce Readiness',  color:'bg-slate-600',   order:9},
+  // Fallback labels for raw DB category values that bypass normalizeCategory
+  transportation:  {label:'Transportation',       color:'bg-orange-600',  order:10},
+  'beauty wellness':{label:'Beauty & Wellness',  color:'bg-pink-600',    order:11},
+  sales:            {label:'Sales',               color:'bg-emerald-600', order:12},
+  professional:    {label:'Professional',       color:'bg-indigo-600',  order:13},
+  'culinary arts': {label:'Culinary Arts',       color:'bg-yellow-600',  order:14},
 };
 
 const SUPPRESSED = new Set([

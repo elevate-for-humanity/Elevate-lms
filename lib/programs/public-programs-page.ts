@@ -112,11 +112,11 @@ export async function buildProgramsListingMetadata(): Promise<Metadata> {
   // Use { absolute: ... } to bypass root layout template and prevent doubled site name
   return {
     title: { absolute: 'Career Training Programs | Elevate for Humanity' },
-    description: `${count} credential-bearing career training programs in healthcare, skilled trades, technology, beauty, and business. WIOA and Workforce Ready Grant funding available.`,
+    description: `${count} career training programs in healthcare, skilled trades, technology, beauty, and business. WIOA and Workforce Ready Grant funding available.`,
     alternates: { canonical: `${PLATFORM_DEFAULTS.siteUrl.replace(/\/$/, '')}/programs` },
     openGraph: {
       title: 'Career Training Programs | Elevate for Humanity',
-      description: `${count} credential-bearing career training programs in healthcare, skilled trades, technology, beauty, and business. WIOA and Workforce Ready Grant funding available.`,
+      description: `${count} career training programs in healthcare, skilled trades, technology, beauty, and business. WIOA and Workforce Ready Grant funding available.`,
       url: `${PLATFORM_DEFAULTS.siteUrl.replace(/\/$/, '')}/programs`,
       siteName: PLATFORM_DEFAULTS.orgName,
       type: 'website',
@@ -125,7 +125,7 @@ export async function buildProgramsListingMetadata(): Promise<Metadata> {
     twitter: {
       card: 'summary_large_image',
       title: 'Career Training Programs | Elevate for Humanity',
-      description: `${count} credential-bearing career training programs in healthcare, skilled trades, technology, beauty, and business. WIOA and Workforce Ready Grant funding available.`,
+      description: `${count} career training programs in healthcare, skilled trades, technology, beauty, and business. WIOA and Workforce Ready Grant funding available.`,
     },
   };
 }

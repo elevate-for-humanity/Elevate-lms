@@ -66,7 +66,16 @@ export default async function ApplyPage({
       .order('title');
 
     if (!error && data?.length) {
-      programs = data;
+      // Deduplicate by slug — keep first occurrence of each slug
+      const seen = new Set<string>();
+      const deduped: typeof data = [];
+      for (const p of data) {
+        if (!seen.has(p.slug)) {
+          seen.add(p.slug);
+          deduped.push(p);
+        }
+      }
+      programs = deduped;
     }
   }
 

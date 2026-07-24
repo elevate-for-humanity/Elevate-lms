@@ -124,10 +124,10 @@ function normalizeCategory(category?: string | null, sector?: string | null, pro
   const normalizedSector = (sector ?? '').trim().toLowerCase();
 
   if (raw.includes('health') || raw.includes('medical') || raw.includes('care') || normalizedSector === 'healthcare') return 'healthcare';
-  if (raw.includes('trade') || raw.includes('welding') || raw.includes('electrical') || raw.includes('plumbing') || raw.includes('hvac') || raw.includes('construction') || raw.includes('cdl') || raw.includes('diesel') || raw.includes('fabrication') || normalizedSector === 'skilled-trades') return 'trades';
-  if (raw.includes('beauty') || raw.includes('cosmetology') || raw.includes('esthetic') || raw.includes('nail') || raw.includes('barber') || normalizedSector === 'personal-services') return 'beauty';
+  if (raw.includes('trade') || raw.includes('welding') || raw.includes('electrical') || raw.includes('plumbing') || raw.includes('hvac') || raw.includes('construction') || raw.includes('cdl') || raw.includes('diesel') || raw.includes('fabrication') || raw.includes('transportation') || normalizedSector === 'skilled-trades') return 'trades';
+  if (raw.includes('beauty') || raw.includes('beauty & wellness') || raw.includes('beauty wellness') || raw.includes('cosmetology') || raw.includes('esthetic') || raw.includes('nail') || raw.includes('barber') || normalizedSector === 'personal-services') return 'beauty';
   if (raw.includes('tech') || raw.includes('it ') || raw.includes('software') || raw.includes('cyber') || raw.includes('network') || raw.includes('web') || raw.includes('design') || raw.includes('data') || normalizedSector === 'technology') return 'technology';
-  if (raw.includes('business') || raw.includes('accounting') || raw.includes('project') || raw.includes('entrepreneur') || normalizedSector === 'business') return 'business';
+  if (raw.includes('business') || raw.includes('accounting') || raw.includes('project') || raw.includes('entrepreneur') || raw.includes('sales') || raw.includes('professional') || normalizedSector === 'business') return 'business';
   if (raw.includes('hospitality') || raw.includes('culinary') || raw.includes('food') || raw.includes('tourism')) return 'hospitality';
   if (raw.includes('social') || raw.includes('community') || raw.includes('peer') || raw.includes('support')) return 'social services';
   if (programType === 'apprenticeship') return 'apprenticeship';
@@ -157,12 +157,14 @@ const staticProgramFallback: Prog[] = Array.from(STATIC_PROGRAM_MAP.values())
 
 export default async function ProgramsPage() {
   const { programs: catalogPrograms, catalogSource } = await getPublicProgramsPageData();
-  const programs: Prog[] = catalogPrograms;
   
-  // Log data source for debugging
-  if (process.env.NODE_ENV === 'development') {
-    console.debug(`[ProgramsPage] Data source: ${catalogSource} (${programs.length} programs)`);
-  }
+  // Deduplicate by slug — keep first occurrence of each slug
+  const seenSlugs = new Set<string>();
+  const programs: Prog[] = catalogPrograms.filter(p => {
+    if (seenSlugs.has(p.slug)) return false;
+    seenSlugs.add(p.slug);
+    return true;
+  });
 
   const grouped:Record<string,Prog[]>={};
   programs.forEach(p=>{if(!grouped[p.category])grouped[p.category]=[];grouped[p.category].push(p);});
@@ -181,7 +183,7 @@ export default async function ProgramsPage() {
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-2">{PLATFORM_DEFAULTS.orgName}</p>
           <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight">Career Training Programs</h1>
           <p className="mt-3 text-slate-200 text-sm sm:text-base max-w-xl">
-            {formatPublicProgramsDisplay(programs.length)} credential-bearing programs. Duration, funding eligibility, and enrollment availability vary by program.
+            {formatPublicProgramsDisplay(programs.length)} — all credential-bearing. Duration, funding eligibility, and enrollment availability vary by program.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link href="/orientation/schedule" className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-red-700 transition-colors">

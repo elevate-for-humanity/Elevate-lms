@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { X, MessageCircle } from 'lucide-react';
 
@@ -13,32 +13,14 @@ const ParisChat = dynamic(() => import('./ParisChat'), {
   ),
 });
 
-const STORAGE_KEY = 'paris-chat-dismissed';
-
 export function ParisFloatingButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const tooltipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const autoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Auto-open after 3s for first-time visitors
-  useEffect(() => {
-    try {
-      const dismissed = sessionStorage.getItem(STORAGE_KEY);
-      if (!dismissed) {
-        autoTimer.current = setTimeout(() => setIsOpen(true), 3000);
-      }
-    } catch { /* sessionStorage unavailable */ }
-    return () => { if (autoTimer.current) clearTimeout(autoTimer.current); };
-  }, []);
-
+  // Auto-open removed — triggered manually by user click to prevent SSR issues
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
-
-  const handleDismiss = useCallback(() => {
-    setIsOpen(false);
-    try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch { /* ignore */ }
-  }, []);
 
   const handleFloatingMouseEnter = () => {
     tooltipTimer.current = setTimeout(() => setShowTooltip(true), 400);
@@ -78,22 +60,13 @@ export function ParisFloatingButton() {
                   <span className="hidden sm:block text-xs text-slate-500 ml-2">Career Guidance Assistant</span>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={handleDismiss}
-                  title="Don't show again this session"
-                  className="text-slate-400 hover:text-slate-600 text-xs sm:text-sm px-2.5 sm:px-3 py-1.5 sm:py-1 rounded-md hover:bg-slate-100 transition-colors font-medium"
-                >
-                  Dismiss
-                </button>
-                <button
-                  onClick={close}
-                  aria-label="Close chat"
-                  className="text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-lg hover:bg-slate-100"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+              <button
+                onClick={close}
+                aria-label="Close chat"
+                className="text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-lg hover:bg-slate-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             {/* Chat body — fills remaining height */}

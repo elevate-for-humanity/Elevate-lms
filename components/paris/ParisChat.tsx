@@ -1,13 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { Loader2, Send, User, Bot, GraduationCap, ArrowRight, CheckCircle } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Loader2, Send, User, Bot, GraduationCap, ArrowRight, Stethoscope, Wrench, Scissors, FileCheck } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
-  timestamp?: string;
 }
 
 interface ParisChatProps {
@@ -16,89 +14,48 @@ interface ParisChatProps {
   className?: string;
 }
 
+const PATHWAYS = [
+  { id: 'healthcare', label: 'Healthcare', icon: Stethoscope, color: 'bg-red-500 hover:bg-red-600', textColor: 'text-white' },
+  { id: 'trades', label: 'Skilled Trades', icon: Wrench, color: 'bg-orange-500 hover:bg-orange-600', textColor: 'text-white' },
+  { id: 'beauty', label: 'Beauty & Cosmo', icon: Scissors, color: 'bg-pink-500 hover:bg-pink-600', textColor: 'text-white' },
+  { id: 'testing', label: 'Testing & Certs', icon: FileCheck, color: 'bg-blue-500 hover:bg-blue-600', textColor: 'text-white' },
+];
+
 export default function ParisChat({ onComplete, showHeader = true, className = '' }: ParisChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [isComplete, setIsComplete] = useState(false);
-  const [recommendations, setRecommendations] = useState<string[]>([]);
+  const [sessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const supabase = createClient();
 
-  // Scroll to bottom when new messages arrive
+  const greeting: Message = {
+    role: 'assistant',
+    content: `👋 Hi! I'm **Paris** — your career guide at Elevate for Humanity.
+
+I can help you find the right career path. **Just click an option below** or type your interest:
+
+🏥 **Healthcare** — Medical Assistant, Phlebotomy, CNA, Pharmacy Tech
+⚙️ **Skilled Trades** — HVAC, CDL, Building Maintenance, EPA Certs
+✂️ **Beauty & Cosmo** — Barber, Cosmetology, Esthetics
+📝 **Testing** — ACT WorkKeys, OSHA, CPR, NHA Prep
+
+*No pressure, no commitment — just honest guidance.*`,
+  };
+
+  useEffect(() => {
+    setMessages([greeting]);
+  }, []);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Initialize session and greeting
-  useEffect(() => {
-    initializeSession();
-  }, []);
-
-  async function initializeSession() {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        // Get or create session
-        const response = await fetch('/api/zora/session');
-        const data = await response.json();
-        
-        if (data.session) {
-          setSessionId(data.session.id);
-          
-          if (data.messages && data.messages.length > 0) {
-            // Resume existing session
-            setMessages(data.messages.map((m: { role: string; content: string }) => ({
-              role: m.role === 'user' ? 'user' : 'assistant',
-              content: m.content,
-            })));
-          } else {
-            // New session - send greeting
-            await sendMessage('Start my career guidance session');
-          }
-        }
-      } else {
-        // Not authenticated - start with greeting only
-        setMessages([{
-          role: 'assistant',
-          content: `👋 Hi there! I'm PARIS — Zero Obstacles, Ready Advisors.
-
-I'm here to help you figure out your career path and see if Elevate's programs are right for you.
-
-There's no pressure here — just a friendly conversation to understand your goals and how we might help you get there.
-
-**Shall we get started?** Just tell me — what kind of work are you interested in doing?`
-        }]);
-      }
-    } catch (error) {
-      console.error('Failed to initialize session:', error);
-      // Start with greeting even if session fails
-      setMessages([{
-        role: 'assistant',
-        content: `👋 Hi there! I'm PARIS — Zero Obstacles, Ready Advisors.
-
-I'm here to help you figure out your career path and see if Elevate's programs are right for you.
-
-There's no pressure here — just a friendly conversation to understand your goals and how we might help you get there.
-
-**Shall we get started?** Just tell me — what kind of work are you interested in doing?`
-      }]);
-    }
-  }
-
-  async function sendMessage(content: string) {
+  const sendToApi = useCallback(async (content: string) => {
     if (!content.trim() || isLoading) return;
 
-    const userMessage: Message = {
-      role: 'user',
-      content: content.trim(),
-      timestamp: new Date().toISOString(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
+    const userMsg: Message = { role: 'user', content: content.trim() };
+    setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
 
@@ -106,79 +63,42 @@ There's no pressure here — just a friendly conversation to understand your goa
       const response = await fetch('/api/zora', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: content,
-          history: messages.slice(-20), // Send last 20 messages for context
-          sessionId,
-        }),
+        body: JSON.stringify({ message: content, history: messages.slice(-20), sessionId }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-
+      if (!response.ok) throw new Error('Failed');
       const data = await response.json();
-      
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: data.response,
-        timestamp: new Date().toISOString(),
-      };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
 
-      // Check if conversation is wrapping up (simple heuristic)
-      if (content.toLowerCase().includes('done') || 
-          content.toLowerCase().includes('finish') ||
-          content.toLowerCase().includes('submit') ||
-          data.response.toLowerCase().includes('next step')) {
-        setIsComplete(true);
-        
-        // Extract recommendations from response (simple parsing)
-        const recs = extractRecommendations(data.response);
-        if (recs.length > 0) {
-          setRecommendations(recs);
-          onComplete?.(recs);
-        }
+      if (data.response.includes('Next step') || data.response.includes('book a free')) {
+        onComplete?.([]);
       }
-
-    } catch (error) {
-      console.error('Chat error:', error);
+    } catch {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: 'I apologize, but I encountered an error. Please try again, or you can reach us at admissions@elevateforhumanity.org for personal assistance.',
+        content: `I'm having trouble right now. Please try again or reach us at **info@elevateforhumanity.org** — we're happy to help!`,
       }]);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  }
+  }, [isLoading, messages, sessionId, onComplete]);
 
-  function extractRecommendations(text: string): string[] {
-    // Simple heuristic to extract program recommendations
-    const programs = ['HVAC', 'CNA', 'CDL', 'barber', 'cosmetology', 'medical assistant', 
-                      'phlebotomy', 'business', 'nursing', 'truck driving'];
-    const found = programs.filter(p => 
-      text.toLowerCase().includes(p.toLowerCase())
-    );
-    return found;
-  }
-
-  function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    sendMessage(input);
-  }
+    sendToApi(input);
+  };
 
-  function handleKeyDown(e: React.KeyboardEvent) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      sendMessage(input);
+      sendToApi(input);
     }
-  }
+  };
 
   return (
     <div className={`flex flex-col h-full ${className}`}>
-      {/* Header */}
       {showHeader && (
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-4 shrink-0">
           <div className="flex items-center gap-3">
@@ -186,47 +106,31 @@ There's no pressure here — just a friendly conversation to understand your goa
               <GraduationCap className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="font-bold text-lg">PARIS</h2>
-              <p className="text-sm text-white/80">Career Guidance Interview</p>
+              <h2 className="font-bold text-lg">Paris</h2>
+              <p className="text-sm text-white/80">Career Guidance Assistant</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4 bg-slate-50">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
-          >
-            {/* Avatar */}
+        {messages.map((msg, i) => (
+          <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
             <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${
-              message.role === 'user' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gradient-to-br from-purple-600 to-blue-600 text-white'
+              msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gradient-to-br from-purple-600 to-blue-600 text-white'
             }`}>
-              {message.role === 'user' ? (
-                <User className="w-4 h-4" />
-              ) : (
-                <Bot className="w-4 h-4" />
-              )}
+              {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
             </div>
-
-            {/* Message bubble */}
-            <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-              message.role === 'user'
+            <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+              msg.role === 'user'
                 ? 'bg-blue-600 text-white rounded-tr-sm'
                 : 'bg-white text-slate-800 rounded-tl-sm shadow-sm border border-slate-200'
             }`}>
-              <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                {message.content}
-              </div>
+              <div className="whitespace-pre-wrap">{msg.content}</div>
             </div>
           </div>
         ))}
 
-        {/* Loading indicator */}
         {isLoading && (
           <div className="flex gap-3">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white flex items-center justify-center">
@@ -235,40 +139,31 @@ There's no pressure here — just a friendly conversation to understand your goa
             <div className="bg-white rounded-2xl rounded-tl-sm shadow-sm border border-slate-200 px-4 py-3">
               <div className="flex items-center gap-2 text-slate-500">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">Thinking...</span>
+                <span className="text-sm">Finding your options...</span>
               </div>
             </div>
           </div>
         )}
 
-        {/* Completion state */}
-        {isComplete && recommendations.length > 0 && (
-          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
-            <div className="flex items-center gap-2 text-green-700 mb-2">
-              <CheckCircle className="w-5 h-5" />
-              <span className="font-semibold">Based on our conversation, here are some programs that might be a great fit:</span>
-            </div>
-            <ul className="space-y-2">
-              {recommendations.map((rec, i) => (
-                <li key={i} className="flex items-center gap-2 text-green-800">
-                  <ArrowRight className="w-4 h-4" />
-                  <span>{rec}</span>
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => window.location.href = '/apply'}
-              className="mt-4 w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition"
-            >
-              Apply Now
-            </button>
+        {!isLoading && messages.length === 1 && (
+          <div className="space-y-2">
+            {PATHWAYS.map(({ id, label, icon: Icon, color, textColor }) => (
+              <button
+                key={id}
+                onClick={() => sendToApi(`I'm interested in ${label}`)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${color} ${textColor} font-medium transition-all active:scale-[0.98] shadow-sm`}
+              >
+                <Icon className="w-5 h-5 shrink-0" />
+                <span>{label}</span>
+                <ArrowRight className="w-4 h-4 ml-auto" />
+              </button>
+            ))}
           </div>
         )}
 
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
       <form onSubmit={handleSubmit} className="border-t border-slate-200 bg-white px-4 sm:px-6 py-4 shrink-0">
         <div className="flex gap-3 items-end">
           <textarea
@@ -276,22 +171,21 @@ There's no pressure here — just a friendly conversation to understand your goa
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message..."
-            className="flex-1 resize-none rounded-2xl border-2 border-slate-200 px-4 py-3 sm:py-4 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 transition-colors min-h-[52px] max-h-40"
+            placeholder="Or type your interest here..."
+            className="flex-1 resize-none rounded-2xl border-2 border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 transition-colors min-h-[52px] max-h-40"
             rows={2}
             disabled={isLoading}
           />
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="px-5 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shrink-0"
+            className="px-5 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shrink-0"
           >
-            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="hidden sm:inline">Send</span>
+            <Send className="w-4 h-4" />
           </button>
         </div>
         <p className="text-xs text-slate-400 mt-2 text-center">
-          Enter to send · Shift+Enter for new line
+          Or click a pathway above — no typing required!
         </p>
       </form>
     </div>

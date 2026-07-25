@@ -18,7 +18,7 @@ export function FAQSection({
   faqs,
 }: FAQSectionProps) {
   return (
-    <section className="py-20 bg-slate-50 px-4">
+    <section className="py-12 lg:py-16 bg-slate-50 px-4">
       <div className="max-w-3xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

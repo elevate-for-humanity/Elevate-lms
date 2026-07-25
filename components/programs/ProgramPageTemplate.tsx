@@ -111,9 +111,9 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       </section>
 
       {/* Title + Highlights */}
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="max-w-3xl mb-16">
+          <div className="max-w-3xl mb-8">
             <Link
               href={program.categoryHref}
               className="text-sm text-slate-500 hover:text-slate-900 mb-4 inline-block"
@@ -127,11 +127,11 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           </div>
 
           {program.highlights && program.highlights.length > 0 && (
-            <div className="border-t border-slate-100 pt-12">
-              <p className="text-sm text-slate-500 uppercase tracking-wider mb-8">
+            <div className="border-t border-slate-100 pt-8">
+              <p className="text-sm text-slate-500 uppercase tracking-wider mb-6">
                 This program includes
               </p>
-              <div className="grid md:grid-cols-3 gap-8">
+              <div className="grid md:grid-cols-3 gap-6">
                 {program.highlights.map((highlight, index) => (
                   <div key={index}>
                     <h3 className="text-lg font-semibold text-slate-900">{highlight}</h3>
@@ -144,10 +144,10 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       </section>
 
       {/* What You'll Learn */}
-      <section className="py-16 lg:py-24 bg-slate-50">
+      <section className="py-12 lg:py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-12">What you'll learn</h2>
-          <div className="grid md:grid-cols-2 gap-x-16 gap-y-4">
+          <h2 className="text-2xl font-bold text-slate-900 mb-8">What you'll learn</h2>
+          <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
             {(program.skills || []).map((skill, index) => (
               <div key={index} className="flex items-start gap-3 py-3 border-b border-slate-200">
                 <ArrowRight className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
@@ -159,9 +159,9 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       </section>
 
       {/* How It Works - Detailed Steps */}
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
             <span className="inline-block bg-brand-green-100 text-brand-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Your Journey
             </span>
@@ -172,9 +172,9 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-6">
             {/* Step 1: Apply Online */}
-            <div className="relative bg-gradient-to-br from-brand-blue-50 to-white rounded-2xl p-8 border border-brand-blue-100 shadow-sm">
+            <div className="relative bg-gradient-to-br from-brand-blue-50 to-white rounded-2xl p-6 border border-brand-blue-100 shadow-sm">
               <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-red-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 1
               </div>
@@ -214,7 +214,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
             </div>
 
             {/* Step 2: Complete Training */}
-            <div className="relative bg-gradient-to-br from-purple-50 to-white rounded-2xl p-8 border border-purple-100 shadow-sm">
+            <div className="relative bg-gradient-to-br from-purple-50 to-white rounded-2xl p-6 border border-purple-100 shadow-sm">
               <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-red-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 2
               </div>
@@ -252,7 +252,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
             </div>
 
             {/* Step 3: Start Working */}
-            <div className="relative bg-gradient-to-br from-brand-green-50 to-white rounded-2xl p-8 border border-brand-green-100 shadow-sm">
+            <div className="relative bg-gradient-to-br from-brand-green-50 to-white rounded-2xl p-6 border border-brand-green-100 shadow-sm">
               <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-red-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 3
               </div>
@@ -306,9 +306,9 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       </section>
 
       {/* Career Outcomes - Enhanced with images and details */}
-      <section className="py-16 lg:py-24 bg-slate-50">
+      <section className="py-12 lg:py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <span className="inline-block bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Career Paths
             </span>
@@ -320,7 +320,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
               pay and growth opportunities.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {(program.outcomes || []).map((outcome, index) => {
               const isObject = typeof outcome === 'object';
               const title = isObject ? outcome.title : outcome;
@@ -371,10 +371,10 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
       {/* Requirements */}
       {program.requirements && program.requirements.length > 0 && (
-        <section className="py-16 lg:py-24">
+        <section className="py-12 lg:py-16">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-12">Requirements</h2>
-            <div className="grid md:grid-cols-2 gap-x-16 gap-y-4">
+            <h2 className="text-2xl font-bold text-slate-900 mb-8">Requirements</h2>
+            <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
               {program.requirements.map((req, index) => (
                 <div key={index} className="flex items-start gap-3 py-3 border-b border-slate-100">
                   <Briefcase className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
@@ -388,12 +388,12 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
       {/* Related Programs */}
       {program.relatedPrograms && program.relatedPrograms.length > 0 && (
-        <section className="py-16 lg:py-24 bg-slate-50">
+        <section className="py-12 lg:py-16 bg-slate-50">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-12">
+            <h2 className="text-2xl font-bold text-slate-900 mb-8">
               Looking for a different program?
             </h2>
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-6">
               {program.relatedPrograms.map((related, index) => (
                 <Link
                   key={index}
@@ -412,7 +412,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       )}
 
       {/* CTA */}
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
             Ready to get started?
@@ -446,7 +446,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           <div className="mt-6">
             <Link
               href="/contact"
-              className="inline-flex items-center text-slate-400 hover:text-white transition-colors"
+              className="inline-flex items-center text-slate-400 hover:text-slate-700 transition-colors"
             >
               Questions? Contact Us
               <ArrowRight className="w-4 h-4 ml-1" />

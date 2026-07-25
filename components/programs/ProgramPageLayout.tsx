@@ -215,7 +215,7 @@ export default function ProgramPageLayout({
 
       {/* ===== BREADCRUMBS ===== */}
       <div className="bg-white border-b border-slate-100">
-        <div className="max-w-5xl mx-auto px-6 py-3">
+        <div className="max-w-7xl mx-auto px-6 py-3">
           <Breadcrumbs items={c.breadcrumbs} />
         </div>
       </div>
@@ -223,7 +223,7 @@ export default function ProgramPageLayout({
       {/* ===== STATUS NOTICE (e.g. "Accepting interest — not yet enrolling") ===== */}
       {c.statusNotice && (
         <div className="bg-amber-50 border-b border-amber-200">
-          <div className="max-w-5xl mx-auto px-6 py-3 flex items-center gap-3">
+          <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-3">
             <span className="flex-shrink-0 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">!</span>
             </span>
@@ -234,8 +234,8 @@ export default function ProgramPageLayout({
 
       {/* ===== PROGRAM IDENTITY — two-column compressed block ===== */}
       <InView animation="fade-up">
-        <section className="py-8 sm:py-10 border-b border-slate-100">
-          <div className="max-w-5xl mx-auto px-6">
+        <section className="py-8 sm:py-12 border-b border-slate-100">
+          <div className="max-w-7xl mx-auto px-6">
             {/* Row 1: Title + CTA */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
               <div className="flex-1 min-w-0">
@@ -315,9 +315,9 @@ export default function ProgramPageLayout({
 
       {/* ===== OVERVIEW + IMAGE ===== */}
       <InView animation="fade-up">
-        <section className="py-14 lg:py-20 bg-slate-50 border-t border-slate-100">
-          <div className="max-w-5xl mx-auto px-6">
-            <div className="grid lg:grid-cols-5 gap-10 items-start">
+        <section className="py-12 lg:py-16 bg-slate-50 border-t border-slate-100">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid lg:grid-cols-5 gap-8 items-start">
               <div className="lg:col-span-3">
                 <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">
                   Credential Pathway Overview
@@ -366,9 +366,9 @@ export default function ProgramPageLayout({
       {/* ===== CURRICULUM ===== */}
       {c.curriculum && c.curriculum.length > 0 && (
         <InView animation="fade-up">
-          <section className="py-14 lg:py-20 border-t border-slate-100">
-            <div className="max-w-5xl mx-auto px-6">
-              <div className="text-center mb-10">
+          <section className="py-12 lg:py-16 border-t border-slate-100">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="text-center mb-8">
                 <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">
                   Curriculum
                 </p>
@@ -376,7 +376,7 @@ export default function ProgramPageLayout({
                   What You&apos;ll Learn
                 </h2>
               </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {c.curriculum.map((mod, i) => (
                   <ScrollReveal key={mod.title} delay={i * 80} direction="up">
                     <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 h-full hover:shadow-md hover:-translate-y-1 transition-all duration-300">
@@ -403,9 +403,9 @@ export default function ProgramPageLayout({
       {/* ===== INSTRUCTIONAL DELIVERY ===== */}
       {c.instructionalDelivery && (
         <InView animation="fade-up">
-          <section className="py-14 lg:py-20 border-t border-slate-100">
-            <div className="max-w-5xl mx-auto px-6">
-              <div className="text-center mb-10">
+          <section className="py-12 lg:py-16 border-t border-slate-100">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="text-center mb-8">
                 <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">
                   Instructional Delivery
                 </p>
@@ -790,9 +790,9 @@ export default function ProgramPageLayout({
       {/* ===== CAREER PATHS ===== */}
       {c.careers && c.careers.length > 0 && (
         <InView animation="fade-up">
-          <section className="py-14 lg:py-20 border-t border-slate-100">
-            <div className="max-w-5xl mx-auto px-6">
-              <div className="text-center mb-10">
+          <section className="py-12 lg:py-16 border-t border-slate-100">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="text-center mb-8">
                 <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">
                   After Graduation
                 </p>
@@ -801,7 +801,7 @@ export default function ProgramPageLayout({
                   Where our graduates work after completing this program.
                 </p>
               </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {c.careers.map((career, i) => (
                   <ScrollReveal key={career.title} delay={i * 80} direction="up">
                     <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
@@ -822,9 +822,9 @@ export default function ProgramPageLayout({
       {/* ===== HOW TO ENROLL ===== */}
       {c.steps && c.steps.length > 0 && (
         <InView animation="fade-up">
-          <section className="py-14 lg:py-20 bg-slate-50 border-t border-slate-100">
-            <div className="max-w-5xl mx-auto px-6">
-              <div className="text-center mb-10">
+          <section className="py-12 lg:py-16 bg-slate-50 border-t border-slate-100">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="text-center mb-8">
                 <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-wider mb-2">
                   Get Started
                 </p>
@@ -832,7 +832,7 @@ export default function ProgramPageLayout({
                   How to Enroll
                 </h2>
               </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {c.steps.map((step, i) => (
                   <ScrollReveal key={step.title} delay={i * 100} direction="up">
                     <div className="text-center">
@@ -871,7 +871,7 @@ export default function ProgramPageLayout({
       {/* ===== FAQ ===== */}
       {c.faqs && c.faqs.length > 0 && (
         <InView animation="fade-up">
-          <section className="py-14 lg:py-20 border-t border-slate-100">
+          <section className="py-12 lg:py-16 border-t border-slate-100">
             <div className="max-w-3xl mx-auto px-6">
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8 text-center">
                 Frequently Asked Questions
@@ -901,7 +901,7 @@ export default function ProgramPageLayout({
 
       {/* ===== FINAL CTA ===== */}
       <InView animation="fade-up">
-        <section className="py-14 sm:py-20 bg-slate-900">
+        <section className="py-12 lg:py-16 bg-slate-900">
           <div className="max-w-3xl mx-auto px-6 text-center">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
               Start This Credential Pathway
@@ -930,7 +930,7 @@ export default function ProgramPageLayout({
 
       {/* ===== TRUST BAR ===== */}
       <section className="py-8 bg-slate-50 border-t border-slate-100">
-        <div className="max-w-5xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6">
           <p className="text-center text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
             Recognized By
           </p>

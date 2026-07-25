@@ -21,7 +21,7 @@ export function SkillsSection({
   skills,
 }: SkillsSectionProps) {
   return (
-    <section className="py-24 px-4 relative overflow-hidden">
+    <section className="py-12 lg:py-16 px-4 relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-slate-50 to-white" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />

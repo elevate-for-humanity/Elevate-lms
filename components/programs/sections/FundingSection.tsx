@@ -25,7 +25,7 @@ export function FundingSection({
   eligibilityCta = { label: "Check Your Eligibility", href: "/check-eligibility" },
 }: FundingSectionProps) {
   return (
-    <section className="py-20 bg-gradient-to-br from-brand-blue-900 to-slate-900 text-white px-4">
+    <section className="py-12 lg:py-16 bg-gradient-to-br from-brand-blue-900 to-slate-900 text-white px-4">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

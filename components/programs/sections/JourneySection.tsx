@@ -21,7 +21,7 @@ export function JourneySection({
   steps,
 }: JourneySectionProps) {
   return (
-    <section className="py-24 px-4 relative overflow-hidden">
+    <section className="py-12 lg:py-16 px-4 relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-rose-50/30" />
       

@@ -10,7 +10,6 @@
 
 const _cache = new Map<string, unknown>();
 const _errors = new Map<string, unknown>();
-const _fileMtimes = new Map<string, number>();
 
 type NodeRequire = (id: string) => unknown;
 
@@ -31,33 +30,14 @@ export function loadJsonOnce<T = unknown>(filename: string): T {
   if (_errors.has(filename)) {
     return {} as T;
   }
-
-  // Use __non_webpack_require__ to prevent webpack from bundling fs/path into client code
-  const nodeRequire = getNodeRequire();
-  const fs = nodeRequire('fs') as typeof import('fs');
-  const nodePath = nodeRequire('path') as typeof import('path');
-
-  // Prefer the image-embedded path (apps/marketing/public/data) if it exists.
-  // Fall back to public/data for compatibility with other apps.
-  // This ensures marketing static data is always read from the Docker image,
-  // bypassing any volume mounts that may override the public/ directory.
-  const marketingDataPath = nodePath.join(process.cwd(), 'apps/marketing/public/data', filename);
-  const defaultDataPath = nodePath.join(process.cwd(), 'public/data', filename);
-
-  // Use marketing path if it exists (marketing app), otherwise use default path
-  const filePath = fs.existsSync(marketingDataPath) ? marketingDataPath : defaultDataPath;
+  if (_cache.has(filename)) return _cache.get(filename) as T;
 
   try {
-    // Check cache first (fast path for repeated requests)
-    const cached = _cache.get(filename) as T | undefined;
-    const cachedMtime = _fileMtimes.get(filename);
-
-    // Invalidate cache if file mtime changed (handles volume mount or live updates)
-    const mtime = fs.statSync(filePath).mtimeMs;
-
-    if (cached && cachedMtime === mtime) {
-      return cached;
-    }
+    // Use __non_webpack_require__ to prevent webpack from bundling fs/path into client code
+    const nodeRequire = getNodeRequire();
+    const fs = nodeRequire('fs') as typeof import('fs');
+    const nodePath = nodeRequire('path') as typeof import('path');
+    const filePath = nodePath.join(process.cwd(), 'public/data', filename);
 
     if (!fs.existsSync(filePath)) {
       console.warn(`[json-cache] File not found: ${filePath}`);
@@ -68,7 +48,6 @@ export function loadJsonOnce<T = unknown>(filename: string): T {
     const raw = fs.readFileSync(filePath, 'utf8');
     const parsed = JSON.parse(raw) as T;
     _cache.set(filename, parsed);
-    _fileMtimes.set(filename, mtime);
     return parsed;
   } catch (error) {
     console.error(`[json-cache] Error loading ${filename}:`, error);
@@ -80,5 +59,4 @@ export function loadJsonOnce<T = unknown>(filename: string): T {
 export function clearJsonCache() {
   _cache.clear();
   _errors.clear();
-  _fileMtimes.clear();
 }

@@ -5,8 +5,8 @@
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "voiceoverSrc": "/audio/heroes/home.mp3",
     "microLabel": "The AI-Powered Workforce Operating System",
-    "belowHeroHeadline": "The AI-Powered Operating System for the Modern Workforce.",
-    "belowHeroSubheadline": "One unified platform for workforce development, apprenticeship management, and career advancement. Empowering learners, employers, and agencies to build talent pipelines at scale.",
+    "belowHeroHeadline": "Career Training, Registered Apprenticeships & Workforce Technology in Indiana",
+    "belowHeroSubheadline": "DOL-registered apprenticeship sponsor and WIOA-approved training provider serving learners, employers, and workforce agencies in Indianapolis and across Indiana. Funded training in healthcare, skilled trades, CDL, and technology often at no cost for eligible participants.",
     "primaryCta": {
       "label": "Get Started",
       "href": "/apply"
@@ -23,7 +23,8 @@
     ],
     "transcript": "Elevate for Humanity is an AI-powered workforce operating system \u2014 not just a training provider. We automate the entire journey from recruitment to employment. Our platform handles credentialing, compliance tracking, employer placement, and apprenticeship coordination through a single unified ecosystem.",
     "analyticsName": "home",
-    "posterImage": "/images/heroes/hero-homepage.webp"
+    "posterImage": "/images/heroes/hero-homepage.webp",
+    "eyebrow": "Career Training & Workforce Development"
   },
   "about": {
     "pageKey": "about",
@@ -575,9 +576,9 @@
     "voiceoverSrc": "/audio/heroes/medical-assistant.mp3",
     "microLabel": "NHA CCMA Certification",
     "credentialLabel": "NHA CCMA",
-    "durationLabel": "12 weeks",
+    "durationLabel": "20 weeks",
     "salaryRangeLabel": "$35,000 to $45,000",
-    "belowHeroHeadline": "Medical Assistant \u2014 NHA CCMA certification in 12 weeks.",
+    "belowHeroHeadline": "Medical Assistant \u2014 NHA CCMA certification in 20 weeks.",
     "belowHeroSubheadline": "Clinical procedures, patient intake, EHR documentation, and phlebotomy. Prepare for the NHA CCMA and CPT exams. Free with WIOA or Next Level Jobs funding.",
     "primaryCta": {
       "label": "Apply Now",
@@ -594,7 +595,7 @@
       "Clinical rotations included",
       "MA pay $35K\u2013$45K"
     ],
-    "transcript": "Train for NHA CCMA and CPT certification in 12 weeks, building skills in clinical procedures, patient intake, EHR documentation, and phlebotomy. Medical assistants commonly earn $35,000 to $45,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
+    "transcript": "Train for NHA CCMA and CPT certification in 20 weeks, building skills in clinical procedures, patient intake, EHR documentation, and phlebotomy. Medical assistants commonly earn $35,000 to $45,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "medical-assistant",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
     "_pexelsVideoId": 6130025

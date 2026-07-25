@@ -1,19 +1,9 @@
-'use client';
+import { NextResponse } from 'next/server';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
-export default function ProgramHolderVerification() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to dashboard - verification is handled within the dashboard
-    router.replace('/program-holder/dashboard');
-  }, [router]);
-
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-pulse">Loading...</div>
-    </div>
+// Verification is handled within the dashboard
+export function GET() {
+  return NextResponse.redirect(
+    new URL('/program-holder/dashboard', process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'),
+    307
   );
 }

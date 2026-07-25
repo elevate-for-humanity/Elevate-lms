@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-// Students management is handled within the dashboard
+// Legacy portal redirect — main portal page
 export function GET() {
   return NextResponse.redirect(
     new URL('/program-holder/dashboard', process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'),

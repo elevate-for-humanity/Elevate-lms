@@ -28,7 +28,7 @@ const EMPLOYER_PATHS = [
   },
   {
     accent: 'border-t-4 border-blue-500',
-    img: '/images/pages/apprenticeships-page-1.webp',
+    img: '/images/pages/apprenticeship-sponsor-page-1.webp',
     imgAlt: 'Apprentice working on-site with employer supervisor',
     title: 'Sponsor a DOL Apprentice',
     desc: 'Earn-and-learn from day one. Apprentices work in your business while completing structured training. OJT wage reimbursement up to 50%. RAPIDS-tracked.',

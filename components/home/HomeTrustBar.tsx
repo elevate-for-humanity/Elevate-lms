@@ -11,7 +11,7 @@ import Link from 'next/link';
 
 const TRUST_ITEMS = [
   {
-    img: '/images/pages/about-hero.webp',
+    img: '/images/pages/about-career-pathways.webp',
     label: 'DOL Registered',
     sub: 'Federal apprenticeship sponsor',
     href: '/compliance/apprenticeship-structure',
@@ -23,19 +23,19 @@ const TRUST_ITEMS = [
     href: '/federal-compliance',
   },
   {
-    img: '/images/pages/credential-partners-hero.webp',
+    img: '/images/pages/certifications.webp',
     label: 'WIOA Aligned',
     sub: 'Title I & II compliant',
     href: '/eligibility',
   },
   {
-    img: '/images/pages/workforce-board.webp',
+    img: '/images/pages/comp-state-career-hero.webp',
     label: 'RAPIDS Tracked',
     sub: 'DOL apprenticeship system',
     href: '/compliance/apprenticeship-structure',
   },
   {
-    img: '/images/pages/workone-partners.webp',
+    img: '/images/pages/about-employer-partners.webp',
     label: 'WorkOne Partner',
     sub: 'Indiana DWD aligned',
     href: '/partners/workforce',
@@ -49,10 +49,10 @@ const TRUST_ITEMS = [
 ];
 
 const PARTNER_LOGOS = [
-      { src: '/images/pages/about-hero.webp', alt: 'US Department of Labor', href: '/federal-compliance' },
-  { src: '/images/pages/workforce-board.webp', alt: 'Indiana Department of Workforce Development', href: '/partners/workforce' },
-  { src: '/images/pages/workone-partners.webp', alt: 'WorkOne Indiana', href: '/partners/workforce' },
-  { src: '/images/pages/credential-partners-hero.webp', alt: 'Next Level Jobs', href: '/eligibility' },
+  { src: '/images/pages/about-funding-nav.webp', alt: 'US Department of Labor', href: '/federal-compliance' },
+  { src: '/images/pages/about-partner-cta.webp', alt: 'Indiana Department of Workforce Development', href: '/partners/workforce' },
+  { src: '/images/pages/workforce-board-page-2.webp', alt: 'WorkOne Indiana', href: '/partners/workforce' },
+  { src: '/images/pages/federal-funded.webp', alt: 'Next Level Jobs', href: '/eligibility' },
   { src: '/images/pages/certifications.webp', alt: 'OSHA Authorized', href: '/compliance' },
 ];
 

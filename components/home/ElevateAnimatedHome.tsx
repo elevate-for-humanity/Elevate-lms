@@ -65,7 +65,7 @@ const STEPS = [
     num: '02', 
     title: 'Funding Review', 
     desc: 'We check WIOA, Workforce Ready Grant, and other sources. Most qualify.',
-    image: '/images/pages/funding-impact-1.webp'
+    image: '/images/pages/funding-impact-2.jpg'
   },
   { num: '03', title: 'Training', desc: 'Instructor-led, credential-aligned coursework with AI-powered support.', image: '/images/pages/comp-pathway-classroom.webp' },
   { num: '04', title: 'Apprenticeship', desc: 'DOL-registered OJT with employer partners. Hours tracked, wages paid.', image: '/images/pages/apprenticeships-page-1.webp' },

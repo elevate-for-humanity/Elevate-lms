@@ -237,7 +237,7 @@ async function main() {
         if (BUILD_DONE_STATUSES.has(buildStatus ?? '')) {
           if (buildSuccess === true) {
             console.log(`${serviceId}: build ${targetBuildId} completed successfully ✅`);
-            return;
+            process.exit(0);
           }
           // Build done but failed
           console.error(`${serviceId}: build ${targetBuildId} ${buildStatus} (failed)`);
@@ -272,7 +272,7 @@ async function main() {
       if (BUILD_FAILURE_STATUSES.has(buildStatus ?? '')) {
         if (deployReady) {
           console.log(`${serviceId}: build failed (${buildStatus}) but deployment healthy (${deploy})`);
-          return;
+          process.exit(0);
         }
         console.error(`${serviceId}: build failed (${buildStatus}) and deployment not ready`);
         process.exit(1);
@@ -280,7 +280,7 @@ async function main() {
 
       if (buildDone && deployReady) {
         console.log(`${serviceId}: service ready ✅`);
-        return;
+        process.exit(0);
       }
 
       if (DEPLOY_FAILURE_STATUSES.has(deploy ?? '')) {

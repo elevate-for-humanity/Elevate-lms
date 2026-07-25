@@ -127,8 +127,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
     CMD curl -sf http://127.0.0.1:8080/api/live || curl -sf http://127.0.0.1:8080/ || exit 1
 
 # Start the marketing application
-# Clear ISR cache at startup so fresh pages are generated on each deploy
-USER root
-RUN echo '#!/bin/sh\nrm -rf /app/.next/server/app /app/.next/server/pages\nexec node --max-old-space-size=4096 server.cjs' > /app/start.sh && chmod 755 /app/start.sh
-USER nextjs
-CMD ["/app/start.sh"]
+CMD ["node", "--max-old-space-size=4096", "server.cjs"]

@@ -229,7 +229,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
     {
       phase: 1,
       title: 'Foundations',
-      weeks: 'Weeks 1–3',
+      weeks: 'Weeks 1–5',
       focus: 'Medical terminology, anatomy, infection control, and vital signs.',
       labCompetencies: [
         'Take accurate vital signs',
@@ -240,7 +240,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
     {
       phase: 2,
       title: 'Clinical Skills',
-      weeks: 'Weeks 4–7',
+      weeks: 'Weeks 6–10',
       focus: 'Pharmacology, injections, phlebotomy, and lab procedures.',
       labCompetencies: [
         'Administer injections on simulation models',
@@ -251,14 +251,14 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
     {
       phase: 3,
       title: 'Advanced Clinical & Admin',
-      weeks: 'Weeks 8–10',
+      weeks: 'Weeks 11–15',
       focus: 'EKG, minor surgery assistance, and administrative skills.',
       labCompetencies: ['Administer 12-lead EKG', 'Set up sterile field', 'Navigate EHR system'],
     },
     {
       phase: 4,
       title: 'Certification & Placement',
-      weeks: 'Weeks 11–12',
+      weeks: 'Weeks 16–20',
       focus: 'CCMA exam prep and career placement.',
       labCompetencies: [
         'Pass CCMA practice exam at 80%+',
@@ -269,7 +269,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   ],
   credentialPipeline: [
     {
-      training: 'Medical Assistant (12 weeks)',
+      training: 'Medical Assistant (20 weeks)',
       certification: 'CCMA',
       certBody: 'National Healthcareer Association',
       jobRole: 'Certified Medical Assistant',
@@ -387,7 +387,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
     {
       question: 'What certifications will I earn?',
       answer:
-        'You will earn CCMA, CPT (phlebotomy), CET (EKG), and CPR/First Aid — four healthcare certifications in 12 weeks.',
+        'You will earn CCMA, CPT (phlebotomy), CET (EKG), and CPR/First Aid — four healthcare certifications in 20 weeks.',
     },
     {
       question: 'Do I need healthcare experience?',
@@ -411,7 +411,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   ],
   metaTitle: 'Medical Assistant Program | CCMA Certified | Indianapolis',
   metaDescription:
-    'Prepare for CCMA, phlebotomy, and EKG certifications in 12 weeks. Medical assistants earn $38,270/year. 14% job growth. WIOA funding available. Indianapolis.',
+    'Prepare for the NHA CCMA, CPT, and CET exams in 20 weeks. Clinical and administrative medical assisting. Medical assistants earn $38,270/year. 14% job growth. WIOA funding available. Indianapolis.',
 
 
   funding: {

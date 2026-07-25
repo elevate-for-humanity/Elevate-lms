@@ -44,7 +44,7 @@ const STEPS = [
     label: 'Apprenticeship',
     detail: 'DOL-registered OJT with employer partners. Hours tracked, wages paid.',
     href: '/apprenticeships',
-    img: '/images/pages/apprenticeships-page-1.webp',
+    img: '/images/pages/apprenticeship-sponsor-page-1.webp',
     imgAlt: 'Apprentice working on-site with employer supervisor',
     accent: 'border-emerald-500',
   },

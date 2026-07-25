@@ -21,12 +21,12 @@ export function ParisFloatingButton() {
   const tooltipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Auto-open after 2s for first-time visitors
+  // Auto-open after 3s for first-time visitors
   useEffect(() => {
     try {
       const dismissed = sessionStorage.getItem(STORAGE_KEY);
       if (!dismissed) {
-        autoTimer.current = setTimeout(() => setIsOpen(true), 2000);
+        autoTimer.current = setTimeout(() => setIsOpen(true), 3000);
       }
     } catch { /* sessionStorage unavailable */ }
     return () => { if (autoTimer.current) clearTimeout(autoTimer.current); };
@@ -56,44 +56,47 @@ export function ParisFloatingButton() {
           role="dialog"
           aria-modal="true"
           aria-label="Paris AI Assistant"
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-end p-4"
+          className="fixed inset-0 z-[9999] flex items-stretch"
         >
-          {/* Backdrop — click anywhere to close */}
+          {/* Backdrop — click to close on mobile, fixed panel on desktop */}
           <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={close}
             aria-hidden="true"
           />
 
-          {/* Chat Window */}
-          <div className="relative z-10 w-full sm:w-[420px] sm:max-w-[calc(100vw-2rem)] h-[88vh] sm:h-[600px] sm:max-h-[85vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 fade-in duration-200">
-            {/* Header — shared with ParisChat, just show dismiss/close */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-brand-red-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+          {/* Chat Panel — full-screen mobile, right-side panel on tablet/desktop */}
+          <div className="relative z-10 ml-auto w-full sm:w-[min(100vw,640px)] lg:w-[min(100vw,720px)] h-full bg-white flex flex-col shadow-2xl animate-in slide-in-from-right-0 fade-in duration-200">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 shrink-0 bg-white">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand-red-600 flex items-center justify-center text-white text-sm sm:text-base font-bold shrink-0">
                   P
                 </div>
-                <span className="font-semibold text-slate-800 text-sm">Paris AI</span>
+                <div>
+                  <span className="font-bold text-slate-800 text-base sm:text-lg">Paris AI</span>
+                  <span className="hidden sm:block text-xs text-slate-500 ml-2">Career Guidance Assistant</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <button
                   onClick={handleDismiss}
                   title="Don't show again this session"
-                  className="text-slate-400 hover:text-slate-600 text-xs px-2.5 py-1 rounded-md hover:bg-slate-100 transition-colors"
+                  className="text-slate-400 hover:text-slate-600 text-xs sm:text-sm px-2.5 sm:px-3 py-1.5 sm:py-1 rounded-md hover:bg-slate-100 transition-colors font-medium"
                 >
                   Dismiss
                 </button>
                 <button
                   onClick={close}
                   aria-label="Close chat"
-                  className="text-slate-400 hover:text-slate-600 transition-colors p-1.5 rounded-lg hover:bg-slate-100"
+                  className="text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-lg hover:bg-slate-100"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            {/* Chat body */}
+            {/* Chat body — fills remaining height */}
             <div className="flex-1 overflow-hidden min-h-0">
               <ParisChat showHeader={false} />
             </div>

@@ -177,10 +177,10 @@ There's no pressure here — just a friendly conversation to understand your goa
   }
 
   return (
-    <div className={`flex flex-col h-full max-w-3xl mx-auto ${className}`}>
+    <div className={`flex flex-col h-full ${className}`}>
       {/* Header */}
       {showHeader && (
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-4 rounded-t-xl">
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-4 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
               <GraduationCap className="w-6 h-6" />
@@ -194,7 +194,7 @@ There's no pressure here — just a friendly conversation to understand your goa
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-slate-50">
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4 bg-slate-50">
         {messages.map((message, index) => (
           <div
             key={index}
@@ -269,29 +269,29 @@ There's no pressure here — just a friendly conversation to understand your goa
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="border-t border-slate-200 bg-white px-6 py-4 rounded-b-xl">
-        <div className="flex gap-3">
+      <form onSubmit={handleSubmit} className="border-t border-slate-200 bg-white px-4 sm:px-6 py-4 shrink-0">
+        <div className="flex gap-3 items-end">
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message..."
-            className="flex-1 resize-none rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            rows={1}
+            className="flex-1 resize-none rounded-2xl border-2 border-slate-200 px-4 py-3 sm:py-4 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 transition-colors min-h-[52px] max-h-40"
+            rows={2}
             disabled={isLoading}
           />
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-5 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shrink-0"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
             <span className="hidden sm:inline">Send</span>
           </button>
         </div>
-        <p className="text-xs text-slate-500 mt-2 text-center">
-          Press Enter to send, Shift+Enter for new line
+        <p className="text-xs text-slate-400 mt-2 text-center">
+          Enter to send · Shift+Enter for new line
         </p>
       </form>
     </div>

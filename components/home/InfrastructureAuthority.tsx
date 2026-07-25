@@ -78,23 +78,22 @@ export default function InfrastructureAuthority() {
               {/* Partner logos */}
               <div className="mt-12 pt-8 border-t border-slate-200">
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
-                  Approved & Recognized By
+                  Approved &amp; Recognized By
                 </p>
-                <div className="flex items-center gap-8 flex-wrap">
+                <div className="flex items-center gap-3 flex-wrap">
                   {[
-                    { src: '/images/heroes/hero-homepage.webp', alt: 'U.S. Department of Labor' },
-                    { src: '/images/heroes/hero-homepage.webp', alt: 'Indiana DWD' },
-                    { src: '/images/heroes/hero-homepage.webp', alt: 'WorkOne Indiana' },
-                    { src: '/images/heroes/hero-homepage.webp', alt: 'Next Level Jobs' },
-                  ].map((logo) => (
-                    <Image
-                      key={logo.alt}
-                      src={logo.src}
-                      alt={logo.alt}
-                      width={120}
-                      height={48}
-                      className="object-contain h-10 w-auto opacity-60 hover:opacity-100 transition-opacity" sizes="(max-width: 768px) 100vw, 50vw"
-                    />
+                    { label: 'U.S. Department of Labor', sub: 'DOL Registered', color: 'bg-blue-50 text-blue-700' },
+                    { label: 'Indiana DWD', sub: 'WIOA Approved', color: 'bg-emerald-50 text-emerald-700' },
+                    { label: 'WorkOne Indiana', sub: 'Workforce Partner', color: 'bg-amber-50 text-amber-700' },
+                    { label: 'Next Level Jobs', sub: 'State Funded', color: 'bg-purple-50 text-purple-700' },
+                  ].map((partner) => (
+                    <div
+                      key={partner.label}
+                      className={`px-4 py-2.5 rounded-xl border border-slate-200 ${partner.color} opacity-80 hover:opacity-100 transition-opacity text-center min-w-[130px]`}
+                    >
+                      <div className="text-xs font-bold leading-tight">{partner.label}</div>
+                      <div className="text-[10px] font-medium opacity-75 mt-0.5">{partner.sub}</div>
+                    </div>
                   ))}
                 </div>
               </div>

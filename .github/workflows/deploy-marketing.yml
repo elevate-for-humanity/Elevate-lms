@@ -58,7 +58,8 @@ jobs:
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
       NORTHFLANK_MARKETING_SERVICE_ID: ${{ secrets.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing' }}
-      DEPLOY_BRANCH: main
+      # FIX: Use actual branch from PR (github.head_ref) not hardcoded main
+      DEPLOY_BRANCH: ${{ github.head_ref || 'main' }}
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org

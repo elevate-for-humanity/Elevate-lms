@@ -49,7 +49,7 @@ function MobileSubLink({
         prefetch={false}
         onClick={onNavigate}
         {...(isExternalHref(subItem.href ?? '') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-        className="flex items-center gap-1.5 py-3 min-h-[44px] text-sm font-semibold text-brand-red-600 hover:text-brand-red-700"
+        className="flex items-center gap-1.5 py-2 min-h-[40px] text-sm font-semibold text-brand-red-600 hover:text-brand-red-700"
       >
         {subItem.isAuth && <Lock className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />}
         <span className="break-words">{subItem.name}</span>
@@ -67,7 +67,7 @@ function MobileSubLink({
         prefetch={false}
         onClick={onNavigate}
         {...(isExternalHref(subItem.href ?? '') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-        className="flex items-center gap-1.5 py-3 min-h-[44px] text-sm text-slate-700 hover:text-brand-blue-600"
+        className="flex items-center gap-1.5 py-2 min-h-[40px] text-sm text-slate-700 hover:text-brand-blue-600"
       >
         {subItem.isAuth && <Lock className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" aria-hidden="true" />}
         <span className="break-words">{subItem.name}</span>
@@ -77,7 +77,7 @@ function MobileSubLink({
           href={applyHref}
           prefetch={false}
           onClick={onNavigate}
-          className="block py-2 pl-7 min-h-[36px] text-xs font-medium text-brand-blue-700 hover:underline"
+          className="block py-1.5 pl-6 min-h-[32px] text-xs font-medium text-brand-blue-700 hover:underline"
         >
           Apply to {subItem.name}
         </Link>
@@ -171,7 +171,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
 
               {/* Scrollable nav */}
               <nav
-                className="flex-1 overflow-y-auto overscroll-contain p-4 pb-2"
+                className="flex-1 overflow-y-auto overscroll-contain p-3 pb-2"
                 aria-label="Site navigation"
               >
                 {items.map((item, idx) => {
@@ -191,7 +191,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                           ref={idx === 0 ? firstFocusRef : undefined}
                           type="button"
                           onClick={() => toggleSection(sectionKey)}
-                          className="flex w-full items-center justify-between py-3 min-h-[44px] text-left text-base font-semibold text-slate-900 hover:text-brand-blue-600"
+                          className="flex w-full items-center justify-between py-2.5 min-h-[44px] text-left text-base font-semibold text-slate-900 hover:text-brand-blue-600"
                           aria-expanded={sectionOpen}
                           aria-controls={`mobile-section-${sectionKey}`}
                         >
@@ -208,12 +208,12 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                           href={item.href}
                           prefetch={false}
                           onClick={closeMenu}
-                          className="flex py-3 min-h-[44px] text-base font-semibold text-slate-900 hover:text-brand-blue-600"
+                          className="flex py-2.5 min-h-[44px] text-base font-semibold text-slate-900 hover:text-brand-blue-600"
                         >
                           {item.name}
                         </Link>
                       ) : (
-                        <p className="py-3 min-h-[44px] text-base font-semibold text-slate-900">
+                        <p className="py-2.5 min-h-[44px] text-base font-semibold text-slate-900">
                           {item.name}
                         </p>
                       )}
@@ -222,7 +222,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                       {hasSubItems && sectionOpen ? (
                         <div
                           id={`mobile-section-${sectionKey}`}
-                          className="pb-4 pl-3 border-l-2 border-brand-red-200"
+                          className="pb-3 pl-3 border-l-2 border-brand-red-200"
                         >
                           {/* "View all" link */}
                           {item.href ? (
@@ -230,7 +230,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                               href={item.href}
                               prefetch={false}
                               onClick={closeMenu}
-                              className="block py-2 min-h-[44px] text-sm font-bold text-brand-red-600 hover:text-brand-red-700"
+                              className="block py-1.5 min-h-[40px] text-sm font-bold text-brand-red-600 hover:text-brand-red-700"
                             >
                               View all {item.name} →
                             </Link>
@@ -245,27 +245,27 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                                 const categoryHref = column.find((c) => c.isHeader && c.href)?.href;
 
                                 return (
-                                  <div key={categoryKey} className="mt-1">
+                                  <div key={categoryKey}>
                                     {/* Full-width accordion trigger */}
                                     <button
                                       type="button"
                                       onClick={() =>
                                         setExpandedCategory(categoryOpen ? null : categoryKey)
                                       }
-                                      className="flex w-full min-h-[44px] items-center justify-between py-2 text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
+                                      className="flex w-full min-h-[40px] items-center justify-between py-1.5 text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
                                       aria-label={`${categoryOpen ? 'Collapse' : 'Expand'} ${label}`}
                                       aria-expanded={categoryOpen}
                                     >
                                       <span className="break-words leading-tight text-left">{label}</span>
                                       <ChevronDown
-                                        className={`h-4 w-4 flex-none text-brand-red-400 transition-transform duration-200 ml-2 flex-shrink-0 ${
+                                        className={`h-3.5 w-3.5 flex-none text-brand-red-400 transition-transform duration-200 ml-2 flex-shrink-0 ${
                                           categoryOpen ? 'rotate-180' : ''
                                         }`}
                                         aria-hidden="true"
                                       />
                                     </button>
                                     {categoryOpen ? (
-                                      <div className="pl-2 pb-2 border-l border-slate-200 ml-1">
+                                      <div className="pl-2 pb-1 border-l border-slate-200 ml-1 -mt-0.5">
                                         {column.map((subItem) =>
                                           !subItem ? null : (
                                             <MobileSubLink

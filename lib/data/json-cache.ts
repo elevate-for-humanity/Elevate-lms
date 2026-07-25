@@ -4,12 +4,24 @@
  * Server-side: reads from public/data/ via fs, caches per process.
  * Client-side: returns empty object — data must be passed as props from server.
  *
- * Uses dynamic require() so webpack does not trace 'fs' into client bundles.
+ * Uses __non_webpack_require__ pattern so webpack does NOT trace 'fs' into client bundles.
+ * This is critical — heroBanners.ts imports this module and would break webpack if fs were bundled.
  */
 
 const _cache = new Map<string, unknown>();
 const _errors = new Map<string, unknown>();
 const _fileMtimes = new Map<string, number>();
+
+type NodeRequire = (id: string) => unknown;
+
+function getNodeRequire(): NodeRequire {
+  // __non_webpack_require__ is injected by webpack when using getNodeRequire() trick.
+  // Falls back to eval('require') which webpack also ignores.
+  const globalRequire = (globalThis as { __non_webpack_require__?: NodeRequire }).__non_webpack_require__;
+  return typeof globalRequire === 'function'
+    ? globalRequire
+    : ((0, eval)('require') as NodeRequire);
+}
 
 export function loadJsonOnce<T = unknown>(filename: string): T {
   if (typeof window !== 'undefined') {
@@ -20,9 +32,10 @@ export function loadJsonOnce<T = unknown>(filename: string): T {
     return {} as T;
   }
 
-  // Dynamic require keeps 'fs' out of webpack's static import graph
-  const fs = require('fs') as typeof import('fs');
-  const nodePath = require('path') as typeof import('path');
+  // Use __non_webpack_require__ to prevent webpack from bundling fs/path into client code
+  const nodeRequire = getNodeRequire();
+  const fs = nodeRequire('fs') as typeof import('fs');
+  const nodePath = nodeRequire('path') as typeof import('path');
 
   // Prefer the image-embedded path (apps/marketing/public/data) if it exists.
   // Fall back to public/data for compatibility with other apps.
@@ -35,10 +48,12 @@ export function loadJsonOnce<T = unknown>(filename: string): T {
   const filePath = fs.existsSync(marketingDataPath) ? marketingDataPath : defaultDataPath;
 
   try {
-    // Invalidate cache if file mtime changed (file was updated on disk)
-    const mtime = fs.statSync(filePath).mtimeMs;
+    // Check cache first (fast path for repeated requests)
     const cached = _cache.get(filename) as T | undefined;
     const cachedMtime = _fileMtimes.get(filename);
+
+    // Invalidate cache if file mtime changed (handles volume mount or live updates)
+    const mtime = fs.statSync(filePath).mtimeMs;
 
     if (cached && cachedMtime === mtime) {
       return cached;

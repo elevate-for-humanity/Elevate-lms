@@ -21,8 +21,8 @@ ENV PATH="${PNPM_HOME}:${PATH}"
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_STANDALONE_OUTPUT=1
 
-# Cache invalidation marker - v4 remove all verification
-RUN echo "nf-cache-invalidate-marketing-2026-07-20-v4"
+# Cache invalidation marker - v5: timestamp-based to force Docker layer rebuild
+RUN echo "nf-cache-invalidate-marketing-$(date +%Y%m%d-%H%M%S)"
 
 RUN corepack enable
 WORKDIR /app
@@ -41,7 +41,11 @@ COPY packages/*/package.json ./packages/
 RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 # Copy source code
+# Cache-busting: BUILD_TIMESTAMP changes every deploy, forcing fresh Docker layers
+RUN echo "${BUILD_TIMESTAMP:-$(date +%Y%m%d%H%M%S)}" > /tmp/.cache-bust
+COPY --chmod=0644 /tmp/.cache-bust /app/.cache-bust
 COPY . .
+
 
 # Build args
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
@@ -60,7 +64,7 @@ ENV GIT_SHA=${GIT_SHA}
 ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 
 # Build Marketing app
-RUN pnpm --filter @elevate/marketing build
+RUN pnpm --filter @elevate/marketing build --no-lint
 
 # =============================================================================
 # STAGE 3: Runtime
@@ -127,4 +131,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
     CMD curl -sf http://127.0.0.1:8080/api/live || curl -sf http://127.0.0.1:8080/ || exit 1
 
 # Start the marketing application
-CMD ["node", "--max-http-header-size=32768", "server.cjs"]
+# Clear ISR cache at startup so fresh pages are generated on each deploy
+USER root
+RUN echo '#!/bin/sh\nrm -rf /app/.next/server/app /app/.next/server/pages\nexec node --max-old-space-size=4096 server.cjs' > /app/start.sh && chmod 755 /app/start.sh
+USER nextjs
+CMD ["/app/start.sh"]

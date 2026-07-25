@@ -71,6 +71,7 @@ async function main() {
     body: JSON.stringify({
       sha: currentSha,
       buildArgs: {
+        GITHUB_SHA: currentSha,
         GIT_SHA: currentSha,
         NEXT_PUBLIC_GIT_SHA: currentSha,
         BUILD_TIMESTAMP: new Date().toISOString(),

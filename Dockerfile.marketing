@@ -40,10 +40,6 @@ COPY packages/*/package.json ./packages/
 # Install dependencies
 RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-# Copy source code
-# Cache-busting: BUILD_TIMESTAMP changes every deploy, forcing fresh Docker layers
-RUN echo "${BUILD_TIMESTAMP:-$(date +%Y%m%d%H%M%S)}" > /tmp/.cache-bust
-COPY --chmod=0644 /tmp/.cache-bust /app/.cache-bust
 COPY . .
 
 

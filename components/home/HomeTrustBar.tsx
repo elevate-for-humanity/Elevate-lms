@@ -23,7 +23,7 @@ const TRUST_ITEMS = [
     href: '/federal-compliance',
   },
   {
-    img: '/images/pages/certifications.webp',
+    img: '/images/pages/about-career-training.webp',
     label: 'WIOA Aligned',
     sub: 'Title I & II compliant',
     href: '/eligibility',
@@ -35,7 +35,7 @@ const TRUST_ITEMS = [
     href: '/compliance/apprenticeship-structure',
   },
   {
-    img: '/images/pages/about-employer-partners.webp',
+    img: '/images/pages/about-team-hero.webp',
     label: 'WorkOne Partner',
     sub: 'Indiana DWD aligned',
     href: '/partners/workforce',
@@ -53,7 +53,7 @@ const PARTNER_LOGOS = [
   { src: '/images/pages/about-partner-cta.webp', alt: 'Indiana Department of Workforce Development', href: '/partners/workforce' },
   { src: '/images/pages/workforce-board-page-2.webp', alt: 'WorkOne Indiana', href: '/partners/workforce' },
   { src: '/images/pages/federal-funded.webp', alt: 'Next Level Jobs', href: '/eligibility' },
-  { src: '/images/pages/certifications.webp', alt: 'OSHA Authorized', href: '/compliance' },
+  { src: '/images/pages/about-hero.webp', alt: 'OSHA Authorized', href: '/compliance' },
 ];
 
 export function HomeTrustBar() {

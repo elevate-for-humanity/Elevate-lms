@@ -1,12 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
-import { buildLoginUrl, buildReturnPath } from '@/lib/auth/validate-redirect';
+import { safeGetUser, createClient } from '@/lib/supabase/server';
 
 /**
- * Admin Middleware
- * 
- * Fix: Only redirect if NEXT_PUBLIC_ADMIN_URL is explicitly configured.
- * On work hosts (no ADMIN_URL set), allow the request through.
+ * Admin Middleware - handles auth BEFORE pages render to avoid redirect loops.
  */
 
 // Paths that never require auth
@@ -19,42 +16,22 @@ const PUBLIC_PATHS = [
   '/auth/reset-password',
 ];
 
-function getSessionCookieName(): string {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
-  const match = url.match(/https?:\/\/([^.]+)\./);
-  if (match?.[1]) return `sb-${match[1]}-auth-token`;
-  return 'sb-cuxzzpsyufcewtmicszk-auth-token';
-}
-const SESSION_COOKIE = getSessionCookieName();
-
 export async function middleware(req: NextRequest) {
-  const { pathname, search } = req.nextUrl;
-  const host = req.headers.get('host')?.toLowerCase().split(':')[0] ?? '';
-  const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+  const { pathname } = req.nextUrl;
 
   // Always allow public paths and static files
   if (
     PUBLIC_PATHS.some((p) => pathname.startsWith(p)) ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
-    /\.[a-z0-9]+$/i.test(pathname)
+    /[a-z0-9]+\.[a-z]+$/i.test(pathname)
   ) {
     return NextResponse.next();
   }
 
-  // FIX: Only redirect if NEXT_PUBLIC_ADMIN_URL is explicitly set
-  const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL;
-  if (adminUrl && !isLocalHost) {
-    try {
-      const configuredHost = new URL(adminUrl).host;
-      if (host !== configuredHost) {
-        const adminBase = adminUrl.replace(/\/+$/, '');
-        return NextResponse.redirect(`${adminBase}${pathname}${search}`, { status: 301 });
-      }
-    } catch {
-      // Invalid URL, skip redirect
-    }
-  }
+  // Check IP guard first
+  const ipBlocked = checkAdminIP(req);
+  if (ipBlocked) return ipBlocked;
 
   // Only gate protected namespaces.
   const isProtected =
@@ -67,15 +44,34 @@ export async function middleware(req: NextRequest) {
 
   if (!isProtected) return NextResponse.next();
 
+  // Auth check - runs in middleware to avoid layout redirect loops
+  const supabase = await createClient();
+  const user = safeGetUser(await supabase.auth.getUser());
+
+  if (!user) {
+    const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Check role
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  const validRoles = ['admin', 'instructor', 'staff', 'super_admin'];
+  if (!profile?.role || !validRoles.includes(profile.role)) {
+    return NextResponse.redirect(new URL('/unauthorized', req.url));
+  }
+
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', pathname);
-
-  const ipBlocked = checkAdminIP(req);
-  if (ipBlocked) return ipBlocked;
 
   return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon\\.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

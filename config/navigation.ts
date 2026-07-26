@@ -18,25 +18,21 @@ function itemsFrom(key: string): NavItem[] {
 }
 
 /**
- * HEADER NAV - Simplified (4-6 top items max)
+ * HEADER NAV - Clean & Simple (Primary Entry Points Only)
+ * - NO standalone portals (Admin, Staff Portal, LMS are separate apps)
+ * - NO stub pages (Blog, Events, Webinars, News should be INSIDE parent pages)
+ * - NO duplicate sections
  */
 export const headerNav: NavSection[] = [
   {
     label: 'Testing',
     href: '/testing',
     items: [
-      { label: 'Testing Home', href: '/testing' },
+      { label: 'Testing Center', href: '/testing' },
       { label: 'Schedule Exam', href: '/testing/book' },
-      { label: 'Certiport (MOS, IC3)', href: '/testing/certiport' },
-      { label: 'EPA 608 Universal', href: '/testing/epa608' },
-      { label: 'ACT WorkKeys / NCRC', href: '/testing/workkeys' },
-      { label: 'NHA Certifications', href: '/testing/nha' },
-      { label: 'NRF Rise Up', href: '/testing/riseup' },
-      { label: 'ASE Certification', href: '/testing/ase' },
-      { label: 'Midland Certification', href: '/testing/midland' },
-      { label: 'Testing Policies', href: '/testing#policies' },
-      { label: 'Accommodations', href: '/testing/accommodations' },
-      { label: 'For Employers', href: '/testing/for-employers' },
+      { label: 'Certiport', href: '/testing/certiport' },
+      { label: 'WorkKeys', href: '/testing/workkeys' },
+      { label: 'Policies', href: '/testing#policies' },
     ],
   },
   {
@@ -49,121 +45,35 @@ export const headerNav: NavSection[] = [
       { label: 'Beauty & Cosmetology', href: '/barber-and-beauty-apprenticeships' },
       { label: 'Technology', href: '/programs/technology' },
       { label: 'Business', href: '/programs/business' },
-      { label: 'Apprenticeships', href: '/barber-and-beauty-apprenticeships' },
     ],
   },
   {
     label: 'Funding',
     href: '/funding',
     items: [
-      { label: 'How Funding Works', href: '/funding' },
-      { label: 'WIOA Funding', href: '/funding/wioa' },
-      { label: 'Workforce Ready Grant', href: '/funding/wrg' },
-      { label: 'FAQ', href: '/faq' },
+      { label: 'Funding Options', href: '/funding' },
+      { label: 'WIOA', href: '/funding/wioa' },
+      { label: 'Scholarships', href: '/scholarships' },
     ],
   },
   {
     label: 'Partners',
-    href: '/admin/partners',
+    href: '/partners',
     items: [
-      { label: 'Partner Network', href: '/admin/partners' },
+      { label: 'Our Partners', href: '/partners' },
       { label: 'For Employers', href: '/employers' },
-      { label: 'Hire Graduates', href: '/hire-graduates' },
-      { label: 'Workforce Partners', href: '/workforce-partners' },
-      { label: 'Career Services', href: '/career-services' },
-    ],
-  },
-  {
-    label: 'Portals',
-    href: '/portals',
-    items: [
-      { label: '🏠 All Portals', href: '/portals' },
-      { label: '📚 Student Portal', href: '/lms/dashboard' },
-      { label: '⚙️ Admin Portal', href: '/admin' },
-      { label: '🤝 Partner Portal', href: '/partner/dashboard' },
-      { label: '💼 Workforce Board', href: '/workforce-board/dashboard' },
-      { label: '👥 Staff Portal', href: '/admin/staff-portal/dashboard' },
-      { label: '👨‍🏫 Instructor Portal', href: '/admin/instructor/dashboard' },
-      { label: '🏭 Employer Portal', href: '/employer/dashboard' },
-      { label: '💈 Host Shop Portal', href: '/host-shop/dashboard' },
-      { label: '👪 Parent Portal', href: '/parent-portal/dashboard' },
-    ],
-  },
-  {
-    label: 'Student Portal',
-    href: '/lms/dashboard',
-    items: [
-      { label: 'My Dashboard', href: '/lms/dashboard' },
-      { label: 'My Courses', href: '/lms/courses' },
-      { label: 'Assignments', href: '/lms/assignments' },
-      { label: 'Grades', href: '/lms/grades' },
-      { label: 'Certificates', href: '/lms/certificates' },
-      { label: 'AI Tutor', href: '/ai-tutor' },
-      { label: 'Career Counseling', href: '/career-counseling' },
-      { label: 'Resources', href: '/lms/resources' },
-      { label: 'Support', href: '/lms/support' },
-    ],
-  },
-  {
-    label: 'LMS',
-    href: 'https://elevateforhumanitylearning.com',
-    items: [
-      {
-        label: 'LMS Dashboard',
-        href: 'https://elevateforhumanitylearning.com/dashboard',
-      },
-      {
-        label: 'My Courses',
-        href: 'https://elevateforhumanitylearning.com/courses',
-      },
-      {
-        label: 'Calendar',
-        href: 'https://elevateforhumanitylearning.com/calendar',
-      },
-      {
-        label: 'Assignments',
-        href: 'https://elevateforhumanitylearning.com/assignments',
-      },
-      {
-        label: 'Grades',
-        href: 'https://elevateforhumanitylearning.com/grades',
-      },
-      {
-        label: 'Certificates',
-        href: 'https://elevateforhumanitylearning.com/certificates',
-      },
-      {
-        label: 'Messages',
-        href: 'https://elevateforhumanitylearning.com/messages',
-      },
-      {
-        label: 'Resources',
-        href: 'https://elevateforhumanitylearning.com/resources',
-      },
-    ],
-  },
-  {
-    label: 'Services',
-    items: [
-      { label: 'Book Appointment', href: '/booking' },
-      { label: 'Career Services', href: '/career-services' },
+      { label: 'Workforce Agencies', href: '/for-agencies' },
+      { label: 'Host Shops', href: '/partners/barbershop-apprenticeship/host-shops' },
     ],
   },
   {
     label: 'Resources',
-    href: '/resources',
+    href: '/help',
     items: [
-      { label: 'Success Stories', href: '/success-stories' },
-      { label: 'Blog', href: '/blog' },
-      { label: 'Videos', href: '/videos' },
-      { label: 'Webinars', href: '/webinars' },
-      { label: 'News', href: '/news' },
-      { label: 'Events', href: '/events' },
-      { label: 'Alumni', href: '/alumni' },
-      { label: 'FAQ', href: '/faq' },
-      { label: 'Help & Tutorials', href: '/help/tutorials' },
-      { label: 'Accessibility', href: '/accessibility' },
-      { label: 'Contact Us', href: '/contact' },
+      { label: 'Help Center', href: '/help' },
+      { label: 'Career Services', href: '/career-services' },
+      { label: 'FAQs', href: '/faq' },
+      { label: 'Contact', href: '/contact' },
     ],
   },
   {
@@ -173,79 +83,46 @@ export const headerNav: NavSection[] = [
       { label: 'About Us', href: '/about' },
       { label: 'Our Team', href: '/team' },
       { label: 'Platform', href: '/platform' },
-      { label: 'Features', href: '/features' },
       { label: 'Pricing', href: '/pricing' },
-      { label: 'Accreditation', href: '/accreditation' },
-      { label: 'Donate', href: '/donate' },
-      { label: 'Volunteer', href: '/volunteer' },
-      { label: 'Grants', href: '/grants' },
-      { label: 'Philanthropy', href: '/philanthropy' },
-      { label: 'Contact Us', href: '/contact' },
-    ],
-  },
-  {
-    label: 'Admin',
-    href: '/admin',
-    items: [
-      { label: 'Admin Dashboard', href: '/admin' },
-      { label: 'Performance Dashboard', href: '/admin/reports' },
-      { label: 'Analytics Dashboard', href: '/admin/analytics' },
-      { label: 'Analytics', href: '/admin/analytics' },
-      { label: 'Applications', href: '/admin/applications' },
-      { label: 'Enrollments', href: '/admin/enrollments' },
-      { label: 'Students', href: '/admin/students' },
-      { label: 'Instructors', href: '/admin/instructor' },
-      { label: 'Programs', href: '/admin/programs' },
-      { label: 'Partners', href: '/admin/partners' },
-      { label: 'Reports', href: '/admin/reports' },
-      { label: 'Payments', href: '/admin/integrations/stripe' },
-      { label: 'Live Chat', href: '/admin/live-chat' },
-      { label: 'Notifications', href: '/admin/notifications' },
-      { label: 'Settings', href: '/admin/settings' },
-      { label: 'Studio', href: '/admin/studio' },
-      { label: 'Security', href: '/admin/settings/security' },
-    ],
-  },
-  {
-    label: 'Staff Portal',
-    href: '/admin/staff-portal/dashboard',
-    items: [
-      { label: 'Dashboard', href: '/admin/staff-portal/dashboard' },
-      { label: 'Training', href: '/admin/staff-portal/training' },
-      { label: 'Processes', href: '/admin/staff-portal/processes' },
-      { label: 'QA Checklist', href: '/admin/staff-portal/qa-checklist' },
-      { label: 'Customer Service', href: '/admin/staff-portal/customer-service' },
-      { label: 'Courses', href: '/admin/staff-portal/courses' },
-      { label: 'Students', href: '/admin/staff-portal/students' },
-    ],
-  },
-  {
-    label: 'VITA',
-    href: '/vita',
-    items: [
-      { label: 'VITA Home', href: '/vita' },
-      { label: 'Book Appointment', href: '/vita/appointments' },
-      { label: 'Upload Documents', href: '/vita/upload' },
-      { label: 'Volunteer Portal', href: '/vita/volunteer-portal' },
-      { label: 'Resources', href: '/vita/resources' },
-    ],
-  },
-  {
-    label: 'Community Services',
-    href: '/community-services',
-    items: [
-      { label: 'Community Services', href: '/community-services' },
-      { label: 'Book Appointment', href: '/vita/appointments' },
-      { label: 'Volunteer Portal', href: '/vita/volunteer-portal' },
-      { label: 'VITA Resources', href: '/vita/resources' },
-      { label: 'Contact', href: '/contact' },
     ],
   },
 ];
 
 /**
- * FOOTER NAV
- * - expose ALL sections (Main Pages, Programs, Funding, LMS, HR, Reports, etc.)
- * - used by SiteFooter to render a mega-footer with every page
+ * FOOTER NAV - Clean Footer
+ * - Only essential links for public site
+ * - NO program links (they're in header)
+ * - NO internal/portal links
  */
-export const footerSections = siteMapSections;
+export const footerSections = [
+  {
+    id: 'company',
+    title: 'Company',
+    items: [
+      { label: 'About Us', href: '/about', description: 'Learn about our mission' },
+      { label: 'Contact', href: '/contact', description: 'Get in touch' },
+      { label: 'Partners', href: '/partners', description: 'Our partner network' },
+      { label: 'Employers', href: '/employers', description: 'Hire our graduates' },
+    ],
+  },
+  {
+    id: 'resources',
+    title: 'Resources',
+    items: [
+      { label: 'Help Center', href: '/help', description: 'FAQs and support' },
+      { label: 'Funding', href: '/funding', description: 'Financial assistance' },
+      { label: 'Career Services', href: '/career-services', description: 'Job placement help' },
+      { label: 'Testing Center', href: '/testing', description: 'Schedule exams' },
+    ],
+  },
+  {
+    id: 'legal',
+    title: 'Legal',
+    items: [
+      { label: 'Privacy Policy', href: '/privacy', description: 'How we protect your data' },
+      { label: 'Terms of Service', href: '/terms', description: 'Service terms' },
+      { label: 'Accessibility', href: '/accessibility', description: 'ADA compliance' },
+      { label: 'Student Handbook', href: '/handbook', description: 'Policies and procedures' },
+    ],
+  },
+];

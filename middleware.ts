@@ -50,12 +50,19 @@ const PUBLIC_PATHS = [
   '/update-password',
 ];
 
+// Admin + marketing portal paths that need x-pathname header set for auth redirects
 const ADMIN_PATHS = [
   '/admin',
   '/api/admin',
   '/api/staff',
   '/api/devstudio',
   '/api/platform',
+  // Marketing portal routes — requireRole uses x-pathname to preserve redirect destination
+  '/provider',
+  '/program-holder',
+  '/case-manager',
+  '/workforce-board',
+  '/staff-portal',
 ];
 
 const STUDENT_PATHS = [

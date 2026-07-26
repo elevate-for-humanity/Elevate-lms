@@ -37,8 +37,9 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json ./apps/admin/package.json
 COPY packages/*/package.json ./packages/
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
+# Install dependencies (remove --frozen-lockfile to allow lockfile migration)
+# pnpm 10.x can migrate lockfiles from pnpm 9.x
+RUN pnpm install --strict-peer-dependencies=false
 
 # Copy source code
 COPY . .

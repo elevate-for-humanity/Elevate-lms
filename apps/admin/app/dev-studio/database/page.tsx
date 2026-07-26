@@ -1,15 +1,17 @@
-import { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Database | Dev Studio',
-  description: 'Database management and monitoring.',
-};
+import dynamic from 'next/dynamic';
+import DashboardPanelErrorBoundary from '@/components/admin/dashboard/DashboardPanelErrorBoundary';
+
+const SecretsPanel = dynamic(
+  () => import('@/components/studio/SecretsPanel').then(m => m.default || m),
+  { ssr: false }
+);
 
 export default function DevStudioDatabasePage() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-slate-900 mb-4">Database Management</h1>
-      <p className="text-slate-600">Database tools and monitoring coming soon.</p>
-    </div>
+    <DashboardPanelErrorBoundary title="Database">
+      <SecretsPanel />
+    </DashboardPanelErrorBoundary>
   );
 }

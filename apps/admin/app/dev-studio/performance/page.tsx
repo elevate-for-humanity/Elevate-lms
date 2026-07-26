@@ -1,15 +1,17 @@
-import { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Performance | Dev Studio',
-  description: 'Performance monitoring and analysis.',
-};
+import dynamic from 'next/dynamic';
+import DashboardPanelErrorBoundary from '@/components/admin/dashboard/DashboardPanelErrorBoundary';
+
+const LizzyOperationsPanel = dynamic(
+  () => import('@/components/admin/dashboard/LizzyOperationsPanel').then(m => m.default || m),
+  { ssr: false }
+);
 
 export default function DevStudioPerformancePage() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-slate-900 mb-4">Performance Monitoring</h1>
-      <p className="text-slate-600">Performance tools coming soon.</p>
-    </div>
+    <DashboardPanelErrorBoundary title="Performance">
+      <LizzyOperationsPanel />
+    </DashboardPanelErrorBoundary>
   );
 }

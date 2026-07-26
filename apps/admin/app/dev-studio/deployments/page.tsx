@@ -1,15 +1,17 @@
-import { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Deployments | Dev Studio',
-  description: 'Deployment management.',
-};
+import dynamic from 'next/dynamic';
+import DashboardPanelErrorBoundary from '@/components/admin/dashboard/DashboardPanelErrorBoundary';
+
+const DeployPanel = dynamic(
+  () => import('@/components/studio/DeployPanel').then(m => m.default || m),
+  { ssr: false }
+);
 
 export default function DevStudioDeploymentsPage() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-slate-900 mb-4">Deployment Management</h1>
-      <p className="text-slate-600">Deployment tools coming soon.</p>
-    </div>
+    <DashboardPanelErrorBoundary title="Deployments">
+      <DeployPanel />
+    </DashboardPanelErrorBoundary>
   );
 }

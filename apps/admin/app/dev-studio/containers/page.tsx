@@ -1,15 +1,17 @@
-import { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Containers | Dev Studio',
-  description: 'Container management.',
-};
+import dynamic from 'next/dynamic';
+import DashboardPanelErrorBoundary from '@/components/admin/dashboard/DashboardPanelErrorBoundary';
+
+const DevContainerPanel = dynamic(
+  () => import('@/components/studio/DevContainerPanel').then(m => m.default || m),
+  { ssr: false }
+);
 
 export default function DevStudioContainersPage() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-slate-900 mb-4">Container Management</h1>
-      <p className="text-slate-600">Container tools coming soon.</p>
-    </div>
+    <DashboardPanelErrorBoundary title="Containers">
+      <DevContainerPanel />
+    </DashboardPanelErrorBoundary>
   );
 }

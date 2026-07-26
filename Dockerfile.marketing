@@ -91,15 +91,11 @@ RUN groupadd --system --gid 1001 nodejs && \
 # Copy the entire Next.js build output to /app/
 COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next ./.next
 
-# Copy root public folder FIRST (contains version.json from CI)
+# Copy root public folder (contains version.json from CI build step)
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# Merge app-specific public files into public/ (backup any existing files)
-# Copy marketing public folder contents if they exist
-RUN if [ -d /app/apps/marketing/public ] && [ "$(ls -A /app/apps/marketing/public 2>/dev/null)" ]; then \
-    cp -rf /app/apps/marketing/public/* ./public/ 2>/dev/null || true; \
-    fi && \
-    chown -R nextjs:nodejs ./public
+# Set ownership on public folder
+RUN chown -R nextjs:nodejs ./public
 
 # Copy node_modules (needed for runtime dependencies)
 COPY --from=builder /app/node_modules ./node_modules

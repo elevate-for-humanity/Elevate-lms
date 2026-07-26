@@ -205,10 +205,13 @@ const ADMIN_CATEGORY_CARDS = [
 function AdminCategoryLanding() {
   return (
     <section className="mb-8">
-      <div className="mb-4 flex items-end justify-between gap-4">
+      <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-brand-red-600">Admin OS</p>
-          <h2 className="mt-1 text-xl font-black text-slate-900">Operate by category</h2>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1 h-6 bg-gradient-to-b from-orange-500 to-red-600 rounded-full" />
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Admin OS</p>
+          </div>
+          <h2 className="text-xl font-black text-slate-900">Operate by category</h2>
           <p className="mt-1 text-sm text-slate-500">
             Each card opens a dedicated admin area. Use the{' '}
             <span className="font-semibold text-slate-700">☰ menu</span> in the header for every
@@ -220,36 +223,47 @@ function AdminCategoryLanding() {
         </Link>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {ADMIN_CATEGORY_CARDS.map(({ title, eyebrow, description, href, Icon, links }) => (
-          <div key={title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-            <Link href={href} className="group block">
-              <div className="mb-4 flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">{eyebrow}</p>
-                    <h3 className="text-lg font-black text-slate-900 group-hover:text-brand-blue-700">{title}</h3>
+        {ADMIN_CATEGORY_CARDS.map(({ title, eyebrow, description, href, Icon, links }, index) => {
+          const gradients = [
+            'from-blue-500 to-blue-600',
+            'from-emerald-500 to-emerald-600',
+            'from-purple-500 to-purple-600',
+            'from-orange-500 to-orange-600',
+            'from-pink-500 to-pink-600',
+            'from-cyan-500 to-cyan-600',
+          ];
+          const gradient = gradients[index % gradients.length];
+          return (
+            <div key={title} className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <Link href={href} className="block h-full">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${gradient} text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon className="h-6 w-6" />
+                    </span>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{eyebrow}</p>
+                      <h3 className="text-lg font-black text-slate-900 group-hover:text-brand-blue-700 transition-colors">{title}</h3>
+                    </div>
                   </div>
+                  <ArrowRight className="mt-2 h-5 w-5 text-slate-300 group-hover:text-brand-blue-600 group-hover:translate-x-1 transition-all" />
                 </div>
-                <ArrowRight className="mt-2 h-4 w-4 text-slate-300 group-hover:text-brand-blue-600" />
+                <p className="min-h-[40px] text-sm leading-5 text-slate-600">{description}</p>
+              </Link>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {links.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 hover:border-brand-blue-300 hover:bg-brand-blue-50 hover:text-brand-blue-700 transition-all"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
               </div>
-              <p className="min-h-[40px] text-sm leading-5 text-slate-600">{description}</p>
-            </Link>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {links.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 hover:border-brand-blue-300 hover:bg-brand-blue-50 hover:text-brand-blue-700"
-                >
-                  {link.label}
-                </Link>
-              ))}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
@@ -258,20 +272,30 @@ function AdminCategoryLanding() {
 function TodaysPriorities({ data }: { data: AdminDashboardData }) {
   const items = data.priorities ?? [];
   return (
-    <div className="rounded-xl border border-slate-200 bg-white mb-6">
-      <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Inbox className="w-4 h-4 text-slate-500" />
-          <h2 className="font-bold text-slate-900">Today's Priorities</h2>
+    <div className="rounded-2xl border border-slate-200 bg-white mb-6 overflow-hidden shadow-sm">
+      <div className="px-5 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg">
+            <Inbox className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="font-bold text-slate-900">Today's Priorities</h2>
+            {items.length > 0 && (
+              <p className="text-xs text-slate-500">Ranked by impact score</p>
+            )}
+          </div>
         </div>
         {items.length > 0 && (
-          <span className="text-xs text-slate-400 hidden sm:block">Ranked by impact score</span>
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-orange-100 text-orange-700">{items.length} items</span>
         )}
       </div>
       {items.length === 0 ? (
-        <div className="px-4 sm:px-6 py-8 flex items-center gap-3 text-brand-green-700">
-          <span className="w-5 h-5 rounded-full bg-brand-green-500 inline-block flex-shrink-0" aria-hidden="true" />
-          <p className="text-sm font-medium">No urgent operational items right now.</p>
+        <div className="px-5 sm:px-6 py-10 flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+            <span className="text-3xl">✨</span>
+          </div>
+          <p className="text-base font-semibold text-emerald-700">No urgent operational items right now.</p>
+          <p className="text-sm text-slate-500 mt-1">You're all caught up!</p>
         </div>
       ) : (
         <div className="divide-y divide-slate-100">
@@ -279,19 +303,19 @@ function TodaysPriorities({ data }: { data: AdminDashboardData }) {
             const s = SEVERITY_STYLES[item.severity] ?? SEVERITY_STYLES.low;
             return (
               <Link key={item.id} href={item.href}
-                className={`flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 hover:brightness-95 group transition-all ${s.bg}`}>
-                <div className="flex items-start gap-3 min-w-0">
-                  <span className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${s.dot}`} />
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                      <span className={`text-[10px] font-black tracking-widest ${s.text}`}>{s.label}</span>
-                      <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">score {item.score}</span>
+                className={`flex items-center justify-between px-5 sm:px-6 py-4 hover:brightness-95 group transition-all ${s.bg}`}>
+                <div className="flex items-start gap-4 min-w-0 flex-1">
+                  <div className={`mt-1 w-3 h-3 rounded-full flex-shrink-0 ${s.dot} shadow-sm`} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-3 mb-1 flex-wrap">
+                      <span className={`text-[10px] font-black tracking-widest ${s.text} uppercase`}>{s.label}</span>
+                      <span className="text-[10px] text-slate-400 font-mono bg-slate-100 px-2 py-0.5 rounded">score {item.score}</span>
                     </div>
-                    <p className="text-sm font-semibold text-slate-900 line-clamp-2">{item.label}</p>
-                    <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{item.context}</p>
+                    <p className="text-sm font-bold text-slate-900 line-clamp-2">{item.label}</p>
+                    <p className="text-xs text-slate-500 mt-1 line-clamp-1">{item.context}</p>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 transition-colors flex-shrink-0 ml-3" />
+                <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-slate-600 group-hover:translate-x-1 transition-all flex-shrink-0 ml-4" />
               </Link>
             );
           })}
@@ -304,25 +328,34 @@ function TodaysPriorities({ data }: { data: AdminDashboardData }) {
 
 function LearnersNeedingAttention({ learners }: { learners: InactiveLearner[] }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white mb-6">
-      <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-slate-500" />
-          <h2 className="font-bold text-slate-900">Learners Needing Attention</h2>
+    <div className="rounded-2xl border border-slate-200 bg-white mb-6 overflow-hidden shadow-sm">
+      <div className="px-5 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg">
+            <Users className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="font-bold text-slate-900">Learners Needing Attention</h2>
+            <p className="text-xs text-slate-500">Inactive or at-risk learners</p>
+          </div>
         </div>
-        <Link href="/admin/at-risk" className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
-          View all <ArrowRight className="w-3 h-3" />
-        </Link>
+        {learners.length > 0 && (
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700">{learners.length} learners</span>
+        )}
       </div>
       {learners.length === 0 ? (
-        <Empty message="No learners currently need intervention." />
+        <div className="px-5 sm:px-6 py-8 text-center">
+          <p className="text-sm text-slate-500">No learners currently need intervention.</p>
+        </div>
       ) : (
         <div className="divide-y divide-slate-100">
           {learners.slice(0, 6).map((l) => (
-            <div key={l.enrollmentId} className="flex items-center justify-between px-4 sm:px-6 py-3 hover:bg-slate-50 transition-colors">
+            <div key={l.enrollmentId} className="flex items-center justify-between px-5 sm:px-6 py-3 hover:bg-slate-50 transition-colors">
               <Link href={l.href} className="min-w-0 flex-1 group">
                 <p className="text-sm font-semibold text-slate-900 truncate">{l.fullName ?? l.email ?? "Unknown learner"}</p>
-                <p className="text-xs text-slate-500 truncate">{l.programTitle ?? "Unknown program"}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-slate-500 truncate">{l.programTitle ?? "Unknown program"}</span>
+                </div>
               </Link>
               <div className="flex items-center gap-2 flex-shrink-0 ml-4">
                 <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Inactive {l.daysInactive}d</span>
@@ -352,32 +385,58 @@ function ReviewQueues({ data }: { data: AdminDashboardData }) {
   const pendingWioaDocs = data.pendingWioaDocs ?? 0;
   const pendingSubmissionsCount = data.pendingSubmissions?.length ?? 0;
   const queues = [
-    { label: "Applications awaiting review", count: counts.pendingApplications, context: counts.pendingApplications > 0 ? "Intake queue needs admin action" : "Queue is clear", href: "/admin/applications?status=submitted,pending,in_review,pending_admin_review", urgent: counts.pendingApplications > 0 },
-    { label: "WIOA documents awaiting review", count: pendingWioaDocs, context: pendingWioaDocs > 0 ? "Funding eligibility may be blocked" : "Queue is clear", href: "/admin/wioa/documents", urgent: pendingWioaDocs > 0 },
-    { label: "Lab submissions awaiting sign-off", count: pendingSubmissionsCount, context: pendingSubmissionsCount > 0 ? "Instructor action required" : "Queue is clear", href: "/admin/submissions", urgent: pendingSubmissionsCount > 0 },
-    { label: "Program holders awaiting approval", count: counts.pendingProgramHolders, context: counts.pendingProgramHolders > 0 ? "Partner applications need review" : "Queue is clear", href: "/admin/program-holders", urgent: counts.pendingProgramHolders > 0 },
-    { label: "Program holder documents pending", count: counts.pendingDocuments, context: counts.pendingDocuments > 0 ? "Documents submitted, awaiting review" : "Queue is clear", href: "/admin/program-holder-documents", urgent: counts.pendingDocuments > 0 },
-    { label: "Certificates to issue", count: counts.certificatesIssued, context: "Completed learners awaiting credential", href: "/admin/certificates", urgent: false },
+    { label: "Applications awaiting review", count: counts.pendingApplications, context: counts.pendingApplications > 0 ? "Intake queue needs admin action" : "Queue is clear", href: "/admin/applications?status=submitted,pending,in_review,pending_admin_review", urgent: counts.pendingApplications > 0, color: "blue" },
+    { label: "WIOA documents awaiting review", count: pendingWioaDocs, context: pendingWioaDocs > 0 ? "Funding eligibility may be blocked" : "Queue is clear", href: "/admin/wioa/documents", urgent: pendingWioaDocs > 0, color: "amber" },
+    { label: "Lab submissions awaiting sign-off", count: pendingSubmissionsCount, context: pendingSubmissionsCount > 0 ? "Instructor action required" : "Queue is clear", href: "/admin/submissions", urgent: pendingSubmissionsCount > 0, color: "purple" },
+    { label: "Program holders awaiting approval", count: counts.pendingProgramHolders, context: counts.pendingProgramHolders > 0 ? "Partner applications need review" : "Queue is clear", href: "/admin/program-holders", urgent: counts.pendingProgramHolders > 0, color: "emerald" },
+    { label: "Program holder documents pending", count: counts.pendingDocuments, context: counts.pendingDocuments > 0 ? "Documents submitted, awaiting review" : "Queue is clear", href: "/admin/program-holder-documents", urgent: counts.pendingDocuments > 0, color: "pink" },
+    { label: "Certificates to issue", count: counts.certificatesIssued, context: "Completed learners awaiting credential", href: "/admin/certificates", urgent: false, color: "cyan" },
   ];
+  const urgentCount = queues.filter(q => q.urgent).length;
+  
   return (
-    <div className="rounded-xl border border-slate-200 bg-white mb-6">
-      <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex items-center gap-2">
-        <FileText className="w-4 h-4 text-slate-500" />
-        <h2 className="font-bold text-slate-900">Review Queues</h2>
+    <div className="rounded-2xl border border-slate-200 bg-white mb-6 overflow-hidden shadow-sm">
+      <div className="px-5 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+            <FileText className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="font-bold text-slate-900">Review Queues</h2>
+            <p className="text-xs text-slate-500">{queues.length} queues monitored</p>
+          </div>
+        </div>
+        {urgentCount > 0 && (
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-100 text-rose-700">{urgentCount} need attention</span>
+        )}
       </div>
       <div className="divide-y divide-slate-100">
-        {queues.map((q) => (
-          <Link key={q.label} href={q.href} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 group transition-colors">
-            <div>
-              <p className="text-sm font-medium text-slate-900">{q.label}</p>
-              <p className="text-xs text-slate-500 mt-0.5">{q.context}</p>
-            </div>
-            <div className="flex items-center gap-3 flex-shrink-0 ml-4">
-              <span className={`text-lg font-black tabular-nums ${q.urgent ? "text-rose-600" : "text-slate-400"}`}>{q.count}</span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-600 transition-colors" />
-            </div>
-          </Link>
-        ))}
+        {queues.map((q) => {
+          const colorMap: Record<string, { bg: string; text: string; dot: string }> = {
+            blue: { bg: 'hover:bg-blue-50', text: 'text-blue-600', dot: 'bg-blue-500' },
+            amber: { bg: 'hover:bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-500' },
+            purple: { bg: 'hover:bg-purple-50', text: 'text-purple-600', dot: 'bg-purple-500' },
+            emerald: { bg: 'hover:bg-emerald-50', text: 'text-emerald-600', dot: 'bg-emerald-500' },
+            pink: { bg: 'hover:bg-pink-50', text: 'text-pink-600', dot: 'bg-pink-500' },
+            cyan: { bg: 'hover:bg-cyan-50', text: 'text-cyan-600', dot: 'bg-cyan-500' },
+          };
+          const c = colorMap[q.color] || colorMap.blue;
+          return (
+            <Link key={q.label} href={q.href} className={`flex items-center justify-between px-5 sm:px-6 py-4 ${c.bg} group transition-colors`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-2 h-2 rounded-full ${c.dot} ${q.urgent ? 'animate-pulse' : ''}`} />
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">{q.label}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{q.context}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+                <span className={`text-xl font-black tabular-nums ${q.urgent ? c.text : "text-slate-300"}`}>{q.count}</span>
+                <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-slate-600 group-hover:translate-x-1 transition-all" />
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
@@ -385,28 +444,35 @@ function ReviewQueues({ data }: { data: AdminDashboardData }) {
 
 function CrmFollowUpQueue({ leads }: { leads: StaleLeadItem[] }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white mb-6">
-      <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-slate-500" />
-          <h2 className="font-bold text-slate-900">Follow-Up Queue</h2>
-          {leads.length > 0 && (
-            <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">{leads.length}</span>
-          )}
+    <div className="rounded-2xl border border-slate-200 bg-white mb-6 overflow-hidden shadow-sm">
+      <div className="px-5 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+            <TrendingUp className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="font-bold text-slate-900">Follow-Up Queue</h2>
+            <p className="text-xs text-slate-500">Leads needing follow-up</p>
+          </div>
         </div>
-        <Link href="/admin/crm/leads" className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
-          View all <ArrowRight className="w-3 h-3" />
-        </Link>
+        {leads.length > 0 && (
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-orange-100 text-orange-700">{leads.length} leads</span>
+        )}
       </div>
       {leads.length === 0 ? (
-        <Empty message="No CRM follow-ups need attention today." />
+        <div className="px-5 sm:px-6 py-8 text-center">
+          <p className="text-sm text-slate-500">No CRM follow-ups need attention today.</p>
+        </div>
       ) : (
         <div className="divide-y divide-slate-100">
           {leads.map((lead) => (
-            <div key={lead.id} className="flex items-center justify-between px-4 sm:px-6 py-3 hover:bg-slate-50 transition-colors">
+            <div key={lead.id} className="flex items-center justify-between px-5 sm:px-6 py-3 hover:bg-slate-50 transition-colors">
               <Link href={lead.href} className="min-w-0 flex-1 group">
                 <p className="text-sm font-semibold text-slate-900 truncate">{lead.name ?? "Unknown lead"}</p>
-                <p className="text-xs text-slate-500">{lead.status ?? "No status"}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{lead.status ?? "No status"}</span>
+                  <span className="text-xs text-slate-400">{lead.days_stale}d stale</span>
+                </div>
               </Link>
               <div className="flex items-center gap-2 flex-shrink-0 ml-4">
                 <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">{lead.days_stale}d no activity</span>
@@ -420,29 +486,77 @@ function CrmFollowUpQueue({ leads }: { leads: StaleLeadItem[] }) {
   );
 }
 
+function LearnersNeedingAttention({ learners }: { learners: InactiveLearner[] }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white mb-6 overflow-hidden shadow-sm">
+      <div className="px-5 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg">
+            <Users className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="font-bold text-slate-900">Learners Needing Attention</h2>
+            <p className="text-xs text-slate-500">Inactive or at-risk learners</p>
+          </div>
+        </div>
+        {learners.length > 0 && (
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700">{learners.length} learners</span>
+        )}
+      </div>
+      {learners.length === 0 ? (
+        <div className="px-5 sm:px-6 py-8 text-center">
+          <p className="text-sm text-slate-500">No learners currently need intervention.</p>
+        </div>
+      ) : (
+        <div className="divide-y divide-slate-100">
+          {learners.slice(0, 6).map((l) => (
+            <div key={l.enrollmentId} className="flex items-center justify-between px-5 sm:px-6 py-3 hover:bg-slate-50 transition-colors">
+              <Link href={l.href} className="min-w-0 flex-1 group">
+                <p className="text-sm font-semibold text-slate-900 truncate">{l.fullName ?? l.email ?? "Unknown learner"}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-slate-500 truncate">{l.programTitle ?? "Unknown program"}</span>
+                </div>
+              </Link>
+              <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Inactive {l.daysInactive}d</span>
+                <LearnerActionButtons
+                  studentId={l.userId}
+                  enrollmentId={l.enrollmentId}
+                  studentName={l.fullName ?? l.email ?? "learner"}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function RecentStudentsPanel({ students }: { students: import('./types').RecentStudent[] }) {
   if (!students.length) return null;
   return (
-    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-      <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+      <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
         <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-slate-500" />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
+            <Users className="w-4 h-4 text-white" />
+          </div>
           <h2 className="font-bold text-slate-900 text-sm">Recent Students</h2>
         </div>
         <Link href="/admin/students" className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
           View all <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
-      <div className="divide-y divide-slate-50">
+      <div className="divide-y divide-slate-100">
         {students.slice(0, 5).map(s => (
-          <Link key={s.id} href={s.href} className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 transition-colors">
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-slate-900 truncate">{s.full_name ?? s.email ?? String(s.id).slice(0, 8)}</p>
-              <p className="text-xs text-slate-400 truncate">{s.program_name ?? 'No program'}</p>
+          <Link key={s.id} href={s.href} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-slate-900 truncate">{s.full_name ?? s.email ?? String(s.id).slice(0, 8)}</p>
+              <p className="text-xs text-slate-500 truncate">{s.program_name ?? 'No program'}</p>
             </div>
             {s.enrollment_status && (
-              <span className={`ml-2 flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${
+              <span className={`ml-2 flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded-full ${
                 s.enrollment_status === 'active' ? 'bg-emerald-100 text-emerald-700' :
                 s.enrollment_status === 'completed' ? 'bg-purple-100 text-purple-700' :
                 'bg-slate-100 text-slate-600'
@@ -458,16 +572,18 @@ function RecentStudentsPanel({ students }: { students: import('./types').RecentS
 function RecentActivity({ items }: { items: { id: string; title: string; timestamp: string }[] }) {
   if (items.length === 0) return null;
   return (
-    <div className="rounded-xl border border-slate-200 bg-white mb-6">
-      <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex items-center gap-2">
-        <Activity className="w-4 h-4 text-slate-500" />
-        <h2 className="font-bold text-slate-900">Recent Activity</h2>
+    <div className="rounded-2xl border border-slate-200 bg-white mb-6 overflow-hidden shadow-sm">
+      <div className="px-5 py-3 border-b border-slate-100 flex items-center gap-3 bg-gradient-to-r from-slate-50 to-white">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+          <Activity className="w-4 h-4 text-white" />
+        </div>
+        <h2 className="font-bold text-slate-900 text-sm">Recent Activity</h2>
       </div>
       <div className="divide-y divide-slate-100">
         {items.slice(0, 8).map((item) => (
-          <div key={item.id} className="flex items-center justify-between px-4 sm:px-6 py-3">
+          <div key={item.id} className="flex items-center justify-between px-5 py-3 hover:bg-slate-50 transition-colors">
             <p className="text-sm text-slate-700 truncate flex-1">{item.title}</p>
-            <p className="text-xs text-slate-400 flex-shrink-0 ml-4">{relativeTime(item.timestamp)}</p>
+            <p className="text-xs text-slate-400 flex-shrink-0 ml-4 bg-slate-100 px-2 py-0.5 rounded-full">{relativeTime(item.timestamp)}</p>
           </div>
         ))}
       </div>
@@ -491,21 +607,42 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
 
   return (
     <div className="pb-16">
-      <div
-        className="relative w-full h-32 sm:h-40 overflow-hidden rounded-2xl mb-6 bg-slate-100 border border-slate-200"
-        aria-hidden="true"
-      />
+      {/* Premium Hero Header */}
+      <div className="relative w-full overflow-hidden rounded-2xl mb-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700 shadow-2xl">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 25% 25%, #f97316 0%, transparent 50%),
+                             radial-gradient(circle at 75% 75%, #2563eb 0%, transparent 50%)`,
+          }} />
+        </div>
+        <div className="relative px-6 sm:px-8 py-8 sm:py-10">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Live Dashboard</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-black text-white mb-1">
+                <AdminGreeting name={firstName} />
+              </h1>
+              <p className="text-slate-400 text-sm">{today}</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
+                <p className="text-xs text-slate-400 mb-0.5">Pending Applications</p>
+                <p className="text-xl font-black text-white">{data.counts?.pendingApplications ?? 0}</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/10">
+                <p className="text-xs text-slate-400 mb-0.5">Active Enrollments</p>
+                <p className="text-xl font-black text-emerald-400">{data.counts?.activeEnrollments ?? 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="pt-2">
 
-        {/* Header */}
-        <div className="mb-6">
-          <p className="text-sm text-slate-500 mb-0.5" suppressHydrationWarning>
-            <AdminGreeting name={firstName} /> · {today}
-          </p>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900">Admin Dashboard</h1>
-          <p className="text-slate-500 text-sm mt-1">Monitor operations, learner progress, compliance, and revenue.</p>
-        </div>
         {/* Quick-action strip — mobile only. Desktop has the full nav bar. */}
         <div className="md:hidden flex gap-2 overflow-x-auto pb-2 mb-6 -mx-4 px-4 scrollbar-none">
           <Link href="/admin/applications?status=submitted,pending,in_review,pending_admin_review" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-slate-900 text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors">Review Applications</Link>

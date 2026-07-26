@@ -463,6 +463,7 @@ async function _POST(req: Request) {
           status: 'submitted',
           source: body.source || 'website',
           contact_preference: body.preferredContact || 'phone',
+          reference_number: referenceNumber, // CRITICAL: include ref number so email has it
         })
         .select()
         .maybeSingle();

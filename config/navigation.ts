@@ -72,6 +72,7 @@ export const headerNav: NavSection[] = [
     items: [
       { label: 'Help Center', href: '/help' },
       { label: 'Career Services', href: '/career-services' },
+      { label: 'Videos', href: '/videos' },
       { label: 'FAQs', href: '/faq' },
       { label: 'Contact', href: '/contact' },
     ],
@@ -83,6 +84,7 @@ export const headerNav: NavSection[] = [
       { label: 'About Us', href: '/about' },
       { label: 'Our Team', href: '/team' },
       { label: 'Platform', href: '/platform' },
+      { label: 'Features', href: '/features' },
       { label: 'Pricing', href: '/pricing' },
     ],
   },

@@ -724,6 +724,14 @@ const nextConfig = {
         source: '/_next/static/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
+      // Server action chunks - prevent caching to fix "Failed to find Server Action" errors
+      {
+        source: '/_next/server/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, max-age=0, must-revalidate' },
+          { key: 'Pragma', value: 'no-cache' },
+        ],
+      },
       {
         source: '/_next/image',
         headers: [

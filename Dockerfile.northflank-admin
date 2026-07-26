@@ -87,6 +87,10 @@ RUN echo "=== ADMIN BUILD VERIFICATION ===" && \
 # =============================================================================
 FROM node:22-bookworm-slim AS runner
 
+# Declare build args for runtime stage
+ARG GIT_SHA=unknown
+ARG BUILD_TIMESTAMP=unknown
+
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0

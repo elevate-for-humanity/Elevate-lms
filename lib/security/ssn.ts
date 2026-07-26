@@ -3,8 +3,9 @@ import { logger } from '@/lib/logger';
 
 const SSN_SALT = process.env.SSN_SALT;
 
-if (!SSN_SALT && typeof window === 'undefined') {
-  logger.error('SSN_SALT environment variable is not set. SSN hashing will fail.');
+// Only warn in server-side code (not during build)
+if (!SSN_SALT && typeof window === 'undefined' && process.env.NODE_ENV === 'production') {
+  logger.warn('SSN_SALT environment variable is not set. SSN hashing will fail in production.');
 }
 
 /**

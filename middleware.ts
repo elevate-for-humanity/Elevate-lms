@@ -323,11 +323,22 @@ export async function middleware(request: NextRequest) {
   // =============================================================================
 
   if (isAdminPath(pathname)) {
-    // Add request headers for admin routes
+    // Set a cookie as a reliable fallback for server components that can't
+    // read Edge middleware headers in standalone Node.js deployments.
+    const response = NextResponse.next();
+    response.cookies.set('__efh_pathname', pathname, {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60,
+    });
+
+    // Also set request headers for Edge-compatible header-based passing.
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-pathname', pathname);
     requestHeaders.set('x-host', host);
-    
+
     return addSecurityHeaders(
       NextResponse.next({ request: { headers: requestHeaders } })
     );

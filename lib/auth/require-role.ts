@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
 
 export interface AuthResult {
@@ -22,8 +22,50 @@ export interface AuthResult {
 }
 
 /**
+ * Resolve the current request pathname for post-login redirect.
+ *
+ * Priority:
+ *  1. x-pathname header  — set by middleware (works in Edge runtime)
+ *  2. __efh_pathname cookie — set by middleware as fallback for standalone
+ *                             Node.js deployments where headers() doesn't
+ *                             carry Edge-set custom headers to server components
+ *  3. ''                 — no usable path; caller must handle
+ */
+async function resolveCurrentPath(): Promise<string> {
+  const headersList = await headers();
+  const fromHeader =
+    headersList.get('x-pathname') ||
+    headersList.get('x-url') ||
+    headersList.get('x-invoke-path') ||
+    '';
+
+  if (fromHeader) {
+    try {
+      const u = new URL(fromHeader, 'http://localhost');
+      return u.pathname + (u.search || '');
+    } catch {
+      // malformed URL — fall through to cookie
+    }
+  }
+
+  // Cookie fallback: set by middleware for standalone Node.js runtimes
+  // where Edge headers() are not propagated to server components.
+  try {
+    const cookieStore = await cookies();
+    const cookie = cookieStore.get('__efh_pathname');
+    if (cookie?.value) {
+      return cookie.value;
+    }
+  } catch {
+    // cookies() throws during static prerender
+  }
+
+  return '';
+}
+
+/**
  * Require user to have one of the specified roles.
- * Redirects to /login?redirect=<current-path> if not authenticated.
+ * Redirects to /admin-login?redirect=<current-path> if not authenticated.
  * Redirects to /unauthorized if authenticated but wrong role.
  */
 export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
@@ -33,27 +75,12 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    // Attempt to preserve the requested path for post-login redirect.
-    // In standalone deployments the Edge middleware may not be active, so this
-    // header is often absent.  When that happens we fall back to /admin-login
-    // (the unified login entry that handles all role types).
-    const headersList = await headers();
-    const rawUrl =
-      headersList.get('x-pathname') ||
-      headersList.get('x-url') ||
-      headersList.get('x-invoke-path') ||
-      '';
+    const currentPath = await resolveCurrentPath();
 
-    if (rawUrl) {
-      try {
-        const u = new URL(rawUrl, 'http://localhost');
-        const returnPath = u.pathname + (u.search || '');
-        redirect(`/admin-login?redirect=${encodeURIComponent(returnPath)}`);
-      } catch {
-        // malformed URL — fall through to default
-      }
+    if (currentPath) {
+      redirect(`/admin-login?redirect=${encodeURIComponent(currentPath)}`);
     }
-    // No usable path header; send to the unified marketing login entry.
+    // No usable path; send to the unified marketing login entry.
     redirect('/admin-login');
   }
 

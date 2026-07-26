@@ -14,7 +14,7 @@
  */
 
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
@@ -47,8 +47,11 @@ export type AuthUser = {
 };
 
 /**
- * Resolves the current path from headers set by proxy.ts.
+ * Resolves the current path from middleware-set headers or cookie.
  * Falls back to /login if the path cannot be determined.
+ *
+ * In standalone Node.js deployments, Edge middleware custom headers are not
+ * reliably propagated to server components, so a cookie is used as fallback.
  */
 async function currentPath(): Promise<string> {
   const headersList = await headers();
@@ -57,13 +60,25 @@ async function currentPath(): Promise<string> {
     headersList.get('x-url') ||
     headersList.get('x-invoke-path') ||
     '';
-  if (!raw) return '/login';
-  try {
-    const u = new URL(raw, 'http://localhost');
-    return u.pathname + (u.search || '');
-  } catch {
-    return '/login';
+  if (raw) {
+    try {
+      const u = new URL(raw, 'http://localhost');
+      return u.pathname + (u.search || '');
+    } catch {
+      // malformed URL — fall through to cookie
+    }
   }
+
+  // Cookie fallback for standalone Node.js runtimes
+  try {
+    const cookieStore = await cookies();
+    const cookie = cookieStore.get('__efh_pathname');
+    if (cookie?.value) return cookie.value;
+  } catch {
+    // cookies() throws during static prerender
+  }
+
+  return '/login';
 }
 
 export async function requireUser(options?: {

@@ -18,9 +18,13 @@ export default async function EmployerLayout({ children }: { children: React.Rea
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    const { headers: headersList } = await import('next/headers');
+    const [{ headers: headersList }, { cookies }] = await Promise.all([
+      import('next/headers'),
+      import('next/headers'),
+    ]);
     const headers = await headersList();
-    const pathname = headers.get('x-pathname') || '/employer';
+    const cookieStore = await cookies();
+    const pathname = headers.get('x-pathname') || cookieStore.get('__efh_pathname')?.value || '/employer';
     redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
   }
 
@@ -30,9 +34,13 @@ export default async function EmployerLayout({ children }: { children: React.Rea
     .eq('id', user.id)
     .maybeSingle();
 
-  const { headers: headersList } = await import('next/headers');
+  const [{ headers: headersList }, { cookies }] = await Promise.all([
+    import('next/headers'),
+    import('next/headers'),
+  ]);
   const headers = await headersList();
-  const pathname = headers.get('x-pathname') || '/employer';
+  const cookieStore = await cookies();
+  const pathname = headers.get('x-pathname') || cookieStore.get('__efh_pathname')?.value || '/employer';
   const breadcrumbs = generateBreadcrumbs(pathname);
 
   return (

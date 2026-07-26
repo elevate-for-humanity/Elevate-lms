@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 // =====================================================
@@ -40,6 +40,44 @@ export interface AuthGuardResult {
 // =====================================================
 
 /**
+ * Resolve the current request pathname for post-login redirect.
+ * In standalone Node.js deployments, Edge middleware custom headers are not
+ * reliably propagated to server components, so a cookie is used as fallback.
+ */
+async function resolveCurrentPath(): Promise<string> {
+  const headersList = await headers();
+  const rawUrl =
+    headersList.get('x-pathname') ||
+    headersList.get('x-url') ||
+    headersList.get('x-invoke-path') ||
+    headersList.get('referer') ||
+    '';
+
+  if (rawUrl) {
+    try {
+      const u = new URL(rawUrl, 'http://localhost');
+      const returnPath = u.pathname + (u.search || '');
+      if (returnPath) return returnPath;
+    } catch {
+      // fall through to cookie
+    }
+  }
+
+  // Cookie fallback for standalone Node.js runtimes
+  try {
+    const cookieStore = await cookies();
+    const cookie = cookieStore.get('__efh_pathname');
+    if (cookie?.value) return cookie.value;
+  } catch {
+    // cookies() throws during static prerender
+  }
+
+  return '';
+}
+
+
+
+/**
  * Comprehensive authentication guard for server components
  */
 export async function authGuard(options: AuthGuardOptions = {}): Promise<AuthGuardResult> {
@@ -59,27 +97,11 @@ export async function authGuard(options: AuthGuardOptions = {}): Promise<AuthGua
   // Check if authentication is required
   if (requireAuth && (!user || error)) {
     // Preserve the current path so login can return the user here.
-    // Only append ?redirect= when redirectTo is the login page and no path
-    // is already encoded in it (avoids double-encoding on custom redirectTo values).
     let destination = redirectTo;
     if (redirectTo === '/login') {
-      try {
-        const headersList = await headers();
-        const rawUrl =
-          headersList.get('x-pathname') ||
-          headersList.get('x-url') ||
-          headersList.get('x-invoke-path') ||
-          headersList.get('referer') ||
-          '';
-        if (rawUrl) {
-          const u = new URL(rawUrl, 'http://localhost');
-          const returnPath = u.pathname + (u.search || '');
-          if (returnPath && returnPath !== '/login') {
-            destination = `/login?redirect=${encodeURIComponent(returnPath)}`;
-          }
-        }
-      } catch {
-        // headers() not available in this context (e.g. API route) — use plain /login
+      const currentPath = await resolveCurrentPath();
+      if (currentPath && currentPath !== '/login') {
+        destination = `/login?redirect=${encodeURIComponent(currentPath)}`;
       }
     }
     redirect(destination);

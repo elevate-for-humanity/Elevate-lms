@@ -2,7 +2,7 @@
 // Unified route guards for all authenticated routes
 
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 import type { UserRole } from '@/lib/navigation/navigation-config';
 
 // Allowed roles for each portal
@@ -147,6 +147,34 @@ export function normalizeRole(role: string): string {
   return roleMap[role] || role;
 }
 
+
+/**
+ * Resolve the current request pathname for post-login redirect.
+ * In standalone Node.js deployments, Edge middleware custom headers are not
+ * reliably propagated to server components, so a cookie is used as fallback.
+ */
+async function resolveCurrentPath(): Promise<string> {
+  const headersList = await headers();
+  const raw = headersList.get('x-pathname') || '';
+  if (raw) {
+    try {
+      const u = new URL(raw, 'http://localhost');
+      return u.pathname + (u.search || '');
+    } catch {
+      // fall through to cookie
+    }
+  }
+  // Cookie fallback for standalone Node.js runtimes
+  try {
+    const cookieStore = await cookies();
+    const cookie = cookieStore.get('__efh_pathname');
+    if (cookie?.value) return cookie.value;
+  } catch {
+    // cookies() throws during static prerender
+  }
+  return '/';
+}
+
 /**
  * Require authentication - redirects to login if not authenticated
  */
@@ -160,8 +188,7 @@ export async function requireAuth() {
   } = await supabase.auth.getUser();
   
   if (error || !user) {
-    const headersList = await headers();
-    const pathname = headersList.get('x-pathname') || '/';
+    const pathname = await resolveCurrentPath();
     redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
   }
   
@@ -198,8 +225,7 @@ export async function requireRoles(allowedRoles: string[]) {
 export async function requirePortalAccess() {
   const user = await requireAuth();
   
-  const headersList = await headers();
-  const pathname = headersList.get('x-pathname') || '/';
+  const pathname = await resolveCurrentPath();
   
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();

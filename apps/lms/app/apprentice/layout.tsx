@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { ApprenticeSubNav } from '@/components/portal/ApprenticeSubNav';
 import { resolveApprenticeNavConfig } from '@/lib/portal/apprentice-nav-config';
@@ -23,7 +23,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
   if (!user) {
     const h = await headers();
-    const pathname = h.get('x-pathname') ?? '/apprentice';
+    const pathname = h.get('x-pathname') || (await cookies()).get('__efh_pathname')?.value || '/apprentice';
     redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
   }
 
@@ -37,7 +37,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const nav = resolveApprenticeNavConfig(programSlug);
 
   const h = await headers();
-  const pathname = h.get('x-pathname') ?? '/apprentice';
+  const pathname = h.get('x-pathname') || (await cookies()).get('__efh_pathname')?.value || '/apprentice';
   const breadcrumbs = generateBreadcrumbs(pathname).map(crumb => {
     if (crumb.label === 'Apprentice') {
       return { label: 'Apprentice Portal', href: crumb.href };

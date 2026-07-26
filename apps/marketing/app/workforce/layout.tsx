@@ -36,9 +36,13 @@ export default async function WorkforceLayout({ children }: { children: React.Re
   }
 
   // Get pathname for breadcrumbs
-  const { headers: headersList } = await import('next/headers');
+  const [{ headers: headersList }, { cookies }] = await Promise.all([
+    import('next/headers'),
+    import('next/headers'),
+  ]);
   const headers = await headersList();
-  const pathname = headers.get('x-pathname') || '/workforce';
+  const cookieStore = await cookies();
+  const pathname = headers.get('x-pathname') || cookieStore.get('__efh_pathname')?.value || '/workforce';
   const breadcrumbs = generateBreadcrumbs(pathname);
 
   return (

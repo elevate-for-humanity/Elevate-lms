@@ -3,6 +3,7 @@ import './globals.css';
 import './layout.css';
 import Header from '@/components/site/Header';
 import { SiteFooter } from '@/components/site-footer';
+import { I18nProvider } from '@/lib/i18n/context';
 
 export const metadata: Metadata = {
   title: { default: 'Elevate for Humanity', template: '%s | Elevate for Humanity' },
@@ -24,9 +25,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <Header />
-        <main className="pt-[60px]">{children}</main>
-        <SiteFooter />
+        <I18nProvider>
+          <Header />
+          <main className="pt-[60px]">{children}</main>
+          <SiteFooter />
+        </I18nProvider>
       </body>
     </html>
   );

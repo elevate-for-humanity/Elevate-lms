@@ -63,7 +63,7 @@ export default function Page() {
                 <li>• Esthetics</li>
                 <li>• Nail Technology</li>
               </ul>
-              <Link href="/programs/beauty" className="text-pink-600 font-semibold hover:text-pink-700">View Beauty Programs →</Link>
+              <Link href="/barber-and-beauty-apprenticeships" className="text-pink-600 font-semibold hover:text-pink-700">View Beauty Programs →</Link>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-6 border-t-4 border-amber-500">

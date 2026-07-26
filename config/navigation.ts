@@ -42,6 +42,15 @@ export const headerNav: NavSection[] = [
   {
     label: 'Programs',
     href: '/programs',
+    items: [
+      { label: 'All Programs', href: '/programs' },
+      { label: 'Healthcare', href: '/programs/healthcare' },
+      { label: 'Skilled Trades', href: '/programs/skilled-trades' },
+      { label: 'Beauty & Cosmetology', href: '/barber-and-beauty-apprenticeships' },
+      { label: 'Technology', href: '/programs/technology' },
+      { label: 'Business', href: '/programs/business' },
+      { label: 'Apprenticeships', href: '/barber-and-beauty-apprenticeships' },
+    ],
   },
   {
     label: 'Funding',

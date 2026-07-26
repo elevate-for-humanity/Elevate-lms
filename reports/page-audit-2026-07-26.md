@@ -7,31 +7,48 @@
 - `pages` - EMPTY for these routes
 - `marketing_pages` - EMPTY
 - `website_pages` - EMPTY
-- `site_content` - EMPTY for these routes
-- `apprenticeship_programs` - **HAS DATA** (slugs found)
+- `site_content` - EMPTY
+- `apprenticeship_programs` - **HAS DATA**
 
 ---
 
-## 1. MISSING ROUTES (Linked but DO NOT EXIST)
+## 1. NAVIGATION STRUCTURE (Fixed)
 
-| Route | Referenced In | Supabase | Action |
-|-------|---------------|----------|--------|
-| `/programs/beauty` | Footer, Industries | `beauty-career-educator` in DB | CREATE page |
-| `/programs/business-financial` | Footer | NOT FOUND | Create page or remove link |
-| `/student-portal` | Footer | NOT FOUND | Create page or remove link |
-| `/lms` | Footer | NOT FOUND | Create page or remove link |
-| `/community` | Footer | NOT FOUND | Create page or remove link |
-| `/marketplace` | Footer | NOT FOUND | Create page or remove link |
+### HEADER NAVIGATION (Programs Section):
+```
+Programs/
+├── All Programs -> /programs
+├── Healthcare -> /programs/healthcare
+├── Skilled Trades -> /programs/skilled-trades
+├── Beauty & Cosmetology -> /barber-and-beauty-apprenticeships
+├── Technology -> /programs/technology
+├── Business -> /programs/business
+└── Apprenticeships -> /barber-and-beauty-apprenticeships
+```
+
+### FOOTER (Cleaned - only general links):
+```
+Resources: Funding Options, Testing Center, Apprenticeship, Career Services
+Company: About Us, Contact, Partners, Employers
+Legal: Privacy Policy, Terms of Service, Accessibility, Student Handbook
+```
+
+### PORTALS (Separate section in nav):
+```
+Portals/
+├── All Portals -> /portals
+├── Student Portal -> /lms/dashboard
+├── Admin Portal -> /admin
+├── Partner Portal -> /partner/dashboard
+└── ...
+```
 
 ---
 
-## 2. APPRENTICESHIP PROGRAMS IN DATABASE (Active)
+## 2. PAGES THAT EXIST IN /programs/ (from apprenticeship_programs DB):
 
 | DB Slug | Page Route | File Status |
 |---------|-----------|-------------|
-| `electrical` | /programs/electrical | STUB (6 lines) |
-| `plumbing` | /programs/plumbing | STUB (6 lines) |
-| `beauty-career-educator` | /programs/beauty | MISSING PAGE |
 | `barber-apprenticeship` | /programs/barber-apprenticeship | EXISTS |
 | `cosmetology-apprenticeship` | /programs/cosmetology-apprenticeship | EXISTS |
 | `esthetician-apprenticeship` | /programs/esthetician-apprenticeship | EXISTS |
@@ -39,56 +56,45 @@
 | `hvac-technician` | /programs/hvac-technician | EXISTS |
 | `medical-assistant` | /programs/medical-assistant | EXISTS |
 | `cna` | /programs/cna | EXISTS |
+| `electrical` | /programs/electrical | STUB (6 lines) |
+| `plumbing` | /programs/plumbing | STUB (6 lines) |
+| `beauty-career-educator` | USE /barber-and-beauty-apprenticeships | EXISTS |
 
 ---
 
-## 3. STUB PAGES vs DATABASE
+## 3. STUBS TO FIX CONTENT:
 
-| Stub Page | Lines | Supabase | Recommendation |
-|-----------|-------|----------|----------------|
-| `programs/electrical` | 6 | `electrical` EXISTS | FIX CONTENT |
-| `programs/plumbing` | 6 | `plumbing` EXISTS | FIX CONTENT |
-| `healthcare` (root) | 7 | `cna` EXISTS | DELETE duplicate |
-| `career-training-indiana` | 7 | NOT FOUND | DELETE stub |
-| `case-manager` | 7 | NOT FOUND | DELETE stub |
-| `community-services-indiana` | 7 | NOT FOUND | DELETE stub |
-| `launch` | 7 | NOT FOUND | DELETE stub |
-| `partner` | 7 | NOT FOUND | DELETE stub |
-| `program-holder/*` | 7-10 | NOT FOUND | DELETE stubs |
-| `partners/barbershop-apprenticeship/*` | 9 | NOT FOUND | DELETE stubs |
-| `portal/page.tsx` | 9 | NOT FOUND | DELETE stub |
+| Stub Page | Lines | Action |
+|-----------|-------|--------|
+| `/programs/electrical` | 6 | FIX CONTENT |
+| `/programs/plumbing` | 6 | FIX CONTENT |
+| `/programs/technology` | 38 | FIX CONTENT |
+| `/programs/healthcare` | EXISTS | OK |
+| `/programs/skilled-trades` | EXISTS | OK |
 
 ---
 
-## 4. DELETE THESE (No DB data, Stub content):
+## 4. DELETE THESE STUBS (No DB data):
 
-- [ ] `apps/marketing/app/healthcare/` (duplicate of programs/healthcare)
+- [ ] `apps/marketing/app/healthcare/` (DUPLICATE - /programs/healthcare exists)
 - [ ] `apps/marketing/app/career-training-indiana/`
 - [ ] `apps/marketing/app/case-manager/`
 - [ ] `apps/marketing/app/community-services-indiana/`
 - [ ] `apps/marketing/app/launch/`
-- [ ] `apps/marketing/app/partner/`
-- [ ] `apps/marketing/app/program-holder/`
-- [ ] `apps/marketing/app/partners/barbershop-apprenticeship/`
+- [ ] `apps/marketing/app/partner/` (use /partners)
+- [ ] `apps/marketing/app/program-holder/` (stubs)
+- [ ] `apps/marketing/app/partners/barbershop-apprenticeship/` (stubs)
 - [ ] `apps/marketing/app/portal/page.tsx`
-
-## 5. FIX CONTENT (Has DB data):
-
-- [ ] `apps/marketing/app/programs/electrical/page.tsx`
-- [ ] `apps/marketing/app/programs/plumbing/page.tsx`
-- [ ] `apps/marketing/app/programs/technology/page.tsx` (38 lines)
-- [ ] `apps/marketing/app/wioa-eligibility/page.tsx` (28 lines)
-- [ ] `apps/marketing/app/terms/page.tsx` (14 lines)
-
-## 6. CREATE PAGES:
-
-- [ ] `apps/marketing/app/programs/beauty/page.tsx`
-- [ ] `apps/marketing/app/programs/business-financial/page.tsx`
-- [ ] `apps/marketing/app/student-portal/page.tsx`
-- [ ] `apps/marketing/app/lms/page.tsx`
-- [ ] `apps/marketing/app/community/page.tsx`
-- [ ] `apps/marketing/app/marketplace/page.tsx`
+- [ ] `apps/marketing/app/connect/`
 
 ---
 
-Generated: 2026-07-26 - Updated with Supabase Analysis
+## 5. FILES UPDATED:
+
+- [x] `components/shared/PlatformFooter.tsx` - Removed program links from footer
+- [x] `apps/marketing/app/industries/page.tsx` - Updated beauty link
+- [x] `config/navigation.ts` - Added Programs dropdown with all categories
+
+---
+
+Generated: 2026-07-26 - Updated with Navigation Fix

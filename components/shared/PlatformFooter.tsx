@@ -1,24 +1,15 @@
 import Link from 'next/link';
 
 const footerLinks = {
-  programs: [
-    { label: 'Healthcare', href: '/programs/healthcare' },
-    { label: 'Trades', href: '/programs/trades' },
-    { label: 'Beauty', href: '/programs/beauty' },
-    { label: 'Technology', href: '/programs/technology' },
-    { label: 'All Programs', href: '/programs' },
-  ],
   resources: [
     { label: 'Funding Options', href: '/funding' },
     { label: 'Testing Center', href: '/testing' },
-    { label: 'Student Portal', href: '/lms/dashboard' },
-    { label: 'Apprenticeship', href: '/apprenticeship' },
-    { label: 'Career Services', href: '/careers' },
+    { label: 'Apprenticeship', href: '/barber-and-beauty-apprenticeships' },
+    { label: 'Career Services', href: '/career-services' },
   ],
   company: [
     { label: 'About Us', href: '/about' },
     { label: 'Contact', href: '/contact' },
-    { label: 'Blog', href: '/blog' },
     { label: 'Partners', href: '/partners' },
     { label: 'Employers', href: '/employers' },
   ],

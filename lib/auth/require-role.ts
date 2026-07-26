@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
+import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
 
 export interface AuthResult {
   user: {
@@ -39,13 +40,15 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
       headersList.get('x-url') ||
       headersList.get('x-invoke-path') ||
       '';
-    let returnPath = '/learner/dashboard';
+    // Default redirect: /admin-login (the marketing login page that handles all roles).
+    // This is the entry point for all authenticated portals.
+    let returnPath = '/admin-login';
     if (rawUrl) {
       try {
         const u = new URL(rawUrl, 'http://localhost');
         returnPath = u.pathname + (u.search || '');
       } catch {
-        // malformed — use default
+        // malformed — use default from DashboardResolver
       }
     }
     // Always use relative /login and /unauthorized — middleware handles cross-domain routing.

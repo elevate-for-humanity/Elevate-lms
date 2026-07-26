@@ -1,20 +1,25 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { PortalRouter, PORTAL_META, type PortalKey } from '@/lib/routing/portal-router';
 import {
-  GraduationCap,
-  Shield,
-  Handshake,
-  Briefcase,
-  Users,
-  Building2,
-  Crown,
-  ClipboardList,
-  UserCheck,
-  Home,
-  Palette,
-  Scissors,
-  Wrench,
-  Heart,
+  GraduationCap, Shield, Handshake, Briefcase, Users,
+  Building2, Crown, ClipboardList, UserCheck, Home,
+  Palette, Scissors, Wrench, Heart,
+} from 'lucide-react';
+import {
+  GraduationCap as GradCap,
+  Shield as ShieldAlt,
+  Handshake as HandShake,
+  Briefcase as Brief,
+  Users as UsersAlt,
+  Building2 as BuildingAlt,
+  Crown as CrownAlt,
+  ClipboardList as Clip,
+  UserCheck as User,
+  Palette as PaletteAlt,
+  Scissors as ScissorsAlt,
+  Wrench as WrenchAlt,
+  Heart as HeartAlt,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -24,113 +29,54 @@ export const metadata: Metadata = {
   description: 'Access your personalized portal based on your role.',
 };
 
-const portals = [
-  {
-    title: 'Student Portal',
-    href: '/lms/dashboard',
-    icon: GraduationCap,
-    desc: 'Access courses, assignments, grades, and certificates',
-    color: 'bg-brand-blue-600',
-  },
-  {
-    title: 'Admin Portal',
-    href: '/admin',
-    icon: Shield,
-    desc: 'Platform administration and management',
-    color: 'bg-slate-700',
-  },
-  {
-    title: 'Partner Portal',
-    href: '/partner/dashboard',
-    icon: Handshake,
-    desc: 'Manage partnerships, programs, and host shops',
-    color: 'bg-purple-600',
-  },
-  {
-    title: 'Staff Portal',
-    href: '/admin/staff-portal/dashboard',
-    icon: Users,
-    desc: 'Student management and enrollment support',
-    color: 'bg-emerald-600',
-  },
-  {
-    title: 'Employer Portal',
-    href: '/employer/dashboard',
-    icon: Briefcase,
-    desc: 'Post jobs, manage apprentices, view partnerships',
-    color: 'bg-amber-600',
-  },
-  {
-    title: 'Instructor Portal',
-    href: '/admin/instructor/dashboard',
-    icon: Crown,
-    desc: 'Class management, student progress, and grades',
-    color: 'bg-rose-600',
-  },
-  {
-    title: 'Host Shop Portal',
-    href: '/host-shop/dashboard',
-    icon: Scissors,
-    desc: 'Track apprentices, OJT hours, and competencies',
-    color: 'bg-teal-600',
-  },
-  {
-    title: 'Apprentice Portal',
-    href: '/apprentice',
-    icon: UserCheck,
-    desc: 'Track hours, competencies, and training progress',
-    color: 'bg-orange-600',
-  },
-  {
-    title: 'Workforce Board',
-    href: '/workforce-board/dashboard',
-    icon: Building2,
-    desc: 'Career services, job matching, and placement',
-    color: 'bg-indigo-600',
-  },
-  {
-    title: 'Program Holder Portal',
-    href: '/partner/dashboard',
-    icon: ClipboardList,
-    desc: 'Program management and compliance',
-    color: 'bg-cyan-600',
-  },
-  {
-    title: 'Parent Portal',
-    href: '/parent-portal/dashboard',
-    icon: Heart,
-    desc: 'Track student progress and communications',
-    color: 'bg-pink-600',
-  },
-  {
-    title: 'Case Manager Portal',
-    href: '/case-manager/dashboard',
-    icon: ClipboardList,
-    desc: 'Client case management and referrals',
-    color: 'bg-sky-600',
-  },
-  {
-    title: 'Provider Portal',
-    href: '/provider/dashboard',
-    icon: Building2,
-    desc: 'Training provider management',
-    color: 'bg-lime-600',
-  },
-  {
-    title: 'Workforce Portal',
-    href: '/workforce/dashboard',
-    icon: Wrench,
-    desc: 'Workforce development and job training',
-    color: 'bg-gray-600',
-  },
-  {
-    title: 'Cosmetology Host Shop',
-    href: '/cosmetology-host-shop/dashboard',
-    icon: Palette,
-    desc: 'Cosmetology apprenticeship management',
-    color: 'bg-fuchsia-600',
-  },
+// Portal keys shown on the hub page (in display order)
+const PORTAL_KEYS: PortalKey[] = [
+  'lms',
+  'admin',
+  'employer',
+  'apprentice',
+  'hostshop',
+  'cosmetology',
+  'instructor',
+  'staff',
+  'workforceboard',
+  'casemanager',
+  'provider',
+  'partner',
+  'programholder',
+  'workforce',
+  'parent',
 ];
+
+// Icon map (server components can't use dynamic icon components easily)
+const ICON_MAP: Record<string, React.ElementType> = {
+  GraduationCap: GraduationCap,
+  Shield: Shield,
+  Handshake: Handshake,
+  Briefcase: Brief,
+  Users: UsersAlt,
+  Building2: BuildingAlt,
+  Crown: CrownAlt,
+  ClipboardList: Clip,
+  UserCheck: User,
+  Palette: PaletteAlt,
+  Scissors: ScissorsAlt,
+  Wrench: WrenchAlt,
+  Heart: HeartAlt,
+};
+
+const portals = PORTAL_KEYS.map((key) => {
+  const meta = PORTAL_META[key];
+  const Icon = ICON_MAP[meta.iconName] ?? BuildingAlt;
+  return {
+    key,
+    href: PortalRouter.get(key),
+    icon: Icon,
+    title: meta.label,
+    desc: meta.description,
+    color: meta.colorClass,
+  };
+});
 
 export default function PortalsPage() {
   return (
@@ -149,7 +95,7 @@ export default function PortalsPage() {
               const Icon = portal.icon;
               return (
                 <Link
-                  key={portal.href}
+                  key={portal.key}
                   href={portal.href}
                   className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all group"
                 >

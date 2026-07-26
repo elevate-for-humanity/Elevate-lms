@@ -12,6 +12,7 @@ const nextConfig = {
 
       // ============================================================
       // LMS APP ROUTES — portal routes belong on app. subdomain
+      // IMPORTANT: Must come before any marketing catch-alls for the same prefix.
       // ============================================================
       { source: '/lms/:path*', destination: 'https://app.elevateforhumanity.org/lms/:path*', permanent: false },
       { source: '/employer/:path*', destination: 'https://app.elevateforhumanity.org/employer/:path*', permanent: false },
@@ -19,21 +20,12 @@ const nextConfig = {
       { source: '/parent-portal/:path*', destination: 'https://app.elevateforhumanity.org/parent-portal/:path*', permanent: false },
       { source: '/workforce/:path*', destination: 'https://app.elevateforhumanity.org/workforce/:path*', permanent: false },
       { source: '/cosmetology-host-shop/:path*', destination: 'https://app.elevateforhumanity.org/cosmetology-host-shop/:path*', permanent: false },
-      { source: '/host-shop/dashboard', destination: 'https://app.elevateforhumanity.org/host-shop/dashboard', permanent: false },
+      { source: '/host-shop/:path*', destination: 'https://app.elevateforhumanity.org/host-shop/:path*', permanent: false },
 
-      // ============================================================
-      // MARKETING PAGE ROUTES — routes that exist in marketing app
-      // (no redirect needed, just serving the page)
-      // ============================================================
-      // workforce-board, case-manager, provider, partner, staff, program-holder
-      // all exist in marketing app — no redirect needed.
-
-      // ============================================================
-      // LEGACY ADMIN ALIASES — these redirect WITHIN the admin app
-      // (now captured by /admin/:path* above which routes to admin.)
-      // ============================================================
-      // Note: These are relative redirects that used to be in root next.config.mjs.
-      // Since /admin/* now routes to admin. subdomain, these are handled there.
+      // Partner routes — redirect to LMS app (the LMS app has /partner/dashboard etc.)
+      // The marketing /partner/* catch-all page.tsx is OVERRIDDEN by this redirect.
+      { source: '/partner', destination: 'https://app.elevateforhumanity.org/partner/dashboard', permanent: false },
+      { source: '/partner/:path*', destination: 'https://app.elevateforhumanity.org/partner/:path*', permanent: false },
     ];
   },
 };

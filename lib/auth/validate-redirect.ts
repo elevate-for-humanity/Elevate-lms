@@ -28,8 +28,9 @@ export function readRedirectParam(
 
 const TRUSTED_HOSTS = [
   PLATFORM_DEFAULTS.canonicalDomain,
-  PLATFORM_DEFAULTS.canonicalDomain,
+  'www.elevateforhumanity.org',
   'admin.elevateforhumanity.org',
+  'app.elevateforhumanity.org',
 ];
 
 export function validateRedirect(url: string | null | undefined, fallback: string = '/'): string {

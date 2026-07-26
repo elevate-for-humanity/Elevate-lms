@@ -1,100 +1,144 @@
-# COMPREHENSIVE PAGE AUDIT REPORT WITH SUPABASE ANALYSIS
+# LINE-BY-LINE AUDIT: FOOTER vs HEADER NAVIGATION
+
 ## Date: 2026-07-26
 
 ---
 
-## SUPABASE TABLES CHECKED:
-- `pages` - EMPTY for these routes
-- `marketing_pages` - EMPTY
-- `website_pages` - EMPTY
-- `site_content` - EMPTY
-- `apprenticeship_programs` - **HAS DATA**
+## 1. FOOTER LINKS (PlatformFooter.tsx)
+
+### CURRENT FOOTER:
+```
+resources: ["/funding", "/testing", "/barber-and-beauty-apprenticeships", "/career-services"]
+company: ["/about", "/contact", "/partners", "/employers"]
+legal: ["/privacy", "/terms", "/accessibility", "/handbook"]
+```
+
+### AUDIT RESULTS:
+| Link | Route | Status | Lines |
+|------|-------|--------|-------|
+| Funding Options | /funding | ✅ EXISTS | 2798 |
+| Testing Center | /testing | ✅ EXISTS | 2090 |
+| Apprenticeship | /barber-and-beauty-apprenticeships | ✅ EXISTS | 50 |
+| Career Services | /career-services | ✅ EXISTS | 331 |
+| About Us | /about | ✅ EXISTS | 1622 |
+| Contact | /contact | ✅ EXISTS | 905 |
+| Partners | /partners | ✅ EXISTS | 1191 |
+| Employers | /employers | ✅ EXISTS | 244 |
+| Privacy Policy | /privacy | ✅ EXISTS | 732 |
+| Terms of Service | /terms | ⚠️ STUB | 14 |
+| Accessibility | /accessibility | ✅ EXISTS | 171 |
+| Student Handbook | /handbook | ✅ EXISTS | 198 |
+
+**ISSUE:** /terms is a STUB (14 lines)
 
 ---
 
-## 1. NAVIGATION STRUCTURE (Fixed)
+## 2. HEADER NAVIGATION (config/navigation.ts)
 
-### HEADER NAVIGATION (Programs Section):
-```
-Programs/
-├── All Programs -> /programs
-├── Healthcare -> /programs/healthcare
-├── Skilled Trades -> /programs/skilled-trades
-├── Beauty & Cosmetology -> /barber-and-beauty-apprenticeships
-├── Technology -> /programs/technology
-├── Business -> /programs/business
-└── Apprenticeships -> /barber-and-beauty-apprenticeships
-```
+### SECTION-BY-SECTION AUDIT:
 
-### FOOTER (Cleaned - only general links):
-```
-Resources: Funding Options, Testing Center, Apprenticeship, Career Services
-Company: About Us, Contact, Partners, Employers
-Legal: Privacy Policy, Terms of Service, Accessibility, Student Handbook
-```
-
-### PORTALS (Separate section in nav):
-```
-Portals/
-├── All Portals -> /portals
-├── Student Portal -> /lms/dashboard
-├── Admin Portal -> /admin
-├── Partner Portal -> /partner/dashboard
-└── ...
-```
-
----
-
-## 2. PAGES THAT EXIST IN /programs/ (from apprenticeship_programs DB):
-
-| DB Slug | Page Route | File Status |
-|---------|-----------|-------------|
-| `barber-apprenticeship` | /programs/barber-apprenticeship | EXISTS |
-| `cosmetology-apprenticeship` | /programs/cosmetology-apprenticeship | EXISTS |
-| `esthetician-apprenticeship` | /programs/esthetician-apprenticeship | EXISTS |
-| `nail-technician-apprenticeship` | /programs/nail-technician-apprenticeship | EXISTS |
-| `hvac-technician` | /programs/hvac-technician | EXISTS |
-| `medical-assistant` | /programs/medical-assistant | EXISTS |
-| `cna` | /programs/cna | EXISTS |
-| `electrical` | /programs/electrical | STUB (6 lines) |
-| `plumbing` | /programs/plumbing | STUB (6 lines) |
-| `beauty-career-educator` | USE /barber-and-beauty-apprenticeships | EXISTS |
-
----
-
-## 3. STUBS TO FIX CONTENT:
-
-| Stub Page | Lines | Action |
-|-----------|-------|--------|
-| `/programs/electrical` | 6 | FIX CONTENT |
-| `/programs/plumbing` | 6 | FIX CONTENT |
-| `/programs/technology` | 38 | FIX CONTENT |
-| `/programs/healthcare` | EXISTS | OK |
-| `/programs/skilled-trades` | EXISTS | OK |
+| Section | Link | Route | Status |
+|---------|------|-------|--------|
+| **Testing** | Testing Home | /testing | ✅ EXISTS |
+| | Schedule Exam | /testing/book | ✅ |
+| | Certiport | /testing/certiport | ✅ |
+| | EPA 608 | /testing/epa608 | ✅ |
+| | WorkKeys | /testing/workkeys | ✅ |
+| | NHA | /testing/nha | ✅ |
+| | NRF Rise Up | /testing/riseup | ✅ |
+| | ASE | /testing/ase | ✅ |
+| | Midland | /testing/midland | ✅ |
+| **Programs** | All Programs | /programs | ✅ EXISTS |
+| | Healthcare | /programs/healthcare | ✅ EXISTS |
+| | Skilled Trades | /programs/skilled-trades | ✅ EXISTS |
+| | Beauty & Cosmetology | /barber-and-beauty-apprenticeships | ✅ EXISTS |
+| | Technology | /programs/technology | ⚠️ STUB (38 lines) |
+| | Business | /programs/business | ✅ EXISTS |
+| **Funding** | How Funding Works | /funding | ✅ EXISTS |
+| | WIOA Funding | /funding/wioa | ✅ EXISTS |
+| | Workforce Ready Grant | /funding/wrg | ✅ EXISTS |
+| | FAQ | /faq | ✅ EXISTS |
+| **Partners** | Partner Network | /admin/partners | ⚠️ ADMIN APP |
+| | For Employers | /employers | ✅ EXISTS |
+| | Hire Graduates | /hire-graduates | ✅ EXISTS |
+| | Workforce Partners | /workforce-partners | ✅ EXISTS |
+| | Career Services | /career-services | ✅ EXISTS |
+| **Portals** | Student Portal | /lms/dashboard | ⚠️ LMS APP |
+| | Admin Portal | /admin | ⚠️ ADMIN APP |
+| | Partner Portal | /partner/dashboard | ⚠️ PARTNER APP |
+| | Workforce Board | /workforce-board/dashboard | ⚠️ ADMIN APP |
+| | Staff Portal | /admin/staff-portal/dashboard | ⚠️ ADMIN APP |
+| | Instructor Portal | /admin/instructor/dashboard | ⚠️ ADMIN APP |
+| | Employer Portal | /employer/dashboard | ⚠️ ADMIN APP |
+| | Host Shop Portal | /host-shop/dashboard | ⚠️ MARKETING |
+| | Parent Portal | /parent-portal/dashboard | ⚠️ ADMIN APP |
+| **Resources** | Success Stories | /success-stories | ✅ EXISTS |
+| | Blog | /blog | ⚠️ STUB (46 lines) |
+| | Videos | /videos | ❌ MISSING |
+| | Webinars | /webinars | ⚠️ STUB (25 lines) |
+| | News | /news | ⚠️ STUB (25 lines) |
+| | Events | /events | ⚠️ STUB (25 lines) |
+| | FAQ | /faq | ✅ EXISTS |
+| **About** | About Us | /about | ✅ EXISTS |
+| | Our Team | /team | ✅ EXISTS |
+| | Platform | /platform | ✅ EXISTS |
+| | Features | /features | ❌ MISSING |
+| | Pricing | /pricing | ✅ EXISTS |
+| | Accreditation | /accreditation | ✅ EXISTS |
+| | Donate | /donate | ✅ EXISTS |
+| | Grants | /grants | ✅ EXISTS |
+| | Philanthropy | /philanthropy | ✅ EXISTS |
 
 ---
 
-## 4. DELETE THESE STUBS (No DB data):
+## 3. MISSING/NEED FIX:
 
-- [ ] `apps/marketing/app/healthcare/` (DUPLICATE - /programs/healthcare exists)
-- [ ] `apps/marketing/app/career-training-indiana/`
-- [ ] `apps/marketing/app/case-manager/`
-- [ ] `apps/marketing/app/community-services-indiana/`
-- [ ] `apps/marketing/app/launch/`
-- [ ] `apps/marketing/app/partner/` (use /partners)
-- [ ] `apps/marketing/app/program-holder/` (stubs)
-- [ ] `apps/marketing/app/partners/barbershop-apprenticeship/` (stubs)
-- [ ] `apps/marketing/app/portal/page.tsx`
-- [ ] `apps/marketing/app/connect/`
+### ❌ MISSING (No page exists):
+- /videos
+- /features
 
----
-
-## 5. FILES UPDATED:
-
-- [x] `components/shared/PlatformFooter.tsx` - Removed program links from footer
-- [x] `apps/marketing/app/industries/page.tsx` - Updated beauty link
-- [x] `config/navigation.ts` - Added Programs dropdown with all categories
+### ⚠️ STUBS (< 50 lines):
+| Route | Lines | Action |
+|-------|-------|--------|
+| /terms | 14 | FIX CONTENT |
+| /blog | 46 | FIX CONTENT |
+| /events | 25 | FIX CONTENT |
+| /webinars | 25 | FIX CONTENT |
+| /news | 25 | FIX CONTENT |
+| /programs/technology | 38 | FIX CONTENT |
 
 ---
 
-Generated: 2026-07-26 - Updated with Navigation Fix
+## 4. APP LOCATION MAP:
+
+```
+apps/
+├── marketing/app/    -> Public marketing pages
+├── admin/app/       -> Admin dashboard pages
+├── lms/app/         -> Student LMS pages
+└── partner/app/     -> Partner portal pages
+```
+
+Links with ⚠️ ADMIN/LMS/PARTNER are valid routes but in DIFFERENT apps.
+
+---
+
+## 5. RECOMMENDED FIXES:
+
+### FOOTER:
+- [x] /terms - NEEDS CONTENT (14 lines)
+
+### HEADER - STUBS:
+- [ ] /blog - Add real content
+- [ ] /events - Add real content
+- [ ] /webinars - Add real content
+- [ ] /news - Add real content
+- [ ] /programs/technology - Add real content (DB has tech slugs)
+
+### HEADER - MISSING:
+- [ ] /videos - Create page or remove link
+- [ ] /features - Create page or remove link
+
+---
+
+Generated: 2026-07-26

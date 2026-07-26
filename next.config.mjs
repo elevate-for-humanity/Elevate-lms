@@ -525,6 +525,64 @@ const nextConfig = {
 
       // Include image .jpg -> .webp redirects
       ...imageJpgRedirects,
+
+      // ============================================================
+      // PORTAL ROUTE ROUTING
+      // Route portal links from www. to the correct subdomain apps.
+      // Uses has:host condition so these don't run on other subdomains.
+      // ============================================================
+
+      // LMS app routes → app.elevateforhumanity.org
+      {
+        source: '/lms/:path*',
+        has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
+        destination: 'https://app.elevateforhumanity.org/lms/:path*',
+        permanent: false,
+      },
+      {
+        source: '/employer/:path*',
+        has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
+        destination: 'https://app.elevateforhumanity.org/employer/:path*',
+        permanent: false,
+      },
+      {
+        source: '/apprentice/:path*',
+        has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
+        destination: 'https://app.elevateforhumanity.org/apprentice/:path*',
+        permanent: false,
+      },
+      {
+        source: '/parent-portal/:path*',
+        has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
+        destination: 'https://app.elevateforhumanity.org/parent-portal/:path*',
+        permanent: false,
+      },
+      {
+        source: '/workforce/:path*',
+        has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
+        destination: 'https://app.elevateforhumanity.org/workforce/:path*',
+        permanent: false,
+      },
+      {
+        source: '/cosmetology-host-shop/:path*',
+        has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
+        destination: 'https://app.elevateforhumanity.org/cosmetology-host-shop/:path*',
+        permanent: false,
+      },
+      {
+        source: '/host-shop/dashboard',
+        has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
+        destination: 'https://app.elevateforhumanity.org/host-shop/dashboard',
+        permanent: false,
+      },
+
+      // Admin app routes → admin.elevateforhumanity.org
+      {
+        source: '/admin/:path*',
+        has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
+        destination: 'https://admin.elevateforhumanity.org/admin/:path*',
+        permanent: false,
+      },
     ];
   },
 

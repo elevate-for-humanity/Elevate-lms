@@ -1,13 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   LayoutDashboard, Users, FileText, BookOpen, DollarSign, 
   Settings, Bell, Search, ChevronDown, LogOut, User,
-  Handshake, ShieldCheck, Bot, Activity, Megaphone, Plus, Minus
+  Handshake, ShieldCheck, Bot, Megaphone, Plus, Minus,
+  Globe, X
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useI18n, LOCALES, LOCALE_NAMES, LOCALE_FLAGS, type Locale } from '@/lib/i18n/context';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
@@ -21,10 +23,82 @@ const NAV_ITEMS = [
   { label: 'Dev Studio', href: '/admin/dev-studio', icon: Bot },
 ];
 
+function LanguageSwitcher() {
+  const { locale, setLocale } = useI18n();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLocaleChange = (newLocale: Locale) => {
+    setLocale(newLocale);
+    setIsOpen(false);
+    window.location.reload();
+  };
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-1.5 p-2 rounded-md hover:bg-white/10 transition-colors"
+        title="Change language"
+      >
+        <Globe className="w-4 h-4" />
+        <span className="hidden lg:block text-xs">{LOCALE_FLAGS[locale]}</span>
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-xl border border-slate-200 py-1 z-50">
+          {LOCALES.map((loc) => (
+            <button
+              key={loc}
+              onClick={() => handleLocaleChange(loc)}
+              className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-slate-50 transition-colors ${
+                loc === locale ? 'text-orange-600 bg-orange-50' : 'text-slate-700'
+              }`}
+            >
+              <span>{LOCALE_FLAGS[loc]}</span>
+              <span>{LOCALE_NAMES[loc]}</span>
+              {loc === locale && <span className="ml-auto">✓</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
   const [navExpanded, setNavExpanded] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (searchOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [searchOpen]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/admin/students?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+      setSearchOpen(false);
+    }
+  };
 
   return (
     <>
@@ -68,20 +142,37 @@ export default function AdminHeader() {
             </nav>
 
             {/* Right Side */}
-            <div className="flex items-center gap-1">
-              {/* Mobile Nav Toggle */}
-              <button 
-                onClick={() => setNavExpanded(!navExpanded)}
-                className="xl:hidden p-2 rounded-md hover:bg-white/10 transition-colors"
-                title={navExpanded ? 'Collapse nav' : 'Expand nav'}
-              >
-                {navExpanded ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-              </button>
-              
+            <div className="flex items-center gap-0.5">
               {/* Search */}
-              <button className="p-2 rounded-md hover:bg-white/10 transition-colors">
-                <Search className="w-4 h-4" />
-              </button>
+              {searchOpen ? (
+                <form onSubmit={handleSearch} className="flex items-center gap-2 bg-white/10 rounded-md px-2 py-1">
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search students..."
+                    className="w-32 lg:w-48 bg-transparent text-sm text-white outline-none placeholder:text-slate-400"
+                  />
+                  <button type="submit" className="p-1 hover:bg-white/10 rounded">
+                    <Search className="w-4 h-4" />
+                  </button>
+                  <button type="button" onClick={() => setSearchOpen(false)} className="p-1 hover:bg-white/10 rounded">
+                    <X className="w-4 h-4" />
+                  </button>
+                </form>
+              ) : (
+                <button 
+                  onClick={() => setSearchOpen(true)}
+                  className="p-2 rounded-md hover:bg-white/10 transition-colors"
+                  title="Search"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
+              )}
+
+              {/* Language */}
+              <LanguageSwitcher />
               
               {/* Notifications */}
               <button className="p-2 rounded-md hover:bg-white/10 transition-colors relative">
@@ -119,6 +210,15 @@ export default function AdminHeader() {
                   </div>
                 )}
               </div>
+
+              {/* Mobile Nav Toggle */}
+              <button 
+                onClick={() => setNavExpanded(!navExpanded)}
+                className="xl:hidden p-2 rounded-md hover:bg-white/10 transition-colors"
+                title={navExpanded ? 'Collapse nav' : 'Expand nav'}
+              >
+                {navExpanded ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              </button>
             </div>
           </div>
         </div>

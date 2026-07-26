@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import DashboardPanelErrorBoundary from '@/components/admin/dashboard/DashboardPanelErrorBoundary';
+import { DashboardPanelErrorBoundary } from '@/components/admin/dashboard/DashboardPanelErrorBoundary';
 
 const SecretsPanel = dynamic(
   () => import('@/components/studio/SecretsPanel').then(m => m.default || m),

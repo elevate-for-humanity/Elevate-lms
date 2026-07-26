@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Career Assessment',
-  description: 'Career Assessment page content.',
+  title: 'Career Assessment | Elevate for Humanity',
+  description: 'Discover your career strengths and find the right training program.',
 };
 
 export default function Page() {
@@ -12,7 +12,7 @@ export default function Page() {
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-3xl font-bold">Career Assessment</h1>
-          <p className="text-blue-200">Workforce development resources.</p>
+          <p className="text-blue-200">Take our assessment to find your ideal career pathway.</p>
         </div>
       </section>
       <section className="py-12">

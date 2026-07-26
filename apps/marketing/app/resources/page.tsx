@@ -4,13 +4,13 @@ import Link from 'next/link';
 import { GraduationCap, DollarSign, Shield, Briefcase, ExternalLink } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Resources',
+  title: 'Resources | Elevate for Humanity',
   description: 'Resources page content.',
 };
 
 const sections = [
   {
-    title: 'For Students',
+    title: 'Resources | Elevate for Humanity',
     icon: GraduationCap,
     links: [
       { label: 'Apply for Training', href: '/apply/student', external: false },
@@ -21,7 +21,7 @@ const sections = [
     ],
   },
   {
-    title: 'Funding & Financial Aid',
+    title: 'Resources | Elevate for Humanity',
     icon: DollarSign,
     links: [
       { label: 'WIOA Funding', href: '/funding', external: false },
@@ -36,7 +36,7 @@ const sections = [
     ],
   },
   {
-    title: 'For Employers',
+    title: 'Resources | Elevate for Humanity',
     icon: Briefcase,
     links: [
       { label: 'Employer Portal', href: '/employer/dashboard', external: false },
@@ -46,7 +46,7 @@ const sections = [
     ],
   },
   {
-    title: 'External Resources',
+    title: 'Resources | Elevate for Humanity',
     icon: ExternalLink,
     links: [
       { label: 'WorkOne Indiana', href: 'https://www.workoneindy.com', external: true },
@@ -57,7 +57,7 @@ const sections = [
     ],
   },
   {
-    title: 'Policies & Compliance',
+    title: 'Resources | Elevate for Humanity',
     icon: Shield,
     links: [
       { label: 'Privacy Policy', href: '/legal/privacy', external: false },
@@ -75,7 +75,7 @@ export default function ResourcesPage() {
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-3xl font-bold">Resources</h1>
-          <p className="text-blue-200">Workforce development resources.</p>
+          <p className="text-blue-200">Career resources and learning materials.</p>
         </div>
       </section>
       <section className="py-12">

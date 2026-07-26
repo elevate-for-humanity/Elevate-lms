@@ -2,17 +2,17 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'For Students',
+  title: 'For Students | Elevate for Humanity',
   description: 'For Students page content.',
 };
 
 const steps = [
-  { n: '1', title: 'Apply', desc: 'Submit one application. We handle the rest.' },
-  { n: '2', title: 'Get Approved for Funding', desc: 'We check WIOA, WRG, FSSA, and other sources on your behalf.' },
-  { n: '3', title: 'Get Placed in a Program', desc: 'Matched to a program based on your goals and eligibility.' },
-  { n: '4', title: 'Complete Training', desc: 'Delivered by Elevate or an approved training partner.' },
-  { n: '5', title: 'Test & Get Certified', desc: 'Testing coordinated through Elevate or approved certifying bodies.' },
-  { n: '6', title: 'Get Placed into Employment', desc: 'Connected to employers and apprenticeship opportunities.' },
+  { n: '1', title: 'For Students | Elevate for Humanity' },
+  { n: '2', title: 'For Students | Elevate for Humanity' },
+  { n: '3', title: 'For Students | Elevate for Humanity' },
+  { n: '4', title: 'For Students | Elevate for Humanity' },
+  { n: '5', title: 'For Students | Elevate for Humanity' },
+  { n: '6', title: 'For Students | Elevate for Humanity' },
 ];
 
 const categories = [
@@ -36,7 +36,7 @@ export default function ForStudentsPage() {
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-3xl font-bold">For Students</h1>
-          <p className="text-blue-200">Workforce development resources.</p>
+          <p className="text-blue-200">Your gateway to learning and career support.</p>
         </div>
       </section>
       <section className="py-12">

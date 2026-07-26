@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Academic Calendar',
-  keywords: ["calendar", "class schedule", "program dates", "Indiana"], description: 'Academic Calendar page content.',
+  title: 'Academic Calendar | Elevate for Humanity',
+  keywords: ["calendar", "class schedule", "program dates", "Indiana"], description: 'View important dates, deadlines, and academic calendar for Elevate for Humanity programs.',
 };
 
 export default function Page() {
@@ -12,7 +12,7 @@ export default function Page() {
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-3xl font-bold">Academic Calendar</h1>
-          <p className="text-blue-200">Workforce development resources.</p>
+          <p className="text-blue-200">Important dates and deadlines for enrollment, classes, and graduation.</p>
         </div>
       </section>
       <section className="py-12">

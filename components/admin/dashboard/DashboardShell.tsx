@@ -486,53 +486,6 @@ function CrmFollowUpQueue({ leads }: { leads: StaleLeadItem[] }) {
   );
 }
 
-function LearnersNeedingAttention({ learners }: { learners: InactiveLearner[] }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white mb-6 overflow-hidden shadow-sm">
-      <div className="px-5 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg">
-            <Users className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h2 className="font-bold text-slate-900">Learners Needing Attention</h2>
-            <p className="text-xs text-slate-500">Inactive or at-risk learners</p>
-          </div>
-        </div>
-        {learners.length > 0 && (
-          <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-700">{learners.length} learners</span>
-        )}
-      </div>
-      {learners.length === 0 ? (
-        <div className="px-5 sm:px-6 py-8 text-center">
-          <p className="text-sm text-slate-500">No learners currently need intervention.</p>
-        </div>
-      ) : (
-        <div className="divide-y divide-slate-100">
-          {learners.slice(0, 6).map((l) => (
-            <div key={l.enrollmentId} className="flex items-center justify-between px-5 sm:px-6 py-3 hover:bg-slate-50 transition-colors">
-              <Link href={l.href} className="min-w-0 flex-1 group">
-                <p className="text-sm font-semibold text-slate-900 truncate">{l.fullName ?? l.email ?? "Unknown learner"}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-slate-500 truncate">{l.programTitle ?? "Unknown program"}</span>
-                </div>
-              </Link>
-              <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Inactive {l.daysInactive}d</span>
-                <LearnerActionButtons
-                  studentId={l.userId}
-                  enrollmentId={l.enrollmentId}
-                  studentName={l.fullName ?? l.email ?? "learner"}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function RecentStudentsPanel({ students }: { students: import('./types').RecentStudent[] }) {
   if (!students.length) return null;
   return (

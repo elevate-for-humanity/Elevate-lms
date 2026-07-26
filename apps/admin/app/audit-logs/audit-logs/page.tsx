@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import AuditLogsPageClient from './PageClient';
+import AuditLogsPageClient from '../PageClient';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;

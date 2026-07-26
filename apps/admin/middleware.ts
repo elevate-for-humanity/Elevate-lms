@@ -1,9 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
-import { safeGetUser, createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
 
 /**
  * Admin Middleware - handles auth BEFORE pages render to avoid redirect loops.
+ * Uses @supabase/ssr for Edge Runtime compatibility.
  */
 
 // Paths that never require auth
@@ -45,16 +46,33 @@ export async function middleware(req: NextRequest) {
   if (!isProtected) return NextResponse.next();
 
   // Auth check - runs in middleware to avoid layout redirect loops
-  const supabase = await createClient();
-  const user = safeGetUser(await supabase.auth.getUser());
+  // Using @supabase/ssr for Edge Runtime compatibility
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            req.cookies.set(name, value);
+          });
+        },
+      },
+    }
+  );
 
-  if (!user) {
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
     const loginUrl = new URL('/login', req.url);
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Check role
+  // Check role from public.profiles
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')

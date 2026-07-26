@@ -33,27 +33,28 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    // Preserve the requested path so login can return the user here
+    // Attempt to preserve the requested path for post-login redirect.
+    // In standalone deployments the Edge middleware may not be active, so this
+    // header is often absent.  When that happens we fall back to /admin-login
+    // (the unified login entry that handles all role types).
     const headersList = await headers();
     const rawUrl =
       headersList.get('x-pathname') ||
       headersList.get('x-url') ||
       headersList.get('x-invoke-path') ||
       '';
-    // Default redirect: /admin-login (the marketing login page that handles all roles).
-    // This is the entry point for all authenticated portals.
-    let returnPath = '/admin-login';
+
     if (rawUrl) {
       try {
         const u = new URL(rawUrl, 'http://localhost');
-        returnPath = u.pathname + (u.search || '');
+        const returnPath = u.pathname + (u.search || '');
+        redirect(`/admin-login?redirect=${encodeURIComponent(returnPath)}`);
       } catch {
-        // malformed — use default from DashboardResolver
+        // malformed URL — fall through to default
       }
     }
-    // Always use relative /login and /unauthorized — middleware handles cross-domain routing.
-    // The x-pathname header set by middleware gives us the actual requested path.
-    redirect(`/login?redirect=${encodeURIComponent(returnPath)}`);
+    // No usable path header; send to the unified marketing login entry.
+    redirect('/admin-login');
   }
 
   const { data: profile } = await supabase

@@ -9,10 +9,12 @@ import {
   BookOpen,
   Box,
   Circle,
+  Clapperboard,
   ExternalLink,
   FileText,
   FolderOpen,
   Globe,
+  Inbox,
   Key,
   LayoutDashboard,
   Loader2,
@@ -25,6 +27,7 @@ import {
   Server,
   Sparkles,
   Upload,
+  Zap,
   Briefcase,
   Plug,
   Brain,
@@ -62,7 +65,7 @@ interface CourseBuilderProps {
   initialProgramId?: string;
 }
 
-type Workspace = 'studio' | 'command' | 'deploy' | 'files' | 'environments' | 'health' | 'secrets' | 'integrations' | 'workflows';
+type Workspace = 'studio' | 'command' | 'deploy' | 'files' | 'environments' | 'health' | 'secrets' | 'integrations' | 'workflows' | 'upload' | 'operations' | 'errors' | 'video';
 type StudioMode = 'ask' | 'run' | 'courses';
 
 const UnifiedEllieChat = dynamic(() => import('@/components/studio/UnifiedEllieChat'), {
@@ -93,6 +96,22 @@ const IntegrationsPanel = dynamic(
   () => import('@/components/studio/IntegrationsPanel'),
   { ssr: false },
 );
+const LizzyUploadPanel = dynamic(
+  () => import('@/components/admin/dashboard/LizzyUploadPanel'),
+  { ssr: false },
+);
+const LizzyOperationsPanel = dynamic(
+  () => import('@/components/admin/dashboard/LizzyOperationsPanel'),
+  { ssr: false },
+);
+const LizzyErrorsPanel = dynamic(
+  () => import('@/components/admin/dashboard/LizzyErrorsPanel'),
+  { ssr: false },
+);
+const LizzyVideoPanel = dynamic(
+  () => import('@/components/admin/dashboard/LizzyVideoPanel'),
+  { ssr: false },
+);
 
 const WORKSPACES: { id: Workspace; label: string; Icon: ElementType<{ className?: string }> }[] = [
   { id: 'studio', label: 'Studio', Icon: Bot },
@@ -104,6 +123,10 @@ const WORKSPACES: { id: Workspace; label: string; Icon: ElementType<{ className?
   { id: 'health', label: 'Health', Icon: Activity },
   { id: 'secrets', label: 'Secrets', Icon: Key },
   { id: 'integrations', label: 'Integrations', Icon: Plug },
+  { id: 'upload', label: 'Upload', Icon: Upload },
+  { id: 'operations', label: 'Operations', Icon: Inbox },
+  { id: 'errors', label: 'Errors', Icon: Zap },
+  { id: 'video', label: 'Video', Icon: Clapperboard },
 ];
 
 const QUICK_ACTIONS = [
@@ -431,6 +454,10 @@ export default function DevStudioUnifiedClient({
                 <HealthPanel health={health} onRefresh={() => window.location.reload()} />
               ))}
             {workspace === 'integrations' && <IntegrationsPanel />}
+            {workspace === 'upload' && <LizzyUploadPanel />}
+            {workspace === 'operations' && <LizzyOperationsPanel />}
+            {workspace === 'errors' && <LizzyErrorsPanel />}
+            {workspace === 'video' && <LizzyVideoPanel />}
           </main>
 
           <section className="hidden w-[38vw] min-w-[340px] max-w-[560px] shrink-0 flex-col border-l border-[#3c3c3c] bg-[#1e1e1e] lg:flex">

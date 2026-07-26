@@ -25,6 +25,7 @@ const nextConfig = {
       { source: '/funding', destination: 'https://www.elevateforhumanity.org/funding', permanent: false },
       { source: '/testing', destination: 'https://www.elevateforhumanity.org/testing', permanent: false },
       { source: '/store', destination: 'https://www.elevateforhumanity.org/store', permanent: false },
+      { source: '/portal', destination: 'https://www.elevateforhumanity.org/portals', permanent: false },
       // Admin -> admin site
       { source: '/admin', destination: 'https://admin.elevateforhumanity.org/admin/dashboard', permanent: true },
     ];

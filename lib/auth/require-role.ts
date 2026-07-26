@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export interface AuthResult {
   user: {
@@ -39,7 +38,6 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
       headersList.get('x-pathname') ||
       headersList.get('x-url') ||
       headersList.get('x-invoke-path') ||
-      headersList.get('referer') ||
       '';
     let returnPath = '/learner/dashboard';
     if (rawUrl) {
@@ -50,13 +48,9 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
         // malformed — use default
       }
     }
-    // Admin app has no /login page — redirect to /admin-login on the LMS.
-    // SERVICE_ROLE=admin is set in the admin ECS task definition.
-    const loginPath =
-      process.env.SERVICE_ROLE === 'admin'
-        ? `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/admin-login?redirect=${encodeURIComponent(returnPath)}`
-        : `/login?redirect=${encodeURIComponent(returnPath)}`;
-    redirect(loginPath);
+    // Always use relative /login and /unauthorized — middleware handles cross-domain routing.
+    // The x-pathname header set by middleware gives us the actual requested path.
+    redirect(`/login?redirect=${encodeURIComponent(returnPath)}`);
   }
 
   const { data: profile } = await supabase
@@ -66,16 +60,9 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
     .maybeSingle();
 
   // Profile row missing — authenticated but no profile record.
-  // This happens when the handle_new_user trigger fails silently (e.g. tenants
-  // table empty, constraint violation) or when a user is created via admin API
-  // without going through the normal signup flow.
-  // Do not send to /unauthorized — the user is legitimate, just incomplete.
-  // Admin users are exempt: they land on the admin app which has its own recovery.
+  // Redirect to /unauthorized for handling.
   if (!profile) {
-    if (process.env.SERVICE_ROLE === 'admin') {
-      redirect(`${process.env.NEXT_PUBLIC_SITE_URL || ''}/unauthorized`);
-    }
-    redirect('/onboarding/learner?reason=profile_missing');
+    redirect('/unauthorized');
   }
 
   // Load secondary roles from user_roles table (multi-role users)
@@ -92,11 +79,7 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
   const allowed = effectiveRoles.some((r) => allowedRoles.includes(r));
 
   if (!allowed) {
-    const unauthorizedPath =
-      process.env.SERVICE_ROLE === 'admin'
-        ? `${process.env.NEXT_PUBLIC_SITE_URL || ''}/unauthorized`
-        : '/unauthorized';
-    redirect(unauthorizedPath);
+    redirect('/unauthorized');
   }
 
   return {

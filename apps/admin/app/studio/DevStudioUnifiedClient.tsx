@@ -97,19 +97,19 @@ const IntegrationsPanel = dynamic(
   { ssr: false },
 );
 const LizzyUploadPanel = dynamic(
-  () => import('@/components/admin/dashboard/LizzyUploadPanel'),
+  () => import('@/components/admin/dashboard/LizzyUploadPanel').then(m => m.LizzyUploadPanel || m.default || m),
   { ssr: false },
 );
 const LizzyOperationsPanel = dynamic(
-  () => import('@/components/admin/dashboard/LizzyOperationsPanel'),
+  () => import('@/components/admin/dashboard/LizzyOperationsPanel').then(m => m.LizzyOperationsPanel || m.default || m),
   { ssr: false },
 );
 const LizzyErrorsPanel = dynamic(
-  () => import('@/components/admin/dashboard/LizzyErrorsPanel'),
+  () => import('@/components/admin/dashboard/LizzyErrorsPanel').then(m => m.LizzyErrorsPanel || m.default || m),
   { ssr: false },
 );
 const LizzyVideoPanel = dynamic(
-  () => import('@/components/admin/dashboard/LizzyVideoPanel'),
+  () => import('@/components/admin/dashboard/LizzyVideoPanel').then(m => m.LizzyVideoPanel || m.default || m),
   { ssr: false },
 );
 

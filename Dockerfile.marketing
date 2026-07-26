@@ -81,8 +81,8 @@ ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 
 WORKDIR /app
 
-# Install curl for health check
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && \
+# Install curl and rsync for merging public folders
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates rsync && \
     rm -rf /var/lib/apt/lists/*
 
 RUN groupadd --system --gid 1001 nodejs && \
@@ -90,8 +90,14 @@ RUN groupadd --system --gid 1001 nodejs && \
 
 # Copy the entire Next.js build output to /app/
 COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next ./.next
-# Copy app-specific public folder (images, icons, etc.)
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/public ./public
+
+# Copy root public folder FIRST (contains version.json from CI)
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+# MERGE app-specific public folder INTO public/ using rsync
+# This PRESERVES version.json while adding app-specific files
+RUN rsync -a --info=skip /app/apps/marketing/public/ ./public/ && \
+    chown -R nextjs:nodejs ./public
 
 # Copy node_modules (needed for runtime dependencies)
 COPY --from=builder /app/node_modules ./node_modules

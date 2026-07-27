@@ -809,7 +809,6 @@ export default function TestingAccommodationsPage() {
           </Link>
         </div>
       </section>
-    </>
   );
 }
 

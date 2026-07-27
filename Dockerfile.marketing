@@ -42,16 +42,12 @@ RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 COPY . .
 
-# Generate version.json - use git rev-parse HEAD with fallback
-RUN COMMIT_SHA=$(git -C . rev-parse HEAD 2>/dev/null || echo "${GIT_SHA:-$(date +%s)}") && \
-    echo "{\"service\":\"marketing\",\"commit\":\"${COMMIT_SHA}\",\"builtAt\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > ./public/version.json
-
-# Build args
+# Build args - GIT_SHA passed from Northflank (set by trigger-build.ts)
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG GIT_SHA
-ARG BUILD_TIMESTAMP
+ARG GIT_SHA=unknown
+ARG BUILD_TIMESTAMP=unknown
 
 ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
 ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
@@ -61,6 +57,9 @@ ENV NODE_OPTIONS="--max-old-space-size=8192"
 ENV CI=true
 ENV GIT_SHA=${GIT_SHA}
 ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
+
+# Generate version.json - GIT_SHA passed from Northflank via trigger-build.ts
+RUN echo "{\"service\":\"marketing\",\"commit\":\"${GIT_SHA}\",\"builtAt\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > ./public/version.json
 
 # Build Marketing app
 RUN pnpm --filter @elevate/marketing build --no-lint

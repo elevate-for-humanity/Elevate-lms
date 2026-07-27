@@ -13,7 +13,7 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
   const isExternal = (href: string) => href?.startsWith('http');
 
   return (
-    <nav aria-label="Main navigation" className="flex items-center gap-0.5 whitespace-nowrap">
+    <nav aria-label="Main navigation" className="flex items-center gap-0.5 whitespace-nowrap overflow-x-auto scrollbar-hide -mx-2 px-2">
       {items.map((item, idx) => {
         const hasSubItems = Boolean(item.subItems?.length);
         // Right-align dropdowns for items on the right side of the nav
@@ -21,18 +21,18 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
         const dropdownId = `nav-dropdown-${item.id ?? idx}`;
 
         return (
-          <div key={item.id ?? item.name} className="relative group">
+          <div key={item.id ?? item.name} className="relative group flex-shrink-0">
             {item.href && !hasSubItems ? (
               <Link
                 href={item.href}
-                className="whitespace-nowrap px-2 xl:px-3 py-2 text-sm font-medium text-slate-700 hover:text-brand-blue-600 rounded-md"
+                className="whitespace-nowrap px-2 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:text-brand-blue-600 rounded-md"
               >
                 {item.name}
               </Link>
             ) : (
               <button
                 type="button"
-                className="whitespace-nowrap px-2 xl:px-3 py-2 text-sm font-medium text-slate-700 hover:text-brand-blue-600 rounded-md"
+                className="whitespace-nowrap px-2 py-2 text-xs sm:text-sm font-medium text-slate-700 hover:text-brand-blue-600 rounded-md"
                 aria-haspopup={hasSubItems ? 'menu' : undefined}
                 aria-expanded={false}
                 aria-controls={hasSubItems ? dropdownId : undefined}

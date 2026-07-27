@@ -34,29 +34,29 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Desktop nav - show on xl screens (1280px+) */}
-        <div className="hidden xl:flex justify-center min-w-0 overflow-visible">
+        {/* Mobile nav - show on screens below xl (horizontal links on mobile/tablet) */}
+        <div className="flex xl:hidden justify-center min-w-0 overflow-visible">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
         <div className="flex flex-row flex-nowrap items-center justify-end gap-0.5 xl:gap-1 flex-shrink-0 min-w-0">
-          {/* Desktop search/signin - show on xl screens and up */}
-          <div className="hidden xl:flex items-center gap-2 mr-2">
+          {/* Mobile: Sign In / Apply buttons */}
+          <div className="flex xl:hidden items-center gap-2 mr-2">
             <Link
               href="/login"
-              className="text-sm text-slate-600 hover:text-slate-900 px-3 py-2"
+              className="text-xs sm:text-sm text-slate-600 hover:text-slate-900 px-2 sm:px-3 py-2"
             >
               Sign In
             </Link>
             <Link
               href="/apply"
-              className="text-sm bg-brand-red-600 hover:bg-brand-red-700 text-white px-4 py-2 rounded-lg font-medium"
+              className="text-xs sm:text-sm bg-brand-red-600 hover:bg-brand-red-700 text-white px-3 sm:px-4 py-2 rounded-lg font-medium"
             >
               Apply
             </Link>
           </div>
-          {/* Mobile menu button - hide on xl (visible on mobile + tablet) */}
-          <span className="xl:hidden">
+          {/* Desktop hamburger menu - show on xl screens (vertical drawer with full subpages) */}
+          <span className="hidden xl:inline-flex">
             <HeaderMobileMenu items={NAV_ITEMS} programApplyLinks={PROGRAM_APPLY_LINKS} />
           </span>
         </div>

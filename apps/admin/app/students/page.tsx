@@ -10,7 +10,7 @@ import {
 } from '@/components/admin/AdminPageShell';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Students | Admin',
 };

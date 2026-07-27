@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import TeamsIntegrationClient from './TeamsIntegrationClient';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Microsoft Teams | Integrations | Admin',

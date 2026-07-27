@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { CheckCircle, Clock, FileText, ShieldCheck, BookOpen } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Program Holder Acknowledgements | Admin | Elevate For Humanity',

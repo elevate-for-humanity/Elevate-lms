@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Building2 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'New Employer | Admin' };
 
 async function createEmployer(formData: FormData) {

@@ -15,7 +15,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl;
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Review Application | Elevate For Humanity',

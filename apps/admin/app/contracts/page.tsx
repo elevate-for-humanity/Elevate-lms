@@ -3,7 +3,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import ContractsClient from './ContractsClient';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Contract Automation | Admin | Elevate For Humanity',

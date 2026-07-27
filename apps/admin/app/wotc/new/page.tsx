@@ -1,4 +1,4 @@
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 import { requireRole } from '@/lib/auth/require-role';
 import { Metadata } from 'next';

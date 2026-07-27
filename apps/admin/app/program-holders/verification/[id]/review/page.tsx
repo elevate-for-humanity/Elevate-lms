@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import VerificationReviewForm from './VerificationReviewForm';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Review Program Holder | Admin',

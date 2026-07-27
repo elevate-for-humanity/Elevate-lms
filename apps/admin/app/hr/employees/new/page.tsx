@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { createEmployeeAction } from './actions';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/hr/employees/new' },

@@ -15,7 +15,7 @@ import {
 import PirlExportPanel from '@/components/admin/wioa/PirlExportPanel';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'WIOA Performance Report | Admin',
 };

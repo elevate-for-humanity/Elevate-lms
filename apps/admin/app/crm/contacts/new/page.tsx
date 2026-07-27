@@ -7,7 +7,7 @@ import { createContactAction } from './actions';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'New Contact | CRM | Admin | Elevate For Humanity',

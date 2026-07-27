@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function AutomationLogPage() {
   await requireRole(['admin', 'staff']);

@@ -4,7 +4,7 @@ import PageBuilderClient from './PageBuilderClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Page Builder | Admin | ${PLATFORM_DEFAULTS.orgName}`,

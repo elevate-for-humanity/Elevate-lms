@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Integrations | Admin Settings' };
 
 export default async function IntegrationSettingsPage() {

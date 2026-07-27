@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description: 'Real-time activity feed across all system events.',
 };
 
-export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 const EVENT_ICON: Record<string, React.ElementType> = {
   enrollment:   BookOpen,

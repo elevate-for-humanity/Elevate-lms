@@ -4,7 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Employer Analytics | Elevate For Humanity' };
 
 export default async function EmployerAnalyticsPage() {

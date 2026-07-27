@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Data Export Requests | Admin Compliance | ${process.env.NEXT_PUBLIC_ORG_NAME ?? PLATFORM_DEFAULTS.orgName}`,

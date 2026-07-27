@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 import { CheckSquare, Clock, Target, Shuffle, Edit3, Plus, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,

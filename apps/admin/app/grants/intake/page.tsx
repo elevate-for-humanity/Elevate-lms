@@ -6,7 +6,7 @@ import { ChevronRight } from 'lucide-react';
 import GrantIntakeClient from './GrantIntakeClient';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Grant Intake | Admin | Elevate For Humanity',

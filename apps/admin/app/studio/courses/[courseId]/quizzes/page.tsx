@@ -5,7 +5,7 @@ import Link from 'next/link';
 import QuizManagerClient from './QuizManagerClient';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Course Quizzes | Elevate For Humanity',

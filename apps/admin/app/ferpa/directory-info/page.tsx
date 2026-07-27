@@ -7,7 +7,7 @@ import DirectoryInfoClient from './DirectoryInfoClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `FERPA Directory Information | Admin | ${PLATFORM_DEFAULTS.orgName}`,

@@ -7,7 +7,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Platform Console | Admin | ${PLATFORM_DEFAULTS.orgName}`,

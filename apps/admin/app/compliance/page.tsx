@@ -18,7 +18,7 @@ import {
 import ComplianceItemsPanel from './ComplianceItemsPanel';
 import { getPlatformConfig } from '@/lib/config/platform-config';
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Compliance Dashboard | Admin | ${process.env.NEXT_PUBLIC_ORG_NAME ?? PLATFORM_DEFAULTS.orgName}`,

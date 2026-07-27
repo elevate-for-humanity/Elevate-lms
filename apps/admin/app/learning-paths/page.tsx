@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { BookOpen, Plus, ChevronRight, ArrowRight, Star } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Learning Paths | Admin' };
 
 export default async function LearningPathsPage() {

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, HeartHandshake } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'New WIOA Participant | Admin' };
 
 async function createWioaParticipant(formData: FormData) {

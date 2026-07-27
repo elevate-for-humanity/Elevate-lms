@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { MessageSquare } from 'lucide-react';
-import FAQSearch from './FAQSearch';
+import FAQSearch from '@/components/faq/FAQSearch';
 
 export const metadata: Metadata = {
   title: 'FAQ | Elevate For Humanity',

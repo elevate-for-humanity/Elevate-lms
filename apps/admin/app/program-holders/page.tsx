@@ -7,7 +7,7 @@ import { Building2, Clock, CheckCircle, XCircle, Eye, Send } from 'lucide-react'
 import ResendOnboardingButton from './ResendOnboardingButton';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Program Holders | Admin | Elevate For Humanity',

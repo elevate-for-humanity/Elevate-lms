@@ -3,7 +3,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import CurriculumUploadClient from './CurriculumUploadClient';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Upload Curriculum | Admin | Elevate For Humanity',

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import VideoUploadClient from './VideoUploadClient';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/videos/upload' },

@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import ProgramHolderApplicationActions from './ProgramHolderApplicationActions';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Program Holder Applications | Elevate For Humanity',

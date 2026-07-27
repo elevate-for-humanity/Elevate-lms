@@ -70,7 +70,7 @@ RUN echo "=== BUILD ARG DEBUG ===" && \
     echo "==================="
 
 # Build Marketing app
-RUN pnpm --filter @elevate/marketing build --no-lint
+RUN pnpm --filter @elevate/marketing build
 
 # =============================================================================
 # STAGE 3: Runtime

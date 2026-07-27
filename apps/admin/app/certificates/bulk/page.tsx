@@ -6,7 +6,7 @@ import BulkIssueForm from './BulkIssueForm';
 import BulkCertificationsClient from './BulkCertificationsClient';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/certificates/bulk' },

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function ProgramCatalogPage() {
   await requireRole(['admin', 'staff']);

@@ -6,7 +6,7 @@ import { Briefcase, CheckCircle, Clock, Plus, ChevronRight, ArrowRight } from 'l
 import { GrantsSyncButton } from './GrantsSyncButton';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Grants | Admin',
 };

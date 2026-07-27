@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { FileText, ChevronRight, ArrowRight, Plus, Eye, Edit } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Blog | Admin',
 };

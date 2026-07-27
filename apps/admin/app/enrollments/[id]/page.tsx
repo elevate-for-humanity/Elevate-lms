@@ -7,7 +7,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft, User, BookOpen, DollarSign, Calendar } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {};

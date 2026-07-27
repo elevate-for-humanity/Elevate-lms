@@ -5,7 +5,7 @@ import Link from 'next/link';
 import QuestionManagerClient from './QuestionManagerClient';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Quiz Questions | Elevate For Humanity',

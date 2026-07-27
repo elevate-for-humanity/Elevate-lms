@@ -6,7 +6,7 @@ import { FileText, Download, ArrowLeft, CheckCircle, Briefcase, Users } from 'lu
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Job Ready Indy Reports | Elevate For Humanity',

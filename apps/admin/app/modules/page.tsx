@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ModulesTable } from './modules-table';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Modules Management | Admin',

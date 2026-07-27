@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'New Appointment | CRM | Admin' };
 
 async function createAppointment(formData: FormData) {

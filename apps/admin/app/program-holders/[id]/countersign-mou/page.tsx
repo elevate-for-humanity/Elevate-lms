@@ -8,7 +8,7 @@ import { FileSignature, CheckCircle, XCircle, ArrowLeft, ExternalLink } from 'lu
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Countersign MOU | Admin | Elevate For Humanity',

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import TenantsClient from './TenantsClient';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/tenants' },

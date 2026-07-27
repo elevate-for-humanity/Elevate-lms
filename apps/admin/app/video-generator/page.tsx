@@ -3,7 +3,7 @@ import VideoGeneratorClient from './VideoGeneratorClient';
 
 export { metadata } from './layout';
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export default async function Page() {
   await requireRole(['admin', 'staff']);

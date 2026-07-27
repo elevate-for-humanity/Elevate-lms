@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { BarChart3, TrendingUp, PieChart, Target } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Charts & Visualizations | Elevate For Humanity',

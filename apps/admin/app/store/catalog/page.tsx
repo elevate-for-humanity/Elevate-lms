@@ -6,7 +6,7 @@ import { getCatalogProducts, type CatalogProduct } from '@/lib/store/db';
 import { ALL_PRODUCTS } from '@/lib/data/store-products';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Catalog Sanity Check | Admin',

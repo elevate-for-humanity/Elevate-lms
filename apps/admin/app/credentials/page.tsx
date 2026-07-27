@@ -7,7 +7,7 @@ import { Shield, Plus, ExternalLink, Award, BookOpen, Users } from 'lucide-react
 import { mapCredentialRow, type RawCredentialRow, type CredentialRecord } from '@/lib/domain';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Credential Registry | Admin' };
 
 const LANE_LABELS: Record<string, { label: string; color: string }> = {

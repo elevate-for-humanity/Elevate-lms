@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Building2, ChevronRight, ArrowRight, Plus, MapPin, Phone, Mail } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Employers | Admin',
 };

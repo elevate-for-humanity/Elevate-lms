@@ -5,7 +5,7 @@ import Link from 'next/link';
 import SettingsFormClient, { SettingsField } from '@/components/admin/settings/SettingsFormClient';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Security | Admin Settings' };
 
 const KEYS = ['mfa_required', 'session_timeout', 'ip_allowlist'];

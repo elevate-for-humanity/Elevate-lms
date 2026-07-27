@@ -21,7 +21,7 @@ import Image from 'next/image';
 import PayRateEditor from './PayRateEditor';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 interface Props {
   params: Promise<{ id: string }>;

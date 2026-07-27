@@ -94,37 +94,17 @@ jobs:
           echo "GITHUB_SHA env var: $GITHUB_SHA"
           echo "SHA verification passed"
 
-      # FIX: Write commit SHA to a file and commit it (so Northflank can access it)
+      # Generate version.json for runtime reference (GitHub Actions only)
       - name: Generate version file
         run: |
-          # Write commit SHA to a file (for Docker build)
-          echo "${{ github.sha }}" > .commit_sha
-          
-          # Also create version.json (for runtime reference)
-          cat > public/version.json <<EOF
+          cat > public/version.json <<'VERSIONEOF'
           {
             "service": "marketing",
             "commit": "${{ github.sha }}",
             "builtAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           }
-          EOF
-          
-          echo "Generated .commit_sha with SHA: ${{ github.sha }}"
-      
-      # Commit .commit_sha to git so Northflank can access it during Docker build
-      - name: Commit SHA file
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add .commit_sha public/version.json
-          git commit -m "chore: update build version ${{ github.sha }} [skip ci]"
-      
-      - name: Push version update
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
-          force: true
+          VERSIONEOF
+          echo "Generated version.json with SHA: ${{ github.sha }}"
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4

@@ -58,15 +58,87 @@ export default async function ApplyPage({
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
+      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl font-bold">Apply</h1>
-          <p className="text-blue-200">Resources to support your success.</p>
+          <div className="flex items-center gap-4 mb-4">
+            <span className="bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium">Host Shop Application</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Become a Barber Host Shop</h1>
+          <p className="text-xl text-blue-100 max-w-2xl">Apply to host barber apprentices in your barbershop. Train future professionals while building your team.</p>
         </div>
       </section>
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
+      
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">Host Shop Benefits</h2>
+              <div className="space-y-4">
+                <div className="flex gap-4 bg-white rounded-xl p-6 shadow-sm">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">💰</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-slate-900">Tax Incentives</h4>
+                    <p className="text-slate-600 text-sm">Receive tax credits for hosting registered apprentices</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 bg-white rounded-xl p-6 shadow-sm">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">👥</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-slate-900">Build Your Team</h4>
+                    <p className="text-slate-600 text-sm">Pre-trained talent ready to hire after completing their apprenticeship</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 bg-white rounded-xl p-6 shadow-sm">
+                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">📚</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-slate-900">No Training Burden</h4>
+                    <p className="text-slate-600 text-sm">We handle classroom instruction; you provide hands-on experience</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 bg-white rounded-xl p-6 shadow-sm">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">🎯</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-slate-900">Shape the Industry</h4>
+                    <p className="text-slate-600 text-sm">Mentor the next generation of professional barbers</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">Apply Now</h2>
+              <p className="text-slate-600 mb-6">Complete the form below and our team will contact you within 2-3 business days to discuss next steps.</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Business Name</label>
+                  <input type="text" className="w-full border border-slate-300 rounded-lg px-4 py-3" placeholder="Your barbershop name" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Contact Name</label>
+                  <input type="text" className="w-full border border-slate-300 rounded-lg px-4 py-3" placeholder="Your name" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                  <input type="tel" className="w-full border border-slate-300 rounded-lg px-4 py-3" placeholder="(317) 000-0000" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                  <input type="email" className="w-full border border-slate-300 rounded-lg px-4 py-3" placeholder="you@barbershop.com" />
+                </div>
+                <Link href="/contact" className="block w-full text-center bg-brand-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-brand-blue-700 transition-colors">
+                  Submit Application
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>

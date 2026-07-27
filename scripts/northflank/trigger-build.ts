@@ -3,6 +3,10 @@
  * Trigger a Northflank combined-service build from the current git branch.
  * Skips build if the same SHA is already building or recently completed.
  *
+ * CRITICAL FIX: This script now PATCHes the service configuration with GIT_SHA
+ * before triggering the build. The POST to /build is ephemeral, but PATCH to
+ * /services/combined/{id} permanently stores buildArguments for the Docker build.
+ *
  *   npx tsx scripts/northflank/trigger-build.ts elevate-lms
  *   npx tsx scripts/northflank/trigger-build.ts elevate-admin
  */
@@ -59,12 +63,16 @@ async function main() {
     }
   }
   
-  // Trigger build from the current branch
-  // Pass GIT_SHA as the authoritative release identity
+  // EVIDENCE: Log the SHA that will be used
+  console.log('=== TRIGGER BUILD EVIDENCE ===');
+  console.log('Service:', serviceId);
+  console.log('currentSha:', currentSha);
+  console.log('GITHUB_SHA env:', process.env.GITHUB_SHA);
+  console.log('BUILD_SHA env:', process.env.BUILD_SHA);
   
-  // EVIDENCE: Capture exact payload sent to Northflank
-  const payload = {
-    sha: currentSha,
+  // FIX: PATCH the service configuration with GIT_SHA BEFORE triggering build
+  // This ensures buildArguments are permanently stored and used by Docker
+  const buildArgsPayload = {
     buildArguments: {
       GITHUB_SHA: currentSha,
       GIT_SHA: currentSha,
@@ -74,15 +82,25 @@ async function main() {
     },
   };
   
-  console.log('=== TRIGGER BUILD EVIDENCE ===');
-  console.log('Service:', serviceId);
-  console.log('currentSha:', currentSha);
-  console.log('GITHUB_SHA env:', process.env.GITHUB_SHA);
-  console.log('BUILD_SHA env:', process.env.BUILD_SHA);
-  console.log('Payload sent to Northflank:');
-  console.log(JSON.stringify(payload, null, 2));
+  console.log('Payload for PATCH (permanently stored):');
+  console.log(JSON.stringify(buildArgsPayload, null, 2));
+  
+  try {
+    const patchResult = await nfFetch(
+      projectApiPath(projectId, `/services/combined/${serviceId}`),
+      {
+        method: 'PATCH',
+        body: JSON.stringify(buildArgsPayload),
+      }
+    );
+    console.log('PATCH result:', patchResult);
+  } catch (e) {
+    console.error('PATCH failed:', e);
+    // Continue anyway - the POST to /build may still work
+  }
   console.log('=== END EVIDENCE ===');
   
+  // Trigger build from the current branch
   const build = await nfFetch<{
     id: string;
     branch?: string;
@@ -91,7 +109,7 @@ async function main() {
     concluded?: boolean;
   }>(projectApiPath(projectId, `/services/${serviceId}/build`), {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ sha: currentSha }),
   });
   console.log(`Triggered build for ${serviceId}:`, build);
 

@@ -78,9 +78,19 @@ jobs:
 
       # FIX: Set GITHUB_SHA env var so trigger-build.ts can read it
       - name: Set build environment variables
+        id: env_setup
         run: |
           echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
           echo "BUILD_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          echo "VERCEL_GIT_COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          
+          # EVIDENCE: Log what we set
+          echo "=== WORKFLOW EVIDENCE ==="
+          echo "github.sha: ${{ github.sha }}"
+          echo "GITHUB_SHA set to: ${{ github.sha }}"
+          echo "BUILD_SHA set to: ${{ github.sha }}"
+          echo "VERCEL_GIT_COMMIT_SHA set to: ${{ github.sha }}"
+          echo "=== END EVIDENCE ==="
 
       - name: Verify source commit SHA
         run: |
@@ -92,6 +102,7 @@ jobs:
           test "$ACTUAL_SHA" = "$EXPECTED_SHA"
           test "$(git status --porcelain)" = ""
           echo "GITHUB_SHA env var: $GITHUB_SHA"
+          echo "BUILD_SHA env var: $BUILD_SHA"
           echo "SHA verification passed"
 
       # Generate version.json for runtime reference (GitHub Actions only)

@@ -79,10 +79,19 @@ jobs:
           echo "SHA verification passed"
 
       - name: Set build environment variables
+        id: env_setup
         run: |
           echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
           echo "BUILD_SHA=${{ github.sha }}" >> $GITHUB_ENV
-          echo "Set GITHUB_SHA=${{ github.sha }} for trigger-build.ts"
+          echo "VERCEL_GIT_COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          
+          # EVIDENCE: Log what we set
+          echo "=== WORKFLOW EVIDENCE ==="
+          echo "github.sha: ${{ github.sha }}"
+          echo "GITHUB_SHA set to: ${{ github.sha }}"
+          echo "BUILD_SHA set to: ${{ github.sha }}"
+          echo "VERCEL_GIT_COMMIT_SHA set to: ${{ github.sha }}"
+          echo "=== END EVIDENCE ==="
 
       - name: Generate version file
         run: |

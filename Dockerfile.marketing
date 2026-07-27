@@ -61,13 +61,20 @@ ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 # version.json is generated at build time by Docker
 # Server.js serves the Next.js app
 
-# DEBUG: Print all build arguments to see what Northflank passed
-RUN echo "=== BUILD ARG DEBUG ===" && \
+# EVIDENCE: Print all build arguments to see what Northflank passed
+RUN echo "=== DOCKER BUILD EVIDENCE (Marketing) ===" && \
     echo "GIT_SHA=${GIT_SHA}" && \
     echo "GITHUB_SHA=${GITHUB_SHA}" && \
     echo "BUILD_TIMESTAMP=${BUILD_TIMESTAMP}" && \
     echo "FALLBACK_COMMIT=${FALLBACK_COMMIT}" && \
-    echo "==================="
+    echo "" && \
+    echo "All environment variables starting with GIT:" && \
+    printenv | grep -i git || echo "(none)" && \
+    echo "" && \
+    echo "All ARG values:" && \
+    echo "NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}" && \
+    echo "NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}" && \
+    echo "=== END DOCKER BUILD EVIDENCE ==="
 
 # Build Marketing app
 RUN pnpm --filter @elevate/marketing build --no-lint

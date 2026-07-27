@@ -65,6 +65,17 @@ ENV GIT_SHA=${GIT_SHA}
 ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 ENV NEXT_STANDALONE_OUTPUT=1
 
+# EVIDENCE: Print all build arguments to see what Northflank passed
+RUN echo "=== DOCKER BUILD EVIDENCE (Admin) ===" && \
+    echo "GIT_SHA=${GIT_SHA}" && \
+    echo "GITHUB_SHA=${GITHUB_SHA}" && \
+    echo "BUILD_TIMESTAMP=${BUILD_TIMESTAMP}" && \
+    echo "FALLBACK_COMMIT=${FALLBACK_COMMIT}" && \
+    echo "" && \
+    echo "All environment variables starting with GIT:" && \
+    printenv | grep -i git || echo "(none)" && \
+    echo "=== END DOCKER BUILD EVIDENCE ==="
+
 # Build Admin app
 RUN pnpm --filter @elevate/admin build
 

@@ -61,6 +61,28 @@ async function main() {
   
   // Trigger build from the current branch
   // Pass GIT_SHA as the authoritative release identity
+  
+  // EVIDENCE: Capture exact payload sent to Northflank
+  const payload = {
+    sha: currentSha,
+    buildArguments: {
+      GITHUB_SHA: currentSha,
+      GIT_SHA: currentSha,
+      NEXT_PUBLIC_GIT_SHA: currentSha,
+      BUILD_TIMESTAMP: new Date().toISOString(),
+      FALLBACK_COMMIT: currentSha,
+    },
+  };
+  
+  console.log('=== TRIGGER BUILD EVIDENCE ===');
+  console.log('Service:', serviceId);
+  console.log('currentSha:', currentSha);
+  console.log('GITHUB_SHA env:', process.env.GITHUB_SHA);
+  console.log('BUILD_SHA env:', process.env.BUILD_SHA);
+  console.log('Payload sent to Northflank:');
+  console.log(JSON.stringify(payload, null, 2));
+  console.log('=== END EVIDENCE ===');
+  
   const build = await nfFetch<{
     id: string;
     branch?: string;
@@ -69,16 +91,7 @@ async function main() {
     concluded?: boolean;
   }>(projectApiPath(projectId, `/services/${serviceId}/build`), {
     method: 'POST',
-    body: JSON.stringify({
-      sha: currentSha,
-      buildArguments: {
-        GITHUB_SHA: currentSha,
-        GIT_SHA: currentSha,
-        NEXT_PUBLIC_GIT_SHA: currentSha,
-        BUILD_TIMESTAMP: new Date().toISOString(),
-        FALLBACK_COMMIT: currentSha,
-      },
-    }),
+    body: JSON.stringify(payload),
   });
   console.log(`Triggered build for ${serviceId}:`, build);
 

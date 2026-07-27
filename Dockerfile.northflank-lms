@@ -82,8 +82,19 @@ ENV NEXT_PUBLIC_BUILD_VERSION=${GITHUB_SHA}
 ENV NEXT_PUBLIC_COMMIT_SHA=${GITHUB_SHA}
 ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 
-# Verify build args
-RUN echo "LMS Build SHA: ${GITHUB_SHA}" && echo "LMS Build Timestamp: ${BUILD_TIMESTAMP}"
+# EVIDENCE: Print all build arguments to see what Northflank passed
+RUN echo "=== DOCKER BUILD EVIDENCE (LMS) ===" && \
+    echo "GITHUB_SHA=${GITHUB_SHA}" && \
+    echo "GIT_SHA=${GIT_SHA}" && \
+    echo "BUILD_TIMESTAMP=${BUILD_TIMESTAMP}" && \
+    echo "BUILD_ID=${BUILD_ID}" && \
+    echo "FALLBACK_COMMIT=${FALLBACK_COMMIT}" && \
+    echo "" && \
+    echo "All environment variables starting with GIT:" && \
+    printenv | grep -i git || echo "(none)" && \
+    echo "All environment variables starting with NEXT_PUBLIC:" && \
+    printenv | grep -i next_public || echo "(none)" && \
+    echo "=== END DOCKER BUILD EVIDENCE ==="
 
 RUN pnpm run build:lms:compile --no-lint
 

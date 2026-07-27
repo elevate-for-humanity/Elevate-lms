@@ -19,9 +19,7 @@ async function getPricingData() {
       supabase
         .from('programs')
         .select('id, name, slug, price, duration_weeks, program_type, status')
-        .eq('status', 'active')
-        .not('price', 'is', null)
-        .gt('price', 0)
+        .in('status', ['active', 'enrolling'])
         .order('name'),
       supabase
         .from('curriculum_licenses')
@@ -36,14 +34,31 @@ async function getPricingData() {
         .limit(50)
     ]);
     
+    // Log any errors for debugging but don't fail the page
+    if (programsRes.error) {
+      console.error('[pricing] Programs query error:', programsRes.error);
+    }
+    if (licenseTiersRes.error) {
+      console.error('[pricing] License tiers query error:', licenseTiersRes.error);
+    }
+    if (storeProductsRes.error) {
+      console.error('[pricing] Store products query error:', storeProductsRes.error);
+    }
+    
     return {
       programs: programsRes.data || [],
       licenseTiers: licenseTiersRes.data || [],
-      storeProducts: storeProductsRes.data || []
+      storeProducts: storeProductsRes.data || [],
+      programsError: programsRes.error?.message || null
     };
   } catch (error) {
     console.error('Error fetching pricing data:', error);
-    return { programs: [], licenseTiers: [], storeProducts: [] };
+    return { 
+      programs: [], 
+      licenseTiers: [], 
+      storeProducts: [],
+      programsError: error instanceof Error ? error.message : 'Failed to load programs'
+    };
   }
 }
 
@@ -55,7 +70,7 @@ function formatDuration(weeks?: number | null): string {
 }
 
 export default async function PricingPage() {
-  const { programs, licenseTiers, storeProducts } = await getPricingData();
+  const { programs, licenseTiers, storeProducts, programsError } = await getPricingData();
   const featuredPrograms = programs.slice(0, 6);
 
   return (
@@ -86,7 +101,17 @@ export default async function PricingPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Program Tuition</h2>
             <p className="text-lg text-slate-600">Prices shown before funding. Most students pay $0 out of pocket.</p>
-            <p className="text-sm text-green-600 mt-2">{programs.length} programs available</p>
+            {programsError ? (
+              <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg max-w-md mx-auto">
+                <p className="text-amber-800 text-sm">
+                  <strong>Note:</strong> Program catalog temporarily unavailable. 
+                  <a href="/programs" className="underline ml-1">Browse all programs</a> or 
+                  <a href="/contact" className="underline ml-1">contact admissions</a> for current pricing.
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-green-600 mt-2">{programs.length} programs available</p>
+            )}
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -119,9 +144,18 @@ export default async function PricingPage() {
           </div>
 
           <div className="text-center mb-8">
-            <Link href="/programs" className="inline-flex items-center gap-2 text-green-600 font-semibold hover:underline">
-              View all {programs.length} programs <ArrowRight className="w-4 h-4" />
-            </Link>
+            {programs.length > 0 ? (
+              <Link href="/programs" className="inline-flex items-center gap-2 text-green-600 font-semibold hover:underline">
+                View all {programs.length} programs <ArrowRight className="w-4 h-4" />
+              </Link>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-slate-600">Contact us for current program availability and pricing.</p>
+                <Link href="/contact" className="inline-flex items-center gap-2 text-green-600 font-semibold hover:underline">
+                  Contact Admissions <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
           </div>
 
           <div className="bg-green-50 rounded-xl p-6 text-center">

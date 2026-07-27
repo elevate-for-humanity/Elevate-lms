@@ -61,6 +61,14 @@ ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 # version.json is generated at runtime by the server (server.cjs)
 # This ensures the correct commit SHA is always available
 
+# DEBUG: Print all build arguments to see what Northflank passed
+RUN echo "=== BUILD ARG DEBUG ===" && \
+    echo "GIT_SHA=${GIT_SHA}" && \
+    echo "GITHUB_SHA=${GITHUB_SHA}" && \
+    echo "BUILD_TIMESTAMP=${BUILD_TIMESTAMP}" && \
+    echo "FALLBACK_COMMIT=${FALLBACK_COMMIT}" && \
+    echo "==================="
+
 # Build Marketing app
 RUN pnpm --filter @elevate/marketing build --no-lint
 

@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Users, Mail, Shield, Plus } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Staff | Admin | Elevate For Humanity',

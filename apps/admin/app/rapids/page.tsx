@@ -6,7 +6,6 @@ import { Download, ChevronRight, CheckCircle, Clock, AlertTriangle } from 'lucid
 import RapidsExportClient from './RapidsExportClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'RAPIDS | Admin | Elevate For Humanity' };
 
 export default async function RapidsPage() {

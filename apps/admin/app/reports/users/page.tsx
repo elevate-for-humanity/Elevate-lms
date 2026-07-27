@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { ArrowLeft, Users, UserPlus, Shield, GraduationCap } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'User Activity Report | Admin',

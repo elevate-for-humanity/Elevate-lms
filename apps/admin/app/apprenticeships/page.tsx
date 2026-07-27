@@ -6,7 +6,6 @@ import { ChevronRight, Users, Clock, CheckCircle, BookOpen } from 'lucide-react'
 import ApprenticeshipHoursClient from './ApprenticeshipHoursClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Apprenticeships | Admin | Elevate For Humanity' };
 
 export default async function ApprenticeshipsPage() {

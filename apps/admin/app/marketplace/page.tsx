@@ -6,7 +6,6 @@ import { ShoppingBag, Users, DollarSign } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Marketplace | Admin | Elevate For Humanity',

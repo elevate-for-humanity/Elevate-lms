@@ -3,7 +3,6 @@ import { requireRole } from '@/lib/auth/require-role';
 import CalendlyClient from './CalendlyClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Calendly Integration | Admin | Elevate For Humanity',

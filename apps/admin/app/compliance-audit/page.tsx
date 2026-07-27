@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { ChevronRight, Shield, Activity, AlertTriangle, FileText } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Compliance Audit | Admin | Elevate For Humanity' };
 
 export default async function ComplianceAuditPage() {

@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { ArrowLeft, DollarSign } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'New Deal | CRM | Admin' };
 
 async function createDeal(formData: FormData) {

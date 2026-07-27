@@ -5,7 +5,6 @@ import Link from 'next/link';
 import AdvancedVideoUploader from '@/components/admin/AdvancedVideoUploader';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/files' },

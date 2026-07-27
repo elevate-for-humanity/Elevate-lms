@@ -5,7 +5,6 @@ import { ChevronRight } from 'lucide-react';
 import DataImportClient from './DataImportClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Data Import | Admin | Elevate For Humanity' };
 
 export default async function DataImportPage() {

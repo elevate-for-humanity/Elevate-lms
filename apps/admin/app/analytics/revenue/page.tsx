@@ -4,7 +4,6 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Revenue Analytics | Elevate For Humanity' };
 
 function fmtUsd(n: number) {

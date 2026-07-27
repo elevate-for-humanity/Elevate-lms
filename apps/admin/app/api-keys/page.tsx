@@ -5,7 +5,6 @@ import { createClient } from '@/lib/supabase/server';
 import { ApiKeysClient } from './ApiKeysClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'API Keys | Admin | Elevate For Humanity',

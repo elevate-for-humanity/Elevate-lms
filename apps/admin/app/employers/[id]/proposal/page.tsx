@@ -8,7 +8,6 @@ import { EmployerProposalPreview } from '@/components/admin/EmployerProposalPrev
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Employer Proposal | Admin | ${PLATFORM_DEFAULTS.orgName}`,

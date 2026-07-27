@@ -3,7 +3,6 @@ import { requireRole } from '@/lib/auth/require-role';
 import NavEditorClient from './NavEditorClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Navigation Settings | Admin | Elevate For Humanity',

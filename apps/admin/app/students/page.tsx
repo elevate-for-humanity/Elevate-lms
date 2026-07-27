@@ -10,7 +10,6 @@ import {
 } from '@/components/admin/AdminPageShell';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Students | Admin',
 };

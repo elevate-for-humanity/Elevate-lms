@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Award, Calendar, ChevronRight, ExternalLink } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Certificates | Admin',
 };

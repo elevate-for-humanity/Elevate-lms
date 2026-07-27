@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic'; // deploy-trigger: 20260518173947
 export const metadata: Metadata = {
   title: 'Compliance Automation | Admin | Elevate For Humanity',
 };

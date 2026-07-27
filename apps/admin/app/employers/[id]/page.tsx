@@ -6,7 +6,6 @@ import { notFound } from 'next/navigation';
 import { Building2, Mail, Phone, MapPin, Briefcase, Users, Edit3, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,

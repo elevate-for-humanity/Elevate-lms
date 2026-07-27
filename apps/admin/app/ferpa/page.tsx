@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'FERPA Compliance | Admin',
 };

@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/server';
 import NewSocialCampaignClient from './NewSocialCampaignClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export default async function Page() {
   await requireRole(['admin', 'staff']);

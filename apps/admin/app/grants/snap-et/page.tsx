@@ -5,7 +5,6 @@ import Link from 'next/link';
 import SnapEtClient from './SnapEtClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'SNAP E&T TPP Application | Admin' };
 
 export default async function SnapEtPage() {

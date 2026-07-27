@@ -17,7 +17,6 @@ import {
 import IepStatusButton from './IepStatusButton';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,

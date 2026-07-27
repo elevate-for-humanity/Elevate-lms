@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { FileText, XCircle, Clock, Eye } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Review Documents | Admin',

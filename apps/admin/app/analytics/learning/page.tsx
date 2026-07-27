@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { BookOpen, Users, CheckCircle, TrendingUp, ChevronRight, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Learning Analytics | Admin',
 };

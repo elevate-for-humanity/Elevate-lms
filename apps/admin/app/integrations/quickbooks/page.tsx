@@ -3,7 +3,6 @@ import { requireRole } from '@/lib/auth/require-role';
 import QuickBooksClient from './QuickBooksClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'QuickBooks Integration | Admin | Elevate For Humanity',

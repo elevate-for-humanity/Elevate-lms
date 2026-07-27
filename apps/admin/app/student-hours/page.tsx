@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Clock, CheckCircle2, AlertCircle, TrendingUp, User } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 // DOL OJT requirements by program
 const OJT_REQUIREMENTS: Record<string, number> = {

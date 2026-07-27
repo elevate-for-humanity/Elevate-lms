@@ -7,7 +7,6 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Inspect Course | Admin | Elevate For Humanity',

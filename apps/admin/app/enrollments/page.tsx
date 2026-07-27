@@ -9,7 +9,6 @@ import AutomatedEnrollmentWorkflow from '@/components/AutomatedEnrollmentWorkflo
 import PendingAccessPanel from './PendingAccessPanel';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Enrollments | Admin',
 };

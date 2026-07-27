@@ -20,7 +20,6 @@ import ApplicationsTableClient from './ApplicationsTableClient';
 import type { ApplicationRow } from './ApplicationsTableClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Applications | Admin',
 };

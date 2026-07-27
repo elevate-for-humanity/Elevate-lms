@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/Button';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export default async function AdminLicensesPage() {
   await requireRole(['admin', 'staff']);

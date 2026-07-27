@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Calendar, Plus, Clock, User, CheckCircle, XCircle } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Appointments | CRM | Admin | Elevate For Humanity',
 };

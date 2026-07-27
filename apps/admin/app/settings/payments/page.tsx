@@ -5,7 +5,6 @@ import Link from 'next/link';
 import SettingsFormClient, { SettingsField } from '@/components/admin/settings/SettingsFormClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Payments | Admin Settings' };
 
 const KEYS = ['stripe_mode', 'currency', 'payment_methods'];

@@ -7,7 +7,6 @@ import { ArrowLeft, Award, Calendar, Building, Save } from 'lucide-react';
 import { createLicense } from '../actions';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Create License | Admin',

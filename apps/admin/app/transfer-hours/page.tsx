@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { TransferHoursTable } from './transfer-hours-table';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Transfer Hours Management | Admin',

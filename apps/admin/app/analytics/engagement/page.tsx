@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Users, Activity, TrendingUp, Clock, ChevronRight, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Engagement Analytics | Admin',
 };

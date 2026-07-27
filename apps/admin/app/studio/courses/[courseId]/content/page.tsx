@@ -6,7 +6,6 @@ import LessonManagerClient from './LessonManagerClient';
 import QuizManagerClient from './QuizManagerClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Course Content | Elevate For Humanity',

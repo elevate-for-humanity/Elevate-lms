@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { DollarSign, TrendingUp, Users, Award, Plus } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Incentives | Admin | Elevate For Humanity',
 };

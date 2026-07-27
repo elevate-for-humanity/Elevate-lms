@@ -4,7 +4,6 @@ import type { Metadata } from 'next';
 import FundingVerificationTable from './FundingVerificationTable';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Funding Verification Queue | Admin',

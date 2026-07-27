@@ -21,7 +21,6 @@ import Image from 'next/image';
 import PayRateEditor from './PayRateEditor';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 interface Props {
   params: Promise<{ id: string }>;

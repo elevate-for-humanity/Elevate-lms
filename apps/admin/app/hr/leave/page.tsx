@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/hr/leave' },

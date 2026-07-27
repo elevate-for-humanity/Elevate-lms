@@ -5,7 +5,6 @@ import { ChevronRight } from 'lucide-react';
 import MonitoringSetupClient from './MonitoringSetupClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Monitoring Setup | Admin | Elevate For Humanity' };
 
 export default async function MonitoringSetupPage() {

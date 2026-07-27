@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation';
 import { VerificationReviewForm } from '@/components/admin/VerificationReviewForm';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Review Verification | Admin',

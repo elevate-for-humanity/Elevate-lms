@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { ArrowLeft, FileSignature } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'New Signature Request | Admin' };
 
 async function createSignatureRequest(formData: FormData) {

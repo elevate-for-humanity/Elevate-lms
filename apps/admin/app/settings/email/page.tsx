@@ -6,7 +6,6 @@ import Link from 'next/link';
 import SettingsFormClient, { SettingsField } from '@/components/admin/settings/SettingsFormClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Email | Admin Settings' };
 
 const KEYS = ['email_from_name', 'email_from_address', 'email_provider'];

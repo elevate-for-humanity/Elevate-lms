@@ -7,7 +7,6 @@ import OrgProfileClient from './OrgProfileClient';
 import { ORG_PROFILE } from '@/lib/grants/org-profile';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Organization Profile | Admin' };
 
 export default async function OrgProfilePage() {

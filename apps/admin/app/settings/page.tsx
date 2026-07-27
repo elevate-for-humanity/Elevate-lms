@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Bell, Shield, CreditCard, Globe, Mail, Webhook, ArrowRight, Share2 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Settings | Admin',
 };

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Shield, XCircle, Clock, Eye } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Review ID Verifications | Admin',

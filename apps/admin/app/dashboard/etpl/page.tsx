@@ -19,7 +19,6 @@ import {
   Download,
 } from 'lucide-react';
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'ETPL Performance Dashboard | Admin',

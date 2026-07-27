@@ -6,7 +6,6 @@ import { ChevronRight } from 'lucide-react';
 import OpportunitiesClient from './OpportunitiesClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Grant Opportunities | Admin' };
 
 export default async function GrantOpportunitiesPage() {

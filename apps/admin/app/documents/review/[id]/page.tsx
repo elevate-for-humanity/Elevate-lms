@@ -6,7 +6,6 @@ import { DocumentReviewForm } from '@/components/admin/DocumentReviewForm';
 import { getAdminDocumentUrl } from '@/lib/admin/document-access';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Review Document | Admin',

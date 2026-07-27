@@ -6,7 +6,6 @@ import { ChevronRight, AlertTriangle, CheckCircle, Activity, Shield, ExternalLin
 import MonitoringClient from './MonitoringClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Monitoring | Admin | Elevate For Humanity' };
 
 export default async function MonitoringPage() {

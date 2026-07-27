@@ -7,7 +7,6 @@ import { ChevronRight } from 'lucide-react';
 import GrantApplicationForm from '../GrantApplicationForm';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Grant Application | Admin' };
 
 export default async function GrantApplicationDetailPage({

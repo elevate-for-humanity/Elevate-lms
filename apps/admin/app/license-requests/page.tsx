@@ -6,7 +6,6 @@ import { ChevronRight, Clock, CheckCircle, XCircle, Key } from 'lucide-react';
 import LicenseRequestsClient from './LicenseRequestsClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'License Requests | Admin | Elevate For Humanity' };
 
 export default async function LicenseRequestsPage() {

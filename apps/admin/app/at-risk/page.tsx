@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { AlertTriangle, Clock, ChevronRight, ArrowRight, Brain, BookOpen, Phone, Mail, MessageSquare, TrendingDown, Users, Zap } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Student Success | Admin',
 };

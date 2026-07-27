@@ -3,7 +3,6 @@ import { requireRole } from '@/lib/auth/require-role';
 import { DocumentUploadClient } from './DocumentUploadClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/documents/upload' },

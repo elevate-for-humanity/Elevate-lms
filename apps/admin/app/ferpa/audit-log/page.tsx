@@ -7,7 +7,6 @@ import { Shield } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `FERPA Audit Log | Admin | ${PLATFORM_DEFAULTS.orgName}`,

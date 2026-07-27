@@ -5,7 +5,6 @@ import Link from 'next/link';
 import LearningBarrierAnalyzer from '@/components/admin/LearningBarrierAnalyzer';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Barriers Management | Elevate For Humanity',

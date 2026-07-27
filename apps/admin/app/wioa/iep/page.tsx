@@ -20,7 +20,6 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 const STATUS_META: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   draft:     { label: 'Draft',     color: 'bg-slate-100 text-slate-700',   icon: <Clock className="w-3 h-3" /> },

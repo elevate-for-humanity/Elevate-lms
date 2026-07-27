@@ -5,7 +5,6 @@ import SiteStatsClient from './SiteStatsClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: `Site Stats | Admin | ${process.env.NEXT_PUBLIC_ORG_NAME ?? PLATFORM_DEFAULTS.orgName}`,

@@ -5,7 +5,6 @@ import { createClient } from '@/lib/supabase/server';
 import PartnerApplicationActions from './PartnerApplicationActions';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {

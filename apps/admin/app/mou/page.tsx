@@ -5,7 +5,6 @@ import Link from 'next/link';
 import MouAdminClient from './MouAdminClient';
 
 export const dynamic = 'force-dynamic';
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'MOU Management | Admin | Elevate For Humanity',

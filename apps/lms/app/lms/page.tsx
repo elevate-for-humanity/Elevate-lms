@@ -6,6 +6,7 @@ import { GraduationCap, Users, Award, BookOpen, ArrowRight, CheckCircle2 } from 
 export const metadata: Metadata = {
   title: 'Learning Management System | Elevate for Humanity',
   description: 'Access your courses, track progress, and earn credentials through Elevate for Humanity\'s training platform.',
+  robots: { index: false, follow: false },
 };
 
 export default function LmsRootPage() {

@@ -2,7 +2,17 @@
 # Dockerfile.northflank-admin - Northflank Admin Service
 # Serves admin.elevateforhumanity.org
 #
-# CRITICAL: This Dockerfile was fixed to resolve path mismatches.
+# CRITICAL: This Dockerfile requires the following build arguments:
+#   - NEXT_PUBLIC_SUPABASE_URL
+#   - NEXT_PUBLIC_SUPABASE_ANON_KEY
+#   - NEXT_PUBLIC_SITE_URL (optional, defaults to https://www.elevateforhumanity.org)
+#   - NEXT_PUBLIC_ADMIN_URL (optional)
+#   - GIT_SHA (optional)
+#   - BUILD_TIMESTAMP (optional)
+#
+# Runtime secrets (NOT build args, set in Northflank secrets):
+#   - SUPABASE_SERVICE_ROLE_KEY
+#   - SSN_SALT
 
 ARG GIT_SHA=unknown
 ARG BUILD_TIMESTAMP=unknown
@@ -13,7 +23,7 @@ ARG BUILD_TIMESTAMP=unknown
 FROM node:22-bookworm-slim AS base
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 make g++ ca-certificates curl && \
+    python3 make g++ ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
 ENV PNPM_HOME="/pnpm"
@@ -22,7 +32,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_STANDALONE_OUTPUT=1
 
 # Cache invalidation marker
-RUN echo "nf-cache-invalidate-admin-2026-07-20-v2"
+RUN echo "nf-cache-invalidate-admin-2026-07-27-buildfix"
 
 RUN corepack enable
 WORKDIR /app
@@ -44,20 +54,30 @@ RUN pnpm install --strict-peer-dependencies=false
 # Copy source code
 COPY . .
 
-# Build args
+# =============================================================================
+# CRITICAL: Required build arguments for Supabase
+# These MUST be passed as build arguments, NOT runtime env vars
+# NEXT_PUBLIC_* vars are compiled into the app during build
+# =============================================================================
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
 ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG SUPABASE_SERVICE_ROLE_KEY
 ARG GIT_SHA
 ARG BUILD_TIMESTAMP
+
+# Validate required Supabase build arguments
+RUN echo "=== Validating build arguments ===" && \
+    echo "NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}" && \
+    echo "NEXT_PUBLIC_ADMIN_URL: ${NEXT_PUBLIC_ADMIN_URL}" && \
+    (test -n "$NEXT_PUBLIC_SUPABASE_URL" || (echo "ERROR: NEXT_PUBLIC_SUPABASE_URL is required as a build argument" && exit 1)) && \
+    (test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" || (echo "ERROR: NEXT_PUBLIC_SUPABASE_ANON_KEY is required as a build argument" && exit 1)) && \
+    echo "✓ All required build arguments present"
 
 ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
 ENV NEXT_PUBLIC_ADMIN_URL=${NEXT_PUBLIC_ADMIN_URL}
 ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-ENV SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
 ENV NODE_ENV=production
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 ENV CI=true
@@ -86,6 +106,11 @@ RUN echo "=== ADMIN BUILD VERIFICATION ===" && \
 # STAGE 3: Runtime
 # =============================================================================
 FROM node:22-bookworm-slim AS runner
+
+# Install curl for healthcheck (not in base image by default)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 # Declare build args for runtime stage
 ARG GIT_SHA=unknown

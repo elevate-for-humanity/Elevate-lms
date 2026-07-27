@@ -13,6 +13,10 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
+// Prevent static generation - CRM data requires runtime Supabase credentials
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata = {
   title: 'CRM Hub | Admin Dashboard',
   description: 'Manage contacts, campaigns, leads, and customer relationships',

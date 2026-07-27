@@ -59,11 +59,12 @@ ENV GIT_SHA=${GIT_SHA}
 ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 
 # Generate version.json - try multiple sources for commit SHA
-# 1. GIT_SHA from Northflank build args
+# 1. GIT_SHA from Northflank buildArguments
 # 2. NF_GIT_SHA alternative env var
-# 3. NF_COMMIT from Northflank metadata
-# 4. Fallback to timestamp hash
-RUN echo "{\"service\":\"marketing\",\"commit\":\"${GIT_SHA:-${NF_GIT_SHA:-${NF_COMMIT:-$(date +%s)}}}\",\"builtAt\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > ./public/version.json
+# 3. NF_COMMIT from Northflank metadata (sha passed to build trigger)
+# 4. FALLBACK_COMMIT from buildArguments (alternative sha field)
+# 5. Fallback to timestamp hash
+RUN echo "{\"service\":\"marketing\",\"commit\":\"${GIT_SHA:-${NF_GIT_SHA:-${NF_COMMIT:-${FALLBACK_COMMIT:-$(date +%s%N | head -c 12)}}}\",\"builtAt\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > ./public/version.json
 
 # Build Marketing app
 RUN pnpm --filter @elevate/marketing build --no-lint

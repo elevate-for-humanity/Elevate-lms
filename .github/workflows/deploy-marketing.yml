@@ -76,6 +76,12 @@ jobs:
           fetch-depth: 1
           clean: true
 
+      # FIX: Set GITHUB_SHA env var so trigger-build.ts can read it
+      - name: Set build environment variables
+        run: |
+          echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          echo "BUILD_SHA=${{ github.sha }}" >> $GITHUB_ENV
+
       - name: Verify source commit SHA
         run: |
           set -euo pipefail
@@ -85,6 +91,7 @@ jobs:
           echo "Actual SHA:   $ACTUAL_SHA"
           test "$ACTUAL_SHA" = "$EXPECTED_SHA"
           test "$(git status --porcelain)" = ""
+          echo "GITHUB_SHA env var: $GITHUB_SHA"
           echo "SHA verification passed"
 
       - name: Generate version file

@@ -39,7 +39,8 @@ async function main() {
   }
 
   // Get current SHA and pass as build argument
-  const currentSha = process.env.GITHUB_SHA || process.env.VERCEL_GIT_COMMIT_SHA || '';
+  // Check multiple sources: GITHUB_SHA (from workflow), BUILD_SHA (alternative), or VERCEL
+  const currentSha = process.env.GITHUB_SHA || process.env.BUILD_SHA || process.env.VERCEL_GIT_COMMIT_SHA || '';
 
   // Check for existing build with same SHA
   if (currentSha) {
@@ -76,6 +77,7 @@ async function main() {
         GIT_SHA: currentSha,
         NEXT_PUBLIC_GIT_SHA: currentSha,
         BUILD_TIMESTAMP: new Date().toISOString(),
+        FALLBACK_COMMIT: currentSha,
       },
     }),
   });

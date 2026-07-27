@@ -11,6 +11,7 @@ import {
   Phone,
 } from 'lucide-react';
 import { BOOTH_RENTAL_TIERS } from '@/lib/programs/pricing';
+import { organization } from '@/lib/config/organization';
 
 export const metadata: Metadata = {
   title: 'Booth & Suite Rentals | Elevate for Humanity — Indianapolis',
@@ -90,7 +91,7 @@ export default function BoothRentalLandingPage() {
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-slate-600">
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4 text-brand-blue-600" />
-            <span>8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240</span>
+            <span>{organization.address}</span>
           </div>
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4 text-brand-blue-600" />

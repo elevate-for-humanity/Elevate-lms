@@ -6,6 +6,7 @@ import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TEAM } from '@/data/team';
 import { createClient } from '@/lib/supabase/server';
+import { organization } from '@/lib/config/organization';
 
 export const revalidate = 3600; // re-fetch team from DB hourly
 
@@ -252,7 +253,7 @@ export default async function AboutPage() {
             </div>
             <div className="bg-white rounded-lg p-4 border border-slate-200">
               <h3 className="font-semibold text-slate-900 text-sm mb-2">Administrative Office</h3>
-              <p className="text-xs text-black">8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. Administrative and enrollment support — not an instructional facility.</p>
+              <p className="text-xs text-black">{organization.address}. Administrative and enrollment support — not an instructional facility.</p>
             </div>
           </div>
           <div className="text-sm text-slate-700 space-y-2">

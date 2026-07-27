@@ -1,4 +1,5 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { organization } from '@/lib/config/organization';
 // lib/partners/certiport.ts
 // Certiport (Pearson VUE) — Portal/Link-Based Integration
 //
@@ -8,7 +9,9 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 // vouchers are purchased by admin, and results are recorded by proctors.
 //
 // Elevate for Humanity is a registered CATC (Certiport Authorized Testing Center).
-// Location: 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240
+// Location: 120 Market St, Suite 930, Indianapolis, IN 46204
+
+export const CERTIPORT_CATC_ADDRESS = '120 Market St, Suite 930, Indianapolis, IN 46204';
 //
 // Actual flow:
 //   1. Admin purchases exam vouchers via Certiport portal

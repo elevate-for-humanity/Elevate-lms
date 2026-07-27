@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import { createClient } from '@/lib/supabase/client';
 import { Award, Lock, ArrowRight, Shield, MapPin, Clock } from 'lucide-react';
-import { CERTIPORT_EXAMS } from '@/lib/partners/certiport';
+import { CERTIPORT_EXAMS, CERTIPORT_CATC_ADDRESS } from '@/lib/partners/certiport';
 import { getProvidersForAmount } from '@/lib/bnpl-config';
 
 type FundingStatus = 'funded' | 'self_pay' | 'loading';
@@ -153,9 +153,7 @@ function CertiportExamContent() {
               <p className="text-brand-blue-800 text-sm">
                 Elevate for Humanity Career &amp; Technical Institute
                 <br />
-                8888 Keystone Crossing, Suite 1300
-                <br />
-                Indianapolis, IN 46240
+                {CERTIPORT_CATC_ADDRESS}
               </p>
             </div>
 

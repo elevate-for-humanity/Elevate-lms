@@ -24,7 +24,7 @@ export const ORG_PROFILE = {
   dunsOrUei: 'UEI: VX2GK5S8SZH8',
 
   // ── Contact ─────────────────────────────────────────────────────────────────
-  address: '8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240',
+  address: '120 Market St, Suite 930, Indianapolis, IN 46204',
   city: 'Indianapolis',
   state: 'Indiana',
   zip: '46240',

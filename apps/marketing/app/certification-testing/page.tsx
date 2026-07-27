@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { getProvidersForAmount } from '@/lib/bnpl-config';
+import { TESTING_CENTER } from '@/lib/testing/testing-config';
 import {
   CheckCircle,
   Shield,
@@ -308,11 +309,7 @@ export default function CertificationTestingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-slate-300">
             <div className="flex items-start gap-2">
               <MapPin className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-              <span>
-                8888 Keystone Crossing, Suite 1300
-                <br />
-                Indianapolis, IN 46240
-              </span>
+              <span>{TESTING_CENTER.address}</span>
             </div>
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-slate-400 flex-shrink-0" />

@@ -13,6 +13,7 @@ import { provisionAccount } from '@/lib/enrollment/provision-account';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { organization } from '@/lib/config/organization';
 // approveApplication is called by /api/admin/applications/[id]/approve - not here
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -665,7 +666,7 @@ async function _POST(req: Request) {
               <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
               <p style="color: #64748b; font-size: 13px; text-align: center;">
                 ${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute<br />
-                8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240<br />
+                ${organization.address}<br />
                 <a href="${siteUrl}" style="color: #3b82f6;">${PLATFORM_DEFAULTS.canonicalDomain}</a>
               </p>
             </div>

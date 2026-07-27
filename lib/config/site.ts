@@ -34,8 +34,8 @@ export const siteConfig = {
     city: 'Indianapolis',
     state: 'Indiana',
     stateAbbr: 'IN',
-    address: '8888 Keystone Crossing, Suite 1300',
-    zip: '46240',
+    address: '120 Market St, Suite 930',
+    zip: '46204',
     country: 'United States',
   },
 

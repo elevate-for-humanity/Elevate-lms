@@ -11,6 +11,7 @@ import Turnstile from '@/components/Turnstile';
 
 import FeedbackWidget from '@/components/FeedbackWidget';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { organization } from '@/lib/config/organization';
 
 const contactInfo = [
   {
@@ -515,7 +516,7 @@ function ContactPageInner() {
             },
             {
               q: 'Can I visit your office in person?',
-              a: 'All visits are by appointment only. Our address is 8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240. Use the calendar above to schedule your appointment.',
+              a: `All visits are by appointment only. Our address is ${organization.address}. Use the calendar above to schedule your appointment.`,
             },
             {
               q: 'Who should I contact about enrollment?',

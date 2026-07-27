@@ -7,7 +7,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 
 export const metadata: Metadata = {
   title: 'Pricing',
-  description: 'Workforce development pricing for individuals, businesses, and government agencies.',
+  description: 'Workforce development pricing for individuals, businesses, and government agencies. Training tuition, platform licenses, and agency contracts.',
   keywords: ['workforce training pricing', 'LMS pricing', 'apprenticeship platform cost', 'WIOA training'],
 };
 
@@ -60,6 +60,26 @@ export default async function PricingPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Pricing Type Selector */}
+      <section className="bg-white border-b border-slate-200 py-4">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-wrap gap-4 justify-center text-sm">
+            <span className="font-semibold text-slate-900">Pricing for:</span>
+            <Link href="/tuition" className="text-green-600 hover:underline font-medium">
+              Training Tuition
+            </Link>
+            <span className="text-slate-300">|</span>
+            <Link href="/platform/pricing" className="text-green-600 hover:underline font-medium">
+              Platform Software
+            </Link>
+            <span className="text-slate-300">|</span>
+            <Link href="/for-agencies" className="text-green-600 hover:underline font-medium">
+              Agency Contracts
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Hero */}
       <section className="bg-gradient-to-br from-green-700 to-green-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">

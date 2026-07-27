@@ -350,9 +350,6 @@ importers:
       next:
         specifier: 15.5.15
         version: 15.5.15(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.57.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      node-pty:
-        specifier: ^1.1.0
-        version: 1.1.0
       nodemailer:
         specifier: ^8.0.7
         version: 8.0.11
@@ -7482,9 +7479,6 @@ packages:
       sass:
         optional: true
 
-  node-addon-api@7.1.1:
-    resolution: {integrity: sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==}
-
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
@@ -7506,9 +7500,6 @@ packages:
   node-fetch@3.3.2:
     resolution: {integrity: sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-
-  node-pty@1.1.0:
-    resolution: {integrity: sha512-20JqtutY6JPXTUnL0ij1uad7Qe1baT46lyolh2sSENDd4sTzKZ4nmAFkeAARDKwmlLjPx6XKRlwRUxwjOy+lUg==}
 
   node-releases@2.0.51:
     resolution: {integrity: sha512-wRNIrw4DmVLKQlbgOMdkMx27Wrpzes2hh5Jtbi2bjPd+4wJstWIqP5A+lscnqbm0xxmT5Bpg8Lec5ItEBwx6BQ==}
@@ -10846,7 +10837,7 @@ snapshots:
   '@jonny/eslint-config@2.1.252(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)':
     dependencies:
       '@typescript-eslint/eslint-plugin': 4.33.0(@typescript-eslint/parser@4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5))(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)
-      '@typescript-eslint/parser': 4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3)
+      '@typescript-eslint/parser': 4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)
       eslint-config-prettier: 8.10.2(eslint@10.5.0(jiti@1.21.7))
       eslint-config-xo: 0.39.0(eslint@10.5.0(jiti@1.21.7))
       eslint-config-xo-react: 0.25.0(eslint-plugin-react-hooks@4.2.1-alpha-930c9e7ee-20211015(eslint@10.5.0(jiti@1.21.7)))(eslint-plugin-react@7.37.5(eslint@10.5.0(jiti@1.21.7)))(eslint@10.5.0(jiti@1.21.7))
@@ -13831,7 +13822,7 @@ snapshots:
   '@typescript-eslint/eslint-plugin@4.33.0(@typescript-eslint/parser@4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5))(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)':
     dependencies:
       '@typescript-eslint/experimental-utils': 4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)
-      '@typescript-eslint/parser': 4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3)
+      '@typescript-eslint/parser': 4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)
       '@typescript-eslint/scope-manager': 4.33.0
       debug: 4.4.3
       eslint: 10.5.0(jiti@1.21.7)
@@ -13874,7 +13865,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@typescript-eslint/parser@4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@5.9.3)':
+  '@typescript-eslint/parser@4.33.0(eslint@10.5.0(jiti@1.21.7))(typescript@4.9.5)':
     dependencies:
       '@typescript-eslint/scope-manager': 4.33.0
       '@typescript-eslint/types': 4.33.0
@@ -13882,7 +13873,7 @@ snapshots:
       debug: 4.4.3
       eslint: 10.5.0(jiti@1.21.7)
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 4.9.5
     transitivePeerDependencies:
       - supports-color
 
@@ -17275,8 +17266,6 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  node-addon-api@7.1.1: {}
-
   node-domexception@1.0.0: {}
 
   node-exports-info@1.6.2:
@@ -17295,10 +17284,6 @@ snapshots:
       data-uri-to-buffer: 4.0.1
       fetch-blob: 3.2.0
       formdata-polyfill: 4.0.10
-
-  node-pty@1.1.0:
-    dependencies:
-      node-addon-api: 7.1.1
 
   node-releases@2.0.51: {}
 

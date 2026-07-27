@@ -4,21 +4,48 @@ import React, { useState, createContext, useContext, ReactNode } from 'react';
 import { ShoppingCart, X, Plus, Minus, Loader2, CreditCard } from 'lucide-react';
 import { useCart } from '@/lib/store/use-cart';
 import { handleTestingCheckout } from '@/lib/store/actions';
+import { addToCart } from '@/lib/store/cart';
 
 // Provider implementation
 export const TestingCartProvider = ({ children }: { children: ReactNode }) => {
   return <>{children}</>;
 };
 
+interface AddExamToCartButtonProps {
+  examType: string;
+  examName: string;
+  amountCents: number;
+  active: boolean;
+  className?: string;
+}
+
 // Add to cart button
-export const AddExamToCartButton = ({ exam, className }: { exam: any, className?: string }) => {
-  const { addItem } = useCart();
+export const AddExamToCartButton = ({ examType, examName, amountCents, active, className }: AddExamToCartButtonProps) => {
+  const handleAddToCart = () => {
+    const product = {
+      id: `testing-${examType}-${examName}`.replace(/\s+/g, '-').toLowerCase(),
+      name: examName,
+      slug: `testing-${examType}-${examName}`.replace(/\s+/g, '-').toLowerCase(),
+      category: 'certification-prep' as const,
+      price: amountCents / 100,
+      description: `${examName} exam at Elevate Testing Center`,
+      image: '/images/pages/testing-hero.webp',
+      inStock: true,
+      featured: false,
+      digital: false,
+    };
+    addToCart(product);
+  };
+
+  if (!active) return null;
+
   return (
     <button
-      onClick={() => addItem(exam)}
-      className={className}
+      onClick={handleAddToCart}
+      className={className ?? 'inline-flex items-center gap-1 border border-brand-red-300 text-brand-red-700 hover:border-brand-red-400 hover:bg-brand-red-50 text-xs font-semibold px-2.5 py-1 rounded-md whitespace-nowrap transition-colors'}
     >
-      Add Exam
+      <CreditCard className="w-3 h-3" />
+      Add to Cart
     </button>
   );
 };

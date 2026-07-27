@@ -44,16 +44,16 @@ export function SiteFooter() {
             
             {/* Social Links */}
             <div className="flex gap-3 mt-4">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center hover:bg-brand-red-600 hover:text-white transition-colors">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center hover:bg-brand-red-600 hover:text-white transition-colors">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-sky-500 rounded-full flex items-center justify-center text-white hover:bg-sky-600 transition-colors">
                 <Twitter className="w-4 h-4" />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center hover:bg-brand-red-600 hover:text-white transition-colors">
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-blue-700 rounded-full flex items-center justify-center text-white hover:bg-blue-800 transition-colors">
                 <Linkedin className="w-4 h-4" />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center hover:bg-brand-red-600 hover:text-white transition-colors">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 rounded-full flex items-center justify-center text-white hover:opacity-90 transition-opacity">
                 <Instagram className="w-4 h-4" />
               </a>
             </div>

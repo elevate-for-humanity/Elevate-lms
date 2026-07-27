@@ -274,6 +274,12 @@ function BookingForm() {
     // Block if unpaid enforcement hold exists
     if (enforcementHold) return;
 
+    // Require slot selection BEFORE payment - users must choose a time slot first
+    if (!selectedSlotId && selectedProvider.fees?.length) {
+      alert('Please select a time slot before proceeding to payment.');
+      return;
+    }
+
     setSubmitting(true);
     const [firstName, ...rest] = name.trim().split(' ');
     const lastName = rest.join(' ') || '';
@@ -1111,6 +1117,8 @@ function BookingForm() {
                   submitting ||
                   (!!enforcementHold && !(enforcementHold as any).paid) ||
                   checkingHold ||
+                  // Require slot selection BEFORE payment when fees exist
+                  (!paid && !selectedSlotId && !!selectedProvider?.fees?.length) ||
                   (paid && !selectedSlotId)
                 }
                 className="w-full bg-brand-red-600 hover:bg-brand-red-700 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-colors text-sm"
@@ -1122,17 +1130,19 @@ function BookingForm() {
                       ? 'Confirm Booking'
                       : 'Select a time slot above'
                     : selectedProvider?.fees?.length
-                      ? (() => {
-                          const isOrgType = orgType !== 'Individual' && orgType !== '';
-                          const qty = parseInt(participantCount, 10) || 1;
-                          const base = selectedProvider.fees![0].amount;
-                          const addOn =
-                            !isOrgType && addOnSelected && selectedProvider.addOn
-                              ? selectedProvider.addOn.amountCents / 100
-                              : 0;
-                          const total = isOrgType ? base * qty : base + addOn;
-                          return `Pay & Continue — $${total.toFixed(0)}${isOrgType && qty > 1 ? ` (${qty} seats)` : ''}`;
-                        })()
+                      ? selectedSlotId
+                        ? (() => {
+                            const isOrgType = orgType !== 'Individual' && orgType !== '';
+                            const qty = parseInt(participantCount, 10) || 1;
+                            const base = selectedProvider.fees![0].amount;
+                            const addOn =
+                              !isOrgType && addOnSelected && selectedProvider.addOn
+                                ? selectedProvider.addOn.amountCents / 100
+                                : 0;
+                            const total = isOrgType ? base * qty : base + addOn;
+                            return `Pay & Continue — $${total.toFixed(0)}${isOrgType && qty > 1 ? ` (${qty} seats)` : ''}`;
+                          })()
+                        : 'Select a time slot first'
                       : 'Continue to Payment'}
               </button>
 

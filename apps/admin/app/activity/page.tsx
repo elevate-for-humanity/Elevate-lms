@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import type React from 'react';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';

@@ -106,7 +106,20 @@ export default async function PricingPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Program Tuition</h2>
             <p className="text-lg text-slate-600">Prices shown before funding. Most students pay $0 out of pocket.</p>
-            <p className="text-sm text-green-600 mt-2">{programs.length} programs available</p>
+            {programs.length > 0 ? (
+              <p className="text-sm text-green-600 mt-2">{programs.length} programs with published pricing</p>
+            ) : (
+              <p className="text-sm text-slate-500 mt-2">
+                <Link href="/programs" className="text-green-600 hover:underline font-medium">
+                  Browse all programs →
+                </Link>
+                {' '}or{' '}
+                <Link href="/contact" className="text-green-600 hover:underline font-medium">
+                  contact admissions
+                </Link>
+                {' '}for current pricing.
+              </p>
+            )}
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -140,7 +153,7 @@ export default async function PricingPage() {
 
           <div className="text-center mb-8">
             <Link href="/programs" className="inline-flex items-center gap-2 text-green-600 font-semibold hover:underline">
-              View all {programs.length} programs <ArrowRight className="w-4 h-4" />
+              View all programs <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 

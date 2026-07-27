@@ -1,15 +1,13 @@
 export const revalidate = 3600;
 
 import { Metadata } from 'next';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Shield, AlertTriangle, BookOpen, FileText, Users, Phone, CheckCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Academic Integrity Policy',
+  title: 'Academic Integrity Policy | Elevate for Humanity',
   description: 'Academic honesty, plagiarism policy, and code of conduct',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/academic-integrity',
@@ -28,16 +26,14 @@ export default function AcademicIntegrityPage() {
 
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
+        <Image
           src="/images/pages/academic-integrity-hero.webp"
           alt="Academic Integrity"
           fill
           className="object-cover"
           quality={90}
           priority
-          sizes="100vw" 
+          sizes="100vw"
         />
       </section>
 
@@ -48,7 +44,7 @@ export default function AcademicIntegrityPage() {
             Our Commitment to Academic Honesty
           </h2>
           <p className="text-black mb-4">
-            At {PLATFORM_DEFAULTS.orgName}, we are committed to maintaining the highest standards of
+            At Elevate for Humanity, we are committed to maintaining the highest standards of
             academic integrity. Academic honesty is fundamental to the learning process and
             essential for preparing students for professional careers.
           </p>
@@ -352,7 +348,7 @@ export default function AcademicIntegrityPage() {
               <li>• Contact the Dean of Students</li>
               <li>• Submit an anonymous report through the student portal</li>
               <li>• Email: our contact form</li>
-              <li>• Phone: {PLATFORM_DEFAULTS.supportPhone}</li>
+              <li>• Phone: 317-314-3757</li>
             </ul>
             <p className="text-brand-blue-900 text-sm mt-4">
               <strong>Protection:</strong> Students who report violations in good faith will not

@@ -1,11 +1,9 @@
-export const revalidate = 3600;
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ShieldCheck, FileCheck, Download } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Verify Credentials',
+  title: 'Verify Credentials | Elevate for Humanity',
   description: 'Verify credentials and certificates earned through Elevate for Humanity workforce programs.',
 };
 

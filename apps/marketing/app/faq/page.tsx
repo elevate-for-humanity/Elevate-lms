@@ -1,48 +1,366 @@
-export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
-import { HelpCircle, ChevronDown } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { MessageSquare } from 'lucide-react';
+import FAQSearch from './FAQSearch';
 
 export const metadata: Metadata = {
-  title: 'FAQ',
-  description: 'Frequently asked questions about workforce training, apprenticeships, and funding.',
+  title: 'FAQ | Elevate For Humanity',
+  description:
+    'Frequently asked questions about our career training programs, eligibility, funding, and services. Training at no cost to eligible participants.',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/faq',
+  },
 };
 
-const faqs = [
-  { q: 'How do I know if I qualify for WIOA funding?', a: 'If you are unemployed, underemployed, receive public assistance (SNAP, Medicaid), are a veteran, or lack a high school diploma, you may qualify. The best way to find out is to complete our free eligibility check or visit your local WorkOne center.' },
-  { q: 'How long do the training programs take?', a: 'Program length varies. Short courses (CPR, OSHA) can be completed in 1-2 days. Healthcare programs like CNA typically take 4-8 weeks. Apprenticeships in barbering or cosmetology take 1-2 years since you earn while you learn.' },
-  { q: 'Are the programs really free?', a: 'Many participants qualify for WIOA funding that covers 100% of tuition. Others receive employer sponsorship or state grants. We help you explore all funding options at no cost.' },
-  { q: 'What is a DOL-registered apprenticeship?', a: 'A DOL-registered apprenticeship is a federal program that combines paid on-the-job training with classroom instruction. Apprentices earn wages while learning and receive an industry-recognized credential upon completion.' },
-  { q: 'Can I work while in the program?', a: 'Yes! For apprenticeships, you earn wages from day one at your host shop. For other programs, many offer evening and weekend schedules to accommodate work.' },
-  { q: 'What support do you provide after graduation?', a: 'We offer career coaching, job placement assistance, and employer connections. Our goal is employment outcomes, not just program completion.' },
-];
+interface FAQ {
+  id: string;
+  question: string;
+  answer: string;
+  category: string;
+  display_order: number;
+}
 
 export default function FAQPage() {
+  const faqs: FAQ[] = [
+    // Enrollment
+    {
+      id: '1',
+      question: 'Is the training really free?',
+      answer:
+        'Yes, for eligible participants. Federal and state workforce programs (WIOA, WRG, Job Ready Indy) cover tuition, books, and supplies. Some programs like Barber Apprenticeship are self-pay with payment plans available.',
+      category: 'Enrollment',
+      display_order: 1,
+    },
+    {
+      id: '2',
+      question: 'How do I know if I qualify for funded training?',
+      answer:
+        'You likely qualify if you are unemployed, underemployed, receiving public assistance (SNAP, TANF, Medicaid), a veteran, or have household income below 200% of poverty level. Take our 2-minute eligibility check.',
+      category: 'Enrollment',
+      display_order: 2,
+    },
+    {
+      id: '5',
+      question: 'Do I need prior experience?',
+      answer:
+        'Most programs require only a high school diploma or GED. No prior experience needed. We start from the basics.',
+      category: 'Enrollment',
+      display_order: 3,
+    },
+    {
+      id: '9',
+      question: 'How do I get started?',
+      answer:
+        'Step 1: Check your eligibility (2 minutes). Step 2: Choose a program. Step 3: Complete the application. Step 4: Meet with an advisor. Most people start training within 2-4 weeks.',
+      category: 'Enrollment',
+      display_order: 4,
+    },
+    {
+      id: '13',
+      question: 'What documents do I need to enroll?',
+      answer:
+        'Bring a valid government-issued photo ID, proof of Indiana residency (utility bill or lease), and your high school diploma or GED. You will enter your Social Security number securely online during onboarding. For WIOA funding, you may also need proof of income or public assistance documentation.',
+      category: 'Enrollment',
+      display_order: 5,
+    },
+    {
+      id: '14',
+      question: 'Is there an age requirement?',
+      answer:
+        'Most programs require participants to be at least 18 years old. Some youth programs are available for ages 16-24 through WIOA Youth funding. Contact us for details.',
+      category: 'Enrollment',
+      display_order: 6,
+    },
+    // Programs
+    {
+      id: '3',
+      question: 'What programs do you offer?',
+      answer:
+        'Healthcare (CNA, Medical Assistant, Phlebotomy), Skilled Trades (HVAC, Electrical, Welding), Technology (IT Support, Cybersecurity), CDL/Transportation, Barber Apprenticeship, and Business programs.',
+      category: 'Programs',
+      display_order: 7,
+    },
+    {
+      id: '4',
+      question: 'How long are the programs?',
+      answer:
+        'Most certification programs are 4-16 weeks. CDL training is 3-6 weeks. Apprenticeships like Barber are 12-18 months.',
+      category: 'Programs',
+      display_order: 8,
+    },
+    {
+      id: '10',
+      question: 'What certifications will I earn?',
+      answer:
+        'Depends on your program. Examples: CNA, OSHA 10/30, Certiport IT Specialist, CDL Class A, Phlebotomy, Medical Assistant, HVAC EPA 608, Adobe Certified Professional.',
+      category: 'Programs',
+      display_order: 9,
+    },
+    {
+      id: '11',
+      question: 'Can I work while in training?',
+      answer:
+        'Yes, many students work part-time while in training. We offer flexible scheduling when possible to accommodate working adults.',
+      category: 'Programs',
+      display_order: 10,
+    },
+    {
+      id: '15',
+      question: 'What are the class hours?',
+      answer:
+        'Class schedules vary by program. Most daytime programs run Monday-Friday, 8:00 AM to 3:00 PM. Some programs offer evening or weekend options. Check your specific program page for exact hours.',
+      category: 'Programs',
+      display_order: 11,
+    },
+    {
+      id: '16',
+      question: 'Is there a dress code?',
+      answer:
+        'Yes. Professional attire or program-specific uniforms are required. Healthcare students need scrubs and closed-toe shoes. Skilled trades students need steel-toe boots and safety glasses. Barber/cosmetology students need all-black attire. Specific requirements are provided at orientation.',
+      category: 'Programs',
+      display_order: 12,
+    },
+    // Eligibility
+    {
+      id: '6',
+      question: 'What if I have a criminal record?',
+      answer:
+        'We specialize in serving justice-involved individuals. Many programs are specifically designed for people with records. Job Ready Indy funding covers training for eligible participants.',
+      category: 'Eligibility',
+      display_order: 13,
+    },
+    {
+      id: '17',
+      question: 'Is there a drug test required?',
+      answer:
+        'Some employer partners and clinical sites require drug screening as a condition of placement. Healthcare programs (CNA, Medical Assistant, Phlebotomy) typically require a drug test before clinical rotations. CDL programs require DOT drug testing. We will inform you of any requirements during enrollment.',
+      category: 'Eligibility',
+      display_order: 14,
+    },
+    {
+      id: '18',
+      question: 'Do I need a background check?',
+      answer:
+        'Some programs require background checks, particularly healthcare and CDL. Having a record does not automatically disqualify you — many of our programs are designed for justice-involved individuals. We review each situation individually and help you understand which programs are the best fit.',
+      category: 'Eligibility',
+      display_order: 15,
+    },
+    {
+      id: '19',
+      question: 'Can non-U.S. citizens enroll?',
+      answer:
+        'WIOA-funded programs require U.S. citizenship or eligible immigration status with work authorization. Self-pay programs may have different requirements. Contact us to discuss your specific situation.',
+      category: 'Eligibility',
+      display_order: 16,
+    },
+    // Career Services
+    {
+      id: '7',
+      question: 'Do you help with job placement?',
+      answer:
+        'Yes. Every program includes career services: resume writing, interview preparation, and direct connections to employer partners actively hiring in your field.',
+      category: 'Career Services',
+      display_order: 17,
+    },
+    {
+      id: '20',
+      question: 'What is the job placement rate?',
+      answer:
+        'We provide career services to every graduate including resume support, interview prep, and employer introductions. Placement outcomes vary by program, cohort, and market conditions.',
+      category: 'Career Services',
+      display_order: 18,
+    },
+    {
+      id: '21',
+      question: 'What salary can I expect after training?',
+      answer:
+        'Starting salaries vary by field. CNA: $15-$20/hr. Medical Assistant: $16-$22/hr. CDL Driver: $50,000-$75,000/yr. HVAC Technician: $18-$28/hr. Barber: $30,000-$60,000/yr depending on clientele. See individual program pages for detailed salary ranges.',
+      category: 'Career Services',
+      display_order: 19,
+    },
+    // General / Logistics
+    {
+      id: '8',
+      question: 'Where are you located?',
+      answer:
+        'We are based in Indianapolis, Indiana (Marion County). Training locations vary by program. Some programs offer hybrid or online options.',
+      category: 'General',
+      display_order: 20,
+    },
+    {
+      id: '22',
+      question: 'Is parking available?',
+      answer:
+        'Yes, free parking is available at all training locations. Specific parking instructions are provided during orientation. If you rely on public transportation, IndyGo bus routes serve most of our locations.',
+      category: 'General',
+      display_order: 21,
+    },
+    {
+      id: '23',
+      question: 'Is there help with transportation?',
+      answer:
+        'Yes. WIOA-eligible participants may qualify for transportation assistance including bus passes or gas cards. Ask your case manager at WorkOne about available supportive services.',
+      category: 'General',
+      display_order: 22,
+    },
+    {
+      id: '24',
+      question: 'Is childcare assistance available?',
+      answer:
+        'WIOA funding may cover childcare costs for eligible participants during training hours. Contact WorkOne to determine your eligibility for childcare supportive services.',
+      category: 'General',
+      display_order: 23,
+    },
+    {
+      id: '25',
+      question: 'What is the attendance policy?',
+      answer:
+        'Regular attendance is required. Most programs allow no more than 2-3 absences. Excessive absences may result in dismissal from the program. If you have an emergency, contact your instructor immediately. Full details are in the Student Handbook.',
+      category: 'General',
+      display_order: 24,
+    },
+    // Support
+    {
+      id: '12',
+      question: 'What support services are available?',
+      answer:
+        'Eligible participants may receive help with transportation, childcare, work supplies, and other supportive services through WIOA funding.',
+      category: 'Support',
+      display_order: 25,
+    },
+    {
+      id: '26',
+      question: 'What if I need to withdraw from a program?',
+      answer:
+        'Contact your program coordinator as soon as possible. For self-pay programs, our refund policy is outlined in the enrollment agreement. For funded programs, your case manager will help you explore options including program transfers or re-enrollment.',
+      category: 'Support',
+      display_order: 26,
+    },
+    {
+      id: '27',
+      question: 'Do you offer tutoring or extra help?',
+      answer:
+        'Yes. Instructors are available for additional help during office hours. Some programs offer peer tutoring and study groups. If you are struggling, talk to your instructor early — we want you to succeed.',
+      category: 'Support',
+      display_order: 27,
+    },
+    {
+      id: '28',
+      question: 'How do I file a complaint or grievance?',
+      answer:
+        'We take all concerns seriously. You can file a grievance through our formal process outlined in the Student Handbook, speak with your program coordinator, or contact us at our main office. See our Grievance Policy page for full details.',
+      category: 'Support',
+      display_order: 28,
+    },
+  ];
+
+  // Group FAQs by category
+  const categories = [...new Set(faqs.map((faq: FAQ) => faq.category))];
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <HelpCircle className="w-12 h-12 mb-4" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h1>
-          <p className="text-xl text-blue-100">Find answers to common questions about our programs and funding.</p>
+    <div className="min-h-screen bg-white">
+      {' '}
+      {/* Breadcrumbs */}
+      <div className="bg-white border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[{ label: 'FAQ' }]} />
         </div>
+      </div>
+      {/* Hero */}
+      <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
+        <Image
+          src="/images/pages/faq-page-1.webp"
+          alt="Students in a workforce training classroom"
+          fill
+          sizes="100vw"
+          quality={90}
+          className="object-cover"
+          priority
+        />
       </section>
-      <section className="py-16">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-4">
-            {faqs.map((faq, i) => (
-              <details key={i} className="bg-white rounded-xl shadow-md group">
-                <summary className="p-6 cursor-pointer flex items-center justify-between font-bold text-slate-900">
-                  {faq.q}
-                  <ChevronDown className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" />
-                </summary>
-                <div className="px-6 pb-6 text-slate-600">
-                  {faq.a}
-                </div>
-              </details>
-            ))}
+      <div className="bg-white border-b border-slate-200 py-8 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">
+            Frequently Asked Questions
+          </h1>
+          <p className="text-slate-600 mt-2">
+            Answers about programs, funding, enrollment, and credentials.
+          </p>
+        </div>
+      </div>
+      {/* Quick Links */}
+      <section className="py-8 border-b">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link
+              href="/wioa-eligibility"
+              className="px-4 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-medium hover:bg-brand-green-200 transition-colors"
+            >
+              WIOA Eligibility
+            </Link>
+            <Link
+              href="/funding"
+              className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors"
+            >
+              Funding Options
+            </Link>
+            <Link
+              href="/programs"
+              className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors"
+            >
+              Training Programs
+            </Link>
+            <Link
+              href="/how-it-works"
+              className="px-4 py-2 bg-brand-orange-100 text-brand-orange-800 rounded-full text-sm font-medium hover:bg-brand-orange-200 transition-colors"
+            >
+              How It Works
+            </Link>
+            <Link
+              href="/contact"
+              className="px-4 py-2 bg-white text-slate-800 rounded-full text-sm font-medium hover:bg-slate-200 transition-colors"
+            >
+              Contact Us
+            </Link>
           </div>
         </div>
       </section>
+      <div className="max-w-4xl mx-auto px-4 py-16">
+        {/* Category filters */}
+        {categories.length > 1 && (
+          <div className="flex flex-wrap gap-2 mb-8">
+            {categories.map((cat) => (
+              <a
+                key={cat}
+                href={`#${cat}`}
+                className="px-4 py-2 bg-white border rounded-full text-sm font-medium text-slate-700 hover:bg-white capitalize"
+              >
+                {cat}
+              </a>
+            ))}
+          </div>
+        )}
+
+        {/* FAQ List with Search */}
+        <FAQSearch faqs={faqs} />
+
+        {/* Contact CTA */}
+        <div className="mt-12 bg-brand-orange-50 rounded-xl p-8 text-center">
+          <MessageSquare className="w-12 h-12 text-brand-orange-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">Still have questions?</h2>
+          <p className="text-slate-600 mb-4">
+            Our team is here to help you find the answers you need.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 bg-brand-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-orange-600"
+          >
+            Contact Us
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,44 +1,106 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { Users, Heart } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
+import { TEAM } from '@/data/team';
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Our Team',
-  keywords: ["team", "staff", "workforce development", "Elevate staff"], description: 'Meet the dedicated team at Elevate for Humanity working to empower individuals through workforce training.',
+  title: 'Our Team | Elevate for Humanity',
+  description:
+    'Meet the educators, workforce specialists, and community advocates behind Elevate for Humanity.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/team' },
 };
 
-export default function TeamPage() {
+export default async function TeamPage() {
+  // Pull staff profiles from DB; fall back to static data if table is empty
+  const supabase = await createClient();
+  const { data: dbStaff } = await supabase
+    .from('team_members')
+    .select('id, name, title, bio, image_url, email')
+    .eq('is_active', true)
+    .order('display_order');
+
+  const members =
+    dbStaff && dbStaff.length > 0
+      ? dbStaff.map((p) => ({
+          id: p.id,
+          name: p.name ?? 'Team Member',
+          title: p.title ?? '',
+          bio: p.bio ?? '',
+          headshotSrc: p.image_url ?? null,
+          email: p.email ?? '',
+        }))
+      : TEAM;
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl font-bold">Our Team</h1>
-          <p className="text-blue-200">Dedicated professionals committed to workforce development.</p>
+    <div className="min-h-screen bg-white">
+      <div className="bg-white border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[{ label: 'About', href: '/about' }, { label: 'Team' }]} />
+        </div>
+      </div>
+
+      <section className="bg-slate-900 py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-3">
+            Elevate for Humanity
+          </p>
+          <h1 className="text-4xl font-extrabold text-white mb-4">Our Team</h1>
+          <p className="text-slate-300 text-lg max-w-2xl">
+            Educators, workforce specialists, and community advocates committed to learner success.
+          </p>
         </div>
       </section>
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6 text-center">Meet the Team</h2>
-          <p className="text-slate-600 text-center mb-8">Our team brings together decades of experience in education, workforce development, and career services. We&apos;re united by a shared mission: helping individuals achieve economic mobility through quality training and employment.</p>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl p-6 shadow text-center">
-              <div className="w-24 h-24 bg-brand-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <Users className="w-12 h-12 text-brand-blue-600" />
+
+      <section className="py-16 px-4">
+        <div className="max-w-6xl mx-auto grid gap-6 md:grid-cols-2">
+          {members.map((member) => (
+            <article
+              key={member.id}
+              className="flex gap-4 rounded-xl border p-6 hover:bg-slate-50 transition"
+            >
+              {member.headshotSrc && (
+                <Image sizes="100vw"
+                  src={member.headshotSrc}
+                  alt={member.name}
+                  width={80}
+                  height={80}
+                  className="rounded-full object-cover shrink-0 self-start"
+                />
+              )}
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900">{member.name}</h2>
+                <p className="text-sm text-slate-500 mb-2">{member.title}</p>
+                <p className="text-sm text-slate-700 line-clamp-3">{member.bio}</p>
+                {'id' in member && (
+                  <Link
+                    href={`/about/team/${member.id}`}
+                    className="mt-3 inline-block text-sm font-medium text-brand-red-600 hover:underline"
+                  >
+                    Read more →
+                  </Link>
+                )}
               </div>
-              <h3 className="font-bold text-lg">Leadership Team</h3>
-              <p className="text-slate-600 text-sm mt-2">Visionary leaders driving our mission forward.</p>
-            </div>
-            <div className="bg-white rounded-xl p-6 shadow text-center">
-              <div className="w-24 h-24 bg-brand-orange-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <Heart className="w-12 h-12 text-brand-orange-600" />
-              </div>
-              <h3 className="font-bold text-lg">Instructors</h3>
-              <p className="text-slate-600 text-sm mt-2">Industry-experienced educators preparing students for careers.</p>
-            </div>
-          </div>
-          <div className="mt-8 text-center">
-            <Link href="/about" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Learn More About Us</Link>
-          </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-slate-50 py-12 px-4 text-center">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-2xl font-bold text-slate-900 mb-3">Join Our Team</h2>
+          <p className="text-slate-600 mb-6">
+            We're always looking for passionate educators and workforce professionals.
+          </p>
+          <Link
+            href="/careers"
+            className="rounded-lg bg-brand-red-600 px-6 py-3 text-white font-semibold hover:bg-brand-red-700"
+          >
+            View Open Positions
+          </Link>
         </div>
       </section>
     </div>

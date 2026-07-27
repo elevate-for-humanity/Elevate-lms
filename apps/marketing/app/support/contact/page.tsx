@@ -1,24 +1,129 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import Link from 'next/link';
+import { Phone, Mail, MapPin, Clock, MessageCircle, Send } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Contact',
-  description: 'Contact page content.',
+  title: 'Contact Us | Elevate Support',
+  description: 'Get in touch with our support team. We\'re here to help with questions about programs, enrollment, and technical support.',
 };
 
-export default function Page() {
+export default function SupportContactPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl font-bold">Contact</h1>
-          <p className="text-blue-200">Resources to support your success.</p>
+    <div className="min-h-screen bg-white">
+      {/* Hero */}
+      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-20 overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-red-500 to-brand-orange-500" />
+        </div>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 bg-brand-red-500/20 text-brand-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <MessageCircle className="w-4 h-4" />
+              Support
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+              Contact Support
+            </h1>
+            <p className="text-xl text-blue-100 leading-relaxed mb-8">
+              Have questions? Our support team is here to help. Reach out via phone, email, or submit a support request.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <a href="tel:3173143757" className="inline-flex items-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+                <Phone className="w-4 h-4 mr-2" />
+                Call (317) 314-3757
+              </a>
+            </div>
+          </div>
         </div>
       </section>
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
+
+      {/* Contact Options */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-xl p-6 border border-slate-200 text-center">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Phone className="w-6 h-6 text-brand-blue-600" />
+              </div>
+              <h3 className="font-bold text-slate-900 mb-2">Call Us</h3>
+              <p className="text-sm text-slate-600 mb-4">Speak directly with a support specialist</p>
+              <a href="tel:3173143757" className="text-brand-blue-600 font-semibold text-sm hover:text-brand-blue-700">
+                (317) 314-3757
+              </a>
+            </div>
+            <div className="bg-white rounded-xl p-6 border border-slate-200 text-center">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-6 h-6 text-brand-blue-600" />
+              </div>
+              <h3 className="font-bold text-slate-900 mb-2">Email Us</h3>
+              <p className="text-sm text-slate-600 mb-4">Send your questions anytime</p>
+              <a href="mailto:support@elevateforhumanity.org" className="text-brand-blue-600 font-semibold text-sm hover:text-brand-blue-700">
+                support@elevateforhumanity.org
+              </a>
+            </div>
+            <div className="bg-white rounded-xl p-6 border border-slate-200 text-center">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-6 h-6 text-brand-blue-600" />
+              </div>
+              <h3 className="font-bold text-slate-900 mb-2">Hours</h3>
+              <p className="text-sm text-slate-600 mb-4">Mon-Fri, 8am-6pm EST</p>
+              <span className="text-brand-blue-600 font-semibold text-sm">
+                Virtual appointments available
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Form */}
+      <section className="py-16">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-slate-900 text-center mb-4">Submit a Support Request</h2>
+          <p className="text-slate-600 text-center mb-8">Fill out the form below and we'll respond within 24 hours.</p>
+          <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <form className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Your Name</label>
+                  <input type="text" className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="John Smith" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Email Address</label>
+                  <input type="email" className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="john@example.com" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Topic</label>
+                <select className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500 bg-white">
+                  <option>Select a topic</option>
+                  <option>Enrollment Question</option>
+                  <option>Technical Support</option>
+                  <option>Program Information</option>
+                  <option>Payment/Billing</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Message</label>
+                <textarea rows={4} className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="How can we help?"></textarea>
+              </div>
+              <button type="submit" className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-3 rounded-lg transition-colors inline-flex items-center justify-center gap-2">
+                Submit Request <Send className="w-4 h-4" />
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Location */}
+      <section className="py-16 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-xl font-bold text-slate-900 mb-4">Visit Us</h2>
+          <div className="flex items-center justify-center gap-2 text-slate-600 mb-2">
+            <MapPin className="w-4 h-4" />
+            Indianapolis, Indiana
+          </div>
+          <p className="text-sm text-slate-500">Virtual support available throughout Indiana</p>
         </div>
       </section>
     </div>

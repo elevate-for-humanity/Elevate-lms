@@ -169,17 +169,111 @@ export default async function WorkforceDashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
+      {/* Header */}
+      <section className="bg-white border-b border-slate-200 py-6">
         <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl font-bold">Workforce</h1>
-          <p className="text-blue-200">Workforce development resources.</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-black">
+                {isCaseManager ? 'My Caseload' : 'Workforce Dashboard'}
+              </h1>
+              <p className="text-slate-600 mt-1">
+                {isCaseManager ? 'Manage your assigned participants' : 'Overview of workforce training programs'}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
+
+      {/* Stats Grid */}
+      <section className="py-8">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {stats.map((stat) => (
+              <Link
+                key={stat.label}
+                href={stat.href}
+                className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-md transition-shadow"
+              >
+                <div className={`w-10 h-10 ${stat.bg} rounded-lg flex items-center justify-center mb-3`}>
+                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                </div>
+                <div className="text-2xl font-bold text-black">{stat.value.toLocaleString()}</div>
+                <div className="text-sm text-slate-600">{stat.label}</div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
+
+      {/* Quick Actions */}
+      <section className="py-4">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-lg font-bold text-black mb-4">Quick Actions</h2>
+          <div className="flex flex-wrap gap-3">
+            {quickActions.map((action) => (
+              <Link
+                key={action.label}
+                href={action.href}
+                className="flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                <action.icon className="w-4 h-4 text-brand-blue-600" />
+                <span className="text-sm font-medium text-slate-700">{action.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Recent Participants */}
+      {recentParticipants.length > 0 && (
+        <section className="py-8">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-black">Recent Participants</h2>
+              <Link href="/workforce/participants" className="text-sm font-semibold text-brand-blue-600 hover:text-brand-blue-700">
+                View All →
+              </Link>
+            </div>
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">Name</th>
+                    <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">Program</th>
+                    <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">Status</th>
+                    <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">Enrolled</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {recentParticipants.map((participant: any) => (
+                    <tr key={participant.id} className="hover:bg-slate-50">
+                      <td className="px-4 py-3 text-sm text-slate-900">
+                        {participant.profile?.full_name || 'Unknown'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-slate-600">
+                        {(participant as any).programs?.title || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                          participant.enrollment_state === 'active' ? 'bg-green-100 text-green-700' :
+                          participant.enrollment_state === 'completed' ? 'bg-blue-100 text-blue-700' :
+                          'bg-slate-100 text-slate-700'
+                        }`}>
+                          {participant.enrollment_state}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-slate-500">
+                        {new Date(participant.enrolled_at).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

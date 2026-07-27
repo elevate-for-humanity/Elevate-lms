@@ -195,15 +195,149 @@ function LogCompetencyForm() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl font-bold">Log</h1>
-          <p className="text-blue-200">Workforce development resources.</p>
+      {/* Header */}
+      <section className="bg-white border-b border-slate-200 py-6">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-black">Log Competency</h1>
+              <p className="text-slate-600 mt-1">Record your work hours and competency completion.</p>
+            </div>
+          </div>
         </div>
       </section>
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Link href="/" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">Back to Home</Link>
+
+      {/* Form */}
+      <section className="py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-8 space-y-6">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+                {error}
+              </div>
+            )}
+
+            {/* Skill Selection */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Competency/Skill *
+              </label>
+              {loadingSkills ? (
+                <div className="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-50">
+                  Loading skills...
+                </div>
+              ) : skills.length === 0 ? (
+                <div className="w-full px-4 py-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-500">
+                  No competencies available for your program.
+                </div>
+              ) : (
+                <select
+                  value={formData.skillId}
+                  onChange={(e) => setFormData({ ...formData, skillId: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">Select a competency...</option>
+                  {Object.entries(grouped).map(([category, categorySkills]) => (
+                    <optgroup key={category} label={category}>
+                      {categorySkills.map((skill) => (
+                        <option key={skill.id} value={skill.id}>
+                          {skill.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* Work Date */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Date of Work *
+              </label>
+              <input
+                type="date"
+                value={formData.workDate}
+                onChange={(e) => setFormData({ ...formData, workDate: e.target.value })}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            {/* Hours and Service Count */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Hours Worked
+                </label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  value={formData.hoursCredited}
+                  onChange={(e) => setFormData({ ...formData, hoursCredited: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                  disabled={isRTI}
+                />
+                {isRTI && (
+                  <p className="text-xs text-slate-500 mt-1">RTI hours calculated automatically</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Services Performed
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={formData.serviceCount}
+                  onChange={(e) => setFormData({ ...formData, serviceCount: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Supervisor Name */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Supervisor Name
+              </label>
+              <input
+                type="text"
+                value={formData.supervisorName}
+                onChange={(e) => setFormData({ ...formData, supervisorName: e.target.value })}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                placeholder="Enter supervisor name (optional)"
+              />
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Notes
+              </label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                rows={3}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                placeholder="Add any notes about this work experience..."
+              />
+            </div>
+
+            {/* Submit */}
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={submitting || loadingSkills}
+                className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+              >
+                {submitting ? 'Submitting...' : 'Submit Entry'}
+              </button>
+            </div>
+          </form>
         </div>
       </section>
     </div>

@@ -43,7 +43,8 @@ RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 COPY . .
 
 # Generate version.json - use git rev-parse HEAD with fallback
-RUN echo "{\"service\":\"marketing\",\"commit\":\"$(git -C . rev-parse HEAD 2>/dev/null || echo \"${GIT_SHA:-$(date +%s)}\")\",\"builtAt\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > ./public/version.json
+RUN COMMIT_SHA=$(git -C . rev-parse HEAD 2>/dev/null || echo "${GIT_SHA:-$(date +%s)}") && \
+    echo "{\"service\":\"marketing\",\"commit\":\"${COMMIT_SHA}\",\"builtAt\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > ./public/version.json
 
 # Build args
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org

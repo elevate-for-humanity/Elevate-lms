@@ -61,7 +61,6 @@ async function main() {
   
   // Trigger build from the current branch
   // Pass GIT_SHA as the authoritative release identity
-  // NOTE: Northflank 'web' service uses "buildArgs" (lowercase), not "buildArguments"
   const build = await nfFetch<{
     id: string;
     branch?: string;
@@ -72,7 +71,7 @@ async function main() {
     method: 'POST',
     body: JSON.stringify({
       sha: currentSha,
-      buildArgs: {
+      buildArguments: {
         GITHUB_SHA: currentSha,
         GIT_SHA: currentSha,
         NEXT_PUBLIC_GIT_SHA: currentSha,

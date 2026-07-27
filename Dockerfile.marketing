@@ -58,13 +58,8 @@ ENV CI=true
 ENV GIT_SHA=${GIT_SHA}
 ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
 
-# Generate version.json - try multiple sources for commit SHA
-# 1. GIT_SHA from Northflank buildArguments
-# 2. NF_GIT_SHA alternative env var
-# 3. NF_COMMIT from Northflank metadata (sha passed to build trigger)
-# 4. FALLBACK_COMMIT from buildArguments (alternative sha field)
-# 5. Fallback to timestamp hash
-RUN echo "{\"service\":\"marketing\",\"commit\":\"${GIT_SHA:-${NF_GIT_SHA:-${NF_COMMIT:-${FALLBACK_COMMIT:-$(date +%s%N | head -c 12)}}}\",\"builtAt\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > ./public/version.json
+# version.json is generated at runtime by the server (server.cjs)
+# This ensures the correct commit SHA is always available
 
 # Build Marketing app
 RUN pnpm --filter @elevate/marketing build --no-lint
@@ -107,27 +102,74 @@ RUN chown -R nextjs:nodejs ./public
 # Copy node_modules (needed for runtime dependencies)
 COPY --from=builder /app/node_modules ./node_modules
 
-# Create a simple server that serves the Next.js app
-RUN echo 'const { createServer } = require("http"); \
-const { parse } = require("url"); \
-const next = require("next"); \
-\
-const dev = process.env.NODE_ENV !== "production"; \
-const hostname = process.env.HOSTNAME || "0.0.0.0"; \
-const port = parseInt(process.env.PORT || "3000", 10); \
-\
-const app = next({ dev, hostname, port }); \
-const handle = app.getRequestHandler(); \
-\
-app.prepare().then(() => { \
-  createServer((req, res) => { \
-    const parsedUrl = parse(req.url, true); \
-    handle(req, res, parsedUrl); \
-  }).listen(port, hostname, (err) => { \
-    if (err) throw err; \
-    console.info("> Marketing ready on http://" + hostname + ":" + port); \
-  }); \
-});' > ./server.cjs && chmod +x ./server.cjs
+# Create server.js that generates version.json at runtime
+RUN cat > ./server.js << 'SERVEREOF'
+const { createServer } = require("http");
+const { parse } = require("url");
+const { readFileSync, writeFileSync, existsSync } = require("fs");
+const { join } = require("path");
+const next = require("next");
+
+const dev = process.env.NODE_ENV !== "production";
+const hostname = process.env.HOSTNAME || "0.0.0.0";
+const port = parseInt(process.env.PORT || "3000", 10);
+
+// Get commit SHA from multiple sources
+function getCommitSha() {
+  // 1. GIT_SHA environment variable (set by Northflank build args)
+  if (process.env.GIT_SHA && process.env.GIT_SHA !== "unknown") {
+    return process.env.GIT_SHA;
+  }
+  // 2. GITHUB_SHA environment variable
+  if (process.env.GITHUB_SHA && process.env.GITHUB_SHA !== "unknown") {
+    return process.env.GITHUB_SHA;
+  }
+  // 3. Read from .commit_sha file
+  const shaFile = join(__dirname, ".commit_sha");
+  if (existsSync(shaFile)) {
+    try {
+      const sha = readFileSync(shaFile, "utf8").trim();
+      if (sha && sha !== "unknown") return sha;
+    } catch (e) {}
+  }
+  // 4. Fallback
+  return "unknown";
+}
+
+// Generate version.json at runtime
+function generateVersionJson() {
+  const version = {
+    service: "marketing",
+    commit: getCommitSha(),
+    builtAt: new Date().toISOString()
+  };
+  const versionPath = join(__dirname, "public", "version.json");
+  try {
+    writeFileSync(versionPath, JSON.stringify(version, null, 2));
+    console.log("Generated version.json with commit:", version.commit);
+  } catch (e) {
+    console.error("Failed to write version.json:", e.message);
+  }
+}
+
+const app = next({ dev, hostname, port });
+const handle = app.getRequestHandler();
+
+// Generate version.json before starting server
+generateVersionJson();
+
+app.prepare().then(() => {
+  createServer((req, res) => {
+    const parsedUrl = parse(req.url, true);
+    handle(req, res, parsedUrl);
+  }).listen(port, hostname, (err) => {
+    if (err) throw err;
+    console.info("> Marketing ready on http://" + hostname + ":" + port);
+  });
+});
+SERVEREOF
+
+RUN chmod +x ./server.js
 
 USER nextjs
 
@@ -138,4 +180,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
     CMD curl -sf http://127.0.0.1:8080/api/live || curl -sf http://127.0.0.1:8080/ || exit 1
 
 # Start the marketing application
-CMD ["node", "--max-old-space-size=4096", "server.cjs"]
+CMD ["node", "--max-old-space-size=4096", "server.js"]

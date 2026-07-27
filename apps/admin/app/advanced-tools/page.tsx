@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Advanced Tools | Admin',
   description: 'System tools — migrations, imports, exports, API keys, queues, and developer utilities.',

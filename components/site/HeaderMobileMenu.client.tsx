@@ -222,7 +222,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                       {hasSubItems && sectionOpen ? (
                         <div
                           id={`mobile-section-${sectionKey}`}
-                          className="pb-3 pl-3 border-l-2 border-brand-red-200"
+                          className="pt-2 pb-3 pl-4 border-l-2 border-brand-red-200"
                         >
                           {/* "View all" link */}
                           {item.href ? (
@@ -245,14 +245,14 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                                 const categoryHref = column.find((c) => c.isHeader && c.href)?.href;
 
                                 return (
-                                  <div key={categoryKey}>
+                                  <div key={categoryKey} className="mt-1 first:mt-0">
                                     {/* Full-width accordion trigger */}
                                     <button
                                       type="button"
                                       onClick={() =>
                                         setExpandedCategory(categoryOpen ? null : categoryKey)
                                       }
-                                      className="flex w-full min-h-[40px] items-center justify-between py-1.5 text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
+                                      className="flex w-full min-h-[40px] items-center justify-between py-2 text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
                                       aria-label={`${categoryOpen ? 'Collapse' : 'Expand'} ${label}`}
                                       aria-expanded={categoryOpen}
                                     >
@@ -265,9 +265,32 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                                       />
                                     </button>
                                     {categoryOpen ? (
-                                      <div className="pl-2 pb-1 border-l border-slate-200 ml-1 -mt-0.5">
-                                        {column.map((subItem) =>
-                                          !subItem ? null : (
+                                      <div className="pl-3 border-l border-brand-red-200">
+                                        {column.map((subItem) => {
+                                          if (!subItem) return null;
+                                          // Show header as label, not as link
+                                          if (subItem.isHeader) {
+                                            const headerLabel = subItem.name.replace(/—/g, '').trim();
+                                            return categoryHref ? (
+                                              <Link
+                                                key={`${subItem.name}-${subItem.href ?? 'nohref'}`}
+                                                href={categoryHref}
+                                                prefetch={false}
+                                                onClick={closeMenu}
+                                                className="block py-1 min-h-[32px] text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
+                                              >
+                                                {headerLabel}
+                                              </Link>
+                                            ) : (
+                                              <p
+                                                key={`${subItem.name}-${subItem.href ?? 'nohref'}`}
+                                                className="py-1 min-h-[32px] text-xs font-bold uppercase tracking-wide text-brand-red-600"
+                                              >
+                                                {headerLabel}
+                                              </p>
+                                            );
+                                          }
+                                          return (
                                             <MobileSubLink
                                               key={`${subItem.name}-${subItem.href ?? 'nohref'}`}
                                               subItem={subItem}
@@ -275,23 +298,37 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                                               programApplyLinks={programApplyLinks}
                                               onNavigate={closeMenu}
                                             />
-                                          ),
-                                        )}
+                                          );
+                                        })}
                                       </div>
                                     ) : null}
                                   </div>
                                 );
                               })
                             : /* Single-column subItems */
-                              item.subItems!.map((subItem) =>
-                                subItem.isHeader ? (
-                                  <p
-                                    key={subItem.name}
-                                    className="pt-4 pb-1 text-xs font-bold uppercase tracking-wide text-brand-red-600 break-words"
-                                  >
-                                    {subItem.name.replace(/—/g, '').trim()}
-                                  </p>
-                                ) : (
+                              item.subItems!.map((subItem) => {
+                                if (subItem.isHeader) {
+                                  const headerLabel = subItem.name.replace(/—/g, '').trim();
+                                  return subItem.href ? (
+                                    <Link
+                                      key={subItem.name}
+                                      href={subItem.href}
+                                      prefetch={false}
+                                      onClick={closeMenu}
+                                      className="block py-2 text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
+                                    >
+                                      {headerLabel}
+                                    </Link>
+                                  ) : (
+                                    <p
+                                      key={subItem.name}
+                                      className="pt-3 pb-1 text-xs font-bold uppercase tracking-wide text-brand-red-600 break-words"
+                                    >
+                                      {headerLabel}
+                                    </p>
+                                  );
+                                }
+                                return (
                                   <MobileSubLink
                                     key={`${subItem.name}-${subItem.href ?? 'nohref'}`}
                                     subItem={subItem}
@@ -299,8 +336,8 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                                     programApplyLinks={programApplyLinks}
                                     onNavigate={closeMenu}
                                   />
-                                ),
-                              )}
+                                );
+                              })}
                         </div>
                       ) : null}
                     </section>

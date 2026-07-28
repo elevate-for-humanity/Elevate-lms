@@ -12,13 +12,16 @@ import {
   Clapperboard,
   ExternalLink,
   FileText,
+  FlaskConical,
   FolderOpen,
   Globe,
+  ImageIcon,
   Inbox,
   Key,
   LayoutDashboard,
   Loader2,
   MessageSquare,
+  Microscope,
   PanelBottomOpen,
   RefreshCw,
   Rocket,
@@ -27,6 +30,7 @@ import {
   Server,
   Sparkles,
   Upload,
+  Wind,
   Zap,
   Briefcase,
   Plug,
@@ -65,7 +69,7 @@ interface CourseBuilderProps {
   initialProgramId?: string;
 }
 
-type Workspace = 'studio' | 'command' | 'deploy' | 'files' | 'environments' | 'health' | 'secrets' | 'integrations' | 'workflows' | 'upload' | 'operations' | 'errors' | 'video';
+type Workspace = 'studio' | 'command' | 'deploy' | 'files' | 'media' | 'environments' | 'health' | 'secrets' | 'integrations' | 'workflows' | 'upload' | 'operations' | 'errors' | 'video' | 'evaluations' | 'cfd';
 type StudioMode = 'ask' | 'run' | 'courses';
 
 const UnifiedEllieChat = dynamic(() => import('@/components/studio/UnifiedEllieChat'), {
@@ -117,13 +121,31 @@ const LizzyVideoPanel = dynamic(
   { ssr: false },
 );
 
+const MediaStudioPanel = dynamic(
+  () => import('@/components/studio/MediaStudioPanel'),
+  { ssr: false },
+);
+
+const EvaluationStudioPanel = dynamic(
+  () => import('@/components/studio/EvaluationStudioPanel'),
+  { ssr: false },
+);
+
+const CfdStudioPanel = dynamic(
+  () => import('@/components/studio/CfdStudioPanel'),
+  { ssr: false },
+);
+
 const WORKSPACES: { id: Workspace; label: string; Icon: ElementType<{ className?: string }> }[] = [
-  { id: 'studio', label: 'Studio', Icon: Bot },
+  { id: 'studio', label: 'AI Studio', Icon: Bot },
   { id: 'workflows', label: 'Workflows', Icon: Workflow },
   { id: 'command', label: 'Command', Icon: LayoutDashboard },
   { id: 'deploy', label: 'Deploy', Icon: Rocket },
   { id: 'files', label: 'Files', Icon: FolderOpen },
-  { id: 'environments', label: 'Container', Icon: Box },
+  { id: 'media', label: 'Media', Icon: ImageIcon },
+  { id: 'environments', label: 'Containers', Icon: Box },
+  { id: 'evaluations', label: 'Evaluation', Icon: Microscope },
+  { id: 'cfd', label: 'CFD', Icon: Wind },
   { id: 'health', label: 'Health', Icon: Activity },
   { id: 'secrets', label: 'Secrets', Icon: Key },
   { id: 'integrations', label: 'Integrations', Icon: Plug },
@@ -147,11 +169,17 @@ const QUICK_ACTIONS = [
 ];
 
 function normalizeWorkspace(tab: string | null): { workspace: Workspace; mode: StudioMode } {
-  if (tab === 'deploy') return { workspace: 'deploy', mode: 'ask' };
+  if (tab === 'deploy' || tab === 'deployments') return { workspace: 'deploy', mode: 'ask' };
   if (tab === 'files' || tab === 'git' || tab === 'docs' || tab === 'documents')
     return { workspace: 'files', mode: 'ask' };
-  if (tab === 'container' || tab === 'environments' || tab === 'services')
+  if (tab === 'media' || tab === 'media-library' || tab === 'assets')
+    return { workspace: 'media', mode: 'ask' };
+  if (tab === 'container' || tab === 'containers' || tab === 'environments' || tab === 'services')
     return { workspace: 'environments', mode: 'ask' };
+  if (tab === 'evaluation' || tab === 'evaluations' || tab === 'evals')
+    return { workspace: 'evaluations', mode: 'ask' };
+  if (tab === 'cfd' || tab === 'cfd-studio' || tab === 'simulation')
+    return { workspace: 'cfd', mode: 'ask' };
   if (tab === 'health') return { workspace: 'health', mode: 'ask' };
   if (tab === 'secrets') return { workspace: 'secrets', mode: 'ask' };
   if (tab === 'integrations') return { workspace: 'integrations', mode: 'ask' };
@@ -487,6 +515,9 @@ export default function DevStudioUnifiedClient({
             {workspace === 'operations' && <LizzyOperationsPanel />}
             {workspace === 'errors' && <LizzyErrorsPanel />}
             {workspace === 'video' && <LizzyVideoPanel />}
+            {workspace === 'media' && <MediaStudioPanel />}
+            {workspace === 'evaluations' && <EvaluationStudioPanel />}
+            {workspace === 'cfd' && <CfdStudioPanel />}
           </main>
 
           <section className="hidden w-[38vw] min-w-[340px] max-w-[560px] shrink-0 flex-col border-l border-[#3c3c3c] bg-[#1e1e1e] lg:flex">

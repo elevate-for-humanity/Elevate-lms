@@ -26,7 +26,7 @@ export const metadata = {
 };
 
 export default async function SponsorLicensingPage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
   
   // Fetch sponsor licensing info
   const { data: licensing } = await db

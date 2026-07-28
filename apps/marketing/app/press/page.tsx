@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PressPage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
 
   // Press-specific posts (category = 'press' or 'media')
   const { data: pressItems } = await db

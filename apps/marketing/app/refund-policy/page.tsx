@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RefundPolicyPage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
 
   // Fetch refund policy
   const { data: policy } = await supabase

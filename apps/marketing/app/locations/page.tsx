@@ -33,7 +33,7 @@ interface Location {
 }
 
 export default async function LocationsPage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
 
   const { data: locations, error } = await supabase
     .from('locations')

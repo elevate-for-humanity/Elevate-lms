@@ -142,7 +142,7 @@ const defaultResources = {
 };
 
 export default async function DownloadsPage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
 
   // Get documents from database
   const { data: documents } = await supabase

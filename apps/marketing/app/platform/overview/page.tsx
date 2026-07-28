@@ -31,7 +31,7 @@ export const metadata = {
 };
 
 export default async function PlatformLicensingPage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
   
   // Fetch platform licensing info
   const { data: licensing } = await db

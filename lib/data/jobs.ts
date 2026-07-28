@@ -53,7 +53,7 @@ const SELECT_COLS = [
 
 async function getDb() {
   const db = createPublicClient();
-  if (admin) return admin;
+  if (db) return db;
   return await createClient();
 }
 

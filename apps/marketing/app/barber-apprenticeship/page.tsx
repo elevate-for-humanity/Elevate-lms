@@ -44,7 +44,7 @@ const WHAT_YOU_LEARN = [
 ];
 
 export default async function BarberApprenticeshipPage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
 
   // Pull live program data
   const { data: program } = await db

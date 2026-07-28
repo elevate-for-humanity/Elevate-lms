@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/public';
+import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function CalendarPage() {
-  const supabase = createPublicClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PlatformAppsPage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
   
   // Fetch platform apps
   const { data: dbApps } = await db

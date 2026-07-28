@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MobilePage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
 
   if (!supabase) {
     return (

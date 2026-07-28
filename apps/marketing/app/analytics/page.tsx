@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createPublicClient } from '@/lib/supabase/public';
+import { createClient } from '@/lib/supabase/server';
 
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import {
@@ -31,7 +31,7 @@ export default async function AnalyticsPage() {
   const supabase = await createClient();
   const {
     data: { user },
-  } = await db.auth.getUser();
+  } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/analytics');
 
   // Check role — analytics is admin/staff only
@@ -46,8 +46,6 @@ export default async function AnalyticsPage() {
     redirect('/lms/dashboard');
   }
 
-  const db = createPublicClient();
-
   const [
     { count: totalUsers },
     { count: totalStudents },
@@ -57,9 +55,9 @@ export default async function AnalyticsPage() {
     { count: totalCertificates },
     { count: publishedPrograms },
   ] = await Promise.all([
-    db.from('profiles').select('*', { count: 'exact', head: true }),
-    db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
-    db.from('program_enrollments').select('*', { count: 'exact', head: true }),
+    supabase.from('profiles').select('*', { count: 'exact', head: true }),
+    supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+    supabase.from('program_enrollments').select('*', { count: 'exact', head: true }),
     db
       .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
@@ -68,8 +66,8 @@ export default async function AnalyticsPage() {
       .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'completed'),
-    db.from('program_completion_certificates').select('*', { count: 'exact', head: true }),
-    db.from('programs').select('*', { count: 'exact', head: true }).eq('published', true),
+    supabase.from('program_completion_certificates').select('*', { count: 'exact', head: true }),
+    supabase.from('programs').select('*', { count: 'exact', head: true }).eq('published', true),
   ]);
 
   // Recent enrollments

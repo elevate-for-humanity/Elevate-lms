@@ -36,7 +36,7 @@ const LICENSE_TIERS = [
 ];
 
 export default async function PricingPage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
 
   const { data: dbTiers } = await supabase
     .from('license_tiers')

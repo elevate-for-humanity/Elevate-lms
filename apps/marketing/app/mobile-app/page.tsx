@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MobileAppPage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
   const { data: appInfo } = await supabase
     .from('site_settings')
     .select('*')

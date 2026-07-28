@@ -15,7 +15,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const dynamic = 'force-dynamic';
 
 export default async function ArchitecturePage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
   
   // Fetch architecture docs
   const { data: docs } = await db

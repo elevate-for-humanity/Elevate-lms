@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createPublicClient } from '@/lib/supabase/public';
+import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { CreditCard, Shield, Smartphone, DollarSign, Circle } from 'lucide-react';
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function CardPage() {
-  const supabase = createPublicClient();
+  const supabase = await createClient();
   if (!supabase) redirect('/login');
   const {
     data: { user },

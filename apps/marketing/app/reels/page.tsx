@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ReelsPage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
 
   const { data: reels } = await db
     .from('reels')

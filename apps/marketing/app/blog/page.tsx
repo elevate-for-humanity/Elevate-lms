@@ -43,7 +43,7 @@ export const revalidate = 600;
 
 async function getDbPosts(): Promise<BlogPost[]> {
   try {
-    const db = createPublicClient();
+    const supabase = createPublicClient();
     const { data } = await db
       .from('blog_posts')
       .select('*')

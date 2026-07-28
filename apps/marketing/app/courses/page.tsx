@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 const categories = ['All', 'Healthcare', 'Trades', 'Beauty', 'Transportation', 'Technology'];
 
 export default async function CoursesPage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
   let featuredCourses: any[] = [];
 
   if (true) {

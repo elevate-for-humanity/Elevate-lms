@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 };
 
 export default async function CompliancePage() {
-  const db = createPublicClient();
-  const { data: dbRows } = await db.from('compliance_audits').select('*').limit(50);
+  const supabase = createPublicClient();
+  const { data: dbRows } = await supabase.from('compliance_audits').select('*').limit(50);
 
   const programCredentials = (dbRows as any[]) || [];
 

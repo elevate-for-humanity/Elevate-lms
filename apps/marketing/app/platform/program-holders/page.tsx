@@ -24,7 +24,7 @@ export const metadata = {
 };
 
 export default async function ProgramHolderLicensePage() {
-  const db = createPublicClient();
+  const supabase = createPublicClient();
   
   // Fetch program holder pricing
   const { data: pricing } = await db

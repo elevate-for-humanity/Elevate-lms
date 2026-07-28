@@ -27,8 +27,8 @@ export default async function LeaderboardPage() {
     }
   } catch {
     // fallback — direct query if API unreachable during SSR
-    const db = createPublicClient();
-    const { data } = await db.from('user_points').select('*').limit(50);
+    const supabase = createPublicClient();
+    const { data } = await supabase.from('user_points').select('*').limit(50);
     topLearners = (data as any[]) || [];
   }
 

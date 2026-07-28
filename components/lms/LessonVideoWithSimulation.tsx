@@ -45,7 +45,7 @@ export default function LessonVideoWithSimulation({
     }
   }, [minimumReached, minimumReported, onMinimumTimeReached]);
 
-  useEffect(() => {
+  useEffect((): (() => void) | undefined => {
     const video = videoRef.current;
     if (!video) return;
 

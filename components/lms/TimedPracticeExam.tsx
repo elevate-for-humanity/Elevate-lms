@@ -77,7 +77,7 @@ export default function TimedPracticeExam({
   );
 
   // Countdown timer
-  useEffect(() => {
+  useEffect((): (() => void) | undefined => {
     if (state !== 'active') return;
     timerRef.current = setInterval(() => {
       setTimeLeft((t) => {

@@ -66,9 +66,11 @@ export function NotificationBell() {
 
     // Subscribe to realtime notifications
     const supabase = createClient();
+    let unsubscribe: (() => void) | undefined;
+
     supabase.auth.getUser().then(({ data: { user } }): void => {
       if (!user) return;
-      const unsubscribe = subscribeToNotifications(user.id, (payload: NotificationPayload) => {
+      const unsub = subscribeToNotifications(user.id, (payload: NotificationPayload) => {
         setNotifications((prev) => [
           {
             id: payload.id || `notif-${Date.now()}`,
@@ -81,8 +83,12 @@ export function NotificationBell() {
           ...prev,
         ]);
       });
-      return () => unsubscribe();
+      unsubscribe = unsub;
     });
+
+    return () => {
+      unsubscribe?.();
+    };
   }, [fetchNotifications]);
 
   const getTimeAgo = (date: string) => {

@@ -141,7 +141,7 @@ export default function HeroVideo({
 
   // src is resolved synchronously in useState initializer above — no swap needed.
 
-  useEffect(() => {
+  useEffect((): (() => void) | undefined => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
     // Voices may not be loaded yet on first render (Chrome async loads them).

@@ -116,7 +116,7 @@ export default function UniversalPracticeExam() {
     [timeLeft],
   );
 
-  useEffect(() => {
+  useEffect((): (() => void) | undefined => {
     if (state !== 'active') return;
     timerRef.current = setInterval(() => {
       setTimeLeft((t) => {

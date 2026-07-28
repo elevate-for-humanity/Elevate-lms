@@ -76,6 +76,15 @@ export function ScenarioBlock({ scenario, onComplete, showContinue = true }: Pro
     setTimeout(() => feedbackRef.current?.focus(), 50);
   }, []);
 
+  const handleReset = useCallback(() => {
+    setCurrentNode(scenario);
+    setPhase('choosing');
+    setSelectedChoice(null);
+    setFocusedIdx(0);
+    setHistory([]);
+    setTimeout(() => choiceRefs.current[0]?.focus(), 50);
+  }, [scenario]);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent, idx: number) => {
       const count = currentNode.choices.length;
@@ -110,15 +119,6 @@ export function ScenarioBlock({ scenario, onComplete, showContinue = true }: Pro
       onComplete?.(selectedChoice.correct);
     }
   }, [selectedChoice, currentNode, onComplete]);
-
-  const handleReset = useCallback(() => {
-    setCurrentNode(scenario);
-    setPhase('choosing');
-    setSelectedChoice(null);
-    setFocusedIdx(0);
-    setHistory([]);
-    setTimeout(() => choiceRefs.current[0]?.focus(), 50);
-  }, [scenario]);
 
   const isCorrect = selectedChoice?.correct ?? false;
   const hasBranch = !!selectedChoice?.branch;

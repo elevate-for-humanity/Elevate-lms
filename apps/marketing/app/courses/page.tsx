@@ -18,11 +18,106 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { CourseCatalog } from '@/components/CourseCatalog';
 import { CourseCompletionTracking } from '@/components/CourseCompletionTracking';
 import { CoursePrerequisiteManagement } from '@/components/CoursePrerequisiteManagement';
-import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
+
+const featuredCategories = [
+  {
+    slug: 'healthcare',
+    name: 'Healthcare',
+    description: 'Launch a career in hospitals, clinics, and healthcare facilities.',
+    image: '/images/pages/healthcare-hero.webp',
+    courses: 12,
+  },
+  {
+    slug: 'skilled-trades',
+    name: 'Skilled Trades',
+    description: 'Build hands-on skills in HVAC, welding, electrical, and more.',
+    image: '/images/pages/trades-hero.webp',
+    courses: 8,
+  },
+  {
+    slug: 'technology',
+    name: 'Technology',
+    description: 'Start a tech career with IT support, coding, and digital skills.',
+    image: '/images/pages/tech-classroom.webp',
+    courses: 6,
+  },
+  {
+    slug: 'business',
+    name: 'Business',
+    description: 'Develop professional skills in bookkeeping, administration, and management.',
+    image: '/images/pages/business-hero.webp',
+    courses: 5,
+  },
+  {
+    slug: 'beauty',
+    name: 'Beauty & Wellness',
+    description: 'Pursue a career in barbering, cosmetology, and esthetics.',
+    image: '/images/pages/beauty-hero.webp',
+    courses: 4,
+  },
+  {
+    slug: 'transportation',
+    name: 'Transportation',
+    description: 'Earn your CDL and join one of the highest-demand industries.',
+    image: '/images/pages/cdl-hero.webp',
+    courses: 3,
+  },
+];
+
+const microClasses = [
+  {
+    id: 'cpr-first-aid',
+    title: 'CPR & First Aid',
+    category: 'Healthcare',
+    price: '$75',
+    duration: '1 day',
+    description: 'American Heart Association certified CPR and First Aid training for healthcare providers and general public.',
+  },
+  {
+    id: 'osha-10',
+    title: 'OSHA 10-Hour Safety',
+    category: 'Trades',
+    price: '$99',
+    duration: '2 days',
+    description: 'OSHA 10-hour construction safety certification covering hazard identification and prevention.',
+  },
+  {
+    id: 'servsafe-manager',
+    title: 'ServSafe Manager',
+    category: 'Hospitality',
+    price: '$149',
+    duration: '1-2 days',
+    description: 'Food safety manager certification required for food service establishments in Indiana.',
+  },
+  {
+    id: 'forklift-cert',
+    title: 'Forklift Certification',
+    category: 'Trades',
+    price: '$125',
+    duration: '1 day',
+    description: 'OSHA-compliant forklift operator training and certification for warehouse and industrial settings.',
+  },
+  {
+    id: 'epa-608',
+    title: 'EPA 608 Universal',
+    category: 'Trades',
+    price: '$199',
+    duration: '2 days',
+    description: 'EPA Section 608 technician certification for handling refrigerants in HVAC and refrigeration.',
+  },
+  {
+    id: 'act-workkeys',
+    title: 'ACT WorkKeys',
+    category: 'Workforce',
+    price: '$45',
+    duration: 'Half day',
+    description: 'National Career Readiness Certificate testing — valued by employers across Indiana.',
+  },
+];
 
 export const metadata: Metadata = {
   title: 'Career Training Courses | Elevate for Humanity',
@@ -47,22 +142,20 @@ export default async function CoursesPage() {
   const supabase = createPublicClient();
   let featuredCourses: any[] = [];
 
-  if (true) {
-    try {
-      const { data } = await db
-        .from('programs')
-        .select('id, title, slug, category, image_url, description, duration, price')
-        .eq('is_active', true)
-        .eq('featured', true)
-        .order('title', { ascending: true })
-        .limit(6);
+  try {
+    const { data } = await supabase
+      .from('programs')
+      .select('id, title, slug, category, image_url, description, duration, price')
+      .eq('is_active', true)
+      .eq('featured', true)
+      .order('title', { ascending: true })
+      .limit(6);
 
-      if (data && data.length > 0) {
-        featuredCourses = data;
-      }
-    } catch (error) {
-      logger.error('[Courses] Error:', error);
+    if (data && data.length > 0) {
+      featuredCourses = data;
     }
+  } catch {
+    // Silently fall back to empty array — page renders fine without featured courses
   }
 
   return (

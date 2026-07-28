@@ -204,6 +204,31 @@ export async function middleware(request: NextRequest) {
     // Programs on waitlist
     ['/programs/plumbing', '/programs'],
     ['/programs/forklift', '/programs'],
+    // Old /courses routes → /courses
+    ['/courses/healthcare', '/courses'],
+    ['/courses/trades', '/courses'],
+    ['/courses/technology', '/courses'],
+    ['/courses/business', '/courses'],
+    // Old /apply category pages (absorbed into main apply)
+    ['/apply/healthcare', '/apply'],
+    ['/apply/trades', '/apply'],
+    ['/apply/technology', '/apply'],
+    ['/apply/business', '/apply'],
+    ['/apply/beauty', '/apply'],
+    // Funding/payment related
+    ['/financial-aid', '/funding'],
+    ['/payment', '/funding'],
+    // Marketing-era AI routes (placeholder - returns 404)
+    ['/paris', '/'],
+    ['/lizzy', '/'],
+    ['/studio', '/'],
+    // Legacy support routes
+    ['/mentorship', '/career-services'],
+    ['/vita', '/career-services'],
+    // Admissions absorbed into apply
+    ['/admissions', '/apply'],
+    // Signup → apply (students sign up through the application flow)
+    ['/signup', '/apply'],
   ];
 
   for (const [from, to] of LEGACY_REDIRECTS) {

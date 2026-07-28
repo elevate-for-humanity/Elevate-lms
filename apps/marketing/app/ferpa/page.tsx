@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic';
 
-import Image from 'next/image';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
@@ -13,43 +12,58 @@ export const metadata: Metadata = {
 };
 
 export default async function FERPAPortal() {
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = await createClient();
+  } catch {
+    redirect('/login?redirect=/ferpa');
+  }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data?.user;
+  } catch {
+    redirect('/login?redirect=/ferpa');
+  }
 
   if (!user) {
     redirect('/login?redirect=/ferpa');
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role, full_name')
-    .eq('id', user.id)
-    .maybeSingle();
+  let profile = null;
+  try {
+    const { data } = await supabase
+      .from('profiles')
+      .select('role, full_name')
+      .eq('id', user.id)
+      .maybeSingle();
+    profile = data;
+  } catch {
+    redirect('/login?redirect=/ferpa');
+  }
 
-  // Check if user has FERPA access
   const allowedRoles = ['admin', 'super_admin', 'ferpa_officer', 'registrar', 'staff'];
   if (!profile || !allowedRoles.includes(profile.role)) {
     redirect('/unauthorized');
   }
 
-  // Fetch FERPA metrics
-  const { count: totalStudents } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('role', 'student');
+  let totalStudents = 0;
+  let activeEnrollments = 0;
+  let pendingRequests = 0;
 
-  const { count: activeEnrollments } = await supabase
-    .from('program_enrollments')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'active');
-
-  const { count: pendingRequests } = await supabase
-    .from('applications')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'pending');
+  try {
+    const [{ count: ts }, { count: ae }, { count: pr }] = await Promise.all([
+      supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+      supabase.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+      supabase.from('applications').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    ]);
+    totalStudents = ts ?? 0;
+    activeEnrollments = ae ?? 0;
+    pendingRequests = pr ?? 0;
+  } catch {
+    // Metrics load failed - page still renders with zeros
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -65,7 +79,6 @@ export default async function FERPAPortal() {
       
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4">
-          {/* Metrics */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center gap-4">
@@ -73,7 +86,7 @@ export default async function FERPAPortal() {
                   <Users className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-900">{totalStudents ?? 0}</p>
+                  <p className="text-2xl font-bold text-slate-900">{totalStudents}</p>
                   <p className="text-slate-600 text-sm">Total Students</p>
                 </div>
               </div>
@@ -84,7 +97,7 @@ export default async function FERPAPortal() {
                   <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-900">{activeEnrollments ?? 0}</p>
+                  <p className="text-2xl font-bold text-slate-900">{activeEnrollments}</p>
                   <p className="text-slate-600 text-sm">Active Enrollments</p>
                 </div>
               </div>
@@ -95,14 +108,13 @@ export default async function FERPAPortal() {
                   <Clock className="w-6 h-6 text-brand-orange-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-900">{pendingRequests ?? 0}</p>
+                  <p className="text-2xl font-bold text-slate-900">{pendingRequests}</p>
                   <p className="text-slate-600 text-sm">Pending Requests</p>
                 </div>
               </div>
             </div>
           </div>
           
-          {/* Quick Actions */}
           <div className="bg-white rounded-xl p-8 shadow-sm">
             <h2 className="text-xl font-bold text-slate-900 mb-6">Quick Actions</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">

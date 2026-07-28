@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
 import { TEAM } from '@/data/team';
 
 export const revalidate = 3600;
@@ -12,7 +13,34 @@ export const metadata: Metadata = {
     'Meet the educators, workforce specialists, and community advocates behind Elevate for Humanity.',
 };
 
-export default function TeamPage() {
+export default async function TeamPage() {
+  let members = TEAM;
+
+  try {
+    const supabase = await createClient();
+    const { data: dbStaff, error } = await supabase
+      .from('team_members')
+      .select('id, name, title, bio, image_url, email')
+      .eq('is_active', true)
+      .order('display_order');
+
+    if (error) {
+      console.error('[team] Supabase query failed:', error.message);
+    } else if (dbStaff && dbStaff.length > 0) {
+      members = dbStaff.map((p) => ({
+        id: p.id,
+        name: p.name ?? 'Team Member',
+        title: p.title ?? '',
+        bio: p.bio ?? '',
+        headshotSrc: p.image_url ?? null,
+        email: p.email ?? '',
+      }));
+    }
+  } catch (err) {
+    console.error('[team] Failed to load team members:', err);
+    // Fall back to static data on any failure
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b">
@@ -35,7 +63,7 @@ export default function TeamPage() {
 
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto grid gap-6 md:grid-cols-2">
-          {TEAM.map((member) => (
+          {members.map((member) => (
             <article
               key={member.id}
               className="flex gap-4 rounded-xl border p-6 hover:bg-slate-50 transition"

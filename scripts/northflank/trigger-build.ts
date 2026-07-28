@@ -3,9 +3,9 @@
  * Trigger a Northflank combined-service build from the current git branch.
  * Skips build if the same SHA is already building or recently completed.
  *
- * CRITICAL FIX: PATCHes the service configuration with GIT_SHA before triggering build.
- * POST to /build is ephemeral, but PATCH to /services/combined/{id} permanently stores
- * buildArguments for the Docker build.
+ * CRITICAL: PATCHes the service configuration with GIT_SHA while preserving
+ * existing buildArguments (like NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)
+ * that were set by configure-services.ts.
  *
  *   npx tsx scripts/northflank/trigger-build.ts elevate-lms
  *   npx tsx scripts/northflank/trigger-build.ts elevate-admin
@@ -30,6 +30,21 @@ async function getRecentBuilds(projectId: string, serviceId: string, sha: string
   }
 }
 
+/** Fetch existing buildArguments from Northflank to preserve them. */
+async function getExistingBuildArguments(
+  projectId: string,
+  serviceId: string,
+): Promise<Record<string, string>> {
+  try {
+    const service = await nfFetch<{ buildArguments?: Record<string, string> }>(
+      projectApiPath(projectId, `/services/combined/${serviceId}`),
+    );
+    return service.buildArguments ?? {};
+  } catch {
+    return {};
+  }
+}
+
 async function main() {
   const serviceId = process.argv[2];
   if (!serviceId) {
@@ -43,18 +58,25 @@ async function main() {
   }
 
   // Get current SHA and pass as build argument
-  // Check multiple sources: GITHUB_SHA (from workflow), BUILD_SHA (alternative), or VERCEL
-  const currentSha = process.env.GITHUB_SHA || process.env.BUILD_SHA || process.env.VERCEL_GIT_COMMIT_SHA || '';
+  const currentSha =
+    process.env.GITHUB_SHA ||
+    process.env.BUILD_SHA ||
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    '';
 
   // Check for existing build with same SHA
   if (currentSha) {
     const recentBuilds = await getRecentBuilds(projectId, serviceId, currentSha);
     const existingBuild = recentBuilds.find(
-      (b) => b.sha === currentSha && (!b.concluded || b.status === 'running' || b.status === 'pending')
+      (b) =>
+        b.sha === currentSha &&
+        (!b.concluded || b.status === 'running' || b.status === 'pending'),
     );
-    
+
     if (existingBuild) {
-      console.log(`Skipping build for ${serviceId} - SHA ${currentSha} already has build ${existingBuild.id} (status: ${existingBuild.status})`);
+      console.log(
+        `Skipping build for ${serviceId} - SHA ${currentSha} already has build ${existingBuild.id} (status: ${existingBuild.status})`,
+      );
       if (process.env.GITHUB_OUTPUT) {
         fs.appendFileSync(process.env.GITHUB_OUTPUT, `build_id=${existingBuild.id}\n`, 'utf8');
         fs.appendFileSync(process.env.GITHUB_OUTPUT, `skipped=true\n`, 'utf8');
@@ -62,43 +84,45 @@ async function main() {
       return;
     }
   }
-  
-  // EVIDENCE: Log the SHA that will be used
-  console.log('=== TRIGGER BUILD EVIDENCE ===');
+
+  console.log('=== TRIGGER BUILD ===');
   console.log('Service:', serviceId);
   console.log('currentSha:', currentSha);
-  console.log('GITHUB_SHA env:', process.env.GITHUB_SHA);
-  console.log('BUILD_SHA env:', process.env.BUILD_SHA);
-  
-  // FIX: PATCH the service configuration with GIT_SHA BEFORE triggering build
-  // This ensures buildArguments are permanently stored and used by Docker
-  const buildArgsPayload = {
-    buildArguments: {
-      GITHUB_SHA: currentSha,
-      GIT_SHA: currentSha,
-      NEXT_PUBLIC_GIT_SHA: currentSha,
-      BUILD_TIMESTAMP: new Date().toISOString(),
-      FALLBACK_COMMIT: currentSha,
-    },
+
+  // CRITICAL FIX: Fetch existing buildArguments (Supabase URL, anon key, etc.)
+  // and MERGE with git-related arguments. This prevents overwriting the
+  // Supabase build arguments that configure-services.ts set.
+  const existingArgs = await getExistingBuildArguments(projectId, serviceId);
+  console.log('Existing buildArguments:', Object.keys(existingArgs));
+
+  // Merge: keep existing args (Supabase, etc.) + add/update git args
+  const mergedBuildArguments: Record<string, string> = {
+    ...existingArgs,
+    GITHUB_SHA: currentSha,
+    GIT_SHA: currentSha,
+    NEXT_PUBLIC_GIT_SHA: currentSha,
+    BUILD_TIMESTAMP: new Date().toISOString(),
+    FALLBACK_COMMIT: currentSha,
   };
-  
-  console.log('Payload for PATCH (permanently stored):');
+
+  console.log('Merged buildArguments:', Object.keys(mergedBuildArguments));
+
+  const buildArgsPayload = { buildArguments: mergedBuildArguments };
+
+  console.log('PATCH payload (preserving existing args):');
   console.log(JSON.stringify(buildArgsPayload, null, 2));
-  
+
   try {
     const patchResult = await nfFetch(
       projectApiPath(projectId, `/services/combined/${serviceId}`),
-      {
-        method: 'PATCH',
-        body: JSON.stringify(buildArgsPayload),
-      }
+      { method: 'PATCH', body: JSON.stringify(buildArgsPayload) },
     );
     console.log('PATCH result:', patchResult);
   } catch (e) {
     console.error('PATCH failed:', e);
   }
-  console.log('=== END EVIDENCE ===');
-  
+  console.log('=== TRIGGER BUILD END ===');
+
   // Trigger build from the current branch
   const build = await nfFetch<{
     id: string;

@@ -8,3 +8,8 @@ export function GET() {
     headers: { 'X-Robots-Tag': 'noindex, nofollow' },
   });
 }
+
+export default function PortalStudentsPage() {
+  // This component is never rendered - all requests are handled by GET above
+  return null;
+}

@@ -38,7 +38,13 @@ import {
   Workflow,
 } from 'lucide-react';
 import { getSkillsLoader, type Skill } from '@/lib/studio/skills-loader';
-import { STUDIO_WORKSPACES, getAvailableWorkspaces, type StudioWorkspaceId } from '@/lib/devstudio/workspace-registry';
+import {
+  STUDIO_WORKSPACES,
+  WORKSPACE_ICONS,
+  getWorkspaceById,
+  type StudioWorkspaceId,
+  type StudioWorkspaceDefinition,
+} from '@/lib/devstudio/workspace-registry.shared';
 
 // Import OpenHands-style components
 const WebContainerSandbox = dynamic(
@@ -70,8 +76,6 @@ interface CourseBuilderProps {
   initialProgramId?: string;
 }
 
-// Use StudioWorkspaceId from the canonical registry
-type Workspace = StudioWorkspaceId;
 type StudioMode = 'ask' | 'run' | 'courses';
 
 const UnifiedEllieChat = dynamic(() => import('@/components/studio/UnifiedEllieChat'), {
@@ -138,58 +142,13 @@ const CfdStudioPanel = dynamic(
   { ssr: false },
 );
 
-// Mapping from registry workspace IDs to UI components
-const WORKSPACE_COMPONENT_MAP: Record<string, ElementType<{ className?: string }>> = {
-  ai: Bot,
-  courses: BookOpen,
-  content: FileText,
-  media: ImageIcon,
-  workflows: Workflow,
-  repository: Globe,
-  tasks: Briefcase,
-  deployments: Rocket,
-  containers: Box,
-  evaluations: Microscope,
-  collaboration: MessageSquare,
-  cfd: Wind,
-  plugins: Plug,
-  memory: Brain,
-  health: Activity,
-  settings: Key,
-  command: LayoutDashboard,
-  files: FolderOpen,
-  secrets: Key,
-  integrations: Plug,
-  upload: Upload,
-  operations: Inbox,
-  errors: Zap,
-  video: Clapperboard,
-  studio: Bot,
-};
-
-// Canonical WORKSPACES derived from registry - use registry for all metadata
-const WORKSPACES: { id: Workspace; label: string; Icon: ElementType<{ className?: string }> }[] = [
-  { id: 'ai', label: 'AI Studio', Icon: Bot },
-  { id: 'workflows', label: 'Workflows', Icon: Workflow },
-  { id: 'command', label: 'Command', Icon: LayoutDashboard },
-  { id: 'deploy', label: 'Deploy', Icon: Rocket },
-  { id: 'files', label: 'Files', Icon: FolderOpen },
-  { id: 'media', label: 'Media', Icon: ImageIcon },
-  { id: 'containers', label: 'Containers', Icon: Box },
-  { id: 'evaluations', label: 'Evaluation', Icon: Microscope },
-  { id: 'cfd', label: 'CFD', Icon: Wind },
-  { id: 'health', label: 'Health', Icon: Activity },
-  { id: 'secrets', label: 'Secrets', Icon: Key },
-  { id: 'integrations', label: 'Integrations', Icon: Plug },
-  { id: 'upload', label: 'Upload', Icon: Upload },
-  { id: 'operations', label: 'Operations', Icon: Inbox },
-  { id: 'errors', label: 'Errors', Icon: Zap },
-  { id: 'video', label: 'Video', Icon: Clapperboard },
-];
-
-// Verify WORKSPACES align with registry - for audit purposes
-const _registryIds = STUDIO_WORKSPACES.map(w => w.id);
-const _workspaceIds = WORKSPACES.map(w => w.id);
+// Generate workspace list from canonical registry
+const WORKSPACES: Array<{ id: StudioWorkspaceId; label: string; Icon: ElementType<{ className?: string }> }> =
+  STUDIO_WORKSPACES.map((def) => ({
+    id: def.id,
+    label: def.label,
+    Icon: WORKSPACE_ICONS[def.id],
+  }));
 
 const QUICK_ACTIONS = [
   { label: 'Website deploy', command: 'Deploy the LMS service' },
@@ -204,7 +163,7 @@ const QUICK_ACTIONS = [
   { label: 'Create social post', command: 'Generate social media content' },
 ];
 
-function normalizeWorkspace(tab: string | null): { workspace: Workspace; mode: StudioMode } {
+function normalizeWorkspace(tab: string | null): { workspace: StudioWorkspaceId; mode: StudioMode } {
   if (tab === 'deploy' || tab === 'deployments') return { workspace: 'deployments', mode: 'ask' };
   if (tab === 'files' || tab === 'git' || tab === 'docs' || tab === 'documents')
     return { workspace: 'files', mode: 'ask' };
@@ -239,11 +198,11 @@ export default function DevStudioUnifiedClient({
   const searchParams = useSearchParams();
   const initial = normalizeWorkspace(searchParams.get('tab'));
   
-  // Check if workspace requires super admin
-  const workspaceDef = STUDIO_WORKSPACES.find(w => w.id === initial.workspace);
+  // Check if workspace requires super admin from registry
+  const workspaceDef = getWorkspaceById(initial.workspace);
   const requiresSuperAdmin = workspaceDef?.superAdminOnly ?? false;
   
-  const [workspace, setWorkspace] = useState<Workspace>(
+  const [workspace, setWorkspace] = useState<StudioWorkspaceId>(
     requiresSuperAdmin && !isSuperAdmin
       ? 'ai'
       : initial.workspace,
@@ -324,9 +283,9 @@ export default function DevStudioUnifiedClient({
     );
   }, [health]);
 
-  function openWorkspace(next: Workspace) {
+  function openWorkspace(next: StudioWorkspaceId) {
     // Use registry for permission check
-    const workspaceDef = STUDIO_WORKSPACES.find(w => w.id === next);
+    const workspaceDef = getWorkspaceById(next);
     if (workspaceDef?.superAdminOnly && !isSuperAdmin) {
       setWorkspace('ai');
       return;
@@ -424,7 +383,7 @@ export default function DevStudioUnifiedClient({
           <div className="space-y-1">
             {WORKSPACES.filter(
               (item) => {
-                const ws = STUDIO_WORKSPACES.find(w => w.id === item.id);
+                const ws = getWorkspaceById(item.id);
                 return !ws?.superAdminOnly || isSuperAdmin;
               },
             ).map(({ id, label, Icon }) => {
@@ -630,15 +589,15 @@ function MobileTabs({
   isSuperAdmin,
   onChange,
 }: {
-  workspace: Workspace;
+  workspace: StudioWorkspaceId;
   isSuperAdmin: boolean;
-  onChange: (workspace: Workspace) => void;
+  onChange: (workspace: StudioWorkspaceId) => void;
 }) {
   return (
     <div className="flex shrink-0 gap-1 overflow-x-auto border-b border-[#3c3c3c] bg-[#252526] p-1 md:hidden">
       {WORKSPACES.filter(
         (item) => {
-          const ws = STUDIO_WORKSPACES.find(w => w.id === item.id);
+          const ws = getWorkspaceById(item.id);
           return !ws?.superAdminOnly || isSuperAdmin;
         },
       ).map(({ id, label, Icon }) => (

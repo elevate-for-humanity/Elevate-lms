@@ -53,10 +53,7 @@ function hasNoindex(content) {
   // Only match explicit metadata exports — not JSX meta tags or comments.
   // Matches: robots: { index: false, ... } inside a metadata/Metadata export.
   // Does NOT match: <meta name="robots" content="noindex"> (JSX, may be conditional)
-  // Also accepts NextResponse.redirect with X-Robots-Tag header
-  if (/robots\s*:\s*\{[^}]*index\s*:\s*false/.test(content)) return true;
-  if (/NextResponse\.redirect\(/i.test(content) && /X-Robots-Tag.*noindex/i.test(content)) return true;
-  return false;
+  return /robots\s*:\s*\{[^}]*index\s*:\s*false/.test(content);
 }
 
 /** Walk a directory, yielding all file paths matching a predicate. */
@@ -107,10 +104,7 @@ function isCoveredByNoindex(pageFile) {
 function isPureRedirectStub(content) {
   const lines = content.split('\n').filter(l => l.trim());
   // Must call redirect() and have ≤12 non-empty lines
-  // Also accepts NextResponse.redirect() with X-Robots-Tag header
-  const hasRedirect = /redirect\(/.test(content);
-  const hasRobotsTag = /X-Robots-Tag.*noindex/i.test(content);
-  return lines.length <= 12 && hasRedirect && hasRobotsTag;
+  return lines.length <= 12 && /redirect\(/.test(content);
 }
 
 // ── Route prefix definitions ─────────────────────────────────────────────────

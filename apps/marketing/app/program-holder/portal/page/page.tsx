@@ -1,15 +1,11 @@
-import { NextResponse } from 'next/server';
+import { redirect } from 'next/navigation';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 // Legacy portal redirect — main portal page
-export function GET() {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
-  return NextResponse.redirect(new URL('/program-holder/dashboard', base), {
-    status: 307,
-    headers: { 'X-Robots-Tag': 'noindex, nofollow' },
-  });
-}
-
 export default function PortalPage() {
-  // This component is never rendered - all requests are handled by GET above
-  return null;
+  redirect('/program-holder/dashboard');
 }

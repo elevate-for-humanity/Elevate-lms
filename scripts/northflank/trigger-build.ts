@@ -35,14 +35,31 @@ async function getExistingBuildArguments(
   projectId: string,
   serviceId: string,
 ): Promise<Record<string, string>> {
-  try {
-    const service = await nfFetch<{ buildArguments?: Record<string, string> }>(
-      projectApiPath(projectId, `/services/combined/${serviceId}`),
-    );
-    return service.buildArguments ?? {};
-  } catch {
-    return {};
+  const endpoints = [
+    projectApiPath(projectId, `/services/combined/${serviceId}`),
+    projectApiPath(projectId, `/services/${serviceId}`),
+    projectApiPath(projectId, `/services/${serviceId}/build`),
+    projectApiPath(projectId, `/services/combined/${serviceId}/build`),
+  ];
+
+  for (const endpoint of endpoints) {
+    try {
+      const service = await nfFetch<Record<string, unknown>>(endpoint);
+      const args =
+        (service.buildArguments as Record<string, string> | undefined) ??
+        ((service.build as Record<string, unknown>)?.buildArguments as Record<string, string> | undefined) ??
+        {};
+      if (args && Object.keys(args).length > 0) {
+        console.log(`Found buildArguments at ${endpoint}:`, Object.keys(args));
+        return args;
+      }
+    } catch {
+      // Continue to next endpoint
+    }
   }
+
+  console.log('No existing buildArguments found at any endpoint');
+  return {};
 }
 
 async function main() {

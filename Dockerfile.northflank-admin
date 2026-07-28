@@ -83,6 +83,18 @@ COPY --from=dependencies /workspace/node_modules ./node_modules
 # Copy the full repository source afterward
 COPY . .
 
+# Verify required build arguments are present (fail-fast before expensive build)
+RUN echo "Verifying build arguments..." && \
+    echo "NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-MISSING}" && \
+    echo "NEXT_PUBLIC_ADMIN_URL: ${NEXT_PUBLIC_ADMIN_URL:-MISSING}" && \
+    echo "NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:+SET}" && \
+    echo "NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:+SET}" && \
+    echo "GIT_SHA: ${GIT_SHA:-MISSING}" && \
+    echo "BUILD_TIMESTAMP: ${BUILD_TIMESTAMP:-MISSING}" && \
+    (test -n "$NEXT_PUBLIC_SUPABASE_URL" || (echo "ERROR: NEXT_PUBLIC_SUPABASE_URL is not set" && exit 1)) && \
+    (test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" || (echo "ERROR: NEXT_PUBLIC_SUPABASE_ANON_KEY is not set" && exit 1)) && \
+    echo "All required build arguments verified."
+
 # Build Admin app
 RUN pnpm --filter @elevate/admin build
 

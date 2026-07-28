@@ -6,6 +6,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { formatPostDate } from '@/lib/data/news';
 
+export const dynamic = "force-dynamic";
+
 export const revalidate = 3600;
 
 export const metadata: Metadata = {

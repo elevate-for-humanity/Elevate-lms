@@ -14,6 +14,8 @@ import CatalogFilters from './CatalogFilters';
 import { PayNowButton } from '@/components/programs/PayNowButton';
 import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
+export const dynamic = "force-dynamic";
+
 export const revalidate = 0;
 
 export async function generateMetadata(): Promise<Metadata> {

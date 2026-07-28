@@ -7,6 +7,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { STATIC_POSTS, type BlogPost } from '@/content/blog/posts';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: 'Blog',
   description:

@@ -6,6 +6,8 @@ import { Calendar, User, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { STATIC_POSTS, type BlogPost } from '@/content/blog/posts';
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: 'Blog | Elevate For Humanity',
   description:

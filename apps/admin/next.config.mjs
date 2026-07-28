@@ -22,8 +22,14 @@ const useStandaloneOutput =
 const adminConfig = {
   ...(useStandaloneOutput ? { output: 'standalone' } : {}),
 
-  typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
+  typescript: { 
+    // TODO: Set to false after fixing all TypeScript errors in apps/admin
+    ignoreBuildErrors: true, 
+  },
+  eslint: { 
+    // TODO: Set to ignoreDuringBuilds: false after fixing all ESLint errors
+    ignoreDuringBuilds: true, 
+  },
 
   experimental: {
     workerThreads: false,

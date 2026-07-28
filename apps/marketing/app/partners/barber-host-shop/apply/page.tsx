@@ -4,6 +4,8 @@ import { STATIC_PROGRAM_MAP, getStaticProgram } from '@/data/programs/index';
 import { normalizeProgramInterest } from '@/lib/intake/normalize-program-interest';
 import { getAdminClient } from '@/lib/supabase/admin';
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: 'Host Shop Application | Barber Apprenticeship',
   description: 'Apply to become a host shop for our barber apprenticeship program. Train the next generation of barbers while growing your business.',

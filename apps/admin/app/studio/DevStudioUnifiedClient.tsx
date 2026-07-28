@@ -38,6 +38,7 @@ import {
   Workflow,
 } from 'lucide-react';
 import { getSkillsLoader, type Skill } from '@/lib/studio/skills-loader';
+import { STUDIO_WORKSPACES, getAvailableWorkspaces, type StudioWorkspaceId } from '@/lib/devstudio/workspace-registry';
 
 // Import OpenHands-style components
 const WebContainerSandbox = dynamic(
@@ -69,7 +70,8 @@ interface CourseBuilderProps {
   initialProgramId?: string;
 }
 
-type Workspace = 'studio' | 'command' | 'deploy' | 'files' | 'media' | 'environments' | 'health' | 'secrets' | 'integrations' | 'workflows' | 'upload' | 'operations' | 'errors' | 'video' | 'evaluations' | 'cfd';
+// Use StudioWorkspaceId from the canonical registry
+type Workspace = StudioWorkspaceId;
 type StudioMode = 'ask' | 'run' | 'courses';
 
 const UnifiedEllieChat = dynamic(() => import('@/components/studio/UnifiedEllieChat'), {
@@ -136,14 +138,44 @@ const CfdStudioPanel = dynamic(
   { ssr: false },
 );
 
+// Mapping from registry workspace IDs to UI components
+const WORKSPACE_COMPONENT_MAP: Record<string, ElementType<{ className?: string }>> = {
+  ai: Bot,
+  courses: BookOpen,
+  content: FileText,
+  media: ImageIcon,
+  workflows: Workflow,
+  repository: Globe,
+  tasks: Briefcase,
+  deployments: Rocket,
+  containers: Box,
+  evaluations: Microscope,
+  collaboration: MessageSquare,
+  cfd: Wind,
+  plugins: Plug,
+  memory: Brain,
+  health: Activity,
+  settings: Key,
+  command: LayoutDashboard,
+  files: FolderOpen,
+  secrets: Key,
+  integrations: Plug,
+  upload: Upload,
+  operations: Inbox,
+  errors: Zap,
+  video: Clapperboard,
+  studio: Bot,
+};
+
+// Canonical WORKSPACES derived from registry - use registry for all metadata
 const WORKSPACES: { id: Workspace; label: string; Icon: ElementType<{ className?: string }> }[] = [
-  { id: 'studio', label: 'AI Studio', Icon: Bot },
+  { id: 'ai', label: 'AI Studio', Icon: Bot },
   { id: 'workflows', label: 'Workflows', Icon: Workflow },
   { id: 'command', label: 'Command', Icon: LayoutDashboard },
   { id: 'deploy', label: 'Deploy', Icon: Rocket },
   { id: 'files', label: 'Files', Icon: FolderOpen },
   { id: 'media', label: 'Media', Icon: ImageIcon },
-  { id: 'environments', label: 'Containers', Icon: Box },
+  { id: 'containers', label: 'Containers', Icon: Box },
   { id: 'evaluations', label: 'Evaluation', Icon: Microscope },
   { id: 'cfd', label: 'CFD', Icon: Wind },
   { id: 'health', label: 'Health', Icon: Activity },
@@ -154,6 +186,10 @@ const WORKSPACES: { id: Workspace; label: string; Icon: ElementType<{ className?
   { id: 'errors', label: 'Errors', Icon: Zap },
   { id: 'video', label: 'Video', Icon: Clapperboard },
 ];
+
+// Verify WORKSPACES align with registry - for audit purposes
+const _registryIds = STUDIO_WORKSPACES.map(w => w.id);
+const _workspaceIds = WORKSPACES.map(w => w.id);
 
 const QUICK_ACTIONS = [
   { label: 'Website deploy', command: 'Deploy the LMS service' },
@@ -169,24 +205,30 @@ const QUICK_ACTIONS = [
 ];
 
 function normalizeWorkspace(tab: string | null): { workspace: Workspace; mode: StudioMode } {
-  if (tab === 'deploy' || tab === 'deployments') return { workspace: 'deploy', mode: 'ask' };
+  if (tab === 'deploy' || tab === 'deployments') return { workspace: 'deployments', mode: 'ask' };
   if (tab === 'files' || tab === 'git' || tab === 'docs' || tab === 'documents')
     return { workspace: 'files', mode: 'ask' };
   if (tab === 'media' || tab === 'media-library' || tab === 'assets')
     return { workspace: 'media', mode: 'ask' };
   if (tab === 'container' || tab === 'containers' || tab === 'environments' || tab === 'services')
-    return { workspace: 'environments', mode: 'ask' };
+    return { workspace: 'containers', mode: 'ask' };
   if (tab === 'evaluation' || tab === 'evaluations' || tab === 'evals')
     return { workspace: 'evaluations', mode: 'ask' };
   if (tab === 'cfd' || tab === 'cfd-studio' || tab === 'simulation')
     return { workspace: 'cfd', mode: 'ask' };
   if (tab === 'health') return { workspace: 'health', mode: 'ask' };
-  if (tab === 'secrets') return { workspace: 'secrets', mode: 'ask' };
+  if (tab === 'secrets' || tab === 'settings') return { workspace: 'settings', mode: 'ask' };
   if (tab === 'integrations') return { workspace: 'integrations', mode: 'ask' };
   if (tab === 'command-center' || tab === 'os') return { workspace: 'command', mode: 'ask' };
-  if (tab === 'command' || tab === 'terminal') return { workspace: 'studio', mode: 'run' };
-  if (tab === 'courses' || tab === 'course') return { workspace: 'studio', mode: 'courses' };
-  return { workspace: 'studio', mode: 'ask' };
+  if (tab === 'command' || tab === 'terminal') return { workspace: 'ai', mode: 'run' };
+  if (tab === 'courses' || tab === 'course') return { workspace: 'courses', mode: 'ask' };
+  if (tab === 'content') return { workspace: 'content', mode: 'ask' };
+  if (tab === 'repository') return { workspace: 'repository', mode: 'ask' };
+  if (tab === 'tasks' || tab === 'task-queue') return { workspace: 'tasks', mode: 'ask' };
+  if (tab === 'collaboration') return { workspace: 'collaboration', mode: 'ask' };
+  if (tab === 'plugins') return { workspace: 'plugins', mode: 'ask' };
+  if (tab === 'memory') return { workspace: 'memory', mode: 'ask' };
+  return { workspace: 'ai', mode: 'ask' };
 }
 
 export default function DevStudioUnifiedClient({
@@ -196,9 +238,14 @@ export default function DevStudioUnifiedClient({
 }) {
   const searchParams = useSearchParams();
   const initial = normalizeWorkspace(searchParams.get('tab'));
+  
+  // Check if workspace requires super admin
+  const workspaceDef = STUDIO_WORKSPACES.find(w => w.id === initial.workspace);
+  const requiresSuperAdmin = workspaceDef?.superAdminOnly ?? false;
+  
   const [workspace, setWorkspace] = useState<Workspace>(
-    (initial.workspace === 'secrets' || initial.workspace === 'environments') && !isSuperAdmin
-      ? 'studio'
+    requiresSuperAdmin && !isSuperAdmin
+      ? 'ai'
       : initial.workspace,
   );
   const [studioMode, setStudioMode] = useState<StudioMode>(initial.mode);
@@ -278,8 +325,10 @@ export default function DevStudioUnifiedClient({
   }, [health]);
 
   function openWorkspace(next: Workspace) {
-    if ((next === 'secrets' || next === 'environments') && !isSuperAdmin) {
-      setWorkspace('health');
+    // Use registry for permission check
+    const workspaceDef = STUDIO_WORKSPACES.find(w => w.id === next);
+    if (workspaceDef?.superAdminOnly && !isSuperAdmin) {
+      setWorkspace('ai');
       return;
     }
     setWorkspace(next);
@@ -374,7 +423,10 @@ export default function DevStudioUnifiedClient({
           </div>
           <div className="space-y-1">
             {WORKSPACES.filter(
-              (item) => (item.id !== 'secrets' && item.id !== 'environments') || isSuperAdmin,
+              (item) => {
+                const ws = STUDIO_WORKSPACES.find(w => w.id === item.id);
+                return !ws?.superAdminOnly || isSuperAdmin;
+              },
             ).map(({ id, label, Icon }) => {
               const active = workspace === id;
               return (
@@ -447,7 +499,7 @@ export default function DevStudioUnifiedClient({
               isSuperAdmin={isSuperAdmin}
               onChange={openWorkspace}
             />
-            {workspace === 'studio' && (
+            {workspace === 'ai' && (
               <StudioPanel
                 mode={studioMode}
                 onModeChange={setStudioMode}
@@ -458,7 +510,7 @@ export default function DevStudioUnifiedClient({
             )}
             {workspace === 'workflows' && <WorkflowsPanel embedded />}
             {workspace === 'command' && <CommandCenterPanel />}
-            {workspace === 'deploy' && <DeployPanel workflowButtons={config?.workflowButtons} />}
+            {workspace === 'deployments' && <DeployPanel workflowButtons={config?.workflowButtons} />}
             {workspace === 'files' && (
               <div className="flex h-full flex-col overflow-hidden">
                 <div className="min-h-0 flex-1 overflow-hidden">
@@ -495,9 +547,9 @@ export default function DevStudioUnifiedClient({
                 )}
               </div>
             )}
-            {workspace === 'environments' &&
+            {workspace === 'containers' &&
               (isSuperAdmin ? (
-                <EnvironmentPanel />
+                <DevContainerPanel />
               ) : (
                 <HealthPanel health={health} onRefresh={() => window.location.reload()} />
               ))}
@@ -585,7 +637,10 @@ function MobileTabs({
   return (
     <div className="flex shrink-0 gap-1 overflow-x-auto border-b border-[#3c3c3c] bg-[#252526] p-1 md:hidden">
       {WORKSPACES.filter(
-        (item) => (item.id !== 'secrets' && item.id !== 'environments') || isSuperAdmin,
+        (item) => {
+          const ws = STUDIO_WORKSPACES.find(w => w.id === item.id);
+          return !ws?.superAdminOnly || isSuperAdmin;
+        },
       ).map(({ id, label, Icon }) => (
         <button
           key={id}

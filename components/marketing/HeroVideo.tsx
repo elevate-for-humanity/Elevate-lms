@@ -31,6 +31,8 @@ export interface HeroVideoProps {
   videoSrcDesktop: string;
   /** Mobile video source — falls back to desktop if omitted */
   videoSrcMobile?: string;
+  /** Poster image shown before video loads */
+  posterImage?: string;
   /** Voiceover audio track — starts on first user interaction */
   voiceoverSrc?: string;
   /** 2–4 word micro-label rendered in bottom-left corner of video */

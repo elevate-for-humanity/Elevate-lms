@@ -2,6 +2,7 @@
 
 // Stub action for marketing site - application submission handled by LMS
 export async function submitStudentApplication(data: {
+  role?: string;
   firstName: string;
   lastName: string;
   email: string;

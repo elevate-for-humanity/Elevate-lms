@@ -1,4 +1,9 @@
 import { NextResponse } from 'next/server';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 // Redirect-only route — verification is handled within the dashboard
 export function GET() {

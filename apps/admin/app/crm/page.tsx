@@ -13,6 +13,8 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'CRM Hub | Admin Dashboard',
   description: 'Manage contacts, campaigns, leads, and customer relationships',

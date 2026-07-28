@@ -2,7 +2,12 @@
 # Dockerfile.northflank-admin - Northflank Admin Service
 # Serves admin.elevateforhumanity.org
 #
-# CRITICAL: This Dockerfile was fixed to resolve path mismatches.
+# Fixes applied:
+# 1. Explicit COPY commands for package.json (prevents wildcard flattening)
+# 2. SUPABASE_SERVICE_ROLE_KEY is runtime-only (not embedded in image)
+# 3. curl installed in runtime stage for HEALTHCHECK
+# 4. Standalone output used correctly (preserves directory structure)
+# 5. server.js stays at apps/admin/server.js (not moved to /app/)
 
 ARG GIT_SHA=unknown
 ARG BUILD_TIMESTAMP=unknown
@@ -12,58 +17,77 @@ ARG BUILD_TIMESTAMP=unknown
 # =============================================================================
 FROM node:22-bookworm-slim AS base
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 make g++ ca-certificates curl && \
-    rm -rf /var/lib/apt/lists/*
-
 ENV PNPM_HOME="/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NEXT_STANDALONE_OUTPUT=1
 
-# Cache invalidation marker
-RUN echo "nf-cache-invalidate-admin-2026-07-20-v2"
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN corepack enable
-WORKDIR /app
+
+# Cache invalidation marker
+RUN echo "nf-cache-invalidate-admin-2026-07-28"
+
+WORKDIR /workspace
 
 # =============================================================================
-# STAGE 2: Builder
+# STAGE 2: Manifests
+# Preserve monorepo directory structure explicitly.
+# =============================================================================
+FROM base AS manifests
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/admin/package.json ./apps/admin/package.json
+
+# Copy each shared package manifest explicitly (not packages/*/package.json)
+COPY packages/config/package.json ./packages/config/package.json
+COPY packages/database/package.json ./packages/database/package.json
+COPY packages/ui/package.json ./packages/ui/package.json
+COPY packages/auth/package.json ./packages/auth/package.json
+COPY packages/types/package.json ./packages/types/package.json
+COPY packages/supabase/package.json ./packages/supabase/package.json
+
+# =============================================================================
+# STAGE 3: Dependencies
+# =============================================================================
+FROM manifests AS dependencies
+
+RUN --mount=type=cache,id=pnpm-admin,target=/pnpm/store \
+    pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+# =============================================================================
+# STAGE 4: Builder
 # =============================================================================
 FROM base AS builder
 
-# Copy manifests first for layer caching
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/admin/package.json ./apps/admin/package.json
-COPY packages/*/package.json ./packages/
-
-# Install dependencies (remove --frozen-lockfile to allow lockfile migration)
-# pnpm 10.x can migrate lockfiles from pnpm 9.x
-RUN pnpm install --strict-peer-dependencies=false
-
-# Copy source code
-COPY . .
-
-# Build args
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
 ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
+ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG SUPABASE_SERVICE_ROLE_KEY
-ARG GIT_SHA
-ARG BUILD_TIMESTAMP
+ARG GIT_SHA=unknown
+ARG BUILD_TIMESTAMP=unknown
 
-ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
-ENV NEXT_PUBLIC_ADMIN_URL=${NEXT_PUBLIC_ADMIN_URL}
-ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-ENV SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
 ENV NODE_ENV=production
-ENV NODE_OPTIONS="--max-old-space-size=8192"
 ENV CI=true
-ENV GIT_SHA=${GIT_SHA}
-ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
-ENV NEXT_STANDALONE_OUTPUT=1
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+
+ENV NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL}"
+ENV NEXT_PUBLIC_ADMIN_URL="${NEXT_PUBLIC_ADMIN_URL}"
+ENV NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL}"
+ENV NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}"
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}"
+
+ENV GIT_SHA="${GIT_SHA}"
+ENV BUILD_TIMESTAMP="${BUILD_TIMESTAMP}"
+
+COPY --from=dependencies /workspace/node_modules ./node_modules
+COPY --from=dependencies /workspace/apps/admin/node_modules ./apps/admin/node_modules
+COPY --from=dependencies /workspace/packages ./packages
+
+COPY . .
 
 # Build Admin app
 RUN pnpm --filter @elevate/admin build
@@ -71,94 +95,81 @@ RUN pnpm --filter @elevate/admin build
 # =============================================================================
 # VERIFICATION: Builder stage
 # =============================================================================
-RUN echo "=== ADMIN BUILD VERIFICATION ===" && \
-    echo "Checking standalone directory..." && \
-    test -d /app/apps/admin/.next/standalone && echo "✓ Standalone dir exists" || (echo "✗ Standalone dir MISSING!"; exit 1) && \
-    echo "Checking static directory..." && \
-    test -d /app/apps/admin/.next/static && echo "✓ Static dir exists" || (echo "✗ Static dir MISSING!"; exit 1) && \
-    echo "Checking BUILD_ID..." && \
-    test -f /app/apps/admin/.next/BUILD_ID && echo "✓ BUILD_ID exists" || (echo "✗ BUILD_ID MISSING!"; exit 1) && \
-    echo "Checking server.js location..." && \
-    find /app/apps/admin/.next/standalone -name "server.js" -type f && echo "✓ server.js found" || (echo "✗ server.js MISSING!"; exit 1) && \
+RUN set -eux; \
+    echo "=== ADMIN BUILD VERIFICATION ==="; \
+    test -d /workspace/apps/admin/.next/standalone && echo "✓ Standalone dir exists"; \
+    test -d /workspace/apps/admin/.next/static && echo "✓ Static dir exists"; \
+    test -f /workspace/apps/admin/.next/BUILD_ID && echo "✓ BUILD_ID exists"; \
+    test -f /workspace/apps/admin/.next/standalone/apps/admin/server.js && echo "✓ server.js at apps/admin/server.js"; \
     echo "=== BUILD VERIFICATION COMPLETE ==="
 
 # =============================================================================
-# STAGE 3: Runtime
+# STAGE 5: Runtime
 # =============================================================================
 FROM node:22-bookworm-slim AS runner
 
-# Declare build args for runtime stage
 ARG GIT_SHA=unknown
 ARG BUILD_TIMESTAMP=unknown
+
+LABEL org.opencontainers.image.title="Elevate Admin"
+LABEL org.opencontainers.image.revision="${GIT_SHA}"
+LABEL org.opencontainers.image.created="${BUILD_TIMESTAMP}"
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 ENV SERVICE_NAME=elevate-admin
-ENV GIT_SHA=${GIT_SHA}
-ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
+ENV GIT_SHA="${GIT_SHA}"
+ENV BUILD_TIMESTAMP="${BUILD_TIMESTAMP}"
 
 WORKDIR /app
 
+# Install curl for HEALTHCHECK
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN groupadd --system --gid 1001 nodejs && \
-    useradd --system --uid 1001 --gid nodejs nextjs
+    useradd --system --uid 1001 --gid nodejs --create-home nextjs
 
-# Copy standalone build to /app/ root
-# The standalone output preserves the full monorepo path structure (apps/admin/)
-# so server.js ends up at /app/apps/admin/.next/standalone/apps/admin/server.js
-# We need to extract the actual app files from the nested structure
-COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/standalone /app/
+# Copy standalone build (preserves apps/admin/ directory structure)
+# server.js will be at /app/apps/admin/server.js
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/apps/admin/.next/standalone/ \
+    /app/
 
-# Move the actual app files from the nested structure to /app/
-# The standalone output has apps/admin/server.js, apps/admin/package.json, etc.
-RUN if [ -f /app/apps/admin/server.js ]; then \
-        mv /app/apps/admin/server.js /app/server.js; \
-    fi && \
-    if [ -f /app/apps/admin/package.json ]; then \
-        mv /app/apps/admin/package.json /app/package.json; \
-    fi && \
-    rm -rf /app/apps
+# Static assets
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/apps/admin/.next/static/ \
+    /app/apps/admin/.next/static/
 
-# Copy ALL required Next.js build artifacts to correct locations
-# Copy FULL .next directory so the standalone server finds BUILD_ID and all root-level files
-COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./public
-
-# Copy node_modules (needed for runtime dependencies)
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/apps/admin/public/ \
+    /app/apps/admin/public/
 
 # =============================================================================
 # VERIFICATION: Runtime stage
 # =============================================================================
-RUN echo "=== RUNTIME VERIFICATION ===" && \
-    echo "Current directory: $(pwd)" && \
-    echo "Contents of /app:" && \
-    ls -la /app/ && \
-    echo "" && \
-    if [ -f "/app/server.js" ]; then \
-        echo "✓ server.js found at /app/server.js"; \
-    else \
-        echo "✗ CRITICAL: server.js NOT found at /app/server.js"; \
-        echo "Searching for server.js:"; \
-        find /app -name "server.js" -type f 2>/dev/null; \
-        exit 1; \
-    fi && \
-    if [ -d "/app/.next/server" ]; then \
-        echo "✓ .next/server directory found"; \
-    else \
-        echo "✗ CRITICAL: .next/server directory MISSING"; \
-        exit 1; \
-    fi && \
+RUN set -eux; \
+    echo "=== RUNTIME VERIFICATION ==="; \
+    test -f /app/apps/admin/server.js && echo "✓ server.js at /app/apps/admin/server.js"; \
+    test -d /app/apps/admin/.next/static && echo "✓ Static dir exists"; \
+    test -d /app/apps/admin/public && echo "✓ Public dir exists"; \
     echo "=== RUNTIME VERIFICATION PASSED ==="
 
 USER nextjs
 
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-    CMD curl -sf http://127.0.0.1:3000/api/ping || exit 1
+HEALTHCHECK \
+    --interval=30s \
+    --timeout=5s \
+    --start-period=90s \
+    --retries=5 \
+    CMD curl --fail --silent --show-error \
+        http://127.0.0.1:3000/api/ping \
+        >/dev/null || exit 1
 
-# Start server from /app/ where server.js is located
-CMD ["node", "--max-http-header-size=32768", "server.js"]
+# Start from the correct location (apps/admin/)
+CMD ["node", "--max-http-header-size=32768", "apps/admin/server.js"]

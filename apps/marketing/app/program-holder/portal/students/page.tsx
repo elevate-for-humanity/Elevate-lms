@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 
 // Legacy portal redirect — students section
 export default function PortalStudentsPage() {
-  redirect('/program-holder/dashboard');
+  permanentRedirect('/program-holder/dashboard');
 }

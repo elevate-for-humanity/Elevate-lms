@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const revalidate = 3600;
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RefundPolicyPage() {
-  const supabase = await createClient();
+  const db = createPublicClient();
 
   // Fetch refund policy
   const { data: policy } = await supabase

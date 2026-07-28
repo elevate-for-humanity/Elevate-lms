@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -36,7 +36,7 @@ const LICENSE_TIERS = [
 ];
 
 export default async function PricingPage() {
-  const supabase = await createClient();
+  const db = createPublicClient();
 
   const { data: dbTiers } = await supabase
     .from('license_tiers')

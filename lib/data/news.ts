@@ -5,7 +5,7 @@
  *          author_id, category, tags, published, published_at, created_at
  */
 
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { createPublicClient } from '@/lib/supabase/public';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 
@@ -31,7 +31,7 @@ const LIST_COLS =
 const FULL_COLS = `${LIST_COLS}, content, author_id`;
 
 async function getDb() {
-  const admin = await requireAdminClient();
+  const db = createPublicClient();
   if (admin) return admin;
   return await createClient();
 }

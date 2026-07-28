@@ -13,8 +13,7 @@ import {
   BookOpen,
   Sparkles,
 } from 'lucide-react';
-import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { createPublicClient } from '@/lib/supabase/public';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { CourseCatalog } from '@/components/CourseCatalog';
 import { CourseCompletionTracking } from '@/components/CourseCompletionTracking';
@@ -45,11 +44,10 @@ export const metadata: Metadata = {
 const categories = ['All', 'Healthcare', 'Trades', 'Beauty', 'Transportation', 'Technology'];
 
 export default async function CoursesPage() {
-  const supabase = await createClient();
-  const db = (await requireAdminClient()) || supabase;
+  const db = createPublicClient();
   let featuredCourses: any[] = [];
 
-  if (supabase) {
+  if (true) {
     try {
       const { data } = await db
         .from('programs')

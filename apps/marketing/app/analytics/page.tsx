@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { createPublicClient } from '@/lib/supabase/public';
+
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import {
   Users,
@@ -31,7 +31,7 @@ export default async function AnalyticsPage() {
   const supabase = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await db.auth.getUser();
   if (!user) redirect('/login?redirect=/analytics');
 
   // Check role — analytics is admin/staff only
@@ -46,7 +46,7 @@ export default async function AnalyticsPage() {
     redirect('/lms/dashboard');
   }
 
-  const db = await requireAdminClient();
+  const db = createPublicClient();
 
   const [
     { count: totalUsers },

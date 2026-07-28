@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 
 export const revalidate = 3600;
 export const metadata: Metadata = {
@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 };
 
 export default async function CompliancePage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('compliance_audits').select('*').limit(50);
+  const db = createPublicClient();
+  const { data: dbRows } = await db.from('compliance_audits').select('*').limit(50);
 
   const programCredentials = (dbRows as any[]) || [];
 

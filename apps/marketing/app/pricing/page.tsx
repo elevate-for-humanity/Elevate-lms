@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Check, ArrowRight, DollarSign, Building2, Users, GraduationCap, Zap, Shield, BookOpen, Calendar, Play } from 'lucide-react';
-import { getAdminClient } from '@/lib/supabase/admin';
+import { createPublicClient } from '@/lib/supabase/public';
 
 export const metadata: Metadata = {
   title: 'Pricing',
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 async function getPricingData() {
   try {
-    const supabase = getAdminClient();
+    const supabase = createPublicClient();
     
     const [programsRes, licenseTiersRes, storeProductsRes] = await Promise.all([
       supabase

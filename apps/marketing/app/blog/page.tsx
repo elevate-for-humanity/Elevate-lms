@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { createPublicClient } from '@/lib/supabase/public';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, User, ArrowRight } from 'lucide-react';
@@ -43,9 +43,8 @@ export const revalidate = 600;
 
 async function getDbPosts(): Promise<BlogPost[]> {
   try {
-    const { requireAdminClient: getAdminClient } = await import('@/lib/supabase/admin');
-    const supabase = await requireAdminClient();
-    const { data } = await supabase
+    const db = createPublicClient();
+    const { data } = await db
       .from('blog_posts')
       .select('*')
       .eq('published', true)

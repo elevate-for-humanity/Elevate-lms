@@ -5,7 +5,7 @@
  * Separate from lib/data/careers.ts which queries internal Elevate HR positions.
  */
 
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { createPublicClient } from '@/lib/supabase/public';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 
@@ -52,7 +52,7 @@ const SELECT_COLS = [
 ].join(', ');
 
 async function getDb() {
-  const admin = await requireAdminClient();
+  const db = createPublicClient();
   if (admin) return admin;
   return await createClient();
 }

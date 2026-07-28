@@ -1,6 +1,6 @@
 export const revalidate = 3600;
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Smartphone, Zap, Download, Wifi, Bell, Lock } from 'lucide-react';
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MobileAppPage() {
-  const supabase = await createClient();
+  const db = createPublicClient();
   const { data: appInfo } = await supabase
     .from('site_settings')
     .select('*')

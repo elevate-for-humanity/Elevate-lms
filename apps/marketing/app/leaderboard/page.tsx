@@ -2,8 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Trophy, Medal, Flame } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { createPublicClient } from '@/lib/supabase/public';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = {
   title: 'Leaderboard',
@@ -28,8 +27,7 @@ export default async function LeaderboardPage() {
     }
   } catch {
     // fallback — direct query if API unreachable during SSR
-    const supabase = await createClient();
-    const db = (await requireAdminClient()) || supabase;
+    const db = createPublicClient();
     const { data } = await db.from('user_points').select('*').limit(50);
     topLearners = (data as any[]) || [];
   }

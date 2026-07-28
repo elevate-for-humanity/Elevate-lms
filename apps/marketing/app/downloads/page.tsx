@@ -1,6 +1,6 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import Link from 'next/link';
 import { Download, FileText, BookOpen, GraduationCap, FileCheck } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -142,7 +142,7 @@ const defaultResources = {
 };
 
 export default async function DownloadsPage() {
-  const supabase = await createClient();
+  const db = createPublicClient();
 
   // Get documents from database
   const { data: documents } = await supabase

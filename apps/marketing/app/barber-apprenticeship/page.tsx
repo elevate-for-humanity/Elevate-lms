@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { createPublicClient } from '@/lib/supabase/public';
 import {
   CheckCircle,
   ArrowRight,
@@ -44,7 +44,7 @@ const WHAT_YOU_LEARN = [
 ];
 
 export default async function BarberApprenticeshipPage() {
-  const db = await requireAdminClient();
+  const db = createPublicClient();
 
   // Pull live program data
   const { data: program } = await db

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, ArrowRight, Newspaper, Mail, Download } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { createPublicClient } from '@/lib/supabase/public';
 import { formatPostDate } from '@/lib/data/news';
 
 export const dynamic = "force-dynamic";
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PressPage() {
-  const db = await requireAdminClient();
+  const db = createPublicClient();
 
   // Press-specific posts (category = 'press' or 'media')
   const { data: pressItems } = await db

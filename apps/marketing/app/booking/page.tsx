@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, Clock, MapPin, User, Video, Building } from 'lucide-react';
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600;
 export default async function BookingPage() {
-  const supabase = await createClient();
+  const db = createPublicClient();
 
   // Get available appointment types
   const { data: appointmentTypes } = await supabase

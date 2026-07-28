@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Phone, Mail, Clock, Navigation } from 'lucide-react';
@@ -33,7 +33,7 @@ interface Location {
 }
 
 export default async function LocationsPage() {
-  const supabase = await createClient();
+  const db = createPublicClient();
 
   const { data: locations, error } = await supabase
     .from('locations')

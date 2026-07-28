@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MobilePage() {
-  const supabase = await createClient();
+  const db = createPublicClient();
 
   if (!supabase) {
     return (

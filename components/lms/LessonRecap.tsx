@@ -38,7 +38,7 @@ export default function LessonRecap({ topics, lessonTitle }: Props) {
   }, [started]);
 
   // Fade in topics one by one
-  useEffect(() => {
+  useEffect((): (() => void) | undefined => {
     if (!started) return;
     if (visibleCount >= topics.length) return;
 

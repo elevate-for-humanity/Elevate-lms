@@ -59,7 +59,6 @@ export function RichTextEditor({
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
-        history: {},
       }),
       Placeholder.configure({ placeholder }),
       CharacterCount.configure({ limit: maxChars }),
@@ -90,7 +89,7 @@ export function RichTextEditor({
     if (!editor) return;
     const current = editor.getHTML();
     if (value !== undefined && current !== value) {
-      editor.commands.setContent(value || '', false);
+      editor.commands.setContent(value || '');
     }
   }, [editor, value]);
 

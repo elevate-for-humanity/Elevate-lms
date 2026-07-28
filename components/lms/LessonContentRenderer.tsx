@@ -84,7 +84,7 @@ export default function LessonContentRenderer({
           `is missing required field: ${missingField}. Fix the lesson data — do not add a UI fallback.`,
       );
     }
-    logger.error('[LessonContentRenderer] Required lesson data missing — lesson skipped', ctx);
+    logger.error('[LessonContentRenderer] Required lesson data missing — lesson skipped', undefined, ctx);
     return null;
   }
 
@@ -153,7 +153,7 @@ export default function LessonContentRenderer({
                   Quick Check
                 </h3>
                 <QuizPlayer
-                  questions={lesson.quiz_questions}
+                  questions={lesson.quiz_questions as any[]}
                   title="Quick Check"
                   passingScore={60}
                   onComplete={() => {}}
@@ -198,7 +198,7 @@ export default function LessonContentRenderer({
                 Quick Check
               </h3>
               <QuizPlayer
-                questions={lesson.quiz_questions}
+                questions={lesson.quiz_questions as any[]}
                 title="Quick Check"
                 passingScore={60}
                 onComplete={() => {}}
@@ -311,7 +311,7 @@ export default function LessonContentRenderer({
                   Quick Check
                 </h3>
                 <QuizPlayer
-                  questions={lesson.quiz_questions}
+                  questions={lesson.quiz_questions as any[]}
                   title="Quick Check"
                   passingScore={60}
                   onComplete={() => {}}
@@ -347,7 +347,7 @@ export default function LessonContentRenderer({
                   Quick Check
                 </h3>
                 <QuizPlayer
-                  questions={lesson.quiz_questions}
+                  questions={lesson.quiz_questions as any[]}
                   title="Quick Check"
                   passingScore={60}
                   onComplete={() => {}}

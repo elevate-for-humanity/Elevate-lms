@@ -193,11 +193,11 @@ const ADMIN_CATEGORY_CARDS = [
     title: 'Dev Studio',
     eyebrow: 'Build + deploy',
     description: 'Container, environments, deploy pipeline, secrets, and platform tooling.',
-    href: '/admin/dev-studio',
+    href: '/admin/studio',
     Icon: Settings,
     links: [
-      { label: 'Open studio', href: '/admin/dev-studio' },
-      { label: 'Workflows', href: '/admin/dev-studio/workflows' },
+      { label: 'Open studio', href: '/admin/studio' },
+      { label: 'Workflows', href: '/admin/studio/workflows' },
     ],
   },
 ] as const;
@@ -606,7 +606,7 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
           <Link href="/admin/students" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Students</Link>
           <Link href="/admin/enrollments" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Enrollments</Link>
           <Link href="/admin/reports" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Reports</Link>
-          <Link href="/admin/dev-studio" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Dev Studio</Link>
+          <Link href="/admin/studio" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Dev Studio</Link>
         </div>
 
         <DegradedBanner

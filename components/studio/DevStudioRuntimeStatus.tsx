@@ -56,7 +56,7 @@ export default function DevStudioRuntimeStatus({
         </div>
         {!compact && (
           <Link
-            href="/admin/dev-studio"
+            href="/admin/studio"
             className="text-[11px] text-[#4ec9b0] underline"
           >
             Open Services

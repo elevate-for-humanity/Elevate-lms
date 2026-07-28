@@ -158,7 +158,7 @@ export const ROLE_NAVIGATION: Record<UserRole, NavSection[]> = {
       id: 'tools',
       label: 'Tools',
       items: [
-        { id: 'studio', label: 'Dev Studio', href: '/admin/dev-studio', icon: Settings },
+        { id: 'studio', label: 'Dev Studio', href: '/admin/studio', icon: Settings },
         { id: 'reports', label: 'Reports', href: '/admin/reports', icon: BarChart3 },
       ],
     },

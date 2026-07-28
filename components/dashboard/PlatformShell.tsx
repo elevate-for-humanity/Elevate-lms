@@ -63,7 +63,7 @@ const NAV_CONFIG: Record<UserRole, { items: NavItem[]; title: string }> = {
       { href: '/admin/program-holders', label: 'Partners', icon: Handshake },
       { href: '/admin/crm', label: 'Marketing', icon: Megaphone },
       { href: '/admin/compliance', label: 'Compliance', icon: Shield },
-      { href: '/admin/dev-studio', label: 'Dev Studio', icon: Settings },
+      { href: '/admin/studio', label: 'Dev Studio', icon: Settings },
     ],
   },
   student: {

@@ -20,7 +20,7 @@ const NAV_ITEMS = [
   { label: 'Partners', href: '/admin/partners', icon: Handshake },
   { label: 'Marketing', href: '/admin/crm', icon: Megaphone },
   { label: 'Compliance', href: '/admin/compliance', icon: ShieldCheck },
-  { label: 'Dev Studio', href: '/admin/dev-studio', icon: Bot },
+  { label: 'Dev Studio', href: '/admin/studio', icon: Bot },
 ];
 
 function LanguageSwitcher() {

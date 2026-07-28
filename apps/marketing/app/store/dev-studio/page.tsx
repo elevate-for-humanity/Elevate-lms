@@ -112,7 +112,7 @@ export default function DevStudioPage() {
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link
-                    href="/admin/dev-studio"
+                    href="/admin/studio"
                     className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-red-700 transition-colors text-center"
                   >
                     Open Dev Studio
@@ -344,7 +344,7 @@ export default function DevStudioPage() {
             Start with a free trial. No credit card required.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/admin/dev-studio" className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold px-8 py-4 rounded-xl hover:bg-slate-100 transition-colors">
+            <Link href="/admin/studio" className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold px-8 py-4 rounded-xl hover:bg-slate-100 transition-colors">
               Open Dev Studio Free
               <ArrowRight className="w-5 h-5" />
             </Link>

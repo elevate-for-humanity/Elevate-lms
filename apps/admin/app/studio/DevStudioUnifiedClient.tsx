@@ -100,6 +100,10 @@ const LizzyUploadPanel = dynamic(
   () => import('@/components/admin/dashboard/LizzyUploadPanel').then(m => m.LizzyUploadPanel || m.default || m),
   { ssr: false },
 );
+const LizzyFilesPanel = dynamic(
+  () => import('@/components/admin/dashboard/LizzyFilesPanel').then(m => m.LizzyFilesPanel || m.default || m),
+  { ssr: false },
+);
 const LizzyOperationsPanel = dynamic(
   () => import('@/components/admin/dashboard/LizzyOperationsPanel').then(m => m.LizzyOperationsPanel || m.default || m),
   { ssr: false },
@@ -136,6 +140,10 @@ const QUICK_ACTIONS = [
   { label: 'Smoke test', command: 'Run smoke test' },
   { label: 'Build course', command: 'Generate a new course' },
   { label: 'System health', command: 'Check system health' },
+  { label: 'Generate content', command: 'Open PARIS content studio' },
+  { label: 'Evaluate AI', command: 'Open AI evaluation studio' },
+  { label: 'Create blog post', command: 'Generate a blog post using PARIS' },
+  { label: 'Create social post', command: 'Generate social media content' },
 ];
 
 function normalizeWorkspace(tab: string | null): { workspace: Workspace; mode: StudioMode } {
@@ -378,6 +386,27 @@ export default function DevStudioUnifiedClient({
                 className="flex h-8 w-full items-center rounded px-2 text-left text-[11px] text-[#858585] hover:text-white hover:bg-[#094771] transition"
               >
                 {link.label}
+              </a>
+            ))}
+          </div>
+          <div className="mt-4 mb-2 px-2 text-[10px] font-bold uppercase tracking-widest text-[#858585]">
+            AI Studios
+          </div>
+          <div className="space-y-0.5">
+            {[
+              { label: 'PARIS Content', href: '/admin/paris', external: true },
+              { label: 'AI Evaluation', href: '/admin/evaluation', external: true },
+              { label: 'CFD Simulation', href: '/admin/cfd-studio', external: true },
+            ].map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noopener noreferrer' : undefined}
+                className="flex h-8 w-full items-center rounded px-2 text-left text-[11px] text-[#858585] hover:text-white hover:bg-[#094771] transition"
+              >
+                {link.label}
+                {link.external && <span className="ml-1 text-[8px]">↗</span>}
               </a>
             ))}
           </div>

@@ -142,7 +142,7 @@ export async function GET(req: NextRequest) {
       { label: 'Admin Dashboard', url: `${adminUrl}/admin` },
       { label: 'Course Builder', url: `${adminUrl}/admin/courses/create` },
       { label: 'Admin Applications', url: `${adminUrl}/admin/applications` },
-      { label: 'Dev Studio', url: `${adminUrl}/admin/dev-studio` },
+      { label: 'Dev Studio', url: `${adminUrl}/admin/studio` },
     ],
     tabFiles: {
       studio: 'Studio',

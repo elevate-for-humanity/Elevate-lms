@@ -2685,7 +2685,7 @@ async function executeAction(
         }
         if (filter === 'no-auth') {
           write(`\n   Run: bash scripts/audit-auth-gaps.sh for full auth gap report`);
-          write(`   View at: /admin/dev-studio`);
+          write(`   View at: /admin/studio`);
         }
         if (filter === 'duplicates') {
           const slugs = pages.map(p => p.split('/').pop() ?? '');

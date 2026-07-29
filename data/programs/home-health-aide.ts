@@ -19,8 +19,8 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 30, handsOnLab: 40, examPrep: 6, careerPlacement: 4 },
   schedule: 'Day or evening options — monthly cohort start dates',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: '$0 with WIOA or Workforce Ready Grant. Self-pay: $4,700.',
-  selfPayCost: '$4,700',
+  fundingStatement: '$0 with WIOA or Workforce Ready Grant. Self-pay: $2,500.',
+  selfPayCost: '$2,500',
   fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
   badge: 'ETPL Approved',
   badgeColor: 'green',
@@ -281,7 +281,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
     'Career placement support',
   ],
   paymentTerms:
-    'WIOA and Workforce Ready Grant accepted. Self-pay: $4,700 with payment plans available.',
+    'WIOA and Workforce Ready Grant accepted. Self-pay: $2,500 with payment plans available.',
 
   faqs: [
     {

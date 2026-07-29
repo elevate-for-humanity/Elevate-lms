@@ -160,7 +160,7 @@ export const PROGRAMS: Program[] = [
     intrainingId: '#10004626',
     name: 'Home Health Aide Certification',
     slug: 'home-health-aide',
-    price: 4700,
+    price: 2500,
     duration: '4 weeks',
     durationDays: 28,
     location: 'Elevate for Humanity Training Center, Indianapolis, Indiana',

@@ -57,7 +57,7 @@ export default function GrantProgramsPage() {
             Funded Training Programs
           </h1>
           <p className="text-base md:text-lg mb-8 drop-shadow-md">
-            ETPL Approved • WIOA Eligible • WRG Funded • JRI Approved
+            Funding programs may help cover tuition for eligible participants in approved programs. Contact admissions or your WorkOne office to confirm eligibility.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -82,9 +82,7 @@ export default function GrantProgramsPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-8">What Does ETPL Approved Mean?</h2>
 
           <p className="text-lg text-black mb-6">
-            ETPL stands for <strong>Eligible Training Provider List</strong>. It means our programs
-            are approved by the state for Funded training through government funding programs like
-            WIOA, WRG, and JRI.
+            ETPL stands for <strong>Eligible Training Provider List</strong>. Elevate is an Indiana ETPL-listed training provider. Individual programs on the ETPL list may qualify for WIOA or other workforce funding — program eligibility is determined separately. Contact admissions or your local WorkOne office to confirm which programs are currently approved for funding.
           </p>
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">

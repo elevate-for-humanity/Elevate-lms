@@ -83,9 +83,9 @@ export default async function PricingPage() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-green-700 to-green-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold mb-4">Training That Pays for Itself</h1>
+          <h1 className="text-4xl font-bold mb-4">Career Training Investment</h1>
           <p className="text-xl text-green-100 max-w-2xl mx-auto mb-8">
-            Most programs qualify for WIOA funding. Businesses get tax credits.
+            Affordable programs with funding options for eligible participants. Self-pay and employer sponsorship also available.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link href="/check-eligibility" className="bg-white text-green-700 font-bold py-3 px-6 rounded-lg hover:bg-green-50 flex items-center gap-2">
@@ -140,7 +140,7 @@ export default async function PricingPage() {
                   <span className="text-slate-500 ml-2">full tuition</span>
                 </div>
                 <div className="text-sm text-slate-600 mb-4 space-y-1">
-                  <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> WIOA funding may cover 100%</p>
+                  <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> Funding options may be available</p>
                   <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> Payment plan from $50/week</p>
                   <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> Employer sponsorship</p>
                 </div>
@@ -284,8 +284,8 @@ export default async function PricingPage() {
               <h2 className="text-2xl font-bold mb-4">For Individuals</h2>
               <div className="space-y-4">
                 <div className="bg-slate-800 rounded-lg p-4">
-                  <h3 className="font-semibold mb-2">WIOA Funding</h3>
-                  <p className="text-slate-300 text-sm">Most programs qualify for 100% coverage through Workforce Innovation and Opportunity Act.</p>
+                  <h3 className="font-semibold mb-2">Workforce Funding</h3>
+                  <p className="text-slate-300 text-sm">WIOA, Indiana Workforce Ready Grant, and other programs may help cover tuition for eligible participants in approved programs. Contact admissions or your local WorkOne office to confirm options.</p>
                   <Link href="/check-eligibility" className="text-green-400 font-semibold text-sm hover:underline mt-2 inline-block">Check eligibility</Link>
                 </div>
                 <div className="bg-slate-800 rounded-lg p-4">

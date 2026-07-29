@@ -32,14 +32,14 @@ export default async function TuitionFeesPage() {
   // DB programs supplement this if tuition_cost is populated
   const STATIC_PROGRAMS = [
     // Prices sourced from INTraining / ETPL official listing (2Exclusive LLC-S / {PLATFORM_DEFAULTS.orgName} Training Center)
-    {
+          {
       name: 'Barber Apprenticeship',
       duration: '15 months',
       tuition: 4890,
       examFees: 75,
       examFeesNote: 'Indiana PSI barber exam',
       materials: 0,
-      fundingType: 'WIOA Eligible — most students pay $0',
+      fundingType: 'RAP — funding options may be available',
     },
     {
       name: 'Bookkeeping / Accounting Clerk',
@@ -48,7 +48,7 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: 'QuickBooks + MOS exams included',
       materials: 0,
-      fundingType: 'WIOA Eligible — most students pay $0',
+      fundingType: 'Contact admissions for funding options',
     },
     {
       name: 'Business Management',
@@ -57,7 +57,7 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: 'Certifications included',
       materials: 0,
-      fundingType: 'WIOA Eligible — most students pay $0',
+      fundingType: 'Contact admissions for funding options',
     },
     {
       name: 'CPR / AED / First Aid',
@@ -66,7 +66,7 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: '',
       materials: 0,
-      fundingType: 'WIOA Eligible',
+      fundingType: 'Self-Pay',
     },
     {
       name: 'Emergency Health & Safety Technician',
@@ -75,16 +75,16 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: 'CPR + EMR + OSHA 10 included',
       materials: 0,
-      fundingType: 'WIOA Eligible — most students pay $0',
+      fundingType: 'Contact admissions for funding options',
     },
     {
       name: 'Home Health Aide',
       duration: '4 weeks',
-      tuition: 4700,
+      tuition: 2500,
       examFees: 0,
       examFeesNote: 'HHA licensure + CPR + CCHW included',
       materials: 0,
-      fundingType: 'WIOA Eligible — most students pay $0',
+      fundingType: 'WIOA Eligible — funding may be available',
     },
     {
       name: 'HVAC Technician',
@@ -93,7 +93,7 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: 'EPA 608 + OSHA 30 + CPR + Rise Up included',
       materials: 0,
-      fundingType: 'WIOA / WRG Eligible — most students pay $0',
+      fundingType: 'Contact admissions for funding options',
     },
     {
       name: 'Medical Assistant',
@@ -102,7 +102,7 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: 'CCHW + CPR + Rise Up included',
       materials: 0,
-      fundingType: 'WIOA Eligible — most students pay $0',
+      fundingType: 'Contact admissions for funding options',
     },
     {
       name: 'Professional Esthetician & Client Services',
@@ -111,7 +111,7 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: 'OSHA 10 + certifications included',
       materials: 0,
-      fundingType: 'WIOA Eligible — most students pay $0',
+      fundingType: 'Contact admissions for funding options',
     },
     {
       name: 'Public Safety Reentry Specialist',
@@ -120,7 +120,7 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: 'CPRC + CPSP + CCHW + CPR included',
       materials: 0,
-      fundingType: 'WIOA Eligible — most students pay $0',
+      fundingType: 'Contact admissions for funding options',
     },
     {
       name: 'CDL Class A Training',
@@ -129,7 +129,7 @@ export default async function TuitionFeesPage() {
       examFees: 50,
       examFeesNote: 'Indiana BMV CDL skills test',
       materials: 0,
-      fundingType: 'WIOA / WRG Eligible',
+      fundingType: 'Contact admissions for funding options',
     },
     {
       name: 'Tax Preparation',
@@ -138,7 +138,7 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: '',
       materials: 0,
-      fundingType: 'Grant-Funded',
+      fundingType: 'Grant-Funded — contact admissions',
     },
     {
       name: 'Web Development',
@@ -147,7 +147,7 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: '',
       materials: 0,
-      fundingType: 'WIOA / WRG Eligible',
+      fundingType: 'Contact admissions for funding options',
     },
     {
       name: 'Cybersecurity Fundamentals',
@@ -156,7 +156,7 @@ export default async function TuitionFeesPage() {
       examFees: 0,
       examFeesNote: '',
       materials: 0,
-      fundingType: 'WIOA / WRG Eligible',
+      fundingType: 'Contact admissions for funding options',
     },
   ];
 

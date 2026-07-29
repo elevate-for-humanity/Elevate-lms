@@ -8,28 +8,18 @@ import { Shield, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } f
 export function SiteFooter() {
   return (
     <footer className="border-t bg-slate-50">
-      {/* Trust Badges */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12">
+      {/* Funding Disclosure Bar */}
+      <div className="bg-slate-100 border-b">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 text-center">
             <div className="flex items-center gap-2 text-slate-600">
-              <Shield className="w-5 h-5 text-emerald-600" />
-              <span className="text-sm font-medium">ETPL Approved</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-600">
-              <svg className="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+              <svg className="w-4 h-4 text-blue-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
               </svg>
-              <span className="text-sm font-medium">Secure SSL</span>
+              <span className="text-xs text-slate-600">Secure SSL</span>
             </div>
-            <div className="flex items-center gap-2 text-slate-600">
-              <svg className="w-5 h-5 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-              </svg>
-              <span className="text-sm font-medium">DOL Registered</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-600">
-              <span className="text-sm font-medium">WIOA Compliant</span>
+            <div className="max-w-xl text-xs text-slate-500 px-2">
+              <strong>Funding notice:</strong> Elevate is a workforce training provider and Registered Apprenticeship sponsor. Individual programs may be eligible for WIOA, Workforce Ready Grant, or other funding — eligibility varies by program and participant. Contact admissions or your local WorkOne office to confirm available funding options.
             </div>
           </div>
         </div>

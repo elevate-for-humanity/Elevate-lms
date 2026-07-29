@@ -151,12 +151,13 @@ export default function ServerFooter() {
             <span className="text-white">·</span>
             <span>{RAPIDS_SPONSOR_LABEL}</span>
             <span className="text-white">·</span>
-            <span>ETPL Listed Training Provider</span>
-            <span className="text-white">·</span>
-            <span>WIOA Title I Approved</span>
+            <span>Indiana ETPL-Listed Training Provider</span>
             <span className="text-white">·</span>
             <span>WorkOne Workforce Partner</span>
           </div>
+          <p className="mt-3 text-xs text-slate-400 max-w-2xl">
+            <strong className="text-white">Funding notice:</strong> Program-specific funding eligibility (WIOA, Workforce Ready Grant, etc.) varies by individual program, participant eligibility, and local workforce-board authorization. Contact admissions or your WorkOne office to confirm available options.
+          </p>
           <p className="mt-3 text-xs text-slate-400 max-w-2xl">
             HQ: {formatHeadquartersLine()} — administrative and enrollment support. Hands-on training
             occurs at approved Indianapolis instructional sites by program.
@@ -294,7 +295,7 @@ export default function ServerFooter() {
               {[
                 { abbr: 'AI-POWERED', label: 'Workforce Operating System' },
                 { abbr: 'USDOL', label: 'DOL Registered Sponsor' },
-                { abbr: 'ETPL', label: 'Approved Training Provider' },
+                { abbr: 'ETPL', label: 'Indiana ETPL-Listed Provider' },
                 { abbr: 'Certiport', label: 'Authorized Testing Center' },
                 { abbr: 'EPA 608', label: 'Certification Prep' },
                 { abbr: 'OSHA', label: 'Safety Training' },
@@ -325,9 +326,7 @@ export default function ServerFooter() {
                 Certiport Authorized Testing Center operating under 2Exclusive LLC-S. Industry
                 certifications are issued by the respective credentialing bodies (CompTIA, NHA, EPA,
                 NCCCO, etc.) upon passing the required exams — these are the same credentials
-                employers hire for. Training may be fully funded for eligible participants through
-                WIOA, Workforce Ready Grant, JRI, and approved workforce partners; eligibility is
-                determined by the applicable agency. {PLATFORM_DEFAULTS.orgName} Career &amp; Technical
+                employers hire for. Certain individual programs may qualify for WIOA, Workforce Ready Grant, or other workforce funding — eligibility is determined by the applicable agency and depends on program approval status, participant eligibility, and available funds. Contact admissions or your local WorkOne office to confirm funding options. {PLATFORM_DEFAULTS.orgName} Career &amp; Technical
                 Institute is a workforce training organization, not a degree-granting postsecondary
                 institution under the Indiana Department of Education — our programs lead to
                 industry certifications and employment, not academic degrees.

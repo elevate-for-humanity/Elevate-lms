@@ -3,7 +3,7 @@
  *
  * Funding accessibility section - WIOA, Workforce Ready Grant,
  * employer reimbursement, payment assistance.
- * Messaging: "Most learners qualify."
+ * Funding eligibility varies by program and participant.
  */
 
 import Link from 'next/link';
@@ -14,14 +14,14 @@ const FUNDING_SOURCES = [
   {
     name: 'WIOA',
     full: 'Workforce Innovation & Opportunity Act',
-    desc: 'Federal funding for eligible job seekers. Covers tuition, books, and exam fees.',
+    desc: 'Federal funding for eligible job seekers. May cover tuition, books, and exam fees for approved programs.',
     badge: 'Federal',
     badgeColor: 'bg-blue-100 text-blue-700',
   },
   {
     name: 'Workforce Ready Grant',
     full: 'Indiana Next Level Jobs',
-    desc: 'State grant for high-demand credentials. No repayment required.',
+    desc: 'State grant for qualifying credentials. No repayment required.',
     badge: 'Indiana',
     badgeColor: 'bg-amber-100 text-amber-700',
   },
@@ -59,18 +59,16 @@ export function HomeFunding() {
           {/* Left: copy */}
           <div>
             <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-3">
-              Funding & Accessibility
+              Funding & Support
             </p>
             <h2
               id="funding-heading"
               className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4"
             >
-              Most learners pay $0.
+              Funding options for eligible participants.
             </h2>
             <p className="text-slate-600 text-sm leading-relaxed mb-6 max-w-lg">
-              WIOA, state grants, and employer reimbursement programs cover tuition, books,
-              and exam fees for most eligible Indiana residents. We handle the paperwork -
-              you focus on training.
+              WIOA, Indiana Workforce Ready Grant, and employer programs may help cover tuition, books, and exam fees. Eligibility varies by program and participant. We help navigate the process — contact admissions or your local WorkOne office to confirm options.
             </p>
 
             {/* Funding source grid */}

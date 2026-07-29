@@ -19,29 +19,29 @@ import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: { absolute: `${PLATFORM_DEFAULTS.orgName} | Workforce Training, Apprenticeships & Funding — Indianapolis` },
+  title: { absolute: `${PLATFORM_DEFAULTS.orgName} | Workforce Training, Apprenticeships & Career Programs — Indianapolis` },
   description:
-    'DOL-registered apprenticeship sponsor and WIOA-approved training provider. Funded training in healthcare, skilled trades, CDL, technology, and more — often at no cost. Apply today.',
+    'DOL-registered apprenticeship sponsor and Indiana ETPL-listed training provider. Career training programs in healthcare, skilled trades, CDL, technology, and beauty — funding options may be available.',
   keywords: [
     'workforce training Indianapolis',
-    'WIOA training Indiana',
+    'Indiana workforce training',
     'DOL registered apprenticeship',
-    'ETPL approved training provider',
-    'funded career training Indiana',
+    'Indiana ETPL training provider',
+    'career training Indiana',
     'apprenticeship programs Indianapolis',
     'HVAC training Indianapolis',
     'CNA training Indianapolis',
     'CDL training Indiana',
-    'free job training Marion County',
+    'affordable career training Marion County',
     PLATFORM_DEFAULTS.orgName,
   ],
   alternates: {
     canonical: PLATFORM_DEFAULTS.siteUrl,
   },
   openGraph: {
-    title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training, Apprenticeships & Funding`,
+    title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training, Apprenticeships & Career Programs`,
     description:
-      'DOL-registered apprenticeship sponsor. Funded training in healthcare, skilled trades, CDL, and technology — often at no cost through WIOA or state funding.',
+      'DOL-registered apprenticeship sponsor and Indiana ETPL-listed training provider. Career programs in healthcare, skilled trades, CDL, technology, and beauty — funding options may be available.',
     url: PLATFORM_DEFAULTS.siteUrl,
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [

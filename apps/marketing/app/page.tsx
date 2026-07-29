@@ -9,13 +9,8 @@ import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeApprenticeshipInfra } from '@/components/home/HomeApprenticeshipInfra';
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeOutcomes } from '@/components/home/HomeOutcomes';
-import { HomePlatformPreview } from '@/components/home/HomePlatformPreview';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
-import { WorkforceOSArchitecture } from '@/components/home/WorkforceOSArchitecture';
-import { HomeAIPlatform } from '@/components/home/HomeAIPlatform';
-import { HomeSegmentedCTA } from '@/components/home/HomeSegmentedCTA';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
-import { HomeAIDemo } from '@/components/home/HomeAIDemo';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
@@ -106,69 +101,31 @@ export default async function HomePage() {
       {/* ── 1b. ROTATING MARQUEE BANNER ─────────────────────────────────── */}
       <MarqueeBanner />
 
-      {/* ── 2. HOW ELEVATE WORKS ────────────────────────────────────────── */}
-      {/* 6-step operational pipeline: Apply → Funding → Training →
-          Apprenticeship → Credential → Employment */}
-      <HomeHowItWorks />
-
-      {/* ── 4. CAREER PATHWAYS ──────────────────────────────────────────── */}
-      {/* 8 featured program cards with credential, funding, and
-          apprenticeship flags. Sector quick-links below. */}
+      {/* ── 2. CAREER CATEGORIES ────────────────────────────────────────── */}
       <HomeCareerPathways />
 
-      {/* ── 5. APPRENTICESHIP + EMPLOYER INFRASTRUCTURE ─────────────────── */}
-      {/* Dual-column: learner OJT benefits + employer capabilities.
-          RAPIDS, wage reimbursement, compliance — in human language. */}
-      <HomeApprenticeshipInfra />
+      {/* ── 3. HOW IT WORKS ───────────────────────────────────────────── */}
+      <HomeHowItWorks />
 
-      {/* ── 6. FUNDING & ACCESSIBILITY ──────────────────────────────────── */}
-      {/* WIOA, Workforce Ready Grant, Job Ready Indy,
-          OJT reimbursement, payment plans. "Most learners pay $0." */}
+      {/* ── 4. FUNDING ─────────────────────────────────────────────────── */}
       <HomeFunding />
 
-      {/* ── 7. OUTCOMES + SUCCESS STORIES ───────────────────────────────── */}
-      {/* Testimonials from DB (featured=true). Server component with DB fallback. */}
+      {/* ── 5. WHY ELEVATE ────────────────────────────────────────────── */}
+      <HomeApprenticeshipInfra />
+
+      {/* ── 6. SUCCESS STORIES + OUTCOMES ─────────────────────────────── */}
       <Suspense fallback={<OutcomesSkeleton />}>
         <HomeOutcomes />
       </Suspense>
 
-      {/* ── 8. PLATFORM PREVIEW ─────────────────────────────────────────── */}
-      {/* Learner portal, employer dashboard, workforce analytics screenshots.
-          System capabilities listed — framed as "supporting student success." */}
-      <HomePlatformPreview />
-
-      {/* ── 8b. EMPLOYER STRIP ──────────────────────────────────────────── */}
+      {/* ── 7. EMPLOYER CTA ───────────────────────────────────────────── */}
       <HomeEmployerStrip />
 
-      {/* ── 9. SEGMENTED CTA ────────────────────────────────────────────── */}
-      {/* Separate entry funnels: Learners / Employers / Workforce Agencies /
-          Training Partners. Each routes to its own journey. */}
-      <HomeSegmentedCTA />
-
-      {/* ── 9b. ACCREDITATIONS & PARTNER LOGOS (before final CTA) ───────── */}
+      {/* ── 8. TRUST + FINAL CTA ───────────────────────────────────────── */}
       <HomeTrustBar />
-
-      {/* ── 10. FINAL CTA ───────────────────────────────────────────────── */}
-      {/* "From where you are to where you want to be."
-          Apply Now + Check Eligibility + phone number. */}
       <HomeFinalCTA />
 
-      {/* AI Workforce Operating System - 13 sovereign portals serving
-          every stakeholder in the workforce pipeline */}
-      <WorkforceOSArchitecture />
-
-      {/* ── 8h. AI PLATFORM OVERVIEW ───────────────────────────────────── */}
-      {/* PARIS AI, Course Factory, Credential Engine, Dev Studio */}
-      <HomeAIPlatform />
-
-      {/* ── 8g. AI DEMONSTRATION ─────────────────────────────────────── */}
-      {/* Interactive AI demo for government procurement review */}
-      <HomeAIDemo />
-
-
-
       {/* ── PARIS AI Assistant ─────────────────────────────────────────── */}
-      {/* Floating chat button + chat window */}
       <ParisFloatingButton />
     </>
   );

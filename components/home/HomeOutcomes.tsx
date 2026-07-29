@@ -1,14 +1,12 @@
 /**
  * HomeOutcomes
  *
- * Outcomes + success stories section.
- * Stats pulled directly from Supabase (server component, no internal fetch).
- * Testimonials from testimonials table. Falls back to static content.
+ * Success stories section.
+ * Testimonials from DB (featured=true). Server component with DB fallback.
  */
 
 import Link from 'next/link';
 import { ArrowRight, Quote } from 'lucide-react';
-import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
 import { createPublicClient } from '@/lib/supabase/public';
 
 const FALLBACK_STORIES = [
@@ -93,7 +91,6 @@ function StoryCard({ story }: { story: Testimonial }) {
 
 export async function HomeOutcomes() {
   const stories = await fetchTestimonials();
-  const verified = await loadVerifiedPublicStats();
 
   return (
     <section className="bg-slate-900 py-16 px-4" aria-labelledby="outcomes-heading">

@@ -16,13 +16,11 @@ import { HomeAIPlatform } from '@/components/home/HomeAIPlatform';
 import { HomeSegmentedCTA } from '@/components/home/HomeSegmentedCTA';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { HomeAIDemo } from '@/components/home/HomeAIDemo';
-import { SuccessMetrics } from '@/components/home/SuccessMetrics';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
 
-// Revalidate every 5 minutes — allows live enrollment stats to refresh
-// without a full rebuild.
+// Revalidate every 5 minutes.
 export const revalidate = 300;
 
 export const metadata: Metadata = {
@@ -129,9 +127,7 @@ export default async function HomePage() {
       <HomeFunding />
 
       {/* ── 7. OUTCOMES + SUCCESS STORIES ───────────────────────────────── */}
-      {/* Live enrollment stats from /api/enrollment-stats.
-          Testimonials from /api/testimonials (featured=true).
-          Falls back to static content if APIs unavailable. */}
+      {/* Testimonials from DB (featured=true). Server component with DB fallback. */}
       <Suspense fallback={<OutcomesSkeleton />}>
         <HomeOutcomes />
       </Suspense>
@@ -143,8 +139,6 @@ export default async function HomePage() {
 
       {/* ── 8b. EMPLOYER STRIP ──────────────────────────────────────────── */}
       <HomeEmployerStrip />
-
-      <SuccessMetrics />
 
       {/* ── 9. SEGMENTED CTA ────────────────────────────────────────────── */}
       {/* Separate entry funnels: Learners / Employers / Workforce Agencies /

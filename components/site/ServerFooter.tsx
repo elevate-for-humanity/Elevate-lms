@@ -34,24 +34,25 @@ const footerLinks = {
   funding: [
     { name: 'Check My Eligibility', href: '/check-eligibility' },
     { name: 'WIOA / WorkOne', href: '/funding/wioa' },
-    { name: 'Gov Portal Partner', href: '/snap-et-partner' },
+    { name: 'Gov Portal Partner', href: '/snap/snap-et' },
     { name: 'Consumer Education', href: '/consumer-education' },
     { name: 'Tuition & Fees', href: '/tuition-fees' },
   ],
 
   // Partners & Employers (footer-only)
   partners: [
-    { name: 'Program Holders', href: '/program-holder' },
-    { name: 'LMS Licensing', href: '/partners/sales' },
-    { name: 'Technology Partners', href: '/partners/technology' },
+    { name: 'Program Holders', href: '/partners/host-shops' },
+    { name: 'LMS Licensing', href: '/store/licensing' },
+    { name: 'Technology Partners', href: '/partner-operating-model' },
   ],
 
   // About (footer-only)
   about: [
-    { name: 'Organization', href: '/about/organization' },
+    { name: 'Organization', href: '/institutional-governance' },
     { name: 'Compliance Center', href: '/compliance/center' },
     { name: 'Philanthropy', href: '/philanthropy' },
     { name: 'Careers', href: '/careers' },
+    { name: 'Approvals', href: '/verification-approvals' },
   ],
 
   // Platform / Resources (footer-only)
@@ -59,7 +60,7 @@ const footerLinks = {
     { name: 'Platform Overview', href: '/platform' },
     { name: 'Microclasses', href: '/programs' },
     { name: 'Downloads & Resources', href: '/downloads' },
-    { name: 'Credential Verification', href: '/verify-credentials' },
+    { name: 'Credential Verification', href: '/verify' },
   ],
 
   legal: [
@@ -79,7 +80,7 @@ const footerLinks = {
     { name: 'DMCA', href: '/dmca' },
     { name: 'Equal Opportunity', href: '/equal-opportunity' },
     { name: 'Grievance', href: '/grievance' },
-    { name: 'Acceptable Use', href: '/legal/acceptable-use' },
+    { name: 'Acceptable Use', href: '/legal' },
     { name: 'Creator Agreement', href: '/legal/creator-agreement' },
     { name: 'Data Sharing', href: '/legal/data-sharing' },
     { name: 'Disclosures', href: '/legal/disclosures' },
@@ -89,7 +90,7 @@ const footerLinks = {
     { name: 'FERPA Consent', href: '/legal/ferpa-consent' },
     { name: 'License Agreement', href: '/legal/license-agreement' },
     { name: 'Marketplace Terms', href: '/legal/marketplace-terms' },
-    { name: 'MOU', href: '/legal/mou' },
+    { name: 'MOU', href: '/legal/partner-mou' },
     { name: 'Participation Agreement', href: '/legal/participation-agreement' },
     { name: 'Partner MOU', href: '/legal/partner-mou' },
     { name: 'Program Host Agreement', href: '/legal/program-host-agreement' },
@@ -125,13 +126,7 @@ const footerLinks = {
     { name: 'Operational Security', href: '/governance/security' },
     { name: 'Institutional Governance', href: '/institutional-governance' },
     { name: 'Legal Entity Structure', href: '/legal-entity-structure' },
-    { name: 'Legal Governance', href: '/legal/governance' },
-    { name: 'Governance Compliance', href: '/legal/governance/compliance' },
-    { name: 'LMS Standards', href: '/legal/governance/lms-standards' },
-    { name: 'Onboarding UX', href: '/legal/governance/onboarding-ux' },
-    { name: 'Governance Platform Overview', href: '/legal/governance/platform-overview' },
-    { name: 'Legal Gov — Security', href: '/legal/governance/security' },
-    { name: 'Governance Store Payments', href: '/legal/governance/store-payments' },
+    { name: 'Legal Governance', href: '/legal' },
   ],
 };
 

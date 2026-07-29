@@ -39,6 +39,14 @@ Remove any **A** record on `www`.
 |------|------|--------|
 | CNAME | `admin` | `admin.elevateforhumanity.org.elev-5vfk.dns.northflank.app` |
 
+### 4. LMS — `lms.elevateforhumanity.org`
+
+| Type | Host | Value |
+|------|------|-------|
+| CNAME | `lms` | `lms.elevateforhumanity.org.elev-5vfk.dns.northflank.app` |
+
+> Run `pnpm tsx scripts/northflank/print-cname-targets.ts` after DNS propagation to get verified CNAME targets.
+
 ## App behavior (after deploy)
 
 - Canonical host: **`www.elevateforhumanity.org`**

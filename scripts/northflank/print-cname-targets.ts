@@ -40,6 +40,7 @@ async function main() {
   console.log('\n=== Northflank CNAME records for Durable ===\n');
   await printDomain('www.elevateforhumanity.org');
   await printDomain('admin.elevateforhumanity.org');
+  await printDomain('lms.elevateforhumanity.org');
   console.log('=== Apex (Durable — URL redirect, NOT Northflank CNAME) ===\n');
   console.log('elevateforhumanity.org');
   console.log('  Use Durable URL forward / 301 redirect @ → https://www.elevateforhumanity.org');

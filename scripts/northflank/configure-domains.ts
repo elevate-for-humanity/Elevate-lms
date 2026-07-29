@@ -26,7 +26,7 @@ type Port = {
   dns?: string;
 };
 
-const LMS_DOMAINS = ['elevateforhumanity.org', 'www.elevateforhumanity.org'];
+const LMS_DOMAINS = ['elevateforhumanity.org', 'www.elevateforhumanity.org', 'lms.elevateforhumanity.org'];
 const ADMIN_DOMAINS = ['admin.elevateforhumanity.org'];
 
 async function getSubdomainCname(domain: string): Promise<{ verified: boolean; content?: string }> {
@@ -155,9 +155,10 @@ async function main() {
 --- DNS (at your registrar / Cloudflare) ---
 For each custom domain Northflank shows a CNAME target in the service → Ports UI.
 Point (browser should show apex, not www):
-  www.elevateforhumanity.org     → LMS www CNAME (canonical — valid TLS on Durable)
-  elevateforhumanity.org         → URL forward to www in Durable (not Northflank A record)
-  admin.elevateforhumanity.org   → Admin service CNAME
+  www.elevateforhumanity.org       → LMS www CNAME (canonical — valid TLS on Durable)
+  elevateforhumanity.org           → URL forward to www in Durable (not Northflank A record)
+  admin.elevateforhumanity.org     → Admin service CNAME
+  lms.elevateforhumanity.org       → LMS service CNAME (same target as www)
 
 After DNS propagates, TLS certificates provision automatically in Northflank.
 `);

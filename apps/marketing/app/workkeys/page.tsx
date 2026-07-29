@@ -234,7 +234,7 @@ export default function WorkKeysPage() {
             ))}
           </div>
           <p className="text-xs text-slate-500 mt-4">
-            Retake fee: ${WORKKEYS_PRICING.retake.price} · No-show fee: ${WORKKEYS_PRICING.noShow.price}
+            Retake fee: ${WORKKEYS_PRICING.retake} · No-show fee: ${WORKKEYS_PRICING.noShow}
             · WIOA and Workforce Ready Grant funding accepted
           </p>
         </div>

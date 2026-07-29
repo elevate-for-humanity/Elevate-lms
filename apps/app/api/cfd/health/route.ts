@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(): Promise<NextResponse<CapabilityHealth>> {
   const checks: CapabilityHealth['checks'] = [];
-  let status: CapabilityHealth['status'] = 'degraded';
+  const status: CapabilityHealth['status'] = 'degraded';
   
   // Check if CFD is enabled
   const cfdEnabled = process.env.CFD_ENABLED === 'true';

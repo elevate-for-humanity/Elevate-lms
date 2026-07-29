@@ -34,7 +34,7 @@ async function handler(req: Request) {
     }
 
     const body = await req.json();
-    const { courseId, priceId, successUrl, cancelUrl } = body;
+    const { courseId, priceId, successUrl, cancelUrl, couponCode } = body;
 
     if (!courseId || !successUrl || !cancelUrl) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -97,6 +97,7 @@ async function handler(req: Request) {
       automatic_tax: {
         enabled: true,
       },
+      allow_promotion_codes: true,
     });
 
     if (!session.url) {

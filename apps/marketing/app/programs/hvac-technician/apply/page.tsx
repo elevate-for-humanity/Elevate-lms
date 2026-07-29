@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Loader2, CreditCard, Info, Shield } from 'lucide-react';
+import { ArrowLeft, Loader2, CreditCard, Info, Shield, Percent } from 'lucide-react';
 import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import FundingEligibilityFlow, {
@@ -64,6 +64,7 @@ export default function HvacApplyPage() {
   const [customWeekly, setCustomWeekly] = useState(MIN_WEEKLY);
   // customAmount: used by Affirm/Sezzle for their amount input
   const [customAmount, setCustomAmount] = useState(PRICING.depositAmount);
+  const [couponCode, setCouponCode] = useState('$300off');
 
   const { weekly: structuredWeekly, weeksNeeded } = calcWeekly(MIN_WEEKLY);
   const { weekly: userWeekly, weeksNeeded: userWeeks, lastPayment } = calcWeekly(customWeekly);
@@ -851,6 +852,22 @@ export default function HvacApplyPage() {
                           </p>
                         </div>
                       )}
+                    </div>
+
+                    {/* Coupon Code */}
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Percent className="w-4 h-4 text-green-600" />
+                        <p className="text-sm font-bold text-green-800">Coupon Code</p>
+                      </div>
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        placeholder="$300off"
+                        className="w-full px-3 py-2 border border-green-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      />
+                      {couponCode && <p className="text-xs text-green-700 mt-1">Code: <strong>{couponCode}</strong> — will be applied at checkout</p>}
                     </div>
 
                     {/* Payment methods accepted */}

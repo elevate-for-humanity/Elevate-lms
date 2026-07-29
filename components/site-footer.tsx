@@ -66,7 +66,6 @@ export function SiteFooter() {
               <li><Link href="/programs" className="hover:text-slate-900">All Programs</Link></li>
               <li><Link href="/career-training" className="hover:text-slate-900">Career Training</Link></li>
               <li><Link href="/community-services" className="hover:text-slate-900">Community Services</Link></li>
-              <li><Link href="/cna-waitlist" className="hover:text-slate-900">CNA Interest List</Link></li>
               <li><Link href="/store" className="hover:text-slate-900">Platform Licensing</Link></li>
             </ul>
           </div>

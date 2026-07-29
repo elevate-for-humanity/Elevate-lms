@@ -129,7 +129,7 @@ export default async function ApplyPage({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
-                  <input type="tel" className="w-full border border-slate-300 rounded-lg px-4 py-3" placeholder="(317) 000-0000" />
+                  <input type="tel" className="w-full border border-slate-300 rounded-lg px-4 py-3" placeholder="(317) 314-3757" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>

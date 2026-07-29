@@ -129,7 +129,7 @@ export default function IntakeFormInner({ programs }: IntakeFormInnerProps) {
               value={form.phone}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
-              placeholder="(317) 555-0123"
+              placeholder="(317) 314-3757"
             />
           </div>
 

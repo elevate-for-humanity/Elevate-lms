@@ -255,7 +255,7 @@ export default function WaitlistPage() {
                 value={form.phone}
                 onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent text-sm"
-                placeholder="(317) 000-0000"
+                placeholder="(317) 314-3757"
               />
             </div>
 

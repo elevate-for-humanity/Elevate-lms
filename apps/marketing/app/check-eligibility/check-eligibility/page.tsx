@@ -501,7 +501,7 @@ export default function CheckEligibilityPage() {
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="(317) 000-0000"
+                  placeholder="(317) 314-3757"
                   className="w-full min-h-[48px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
                 />
                 <p className="text-xs text-slate-400 mt-1">

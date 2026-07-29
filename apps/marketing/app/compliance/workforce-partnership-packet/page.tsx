@@ -562,7 +562,7 @@ export default function WorkforcePartnershipPacketPage() {
                 <Phone className="w-5 h-5 text-brand-blue-600 flex-shrink-0 print:text-slate-700" />
                 <div>
                   <p className="font-semibold text-slate-900">Phone</p>
-                  <p className="text-slate-700">(317) 794-0484</p>
+                  <p className="text-slate-700">(317) 314-3757</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">

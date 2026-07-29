@@ -5,5 +5,5 @@ export const metadata = {
 };
 
 export default function BarbershopApprenticeshipPage() {
-  redirect('/partners/barber-host-shop');
+  redirect('/partners/host-shops');
 }

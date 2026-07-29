@@ -403,7 +403,7 @@ export default function ProgramHostAgreementPage() {
           agreementType="mou"
           agreementVersion="1.0"
           buttonLabel="Sign Master Program Host Agreement"
-          nextUrl="/partner/dashboard"
+          nextUrl="/partners"
         />
       </DocumentPage>
     </>

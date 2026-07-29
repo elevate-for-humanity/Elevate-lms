@@ -40,8 +40,8 @@ export default function Page() {
                     <svg className="w-5 h-5 text-brand-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-slate-900">Tax Incentives</h4>
-                    <p className="text-slate-600 text-sm">Available for hiring registered apprentices</p>
+                    <h4 className="font-semibold text-slate-900">Potential Workforce Support</h4>
+                    <p className="text-slate-600 text-sm">Employers may qualify for OJT reimbursement and workforce incentives. Eligibility varies.</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -56,31 +56,35 @@ export default function Page() {
               </div>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-lg">
-              <h3 className="text-xl font-bold text-slate-900 mb-6">Apprenticeship Industries</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-6">Beauty Apprenticeship Programs</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                   <span className="text-2xl">✂️</span>
-                  <span className="font-medium text-slate-900">Barbering</span>
+                  <div>
+                    <div className="font-medium text-slate-900">Barbering</div>
+                    <div className="text-xs text-slate-500">2,000 hrs · DOL Registered</div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                   <span className="text-2xl">💇</span>
-                  <span className="font-medium text-slate-900">Cosmetology</span>
+                  <div>
+                    <div className="font-medium text-slate-900">Cosmetology</div>
+                    <div className="text-xs text-slate-500">2,000 hrs · DOL Registered</div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                   <span className="text-2xl">💅</span>
-                  <span className="font-medium text-slate-900">Nail Technology</span>
+                  <div>
+                    <div className="font-medium text-slate-900">Nail Technology</div>
+                    <div className="text-xs text-slate-500">DOL Registered</div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                   <span className="text-2xl">✨</span>
-                  <span className="font-medium text-slate-900">Esthetics</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                  <span className="text-2xl">❄️</span>
-                  <span className="font-medium text-slate-900">HVAC</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                  <span className="text-2xl">🔧</span>
-                  <span className="font-medium text-slate-900">Welding</span>
+                  <div>
+                    <div className="font-medium text-slate-900">Esthetics</div>
+                    <div className="text-xs text-slate-500">DOL Registered</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -121,31 +125,44 @@ export default function Page() {
           </div>
           
           <div className="bg-brand-blue-700 rounded-2xl p-8 md:p-12 text-white mb-16">
-            <div className="grid md:grid-cols-3 gap-8 text-center">
-              <div>
-                <div className="text-4xl font-bold mb-2">100+</div>
-                <div className="text-blue-200">Active Host Shops</div>
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold mb-2">Join Our Beauty Apprenticeship Network</h2>
+              <p className="text-blue-200 max-w-xl mx-auto">
+                We currently host Registered Apprenticeships in Barbering, Cosmetology, Esthetics, and Nail Technology in the Indianapolis metro area.
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+              <div className="bg-white/10 rounded-xl p-6 text-center">
+                <div className="text-3xl font-bold text-brand-red-400 mb-1">Barber</div>
+                <div className="text-sm text-blue-200">2,000-hour Registered Apprenticeship</div>
               </div>
-              <div>
-                <div className="text-4xl font-bold mb-2">500+</div>
-                <div className="text-blue-200">Apprentices Trained</div>
+              <div className="bg-white/10 rounded-xl p-6 text-center">
+                <div className="text-3xl font-bold text-brand-red-400 mb-1">Cosmetology</div>
+                <div className="text-sm text-blue-200">2,000-hour Registered Apprenticeship</div>
               </div>
-              <div>
-                <div className="text-4xl font-bold mb-2">80%</div>
-                <div className="text-blue-200">Hire Rate</div>
+              <div className="bg-white/10 rounded-xl p-6 text-center">
+                <div className="text-3xl font-bold text-brand-red-400 mb-1">Esthetics</div>
+                <div className="text-sm text-blue-200">Apprenticeship available</div>
+              </div>
+              <div className="bg-white/10 rounded-xl p-6 text-center">
+                <div className="text-3xl font-bold text-brand-red-400 mb-1">Nail Technology</div>
+                <div className="text-sm text-blue-200">Apprenticeship available</div>
               </div>
             </div>
+            <p className="text-xs text-blue-300 text-center mt-6">
+              Apprenticeship programs are sponsored by 2Exclusive LLC-S under DOL Registered Apprenticeship standards. Programs subject to availability and approval.
+            </p>
           </div>
           
           <div className="text-center">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Ready to Become a Host Shop?</h2>
-            <p className="text-slate-600 mb-8 max-w-2xl mx-auto">Join hundreds of businesses already training the next generation while building their workforce pipeline.</p>
+            <p className="text-slate-600 mb-8 max-w-2xl mx-auto">Apply online and our team will review your shop and contact you within 2-3 business days.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/partners/barber-host-shop/apply" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700 transition-colors">
-                Apply to Become a Host Shop
+                Apply Now
               </Link>
               <Link href="/contact" className="bg-white text-brand-blue-600 border-2 border-brand-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-50 transition-colors">
-                Learn More
+                Contact Us
               </Link>
             </div>
           </div>

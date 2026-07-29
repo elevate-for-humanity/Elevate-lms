@@ -239,7 +239,7 @@ export default function ApprenticeshipSponsorPage() {
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/partners/barber-host-shop"
+                href="/partners/host-shops"
                 className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors inline-flex items-center gap-2"
               >
                 Barbershop Partner Program <ArrowRight className="w-4 h-4" />

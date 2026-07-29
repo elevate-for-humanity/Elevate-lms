@@ -136,7 +136,7 @@ export default function EmployerPostJobPage() {
                 </li>
               </ul>
               <Link
-                href="/host-shop"
+                href="/partners/host-shops"
                 className="block w-full text-center bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors"
               >
                 Become a Host Shop

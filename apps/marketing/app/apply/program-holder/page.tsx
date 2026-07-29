@@ -21,9 +21,9 @@ const OTHER_APPLICATION_PATHS = [
     hint: 'Licensed barbershop hosting apprentices',
   },
   {
-    label: 'Cosmetology host shop',
-    href: '/partners/cosmetology-host-shop/apply',
-    hint: 'Salon or school hosting cosmetology apprentices',
+    label: 'Beauty apprenticeship host shop',
+    href: '/partners/barber-host-shop/apply',
+    hint: 'Licensed shop or salon hosting beauty apprentices',
   },
   {
     label: 'Training provider (ETPL / WIOA)',

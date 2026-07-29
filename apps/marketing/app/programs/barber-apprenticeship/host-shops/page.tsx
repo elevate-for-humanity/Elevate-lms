@@ -48,7 +48,7 @@ export default async function HostShopsPage() {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-4 text-black">Why Partner With Us?</h2>
           <p className="text-xl text-black text-center mb-16 max-w-3xl mx-auto">
-            Host shops gain trained talent, zero paperwork burden, and the satisfaction of building the next generation.
+            Host shops gain trained talent, reduced administrative burden, and the satisfaction of building the next generation.
           </p>
           
           {/* Benefit 1 - Image Left */}
@@ -89,7 +89,7 @@ export default async function HostShopsPage() {
               <div className="w-16 h-16 bg-brand-blue-100 rounded-2xl flex items-center justify-center mb-6">
                 <Shield className="w-8 h-8 text-brand-blue-700" />
               </div>
-              <h3 className="text-2xl font-bold text-black mb-4">Zero Paperwork for You</h3>
+              <h3 className="text-2xl font-bold text-black mb-4">We Handle the Administration</h3>
               <p className="text-lg text-black mb-4">
                 We handle all the administrative burden. Hour tracking, state compliance, curriculum delivery, and completion documentation - that's our job, not yours.
               </p>
@@ -318,16 +318,16 @@ export default async function HostShopsPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/programs/barber-apprenticeship/host-shops"
-              className="bg-white text-slate-900 px-8 py-4 rounded-lg font-bold transition hover:bg-white"
+              href="/contact"
+              className="bg-white text-slate-900 border border-slate-300 px-8 py-4 rounded-lg font-bold transition hover:bg-slate-50"
             >
-              General Inquiry
+              Contact Us
             </Link>
             <Link
-              href="/programs/barber-apprenticeship/apply"
+              href="/partners/barber-host-shop/apply"
               className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold transition"
             >
-              Enroll as a Host Shop
+              Apply to Host
             </Link>
           </div>
         </div>

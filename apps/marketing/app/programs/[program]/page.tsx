@@ -16,6 +16,7 @@ import { resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
 import { CheckCircle, Clock, Award, DollarSign, ArrowRight, ShieldCheck } from 'lucide-react';
 import LiveJobPostings from '@/components/careers/LiveJobPostings';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { FAQSection } from '@/components/programs/sections/FAQSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -473,7 +474,20 @@ function ProgramPage({
         </div>
       </section>
 
-      {/* SECTION 9: FINAL CTA */}
+      {/* SECTION 9: FAQ */}
+      <FAQSection
+        title={`${title} — Frequently Asked Questions`}
+        faqs={[
+          { question: 'How long does the program take?', answer: durationWeeks ? `This program typically takes ${durationWeeks} weeks to complete. Duration may vary based on cohort schedule and individual pace.` : 'Program duration varies by cohort. Contact an advisor for current schedule.' },
+          { question: 'Does this program qualify for WIOA funding?', answer: 'This program may qualify for WIOA funding depending on your eligibility status. Complete the eligibility form to find out if you qualify.' },
+          { question: 'What credential will I earn?', answer: credential ? `Upon completion, you will earn the ${credential}. Industry certifications are proctored on-site.` : 'You will earn an Elevate Completion Certificate and may be eligible for industry-recognized certifications.' },
+          { question: 'Is there job placement help?', answer: 'Yes. Elevate provides career support including resume building, interview prep, and employer connections. Employer partners actively recruit from our graduates.' },
+          { question: 'What are the prerequisites?', answer: 'Most programs have no prerequisites. Some programs may require a background check or basic skills assessment. See individual program details.' },
+          { question: 'Can I work while in training?', answer: 'Many programs are designed around work schedules. Apprenticeship programs pay you to train on the job. Ask an advisor about flexible scheduling options.' },
+        ]}
+      />
+
+      {/* SECTION 10: FINAL CTA */}
       <section className="bg-brand-red-700 py-20 px-6">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-5">

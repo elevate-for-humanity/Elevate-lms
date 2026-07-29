@@ -47,7 +47,7 @@ export default function CaseManagerHoursPage() {
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <Link href="/host-shop/dashboard" className="w-10 h-10 bg-gradient-to-br from-brand-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+              <Link href="/partners/host-shops" className="w-10 h-10 bg-gradient-to-br from-brand-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
                 <Building2 className="w-6 h-6 text-white" />
               </Link>
               <div>

@@ -5,7 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import { WORKKEYS_PRICING } from '@/lib/testing/providers/workkeys-pricing';
 
 export const metadata: Metadata = {
-  title: 'ACT WorkKeys / NCRC | Elevate for Humanity — Indianapolis',
+  title: 'ACT WorkKeys / NCRC Testing in Indianapolis, Indiana',
   description:
     'Take the ACT WorkKeys assessment and earn the National Career Readiness Certificate (NCRC) at Elevate for Humanity in Indianapolis. Proctored on-site.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/workkeys' },

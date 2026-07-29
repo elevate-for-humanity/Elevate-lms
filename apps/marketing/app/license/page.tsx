@@ -20,7 +20,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 
 export const metadata: Metadata = {
-  title: 'License the Elevate LMS + Workforce Hub | Elevate for Humanity',
+  title: 'License the Elevate LMS + Workforce Hub',
   description:
     'White-label LMS + Workforce Platform Licensing. Built for training providers, workforce boards, and employer partners. Starting at $4,999.',
   alternates: {

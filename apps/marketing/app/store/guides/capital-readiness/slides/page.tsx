@@ -9,7 +9,7 @@ import { ArrowLeft, Download, Presentation } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Capital Readiness Slide Deck | Elevate Store',
+  title: 'Capital Readiness Slide Deck',
   description: 'Presentation slides for the Elevate Capital Readiness Framework.',
 };
 

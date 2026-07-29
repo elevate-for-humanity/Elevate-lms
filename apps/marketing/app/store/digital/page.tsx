@@ -14,7 +14,7 @@ import {
 import { DIGITAL_PRODUCTS } from '@/lib/store/digital-products';
 
 export const metadata: Metadata = {
-  title: 'Digital Resources | Elevate Store',
+  title: 'Digital Resources',
   description: 'AI tools, toolkits, guides, templates, and courses for training providers. SAM.gov assistant, grants navigator, AI studio, and more.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/digital',

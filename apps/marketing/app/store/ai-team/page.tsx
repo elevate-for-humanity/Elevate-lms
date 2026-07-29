@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'AI Workforce Tools | Elevate for Humanity Store',
+  title: 'AI Workforce Tools',
   keywords: ['AI', 'workforce tools', 'automation', 'job matching', 'career AI'],
   description: 'AI-powered workforce development tools including PARIS career advisor, job matching, resume building, and automated career coaching.',
 };

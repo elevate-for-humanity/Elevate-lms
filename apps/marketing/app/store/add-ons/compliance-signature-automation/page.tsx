@@ -5,7 +5,7 @@ import { PenTool, ArrowRight, FileText, Clock } from 'lucide-react';
 
 export const dynamic = 'force-static';
 export const metadata: Metadata = {
-  title: 'Compliance & Signature Automation | Elevate Store',
+  title: 'Compliance & Signature Automation',
   description: 'Digital signatures, MOU management, and compliance document workflows with full audit trail.',
 };
 

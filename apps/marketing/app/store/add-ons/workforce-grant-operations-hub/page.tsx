@@ -5,7 +5,7 @@ import { Briefcase, Search, ArrowRight, BarChart3, ShieldCheck, FileText, Users 
 
 export const dynamic = 'force-static';
 export const metadata: Metadata = {
-  title: 'Workforce Grant Operations Hub | Elevate Store',
+  title: 'Workforce Grant Operations Hub',
   description: 'Full grant operations platform — opportunity search, application pipeline, org profile, facts vault, and submission tracking.',
 };
 

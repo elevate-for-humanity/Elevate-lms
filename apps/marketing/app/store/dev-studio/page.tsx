@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Dev Studio | Elevate Store',
+  title: 'Dev Studio',
   description: 'AI-powered development environment with workflow automation, container management, and intelligent code assistance for technical teams.',
   keywords: ['dev studio', 'AI coding', 'workflow automation', 'container management', 'development tools'],
   alternates: {

@@ -8,7 +8,7 @@ import { ArrowRight, TrendingUp, Shield, Building2, Users } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Guides & Resources | Elevate Store',
+  title: 'Guides & Resources',
   description:
     'Practical guides for workforce development organizations — capital readiness, compliance, licensing, and funding navigation.',
   alternates: {

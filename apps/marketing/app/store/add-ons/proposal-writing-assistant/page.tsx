@@ -5,7 +5,7 @@ import { Sparkles, ArrowRight, AlertTriangle } from 'lucide-react';
 
 export const dynamic = 'force-static';
 export const metadata: Metadata = {
-  title: 'Proposal Writing Assistant | Elevate Store',
+  title: 'Proposal Writing Assistant',
   description: 'AI-assisted grant narrative writing grounded in your org data — no hallucinations, no fluff.',
 };
 

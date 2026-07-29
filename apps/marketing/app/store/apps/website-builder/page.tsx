@@ -10,7 +10,7 @@ import { IndividualAppPlansSection } from '@/components/store/IndividualAppPlans
 import { INDIVIDUAL_APP_CATALOG } from '@/lib/apps/individual-app-plans';
 
 export const metadata: Metadata = {
-  title: 'Website Builder for Training Providers | Elevate Store',
+  title: 'Website Builder for Training Providers',
   description: 'Build professional training provider websites in minutes. Pre-built templates, LMS integration, enrollment forms, and SEO optimization included.',
   keywords: ['website builder', 'training provider website', 'LMS website', 'education website builder', 'course website', 'enrollment forms', 'SEO'],
   openGraph: {

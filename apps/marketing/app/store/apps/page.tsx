@@ -7,11 +7,11 @@ import Link from 'next/link';
 import { Star, ShoppingCart, Building2, DollarSign, Layout } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Apps & Tools | Elevate Store',
+  title: 'Apps & Tools',
   description: 'Discover apps and tools for workforce development, government contracting, grant management, and training provider websites.',
   keywords: ['workforce apps', 'SAM.gov', 'grants management', 'website builder', 'training provider tools'],
   openGraph: {
-    title: 'Apps & Tools | Elevate Store',
+    title: 'Apps & Tools',
     description: 'Discover apps and tools for workforce development and training providers.',
     type: 'website',
   },

@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { ArrowRight, Zap } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Community Hub Add-On | Build Engagement | Elevate Store',
+  title: 'Community Hub Add-On | Build Engagement',
   description:
     'Community Hub add-on for Elevate LMS — discussion forums, member groups, leaderboards, events, and gamification. One-time purchase, lifetime access.',
   alternates: {

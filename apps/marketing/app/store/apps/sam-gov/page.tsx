@@ -8,7 +8,7 @@ import { INDIVIDUAL_APP_CATALOG } from '@/lib/apps/individual-app-plans';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'SAM.gov Assistant - Federal Contractor Registration Tool | Elevate Store',
+  title: 'SAM.gov Assistant - Federal Contractor Registration Tool',
   description: 'Complete your SAM.gov registration in hours, not days. Step-by-step wizard, compliance monitoring, and automatic renewal reminders. Trusted by 2,500+ organizations.',
   openGraph: {
     title: 'SAM.gov Assistant - Federal Contractor Registration Made Simple',

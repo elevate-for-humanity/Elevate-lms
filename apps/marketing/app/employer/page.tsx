@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';

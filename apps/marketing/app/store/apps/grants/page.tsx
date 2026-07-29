@@ -10,7 +10,7 @@ import { IndividualAppPlansSection } from '@/components/store/IndividualAppPlans
 import { INDIVIDUAL_APP_CATALOG } from '@/lib/apps/individual-app-plans';
 
 export const metadata: Metadata = {
-  title: 'Grants Discovery & Management App | Elevate Store',
+  title: 'Grants Discovery & Management App',
   description: 'Find and manage federal, state, and foundation grants. AI-powered grant matching, application tracking, deadline alerts, and compliance reporting.',
   keywords: ['grants', 'grant management', 'federal grants', 'grants.gov', 'foundation grants', 'grant writing', 'grant tracking', 'nonprofit funding'],
   openGraph: {

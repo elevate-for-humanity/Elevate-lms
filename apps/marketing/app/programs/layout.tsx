@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Career Training Programs | Elevate for Humanity' },
+  title: { absolute: 'Career Training Programs' },
   description:
     'Career training programs in healthcare, skilled trades, and technology. Training at no cost to eligible Indiana residents through WIOA and state funding. Job placement support included.',
   alternates: {

@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Barber Apprenticeship Program | Earn While You Learn | Elevate for Humanity',
+  title: 'Barber Apprenticeship Program | Earn While You Learn',
   description:
     "Become a licensed barber through Elevate's DOL-registered apprenticeship. Earn wages while training, complete 2,000 OJT hours, and earn your Indiana Barber License.",
   alternates: { canonical: 'https://www.elevateforhumanity.org/barber-apprenticeship' },

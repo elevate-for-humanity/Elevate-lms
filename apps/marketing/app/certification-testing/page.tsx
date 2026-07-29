@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Schedule Your NHA Certification Exam | Elevate for Humanity',
+  title: 'Schedule Your NHA Certification Exam',
   description:
     'Authorized NHA testing center in Indianapolis. Schedule your CCMA, CPT, CET, CMAA, or ExCPT exam. Secure proctoring, instant confirmation, full candidate support.',
   alternates: {

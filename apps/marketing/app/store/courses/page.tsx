@@ -10,7 +10,7 @@ import { Award, Clock, Check, ArrowRight, BookOpen, Shield } from 'lucide-react'
 import { COURSES as courses } from '@/apps/marketing/app/data/courses';
 
 export const metadata: Metadata = {
-  title: 'Certification Courses | Elevate Store',
+  title: 'Certification Courses',
   description:
     'Industry-recognized certification courses with exam vouchers. Microsoft Office, Adobe Creative, OSHA Safety, Healthcare, and more.',
   alternates: {

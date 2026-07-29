@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'AI Studio | Elevate Store',
+  title: 'AI Studio',
   description:
     'Generate AI videos, voiceovers, images, and virtual instructors for your courses. Powered by OpenAI, Synthesia, D-ID, and more.',
   alternates: {

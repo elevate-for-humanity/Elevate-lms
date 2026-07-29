@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Job Ready Indy | Funded Career Training | Elevate for Humanity',
+  title: 'Job Ready Indy | Funded Career Training',
   description:
     'Indiana Job Ready Indy program provides funded career training for justice-involved individuals. Get certified in healthcare, skilled trades, and more.',
   alternates: {

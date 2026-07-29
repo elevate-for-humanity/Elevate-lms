@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { PlansPageClient } from './PlansPageClient';
 
 export const metadata: Metadata = {
-  title: 'Plans & Add-Ons | Elevate Store',
+  title: 'Plans & Add-Ons',
   description:
     'Solo, Business, and Professional plans from $29/month. Add LMS, workforce, apprenticeship, and AI modules à la carte.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/store/plans' },

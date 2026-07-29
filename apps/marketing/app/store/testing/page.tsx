@@ -14,7 +14,7 @@ import { CAREERSAFE_PRICING } from '@/lib/testing/providers/careersafe-pricing';
 import { NRF_RISEUP_PRICING } from '@/lib/testing/providers/nrf-riseup';
 
 export const metadata: Metadata = {
-  title: 'Testing Center | Elevate Store',
+  title: 'Testing Center',
   description: 'Schedule certification exams, manage proctors, track scores, and issue credentials. ACT WorkKeys, Certiport, EPA, CPR, and more.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/testing',

@@ -6,7 +6,7 @@ import { BookOpen, Clock, CheckCircle, ArrowRight, TrendingUp, Award, Target } f
 import { SimpleAddToCartButton } from '@/components/store/SimpleAddToCartButton';
 
 export const metadata: Metadata = {
-  title: 'Practice Tests | Elevate Store',
+  title: 'Practice Tests',
   description: 'Boost your certification exam pass rate with our comprehensive practice tests and exam prep materials.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/practice-tests',

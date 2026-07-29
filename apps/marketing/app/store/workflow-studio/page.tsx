@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { Workflow, ArrowRight, Play, CheckCircle, Zap, Users, Database, Bell, FileText, Settings } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Workflow Studio | Elevate Store',
+  title: 'Workflow Studio',
   description: 'Visual drag-and-drop workflow automation. Build enrollment pipelines, compliance workflows, and business processes without code.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/workflow-studio',

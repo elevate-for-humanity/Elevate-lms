@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Our Impact | Sit Selfish Inc × Elevate for Humanity',
+  title: 'Our Impact | Sit Selfish Inc × Elevate',
   description: 'Real-time impact data — students trained, credentials issued, and careers launched through Elevate for Humanity workforce programs.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/impact' },
 };

@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Course Builder | Elevate Store',
+  title: 'Course Builder',
   description: 'AI-powered course creation with drag-and-drop lessons, video hosting, quizzes, and instant publishing to your LMS.',
   keywords: ['course builder', 'LMS', 'online courses', 'training platform', 'course creation'],
   alternates: {

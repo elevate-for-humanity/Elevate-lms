@@ -9,7 +9,7 @@ import { Check, Play, BookOpen, Award, Clock, Users, FileText, Wrench } from 'lu
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'HVAC Technician Course License | Elevate Store',
+  title: 'HVAC Technician Course License',
   description: 'License the complete 640-hour HVAC Technician course for your workforce program, community college, or training center. 16 modules, 94 lessons, EPA 608, OSHA 10, CPR/AED.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/store/courses/hvac-technician-course-license' },
 };

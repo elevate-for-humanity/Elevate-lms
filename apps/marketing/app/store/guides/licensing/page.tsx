@@ -9,7 +9,7 @@ import { ArrowRight, AlertTriangle } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Platform Licensing Guide | Elevate LMS',
+  title: 'Platform Licensing Guide',
   description:
     'How the Elevate LMS platform license works — tiers, provisioning, billing, enforcement, and what you own versus what you access.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/store/guides/licensing' },

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Enterprise Licensing | Elevate for Humanity Store',
+  title: 'Enterprise Licensing',
   description: 'License Elevate for Humanity platform technology for your organization. Enterprise LMS, workforce tools, and white-label solutions.',
 };
 

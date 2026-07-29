@@ -55,7 +55,9 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
                       : 'min-w-[15rem]'
                   }`}
                 >
-                  {Object.values(groupNavSubItemsByHeader(item.subItems)).map((group) => {
+                  {Object.values(groupNavSubItemsByHeader(item.subItems))
+                    .filter((group) => group.some((sub) => !sub.isHeader))
+                    .map((group) => {
                     const heading = group.find((sub) => sub.isHeader);
                     const links = group.filter((sub) => !sub.isHeader);
 

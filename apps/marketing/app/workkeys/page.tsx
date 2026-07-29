@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronRight } from 'lucide-react';
+import { WORKKEYS_PRICING } from '@/lib/testing/providers/workkeys-pricing';
 
 export const metadata: Metadata = {
   title: 'ACT WorkKeys / NCRC | Elevate for Humanity — Indianapolis',
@@ -185,6 +186,57 @@ export default function WorkKeysPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="py-14 border-b border-slate-100 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">
+            Exam Fees
+          </p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8">
+            WorkKeys Pricing
+          </h2>
+          <div className="grid sm:grid-cols-3 gap-4 max-w-3xl">
+            {[
+              {
+                label: 'Per Assessment',
+                price: `$${WORKKEYS_PRICING.individual.price}`,
+                desc: 'Applied Math · Workplace Documents · Graphic Literacy',
+              },
+              {
+                label: 'Full NCRC Bundle',
+                price: `$${WORKKEYS_PRICING.ncrc.price}`,
+                desc: 'All 3 assessments in one session — best value',
+                highlight: true,
+              },
+              {
+                label: 'Workforce Referral',
+                price: `$${WORKKEYS_PRICING.agencyReferral.price}`,
+                desc: 'WorkOne / WIOA-referred candidates',
+              },
+            ].map(({ label, price, desc, highlight }) => (
+              <div
+                key={label}
+                className={`rounded-xl p-5 ${highlight ? 'bg-brand-red-600 text-white' : 'bg-white border border-slate-200'}`}
+              >
+                <p className={`text-xs font-bold uppercase tracking-wide mb-1 ${highlight ? 'text-red-200' : 'text-slate-500'}`}>
+                  {label}
+                </p>
+                <p className={`text-3xl font-black mb-1 ${highlight ? 'text-white' : 'text-brand-red-600'}`}>
+                  {price}
+                </p>
+                <p className={`text-xs leading-relaxed ${highlight ? 'text-red-100' : 'text-slate-600'}`}>
+                  {desc}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-slate-500 mt-4">
+            Retake fee: ${WORKKEYS_PRICING.retake.price} · No-show fee: ${WORKKEYS_PRICING.noShow.price}
+            · WIOA and Workforce Ready Grant funding accepted
+          </p>
         </div>
       </section>
 

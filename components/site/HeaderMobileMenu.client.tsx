@@ -238,7 +238,9 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
 
                           {/* Category accordion columns */}
                           {useCategoryAccordions
-                            ? columns.map((column, columnIndex) => {
+                            ? columns
+                                .filter((col) => col.some((c) => !c?.isHeader))
+                                .map((column, columnIndex) => {
                                 const categoryKey = `${sectionKey}::${columnIndex}`;
                                 const categoryOpen = expandedCategory === categoryKey;
                                 const label = getNavCategoryLabel(column);

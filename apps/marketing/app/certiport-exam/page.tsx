@@ -6,7 +6,16 @@ import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import { createClient } from '@/lib/supabase/client';
 import { Award, Lock, ArrowRight, Shield, MapPin, Clock } from 'lucide-react';
 import { CERTIPORT_EXAMS, CERTIPORT_CATC_ADDRESS } from '@/lib/partners/certiport';
+import { CERTIPORT_FEES } from '@/lib/testing/providers/certiport-pricing';
 import { getProvidersForAmount } from '@/lib/bnpl-config';
+
+// Map category to pricing key
+const CATEGORY_PRICE_MAP: Record<string, number> = {
+  'Microsoft Office': CERTIPORT_FEES[0].amount,
+  'Digital Literacy': CERTIPORT_FEES[0].amount,
+  'IT': CERTIPORT_FEES[0].amount,
+  'Business': CERTIPORT_FEES[1].amount, // Adobe/QuickBooks/ESB
+};
 
 type FundingStatus = 'funded' | 'self_pay' | 'loading';
 type CourseStatus = 'complete' | 'incomplete' | 'loading';
@@ -209,7 +218,7 @@ function CertiportExamContent() {
             Select your exam below.{' '}
             {fundingStatus === 'funded'
               ? 'Your exam is covered by your funding program.'
-              : 'Exam fee: $150.'}
+              : 'Exam fees range from $185–$395 depending on certification.'}
           </p>
         </div>
 
@@ -255,8 +264,11 @@ function CertiportExamContent() {
               key={category}
               className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
             >
-              <div className="bg-white px-6 py-3">
+              <div className="bg-white px-6 py-3 flex items-center justify-between">
                 <h2 className="text-slate-900 font-semibold">{category}</h2>
+                <span className="text-sm font-bold text-brand-red-600">
+                  From ${CATEGORY_PRICE_MAP[category] || 150}
+                </span>
               </div>
               <div className="p-4 space-y-2">
                 {exams.map((exam) => (
@@ -319,7 +331,7 @@ function CertiportExamContent() {
         {fundingStatus !== 'funded' && (
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 mt-4">
             <p className="text-xs font-semibold text-slate-600 mb-2 text-center">
-              Split your $150 payment — accepted at checkout
+              Split your exam payment — accepted at checkout
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {getProvidersForAmount(150).map((p) => (

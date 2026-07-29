@@ -1,212 +1,172 @@
 /**
- * HomeCareerPathways
+ * HomeCareerPathways — 5 priority homepage pathways
  *
- * Featured program cards - server-rendered from static catalog with
- * live data overlay (funding availability, apprenticeship flag).
- * Falls back gracefully if DB is unavailable.
+ * Barber Apprenticeship → Host Shop → CDL → HVAC → Business
  */
 
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import { ALL_PROGRAMS } from '@/data/programs/catalog';
-import type { ProgramSchema } from '@/lib/programs/program-schema';
-import { loadVerifiedPublicStats } from '@/lib/site-stats-server';
-import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
-import { card, grid, layout } from '@/lib/page-design-tokens';
-import { getProgramPaymentPlan } from '@/lib/payments/payment-plan';
 
-// Featured programs shown on homepage - ordered by demand/visibility
-const FEATURED_SLUGS = [
-  'barber-apprenticeship',
-  'hvac-technician',
-  'medical-assistant',
-  'cdl-training',
-  'qma',
-];
+const PATHWAYS = [
+  {
+    slug: 'barber-apprenticeship',
+    label: 'Earn While You Learn',
+    title: 'Barber Apprenticeship',
+    description:
+      'Earn while you learn through a structured barber apprenticeship combining paid on-the-job learning, related technical instruction, competency tracking, and state-required training hours.',
+    bestFor: 'Future barbers seeking a work-based pathway',
+    image: '/images/pages/barber-hero-main.webp',
+    imageAlt: 'Barber apprenticeship — paid training at partner barbershops',
+    cta: 'Apply for Barber Apprenticeship',
+    ctaHref: '/programs/barber-apprenticeship',
+    badge: 'Earn While You Learn',
+    badgeColor: 'bg-brand-green-700',
+  },
+  {
+    slug: 'host-shop',
+    label: 'For Shop Owners',
+    title: 'Become a Host Shop',
+    description:
+      'Partner with Elevate to train barber, beauty, cosmetology, esthetics, or nail apprentices at your business. Elevate supports onboarding, hour tracking, competency documentation, and apprenticeship compliance.',
+    bestFor: 'Licensed shop owners and participating employers',
+    image: '/images/pages/shop-hero.webp',
+    imageAlt: 'Host shop partnership — train apprentices at your barbershop or salon',
+    cta: 'Become a Host Shop',
+    ctaHref: '/host-shop',
+    badge: 'For Shop Owners',
+    badgeColor: 'bg-purple-700',
+  },
+  {
+    slug: 'cdl-training',
+    label: 'High-Demand Career',
+    title: 'CDL Training',
+    description:
+      'Prepare for commercial driving opportunities through structured classroom preparation, permit support, safety instruction, and coordinated behind-the-wheel training.',
+    bestFor: 'Individuals pursuing transportation careers',
+    image: '/images/pages/cdl-hero.webp',
+    imageAlt: 'CDL training — commercial driving career preparation',
+    cta: 'Explore CDL Training',
+    ctaHref: '/programs/cdl-training',
+    badge: 'High-Demand Career',
+    badgeColor: 'bg-emerald-700',
+  },
+  {
+    slug: 'hvac-technician',
+    label: 'Skilled Trades',
+    title: 'HVAC Training',
+    description:
+      'Build foundational skills in heating, ventilation, air conditioning, refrigeration, workplace safety, tools, diagnostics, installation, and maintenance.',
+    bestFor: 'Individuals pursuing skilled-trades careers',
+    image: '/images/pages/hvac-technician.webp',
+    imageAlt: 'HVAC technician training — heating, ventilation, and air conditioning',
+    cta: 'Explore HVAC Training',
+    ctaHref: '/programs/hvac-technician',
+    badge: 'Skilled Trades',
+    badgeColor: 'bg-amber-700',
+  },
+  {
+    slug: 'business',
+    label: 'Start or Grow a Business',
+    title: 'Business Start-Up & Career Advancement',
+    description:
+      'Learn how to plan, launch, operate, and grow a business. Training may include business formation, budgeting, branding, marketing, digital tools, compliance, and workforce credentials.',
+    bestFor: 'Entrepreneurs, contractors, and career changers',
+    image: '/images/business/office-admin.webp',
+    imageAlt: 'Business training — entrepreneurship and career advancement',
+    cta: 'Explore Business Training',
+    ctaHref: '/programs/business',
+    badge: 'Start or Grow a Business',
+    badgeColor: 'bg-slate-700',
+  },
+] as const;
 
-const SECTOR_COLORS: Record<string, string> = {
-  healthcare: 'bg-blue-600',
-  'skilled-trades': 'bg-amber-700',
-  transportation: 'bg-emerald-700',
-  technology: 'bg-purple-600',
-  'personal-services': 'bg-pink-600',
-  business: 'bg-slate-600',
-};
-
-function PathwayCard({ prog, priority }: { prog: ProgramSchema; priority?: boolean }) {
-  const sectorColor = SECTOR_COLORS[prog.sector] ?? 'bg-slate-600';
-  const duration = prog.durationWeeks
-    ? prog.durationWeeks === 1
-      ? '1 week'
-      : `${prog.durationWeeks} weeks`
-    : null;
-  const salary = prog.laborMarket?.salaryRange ?? null;
-  const hasApprenticeship =
-    prog.slug === 'barber-apprenticeship' ||
-    prog.slug === 'cdl-training' ||
-    prog.slug === 'hvac-technician' ||
-    prog.slug === 'electrical' ||
-    prog.slug === 'welding' ||
-    prog.slug === 'culinary-apprenticeship';
-
-  // Safe Image Source - Prevents build crashes on null sources
-  const imageSrc = prog.heroImage || '/images/logo.png';
-  
-  // Compute payment plan for this program
-  const paymentPlan = getProgramPaymentPlan(prog.slug);
-  
+export function HomeCareerPathways() {
   return (
-    <article className="group flex flex-col rounded-2xl overflow-hidden bg-white border border-slate-200 hover:border-brand-red-300 hover:shadow-lg transition-all hover:-translate-y-0.5">
-      {/* Image */}
-      <div className={card.programImage}>
-        <Image
-          src={imageSrc}
-          alt={prog.heroImageAlt || prog.title}
-          fill
-          className={card.programImageFill}
-          sizes={IMAGE_SIZES.programCard}
-          loading={priority ? 'eager' : 'lazy'}
-          priority={priority}
-          placeholder="empty"
-        />
-        {/* Sector badge */}
-        <div className="absolute top-3 left-3">
-          <span
-            className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white ${sectorColor}`}
-          >
-            {prog.category}
-          </span>
-        </div>
-        {/* Funding badge */}
-        {prog.badge && (
-          <div className="absolute top-3 right-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-brand-green-700 text-white">
-              {prog.badge}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="flex flex-col flex-1 p-4 gap-2">
-        <h3 className="font-extrabold text-slate-900 text-sm leading-snug line-clamp-2">{prog.title}</h3>
-
-        {/* Meta row - text only, no icons */}
-        <div className="flex flex-col gap-0.5">
-          {duration && (
-            <span className="text-[11px] text-slate-500">{duration}</span>
-          )}
-          {salary && (
-            <span className="text-[11px] font-semibold text-brand-green-700">{salary}</span>
-          )}
-        </div>
-
-        {/* Credential + apprenticeship flags - text only */}
-        <div className="flex flex-wrap gap-1.5">
-          {prog.credentials?.slice(0, 1).map((c) => (
-            <span
-              key={c.name}
-              className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full truncate max-w-full"
-            >
-              {c.name}
-            </span>
-          ))}
-          {hasApprenticeship && (
-            <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
-              Apprenticeship
-            </span>
-          )}
-        </div>
-
-        {/* CTAs */}
-        <div className="flex flex-col gap-2 mt-auto pt-2">
-          {paymentPlan && (
-            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter flex justify-between items-center px-1">
-              <span>Payment Plan</span>
-              <span className="text-brand-red-600">Starting at ${paymentPlan.weeklyPayment}/week</span>
-            </div>
-          )}
-          <div className="flex gap-2">
-            <Link
-              href={prog.cta?.applyHref || `/apply?program=${prog.slug}`}
-              className="flex-1 text-center py-2.5 rounded-xl bg-brand-red-600 hover:bg-brand-red-700 text-white text-sm font-bold transition-colors"
-            >
-              Apply Free
-            </Link>
-            <Link
-              href={`/programs/${prog.slug}`}
-              className="flex-1 text-center py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition-colors"
-            >
-              Details
-            </Link>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-export async function HomeCareerPathways() {
-  const verified = await loadVerifiedPublicStats();
-  const featured = FEATURED_SLUGS.map((slug) =>
-    ALL_PROGRAMS.find((p) => p.slug === slug),
-  ).filter((p): p is ProgramSchema => Boolean(p));
-
-  return (
-    <section
-      className={`bg-white ${layout.sectionTight} px-4`}
-      aria-labelledby="career-pathways-heading"
-    >
+    <section className="bg-white py-16 px-4" aria-labelledby="featured-pathways-heading">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
+        {/* Heading */}
+        <div className="mb-8 text-center">
           <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-2">
-            Career Pathways
+            Featured Career Pathways
           </p>
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
-            <div>
-              <h2
-                id="career-pathways-heading"
-                className="text-2xl sm:text-3xl font-extrabold text-slate-900"
-              >
-                Pick a career. Start in weeks.
-              </h2>
-              <p className="text-slate-500 text-sm mt-2 max-w-lg">
-                Healthcare, skilled trades, CDL, technology, and more - each with a real
-                credential, funding options, and job placement support.
-              </p>
-            </div>
-            <Link
-              href="/programs"
-              className="inline-flex items-center gap-1.5 text-brand-red-600 hover:text-brand-red-700 text-sm font-bold transition-colors shrink-0"
-            >
-              View all {verified.programsDisplay} programs <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
+          <h2
+            id="featured-pathways-heading"
+            className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3"
+          >
+            Choose your pathway
+          </h2>
+          <p className="text-slate-500 text-sm max-w-xl mx-auto">
+            A training or apprenticeship pathway designed to lead to a credential,
+            employment, business ownership, or workforce advancement.
+          </p>
         </div>
 
-        <div className={grid.homePrograms}>
-          {featured.map((prog, index) => (
-            <PathwayCard key={prog.slug} prog={prog} priority={index === 0} />
+        {/* Pathway cards */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-8">
+          {PATHWAYS.map((p) => (
+            <article
+              key={p.slug}
+              className="group flex flex-col rounded-2xl overflow-hidden bg-white border border-slate-200 hover:border-brand-red-300 hover:shadow-lg transition-all hover:-translate-y-0.5"
+            >
+              {/* Image */}
+              <div className="relative h-36 overflow-hidden bg-slate-100">
+                <Image
+                  src={p.image}
+                  alt={p.imageAlt}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
+                  loading="lazy"
+                />
+                <div className="absolute top-3 left-3">
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white ${p.badgeColor}`}>
+                    {p.badge}
+                  </span>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="flex flex-col flex-1 p-4 gap-2">
+                <h3 className="font-extrabold text-slate-900 text-sm leading-snug">
+                  {p.title}
+                </h3>
+
+                <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-3 flex-1">
+                  {p.description}
+                </p>
+
+                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
+                  Best for: {p.bestFor}
+                </p>
+
+                <div className="mt-auto pt-2 flex flex-col gap-2">
+                  <Link
+                    href={p.ctaHref}
+                    className="w-full text-center py-2.5 rounded-xl bg-brand-red-600 hover:bg-brand-red-700 text-white text-sm font-bold transition-colors"
+                  >
+                    {p.cta}
+                  </Link>
+                  <Link
+                    href={p.ctaHref}
+                    className="w-full text-center py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-700 text-xs font-semibold transition-colors"
+                  >
+                    View Details <ArrowRight className="inline w-3 h-3 ml-1" />
+                  </Link>
+                </div>
+              </div>
+            </article>
           ))}
         </div>
 
-        {/* Sector quick-links */}
-        <div className="mt-8 flex flex-wrap gap-2 justify-center">
-          {[
-            { label: 'Healthcare', href: '/programs/healthcare' },
-            { label: 'Skilled Trades', href: '/programs/skilled-trades' },
-            { label: 'Transportation', href: '/programs/cdl-training' },
-            { label: 'Personal Services', href: '/programs/barber-apprenticeship' },
-          ].map((s) => (
-            <Link
-              key={s.label}
-              href={s.href}
-              className="text-xs font-semibold text-slate-600 hover:text-brand-red-600 bg-slate-100 hover:bg-brand-red-50 px-3 py-1.5 rounded-full transition-colors"
-            >
-              {s.label}
-            </Link>
-          ))}
+        {/* View All Programs */}
+        <div className="text-center">
+          <Link
+            href="/programs"
+            className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-3 rounded-xl transition-colors text-sm"
+          >
+            View All Programs <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     </section>

@@ -41,7 +41,7 @@ describe('resolveDefaultPreviewUrl', () => {
     process.env.NEXT_PUBLIC_ADMIN_URL = '';
     expect(
       resolveDefaultPreviewUrl({ requestHost: 'admin.elevateforhumanity.org' }),
-    ).toBe('/admin/dashboard');
+    ).toBe('https://admin.elevateforhumanity.org/admin/dashboard');
   });
 
   it('respects DEVSTUDIO_DEFAULT_PREVIEW_URL', () => {

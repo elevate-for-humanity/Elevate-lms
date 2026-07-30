@@ -3,6 +3,7 @@
  * Auth check is handled by middleware to avoid redirect loops.
  */
 import type { Metadata } from "next";
+import "./globals.css";
 import BuildVersionSync from '@/components/BuildVersionSync';
 import { LiveChatWidget } from '@/components/support/LiveChatWidget';
 import AdminHeader from '@/components/admin/AdminHeader';

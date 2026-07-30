@@ -1,7 +1,7 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, ArrowRight, CheckCircle, Loader2, AlertCircle, Sparkles, Save } from 'lucide-react';
@@ -29,7 +29,7 @@ const FUNDING_OPTIONS = [
   { value: 'other', label: 'Other / Unsure', desc: 'Let\'s explore options together' },
 ];
 
-export default function EnrollmentApplyPage() {
+function EnrollmentApplyForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialProgram = searchParams.get('program') || '';
@@ -475,5 +475,17 @@ export default function EnrollmentApplyPage() {
         </div>
       </div>
     </div>
+  );
+}
+// Wrap in Suspense so useSearchParams can access URL params during streaming
+export default function EnrollmentApplyPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    }>
+      <EnrollmentApplyForm />
+    </Suspense>
   );
 }

@@ -79,7 +79,7 @@ const handlePost: AuthHandler = async (req: NextRequest) => {
     return NextResponse.json({ error: 'Application ID is required' }, { status: 400 });
   }
 
-  let updates: Record<string, any> = { updated_at: new Date().toISOString() };
+  const updates: Record<string, any> = { updated_at: new Date().toISOString() };
 
   switch (action) {
     case 'approve':

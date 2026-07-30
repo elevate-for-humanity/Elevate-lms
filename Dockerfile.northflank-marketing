@@ -41,8 +41,10 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/marketing/package.json ./apps/marketing/package.json
 COPY packages ./packages
 
-RUN --mount=type=cache,id=pnpm-marketing,target=/pnpm/store \
-    pnpm install \
+# Note: --mount=type=cache is NOT used because Northflank's no_cache:true does
+# not invalidate BuildKit mount caches. The standard layer cache is properly
+# invalidated by no_cache:true and Dockerfile content changes.
+RUN pnpm install \
       --frozen-lockfile \
       --strict-peer-dependencies=false
 

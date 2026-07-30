@@ -24,15 +24,16 @@ const adminConfig = {
   ...(useStandaloneOutput ? { output: 'standalone' } : {}),
 
   // Deterministic build ID — never use Date.now(), Math.random(), or random UUID.
+  // Must match: admin-${GIT_SHA} format for Dockerfile verification
   generateBuildId: async () => {
     const sha = resolveCommitSha(process.env);
-    return sha === 'local-development' ? 'local-dev' : sha.slice(0, 7);
+    return sha === 'local-development' ? 'admin-local-dev' : `admin-${sha}`;
   },
 
   // Bake deterministic build identity into client bundles at build time.
   env: {
     NEXT_PUBLIC_GIT_SHA: resolveCommitSha(process.env),
-    NEXT_PUBLIC_BUILD_ID: `elevate-${resolveCommitSha(process.env)}`,
+    NEXT_PUBLIC_BUILD_ID: `admin-${resolveCommitSha(process.env)}`,
     NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
   },
 
@@ -104,16 +105,7 @@ const adminConfig = {
       { source: '/admin/copilot/:path*', destination: '/admin/studio', permanent: true },
       { source: '/admin/video-manager', destination: '/admin/studio', permanent: true },
       { source: '/admin/video-manager/:path*', destination: '/admin/studio', permanent: true },
-      { source: '/admin/course-builder', destination: '/admin/studio', permanent: true },
-      { source: '/admin/course-builder/assessments', destination: '/admin/studio', permanent: true },
-      { source: '/admin/course-builder/generate', destination: '/admin/studio', permanent: true },
-      { source: '/admin/course-builder/media', destination: '/admin/studio', permanent: true },
-      { source: '/admin/course-builder/templates', destination: '/admin/studio', permanent: true },
-      {
-        source: '/admin/course-builder/:courseId',
-        destination: '/admin/studio/:courseId',
-        permanent: true,
-      },
+      // course-builder redirects removed - page now exists at /admin/course-builder
       // document-center â†’ documents (canonical)
       {
         source: '/admin/document-center',

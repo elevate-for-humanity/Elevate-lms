@@ -160,16 +160,47 @@ RUN pnpm --filter @elevate/admin build
 # =============================================================================
 # VERIFICATION: Builder stage
 # =============================================================================
+ARG GIT_SHA
+
 RUN set -eux; \
     echo "=== ADMIN BUILD VERIFICATION ==="; \
-    test -d /workspace/apps/admin/.next/standalone && echo "✓ Standalone dir exists"; \
-    test -d /workspace/apps/admin/.next/static && echo "✓ Static dir exists"; \
-    test -f /workspace/apps/admin/.next/BUILD_ID && echo "✓ BUILD_ID exists"; \
-    test -f /workspace/apps/admin/.next/standalone/apps/admin/server.js && echo "✓ server.js at apps/admin/server.js"; \
-    echo "Expected BUILD_ID: ${GIT_SHA}"; \
-    echo "Actual BUILD_ID: $(cat /workspace/apps/admin/.next/BUILD_ID)"; \
-    test "$(cat /workspace/apps/admin/.next/BUILD_ID)" = "${GIT_SHA}" && echo "✓ BUILD_ID matches GIT_SHA" || (echo "ERROR: BUILD_ID mismatch!" && exit 1); \
-    echo "=== BUILD VERIFICATION COMPLETE ==="
+    \
+    echo "Checking required build output directories..."; \
+    test -d /workspace/apps/admin/.next/standalone; \
+    echo "✓ Standalone directory exists"; \
+    \
+    test -d /workspace/apps/admin/.next/static; \
+    echo "✓ Static directory exists"; \
+    \
+    echo "Checking BUILD_ID file..."; \
+    test -f /workspace/apps/admin/.next/BUILD_ID; \
+    echo "✓ BUILD_ID exists"; \
+    \
+    echo "Checking standalone Admin server..."; \
+    test -f /workspace/apps/admin/.next/standalone/apps/admin/server.js; \
+    echo "✓ server.js exists at apps/admin/server.js"; \
+    \
+    EXPECTED_BUILD_ID="admin-${GIT_SHA}"; \
+    ACTUAL_BUILD_ID="$(cat /workspace/apps/admin/.next/BUILD_ID)"; \
+    \
+    echo "GIT_SHA: ${GIT_SHA}"; \
+    echo "Expected BUILD_ID: ${EXPECTED_BUILD_ID}"; \
+    echo "Actual BUILD_ID: ${ACTUAL_BUILD_ID}"; \
+    \
+    test -n "${GIT_SHA}"; \
+    test "${GIT_SHA}" != "unknown"; \
+    echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; \
+    \
+    test "${ACTUAL_BUILD_ID}" = "${EXPECTED_BUILD_ID}" \
+      || { \
+        echo "ERROR: BUILD_ID mismatch"; \
+        echo "Expected: ${EXPECTED_BUILD_ID}"; \
+        echo "Actual: ${ACTUAL_BUILD_ID}"; \
+        exit 1; \
+      }; \
+    \
+    echo "✓ BUILD_ID matches GIT_SHA"; \
+    echo "=== ADMIN BUILD VERIFICATION COMPLETE ==="
 
 # =============================================================================
 # NATIVE MODULE VERIFICATION: Fail build if native modules unavailable

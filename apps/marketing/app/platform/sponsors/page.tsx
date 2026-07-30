@@ -29,7 +29,7 @@ export default async function SponsorLicensingPage() {
   const supabase = createPublicClient();
   
   // Fetch sponsor licensing info
-  const { data: licensing } = await db
+  const { data: licensing } = await supabase
     .from('pricing_plans')
     .select('*')
     .eq('type', 'sponsor');

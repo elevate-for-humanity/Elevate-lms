@@ -29,7 +29,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Run migrations
-        run: pnpm db:migrate
+        run: node scripts/db/runMigrations.js
         env:
           SUPABASE_MANAGEMENT_API_KEY: ${{ secrets.SUPABASE_MANAGEMENT_API_KEY }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}

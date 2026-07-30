@@ -2,6 +2,15 @@
 
 import { useState, useRef } from 'react';
 import Link from 'next/link';
+const ACCOMMODATION_TYPES = [
+  { title: 'Extended Time', desc: '1.5x or 2x time' },
+  { title: 'Screen Reader', desc: 'Assistive technology support' },
+  { title: 'Large Print', desc: 'Enlarged text materials' },
+  { title: 'Separate Room', desc: 'Private testing environment' },
+  { title: 'Frequent Breaks', desc: 'Additional rest periods' },
+  { title: 'Scribe', desc: 'Verbal response transcription' },
+];
+
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
 import { AlertTriangle, CheckCircle, ChevronRight, Mail, Phone, Upload, Loader2, FileCheck, Send } from 'lucide-react';
 

@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/server';
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -18,9 +18,7 @@ export const metadata: Metadata = {
 };
 
 export default async function WorkforceAnalyticsPage() {
-  const supabase = await createClient();
-
-  if (!supabase) {
+  if (!isSupabaseConfigured()) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -30,13 +28,21 @@ export default async function WorkforceAnalyticsPage() {
       </div>
     );
   }
-  
+
+  const supabase = await createClient();
+
   // Fetch analytics data
-  const { data: analytics } = await supabase
-    .from('workforce_analytics')
-    .select('*')
-    .order('date', { ascending: false })
-    .limit(30);
+  let analytics: unknown[] = [];
+  try {
+    const { data } = await supabase
+      .from('workforce_analytics')
+      .select('*')
+      .order('date', { ascending: false })
+      .limit(30);
+    analytics = data ?? [];
+  } catch {
+    analytics = [];
+  }
   return (
     <div className="min-h-screen bg-gray-50">
       <Breadcrumbs

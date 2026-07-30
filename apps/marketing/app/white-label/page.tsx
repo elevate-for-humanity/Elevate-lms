@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Check, Code, Users, Shield, Zap, Globe } from 'lucide-react';
 
@@ -14,9 +14,7 @@ export const metadata = {
 };
 
 export default async function WhiteLabelPage() {
-  const supabase = await createClient();
-
-  if (!supabase) {
+  if (!isSupabaseConfigured()) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
@@ -27,11 +25,19 @@ export default async function WhiteLabelPage() {
     );
   }
 
+  const supabase = await createClient();
+
   // Fetch white label info
-  const { data: whiteLabel } = await supabase
-    .from('pricing_plans')
-    .select('*')
-    .eq('type', 'white_label');
+  let whiteLabel: unknown[] = [];
+  try {
+    const { data } = await supabase
+      .from('pricing_plans')
+      .select('*')
+      .eq('type', 'white_label');
+    whiteLabel = data ?? [];
+  } catch {
+    whiteLabel = [];
+  }
   return (
     <div className="bg-white">
       {/* Hero Section */}

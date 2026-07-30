@@ -50,7 +50,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Install Playwright
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install chromium --with-deps
 
       - name: Build application
         run: pnpm run ci:build
@@ -86,7 +86,7 @@ jobs:
         run: npx wait-on http://127.0.0.1:3000 --timeout 120000
 
       - name: Run E2E enrollment tests
-        run: npx playwright test tests/e2e/full-enrollment-journey.spec.ts
+        run: pnpm exec playwright test tests/e2e/full-enrollment-journey.spec.ts --config playwright.config.ts
 
       - name: Upload test results
         if: failure()
@@ -112,7 +112,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Install Playwright
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install chromium --with-deps
 
       - name: Build application
         run: pnpm run ci:build
@@ -148,10 +148,10 @@ jobs:
         run: npx wait-on http://127.0.0.1:3000 --timeout 120000
 
       - name: Run accessibility tests
-        run: npx playwright test tests/e2e/accessibility.spec.ts
+        run: pnpm exec playwright test tests/e2e/accessibility.spec.ts --config playwright.config.ts
 
       - name: Homepage config leak smoke
-        run: npx playwright test tests/e2e/home-config-leaks.spec.ts
+        run: pnpm exec playwright test tests/e2e/home-config-leaks.spec.ts --config playwright.config.ts
 
       - name: Upload test results
         if: failure()

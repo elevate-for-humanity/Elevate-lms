@@ -124,7 +124,6 @@
     "passport-google-oauth20": "2.0.0",
     "pdf-parse": "^2.4.5",
     "pdfkit": "^0.18.0",
-    "playwright": "^1.57.0",
     "postgres": "^3.4.9",
     "qrcode": "1.5.4",
     "react": "19.2.7",
@@ -364,7 +363,10 @@
     "audit:git-egress": "node scripts/audit-and-fix-git-egress.mjs --fix-git",
     "build:marketing": "pnpm --filter @elevate/marketing build --no-lint",
     "audit:logger": "node scripts/audit-logger-errors.mjs",
-    "audit:casing": "node scripts/check-path-casing.mjs"
+    "audit:casing": "node scripts/check-path-casing.mjs",
+    "db:migrate": "node scripts/db/runMigrations.js",
+    "db:seed": "node scripts/db/runSeeds.js",
+    "db:check": "node scripts/db/checkDatabase.js"
   },
   "overrides": {
     "inflight": "npm:lru-cache@^10.0.0"

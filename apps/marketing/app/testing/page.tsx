@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 
 const PROVIDER_IMAGES: Record<string, string> = {
   esco: '/images/pages/hvac-unit.jpg',
-  nrf: '/images/pages/certifications-page-1.jpg',
+  nrf: '/images/pages/certifications-page-1.webp',
   certiport: '/images/pages/testing-page-1.jpg',
   nha: '/images/pages/medical-assistant.webp',
   workkeys: '/images/pages/career-services-page-1.webp',

@@ -112,12 +112,18 @@ async function main() {
   const existingArgs = await getExistingBuildArguments(projectId, serviceId);
   console.log('Existing buildArguments:', Object.keys(existingArgs));
 
+  // Service name from service ID (e.g. "elevate-admin" → "admin")
+  const serviceName = serviceId.replace(/^elevate-/, '');
+  const buildId = `${serviceName}-${currentSha}`;
+
   // Merge: keep existing args (Supabase, etc.) + add/update git args
   const mergedBuildArguments: Record<string, string> = {
     ...existingArgs,
     GITHUB_SHA: currentSha,
     GIT_SHA: currentSha,
     NEXT_PUBLIC_GIT_SHA: currentSha,
+    NEXT_PUBLIC_BUILD_ID: buildId,
+    NEXT_PUBLIC_SERVICE_NAME: serviceName,
     BUILD_TIMESTAMP: new Date().toISOString(),
     FALLBACK_COMMIT: currentSha,
   };
@@ -141,6 +147,8 @@ async function main() {
   console.log('=== TRIGGER BUILD END ===');
 
   // Trigger build from the current branch
+  // no_cache: true forces a fresh Docker layer rebuild — required when
+  // Dockerfile changes (pnpm version, native modules, build identity) are made.
   const build = await nfFetch<{
     id: string;
     branch?: string;
@@ -149,7 +157,7 @@ async function main() {
     concluded?: boolean;
   }>(projectApiPath(projectId, `/services/${serviceId}/build`), {
     method: 'POST',
-    body: JSON.stringify({ sha: currentSha }),
+    body: JSON.stringify({ sha: currentSha, no_cache: true }),
   });
   console.log(`Triggered build for ${serviceId}:`, build);
 

@@ -17,12 +17,21 @@ ARG BUILD_TIMESTAMP=unknown
 # =============================================================================
 FROM node:22-bookworm-slim AS base
 
-ENV NEXT_TELEMETRY_DISABLED=1
+
+ARG PNPM_VERSION=10.28.2
+
+
+ENV CI=true \
+    NEXT_TELEMETRY_DISABLED=1
+
+
+RUN corepack enable \
+    && corepack prepare "pnpm@${PNPM_VERSION}" --activate \
+    && pnpm --version \
+    && test "$(pnpm --version)" = "${PNPM_VERSION}"
+
 
 # Install native build toolchain + font/image processing libraries
-# Install pnpm@10.28.2 as a standalone binary (NOT via corepack or npm):
-# corepack shim issues cause pnpm 9 to be invoked instead of pnpm 10 in this
-# Docker environment. Using the standalone binary avoids all shim/resolution problems.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
@@ -36,49 +45,51 @@ RUN apt-get update \
         make \
         g++ \
         curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && curl -fsSL https://get.pnpm.io/pnpm.js \
-        -o /usr/local/bin/pnpm \
-    && chmod +x /usr/local/bin/pnpm \
-    && pnpm --version \
-    && (pnpm --version | grep -qE '^9\.' \
-        && echo "FATAL: pnpm 9.x is active" && exit 1 \
-        || echo "PASS: pnpm 10.x is active")
+    && rm -rf /var/lib/apt/lists/*
+
 
 WORKDIR /workspace
 
+
 # Cache invalidation marker — changes when Dockerfile content changes
-RUN echo "nf-cache-invalidate-admin-2026-07-30-pnpm-standalone"
+RUN echo "nf-cache-invalidate-admin-2026-07-30-corepack"
 
 # =============================================================================
 # STAGE 2: Dependencies
 # =============================================================================
 FROM base AS dependencies
 
+
 # Cache invalidation marker — must change to force rebuild with correct pnpm version
-RUN echo "nf-deps-2026-07-30-standalone-pnpm"
+RUN echo "nf-deps-2026-07-30-corepack"
+
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json ./apps/admin/package.json
 
+
 # Copy actual packages directory (preserves structure: db, shared, ui)
 COPY packages ./packages
+
 
 # Note: --mount=type=cache is NOT used here because Northflank's no_cache:true does
 # not invalidate BuildKit mount caches. Using the standard build cache which is
 # properly invalidated by no_cache:true and Dockerfile content changes.
-RUN pnpm install \
+RUN set -eux; \
+    echo "PATH=${PATH}"; \
+    type -a pnpm; \
+    command -v pnpm; \
+    readlink -f "$(command -v pnpm)" || true; \
+    pnpm --version; \
+    pnpm install --help | grep -E "frozen-lockfile|lockfile" || true; \
+    pnpm install \
       --frozen-lockfile \
-      --strict-peer-dependencies=false \
-      --include=optional
+      --strict-peer-dependencies=false
 
 # =============================================================================
 # STAGE 3: Builder
 # =============================================================================
 FROM base AS builder
-
-# pnpm@10.28.2 is already installed globally in the base stage via npm install -g.
-# No corepack activation needed — the global pnpm is already in PATH.
 
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
 ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org

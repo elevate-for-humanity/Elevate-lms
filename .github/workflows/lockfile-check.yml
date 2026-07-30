@@ -1,0 +1,27 @@
+name: Lockfile Integrity
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  verify-lockfile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Activate pnpm
+        run: corepack prepare pnpm@10.28.2 --activate
+
+      - name: Verify frozen lockfile
+        run: |
+          pnpm install \
+            --frozen-lockfile \
+            --strict-peer-dependencies=false

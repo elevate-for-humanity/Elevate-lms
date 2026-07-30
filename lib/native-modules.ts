@@ -9,7 +9,7 @@
 let sharpInstance: typeof import('sharp') | null = null;
 let canvasInstance: typeof import('@napi-rs/canvas') | null = null;
 let pdfkitInstance: typeof import('pdfkit') | null = null;
-let initializationError: string | null = null;
+let fontkitInstance: unknown = null;
 
 /**
  * Wrapper for operations that might cause segfaults
@@ -95,52 +95,64 @@ export async function withPDFKit<T>(
  */
 export async function initializeNativeModules(): Promise<{
   success: boolean;
-  error?: string;
+  errors: Record<string, string>;
   modules: {
     sharp: boolean;
     canvas: boolean;
     pdfkit: boolean;
+    fontkit: boolean;
   };
 }> {
-  const result = {
-    success: true,
-    modules: {
-      sharp: false,
-      canvas: false,
-      pdfkit: false,
-    },
+  const errors: Record<string, string> = {};
+  const modules = {
+    sharp: false,
+    canvas: false,
+    pdfkit: false,
+    fontkit: false,
   };
 
   // Try sharp
   try {
     sharpInstance = await import('sharp');
-    result.modules.sharp = true;
+    modules.sharp = true;
   } catch (e) {
-    console.warn('[NativeModules] sharp initialization failed:', e);
+    const msg = e instanceof Error ? e.message : String(e);
+    errors.sharp = msg;
+    console.warn('[NativeModules] sharp initialization failed:', msg);
   }
 
   // Try canvas
   try {
     canvasInstance = await import('@napi-rs/canvas');
-    result.modules.canvas = true;
+    modules.canvas = true;
   } catch (e) {
-    console.warn('[NativeModules] canvas initialization failed:', e);
+    const msg = e instanceof Error ? e.message : String(e);
+    errors.canvas = msg;
+    console.warn('[NativeModules] canvas initialization failed:', msg);
   }
 
   // Try pdfkit
   try {
     pdfkitInstance = await import('pdfkit');
-    result.modules.pdfkit = true;
+    modules.pdfkit = true;
   } catch (e) {
-    console.warn('[NativeModules] pdfkit initialization failed:', e);
+    const msg = e instanceof Error ? e.message : String(e);
+    errors.pdfkit = msg;
+    console.warn('[NativeModules] pdfkit initialization failed:', msg);
   }
 
-  if (!result.modules.sharp && !result.modules.canvas && !result.modules.pdfkit) {
-    result.success = false;
-    initializationError = 'All native modules failed to initialize';
+  // Try fontkit (required by pdfkit for font embedding)
+  try {
+    fontkitInstance = await import('fontkit');
+    modules.fontkit = true;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    errors.fontkit = msg;
+    console.warn('[NativeModules] fontkit initialization failed:', msg);
   }
 
-  return result;
+  const success = modules.sharp && modules.canvas && modules.pdfkit && modules.fontkit;
+  return { success, errors, modules };
 }
 
 /**
@@ -344,4 +356,26 @@ export function isNativeModuleAvailable(module: 'sharp' | 'canvas' | 'pdfkit'): 
     default:
       return false;
   }
+}
+
+// Admin health route: checkNativeModules
+export type NativeModuleName = 'sharp' | 'canvas' | 'fontkit' | 'pdfkit';
+export type NativeModuleResult = {
+  success: boolean;
+  modules: Record<NativeModuleName, boolean>;
+  errors: Partial<Record<NativeModuleName, string>>;
+};
+
+export async function checkNativeModules(): Promise<NativeModuleResult> {
+  const init = await initializeNativeModules();
+  return {
+    success: init.success,
+    modules: {
+      sharp: init.modules.sharp,
+      canvas: init.modules.canvas,
+      fontkit: init.modules.fontkit ?? false,
+      pdfkit: init.modules.pdfkit,
+    },
+    errors: init.errors as Partial<Record<NativeModuleName, string>>,
+  };
 }

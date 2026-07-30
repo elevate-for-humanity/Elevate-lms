@@ -157,6 +157,7 @@ const adminConfig = {
     '@opentelemetry/resources',
     '@opentelemetry/semantic-conventions',
     'sharp',
+    'fontkit',
     // edge-tts: transpilePackages only (conflicts if also listed here)
     // ws â€” custom server.js only
     'ws',

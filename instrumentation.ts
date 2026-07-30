@@ -8,9 +8,16 @@ export async function register() {
     const { initializeNativeModules } = await import('./lib/native-modules');
     try {
       const initResult = await initializeNativeModules();
-      console.info('[NativeModules] Initialization:', initResult);
-      if (!initResult.success) {
-        console.warn('[NativeModules] Some modules failed to initialize:', initResult.error);
+      if (initResult.success) {
+        console.info('[NativeModules] All modules loaded:', initResult.modules);
+      } else {
+        const failed = Object.entries(initResult.modules)
+          .filter(([, loaded]) => !loaded)
+          .map(([name]) => name);
+        console.warn('[NativeModules] Some modules failed to initialize:', {
+          failedModules: failed,
+          errors: initResult.errors ?? {},
+        });
       }
     } catch (err) {
       // Non-fatal - native modules may not be available in all environments

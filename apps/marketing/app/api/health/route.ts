@@ -14,9 +14,11 @@ export const revalidate = 0;
 export async function GET() {
   return NextResponse.json(
     {
+      service: 'marketing',
       status: 'healthy',
       ready: true,
-      service: process.env.SERVICE_NAME || 'marketing',
+      commit: process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? 'unknown',
+      builtAt: process.env.BUILD_TIMESTAMP ?? 'unknown',
       environment: process.env.NODE_ENV,
       uptime: Math.floor(process.uptime()),
       timestamp: new Date().toISOString(),

@@ -15,7 +15,8 @@ export async function GET() {
   return NextResponse.json(
     {
       ok: true,
-      service: process.env.SERVICE_NAME || 'admin',
+      service: 'admin',
+      commit: process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? 'unknown',
       uptime: Math.floor(process.uptime()),
       timestamp: new Date().toISOString(),
     },

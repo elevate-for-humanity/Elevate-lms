@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
       # Pre-auth registry check — runs before build, no secrets needed.
       # Fails if any public-write route inserts into a table not declared in
@@ -68,6 +68,14 @@ jobs:
       # Migration lint — runs before any other check, no secrets needed
       - name: Migration lint
         run: node scripts/lint-migrations.cjs
+
+      # Repository structure integrity — verifies required files, pnpm version, and admin native deps
+      - name: Repository integrity check
+        run: node scripts/verify-repository-integrity.cjs
+
+      # Admin native module check — verifies sharp, canvas, fontkit, pdfkit are loadable
+      - name: Admin native modules check
+        run: pnpm --filter @elevate/admin exec node ../scripts/check-native-modules.cjs
 
       - name: No AWS ECS deploy artifacts
         run: node scripts/verify-no-aws-deploy.mjs

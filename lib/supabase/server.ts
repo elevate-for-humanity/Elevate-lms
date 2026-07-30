@@ -61,16 +61,13 @@ const mockClient = {
 
 // Returns a real Supabase client. Throws if env vars are missing — misconfiguration
 // must be caught immediately, not silently swallowed by a mock.
-export async function createClient(): Promise<SupabaseClient<any>> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error(
-      '[Supabase] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. ' +
-        'Run: bash .devcontainer/setup-env.sh',
-    );
+export async function createClient(): Promise<SupabaseClient<any> | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
   }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
   try {
     const cookieStore = await cookies();

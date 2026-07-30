@@ -64,6 +64,9 @@ RUN --mount=type=cache,id=pnpm-admin,target=/pnpm/store \
 # =============================================================================
 FROM base AS builder
 
+# Activate pnpm 10.28.2 (base image has pnpm 9 which lacks --frozen-lockfile)
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
 ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
 ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org

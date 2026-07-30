@@ -75,7 +75,7 @@ jobs:
 
       # Admin native module check — verifies sharp, canvas, fontkit, pdfkit are loadable
       - name: Admin native modules check
-        run: pnpm --filter @elevate/admin exec node ../scripts/check-native-modules.cjs
+        run: pnpm --filter @elevate/admin exec node ../../scripts/check-native-modules.cjs
 
       - name: No AWS ECS deploy artifacts
         run: node scripts/verify-no-aws-deploy.mjs

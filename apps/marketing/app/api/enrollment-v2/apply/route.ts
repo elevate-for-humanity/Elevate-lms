@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy initialization — avoids build-time env access
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 function generateConfirmationNumber(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -16,12 +19,13 @@ function generateConfirmationNumber(): string {
 }
 
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     const body = await req.json();
     const {
       programSlug, programName, firstName, lastName, email, phone,
       dateOfBirth, addressLine1, addressCity, addressState, addressZip,
-      fundingSource, highSchoolDiploma, goals, howHeard,
+      fundingSource, goals, howHeard,
     } = body;
 
     if (!programSlug || !firstName || !lastName || !email) {
@@ -99,6 +103,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
   try {
     const { searchParams } = new URL(req.url);
     const applicationId = searchParams.get('id');

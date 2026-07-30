@@ -27,8 +27,7 @@ ENV CI=true \
 
 RUN corepack enable \
     && corepack prepare "pnpm@${PNPM_VERSION}" --activate \
-    && pnpm --version \
-    && test "$(pnpm --version)" = "${PNPM_VERSION}"
+    && test "$(corepack pnpm --version)" = "${PNPM_VERSION}"
 
 
 # Install native build toolchain + font/image processing libraries
@@ -77,12 +76,22 @@ COPY packages ./packages
 # properly invalidated by no_cache:true and Dockerfile content changes.
 RUN set -eux; \
     echo "PATH=${PATH}"; \
-    type -a pnpm; \
-    command -v pnpm; \
-    readlink -f "$(command -v pnpm)" || true; \
-    pnpm --version; \
-    pnpm install --help | grep -E "frozen-lockfile|lockfile" || true; \
-    pnpm install \
+    echo "Corepack version:"; \
+    corepack --version; \
+    echo "Available pnpm commands:"; \
+    type -a pnpm || true; \
+    echo "Resolved pnpm executable:"; \
+    PNPM_BIN="$(command -v pnpm)"; \
+    test -n "${PNPM_BIN}"; \
+    echo "${PNPM_BIN}"; \
+    readlink -f "${PNPM_BIN}" || true; \
+    echo "Active pnpm version:"; \
+    corepack pnpm --version; \
+    test "$(corepack pnpm --version)" = "10.28.2"; \
+    echo "Confirming install command supports frozen lockfiles:"; \
+    corepack pnpm install --help | grep -E -- 'frozen-lockfile|lockfile'; \
+    echo "Installing workspace dependencies:"; \
+    corepack pnpm install \
       --frozen-lockfile \
       --strict-peer-dependencies=false
 

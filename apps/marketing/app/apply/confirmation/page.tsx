@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { CheckCircle, Phone, Mail, ArrowRight, Hash } from 'lucide-react';
 import ConfirmationTracking from './ConfirmationTracking';
@@ -26,21 +26,24 @@ export default async function ConfirmationPage({
   const refNumber = params.ref ? decodeURIComponent(params.ref) : null;
   const programName = params.program ? decodeURIComponent(params.program) : null;
 
-  const supabase = await createClient();
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Service Unavailable</h1>
-          <p className="text-slate-600">Please try again later.</p>
-        </div>
-      </div>
-    );
+  // Only create Supabase client if configured — prevents build-time crashes
+  let supabaseAvailable = false;
+  try {
+    if (!isSupabaseConfigured()) {
+      supabaseAvailable = false;
+    } else {
+      const supabase = await createClient();
+      supabaseAvailable = !!supabase;
+      // Non-critical logging — don't block on failure
+      if (supabaseAvailable) {
+        try {
+          await supabase.from('page_views').insert({ page: 'application_confirmation' }).select();
+        } catch { /* non-critical */ }
+      }
+    }
+  } catch {
+    supabaseAvailable = false;
   }
-
-  // Log confirmation page visit
-  try { await supabase.from('page_views').insert({ page: 'application_confirmation' }).select(); } catch { /* non-critical */ }
   return (
     <>
       <ConfirmationTracking />

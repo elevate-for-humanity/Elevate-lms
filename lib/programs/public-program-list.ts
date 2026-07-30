@@ -11,6 +11,10 @@ export type PublicProgramListItem = {
   duration: string | null;
   credential: string | null;
   funding_eligible: boolean;
+  /** Tuition in dollars, e.g. 5000 for $5,000. null if no public price. */
+  tuition: number | null;
+  /** Short pricing label, e.g. "$5,000" or "Contact admissions". */
+  price_label: string | null;
 };
 
 export type PublicProgramListResult = {
@@ -52,6 +56,12 @@ const SECTOR_TO_CATEGORY: Record<ProgramSchema['sector'], string> = {
   business: 'business',
 };
 
+function getPriceLabel(tuition: number | null, fundingEligible: boolean): string | null {
+  if (tuition === null) return 'Contact admissions';
+  if (tuition === 0) return 'Free';
+  return `$${tuition.toLocaleString('en-US')}`;
+}
+
 function trimDescription(text: string | undefined | null): string | null {
   if (!text?.trim()) return null;
   let desc = text.trim();
@@ -89,6 +99,8 @@ function fromStaticCatalog(): PublicProgramListItem[] {
         program.fundingStatement?.toLowerCase().includes('wioa') ||
           program.fundingStatement?.toLowerCase().includes('funding'),
       ),
+      tuition: null,
+      price_label: 'Contact admissions',
     });
   }
 
@@ -105,7 +117,7 @@ export async function loadPublicProgramList(): Promise<PublicProgramListResult> 
     const { data } = await db
       .from('programs')
       .select(
-        'slug,title,short_description,description,category,duration,credential_type,credential_name,wioa_approved,funding_eligible,published,status',
+        'slug,title,short_description,description,category,duration,credential_type,credential_name,wioa_approved,funding_eligible,published,status,tuition,price',
       )
       .eq('is_active', true)
       .eq('published', true)
@@ -115,15 +127,21 @@ export async function loadPublicProgramList(): Promise<PublicProgramListResult> 
     if (data?.length) {
       const programs = data
         .filter((p) => !SUPPRESSED.has(p.slug))
-        .map((p) => ({
-          slug: p.slug,
-          title: p.title,
-          description: trimDescription(p.short_description || p.description),
-          category: p.category || 'other',
-          duration: p.duration ?? null,
-          credential: resolveCredentialLabel(p),
-          funding_eligible: Boolean(p.wioa_approved ?? p.funding_eligible),
-        }));
+        .map((p) => {
+          const rawTuition = p.tuition ?? p.price ?? null;
+          const tuition = rawTuition ? parseFloat(String(rawTuition)) : null;
+          return {
+            slug: p.slug,
+            title: p.title,
+            description: trimDescription(p.short_description || p.description),
+            category: p.category || 'other',
+            duration: p.duration ?? null,
+            credential: resolveCredentialLabel(p),
+            funding_eligible: Boolean(p.wioa_approved ?? p.funding_eligible),
+            tuition: tuition && !isNaN(tuition) ? tuition : null,
+            price_label: getPriceLabel(tuition, Boolean(p.wioa_approved ?? p.funding_eligible)),
+          };
+        });
 
       if (programs.length > 0) {
         return { programs, source: 'database' };

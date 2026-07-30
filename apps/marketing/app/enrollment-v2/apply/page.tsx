@@ -1,10 +1,13 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { ArrowLeft, ArrowRight, CheckCircle, Loader2, AlertCircle, Sparkles } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ArrowLeft, ArrowRight, CheckCircle, Loader2, AlertCircle, Sparkles, Save } from 'lucide-react';
+
+const AUTOSAVE_KEY = 'elevate:enrollment-v2:application:v1';
+const AUTOSAVE_DEBOUNCE_MS = 1500;
 
 const PROGRAMS = [
   { slug: 'medical-assistant', name: 'Medical Assistant' },
@@ -27,44 +30,83 @@ const FUNDING_OPTIONS = [
 ];
 
 export default function EnrollmentApplyPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const initialProgram = searchParams.get('program') || '';
 
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [confirmation, setConfirmation] = useState('');
   const [error, setError] = useState('');
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Load saved draft on mount
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(AUTOSAVE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Only restore if saved data is newer than 24 hours
+        if (parsed.savedAt && Date.now() - parsed.savedAt < 86400000) {
+          setFormData(prev => ({ ...prev, ...parsed.data }));
+          setLastSaved(new Date(parsed.savedAt).toLocaleTimeString());
+        }
+      }
+    } catch { /* ignore corrupt storage */ }
+  }, []);
 
   const [formData, setFormData] = useState({
     programSlug: initialProgram,
     programName: PROGRAMS.find(p => p.slug === initialProgram)?.name || '',
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    dateOfBirth: '',
-    addressLine1: '',
-    addressCity: '',
-    addressState: '',
-    addressZip: '',
-    fundingSource: '',
-    highSchoolDiploma: '',
-    workExperience: '',
-    criminalBackground: '',
-    goals: '',
-    howHeard: '',
+    firstName: '', lastName: '', email: '', phone: '',
+    dateOfBirth: '', addressLine1: '', addressCity: '',
+    addressState: '', addressZip: '',
+    preferredStartDate: '', educationLevel: '', employmentStatus: '',
+    fundingSource: '', goals: '', howHeard: '',
+    emergencyContactName: '', emergencyContactRelationship: '',
+    emergencyContactPhone: '', consentAcknowledged: false,
   });
 
-  const update = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (field === 'programSlug') {
-      const prog = PROGRAMS.find(p => p.slug === value);
-      setFormData(prev => ({ ...prev, programSlug: value, programName: prog?.name || '' }));
+  // Autosave with debounce — skips file/boolean fields
+  const scheduleAutosave = useCallback((data: typeof formData) => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      try {
+        const payload = { ...data };
+        // Never store files or consent in autosave
+        delete payload.consentAcknowledged;
+        sessionStorage.setItem(AUTOSAVE_KEY, JSON.stringify({ data: payload, savedAt: Date.now() }));
+        setLastSaved(new Date().toLocaleTimeString());
+      } catch { /* storage full — ignore */ }
+    }, AUTOSAVE_DEBOUNCE_MS);
+  }, []);
+
+  const update = (field: string, value: string | boolean) => {
+    setFormData(prev => {
+      const next = { ...prev, [field]: value };
+      if (field === 'programSlug') {
+        const prog = PROGRAMS.find(p => p.slug === value);
+        return { ...next, programName: prog?.name || '' };
+      }
+      return next;
+    });
+    if (field !== 'consentAcknowledged') {
+      scheduleAutosave(formData);
     }
   };
 
+  const clearDraft = () => {
+    sessionStorage.removeItem(AUTOSAVE_KEY);
+    setLastSaved(null);
+    setShowClearConfirm(false);
+  };
+
   const handleSubmit = async () => {
+    if (!formData.consentAcknowledged) {
+      setError('You must acknowledge the consent to submit your application.');
+      return;
+    }
     setSubmitting(true);
     setError('');
     try {
@@ -75,52 +117,16 @@ export default function EnrollmentApplyPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to submit');
-      setConfirmation(data.confirmation_number || data.application_id);
-      setSubmitted(true);
+      // Clear draft only on confirmed success
+      sessionStorage.removeItem(AUTOSAVE_KEY);
+      // Redirect to confirmation page
+      router.push(data.confirmationUrl || `/enrollment-v2/confirmation?confirmation=${data.referenceNumber}&program=${encodeURIComponent(formData.programName)}&firstName=${encodeURIComponent(formData.firstName)}`);
     } catch (err: any) {
       setError(err.message);
     } finally {
       setSubmitting(false);
     }
   };
-
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-        <div className="max-w-lg w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-8 h-8 text-green-600" />
-          </div>
-          <h1 className="text-3xl font-bold mb-4">Application Received!</h1>
-          <p className="text-slate-600 mb-2">Your application has been submitted successfully.</p>
-          {confirmation && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-              <p className="text-sm text-blue-600 mb-1">Confirmation Number</p>
-              <p className="text-2xl font-mono font-bold text-blue-700">{confirmation}</p>
-            </div>
-          )}
-          <div className="space-y-3 text-left bg-slate-50 rounded-xl p-4 mb-6">
-            <h3 className="font-bold">What happens next?</h3>
-            <div className="flex gap-3 text-sm">
-              <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">1</div>
-              <p className="text-slate-600">Paris AI will review your application and determine funding eligibility — same day.</p>
-            </div>
-            <div className="flex gap-3 text-sm">
-              <div className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">2</div>
-              <p className="text-slate-600">You&apos;ll receive an email with next steps — upload documents and sign your enrollment agreement.</p>
-            </div>
-            <div className="flex gap-3 text-sm">
-              <div className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">3</div>
-              <p className="text-slate-600">Once approved, access your student portal and start orientation.</p>
-            </div>
-          </div>
-          <Link href="/enrollment-v2/documents" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl transition-colors">
-            Upload Documents <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -134,9 +140,18 @@ export default function EnrollmentApplyPage() {
             <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
               <Sparkles className="w-4 h-4" />
             </div>
-            <h1 className="text-3xl font-bold">Apply — Enrollment V2</h1>
+            <h1 className="text-3xl font-bold">Student Application</h1>
           </div>
           <p className="text-slate-300">Powered by Paris AI. Takes about 5 minutes.</p>
+
+          {/* Autosave indicator */}
+          {lastSaved && (
+            <div className="flex items-center gap-2 mt-3 text-xs text-slate-400">
+              <Save className="w-3 h-3" />
+              Draft saved at {lastSaved}
+              <button onClick={() => setShowClearConfirm(true)} className="underline hover:text-white ml-2">Clear draft</button>
+            </div>
+          )}
 
           {/* Progress */}
           <div className="flex gap-2 mt-6">
@@ -144,7 +159,9 @@ export default function EnrollmentApplyPage() {
               <div key={s} className={`h-1.5 flex-1 rounded-full transition-colors ${s <= step ? 'bg-blue-500' : 'bg-slate-700'}`} />
             ))}
           </div>
-          <p className="text-sm text-slate-400 mt-2">Step {step} of 3 — {step === 1 ? 'Program & Funding' : step === 2 ? 'Personal Information' : 'Goals & Review'}</p>
+          <p className="text-sm text-slate-400 mt-2">
+            Step {step} of 3 — {step === 1 ? 'Program & Funding' : step === 2 ? 'Personal Information' : 'Goals & Review'}
+          </p>
         </div>
       </div>
 
@@ -283,15 +300,58 @@ export default function EnrollmentApplyPage() {
           {step === 3 && (
             <div className="space-y-5">
               <div>
-                <label className="block text-sm font-bold mb-1">What are your career goals?</label>
-                <textarea value={formData.goals} onChange={e => update('goals', e.target.value)} rows={4}
+                <label className="block text-sm font-bold mb-1">Preferred Start Date</label>
+                <input type="date" value={formData.preferredStartDate}
+                  onChange={e => update('preferredStartDate', e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                  min={new Date().toISOString().split('T')[0]} />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-1">Education Level</label>
+                <select value={formData.educationLevel}
+                  onChange={e => update('educationLevel', e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                  <option value="">Select highest level...</option>
+                  <option value="some_hs">Some High School</option>
+                  <option value="hs_diploma">High School Diploma</option>
+                  <option value="ged">GED</option>
+                  <option value="some_college">Some College</option>
+                  <option value="associate">Associate Degree</option>
+                  <option value="bachelor">Bachelor&apos;s Degree</option>
+                  <option value="master">Master&apos;s Degree or Higher</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-1">Employment Status</label>
+                <select value={formData.employmentStatus}
+                  onChange={e => update('employmentStatus', e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none">
+                  <option value="">Select...</option>
+                  <option value="employed_full">Employed Full-Time</option>
+                  <option value="employed_part">Employed Part-Time</option>
+                  <option value="unemployed">Unemployed</option>
+                  <option value="self_employed">Self-Employed</option>
+                  <option value="student">Student</option>
+                  <option value="retired">Retired</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold mb-1">What are your career goals? *</label>
+                <textarea value={formData.goals}
+                  onChange={e => update('goals', e.target.value)} rows={3}
                   className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none"
-                  placeholder="I want to become a licensed barber and eventually own my own shop..." />
+                  placeholder="I want to become a licensed barber and eventually own my own shop..."
+                  required />
               </div>
 
               <div>
                 <label className="block text-sm font-bold mb-1">How did you hear about Elevate?</label>
-                <select value={formData.howHeard} onChange={e => update('howHeard', e.target.value)}
+                <select value={formData.howHeard}
+                  onChange={e => update('howHeard', e.target.value)}
                   className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none">
                   <option value="">Select...</option>
                   <option value="google">Google Search</option>
@@ -304,6 +364,43 @@ export default function EnrollmentApplyPage() {
                 </select>
               </div>
 
+              {/* Emergency Contact */}
+              <div className="border-t border-slate-200 pt-5">
+                <h3 className="font-bold mb-3">Emergency Contact</h3>
+                <div className="space-y-4">
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold mb-1">Contact Name *</label>
+                      <input type="text" value={formData.emergencyContactName}
+                        onChange={e => update('emergencyContactName', e.target.value)}
+                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                        placeholder="Jane Doe" required />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold mb-1">Relationship *</label>
+                      <select value={formData.emergencyContactRelationship}
+                        onChange={e => update('emergencyContactRelationship', e.target.value)}
+                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none" required>
+                        <option value="">Select...</option>
+                        <option value="parent">Parent</option>
+                        <option value="spouse">Spouse</option>
+                        <option value="sibling">Sibling</option>
+                        <option value="friend">Friend</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold mb-1">Phone Number *</label>
+                    <input type="tel" value={formData.emergencyContactPhone}
+                      onChange={e => update('emergencyContactPhone', e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none"
+                      placeholder="(317) 555-0123" required />
+                  </div>
+                </div>
+              </div>
+
+              {/* Application Summary */}
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                 <h3 className="font-bold mb-2">Application Summary</h3>
                 <div className="grid grid-cols-2 gap-2 text-sm">
@@ -321,9 +418,36 @@ export default function EnrollmentApplyPage() {
                 </div>
               )}
 
-              <p className="text-xs text-slate-500">
-                By submitting, you agree to Elevate&apos;s Terms of Service and Privacy Policy. We&apos;ll send application updates to your email.
-              </p>
+              {/* Consent Acknowledgment */}
+              <label className="flex items-start gap-3 p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-blue-300">
+                <input type="checkbox"
+                  checked={formData.consentAcknowledged}
+                  onChange={e => update('consentAcknowledged', e.target.checked)}
+                  className="mt-1 w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                <div className="text-sm">
+                  <p className="font-bold">I acknowledge and agree *</p>
+                  <p className="text-slate-500 text-xs mt-1">
+                    By submitting, I agree to Elevate&apos;s <a href="/terms" className="underline">Terms of Service</a> and <a href="/privacy" className="underline">Privacy Policy</a>. I authorize Elevate to contact me about my application via phone, email, and SMS. I understand my application data will be used for admissions review and workforce reporting as required by law.
+                  </p>
+                </div>
+              </label>
+
+              {/* Clear Draft Confirmation */}
+              {showClearConfirm && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                  <p className="text-sm font-bold text-amber-800 mb-3">Clear your saved draft?</p>
+                  <div className="flex gap-2">
+                    <button onClick={clearDraft}
+                      className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-lg">
+                      Yes, Clear
+                    </button>
+                    <button onClick={() => setShowClearConfirm(false)}
+                      className="px-4 py-2 border border-amber-300 text-amber-800 text-sm font-bold rounded-lg hover:bg-amber-100">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

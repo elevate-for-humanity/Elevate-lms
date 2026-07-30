@@ -23,8 +23,8 @@ export default async function EnrollPage() {
     description: p.description,
     duration_weeks: p.duration ? parseInt(p.duration, 10) || null : null,
     is_free: p.funding_eligible,
-    price: null,
-    total_cost: null,
+    tuition: p.tuition ?? null,
+    price_label: p.price_label ?? 'Contact admissions',
     funding_eligible: p.funding_eligible,
   }));
 
@@ -82,32 +82,26 @@ export default async function EnrollPage() {
                       )}
                     </div>
                     <div className="flex-shrink-0 ml-4 text-right">
-                      {program.is_free === true ? (
+                      {program.price_label === 'Free' || program.price_label === '$0' ? (
                         <span className="inline-block px-3 py-1 bg-brand-green-100 text-brand-green-800 text-sm font-medium rounded-full">
-                          Free
+                          {program.price_label}
                         </span>
-                      ) : program.funding_eligible === true ? (
+                      ) : program.funding_eligible && program.tuition ? (
                         <div>
                           <span className="inline-block px-3 py-1 bg-brand-green-100 text-brand-green-800 text-sm font-medium rounded-full">
-                            Free with WIOA/WRG
+                            Free with funding
                           </span>
-                          {program.price || program.total_cost ? (
-                            <p className="text-xs text-slate-500 mt-1">
-                              or $
-                              {(
-                                (program.price || program.total_cost || 0) as number
-                              ).toLocaleString()}{' '}
-                              self-pay
-                            </p>
-                          ) : null}
+                          <p className="text-xs text-slate-500 mt-1">
+                            or {program.price_label} self-pay
+                          </p>
                         </div>
-                      ) : program.price || program.total_cost ? (
+                      ) : program.price_label ? (
                         <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                          ${((program.price || program.total_cost || 0) as number).toLocaleString()}
+                          {program.price_label}
                         </span>
                       ) : (
-                        <span className="inline-block px-3 py-1 bg-brand-green-100 text-brand-green-800 text-sm font-medium rounded-full">
-                          Free
+                        <span className="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-sm font-medium rounded-full">
+                          Contact admissions
                         </span>
                       )}
                     </div>

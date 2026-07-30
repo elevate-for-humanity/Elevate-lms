@@ -15,6 +15,9 @@ const PUBLIC_PATHS = [
   '/api/ping',
   '/auth/confirm',
   '/auth/reset-password',
+  '/admin/studio',
+  '/admin/dev-studio',
+  '/admin/install',
 ];
 
 export async function middleware(req: NextRequest) {

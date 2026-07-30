@@ -77,6 +77,13 @@ jobs:
       - name: Admin native modules check
         run: pnpm --filter @elevate/admin exec node ../../scripts/check-native-modules.cjs
 
+
+      # Deployment anti-drift gates — must pass before any build
+      - name: Next.js version parity check
+        run: pnpm run verify:next-parity
+
+      - name: Build identity configuration check
+        run: pnpm run verify:build-identity
       - name: No AWS ECS deploy artifacts
         run: node scripts/verify-no-aws-deploy.mjs
 

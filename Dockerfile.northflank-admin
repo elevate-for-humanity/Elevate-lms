@@ -8,8 +8,8 @@
 # 3. node_modules copied into runtime stage for native module access
 # 4. Native module health check in builder stage (fails build if modules unavailable)
 # 5. Standalone output used correctly (preserves directory structure)
+# 6. Deterministic build identity — GIT_SHA required, no defaults
 
-ARG GIT_SHA=unknown
 ARG BUILD_TIMESTAMP=unknown
 
 # =============================================================================
@@ -69,8 +69,19 @@ ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
 ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG GIT_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
+
+# GIT_SHA must be a real full SHA in production — no default allowed.
+# CI/CD MUST pass: --build-arg GIT_SHA=$(git rev-parse HEAD)
+ARG GIT_SHA
+ARG BUILD_TIMESTAMP
+
+# Strict SHA validation — fail immediately if unknown or all zeros.
+# Also reject if no ARG was passed (empty expansion).
+RUN echo "Validating GIT_SHA=${GIT_SHA}" && \
+    (test -n "${GIT_SHA}" || (echo "ERROR: GIT_SHA is required but not set" && exit 1)) && \
+    (test "${GIT_SHA}" != "unknown" || (echo "ERROR: GIT_SHA cannot be 'unknown'" && exit 1)) && \
+    (echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$' || (echo "ERROR: GIT_SHA must be 7-40 hex characters, got '${GIT_SHA}'" && exit 1)) && \
+    echo "GIT_SHA validated: ${GIT_SHA}"
 
 ENV NODE_ENV=production
 ENV CI=true
@@ -84,6 +95,9 @@ ENV NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}"
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}"
 
 ENV GIT_SHA="${GIT_SHA}"
+ENV GITHUB_SHA="${GIT_SHA}"
+ENV NEXT_PUBLIC_GIT_SHA="${GIT_SHA}"
+ENV NEXT_PUBLIC_BUILD_ID="elevate-${GIT_SHA}"
 ENV BUILD_TIMESTAMP="${BUILD_TIMESTAMP}"
 
 # Copy installed dependencies first
@@ -116,6 +130,9 @@ RUN set -eux; \
     test -d /workspace/apps/admin/.next/static && echo "✓ Static dir exists"; \
     test -f /workspace/apps/admin/.next/BUILD_ID && echo "✓ BUILD_ID exists"; \
     test -f /workspace/apps/admin/.next/standalone/apps/admin/server.js && echo "✓ server.js at apps/admin/server.js"; \
+    echo "Expected BUILD_ID: ${GIT_SHA}"; \
+    echo "Actual BUILD_ID: $(cat /workspace/apps/admin/.next/BUILD_ID)"; \
+    test "$(cat /workspace/apps/admin/.next/BUILD_ID)" = "${GIT_SHA}" && echo "✓ BUILD_ID matches GIT_SHA" || (echo "ERROR: BUILD_ID mismatch!" && exit 1); \
     echo "=== BUILD VERIFICATION COMPLETE ==="
 
 # =============================================================================
@@ -129,8 +146,8 @@ RUN pnpm --filter @elevate/admin exec node \
 # =============================================================================
 FROM node:22-bookworm-slim AS runner
 
-ARG GIT_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
+ARG GIT_SHA
+ARG BUILD_TIMESTAMP
 
 LABEL org.opencontainers.image.title="Elevate Admin"
 LABEL org.opencontainers.image.revision="${GIT_SHA}"
@@ -142,6 +159,9 @@ ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 ENV SERVICE_NAME=elevate-admin
 ENV GIT_SHA="${GIT_SHA}"
+ENV GITHUB_SHA="${GIT_SHA}"
+ENV NEXT_PUBLIC_GIT_SHA="${GIT_SHA}"
+ENV NEXT_PUBLIC_BUILD_ID="elevate-${GIT_SHA}"
 ENV BUILD_TIMESTAMP="${BUILD_TIMESTAMP}"
 
 WORKDIR /app

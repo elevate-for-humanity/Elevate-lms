@@ -18,6 +18,7 @@ export async function GET() {
       status: 'healthy',
       ready: true,
       commit: process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? 'unknown',
+      buildId: process.env.NEXT_PUBLIC_BUILD_ID ?? 'unknown',
       builtAt: process.env.BUILD_TIMESTAMP ?? 'unknown',
       environment: process.env.NODE_ENV,
       uptime: Math.floor(process.uptime()),

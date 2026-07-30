@@ -1,10 +1,25 @@
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { resolveCommitSha } from '../../scripts/build-identity.mjs';
 
 /** @type {import('next').NextConfig} */
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const nextConfig = {
   output: 'standalone',
+
+  // Deterministic build ID — never use Date.now(), Math.random(), or random UUID.
+  generateBuildId: async () => {
+    const sha = resolveCommitSha(process.env);
+    return sha === 'local-development' ? 'local-dev' : sha.slice(0, 7);
+  },
+
+  // Bake deterministic build identity into client bundles at build time.
+  env: {
+    NEXT_PUBLIC_GIT_SHA: resolveCommitSha(process.env),
+    NEXT_PUBLIC_BUILD_ID: `elevate-${resolveCommitSha(process.env)}`,
+    NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
+  },
+
   images: { unoptimized: true },
   typescript: {
     // Disable type checking during build — run separately via `pnpm --filter @elevate/lms exec tsc --noEmit`

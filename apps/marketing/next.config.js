@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveCommitSha } from '../../scripts/build-identity.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -8,6 +9,19 @@ const __dirname = path.dirname(__filename);
 const nextConfig = {
   output: 'standalone',
   outputFileTracingRoot: path.join(__dirname, '../..'),
+
+  // Deterministic build ID — never use Date.now(), Math.random(), or random UUID.
+  generateBuildId: async () => {
+    const sha = resolveCommitSha(process.env);
+    return sha === 'local-development' ? 'local-dev' : sha.slice(0, 7);
+  },
+
+  // Bake deterministic build identity into client bundles at build time.
+  env: {
+    NEXT_PUBLIC_GIT_SHA: resolveCommitSha(process.env),
+    NEXT_PUBLIC_BUILD_ID: `elevate-${resolveCommitSha(process.env)}`,
+    NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
+  },
   images: { unoptimized: true },
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },

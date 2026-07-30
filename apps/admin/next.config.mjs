@@ -12,6 +12,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { sharedStandaloneTraceExcludes } from '../../scripts/next-standalone-trace-excludes.mjs';
+import { resolveCommitSha } from '../../scripts/build-identity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -21,6 +22,19 @@ const useStandaloneOutput =
 /** @type {import('next').NextConfig} */
 const adminConfig = {
   ...(useStandaloneOutput ? { output: 'standalone' } : {}),
+
+  // Deterministic build ID — never use Date.now(), Math.random(), or random UUID.
+  generateBuildId: async () => {
+    const sha = resolveCommitSha(process.env);
+    return sha === 'local-development' ? 'local-dev' : sha.slice(0, 7);
+  },
+
+  // Bake deterministic build identity into client bundles at build time.
+  env: {
+    NEXT_PUBLIC_GIT_SHA: resolveCommitSha(process.env),
+    NEXT_PUBLIC_BUILD_ID: `elevate-${resolveCommitSha(process.env)}`,
+    NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
+  },
 
   typescript: { 
     // TODO: Set to false after fixing all TypeScript errors in apps/admin

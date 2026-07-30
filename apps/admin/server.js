@@ -411,7 +411,17 @@ process.on('unhandledRejection', (reason) => {
 // Expose metrics for health checks
 process.rejectionMetrics = rejectionMetrics;
 
-log.serverStart(host, port, { startup: 'initiated' });
+// Log deterministic build identity at startup
+const deploymentIdentity = {
+  service: 'admin',
+  commitSha: process.env.GIT_SHA ?? 'unknown',
+  buildId: process.env.NEXT_PUBLIC_BUILD_ID ?? 'unknown',
+  builtAt: process.env.BUILD_TIMESTAMP ?? 'unknown',
+  nodeEnv: process.env.NODE_ENV ?? 'unknown',
+};
+console.info('[deployment]', JSON.stringify(deploymentIdentity));
+
+log.serverStart(host, port, { startup: 'initiated', ...deploymentIdentity });
 
 const startTime = Date.now();
 

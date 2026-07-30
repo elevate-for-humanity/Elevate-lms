@@ -5,6 +5,7 @@ import {
   lmsOnlyStandaloneTraceExcludes,
   sharedStandaloneTraceExcludes,
 } from './scripts/next-standalone-trace-excludes.mjs';
+import { resolveCommitSha } from './scripts/build-identity.mjs';
 
 const useStandaloneOutput =
   process.env.GITHUB_ACTIONS !== 'true' || process.env.NEXT_STANDALONE_OUTPUT === '1';
@@ -82,18 +83,23 @@ const nextConfig = {
   },
 
   generateBuildId: async () => {
-    // Priority: explicit env vars > git commit > timestamp fallback
-    if (process.env.COMMIT_REF) return process.env.COMMIT_REF.slice(0, 7);
-    if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 7);
-    try {
-      const { execSync } = await import('child_process');
-      return execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim().slice(0, 7);
-    } catch {
-      // CRITICAL: Always return a unique timestamp-based ID to ensure cache busting works
-      // 'dev' causes permanent cache issues because version check never detects changes
-      return `build-${Date.now()}`;
-    }
+    // Deterministic build ID: always derived from the canonical commit SHA.
+    // Uses GIT_SHA > GITHUB_SHA > NEXT_PUBLIC_GIT_SHA > COMMIT_SHA.
+    // Falls back to 'local-dev' only in non-production environments.
+    // NEVER uses Date.now(), Math.random(), or random UUID.
+    const sha = resolveCommitSha(process.env);
+    return sha === 'local-development' ? 'local-dev' : sha.slice(0, 7);
   },
+
+  // Expose deterministic build identity to client bundles.
+  // These are baked into .next/BUILD_ID at build time (not runtime env).
+  env: {
+    NEXT_PUBLIC_GIT_SHA: resolveCommitSha(process.env),
+    NEXT_PUBLIC_BUILD_ID: `elevate-${resolveCommitSha(process.env)}`,
+    NEXT_PUBLIC_BUILD_TIMESTAMP:
+      process.env.BUILD_TIMESTAMP ?? 'unknown',
+  },
+
   ...(useStandaloneOutput ? { output: 'standalone' } : {}),
   transpilePackages: ['edge-tts'],
 

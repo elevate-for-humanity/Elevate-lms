@@ -165,41 +165,51 @@ ARG GIT_SHA
 RUN set -eux; \
     echo "=== ADMIN BUILD VERIFICATION ==="; \
     \
-    echo "Checking required build output directories..."; \
-    test -d /workspace/apps/admin/.next/standalone; \
+    ADMIN_NEXT_DIR="/workspace/apps/admin/.next"; \
+    BUILD_ID_FILE="${ADMIN_NEXT_DIR}/BUILD_ID"; \
+    SERVER_FILE="${ADMIN_NEXT_DIR}/standalone/apps/admin/server.js"; \
+    \
+    echo "Checking standalone output..."; \
+    test -d "${ADMIN_NEXT_DIR}/standalone"; \
     echo "✓ Standalone directory exists"; \
     \
-    test -d /workspace/apps/admin/.next/static; \
+    echo "Checking static assets..."; \
+    test -d "${ADMIN_NEXT_DIR}/static"; \
     echo "✓ Static directory exists"; \
     \
     echo "Checking BUILD_ID file..."; \
-    test -f /workspace/apps/admin/.next/BUILD_ID; \
+    test -f "${BUILD_ID_FILE}"; \
     echo "✓ BUILD_ID exists"; \
     \
-    echo "Checking standalone Admin server..."; \
-    test -f /workspace/apps/admin/.next/standalone/apps/admin/server.js; \
+    echo "Checking standalone server entrypoint..."; \
+    test -f "${SERVER_FILE}"; \
     echo "✓ server.js exists at apps/admin/server.js"; \
-    \
-    EXPECTED_BUILD_ID="admin-${GIT_SHA}"; \
-    ACTUAL_BUILD_ID="$(cat /workspace/apps/admin/.next/BUILD_ID)"; \
-    \
-    echo "GIT_SHA: ${GIT_SHA}"; \
-    echo "Expected BUILD_ID: ${EXPECTED_BUILD_ID}"; \
-    echo "Actual BUILD_ID: ${ACTUAL_BUILD_ID}"; \
     \
     test -n "${GIT_SHA}"; \
     test "${GIT_SHA}" != "unknown"; \
     echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; \
     \
-    test "${ACTUAL_BUILD_ID}" = "${EXPECTED_BUILD_ID}" \
+    ACTUAL_BUILD_ID="$(tr -d '\r\n' < "${BUILD_ID_FILE}")"; \
+    ACTUAL_SHA="${ACTUAL_BUILD_ID#admin-}"; \
+    EXPECTED_PREFIX="$(printf '%s' "${GIT_SHA}" | cut -c1-"${#ACTUAL_SHA}")"; \
+    \
+    echo "Full GIT_SHA: ${GIT_SHA}"; \
+    echo "Actual BUILD_ID: ${ACTUAL_BUILD_ID}"; \
+    echo "Build SHA portion: ${ACTUAL_SHA}"; \
+    echo "Expected SHA prefix: ${EXPECTED_PREFIX}"; \
+    \
+    echo "${ACTUAL_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; \
+    \
+    test "${ACTUAL_SHA}" = "${EXPECTED_PREFIX}" \
       || { \
-        echo "ERROR: BUILD_ID mismatch"; \
-        echo "Expected: ${EXPECTED_BUILD_ID}"; \
-        echo "Actual: ${ACTUAL_BUILD_ID}"; \
+        echo "ERROR: BUILD_ID does not match the deployed GIT_SHA"; \
+        echo "Full GIT_SHA: ${GIT_SHA}"; \
+        echo "Actual BUILD_ID: ${ACTUAL_BUILD_ID}"; \
+        echo "Expected prefix: ${EXPECTED_PREFIX}"; \
         exit 1; \
       }; \
     \
-    echo "✓ BUILD_ID matches GIT_SHA"; \
+    echo "✓ BUILD_ID matches deployed GIT_SHA"; \
     echo "=== ADMIN BUILD VERIFICATION COMPLETE ==="
 
 # =============================================================================

@@ -60,8 +60,10 @@ COPY apps/admin/package.json ./apps/admin/package.json
 # Copy actual packages directory (preserves structure: db, shared, ui)
 COPY packages ./packages
 
-RUN --mount=type=cache,id=pnpm-admin,target=/pnpm/store \
-    pnpm install \
+# Note: --mount=type=cache is NOT used here because Northflank's no_cache:true does
+# not invalidate BuildKit mount caches. Using the standard build cache which is
+# properly invalidated by no_cache:true and Dockerfile content changes.
+RUN pnpm install \
       --frozen-lockfile \
       --strict-peer-dependencies=false \
       --include=optional

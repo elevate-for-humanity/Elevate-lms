@@ -10,25 +10,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-192-maskable.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/icon-512.png",
+      "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512-maskable.png",
+      "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -36,21 +24,6 @@
   ],
   "categories": [
     "productivity"
-  ],
-  "screenshots": [
-    {
-      "src": "/images/pages/comp-home-highlight-health.jpg",
-      "sizes": "540x720",
-      "type": "image/jpeg",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "/screenshots/home-wide.jpg",
-      "sizes": "1920x1080",
-      "type": "image/jpeg",
-      "form_factor": "wide",
-      "label": "Admin dashboard"
-    }
   ],
   "shortcuts": [
     {

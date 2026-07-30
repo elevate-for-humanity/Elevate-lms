@@ -17,8 +17,8 @@ ENV PATH="/usr/local/bin:${PATH}"
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Install native build toolchain + pnpm@10
-# Using npm install -g instead of corepack because corepack's prepare/activate
-# does not reliably create working shims in Docker build environments.
+# CRITICAL: corepack disable MUST come first. corepack creates a shim at /usr/local/bin/pnpm
+# that runs pnpm 9 from ~/.config/corepack, intercepting all pnpm calls.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
@@ -26,6 +26,7 @@ RUN apt-get update \
         make \
         g++ \
     && rm -rf /var/lib/apt/lists/* \
+    && corepack disable \
     && npm install -g pnpm@10.28.2 \
     && echo "Installed pnpm version:" && pnpm --version
 

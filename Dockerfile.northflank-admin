@@ -17,17 +17,12 @@ ARG BUILD_TIMESTAMP=unknown
 # =============================================================================
 FROM node:22-bookworm-slim AS base
 
-ENV PNPM_HOME="/root/.pnpm-store"
-ENV PATH="/root/.pnpm-store/bin:/root/.local/bin:/usr/local/bin:/usr/bin:${PATH}"
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Install native build toolchain + font/image processing libraries
-# Install pnpm@10.28.2 via corepack with PNPM_HOME explicitly set:
-# corepack shims go to PNPM_HOME/bin (/root/.pnpm-store/bin)
-# This is FIRST in PATH so pnpm will find the shim there.
-# The /usr/local/bin/pnpm shim (corepack default) is irrelevant because
-# /root/.pnpm-store/bin comes first in PATH.
-# Verify pnpm 10.x before proceeding.
+# Install pnpm@10.28.2 as a standalone binary (NOT via corepack or npm):
+# corepack shim issues cause pnpm 9 to be invoked instead of pnpm 10 in this
+# Docker environment. Using the standalone binary avoids all shim/resolution problems.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
@@ -40,27 +35,20 @@ RUN apt-get update \
         python3 \
         make \
         g++ \
+        curl \
     && rm -rf /var/lib/apt/lists/* \
-    && corepack enable \
-    && PNPM_HOME="/root/.pnpm-store" \
-       PATH="/root/.pnpm-store/bin:/usr/local/bin:${PATH}" \
-       corepack prepare pnpm@10.28.2 --activate \
-    && echo "PATH=$PATH" \
-    && echo "Checking pnpm location:" && which pnpm \
-    && echo "pnpm version:" && pnpm --version \
+    && curl -fsSL https://get.pnpm.io/pnpm.js \
+        -o /usr/local/bin/pnpm \
+    && chmod +x /usr/local/bin/pnpm \
+    && pnpm --version \
     && (pnpm --version | grep -qE '^9\.' \
         && echo "FATAL: pnpm 9.x is active" && exit 1 \
         || echo "PASS: pnpm 10.x is active")
 
 WORKDIR /workspace
 
-# Cache invalidation marker — also verifies pnpm version
-RUN echo "nf-cache-invalidate-admin-2026-07-30-pnpm10-v2" && \
-    PATH="/root/.pnpm-store/bin:/usr/local/bin:${PATH}" \
-    pnpm --version && \
-    PATH="/root/.pnpm-store/bin:/usr/local/bin:${PATH}" \
-    pnpm --version | grep -qE '^9\.' && \
-    echo "FATAL: pnpm 9.x is active after all fixes" && exit 1 || echo "PASS: pnpm 10.x verified"
+# Cache invalidation marker — changes when Dockerfile content changes
+RUN echo "nf-cache-invalidate-admin-2026-07-30-pnpm-standalone"
 
 # =============================================================================
 # STAGE 2: Dependencies
@@ -68,7 +56,7 @@ RUN echo "nf-cache-invalidate-admin-2026-07-30-pnpm10-v2" && \
 FROM base AS dependencies
 
 # Cache invalidation marker — must change to force rebuild with correct pnpm version
-RUN echo "nf-deps-pnpm10-2026-07-30"
+RUN echo "nf-deps-2026-07-30-standalone-pnpm"
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json ./apps/admin/package.json

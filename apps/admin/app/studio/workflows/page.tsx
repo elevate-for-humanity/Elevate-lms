@@ -4,6 +4,6 @@ import WorkflowsClient from './WorkflowsClient';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Workflows | Dev Studio' };
 
-export default function WorkflowsPage() {
+export default async function WorkflowsPage() {
   return <WorkflowsClient />;
 }

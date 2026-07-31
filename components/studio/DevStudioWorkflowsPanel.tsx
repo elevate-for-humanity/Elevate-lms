@@ -39,8 +39,8 @@ export default function DevStudioWorkflowsPanel() {
     setError(null);
     try {
       const [wfRes, runsRes] = await Promise.all([
-        fetch('/api/admin/workflows'),
-        fetch('/api/admin/workflows/runs?limit=15'),
+        fetch('/api/admin/studio/workflows'),
+        fetch('/api/admin/studio/workflows'),
       ]);
       const wfData = await wfRes.json().catch(() => ({}));
       const runsData = await runsRes.json().catch(() => ({}));
@@ -62,7 +62,7 @@ export default function DevStudioWorkflowsPanel() {
     setRunningId(id);
     setError(null);
     try {
-      const res = await fetch('/api/admin/workflows/run', {
+      const res = await fetch('/api/admin/studio/workflows', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ workflow_id: id }),
@@ -95,7 +95,7 @@ export default function DevStudioWorkflowsPanel() {
             Refresh
           </button>
           <Link
-            href="/admin/workflows"
+            href="/admin/studio/workflows"
             className="inline-flex items-center gap-1 rounded-lg bg-brand-blue-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-brand-blue-700"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -126,7 +126,7 @@ export default function DevStudioWorkflowsPanel() {
           {workflows.length === 0 && !loading ? (
             <p className="text-sm text-slate-500">
               No workflows yet.{' '}
-              <Link href="/admin/workflows" className="text-brand-blue-600 underline">
+              <Link href="/admin/studio/workflows" className="text-brand-blue-600 underline">
                 Create one
               </Link>
             </p>
@@ -158,8 +158,7 @@ export default function DevStudioWorkflowsPanel() {
                       Run
                     </button>
                     <Link
-                      href={`/admin/workflows/${wf.id}`}
-                      className="text-xs text-brand-blue-600 hover:underline"
+                      href={`/admin/studio/workflows                      className="text-xs text-brand-blue-600 hover:underline"
                     >
                       Edit
                     </Link>
@@ -187,7 +186,7 @@ export default function DevStudioWorkflowsPanel() {
             </ul>
           )}
           <Link
-            href="/admin/workflows"
+            href="/admin/studio/workflows"
             className="mt-2 inline-flex items-center gap-1 text-xs text-brand-blue-600 hover:underline"
           >
             Open workflow builder

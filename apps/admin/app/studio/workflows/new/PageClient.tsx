@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { GitBranch, Save, Loader2, Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import Image from 'next/image';
+import { GitBranch, Save, Loader2, Plus, Trash2, ChevronDown, ChevronUp, ArrowLeft, Workflow } from 'lucide-react';
 
 // ─── Trigger options ──────────────────────────────────────────────────────────
 
@@ -336,7 +336,7 @@ export default function NewWorkflowPage() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error((await res.json()).error || 'Failed to save');
-      router.push('/admin/workflows');
+      router.push('/admin/studio/workflows');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Unknown error');
       setSaving(false);
@@ -344,20 +344,37 @@ export default function NewWorkflowPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10">
-      <Breadcrumbs
-        items={[
-          { label: 'Admin', href: '/dashboard' },
-          { label: 'Workflows', href: '/admin/workflows' },
-          { label: 'New Workflow' },
-        ]}
-      />
-      <div className="flex items-center gap-3 mt-6 mb-8">
-        <GitBranch className="w-7 h-7 text-slate-600" />
-        <h1 className="text-2xl font-bold text-slate-900">New Workflow</h1>
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-50">
+      {/* Hero */}
+      <div className="relative h-[220px] w-full overflow-hidden">
+        <Image src="/images/pages/admin-grants-workflow-detail.webp" alt="New Workflow" fill className="object-cover" priority sizes="100vw" />
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/80 to-violet-900/60" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="max-w-4xl mx-auto px-6 w-full">
+            <div className="flex items-center gap-3 mb-2">
+              <Link href="/admin/studio/workflows" className="inline-flex items-center gap-1 text-xs text-indigo-200 hover:text-white transition-colors">
+                <ArrowLeft className="w-3.5 h-3.5" /> Workflows
+              </Link>
+            </div>
+            <div className="flex items-center gap-3 mb-1">
+              <Workflow className="h-7 w-7 text-white/90" />
+              <span className="text-xs font-semibold tracking-widest uppercase bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-white">
+                Automation
+              </span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
+              New Workflow
+            </h1>
+            <p className="text-indigo-100 text-base mt-1">
+              Build multi-step automation workflows with triggers and actions.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Form */}
+      <div className="max-w-3xl mx-auto px-6 py-8">
+        <form onSubmit={handleSubmit} className="space-y-5">
         {error && (
           <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-3">
             {error}
@@ -514,13 +531,15 @@ export default function NewWorkflowPage() {
             {saving ? 'Saving…' : 'Create Workflow'}
           </button>
           <Link
-            href="/admin/workflows"
+            href="/admin/studio/workflows"
             className="px-5 py-2.5 text-sm text-slate-600 hover:text-slate-900 font-medium"
           >
             Cancel
           </Link>
         </div>
       </form>
+      </div>
+      </div>
     </div>
   );
 }

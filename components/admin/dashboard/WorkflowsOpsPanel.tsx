@@ -22,7 +22,7 @@ export function WorkflowsOpsPanel() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/workflows');
+      const res = await fetch('/api/admin/studio/workflows');
       const data = await res.json().catch(() => ({}));
       const rows = Array.isArray(data?.workflows) ? data.workflows : Array.isArray(data?.data) ? data.data : [];
       setWorkflows(rows);
@@ -41,7 +41,7 @@ export function WorkflowsOpsPanel() {
     setRunningId(workflowId);
     setMessage(null);
     try {
-      const res = await fetch('/api/admin/workflows/run', {
+      const res = await fetch('/api/admin/studio/workflows', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ workflow_id: workflowId }),
@@ -76,7 +76,7 @@ export function WorkflowsOpsPanel() {
             Refresh
           </button>
           <Link
-            href="/admin/workflows"
+            href="/admin/studio/workflows"
             className="inline-flex h-8 items-center gap-1 rounded bg-[#0078d4] px-2 text-[11px] font-semibold text-white"
           >
             Full editor
@@ -117,8 +117,7 @@ export function WorkflowsOpsPanel() {
                   Run
                 </button>
                 <Link
-                  href={`/admin/workflows/${w.id}`}
-                  className="text-[10px] font-semibold text-[#4ec9b0] hover:underline"
+                  href={`/admin/studio/workflows                  className="text-[10px] font-semibold text-[#4ec9b0] hover:underline"
                 >
                   Edit
                 </Link>

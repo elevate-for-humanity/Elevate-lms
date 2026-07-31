@@ -141,7 +141,7 @@ export default async function OperationsPage() {
   const quickLinks = [
     { label: 'Mission Control', href: '/admin/mission-control' },
     { label: 'System Health', href: '/admin/system-health' },
-    { label: 'Workflows', href: '/admin/workflows' },
+    { label: 'Workflows', href: '/admin/studio/workflows' },
     { label: 'Automation log', href: '/admin/automation' },
     { label: 'Monitoring', href: '/admin/monitoring' },
   ];
@@ -279,7 +279,7 @@ export default async function OperationsPage() {
             <h2 className="text-sm font-semibold text-slate-900">Workflow dead letters</h2>
             <span className="ml-auto text-xs text-slate-500">{dlTotalCount} total</span>
             <Link
-              href="/admin/workflows"
+              href="/admin/studio/workflows"
               className="ml-2 flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:underline"
             >
               Workflows <ArrowRight className="h-3 w-3" />
@@ -304,8 +304,7 @@ export default async function OperationsPage() {
                     </span>
                     {r.workflow_id ? (
                       <Link
-                        href={`/admin/workflows/${r.workflow_id}`}
-                        className="ml-auto flex items-center gap-1 text-xs font-semibold text-amber-700 hover:underline"
+                        href={`/admin/studio/workflows                        className="ml-auto flex items-center gap-1 text-xs font-semibold text-amber-700 hover:underline"
                       >
                         <RotateCcw className="h-3 w-3" /> Open workflow
                       </Link>

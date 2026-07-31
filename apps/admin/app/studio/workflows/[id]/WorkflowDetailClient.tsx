@@ -1,10 +1,13 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import {
   Zap, Play, Plus, CheckCircle, XCircle, Clock,
   RefreshCw, Trash2, ChevronDown, ChevronUp, AlertTriangle,
+  ArrowLeft, Workflow,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -207,19 +210,79 @@ export default function WorkflowDetailClient({
   }
 
   return (
-    <div className="space-y-6 mt-4">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900">{workflow.name}</h1>
-            <span className={`px-2 py-0.5 rounded text-sm font-medium ${STATUS_BADGE[status] ?? 'bg-slate-100 text-slate-600'}`}>{status}</span>
+    <div>
+      {/* Hero */}
+      <div className="relative h-[200px] w-full overflow-hidden">
+        <Image src="/images/pages/admin-grants-workflow-detail.webp" alt="Workflow" fill className="object-cover" priority sizes="100vw" />
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/80 to-violet-900/60" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="max-w-6xl mx-auto px-6 w-full">
+            <div className="flex items-center gap-3 mb-2">
+              <Link href="/admin/studio/workflows" className="inline-flex items-center gap-1 text-xs text-indigo-200 hover:text-white transition-colors">
+                <ArrowLeft className="w-3.5 h-3.5" /> Workflows
+              </Link>
+              <span className="text-indigo-300">/</span>
+              <span className="text-xs text-indigo-200">{workflow.name}</span>
+            </div>
+            <div className="flex items-center gap-3 mb-1">
+              <Workflow className="h-6 w-6 text-white/90" />
+              <span className="text-xs font-semibold tracking-widest uppercase bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-white">
+                Automation
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
+                {workflow.name}
+              </h1>
+              <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${STATUS_BADGE[status] ?? 'bg-slate-400/50 text-white'}`}>
+                {status}
+              </span>
+            </div>
+            <p className="text-indigo-100 text-sm mt-1">
+              {workflow.category} · {workflow.run_count} runs{workflow.last_run_at ? ` · last run ${formatRelative(workflow.last_run_at)}` : ''}
+            </p>
           </div>
-          <p className="text-slate-500 text-sm mt-1">
-            {workflow.category} · {workflow.run_count} runs
-            {workflow.last_run_at && ` · last run ${formatRelative(workflow.last_run_at)}`}
-          </p>
         </div>
+      </div>
+
+      {/* Actions bar */}
+      <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              const next = status === 'active' ? 'inactive' : 'active';
+              handleStatusChange(next);
+            }}
+            disabled={savingStatus}
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all disabled:opacity-50 ${
+              status === 'active'
+                ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border border-yellow-200'
+                : 'bg-green-100 text-green-800 hover:bg-green-200 border border-green-200'
+            }`}
+          >
+            {status === 'active' ? <><Zap className="w-4 h-4" /> Deactivate</> : <><Activity className="w-4 h-4" /> Activate</>}
+          </button>
+          <button
+            onClick={handleRun}
+            disabled={running}
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 text-sm font-semibold transition-all disabled:opacity-50 shadow-sm"
+          >
+            {running ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+            {running ? 'Running…' : 'Run Now'}
+          </button>
+        </div>
+        {runResult && (
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium ${
+            runResult.ok ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'
+          }`}>
+            {runResult.ok ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+            {runResult.msg}
+          </div>
+        )}
+      </div>
+
+      {/* Body */}
+      <div className="max-w-6xl mx-auto px-6 pb-8 space-y-6">
         <div className="flex items-center gap-2">
           <select
             value={status}

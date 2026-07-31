@@ -2,15 +2,19 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '@/lib/authGuards';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import WorkflowDetailClient from './WorkflowDetailClient';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: 'Workflow Detail | Admin | Elevate For Humanity',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  return { title: `Workflow ${id.slice(0, 8)} | Dev Studio` };
+}
 
 export default async function WorkflowDetailPage({
   params,
@@ -37,22 +41,13 @@ export default async function WorkflowDetailPage({
   if (!workflow) notFound();
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <Breadcrumbs
-          items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'Workflows', href: '/admin/workflows' },
-            { label: workflow.name },
-          ]}
-        />
-        <WorkflowDetailClient
-          workflow={workflow}
-          triggers={triggers ?? []}
-          steps={steps ?? []}
-          runs={runs ?? []}
-        />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-50">
+      <WorkflowDetailClient
+        workflow={workflow}
+        triggers={triggers ?? []}
+        steps={steps ?? []}
+        runs={runs ?? []}
+      />
     </div>
   );
 }

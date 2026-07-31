@@ -22,7 +22,7 @@ export function AutomationPanel() {
         subtitle={`${automationRules.length} rule${automationRules.length !== 1 ? 's' : ''} · ${workflows.length} workflow${workflows.length !== 1 ? 's' : ''}`}
         actions={
           <a
-            href="/admin/workflows"
+            href="/admin/studio/workflows"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-xs font-medium text-brand-blue-600 hover:text-brand-blue-800 transition"
@@ -78,7 +78,7 @@ export function AutomationPanel() {
             Create rules to automate notifications, enrollments, and completions.
           </p>
           <a
-            href="/admin/workflows"
+            href="/admin/studio/workflows"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 mt-4 text-sm font-medium text-brand-blue-600 hover:text-brand-blue-800"

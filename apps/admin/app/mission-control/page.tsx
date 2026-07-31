@@ -37,7 +37,7 @@ export default async function MissionControlPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <Breadcrumbs
             items={[
-              { label: 'Admin', href: '/admin/dashboard' },
+              { label: 'Admin', href: '/dashboard' },
               { label: 'Mission Control' },
             ]}
           />

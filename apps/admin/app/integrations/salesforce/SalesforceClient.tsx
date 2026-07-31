@@ -85,7 +85,7 @@ export default function SalesforceClient() {
         <div className="mb-4">
           <Breadcrumbs
             items={[
-              { label: 'Admin', href: '/admin/dashboard' },
+              { label: 'Admin', href: '/dashboard' },
               { label: 'Integrations', href: '/admin/integrations' },
               { label: 'Salesforce' },
             ]}

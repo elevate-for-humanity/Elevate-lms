@@ -48,7 +48,7 @@ export default async function CareerCoursesPage() {
     <AdminPageShell
       title="Career Courses"
       description="Self-paced career development courses available in the marketplace."
-      breadcrumbs={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Career Courses' }]}
+      breadcrumbs={[{ label: 'Admin', href: '/dashboard' }, { label: 'Career Courses' }]}
       stats={[
         { label: 'Total', value: total ?? 0, icon: BookOpen, color: 'slate' },
         { label: 'Published', value: published ?? 0, icon: CheckCircle, color: 'green' },

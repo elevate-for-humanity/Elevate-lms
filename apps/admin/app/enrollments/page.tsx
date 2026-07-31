@@ -98,7 +98,7 @@ export default async function AdminEnrollmentsPage({
     <AdminPageShell
       title="Enrollments"
       description="Manage student program enrollments, approvals, and progress."
-      breadcrumbs={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Enrollments' }]}
+      breadcrumbs={[{ label: 'Admin', href: '/dashboard' }, { label: 'Enrollments' }]}
       stats={[
         { label: 'Total', value: stats.total, icon: Users, color: 'slate' },
         { label: 'Active', value: stats.active, icon: TrendingUp, color: 'green' },

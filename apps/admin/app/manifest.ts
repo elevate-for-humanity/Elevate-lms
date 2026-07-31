@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'Elevate Admin',
     short_name: 'EFH Admin',
     description: 'Elevate for Humanity — Admin Portal',
-    start_url: '/admin/dashboard',
+    start_url: '/dashboard',
     scope: '/admin',
     display: 'standalone',
     orientation: 'portrait',

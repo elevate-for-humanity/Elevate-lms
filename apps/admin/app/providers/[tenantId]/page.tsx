@@ -131,7 +131,7 @@ export default async function ProviderDetailPage({
       <div className="max-w-6xl mx-auto px-4 py-4">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Admin', href: '/dashboard' },
             { label: 'Providers', href: '/admin/providers' },
             { label: tenant.name },
           ]}

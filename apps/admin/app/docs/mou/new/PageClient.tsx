@@ -45,7 +45,7 @@ export default function NewMouPage() {
     <div className="max-w-2xl mx-auto px-4 py-10">
       <Breadcrumbs
         items={[
-          { label: 'Admin', href: '/admin/dashboard' },
+          { label: 'Admin', href: '/dashboard' },
           { label: 'MOU Documents', href: '/admin/docs/mou' },
           { label: 'New MOU' },
         ]}

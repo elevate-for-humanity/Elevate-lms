@@ -45,7 +45,7 @@ export default function AdminResetPasswordForm() {
       const { error: updateError } = await supabase.auth.updateUser({ password });
       if (updateError) throw updateError;
       setSuccess(true);
-      setTimeout(() => router.replace('/admin/dashboard'), 2000);
+      setTimeout(() => router.replace('/dashboard'), 2000);
     } catch (err: any) {
       setError(err?.message || 'Failed to update password. Try again.');
     } finally {

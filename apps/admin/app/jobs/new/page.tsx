@@ -22,7 +22,7 @@ export default async function AdminNewJobPage() {
         <div className="mb-4">
           <Breadcrumbs
             items={[
-              { label: 'Admin', href: '/admin/dashboard' },
+              { label: 'Admin', href: '/dashboard' },
               { label: 'Jobs', href: '/admin/jobs' },
               { label: 'New Job' },
             ]}

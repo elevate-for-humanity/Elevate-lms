@@ -50,7 +50,7 @@ export default function AppointmentsPage() {
         <div className="mb-4">
           <Breadcrumbs
             items={[
-              { label: 'Admin', href: '/admin/dashboard' },
+              { label: 'Admin', href: '/dashboard' },
               { label: 'CRM', href: '/admin/crm' },
               { label: 'Appointments' },
             ]}

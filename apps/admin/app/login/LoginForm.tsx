@@ -7,7 +7,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
 
 function getSafeRedirect(raw: string | null | undefined): string {
-  return validateRedirect(raw, '/admin/dashboard');
+  return validateRedirect(raw, '/dashboard');
 }
 
 export default function AdminLoginForm({ redirectTo, initialError }: { redirectTo?: string; initialError?: string }) {

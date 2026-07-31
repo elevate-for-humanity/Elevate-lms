@@ -116,7 +116,7 @@ export default async function IepDetailPage({
       <div className="bg-white border-b px-6 py-3">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Admin', href: '/dashboard' },
             { label: 'WIOA', href: '/admin/wioa' },
             { label: 'Employment Plans', href: '/admin/wioa/iep' },
             { label: participant?.full_name ?? id.slice(0, 8) },

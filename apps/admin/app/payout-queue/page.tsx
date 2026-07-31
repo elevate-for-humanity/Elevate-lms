@@ -67,7 +67,7 @@ export default async function PayoutQueuePage({
   // Guard against null user
   if (!user) redirect('/login');
   const db = await requireAdminClient();
-  if (!db) redirect('/admin/dashboard');
+  if (!db) redirect('/dashboard');
 
   const { data: profile } = await db
     .from('profiles')
@@ -75,7 +75,7 @@ export default async function PayoutQueuePage({
     .eq('id', user.id)
     .maybeSingle();
   if (!profile || !['admin', 'staff'].includes(profile.role)) {
-    redirect('/admin/dashboard');
+    redirect('/dashboard');
   }
 
   const params = await searchParams;

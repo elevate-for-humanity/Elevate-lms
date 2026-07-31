@@ -72,7 +72,7 @@ export default async function WorkOneQueuePage() {
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b px-6 py-3">
         <Breadcrumbs
-          items={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'WorkOne Queue' }]}
+          items={[{ label: 'Admin', href: '/dashboard' }, { label: 'WorkOne Queue' }]}
         />
       </div>
 

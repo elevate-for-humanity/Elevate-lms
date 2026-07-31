@@ -15,7 +15,7 @@ const SECTIONS = [
   { label: 'Webhooks', description: 'Monitor webhook delivery health and failures', href: '/admin/system/webhooks', icon: Webhook },
   { label: 'System Health', description: 'Live service and API health checks', href: '/admin/system-health', icon: Server },
   { label: 'Audit Logs', description: 'Full audit trail of admin actions', href: '/admin/audit-logs', icon: Shield },
-  { label: 'Dev Studio', description: 'Terminal, editor, AI assistant, and deploy controls', href: '/admin/dashboard', icon: Database },
+  { label: 'Dev Studio', description: 'Terminal, editor, AI assistant, and deploy controls', href: '/dashboard', icon: Database },
   { label: 'Settings', description: 'Platform configuration and integrations', href: '/admin/settings', icon: Settings },
 ];
 

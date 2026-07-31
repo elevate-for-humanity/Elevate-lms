@@ -66,7 +66,7 @@ export default async function ProviderApplicationsPage({
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Provider Applications' }]}
+          items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Provider Applications' }]}
         />
       </div>
 

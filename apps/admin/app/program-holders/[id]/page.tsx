@@ -370,7 +370,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
         <div className="mb-4">
           <Breadcrumbs
             items={[
-              { label: 'Admin', href: '/admin/dashboard' },
+              { label: 'Admin', href: '/dashboard' },
               { label: 'Program Holders', href: '/admin/program-holders' },
               { label: holder.organization_name || holder.name || 'Detail' },
             ]}

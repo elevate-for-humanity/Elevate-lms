@@ -69,7 +69,7 @@ export default async function CohortTrackerPage() {
       <div className="border-b border-slate-200 px-6 py-5">
         <div className="max-w-7xl mx-auto">
           <Breadcrumbs
-            items={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Cohorts' }]}
+            items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Cohorts' }]}
           />
           <div className="flex items-center justify-between mt-4">
             <div>

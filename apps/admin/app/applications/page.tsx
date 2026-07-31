@@ -153,7 +153,7 @@ export default async function ApplicationsPage({
     <AdminPageShell
       title="Applications"
       description="Review, approve, and manage program applications."
-      breadcrumbs={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Applications' }]}
+      breadcrumbs={[{ label: 'Admin', href: '/dashboard' }, { label: 'Applications' }]}
       stats={[
         { label: 'Total', value: totalApplications, icon: Inbox, color: 'slate' },
         { label: 'Needs Review', value: pending, icon: Clock, color: 'amber', alert: pending > 0 },

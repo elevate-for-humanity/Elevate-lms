@@ -56,7 +56,7 @@ export default async function AdminProgramHoldersPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-4">
           <Breadcrumbs
-            items={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Program Holders' }]}
+            items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Program Holders' }]}
           />
         </div>
 

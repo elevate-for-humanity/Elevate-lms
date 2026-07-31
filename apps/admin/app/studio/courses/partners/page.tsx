@@ -31,7 +31,7 @@ export default async function CoursePartnersPage() {
         <div className="mb-4">
           <Breadcrumbs
             items={[
-              { label: 'Admin', href: '/admin/dashboard' },
+              { label: 'Admin', href: '/dashboard' },
               { label: 'Courses', href: '/admin/courses' },
               { label: 'Partners' },
             ]}

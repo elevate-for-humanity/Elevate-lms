@@ -78,7 +78,7 @@ export default async function IepListPage({
       <div className="bg-white border-b px-6 py-3">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Admin', href: '/dashboard' },
             { label: 'WIOA', href: '/admin/wioa' },
             { label: 'Employment Plans' },
           ]}

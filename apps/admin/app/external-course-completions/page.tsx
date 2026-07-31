@@ -82,7 +82,7 @@ export default async function ExternalCourseApprovalsPage() {
       <div className="bg-white border-b px-6 py-3">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Admin', href: '/dashboard' },
             { label: 'External Course Approvals' },
           ]}
         />

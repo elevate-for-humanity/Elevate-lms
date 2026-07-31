@@ -64,7 +64,7 @@ export default async function GeminiIntegrationPage() {
       <div className="max-w-3xl mx-auto px-4 py-8">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin/dashboard' },
+            { label: 'Admin', href: '/dashboard' },
             { label: 'Integrations', href: '/admin/integrations' },
             { label: 'Gemini AI' },
           ]}

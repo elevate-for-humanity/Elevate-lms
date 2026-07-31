@@ -75,7 +75,7 @@ export default async function VerificationsPage() {
     <AdminPageShell
       title="ID Verifications"
       description="Review and approve identity verification submissions."
-      breadcrumbs={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Verifications' }]}
+      breadcrumbs={[{ label: 'Admin', href: '/dashboard' }, { label: 'Verifications' }]}
       stats={[
         { label: 'Total', value: total ?? 0, icon: Shield, color: 'slate' },
         {

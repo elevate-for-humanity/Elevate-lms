@@ -111,7 +111,7 @@ export default async function StudentsPage() {
     <AdminPageShell
       title="Students"
       description="View and manage all registered students and their enrollment status."
-      breadcrumbs={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Students' }]}
+      breadcrumbs={[{ label: 'Admin', href: '/dashboard' }, { label: 'Students' }]}
       stats={[
         { label: 'Total Students', value: totalStudents || 0, icon: Users, color: 'slate' },
         { label: 'Access Granted', value: activeEnrollments || 0, icon: TrendingUp, color: 'green' },

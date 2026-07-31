@@ -98,7 +98,7 @@ export default async function ReferralsPage({
       {/* Header */}
       <div className="bg-white border-b px-6 py-3">
         <Breadcrumbs
-          items={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Agency Referrals' }]}
+          items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Agency Referrals' }]}
         />
       </div>
 

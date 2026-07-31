@@ -304,7 +304,8 @@ export default async function OperationsPage() {
                     </span>
                     {r.workflow_id ? (
                       <Link
-                        href={`/admin/studio/workflows                        className="ml-auto flex items-center gap-1 text-xs font-semibold text-amber-700 hover:underline"
+                        href="/admin/studio/workflows"
+                        className="ml-auto flex items-center gap-1 text-xs font-semibold text-amber-700 hover:underline"
                       >
                         <RotateCcw className="h-3 w-3" /> Open workflow
                       </Link>

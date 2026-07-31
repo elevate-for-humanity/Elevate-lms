@@ -322,7 +322,7 @@ export class ConversationEngine {
       const skipNotification: ConversationMessage = {
         id: generateId(),
         role: 'paris',
-        content: 'No problem! Let\\'s move on to the next question.',
+        content: "No problem! Let's move on to the next question.",
         timestamp: new Date()
       };
       responseMessages.push(skipNotification);

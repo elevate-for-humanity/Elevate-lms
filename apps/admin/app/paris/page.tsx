@@ -1,155 +1,217 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import { 
-  Sparkles, 
-  Bot, 
-  Image, 
-  Code, 
-  FileText, 
-  BarChart3,
-  Github,
-  Layers,
-  Volume2,
-  VolumeX,
-  CheckCircle2,
-  Clock,
-  AlertCircle,
-  Loader2,
-  Send,
-  Play,
-  ChevronDown,
-  ChevronUp,
-  ArrowRight,
-  X,
-  Settings
+import { useState, useCallback, useEffect, useRef } from 'react';
+import {
+  Sparkles, Bot, FileText, Image, Code, CheckCircle2, Loader2,
+  Send, X, Clock, AlertCircle, Volume2, VolumeX,
 } from 'lucide-react';
 import Link from 'next/link';
 
-// Command categories
+interface ChatMessage {
+  id: string;
+  type: 'user' | 'ai' | 'narration' | 'error';
+  content: string;
+  timestamp: string;
+}
+
 const COMMAND_CATEGORIES = [
   {
-    id: 'import',
-    label: 'Import & Connect',
-    icon: Github,
+    id: 'course-orchestrator',
+    label: 'Course Builder',
     color: 'from-purple-500 to-purple-600',
     commands: [
-      { text: 'Import this GitHub repository', desc: 'Analyze and import a codebase' },
-      { text: 'Connect to an API', desc: 'Import OpenAPI/Swagger spec' },
-      { text: 'Analyze this repo', desc: 'Quick analysis of any GitHub repo' },
-      { text: 'Clone this website', desc: 'Use existing site as starting point' },
+      { text: 'Build a Medical Assistant course', desc: 'Create full course with modules' },
+      { text: 'Add a module to HVAC program', desc: 'Add new training module' },
+      { text: 'Create assessment questions', desc: 'Build quiz or exam' },
+      { text: 'Design competency rubric', desc: 'Create competency-based grading' },
     ],
   },
   {
-    id: 'agents',
-    label: 'AI Workforce',
-    icon: Bot,
+    id: 'instructional-designer',
+    label: 'Instructional Design',
     color: 'from-blue-500 to-blue-600',
     commands: [
-      { text: 'Hire a recruiter agent', desc: 'AI for job matching and outreach' },
-      { text: 'Create a marketing agent', desc: 'AI for content and campaigns' },
-      { text: 'Add a grant writer', desc: 'AI for grant proposals' },
-      { text: 'Train the support agent', desc: 'Add knowledge to existing agent' },
+      { text: 'Design a learning path for CDL', desc: 'Create curriculum roadmap' },
+      { text: 'Add micro-credentials', desc: 'Design badge/credential system' },
+      { text: 'Build simulation exercises', desc: 'Create interactive scenarios' },
+      { text: 'Write learning objectives', desc: "Bloom's taxonomy aligned" },
     ],
   },
   {
-    id: 'content',
+    id: 'marketing-content',
     label: 'Content Studio',
-    icon: FileText,
     color: 'from-pink-500 to-pink-600',
     commands: [
-      { text: 'Generate a video reel', desc: 'Create social media video' },
-      { text: 'Write social posts', desc: 'Multi-platform content' },
-      { text: 'Create a flyer', desc: 'Program/event flyer' },
-      { text: 'Draft newsletter', desc: 'Email newsletter' },
+      { text: 'Generate a program flyer', desc: 'Create printable flyer' },
+      { text: 'Write homepage copy', desc: 'Hero and section content' },
+      { text: 'Draft enrollment email', desc: 'Student enrollment sequence' },
+      { text: 'Create employer outreach letter', desc: 'Business partnership letter' },
     ],
   },
   {
-    id: 'media',
-    label: 'Media Studio',
-    icon: Image,
+    id: 'marketing-social',
+    label: 'Social Media',
     color: 'from-amber-500 to-amber-600',
     commands: [
-      { text: 'Find a hero image', desc: 'Search stock photos' },
-      { text: 'Generate an image', desc: 'AI image creation' },
-      { text: 'Edit this image', desc: 'Remove background, etc.' },
-      { text: 'Create brand assets', desc: 'Logo variants, icons' },
+      { text: 'Write LinkedIn posts', desc: 'Professional network content' },
+      { text: 'Generate Twitter thread', desc: 'Short-form engagement content' },
+      { text: 'Create Instagram captions', desc: 'Visual platform content' },
+      { text: 'Build email newsletter', desc: 'Monthly student newsletter' },
     ],
   },
   {
-    id: 'build',
-    label: 'Build & Deploy',
-    icon: Code,
+    id: 'marketing-video',
+    label: 'Video Scripts',
     color: 'from-emerald-500 to-emerald-600',
     commands: [
-      { text: 'Build a landing page', desc: 'Create new page from scratch' },
-      { text: 'Update the homepage', desc: 'Modify existing page' },
-      { text: 'Add a new program', desc: 'Create program page' },
-      { text: 'Deploy to production', desc: 'Push changes live' },
+      { text: 'Write a program intro video', desc: '90-second enrollment video' },
+      { text: 'Create testimonial video script', desc: 'Student success story' },
+      { text: 'Build employer promo video', desc: 'Workforce partnership video' },
+      { text: 'Write CTA video script', desc: 'Call-to-action overlay' },
     ],
   },
-];
-
-// Demo data for Live Canvas
-const DEMO_MESSAGES = [
-  { id: '1', type: 'narration' as const, content: "I'm creating the Employer Apprenticeship page now.", timestamp: new Date().toISOString() },
-  { id: '2', type: 'ai' as const, content: "I've connected the application form to your CRM.", timestamp: new Date().toISOString() },
-  { id: '3', type: 'ai' as const, content: "Adding Stripe payment processing for enrollment deposits.", timestamp: new Date().toISOString() },
-  { id: '4', type: 'narration' as const, content: "The Digital Student Binder is now linked to enrollment.", timestamp: new Date().toISOString() },
-];
-
-const DEMO_WORKERS = [
-  { id: '1', name: 'Developer AI', role: 'dev', icon: '💻', color: 'blue', status: 'working' as const, currentTask: 'Building Student Dashboard', progress: 92 },
-  { id: '2', name: 'Designer AI', role: 'designer', icon: '🎨', color: 'purple', status: 'working' as const, currentTask: 'Creating Hero Banner', progress: 75 },
-  { id: '3', name: 'Marketing AI', role: 'marketing', icon: '📢', color: 'pink', status: 'working' as const, currentTask: 'Writing SEO content', progress: 45 },
-  { id: '4', name: 'Video AI', role: 'video', icon: '🎥', color: 'orange', status: 'waiting' as const, currentTask: 'Creating promo reel', progress: 20 },
-  { id: '5', name: 'QA AI', role: 'qa', icon: '🧪', color: 'emerald', status: 'idle' as const, currentTask: 'Running tests', progress: 0 },
-];
-
-const DEMO_TASKS = [
-  { id: '1', title: 'Create page structure', status: 'completed' as const, progress: 100, priority: 'high' as const, createdAt: new Date().toISOString() },
-  { id: '2', title: 'Add hero section', status: 'in_progress' as const, progress: 75, priority: 'high' as const, createdAt: new Date().toISOString() },
-  { id: '3', title: 'Build enrollment form', status: 'pending' as const, progress: 0, priority: 'high' as const, createdAt: new Date().toISOString() },
-  { id: '4', title: 'Add testimonials', status: 'pending' as const, progress: 0, priority: 'medium' as const, createdAt: new Date().toISOString() },
-  { id: '5', title: 'Connect Stripe', status: 'pending' as const, progress: 0, priority: 'high' as const, createdAt: new Date().toISOString() },
-  { id: '6', title: 'Add funding calculator', status: 'pending' as const, progress: 0, priority: 'medium' as const, createdAt: new Date().toISOString() },
+  {
+    id: 'admissions-agent',
+    label: 'Admissions',
+    color: 'from-rose-500 to-rose-600',
+    commands: [
+      { text: 'Review pending applications', desc: 'Check application queue' },
+      { text: 'Send enrollment reminders', desc: 'Batch outreach to prospects' },
+      { text: 'Generate acceptance letters', desc: 'Bulk acceptance generation' },
+      { text: 'Check funding eligibility', desc: 'WIOA and grant qualification' },
+    ],
+  },
+  {
+    id: 'qa-designer',
+    label: 'Quality Assurance',
+    color: 'from-cyan-500 to-cyan-600',
+    commands: [
+      { text: 'Review course content', desc: 'Quality check all modules' },
+      { text: 'Audit assessment questions', desc: 'Validate quiz accuracy' },
+      { text: 'Check accessibility', desc: 'WCAG compliance review' },
+      { text: 'Run content gap analysis', desc: 'Find missing curriculum areas' },
+    ],
+  },
+  {
+    id: 'media-designer',
+    label: 'Media Designer',
+    color: 'from-violet-500 to-violet-600',
+    commands: [
+      { text: 'Find hero image for program', desc: 'Stock photo search' },
+      { text: 'Create program badge/credential', desc: 'Graduate certificate graphic' },
+      { text: 'Design funding badge set', desc: 'WIOA, Pell, grant badges' },
+      { text: 'Build employer logo wall', desc: 'Partnership logos section' },
+    ],
+  },
 ];
 
 export default function ParisOSPage() {
-  const [isLiveMode, setIsLiveMode] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showDemo, setShowDemo] = useState(false);
+  const [showPanel, setShowPanel] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [stats, setStats] = useState({ total: 0, completed: 0, active: 0, failed: 0 });
+  const [error, setError] = useState<string | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
-  const startLiveDemo = useCallback(() => {
-    setShowDemo(true);
-    setIsLiveMode(true);
+  // Fetch real task stats from Supabase on mount
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/devstudio/workflows');
+        if (!res.ok) return;
+        const data = await res.json();
+        const tasks = Array.isArray(data) ? data : (data.tasks ?? []);
+        setStats({
+          total: tasks.length,
+          completed: tasks.filter((t: any) => t.status === 'completed').length,
+          active: tasks.filter((t: any) => t.status === 'running').length,
+          failed: tasks.filter((t: any) => t.status === 'failed').length,
+        });
+      } catch {
+        // silently ignore
+      }
+    }
+    loadStats();
   }, []);
 
-  const handleCommand = useCallback(async (command: string) => {
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const addMessage = useCallback((type: ChatMessage['type'], content: string) => {
+    setMessages(prev => [...prev, {
+      id: `${Date.now()}-${Math.random()}`,
+      type,
+      content,
+      timestamp: new Date().toISOString(),
+    }]);
+  }, []);
+
+  const handleCommand = useCallback(async (command: string, agentType: string) => {
     if (!command.trim()) return;
-    
     setInputValue(command);
     setIsProcessing(true);
-    
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setShowDemo(true);
-    setIsLiveMode(true);
-    setIsProcessing(false);
-  }, []);
+    setShowPanel(true);
+    setError(null);
 
-  const executeQuickCommand = useCallback((text: string) => {
-    handleCommand(text);
+    addMessage('user', command);
+    addMessage('narration', `Dispatching ${agentType} agent...`);
+
+    try {
+      const res = await fetch('/api/paris/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agentType, command }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.message || 'Execution failed');
+
+      addMessage('ai', data.message);
+      if (data.actions?.length) {
+        addMessage('narration', 'Actions completed:');
+        for (const action of data.actions) addMessage('ai', `✓ ${action}`);
+      }
+
+      // Refresh stats
+      const statsRes = await fetch('/api/devstudio/workflows');
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
+        const tasks = Array.isArray(statsData) ? statsData : (statsData.tasks ?? []);
+        setStats({
+          total: tasks.length,
+          completed: tasks.filter((t: any) => t.status === 'completed').length,
+          active: tasks.filter((t: any) => t.status === 'running').length,
+          failed: tasks.filter((t: any) => t.status === 'failed').length,
+        });
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      setError(msg);
+      addMessage('error', `Error: ${msg}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [addMessage]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleCommand(inputValue, activeCategory ?? 'course-orchestrator');
+    }
+  }, [inputValue, activeCategory, handleCommand]);
+
+  const executeCommand = useCallback((text: string, agentType: string) => {
+    handleCommand(text, agentType);
   }, [handleCommand]);
 
   return (
     <div className="min-h-screen bg-slate-900">
       {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="bg-slate-800 border-b border-slate-700 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-white" />
@@ -159,505 +221,205 @@ export default function ParisOSPage() {
               <p className="text-xs text-slate-400">AI Operating System</p>
             </div>
           </div>
-          
+          <div className="flex items-center gap-6">
+            {[
+              { label: 'Total Tasks', value: stats.total, color: 'text-white' },
+              { label: 'Completed', value: stats.completed, color: 'text-green-400' },
+              { label: 'Active', value: stats.active, color: 'text-yellow-400' },
+              { label: 'Failed', value: stats.failed, color: 'text-red-400' },
+            ].map(s => (
+              <div key={s.label} className="text-center hidden md:block">
+                <p className={`text-lg font-bold ${s.color}`}>{s.value}</p>
+                <p className="text-xs text-slate-500">{s.label}</p>
+              </div>
+            ))}
+          </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsMuted(!isMuted)}
-              className="p-2 text-slate-400 hover:text-white transition-colors"
-            >
+            <button onClick={() => setIsMuted(!isMuted)} className="p-2 text-slate-400 hover:text-white transition-colors">
               {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
             </button>
-            <Link 
-              href="/admin"
-              className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors text-sm"
-            >
+            <Link href="/admin" className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors text-sm">
               Dashboard
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      {showDemo ? (
-        <LiveCanvasDemo 
-          onClose={() => {
-            setShowDemo(false);
-            setIsLiveMode(false);
-          }}
-          isMuted={isMuted}
-        />
-      ) : (
-        <div className="max-w-5xl mx-auto px-4 py-12">
-          {/* Hero */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/20 text-yellow-400 rounded-full text-sm font-medium mb-6">
-              <Sparkles className="w-4 h-4" />
-              AI-Powered Platform
-            </div>
-            <h2 className="text-4xl font-bold text-white mb-4">
-              What would you like to build?
-            </h2>
-            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              Tell PARIS what you need. Import code, create agents, generate content, or build features.
-            </p>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/20 text-yellow-400 rounded-full text-sm font-medium mb-4">
+            <Sparkles className="w-4 h-4" />
+            AI Agents — Real Execution
           </div>
-
-          {/* Command Input */}
-          <div className="relative mb-12">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-2xl blur-xl" />
-            <div className="relative bg-slate-800 border border-slate-700 rounded-2xl p-6">
-              <div className="flex gap-4">
-                <button className="p-3 bg-slate-700 rounded-xl text-slate-400 hover:text-white hover:bg-slate-600 transition-colors">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                  </svg>
-                </button>
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleCommand(inputValue)}
-                  placeholder="Type a command... (e.g., 'Import this GitHub repo' or 'Create a recruiter agent')"
-                  className="flex-1 bg-transparent text-white placeholder-slate-500 text-lg outline-none"
-                />
-                <button
-                  onClick={() => handleCommand(inputValue)}
-                  disabled={isProcessing || !inputValue.trim()}
-                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium rounded-xl hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 transition-all flex items-center gap-2"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      Execute
-                      <ArrowRight className="w-5 h-5" />
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="grid grid-cols-3 gap-4 mb-12">
-            <QuickActionCard
-              icon={Play}
-              title="Live Demo"
-              desc="See Live Canvas in action"
-              color="from-red-500 to-red-600"
-              onClick={startLiveDemo}
-            />
-            <QuickActionCard
-              icon={Github}
-              title="Import Repo"
-              desc="Connect GitHub repository"
-              color="from-slate-600 to-slate-700"
-              onClick={() => handleCommand('Import this GitHub repository')}
-            />
-            <QuickActionCard
-              icon={Bot}
-              title="Hire Agent"
-              desc="Create AI workforce"
-              color="from-blue-500 to-blue-600"
-              onClick={() => handleCommand('Hire a recruiter agent')}
-            />
-          </div>
-
-          {/* Command Categories */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-white">Or choose a category</h3>
-            {COMMAND_CATEGORIES.map((category) => (
-              <CategorySection
-                key={category.id}
-                category={category}
-                isExpanded={activeCategory === category.id}
-                onToggle={() => setActiveCategory(activeCategory === category.id ? null : category.id)}
-                onSelect={executeQuickCommand}
-              />
-            ))}
-          </div>
+          <h2 className="text-4xl font-bold text-white mb-3">What would you like to build?</h2>
+          <p className="text-slate-400 max-w-2xl mx-auto">
+            Select an AI agent category below, or type a command directly.
+            Each agent executes real tasks against your Supabase database and logs results.
+          </p>
         </div>
-      )}
-    </div>
-  );
-}
 
-// Quick Action Card
-function QuickActionCard({ 
-  icon: Icon, 
-  title, 
-  desc, 
-  color, 
-  onClick 
-}: { 
-  icon: React.ElementType; 
-  title: string; 
-  desc: string; 
-  color: string; 
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="group relative overflow-hidden rounded-2xl p-6 text-left transition-all hover:scale-[1.02]"
-    >
-      <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 transition-opacity`} />
-      <div className="relative">
-        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-4`}>
-          <Icon className="w-6 h-6 text-white" />
-        </div>
-        <h3 className="font-bold text-white mb-1">{title}</h3>
-        <p className="text-sm text-slate-400">{desc}</p>
-      </div>
-    </button>
-  );
-}
-
-// Category Section
-function CategorySection({ 
-  category, 
-  isExpanded, 
-  onToggle, 
-  onSelect 
-}: { 
-  category: typeof COMMAND_CATEGORIES[0]; 
-  isExpanded: boolean; 
-  onToggle: () => void;
-  onSelect: (text: string) => void;
-}) {
-  return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center justify-between p-4 hover:bg-slate-800 transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center`}>
-            <category.icon className="w-5 h-5 text-white" />
+        {error && (
+          <div className="mb-6 px-4 py-3 bg-red-500/20 border border-red-500/30 rounded-xl flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <p className="text-red-300 text-sm">{error}</p>
+            <button onClick={() => setError(null)} className="ml-auto text-red-400 hover:text-red-300">
+              <X className="w-4 h-4" />
+            </button>
           </div>
-          <span className="font-medium text-white">{category.label}</span>
-        </div>
-        {isExpanded ? (
-          <ChevronUp className="w-5 h-5 text-slate-400" />
-        ) : (
-          <ChevronDown className="w-5 h-5 text-slate-400" />
         )}
-      </button>
-      
-      {isExpanded && (
-        <div className="border-t border-slate-700 p-4 grid grid-cols-2 gap-3">
-          {category.commands.map((cmd) => (
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {COMMAND_CATEGORIES.map((cat) => (
             <button
-              key={cmd.text}
-              onClick={() => onSelect(cmd.text)}
-              className="flex items-start gap-3 p-3 bg-slate-800 rounded-xl hover:bg-slate-700 transition-colors text-left"
+              key={cat.id}
+              onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
+              className={`bg-slate-800 border rounded-2xl p-5 text-left transition-all hover:border-slate-600 ${
+                activeCategory === cat.id ? 'border-yellow-500/50 bg-slate-700/50' : 'border-slate-700'
+              }`}
             >
-              <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0">
-                <ArrowRight className="w-4 h-4 text-slate-400" />
+              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${cat.color} flex items-center justify-center mb-3`}>
+                <Bot className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <p className="font-medium text-white text-sm">{cmd.text}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{cmd.desc}</p>
-              </div>
+              <p className="text-white font-bold text-sm">{cat.label}</p>
+              <p className="text-slate-400 text-xs mt-1">{cat.commands.length} commands</p>
             </button>
           ))}
         </div>
-      )}
-    </div>
-  );
-}
 
-// Live Canvas Demo Component
-function LiveCanvasDemo({ onClose, isMuted }: { onClose: () => void; isMuted: boolean }) {
-  const [messages, setMessages] = useState(DEMO_MESSAGES);
-  const [workers] = useState(DEMO_WORKERS);
-  const [tasks] = useState(DEMO_TASKS);
-  const [inputValue, setInputValue] = useState('');
-  const [isLive] = useState(true);
-  const [followMode, setFollowMode] = useState(true);
-  const [deviceView, setDeviceView] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
-
-  useEffect(() => {
-    if (!isLive) return;
-    
-    const interval = setInterval(() => {
-      const newMessages = [
-        "I'm updating the hero section with your brand colors.",
-        "Adding the enrollment form now.",
-        "Connecting to the student database.",
-        "The preview is almost ready!",
-        "I've added the funding calculator.",
-      ];
-      
-      const randomMsg = newMessages[Math.floor(Math.random() * newMessages.length)];
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        type: followMode && !isMuted ? 'narration' : 'ai',
-        content: randomMsg,
-        timestamp: new Date().toISOString(),
-      }]);
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [isLive, followMode, isMuted]);
-
-  const handleSendMessage = (msg: string) => {
-    if (!msg.trim()) return;
-    
-    setMessages(prev => [...prev, {
-      id: Date.now().toString(),
-      type: 'user',
-      content: msg,
-      timestamp: new Date().toISOString(),
-    }]);
-    
-    setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        type: 'ai',
-        content: "I'm on it! Making that change now.",
-        timestamp: new Date().toISOString(),
-      }]);
-    }, 1500);
-    
-    setInputValue('');
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 bg-slate-900 flex flex-col">
-      {/* Top Bar */}
-      <div className="h-14 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-4">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded-full ${isLive ? 'bg-red-500 animate-pulse' : 'bg-slate-500'}`} />
-            <span className="font-medium text-white text-sm">
-              {isLive ? 'Building...' : 'Paused'}
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2 px-3 py-1 bg-slate-700 rounded-lg">
-            <Layers className="w-4 h-4 text-slate-400" />
-            <span className="text-sm text-white">Apprenticeship Page</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setFollowMode(!followMode)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              followMode ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-300'
-            }`}
-          >
-            {followMode ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-            Follow Me
-          </button>
-
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 font-medium text-sm transition-colors"
-          >
-            Exit Demo
-          </button>
-        </div>
-      </div>
-
-      {/* Three Panel Layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - Chat */}
-        <div className="w-80 bg-slate-800 border-r border-slate-700 flex flex-col">
-          <div className="p-4 border-b border-slate-700">
-            <h3 className="font-bold text-white flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-yellow-400" />
-              PARIS AI
+        {activeCategory && (
+          <div className="mb-8 bg-slate-800/50 border border-slate-700 rounded-2xl p-5">
+            <h3 className="text-white font-bold mb-4">
+              Commands for {COMMAND_CATEGORIES.find(c => c.id === activeCategory)?.label}
             </h3>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((msg) => (
-              <div key={msg.id} className={`flex gap-3 ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ${
-                  msg.type === 'user' ? 'bg-slate-600' : 
-                  msg.type === 'narration' ? 'bg-yellow-500' : 'bg-blue-500'
-                }`}>
-                  {msg.type === 'user' ? '👤' : msg.type === 'narration' ? '🎙️' : '🤖'}
-                </div>
-                <div className={`flex-1 ${msg.type === 'user' ? 'text-right' : ''}`}>
-                  {msg.type === 'narration' && (
-                    <div className="text-xs text-yellow-400 mb-1">Narrating</div>
-                  )}
-                  <p className={`text-sm ${msg.type === 'user' ? 'text-white' : 'text-slate-300'}`}>
-                    {msg.content}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="p-4 border-t border-slate-700">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage(inputValue)}
-                placeholder="Type a command..."
-                className="flex-1 px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm placeholder-slate-400 outline-none focus:border-blue-500"
-              />
-              <button
-                onClick={() => handleSendMessage(inputValue)}
-                className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Center Panel - Preview */}
-        <div className="flex-1 flex flex-col bg-slate-900">
-          {/* Device Switcher */}
-          <div className="flex items-center justify-center gap-2 p-2 bg-slate-800 border-b border-slate-700">
-            {(['desktop', 'tablet', 'mobile'] as const).map((device) => (
-              <button
-                key={device}
-                onClick={() => setDeviceView(device)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  deviceView === device 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                }`}
-              >
-                {device.charAt(0).toUpperCase() + device.slice(1)}
-              </button>
-            ))}
-          </div>
-          
-          {/* Preview */}
-          <div className="flex-1 flex items-center justify-center p-8 overflow-auto">
-            <div className={`bg-white rounded-2xl shadow-2xl overflow-hidden transition-all ${
-              deviceView === 'desktop' ? 'w-full max-w-5xl h-[600px]' :
-              deviceView === 'tablet' ? 'w-[768px] h-[800px]' :
-              'w-[375px] h-[700px]'
-            }`}>
-              {/* Mock Website Preview */}
-              <div className="h-full flex flex-col">
-                <div className="bg-brand-red-600 text-white text-center py-8 px-4">
-                  <h1 className="text-2xl font-bold mb-2">Employer Apprenticeship</h1>
-                  <p className="text-sm opacity-90">Train the workforce of tomorrow</p>
-                  <button className="mt-4 px-6 py-2 bg-white text-brand-red-600 rounded-lg font-medium text-sm">
-                    Get Started
-                  </button>
-                </div>
-                <div className="flex-1 bg-slate-50 p-4">
-                  <div className="space-y-4">
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <CheckCircle2 className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-slate-900">Earn While You Learn</p>
-                          <p className="text-xs text-slate-500">Get paid during training</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                          <Clock className="w-5 h-5 text-emerald-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-slate-900">Flexible Schedule</p>
-                          <p className="text-xs text-slate-500">Work and train at your own pace</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                          <AlertCircle className="w-5 h-5 text-purple-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-slate-900">Nationally Certified</p>
-                          <p className="text-xs text-slate-500">DOL registered apprenticeship</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Panel - Project */}
-        <div className="w-72 bg-slate-800 border-l border-slate-700 flex flex-col">
-          <div className="p-4 border-b border-slate-700">
-            <h3 className="font-bold text-white flex items-center gap-2">
-              <Layers className="w-4 h-4" />
-              Project
-            </h3>
-            <div className="mt-2">
-              <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-brand-red-600 to-brand-red-500 rounded-full w-[45%] transition-all" />
-              </div>
-              <p className="text-xs text-slate-400 mt-1">45% Complete</p>
-            </div>
-          </div>
-          
-          {/* Workers */}
-          <div className="p-4 border-b border-slate-700">
-            <h4 className="text-sm font-medium text-slate-400 mb-3">AI Workers</h4>
-            <div className="space-y-2">
-              {workers.map((worker) => (
-                <div key={worker.id} className="flex items-center gap-3 p-2 bg-slate-700/50 rounded-lg">
-                  <span className="text-lg">{worker.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{worker.name}</p>
-                    <p className="text-xs text-slate-400 truncate">
-                      {worker.status === 'working' ? `${worker.progress}%` : worker.status}
-                    </p>
-                  </div>
-                  <div className={`w-2 h-2 rounded-full ${
-                    worker.status === 'working' ? 'bg-blue-500 animate-pulse' :
-                    worker.status === 'idle' ? 'bg-slate-500' :
-                    'bg-yellow-500'
-                  }`} />
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          {/* Tasks */}
-          <div className="flex-1 overflow-y-auto p-4">
-            <h4 className="text-sm font-medium text-slate-400 mb-3">Tasks</h4>
-            <div className="space-y-2">
-              {tasks.map((task) => (
-                <div 
-                  key={task.id} 
-                  className={`flex items-start gap-2 p-2 rounded-lg border-l-4 ${
-                    task.status === 'completed' ? 'bg-emerald-500/10 border-emerald-500' :
-                    task.status === 'in_progress' ? 'bg-blue-500/10 border-blue-500' :
-                    'bg-slate-700/50 border-slate-500'
-                  }`}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {COMMAND_CATEGORIES.find(c => c.id === activeCategory)?.commands.map((cmd, i) => (
+                <button
+                  key={i}
+                  onClick={() => executeCommand(cmd.text, activeCategory)}
+                  disabled={isProcessing}
+                  className="bg-slate-700/50 hover:bg-slate-700 disabled:opacity-50 rounded-xl p-4 text-left transition-colors group"
                 >
-                  {task.status === 'completed' ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5" />
-                  ) : task.status === 'in_progress' ? (
-                    <Loader2 className="w-4 h-4 text-blue-500 animate-spin mt-0.5" />
-                  ) : (
-                    <Clock className="w-4 h-4 text-slate-400 mt-0.5" />
-                  )}
-                  <p className={`text-sm flex-1 ${task.status === 'completed' ? 'text-slate-500 line-through' : 'text-white'}`}>
-                    {task.title}
-                  </p>
-                </div>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-white text-sm font-medium group-hover:text-yellow-400 transition-colors">{cmd.text}</p>
+                      <p className="text-slate-400 text-xs mt-1">{cmd.desc}</p>
+                    </div>
+                    <Loader2 className="w-4 h-4 text-slate-500 group-hover:text-yellow-400 mt-1 flex-shrink-0" />
+                  </div>
+                </button>
               ))}
             </div>
           </div>
+        )}
+
+        <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Type a command (e.g. 'Build a Medical Assistant course')..."
+              className="flex-1 bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-yellow-500 transition-colors"
+              disabled={isProcessing}
+            />
+            <button
+              onClick={() => handleCommand(inputValue, activeCategory ?? 'course-orchestrator')}
+              disabled={isProcessing || !inputValue.trim()}
+              className="px-5 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+            >
+              {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              {isProcessing ? 'Executing...' : 'Execute'}
+            </button>
+          </div>
+          <p className="text-slate-500 text-xs mt-2">
+            Commands execute via AI agents and are logged to the database. Results are real.
+          </p>
+        </div>
+
+        {showPanel && messages.length > 0 && (
+          <div className="mt-6 bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
+            <div className="px-5 py-3 bg-slate-700/50 border-b border-slate-700 flex items-center justify-between">
+              <h3 className="text-white font-bold text-sm">Execution Log</h3>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-slate-400">{messages.length} messages</span>
+                <button onClick={() => setShowPanel(false)} className="text-slate-400 hover:text-white transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <div className="max-h-96 overflow-y-auto p-5 space-y-3">
+              {messages.map((msg) => (
+                <div key={msg.id}>
+                  {msg.type === 'user' && (
+                    <div className="flex items-start justify-end gap-3">
+                      <div className="bg-blue-600/80 text-white rounded-2xl rounded-tr-none px-4 py-2.5 max-w-md">
+                        <p className="text-sm">{msg.content}</p>
+                      </div>
+                      <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Send className="w-3.5 h-3.5 text-white" />
+                      </div>
+                    </div>
+                  )}
+                  {msg.type === 'narration' && (
+                    <div className="flex items-start gap-3">
+                      <div className="w-7 h-7 bg-slate-600 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      </div>
+                      <div className="bg-slate-700/80 text-slate-300 rounded-2xl rounded-tl-none px-4 py-2.5 text-sm italic border border-slate-600">
+                        {msg.content}
+                      </div>
+                    </div>
+                  )}
+                  {msg.type === 'ai' && (
+                    <div className="flex items-start gap-3">
+                      <div className="w-7 h-7 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Sparkles className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 text-white rounded-2xl rounded-tl-none px-4 py-2.5 max-w-md">
+                        <p className="text-sm">{msg.content}</p>
+                      </div>
+                    </div>
+                  )}
+                  {msg.type === 'error' && (
+                    <div className="flex items-start gap-3">
+                      <div className="w-7 h-7 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <AlertCircle className="w-3.5 h-3.5 text-red-400" />
+                      </div>
+                      <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-2xl rounded-tl-none px-4 py-2.5 max-w-md">
+                        <p className="text-sm">{msg.content}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+              {isProcessing && (
+                <div className="flex items-start gap-3">
+                  <div className="w-7 h-7 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
+                  </div>
+                  <div className="bg-slate-700/80 text-slate-400 rounded-2xl rounded-tl-none px-4 py-2.5">
+                    <p className="text-sm italic">Agent is processing...</p>
+                  </div>
+                </div>
+              )}
+              <div ref={bottomRef} />
+            </div>
+          </div>
+        )}
+
+        <div className="mt-8 grid grid-cols-4 gap-4">
+          {[
+            { label: 'Total Executions', value: stats.total, color: 'text-white' },
+            { label: 'Successful', value: stats.completed, color: 'text-green-400' },
+            { label: 'In Progress', value: stats.active, color: 'text-yellow-400' },
+            { label: 'Failed', value: stats.failed, color: 'text-red-400' },
+          ].map(s => (
+            <div key={s.label} className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
+              <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+              <p className="text-xs text-slate-500 mt-1">{s.label}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>

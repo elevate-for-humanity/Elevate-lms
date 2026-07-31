@@ -117,7 +117,8 @@ export function WorkflowsOpsPanel() {
                   Run
                 </button>
                 <Link
-                  href={`/admin/studio/workflows                  className="text-[10px] font-semibold text-[#4ec9b0] hover:underline"
+                  href="/admin/studio/workflows"
+                  className="text-[10px] font-semibold text-[#4ec9b0] hover:underline"
                 >
                   Edit
                 </Link>

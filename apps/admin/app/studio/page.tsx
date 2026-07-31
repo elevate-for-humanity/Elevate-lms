@@ -1,24 +1,11 @@
-'use client';
-
-import nextDynamic from 'next/dynamic';
-
-// Prevent Next.js from prerendering this client component at build time.
-// The DevStudioUnifiedClient uses browser-only APIs (WebContainer, Monaco, etc.)
-// that cannot execute during static generation.
+// Minimal page to test routing — swap back to full DevStudioUnifiedClient once routing is confirmed working
 export const dynamic = 'force-dynamic';
 
-const DevStudioUnifiedClient = nextDynamic(
-  () => import('./DevStudioUnifiedClient'),
-  { 
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-red-600"></div>
-      </div>
-    )
-  }
-);
-
 export default function StudioPage() {
-  return <DevStudioUnifiedClient />;
+  return (
+    <div style={{ padding: '2rem', color: 'white', background: '#1e1e1e', minHeight: '100vh' }}>
+      <h1 style={{ fontSize: '24px', marginBottom: '1rem' }}>Studio Route Reached</h1>
+      <p>Routing is working — DevStudioUnifiedClient imports need debugging.</p>
+    </div>
+  );
 }

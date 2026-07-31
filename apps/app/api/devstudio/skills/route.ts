@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSkillsLoader } from '@/lib/dev-studio/skills-loader';
+import { getSkillsLoader } from '@/lib/studio/skills-loader';
 
 export const dynamic = 'force-dynamic';
 

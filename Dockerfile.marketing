@@ -6,7 +6,6 @@
 
 ARG GIT_SHA=unknown
 ARG BUILD_TIMESTAMP=unknown
-ARG CACHE_BUST=0
 
 # =============================================================================
 # STAGE 1: Base
@@ -39,8 +38,8 @@ COPY apps/marketing/package.json ./apps/marketing/package.json
 COPY packages/*/package.json ./packages/
 
 # Install dependencies
-# CACHE_BUST forces re-install when the build is triggered with a new value
-RUN echo "cache_bust=${CACHE_BUST}" && pnpm install --frozen-lockfile --strict-peer-dependencies=false
+# Hardcoded timestamp ensures fresh install on every build
+RUN echo "cache_bust=20250731" && pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 COPY . .
 

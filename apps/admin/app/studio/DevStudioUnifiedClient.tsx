@@ -101,23 +101,23 @@ const IntegrationsPanel = dynamic(
   { ssr: false },
 );
 const LizzyUploadPanel = dynamic(
-  () => import('@/components/dashboard/LizzyUploadPanel').then(m => m.LizzyUploadPanel || m.default || m),
+  () => import('@/components/admin/dashboard/LizzyUploadPanel').then(m => m.LizzyUploadPanel || m.default || m),
   { ssr: false },
 );
 const LizzyFilesPanel = dynamic(
-  () => import('@/components/dashboard/LizzyFilesPanel').then(m => m.LizzyFilesPanel || m.default || m),
+  () => import('@/components/admin/dashboard/LizzyFilesPanel').then(m => m.LizzyFilesPanel || m.default || m),
   { ssr: false },
 );
 const LizzyOperationsPanel = dynamic(
-  () => import('@/components/dashboard/LizzyOperationsPanel').then(m => m.LizzyOperationsPanel || m.default || m),
+  () => import('@/components/admin/dashboard/LizzyOperationsPanel').then(m => m.LizzyOperationsPanel || m.default || m),
   { ssr: false },
 );
 const LizzyErrorsPanel = dynamic(
-  () => import('@/components/dashboard/LizzyErrorsPanel').then(m => m.LizzyErrorsPanel || m.default || m),
+  () => import('@/components/admin/dashboard/LizzyErrorsPanel').then(m => m.LizzyErrorsPanel || m.default || m),
   { ssr: false },
 );
 const LizzyVideoPanel = dynamic(
-  () => import('@/components/dashboard/LizzyVideoPanel').then(m => m.LizzyVideoPanel || m.default || m),
+  () => import('@/components/admin/dashboard/LizzyVideoPanel').then(m => m.LizzyVideoPanel || m.default || m),
   { ssr: false },
 );
 

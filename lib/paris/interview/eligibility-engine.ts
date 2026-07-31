@@ -422,7 +422,7 @@ export function getFundingRecommendations(
   programSlug: string,
   eligibility: 'eligible' | 'review' | 'denied'
 ): FundingOption[] {
-  let options = FUNDING_OPTIONS[programSlug] || FUNDING_OPTIONS.default;
+  const options = FUNDING_OPTIONS[programSlug] || FUNDING_OPTIONS.default;
   
   if (eligibility === 'denied') {
     return options.filter(opt => opt.type === 'self_pay');

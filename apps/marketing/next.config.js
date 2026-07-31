@@ -55,7 +55,19 @@ const nextConfig = {
     scrollRestoration: false,
   },
   webpack: (config, { isServer }) => {
+    // Mark Node.js built-ins as externals for client builds so server-only
+    // code like lib/data/json-cache.ts (which uses 'fs') doesn't break
+    // the client bundle. The loadJsonOnce() function already guards
+    // with `typeof window !== 'undefined'` at runtime.
     if (!isServer) {
+      config.externals = [
+        ...(config.externals || []),
+        'fs', 'path', 'os', 'crypto', 'child_process', 'worker_threads',
+        'net', 'tls', 'http', 'https', 'dgram', 'querystring', 'stream',
+        'util', 'url', 'zlib', 'module', 'constants', 'v8', 'inspector',
+        'async_hooks', 'events', 'buffer', 'string_decoder', 'timers',
+        'domain', 'punycode', 'readline', 'repl', 'sys', 'tty', 'vm',
+      ];
       config.optimization.splitChunks = {
         ...config.optimization.splitChunks,
         cacheGroups: {

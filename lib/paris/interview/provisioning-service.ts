@@ -428,7 +428,7 @@ export async function provisionStudentFromInterview(
     }
     
     // Check if student already exists
-    let existingStudent = await getStudentByEmail(supabase, application.email);
+    const existingStudent = await getStudentByEmail(supabase, application.email);
     
     if (existingStudent) {
       studentId = existingStudent.id;

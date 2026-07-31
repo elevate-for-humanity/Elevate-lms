@@ -539,7 +539,6 @@ export default function NewWorkflowPage() {
         </div>
       </form>
       </div>
-      </div>
     </div>
   );
 }

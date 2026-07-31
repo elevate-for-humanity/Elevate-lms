@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { getAdminDashboardData } from '@/lib/admin/get-admin-dashboard-data';
 import { normalizeAdminDashboardData } from '@/lib/admin/normalize-dashboard-data';
-import { AdminDashboardContent } from '@/components/dashboard/DashboardShell';
+import { AdminDashboardContent } from '@/components/admin/dashboard/DashboardShell';
 
 export const dynamic = 'force-dynamic';
 

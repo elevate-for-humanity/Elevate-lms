@@ -158,7 +158,8 @@ export default function DevStudioWorkflowsPanel() {
                       Run
                     </button>
                     <Link
-                      href={`/admin/studio/workflows                      className="text-xs text-brand-blue-600 hover:underline"
+                      href={`/admin/studio/workflows`}
+                      className="text-xs text-brand-blue-600 hover:underline"
                     >
                       Edit
                     </Link>

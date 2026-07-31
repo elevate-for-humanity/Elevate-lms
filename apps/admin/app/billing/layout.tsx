@@ -2,6 +2,8 @@ import { requireRole } from '@/lib/auth/require-role';
 import { BillingSubnav, ADMIN_BILLING_NAV } from '@/components/billing/BillingSubnav';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminBillingLayout({ children }: { children: React.ReactNode }) {
   await requireRole(['admin', 'staff']);
 

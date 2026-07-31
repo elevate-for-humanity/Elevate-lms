@@ -16,7 +16,7 @@ import { BookOpen } from 'lucide-react';
 import { PanelHeader, PanelSkeleton } from './BlueprintPanel';
 
 const LessonManagerClient = dynamic(
-  () => import('@/apps/admin/app/studio/courses/[courseId]/content/LessonManagerClient').then((m) => m.default || m),
+  () => import('@/apps/admin/app/admin/studio/courses/[courseId]/content/LessonManagerClient').then((m) => m.default || m),
   { ssr: false, loading: () => <PanelSkeleton label="Curriculum" /> }
 );
 

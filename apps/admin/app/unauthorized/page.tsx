@@ -41,7 +41,7 @@ export default function UnauthorizedPage() {
   }, []);
 
   const isAdminPortalRole = ADMIN_PORTAL_ROLES.has(role ?? '');
-  const adminDashboardHref = `${ADMIN_ORIGIN.replace(/\/$/, '')}/admin/dashboard`;
+  const adminDashboardHref = `${ADMIN_ORIGIN.replace(/\/$/, '')}/dashboard`;
   const portalPath = role ? getRoleDestination(role) : null;
   const portalHref = portalPath?.startsWith('http')
     ? portalPath

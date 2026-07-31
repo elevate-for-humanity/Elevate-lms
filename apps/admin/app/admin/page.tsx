@@ -1,5 +1,5 @@
 /**
- * /admin/admin → /admin/dashboard
+ * /admin/admin → /dashboard
  * Required by check-admin-lms-separation.sh — canonical admin landing.
  */
 export const metadata = { robots: { index: false } };

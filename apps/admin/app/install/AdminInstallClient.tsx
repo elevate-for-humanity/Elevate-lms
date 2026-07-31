@@ -53,7 +53,7 @@ export default function AdminInstallClient() {
           <h1 className="text-2xl font-bold text-white mb-2">Admin App Installed</h1>
           <p className="text-slate-400 mb-6">Open it from your home screen or app drawer.</p>
           <Link
-            href="/admin/dashboard"
+            href="/dashboard"
             className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 font-semibold rounded-xl hover:bg-slate-100 transition-colors"
           >
             Open Admin Dashboard
@@ -139,7 +139,7 @@ export default function AdminInstallClient() {
 
         {/* Direct link fallback */}
         <Link
-          href="/admin/dashboard"
+          href="/dashboard"
           className="w-full flex items-center justify-center gap-2 px-6 py-3 border border-slate-700 text-slate-300 font-medium rounded-2xl hover:border-slate-500 hover:text-white transition-colors text-sm"
         >
           Open in browser instead

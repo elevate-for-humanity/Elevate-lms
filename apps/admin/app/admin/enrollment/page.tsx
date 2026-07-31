@@ -76,7 +76,7 @@ export default function AdminEnrollmentPage() {
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
-              <Link href="/admin/dashboard" className="hover:underline">Admin</Link>
+              <Link href="/dashboard" className="hover:underline">Admin</Link>
               <ChevronRight className="w-3 h-3" />
               <span>Enrollment</span>
             </div>

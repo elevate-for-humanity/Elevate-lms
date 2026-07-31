@@ -80,7 +80,7 @@ export default async function AdminDocumentReviewPage() {
               <p className="text-lg text-black">Review and approve uploaded documents</p>
             </div>
             <Link
-              href="/admin/dashboard"
+              href="/dashboard"
               className="px-6 py-3 bg-slate-200 text-black font-semibold rounded-lg hover:bg-slate-300 transition"
             >
               Back to Dashboard

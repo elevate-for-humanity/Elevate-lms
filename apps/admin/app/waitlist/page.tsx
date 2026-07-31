@@ -47,7 +47,7 @@ export default async function AdminWaitlistPage() {
             <p className="text-slate-700 mt-1">{entries?.length || 0} total entries</p>
           </div>
           <Link
-            href="/admin/dashboard"
+            href="/dashboard"
             className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
             Back to Dashboard

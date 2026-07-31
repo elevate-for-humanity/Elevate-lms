@@ -8,7 +8,7 @@ export default function AdminNotFound() {
         <h1 className="text-xl font-bold text-slate-900 mb-2">Admin Resource Unavailable</h1>
         <p className="text-slate-700 mb-6">The requested admin resource is unavailable or has moved.</p>
         <Link
-          href="/admin/dashboard"
+          href="/dashboard"
           className="inline-flex items-center justify-center px-5 py-2.5 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-medium text-sm"
         >
           Back to Dashboard

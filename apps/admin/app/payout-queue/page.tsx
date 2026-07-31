@@ -182,7 +182,7 @@ export default async function PayoutQueuePage({
 
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/admin/dashboard" className="text-slate-400 hover:text-slate-600">
+          <Link href="/dashboard" className="text-slate-400 hover:text-slate-600">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>

@@ -35,7 +35,7 @@ export default async function AIQualityPage() {
     <div className="min-h-screen bg-slate-50">
       <div className="bg-white border-b border-slate-200 px-6 py-5">
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-          <Link href="/admin/dashboard" className="hover:text-slate-700">Admin</Link>
+          <Link href="/dashboard" className="hover:text-slate-700">Admin</Link>
           <span>/</span>
           <Link href="/admin/paris" className="hover:text-slate-700">PARIS AI</Link>
           <span>/</span>

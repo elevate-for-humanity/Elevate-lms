@@ -13,7 +13,7 @@ export default async function MonitoringSetupPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       <div>
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-          <Link href="/admin/dashboard" className="hover:text-slate-700">Admin</Link>
+          <Link href="/dashboard" className="hover:text-slate-700">Admin</Link>
           <ChevronRight className="w-3 h-3" />
           <Link href="/admin/monitoring" className="hover:text-slate-700">Monitoring</Link>
           <ChevronRight className="w-3 h-3" />

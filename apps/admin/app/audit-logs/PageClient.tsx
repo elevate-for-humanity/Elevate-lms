@@ -112,7 +112,7 @@ export default function AuditLogsPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <Link
-              href="/admin/dashboard"
+              href="/dashboard"
               className="text-sm text-slate-700 hover:text-slate-700 mb-3 inline-block"
             >
               ← Back to Dashboard

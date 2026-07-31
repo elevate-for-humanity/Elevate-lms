@@ -62,7 +62,7 @@ export default async function TransferHoursPage() {
               </p>
             </div>
             <Link
-              href="/admin/dashboard"
+              href="/dashboard"
               className="px-6 py-3 border border-slate-300 rounded-lg text-black hover:bg-slate-50 font-medium"
             >
               Back to Dashboard

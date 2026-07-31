@@ -200,7 +200,7 @@ export default function LiveChatPage() {
                   Open Chat
                 </Link>
                 <Link
-                  href="/admin/dashboard"
+                  href="/dashboard"
                   className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
                 >
                   View Dashboard

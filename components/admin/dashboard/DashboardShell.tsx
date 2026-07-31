@@ -197,10 +197,67 @@ const ADMIN_CATEGORY_CARDS = [
     Icon: Settings,
     links: [
       { label: 'Open studio', href: '/admin/studio' },
-      { label: 'Workflows', href: '/admin/studio/workflows' },
+      	  { label: 'Workflows', href: '/admin/studio/workflows' },
     ],
   },
 ] as const;
+
+function WorkspaceCards() {
+  const workspaces = [
+    { title: "Website Editor", description: "Update hero banners, page copy, calls to action, program information, and public website content.", href: "/admin/website-editor", color: "from-pink-500 to-rose-500", icon: "🎨", stats: "47 pages" },
+    { title: "Course Builder", description: "Create courses, modules, lessons, assignments, exams, and completion requirements.", href: "/admin/studio", color: "from-amber-500 to-orange-500", icon: "📚", stats: "12 courses" },
+    { title: "Dev Studio", description: "Review source files, prepare code changes, inspect builds, and manage deployment workflows.", href: "/admin/studio", color: "from-violet-500 to-purple-500", icon: "⚡", stats: "Live" },
+    { title: "Programs", description: "Manage tuition, duration, funding, schedules, credentials, enrollment status, and program pages.", href: "/admin/programs", color: "from-emerald-500 to-teal-500", icon: "💼", stats: "8 active" },
+    { title: "Applications", description: "Review applicants, funding status, admissions steps, documents, and enrollment decisions.", href: "/admin/applications", color: "from-blue-500 to-cyan-500", icon: "👥", stats: "494 pending" },
+    { title: "Students", description: "Manage enrolled students, track progress, view grades, and handle credentials.", href: "/admin/students", color: "from-indigo-500 to-blue-500", icon: "🎓", stats: "217 total" },
+    { title: "Testing Center", description: "Schedule exams, manage test rooms, process certifications, and track credentials.", href: "/admin/testing-center", color: "from-red-500 to-pink-500", icon: "🏆", stats: "3 active" },
+    { title: "Billing & Payments", description: "Track payments, manage invoices, handle refunds, and monitor revenue.", href: "/admin/billing", color: "from-green-500 to-emerald-500", icon: "💳", stats: "$3.4M" },
+    { title: "Install Admin", description: "Install this dashboard on your computer, Android device, iPhone, or iPad.", href: "/admin/install", color: "from-slate-600 to-slate-800", icon: "📥", stats: "Available" },
+  ];
+
+  return (
+    <section className="mb-8">
+      <div className="mb-6">
+        <h2 className="text-2xl font-black text-slate-950">Workspaces</h2>
+        <p className="text-slate-600 mt-1">Quick access to all admin tools</p>
+      </div>
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {workspaces.map((workspace) => (
+          <Link
+            key={workspace.href + workspace.title}
+            href={workspace.href}
+            className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/10"
+          >
+            <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${workspace.color}`}></div>
+            <div className="p-6">
+              <div className="flex items-start justify-between">
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${workspace.color} flex items-center justify-center shadow-lg text-white text-2xl`}>
+                  {workspace.icon}
+                </div>
+                <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold bg-slate-100 text-slate-700">
+                  {workspace.title.split(" ")[0]}
+                </span>
+              </div>
+              <h3 className="mt-5 text-xl font-black text-slate-950 group-hover:text-blue-600 transition-colors">
+                {workspace.title}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                {workspace.description}
+              </p>
+              <div className="mt-6 flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-400">{workspace.stats}</span>
+                <span className="inline-flex items-center gap-1 text-sm font-bold text-blue-600 group-hover:gap-2 transition-all">
+                  Open
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function AdminCategoryLanding() {
   return (
@@ -614,6 +671,7 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
           dashboardUnavailable={(data.degradedSections ?? []).includes('dashboard_data')}
         />
 
+        <WorkspaceCards />
         <AdminCategoryLanding />
 
         <DashboardPanelErrorBoundary name="Publish website">

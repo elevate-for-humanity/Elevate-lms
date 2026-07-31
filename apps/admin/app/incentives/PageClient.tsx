@@ -81,7 +81,7 @@ export default function IncentivesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <Link
-            href="/admin/dashboard"
+            href="/dashboard"
             className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Dashboard

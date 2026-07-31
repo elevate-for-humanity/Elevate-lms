@@ -252,7 +252,7 @@ export default async function WioaReportPage({
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-6 py-5">
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-          <Link href="/admin/dashboard" className="hover:text-slate-700">Admin</Link>
+          <Link href="/dashboard" className="hover:text-slate-700">Admin</Link>
           <ChevronRight className="w-3 h-3" />
           <Link href="/admin/reports" className="hover:text-slate-700">Reports</Link>
           <ChevronRight className="w-3 h-3" />

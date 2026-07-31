@@ -183,7 +183,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-slate-500">
-        <Link href="/admin/dashboard" className="hover:text-slate-700">
+        <Link href="/dashboard" className="hover:text-slate-700">
           Dashboard
         </Link>
         <span>/</span>

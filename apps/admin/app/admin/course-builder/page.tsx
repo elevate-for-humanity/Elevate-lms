@@ -62,7 +62,7 @@ export default function CourseBuilderPage() {
     <main className="min-h-screen bg-slate-100 px-5 py-8">
       <div className="mx-auto max-w-5xl">
         <Link
-          href="/admin/dashboard"
+          href="/dashboard"
           className="font-bold text-blue-700"
         >
           ← Admin Dashboard

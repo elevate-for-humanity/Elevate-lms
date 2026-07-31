@@ -71,7 +71,7 @@ export default async function AdminNotificationsPage() {
       {/* Breadcrumb + title */}
       <div>
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
-          <Link href="/admin/dashboard" className="hover:text-slate-700">
+          <Link href="/dashboard" className="hover:text-slate-700">
             Admin
           </Link>
           <ChevronRight className="w-3 h-3" />

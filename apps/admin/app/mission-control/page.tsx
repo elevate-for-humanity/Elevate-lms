@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { MissionControlLiveOpsPanel } from '@/components/admin/dashboard/MissionControlLiveOpsPanel';
+import { MissionControlLiveOpsPanel } from '@/components/dashboard/MissionControlLiveOpsPanel';
 import {
   Activity,
   ArrowRight,

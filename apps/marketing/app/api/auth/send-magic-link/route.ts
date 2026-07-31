@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAdminClient } from '@/lib/supabase/admin';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     return safeError('Invalid email address', 400);
   }
 
-  const db = await getAdminClient();
+  const db = await requireAdminClient();
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   // Always route through /auth/callback so the session is established correctly

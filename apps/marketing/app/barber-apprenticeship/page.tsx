@@ -47,7 +47,7 @@ export default async function BarberApprenticeshipPage() {
   const supabase = createPublicClient();
 
   // Pull live program data
-  const { data: program } = await db
+  const { data: program } = await supabase
     .from('programs')
     .select(
       'id, title, description, short_description, duration_weeks, tuition_cost, credential_type, status',
@@ -56,20 +56,20 @@ export default async function BarberApprenticeshipPage() {
     .maybeSingle();
 
   // Pull active apprentices count
-  const { count: activeApprentices } = await db
+  const { count: activeApprentices } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'active')
     .eq('program_id', program?.id ?? '');
 
-  const { count: completedApprentices } = await db
+  const { count: completedApprentices } = await supabase
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed')
     .eq('program_id', program?.id ?? '');
 
   // Pull host shop locations
-  const { data: hostShops } = await db
+  const { data: hostShops } = await supabase
     .from('apprenticeship_host_employers')
     .select('id, business_name, city, state, accepting_apprentices')
     .eq('program_type', 'barber')

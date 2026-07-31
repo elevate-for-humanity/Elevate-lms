@@ -16,7 +16,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { getAdminClient } from '@/lib/supabase/admin';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Upsert user in Supabase Auth
-    const admin = await getAdminClient();
+    const admin = await requireAdminClient();
     const { data: existing } = await admin.auth.admin.listUsers() as { data: { users?: Array<{ id: string; email?: string }> } | null };
     const existingUser = existing?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase());
 

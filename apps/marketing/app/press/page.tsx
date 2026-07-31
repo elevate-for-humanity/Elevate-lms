@@ -21,7 +21,7 @@ export default async function PressPage() {
   const supabase = createPublicClient();
 
   // Press-specific posts (category = 'press' or 'media')
-  const { data: pressItems } = await db
+  const { data: pressItems } = await supabase
     .from('blog_posts')
     .select('id, title, slug, excerpt, featured_image, published_at, category')
     .eq('published', true)
@@ -30,7 +30,7 @@ export default async function PressPage() {
     .limit(12);
 
   // Recent news as fallback if no press-tagged posts
-  const { data: recentNews } = await db
+  const { data: recentNews } = await supabase
     .from('blog_posts')
     .select('id, title, slug, excerpt, featured_image, published_at, category')
     .eq('published', true)

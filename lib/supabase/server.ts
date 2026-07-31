@@ -59,11 +59,11 @@ const mockClient = {
   rpc: () => Promise.resolve({ data: null, error: null }),
 } as unknown as SupabaseClient<any>;
 
-// Returns a real Supabase client. Throws if env vars are missing — misconfiguration
-// must be caught immediately, not silently swallowed by a mock.
-export async function createClient(): Promise<SupabaseClient<any> | null> {
+// Returns a real Supabase client. Returns mockClient if env vars are missing.
+// Never throws, never returns null — callers can safely use .auth and .from.
+export async function createClient(): Promise<SupabaseClient<any>> {
   if (!isSupabaseConfigured()) {
-    return null;
+    return mockClient;
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

@@ -81,6 +81,7 @@ const adminConfig = {
       config.plugins.push(
         new (require('webpack').ProvidePlugin)({
           Buffer: ['buffer', 'Buffer'],
+          buffer: 'buffer',
         })
       );
     }

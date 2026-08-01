@@ -1,4 +1,7 @@
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
+import path from 'node:path';
+
+const ROOT = path.resolve(__dirname, '../..');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -15,6 +18,28 @@ const nextConfig = {
     NEXT_PUBLIC_GIT_SHA: resolveCommitSha(process.env),
     NEXT_PUBLIC_BUILD_ID: `elevate-${resolveCommitSha(process.env)}`,
     NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
+  },
+
+  // Resolve @/* to repo root so shared lib/, components/, types/ work
+  webpack(config, { isServer }) {
+    config.resolve.alias['@'] = ROOT;
+    // Keep peak memory stable during marketing builds on low-RAM runners.
+    config.parallelism = 1;
+    // Browser polyfill for @react-pdf/renderer and other Node.js modules that use Buffer
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        buffer: require.resolve('buffer/'),
+      };
+      config.plugins = config.plugins || [];
+      config.plugins.push(
+        new (require('webpack').ProvidePlugin)({
+          Buffer: ['buffer', 'Buffer'],
+          buffer: 'buffer',
+        }),
+      );
+    }
+    return config;
   },
 
   images: { unoptimized: true },

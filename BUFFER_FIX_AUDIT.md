@@ -1,66 +1,48 @@
 # BUFFER POLYFILL - SIDE-BY-SIDE AUDIT
 
 **Date:** 2026-08-01
-**Issue:** `buffer is not defined` browser error in admin app
-**Root Cause:** Missing webpack buffer polyfill for @webcontainer/api
+**Issue:** `buffer is not defined` browser error in marketing app (layout-4d1c44065dc94db2.js:1:7135)
+**Root Cause:** Missing webpack buffer polyfill for @react-pdf/renderer in marketing and lms apps
 
 ---
 
 ## SIDE-BY-SIDE COMPARISON
 
-### MARKETING APP (Working)
+### ADMIN APP (Already Fixed)
 
 ```javascript
-// apps/marketing/next.config.js - Line 55-75
-webpack: (config, { isServer }) => {
-  if (!isServer) {
-    config.externals = [
-      ...(config.externals || []),
-      'fs', 'path', 'os', 'crypto', 'child_process', 'worker_threads',
-      'net', 'tls', 'http', 'https', 'dgram', 'querystring', 'stream',
-      'util', 'url', 'zlib', 'module', 'constants', 'v8', 'inspector',
-      'async_hooks', 'events', 'buffer', 'string_decoder', 'timers',  // ← BUFFER HERE
-      'domain', 'punycode', 'readline', 'repl', 'sys', 'tty', 'vm',
-    ];
-  }
-  return config;
+// apps/admin/next.config.mjs - Lines 74-87
+if (!isServer) {
+  config.resolve.fallback = {
+    ...config.resolve.fallback,
+    buffer: require.resolve('buffer/'),
+  };
+  config.plugins = config.plugins || [];
+  config.plugins.push(
+    new (require('webpack').ProvidePlugin)({
+      Buffer: ['buffer', 'Buffer'],
+      buffer: 'buffer',
+    })
+  );
 }
 ```
 
-### ADMIN APP - BEFORE FIX (Broken)
+### MARKETING APP - BEFORE FIX (Broken)
 
 ```javascript
-// apps/admin/next.config.mjs - Line 59-74 (BEFORE)
-webpack(config, { isServer }) {
-  config.resolve.alias['@'] = ROOT;
-  if (isServer) {
-    config.resolve.alias['@/lib/logger'] = path.join(ROOT, 'lib/logger.ts');
-    config.resolve.alias['@/lib/supabase'] = path.join(ROOT, 'lib/supabase');
-  }
-  config.parallelism = 1;
-  if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') {
-    config.cache = false;
-  }
-  // ❌ NO BUFFER CONFIG HERE!
-  return config;
+// apps/marketing/next.config.mjs - Line 1-47 (BEFORE)
+webpack: (config) => {
+  // NO webpack configuration - missing buffer polyfill!
 }
 ```
 
-### ADMIN APP - AFTER FIX (Fixed)
+### MARKETING APP - AFTER FIX (Fixed)
 
 ```javascript
-// apps/admin/next.config.mjs - Line 59-88 (AFTER)
+// apps/marketing/next.config.mjs - Lines 24-43 (AFTER)
 webpack(config, { isServer }) {
   config.resolve.alias['@'] = ROOT;
-  if (isServer) {
-    config.resolve.alias['@/lib/logger'] = path.join(ROOT, 'lib/logger.ts');
-    config.resolve.alias['@/lib/supabase'] = path.join(ROOT, 'lib/supabase');
-  }
   config.parallelism = 1;
-  if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') {
-    config.cache = false;
-  }
-  // ✅ ADDED: Browser polyfill for @webcontainer/api
   if (!isServer) {
     config.resolve.fallback = {
       ...config.resolve.fallback,
@@ -70,7 +52,47 @@ webpack(config, { isServer }) {
     config.plugins.push(
       new (require('webpack').ProvidePlugin)({
         Buffer: ['buffer', 'Buffer'],
-      })
+        buffer: 'buffer',
+      }),
+    );
+  }
+  return config;
+}
+```
+
+### LMS APP - BEFORE FIX (Broken)
+
+```javascript
+// apps/lms/next.config.mjs - Lines 55-62 (BEFORE)
+webpack: (config) => {
+  config.resolve.alias = {
+    ...config.resolve.alias,
+    '@': resolve(__dirname, '../..'),
+  };
+  return config;
+}
+```
+
+### LMS APP - AFTER FIX (Fixed)
+
+```javascript
+// apps/lms/next.config.mjs - Lines 55-76 (AFTER)
+webpack: (config, { isServer }) => {
+  config.resolve.alias = {
+    ...config.resolve.alias,
+    '@': resolve(__dirname, '../..'),
+  };
+  if (!isServer) {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      buffer: require.resolve('buffer/'),
+    };
+    config.plugins = config.plugins || [];
+    config.plugins.push(
+      new (require('webpack').ProvidePlugin)({
+        Buffer: ['buffer', 'Buffer'],
+        buffer: 'buffer',
+      }),
     );
   }
   return config;
@@ -79,113 +101,84 @@ webpack(config, { isServer }) {
 
 ---
 
-## LINE-BY-LINE BREAKDOWN
+## ROOT CAUSE ANALYSIS
 
-| Line | BEFORE | AFTER | Change |
-|------|--------|-------|--------|
-| 74 | (empty) | `if (!isServer) {` | ADDED |
-| 75 | (empty) | `config.resolve.fallback = {` | ADDED |
-| 76 | (empty) | `...config.resolve.fallback,` | ADDED |
-| 77 | (empty) | `buffer: require.resolve('buffer/'),` | ADDED |
-| 78 | (empty) | `},` | ADDED |
-| 79 | (empty) | `config.plugins = config.plugins || [];` | ADDED |
-| 80 | (empty) | `config.plugins.push(` | ADDED |
-| 81 | (empty) | `new (require('webpack').ProvidePlugin)({` | ADDED |
-| 82 | (empty) | `Buffer: ['buffer', 'Buffer'],` | ADDED |
-| 83 | (empty) | `})` | ADDED |
-| 84 | (empty) | `);` | ADDED |
-| 85 | (empty) | `}` | ADDED |
+### Problematic Libraries
 
----
+1. **@react-pdf/renderer** (v4.3.1)
+   - Used in: `lib/curriculum/export/pdf-exporter.tsx`
+   - Dependencies: `@react-pdf/textkit` which uses Node.js `Buffer`
 
-## WHY THIS BREAKS
+2. **@webcontainer/api**
+   - Used in: `components/studio/WebContainerSandbox.tsx`
+   - Requires buffer for browser sandbox environment
 
-### Component Using @webcontainer/api
+### Why This Breaks
 
-```typescript
-// components/studio/WebContainerSandbox.tsx - Line 41
-const { WebContainer } = await import('@webcontainer/api');
-```
-
-### @webcontainer/api Dependencies
-
-The `@webcontainer/api` package internally uses Node.js `buffer` module:
-
-```
-@webcontainer/api
-├── buffer (required for browser polyfill)
-├── process (required)
-└── stream (required)
-```
-
-### Error Without Polyfill
+The `buffer` npm package provides a browser-compatible implementation of Node.js `Buffer` class. When webpack bundles for browser without the polyfill:
 
 ```javascript
-// Browser console
+// Browser tries to use Buffer from buffer package
+// But buffer isn't resolved, causing:
 ReferenceError: buffer is not defined
-    at Object.<anonymous> (layout-4d1c44065dc94db2.js:module:33105)
-    at __webpack_require__ (layout-4d1c44065dc94db2.js)
-    at (unknown) (undefined)
 ```
 
 ---
 
-## THE FIX
+## FILES MODIFIED
 
-### 1. resolve.fallback.buffer
-
-```javascript
-config.resolve.fallback = {
-  ...config.resolve.fallback,
-  buffer: require.resolve('buffer/'),
-};
-```
-
-**Purpose:** Tell webpack where to find the `buffer` module when bundling for browser.
-
-### 2. ProvidePlugin for Buffer
-
-```javascript
-new (require('webpack').ProvidePlugin)({
-  Buffer: ['buffer', 'Buffer'],
-})
-```
-
-**Purpose:** Automatically import `Buffer` whenever code uses `Buffer` without importing it.
-
----
-
-## VERIFICATION
-
-### Package Available
-
+### 1. `package.json`
+Added `buffer` as direct dependency:
 ```bash
-$ grep "buffer@" pnpm-lock.yaml
-  buffer@6.0.3:
+npm install buffer --legacy-peer-deps
 ```
 
-### Commit Pushed
+### 2. `next.config.mjs` (Root)
+Updated webpack configuration to include buffer polyfill:
+```javascript
+if (!isServer) {
+  config.resolve.fallback = {
+    ...config.resolve.fallback,
+    fs: false,
+    net: false,
+    tls: false,
+    child_process: false,
+    buffer: require.resolve('buffer/'),  // ADDED
+  };
+  config.plugins = config.plugins || [];
+  config.plugins.push(
+    new (require('webpack').ProvidePlugin)({
+      Buffer: ['buffer', 'Buffer'],     // ADDED
+      buffer: 'buffer',                  // ADDED
+    }),
+  );
+}
+```
 
-```
-Commit: 3cbcdf2afd
-Message: fix: add buffer polyfill for @webcontainer/api browser bundle
-```
+### 3. `apps/marketing/next.config.mjs`
+Added complete webpack configuration with buffer polyfill
 
-### GitHub Actions
-
-```
-Workflow: Deploy Admin
-Status: RUNNING (auto-triggered by push)
-```
+### 4. `apps/lms/next.config.mjs`
+Extended existing webpack configuration with buffer polyfill
 
 ---
 
-## USER VERIFICATION STEPS
+## DEPLOYMENT STEPS
 
-1. Wait for GitHub Actions to complete
-2. Clear browser cache:
+1. Rebuild all apps:
+   ```bash
+   pnpm build:marketing
+   pnpm build:admin
+   pnpm build:lms
+   ```
+
+2. Deploy to production (via GitHub Actions or manual)
+
+3. Clear browser cache:
    - Chrome DevTools → Application → Service Workers → Unregister
    - Application → Storage → Clear site data
-3. Hard refresh: Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)
-4. Open Dev Studio: `/admin/dev-studio`
-5. Check console - `buffer is not defined` should be FIXED
+   - Hard refresh: Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)
+
+4. Verify fix:
+   - Open browser console on affected pages
+   - `buffer is not defined` error should be gone

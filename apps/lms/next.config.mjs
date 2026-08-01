@@ -52,12 +52,26 @@ const nextConfig = {
     '@remotion/licensing',
     'esbuild',
   ],
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     // Map @ to repo root where lms-data lives
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': resolve(__dirname, '../..'),
     };
+    // Browser polyfill for @react-pdf/renderer and other Node.js modules that use Buffer
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        buffer: require.resolve('buffer/'),
+      };
+      config.plugins = config.plugins || [];
+      config.plugins.push(
+        new (require('webpack').ProvidePlugin)({
+          Buffer: ['buffer', 'Buffer'],
+          buffer: 'buffer',
+        }),
+      );
+    }
     return config;
   },
 };

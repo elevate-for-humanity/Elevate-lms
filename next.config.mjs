@@ -176,6 +176,8 @@ const nextConfig = {
     },
   },
   webpack: (config, { isServer }) => {
+    // webpack 5 polyfills node core modules automatically but requires explicit configuration
+    // for modules like buffer that need browser polyfills
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -183,7 +185,18 @@ const nextConfig = {
         net: false,
         tls: false,
         child_process: false,
+        buffer: require.resolve('buffer/'),
       };
+
+      // Use ProvidePlugin to make buffer available as a global in the browser
+      // This is needed because @react-pdf/renderer and other libraries use Buffer
+      config.plugins = config.plugins || [];
+      config.plugins.push(
+        new (require('webpack').ProvidePlugin)({
+          Buffer: ['buffer', 'Buffer'],
+          buffer: 'buffer',
+        }),
+      );
     }
 
     // Webpack cache configuration for consistent builds

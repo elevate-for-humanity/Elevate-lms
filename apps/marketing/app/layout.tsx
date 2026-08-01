@@ -1,3 +1,11 @@
+/**
+ * IMPORTANT: client-polyfills MUST be the first import in this file.
+ * It patches the browser environment (Buffer, process, etc.) before
+ * any other module — including Next.js internals — runs.
+ * Placing it anywhere else risks a "Buffer is not defined" crash.
+ */
+import './client-polyfills';
+
 import type { Metadata } from 'next';
 import './globals.css';
 import './layout.css';

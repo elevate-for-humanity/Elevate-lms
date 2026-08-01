@@ -91,6 +91,8 @@ COPY --from=dependencies /workspace/node_modules ./node_modules
 COPY . .
 
 # Build Marketing app
+# GUARD: Check for Node.js APIs in client bundles before building
+RUN pnpm check:client-node-globals
 RUN pnpm --filter @elevate/marketing build
 
 # =============================================================================

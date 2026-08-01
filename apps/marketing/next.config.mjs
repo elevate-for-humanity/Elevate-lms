@@ -24,6 +24,36 @@ const nextConfig = {
     NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
   },
 
+  // ================================================================
+  // BROWSER POLYFILLS — expose Node.js globals for third-party deps
+  // ================================================================
+  webpack: (config, { isServer }) => {
+    if (isServer) return config;
+
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      buffer: require.resolve('buffer'),
+      process: require.resolve('process'),
+      fs: false,
+      net: false,
+      tls: false,
+      child_process: false,
+    };
+
+    config.plugins = [
+      ...config.plugins,
+      // Expose both `Buffer` (uppercase) and `buffer` (lowercase) as global vars.
+      // Third-party libs reference one or the other.
+      new (require('webpack').ProvidePlugin)({
+        Buffer: ['buffer', 'Buffer'],
+        buffer: ['buffer', 'Buffer'],
+        process: ['process'],
+      }),
+    ];
+
+    return config;
+  },
+
   images: { unoptimized: true },
   async redirects() {
     return [

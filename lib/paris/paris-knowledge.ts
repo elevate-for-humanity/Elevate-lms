@@ -397,12 +397,27 @@ export const PARS_KNOWLEDGE: Record<string, ProgramBlueprint> = {
       { id: "cd_1", question: "Describe your experience with cloud platforms and what you've deployed.", category: "Cloud Experience", scoringRubric: { 1: "No cloud experience", 2: "Basic familiarity with one platform", 3: "Hands-on experience with deployments and services", 4: "Multi-cloud experience with advanced services", 5: "Production-grade implementations with thousands of users" }, weight: 1.2 },
       { id: "cd_2", question: "How would you design a CID/CD Ppeline for a microservices application?", category: "DevOps Practices", scoringRubric: { 1: "No understanding of CI/CD concepts", 2: "Basic pipeline understanding without specifics", 3: "Standard pipeline with build, test, deploy stages", 4: "Advanced pipeline with security scanning, canary deployments, rollback", 5: "Enterprise-grade pipeline with GitOps, feature flags, observability, and SRE practices" }, weight: 1.3 },
       { id: "cd_3", question: "Explain Infrastructure as Code. Why is it important and what tools have you used?", category: "Iac Knowledge", scoringRubric: { 1: "No concept of Iac", 2: "Basic definition without tool experience", 3: "Hands-on with Terraform or CloudFormation", 4: "Multi-tool experience with best practices", 5: "Advanced patterns including modules, state management, policy-as-code" }, weight: 1.2 },
-      { id: "cd_4", question: "Tell me about a time you debugged a production issue under pressure." category: "Troubleshooting", scoringRubric: { 1: "No relevant experience", 2: "Minor issue resolution without stress", 3: "Clear incident with resolution process shown", 4: "Complex incident with systematic debugging approach", 5: "Multi-team coordination, root cause analysis, and preventive measures implemented" }, weight: 1.3 },
+      { id: "cd_4", question: "Tell me about a time you debugged a production issue under pressure.", category: "Troubleshooting", scoringRubric: { 1: "No relevant experience", 2: "Minor issue resolution without stress", 3: "Clear incident with resolution process shown", 4: "Complex incident with systematic debugging approach", 5: "Multi-team coordination, root cause analysis, and preventive measures implemented" }, weight: 1.3 },
       { id: "cd_5", question: "How do you approach containerization and orchestration for an application?", category: "Container Knowledge", scoringRubric: { 1: "No container experience", 2: "Basic Docker knowledge", 3: "Docker experience with docker-compose", 4: "Kubernetes experience with deployments, services, ingress", 5: "Advanced Kubernetes including Helm, operators, service mesh, autoscaling" }, weight: 1.2 },
-      { id: "cd_6", question: "What monitoring and observability tools do you use or want to learn?" category: "Observability", scoringRubric: { 1: "No monitoring experience", 2: "Basic logging or single metric tool", 3: "Familiar with standard stack (Prometheus, Grafana, ELK)", 4: "Advanced observability with distributed tracing, alerting", 5: "Full observability with SLOs, error budgets, chaos engineering" }, weight: 1.1 },
+      { id: "cd_6", question: "What monitoring and observability tools do you use or want to learn?", category: "Observability", scoringRubric: { 1: "No monitoring experience", 2: "Basic logging or single metric tool", 3: "Familiar with standard stack (Prometheus, Grafana, ELK)", 4: "Advanced observability with distributed tracing, alerting", 5: "Full observability with SLOs, error budgets, chaos engineering" }, weight: 1.1 },
       { id: "cd_7", question: "Describe your scripting and automation experience.", category: "Automation Skills", scoringRubric: { 1: "No scripting experience", 2: "Basic shell scripts", 3: "Scripting in Python or similar for automation", 4: "Advanced automation with configuration management", 5: "Full automation framework development, self-healing systems" }, weight: 1.1 },
-      { id: "cd_8", question: "where do you see the DevOps/SRE field heading in the next 5 years?" category:  Industry Awareness", scoringRubric: { 1: "No awareness of industry trends", 2: "Basic familiarity with current tools", 3: "Aware of major trends like GitOps, platform engineering", 4: "Deep understanding of trends with informed opinions", 5: "Thought leader perspective on future of operations, FinOps, platform teams" }, weight: 1.0 }
+      { id: "cd_8", question: "where do you see the DevOps/SRE field heading in the next 5 years?", category: "Industry Awareness", scoringRubric: { 1: "No awareness of industry trends", 2: "Basic familiarity with current tools", 3: "Aware of major trends like GitOps, platform engineering", 4: "Deep understanding of trends with informed opinions", 5: "Thought leader perspective on future of operations, FinOps, platform teams" }, weight: 1.0 }
     ],
     fundingTiers: { tier1: { min: 65, max: 74, criteria: ["Basic Linux and networking knowledge", "Command line proficiency", "Clear DevOps interest"] }, tier2: { min: 75, max: 84, criteria: ["Some CI/CD experience", "Container basics", "Scripting skills"] }, tier3: { min: 85, max: 100, criteria: ["Production infrastructure experience", "Multiple cloud platforms", "Open source contributions"] } }
   },
   product_management: {
+    id: "product_management",
+    name: "Product Management",
+    description: "Learn product strategy, roadmapping, user research, and agile methodologies.",
+    duration: "12 weeks",
+    credentials: ["Product Management Certificate"],
+    careerPaths: ["Product Manager", "Product Owner", "Scrum Master"],
+    targetProfile: {
+      traits: ["Strategic thinking", "Communication", "Analytical", "Empathy"],
+      background: ["Business experience", "Basic analytics", "Stakeholder management"],
+      goals: ["PM role", "Product leadership", "Startup experience"]
+    },
+    interviewQuestions: [],
+    fundingTiers: { tier1: { min: 50, max: 69, criteria: ["Basic business knowledge"] }, tier2: { min: 70, max: 89, criteria: ["Some product experience"] }, tier3: { min: 90, max: 100, criteria: ["Strong PM skills"] } }
+  }
+};

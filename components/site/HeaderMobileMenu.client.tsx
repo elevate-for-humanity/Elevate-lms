@@ -378,7 +378,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
               </div>
             </div>
           </>,
-          document.body,
+          document?.body ?? null,
         )
       : null;
 

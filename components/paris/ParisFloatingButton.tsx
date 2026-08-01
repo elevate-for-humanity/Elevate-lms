@@ -1,13 +1,21 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { X, MessageCircle } from 'lucide-react';
+import dynamic from 'next/dynamic';
 
-// Dynamic import disabled - chunks missing in production build causing crashes
-// TODO: Re-enable once build is fixed
-// import dynamic from 'next/dynamic';
-// const ParisChat = dynamic(() => import('./ParisChat'), { ssr: false, loading: () => null });
-import ParisChat from './ParisChat';
+// Dynamic import - only loads on client side to prevent SSR/hydration issues
+const ParisChat = dynamic(() => import('./ParisChat'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-full">
+      <div className="flex items-center gap-2 text-slate-500">
+        <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+        <span className="text-sm">Loading assistant...</span>
+      </div>
+    </div>
+  ),
+});
 
 export function ParisFloatingButton() {
   const [isOpen, setIsOpen] = useState(false);

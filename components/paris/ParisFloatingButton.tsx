@@ -1,18 +1,14 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { X, MessageCircle } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import { X, MessageCircle } from 'lucide-react';
 
-// Dynamic import - only loads on client side to prevent SSR/hydration issues
 const ParisChat = dynamic(() => import('./ParisChat'), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center h-full">
-      <div className="flex items-center gap-2 text-slate-500">
-        <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
-        <span className="text-sm">Loading assistant...</span>
-      </div>
+      <div className="animate-spin w-8 h-8 border-4 border-brand-red-600 border-t-transparent rounded-full" />
     </div>
   ),
 });

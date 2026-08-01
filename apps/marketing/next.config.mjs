@@ -7,9 +7,9 @@ const __dirname = path.dirname(__filename);
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  // Trace from workspace root so .next dir ends up at /app/.next/
-  // server.js runs from /app/ and looks for /app/.next/
-  outputFileTracingRoot: '/app',
+  // Must trace from workspace root so .next dir ends up at /app/apps/marketing/.next/
+  // matching Dockerfile COPY paths: /app/apps/marketing/.next ./.next
+  outputFileTracingRoot: path.join(__dirname, '../..'),
 
   // Deterministic build ID — never use Date.now(), Math.random(), or random UUID.
   generateBuildId: async () => {

@@ -1,145 +1,101 @@
-# syntax=docker/dockerfile:1.7
-# Dockerfile.marketing - Northflank Marketing Service
-# Serves www.elevateforhumanity.org
-#
-# CRITICAL: This Dockerfile was fixed to resolve path mismatches.
-
-ARG GIT_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
-
-# =============================================================================
-# STAGE 1: Base
-# =============================================================================
-FROM node:22-bookworm-slim AS base
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 make g++ ca-certificates curl git && \
-    rm -rf /var/lib/apt/lists/*
+FROM node:22-alpine AS base
 
 ENV PNPM_HOME="/pnpm"
-ENV PATH="${PNPM_HOME}:${PATH}"
+ENV PATH="$PNPM_HOME:$PATH"
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NEXT_STANDALONE_OUTPUT=1
-
-# Cache invalidation marker - v5: timestamp-based to force Docker layer rebuild
-RUN echo "nf-cache-invalidate-marketing-$(date +%Y%m%d-%H%M%S)"
 
 RUN corepack enable
+RUN corepack prepare pnpm@10.28.2 --activate
+
 WORKDIR /app
 
-# =============================================================================
-# STAGE 2: Builder
-# =============================================================================
-FROM base AS builder
+FROM base AS dependencies
 
-# Copy manifests first for layer caching
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/marketing/package.json ./apps/marketing/package.json
-COPY packages/*/package.json ./packages/
 
-# Install dependencies
-# Hardcoded timestamp ensures fresh install on every build
-RUN echo "cache_bust=20250731" && pnpm install --frozen-lockfile --strict-peer-dependencies=false
+RUN pnpm install --frozen-lockfile
+
+FROM base AS builder
+
+ARG GITHUB_SHA=unknown
+ARG GIT_SHA=unknown
+ARG NEXT_PUBLIC_GIT_SHA=unknown
+ARG BUILD_TIMESTAMP=unknown
+
+ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+ENV NEXT_STANDALONE_OUTPUT=1
+ENV GITHUB_SHA=$GITHUB_SHA
+ENV GIT_SHA=$GIT_SHA
+ENV NEXT_PUBLIC_GIT_SHA=$NEXT_PUBLIC_GIT_SHA
+ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
+
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies /app/apps/marketing/node_modules ./apps/marketing/node_modules
 
 COPY . .
 
-# Build args - GIT_SHA passed from Northflank (set by trigger-build.ts)
-ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
-ARG NEXT_PUBLIC_SUPABASE_URL
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG GIT_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
-
-ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
-ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-ENV NODE_ENV=production
-ENV NODE_OPTIONS="--max-old-space-size=8192"
-ENV CI=true
-ENV GIT_SHA=${GIT_SHA}
-ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
-
-# version.json is generated at build time by Docker
-# Server.js serves the Next.js app
-
-# DEBUG: Print all build arguments to see what Northflank passed
-RUN echo "=== BUILD ARG DEBUG ===" && \
-    echo "GIT_SHA=${GIT_SHA}" && \
-    echo "GITHUB_SHA=${GITHUB_SHA}" && \
-    echo "BUILD_TIMESTAMP=${BUILD_TIMESTAMP}" && \
-    echo "FALLBACK_COMMIT=${FALLBACK_COMMIT}" && \
-    echo "==================="
-
-# Build Marketing app
-# GUARD: Check for Node.js APIs in client bundles before building
-RUN pnpm check:client-node-globals
 RUN pnpm --filter @elevate/marketing build
 
-# =============================================================================
-# STAGE 3: Runtime
-# =============================================================================
-FROM node:22-bookworm-slim AS runner
+RUN test -d /app/apps/marketing/.next
+RUN test -f /app/apps/marketing/.next/BUILD_ID
 
-# Redeclare build args for runtime stage
-ARG GIT_SHA=unknown
-ARG BUILD_TIMESTAMP=unknown
+RUN if [ -f /app/apps/marketing/.next/standalone/server.js ]; then \
+      echo "Standalone server found at workspace level"; \
+    elif [ -f /app/apps/marketing/.next/standalone/apps/marketing/server.js ]; then \
+      echo "Standalone server found at monorepo app level"; \
+    else \
+      echo "ERROR: standalone server.js was not generated"; \
+      find /app/apps/marketing/.next -maxdepth 5 -name "server.js" -print; \
+      exit 1; \
+    fi
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV HOSTNAME=0.0.0.0
-ENV PORT=8080
-ENV SERVICE_NAME=elevate-marketing
-ENV GIT_SHA=${GIT_SHA}
-ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-# Install curl for health check
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
-RUN groupadd --system --gid 1001 nodejs && \
-    useradd --system --uid 1001 --gid nodejs nextjs
+RUN addgroup \
+      --system \
+      --gid 1001 \
+      nodejs \
+    && adduser \
+      --system \
+      --uid 1001 \
+      nextjs
 
-# Copy the entire Next.js build output to /app/
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next ./.next
+COPY --from=builder \
+  --chown=nextjs:nodejs \
+  /app/apps/marketing/.next/standalone \
+  ./
 
-# Copy public folder (contains version.json generated in builder stage)
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder \
+  --chown=nextjs:nodejs \
+  /app/apps/marketing/.next/static \
+  ./apps/marketing/.next/static
 
-# Set ownership on public folder
-RUN chown -R nextjs:nodejs ./public
+COPY --from=builder \
+  --chown=nextjs:nodejs \
+  /app/apps/marketing/public \
+  ./apps/marketing/public
 
-# Copy node_modules (needed for runtime dependencies)
-COPY --from=builder /app/node_modules ./node_modules
-
-# Create a simple server that serves the Next.js app
-RUN printf '%s\n' \
-  'const { createServer } = require("http");' \
-  'const { parse } = require("url");' \
-  'const next = require("next");' \
-  'const dev = process.env.NODE_ENV !== "production";' \
-  'const hostname = process.env.HOSTNAME || "0.0.0.0";' \
-  'const port = parseInt(process.env.PORT || "3000", 10);' \
-  'const app = next({ dev, hostname, port });' \
-  'const handle = app.getRequestHandler();' \
-  'app.prepare().then(() => {' \
-  '  createServer((req, res) => {' \
-  '    const parsedUrl = parse(req.url, true);' \
-  '    handle(req, res, parsedUrl);' \
-  '  }).listen(port, hostname, (err) => {' \
-  '    if (err) throw err;' \
-  '    console.info("> Marketing ready on http://" + hostname + ":" + port);' \
-  '  });' \
-  '});' > ./server.js && chmod +x ./server.js
+RUN if [ -f /app/apps/marketing/server.js ]; then \
+      cp /app/apps/marketing/server.js /app/server.js; \
+    elif [ -f /app/server.js ]; then \
+      true; \
+    else \
+      echo "ERROR: No runnable server.js in runtime image"; \
+      find /app -maxdepth 5 -name "server.js" -print; \
+      exit 1; \
+    fi
 
 USER nextjs
 
-EXPOSE 8080
+EXPOSE 3000
 
-# Health check - use root path which always works
-HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
-    CMD curl -sf http://127.0.0.1:8080/api/live || curl -sf http://127.0.0.1:8080/ || exit 1
-
-# Start the marketing application
 CMD ["node", "--max-old-space-size=4096", "server.js"]

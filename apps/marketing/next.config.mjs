@@ -1,13 +1,11 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createRequire } from "node:module";
-import webpack from "webpack";
+
+/** @type {import("next").NextConfig} */
 
 const currentFile = fileURLToPath(import.meta.url);
 const currentDirectory = path.dirname(currentFile);
-const require = createRequire(import.meta.url);
 
-/** @type {import("next").NextConfig} */
 const nextConfig = {
   output: "standalone",
   outputFileTracingRoot: path.join(currentDirectory, "../.."),
@@ -19,40 +17,26 @@ const nextConfig = {
     cpus: 1,
   },
 
-  webpack(config, { isServer }) {
+  webpack(config) {
     config.parallelism = 1;
-
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        buffer: require.resolve("buffer/"),
-        process: require.resolve("process/browser"),
-        fs: false,
-        net: false,
-        tls: false,
-        child_process: false,
-      };
-
-      config.plugins.push(
-        new webpack.ProvidePlugin({
-          Buffer: ["buffer", "Buffer"],
-          buffer: "buffer",
-          process: "process/browser",
-        })
-      );
-    }
-
     return config;
   },
 
   env: {
-    GIT_SHA: process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? "unknown",
+    GIT_SHA:
+      process.env.GIT_SHA ??
+      process.env.GITHUB_SHA ??
+      "unknown",
+
     NEXT_PUBLIC_GIT_SHA:
       process.env.NEXT_PUBLIC_GIT_SHA ??
       process.env.GIT_SHA ??
       process.env.GITHUB_SHA ??
       "unknown",
-    BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? new Date().toISOString(),
+
+    BUILD_TIMESTAMP:
+      process.env.BUILD_TIMESTAMP ??
+      new Date().toISOString(),
   },
 
   async redirects() {

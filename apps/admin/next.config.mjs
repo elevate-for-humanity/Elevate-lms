@@ -71,6 +71,19 @@ const adminConfig = {
     if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') {
       config.cache = false;
     }
+    // Browser polyfill for @webcontainer/api and other Node.js modules
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        buffer: require.resolve('buffer/'),
+      };
+      config.plugins = config.plugins || [];
+      config.plugins.push(
+        new (require('webpack').ProvidePlugin)({
+          Buffer: ['buffer', 'Buffer'],
+        })
+      );
+    }
     return config;
   },
 

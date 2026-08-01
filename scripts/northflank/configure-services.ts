@@ -68,7 +68,7 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
   },
   {
     id: process.env.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-lms-build',
-    dockerfile: '/Dockerfile.marketing',
+    dockerfile: '/Dockerfile.northflank-marketing',
     runtimeEnvironment: {
       SERVICE_ROLE: 'marketing',
       PORT: '3000',
@@ -79,7 +79,7 @@ export const NORTHFLANK_SERVICE_CONFIGS = [
       NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
       NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
       NEXT_PUBLIC_LMS_URL: 'https://www.elevateforhumanity.org/lms',
-      // Supabase credentials
+      // Supabase credentials - UNIFIED SYSTEM
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
       SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',

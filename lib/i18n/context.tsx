@@ -52,7 +52,7 @@ function getValue(obj: unknown, path: string): string {
 // Helper to interpolate params
 function interpolate(text: string, params?: Record<string, string | number>): string {
   if (!params) return text;
-  return text.replace(/\{(\w+)\}/g, (_, key) => String(params[key] ?? `{${key}}`));
+  return text.replace(/\{(\w+)\}/g, (_, key) => params[key] ?? "{" + key + "}");
 }
 
 // Provider

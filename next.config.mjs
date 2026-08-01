@@ -185,18 +185,20 @@ const nextConfig = {
         net: false,
         tls: false,
         child_process: false,
-        buffer: require.resolve('buffer/'),
       };
 
       // Use ProvidePlugin to make buffer available as a global in the browser
       // This is needed because @react-pdf/renderer and other libraries use Buffer
-      config.plugins = config.plugins || [];
-      config.plugins.push(
-        new (require('webpack').ProvidePlugin)({
-          Buffer: ['buffer', 'Buffer'],
-          buffer: 'buffer',
-        }),
-      );
+      const webpack = config.compiler?.webpack;
+      if (webpack?.ProvidePlugin) {
+        config.plugins = config.plugins || [];
+        config.plugins.push(
+          new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+            buffer: 'buffer',
+          })
+        );
+      }
     }
 
     // Webpack cache configuration for consistent builds

@@ -73,17 +73,17 @@ const adminConfig = {
     }
     // Browser polyfill for @webcontainer/api and other Node.js modules
     if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        buffer: require.resolve('buffer/'),
-      };
-      config.plugins = config.plugins || [];
-      config.plugins.push(
-        new (require('webpack').ProvidePlugin)({
-          Buffer: ['buffer', 'Buffer'],
-          buffer: 'buffer',
-        })
-      );
+      // Access webpack's ProvidePlugin via the compiler instance (webpack 5 API)
+      const webpack = config.compiler?.webpack;
+      if (webpack?.ProvidePlugin) {
+        config.plugins = config.plugins || [];
+        config.plugins.push(
+          new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+            buffer: 'buffer',
+          })
+        );
+      }
     }
     return config;
   },

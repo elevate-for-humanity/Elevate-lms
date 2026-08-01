@@ -61,21 +61,34 @@ export default async function AdminGroupLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Dev Studio provides its own shell - exclude admin layout components
+  // Dev Studio routes start with /admin/admin/studio
+  const headersList = await import('next/headers');
+  const headers = headersList.headers();
+  const pathname = headers.get('x-pathname') || '';
+  const isDevStudio = pathname.includes('/admin/studio') || pathname.includes('/studio');
+
   return (
     <html lang="en">
       <body>
         <AdminPwaRegister />
         <AdminUpdateNotice />
         <I18nProvider>
-          <div className="min-h-screen flex flex-col bg-slate-50">
-            <BuildVersionSync />
-            <AdminHeader />
-            <main className="flex-1">
-              {children}
-            </main>
-            <AdminFooter />
-            <LiveChatWidget />
-          </div>
+          {isDevStudio ? (
+            // Dev Studio - standalone layout with dark background
+            <>{children}</>
+          ) : (
+            // Standard admin pages - include header/footer
+            <div className="min-h-screen flex flex-col bg-slate-50">
+              <BuildVersionSync />
+              <AdminHeader />
+              <main className="flex-1">
+                {children}
+              </main>
+              <AdminFooter />
+              <LiveChatWidget />
+            </div>
+          )}
         </I18nProvider>
       </body>
     </html>

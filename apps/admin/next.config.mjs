@@ -99,12 +99,15 @@ const adminConfig = {
       { source: '/admin/payments', destination: '/admin/integrations/stripe', permanent: true },
       { source: '/admin/security', destination: '/admin/settings/security', permanent: true },
       // â”€â”€ Studio consolidation â€” all legacy course/quiz/video/AI surfaces â†’ studio â”€â”€
-      { source: '/admin/quizzes', destination: '/admin/studio', permanent: true },
-      { source: '/admin/quizzes/:path*', destination: '/admin/studio', permanent: true },
-      { source: '/admin/copilot', destination: '/admin/studio', permanent: true },
-      { source: '/admin/copilot/:path*', destination: '/admin/studio', permanent: true },
-      { source: '/admin/video-manager', destination: '/admin/studio', permanent: true },
-      { source: '/admin/video-manager/:path*', destination: '/admin/studio', permanent: true },
+      { source: '/admin/quizzes', destination: '/admin/dev-studio', permanent: true },
+      { source: '/admin/quizzes/:path*', destination: '/admin/dev-studio', permanent: true },
+      { source: '/admin/copilot', destination: '/admin/dev-studio', permanent: true },
+      { source: '/admin/copilot/:path*', destination: '/admin/dev-studio', permanent: true },
+      { source: '/admin/video-manager', destination: '/admin/dev-studio', permanent: true },
+      { source: '/admin/video-manager/:path*', destination: '/admin/dev-studio', permanent: true },
+      // Dev Studio canonical route
+      { source: '/admin/studio', destination: '/admin/dev-studio', permanent: true },
+      { source: '/admin/studio/:path*', destination: '/admin/dev-studio/:path*', permanent: true },
       // course-builder redirects removed - page now exists at /admin/course-builder
       // document-center â†’ documents (canonical)
       {

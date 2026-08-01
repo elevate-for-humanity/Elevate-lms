@@ -235,6 +235,7 @@
     "audit:schema:strict": "tsx scripts/audit-schema-drift.ts --fail-on-drift",
     "check:redirects": "node scripts/check-redirect-conflicts.mjs",
     "check:client-node-globals": "node scripts/check-client-node-globals.mjs",
+    "build:marketing:safe": "pnpm check:client-node-globals && pnpm --filter @elevate/marketing build",
     "integrity:links": "node scripts/integrity/links.mjs",
     "integrity:media": "node scripts/integrity/media.mjs",
     "integrity:lms": "node scripts/integrity/lms.mjs",

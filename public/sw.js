@@ -1,10 +1,9 @@
 // Service Worker for Elevate for Humanity PWA
 // CACHE_VERSION is replaced at build time by scripts/stamp-sw.mjs.
-// If the token was never replaced (broken build / local dev), fall back to a
-// timestamp so old caches are always evicted and users never see a blank screen.
-const CACHE_VERSION = 'v1776518314916'.startsWith('__')
-  ? `fallback-${Date.now()}`
-  : 'v1776518314916';
+// Bump this manually when deploying fixes that must bypass stale cache.
+const CACHE_VERSION =
+  "elevate-v1776518314917";
+
 const STATIC_CACHE = `elevate-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `elevate-dynamic-${CACHE_VERSION}`;
 const COURSE_CACHE = `elevate-courses-${CACHE_VERSION}`;
@@ -23,17 +22,19 @@ const PRECACHE_ASSETS = [
 const CACHE_STRATEGIES = {
   // Never cache — always hit the network
   noCache: [
-    /\/admin(\/|$)/, // All admin routes — auth-gated, must never serve stale
-    /\/api\//, // All API routes
-    /\/login/, // Auth pages
+    /\/admin(\/|$)/,
+    /\/api\//,
+    /\/login/,
     /\/logout/,
     /\/unauthorized/,
     /supabase/,
     /analytics/,
     /gtag/,
   ],
-  // Cache-first for static assets
-  static: [/\.(js|css|woff2?|ttf|eot)$/, /\/_next\/static\//, /\/images\//, /\/icons\//],
+  // Network-first for Next.js chunks — prevents stale chunks from breaking the app
+  nextChunks: [/\/_next\/static\//, /\/_next\/data\//],
+  // Cache-first for static assets (images, fonts, etc.)
+  static: [/\.(js|css|woff2?|ttf|eot)$/, /\/images\//, /\/icons\//],
   // Network-first for dynamic content
   networkFirst: [/\/courses\//, /\/programs\//, /\/lms\//],
   // Stale-while-revalidate for API data
@@ -71,23 +72,6 @@ self.addEventListener('activate', (event) => {
 // Helper: Check if URL matches any pattern
 function matchesPattern(url, patterns) {
   return patterns.some((pattern) => pattern.test(url));
-}
-
-// Helper: Cache-first strategy
-async function cacheFirst(request, cacheName) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
-
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch {
-    return null;
-  }
 }
 
 // Helper: Network-first strategy
@@ -135,27 +119,38 @@ self.addEventListener('fetch', (event) => {
   // Skip no-cache patterns
   if (matchesPattern(request.url, CACHE_STRATEGIES.noCache)) return;
 
-  // Handle navigation requests — never cache redirects (www↔apex loop caused PWA blink).
+  // ================================================================
+  // Never serve stale Next.js chunks before checking the network.
+  // ================================================================
+  if (matchesPattern(request.url, CACHE_STRATEGIES.nextChunks)) {
+    event.respondWith(
+      fetch(request).catch(async () => {
+        const cached = await caches.match(request);
+        if (cached) return cached;
+        throw new Error('Next.js asset unavailable.');
+      }),
+    );
+    return;
+  }
+
+  // ================================================================
+  // Navigations must be network-first so an old HTML page does not
+  // reference deleted chunk hashes.
+  // ================================================================
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request, { cache: 'no-store', redirect: 'follow' })
-        .then((response) => {
-          const isDocumentOk =
-            response.status >= 200 &&
-            response.status < 300 &&
-            response.type === 'basic' &&
-            !response.redirected;
-          if (isDocumentOk) {
-            const responseClone = response.clone();
-            caches.open(DYNAMIC_CACHE).then((cache) => {
-              cache.put(request, responseClone);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          return caches.match(request).then((cached) => cached || caches.match(OFFLINE_URL));
-        }),
+      (async () => {
+        try {
+          return await fetch(request, { cache: 'no-store', redirect: 'follow' });
+        } catch {
+          const cached = await caches.match(request);
+          if (cached) return cached;
+          return new Response('The application is temporarily unavailable.', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain' },
+          });
+        }
+      })(),
     );
     return;
   }
@@ -164,23 +159,18 @@ self.addEventListener('fetch', (event) => {
   let responsePromise;
 
   if (matchesPattern(request.url, CACHE_STRATEGIES.static)) {
-    // Static assets: cache-first
-    responsePromise = cacheFirst(request, STATIC_CACHE);
+    responsePromise = staleWhileRevalidate(request, STATIC_CACHE);
   } else if (matchesPattern(request.url, CACHE_STRATEGIES.staleWhileRevalidate)) {
-    // API data: stale-while-revalidate
     responsePromise = staleWhileRevalidate(request, DYNAMIC_CACHE);
   } else if (matchesPattern(request.url, CACHE_STRATEGIES.networkFirst)) {
-    // Course content: network-first with course cache
     responsePromise = networkFirst(request, COURSE_CACHE);
   } else {
-    // Default: network-first with dynamic cache
     responsePromise = networkFirst(request, DYNAMIC_CACHE);
   }
 
   event.respondWith(
     responsePromise.then((response) => {
       if (response) return response;
-
       return new Response('Offline', {
         status: 503,
         statusText: 'Service Unavailable',
@@ -195,7 +185,6 @@ self.addEventListener('message', (event) => {
 
   switch (type) {
     case 'CACHE_COURSE':
-      // Cache a specific course for offline access
       if (payload?.urls) {
         caches.open(COURSE_CACHE).then((cache) => {
           cache.addAll(payload.urls);
@@ -204,12 +193,10 @@ self.addEventListener('message', (event) => {
       break;
 
     case 'CLEAR_COURSE_CACHE':
-      // Clear course cache
       caches.delete(COURSE_CACHE);
       break;
 
     case 'GET_CACHE_SIZE':
-      // Report cache size back to app
       Promise.all([
         caches.open(STATIC_CACHE).then((c) => c.keys()),
         caches.open(DYNAMIC_CACHE).then((c) => c.keys()),
@@ -225,6 +212,10 @@ self.addEventListener('message', (event) => {
         });
       });
       break;
+
+    case 'SKIP_WAITING':
+      self.skipWaiting();
+      break;
   }
 });
 
@@ -239,12 +230,10 @@ self.addEventListener('sync', (event) => {
 });
 
 async function syncEnrollmentData() {
-  // Get pending enrollments from IndexedDB and sync
   console.log('[SW] Syncing enrollment data...');
 }
 
 async function syncHoursData() {
-  // Sync queued hour logs when back online
   const db = await openOfflineDB();
   const tx = db.transaction('pending-hours', 'readwrite');
   const store = tx.objectStore('pending-hours');
@@ -322,7 +311,6 @@ self.addEventListener('notificationclick', (event) => {
 
   const url = event.notification.data?.url || '/';
 
-  // Handle action buttons
   if (event.action === 'view') {
     event.waitUntil(clients.openWindow(url));
     return;
@@ -332,17 +320,14 @@ self.addEventListener('notificationclick', (event) => {
     return;
   }
 
-  // Default click - open or focus window
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // Try to focus existing window
       for (const client of clientList) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
           client.navigate(url);
           return client.focus();
         }
       }
-      // Open new window
       return clients.openWindow(url);
     }),
   );
@@ -351,13 +336,6 @@ self.addEventListener('notificationclick', (event) => {
 // Notification close handling
 self.addEventListener('notificationclose', (event) => {
   console.log('[SW] Notification closed:', event.notification.tag);
-});
-
-// Allow client to trigger immediate activation of waiting SW
-self.addEventListener('message', (event) => {
-  if (event.data?.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
 });
 
 console.log(`[SW] Service Worker loaded — cache: ${CACHE_VERSION}`);

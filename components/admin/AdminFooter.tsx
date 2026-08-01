@@ -28,10 +28,10 @@ export function AdminFooter() {
           <div>
             <h3 className="font-bold text-sm mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><Link href="/admin/dashboard" className="text-slate-400 hover:text-white text-sm transition-colors">Dashboard</Link></li>
-              <li><Link href="/admin/applications" className="text-slate-400 hover:text-white text-sm transition-colors">Applications</Link></li>
-              <li><Link href="/admin/students" className="text-slate-400 hover:text-white text-sm transition-colors">Students</Link></li>
-              <li><Link href="/admin/programs" className="text-slate-400 hover:text-white text-sm transition-colors">Programs</Link></li>
+              <li><Link href="/dashboard" className="text-slate-400 hover:text-white text-sm transition-colors">Dashboard</Link></li>
+              <li><Link href="/applications" className="text-slate-400 hover:text-white text-sm transition-colors">Applications</Link></li>
+              <li><Link href="/students" className="text-slate-400 hover:text-white text-sm transition-colors">Students</Link></li>
+              <li><Link href="/programs" className="text-slate-400 hover:text-white text-sm transition-colors">Programs</Link></li>
             </ul>
           </div>
 
@@ -39,10 +39,10 @@ export function AdminFooter() {
           <div>
             <h3 className="font-bold text-sm mb-4">Support</h3>
             <ul className="space-y-2">
-              <li><Link href="/admin/help" className="text-slate-400 hover:text-white text-sm transition-colors">Help Center</Link></li>
-              <li><Link href="/admin/documentation" className="text-slate-400 hover:text-white text-sm transition-colors">Documentation</Link></li>
-              <li><Link href="/admin/api-keys" className="text-slate-400 hover:text-white text-sm transition-colors">API Keys</Link></li>
-              <li><Link href="/admin/system-health" className="text-slate-400 hover:text-white text-sm transition-colors">System Status</Link></li>
+              <li><Link href="/help" className="text-slate-400 hover:text-white text-sm transition-colors">Help Center</Link></li>
+              <li><Link href="/documentation" className="text-slate-400 hover:text-white text-sm transition-colors">Documentation</Link></li>
+              <li><Link href="/api-keys" className="text-slate-400 hover:text-white text-sm transition-colors">API Keys</Link></li>
+              <li><Link href="/system-health" className="text-slate-400 hover:text-white text-sm transition-colors">System Status</Link></li>
             </ul>
           </div>
 

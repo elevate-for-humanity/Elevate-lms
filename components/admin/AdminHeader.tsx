@@ -108,7 +108,7 @@ export default function AdminHeader() {
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <Link href="/admin/dashboard" className="flex items-center gap-2">
+              <Link href="/dashboard" className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg">
                   <span className="text-white font-black text-base">E</span>
                 </div>
@@ -194,11 +194,11 @@ export default function AdminHeader() {
                 
                 {profileOpen && (
                   <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50">
-                    <Link href="/admin/profile" className="flex items-center gap-2 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50">
+                    <Link href="/profile" className="flex items-center gap-2 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50">
                       <User className="w-3.5 h-3.5" />
                       Profile
                     </Link>
-                    <Link href="/admin/settings" className="flex items-center gap-2 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50">
+                    <Link href="/settings" className="flex items-center gap-2 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50">
                       <Settings className="w-3.5 h-3.5" />
                       Settings
                     </Link>

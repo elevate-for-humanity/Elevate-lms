@@ -249,7 +249,7 @@ export function isNavSections(v: unknown): v is NavSection[] {
       typeof s === 'object' &&
       typeof s.label === 'string' &&
       typeof s.href === 'string' &&
-      s.href.startsWith('/admin') &&
+      s.href.startsWith('/') &&
       Array.isArray(s.items) &&
       s.items.every(
         (i: unknown) =>
@@ -257,7 +257,7 @@ export function isNavSections(v: unknown): v is NavSection[] {
           typeof i === 'object' &&
           typeof (i as NavItem).label === 'string' &&
           typeof (i as NavItem).href === 'string' &&
-          (i as NavItem).href.startsWith('/admin'),
+          (i as NavItem).href.startsWith('/'),
       ),
   );
 }

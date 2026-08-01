@@ -85,13 +85,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certifi
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs nextjs
 
-# Copy standalone output (contains server.js and minimal deps)
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/standalone ./
+# Copy standalone output (server.js at /.next/standalone/ — server.js runs from /app/)
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 
-# Copy static assets
-COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/.next/static ./apps/marketing/.next/static
+# Copy static assets (server expects at ./apps/marketing/.next/static)
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./apps/marketing/.next/static
 
-# Copy public folder
+# Copy public folder (server expects at ./apps/marketing/public)
 COPY --from=builder --chown=nextjs:nodejs /app/apps/marketing/public ./apps/marketing/public
 
 USER nextjs

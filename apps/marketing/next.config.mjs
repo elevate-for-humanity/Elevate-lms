@@ -1,8 +1,15 @@
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
+import path from 'node:path';
+
+const __filename = new URL(import.meta.url).pathname;
+const __dirname = path.dirname(__filename);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  // Trace from workspace root so .next dir ends up at /app/.next/
+  // server.js runs from /app/ and looks for /app/.next/
+  outputFileTracingRoot: '/app',
 
   // Deterministic build ID — never use Date.now(), Math.random(), or random UUID.
   generateBuildId: async () => {

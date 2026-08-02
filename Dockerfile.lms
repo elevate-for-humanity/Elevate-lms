@@ -63,6 +63,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/public ./apps/lms/public
 # Copy custom server.js (this takes precedence over Next.js standalone server.js)
 COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/server.js ./apps/lms/server.js
 
+# Copy node_modules for the server.js to work
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies /app/apps/lms/node_modules ./apps/lms/node_modules
+
 RUN if [ -f "/app/apps/lms/server.js" ]; then \
       echo "Found server.js at /app/apps/lms/server.js"; \
     else \

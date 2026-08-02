@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.80",
+    "buffer": "^6.0.0",
     "fontkit": "^2.0.4",
     "next": "15.5.15",
     "pdfkit": "^0.18.0",

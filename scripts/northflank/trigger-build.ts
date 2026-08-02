@@ -81,18 +81,16 @@ async function main() {
     process.env.VERCEL_GIT_COMMIT_SHA ||
     '';
 
-  // Check for existing build with same SHA
+  // Check for existing build with same SHA — skip if ANY build exists for this SHA
+  // (prevents Northflank from running multiple containers when set-service-branch + trigger-build
+  // are called in the same workflow, or when CI/CD and deploy workflows overlap)
   if (currentSha) {
     const recentBuilds = await getRecentBuilds(projectId, serviceId, currentSha);
-    const existingBuild = recentBuilds.find(
-      (b) =>
-        b.sha === currentSha &&
-        (!b.concluded || b.status === 'running' || b.status === 'pending'),
-    );
+    const existingBuild = recentBuilds.find((b) => b.sha === currentSha);
 
     if (existingBuild) {
       console.log(
-        `Skipping build for ${serviceId} - SHA ${currentSha} already has build ${existingBuild.id} (status: ${existingBuild.status})`,
+        `Skipping build for ${serviceId} - SHA ${currentSha} already has build ${existingBuild.id} (status: ${existingBuild.status}, concluded: ${existingBuild.concluded})`,
       );
       if (process.env.GITHUB_OUTPUT) {
         fs.appendFileSync(process.env.GITHUB_OUTPUT, `build_id=${existingBuild.id}\n`, 'utf8');

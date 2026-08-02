@@ -45,10 +45,9 @@ jobs:
       - name: Verify health probes on /api/ping
         run: npx tsx scripts/northflank/verify-health-checks.ts --all
 
-      - name: Set branches to main
-        run: |
-          npx tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_LMS_SERVICE_ID" main
-          npx tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_ADMIN_SERVICE_ID" main
+      # NOTE: set-service-branch.ts removed — it PATCHes vcsData which can trigger a Northflank
+      # auto-build in addition to trigger-build.ts, causing multiple containers to build.
+      # trigger-build.ts checks for existing builds by SHA and skips duplicates.
 
       - name: Trigger builds
         run: |

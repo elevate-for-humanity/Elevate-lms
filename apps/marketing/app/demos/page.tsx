@@ -28,7 +28,7 @@ const DEMO_TYPES = [
       'User permissions',
     ],
     demoCredentials: {
-      email: 'demo-admin@elevate.org',
+      email: 'demo-admin@elevateforhumanity.org',
       password: 'DemoPassword123!',
     },
   },
@@ -47,7 +47,7 @@ const DEMO_TYPES = [
       'Career resources',
     ],
     demoCredentials: {
-      email: 'demo-student@elevate.org',
+      email: 'demo-student@elevateforhumanity.org',
       password: 'DemoPassword123!',
     },
   },
@@ -66,7 +66,7 @@ const DEMO_TYPES = [
       'Job placement tools',
     ],
     demoCredentials: {
-      email: 'demo-employer@elevate.org',
+      email: 'demo-employer@elevateforhumanity.org',
       password: 'DemoPassword123!',
     },
   },
@@ -85,7 +85,7 @@ const DEMO_TYPES = [
       'Communication hub',
     ],
     demoCredentials: {
-      email: 'demo-hostshop@elevate.org',
+      email: 'demo-hostshop@elevateforhumanity.org',
       password: 'DemoPassword123!',
     },
   },
@@ -104,7 +104,7 @@ const DEMO_TYPES = [
       'SCORM support',
     ],
     demoCredentials: {
-      email: 'demo-lms@elevate.org',
+      email: 'demo-lms@elevateforhumanity.org',
       password: 'DemoPassword123!',
     },
   },

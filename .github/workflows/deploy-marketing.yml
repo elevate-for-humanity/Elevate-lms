@@ -123,9 +123,9 @@ jobs:
 
       # Note: Ensure elevate-marketing service is set to "external-git" build mode
       # with Dockerfile path /Dockerfile.marketing in Northflank dashboard before running
-
-      - name: Point Marketing service at main
-        run: pnpm tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_MARKETING_SERVICE_ID" "$DEPLOY_BRANCH"
+      # NOTE: set-service-branch.ts removed — it PATCHes vcsData which can trigger a Northflank
+      # auto-build in addition to trigger-build.ts, causing multiple containers to build.
+      # trigger-build.ts checks for existing builds by SHA and skips duplicates.
 
       - name: Trigger Marketing build
         id: trigger_build

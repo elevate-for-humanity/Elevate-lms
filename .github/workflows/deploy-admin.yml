@@ -115,8 +115,9 @@ jobs:
       - name: Verify admin health checks
         run: pnpm tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
-      - name: Point admin service at main
-        run: pnpm tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_ADMIN_SERVICE_ID" "$DEPLOY_BRANCH"
+      # NOTE: set-service-branch.ts removed — it PATCHes vcsData which can trigger a Northflank
+      # auto-build in addition to trigger-build.ts, causing multiple containers to build.
+      # trigger-build.ts checks for existing builds by SHA and skips duplicates.
 
       - name: Trigger admin build
         id: trigger_admin_build

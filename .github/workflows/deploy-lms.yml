@@ -132,8 +132,9 @@ jobs:
       # Skip pre-build health check - containers may be down during fresh deployment
       # Health check happens AFTER deployment in "Smoke LMS" step
 
-      - name: Point LMS service at main
-        run: pnpm tsx scripts/northflank/set-service-branch.ts "$NORTHFLANK_LMS_SERVICE_ID" "$DEPLOY_BRANCH"
+      # NOTE: set-service-branch.ts removed — it PATCHes vcsData which can trigger a Northflank
+      # auto-build in addition to trigger-build.ts, causing multiple containers to build.
+      # trigger-build.ts checks for existing builds by SHA and skips duplicates.
 
       - name: Trigger LMS build
         id: trigger_lms_build

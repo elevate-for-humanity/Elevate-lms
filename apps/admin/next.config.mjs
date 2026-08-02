@@ -102,40 +102,40 @@ const adminConfig = {
       { source: '/store', destination: 'https://www.elevateforhumanity.org/store', permanent: false },
       // â”€â”€ Lizzy control plane (retired dev-studio / ai-console admin routes) â”€â”€
       // Do NOT redirect /admin/dashboard â†’ itself (infinite loop).
-      { source: '/admin/ai-console', destination: '/admin/dashboard', permanent: true },
-      { source: '/admin/ai-console/:path*', destination: '/admin/dashboard', permanent: true },
-      { source: '/admin/ai-studio', destination: '/admin/dashboard', permanent: true },
-      { source: '/admin/ai-studio/:path*', destination: '/admin/dashboard', permanent: true },
-      { source: '/admin/command-center', destination: '/admin/mission-control', permanent: true },
-      { source: '/admin/instructors', destination: '/admin/instructor', permanent: true },
-      { source: '/admin/performance-dashboard', destination: '/admin/reports', permanent: true },
-      { source: '/admin/analytics-dashboard', destination: '/admin/analytics', permanent: true },
-      { source: '/admin/payments', destination: '/admin/integrations/stripe', permanent: true },
-      { source: '/admin/security', destination: '/admin/settings/security', permanent: true },
+      { source: '/admin/ai-console', destination: '/dashboard', permanent: true },
+      { source: '/admin/ai-console/:path*', destination: '/dashboard', permanent: true },
+      { source: '/admin/ai-studio', destination: '/dashboard', permanent: true },
+      { source: '/admin/ai-studio/:path*', destination: '/dashboard', permanent: true },
+      { source: '/admin/command-center', destination: '/mission-control', permanent: true },
+      { source: '/admin/instructors', destination: '/instructor', permanent: true },
+      { source: '/admin/performance-dashboard', destination: '/reports', permanent: true },
+      { source: '/admin/analytics-dashboard', destination: '/analytics', permanent: true },
+      { source: '/admin/payments', destination: '/integrations/stripe', permanent: true },
+      { source: '/admin/security', destination: '/settings/security', permanent: true },
       // â”€â”€ Studio consolidation â€” all legacy course/quiz/video/AI surfaces â†’ studio â”€â”€
-      { source: '/admin/quizzes', destination: '/admin/dev-studio', permanent: true },
-      { source: '/admin/quizzes/:path*', destination: '/admin/dev-studio', permanent: true },
-      { source: '/admin/copilot', destination: '/admin/dev-studio', permanent: true },
-      { source: '/admin/copilot/:path*', destination: '/admin/dev-studio', permanent: true },
-      { source: '/admin/video-manager', destination: '/admin/dev-studio', permanent: true },
-      { source: '/admin/video-manager/:path*', destination: '/admin/dev-studio', permanent: true },
+      { source: '/admin/quizzes', destination: '/dev-studio', permanent: true },
+      { source: '/admin/quizzes/:path*', destination: '/dev-studio/:path*', permanent: true },
+      { source: '/admin/copilot', destination: '/dev-studio', permanent: true },
+      { source: '/admin/copilot/:path*', destination: '/dev-studio/:path*', permanent: true },
+      { source: '/admin/video-manager', destination: '/dev-studio', permanent: true },
+      { source: '/admin/video-manager/:path*', destination: '/dev-studio/:path*', permanent: true },
       // Dev Studio is at /admin/admin/studio (real page) — no redirect needed
       // course-builder redirects removed - page now exists at /admin/course-builder
       // document-center â†’ documents (canonical)
       {
         source: '/admin/document-center',
-        destination: '/admin/documents',
+        destination: '/documents',
         permanent: true,
       },
       {
         source: '/admin/document-center/:path*',
-        destination: '/admin/documents/:path*',
+        destination: '/documents/:path*',
         permanent: true,
       },
       // submissions/org â†’ settings/organization-profile (canonical)
       {
         source: '/admin/submissions/org',
-        destination: '/admin/settings/organization-profile',
+        destination: '/settings/organization-profile',
         permanent: false,
       },
     ];

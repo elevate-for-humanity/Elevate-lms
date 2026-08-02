@@ -18,6 +18,8 @@ const PUBLIC_PATHS = [
   '/admin/studio',
   '/admin/dev-studio',
   '/admin/install',
+  '/admin/course-builder',
+  '/admin/cfd-studio',
 ];
 
 export async function middleware(req: NextRequest) {

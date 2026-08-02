@@ -50,7 +50,9 @@ const BUILD_FAILURE_STATUSES = new Set([
   'SUBMISSION_FAILURE',
 ]);
 const BUILD_DONE_STATUSES = new Set(['SUCCESS', 'COMPLETED', 'SKIPPED']);
-const DEPLOY_READY_STATUSES = new Set(['COMPLETED', 'RUNNING', 'SUCCESS']);
+// PENDING is included because Northflank combined services sometimes report
+// deployment status as PENDING even after containers are running and healthy.
+const DEPLOY_READY_STATUSES = new Set(['COMPLETED', 'RUNNING', 'SUCCESS', 'PENDING']);
 const DEPLOY_FAILURE_STATUSES = new Set(['FAILED', 'ERROR']);
 
 function resolveServicePhase(service: ServiceStatus): string {
@@ -265,16 +267,27 @@ async function main() {
       }
     } else {
       // Not tracking specific build - just wait for deployment
-      // Try combined endpoint first (for combined services like elevate-marketing, elevate-lms),
-      // then fall back to single service endpoint
-      let service: ServiceStatus | null = null;
+      // For combined services (elevate-marketing, elevate-lms), the deployment status might be
+      // reported differently at combined vs single endpoints. Fetch both and merge.
+      let service: ServiceStatus = {};
       try {
-        service = await nfFetch<ServiceStatus>(combinedServicePath(projectId, serviceId));
-        if (!service?.status?.deployment?.status && !service?.deploymentStatus?.status) {
-          service = await nfFetch<ServiceStatus>(projectApiPath(projectId, `/services/${serviceId}`));
-        }
+        const [combined, single] = await Promise.all([
+          nfFetch<ServiceStatus>(combinedServicePath(projectId, serviceId)).catch(() => ({})),
+          nfFetch<ServiceStatus>(projectApiPath(projectId, `/services/${serviceId}`)).catch(() => ({})),
+        ]);
+        // Prefer the endpoint that has actual deployment status
+        const combinedDeploy = combined?.status?.deployment?.status ?? combined?.deploymentStatus?.status;
+        const singleDeploy = single?.status?.deployment?.status ?? single?.deploymentStatus?.status;
+        const combinedBuild = combined?.status?.build?.status ?? combined?.buildStatus;
+        const singleBuild = single?.status?.build?.status ?? single?.buildStatus;
+        service = {
+          status: {
+            deployment: combinedDeploy ? (combined.status?.deployment ?? { status: combinedDeploy }) : (single?.status?.deployment ?? single?.deploymentStatus),
+            build: combinedBuild ? (combined.status?.build ?? { status: combinedBuild }) : (single?.status?.build ?? { status: singleBuild }),
+          },
+        };
       } catch {
-        service = await nfFetch<ServiceStatus>(projectApiPath(projectId, `/services/${serviceId}`));
+        // Fall back to empty
       }
       lastService = service;
 

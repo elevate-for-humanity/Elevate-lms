@@ -205,9 +205,10 @@ async function main() {
       for (const storageMb of storageAllowanceCandidates(requestedEphemeralMb)) {
         const patch = {
           billing,
-          // Builds must roll to pods automatically; disabledCD left admin 194 commits behind main.
-          disabledCD: false,
-          runtimeEnvironment: service.runtimeEnvironment,
+          // disabledCD set to false — keep auto-deploy so new builds roll out automatically.
+          // NOTE: runtimeEnvironment is intentionally omitted here so existing secrets
+          // (DATABASE_URL, SESSION_SECRET, AUTH_SECRET, etc.) are not overwritten.
+          // If you need to update runtime vars, set them in Northflank dashboard or add them here explicitly.
           buildArguments: resolvePublicSupabaseBuildArguments(),
           healthChecks,
           buildSettings: {

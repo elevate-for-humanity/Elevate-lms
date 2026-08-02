@@ -117,7 +117,7 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'All Programs', href: '/programs' },
       { label: 'Create Program', href: '/programs/new' },
       { label: 'Programs — Catalog', href: '/programs/catalog' },
-      { label: 'Studio', href: '/dev-studio' },
+      { label: 'Studio', href: '/admin/studio' },
       { label: 'All Courses', href: '/courses' },
       { label: 'Career Courses', href: '/career-courses' },
       { label: 'Modules', href: '/modules' },

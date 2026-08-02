@@ -26,12 +26,11 @@ if [[ -n "${NEW_DOCS}" ]]; then
 fi
 
 # 2) Verify canonical portal route implementations exist.
-# Keep these pointed at the real route owners so the gate does not require
-# legacy redirect shims just to pass.
+# These paths must match the real route owners in the current multi-app layout.
 REQUIRED_CANONICAL_ROUTE_FILES=(
   "apps/partner/app/partner/dashboard/page.tsx"
   "apps/admin/app/admin/staff-portal/dashboard/page.tsx"
-  "apps/admin/app/admin/dashboard/page.tsx"
+  "apps/admin/app/dashboard/page.tsx"
 )
 
 missing=0

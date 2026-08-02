@@ -8,7 +8,7 @@
  *   npx tsx scripts/northflank/wait-service.ts elevate-admin --build-id <id>
  */
 
-import { nfFetch, projectApiPath, resolveProjectId } from './lib';
+import { nfFetch, projectApiPath, combinedServicePath, resolveProjectId } from './lib';
 
 type ServiceStatus = {
   deploymentStatus?: { status?: string };
@@ -218,10 +218,21 @@ async function main() {
 
   while (Date.now() - start < timeoutMs) {
     // If tracking a specific build, fetch its status
+    // Try combined endpoint first (for combined services like elevate-marketing, elevate-lms)
     if (targetBuildId) {
-      const build = await nfFetch<ServiceBuild>(
-        projectApiPath(projectId, `/services/${serviceId}/build/${targetBuildId}`),
-      ).catch(() => undefined);
+      let build: ServiceBuild | undefined;
+      try {
+        build = await nfFetch<ServiceBuild>(
+          combinedServicePath(projectId, serviceId) + `/build/${targetBuildId}`,
+        ).catch(() => undefined);
+      } catch {
+        // Fall back to single service endpoint
+      }
+      if (!build) {
+        build = await nfFetch<ServiceBuild>(
+          projectApiPath(projectId, `/services/${serviceId}/build/${targetBuildId}`),
+        ).catch(() => undefined);
+      }
       lastBuild = build;
 
       if (build) {
@@ -254,7 +265,17 @@ async function main() {
       }
     } else {
       // Not tracking specific build - just wait for deployment
-      const service = await nfFetch<ServiceStatus>(projectApiPath(projectId, `/services/${serviceId}`));
+      // Try combined endpoint first (for combined services like elevate-marketing, elevate-lms),
+      // then fall back to single service endpoint
+      let service: ServiceStatus | null = null;
+      try {
+        service = await nfFetch<ServiceStatus>(combinedServicePath(projectId, serviceId));
+        if (!service?.status?.deployment?.status && !service?.deploymentStatus?.status) {
+          service = await nfFetch<ServiceStatus>(projectApiPath(projectId, `/services/${serviceId}`));
+        }
+      } catch {
+        service = await nfFetch<ServiceStatus>(projectApiPath(projectId, `/services/${serviceId}`));
+      }
       lastService = service;
 
       const buildStatus = service.status?.build?.status ?? service.buildStatus;

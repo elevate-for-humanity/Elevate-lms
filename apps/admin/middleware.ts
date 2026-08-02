@@ -35,6 +35,14 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // Explicitly allow course-builder and cfd-studio before IP check
+  if (
+    pathname.startsWith('/admin/course-builder') ||
+    pathname.startsWith('/admin/cfd-studio')
+  ) {
+    return NextResponse.next();
+  }
+
   // Check IP guard first
   const ipBlocked = checkAdminIP(req);
   if (ipBlocked) return ipBlocked;

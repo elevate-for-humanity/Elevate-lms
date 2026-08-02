@@ -2,12 +2,12 @@
   "name": "Elevate Admin Portal",
   "short_name": "Admin Portal",
   "description": "Program management, compliance, and workforce development operations",
-  "start_url": "/admin/dashboard",
-  "scope": "/admin/",
+  "start_url": "/dashboard",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#1a2e3e",
-  "orientation": "portrait-primary",
+  "theme_color": "#f97316",
+  "orientation": "any",
   "icons": [
     {
       "src": "/logo.png",
@@ -23,14 +23,15 @@
     }
   ],
   "categories": [
+    "business",
     "productivity"
   ],
   "shortcuts": [
     {
-      "name": "Ellie (Dev Studio)",
+      "name": "Dev Studio",
       "short_name": "Ellie",
       "description": "AI assistant for deploys, ops, and platform fixes",
-      "url": "/admin/dev-studio?tab=ellie",
+      "url": "/admin/studio?tab=ellie",
       "icons": [
         {
           "src": "/favicon.ico",
@@ -43,7 +44,7 @@
       "name": "Applications",
       "short_name": "Applications",
       "description": "Review pending applications",
-      "url": "/admin/applications?status=submitted",
+      "url": "/applications?status=submitted",
       "icons": [
         {
           "src": "/favicon.ico",
@@ -56,7 +57,7 @@
       "name": "Compliance",
       "short_name": "Compliance",
       "description": "Check compliance alerts",
-      "url": "/admin/compliance",
+      "url": "/compliance",
       "icons": [
         {
           "src": "/favicon.ico",
@@ -69,7 +70,7 @@
       "name": "Documents",
       "short_name": "Documents",
       "description": "Review pending documents",
-      "url": "/admin/documents/review",
+      "url": "/documents/review",
       "icons": [
         {
           "src": "/favicon.ico",

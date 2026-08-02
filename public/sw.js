@@ -2,7 +2,9 @@
 // CACHE_VERSION is replaced at build time by scripts/stamp-sw.mjs.
 // Bump this manually when deploying fixes that must bypass stale cache.
 const CACHE_VERSION =
-  "elevate-v1776518314917";
+  "elevate-v1776550800000";
+
+const CDN = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images';
 
 const STATIC_CACHE = `elevate-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `elevate-dynamic-${CACHE_VERSION}`;
@@ -13,8 +15,8 @@ const OFFLINE_URL = '/offline.html';
 const PRECACHE_ASSETS = [
   '/',
   '/offline.html',
-  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
-  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-512.png',
+  `${CDN}/icons/admin-192.png`,
+  `${CDN}/icons/admin-512.png`,
   '/manifest.webmanifest',
 ];
 
@@ -290,8 +292,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || 'You have a new notification',
-    icon: data.icon || 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
-    badge: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png',
+    icon: data.icon || `${CDN}/icons/admin-192.png`,
+    badge: `${CDN}/icons/admin-96.png`,
     vibrate: [100, 50, 100],
     tag: data.tag || 'default',
     renotify: true,

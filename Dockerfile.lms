@@ -54,20 +54,18 @@ RUN addgroup -g 1001 nodejs \
     && adduser -S -u 1001 -G nodejs nextjs
 
 # Copy standalone output - this includes the server and required files
-COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/standalone ./standalone
-COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/standalone/package.json ./
-
-# Copy static assets
-COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/static ./standalone/.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/server ./standalone/.next/server
-COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/public ./standalone/public
+# The standalone output from Next.js already contains: server.js, .next/, public/
+# DO NOT overwrite these with additional copies
+COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/standalone ./
 
 # Copy node_modules for the server to work - need next from builder stage
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/lms/node_modules ./apps/lms/node_modules
 
-RUN if [ -f "/app/standalone/apps/lms/server.js" ]; then \
-      echo "Found server.js at /app/standalone/apps/lms/server.js"; \
+RUN if [ -f "./apps/lms/server.js" ]; then \
+      echo "Found server.js at ./apps/lms/server.js"; \
+    elif [ -f "./standalone/apps/lms/server.js" ]; then \
+      echo "Found server.js at ./standalone/apps/lms/server.js"; \
     else \
       echo "ERROR: No runnable server.js in runtime image"; \
       find /app -maxdepth 5 -name "server.js" -print; \
@@ -78,4 +76,4 @@ USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "standalone/apps/lms/server.js"]
+CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "apps/lms/server.js"]

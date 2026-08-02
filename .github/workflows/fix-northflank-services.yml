@@ -1,0 +1,113 @@
+name: Fix Northflank Services
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+  NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+  NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+
+jobs:
+  fix-all-services:
+    name: Fix all 3 Northflank services
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Set Git SHA for deployment
+        run: |
+          echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          echo "BUILD_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          echo "Using SHA: ${{ github.sha }}"
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Fix all 3 Northflank services
+        run: pnpm tsx scripts/northflank/configure-nf-service.ts --all --execute
+
+      - name: Restart all 3 services
+        run: |
+          pnpm tsx scripts/northflank/restart-service.ts elevate-marketing
+          pnpm tsx scripts/northflank/restart-service.ts elevate-admin
+          pnpm tsx scripts/northflank/restart-service.ts elevate-lms
+
+      - name: Verify Marketing
+        run: |
+          echo "Waiting 30s for restart to begin..."
+          sleep 30
+          for i in $(seq 1 30); do
+            status=$(curl -sk --max-time 10 -o /tmp/mkt-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/health || true)
+            body=$(cat /tmp/mkt-health.json 2>/dev/null || true)
+            if [ "$status" = "200" ] && echo "$body" | grep -qE '"status":"healthy"'; then
+              echo "✓ Marketing /api/health OK (HTTP $status)"
+              echo "$body"
+              exit 0
+            fi
+            echo "Attempt $i/30: Marketing not ready (HTTP $status). Retrying..."
+            sleep 20
+          done
+          echo "Marketing not ready after 30 retries"
+          exit 1
+
+      - name: Verify Admin
+        run: |
+          for i in $(seq 1 30); do
+            status=$(curl -sk --max-time 10 -o /tmp/adm-health.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/health || true)
+            body=$(cat /tmp/adm-health.json 2>/dev/null || true)
+            if [ "$status" = "200" ] && echo "$body" | grep -qE '"status":"healthy"'; then
+              echo "✓ Admin /api/health OK (HTTP $status)"
+              echo "$body"
+              exit 0
+            fi
+            echo "Attempt $i/30: Admin not ready (HTTP $status). Retrying..."
+            sleep 20
+          done
+          echo "Admin not ready after 30 retries"
+          exit 1
+
+      - name: Verify LMS
+        run: |
+          for i in $(seq 1 30); do
+            status=$(curl -sk --max-time 10 -o /tmp/lms-health.json -w "%{http_code}" https://app.elevateforhumanity.org/api/health || true)
+            body=$(cat /tmp/lms-health.json 2>/dev/null || true)
+            if [ "$status" = "200" ] && echo "$body" | grep -qE '"status":"healthy"'; then
+              echo "✓ LMS /api/health OK (HTTP $status)"
+              echo "$body"
+              exit 0
+            fi
+            echo "Attempt $i/30: LMS not ready (HTTP $status). Retrying..."
+            sleep 20
+          done
+          echo "LMS not ready after 30 retries"
+          exit 1
+
+      - name: Report
+        run: |
+          echo "=========================================="
+          echo "✅ ALL 3 NORTHFLANK SERVICES FIXED"
+          echo "=========================================="
+          echo "- CI/CD disabled on all services"
+          echo "- Health probes: startup(15s) + readiness(5s) + liveness(disabled)"
+          echo "- Strategy: recreate"
+          echo "- Storage: 8GB per service"
+          echo "- All services restarted with /api/health on port 3000"

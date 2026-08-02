@@ -53,7 +53,7 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#020617",
+  themeColor: "#f97316",
 };
 
 export default async function AdminGroupLayout({

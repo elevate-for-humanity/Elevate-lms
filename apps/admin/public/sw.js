@@ -1,11 +1,12 @@
-const BUILD_ID = "elevate-admin-v1";
+const BUILD_ID = "elevate-admin-v2";
+const CDN = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images';
 const STATIC_CACHE = `${BUILD_ID}-static`;
 
 const STATIC_ASSETS = [
-  "/admin/install",
-  "/icons/admin-192.png",
-  "/icons/admin-512.png",
-  "/icons/admin-maskable-512.png",
+  "/install",
+  `${CDN}/icons/admin-192.png`,
+  `${CDN}/icons/admin-512.png`,
+  `${CDN}/icons/admin-512-maskable.png`,
 ];
 
 self.addEventListener("install", (event) => {

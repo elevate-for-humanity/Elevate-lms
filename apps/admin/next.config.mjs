@@ -72,16 +72,18 @@ const adminConfig = {
       config.cache = false;
     }
     // Browser polyfill for @webcontainer/api and other Node.js modules
+    // Use config.compiler.webpack (Next.js exposes webpack internals here)
     if (!isServer) {
-      // Use require() to get webpack's ProvidePlugin (not config.compiler.webpack)
-      const { ProvidePlugin } = require('webpack');
-      config.plugins = config.plugins || [];
-      config.plugins.push(
-        new ProvidePlugin({
-          Buffer: ['buffer', 'Buffer'],
-          buffer: 'buffer',
-        })
-      );
+      const webpack = config.compiler?.webpack;
+      if (webpack?.ProvidePlugin) {
+        config.plugins = config.plugins || [];
+        config.plugins.push(
+          new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+            buffer: 'buffer',
+          })
+        );
+      }
     }
     return config;
   },

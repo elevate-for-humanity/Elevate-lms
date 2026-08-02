@@ -41,10 +41,11 @@ permissions:
   contents: read
 
 # FIX #1: Use separate concurrency group - marketing deploys INDEPENDENTLY
-# FIX #2: cancel-in-progress: false to prevent ambiguous states during rollout
+# FIX #2: cancel-in-progress: true — cancels old queued/in-progress runs so only the
+# latest push deploys. Prevents multiple containers building for stale commits.
 concurrency:
   group: northflank-marketing-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   EXPECTED_SHA: ${{ github.sha }}

@@ -42,9 +42,11 @@ permissions:
   contents: read
 
 # FIXED: Use separate concurrency group - LMS deploys INDEPENDENTLY
+# cancel-in-progress: true — cancels old queued/in-progress runs so only the
+# latest push deploys. Prevents multiple containers building for stale commits.
 concurrency:
   group: northflank-lms-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy-lms:

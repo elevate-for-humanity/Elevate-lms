@@ -57,7 +57,7 @@ export function AdminFooter() {
                 </a>
               </li>
               <li>
-                <a href="https://lms.elevateforhumanity.org" target="_blank" rel="noopener noreferrer" 
+                <a href="https://app.elevateforhumanity.org" target="_blank" rel="noopener noreferrer" 
                    className="text-slate-400 hover:text-white text-sm transition-colors flex items-center gap-1">
                   Student LMS <ExternalLink className="w-3 h-3" />
                 </a>

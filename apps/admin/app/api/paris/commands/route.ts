@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/with-auth';
+import type { AuthHandler } from '@/types/auth';
 
 // Command parser patterns
 const COMMAND_PATTERNS = {
@@ -231,10 +233,10 @@ async function executeCommand(
   }
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, _ctx: { params: Promise<Record<string, string>> }, user) => {
   try {
     const body = await request.json();
-    const { command, userId, context } = body;
+    const { command, context } = body;
 
     if (!command || typeof command !== 'string') {
       return NextResponse.json({ 
@@ -250,7 +252,7 @@ export async function POST(request: NextRequest) {
     const result = await executeCommand(
       parsed.intent,
       parsed.entities,
-      userId
+      user.id
     );
 
     // Log command to history (would save to database)
@@ -259,7 +261,7 @@ export async function POST(request: NextRequest) {
       command,
       parsed,
       result,
-      userId,
+      user.id,
       timestamp: new Date().toISOString(),
     };
 
@@ -282,7 +284,7 @@ export async function POST(request: NextRequest) {
       error: 'Internal server error' 
     }, { status: 500 });
   }
-}
+} as AuthHandler);
 
 export async function GET() {
   return NextResponse.json({

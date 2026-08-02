@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/with-auth';
+import type { AuthHandler } from '@/types/auth';
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -88,9 +90,9 @@ export async function GET(
   }
 }
 
-export async function POST(
+export const POST = withAuth(async (
   request: NextRequest,
-) {
+) => {
   try {
     const input =
       (await request.json()) as WebsiteContentInput;
@@ -169,4 +171,4 @@ export async function POST(
       },
     );
   }
-}
+});

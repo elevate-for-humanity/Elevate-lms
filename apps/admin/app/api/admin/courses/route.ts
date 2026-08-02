@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/with-auth';
+import type { AuthHandler } from '@/types/auth';
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,7 +30,7 @@ function getConfiguration() {
   };
 }
 
-export async function GET() {
+export const GET = withAuth(async () => {
   try {
     const { url, serviceRole } =
       getConfiguration();
@@ -65,11 +67,11 @@ export async function GET() {
       },
     );
   }
-}
+} as AuthHandler);
 
-export async function POST(
+export const POST = withAuth(async (
   request: NextRequest,
-) {
+) => {
   try {
     const input =
       (await request.json()) as CourseInput;
@@ -136,4 +138,4 @@ export async function POST(
       },
     );
   }
-}
+} as AuthHandler);

@@ -39,7 +39,7 @@ export async function bulkUpdateCourseStatus(
   });
 
   revalidatePath('/courses');
-  revalidatePath('/admin/courses/bulk-operations');
+  revalidatePath('/admin/studio/courses/bulk-operations');
   return { success: true };
 }
 

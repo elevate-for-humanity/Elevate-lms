@@ -127,7 +127,7 @@ export async function updateWOTCApplication(id: string, formData: FormData) {
   });
 
   revalidatePath('/wotc');
-  revalidatePath(`/admin/wotc/${id}`);
+  revalidatePath(`/wotc/${id}`);
   redirect('/wotc');
 }
 
@@ -205,7 +205,7 @@ export async function updateWOTCStatus(id: string, status: string, notes?: strin
   }
 
   revalidatePath('/wotc');
-  revalidatePath(`/admin/wotc/${id}`);
+  revalidatePath(`/wotc/${id}`);
   return { success: true };
 }
 

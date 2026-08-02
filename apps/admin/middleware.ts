@@ -38,7 +38,7 @@ export async function middleware(req: NextRequest) {
   // Explicitly allow course-builder and cfd-studio before IP check
   if (
     pathname.startsWith('/admin/course-builder') ||
-    pathname.startsWith('/admin/cfd-studio')
+    pathname.startsWith('/cfd-studio')
   ) {
     return NextResponse.next();
   }

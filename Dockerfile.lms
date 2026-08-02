@@ -66,8 +66,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/public ./standalone/publ
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/lms/node_modules ./apps/lms/node_modules
 
-RUN if [ -f "/app/standalone/server.js" ]; then \
-      echo "Found server.js at /app/standalone/server.js"; \
+RUN if [ -f "/app/standalone/apps/lms/server.js" ]; then \
+      echo "Found server.js at /app/standalone/apps/lms/server.js"; \
     else \
       echo "ERROR: No runnable server.js in runtime image"; \
       find /app -maxdepth 5 -name "server.js" -print; \
@@ -78,4 +78,4 @@ USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "standalone/server.js"]
+CMD ["node", "--max-old-space-size=4096", "--max-http-header-size=32768", "standalone/apps/lms/server.js"]

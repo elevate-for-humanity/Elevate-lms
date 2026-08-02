@@ -54,33 +54,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/api/admin') ||
     pathname.startsWith('/api/staff') ||
     pathname.startsWith('/api/devstudio') ||
-    pathname.startsWith('/api/platform') ||
-    pathname.startsWith('/dashboard') ||
-    pathname.startsWith('/students') ||
-    pathname.startsWith('/applications') ||
-    pathname.startsWith('/programs') ||
-    pathname.startsWith('/funding') ||
-    pathname.startsWith('/partners') ||
-    pathname.startsWith('/crm') ||
-    pathname.startsWith('/compliance') ||
-    pathname.startsWith('/settings') ||
-    pathname.startsWith('/notifications') ||
-    pathname.startsWith('/billing') ||
-    pathname.startsWith('/enrollments') ||
-    pathname.startsWith('/staff') ||
-    pathname.startsWith('/employers') ||
-    pathname.startsWith('/credentials') ||
-    pathname.startsWith('/testing') ||
-    pathname.startsWith('/credentials') ||
-    pathname.startsWith('/certificates') ||
-    pathname.startsWith('/testing-center') ||
-    pathname.startsWith('/accreditation') ||
-    pathname.startsWith('/host-shop') ||
-    pathname.startsWith('/cohorts') ||
-    pathname.startsWith('/instructors') ||
-    pathname.startsWith('/contracts') ||
-    pathname.startsWith('/affiliates') ||
-    pathname.startsWith('/providers');
+    pathname.startsWith('/api/platform');
 
   if (!isProtected) return NextResponse.next();
 

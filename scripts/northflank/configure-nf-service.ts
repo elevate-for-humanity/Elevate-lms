@@ -74,7 +74,6 @@ const HEALTH_CHECKS = [
     periodSeconds: 10,
     timeoutSeconds: 5,
     failureThreshold: 18,
-    successThreshold: 1,
   },
   {
     protocol: 'HTTP',
@@ -116,7 +115,9 @@ async function patchService(
     disabledCI: true,
     // Deployment strategy: recreate (kill old before starting new)
     deployment: {
-      strategy: 'recreate',
+      strategy: {
+        type: 'recreate',
+      },
     },
     // Health checks: startup + readiness probes
     healthChecks: HEALTH_CHECKS,

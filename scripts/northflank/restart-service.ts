@@ -1,10 +1,10 @@
 #!/usr/bin/env tsx
 /**
- * Restart a Northflank combined service (redeploy current build).
- * 
+ * Restart a Northflank combined service (redeploy currently deployed image).
+ *
  * After patching service config (health checks, CI/CD, strategy), this script
- * triggers a clean restart using the currently deployed image.
- * 
+ * triggers a clean restart using the currently deployed image (no new build).
+ *
  * Usage:
  *   pnpm tsx scripts/northflank/restart-service.ts elevate-marketing
  *   pnpm tsx scripts/northflank/restart-service.ts elevate-admin
@@ -27,26 +27,13 @@ async function main() {
     process.exit(1);
   }
 
-  // Get current deployed SHA
-  let currentSha = process.env.GITHUB_SHA;
-  if (currentSha) {
-    console.info(`Using GITHUB_SHA: ${currentSha.slice(0, 12)}...`);
-  }
+  // Use combined service endpoint - redeploys the currently deployed image
+  const endpoint = projectApiPath(projectId, `/services/combined/${serviceId}/deployment`);
 
-  const endpoint = projectApiPath(projectId, `/services/${serviceId}/deployment`);
-
-  // Trigger restart with current SHA (or let Northflank use current deployed image)
-  const payload: Record<string, unknown> = {
+  // Trigger restart - Northflank redeploys the current image (no new build needed)
+  const payload = {
     docker: { configType: 'default' },
   };
-
-  if (currentSha) {
-    (payload as Record<string, unknown>).internal = {
-      id: serviceId,
-      branch: 'main',
-      buildSHA: currentSha,
-    };
-  }
 
   console.info(`POST ${endpoint}`);
   console.info(`Payload: ${JSON.stringify(payload)}`);

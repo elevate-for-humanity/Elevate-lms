@@ -50,10 +50,67 @@ const BUILD_FAILURE_STATUSES = new Set([
   'SUBMISSION_FAILURE',
 ]);
 const BUILD_DONE_STATUSES = new Set(['SUCCESS', 'COMPLETED', 'SKIPPED']);
-// PENDING is included because Northflank combined services sometimes report
-// deployment status as PENDING even after containers are running and healthy.
-const DEPLOY_READY_STATUSES = new Set(['COMPLETED', 'RUNNING', 'SUCCESS', 'PENDING']);
+const DEPLOY_READY_STATUSES = new Set(['COMPLETED', 'RUNNING', 'SUCCESS']);
 const DEPLOY_FAILURE_STATUSES = new Set(['FAILED', 'ERROR']);
+
+// Map service IDs to their health check URLs
+const SERVICE_HEALTH_URLS: Record<string, string> = {
+  'elevate-marketing': 'https://www.elevateforhumanity.org/api/health',
+  'elevate-lms': 'https://app.elevateforhumanity.org/api/ping',
+  'elevate-admin': 'https://admin.elevateforhumanity.org/api/ping',
+};
+
+// Map service IDs to their expected commit SHA (from GITHUB_SHA env var)
+function getExpectedSha(): string {
+  return (
+    process.env.GITHUB_SHA ||
+    process.env.BUILD_SHA ||
+    process.env.NEXT_PUBLIC_GIT_SHA ||
+    ''
+  );
+}
+
+/**
+ * Check if the service health endpoint returns a successful response.
+ * This is the definitive test for whether the new container image is running.
+ */
+async function checkHttpHealth(serviceId: string, commitSha: string): Promise<{ ok: boolean; currentCommit: string; error?: string }> {
+  const url = SERVICE_HEALTH_URLS[serviceId];
+  if (!url) return { ok: false, currentCommit: '', error: 'no health URL configured' };
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'wait-service/1.0' },
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      return { ok: false, currentCommit: '', error: `HTTP ${res.status}` };
+    }
+
+    const body = await res.json().catch(() => ({}));
+    const currentCommit = body.commit || body.buildId || '';
+
+    // If we have an expected SHA, verify it matches
+    if (commitSha && currentCommit && !currentCommit.startsWith(commitSha.slice(0, 7))) {
+      return {
+        ok: false,
+        currentCommit,
+        error: `commit mismatch: expected ${commitSha.slice(0, 7)}, got ${currentCommit.slice(0, 7)}`,
+      };
+    }
+
+    return { ok: true, currentCommit };
+  } catch (err: any) {
+    if (err.name === 'AbortError') {
+      return { ok: false, currentCommit: '', error: 'timeout' };
+    }
+    return { ok: false, currentCommit: '', error: err.message || String(err) };
+  }
+}
 
 function resolveServicePhase(service: ServiceStatus): string {
   const build = service.status?.build?.status ?? service.buildStatus;
@@ -313,8 +370,22 @@ async function main() {
       }
 
       if (buildDone && deployReady) {
-        console.log(`${serviceId}: service ready ✅`);
-        process.exit(0);
+        // Build and deployment status say ready — but verify with HTTP health check
+        // to confirm the new container image is actually running. This prevents false
+        // positives where PENDING or stale containers are reported as ready.
+        const expectedSha = getExpectedSha();
+        if (expectedSha) {
+          console.log(`${serviceId}: build/deploy ready — checking HTTP health (expecting ${expectedSha.slice(0, 7)})...`);
+          const health = await checkHttpHealth(serviceId, expectedSha);
+          if (health.ok) {
+            console.log(`${serviceId}: service ready ✅ (commit: ${health.currentCommit.slice(0, 7) || 'unknown'})`);
+            process.exit(0);
+          }
+          console.log(`${serviceId}: health check: ${health.error} — containers may still be starting, waiting...`);
+        } else {
+          console.log(`${serviceId}: service ready ✅ (no SHA to verify)`);
+          process.exit(0);
+        }
       }
 
       if (DEPLOY_FAILURE_STATUSES.has(deploy ?? '')) {

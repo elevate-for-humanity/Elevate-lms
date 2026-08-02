@@ -67,7 +67,7 @@ export const GET = withAuth(async () => {
       },
     );
   }
-} as AuthHandler);
+});
 
 export const POST = withAuth(async (
   request: NextRequest,
@@ -138,4 +138,4 @@ export const POST = withAuth(async (
       },
     );
   }
-} as AuthHandler);
+});

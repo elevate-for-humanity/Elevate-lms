@@ -261,7 +261,7 @@ export const POST = withAuth(async (request: NextRequest, _ctx: { params: Promis
       command,
       parsed,
       result,
-      user.id,
+      userId: user.id,
       timestamp: new Date().toISOString(),
     };
 
@@ -284,7 +284,7 @@ export const POST = withAuth(async (request: NextRequest, _ctx: { params: Promis
       error: 'Internal server error' 
     }, { status: 500 });
   }
-} as AuthHandler);
+});
 
 export async function GET() {
   return NextResponse.json({

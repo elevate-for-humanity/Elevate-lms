@@ -1,9 +1,10 @@
 #!/usr/bin/env tsx
 /**
- * Restart a Northflank combined service (redeploy currently deployed image).
+ * Restart a Northflank combined service container.
  *
  * After patching service config (health checks, CI/CD, strategy), this script
- * triggers a clean restart using the currently deployed image (no new build).
+ * restarts the container using POST /services/{serviceId}/restart.
+ * No new build is triggered — uses the currently deployed image.
  *
  * Usage:
  *   pnpm tsx scripts/northflank/restart-service.ts elevate-marketing
@@ -27,23 +28,18 @@ async function main() {
     process.exit(1);
   }
 
-  // Use combined service endpoint - redeploys the currently deployed image
-  const endpoint = projectApiPath(projectId, `/services/combined/${serviceId}/deployment`);
+  // Restart endpoint: POST /services/{serviceId}/restart (no payload needed)
+  // This restarts the currently deployed container with the latest config
+  const endpoint = projectApiPath(projectId, `/services/${serviceId}/restart`);
 
-  // Trigger restart - Northflank redeploys the current image (no new build needed)
-  const payload = {
-    docker: { configType: 'default' },
-  };
-
-  console.info(`POST ${endpoint}`);
-  console.info(`Payload: ${JSON.stringify(payload)}`);
+  console.info(`POST ${endpoint} (restart currently deployed container)`);
 
   try {
     const result = await nfFetch(endpoint, {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: '{}',
     });
-    console.info(`[restart-ok] ${serviceId}:`, JSON.stringify(result).slice(0, 300));
+    console.info(`[restart-ok] ${serviceId}: restarted`);
   } catch (e) {
     const err = e instanceof Error ? e.message : String(e);
     console.error(`[restart-fail] ${serviceId}: ${err}`);
